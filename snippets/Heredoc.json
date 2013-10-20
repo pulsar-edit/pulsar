@@ -1,0 +1,6 @@
+{
+  "content": "<<<${1:HTML}\n${2:content here}\n$1;\n",
+  "name": "Heredoc",
+  "scope": "source.php",
+  "tabTrigger": "<<<"
+}

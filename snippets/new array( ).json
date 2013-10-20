@@ -1,0 +1,6 @@
+{
+  "content": "\\$${1:arrayName} = array('$2' => $3${4:,} $0);",
+  "name": "$… = array (…)",
+  "scope": "source.php",
+  "tabTrigger": "array"
+}

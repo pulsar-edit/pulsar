@@ -1,0 +1,6 @@
+{
+  "content": "<?${TM_PHP_OPEN_TAG:php} foreach (\\$${1:variable} as \\$${2:key}${3: => \\$${4:value}}): ?>\n\t${0}\n<?${TM_PHP_OPEN_TAG:php} endforeach ?>",
+  "name": "<?php foreach (…) … <?php endforeach ?>",
+  "scope": "text.html.php",
+  "tabTrigger": "foreach"
+}

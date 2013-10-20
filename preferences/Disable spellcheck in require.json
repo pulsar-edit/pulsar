@@ -1,0 +1,7 @@
+{
+  "name": "Disable spellcheck in require",
+  "scope": "meta.include.php string.quoted",
+  "settings": {
+    "spellChecking": 0
+  }
+}

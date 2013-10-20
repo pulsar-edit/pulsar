@@ -1,0 +1,6 @@
+{
+  "content": "switch (${1:variable}) {\n\tcase '${2:value}':\n\t\t${3:# code...}\n\t\tbreak;\n\t$0\n\tdefault:\n\t\t${4:# code...}\n\t\tbreak;\n}",
+  "name": "switch …",
+  "scope": "source.php",
+  "tabTrigger": "switch"
+}

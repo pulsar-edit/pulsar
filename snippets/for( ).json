@@ -1,0 +1,6 @@
+{
+  "content": "for (\\$${1:i}=${2:0}; \\$${1:i} < $3; \\$${1:i}++) { \n\t${0:# code...}\n}",
+  "name": "for …",
+  "scope": "source.php",
+  "tabTrigger": "for"
+}

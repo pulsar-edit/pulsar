@@ -1,0 +1,7 @@
+{
+  "name": "Indentation: Arrays",
+  "scope": "source.php meta.array.php",
+  "settings": {
+    "decreaseIndentPattern": "(?x)\n\t    ^ (.* \\*/)? \\s*\n\t    (\\)+)\n\t"
+  }
+}

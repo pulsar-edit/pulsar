@@ -1,0 +1,6 @@
+{
+  "content": "<?${TM_PHP_OPEN_TAG_WITH_ECHO:php echo} ${1:\\$var} ?>$0",
+  "name": "<?php echo … ?>",
+  "scope": "text.html.php",
+  "tabTrigger": "echo"
+}

@@ -1,0 +1,6 @@
+{
+  "content": "/**\n * $0\n */",
+  "name": "Start Docblock",
+  "scope": "source.php",
+  "tabTrigger": "/**"
+}

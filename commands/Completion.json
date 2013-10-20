@@ -1,0 +1,10 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby -wKU\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/osx/plist'\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/ui'\n\nchoices = OSX::PropertyList.load(File.read(ENV['TM_BUNDLE_SUPPORT'] + '/functions.plist'))\nTextMate::UI.complete(choices, :initial_filter => ENV['TM_CURRENT_WORD'], :extra_chars => '_')\n",
+  "fallbackInput": "word",
+  "input": "selection",
+  "keyEquivalent": "~\u001b",
+  "name": "Completions for Word…",
+  "output": "showAsTooltip",
+  "scope": "source.php"
+}

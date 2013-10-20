@@ -1,0 +1,15 @@
+{
+  "autoScrollOutput": true,
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/sh\n/usr/bin/env ruby -- \"$TM_BUNDLE_SUPPORT/lib/php_mate.rb\"",
+  "input": "document",
+  "inputFormat": "text",
+  "keyEquivalent": "@R",
+  "name": "Run",
+  "outputCaret": "afterOutput",
+  "outputFormat": "html",
+  "outputLocation": "newWindow",
+  "scope": "source.php",
+  "semanticClass": "process.run.php",
+  "version": 2
+}

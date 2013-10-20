@@ -1,0 +1,48 @@
+<script type="text/javascript" charset="utf-8">/* <![CDATA[ */
+function scanErrors() {
+    // Scan the document for tags identifiable as PHP errors
+    // The default PHP error markup is as follows:
+    // 	 <br />
+    // <b>Fatal error</b>:  (error message) in <b>(file path)</b> on line <b>(line number)</b><br />
+    // This script scans all the <b> tags in the document and checks their contents for an error type
+    // The filename and line number to open are taken from the following 2 <b> tags
+    // The error is wrapped in a div to make it available for styling
+    bolds = document.getElementsByTagName('b');
+    for (index = 0; index < bolds.length; index++) {
+        if (bolds[index].innerText.match('(Strict Standards|Warning|Notice|(Parse|Fatal) error)')) {
+            // Step back to the <br />, the start of the error dump
+            current_node = bolds[index].previousSibling.previousSibling;
+
+            wrapper = document.createElement('div');
+            wrapper.className = 'php_error_wrapper';
+            wrapper_parent = current_node.parentNode;
+            wrapper_parent.appendChild(wrapper);
+
+            for (child = 0; child < 7; child++) {
+                // Handle wrapping for require errors
+                if (current_node.tagName == 'A') child -= 2;
+                next_node = current_node.nextSibling;
+                wrapper.appendChild(current_node);
+                if (!(current_node = next_node)) break;
+            }
+
+            link = document.createElement('a');
+            link.href = 'txmt://open?url=file://' + bolds[index-0+1].innerText + '&line=' + bolds[index-0+2].innerText;
+            link.innerText = '[Open in TextMate]';
+            wrapper.appendChild(document.createTextNode(' '));
+            wrapper.appendChild(link);
+        }
+    }
+}
+// Add the onLoad event, preserving existing onLoad functions
+var currentload = window.onload;
+if (typeof window.onload != 'function') {
+    window.onload = scanErrors;
+} else {
+    window.onload = function(){
+        currentload();
+        scanErrors();
+    }
+}
+/* ]]> */
+</script>

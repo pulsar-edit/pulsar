@@ -1,0 +1,10 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby\n\nnext_line = STDIN.read.to_a[ENV['TM_LINE_NUMBER'].to_i..-1].join(\"\\n\").strip[/.+$/]\n\nputs '/**'\n\n@tags = []\ntype = ''\nauthor = true\n\ndef tag(tag, default, trailing = nil)\n  @tags << {:tag => tag, :default => default, :trailing => trailing}\nend\n\ncase next_line\nwhen /(class|interface)/\n  type = $&\n  tag 'package', 'default'\nwhen /function\\s*(\\w+)\\((.*)\\)/\n  function_name, args = $1, $2\n  type = 'function'\n  args.split(/,/).each do |arg|\n    arg.strip =~ /(?:(\\w+)\\s*)?\\$([A-z0-9]+)/\n    tag 'param', $1 || 'string', \"\\\\$\" + $2\n  end\n  tag 'return', 'void' unless function_name == '__construct'\nwhen /const|define/\n  type = 'constant'\n  author = false\nwhen /var|p(ublic|rivate|rotected)\\s*\\$/\n  type = 'variable'\n  tag 'var', 'string'\n  author = false\nend\n\nputs \" * ${1:undocumented #{type}}\"\nputs ' *' if @tags.size > 0 or author\n\nplaceholder = 1\n@tags.each do |tag|\n  placeholder += 1\n  if tag[:trailing]\n    puts \" * @#{tag[:tag]} ${#{placeholder}:#{tag[:default]}} #{tag[:trailing] } \\$#{placeholder += 1}\"\n  else\n    puts \" * @#{tag[:tag]} ${#{placeholder}:#{tag[:default]}}\"\n  end\nend\n\nputs ' * @author ${PHPDOC_AUTHOR:$TM_FULLNAME}$' + (placeholder + 1).to_s if author\nprint ' */$0'",
+  "fallbackInput": "scope",
+  "input": "document",
+  "name": "Post-doc",
+  "output": "insertAsSnippet",
+  "scope": "source.php",
+  "tabTrigger": "doc"
+}

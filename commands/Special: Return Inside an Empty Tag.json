@@ -1,0 +1,14 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/usr/bin/env bash\n[[ -f \"${TM_SUPPORT_PATH}/lib/bash_init.sh\" ]] && . \"${TM_SUPPORT_PATH}/lib/bash_init.sh\"\n\nexit_insert_snippet \"\n\\$0\n?\"",
+  "fallbackInput": "scope",
+  "input": "selection",
+  "inputFormat": "text",
+  "keyEquivalent": "\r",
+  "name": "Special: Return Inside an Empty Tag",
+  "outputCaret": "afterOutput",
+  "outputFormat": "snippet",
+  "outputLocation": "replaceInput",
+  "scope": "meta.special.empty-tag.php",
+  "version": 2
+}

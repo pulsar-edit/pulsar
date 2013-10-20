@@ -1,0 +1,7 @@
+{
+  "name": "Symbols List: Indent Functions",
+  "scope": "entity.name.function.php, support.function.magic.php",
+  "settings": {
+    "symbolTransformation": "\n      s/^/ /;  # pad\n   "
+  }
+}

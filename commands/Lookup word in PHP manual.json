@@ -1,0 +1,15 @@
+{
+  "beforeRunningCommand": "nop",
+  "bundlePath": "/Users/kumar/Library/Application Support/TextMate/Bundles/Custom.tmbundle",
+  "command": "#!/usr/bin/env bash\n[[ -f \"${TM_SUPPORT_PATH}/lib/bash_init.sh\" ]] && . \"${TM_SUPPORT_PATH}/lib/bash_init.sh\"\n\nif grep <<<${TM_CURRENT_WORD:-!} -Esq '^[a-zA-Z0-9_]+$'\n\tthen\n\t\tif URL=`grep -i \"^$TM_CURRENT_WORD=\" \"$TM_BUNDLE_SUPPORT/documentation.txt\"`\n\t\t\tthen\n\t\t\t\tURL=${URL:${#TM_CURRENT_WORD}+1}\n\t\t\telse\n\t\t\t\tURL=\"function.${TM_CURRENT_WORD//_/-}\"\n\t\tfi\n\t\tif [[ \"$PHP_MANUAL_LOCATION\" ]]\n\t\t\tthen\n\t\t\t\tif [[ ! -d \"$PHP_MANUAL_LOCATION\" ]]\n\t\t\t\t\tthen\n\t\t\t\t\t\texit_show_tool_tip \"Your PHP_MANUAL_LOCATION directory ($PHP_MANUAL_LOCATION) does not exist. See the bundle Help for setup instructions.\"\n\t\t\t\tfi\n\t\t\t\tif [[ ! -f \"$PHP_MANUAL_LOCATION/$URL.html\" ]]\n\t\t\t\t\tthen\n\t\t\t\t\t\texit_show_tool_tip \"No documentation found for '$TM_CURRENT_WORD'\"\n\t\t\t\tfi\n\t\t\t\t. \"$TM_SUPPORT_PATH/lib/webpreview.sh\"\n\t\t\t\thtml_header \"PHP Help\" \"${TM_FILENAME:-}\"\n\t\t\t\tcat <<-'HTML'\n\t\t\t\t<script type=\"text/javascript\" charset=\"utf-8\">\n\t\t\t\tfunction jump(page) {\n\t\t\t\t\tTextMate.isBusy = true;\n\t\t\t\t\tres = TextMate.system('cat \"$PHP_MANUAL_LOCATION\"/' + page, null).outputString;\n\t\t\t\t\tdocument.getElementById('php_help').innerHTML = res;\n\t\t\t\t\tTextMate.isBusy = false;\n\t\t\t\t\tsetupLinks();\n\n\t\t\t\t\thistoryList = document.getElementById('history_list');\n\t\t\t\t\tTextMate.log(historyList);\n\t\t\t\t\titem = document.createElement('option');\n\t\t\t\t\tTextMate.log(item);\n\t\t\t\t\titem.value = page;\n\t\t\t\t\tTextMate.log(page);\n\t\t\t\t\titem.innerText = res.match(/>(.+?)<\\/TITLE/i)[1];\n\t\t\t\t\thistoryList.appendChild(item);\n\t\t\t\t\titem.selected = true;\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tfunction setupLinks() {\n\t\t\t\t\tvar link, links = document.links;\n\t\t\t\t\tfor (i = 0; i < links.length; i++) {\n\t\t\t\t\t\tlink = links[i];\n\t\t\t\t\t\tif (matches = link.href.match(/^x-txmt-command:.+\\/(.+.html)$/)) {\n\t\t\t\t\t\t\tlink.href = 'javascript:jump(\"' + matches[1] + '\")';\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t</script>\n\t\t\t\tHTML\n\t\t\t\techo '<select id=\"history_list\" onchange=\"jump(this.options[this.selectedIndex].value)\"></select>'\n\t\t\t\techo '<div id=\"php_help\"></div>'\n\t\t\t\techo '<script>jump(\"'\"$URL\"'.html\");</script>'\n\t\t\t\thtml_footer\n\t\t\t\texit_show_html\n\t\t\telse URL=\"http://php.net/manual/en/$URL.php\"\n\t\tfi\n\t\texit_show_html \"<meta http-equiv='Refresh' content='0;URL=$URL'>\"\n\telse echo \"Nothing to lookup (hint: place the caret on a function name)\"\nfi",
+  "input": "none",
+  "inputFormat": "text",
+  "keyEquivalent": "^h",
+  "name": "Documentation for Word",
+  "outputCaret": "afterOutput",
+  "outputFormat": "text",
+  "outputLocation": "toolTip",
+  "scope": "source.php",
+  "semanticClass": "lookup.define.php",
+  "version": 2
+}

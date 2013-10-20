@@ -1,0 +1,6 @@
+{
+  "content": "else {\n\t${0:# code...}\n}",
+  "name": "else …",
+  "scope": "source.php",
+  "tabTrigger": "else"
+}

@@ -1,0 +1,6 @@
+{
+  "content": "\\$_COOKIE['${1:variable}']",
+  "name": "COOKIE['…']",
+  "scope": "source.php",
+  "tabTrigger": "$_"
+}

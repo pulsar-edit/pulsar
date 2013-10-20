@@ -1,0 +1,6 @@
+{
+  "content": "<?${TM_PHP_OPEN_TAG:php} if (${1:condition}): ?>\n\t$2\n<?${TM_PHP_OPEN_TAG:php} else: ?>\n\t$0\n<?${TM_PHP_OPEN_TAG:php} endif ?>",
+  "name": "<?php if (…) ?> … <?php else ?> … <?php endif ?>",
+  "scope": "text.html.php",
+  "tabTrigger": "ifelse"
+}

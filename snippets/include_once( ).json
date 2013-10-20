@@ -1,0 +1,6 @@
+{
+  "content": "include_once '${1:file}';$0",
+  "name": "include_once …",
+  "scope": "source.php",
+  "tabTrigger": "incl1"
+}

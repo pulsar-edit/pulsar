@@ -1,0 +1,6 @@
+{
+  "content": "<?${TM_PHP_OPEN_TAG:php} else: ?>",
+  "name": "<?php else: ?>",
+  "scope": "text.html.php",
+  "tabTrigger": "else"
+}

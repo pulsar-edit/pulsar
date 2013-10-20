@@ -1,0 +1,6 @@
+{
+  "content": "\\$_FILES['${1:variable}']",
+  "name": "FILES['…']",
+  "scope": "source.php",
+  "tabTrigger": "$_"
+}

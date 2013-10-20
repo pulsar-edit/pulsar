@@ -1,0 +1,6 @@
+{
+  "content": "${TM_CURRENT_LINE/(.*\\*\\/$)|.*?(\\/\\*(?!.*\\*\\/)).*|.*/(?1:\n:\n(?2: )* )/}",
+  "keyEquivalent": "\u0003",
+  "name": "Continue Block Comment",
+  "scope": "source.php comment.block"
+}

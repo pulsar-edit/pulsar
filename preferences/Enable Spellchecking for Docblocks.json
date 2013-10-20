@@ -1,0 +1,7 @@
+{
+  "name": "Enable Spellchecking for Docblocks",
+  "scope": "comment.block.documentation.phpdoc.php",
+  "settings": {
+    "spellChecking": 1
+  }
+}

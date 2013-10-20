@@ -1,0 +1,6 @@
+{
+  "content": "while (${1:$a <= 10}) {\n\t${0:# code...}\n}",
+  "name": "while …",
+  "scope": "source.php",
+  "tabTrigger": "while"
+}

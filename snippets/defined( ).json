@@ -1,0 +1,6 @@
+{
+  "content": "$1defined('$2')$0",
+  "name": "defined(…)",
+  "scope": "source.php",
+  "tabTrigger": "def?"
+}

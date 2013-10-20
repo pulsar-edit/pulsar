@@ -1,0 +1,8 @@
+{
+  "name": "Add goto labels to symbol list",
+  "scope": "entity.name.goto-label.php",
+  "settings": {
+    "showInSymbolList": 1,
+    "symbolTransformation": "s/$/:/a"
+  }
+}

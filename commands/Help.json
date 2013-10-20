@@ -1,0 +1,9 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": ". \"$TM_SUPPORT_PATH/lib/webpreview.sh\"\nhtml_header \"PHP Bundle Help\" \"PHP\"\n\"$TM_SUPPORT_PATH/lib/markdown_to_help.rb\" \"$TM_BUNDLE_SUPPORT/help.markdown\"\nhtml_footer\n",
+  "dontFollowNewOutput": true,
+  "input": "none",
+  "name": "Help",
+  "output": "showAsHTML",
+  "scope": "source.php"
+}

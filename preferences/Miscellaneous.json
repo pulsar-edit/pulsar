@@ -1,0 +1,24 @@
+{
+  "name": "Miscellaneous",
+  "scope": "source.php",
+  "settings": {
+    "highlightPairs": [
+      [
+        "(",
+        ")"
+      ],
+      [
+        "{",
+        "}"
+      ],
+      [
+        "[",
+        "]"
+      ],
+      [
+        "“",
+        "”"
+      ]
+    ]
+  }
+}

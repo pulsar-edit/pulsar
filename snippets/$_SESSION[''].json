@@ -1,0 +1,6 @@
+{
+  "content": "\\$_SESSION['${1:variable}']",
+  "name": "SESSION['…']",
+  "scope": "source.php",
+  "tabTrigger": "$_"
+}

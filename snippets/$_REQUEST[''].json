@@ -1,0 +1,6 @@
+{
+  "content": "\\$_REQUEST['${1:variable}']",
+  "name": "REQUEST['…']",
+  "scope": "source.php",
+  "tabTrigger": "$_"
+}

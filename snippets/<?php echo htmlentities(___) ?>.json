@@ -1,0 +1,6 @@
+{
+  "content": "<?${TM_PHP_OPEN_TAG_WITH_ECHO:php echo} htmlentities(${1:\\$var}, ENT_QUOTES, 'utf-8') ?>$0",
+  "name": "<?php echo htmlentities(…) ?>",
+  "scope": "text.html.php",
+  "tabTrigger": "echoh"
+}

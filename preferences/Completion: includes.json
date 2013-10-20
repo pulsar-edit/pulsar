@@ -1,0 +1,8 @@
+{
+  "name": "Completion: includes",
+  "scope": "meta.include.php string.quoted",
+  "settings": {
+    "completionCommand": "/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby <<-'RUBY'\npath = ENV[\"TM_CURRENT_LINE\"].to_s[0..ENV[\"TM_COLUMN_NUMBER\"].to_i-1].to_s[/['\"]([^'\"]+)['\"]/,1].to_s + \"*\"\nDir::chdir(File.dirname(ENV[\"TM_FILEPATH\"])) if ENV[\"TM_FILEPATH\"]\ninclude_paths = ENV[\"PHP_INCLUDE_PATH\"] ? ENV[\"PHP_INCLUDE_PATH\"].split(\":\") : [\".\"]\nmatches = include_paths.inject([]) do |res, include_path|\n  include_path << \"/\" unless include_path[-1] == ?/\n  res + Dir.glob(include_path + path).map {|file| \n  file[include_path.size..-1][/[^\\/]+$/] + (File.directory?(file) ? \"/\" : \"\")\n  }\nend\nputs matches.sort.uniq.join(\"\\n\")\nRUBY",
+    "disableDefaultCompletion": 1
+  }
+}

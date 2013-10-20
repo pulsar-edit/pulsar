@@ -1,0 +1,111 @@
+# This file is used to map words to PHP manual URLs
+
+# Control structures
+else=control-structures.else
+elseif=control-structures.elseif
+while=control-structures.while
+do=control-structures.do.while
+for=control-structures.for
+foreach=control-structures.foreach
+break=control-structures.break
+continue=control-structures.continue
+switch=control-structures.switch
+case=control-structures.switch
+declare=control-structures.declare
+if=language.control-structures
+
+# Constants
+__line__=language.constants.predefined
+__file__=language.constants.predefined
+__dir__=language.constants.predefined
+__function__=language.constants.predefined
+__class__=language.constants.predefined
+__method__=language.constants.predefined
+__namespace__=language.constants.predefined
+
+# OOP
+new=language.oop5.basic
+class=language.oop5.basic
+extends=language.oop5.basic
+construct=language.oop5.decon
+destruct=language.oop5.decon
+public=language.oop5.visibility
+private=language.oop5.visibility
+protected=language.oop5.visibility
+abstract=language.oop5.abstract
+interface=language.oop5.interfaces
+interfaces=language.oop5.interfaces
+autoload=language.oop5.autoload
+__autoload=language.oop5.autoload
+reflection=language.oop5.reflection
+::=language.oop5.paamayim.nekudotayim
+parent=keyword.parent
+final=language.oop5.final
+abstract=language.oop5.abstract
+
+# Exceptions
+try=language.exceptions
+catch=language.exceptions
+throw=language.exceptions
+
+# Language internals
+function=language.functions
+global=language.variables.scope
+
+# Types
+number=language.pseudo-types
+mixed=language.pseudo-types
+bool=language.types.boolean
+boolean=language.types.boolean
+int=language.types.integer
+integer=language.types.integer
+float=language.types.float
+string=language.types.string
+heredoc=language.types.string
+<<<=language.types.string
+object=language.types.object
+null=language.types.null
+
+# Streams
+php_stream_stat_path=streams.php-stream-stat-path
+php_stream_stat=streams.php-stream-stat
+php_stream_open_wrapper=streams.php-stream-open-wrapper
+php_stream_read=streams.php-stream-read
+php_stream_write=streams.php-stream-write
+php_stream_eof=streams.php-stream-eof
+php_stream_getc=streams.php-stream-getc
+php_stream_gets=streams.php-stream-gets
+php_stream_close=streams.php-stream-close
+php_stream_flush=streams.php-stream-flush
+php_stream_seek=streams.php-stream-seek
+php_stream_tell=streams.php-stream-tell
+php_stream_copy_to_stream=streams.php-stream-copy-to-stream
+php_stream_copy_to_mem=streams.php-stream-copy-to-mem
+php_stream_make_seekable=streams.php-stream-make-seekable
+php_stream_cast=streams.php-stream-cast
+php_stream_can_cast=streams.php-stream-can-cast
+php_stream_is_persistent=streams.php-stream-is-persistent
+php_stream_is=streams.php-stream-is
+php_stream_passthru=streams.php-stream-passthru
+php_register_url_stream_wrapper=streams.php-register-url-stream-wrapper
+php_unregister_url_stream_wrapper=streams.php-unregister-url-stream-wrapper
+php_stream_open_wrapper_ex=streams.php-stream-open-wrapper-ex
+php_stream_open_wrapper_as_file=streams.php-stream-open-wrapper-as-file
+php_stream_filter_register_factory=streams.php-stream-filter-register-factory
+php_stream_filter_unregister_factory=streams.php-stream-filter-unregister-factory
+php_stream_opendir=streams.php-stream-opendir
+php_stream_readdir=streams.php-stream-readdir
+php_stream_rewinddir=streams.php-stream-rewinddir
+php_stream_closedir=streams.php-stream-closedir
+php_stream_fopen_from_file=streams.php-stream-fopen-from-file
+php_stream_fopen_tmpfile=streams.php-stream-fopen-tmpfile
+php_stream_fopen_temporary_file=streams.php-stream-fopen-temporary-file
+php_stream_sock_open_from_socket=streams.php-stream-sock-open-from-socket
+php_stream_sock_open_host=streams.php-stream-sock-open-host
+php_stream_sock_open_unix=streams.php-stream-sock-open-unix
+    
+# Support classes
+dir=class.dir
+
+# Misc
+_=function.gettext

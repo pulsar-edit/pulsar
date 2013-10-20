@@ -1,0 +1,6 @@
+{
+  "content": "\\$GLOBALS['${1:variable}']${2: = }${3:something}${4:;}$0",
+  "name": "$GLOBALS['…']",
+  "scope": "source.php",
+  "tabTrigger": "globals"
+}

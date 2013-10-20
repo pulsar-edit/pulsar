@@ -1,0 +1,8 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": ". \"$TM_SUPPORT_PATH/lib/webpreview.sh\"\nhtml_header PHPDoc\n\nMarkdown.pl <<'EOF'\n\n# Snippets\n\nThis bundle contains snippets for use with [PHPDoc](http://phpdoc.org/).\n\n * `doc_c ` — Class\n * `doc_d ` — Define inline constant\n * `doc_f ` — Function\n * `doc_h ` — Document header\n * `doc_i ` — Interface class\n * `doc_s ` — Abstract function signature\n * `doc_v ` — Class variable\n\nThere is also a command used for adding documentation to existing entities – move the caret before a class/interface, function, define or variable and use `doc⇥`.\n\n# Shell Variables\n\nThe snippets make use of two environment variables (_set these under Preferences &#x2192; Advanced &#x2192; Shell Variables_).\n\n * `TM_ORGANIZATION_NAME` — default value of @copyright [+ date]\n * `PHPDOC_AUTHOR` — default value of @author (realname will be used if not set)\n\nIf you want docblocks to automatically wrap after 80 columns, you need to set it up:\n\n1. Open the Bundle Editor (&#x2303;&#x2325;&#x2318;B)\n2. Find and select the “Wrap Docblock at 80 Characters” command\n3. Click in the white box next to “Key Equivalent” and press space\n4. Close the Bundle Editor\nEOF",
+  "input": "none",
+  "name": "Help",
+  "output": "showAsHTML",
+  "scope": "source.php"
+}
