@@ -1,0 +1,6 @@
+{
+  "content": "class ${1:${TM_FILENAME/(.+)\\..+|.*/(?1:\\L$1_t:name)/}}\n{\npublic:\n\t${1/(\\w+).*/$1/} (${2:arguments});\n\tvirtual ~${1/(\\w+).*/$1/} ();\n\nprivate:\n\t${0:/* data */}\n};",
+  "name": "Class",
+  "scope": "source.c++, source.objc++",
+  "tabTrigger": "cl"
+}

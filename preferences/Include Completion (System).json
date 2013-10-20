@@ -1,0 +1,8 @@
+{
+  "name": "Header Completion (System)",
+  "scope": "meta.preprocessor.c.include string.quoted.other.lt-gt.include",
+  "settings": {
+    "completionCommand": "\"$TM_BUNDLE_SUPPORT/bin/headers\" -p\"$TM_CURRENT_WORD\"",
+    "disableDefaultCompletion": 1
+  }
+}

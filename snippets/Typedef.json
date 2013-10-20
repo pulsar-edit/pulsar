@@ -1,0 +1,6 @@
+{
+  "content": "typedef ${1:int} ${2:MyCustomType};",
+  "name": "Typedef",
+  "scope": "source.c, source.objc, source.c++, source.objc++",
+  "tabTrigger": "td"
+}

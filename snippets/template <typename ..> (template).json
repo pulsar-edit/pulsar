@@ -1,0 +1,6 @@
+{
+  "content": "template <typename ${1:_InputIter}>",
+  "name": "template <typename …>",
+  "scope": "source.c++, source.objc++",
+  "tabTrigger": "tp"
+}

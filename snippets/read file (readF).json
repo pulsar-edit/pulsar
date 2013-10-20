@@ -1,0 +1,6 @@
+{
+  "content": "std::vector<char> v;\nif(FILE${TM_C_POINTER: *}fp = fopen(${1:\"filename\"}, \"r\"))\n{\n\tchar buf[1024];\n\twhile(size_t len = fread(buf, 1, sizeof(buf), fp))\n\t\tv.insert(v.end(), buf, buf + len);\n\tfclose(fp);\n}",
+  "name": "Read File Into Vector",
+  "scope": "source.c++, source.objc++",
+  "tabTrigger": "readfile"
+}

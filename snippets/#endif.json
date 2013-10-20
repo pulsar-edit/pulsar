@@ -1,0 +1,6 @@
+{
+  "content": "#endif\n",
+  "keyEquivalent": "~@.",
+  "name": "#endif",
+  "scope": "source.c, source.c++, source.objc, source.objc++, (source.c | source.c++ | source.objc | source.objc++) & comment.block.preprocessor"
+}

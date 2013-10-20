@@ -1,0 +1,6 @@
+{
+  "content": "int main (int argc, char const${TM_C_POINTER: *}argv[])\n{\n\t${0:/* code */}\n\treturn 0;\n}",
+  "name": "main()",
+  "scope": "source.c, source.objc, source.c++, source.objc++",
+  "tabTrigger": "main"
+}

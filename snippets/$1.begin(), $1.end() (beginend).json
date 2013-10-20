@@ -1,0 +1,6 @@
+{
+  "content": "${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), ${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()",
+  "name": "$1.begin(), $1.end()",
+  "scope": "source.c++, source.objc++",
+  "tabTrigger": "beginend"
+}

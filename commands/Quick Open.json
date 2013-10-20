@@ -1,0 +1,13 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby -wKU\n\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/textmate.rb'\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/ui.rb'\n\ndef header\n  if ENV.has_key? 'TM_SELECTED_TEXT'\n    [:all, ENV['TM_SELECTED_TEXT']]\n  elsif ENV['TM_CURRENT_LINE'] =~ /#\\s*(?:include|import)\\s*([<\"])(.*?)[\">]/;\n    [$1 == '<' ? :system : :user, $2]\n  else\n    defaultText = %x{ /usr/bin/pbpaste -pboard find }\n    header = TextMate::UI.request_string :title => \"Quick Open\", :default => defaultText, :prompt => \"Which header file do you wish to open?\"\n    [:all, header]\n  end\nend\n\ndef select_header(headers)\n  if headers.size > 1\n    menu = headers.map do |e|\n      header_name = $& if e =~ /[^\\/]+$/\n      if e =~ /\\.framework/\n        suffix = e.scan(/\\/([^\\/]+?).framework/).flatten.join(' → ')\n      else\n        suffix = File.split(e).first\n      end\n      { 'path' => e, 'title' => \"#{header_name} — #{suffix}\" }\n    end\n    if res = TextMate::UI.menu(menu)\n      res['path']\n    else\n      nil\n    end\n  else\n    headers.first\n  end\nend\n\ndomain, file = header()\nexit if file.nil?\n\nheaders = %x{ \"$TM_BUNDLE_SUPPORT/bin/headers\" -s #{e_sh file} -d #{domain} -C \"${TM_DIRECTORY}\" }.split(\"\\n\")\n\nif header = select_header(headers)\n  TextMate.go_to :file => header\nelsif headers.empty?\n  abort \"Unable to find ‘#{file}’.\"\nend\n",
+  "input": "none",
+  "inputFormat": "text",
+  "keyEquivalent": "@D",
+  "name": "Quick Open",
+  "outputCaret": "afterOutput",
+  "outputFormat": "text",
+  "outputLocation": "toolTip",
+  "scope": "source.c, source.objc, source.c++, source.objc++",
+  "version": 2
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Indentation Rules",
+  "scope": "source.c, source.c++, source.objc, source.objc++",
+  "settings": {
+    "decreaseIndentPattern": "(?x)\n\t    ^ \\s* ( (?! \\S.* /[*] ) .* [*]/ \\s* )? \\}\n\t|   ^ \\s* (public|private|protected): \\s* $\n\t|   ^ \\s* @(public|private|protected) \\s* $\n\t",
+    "increaseIndentPattern": "(?x)\n\t    ^ .* \\{ [^}\"']* $\n\t|   ^ \\s* (public|private|protected): \\s* $\n\t|   ^ \\s* @(public|private|protected) \\s* $\n\t|   ^ \\s* \\{ \\} $\n\t",
+    "indentNextLinePattern": "(?x)^\n\t    (?! .* [;:{},] \\s*                  # do not indent when line ends with ;, :, {, }, or comma\n\t        ( // .* | /[*] .* [*]/ \\s* )? $ #  …account for potential trailing comment\n\t    |   @(public|private|protected)     # do not indent after obj-c data access keywords\n\t    )\n\t    .                                  # the negative look-ahead above means we don’t care about what we match here\n\t",
+    "unIndentedLinePattern": "^\\s*((/\\*|\\*/|//|template\\b.*?>(?!\\(.*\\))|@protocol|@optional|@interface(?!.*\\{)|@implementation|@end).*)?$",
+    "zeroIndentPattern": "^\\s*#"
+  }
+}

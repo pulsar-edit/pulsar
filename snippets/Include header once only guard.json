@@ -1,0 +1,6 @@
+{
+  "content": "#ifndef ${1:`#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby -wKU -riconv\nname = ENV[\"TM_FILENAME\"] || \"untitled\"\nname = Iconv.iconv(\"ASCII//TRANSLIT\", \"UTF-8\", name).first\nname = name.gsub(/[^a-z0-9]+/i, \"_\")\nuuid = (rand * 2821109907455).round.to_s(36)\nprint \"#{name}_#{uuid}\".tr(\"[a-z]\", \"[A-Z]\")\n`}\n#define $1\n\n${TM_SELECTED_TEXT/\\Z\\n//}${0:}\n\n#endif /* end of include guard: $1 */\n",
+  "name": "Header Include-Guard",
+  "scope": "source.c, source.objc, source.c++, source.objc++",
+  "tabTrigger": "once"
+}

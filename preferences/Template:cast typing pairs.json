@@ -1,0 +1,18 @@
+{
+  "name": "Typing Pairs: Template/Cast",
+  "scope": "storage.type.c++.template, keyword.operator.c++.cast",
+  "settings": {
+    "highlightPairs": [
+      [
+        "<",
+        ">"
+      ]
+    ],
+    "smartTypingPairs": [
+      [
+        "<",
+        ">"
+      ]
+    ]
+  }
+}

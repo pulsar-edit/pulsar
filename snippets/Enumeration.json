@@ -1,0 +1,6 @@
+{
+  "content": "enum ${1:name} { $0 };",
+  "name": "Enumeration",
+  "scope": "source.c++, source.objc++",
+  "tabTrigger": "enum"
+}

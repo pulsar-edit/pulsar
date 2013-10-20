@@ -1,0 +1,23 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/bash\nif ! \"${TM_CLANG_FORMAT}\" -style=\"${TM_CLANG_FORMAT_STYLE-LLVM}\"; then\n\t. \"$TM_SUPPORT_PATH/lib/bash_init.sh\"\n\texit_show_tool_tip\nfi\n",
+  "input": "document",
+  "inputFormat": "text",
+  "keyEquivalent": "^H",
+  "name": "Reformat Document",
+  "outputCaret": "interpolateByLine",
+  "outputFormat": "text",
+  "outputLocation": "replaceDocument",
+  "requiredCommands": [
+    {
+      "command": "clang-format",
+      "locations": [
+        "/usr/local/bin/clang-format"
+      ],
+      "moreInfoURL": "http://clang.llvm.org/docs/ClangFormat.html",
+      "variable": "TM_CLANG_FORMAT"
+    }
+  ],
+  "scope": "source.c, source.objc, source.c++, source.objc++",
+  "version": 2
+}

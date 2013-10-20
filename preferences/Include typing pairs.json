@@ -1,0 +1,26 @@
+{
+  "name": "Typing Pairs: Include Statements",
+  "scope": "meta.preprocessor.c.include",
+  "settings": {
+    "highlightPairs": [
+      [
+        "\"",
+        "\""
+      ],
+      [
+        "<",
+        ">"
+      ]
+    ],
+    "smartTypingPairs": [
+      [
+        "\"",
+        "\""
+      ],
+      [
+        "<",
+        ">"
+      ]
+    ]
+  }
+}

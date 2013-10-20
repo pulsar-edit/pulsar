@@ -1,0 +1,6 @@
+{
+  "content": "#include \"${1:${TM_FILENAME/\\..+$/.h/}}\"",
+  "name": "#include \"…\"",
+  "scope": "source.c, source.objc, source.c++, source.objc++",
+  "tabTrigger": "inc"
+}

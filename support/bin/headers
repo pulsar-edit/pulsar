@@ -1,0 +1,183 @@
+#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby -wKU
+# == Synopsis
+#
+# headers: find include headers
+#
+# == Usage
+#
+# --help:
+#    show help
+#
+# -d/--domain [user|system|all]
+#    search either for user or system headers
+#
+# -s/--search «header»
+#    search for the given «header»
+#
+# -p/--prefix «string»
+#    only show headers with «string» as prefix
+#
+# -C/--basedir «dir»
+#    this is used when searching the user domain
+
+require 'getoptlong'
+require 'rdoc/usage'
+require 'pathname'
+require 'set'
+
+USR_HEAD  = Regexp.escape "#include \"...\" search starts here:\n"
+SYS_HEAD  = Regexp.escape "#include <...> search starts here:\n"
+FOOTER    = Regexp.escape "End of search list."
+
+CONFIG = {
+  'source.c'      => "#{ENV['TM_GCC'] || 'xcrun clang'}   2>&1 >/dev/null -E -v -x c             #{ENV['TM_C_FLAGS']}      /dev/null",
+  'source.c++'    => "#{ENV['TM_GXX'] || 'xcrun clang++'} 2>&1 >/dev/null -E -v -x c++           #{ENV['TM_CXX_FLAGS']}    /dev/null",
+  'source.objc'   => "#{ENV['TM_GCC'] || 'xcrun clang'}   2>&1 >/dev/null -E -v -x objective-c   #{ENV['TM_OBJC_FLAGS']}   /dev/null",
+  'source.objc++' => "#{ENV['TM_GXX'] || 'xcrun clang++'} 2>&1 >/dev/null -E -v -x objective-c++ #{ENV['TM_OBJCXX_FLAGS']} /dev/null",
+}
+
+def compiler(scope = ENV['TM_SCOPE'])
+  return CONFIG[$&] if scope =~ /\bsource\.(obj)?c(\+\+)?/
+  return CONFIG['source.objc++']
+end
+
+def compiler_search_path(domain = :system)
+  res = IO.popen(compiler) { |io| io.read }
+  if res =~ /#{USR_HEAD}(.*)#{SYS_HEAD}(.*)#{FOOTER}/m
+    list = case domain
+      when :system  then $2
+      when :user    then $1
+      when :all     then $1 + $2
+    end
+
+    res = [ ]
+    list.grep(/^ (\S*)( \(framework directory\)$)?/) do
+      next unless File.exists? $1
+      res << { :path => $1, :framework => ($2 ? true : false) }
+    end
+    res
+  else
+    abort "Failed to parse compiler output.\nCommand: " + compiler
+  end
+end
+
+def user_search_path(domain = :system)
+  headers = [ ]
+  headers << ENV["TM_USR_HEADER_PATH"].to_s.split(':') unless domain == :system
+  headers << ENV["TM_SYS_HEADER_PATH"].to_s.split(':') unless domain == :user
+  headers.flatten.reject { |path| path.empty? }.map { |path| { :path => path } }
+end
+
+def find_header(header, dirs)
+  dirs.each do |dir|
+    if File.file?("#{dir[:path]}/#{header}")
+      return [ "#{dir[:path]}/#{header}" ]
+    elsif dir[:framework]
+      Dir.chdir(dir[:path]) do
+        glob = "{*.framework/Frameworks/,}*.framework/Headers/#{header}{,.h}"
+        glob = "{*.framework/Frameworks/,}#$1.framework/Headers/#$2" if header =~ /(.+)\/(.*)/
+        res = [ ]
+        Dir[glob].map do |path|
+          res << "#{dir[:path]}/#{path}"
+        end
+        return res.map { |path| Pathname.new(path).realpath }.sort.uniq unless res.empty?
+      end
+    end
+  end
+  [ ]
+end
+
+def find_header_recursive(header, dirs)
+  seen = Set.new
+  res = [ ]
+  while dir = dirs.shift
+    next unless File.directory?(dir[:path])
+    realpath = Pathname.new(dir[:path]).realpath
+    next if seen.include?(realpath)
+    seen << realpath
+    if dir[:framework]
+      Dir.chdir(realpath) do
+        dirs.concat(Dir['*.framework/{Frameworks/*.framework/,}Headers'].map { |path| { :path => "#{realpath}/#{path}" } })
+      end
+    else
+      Dir.entries(realpath).each do |path|
+        next if path =~ /^\./
+        full_path = "#{realpath}/#{path}"
+        if File.directory?(full_path)
+          dirs << { :path => full_path }
+        elsif path == header || path.sub(/\.[^.]+$/, '') == header
+          res << full_path
+        end
+      end
+    end
+  end
+  res.sort.uniq
+end
+
+def find_header_with_prefix(prefix, dirs)
+  res = [ ]
+  dirs.each do |dir|
+    Dir.chdir(dir[:path]) do
+      if !dir[:framework]
+        Dir["#{prefix}*"].each do |path|
+          if File.directory?(path)
+            res << Dir["#{path}/[A-Za-z]*.h{,pp}"]
+          elsif path != prefix && (path =~ /\.h(pp)?$/ || path =~ /\/[^.]+$/)
+            res << path
+          end
+        end
+      else
+        paths = [ ]
+        if prefix =~ /(.+)\/(.*)/
+          paths << Dir["{,*.framework/Frameworks/}#$1.framework/Headers/#$2*"]
+        else
+          Dir["{,*.framework/Frameworks/}#{prefix}*.framework/Headers"].map do |path|
+            if path =~ /(?:.*\.framework\/Frameworks\/)?(.*)\.framework\/Headers/
+              if File.exists? "#{path}/#$1.h"
+                paths << [ "#$1/#$1.h" ]
+              else
+                paths << Dir["#{path}/[A-Za-z]*.h"]
+              end
+            end
+          end
+        end
+        res << paths.flatten.map { |path| path.sub(/(?:.*\.framework\/Frameworks\/)?(.*)\.framework\/Headers\//, '\1/') }
+      end
+    end
+  end
+  res.flatten.sort.uniq
+end
+
+opts = GetoptLong.new(
+  [ '--search',  '-s', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--prefix',  '-p', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--domain',  '-d', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--basedir', '-C', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--help',          GetoptLong::NO_ARGUMENT       ]
+)
+
+full_search   = nil
+prefix_search = nil
+domain        = :system
+basedir       = nil
+
+opts.each do |opt, arg|
+  case opt
+    when '--help'    then RDoc::usage
+    when '--search'  then full_search = arg
+    when '--prefix'  then prefix_search = arg
+    when '--domain'  then domain = arg.to_sym
+    when '--basedir' then basedir = arg
+  end
+end
+
+dirs = [ user_search_path(domain), compiler_search_path(domain) ].flatten
+dirs << { :path => basedir } unless domain == :system || basedir.nil?
+
+if full_search
+  res = find_header(full_search, dirs)
+  res = find_header_recursive(full_search, dirs) if res.empty?
+  STDOUT << res.join("\n")
+elsif prefix_search
+  STDOUT << find_header_with_prefix(prefix_search, dirs).join("\n")
+end

@@ -1,0 +1,8 @@
+{
+  "name": "Folding: Access/Comments",
+  "scope": "source.c++, source.objc++",
+  "settings": {
+    "foldingIndentedBlockIgnore": "^\\s*#",
+    "foldingIndentedBlockStart": "^\\s*(public|protected|private):\\s*(//.*)?$|^\\s*/[*](?!.*[*]/)"
+  }
+}

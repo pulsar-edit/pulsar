@@ -1,0 +1,6 @@
+{
+  "content": "#ifndef ${1/([A-Za-z0-9_]+).*/$1/}\n#define ${1:SYMBOL} ${2:value}\n#endif",
+  "name": "#ifndef … #define … #endif",
+  "scope": "source.c, source.c++, source.objc, source.objc++",
+  "tabTrigger": "def"
+}
