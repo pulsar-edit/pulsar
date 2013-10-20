@@ -1,0 +1,8 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/sh\nif [[ -e \"$TM_FILEPATH\" ]]; then\n\techo \"<base href=\\\"file://$TM_FILEPATH\\\">\"\nfi\ncat\n",
+  "input": "document",
+  "keyEquivalent": "^~@p",
+  "name": "Show Web Preview",
+  "output": "showAsHTML"
+}

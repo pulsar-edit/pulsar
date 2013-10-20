@@ -1,0 +1,10 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby \n$KCODE = 'U'\n\n$entity_to_char = { }\nFile.open(\"#{ENV['TM_BUNDLE_SUPPORT']}/entities.txt\").read.scan(/^(\\d+)\\t(.+)$/) do |key, value|\n  $entity_to_char[value] = [key.to_i].pack('U')\nend\n\nres = STDIN.read.gsub(/&(?:([a-z0-9]+)|#([0-9]+)|#x([0-9A-F]+));/i) do |m|\n  if $1 then\n    $entity_to_char[$1] || m\n  else\n    [$2 ? $2.to_i : $3.hex].pack(\"U\")\n  end\nend\n\nprint res\n",
+  "fallbackInput": "line",
+  "input": "selection",
+  "keyEquivalent": "@&",
+  "name": "Decode Entities in Line / Selection",
+  "output": "replaceSelectedText",
+  "scope": "text.html"
+}

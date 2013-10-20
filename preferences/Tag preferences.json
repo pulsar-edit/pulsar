@@ -1,0 +1,37 @@
+{
+  "name": "Tag Preferences",
+  "scope": "meta.tag",
+  "settings": {
+    "smartTypingPairs": [
+      [
+        "\"",
+        "\""
+      ],
+      [
+        "(",
+        ")"
+      ],
+      [
+        "{",
+        "}"
+      ],
+      [
+        "[",
+        "]"
+      ],
+      [
+        "“",
+        "”"
+      ],
+      [
+        "<",
+        ">"
+      ],
+      [
+        "'",
+        "'"
+      ]
+    ],
+    "spellChecking": "0"
+  }
+}

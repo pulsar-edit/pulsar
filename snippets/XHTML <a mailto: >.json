@@ -1,0 +1,6 @@
+{
+  "content": "<a href=\"mailto:${1:joe@example.com}?subject=${2:feedback}\">${3:email me}</a>",
+  "name": "Mail Anchor",
+  "scope": "text.html",
+  "tabTrigger": "mailto"
+}

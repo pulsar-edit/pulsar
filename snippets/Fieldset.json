@@ -1,0 +1,7 @@
+{
+  "bundleUUID": "4676FC6D-6227-11D9-BFB1-000D93589AF6",
+  "content": "<fieldset id=\"${1/[[:alpha:]]+|( )/(?1:_:\\L$0)/g}\" ${2:class=\"${3:}\"}>\n\t<legend>${1:$TM_SELECTED_TEXT}</legend>\n\t\n\t$0\n</fieldset>",
+  "name": "Fieldset",
+  "scope": "text.html",
+  "tabTrigger": "fieldset"
+}

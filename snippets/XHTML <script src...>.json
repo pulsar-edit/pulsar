@@ -1,0 +1,6 @@
+{
+  "content": "<script src=\"$1\" type=\"text/javascript\" charset=\"${3:utf-8}\"></script>",
+  "name": "Script With External Source",
+  "scope": "text.html",
+  "tabTrigger": "scriptsrc"
+}

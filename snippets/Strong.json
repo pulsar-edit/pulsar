@@ -1,0 +1,6 @@
+{
+  "content": "${0:${TM_SELECTED_TEXT/\\A<strong>(.*)<\\/strong>\\z|.*/(?1:$1:<strong>$0</strong>)/m}}",
+  "keyEquivalent": "@b",
+  "name": "Strong",
+  "scope": "text.html"
+}

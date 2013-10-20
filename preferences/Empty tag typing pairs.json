@@ -1,0 +1,16 @@
+{
+  "name": "Typing Pairs: Empty Tag",
+  "scope": "text.html invalid.illegal.incomplete",
+  "settings": {
+    "smartTypingPairs": [
+      [
+        "?",
+        "?"
+      ],
+      [
+        "%",
+        "%"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "bundleUUID": "4676FC6D-6227-11D9-BFB1-000D93589AF6",
+  "content": "<label for=\"${2:${1/[[:alpha:]]+|( )/(?1:_:\\L$0)/g}}\">$1</label><input type=\"${3|text,submit,hidden,button|}\" name=\"${4:$2}\" value=\"$5\"${6: id=\"${7:$2}\"}${TM_XHTML}>\n",
+  "name": "Input with Label",
+  "scope": "text.html",
+  "tabTrigger": "input"
+}

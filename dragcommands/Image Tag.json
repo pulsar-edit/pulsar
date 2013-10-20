@@ -1,0 +1,12 @@
+{
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby  -wKU\nrequire \"#{ENV['TM_SUPPORT_PATH']}/lib/escape\"\nrequire \"shellwords\"\nrequire \"cgi\"\n\ndef tag_for_file(file, tab_stop = 0)\n    file_path = File.expand_path file\n\n\ttag = \"<img src=\\\"#{e_sn(CGI::escapeHTML file)}\\\"\"\n\n\tdim = %x{ sips -g pixelWidth -g pixelHeight #{e_sh file_path} }\n\ttag << \" width=\\\"#$1\\\"\"  if dim =~ /pixelWidth: (\\d+)/\n\ttag << \" height=\\\"#$1\\\"\" if dim =~ /pixelHeight: (\\d+)/\n\n    alt = File.basename(file, File.extname(file))\n    alt = alt.gsub(/[_-]+/, ' ').strip.gsub(/\\b[a-z]/) { $&.upcase }\n\ttag << \" alt=\\\"\\${#{tab_stop+1}:#{e_snp(CGI::escapeHTML alt)}}\\\"\"\n\n\ttag << \"#{ENV['TM_XHTML']}>\"\nend\n\nif ENV.has_key? 'TM_DROPPED_FILES'\n\tfiles = Shellwords.shellwords(ENV['TM_DROPPED_FILES'])\n\tfiles.each_with_index do |file, tab_stop|\n\t\tSTDOUT << tag_for_file(file, tab_stop) << \"\\n\"\n\tend\nelse\n\tSTDOUT << tag_for_file(ENV['TM_DROPPED_FILE'])\nend\n",
+  "draggedFileExtensions": [
+    "png",
+    "jpeg",
+    "jpg",
+    "gif"
+  ],
+  "name": "Insert Image With Dimensions",
+  "output": "insertAsSnippet",
+  "scope": "text.html"
+}

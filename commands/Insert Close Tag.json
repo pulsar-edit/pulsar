@@ -1,0 +1,8 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby \n\ndoc        = STDIN.read\nline       = ENV['TM_LINE_NUMBER'].to_i\nline_index = ENV['TM_LINE_INDEX'].to_i\n\nif ENV.has_key? 'TM_INPUT_START_LINE' then\n  line       = ENV['TM_INPUT_START_LINE'].to_i\n  line_index = ENV['TM_INPUT_START_LINE_INDEX'].to_i\nend\n\nbefore = /(.*\\n){#{line-1}}.{#{line_index}}/.match(doc)[0]\n\nbefore.gsub!(/<[^>]+\\/\\s*>/i, '')\n\n# remove all self-closing tags\nif ENV.has_key?('TM_HTML_EMPTY_TAGS') then\n  empty_tags = ENV['TM_HTML_EMPTY_TAGS']\n  before.gsub!(/<(#{empty_tags})\\b[^>]*>/i, '')\nend\n\n# remove all comments\nbefore.gsub!(/<!--.*?-->/m, '')\n\nstack = [ ]\nbefore.scan(/<\\s*(\\/)?\\s*(\\w[\\w:-]*)[^>]*>/) do |m|\n  if m[0].nil? then\n    stack << m[1]\n  else\n    until stack.empty? do\n      close_tag = stack.pop\n      break if close_tag == m[1]\n    end\n  end\nend\n\nif stack.empty? then\n  %x{ osascript -e beep &>/dev/null & }\nelse\n  print \"</#{stack.pop}>\"\nend",
+  "input": "document",
+  "keyEquivalent": "~@.",
+  "name": "Insert Close Tag",
+  "output": "afterSelectedText"
+}

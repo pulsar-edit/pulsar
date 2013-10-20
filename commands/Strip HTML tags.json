@@ -1,0 +1,10 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "## Strip HTML and PHP tags from the selected text\nphp -r 'echo strip_tags( file_get_contents(\"/dev/stdin\") );'\n\n###  If you want to keep a particular tag, such as <p> comment the above line and uncomment the next line\n# php -r 'echo strip_tags( file_get_contents(\"/dev/stdin\"), \"<p>\" );'\n### end",
+  "fallbackInput": "document",
+  "input": "selection",
+  "keyEquivalent": "",
+  "name": "Strip HTML Tags from Document / Selection",
+  "output": "replaceSelectedText",
+  "scope": "text.html"
+}

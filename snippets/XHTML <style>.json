@@ -1,0 +1,6 @@
+{
+  "content": "<style type=\"text/css\" media=\"screen\">\n\t$0\n</style>",
+  "name": "Style",
+  "scope": "text.html",
+  "tabTrigger": "style"
+}

@@ -1,0 +1,12 @@
+{
+  "beforeRunningCommand": "nop",
+  "captureFormatString": "$3",
+  "capturePattern": "line (\\d+) column (\\d+) - (.*?)$",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby  -wKU\n\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/ui.rb'\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes.rb'\n\nresult = `\"${TM_TIDY:-tidy}\" -f /tmp/tm_tidy_errors -iq -utf8 \\\n          -wrap 0 --tab-size $TM_TAB_SIZE --indent-spaces $TM_TAB_SIZE \\\n\t\t--indent yes \\\n          ${TM_XHTML:+-asxhtml --output-xhtml yes} \\\n          ${TM_SELECTED_TEXT:+--show-body-only yes} \\\n          --enclose-text yes \\\n          --doctype strict \\\n\t\t--wrap-php no \\\n          --tidy-mark no`\nstatus = $?.exitstatus\n\nat_exit { File.unlink('/tmp/tm_tidy_errors') } # Clean up error log\n\nif status == 2 # Errors\n\n  msg = \"Errors: \" + File.read('/tmp/tm_tidy_errors')\n  TextMate.exit_show_tool_tip msg\n\nelsif status == 1 # Warnings - use output but also display notification with warnings\n  \n  log = File.read('/tmp/tm_tidy_errors').to_a.select do |line|\n    ! (ENV['TM_SELECTED_TEXT'] and (line.include?('Warning: missing <!DOCTYPE> declaration') or line.include?(\"Warning: inserting missing 'title' element\")))\n  end.join rescue nil\n  \n  unless log.empty?\n    options = {\n      :title   => \"Tidy Warnings\",\n      :summary => \"Warnings for tidying your document (press escape to close):\",\n      :log     => log\n    }\n    TextMate::UI.simple_notification(options)\n  end\n\nend\n\nif ENV['TM_SOFT_TABS'] == \"YES\"\n  print result\nelse\n  in_pre = false\n  result.each_line do |line|\n    unless in_pre\n      tab_size = ENV[\"TM_TAB_SIZE\"].to_i\n      space, text = /( *)(.*)/m.match(line)[1..2]\n      line = \"\\t\" * (space.length / tab_size).floor + \" \"  * (space.length % tab_size) + text\n    end\n    \n    print line\n  \n    in_pre = true  if line.include?(\"<pre>\")\n    in_pre = false if line.include?(\"</pre>\")\n  end\nend",
+  "input": "selection",
+  "keyEquivalent": "^H",
+  "lineCaptureRegister": "1",
+  "name": "Tidy",
+  "output": "replaceSelectedText",
+  "scope": "text.html"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "language-html",
+  "version": "1.0.0",
+  "homepage": "https://atom.github.io/language-html",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "description": "HTML language support in Atom",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-html.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/language-html/issues"
+  }
+}

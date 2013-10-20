@@ -1,0 +1,6 @@
+{
+  "content": "<${1:p}>$TM_SELECTED_TEXT</${1/\\s.*//}>",
+  "keyEquivalent": "^W",
+  "name": "Wrap Selection in Open/Close Tag",
+  "scope": "text.html,"
+}

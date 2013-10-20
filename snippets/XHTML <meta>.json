@@ -1,0 +1,6 @@
+{
+  "content": "<meta name=\"${1:name}\" content=\"${2:content}\"${TM_XHTML}>",
+  "name": "Meta",
+  "scope": "text.html",
+  "tabTrigger": "meta"
+}

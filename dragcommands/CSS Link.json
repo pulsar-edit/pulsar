@@ -1,0 +1,9 @@
+{
+  "command": "echo \"<link rel=\\\"stylesheet\\\" href=\\\"$TM_DROPPED_FILE\\\" type=\\\"text/css\\\" media=\\\"screen\\\" title=\\\"no title\\\" charset=\\\"utf-8\\\"$TM_XHTML>\"",
+  "draggedFileExtensions": [
+    "css"
+  ],
+  "name": "Insert CSS Link",
+  "output": "insertAsSnippet",
+  "scope": "text.html"
+}

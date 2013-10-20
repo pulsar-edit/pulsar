@@ -1,0 +1,6 @@
+{
+  "command": "[ -f \"$TM_NEW_FILE\" ] ||  perl -pe 's/\\$\\{([^}]*)\\}/$ENV{$1}/g' <index.html >\"$TM_NEW_FILE\"",
+  "extension": "html",
+  "name": "XHTML — 1.1",
+  "scope": "text.html"
+}

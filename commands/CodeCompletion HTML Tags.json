@@ -1,0 +1,11 @@
+{
+  "beforeRunningCommand": "nop",
+  "bundleUUID": "467B298F-6227-11D9-BFB1-000D93589AF6",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby \nrequire \"#{ENV['TM_SUPPORT_PATH']}/lib/codecompletion\"\nTextmateCodeCompletion.go!\n",
+  "fallbackInput": "line",
+  "input": "selection",
+  "keyEquivalent": "~\u001b",
+  "name": "CodeCompletion HTML Tags",
+  "output": "insertAsSnippet",
+  "scope": "text.html -entity.other.attribute-name -string.quoted, invalid.illegal.incomplete.html"
+}

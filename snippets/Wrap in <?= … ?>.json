@@ -1,0 +1,5 @@
+{
+  "content": "<?= $TM_SELECTED_TEXT ?>",
+  "name": "Wrap in <?= … ?>",
+  "scope": "text.html string"
+}

@@ -1,0 +1,6 @@
+{
+  "content": "<form action=\"${1:${TM_FILENAME/(.*?)\\..*/$1_submit/}}\" method=\"${2:get}\" accept-charset=\"utf-8\">\n\t$0\n\n\t<p><input type=\"submit\" value=\"Continue &rarr;\"${TM_XHTML}></p>\n</form>",
+  "name": "Form",
+  "scope": "text.html",
+  "tabTrigger": "form"
+}

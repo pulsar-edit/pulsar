@@ -1,0 +1,6 @@
+{
+  "content": "<head>\n\t<meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\"${TM_XHTML}>\n\t<title>${1:${TM_FILENAME/((.+)\\..*)?/(?2:$2:Page Title)/}}</title>\n\t$0\n</head>",
+  "name": "Head",
+  "scope": "text.html - text.html source",
+  "tabTrigger": "head"
+}

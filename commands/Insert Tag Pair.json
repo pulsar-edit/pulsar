@@ -1,0 +1,9 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby  -wKU\n#\n# This script will expand the current word into: <word></word>\n# It will recognize HTML 4.0 tags that need no close tag.\n#\n# With no current word, it will insert: <p></p> and allows you\n# to overwrite the tag name and add potential arguments.\n#\n# The result is inserted as a snippet, so it's\n# possible to tab through the place holders.\n\n# single tags\nsingle_no_arg = /^(?:br|hr)$/i\nsingle        = /^(?:img|meta|link|input|base|area|col|frame|param)$/i\nother_tag     = /^[\\w\\-:_]+$/i\n\n# we are not in HTML mode, so let’s scrap the above hardcoded tag lists\nunless ENV.has_key? 'TM_HTML_EMPTY_TAGS' then\n  single_no_arg = /(?=not)possible/\n  single        = /(?=not)possible/\nend\n\n# handle the case where caret is in the middle of a word, assume only the left part is the tag\nindex = ENV['TM_LINE_INDEX'].to_i - ENV['TM_INPUT_START_LINE_INDEX'].to_i\ntag, suffix = STDIN.read, ''\nif index < tag.length && !ENV['TM_SELECTED_TEXT']\n  tag, suffix = tag[0...index], tag[index..-1]\nend\n\nxhtml = ENV['TM_XHTML'].to_s\n\nprint case tag\n  when single_no_arg then \"<#{tag}#{xhtml}>\"\n  when single then        \"<#{tag} $1#{xhtml}>\"\n  when other_tag then     \"<#{tag}>$1</#{tag.strip[/^\\S+/]}>\"\n  else                    \"#{tag}<${1:#{ENV['TM_DEFAULT_TAG'] || 'p'}}>$2</${1/\\\\s.*//}>\"\nend\n\nprint suffix\n",
+  "fallbackInput": "word",
+  "input": "selection",
+  "keyEquivalent": "^<",
+  "name": "Insert Open/Close Tag (With Current Word)",
+  "output": "insertAsSnippet"
+}

@@ -1,0 +1,6 @@
+{
+  "content": "<body id=\"${1:${TM_FILENAME/(.*)\\..*/\\L$1/}}\"${2: onload=\"$3\"}>\n\t$0\n</body>",
+  "name": "Body",
+  "scope": "text.html - meta.tag",
+  "tabTrigger": "body"
+}

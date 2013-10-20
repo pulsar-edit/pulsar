@@ -1,0 +1,6 @@
+{
+  "content": "<div${1: id=\"${2:name}\"}>\n\t${0:$TM_SELECTED_TEXT}\n</div>",
+  "name": "Div",
+  "scope": "text.html",
+  "tabTrigger": "div"
+}
