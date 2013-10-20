@@ -1,0 +1,13 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/bash\nif ! /usr/bin/python -m json.tool; then\n\t. \"$TM_SUPPORT_PATH/lib/bash_init.sh\"\n\texit_show_tool_tip\nfi\n",
+  "input": "selection",
+  "inputFormat": "text",
+  "keyEquivalent": "^H",
+  "name": "Reformat Document / Selection",
+  "outputCaret": "heuristic",
+  "outputFormat": "text",
+  "outputLocation": "replaceInput",
+  "scope": "source.json",
+  "version": 2
+}
