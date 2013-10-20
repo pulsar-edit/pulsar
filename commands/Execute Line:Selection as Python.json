@@ -1,0 +1,10 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\nimport os\nfrom sys import stdout, stdin, exit\n\npy = stdin.read()\n\ntry:\n    scope = {}\n    result = eval(py, globals(), scope)\nexcept:\n    stdout.write(\"error evaluating: ‘%s’\" % py)\n    exit(206) # exiting with this code show's output in a tooltip \nelse:\n    if 'TM_SELECTED_TEXT' in os.environ:\n        stdout.write(\" #=> \")\n    else:\n        stdout.write(\"\\n\")\n    stdout.write(repr(result))\n\n",
+  "fallbackInput": "line",
+  "input": "selection",
+  "keyEquivalent": "^E",
+  "name": "Execute Line/Selection as Python",
+  "output": "afterSelectedText",
+  "scope": "source.python"
+}

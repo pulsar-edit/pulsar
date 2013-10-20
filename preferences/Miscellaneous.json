@@ -1,0 +1,18 @@
+{
+  "name": "Miscellaneous",
+  "scope": "source.python",
+  "settings": {
+    "decreaseIndentPattern": "^\\s*(elif|else|except|finally)\\b.*:",
+    "increaseIndentPattern": "^\\s*(class|def|elif|else|except|finally|for|if|try|with|while)\\b.*:\\s*$",
+    "shellVariables": [
+      {
+        "name": "TM_COMMENT_START",
+        "value": "# "
+      },
+      {
+        "name": "TM_LINE_TERMINATOR",
+        "value": ":"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "beforeRunningCommand": "nop",
+  "bundleUUID": "E3BADC20-6B0E-11D9-9DC9-000D93589AF6",
+  "command": "#!/usr/bin/env python\nimport sys\nimport re\nimport os\n\nre_symbol = re.compile(r\"^(\\s*)(?:class|def)\\s+([a-zA-Z_][a-zA-Z_0-9]*)\\s*[\\:\\(]\")\ntm_line_num = int(os.environ['TM_LINE_NUMBER'])\nline_num = 0\n\nsymbols = []\nfor line in sys.stdin:\n    line_num += 1\n    m = re_symbol.search(line)\n    if m:\n        ws, name = m.groups()\n        ws_len = len(ws.expandtabs())\n        while symbols and symbols[-1][0] >= ws_len:\n            symbols.pop()\n        symbols.append((ws_len, name))\n    if line_num == tm_line_num:\n        break\n\nsymbol = '.'.join([t[1] for t in symbols])\np = os.popen(\"/usr/bin/pbcopy\", \"w\")\np.write(symbol)\np.close()\n\n",
+  "input": "document",
+  "keyEquivalent": "^~c",
+  "name": "Copy Symbol",
+  "output": "discard",
+  "scope": "source.python"
+}

@@ -1,0 +1,6 @@
+{
+  "content": "def ${1:fname}(${2:`if [ \"$TM_CURRENT_LINE\" != \"\" ]\n\t\t\t\t# poor man's way ... check if there is an indent or not\n\t\t\t\t# (cuz we would have lost the class scope by this point)\n\t\t\t\tthen\n\t\t\t\t\techo \"self\"\n\t\t\t\tfi`}):\n\t${3/.+/\"\"\"/}${3:docstring for $1}${3/.+/\"\"\"\\n/}${3/.+/\\t/}${0:pass}",
+  "name": "New Function",
+  "scope": "source.python",
+  "tabTrigger": "def"
+}

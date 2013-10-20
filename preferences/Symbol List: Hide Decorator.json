@@ -1,0 +1,7 @@
+{
+  "name": "Symbol List: Hide Decorator",
+  "scope": "source.python meta.function.decorator.python entity.name.function.decorator.python",
+  "settings": {
+    "showInSymbolList": 0
+  }
+}

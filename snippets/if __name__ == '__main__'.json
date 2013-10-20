@@ -1,0 +1,6 @@
+{
+  "content": "if __name__ == '__main__':\n\t${1:main()}$0",
+  "name": "if __name__ == '__main__'",
+  "scope": "source.python",
+  "tabTrigger": "ifmain"
+}

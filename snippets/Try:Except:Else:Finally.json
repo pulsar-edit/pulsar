@@ -1,0 +1,6 @@
+{
+  "content": "try:\n\t${1:pass}\nexcept${2: ${3:Exception} as ${4:e}}:\n\t${5:raise}\nelse:\n\t${6:pass}\nfinally:\n\t${7:pass}",
+  "name": "Try/Except/Else/Finally",
+  "scope": "source.python",
+  "tabTrigger": "try"
+}

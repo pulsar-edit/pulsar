@@ -1,0 +1,6 @@
+{
+  "content": "__${1:init}__",
+  "name": "__magic__",
+  "scope": "source.python",
+  "tabTrigger": "__"
+}

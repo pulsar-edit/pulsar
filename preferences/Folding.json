@@ -1,0 +1,8 @@
+{
+  "name": "Folding",
+  "scope": "source.python",
+  "settings": {
+    "foldingStartMarker": "^\\s*\"\"\"(?=.)(?!.*\"\"\")",
+    "foldingStopMarker": "^\\s*\"\"\"\\s*$"
+  }
+}

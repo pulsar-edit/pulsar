@@ -1,0 +1,6 @@
+{
+  "content": "try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}\nelse:\n\t${5:pass}",
+  "name": "Try/Except/Else",
+  "scope": "source.python",
+  "tabTrigger": "try"
+}

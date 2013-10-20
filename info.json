@@ -1,0 +1,86 @@
+{
+  "contactEmailRot13": "obarynxr@znp.pbz",
+  "contactName": "Brad Miller",
+  "description": "Support for the <a href=\"http://www.python.org/\">Python</a> programming language.",
+  "mainMenu": {
+    "excludedItems": [
+      "8FBF7D90-D1FC-49EE-AC1B-14BE5FB11647",
+      "7797CDD8-76A2-4A5C-A41C-9AA7E6FBBA84",
+      "44F64180-F86E-4980-895A-2994B0EEDB5D",
+      "1BAD838C-8B2A-45FD-9AD2-7F3DCA2DD388",
+      "09C00F1F-859E-455D-BD1B-C8F48CEFB078",
+      "8CE4655C-3BAE-489F-BF42-89FB6B4C4119",
+      "CA7F0533-EF2A-429A-9B77-599349C03FE8",
+      "777874B4-E62C-4454-AC56-D4DB3F9965F8",
+      "6CBFE583-039F-4C91-B532-FF1148DC1A6E",
+      "CDA11D94-712F-48EB-932E-114878FD6A54",
+      "8C6C3826-E2AD-410D-9B18-1567F86F7569"
+    ],
+    "items": [
+      "D1C3D420-2DC5-4C61-9586-00E76A6C054B",
+      "1EFE7452-E7BC-4662-874B-8E4C0FCCF45B",
+      "1FAC4AE2-B00C-11D9-91F2-000D93347A42",
+      "504278F6-89F4-11D9-9326-000D93B6E43C",
+      "09E7930D-E706-4C90-B37E-5B95E1D97949",
+      "44C9C59C-89F9-11D9-9326-000D93B6E43C",
+      "95FFEECE-73E4-4B33-9CAE-1641C62FFBC0",
+      "------------------------------------",
+      "095E8342-FAED-4B95-A229-E245B0B601A7",
+      "5BBD932E-7BB0-11D9-8E83-000D93B6E43C",
+      "------------------------------------",
+      "5836C2BA-1237-4CC1-A4E5-5B41A4E233E8",
+      "5A2133DB-C0F4-4485-980A-9EBC2280B3DE",
+      "61740577-3150-424B-B775-2667DBB3AEEC",
+      "76E0A13C-73CC-4F1D-8959-FD4D9D1C65B1",
+      "------------------------------------",
+      "443BBF21-6124-4486-BFCA-D18606465885",
+      "86BCD309-37C2-4978-B332-EC91AEF70340",
+      "3AFD7429-7123-4ADD-B3CC-A9F112F8643B"
+    ],
+    "submenus": {
+      "5836C2BA-1237-4CC1-A4E5-5B41A4E233E8": {
+        "items": [
+          "C397A615-11CE-4332-BB89-186F826417B4",
+          "------------------------------------",
+          "75929BC0-24E5-456D-9FC5-91BF4B490027",
+          "96FC8316-D3A1-4378-8C89-C431EE8AF013",
+          "E8128DB6-AF28-4ABA-A1EE-334584D19BE5",
+          "2E4E82B5-7E7A-4E23-B095-799DDCDB8F75",
+          "EEFB390C-543A-48E8-B5E5-AAF98A0DAF3C"
+        ],
+        "name": "Insert"
+      },
+      "5A2133DB-C0F4-4485-980A-9EBC2280B3DE": {
+        "items": [
+          "659D189C-EC3E-4C4E-9377-B7F5F5216CBD",
+          "70E8843A-A8C0-44FC-ACF3-3DEAE48AE784",
+          "6499BB56-7BB5-11D9-8E83-000D93B6E43C"
+        ],
+        "name": "Declarations"
+      },
+      "61740577-3150-424B-B775-2667DBB3AEEC": {
+        "items": [
+          "195B332F-4464-4539-9FB3-D89152C960DC",
+          "FD868CF0-FEF8-471B-BB6D-F2D7F54F71F3",
+          "------------------------------------",
+          "495317BD-13D7-46F9-8A2F-8D234653A3F0",
+          "4D382FF4-C740-4250-B4AE-7299DD6B4D3A",
+          "EEFC5039-2CD4-4CAA-BCCC-41011864596E",
+          "2FB8153A-1ABE-44A7-A760-763BA141724B"
+        ],
+        "name": "Idioms"
+      },
+      "76E0A13C-73CC-4F1D-8959-FD4D9D1C65B1": {
+        "items": [
+          "AD5B91E1-7DF0-4E4C-B794-591640FAFD08",
+          "190010F6-A759-44C1-A994-479847B23A97",
+          "6A34B01B-9250-43AF-8563-8E47FABA6E77",
+          "D07F50BE-9DC8-4F76-96FB-88DD69E3F3C1",
+          "2065BBC9-C4FC-49B8-A36C-804721F97B9C"
+        ],
+        "name": "Tests"
+      }
+    }
+  },
+  "name": "Python"
+}

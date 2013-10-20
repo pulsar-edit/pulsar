@@ -1,0 +1,9 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "# This command takes the currently selected word and\n# displays the python documentation for the module\n# corresponding to said word.\n#\n# It falls back on the current word.\n\n# change to /tmp to avoid possibly overwriting\n# an html file in the working directory.\ncd /tmp\n\n: ${TM_SELECTED_TEXT:=$TM_CURRENT_WORD}\npydoc -w \"$TM_SELECTED_TEXT\" >/dev/null\nif [[ -f \"$TM_SELECTED_TEXT.html\" ]]; then\n\tcat \"$TM_SELECTED_TEXT.html\"\n\trm -f \"$TM_SELECTED_TEXT.html\"\nelse\n\techo \"<p>No documentation found for:<pre>$TM_SELECTED_TEXT</pre><p>This command only looks for Python modules.\"\nfi\n",
+  "input": "none",
+  "keyEquivalent": "",
+  "name": "Documentation for Module",
+  "output": "showAsHTML",
+  "scope": "source.python"
+}

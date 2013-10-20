@@ -1,0 +1,17 @@
+{
+  "name": "language-python",
+  "version": "0.0.0",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "description": "Python language support in Atom",
+  "homepage": "https://atom.github.io/language-python",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-python.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/language-python/issues"
+  }
+}

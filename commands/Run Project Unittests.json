@@ -1,0 +1,18 @@
+{
+  "beforeRunningCommand": "saveModifiedFiles",
+  "captureFormatString": "Line $2 in $1",
+  "capturePattern": "^\\s*File \"(.+)\", line (\\d+)",
+  "command": "#!/usr/bin/env bash\n[[ -f \"${TM_SUPPORT_PATH}/lib/bash_init.sh\" ]] && . \"${TM_SUPPORT_PATH}/lib/bash_init.sh\"\n\n# Find all files that end with \"Test.py\" and run \n# them.\n\nfind . -name \"*Test.py\" -exec \"${TM_PYTHON:-python}\" '{}' \\;|pre",
+  "fileCaptureRegister": "1",
+  "input": "none",
+  "inputFormat": "text",
+  "keyEquivalent": "~@R",
+  "lineCaptureRegister": "2",
+  "name": "Run Project Unit Tests",
+  "outputCaret": "afterOutput",
+  "outputFormat": "html",
+  "outputLocation": "newWindow",
+  "scope": "source.python",
+  "semanticClass": "process.test.python",
+  "version": 2
+}
