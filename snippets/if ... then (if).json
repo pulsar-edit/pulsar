@@ -1,0 +1,6 @@
+{
+  "content": "if ${2:[[ ${1:condition} ]]}; then\n\t${0:#statements}\nfi",
+  "name": "if … fi",
+  "scope": "source.shell",
+  "tabTrigger": "if"
+}

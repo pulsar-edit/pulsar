@@ -1,0 +1,17 @@
+{
+  "name": "language-shellscript",
+  "version": "0.0.0",
+  "description": "ShellScript language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-shellscript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-shellscript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/language-shellscript/issues"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "beforeRunningCommand": "saveActiveFile",
+  "command": "#!/bin/bash\nif chmod +x \"${TM_FILEPATH}\" && [[ -x \"${TM_FILEPATH}\" ]]\n   then echo \"${TM_FILEPATH} is now executable\"\n   else echo \"Failed making ${TM_FILEPATH} executable\"\nfi",
+  "input": "none",
+  "keyEquivalent": "^@X",
+  "name": "Make Script Executable",
+  "output": "showAsTooltip"
+}

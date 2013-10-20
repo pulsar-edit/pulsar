@@ -1,0 +1,6 @@
+{
+  "content": "#!/bin/sh\n",
+  "name": "#!/bin/sh",
+  "scope": "L:dyn.caret.begin.document",
+  "tabTrigger": "sh"
+}

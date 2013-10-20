@@ -1,0 +1,13 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/bash\ncd \"${TM_DIRECTORY:-${TM_PROJECT_DIRECTORY:-$HOME}}\"\nres=$(cat|\"${TM_BASH:-/bin/bash}\" 2>&1)\necho -n \"${res%\"${res##*[![:space:]]}\"}\"\n",
+  "fallbackInput": "line",
+  "input": "selection",
+  "inputFormat": "text",
+  "keyEquivalent": "^~r",
+  "name": "Execute Line / Selection and Replace With Result",
+  "outputCaret": "heuristic",
+  "outputFormat": "text",
+  "outputLocation": "replaceInput",
+  "version": 2
+}

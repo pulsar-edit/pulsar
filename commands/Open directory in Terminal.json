@@ -1,0 +1,9 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby -wKU\nrequire ENV['TM_SUPPORT_PATH'] + '/lib/escape.rb'\n\ndef find_directory\n  files = [ ENV['TM_SELECTED_FILE'], ENV['TM_FILEPATH'], ENV['TM_DIRECTORY'], ENV['TM_PROJECT_DIRECTORY'], ENV['HOME'] ]\n  res = files.find { |file| file && File.exists?(file) }\n  res && File.file?(res) ? File.split(res).first : res\nend\n\ndef is_running(process)\n  all = `ps -U \"$USER\" -o ucomm`\n  Array(all).find { |cmd| process == cmd.strip }\nend\n\ndef terminal_script(dir)\n  return <<-APPLESCRIPT\n    tell application \"Terminal\"\n      activate\n      do script \"cd #{e_as(e_sh(dir))}; clear; pwd\"\n    end tell\nAPPLESCRIPT\nend\n\ndef iterm_script(dir)\n  return <<-APPLESCRIPT\n    tell application \"iTerm\"\n      activate\n      if exists the first terminal then\n        set myterm to the first terminal\n      else\n        set myterm to (make new terminal)\n      end if\n      tell myterm\n        activate current session\n        launch session \"Default Session\"\n        tell the last session\n          write text \"cd #{e_as(e_sh(dir))}; clear; pwd\"\n        end tell\n      end tell\n    end tell\nAPPLESCRIPT\nend\n\nif dir = find_directory\n  script = nil\n  if ENV['TM_TERMINAL'] =~ /^iterm$/i || is_running('iTerm')\n    script = iterm_script(dir)\n  else\n    script = terminal_script(dir)\n  end\n  open(\"|osascript\", \"w\") { |io| io << script }\nend\n",
+  "input": "none",
+  "keyEquivalent": "^O",
+  "name": "Open Terminal",
+  "output": "discard",
+  "semanticClass": "callback.file-browser.action-menu"
+}

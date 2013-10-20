@@ -1,0 +1,13 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/sh\ncd \"${TM_DIRECTORY:-${TM_PROJECT_DIRECTORY:-$HOME}}\"\necho\ncat|\"${TM_BASH:-/bin/bash}\" 2>&1\n",
+  "fallbackInput": "line",
+  "input": "selection",
+  "inputFormat": "text",
+  "keyEquivalent": "^r",
+  "name": "Execute Line / Selection",
+  "outputCaret": "afterOutput",
+  "outputFormat": "text",
+  "outputLocation": "afterInput",
+  "version": 2
+}

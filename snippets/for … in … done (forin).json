@@ -1,0 +1,6 @@
+{
+  "content": "for ${1:i}${2/.+/ in /}${2:words}; do\n\t${0:#statements}\ndone",
+  "name": "for … in … done",
+  "scope": "source.shell",
+  "tabTrigger": "forin"
+}

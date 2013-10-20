@@ -1,0 +1,11 @@
+{
+  "beforeRunningCommand": "nop",
+  "command": "#!/bin/bash\nNAME=\"$(cat)\"\nif [[ -z \"$NAME\" ]]; then\n\tNAME='${1:function_name}'\nfi\n\ncat <<SNIPPET\nfunction $NAME () {\n\t\\${0:#statements}\n}\nSNIPPET",
+  "fallbackInput": "word",
+  "input": "selection",
+  "keyEquivalent": "$\r",
+  "name": "New Function",
+  "output": "insertAsSnippet",
+  "scope": "source.shell",
+  "tabTrigger": "fun"
+}

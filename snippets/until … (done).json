@@ -1,0 +1,6 @@
+{
+  "content": "until ${2:[[ ${1:condition} ]]}; do\n\t${0:#statements}\ndone",
+  "name": "until … done",
+  "scope": "source.shell",
+  "tabTrigger": "until"
+}

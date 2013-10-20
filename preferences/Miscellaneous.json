@@ -1,0 +1,9 @@
+{
+  "name": "Miscellaneous",
+  "scope": "source.shell",
+  "settings": {
+    "decreaseIndentPattern": "^\\s*(\\}|(elif|else|fi|esac|done)\\b)",
+    "increaseIndentPattern": "^\\s*(if|elif|else|case)\\b|^.*(\\{|\\b(do)\\b)$",
+    "indentNextLinePattern": "^.*[^\\\\]\\\\$"
+  }
+}
