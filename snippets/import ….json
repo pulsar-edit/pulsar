@@ -1,0 +1,6 @@
+{
+  "content": "import ${1:${TM_FILEPATH/.+\\/([^\\/]+)\\/[^\\/]+\\.d$/\\l$1/}.}",
+  "name": "import …",
+  "scope": "source.go",
+  "tabTrigger": "im"
+}

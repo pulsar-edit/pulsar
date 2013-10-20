@@ -1,0 +1,7 @@
+// ${TM_NEW_FILE_BASENAME} -- Copyright (c) ${TM_YEAR} ${TM_ORGANIZATION_NAME}
+
+package main
+
+func main() {
+	println("hello, world");
+}

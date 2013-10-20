@@ -1,0 +1,27 @@
+{
+  "contactEmailRot13": "enfzhf@abgvba.fr",
+  "contactName": "Rasmus Andersson",
+  "description": "Support for the <a href=\"http://golang.org/\">Go programming language</a>",
+  "mainMenu": {
+    "items": [
+      "184C6993-EB89-484E-A6EB-070935D5A2DF",
+      "C73537E4-2AE2-45E3-858F-5196F1FCA169",
+      "8E34D3FD-11D5-45CB-A4B5-D9546D6A319B",
+      "A0C5A834-2DC9-46C9-A9BD-AE962865DB46",
+      "F2793E12-5D26-4C4A-91C5-2F1185D1EB5C",
+      "FFE12F32-B355-44E3-BB0F-27667F9DC4B5"
+    ],
+    "submenus": {}
+  },
+  "name": "Go",
+  "ordering": [
+    "B64C47C0-FDE6-434B-A547-B6D05DC2CC90",
+    "EB8D7F13-DE13-4EBF-9728-AEEEC4817878",
+    "184C6993-EB89-484E-A6EB-070935D5A2DF",
+    "C73537E4-2AE2-45E3-858F-5196F1FCA169",
+    "8E34D3FD-11D5-45CB-A4B5-D9546D6A319B",
+    "A0C5A834-2DC9-46C9-A9BD-AE962865DB46",
+    "F2793E12-5D26-4C4A-91C5-2F1185D1EB5C",
+    "FFE12F32-B355-44E3-BB0F-27667F9DC4B5"
+  ]
+}

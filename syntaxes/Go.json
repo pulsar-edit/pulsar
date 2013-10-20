@@ -1,0 +1,554 @@
+{
+  "comment": "Go language",
+  "fileTypes": [
+    "go"
+  ],
+  "foldingStartMarker": "(?x)/\\*\\*(?!\\*)|^(?![^{]*?//|[^{]*?/\\*(?!.*?\\*/.*?\\{)).*?\\{\\s*($|//|/\\*(?!.*?\\*/.*\\S))",
+  "foldingStopMarker": "(?<!\\*)\\*\\*/|^\\s*\\}",
+  "keyEquivalent": "^~G",
+  "name": "Go",
+  "patterns": [
+    {
+      "captures": {
+        "0": {
+          "name": "punctuation.definition.comment.go"
+        }
+      },
+      "match": "/\\*\\*/",
+      "name": "comment.block.empty.go"
+    },
+    {
+      "include": "text.html.javadoc"
+    },
+    {
+      "begin": "(?x)^\\s*\n\t\t\t\t\t((?:\\b(public|private|protected|static|final|native|synchronized|abstract|export)\\b\\s*)*) # modifier\n\t\t\t\t\t(class|interface)\\s+\n\t\t\t\t\t(\\w+)\\s* # identifier\n\t\t\t\t\t(?:\\(\\s*([^\\)]+)\\s*\\)|)\\s* # Template type\n\t\t\t\t\t(?:\n\t\t\t\t\t  \\s*(:)\\s*\n\t\t\t\t\t  (\\w+)\n\t\t\t\t\t  (?:\\s*,\\s*(\\w+))?\n\t\t\t\t\t  (?:\\s*,\\s*(\\w+))?\n\t\t\t\t\t  (?:\\s*,\\s*(\\w+))?\n\t\t\t\t\t  (?:\\s*,\\s*(\\w+))?\n\t\t\t\t\t  (?:\\s*,\\s*(\\w+))?\n\t\t\t\t\t  (?:\\s*,\\s*(\\w+))?\n\t\t\t\t\t)? # super class\n\t\t\t\t\t",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.modifier.go"
+        },
+        "3": {
+          "name": "storage.type.structure.go"
+        },
+        "4": {
+          "name": "entity.name.type.class.go"
+        },
+        "5": {
+          "name": "storage.type.template.go"
+        },
+        "6": {
+          "name": "punctuation.separator.inheritance.go"
+        },
+        "7": {
+          "name": "entity.other.inherited-class.go"
+        },
+        "8": {
+          "name": "entity.other.inherited-class.go"
+        },
+        "9": {
+          "name": "entity.other.inherited-class.go"
+        },
+        "10": {
+          "name": "entity.other.inherited-class.go"
+        },
+        "11": {
+          "name": "entity.other.inherited-class.go"
+        },
+        "12": {
+          "name": "entity.other.inherited-class.go"
+        },
+        "13": {
+          "name": "entity.other.inherited-class.go"
+        }
+      },
+      "end": "(?={)",
+      "name": "meta.definition.class.go",
+      "patterns": [
+        {
+          "begin": "\\b(_|:)\\b",
+          "captures": {
+            "1": {
+              "name": "storage.modifier.go"
+            }
+          },
+          "end": "(?={)",
+          "name": "meta.definition.class.extends.go",
+          "patterns": [
+            {
+              "include": "#all-types"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "begin": "(?x)^\\s*\n\t\t\t\t\t((?:\\b(public|private|protected|static|final|native|synchronized|abstract|export)\\b\\s*)*) # modifier\n\t\t\t\t\t(struct)\\s+\n\t\t\t\t\t(\\w+)\\s* # identifier\n\t\t\t\t\t(?:\\(\\s*([^\\)]+)\\s*\\)|)\\s* # Template type\n\t\t\t\t\t",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.modifier.go"
+        },
+        "3": {
+          "name": "storage.type.structure.go"
+        },
+        "4": {
+          "name": "entity.name.type.struct.go"
+        },
+        "5": {
+          "name": "storage.type.template.go"
+        }
+      },
+      "end": "(?={)",
+      "name": "meta.definition.struct.go",
+      "patterns": [
+        {
+          "begin": "\\b(_|:)\\b",
+          "captures": {
+            "1": {
+              "name": "storage.modifier.go"
+            }
+          },
+          "end": "(?={)",
+          "name": "meta.definition.class.extends.go",
+          "patterns": [
+            {
+              "include": "#all-types"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "begin": "(?x)^\\s*\n\t\t\t\t\t((?:\\b(public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|export)\\b\\s*)*) # modifier\n\t\t\t\t\t(\\b(this))\\s* # identifier\n\t\t\t\t\t(?!.*;)  # abort if line has a ;\n\t\t\t\t\t(?=\\()",
+      "captures": {
+        "1": {
+          "name": "storage.modifier.go"
+        },
+        "3": {
+          "name": "entity.name.function.constructor.go"
+        }
+      },
+      "end": "(?={)",
+      "name": "meta.definition.constructor.go",
+      "patterns": [
+        {
+          "include": "$base"
+        }
+      ]
+    },
+    {
+      "begin": "(?x)\n    \t\t\t\t(?:  ^                                 # begin-of-line\n    \t\t\t\t  |  (?: (?<!else|new|=) )             #  or word + space before name\n    \t\t\t\t)\n\t\t\t\t\t((?:\\b(?:public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|export)\\b\\s*)*) # modifier\n    \t\t\t\t(~this) # actual name\n    \t\t\t\t \\s*(\\()                           # start bracket or end-of-line\n    \t\t\t",
+      "captures": {
+        "1": {
+          "name": "storage.modifier.go"
+        },
+        "2": {
+          "name": "entity.name.function.destructor.go"
+        }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.parameters.go"
+        }
+      },
+      "name": "meta.definition.destructor.go",
+      "patterns": [
+        {
+          "include": "$base"
+        }
+      ]
+    },
+    {
+      "begin": "(?x)^\\s*\n\t\t\t\t\t((?:\\b(?:public|private|protected|static|final|native|lazy|synchronized|abstract|threadsafe|transient|export)\\b\\s*)*) # modifier\n\t\t\t\t\t(\\b(?:void|boolean|byte|char|short|int|float|long|double|[\\w_]+[\\w0-9_]*|(?:\\w+\\.)*[A-Z]\\w+)\\b(?:<(?:(?:(?:\\w+\\.)*[A-Z]\\w+)(?:\\s*,\\s*)?)+>|(?:\\[\\s*\\])*)?)\\s* # type\n\t\t\t\t\t(\\w+)\\s* # identifier\n\t\t\t\t\t(?!.*;)  # abort if line has a ;\n\t\t\t\t\t(?=\\()",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.modifier.go"
+        },
+        "2": {
+          "name": "storage.type.structure.go"
+        },
+        "3": {
+          "name": "entity.name.function.go"
+        }
+      },
+      "end": "(?={)",
+      "name": "meta.definition.method.go",
+      "patterns": [
+        {
+          "include": "$base"
+        }
+      ]
+    },
+    {
+      "match": "\\b([A-Z][A-Z0-9_]+)\\b",
+      "name": "constant.other.go"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#all-types"
+    },
+    {
+      "match": "<-",
+      "name": "constant.language.chsendrecv.go"
+    },
+    {
+      "match": "\\b(private|protected|public|export)\\b",
+      "name": "storage.modifier.access-control.go"
+    },
+    {
+      "match": "\\b(auto|static|override|final|const|abstract|volatile|synchronized|lazy|map|seq|gen)\\b",
+      "name": "storage.modifier.go"
+    },
+    {
+      "match": "\\b(template|interface|class|enum|struct|union|range)\\b",
+      "name": "storage.type.structure.go"
+    },
+    {
+      "match": "\\b(var|ushort|int|uint|long|ulong|float|void|byte|ubyte|double|bit|char|wchar|ucent|cent|short|bool|dchar|real|ireal|ifloat|idouble|creal|cfloat|cdouble|lazy)\\b",
+      "name": "storage.type.go"
+    },
+    {
+      "match": "\\b(try|catch|finally|throw)\\b",
+      "name": "keyword.control.exception.go"
+    },
+    {
+      "match": "\\b(return|break|select|case|continue|default|do|while|for|switch|if|else)\\b",
+      "name": "keyword.control.go"
+    },
+    {
+      "match": "\\b(if|else|switch|iftype)\\b",
+      "name": "keyword.control.conditional.go"
+    },
+    {
+      "match": "\\b(goto|break|continue|go)\\b",
+      "name": "keyword.control.branch.go"
+    },
+    {
+      "match": "\\b(while|for|do|foreach(_reverse)?)\\b",
+      "name": "keyword.control.repeat.go"
+    },
+    {
+      "match": "\\b(version|return|with|invariant|body|scope|in|ta|chan|out|inout|asm|mixin|delegate|type|func)\\b",
+      "name": "keyword.control.statement.go"
+    },
+    {
+      "match": "\\b(pragma)\\b",
+      "name": "keyword.control.pragma.go"
+    },
+    {
+      "match": "\\b(alias|typedef)\\b",
+      "name": "keyword.control.alias.go"
+    },
+    {
+      "match": "\\b(import)\\b",
+      "name": "keyword.control.import.go"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "keyword.control.module.go"
+        },
+        "2": {
+          "name": "entity.name.function.package.go"
+        }
+      },
+      "match": "^\\s*(module)\\s+([^ ;]+?);",
+      "name": "meta.module.go"
+    },
+    {
+      "match": "\\b(true|false)\\b",
+      "name": "constant.language.boolean.go"
+    },
+    {
+      "match": "\\b(__FILE__|__LINE__|__DATE__|__TIME__|__TIMESTAMP__|nil|_)\\b",
+      "name": "constant.language.go"
+    },
+    {
+      "match": "\\b(this|super)\\b",
+      "name": "variable.language.go"
+    },
+    {
+      "match": "\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)([LlFfUuDd]|UL|ul)?\\b",
+      "name": "constant.numeric.go"
+    },
+    {
+      "include": "#string_escaped_char"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "match": "(==|!=|<=|>=|<>|<|>)",
+      "name": "keyword.operator.comparison.go"
+    },
+    {
+      "match": "(\\-\\-|\\+\\+)",
+      "name": "keyword.operator.increment-decrement.go"
+    },
+    {
+      "match": "(\\-|\\+|\\*|\\/|~|%)",
+      "name": "keyword.operator.arithmetic.go"
+    },
+    {
+      "match": "(!|&&|\\|\\|)",
+      "name": "keyword.operator.logical.go"
+    },
+    {
+      "match": "\\b(opNeg|opCom|opPostInc|opPostDec|opCast|opAdd|opSub|opSub_r|opMul|opDiv|opDiv_r|opMod|opMod_r|opAnd|opOr|opXor|opShl|opShl_r|opShr|opShr_r|opUShr|opUShr_r|opCat|opCat_r|opEquals|opEquals|opCmp|opCmp|opCmp|opCmp|opAddAssign|opSubAssign|opMulAssign|opDivAssign|opModAssign|opAndAssign|opOrAssign|opXorAssign|opShlAssign|opShrAssign|opUShrAssign|opCatAssign|opIndex|opIndexAssign|opCall|opSlice|opSliceAssign|opPos|opAdd_r|opMul_r|opAnd_r|opOr_r|opXor_r)\\b",
+      "name": "keyword.operator.overload.go"
+    },
+    {
+      "match": "\\b(new|delete|typeof|typeid|cast|align|is|make|expect)\\b",
+      "name": "keyword.operator.go"
+    },
+    {
+      "match": "\\b(new|throws)\\b",
+      "name": "keyword.other.class-fns.go"
+    },
+    {
+      "match": "\\b(package|extern)\\b",
+      "name": "keyword.other.external.go"
+    },
+    {
+      "match": "\\b(deprecated|unittest|debug)\\b",
+      "name": "keyword.other.debug.go"
+    },
+    {
+      "match": "\\b(u_char|u_short|u_int|u_long|ushort|uint|u_quad_t|quad_t|qaddr_t|caddr_t|daddr_t|dev_t|fixpt_t|blkcnt_t|blksize_t|gid_t|in_addr_t|in_port_t|ino_t|key_t|mode_t|nlink_t|id_t|pid_t|off_t|segsz_t|swblk_t|uid_t|id_t|clock_t|size_t|ssize_t|time_t|useconds_t|suseconds_t)\\b",
+      "name": "support.type.sys-types.c"
+    },
+    {
+      "match": "\\b(pthread_attr_t|pthread_cond_t|pthread_condattr_t|pthread_mutex_t|pthread_mutexattr_t|pthread_once_t|pthread_rwlock_t|pthread_rwlockattr_t|pthread_t|pthread_key_t)\\b",
+      "name": "support.type.pthread.c"
+    },
+    {
+      "match": "\\b(int8|int16|int32|int64|uint8|uint16|uint32|uint64|int_least8|int_least16|int_least32|int_least64|uint_least8|uint_least16|uint_least32|uint_least64|int_fast8|int_fast16|int_fast32|int_fast64|uint_fast8|uint_fast16|uint_fast32|uint_fast64|intptr|uintptr|intmax|intmax|uintmax|uintmax|float64|float32)\\b",
+      "name": "support.type.stdint.c"
+    }
+  ],
+  "repository": {
+    "all-types": {
+      "patterns": [
+        {
+          "include": "#support-type-built-ins-d"
+        },
+        {
+          "include": "#storage-type-d"
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "begin": "/\\*",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.go"
+            }
+          },
+          "end": "\\*/",
+          "name": "comment.block.go"
+        },
+        {
+          "begin": "/\\+",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.go"
+            }
+          },
+          "end": "\\+/",
+          "name": "comment.block.nested.go"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.go"
+            }
+          },
+          "match": "(//).*$\\n?",
+          "name": "comment.line.double-slash.go"
+        }
+      ]
+    },
+    "constant_placeholder": {
+      "match": "(?i:%(\\([a-z_]+\\))?#?0?\\-?[ ]?\\+?([0-9]*|\\*)(\\.([0-9]*|\\*))?[hL]?[a-z%])",
+      "name": "constant.other.placeholder.go"
+    },
+    "regular_expressions": {
+      "comment": "Change disabled to 1 to turn off syntax highlighting in “r” strings.",
+      "disabled": 1,
+      "patterns": [
+        {
+          "include": "source.regexp.python"
+        }
+      ]
+    },
+    "statement-remainder": {
+      "patterns": [
+        {
+          "begin": "\\(",
+          "end": "(?=\\))",
+          "name": "meta.definition.param-list.go",
+          "patterns": [
+            {
+              "include": "#all-types"
+            }
+          ]
+        },
+        {
+          "begin": "(throws)",
+          "captures": {
+            "1": {
+              "name": "keyword.other.class-fns.go"
+            }
+          },
+          "end": "(?={)",
+          "name": "meta.definition.throws.go",
+          "patterns": [
+            {
+              "include": "#all-types"
+            }
+          ]
+        }
+      ]
+    },
+    "storage-type-d": {
+      "match": "\\b(void|byte|short|char|int|long|float|string|double|boolean|([a-z]\\w+\\.)*[A-Z]\\w+)\\b",
+      "name": "storage.type.go"
+    },
+    "string_escaped_char": {
+      "patterns": [
+        {
+          "match": "\\\\(\\\\|[abefnprtv'\"?]|[0-3]\\d{,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|&\\w+;)",
+          "name": "constant.character.escape.go"
+        },
+        {
+          "match": "\\\\.",
+          "name": "invalid.illegal.unknown-escape.go"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "begin": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.go"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.go"
+            }
+          },
+          "name": "string.quoted.double.go",
+          "patterns": [
+            {
+              "include": "#string_escaped_char"
+            }
+          ]
+        },
+        {
+          "begin": "(r)(\")",
+          "beginCaptures": {
+            "1": {
+              "name": "storage.type.string.go"
+            },
+            "2": {
+              "name": "punctuation.definition.string.begin.go"
+            }
+          },
+          "end": "((?<=\")(\")|\")",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.end.go"
+            },
+            "2": {
+              "name": "meta.empty-string.double.go"
+            }
+          },
+          "name": "string.quoted.double.raw.go",
+          "patterns": [
+            {
+              "include": "#regular_expressions"
+            }
+          ]
+        },
+        {
+          "begin": "`",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.go"
+            }
+          },
+          "end": "((?<=`)(`)|`)",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.end.go"
+            },
+            "2": {
+              "name": "meta.empty-string.double.go"
+            }
+          },
+          "name": "string.quoted.double.raw.backtick.go"
+        },
+        {
+          "begin": "'",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.go"
+            }
+          },
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.go"
+            }
+          },
+          "name": "string.quoted.single.go",
+          "patterns": [
+            {
+              "include": "#string_escaped_char"
+            }
+          ]
+        }
+      ]
+    },
+    "support-type-built-ins-classes-d": {
+      "match": "\\b(print|println|assert|panic|panicln)\\b",
+      "name": "support.type.built-ins.functions.go"
+    },
+    "support-type-built-ins-d": {
+      "patterns": [
+        {
+          "include": "#support-type-built-ins-exceptions-d"
+        },
+        {
+          "include": "#support-type-built-ins-classes-d"
+        },
+        {
+          "include": "#support-type-built-ins-interfaces-d"
+        },
+        {
+          "include": "#support-type-built-ins-structs-d"
+        }
+      ]
+    },
+    "support-type-built-ins-exceptions-d": {
+      "match": "\\b(__todo__)\\b",
+      "name": "support.type.built-ins.exceptions.go"
+    },
+    "support-type-built-ins-interfaces-d": {
+      "match": "\\b(__todo__)\\b",
+      "name": "support.type.built-ins.interfaces.go"
+    },
+    "support-type-built-ins-structs-d": {
+      "match": "\\b(__todo__)\\b",
+      "name": "support.type.built-ins.structs.go"
+    }
+  },
+  "scopeName": "source.go"
+}

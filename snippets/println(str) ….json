@@ -1,0 +1,6 @@
+{
+  "content": "println($1);",
+  "name": "println(str) …",
+  "scope": "source.go",
+  "tabTrigger": "pl"
+}

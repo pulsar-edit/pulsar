@@ -1,0 +1,17 @@
+{
+  "name": "go-tmbundle",
+  "description": "Go language support in Atom",
+  "version": "0.0.0",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "https://atom.github.io/language-go",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-go.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/language-go/issues"
+  }
+}
