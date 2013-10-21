@@ -1,7 +1,7 @@
 {
   "name": "go-tmbundle",
   "description": "Go language support in Atom",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "engines": {
     "atom": "*",
     "node": "*"
