@@ -6,7 +6,7 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "https://atom.github.io/language-go",
+  "homepage": "http://atom.github.io/language-go",
   "repository": {
     "type": "git",
     "url": "https://github.com/atom/language-go.git"
