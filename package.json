@@ -1,6 +1,6 @@
 {
   "name": "language-html",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "homepage": "https://atom.github.io/language-html",
   "engines": {
     "atom": "*",
