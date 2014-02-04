@@ -1,6 +1,0 @@
-{
-  "command": "if [[ ! -f \"$TM_NEW_FILE\" ]]; then\n   TM_DATE=`date +%Y-%m-%d` \\\n   perl -pe 's/\\$\\{([^}]*)\\}/$ENV{$1}/g' \\\n      < index.html > \"$TM_NEW_FILE\"\nfi",
-  "extension": "html",
-  "name": "HTML — 4.01 Transitional",
-  "scope": "text.html"
-}
