@@ -1,9 +1,0 @@
-{
-  "beforeRunningCommand": "saveActiveFile",
-  "command": ". \"$TM_SUPPORT_PATH/lib/webpreview.sh\"\nhtml_header \"${TM_FILENAME}\"\ncd \"$TM_DIRECTORY\"\nFN=$(echo \"${TM_FILENAME}\" | sed 's/\\.go$//g')\n\nif [ -z \"$GOOS\" ]; then export GOOS=darwin; fi\nif [ -z \"$GOARCH\" ]; then\n\tif [ \"$(sysctl -n hw.cpu64bit_capable)\" = 1 ]; then\n\t\texport GOARCH=amd64\n\telse\n\t\texport GOARCH=386\n\tfi\nfi\nN=6\nif [ $GOARCH = \"386\" ]; then N=8; fi\nif [ -z \"$GOROOT\" ]; then\n\tif [ -d \"$HOME/go\" ]; then\n\t\texport GOROOT=\"$HOME/go\"\n\telif [ -d \"$HOME/src/go\" ]; then\n\t\texport GOROOT=\"$HOME/src/go\"\n\tfi\nfi\n\necho '<h2>Compiling, linking and running ('$GOARCH')..</h2>'\n${N}g -o \".$FN.${N}\" \"$TM_FILENAME\"\n${N}l -o \".$FN.${N}-out\" \".$FN.${N}\"\n./\".$FN.${N}-out\" | pre\nrm -f \".$FN.${N}\" \".$FN.${N}-out\"\n\nhtml_footer\n",
-  "input": "none",
-  "keyEquivalent": "@r",
-  "name": "Compile & Run Single File",
-  "output": "showAsHTML",
-  "scope": "source.go"
-}

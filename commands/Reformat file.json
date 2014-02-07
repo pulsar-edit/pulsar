@@ -1,9 +1,0 @@
-{
-  "beforeRunningCommand": "saveActiveFile",
-  "command": "gofmt \"$TM_FILEPATH\" || cat \"$TM_FILEPATH\"",
-  "input": "document",
-  "keyEquivalent": "^H",
-  "name": "Gofmt",
-  "output": "replaceDocument",
-  "scope": "source.go"
-}
