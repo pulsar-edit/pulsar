@@ -1,9 +1,0 @@
-{
-  "beforeRunningCommand": "nop",
-  "command": "# This command passes the script to Ruby via a heredoc, rather than using a shebang.\n# The reason for this is so that .textmate_init is sourced, which IMO is the nicest place to set PHP_INCLUDE_PAT\n# However passing the heredoc axes the document STDIN from TextMate, so here we redirect the original STDIN to\n# file descriptor 3, to be later read from the Ruby script\n/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby 3>&0 <<-'RUBY'\n  require ENV[\"TM_SUPPORT_PATH\"] + \"/lib/ui.rb\"\n  require ENV[\"TM_SUPPORT_PATH\"] + \"/lib/textmate.rb\"\n\n  options = []\n\n  if ENV['TM_CURRENT_LINE'] =~ /(?:include|require)(?:_once)?\\s*\\(?\\s*?['\"](.+)['\"]\\s*\\)?/\n    options << $1\n  else\n    IO.open(3, 'r') do |document| # This reads the TextMate document from file descriptor 3, as describe above\n      document.read.scan(/(?:include|require)(?:_once)?\\s*\\(?\\s*?['\"](.+)['\"]\\s*\\)?/).each do |path|\n        options << path[0] unless path[0].include?('$') # Skip dynamic includes\n      end\n    end\n  end\n\n  abort \"No includes found\" if options.empty?\n\n  file = ''\n  if options.size > 1\n    abort unless choice = TextMate::UI.menu(options)\n    file = options[choice]\n  else\n    file = options.pop\n  end\n\n  paths = []\n  if ENV['PHP_INCLUDE_PATH']\n    paths = ENV['PHP_INCLUDE_PATH'].split(':')\n  else\n    paths = ['.']\n  end\n\n  paths.each do |path|\n    expanded_path = File.expand_path(file, path)\n    if File.exists?(expanded_path)\n      TextMate.go_to :file => expanded_path\n      exit\n    end\n  end\n  puts \"File not found: #{file}\"\n  puts \"Set PHP_INCLUDE_PATH for best results\" unless ENV['PHP_INCLUDE_PATH']\nRUBY\n",
-  "input": "document",
-  "keyEquivalent": "@D",
-  "name": "Jump to Included File",
-  "output": "showAsTooltip",
-  "scope": "source.php"
-}

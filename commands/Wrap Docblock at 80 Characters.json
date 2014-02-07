@@ -1,8 +1,0 @@
-{
-  "beforeRunningCommand": "nop",
-  "command": "#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby\ncol = ENV['TM_COLUMN_NUMBER'].to_i\nstart_col = ENV['TM_CURRENT_LINE'].index('*')\nif col - start_col >= 80\n  puts\n  print \" \" * start_col + \"*\"\nend\nprint \" \"",
-  "input": "none",
-  "name": "Wrap Docblock at 80 Characters",
-  "output": "afterSelectedText",
-  "scope": "comment.block.documentation.phpdoc.php"
-}
