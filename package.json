@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "name": "language-c",
   "description": "Atom language support for C",
   "homepage": "https://atom.github.io/language-c",
