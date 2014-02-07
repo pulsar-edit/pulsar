@@ -1,9 +1,0 @@
-{
-  "beforeRunningCommand": "nop",
-  "command": "# start up Python in debug mode using either Terminal.app or iTerm.app\n# according to the user's value for TM_TERM_PROG\n# Default to Terminal.app since that is standard.\nTP=${TM_TERM_PROG:=Terminal}\nTPY=${TM_PYTHON:=python}\n\nif [ \"$TP\" == iTerm ]; then\n    osascript <<END\n        tell application \"iTerm\"\n            activate\n            set myterm to (the first terminal)\n            tell myterm            \n                set mysession to (make new session at the end of sessions)\n                tell mysession\n                    exec command \"/bin/bash -c \\\"$TPY -m pdb '$TM_FILEPATH' \\\" \" \n                end tell\n            end tell\n        end tell\nEND\nelse\n    osascript  <<END2\n        tell application \"Terminal\"\n            activate\n            do script with command \"$TPY -m pdb '$TM_FILEPATH'\"\n        end tell\nEND2\nfi\n",
-  "input": "none",
-  "keyEquivalent": "@D",
-  "name": "Debug Script in Terminal",
-  "output": "discard",
-  "scope": "source.python"
-}

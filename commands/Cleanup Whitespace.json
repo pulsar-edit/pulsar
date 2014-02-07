@@ -1,8 +1,0 @@
-{
-  "beforeRunningCommand": "nop",
-  "command": "\"${TM_PYTHON:-python}\" \"${TM_BUNDLE_SUPPORT}/cleanup_whitespace.py\"",
-  "input": "selection",
-  "name": "Cleanup Whitespace",
-  "output": "replaceSelectedText",
-  "scope": "source.python"
-}
