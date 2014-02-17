@@ -1,5 +1,5 @@
 {
-  "source.python": {
+  ".source.python": {
     "editor": {
       "foldEndPattern": "^\\s*\"\"\"\\s*$"
     }
