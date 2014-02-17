@@ -1,8 +1,0 @@
-{
-  "name": "Folding",
-  "scope": "source.c, source.c++",
-  "settings": {
-    "foldingStartMarker": "(?x)\n\t\t /\\*\\*(?!\\*)\n\t\t|^(?![^{]*?//|[^{]*?/\\*(?!.*?\\*/.*?\\{)).*?\\{\\s*($|//|/\\*(?!.*?\\*/.*\\S))\n\t",
-    "foldingStopMarker": "(?<!\\*)\\*\\*/|^\\s*\\}"
-  }
-}

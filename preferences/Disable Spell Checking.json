@@ -1,7 +1,0 @@
-{
-  "name": "Spell Checking: Disable for Include Strings",
-  "scope": "meta.preprocessor.c.include string.quoted",
-  "settings": {
-    "spellChecking": 0
-  }
-}

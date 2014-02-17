@@ -1,7 +1,0 @@
-{
-  "name": "Symbol List: Prefix Banner Items",
-  "scope": "meta.toc-list.banner",
-  "settings": {
-    "symbolTransformation": "\n   s/^\\s+/# /;\n   s/^=+$/-/;\n   "
-  }
-}
