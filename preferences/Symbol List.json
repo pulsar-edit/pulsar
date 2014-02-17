@@ -1,8 +1,0 @@
-{
-  "name": "Symbol List",
-  "scope": "source.python meta.function.python, source.python meta.class.python",
-  "settings": {
-    "showInSymbolList": 1,
-    "symbolTransformation": "\n\t\ts/class\\s+([A-Za-z_][A-Za-z0-9_]*.+?\\)?)(\\:|$)/$1/g;\n\t\ts/def\\s+([A-Za-z_][A-Za-z0-9_]*\\()(?:(.{,40}?\\))|((.{40}).+?\\)))(\\:)/$1(?2:$2)(?3:$4…\\))/g;\n\t"
-  }
-}

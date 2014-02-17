@@ -1,8 +1,0 @@
-{
-  "name": "Disable Indention Correction",
-  "scope": "source.python",
-  "settings": {
-    "disableIndentCorrections": "1",
-    "indentOnPaste": "simple"
-  }
-}

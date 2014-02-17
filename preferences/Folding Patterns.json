@@ -1,7 +1,0 @@
-{
-  "name": "Folding Patterns",
-  "scope": "source.python",
-  "settings": {
-    "foldingIndentedBlockStart": "^\\s*(class|def|for|while|if|elif|else|with|try|finally|except)\\b.*:\\s*(#.*)?$"
-  }
-}

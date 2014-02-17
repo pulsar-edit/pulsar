@@ -1,0 +1,9 @@
+{
+  "source.python": {
+    "editor": {
+      "commentStart": "# ",
+      "increaseIndentPattern": "^\\s*(class|def|elif|else|except|finally|for|if|try|with|while)\\b.*:\\s*$",
+      "decreaseIndentPattern": "^\\s*(elif|else|except|finally)\\b.*:"
+    }
+  }
+}
