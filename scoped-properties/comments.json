@@ -1,5 +1,5 @@
 {
-  "text.html": {
+  ".text.html": {
     "editor": {
       "commentStart": "<!-- ",
       "commentEnd": " -->"
