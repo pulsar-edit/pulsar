@@ -1,5 +1,5 @@
 {
-  "source.shell": {
+  ".source.shell": {
     "editor": {
       "commentStart": "# "
     }
