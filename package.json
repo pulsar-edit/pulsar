@@ -7,6 +7,7 @@
     "type": "git",
     "url": "https://github.com/atom/language-c.git"
   },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-c/issues"
   },
