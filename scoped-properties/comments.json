@@ -1,0 +1,7 @@
+{
+  "source.php": {
+    "editor": {
+      "commentStart": "// "
+    }
+  }
+}

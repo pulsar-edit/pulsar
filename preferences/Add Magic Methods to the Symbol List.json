@@ -1,7 +1,0 @@
-{
-  "name": "Add Magic Methods to the Symbol List",
-  "scope": "support.function.magic.php",
-  "settings": {
-    "showInSymbolList": 1
-  }
-}
