@@ -1,5 +1,5 @@
 {
-  "source.json": {
+  ".source.json": {
     "editor": {
       "increaseIndentPattern": "^.*(\\{[^}]*|\\[[^\\]]*)$",
       "decreaseIndentPattern": "^\\s*[}\\]],?\\s*$"
