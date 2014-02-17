@@ -1,0 +1,8 @@
+{
+  "text.html": {
+    "editor": {
+      "commentStart": "<!-- ",
+      "commentEnd": " -->"
+    }
+  }
+}

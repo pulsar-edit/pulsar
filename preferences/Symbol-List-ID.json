@@ -1,7 +1,0 @@
-{
-  "name": "Symbol List: ID",
-  "scope": "text.html meta.toc-list.id.html",
-  "settings": {
-    "symbolTransformation": "s/^/ID: /"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "name": "Indent Corrections",
-  "scope": "text.html",
-  "settings": {
-    "disableIndentCorrections": false,
-    "indentOnPaste": "default"
-  }
-}
