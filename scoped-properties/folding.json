@@ -1,0 +1,7 @@
+{
+  "source.shell": {
+    "editor": {
+      "foldEndPattern": "^\\s*(\\}|(done|fi|esac)\\b)"
+    }
+  }
+}

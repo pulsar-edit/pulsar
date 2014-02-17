@@ -1,0 +1,7 @@
+{
+  "source.shell": {
+    "editor": {
+      "commentStart": "# "
+    }
+  }
+}

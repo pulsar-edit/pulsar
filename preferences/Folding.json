@@ -1,8 +1,0 @@
-{
-  "name": "Folding",
-  "scope": "source.shell",
-  "settings": {
-    "foldingStartMarker": "\\b(if|case)\\b|(\\{|\\b(do)\\b)$",
-    "foldingStopMarker": "^\\s*(\\}|(done|fi|esac)\\b)"
-  }
-}
