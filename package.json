@@ -11,6 +11,7 @@
     "type": "git",
     "url": "https://github.com/atom/language-json.git"
   },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-json/issues"
   }
