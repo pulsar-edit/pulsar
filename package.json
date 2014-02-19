@@ -11,6 +11,7 @@
     "type": "git",
     "url": "https://github.com/atom/language-html.git"
   },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-html/issues"
   }
