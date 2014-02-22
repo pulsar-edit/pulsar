@@ -1,6 +1,0 @@
-{
-  "content": "\n\t$0\n",
-  "keyEquivalent": "\r",
-  "name": "Special: Return Inside Empty Open/Close Tags",
-  "scope": "meta.scope.between-tag-pair"
-}

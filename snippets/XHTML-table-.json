@@ -1,6 +1,0 @@
-{
-  "content": "<table border=\"${1:0}\"${2: cellspacing=\"${3:5}\" cellpadding=\"${4:5}\"}>\n\t<tr><th>${5:Header}</th></tr>\n\t<tr><td>${0:Data}</td></tr>\n</table>",
-  "name": "Table",
-  "scope": "text.html",
-  "tabTrigger": "table"
-}

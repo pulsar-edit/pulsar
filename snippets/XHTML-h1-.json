@@ -1,6 +1,0 @@
-{
-  "content": "<h1 id=\"${1/[[:alpha:]]+|( )/(?1:_:\\L$0)/g}\">${1:$TM_SELECTED_TEXT}</h1>",
-  "name": "Heading",
-  "scope": "text.html - meta.tag, text.html meta.tag & R:punctuation.definition.tag.html",
-  "tabTrigger": "h1"
-}

@@ -1,6 +1,0 @@
-{
-  "content": "<!--[if IE]>${1:${TM_SELECTED_TEXT:       IE Conditional Comment: Internet Explorer          }}<![endif]-->$0",
-  "name": "IE Conditional Comment: Internet Explorer",
-  "scope": "text.html",
-  "tabTrigger": "!"
-}

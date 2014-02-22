@@ -1,7 +1,0 @@
-{
-  "bundleUUID": "4676FC6D-6227-11D9-BFB1-000D93589AF6",
-  "content": "<option${1: value=\"${2:option}\"}>${3:$2}</option>",
-  "name": "Option",
-  "scope": "text.html",
-  "tabTrigger": "opt"
-}

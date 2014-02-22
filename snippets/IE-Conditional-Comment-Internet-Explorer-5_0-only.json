@@ -1,6 +1,0 @@
-{
-  "content": "<!--[if IE 5.0]>${1:${TM_SELECTED_TEXT:   IE Conditional Comment: Internet Explorer 5.0 only }}<![endif]-->$0",
-  "name": "IE Conditional Comment: Internet Explorer 5.0 only",
-  "scope": "text.html",
-  "tabTrigger": "!"
-}

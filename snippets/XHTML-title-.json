@@ -1,6 +1,0 @@
-{
-  "content": "<title>${1:${TM_FILENAME/((.+)\\..*)?/(?2:$2:Page Title)/}}</title>",
-  "name": "Title",
-  "scope": "text.html - text.blog",
-  "tabTrigger": "title"
-}

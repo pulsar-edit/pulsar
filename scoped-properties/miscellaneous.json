@@ -1,8 +1,0 @@
-{
-  ".text.html": {
-    "editor": {
-      "increaseIndentPattern": "(?x)\n\t\t<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|link|meta|param)\\b|[^>]*/>)\n\t\t  ([A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*</\\1>)\n\t\t|<!--(?!.*-->)\n\t\t|<\\?php.+?\\b(if|else(?:if)?|for(?:each)?|while)\\b.*:(?!.*end\\1)\n\t\t|\\{[^}\"']*$\n\t\t",
-      "decreaseIndentPattern": "(?x)\n\t\t^\\s*\n\t\t(</(?!html)\n\t\t  [A-Za-z0-9]+\\b[^>]*>\n\t\t|-->\n\t\t|<\\?(php)?\\s+(else(if)?|end(if|for(each)?|while))\n\t\t|\\}\n\t\t)"
-    }
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "content": "<base href=\"$1\"${2: target=\"$3\"}${TM_XHTML}>",
-  "name": "Base",
-  "scope": "text.html",
-  "tabTrigger": "base"
-}

@@ -1,0 +1,42 @@
+'.text.html':
+  'HTML — 5':
+    'prefix': 'doctype'
+    'body': '<!DOCTYPE html>\n'
+  'Option':
+    'prefix': 'opt'
+    'body': '<option${1: value="${2:option}"}>${3:option}</option>'
+  'Mail Anchor':
+    'prefix': 'mailto'
+    'body': '<a href="mailto:${1:joe@example.com}?subject=${2:feedback}">${3:email me}</a>'
+  'Div':
+    'prefix': 'div'
+    'body': '<div${1: id="${2:name}"}>\n\t$3\n</div>'
+  'Input':
+    'prefix': 'input'
+    'body': '<input type="${1:button}" name="${2:some_name}" value="$3">'
+  'Link':
+    'prefix': 'link'
+    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}">'
+  'Meta':
+    'prefix': 'meta'
+    'body': '<meta name="${1:name}" content="${2:content}">'
+  'Script':
+    'prefix': 'script'
+    'body': '<script type="text/javascript" charset="utf-8">\n\t$1\n</script>'
+  'Script With External Source':
+    'prefix': 'scriptsrc'
+    'body': '<script src="$1" type="text/javascript" charset="${2:utf-8}"></script>'
+  'Style':
+    'prefix': 'style'
+    'body': '<style type="text/css" media="screen">\n\t$1\n</style>'
+  'Text Area':
+    'prefix': 'textarea'
+    'body': '<textarea name="${1:Name}" rows="${2:8}" cols="${3:40}">$4</textarea>'
+'.text.html:not(.meta.tag)':
+  'Body':
+    'prefix': 'body'
+    'body': '<body id="${1:id}"${2: onload="$3"}>\n\t$4\n</body>'
+'.text.html:not(.text.blog)':
+  'Title':
+    'prefix': 'title'
+    'body': '<title>${1:Page Title}</title>'
