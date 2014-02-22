@@ -1,6 +1,0 @@
-{
-  "content": "self.assert_(${1:boolean expression}${2:, '${3:message}'})$0",
-  "name": "Assert",
-  "scope": "source.python",
-  "tabTrigger": "as"
-}

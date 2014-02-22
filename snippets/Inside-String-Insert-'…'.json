@@ -1,6 +1,0 @@
-{
-  "content": "'$0'",
-  "keyEquivalent": "'",
-  "name": "Inside String: Insert '…'",
-  "scope": "source.python string.quoted.single.single-line meta.empty-string.single"
-}

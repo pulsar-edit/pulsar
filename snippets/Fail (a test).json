@@ -1,6 +1,0 @@
-{
-  "content": "self.fail('${1:message}')$0",
-  "name": "Fail (a test)",
-  "scope": "source.python",
-  "tabTrigger": "fail"
-}

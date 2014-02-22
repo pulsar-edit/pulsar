@@ -1,6 +1,0 @@
-{
-  "content": "self.assertRaises(${1:exception}, ${2:callable})$0",
-  "name": "Assert Raises",
-  "scope": "source.python",
-  "tabTrigger": "asr"
-}

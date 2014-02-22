@@ -1,6 +1,0 @@
-{
-  "content": "(${1:object}):$0",
-  "keyEquivalent": "(",
-  "name": "Inside Class Def: Insert (..):",
-  "scope": "source.python meta.class.python invalid.illegal.missing-inheritance.python"
-}

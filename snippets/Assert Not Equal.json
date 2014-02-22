@@ -1,6 +1,0 @@
-{
-  "content": "self.assertNotEqual(${1:expected}, ${2:actual}${3:, '${4:message}'})$0",
-  "name": "Assert Not Equal",
-  "scope": "source.python",
-  "tabTrigger": "asne"
-}

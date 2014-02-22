@@ -1,6 +1,0 @@
-{
-  "content": "\"$0\"",
-  "keyEquivalent": "\"",
-  "name": "Inside String: Insert \"…\"",
-  "scope": "source.python string.quoted.double.single-line meta.empty-string.double"
-}
