@@ -1,6 +1,0 @@
-{
-  "content": "\\$_ENV['${1:variable}']",
-  "name": "ENV['…']",
-  "scope": "source.php",
-  "tabTrigger": "$_"
-}

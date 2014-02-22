@@ -1,6 +1,0 @@
-{
-  "content": "\\$_POST['${1:variable}']",
-  "name": "POST['…']",
-  "scope": "source.php",
-  "tabTrigger": "$_"
-}

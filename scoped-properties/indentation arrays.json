@@ -1,7 +1,0 @@
-{
-  ".source.php .meta.array.php": {
-    "editor": {
-      "decreaseIndentPattern": "(?x)\n\t    ^ (.* \\*/)? \\s*\n\t    (\\)+)\n\t"
-    }
-  }
-}

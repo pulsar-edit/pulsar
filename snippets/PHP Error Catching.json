@@ -1,6 +1,0 @@
-{
-  "content": "`cat \"$TM_BUNDLE_SUPPORT/textmate_error_handler.html\" | grep -E -v '^[ \\t\\s]*\\/\\/' | sed 's/\\(.*\\)[ \\t]*--.*/\\1/' | tr -s ' \\n\\t' ' ' | sed 's/.\\{80\\}[{};]/&\\\n/g'`",
-  "name": "PHP Error Catching JavaScript",
-  "scope": "text.html.php",
-  "tabTrigger": "phperr"
-}

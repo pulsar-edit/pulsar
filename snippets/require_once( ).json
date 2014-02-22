@@ -1,6 +1,0 @@
-{
-  "content": "require_once '${1:file}';$0",
-  "name": "require_once …",
-  "scope": "source.php",
-  "tabTrigger": "req1"
-}

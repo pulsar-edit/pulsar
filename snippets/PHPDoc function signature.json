@@ -1,8 +1,0 @@
-{
-  "bundlePath": "/Users/kumar/Library/Application Support/TextMate/Bundles/PHPDoc.tmbundle",
-  "content": "/**\n * ${4:undocumented function}\n *\n * @return ${5:void}\n * @author ${PHPDOC_AUTHOR:$TM_FULLNAME}$6\n **/\n$1function $2($3);$0",
-  "keyEquivalent": "",
-  "name": "Function Signature",
-  "scope": "source.php",
-  "tabTrigger": "doc_s"
-}

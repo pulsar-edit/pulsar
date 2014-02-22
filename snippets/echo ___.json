@@ -1,6 +1,0 @@
-{
-  "content": "echo \"${1:string}\"${0};",
-  "name": "echo \"…\"",
-  "scope": "source.php",
-  "tabTrigger": "echo"
-}

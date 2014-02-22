@@ -1,6 +1,0 @@
-{
-  "content": "foreach (\\$${1:variable} as \\$${2:key}${3: => \\$${4:value}}) {\n\t${0:# code...}\n}",
-  "name": "foreach …",
-  "scope": "source.php",
-  "tabTrigger": "foreach"
-}

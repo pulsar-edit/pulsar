@@ -1,6 +1,0 @@
-{
-  "content": "// === TextMate error handling ===\n`if [[ \"$TM_BUNDLE_SUPPORT\" == \"$HOME\"* ]]; then\n  echo \"// NOTE: Your PHP bundle is checked out to your home directory.\"\n  echo \"// If the webserver process does not have permission to access\"\n  echo \"// the included file, you can replace\"\n  echo \"// ‘${TM_BUNDLE_SUPPORT%Bundles*}’ with\"\n  echo \"// ‘$(find_app TextMate.app)/Contents/SharedSupport/’.\"\nfi`\n@include_once '$TM_BUNDLE_SUPPORT/textmate.php';\n",
-  "name": "Include TextMate Support Script",
-  "scope": "source.php",
-  "tabTrigger": "tmphp"
-}

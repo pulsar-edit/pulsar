@@ -1,6 +1,0 @@
-{
-  "content": "\\$_SERVER['${1:variable}']",
-  "name": "SERVER['…']",
-  "scope": "source.php",
-  "tabTrigger": "$_"
-}

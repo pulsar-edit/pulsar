@@ -1,6 +1,0 @@
-{
-  "content": "if (${1:condition}) {\n\t${0:# code...}\n}",
-  "name": "if …",
-  "scope": "source.php",
-  "tabTrigger": "if"
-}

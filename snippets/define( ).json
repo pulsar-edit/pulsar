@@ -1,6 +1,0 @@
-{
-  "content": "define('$1', ${2:'$3'});\n$0",
-  "name": "define(…, …)",
-  "scope": "source.php",
-  "tabTrigger": "def"
-}

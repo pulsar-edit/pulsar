@@ -1,7 +1,0 @@
-{
-  "content": "${TM_SELECTED_TEXT/([\\t ]*).*/$1/m}try {\n\t${3:${TM_SELECTED_TEXT/(\\A.*)|(.+)|\\n\\z/(?1:$0:(?2:\\t$0))/g}}\n${TM_SELECTED_TEXT/([\\t ]*).*/$1/m}} catch (${1:Exception} ${2:\\$e}) {\n${TM_SELECTED_TEXT/([\\t ]*).*/$1/m}\t$0\n${TM_SELECTED_TEXT/([\\t ]*).*/$1/m}}",
-  "keyEquivalent": "^@W",
-  "name": "Wrap in try { … } catch (…) { … }",
-  "scope": "source.php",
-  "tabTrigger": "try"
-}

@@ -1,6 +1,0 @@
-{
-  "content": "${1:public }function ${2:FunctionName}(${3:\\$${4:value}${5:=''}})\n{\n\t${0:# code...}\n}",
-  "name": "function …",
-  "scope": "source.php",
-  "tabTrigger": "fun"
-}

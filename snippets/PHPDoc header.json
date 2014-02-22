@@ -1,7 +1,0 @@
-{
-  "bundlePath": "/Users/kumar/Library/Application Support/TextMate/Bundles/PHPDoc.tmbundle",
-  "content": "/**\n * $1\n *\n * @author ${PHPDOC_AUTHOR:$TM_FULLNAME}\n * @version \\$Id\\$\n * @copyright `echo $TM_ORGANIZATION_NAME`, `date +\"%e %B, %Y\" | sed 's/^ //'`\n * @package ${3:default}\n **/\n\n/**\n * Define DocBlock\n **/\n",
-  "name": "Header",
-  "scope": "source.php",
-  "tabTrigger": "doc_h"
-}

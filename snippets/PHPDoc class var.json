@@ -1,7 +1,0 @@
-{
-  "bundlePath": "/Users/kumar/Library/Application Support/TextMate/Bundles/PHPDoc.tmbundle",
-  "content": "/**\n * ${3:undocumented class variable}\n *\n * @var ${4:string}\n **/\n${1:var} \\$$2;$0",
-  "name": "Class Variable",
-  "scope": "source.php",
-  "tabTrigger": "doc_v"
-}

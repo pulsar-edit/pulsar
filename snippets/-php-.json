@@ -1,7 +1,0 @@
-{
-  "content": "<?${TM_PHP_OPEN_TAG:php} $0 ?>",
-  "keyEquivalent": "^>",
-  "name": "<?php … ?>",
-  "scope": "text.html.php",
-  "tabTrigger": "php"
-}

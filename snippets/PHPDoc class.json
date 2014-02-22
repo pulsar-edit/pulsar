@@ -1,7 +1,0 @@
-{
-  "bundlePath": "/Users/kumar/Library/Application Support/TextMate/Bundles/PHPDoc.tmbundle",
-  "content": "/**\n * ${3:undocumented class}\n *\n * @package ${4:default}\n * @author ${PHPDOC_AUTHOR:$TM_FULLNAME}\n **/\n$1class $2\n{$0\n} // END $1class $2",
-  "name": "Class",
-  "scope": "source.php",
-  "tabTrigger": "doc_c"
-}

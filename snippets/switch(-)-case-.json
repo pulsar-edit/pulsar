@@ -1,6 +1,0 @@
-{
-  "content": "case '${1:variable}':\n\t${0:# code...}\n\tbreak;",
-  "name": "case …",
-  "scope": "source.php",
-  "tabTrigger": "case"
-}

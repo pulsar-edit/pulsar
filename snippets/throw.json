@@ -1,6 +1,0 @@
-{
-  "content": "throw new $1Exception(${2:\"${3:Error Processing Request}\"}${4:, ${5:1}});\n$0",
-  "name": "Throw Exception",
-  "scope": "source.php",
-  "tabTrigger": "throw"
-}

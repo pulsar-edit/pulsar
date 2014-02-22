@@ -1,6 +1,0 @@
-{
-  "content": "\\$_GET['${1:variable}']",
-  "name": "GET['…']",
-  "scope": "source.php",
-  "tabTrigger": "$_"
-}

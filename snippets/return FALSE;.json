@@ -1,6 +1,0 @@
-{
-  "content": "return false;$0",
-  "name": "return false",
-  "scope": "source.php",
-  "tabTrigger": "ret0"
-}

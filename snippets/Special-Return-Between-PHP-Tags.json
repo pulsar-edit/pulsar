@@ -1,6 +1,0 @@
-{
-  "content": "\n\t$0\n",
-  "keyEquivalent": "\r",
-  "name": "Special: Return Between PHP Tags",
-  "scope": "L:(meta.embedded.*.php punctuation.section.embedded.end.php) & R:(meta.embedded.line.php punctuation.section.embedded.*.php)"
-}

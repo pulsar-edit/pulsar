@@ -1,6 +1,0 @@
-{
-  "content": "elseif (${1:condition}) {\n\t${0:# code...}\n}",
-  "name": "elseif …",
-  "scope": "source.php",
-  "tabTrigger": "elseif"
-}
