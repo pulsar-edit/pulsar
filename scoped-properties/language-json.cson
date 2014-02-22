@@ -1,0 +1,5 @@
+'.source.json':
+  'editor':
+    'foldEndPattern': '(?x:        # turn on extended mode\n\t                        ^        # a line beginning with\n\t                        \\s*      # some optional space\n\t                        [}\\]]    # and the close of an object or array\n\t                      )'
+    'increaseIndentPattern': '^.*(\\{[^}]*|\\[[^\\]]*)$'
+    'decreaseIndentPattern': '^\\s*[}\\]],?\\s*$'
