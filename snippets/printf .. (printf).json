@@ -1,6 +1,0 @@
-{
-  "content": "printf(\"${1:%s}\\\\n\"${1/([^%]|%%)*(%.)?.*/(?2:, :\\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\\);)/}",
-  "name": "printf …",
-  "scope": "source.c, source.objc, source.c++, source.objc++",
-  "tabTrigger": "printf"
-}

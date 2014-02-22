@@ -1,6 +1,0 @@
-{
-  "content": "struct ${1:${TM_FILENAME/(.+)\\..+|.*/(?1:\\L$1_t:name)/}}\n{\n\t${0:/* data */}\n};",
-  "name": "Struct",
-  "scope": "source.c, source.objc, source.c++, source.objc++",
-  "tabTrigger": "st"
-}

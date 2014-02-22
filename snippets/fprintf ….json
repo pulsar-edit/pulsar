@@ -1,6 +1,0 @@
-{
-  "content": "fprintf(${1:stderr}, \"${2:%s}\\\\n\"${2/([^%]|%%)*(%.)?.*/(?2:, :\\);)/}$3${2/([^%]|%%)*(%.)?.*/(?2:\\);)/}",
-  "name": "fprintf …",
-  "scope": "source.c, source.objc, source.c++, source.objc++",
-  "tabTrigger": "fprintf"
-}

@@ -1,7 +1,0 @@
-{
-  ".source.c, .source.c\\+\\+": {
-    "editor": {
-      "foldEndPattern": "(?<!\\*)\\*\\*/|^\\s*\\}"
-    }
-  }
-}

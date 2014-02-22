@@ -1,6 +1,0 @@
-{
-  "content": "std::string",
-  "name": "std::string",
-  "scope": "source.c++, source.objc++",
-  "tabTrigger": "str"
-}

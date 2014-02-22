@@ -1,8 +1,0 @@
-{
-  ".source.c, .source.c\\+\\+, .source.objc, .source.objc\\+\\+": {
-    "editor": {
-      "increaseIndentPattern": "(?x)\n\t    ^ .* \\{ [^}\"']* $\n\t|   ^ \\s* (public|private|protected): \\s* $\n\t|   ^ \\s* @(public|private|protected) \\s* $\n\t|   ^ \\s* \\{ \\} $\n\t",
-      "decreaseIndentPattern": "(?x)\n\t    ^ \\s* ( (?! \\S.* /[*] ) .* [*]/ \\s* )? \\}\n\t|   ^ \\s* (public|private|protected): \\s* $\n\t|   ^ \\s* @(public|private|protected) \\s* $\n\t"
-    }
-  }
-}

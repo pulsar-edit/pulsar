@@ -1,6 +1,0 @@
-{
-  "content": "do {\n\t${0:/* code */}\n} while(${1:/* condition */});",
-  "name": "Do While Loop",
-  "scope": "source.c, source.objc, source.c++, source.objc++",
-  "tabTrigger": "do"
-}

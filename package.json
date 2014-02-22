@@ -1,7 +1,7 @@
 {
   "version": "0.10.0",
   "name": "language-c",
-  "description": "Atom language support for C",
+  "description": "Atom language support for C/C++",
   "homepage": "https://atom.github.io/language-c",
   "repository": {
     "type": "git",

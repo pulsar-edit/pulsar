@@ -1,6 +1,0 @@
-{
-  "content": "typedef std::shared_ptr<${2:${1:my_type}_t}> ${3:${2/_t$/_ptr/}};",
-  "name": "Shared Pointer",
-  "scope": "source.c, source.objc, source.c++, source.objc++",
-  "tabTrigger": "sp"
-}

@@ -1,7 +1,0 @@
-{
-  ".source.c, .source.c\\+\\+, .source.objc, .source.objc\\+\\+": {
-    "editor": {
-      "commentStart": "// "
-    }
-  }
-}
