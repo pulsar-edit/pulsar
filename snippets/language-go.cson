@@ -1,0 +1,10 @@
+'.source.go':
+  'import':
+    'prefix': 'im'
+    'body': 'import "${1:fmt}"'
+  'print(str)':
+    'prefix': 'pr'
+    'body': 'print($1);'
+  'println(str)':
+    'prefix': 'pl'
+    'body': 'println($1);'

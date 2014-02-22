@@ -1,6 +1,0 @@
-{
-  "content": "print($1);",
-  "name": "print(str) …",
-  "scope": "source.go",
-  "tabTrigger": "pr"
-}
