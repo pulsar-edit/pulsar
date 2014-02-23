@@ -1,6 +1,0 @@
-{
-  "content": "case ${1:word} in\n\t${2:pattern} )\n\t\t$0;;\nesac",
-  "name": "case … esac",
-  "scope": "source.shell",
-  "tabTrigger": "case"
-}

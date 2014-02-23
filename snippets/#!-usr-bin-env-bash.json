@@ -1,6 +1,0 @@
-{
-  "content": "#!/usr/bin/env bash\n",
-  "name": "#!/usr/bin/env bash",
-  "scope": "L:dyn.caret.begin.document",
-  "tabTrigger": "bash"
-}

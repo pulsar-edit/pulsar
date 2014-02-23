@@ -1,6 +1,0 @@
-{
-  "content": "${1:TMPFILE}=\"\\$(mktemp -t ${2:`echo \"${TM_FILENAME%.*}\" | sed -E -e 's/[^[:alnum:]]/_/g' -e 's/^$/untitled/'`})\"\ntrap \"${3:rm -f '\\$${1/.*\\s//}'}\" EXIT INT HUP TERM\n$0",
-  "name": "Tempfile",
-  "scope": "source.shell",
-  "tabTrigger": "tmpf"
-}

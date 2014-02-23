@@ -1,6 +1,0 @@
-{
-  "content": "for (( i = 0; i < ${1:10}; i++ )); do\n\t${0:#statements}\ndone",
-  "name": "for … done",
-  "scope": "source.shell",
-  "tabTrigger": "for"
-}

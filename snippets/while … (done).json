@@ -1,6 +1,0 @@
-{
-  "content": "while ${2:[[ ${1:condition} ]]}; do\n\t${0:#statements}\ndone",
-  "name": "while … done",
-  "scope": "source.shell",
-  "tabTrigger": "while"
-}

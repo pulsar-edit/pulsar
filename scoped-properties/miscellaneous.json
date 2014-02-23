@@ -1,8 +1,0 @@
-{
-  ".source.shell": {
-    "editor": {
-      "increaseIndentPattern": "^\\s*(if|elif|else|case)\\b|^.*(\\{|\\b(do)\\b)$",
-      "decreaseIndentPattern": "^\\s*(\\}|(elif|else|fi|esac|done)\\b)"
-    }
-  }
-}

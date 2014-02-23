@@ -1,6 +1,0 @@
-{
-  "content": "<<-${2:'${1:TOKEN}'}\n\t$0\n${1/['\"`](.+)['\"`]/$1/}",
-  "name": "Here Document",
-  "scope": "source.shell",
-  "tabTrigger": "here"
-}

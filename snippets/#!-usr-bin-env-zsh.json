@@ -1,6 +1,0 @@
-{
-  "content": "#!/usr/bin/env zsh\n",
-  "name": "#!/usr/bin/env zsh",
-  "scope": "L:dyn.caret.begin.document",
-  "tabTrigger": "zsh"
-}

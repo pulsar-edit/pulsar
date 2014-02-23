@@ -1,6 +1,0 @@
-{
-  "content": "#!/usr/bin/env ${1:${TM_SCOPE/(?:source|.*)\\.(?:(shell)|(\\w+)).*/(?1:bash:$2)/}}\n",
-  "name": "#!/usr/bin/env",
-  "scope": "L:dyn.caret.begin.document",
-  "tabTrigger": "env"
-}

@@ -1,0 +1,31 @@
+'.source.shell':
+  '#!/usr/bin/env':
+    'prefix': 'env'
+    'body': '#!/usr/bin/env $1\n'
+  '#!/usr/bin/env bash':
+    'prefix': 'bash'
+    'body': '#!/usr/bin/env bash\n'
+  '#!/bin/sh':
+    'prefix': 'sh'
+    'body': '#!/bin/sh\n'
+  '#!/usr/bin/env zsh':
+    'prefix': 'zsh'
+    'body': '#!/usr/bin/env zsh\n'
+  'case … esac':
+    'prefix': 'case'
+    'body': 'case ${1:word} in\n\t${2:pattern} )\n\t\t$0;;\nesac'
+  'elif …':
+    'prefix': 'elif'
+    'body': 'elif ${2:[[ ${1:condition} ]]}; then\n\t${0:#statements}'
+  'for … done':
+    'prefix': 'for'
+    'body': 'for (( i = 0; i < ${1:10}; i++ )); do\n\t${0:#statements}\ndone'
+  'if … fi':
+    'prefix': 'if'
+    'body': 'if ${2:[[ ${1:condition} ]]}; then\n\t${0:#statements}\nfi'
+  'until … done':
+    'prefix': 'until'
+    'body': 'until ${2:[[ ${1:condition} ]]}; do\n\t${0:#statements}\ndone'
+  'while … done':
+    'prefix': 'while'
+    'body': 'while ${2:[[ ${1:condition} ]]}; do\n\t${0:#statements}\ndone'

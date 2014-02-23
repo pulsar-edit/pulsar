@@ -1,0 +1,6 @@
+'.source.shell':
+  'editor':
+    'commentStart': '# '
+    'foldEndPattern': '^\\s*(\\}|(done|fi|esac)\\b)'
+    'increaseIndentPattern': '^\\s*(if|elif|else|case)\\b|^.*(\\{|\\b(do)\\b)$'
+    'decreaseIndentPattern': '^\\s*(\\}|(elif|else|fi|esac|done)\\b)'
