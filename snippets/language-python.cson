@@ -38,6 +38,15 @@
   'Try/Except':
     'prefix': 'try'
     'body': 'try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}'
+  'List Comprehension':
+    'prefix': 'lc'
+    'body': '[${1:value} for ${2:value} in ${3:variable}]'
+  'List Comprehension If Else':
+    'prefix': 'lcie'
+    'body': '[${1:value} if ${2:condition} else ${3:condition} for ${4:value} in ${5:variable}]'
+  'Dictionary Comprehension':
+    'prefix': 'dc'
+    'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
   '__magic__':
     'prefix': '__'
     'body': '__${1:init}__'
