@@ -44,6 +44,9 @@
   'List Comprehension If Else':
     'prefix': 'lcie'
     'body': '[${1:value} if ${2:condition} else ${3:condition} for ${4:value} in ${5:variable}]'
+  'Dictionary Comprehension':
+    'prefix': 'dc'
+    'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
   '__magic__':
     'prefix': '__'
     'body': '__${1:init}__'
