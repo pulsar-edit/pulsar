@@ -29,6 +29,15 @@
   'New Property':
     'prefix': 'property'
     'body': 'def ${1:foo}():\n    doc = "${2:The $1 property.}"\n    def fget(self):\n        ${3:return self._$1}\n    def fset(self, value):\n        ${4:self._$1 = value}\n    def fdel(self):\n        ${5:del self._$1}\n    return locals()\n$1 = property(**$1())$0'
+  'if':
+    'prefix': 'if'
+    'body': 'if ${1:condition}:\n\t${2:pass}'
+  'for':
+    'prefix': 'for'
+    'body': 'for ${1:value} in ${2:variable}:\n\t${3:pass}'
+  'while':
+    'prefix': 'while'
+    'body': 'while ${1:condition}:\n\t${2:pass}'
   'Try/Except/Else/Finally':
     'prefix': 'try'
     'body': 'try:\n\t${1:pass}\nexcept${2: ${3:Exception} as ${4:e}}:\n\t${5:raise}\nelse:\n\t${6:pass}\nfinally:\n\t${7:pass}'
