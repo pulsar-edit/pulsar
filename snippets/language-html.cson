@@ -32,6 +32,36 @@
   'Text Area':
     'prefix': 'textarea'
     'body': '<textarea name="${1:Name}" rows="${2:8}" cols="${3:40}">$4</textarea>'
+  'Paragraph':
+    'prefix': 'p'
+    'body': '<p>\n\t$1\n</p>'
+  'Span':
+    'prefix': 'span'
+    'body': '<span>$1</span>'
+  'Anchor':
+    'prefix': 'a'
+    'body': '<a href="#">$1</a>'
+  'Image':
+    'prefix': 'img'
+    'body': '<img src="$1" alt="" />'
+  'Bold':
+    'prefix': 'b'
+    'body': '<b>$1</b>'
+  'Strong':
+    'prefix': 'strong'
+    'body': '<strong>$1</strong>'
+  'Line Breaker':
+    'prefix': 'br'
+    'body': '<br>'
+  'Horizontal Rule':
+    'prefix': 'hr'
+    'body': '<hr>'
+  'Form':
+    'prefix': 'form'
+    'body': '<form id="${1:form_id}" action="index.html" method="post" >\n\t$1\n</form>'
+  'Select':
+    'prefix': 'select'
+    'body': '<select id="" name="">\n\t$1\n</select>'
 '.text.html:not(.meta.tag)':
   'Body':
     'prefix': 'body'
