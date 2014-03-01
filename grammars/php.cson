@@ -1,14 +1,15 @@
 'comment': 'TODO:\n• Try to improve parameters list syntax – scope numbers, ‘=’, ‘,’ and possibly be intelligent about entity ordering\n• Is meta.function-call the correct scope? I\'ve added it to my theme but by default it\'s not highlighted'
 'fileTypes': [
+  'aw'
+  'ctp'
+  'inc'
+  'module'
   'php'
   'php3'
   'php4'
   'php5'
   'phpt'
   'phtml'
-  'aw'
-  'ctp'
-  'module'
 ]
 'firstLineMatch': '^#!.*(?<!-)php[0-9]{0,1}\\b'
 'foldingStartMarker': '(/\\*|\\{\\s*$|<<<HTML)'
