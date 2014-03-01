@@ -1,11 +1,10 @@
 'fileTypes': [
-  'html'
   'htm'
+  'html'
   'shtml'
-  'xhtml'
-  'inc'
   'tmpl'
   'tpl'
+  'xhtml'
 ]
 'firstLineMatch': '<(?i:(!DOCTYPE\\s*)?html)'
 'injections':
