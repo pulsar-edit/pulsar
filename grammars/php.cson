@@ -8,7 +8,6 @@
   'phtml'
   'aw'
   'ctp'
-  'inc'
   'module'
 ]
 'firstLineMatch': '^#!.*(?<!-)php[0-9]{0,1}\\b'
