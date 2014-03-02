@@ -25,7 +25,7 @@
     'body': 'class ${1:ClassName}(${2:object}):\n\t"""${3:docstring for ClassName}"""\n\tdef __init__(self, ${4:arg}):\n\t\t${5:super(ClassName, self).__init__()}\n\t\tself.arg = arg\n\t\t$0'
   'New Method':
     'prefix': 'defs'
-    'body': 'def ${1:mname}(self${2/([^,])?.*/(?1:, )/}${2:arg}):\n\t${3:pass}'
+    'body': 'def ${1:mname}(self, ${2:arg}):\n\t${3:pass}'
   'New Property':
     'prefix': 'property'
     'body': 'def ${1:foo}():\n    doc = "${2:The $1 property.}"\n    def fget(self):\n        ${3:return self._$1}\n    def fset(self, value):\n        ${4:self._$1 = value}\n    def fdel(self):\n        ${5:del self._$1}\n    return locals()\n$1 = property(**$1())$0'
