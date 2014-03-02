@@ -40,10 +40,10 @@
     'body': '<span>$1</span>'
   'Anchor':
     'prefix': 'a'
-    'body': '<a href="#">$1</a>'
+    'body': '<a href="${1:#}">$2</a>'
   'Image':
     'prefix': 'img'
-    'body': '<img src="$1" alt="" />'
+    'body': '<img src="$1" alt="$2" />'
   'Bold':
     'prefix': 'b'
     'body': '<b>$1</b>'
@@ -58,10 +58,10 @@
     'body': '<hr>'
   'Form':
     'prefix': 'form'
-    'body': '<form id="${1:form_id}" action="index.html" method="post" >\n\t$1\n</form>'
+    'body': '<form id="${1:form_id}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
   'Select':
     'prefix': 'select'
-    'body': '<select id="" name="">\n\t$1\n</select>'
+    'body': '<select id="$1" name="$2">\n\t$3\n</select>'
 '.text.html:not(.meta.tag)':
   'Body':
     'prefix': 'body'
