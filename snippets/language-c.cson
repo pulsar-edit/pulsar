@@ -17,7 +17,7 @@
     'body': 'int main (int argc, char const *argv[])\n{\n\t${1:/* code */}\n\treturn 0;\n}'
   'For Loop':
     'prefix': 'for'
-    'body': 'for(size_t ${1:i} = 0; $2 < ${2:count}; ${3:i}++)\n{\n\t${4:/* code */}\n}'
+    'body': 'for(size_t ${1:i} = 0; ${2:i} < ${3:count}; ${4:i}++)\n{\n\t${5:/* code */}\n}'
   'Header Include-Guard':
     'prefix': 'once'
     'body': '#ifndef ${1:SYMBOL}\n#define ${2:SYMBOL}\n\n${3}\n\n#endif /* end of include guard: ${4:SYMBOL} */\n'
