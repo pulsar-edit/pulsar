@@ -62,6 +62,9 @@
   'Select':
     'prefix': 'select'
     'body': '<select id="$1" name="$2">\n\t$3\n</select>'
+  'Comment':
+    'prefix': 'comment'
+    'body': '<!-- $1 -->'
 '.text.html:not(.meta.tag)':
   'Body':
     'prefix': 'body'
