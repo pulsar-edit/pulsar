@@ -1,19 +1,19 @@
 '.source.php':
   '$GLOBALS[\'…\']':
     'prefix': 'globals'
-    'body': '\$GLOBALS[\'${1:variable}\']${2: = }${3:something}${4:;}$0'
+    'body': '$GLOBALS[\'${1:variable}\']${2: = }${3:something}${4:;}$0'
   '?>…<?php':
     'prefix': 'php'
     'body': '?>$0<?php'
   'function __construct':
     'prefix': 'con'
-    'body': 'function __construct(${1:\$${2:foo}${3: = ${4:null}}}) {\n\t${2/.+/$this->$0 = \$$0;/}$0\n}'
+    'body': 'function __construct(${1:$${2:foo}${3: = ${4:null}}}) {\n\t${2:$this->$0 = $$0;}$0\n}'
   'Heredoc':
     'prefix': '<<<'
     'body': '<<<${1:HTML}\n${2:content here}\n$1;\n'
   'Class Variable':
     'prefix': 'doc_v'
-    'body': '/**\n * ${3:undocumented class variable}\n *\n * @var ${4:string}\n **/\n${1:var} \$$2;$0'
+    'body': '/**\n * ${3:undocumented class variable}\n *\n * @var ${4:string}\n **/\n${1:var} $$2;$0'
   'Start Docblock':
     'prefix': '/**'
     'body': '/**\n * $0\n */'
@@ -40,13 +40,13 @@
     'body': 'elseif (${1:condition}) {\n\t${0:# code...}\n}'
   'for …':
     'prefix': 'for'
-    'body': 'for (\$${1:i}=${2:0}; \$${1:i} < $3; \$${1:i}++) { \n\t${0:# code...}\n}'
+    'body': 'for ($${1:i}=${2:0}; $${1:i} < $3; $${1:i}++) { \n\t${0:# code...}\n}'
   'foreach …':
     'prefix': 'foreach'
-    'body': 'foreach (\$${1:variable} as \$${2:key}${3: => \$${4:value}}) {\n\t${0:# code...}\n}'
+    'body': 'foreach ($${1:variable} as $${2:key}${3: => $${4:value}}) {\n\t${0:# code...}\n}'
   'function …':
     'prefix': 'fun'
-    'body': '${1:public }function ${2:FunctionName}(${3:\$${4:value}${5:=\'\'}})\n{\n\t${0:# code...}\n}'
+    'body': '${1:public }function ${2:FunctionName}(${3:$${4:value}${5:=\'\'}})\n{\n\t${0:# code...}\n}'
   'if … else …':
     'prefix': 'ifelse'
     'body': 'if (${1:condition}) {\n\t${2:# code...}\n} else {\n\t${3:# code...}\n}\n$0'
@@ -55,7 +55,7 @@
     'body': 'if (${1:condition}) {\n\t${0:# code...}\n}'
   '$… = ( … ) ? … : …':
     'prefix': 'if?'
-    'body': '\$${1:retVal} = (${2:condition}) ? ${3:a} : ${4:b} ;'
+    'body': '$${1:retVal} = (${2:condition}) ? ${3:a} : ${4:b} ;'
   'include …':
     'prefix': 'incl'
     'body': 'include \'${1:file}\';$0'
@@ -64,7 +64,7 @@
     'body': 'include_once \'${1:file}\';$0'
   '$… = array (…)':
     'prefix': 'array'
-    'body': '\$${1:arrayName} = array(\'$2\' => $3${4:,} $0);'
+    'body': '$${1:arrayName} = array(\'$2\' => $3${4:,} $0);'
   'require …':
     'prefix': 'req'
     'body': 'require \'${1:file}\';$0'
@@ -95,26 +95,26 @@
 '.text.html.php:not(.source)':
   '<?php $this->… ?>':
     'prefix': 'this'
-    'body': '<?php \$this->$0 ?>'
+    'body': '<?php $this->$0 ?>'
   '<?php echo $this->… ?>':
     'prefix': 'ethis'
-    'body': '<?php echo \$this->$0 ?>'
+    'body': '<?php echo $this->$0 ?>'
 '.text.html.php':
   '<?php … ?>':
     'prefix': 'php'
     'body': '<?php $0 ?>'
   '<?php echo … ?>':
     'prefix': 'echo'
-    'body': '<?php echo ${1:\$var} ?>$0'
+    'body': '<?php echo ${1:$var} ?>$0'
   '<?php echo htmlentities(…) ?>':
     'prefix': 'echoh'
-    'body': '<?php echo htmlentities(${1:\$var}, ENT_QUOTES, \'utf-8\') ?>$0'
+    'body': '<?php echo htmlentities(${1:$var}, ENT_QUOTES, \'utf-8\') ?>$0'
   '<?php else: ?>':
     'prefix': 'else'
     'body': '<?php else: ?>'
   '<?php foreach (…) … <?php endforeach ?>':
     'prefix': 'foreach'
-    'body': '<?php foreach (\$${1:variable} as \$${2:key}${3: => \$${4:value}}): ?>\n\t${0}\n<?php endforeach ?>'
+    'body': '<?php foreach ($${1:variable} as $${2:key}${3: => $${4:value}}): ?>\n\t${0}\n<?php endforeach ?>'
   '<?php if (…) ?> … <?php else ?> … <?php endif ?>':
     'prefix': 'ifelse'
     'body': '<?php if (${1:condition}): ?>\n\t$2\n<?php else: ?>\n\t$0\n<?php endif ?>'
