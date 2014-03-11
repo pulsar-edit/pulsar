@@ -19,7 +19,7 @@
     'body': '/**\n * $0\n */'
   'class …':
     'prefix': 'class'
-    'body': '/**\n* $1\n*/\nclass ${2:ClassName}${3: extends ${4:AnotherClass}}\n{\n\t$5\n\tfunction ${6:__construct}(${7:argument})\n\t{\n\t\t${0:# code...}\n\t}\n}\n'
+    'body': '/**\n * $1\n */\nclass ${2:ClassName}${3: extends ${4:AnotherClass}}\n{\n\t$5\n\tfunction ${6:__construct}(${7:argument})\n\t{\n\t\t${0:# code...}\n\t}\n}\n'
   'trait …':
     'prefix': 'trait'
     'body': '/**\n * $1\n */\ntrait ${2:TraitName}\n{\n\tfunction ${3:functionName}(${4:argument})\n\t{\n\t\t${5:# code...}\n\t}\n}\n'
