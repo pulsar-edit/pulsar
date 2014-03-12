@@ -65,6 +65,9 @@
   'Content':
     'prefix': 'content'
     'body': '<content select="$1">$2</content>'
+  'Comment':
+    'prefix': 'comment'
+    'body': '<!-- $1 -->'
   # D
   'HTML — 5':
     'prefix': 'doctype'
