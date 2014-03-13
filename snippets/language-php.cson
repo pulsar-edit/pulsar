@@ -89,6 +89,12 @@
   'case …':
     'prefix': 'case'
     'body': 'case \'${1:variable}\':\n\t${0:# code...}\n\tbreak;'
+  '$this->…':
+    'prefix': 'this'
+    'body': '$this->$0'
+  'echo $this->…':
+    'prefix': 'ethis'
+    'body': 'echo $this->$0'
   'Throw Exception':
     'prefix': 'throw'
     'body': 'throw new $1Exception(${2:"${3:Error Processing Request}"}${4:, ${5:1}});\n$0'
