@@ -68,6 +68,12 @@
   '$… = array (…)':
     'prefix': 'array'
     'body': '$${1:arrayName} = array(\'$2\' => $3${4:,} $0);'
+  '$… = […]':
+    'prefix': 'shorray'
+    'body': '$${1:arrayName} = [\'$2\' => $3${4:,} $0];'
+  '… => …':
+    'prefix': 'keyval'
+    'body': '\'$1\' => $2${3:,} $0'
   'require …':
     'prefix': 'req'
     'body': 'require \'${1:file}\';$0'
