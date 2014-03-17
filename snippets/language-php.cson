@@ -126,4 +126,4 @@
     'body': '<?php if (${1:condition}): ?>\n\t$0\n<?php endif ?>'
   'var_dump("…")':
     'prefix': 'dump'
-    'body': 'var_dump($1$0);'
+    'body': 'var_dump($0);'
