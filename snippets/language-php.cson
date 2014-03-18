@@ -34,7 +34,7 @@
     'body': 'do {\n\t${0:# code...}\n} while (${1:$a <= 10});'
   'echo "…"':
     'prefix': 'echo'
-    'body': 'echo "${1:string}"${0};'
+    'body': 'echo "${1:string}"$0;'
   'else …':
     'prefix': 'else'
     'body': 'else {\n\t${0:# code...}\n}'
@@ -136,3 +136,6 @@
   '<?php if (…) ?> … <?php endif ?>':
     'prefix': 'if'
     'body': '<?php if (${1:condition}): ?>\n\t$0\n<?php endif ?>'
+  'var_dump("…")':
+    'prefix': 'dump'
+    'body': 'var_dump($0);'
