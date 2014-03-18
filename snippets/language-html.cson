@@ -129,19 +129,19 @@
     'body': '<h1>$1</h1>'
   'Heading 2':
     'prefix': 'h2'
-    'body': '<h1>$1</h1>'
+    'body': '<h2>$1</h2>'
   'Heading 3':
     'prefix': 'h3'
-    'body': '<h1>$1</h1>'
+    'body': '<h3>$1</h3>'
   'Heading 4':
     'prefix': 'h4'
-    'body': '<h1>$1</h1>'
+    'body': '<h4>$1</h4>'
   'Heading 5':
     'prefix': 'h5'
-    'body': '<h1>$1</h1>'
+    'body': '<h5>$1</h5>'
   'Heading 6':
     'prefix': 'h6'
-    'body': '<h1>$1</h1>'
+    'body': '<h6>$1</h6>'
   'Head':
     'prefix': 'head'
     'body': '<head>\n\t$1\n</head>'
