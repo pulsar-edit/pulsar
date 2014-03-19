@@ -153,7 +153,7 @@
     'body': '<hr>'
   'HTML':
     'prefix': 'html'
-    'body': '<html>\n\t$1\n</html>'
+    'body': '<html>\n\t<head>\n\t\t<title>$1</title>\n\t</head>\n\t<body>\n\t</body>\n</html>'
   # I
   'Italic':
     'prefix': 'i'
