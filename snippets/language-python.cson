@@ -62,6 +62,9 @@
   'Dictionary Comprehension':
     'prefix': 'dc'
     'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
+  'PDB set trace':
+    'prefix': 'pdb'
+    'body': 'import pdb; pdb.set_trace()\n'
   '__magic__':
     'prefix': '__'
     'body': '__${1:init}__'
