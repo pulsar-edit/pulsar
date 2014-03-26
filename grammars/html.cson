@@ -17,7 +17,6 @@
         'name': 'invalid.illegal.bad-angle-bracket.html'
       }
     ]
-'keyEquivalent': '^~H'
 'name': 'HTML'
 'patterns': [
   {
