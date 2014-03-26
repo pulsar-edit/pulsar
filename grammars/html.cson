@@ -416,7 +416,7 @@
         'name': 'entity.other.attribute-name.id.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
-    'end': '(?<=\'|")'
+    'end': '(?<=\'|")|(?=\\s|>)'
     'name': 'meta.attribute-with-value.id.html'
     'patterns': [
       {
@@ -458,6 +458,9 @@
             'include': '#entities'
           }
         ]
+      }
+      {
+        'include': '#unquoted-attribute'
       }
     ]
   'tag-stuff':
