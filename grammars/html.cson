@@ -1,3 +1,4 @@
+'scopeName': 'text.html.basic'
 'fileTypes': [
   'htm'
   'html'
@@ -484,4 +485,3 @@
   'unquoted-attribute':
     'match': '(?<==)(?:[^\\s<>/\'"]|/(?!>))+'
     'name': 'string.unquoted.html'
-'scopeName': 'text.html.basic'
