@@ -2,36 +2,30 @@
   'import':
     'prefix': 'im'
     'body': 'import "${1:fmt}"'
-  'print(str)':
-    'prefix': 'pr'
-    'body': 'print($1);'
-  'println(str)':
-    'prefix': 'pl'
-    'body': 'println($1);'
   'func':
     'prefix': 'func'
-    'body': "func $1($2) {\n$0\n}"
+    'body': "func $1($2) {\n\t$0\n}"
   'main':
     'prefix': 'main'
-    'body': "func main() {\n$1\n}"
+    'body': "func main() {\n\t$1\n}"
   'var':
     'prefix': 'var'
-    'body': "var ${1:ok} ${2:bool}\n$0"
+    'body': "var ${1:ok} ${2:bool}$0"
   'switch':
     'prefix': 'switch'
-    'body': "switch {\n    case ${1:cond}:\n        $0\n}"
+    'body': "switch {\n\tcase ${1:cond}:\n\t\t$0\n}"
   'Import':
     'prefix': 'Im'
-    'body': "import (\n    \"${1:fmt}\"\n)$0"
+    'body': "import (\n\t\"${1:fmt}\"\n)$0"
   'type interface':
     'prefix': 'tyi'
-    'body': "type ${1:Name} interface {\n$0\n}"
+    'body': "type ${1:Name} interface {\n\t$0\n}"
   'type struct':
     'prefix': 'tys'
-    'body': "type ${1:Name} struct {\n$0\n}"
+    'body': "type ${1:Name} struct {\n\t$0\n}"
   'for range':
     'prefix': 'forr'
-    'body': "for ${1:index}, ${2:item} := range ${3:list} {\n$0\n}"
+    'body': "for ${1:index}, ${2:item} := range ${3:list} {\n\t$0\n}"
   'if err != nil':
     'prefix': 'iferr'
     'body': "if err != nil {\n\t${1:return}\n}"
