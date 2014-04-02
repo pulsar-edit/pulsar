@@ -1,3 +1,5 @@
+'scopeName': 'source.python'
+'name': 'Python'
 'fileTypes': [
   'py'
   'rpy'
@@ -11,7 +13,6 @@
   'gypi'
 ]
 'firstLineMatch': '^#!/.*\\bpython\\b'
-'name': 'Python'
 'patterns': [
   {
     'begin': '(^[ \\t]+)?(?=#)'
@@ -1607,4 +1608,3 @@
         'include': '#string_quoted_single'
       }
     ]
-'scopeName': 'source.python'
