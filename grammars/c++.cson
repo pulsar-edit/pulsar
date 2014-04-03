@@ -187,7 +187,7 @@
           '1':
             'name': 'keyword.control.namespace.$2'
         'end': '(?<=\\})|(?=(;|,|\\(|\\)|>|\\[|\\]|=))'
-        'name': 'meta.namespace-block${2:+.$2}.c++'
+        'name': 'meta.namespace-block.c++'
         'patterns': [
           {
             'begin': '\\{'
