@@ -364,7 +364,7 @@
 '.text.html:not(.meta.tag)':
   'Body':
     'prefix': 'body'
-    'body': '<body id="${1:id}"${2: onload="$3"}>\n\t$4\n</body>'
+    'body': '<body>\n\t$1\n</body>'
 '.text.html:not(.text.blog)':
   'Title':
     'prefix': 'title'
