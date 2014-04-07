@@ -65,6 +65,9 @@
   'PDB set trace':
     'prefix': 'pdb'
     'body': 'import pdb; pdb.set_trace()\n'
+  'iPDB set trace':
+    'prefix': 'ipdb'
+    'body': 'import ipdb; ipdb.set_trace()\n'
   '__magic__':
     'prefix': '__'
     'body': '__${1:init}__'
