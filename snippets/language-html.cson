@@ -2,16 +2,16 @@
   # A
   'Anchor':
     'prefix': 'a'
-    'body': '<a href="${1:#}">$2</a>'
+    'body': '<a href="${1:#}">$2</a>$0'
   'Abbreviation':
     'prefix': 'abbr'
-    'body': '<abbr title="$1">$2</abbr>'
+    'body': '<abbr title="$1">$2</abbr>$0'
   'Address':
     'prefix': 'address'
     'body': '<address ${1:id="$2"}>\n\t$3\n</address>'
   'Area':
     'prefix': 'area'
-    'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"} />'
+    'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"} />$0'
   'Article':
     'prefix': 'article'
     'body': '<article id="$1">\n\t$2\n</article>'
@@ -24,16 +24,16 @@
   # B
   'Bold':
     'prefix': 'b'
-    'body': '<b>$1</b>'
+    'body': '<b>$1</b>$0'
   'Base':
     'prefix': 'base'
-    'body': '<base href="${1:#}" target="${2:_blank}" />'
+    'body': '<base href="${1:#}" target="${2:_blank}" />$0'
   'Bi-Directional Isolation':
     'prefix': 'bdi'
-    'body': '<bdi dir="${1:auto}">$2</bdi>'
+    'body': '<bdi dir="${1:auto}">$2</bdi>$0'
   'Bi-Directional Override':
     'prefix': 'bdo'
-    'body': '<bdo dir="${1:auto}">$2</bdo>'
+    'body': '<bdo dir="${1:auto}">$2</bdo>$0'
   'Blockquote':
     'prefix': 'blockquote'
     'body': '<blockquote cite="${1:http://}">\n\t$2\n</blockquote>'
@@ -42,83 +42,83 @@
     'body': '<br>'
   'Button':
     'prefix': 'button'
-    'body': '<button name="${1:button}">$2</button>'
+    'body': '<button name="${1:button}">$2</button>$0'
   # C
   'Canvas':
     'prefix': 'canvas'
-    'body': '<canvas id="${1:canvas}" width="${2:300}" height="${3:300}">$4</canvas>'
+    'body': '<canvas id="${1:canvas}" width="${2:300}" height="${3:300}">$4</canvas>$0'
   'Caption':
     'prefix': 'caption'
-    'body': '<caption>$1</caption>'
+    'body': '<caption>$1</caption>$0'
   'Citation':
     'prefix': 'cite'
-    'body': '<cite>$1</cite>'
+    'body': '<cite>$1</cite>$0'
   'Code':
     'prefix': 'code'
-    'body': '<code>$1</code>'
+    'body': '<code>$1</code>$0'
   'Column':
     'prefix': 'col'
-    'body': '<col>$1</col>'
+    'body': '<col>$1</col>$0'
   'Column Group':
     'prefix': 'colgroup'
-    'body': '<colgroup>$1</colgroup>'
+    'body': '<colgroup>$1</colgroup>$0'
   'Content':
     'prefix': 'content'
-    'body': '<content select="$1">$2</content>'
+    'body': '<content select="$1">$2</content>$0'
   'Comment':
     'prefix': '--'
-    'body': '<!-- $1 -->'
+    'body': '<!-- $1 -->$0'
   # D
   'HTML — 5':
     'prefix': 'doctype'
     'body': '<!DOCTYPE html>\n'
   'Data':
     'prefix': 'data'
-    'body': '<data value="$1">$2</data>'
+    'body': '<data value="$1">$2</data>$0'
   'Data List':
     'prefix': 'datalist'
     'body': '<datalist id="$1">\n\t$2\n</datalist>'
   'Description':
     'prefix': 'dd'
-    'body': '<dd>$1</dd>'
+    'body': '<dd>$1</dd>$0'
   'Deleted Text':
     'prefix': 'del'
-    'body': '<del>$1</del>'
+    'body': '<del>$1</del>$0'
   'Details':
     'prefix': 'details'
-    'body': '<details ${1:open}>$2</details>'
+    'body': '<details ${1:open}>$2</details>$0'
   'Definition':
     'prefix': 'dfn'
-    'body': '<dfn>$1</dfn>'
+    'body': '<dfn>$1</dfn>$0'
   'Description List':
     'prefix': 'dl'
     'body': '<dl id="$1">\n\t$2\n</dl>'
   'Definition Term':
     'prefix': 'dt'
-    'body': '<dt>$1</dt>'
+    'body': '<dt>$1</dt>$0'
   'Div':
     'prefix': 'div'
     'body': '<div${1: id="${2:name}"}>\n\t$3\n</div>'
   # E
   'Emphasis':
     'prefix': 'em'
-    'body': '<em>$1</em>'
+    'body': '<em>$1</em>$0'
   'Embed':
     'prefix': 'embed'
-    'body': '<embed type="${1:video/quicktime}" src="${2:#}" width="${3:300}" height="${4:300}">'
+    'body': '<embed type="${1:video/quicktime}" src="${2:#}" width="${3:300}" height="${4:300}">$0'
   # F
   'Fieldset':
     'prefix': 'fieldset'
-    'body': '<fieldset>$1</fieldset>'
+    'body': '<fieldset>$1</fieldset>$0'
   'Figure Caption':
     'prefix': 'figcaption'
-    'body': '<figcaption>$1</figcaption>'
+    'body': '<figcaption>$1</figcaption>$0'
   'Figure':
     'prefix': 'figure'
-    'body': '<figure>$1</figure>'
+    'body': '<figure>$1</figure>$0'
   'Footer':
     'prefix': 'footer'
-    'body': '<footer>$1</footer>'
+    'body': '<footer>$1</footer>$0'
   'Form':
     'prefix': 'form'
     'body': '<form id="${1:form_id}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
@@ -126,22 +126,22 @@
   # H
   'Heading 1':
     'prefix': 'h1'
-    'body': '<h1>$1</h1>'
+    'body': '<h1>$1</h1>$0'
   'Heading 2':
     'prefix': 'h2'
-    'body': '<h2>$1</h2>'
+    'body': '<h2>$1</h2>$0'
   'Heading 3':
     'prefix': 'h3'
-    'body': '<h3>$1</h3>'
+    'body': '<h3>$1</h3>$0'
   'Heading 4':
     'prefix': 'h4'
-    'body': '<h4>$1</h4>'
+    'body': '<h4>$1</h4>$0'
   'Heading 5':
     'prefix': 'h5'
-    'body': '<h5>$1</h5>'
+    'body': '<h5>$1</h5>$0'
   'Heading 6':
     'prefix': 'h6'
-    'body': '<h6>$1</h6>'
+    'body': '<h6>$1</h6>$0'
   'Head':
     'prefix': 'head'
     'body': '<head>\n\t$1\n</head>'
@@ -157,40 +157,40 @@
   # I
   'Italic':
     'prefix': 'i'
-    'body': '<i>$1</i>'
+    'body': '<i>$1</i>$0'
   'Inline Frame':
     'prefix': 'iframe'
-    'body': '<iframe src="$1" width="$2" height="$3">$4</iframe>'
+    'body': '<iframe src="$1" width="$2" height="$3">$4</iframe>$0'
   'Input':
     'prefix': 'input'
-    'body': '<input type="${1:button}" name="${2:some_name}" value="$3">'
+    'body': '<input type="${1:button}" name="${2:some_name}" value="$3">$0'
   'Image':
     'prefix': 'img'
-    'body': '<img src="$1" alt="$2" />'
+    'body': '<img src="$1" alt="$2" />$0'
   'Inserted Text':
     'prefix': 'ins'
-    'body': '<ins>$1</ins>'
+    'body': '<ins>$1</ins>$0'
   # J
   # K
   'Keyboard Input':
     'prefix': 'kbd'
-    'body': '<kbd>$1</kbd>'
+    'body': '<kbd>$1</kbd>$0'
   'Keygen':
     'prefix': 'keygen'
-    'body': '<keygen name="${1:name}" challenge="${2:string}" keytype="${3:RSA}" keyparams="${4:medium}">'
+    'body': '<keygen name="${1:name}" challenge="${2:string}" keytype="${3:RSA}" keyparams="${4:medium}">$0'
   # L
   'Label':
     'prefix': 'label'
-    'body': '<label ${1:for="$2"}></label>'
+    'body': '<label ${1:for="$2"}></label>$0'
   'Legend':
     'prefix': 'legend'
-    'body': '<legend>$1</legend>'
+    'body': '<legend>$1</legend>$0'
   'List Item':
     'prefix': 'li'
-    'body': '<li>$1</li>'
+    'body': '<li>$1</li>$0'
   'Link':
     'prefix': 'link'
-    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}">'
+    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}">$0'
   # M
   'Main':
     'prefix': 'main'
@@ -200,22 +200,22 @@
     'body': '<map>\n\t$1\n</map>'
   'Mark':
     'prefix': 'mark'
-    'body': '<mark>$1</mark>'
+    'body': '<mark>$1</mark>$0'
   'Menu':
     'prefix': 'menu'
     'body': '<menu>\n\t$1\n</menu>'
   'Menu Item':
     'prefix': 'menuitem'
-    'body': '<menuitem type="${1:command}" label="${2:Save}">'
+    'body': '<menuitem type="${1:command}" label="${2:Save}">$0'
   'Meter':
     'prefix': 'meter'
-    'body': '<meter min="${1:200}" max="${2:500}" value="${3:350}">'
+    'body': '<meter min="${1:200}" max="${2:500}" value="${3:350}">$0'
   'Mail Anchor':
     'prefix': 'mailto'
-    'body': '<a href="mailto:${1:joe@example.com}?subject=${2:feedback}">${3:email me}</a>'
+    'body': '<a href="mailto:${1:joe@example.com}?subject=${2:feedback}">${3:email me}</a>$0'
   'Meta':
     'prefix': 'meta'
-    'body': '<meta name="${1:name}" content="${2:content}">'
+    'body': '<meta name="${1:name}" content="${2:content}">$0'
   # N
   'Navigation':
     'prefix': 'nav'
@@ -226,7 +226,7 @@
   # O
   'Object':
     'prefix': 'object'
-    'body': '<object data="${1:http://}" type="${2:mimetype}">$3</object>'
+    'body': '<object data="${1:http://}" type="${2:mimetype}">$3</object>$0'
   'Ordered List':
     'prefix': 'ol'
     'body': '<ol>\n\t$1\n</ol>'
@@ -235,50 +235,50 @@
     'body': '<optgroup label="${1:Group 1}">\n\t$2\n</optgroup>'
   'Option':
     'prefix': 'opt'
-    'body': '<option${1: value="${2:option}"}>${3:option}</option>'
+    'body': '<option${1: value="${2:option}"}>${3:option}</option>$0'
   'Output':
     'prefix': 'output'
-    'body': '<output name="${1:result}">$2</output>'
+    'body': '<output name="${1:result}">$2</output>$0'
   # P
   'Paragraph':
     'prefix': 'p'
     'body': '<p>\n\t$1\n</p>'
   'Parameter':
     'prefix': 'param'
-    'body': '<param name="${1:foo}" value="${2:bar}">'
+    'body': '<param name="${1:foo}" value="${2:bar}">$0'
   'Preformatted Text':
     'prefix': 'pre'
     'body': '<pre>\n\t$1\n</pre>'
   'Progress':
     'prefix': 'progress'
-    'body': '<progress value="${1:50}" max="${2:100}">${3:50%}</progress>'
+    'body': '<progress value="${1:50}" max="${2:100}">${3:50%}</progress>$0'
   # Q
   'Quote':
     'prefix': 'q'
-    'body': '<q cite="$1">$2</q>'
+    'body': '<q cite="$1">$2</q>$0'
   # R
   'Ruby Parenthesis':
     'prefix': 'rp'
-    'body': '<rp>$1</rp>'
+    'body': '<rp>$1</rp>$0'
   'Ruby Pronunciation':
     'prefix': 'rt'
-    'body': '<rt>$1</rt>'
+    'body': '<rt>$1</rt>$0'
   'Ruby Annotation':
     'prefix': 'ruby'
-    'body': '<ruby>$1</ruby>'
+    'body': '<ruby>$1</ruby>$0'
   # S
   'Strikethrough':
     'prefix': 's'
-    'body': '<s>$1</s>'
+    'body': '<s>$1</s>$0'
   'Sample Output':
     'prefix': 'samp'
-    'body': '<samp>$1</samp>'
+    'body': '<samp>$1</samp>$0'
   'Script':
     'prefix': 'script'
     'body': '<script type="text/javascript" charset="utf-8">\n\t$1\n</script>'
   'Script With External Source':
     'prefix': 'scriptsrc'
-    'body': '<script src="$1" type="text/javascript" charset="${2:utf-8}"></script>'
+    'body': '<script src="$1" type="text/javascript" charset="${2:utf-8}"></script>$0'
   'Section':
     'prefix': 'section'
     'body': '<section>\n\t$1\n</section>'
@@ -287,28 +287,28 @@
     'body': '<select id="$1" name="$2">\n\t$3\n</select>'
   'Small':
     'prefix': 'small'
-    'body': '<small>$1</small>'
+    'body': '<small>$1</small>$0'
   'Source':
     'prefix': 'source'
-    'body': '<source src="${1:http://}" type="${2:mimetype}">'
+    'body': '<source src="${1:http://}" type="${2:mimetype}">$0'
   'Span':
     'prefix': 'span'
-    'body': '<span>$1</span>'
+    'body': '<span>$1</span>$0'
   'Strong':
     'prefix': 'strong'
-    'body': '<strong>$1</strong>'
+    'body': '<strong>$1</strong>$0'
   'Style':
     'prefix': 'style'
     'body': '<style type="text/css" media="screen">\n\t$1\n</style>'
   'Subscript':
     'prefix': 'sub'
-    'body': '<sub>$1</sub>'
+    'body': '<sub>$1</sub>$0'
   'Summary':
     'prefix': 'summary'
-    'body': '<summary>$1</summary>'
+    'body': '<summary>$1</summary>$0'
   'Superscript':
     'prefix': 'sup'
-    'body': '<sup>$1</sup>'
+    'body': '<sup>$1</sup>$0'
   # T
   'Table':
     'prefix': 'table'
@@ -324,7 +324,7 @@
     'body': '<template id="$1">\n\t$2\n</template>'
   'Text Area':
     'prefix': 'textarea'
-    'body': '<textarea name="${1:Name}" rows="${2:8}" cols="${3:40}">$4</textarea>'
+    'body': '<textarea name="${1:Name}" rows="${2:8}" cols="${3:40}">$4</textarea>$0'
   'Table Foot':
     'prefix': 'tfoot'
     'body': '<tfoot>\n\t$1\n</tfoot>'
@@ -336,24 +336,24 @@
     'body': '<thead>\n\t$1\n</thead>'
   'Time':
     'prefix': 'time'
-    'body': '<time>$1</time>'
+    'body': '<time>$1</time>$0'
   'Table Row':
     'prefix': 'tr'
     'body': '<tr>\n\t$1\n</tr>'
   'Track':
     'prefix': 'track'
-    'body': '<track kind="${1:subtitles}" src="${2:sampleSubtitles_en.srt}" srclang="${3:en}">'
+    'body': '<track kind="${1:subtitles}" src="${2:sampleSubtitles_en.srt}" srclang="${3:en}">$0'
   # U
   'Underline':
     'prefix': 'u'
-    'body': '<u>$1</u>'
+    'body': '<u>$1</u>$0'
   'Unordered List':
     'prefix': 'ul'
     'body': '<ul>\n\t$1\n</ul>'
   # V
   'Variable':
     'prefix': 'var'
-    'body': '<var>$1</var>'
+    'body': '<var>$1</var>$0'
   'Video':
     'prefix': 'video'
     'body': '<video src="${1:videofile.ogg}" ${2:autoplay} ${3:poster="${4:posterimage.jpg}"}>\n\t$5\n</video>'
@@ -368,4 +368,4 @@
 '.text.html:not(.text.blog)':
   'Title':
     'prefix': 'title'
-    'body': '<title>${1:Page Title}</title>'
+    'body': '<title>${1:Page Title}</title>$0'
