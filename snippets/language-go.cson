@@ -4,7 +4,7 @@
     'body': 'import "${1:fmt}"'
   'func':
     'prefix': 'func'
-    'body': "func $1($2) {\n\t$0\n}"
+    'body': "func $1($2) $3 {\n\t$0\n}"
   'main':
     'prefix': 'main'
     'body': "func main() {\n\t$1\n}"
