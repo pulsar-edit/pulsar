@@ -251,7 +251,7 @@
             'end': '(\\})(\\s*\\n)?'
             'endCaptures':
               '1':
-                'name': 'punctuation.definition.invalid.c++'
+                'name': 'punctuation.section.block.end.c++'
               '2':
                 'name': 'invalid.illegal.you-forgot-semicolon.c++'
             'patterns': [
