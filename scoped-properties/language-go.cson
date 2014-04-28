@@ -1,0 +1,3 @@
+'.source.go':
+  'editor':
+    'commentStart': '// '
