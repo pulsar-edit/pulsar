@@ -211,3 +211,46 @@ describe 'Go grammar', ->
       allKeywords = scopes.every (scope) -> 'keyword.operator.go' in scope
 
       expect(allKeywords).toBe true
+
+  it 'tokenizes func names in calls to them', ->
+    tests = [
+      {
+        'line': 'a.b()'
+        'name': 'b'
+        'isFunc': true
+      }
+      {
+        'line': 'pkg.Func1('
+        'name': 'Func1'
+        'isFunc': true
+      }
+      {
+        'line': 'pkg.Func1().Func2('
+        'name': 'Func2'
+        'isFunc': true
+      }
+      {
+        'line': 'pkg.var'
+        'name': 'var'
+        'isFunc': false
+      }
+    ]
+
+    want = ['source.go', 'support.function.go']
+
+    for t in tests
+      {tokens} = grammar.tokenizeLine t.line
+      relevantToken = null
+      for token in tokens
+        if token.value is t.name
+          relevantToken = token
+          break
+           
+      expect(relevantToken).not.toBeNull()
+      expect(relevantToken.value).toEqual t.name
+
+      if t.isFunc
+        expect(relevantToken.scopes).toEqual want
+      else
+        expect(relevantToken).not.toEqual want
+
