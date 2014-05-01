@@ -135,27 +135,37 @@ describe 'Go grammar', ->
 
   it 'tokenizes func names in their declarations', ->
     tests = [
-      'func f()'
-      'func (T) f()'
-      'func (t T) f()'
-      'func (t *T) f()'
+      {
+        'line': 'func f()'
+        'tokenPos': 2
+      }
+      {
+        'line': 'func (T) f()'
+        'tokenPos': 2
+      }
+      {
+        'line': 'func (t T) f()'
+        'tokenPos': 2
+      }
+      {
+        'line': 'func (t *T) f()'
+        'tokenPos': 2
+      }
     ]
 
     for t in tests
-      {tokens} = grammar.tokenizeLine t
+      {tokens} = grammar.tokenizeLine t.line
       expect(tokens[0].value).toEqual 'func'
       expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
 
-      relevantToken = null
-      for token in tokens
-        if token.value is 'f'
-          relevantToken = token
-          break
-
-      expect(relevantToken).not.toBeNull()
+      relevantToken = tokens[t.tokenPos]
+      expect(relevantToken).toBeDefined()
       expect(relevantToken.value).toEqual 'f'
       expect(relevantToken.scopes).toEqual ['source.go', 'support.function.go']
 
+      next = tokens[t.tokenPos + 1]
+      expect(next.value).toEqual '('
+      expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
 
   it 'tokenizes numerics', ->
     numerics = [
