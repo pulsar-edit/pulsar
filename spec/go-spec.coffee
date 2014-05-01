@@ -119,19 +119,36 @@ describe 'Go grammar', ->
       expect(tokens[0].scopes).toEqual ['source.go', 'storage.type.go']
 
   it 'tokenizes "func" as a keyword or type based on context', ->
-    {tokens} = grammar.tokenizeLine 'func f()'
-    expect(tokens[0].value).toEqual 'func'
-    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
-    expect(tokens[1].value).toEqual ' '
-    expect(tokens[1].scopes).toEqual ['source.go']
+    funcKeyword = ['func f()', 'func (x) f()', 'func(x) f()', 'func']
+    for line in funcKeyword
+      {tokens} = grammar.tokenizeLine line
+      expect(tokens[0].value).toEqual 'func'
+      expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
 
-    {tokens} = grammar.tokenizeLine 'var f func()'
-    expect(tokens[0].value).toEqual 'var'
-    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
-    expect(tokens[1].value).toEqual ' f '
-    expect(tokens[1].scopes).toEqual ['source.go']
-    expect(tokens[2].value).toEqual 'func'
-    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
+    funcType = [
+      {
+        'line': 'var f func('
+        'tokenPos': 2
+      }
+      {
+        'line': 'f :=func()'
+        'tokenPos': 2
+      }
+      {
+        'line': '\tfunc('
+        'tokenPos': 1
+      }
+    ]
+    for t in funcType
+      {tokens} = grammar.tokenizeLine t.line
+
+      relevantToken = tokens[t.tokenPos]
+      expect(relevantToken.value).toEqual 'func'
+      expect(relevantToken.scopes).toEqual ['source.go', 'storage.type.go']
+
+      next = tokens[t.tokenPos + 1]
+      expect(next.value).toEqual '('
+      expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
 
   it 'tokenizes func names in their declarations', ->
     tests = [

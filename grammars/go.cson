@@ -48,9 +48,9 @@
     'captures':
       '1':
         'name': 'keyword.go'
-      '3':
+      '4':
         'name': 'support.function.go'
-    'match': '^(func)\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\()'
+    'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
     'name': 'storage.type.go'
