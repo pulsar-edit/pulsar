@@ -119,6 +119,13 @@
         'name': 'invalid.illegal.unknown-escape.go'
       }
     ]
+  'printf_verbs':
+    'patterns': [
+      {
+        'match': '%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]'
+        'name': 'constant.escape.format-verb.go'
+      }
+    ]
   'strings':
     'patterns': [
       {
@@ -134,6 +141,9 @@
         'patterns': [
           {
             'include': '#string_escaped_char'
+          }
+          {
+            'include': '#printf_verbs'
           }
         ]
       }
