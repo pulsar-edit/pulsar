@@ -61,6 +61,22 @@
     'match': '\\b(chan|map|bool|string|error|int|int8|int16|int32|int64|rune|byte|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128)\\b'
   }
   {
+    'name': 'invalid.illegal.numeric.go'
+    'match': '\\b0[0-7]*[89]\\d*\\b'
+  }
+  {
+    'name': 'constant.numeric.go'
+    'match': '(\\.\\d+([Ee][\-\+]\\d+)?i?)\\b'
+  }
+  {
+    'name': 'constant.numeric.go'
+    'match': '\\b\\d+\\.\\d*(([Ee][\-\+]\\d+)?i?\\b)?'
+  }
+  {
+    'name': 'constant.numeric.go'
+    'match': '\\b((0x[0-9a-fA-F]+)|(0[0-7]+i?)|(\\d+([Ee]\\d+)?i?)|(\\d+[Ee][\-\+]\\d+i?))\\b'
+  }
+  {
     'name': 'keyword.go'
     'match': '\\b(var|const|type|struct|interface|case|default)\\b'
   }
@@ -97,14 +113,6 @@
   {
     'name': 'support.function.built-in.go'
     'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
-  }
-  {
-    'name': 'constant.numeric.go'
-    'match': '\\b((0x[0-9a-fA-F]+)|(0[0-7]+i?)|(\\d+\\.\\d*([Ee][\-\+]\\d+)?i?)|(\\d+([Ee]\\d+)?i?)|(\\.\\d+([Ee][\-\+]\\d+)?i?)|(\\d+[Ee][\-\+]\\d+i?))\\b'
-  }
-  {
-    'name': 'invalid.illegal.numeric.go'
-    'match': '\\b0[0-7]*[89]\\d*\\b'
   }
 ]
 'repository':
