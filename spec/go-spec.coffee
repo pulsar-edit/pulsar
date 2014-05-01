@@ -244,21 +244,25 @@ describe 'Go grammar', ->
       {
         'line': 'a.b()'
         'name': 'b'
+        'tokenPos': 2
         'isFunc': true
       }
       {
         'line': 'pkg.Func1('
         'name': 'Func1'
+        'tokenPos': 2
         'isFunc': true
       }
       {
         'line': 'pkg.Func1().Func2('
         'name': 'Func2'
+        'tokenPos': 6
         'isFunc': true
       }
       {
         'line': 'pkg.var'
         'name': 'var'
+        'tokenPos': 2
         'isFunc': false
       }
     ]
@@ -267,17 +271,16 @@ describe 'Go grammar', ->
 
     for t in tests
       {tokens} = grammar.tokenizeLine t.line
-      relevantToken = null
-      for token in tokens
-        if token.value is t.name
-          relevantToken = token
-          break
-           
-      expect(relevantToken).not.toBeNull()
-      expect(relevantToken.value).toEqual t.name
 
+      relevantToken = tokens[t.tokenPos]
       if t.isFunc
+        expect(relevantToken).not.toBeNull()
+        expect(relevantToken.value).toEqual t.name
         expect(relevantToken.scopes).toEqual want
+
+        next = tokens[t.tokenPos + 1]
+        expect(next.value).toEqual '('
+        expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
       else
-        expect(relevantToken).not.toEqual want
+        expect(relevantToken.scopes).not.toEqual want
 

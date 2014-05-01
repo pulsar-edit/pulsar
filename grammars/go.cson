@@ -64,7 +64,7 @@
     'captures':
       '1':
         'name': 'support.function.go'
-    'match': '\\.([\\w_][\\w\\d_]*)\\('
+    'match': '\\.([\\w_][\\w\\d_]*)(?=\\()'
   }
   {
     'name': 'invalid.illegal.numeric.go'
