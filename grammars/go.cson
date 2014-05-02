@@ -53,6 +53,28 @@
     'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
+    'match': '^\\s*(var)\\s+([\\w_][\\w\\d_]*)\\s+'
+    'captures':
+      '1':
+        'name': 'keyword.go'
+      '2':
+        'name': 'variable.go'
+  }
+  {
+    'match': '([\\w_][\\w\\d_]*)(?=\\s*:=)'
+    'captures':
+      '1':
+        'name': 'variable.go'
+  }
+  {
+    'match': '^(type)\\s+([\\w_][\\w\\d_]*)\\s+'
+    'captures':
+      '1':
+        'name': 'keyword.go'
+      '2':
+        'name': 'storage.type.go'
+  }
+  {
     'name': 'storage.type.go'
     'match': '\\bfunc\\b'
   }
@@ -61,10 +83,8 @@
     'match': '\\b(chan|map|bool|string|error|int|int8|int16|int32|int64|rune|byte|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128)\\b'
   }
   {
-    'captures':
-      '1':
-        'name': 'support.function.go'
-    'match': '\\.([\\w_][\\w\\d_]*)(?=\\()'
+    'name': 'support.function.go'
+    'match': '([\\w_][\\w\\d_]*)(?=\\()'
   }
   {
     'name': 'invalid.illegal.numeric.go'

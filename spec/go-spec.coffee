@@ -127,16 +127,20 @@ describe 'Go grammar', ->
 
     funcType = [
       {
-        'line': 'var f func('
-        'tokenPos': 2
+        'line': 'var f1 func('
+        'tokenPos': 4
       }
       {
-        'line': 'f :=func()'
-        'tokenPos': 2
+        'line': 'f2 :=func()'
+        'tokenPos': 3
       }
       {
         'line': '\tfunc('
         'tokenPos': 1
+      }
+      {
+        'line': 'type HandlerFunc func('
+        'tokenPos': 4
       }
     ]
     for t in funcType
@@ -265,6 +269,18 @@ describe 'Go grammar', ->
         'tokenPos': 2
         'isFunc': false
       }
+      {
+        'line': 'doWork(ch)'
+        'name': 'doWork'
+        'tokenPos': 0
+        'isFunc': true
+      }
+      {
+        'line': 'f1()'
+        'name': 'f1'
+        'tokenPos': 0
+        'isFunc': true
+      }
     ]
 
     want = ['source.go', 'support.function.go']
@@ -283,4 +299,101 @@ describe 'Go grammar', ->
         expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
       else
         expect(relevantToken.scopes).not.toEqual want
+
+  it 'tokenizes type names in their declarations', ->
+    {tokens} = grammar.tokenizeLine 'type Stringer interface {'
+    expect(tokens[0].value).toBe 'type'
+    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
+    expect(tokens[2].value).toBe 'Stringer'
+    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
+
+    {tokens} = grammar.tokenizeLine 'type Duration int64'
+    expect(tokens[0].value).toBe 'type'
+    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
+    expect(tokens[2].value).toBe 'Duration'
+    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
+
+    {tokens} = grammar.tokenizeLine 'type   byLength []string'
+    expect(tokens[0].value).toBe 'type'
+    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
+    expect(tokens[2].value).toBe 'byLength'
+    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
+
+    {tokens} = grammar.tokenizeLine '  type T'
+    expect(tokens[2].value).toBe ' T'
+    expect(tokens[2].scopes).not.toEqual ['source.go', 'storage.type.go']
+
+  # TODO: finish adding tests from the spec (golang.org/ref/spec#VarDecl)
+  describe 'in variable declarations', ->
+    testVar = (token) ->
+      expect(token.value).toBe 'var'
+      expect(token.scopes).toEqual ['source.go', 'keyword.go']
+
+    wantedScope = ['source.go', 'variable.go']
+
+    # var i int
+    # var U, V, W float64
+    # var k = 0
+    # var x, y float32 = -1, -2
+    # var (
+    #     i       int
+    #     u, v, s = 2.0, 3.0, "bar"
+    # )
+    # var re, im = complexSqrt(-1)
+    # var _, found = entries[name]
+    describe 'in "var" statements', ->
+      it 'tokenizes single names', ->
+        {tokens} = grammar.tokenizeLine 'var vardecl1  = "this is going to be rough!"'
+        testVar tokens[0]
+        expect(tokens[2].value).toBe 'vardecl1'
+        expect(tokens[2].scopes).toEqual wantedScope
+
+        {tokens} = grammar.tokenizeLine '     var  vardecl2 string'
+        testVar tokens[1]
+        expect(tokens[3].value).toBe 'vardecl2'
+        expect(tokens[3].scopes).toEqual wantedScope
+
+      xit 'tokenizes multiple names', ->
+        {tokens} = grammar.tokenizeLine '     var  a, b = 3, 4'
+        testVar tokens[1]
+        expect(tokens[3].value).toBe 'a'
+        expect(tokens[3].scopes).toEqual wantedScope
+        expect(tokens[6].value).toBe 'b'
+        expect(tokens[6].scopes).toEqual wantedScope
+
+        {tokens} = grammar.tokenizeLine 'var x, y int'
+        testVar tokens[0]
+        expect(tokens[2].value).toBe 'x'
+        expect(tokens[2].scopes).toEqual wantedScope
+        expect(tokens[5].value).toBe 'y'
+        expect(tokens[5].scopes).toEqual wantedScope
+
+      xdescribe 'in "var" statement blocks', ->
+        it 'tokenizes single names', ->
+          [kwd, decl, _] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
+          testVar kwd[1]
+          expect(decl[1].value).toBe 'foo'
+          expect(decl[1].scopes).toEqual wantedScope
+
+        it 'tokenizes multiple names', ->
+          [kwd, _, decl, _] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
+          testVar kwd[0]
+          expect(decl[1].value).toBe 'foo'
+          expect(decl[1].scopes).toEqual wantedScope
+          expect(decl[4].value).toBe 'bar'
+          expect(decl[4].scopes).toEqual wantedScope
+
+      # i, j := 0, 10
+      # ch := make(chan int)
+      # r, w := os.Pipe(fd)
+      # _, y, _ := coord(p)
+      describe 'in shorthand variable declarations', ->
+        it 'tokenizes single names', ->
+          {tokens} = grammar.tokenizeLine 'f := func() int { return 7 }'
+          expect(tokens[0].value).toBe 'f'
+          expect(tokens[0].scopes).toEqual ['source.go', 'variable.go']
+          expect(tokens[2].value).toBe ':='
+          expect(tokens[2].scopes).toEqual ['source.go', 'keyword.operator.go']
+
+        xit 'tokenizes multiple names', ->
 
