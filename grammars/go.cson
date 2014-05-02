@@ -53,7 +53,19 @@
     'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
-    'match': '^\\s*(var)\\s+([\\w_][\\w\\d_]*)\\s+'
+    'match': '(var)(?:\\s*([\\w_][\\w\\d_]*)\\b)|(?:\\s*(,)\\s*([\\w_][\\w\\d_]*)(?!\\s*$))'
+    'captures':
+      '1':
+        'name': 'keyword.go'
+      '2':
+        'name': 'variable.go'
+      '3':
+        'name': 'keyword.operator.go'
+      '4':
+        'name': 'variable.go'
+  }
+  {
+    'match': '\\s*,\\s*([\\w_][\\w\\d_]*)(?!\\s*$)'
     'captures':
       '1':
         'name': 'keyword.go'
@@ -65,6 +77,30 @@
     'captures':
       '1':
         'name': 'variable.go'
+  }
+  {
+    'begin': '^\\s*(var)\\s*(?=\\()'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.go'
+    'end': '^\\s*\\)\\s*$'
+    'patterns': [
+      {
+        'include': '#operators'
+      }
+      {
+        'match': '\\s*([\\w_][\\w\\d_]*)\\b'
+        'captures':
+          '1':
+            'name': 'variable.go'
+      }
+      {
+        'match': '\\s*,\\s*([\\w_][\\w\\d_]*)(?!\\s*$)'
+        'captures':
+          '1':
+            'name': 'variable.go'
+      }
+    ]
   }
   {
     'match': '^(type)\\s+([\\w_][\\w\\d_]*)\\s+'
@@ -133,8 +169,7 @@
     'include': '#strings'
   }
   {
-    'name': 'keyword.operator.go'
-    'match': '(\\+|&|\\+=|&=|&&|==|!=|\\(|\\)|\\-|\\||\\-=|\\|=|\\|\\||<|<=|\\[|\\]|\\*|\\^|\\*=|\\^=|<\\-|>|>=|\\{|\\}|/|<<|/=|<<=|\\+\\+|=|:=|,|;|%|>>|%=|>>=|\\-\\-|!|\\.\\.\\.|\\.|:|&\\^|&\\^=)'
+    'include': '#operators'
   }
   {
     'name': 'support.function.built-in.go'
@@ -151,6 +186,13 @@
       {
         'match': '\\\\[^0-7xuUabfnrtv\\\'"]'
         'name': 'invalid.illegal.unknown-escape.go'
+      }
+    ]
+  'operators':
+    'patterns': [
+      {
+        'name': 'keyword.operator.go'
+        'match': '(\\+|&|\\+=|&=|&&|==|!=|\\(|\\)|\\-|\\||\\-=|\\|=|\\|\\||<|<=|\\[|\\]|\\*|\\^|\\*=|\\^=|<\\-|>|>=|\\{|\\}|/|<<|/=|<<=|\\+\\+|=|:=|,|;|%|>>|%=|>>=|\\-\\-|!|\\.\\.\\.|\\.|:|&\\^|&\\^=)'
       }
     ]
   'printf_verbs':
