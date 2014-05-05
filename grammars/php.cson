@@ -1,4 +1,5 @@
-'comment': 'TODO:\n• Try to improve parameters list syntax – scope numbers, ‘=’, ‘,’ and possibly be intelligent about entity ordering\n• Is meta.function-call the correct scope? I\'ve added it to my theme but by default it\'s not highlighted'
+'scopeName': 'text.html.php'
+'name': 'PHP'
 'fileTypes': [
   'aw'
   'ctp'
@@ -107,7 +108,6 @@
         ]
       }
     ]
-'name': 'PHP'
 'patterns': [
   {
     'include': 'text.html.basic'
@@ -2108,4 +2108,3 @@
         ]
       }
     ]
-'scopeName': 'text.html.php'
