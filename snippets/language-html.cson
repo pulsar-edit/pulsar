@@ -190,7 +190,7 @@
     'body': '<li>$1</li>$0'
   'Link':
     'prefix': 'link'
-    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}">$0'
+    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}">$0'
   # M
   'Main':
     'prefix': 'main'
@@ -275,10 +275,10 @@
     'body': '<samp>$1</samp>$0'
   'Script':
     'prefix': 'script'
-    'body': '<script type="text/javascript" charset="utf-8">\n\t$1\n</script>'
+    'body': '<script charset="utf-8">\n\t$1\n</script>'
   'Script With External Source':
     'prefix': 'scriptsrc'
-    'body': '<script src="$1" type="text/javascript" charset="${2:utf-8}"></script>$0'
+    'body': '<script src="$1" charset="${2:utf-8}"></script>$0'
   'Section':
     'prefix': 'section'
     'body': '<section>\n\t$1\n</section>'
@@ -299,7 +299,7 @@
     'body': '<strong>$1</strong>$0'
   'Style':
     'prefix': 'style'
-    'body': '<style type="text/css" media="screen">\n\t$1\n</style>'
+    'body': '<style media="screen">\n\t$1\n</style>'
   'Subscript':
     'prefix': 'sub'
     'body': '<sub>$1</sub>$0'
