@@ -635,7 +635,7 @@
     'match': '(?x)\\b(\n\t\t\t\tbasestring|bool|buffer|bytearray|bytes|complex|dict|float|frozenset|int|\n\t\t\t\tlist|long|memoryview|object|range|set|slice|str|tuple|unicode|xrange\n\t\t\t)\\b'
     'name': 'support.type.python'
   'constant_placeholder':
-    'match': '(?i:(%(\\([a-z_]+\\))?#?0?\\-?[ ]?\\+?([0-9]*|\\*)(\\.([0-9]*|\\*))?[hL]?[a-z%])|(\\{([!\\[\\].:\\w ]+)?\\}))'
+    'match': '(?i:(%(\\([a-z_]+\\))?#?0?\\-?[ ]?\\+?([0-9]*|\\*)(\\.([0-9]*|\\*))?([hL][a-z]|[a-z%]))|(\\{([!\\[\\].:\\w ]+)?\\}))'
     'name': 'constant.other.placeholder.python'
   'docstrings':
     'patterns': [
