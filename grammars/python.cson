@@ -87,8 +87,15 @@
   }
   {
     'comment': 'keywords that delimit flow blocks or alter flow from within a block'
-    'match': '\\b(elif|else|except|finally|for|if|try|while|with|break|continue|pass|raise|return|yield)\\b'
-    'name': 'keyword.control.flow.python'
+    '1':
+      'name': 'keyword.control.flow.condition.python'
+    '2':
+      'name': 'keyword.control.flow.exception.python'
+    '3':
+      'name': 'keyword.control.flow.repeat.python'
+    '4':
+      'name': 'keyword.control.flow.statement.python'
+    'match': '\\b(elif|else|if)|(except|finally|try|raise)|(for|while)|(with|break|continue|pass|return|yield)\\b'
   }
   {
     'comment': 'keyword operators that evaluate to True or False'
