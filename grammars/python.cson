@@ -88,7 +88,7 @@
   {
     'comment': 'keywords that delimit flow blocks or alter flow from within a block'
     '1':
-      'name': 'keyword.control.flow.condition.python'
+      'name': 'keyword.control.flow.conditional.python'
     '2':
       'name': 'keyword.control.flow.exception.python'
     '3':
