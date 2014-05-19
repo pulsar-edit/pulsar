@@ -86,16 +86,24 @@
     'match': '\\b(?:(import)|(from))\\b'
   }
   {
-    'comment': 'keywords that delimit flow blocks or alter flow from within a block'
-    '1':
-      'name': 'keyword.control.flow.conditional.python'
-    '2':
-      'name': 'keyword.control.flow.exception.python'
-    '3':
-      'name': 'keyword.control.flow.repeat.python'
-    '4':
-      'name': 'keyword.control.flow.statement.python'
-    'match': '\\b(elif|else|if)|(except|finally|try|raise)|(for|while)|(with|break|continue|pass|return|yield)\\b'
+    'comment': 'keywords that delimit flow conditionals'
+    'name': 'keyword.control.flow.conditional.pytho'
+    'match': '\\b(if|elif|else)\\b'
+  }
+  {
+    'comment': 'keywords that delimit an exception'
+    'name': 'keyword.control.flow.exception.pytho'
+    'match': '\\b(except|finally|try|raise)\\b'
+  }
+  {
+    'comment': 'keywords that delimit loops'
+    'name': 'keyword.control.flow.repeat.python'
+    'match': '\\b(for|while)\\b'
+  }
+  {
+    'comment': 'keywords that alter flow from within a block'
+    'name': 'keyword.control.flow.statement.python'
+    'match': '\\b(with|break|continue|pass|return|yield)\\b'
   }
   {
     'comment': 'keyword operators that evaluate to True or False'
