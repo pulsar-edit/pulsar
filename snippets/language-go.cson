@@ -13,7 +13,7 @@
     'body': "var ${1:ok} ${2:bool}$0"
   'switch':
     'prefix': 'switch'
-    'body': "switch {\n\tcase ${1:cond}:\n\t\t$0\n}"
+    'body': "switch ${1:var} {\ncase ${2:cond}:\n\t$0\n}"
   'Import':
     'prefix': 'Im'
     'body': "import (\n\t\"${1:fmt}\"\n)$0"
