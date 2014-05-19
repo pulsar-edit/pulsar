@@ -87,12 +87,12 @@
   }
   {
     'comment': 'keywords that delimit flow conditionals'
-    'name': 'keyword.control.flow.conditional.pytho'
+    'name': 'keyword.control.flow.conditional.python'
     'match': '\\b(if|elif|else)\\b'
   }
   {
     'comment': 'keywords that delimit an exception'
-    'name': 'keyword.control.flow.exception.pytho'
+    'name': 'keyword.control.flow.exception.python'
     'match': '\\b(except|finally|try|raise)\\b'
   }
   {
