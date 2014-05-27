@@ -1,11 +1,11 @@
+'scopeName': 'source.go'
+'name': 'Go'
 'comment': 'Go language'
 'fileTypes': [
   'go'
 ]
 'foldingStartMarker': '({|\\()\\s*$'
 'foldingStopMarker': '(}|\\))\\s*$'
-'keyEquivalent': '^~G'
-'name': 'Go'
 'patterns': [
   {
     'begin': '/\\*'
@@ -253,4 +253,3 @@
         ]
       }
     ]
-'scopeName': 'source.go'
