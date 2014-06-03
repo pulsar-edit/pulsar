@@ -87,22 +87,22 @@
   }
   {
     'comment': 'keywords that delimit flow conditionals'
-    'name': 'keyword.control.flow.conditional.python'
+    'name': 'keyword.control.conditional.python'
     'match': '\\b(if|elif|else)\\b'
   }
   {
     'comment': 'keywords that delimit an exception'
-    'name': 'keyword.control.flow.exception.python'
+    'name': 'keyword.control.exception.python'
     'match': '\\b(except|finally|try|raise)\\b'
   }
   {
     'comment': 'keywords that delimit loops'
-    'name': 'keyword.control.flow.repeat.python'
+    'name': 'keyword.control.repeat.python'
     'match': '\\b(for|while)\\b'
   }
   {
     'comment': 'keywords that alter flow from within a block'
-    'name': 'keyword.control.flow.statement.python'
+    'name': 'keyword.control.statement.python'
     'match': '\\b(with|break|continue|pass|return|yield)\\b'
   }
   {
