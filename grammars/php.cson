@@ -1348,11 +1348,11 @@
       {
         'captures':
           '1':
-            'name': 'punctuation.definition.arbitrary-repitition.php'
+            'name': 'punctuation.definition.arbitrary-repetition.php'
           '3':
-            'name': 'punctuation.definition.arbitrary-repitition.php'
+            'name': 'punctuation.definition.arbitrary-repetition.php'
         'match': '(\\{)\\d+(,\\d+)?(\\})'
-        'name': 'string.regexp.arbitrary-repitition.php'
+        'name': 'string.regexp.arbitrary-repetition.php'
       }
       {
         'begin': '\\[(?:\\^?\\])?'
@@ -1386,11 +1386,11 @@
       {
         'captures':
           '1':
-            'name': 'punctuation.definition.arbitrary-repitition.php'
+            'name': 'punctuation.definition.arbitrary-repetition.php'
           '3':
-            'name': 'punctuation.definition.arbitrary-repitition.php'
+            'name': 'punctuation.definition.arbitrary-repetition.php'
         'match': '(\\{)\\d+(,\\d+)?(\\})'
-        'name': 'string.regexp.arbitrary-repitition.php'
+        'name': 'string.regexp.arbitrary-repetition.php'
       }
       {
         'comment': 'Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)'
