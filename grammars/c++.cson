@@ -1,4 +1,4 @@
-'comment': 'I don\'t think anyone uses .hp. .cp tends to be paired with .h. (I could be wrong. :) -- chris'
+'scopeName': 'source.c++'
 'fileTypes': [
   'cc'
   'cpp'
@@ -12,7 +12,6 @@
   'h++'
 ]
 'firstLineMatch': '-\\*- C\\+\\+ -\\*-'
-'keyEquivalent': '^~C'
 'name': 'C++'
 'patterns': [
   {
@@ -303,4 +302,3 @@
         ]
       }
     ]
-'scopeName': 'source.c++'

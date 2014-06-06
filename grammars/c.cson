@@ -1,9 +1,9 @@
+'scopeName': 'source.c'
 'fileTypes': [
   'c'
   'h'
 ]
 'firstLineMatch': '-[*]-( Mode:)? C -[*]-'
-'keyEquivalent': '^~C'
 'name': 'C'
 'patterns': [
   {
@@ -621,4 +621,3 @@
         'name': 'invalid.illegal.placeholder.c'
       }
     ]
-'scopeName': 'source.c'
