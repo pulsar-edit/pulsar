@@ -176,6 +176,22 @@
   'special_block':
     'patterns': [
       {
+        "begin": "\\b(using)\\b\\s*(namespace)\\b\\s*((?:[_A-Za-z][_A-Za-z0-9]*\\b(::)?)*)",
+        "beginCaptures": {
+          "1": {
+            "name": "keyword.control.c++"
+          },
+          "2": {
+            "name": "storage.type.c++"
+          },
+          "3": {
+            "name": "entity.name.type.c++"
+          }
+        },
+        "end": "(;)",
+        "name": "meta.using-namespace-declaration.c++"
+      },
+      {
         'begin': '\\b(namespace)\\b\\s*([_A-Za-z][_A-Za-z0-9]*\\b)?+'
         'beginCaptures':
           '1':
