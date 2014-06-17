@@ -5,6 +5,8 @@
   'cp'
   'cxx'
   'c++'
+  'cu'
+  'cuh'
   'C'
   'h'
   'hh'
