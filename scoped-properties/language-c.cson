@@ -1,8 +1,19 @@
 '.source.c, .source.c\\+\\+, .source.objc, .source.objc\\+\\+':
   'editor':
     'commentStart': '// '
-    'increaseIndentPattern': '(?x)\n\t    ^ .* \\{ [^}"\']* $\n\t|   ^ \\s* (public|private|protected): \\s* $\n\t|   ^ \\s* @(public|private|protected) \\s* $\n\t|   ^ \\s* \\{ \\} $\n\t'
-    'decreaseIndentPattern': '(?x)\n\t    ^ \\s* ( (?! \\S.* /[*] ) .* [*]/ \\s* )? \\}\n\t|   ^ \\s* (public|private|protected): \\s* $\n\t|   ^ \\s* @(public|private|protected) \\s* $\n\t'
+    'increaseIndentPattern': '(?x)
+       ^ .* \\{ [^}"\']* $
+      |^ \\s* (public|private|protected): \\s* $
+      |^ \\s* @(public|private|protected) \\s* $
+      |^ \\s* \\{ \\} $
+      |^ \\s* if \\s* \\( (?!.*?\\belse\\b)
+      |^ \\s* \\}? \\s* else \\s*$
+      |^ \\s* (for|while) \\s* \\('
+    'decreaseIndentPattern': '(?x)
+       ^ \\s* ( (?! \\S.* /[*] ) .* [*]/ \\s* )? \\}
+      |^ \\s* (public|private|protected): \\s* $
+      |^ \\s* @(public|private|protected) \\s* $
+      |^ \\s* else \\s*$'
 '.source.c, .source.c\\+\\+':
   'editor':
     'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}'
