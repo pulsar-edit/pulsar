@@ -104,7 +104,7 @@
         'name': 'punctuation.separator.parameters.c'
       '8':
         'name': 'punctuation.definition.parameters.end.c'
-    'end': '(?=(?://|/\\*))|$'
+    'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.macro.c'
     'patterns': [
       {
@@ -121,7 +121,7 @@
     'captures':
       '1':
         'name': 'keyword.control.import.error.c'
-    'end': '$'
+    'end': '(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.diagnostic.c'
     'patterns': [
       {
@@ -135,7 +135,7 @@
     'captures':
       '1':
         'name': 'keyword.control.import.include.c'
-    'end': '(?=(?://|/\\*))|$'
+    'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.c.include'
     'patterns': [
       {
@@ -174,7 +174,7 @@
     'captures':
       '1':
         'name': 'keyword.control.import.c'
-    'end': '(?=(?://|/\\*))|$'
+    'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.c'
     'patterns': [
       {
