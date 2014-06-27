@@ -32,17 +32,17 @@
     'captures':
       '1':
         'name': 'invalid.illegal.go'
-    'match': '\\bchan([\t ]+)<\-'
+    'match': '\\bchan([\\t ]+)<\-'
   }
   {
     'captures':
       '1':
         'name': 'invalid.illegal.go'
-    'match': '<\\-([\t ]+)chan\\b'
+    'match': '<\\-([\\t ]+)chan\\b'
   }
   {
     'name': 'invalid.illegal.go'
-    'match': '[\t ]+$'
+    'match': '[\\t ]+$'
   }
   {
     'captures':
