@@ -29,3 +29,48 @@
   'if err != nil':
     'prefix': 'iferr'
     'body': "if err != nil {\n\t${1:return}\n}"
+  'channel':
+    'prefix': 'ch'
+    'body': "chan ${0:int}"
+  'case':
+    'prefix': 'cs'
+    'body': "case ${1:value}:$0"
+  'const':
+    'prefix': 'c'
+    'body': "const ${1:NAME} = ${0:0}"
+  'defer':
+    'prefix': 'df'
+    'body': "defer ${0:func}()"
+  'interface':
+    'prefix': 'in'
+    'body': "interface{}"
+  'if':
+    'prefix': 'if'
+    'body': "if ${1:condition} {\n\t${2}\n}"
+  'else':
+    'prefix': 'el'
+    'body': "else {\n\t${1}\n}"
+  'if else':
+    'prefix': 'ie'
+    'body': "if ${1:condition} {\n\t${2}\n} else {\n\t${3}\n}\n${0}"
+  'for':
+    'prefix': 'for'
+    'body':  "for ${2:index} := 0; $2 < ${1:count}; $2${3:++} {\n\t${4}\n}\n${0}"
+  'fmt println':
+    'prefix': 'fp'
+    'body': "fmt.Println(\"${1}\")"
+  'log println':
+    'prefix': 'lp'
+    'body': "log.Println(\"${1}\")"
+  'make':
+    'prefix': 'make'
+    'body': "make(${1:[]string}, ${0:0})"
+  'map':
+    'prefix': 'map'
+    'body': "map[${1:string}]${0:int}"
+  'new':
+    'prefix': 'new'
+    'body': "new(${0:type})"
+  'panic':
+    'prefix': 'pn'
+    'body': "panic(\"${0:message}\")"
