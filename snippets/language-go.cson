@@ -46,22 +46,22 @@
     'body': "interface{}"
   'if':
     'prefix': 'if'
-    'body': "if ${1:condition} {\n\t${2}\n}"
+    'body': "if ${1:condition} {\n\t$2\n}"
   'else':
     'prefix': 'el'
-    'body': "else {\n\t${1}\n}"
+    'body': "else {\n\t$1\n}"
   'if else':
     'prefix': 'ie'
-    'body': "if ${1:condition} {\n\t${2}\n} else {\n\t${3}\n}\n${0}"
+    'body': "if ${1:condition} {\n\t$2\n} else {\n\t$3\n}\n$0"
   'for':
     'prefix': 'for'
-    'body':  "for ${2:index} := 0; $2 < ${1:count}; $2${3:++} {\n\t${4}\n}\n${0}"
+    'body':  "for ${2:index} := 0; $2 < ${1:count}; $2${3:++} {\n\t$4\n}\n$0"
   'fmt println':
     'prefix': 'fp'
-    'body': "fmt.Println(\"${1}\")"
+    'body': "fmt.Println(\"$1\")$0"
   'log println':
     'prefix': 'lp'
-    'body': "log.Println(\"${1}\")"
+    'body': "log.Println(\"$1\")$0"
   'make':
     'prefix': 'make'
     'body': "make(${1:[]string}, ${0:0})"
