@@ -10,8 +10,8 @@
   'h'
   'hh'
   'hpp'
-  'ipp'
   'h++'
+  'ipp'
 ]
 'firstLineMatch': '-\\*- C\\+\\+ -\\*-'
 'name': 'C++'
