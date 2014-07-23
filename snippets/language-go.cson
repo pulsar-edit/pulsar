@@ -94,4 +94,4 @@
     'body': "http.ListenAndServe(\"${1:\:8080}\", ${2:nil})"
   'serve':
     'prefix': 'sv'
-    'body': "http.Serve(\"${1:\:8080}\", ${2:nil})"
+    'body': "http.Serve(\"${1::8080}\", ${2:nil})"
