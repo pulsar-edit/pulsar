@@ -8,12 +8,13 @@
       |^ \\s* \\{ \\} $
       |^ \\s* if \\s* \\( (?!.*?(\\belse\\b|;\\s*$))
       |^ \\s* \\}? \\s* else \\s*$
-      |^ \\s* (for|while) \\s* \\('
+      |^ \\s* (for|while) \\s* \\(
+      '
     'decreaseIndentPattern': '(?x)
        ^ \\s* ( (?! \\S.* /[*] ) .* [*]/ \\s* )? \\}
       |^ \\s* (public|private|protected): \\s* $
       |^ \\s* @(public|private|protected) \\s* $
-      |^ \\s* else \\s*$'
+      '
 '.source.c, .source.c\\+\\+':
   'editor':
     'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}'
