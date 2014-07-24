@@ -1,8 +1,7 @@
 '.source.c, .source.c\\+\\+, .source.objc, .source.objc\\+\\+':
   '#ifndef … #define … #endif':
     'prefix': 'def'
-    'body': '#ifndef ${1:SYMBOL}\n#define ${2:SYMBOL} ${3:value}\n#endif'
-'.source.c, .source.objc, .source.c\\+\\+, .source.objc\\+\\+':
+    'body': '#ifndef ${1:SYMBOL}\n#define $1 ${2:value}\n#endif'
   '#include <>':
     'prefix': 'Inc'
     'body': '#include <${1:.h}>'
@@ -17,10 +16,10 @@
     'body': 'int main (int argc, char const *argv[])\n{\n\t${1:/* code */}\n\treturn 0;\n}'
   'For Loop':
     'prefix': 'for'
-    'body': 'for(size_t ${1:i} = 0; ${2:i} < ${3:count}; ${4:i}++)\n{\n\t${5:/* code */}\n}'
+    'body': 'for(size_t ${1:i} = 0; $1 < ${2:count}; $1${3:++})\n{\n\t${4:/* code */}\n}'
   'Header Include-Guard':
     'prefix': 'once'
-    'body': '#ifndef ${1:SYMBOL}\n#define ${2:SYMBOL}\n\n${3}\n\n#endif /* end of include guard: ${4:SYMBOL} */\n'
+    'body': '#ifndef ${1:SYMBOL}\n#define $1\n\n${2}\n\n#endif /* end of include guard: $1 */\n'
   'Shared Pointer':
     'prefix': 'sp'
     'body': 'typedef std::shared_ptr<${2:${1:my_type}_t}> ${3:${4:my_type}_ptr}};'
@@ -42,6 +41,12 @@
   'Struct':
     'prefix': 'st'
     'body': 'struct ${1:name_t}\n{\n\t${2:/* data */}\n};'
+  'void':
+    'prefix': 'void'
+    'body': 'void ${1:name} (${2:/* arguments */})\n{\n\t${3:/* code */}\n}'
+  'any function':
+    'prefix': 'func'
+    'body': '${1:int} ${2:name} (${3:/* arguments */})\n{\n\t${5:/* code */}\n\treturn ${4:0};\n}'
 '.source.c\\+\\+, .source.objc\\+\\+':
   'Enumeration':
     'prefix': 'enum'
@@ -51,7 +56,7 @@
     'body': 'class ${1:name_t}\n{\npublic:\n\t${2:name_t} (${3:arguments});\n\tvirtual ~${4:name_t} ();\n\nprivate:\n\t${0:/* data */}\n};'
   'Namespace':
     'prefix': 'ns'
-    'body': 'namespace ${1:name}\n{\n\t$2\n} /* ${3:name} */'
+    'body': 'namespace ${1:name}\n{\n\t$2\n} /* $1 */'
   'std::map':
     'prefix': 'map'
     'body': 'std::map<${1:key}, ${2:value}> map$3;'
