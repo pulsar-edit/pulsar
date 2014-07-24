@@ -41,6 +41,12 @@
   'Struct':
     'prefix': 'st'
     'body': 'struct ${1:name_t}\n{\n\t${2:/* data */}\n};'
+  'void':
+    'prefix': 'void'
+    'body': 'void ${1:name} (${2:/* arguments */})\n{\n\t${3:/* code */}\n}'
+  'any function':
+    'prefix': 'func'
+    'body': '${1:int} ${2:name} (${3:/* arguments */})\n{\n\t${5:/* code */}\n\treturn ${4:0};\n}'
 '.source.c\\+\\+, .source.objc\\+\\+':
   'Enumeration':
     'prefix': 'enum'
