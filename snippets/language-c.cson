@@ -2,7 +2,6 @@
   '#ifndef … #define … #endif':
     'prefix': 'def'
     'body': '#ifndef ${1:SYMBOL}\n#define $1 ${2:value}\n#endif'
-'.source.c, .source.objc, .source.c\\+\\+, .source.objc\\+\\+':
   '#include <>':
     'prefix': 'Inc'
     'body': '#include <${1:.h}>'
