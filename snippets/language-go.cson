@@ -95,3 +95,9 @@
   'serve':
     'prefix': 'sv'
     'body': "http.Serve(\"${1::8080}\", ${2:nil})"
+  'goroutine':
+    'prefix': 'go'
+    'body': 'go func($1) {\n\t$2\n}($3)'
+  'goroutine function':
+    'prefix': 'gf'
+    'body': 'go ${1:func}($0)'
