@@ -8,15 +8,6 @@
   'xhtml'
 ]
 'firstLineMatch': '<(?i:(!DOCTYPE\\s*)?html)'
-'injections':
-  'R:text.html - comment.block':
-    'comment': 'Use R: to ensure this matches after any other injections.'
-    'patterns': [
-      {
-        'match': '<'
-        'name': 'invalid.illegal.bad-angle-bracket.html'
-      }
-    ]
 'name': 'HTML'
 'patterns': [
   {
