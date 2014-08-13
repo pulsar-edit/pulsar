@@ -1,4 +1,4 @@
-# HTML language support in Atom
+# HTML language support in Atom [![Build Status](https://travis-ci.org/atom/language-html.svg?branch=master)](https://travis-ci.org/atom/language-html)
 
 Adds syntax highlighting and snippets to HTML files in Atom.
 
