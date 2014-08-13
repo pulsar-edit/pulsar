@@ -150,7 +150,7 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?=[^>]*\\b\\s*type\\s*=\\s*[\'"]?text/(x-handlebars|(x-handlebars-)?template|html)[\'"]?)(?![^>]*/>)'
+    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?=[^>]*\\btype\\s*=\\s*[\'"]?text/(x-handlebars|(x-handlebars-)?template|html)[\'"]?)(?![^>]*/>)'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
@@ -182,7 +182,7 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?=[^>]*\\b\\s*type\\s*=\\s*[\'"]?text/coffeescript[\'"]?)(?![^>]*/>)'
+    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?=[^>]*\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?)(?![^>]*/>)'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
