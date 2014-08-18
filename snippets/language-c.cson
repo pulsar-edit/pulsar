@@ -22,7 +22,7 @@
     'body': '#ifndef ${1:SYMBOL}\n#define $1\n\n${2}\n\n#endif /* end of include guard: $1 */\n'
   'Shared Pointer':
     'prefix': 'sp'
-    'body': 'typedef std::shared_ptr<${2:${1:my_type}_t}> ${3:${4:my_type}_ptr}};'
+    'body': 'typedef std::shared_ptr<${2:${1:my_type}_t}> ${3:${4:my_type}_ptr};'
   'Typedef':
     'prefix': 'td'
     'body': 'typedef ${1:int} ${2:MyCustomType};'
