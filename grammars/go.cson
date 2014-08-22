@@ -83,7 +83,10 @@
     'beginCaptures':
       '1':
         'name': 'keyword.go'
-    'end': '^\\s*\\)\\s*$'
+    'end': '^\\s*(\\))\\s*$'
+    'endCaptures':
+      '1':
+        'name': 'keyword.operator.go'
     'patterns': [
       {
         'include': '#operators'
