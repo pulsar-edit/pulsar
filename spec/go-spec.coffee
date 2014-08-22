@@ -426,7 +426,7 @@ describe 'Go grammar', ->
           testOp kwd[3], '('
           testName decl[1], 'foo'
           testOp decl[3], '*'
-          testType decl[3], 'bar'
+          testType decl[4], 'bar'
           testOp closing[1], ')'
 
         it 'tokenizes single names with an initializer', ->
