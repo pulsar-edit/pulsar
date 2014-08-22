@@ -53,7 +53,7 @@
     'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
-    'comment': 'var statements: single-line and the opening of a multi-line.'
+    'comment': 'var statements, single-line or the opening of a multi-line.'
     'begin': '^\\s*(var)\\s+'
     'beginCaptures':
       '1':
@@ -80,10 +80,8 @@
             'name': 'keyword.operator.go'
       }
       {
-        'match': '([\\w_][\\w\\d_]*)'
-        'captures':
-          '1':
-            'name': 'variable.go'
+        'match': '[\\w_][\\w\\d_]*'
+        'name': 'variable.go'
       }
     ]
   }
