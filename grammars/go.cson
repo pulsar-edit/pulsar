@@ -166,6 +166,15 @@
     'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
   }
   {
+    'comment': 'Variable declaration followed by an explicit type'
+    'match': '([\\w_][\\w\\d_]*)\\s+([\\w_*\\[\\]][\\w\\d_*\\[\\]]*)'
+    'captures':
+      '1':
+        'name': 'variable.go'
+      '2':
+        'name': 'storage.type.go'
+  }
+  {
     'match': '\\b[\\w_][\\w\\d_]*\\b'
     'name': 'variable.go'
   }
