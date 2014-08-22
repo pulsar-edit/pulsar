@@ -380,16 +380,26 @@ describe 'Go grammar', ->
 
       describe 'in "var" statement blocks', ->
         it 'tokenizes single names', ->
-          [kwd, decl, _] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
+          [kwd, decl, closing] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
           testVar kwd[1]
           testOp kwd[3], '('
           testName decl[1], 'foo'
+          testOp decl[3], '*'
+          testName decl[4], 'bar'
+          testOp closing[1], ')'
 
         it 'tokenizes multiple names', ->
-          [kwd, _, decl, _] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
+          [kwd, _, decl, closing] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
           testVar kwd[0]
+          testOp kwd[2], '('
           testName decl[1], 'foo'
+          testOp decl[2], ','
           testName decl[4], 'bar'
+          testOp decl[6], '='
+          testName decl[8], 'baz'
+          testOp decl[9], ','
+          testName decl[11], 'quux'
+          testOp closing[0], ')'
 
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->
