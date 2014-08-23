@@ -364,7 +364,7 @@ describe 'Go grammar', ->
         {tokens} = grammar.tokenizeLine 'var z blub = 7'
         testVar tokens[0]
         testName tokens[2], 'z'
-        testType tokens[4], 'blub'
+        testName tokens[4], 'blub'
         testOp tokens[6], '='
         testNum tokens[8], '7'
 
@@ -425,7 +425,8 @@ describe 'Go grammar', ->
           testVar kwd[1]
           testOp kwd[3], '('
           testName decl[1], 'foo'
-          testType decl[3], '*bar'
+          testOp decl[3], '*'
+          testName decl[4], 'bar'
           testOp closing[1], ')'
 
         it 'tokenizes single names with an initializer', ->

@@ -53,39 +53,6 @@
     'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
-    'comment': 'var statements, single-line or the opening of a multi-line.'
-    'begin': '^\\s*(var)\\s+'
-    'beginCaptures':
-      '1':
-        'name': 'keyword.go'
-    'end': '\\(|='
-    'endCaptures':
-      '0':
-        'name': 'keyword.operator.go'
-    'patterns': [
-      {
-        'match': '([\\w_][\\w\\d_]*)\\s+([\\w_][\\w\\d_]*)'
-        'captures':
-          '1':
-            'name': 'variable.go'
-          '2':
-            'name': 'storage.type.go'
-      }
-      {
-        'match': '([\\w_][\\w\\d_]*)\\s*(,)'
-        'captures':
-          '1':
-            'name': 'variable.go'
-          '2':
-            'name': 'keyword.operator.go'
-      }
-      {
-        'match': '[\\w_][\\w\\d_]*'
-        'name': 'variable.go'
-      }
-    ]
-  }
-  {
     'comment': 'Short declarations'
     'match': '([\\w_][\\w\\d_]*)(?=\\s*:=)'
     'captures':
@@ -164,15 +131,6 @@
   {
     'name': 'support.function.built-in.go'
     'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
-  }
-  {
-    'comment': 'Variable declaration followed by an explicit type'
-    'match': '([\\w_][\\w\\d_]*)\\s+([\\w_*\\[\\]][\\w\\d_*\\[\\]]*)'
-    'captures':
-      '1':
-        'name': 'variable.go'
-      '2':
-        'name': 'storage.type.go'
   }
   {
     'match': '\\b[\\w_][\\w\\d_]*\\b'
