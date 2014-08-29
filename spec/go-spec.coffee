@@ -320,8 +320,8 @@ describe 'Go grammar', ->
     expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
 
     {tokens} = grammar.tokenizeLine '  type T'
-    expect(tokens[2].value).toBe ' T'
-    expect(tokens[2].scopes).not.toEqual ['source.go', 'storage.type.go']
+    expect(tokens[3].value).toBe 'T'
+    expect(tokens[3].scopes).not.toEqual ['source.go', 'storage.type.go']
 
   describe 'in variable declarations', ->
     testVar = (token) ->
@@ -338,40 +338,81 @@ describe 'Go grammar', ->
       expect(token.value).toBe op
       expect(token.scopes).toEqual ['source.go', 'keyword.operator.go']
 
+    testType = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual ['source.go', 'storage.type.go']
+
+    testNum = (token, value) ->
+      expect(token.value).toBe value
+      expect(token.scopes).toEqual ['source.go', 'constant.numeric.go']
+
     describe 'in "var" statements', ->
-      it 'tokenizes single names', ->
+      it 'tokenizes a single name and a type', ->
         {tokens} = grammar.tokenizeLine 'var i int'
         testVar tokens[0]
         testName tokens[2], 'i'
+        testType tokens[4], 'int'
 
+      it 'tokenizes a single name and its initialization', ->
         {tokens} = grammar.tokenizeLine ' var k =  0'
         testVar tokens[1]
         testName tokens[3], 'k'
+        testOp tokens[5], '='
+        testNum tokens[7], '0'
 
-      it 'tokenizes multiple names', ->
+      it 'tokenizes a single name, a type, and an initialization', ->
+        {tokens} = grammar.tokenizeLine 'var z blub = 7'
+        testVar tokens[0]
+        testName tokens[2], 'z'
+        testName tokens[4], 'blub'
+        testOp tokens[6], '='
+        testNum tokens[8], '7'
+
+      it 'tokenizes multiple names and a type', ->
         {tokens} = grammar.tokenizeLine 'var U, V,  W  float64'
         testVar tokens[0]
         testName tokens[2], 'U'
         testOp tokens[3], ','
         testName tokens[5], 'V'
+        testOp tokens[6], ','
         testName tokens[8], 'W'
+        testType tokens[10], 'float64'
 
+      it 'tokenizes multiple names and initialization expressions', ->
+        {tokens} = grammar.tokenizeLine 'var x, y, z = 1, 2, 3'
+        testVar tokens[0]
+        testName tokens[2], 'x'
+        testOp tokens[3], ','
+        testName tokens[5], 'y'
+        testOp tokens[6], ','
+        testName tokens[8], 'z'
+        testOp tokens[10], '='
+        testNum tokens[12], '1'
+        testOp tokens[13], ','
+        testNum tokens[15], '2'
+        testOp tokens[16], ','
+        testNum tokens[18], '3'
+
+      it 'tokenizes multiple names, a type, and initialization expressions', ->
         {tokens} = grammar.tokenizeLine 'var x, y float32 = float, thirtytwo'
         testVar tokens[0]
         testName tokens[2], 'x'
+        testOp tokens[3], ','
         testName tokens[5], 'y'
-        expect(tokens[7].value).toBe 'float32'
-        expect(tokens[7].scopes).toEqual ['source.go', 'storage.type.go']
+        testType tokens[7], 'float32'
         testOp tokens[9], '='
-        expect(tokens[10].value).toBe ' float'
-        expect(tokens[10].scopes).toEqual ['source.go']
+        testName tokens[11], 'float'
+        testOp tokens[12], ','
+        testName tokens[14], 'thirtytwo'
 
+      it 'tokenizes multiple names and a function call', ->
         {tokens} = grammar.tokenizeLine 'var re, im = complexSqrt(-1)'
         testVar tokens[0]
         testName tokens[2], 're'
         testName tokens[5], 'im'
         testOp tokens[7], '='
 
+      it 'tokenizes with a placeholder', ->
         {tokens} = grammar.tokenizeLine 'var _, found = entries[name]'
         testVar tokens[0]
         testName tokens[2], '_'
@@ -379,17 +420,36 @@ describe 'Go grammar', ->
         testOp tokens[7], '='
 
       describe 'in "var" statement blocks', ->
-        it 'tokenizes single names', ->
-          [kwd, decl, _] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
+        it 'tokenizes single names with a type', ->
+          [kwd, decl, closing] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
           testVar kwd[1]
           testOp kwd[3], '('
           testName decl[1], 'foo'
+          testOp decl[3], '*'
+          testName decl[4], 'bar'
+          testOp closing[1], ')'
+
+        it 'tokenizes single names with an initializer', ->
+          [kwd, decl, closing] = grammar.tokenizeLines 'var (\n\tfoo = 42\n)'
+          testVar kwd[0], 'var'
+          testOp kwd[2], '('
+          testName decl[1], 'foo'
+          testOp decl[3], '='
+          testNum decl[5], '42'
+          testOp closing[0], ')'
 
         it 'tokenizes multiple names', ->
-          [kwd, _, decl, _] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
+          [kwd, _, decl, closing] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
           testVar kwd[0]
+          testOp kwd[2], '('
           testName decl[1], 'foo'
+          testOp decl[2], ','
           testName decl[4], 'bar'
+          testOp decl[6], '='
+          testName decl[8], 'baz'
+          testOp decl[9], ','
+          testName decl[11], 'quux'
+          testOp closing[0], ')'
 
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->

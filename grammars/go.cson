@@ -53,54 +53,11 @@
     'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
-    'match': '(var)(?:\\s+([\\w_][\\w\\d_]*)\\b)|(?:\\s*(,)\\s*([\\w_][\\w\\d_]*)(?!\\s*$))'
-    'captures':
-      '1':
-        'name': 'keyword.go'
-      '2':
-        'name': 'variable.go'
-      '3':
-        'name': 'keyword.operator.go'
-      '4':
-        'name': 'variable.go'
-  }
-  {
-    'match': '\\s*,\\s*([\\w_][\\w\\d_]*)(?!\\s*$)'
-    'captures':
-      '1':
-        'name': 'keyword.go'
-      '2':
-        'name': 'variable.go'
-  }
-  {
+    'comment': 'Short declarations'
     'match': '([\\w_][\\w\\d_]*)(?=\\s*:=)'
     'captures':
       '1':
         'name': 'variable.go'
-  }
-  {
-    'begin': '^\\s*(var)\\s*(?=\\()'
-    'beginCaptures':
-      '1':
-        'name': 'keyword.go'
-    'end': '^\\s*\\)\\s*$'
-    'patterns': [
-      {
-        'include': '#operators'
-      }
-      {
-        'match': '\\s*([\\w_][\\w\\d_]*)\\b'
-        'captures':
-          '1':
-            'name': 'variable.go'
-      }
-      {
-        'match': '\\s*,\\s*([\\w_][\\w\\d_]*)(?!\\s*$)'
-        'captures':
-          '1':
-            'name': 'variable.go'
-      }
-    ]
   }
   {
     'match': '^(type)\\s+([\\w_][\\w\\d_]*)\\s+'
@@ -174,6 +131,10 @@
   {
     'name': 'support.function.built-in.go'
     'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
+  }
+  {
+    'match': '\\b[\\w_][\\w\\d_]*\\b'
+    'name': 'variable.go'
   }
 ]
 'repository':
