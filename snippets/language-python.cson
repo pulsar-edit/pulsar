@@ -14,6 +14,30 @@
   'Assert Raises':
     'prefix': 'asr'
     'body': 'self.assertRaises(${1:exception}, ${2:callable})$0'
+  'Assert True':
+      'prefix': 'ast'
+      'body': 'self.assertTrue(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert False':
+     'prefix': 'asf'
+     'body': 'self.assertFalse(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert Is':
+     'prefix': 'asi'
+     'body': 'self.assertIs(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
+  'Assert Is Not':
+     'prefix': 'asint'
+     'body': 'self.assertIsNot(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
+  'Assert Is None':
+     'prefix': 'asino'
+     'body': 'self.assertIsNone(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert Is Not None':
+     'prefix': 'asinno'
+     'body': 'self.assertIsNotNone(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert In':
+     'prefix': 'asin'
+     'body': 'self.assertIn(${1:needle}, ${2:haystack}${3:, \'${4:message}\'})$0'
+  'Assert Not In':
+     'prefix': 'asni'
+     'body': 'self.assertNotIn(${1:needle}, ${2:haystack}${3:, \'${4:message}\'})$0'
   'Assert':
     'prefix': 'as'
     'body': 'self.assert_(${1:boolean expression}${2:, \'${3:message}\'})$0'
