@@ -6,6 +6,7 @@
   'tmpl'
   'tpl'
   'xhtml'
+  'kit'
 ]
 'firstLineMatch': '<(?i:(!DOCTYPE\\s*)?html)'
 'name': 'HTML'
