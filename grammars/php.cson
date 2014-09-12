@@ -5,6 +5,8 @@
   'ctp'
   'inc'
   'module'
+  'install'
+  'profile'
   'php'
   'php3'
   'php4'
