@@ -152,7 +152,7 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
-      expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
+      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
 
   it 'tokenizes func names in their declarations', ->
     tests = [
@@ -182,11 +182,11 @@ describe 'Go grammar', ->
       relevantToken = tokens[t.tokenPos]
       expect(relevantToken).toBeDefined()
       expect(relevantToken.value).toEqual 'f'
-      expect(relevantToken.scopes).toEqual ['source.go', 'support.function.go']
+      expect(relevantToken.scopes).toEqual ['source.go', 'support.function.decl.go']
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
-      expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
+      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
 
   it 'tokenizes numerics', ->
     numerics = [
@@ -226,9 +226,9 @@ describe 'Go grammar', ->
 
   it 'tokenizes operators', ->
     opers = [
-      '+', '&', '+=', '&=', '&&', '==', '!=', '(', ')', '-', '|', '-=', '|=', '||', '<',
-      '<=', '[', ']', '*', '^', '*=', '^=', '<-', '>', '>=', '{', '}', '/', '<<', '/=',
-      '<<=', '++', '=', ':=', ',', ';', '%', '>>', '%=', '>>=', '--', '!', '...', '.',
+      '+', '&', '+=', '&=', '&&', '==', '!=', '-', '|', '-=', '|=', '||', '<',
+      '<=', '*', '^', '*=', '^=', '<-', '>', '>=', '/', '<<', '/=',
+      '<<=', '++', '=', ':=', ';', '%', '>>', '%=', '>>=', '--', '!', '...',
       ':', '&^', '&^='
     ]
 
@@ -240,6 +240,38 @@ describe 'Go grammar', ->
 
       scopes = tokens.map (tok) -> tok.scopes
       allKeywords = scopes.every (scope) -> 'keyword.operator.go' in scope
+
+      expect(allKeywords).toBe true
+
+  it 'tokenizes bracket operators', ->
+    opers = [
+      '[', ']', '(', ')', '{', '}'
+    ]
+
+    for op in opers
+      {tokens} = grammar.tokenizeLine op
+
+      fullOp = tokens.map((tok) -> tok.value).join('')
+      expect(fullOp).toEqual op
+
+      scopes = tokens.map (tok) -> tok.scopes
+      allKeywords = scopes.every (scope) -> 'keyword.operator.bracket.go' in scope
+
+      expect(allKeywords).toBe true
+
+  it 'tokenizes punctuation operators', ->
+    opers = [
+      '.', ','
+    ]
+
+    for op in opers
+      {tokens} = grammar.tokenizeLine op
+
+      fullOp = tokens.map((tok) -> tok.value).join('')
+      expect(fullOp).toEqual op
+
+      scopes = tokens.map (tok) -> tok.scopes
+      allKeywords = scopes.every (scope) -> 'keyword.operator.punctuation.go' in scope
 
       expect(allKeywords).toBe true
 
@@ -296,7 +328,7 @@ describe 'Go grammar', ->
 
         next = tokens[t.tokenPos + 1]
         expect(next.value).toEqual '('
-        expect(next.scopes).toEqual ['source.go', 'keyword.operator.go']
+        expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
       else
         expect(relevantToken.scopes).not.toEqual want
 
@@ -338,6 +370,14 @@ describe 'Go grammar', ->
       expect(token.value).toBe op
       expect(token.scopes).toEqual ['source.go', 'keyword.operator.go']
 
+    testOpBracket = (token, op) ->
+      expect(token.value).toBe op
+      expect(token.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+
+    testOpPunctuation = (token, op) ->
+      expect(token.value).toBe op
+      expect(token.scopes).toEqual ['source.go', 'keyword.operator.punctuation.go']
+
     testType = (token, name) ->
       expect(token.value).toBe name
       expect(token.scopes).toEqual ['source.go', 'storage.type.go']
@@ -372,9 +412,9 @@ describe 'Go grammar', ->
         {tokens} = grammar.tokenizeLine 'var U, V,  W  float64'
         testVar tokens[0]
         testName tokens[2], 'U'
-        testOp tokens[3], ','
+        testOpPunctuation tokens[3], ','
         testName tokens[5], 'V'
-        testOp tokens[6], ','
+        testOpPunctuation tokens[6], ','
         testName tokens[8], 'W'
         testType tokens[10], 'float64'
 
@@ -382,27 +422,27 @@ describe 'Go grammar', ->
         {tokens} = grammar.tokenizeLine 'var x, y, z = 1, 2, 3'
         testVar tokens[0]
         testName tokens[2], 'x'
-        testOp tokens[3], ','
+        testOpPunctuation tokens[3], ','
         testName tokens[5], 'y'
-        testOp tokens[6], ','
+        testOpPunctuation tokens[6], ','
         testName tokens[8], 'z'
         testOp tokens[10], '='
         testNum tokens[12], '1'
-        testOp tokens[13], ','
+        testOpPunctuation tokens[13], ','
         testNum tokens[15], '2'
-        testOp tokens[16], ','
+        testOpPunctuation tokens[16], ','
         testNum tokens[18], '3'
 
       it 'tokenizes multiple names, a type, and initialization expressions', ->
         {tokens} = grammar.tokenizeLine 'var x, y float32 = float, thirtytwo'
         testVar tokens[0]
         testName tokens[2], 'x'
-        testOp tokens[3], ','
+        testOpPunctuation tokens[3], ','
         testName tokens[5], 'y'
         testType tokens[7], 'float32'
         testOp tokens[9], '='
         testName tokens[11], 'float'
-        testOp tokens[12], ','
+        testOpPunctuation tokens[12], ','
         testName tokens[14], 'thirtytwo'
 
       it 'tokenizes multiple names and a function call', ->
@@ -423,33 +463,33 @@ describe 'Go grammar', ->
         it 'tokenizes single names with a type', ->
           [kwd, decl, closing] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
           testVar kwd[1]
-          testOp kwd[3], '('
+          testOpBracket kwd[3], '('
           testName decl[1], 'foo'
           testOp decl[3], '*'
           testName decl[4], 'bar'
-          testOp closing[1], ')'
+          testOpBracket closing[1], ')'
 
         it 'tokenizes single names with an initializer', ->
           [kwd, decl, closing] = grammar.tokenizeLines 'var (\n\tfoo = 42\n)'
           testVar kwd[0], 'var'
-          testOp kwd[2], '('
+          testOpBracket kwd[2], '('
           testName decl[1], 'foo'
           testOp decl[3], '='
           testNum decl[5], '42'
-          testOp closing[0], ')'
+          testOpBracket closing[0], ')'
 
         it 'tokenizes multiple names', ->
           [kwd, _, decl, closing] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
           testVar kwd[0]
-          testOp kwd[2], '('
+          testOpBracket kwd[2], '('
           testName decl[1], 'foo'
-          testOp decl[2], ','
+          testOpPunctuation decl[2], ','
           testName decl[4], 'bar'
           testOp decl[6], '='
           testName decl[8], 'baz'
-          testOp decl[9], ','
+          testOpPunctuation decl[9], ','
           testName decl[11], 'quux'
-          testOp closing[0], ')'
+          testOpBracket closing[0], ')'
 
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->
@@ -464,7 +504,7 @@ describe 'Go grammar', ->
         xit 'tokenizes multiple names', ->
           {tokens} = grammar.tokenizeLine 'i, j := 0, 10'
           testName tokens[0], 'i'
-          testOp tokens[1], ','
+          testOpPunctuation tokens[1], ','
           testName tokens[3], 'j'
 
           {tokens} = grammar.tokenizeLine 'if _, y, z := coord(p); z > 0'
