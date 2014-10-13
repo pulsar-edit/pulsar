@@ -11,6 +11,7 @@
   'SConscript'
   'gyp'
   'gypi'
+  'wsgi'
 ]
 'firstLineMatch': '^#!/.*\\bpython\\b'
 'patterns': [
