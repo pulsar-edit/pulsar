@@ -203,7 +203,12 @@
             'name': 'punctuation.definition.string.end.go'
           '2':
             'name': 'meta.empty-string.double.go'
-        'name': 'string.quoted.double.raw.backtick.go'
+        'name': 'string.quoted.double.raw.backtick.go',
+        'patterns': [
+          {
+            'include': 'source.gotemplate'
+          }
+        ]
       }
       {
         'begin': '\''
