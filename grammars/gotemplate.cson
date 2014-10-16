@@ -1,6 +1,7 @@
+'scopeName': 'source.gotemplate'
+'name': 'Go Template'
 'foldingStartMarker': '\\{\\{\\s*(?:if|with|range)\\b'
 'foldingStopMarker': '\\{\\{\\s*(?:else|end)\\b'
-'name': 'Go template'
 'patterns': [
   {
     'begin': '\\{\\{'
@@ -98,4 +99,3 @@
         'name': 'invalid.illegal.placeholder.gotemplate'
       }
     ]
-'scopeName': 'source.gotemplate'
