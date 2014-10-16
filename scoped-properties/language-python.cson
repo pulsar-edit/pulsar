@@ -1,5 +1,6 @@
 '.source.python':
   'editor':
+    'tabLength': 4
     'foldEndPattern': '^\\s*"""\\s*$'
     'commentStart': '# '
     'increaseIndentPattern': '^\\s*(class|def|elif|else|except|finally|for|if|try|with|while)\\b.*:\\s*$'
