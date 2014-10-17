@@ -29,6 +29,9 @@
   'Do While Loop':
     'prefix': 'do'
     'body': 'do {\n\t${0:/* code */}\n} while(${1:/* condition */});'
+  'While Loop':
+    'prefix': 'while'
+    'body': 'while(${1:/* condition */})\n{\n\t${2:/* code */}\n}'
   'fprintf':
     'prefix': 'fprintf'
     'body': 'fprintf(${1:stderr}, "${2:%s}\\n", $3);$4'
