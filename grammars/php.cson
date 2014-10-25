@@ -706,6 +706,21 @@
         ]
       }
       {
+        'begin': '(?i)^\\s*(trait)\\s+([a-z0-9_]+)\\s*'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.trait.php'
+          '2':
+            'name': 'entity.name.type.class.php'
+        'end': '(?=[{])'
+        'name': 'meta.trait.php'
+        'patterns': [
+          {
+            "include": "#comments"
+          }
+        ]
+      }
+      {
         'begin': '(?i)^\\s*(namespace)\\b\\s+(?=([a-z0-9_\\\\]+\\s*($|[;{]|(\\/[\\/*])))|$)'
         'beginCaptures':
           '1':
@@ -1051,7 +1066,7 @@
         'match': '(?i)\\s*\\(\\s*(array|real|double|float|int(eger)?|bool(ean)?|string|object|binary|unset)\\s*\\)'
       }
       {
-        'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|clone|var|function|interface|parent|self|object)\\b'
+        'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|clone|var|function|interface|trait|parent|self|object)\\b'
         'name': 'storage.type.php'
       }
       {
