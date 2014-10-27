@@ -716,7 +716,7 @@
         'name': 'meta.trait.php'
         'patterns': [
           {
-            "include": "#comments"
+            'include': '#comments'
           }
         ]
       }
