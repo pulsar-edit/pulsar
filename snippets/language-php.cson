@@ -7,7 +7,7 @@
     'body': '?>$0<?php'
   'function __construct':
     'prefix': 'con'
-    'body': 'function __construct(${1:$${2:foo}${3: = ${4:null}}}) {\n\t${2:$this->$0 = $$0;}$0\n}'
+    'body': 'function __construct(${1:$${2:foo} ${3:= ${4:null}}}) {\n\t${2:$this->$0 = $$0;}$0\n}'
   'Heredoc':
     'prefix': '<<<'
     'body': '<<<${1:HTML}\n${2:content here}\n$1;\n'
@@ -19,7 +19,7 @@
     'body': '/**\n * $0\n */'
   'class …':
     'prefix': 'class'
-    'body': '/**\n * $1\n */\nclass ${2:ClassName}${3: extends ${4:AnotherClass}}\n{\n\t$5\n\tfunction ${6:__construct}(${7:argument})\n\t{\n\t\t${0:# code...}\n\t}\n}\n'
+    'body': '/**\n * $1\n */\nclass ${2:ClassName} ${3:extends ${4:AnotherClass}}\n{\n\t$5\n\tfunction ${6:__construct}(${7:argument})\n\t{\n\t\t${0:# code...}\n\t}\n}\n'
   'trait …':
     'prefix': 'trait'
     'body': '/**\n * $1\n */\ntrait ${2:TraitName}\n{\n\tfunction ${3:functionName}(${4:argument})\n\t{\n\t\t${5:# code...}\n\t}\n}\n'
@@ -46,7 +46,7 @@
     'body': 'for ($${1:i}=${2:0}; $${1:i} < $3; $${1:i}++) { \n\t${0:# code...}\n}'
   'foreach …':
     'prefix': 'foreach'
-    'body': 'foreach ($${1:variable} as $${2:key}${3: => $${4:value}}) {\n\t${0:# code...}\n}'
+    'body': 'foreach ($${1:variable} as $${2:key} ${3:=> $${4:value}}) {\n\t${0:# code...}\n}'
   'function …':
     'prefix': 'fun'
     'body': '${1:public }function ${2:FunctionName}(${3:$${4:value}${5:=\'\'}})\n{\n\t${0:# code...}\n}'
