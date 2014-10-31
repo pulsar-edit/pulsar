@@ -11,7 +11,7 @@
       |^ \\s* (for|while) \\s* \\(
       '
     'decreaseIndentPattern': '(?x)
-       ^ \\s* ( (?! \\S.* /[*] ) .* [*]/ \\s* )? \\}
+       ^ \\s* (\\s* /[*] .* [*]/ \\s*)* \\}
       |^ \\s* (public|private|protected): \\s* $
       |^ \\s* @(public|private|protected) \\s* $
       '
