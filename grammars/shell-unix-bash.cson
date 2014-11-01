@@ -1,6 +1,7 @@
 'fileTypes': [
   'sh'
   'bash'
+  'ksh'
   'zsh'
   'zshrc'
   'bashrc'
@@ -10,9 +11,10 @@
   'bash_logout'
   '.textmate_init'
   'npmrc'
+  'PKGBUILD'
 ]
-'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
-'name': 'Shell Script (Bash)'
+'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
+'name': 'Shell Script'
 'patterns': [
   {
     'include': '#comment'
