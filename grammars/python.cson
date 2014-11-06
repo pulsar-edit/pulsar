@@ -994,36 +994,23 @@
         ]
       }
       {
-        'begin': '([uU]r)(")'
-        'beginCaptures':
+        'captures':
           '1':
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'double-quoted raw string'
-        'end': '((?<=")(")|")|(\\n)'
-        'endCaptures':
-          '1':
-            'name': 'punctuation.definition.string.end.python'
-          '2':
-            'name': 'meta.empty-string.double.python'
           '3':
-            'name': 'invalid.illegal.unclosed-string.python'
+            'patterns': [
+              'include': '#constant_placeholder'
+              'include': '#escaped_unicode_char'
+              'include': '#escaped_char'
+              'include': '#regular_expressions'
+            ]
+          '4':
+            'name': 'punctuation.definition.string.end.python'
+        'comment': 'double-quoted raw string'
+        'match': '([uU]r)(")((?:[^"\\\\]|\\\\.)*)(")'
         'name': 'string.quoted.double.single-line.unicode-raw-regex.python'
-        'patterns': [
-          {
-            'include': '#constant_placeholder'
-          }
-          {
-            'include': '#escaped_unicode_char'
-          }
-          {
-            'include': '#escaped_char'
-          }
-          {
-            'include': '#regular_expressions'
-          }
-        ]
       }
       {
         'begin': '([uU]R)(")'
@@ -1055,33 +1042,22 @@
         ]
       }
       {
-        'begin': '(r)(")'
-        'beginCaptures':
+        'captures':
           '1':
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'double-quoted raw string'
-        'end': '((?<=")(")|")|(\\n)'
-        'endCaptures':
-          '1':
-            'name': 'punctuation.definition.string.end.python'
-          '2':
-            'name': 'meta.empty-string.double.python'
           '3':
-            'name': 'invalid.illegal.unclosed-string.python'
+            'patterns': [
+              'include': '#constant_placeholder'
+              'include': '#escaped_char'
+              'include': '#regular_expressions'
+            ]
+          '4':
+            'name': 'punctuation.definition.string.end.python'
+        'comment': 'double-quoted raw string'
+        'match': '(r)(")((?:[^"\\\\]|\\\\.)*)(")'
         'name': 'string.quoted.double.single-line.raw-regex.python'
-        'patterns': [
-          {
-            'include': '#constant_placeholder'
-          }
-          {
-            'include': '#escaped_char'
-          }
-          {
-            'include': '#regular_expressions'
-          }
-        ]
       }
       {
         'begin': '(R)(")'
@@ -1386,34 +1362,23 @@
         ]
       }
       {
-        'begin': '([uU]r)(\')'
-        'beginCaptures':
+        'captures':
           '1':
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'single quoted raw string'
-        'end': '(\')|(\\n)'
-        'endCaptures':
-          '1':
+          '3':
+            'patterns': [
+              'include': '#constant_placeholder'
+              'include': '#escaped_unicode_char'
+              'include': '#escaped_char'
+              'include': '#regular_expressions'
+            ]
+          '4':
             'name': 'punctuation.definition.string.end.python'
-          '2':
-            'name': 'invalid.illegal.unclosed-string.python'
+        'comment': 'single quoted raw string'
+        'match': '([uU]r)(\')((?:[^\'\\\\]|\\\\.)*)(\')'
         'name': 'string.quoted.single.single-line.unicode-raw-regex.python'
-        'patterns': [
-          {
-            'include': '#constant_placeholder'
-          }
-          {
-            'include': '#escaped_unicode_char'
-          }
-          {
-            'include': '#escaped_char'
-          }
-          {
-            'include': '#regular_expressions'
-          }
-        ]
       }
       {
         'begin': '([uU]R)(\')'
@@ -1443,31 +1408,22 @@
         ]
       }
       {
-        'begin': '(r)(\')'
-        'beginCaptures':
+        'captures':
           '1':
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'single quoted raw string'
-        'end': '(\')|(\\n)'
-        'endCaptures':
-          '1':
+          '3':
+            'patterns': [
+              'include': '#constant_placeholder'
+              'include': '#escaped_char'
+              'include': '#regular_expressions'
+            ]
+          '4':
             'name': 'punctuation.definition.string.end.python'
-          '2':
-            'name': 'invalid.illegal.unclosed-string.python'
+        'comment': 'single quoted raw string'
+        'match': '(r)(\')((?:[^\'\\\\]|\\\\.)*)(\')'
         'name': 'string.quoted.single.single-line.raw-regex.python'
-        'patterns': [
-          {
-            'include': '#constant_placeholder'
-          }
-          {
-            'include': '#escaped_char'
-          }
-          {
-            'include': '#regular_expressions'
-          }
-        ]
       }
       {
         'begin': '(R)(\')'
