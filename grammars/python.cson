@@ -1001,10 +1001,10 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              'include': '#constant_placeholder'
-              'include': '#escaped_unicode_char'
-              'include': '#escaped_char'
-              'include': '#regular_expressions'
+              {'include': '#constant_placeholder'}
+              {'include': '#escaped_unicode_char'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
             ]
           '4':
             'name': 'punctuation.definition.string.end.python'
@@ -1049,9 +1049,9 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              'include': '#constant_placeholder'
-              'include': '#escaped_char'
-              'include': '#regular_expressions'
+              {'include': '#constant_placeholder'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
             ]
           '4':
             'name': 'punctuation.definition.string.end.python'
@@ -1369,10 +1369,10 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              'include': '#constant_placeholder'
-              'include': '#escaped_unicode_char'
-              'include': '#escaped_char'
-              'include': '#regular_expressions'
+              {'include': '#constant_placeholder'}
+              {'include': '#escaped_unicode_char'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
             ]
           '4':
             'name': 'punctuation.definition.string.end.python'
@@ -1415,9 +1415,9 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              'include': '#constant_placeholder'
-              'include': '#escaped_char'
-              'include': '#regular_expressions'
+              {'include': '#constant_placeholder'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
             ]
           '4':
             'name': 'punctuation.definition.string.end.python'
