@@ -1,4 +1,4 @@
-# ShellScript language support in Atom
+# ShellScript language support in Atom [![Build Status](https://travis-ci.org/atom/language-shellscript.svg?branch=master)](https://travis-ci.org/atom/language-shellscript)
 
 Adds syntax highlighting and snippets to shell scripts in Atom.
 
