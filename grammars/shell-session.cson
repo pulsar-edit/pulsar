@@ -1,0 +1,54 @@
+'scopeName': 'text.shell-session'
+'name': 'Shell Session'
+'fileTypes': [
+  'sh-session'
+]
+'patterns': [
+  {
+    'match': '^(>)(.*)$'
+    'captures':
+      '1':
+        'name': 'punctuation.separator.prompt.shell-session'
+      '2':
+        'name': 'source.shell'
+        'patterns': [
+          'include': 'source.shell'
+        ]
+  }
+  {
+    'match': '(?x)
+      ^
+      (?:
+        (
+          (?:\\(\\S+\\))?
+          (?:
+            | sh\\S*?
+            | \\w+\\S+[@:]\\S+(?:\\s+\\S+)?
+            | \\[\\S+[@:][^\\n]+\\].+
+          )
+        )
+        \\s*
+      )
+      (
+        [$#%]
+      )
+      \\s+
+      (.*)
+      $
+    '
+    'captures':
+      '1':
+        'name': 'entity.other.prompt-prefix.shell-session'
+      '2':
+        'name': 'punctuation.separator.prompt.shell-session'
+      '3':
+        'name': 'source.shell'
+        'patterns': [
+          'include': 'source.shell'
+        ]
+  }
+  {
+    'match': '^.+$'
+    'name': 'meta.output.shell-session'
+  }
+]
