@@ -38,9 +38,18 @@
   'If Condition':
     'prefix': 'if'
     'body': 'if(${1:/* condition */})\n{\n\t${2:/* code */}\n}'
+  'Switch Statement': 
+    'prefix': 'switch'
+    'body': 'switch(${1:/* expression */}) {\n\tcase ${2:/* value */}:\n}'
+  'case':
+    'prefix': 'cs'
+    'body': 'case ${1:/* value */}:$0'
   'printf':
     'prefix': 'printf'
     'body': 'printf("${1:%s}\\n", $2);$3'
+  'scanf': 
+    'prefix': 'scanf'
+    'body': 'scanf(\"${1:%s}\\n\", $2);$3'
   'Struct':
     'prefix': 'st'
     'body': 'struct ${1:name_t}\n{\n\t${2:/* data */}\n};'
