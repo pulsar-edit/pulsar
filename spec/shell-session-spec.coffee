@@ -6,7 +6,7 @@ describe "Shell session grammar", ->
       atom.packages.activatePackage("language-shellscript")
 
     runs ->
-      grammar = atom.syntax.grammarForScopeName("text.shell-session")
+      grammar = atom.grammars.grammarForScopeName("text.shell-session")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()
