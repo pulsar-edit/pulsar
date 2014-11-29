@@ -230,8 +230,8 @@
         'include': '#parens'
       }
       {
-        'match': '\\bconst\\b'
-        'name': 'storage.modifier.c'
+        'match': '\\b(const|override|final)\\b'
+        'name': 'storage.modifier.c++'
       }
       {
         'include': '#block'
