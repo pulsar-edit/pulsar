@@ -6,7 +6,7 @@ describe "Python grammar", ->
       atom.packages.activatePackage("language-python")
 
     runs ->
-      grammar = atom.syntax.grammarForScopeName("source.python")
+      grammar = atom.grammars.grammarForScopeName("source.python")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()
