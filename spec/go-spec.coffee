@@ -6,7 +6,7 @@ describe 'Go grammar', ->
       atom.packages.activatePackage('language-go')
 
     runs ->
-      grammar = atom.syntax.grammarForScopeName('source.go')
+      grammar = atom.grammars.grammarForScopeName('source.go')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()
