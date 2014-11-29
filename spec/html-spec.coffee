@@ -9,7 +9,7 @@ describe 'HTML grammar', ->
       atom.packages.activatePackage('language-coffee-script')
 
     runs ->
-      grammar = atom.syntax.grammarForScopeName('text.html.basic')
+      grammar = atom.grammars.grammarForScopeName('text.html.basic')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()
