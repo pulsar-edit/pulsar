@@ -2,6 +2,10 @@
   'geojson'
   'json'
   'topojson'
+  'jshintrc'
+  'jslintrc'
+  'eslintrc'
+  'bowerrc'
 ]
 'name': 'JSON'
 'patterns': [
