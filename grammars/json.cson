@@ -1,5 +1,6 @@
 'fileTypes': [
   'json'
+  'geojson'
 ]
 'name': 'JSON'
 'patterns': [
