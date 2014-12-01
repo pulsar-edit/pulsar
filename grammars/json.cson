@@ -1,11 +1,11 @@
 'fileTypes': [
+  'bowerrc'
+  'eslintrc'
   'geojson'
-  'json'
-  'topojson'
   'jshintrc'
   'jslintrc'
-  'eslintrc'
-  'bowerrc'
+  'json'
+  'topojson'
 ]
 'name': 'JSON'
 'patterns': [
