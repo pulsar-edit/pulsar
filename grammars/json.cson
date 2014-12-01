@@ -1,6 +1,7 @@
 'fileTypes': [
-  'json'
   'geojson'
+  'json'
+  'topojson'
 ]
 'name': 'JSON'
 'patterns': [
