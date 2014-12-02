@@ -231,7 +231,7 @@
       }
       {
         'match': '\\b(const|override|final)\\b'
-        'name': 'storage.modifier.c++'
+        'name': 'storage.modifier.c'
       }
       {
         'include': '#block'
