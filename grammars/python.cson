@@ -11,6 +11,7 @@
   'SConstruct'
   'Sconstruct'
   'sconstruct'
+  'Snakefile'
   'wsgi'
 ]
 'firstLineMatch': '^#!/.*\\bpython\\b'
