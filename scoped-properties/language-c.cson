@@ -14,6 +14,7 @@
        ^ \\s* (\\s* /[*] .* [*]/ \\s*)* \\}
       |^ \\s* (public|private|protected): \\s* $
       |^ \\s* @(public|private|protected) \\s* $
+      |^ \\s* \\{
       '
 '.source.c, .source.c\\+\\+':
   'editor':
