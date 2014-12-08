@@ -8,7 +8,7 @@
       |^ \\s* \\{ \\} $
       |^ \\s* if \\s* \\( (?!.*?(\\belse\\b|;\\s*$))
       |^ \\s* \\}? \\s* else \\s*$
-      |^ \\s* (for|while) \\s* \\(
+      |^ \\s* (for|while) \\s* \\( (?! .* ; \\s* $)
       '
     'decreaseIndentPattern': '(?x)
        ^ \\s* (\\s* /[*] .* [*]/ \\s*)* \\}
