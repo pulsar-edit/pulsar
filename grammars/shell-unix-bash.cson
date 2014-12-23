@@ -3,6 +3,7 @@
   'bash'
   'ksh'
   'zsh'
+  'zshenv'
   'zshrc'
   'bashrc'
   'bash_profile'
