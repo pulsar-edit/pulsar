@@ -1,4 +1,4 @@
-'.source.c, .source.c\\+\\+, .source.objc, .source.objc\\+\\+':
+'.source.c, .source.cpp, .source.objc, .source.objcpp':
   '#ifndef … #define … #endif':
     'prefix': 'def'
     'body': '#ifndef ${1:SYMBOL}\n#define $1 ${2:value}\n#endif'
@@ -38,7 +38,7 @@
   'If Condition':
     'prefix': 'if'
     'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}'
-  'Switch Statement': 
+  'Switch Statement':
     'prefix': 'switch'
     'body': 'switch (${1:/* expression */}) {\n\tcase ${2:/* value */}:\n}'
   'case':
@@ -47,7 +47,7 @@
   'printf':
     'prefix': 'printf'
     'body': 'printf("${1:%s}\\n", $2);$3'
-  'scanf': 
+  'scanf':
     'prefix': 'scanf'
     'body': 'scanf(\"${1:%s}\\n\", $2);$3'
   'Struct':
@@ -59,7 +59,7 @@
   'any function':
     'prefix': 'func'
     'body': '${1:int} ${2:name}(${3:/* arguments */}) {\n\t${5:/* code */}\n\treturn ${4:0};\n}'
-'.source.c\\+\\+, .source.objc\\+\\+':
+'.source.cpp, .source.objcpp':
   'Enumeration':
     'prefix': 'enum'
     'body': 'enum ${1:name} { $0 };'
