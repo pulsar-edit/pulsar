@@ -25,11 +25,11 @@ describe 'Language-C', ->
 
   describe "C++", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName('source.c++')
+      grammar = atom.grammars.grammarForScopeName('source.cpp')
 
     it 'parses the grammar', ->
       expect(grammar).toBeTruthy()
-      expect(grammar.scopeName).toBe 'source.c++'
+      expect(grammar.scopeName).toBe 'source.cpp'
 
     it 'tokenizes classes', ->
       lines = grammar.tokenizeLines '''
@@ -38,5 +38,5 @@ describe 'Language-C', ->
         }
       '''
 
-      expect(lines[0][0]).toEqual value: 'class', scopes: ["source.c++", "meta.class-struct-block.c++", "storage.type.c++"]
-      expect(lines[0][2]).toEqual value: 'Thing', scopes: ["source.c++", "meta.class-struct-block.c++", "entity.name.type.c++"]
+      expect(lines[0][0]).toEqual value: 'class', scopes: ["source.cpp", "meta.class-struct-block.cpp", "storage.type.cpp"]
+      expect(lines[0][2]).toEqual value: 'Thing', scopes: ["source.cpp", "meta.class-struct-block.cpp", "entity.name.type.cpp"]

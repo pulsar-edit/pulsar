@@ -1,4 +1,4 @@
-'.source.c, .source.c\\+\\+, .source.objc, .source.objc\\+\\+':
+'.source.c, .source.cpp, .source.objc, .source.objcpp':
   'editor':
     'commentStart': '// '
     'increaseIndentPattern': '(?x)
@@ -16,6 +16,6 @@
       |^ \\s* @(public|private|protected) \\s* $
       |^ \\s* \\{
       '
-'.source.c, .source.c\\+\\+':
+'.source.c, .source.cpp':
   'editor':
     'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}'
