@@ -1,4 +1,4 @@
-# C/C++ language support in Atom
+# C/C++ language support in Atom [![Build Status](https://travis-ci.org/atom/language-c.svg?branch=master)](https://travis-ci.org/atom/language-c)
 
 Adds syntax highlighting and snippets to C/C++ files in Atom.
 
