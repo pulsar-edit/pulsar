@@ -906,7 +906,7 @@
         ]
       }
       {
-        'match': '\\b(catch|try|throw|exception)\\b'
+        'match': '\\b(catch|try|throw|exception|finally)\\b'
         'name': 'keyword.control.exception.php'
       }
       {
