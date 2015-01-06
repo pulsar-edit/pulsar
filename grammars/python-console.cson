@@ -8,7 +8,7 @@
     'match': '^(>{3}|\\.{3}|In \\[\\d+\\]:) (.+)$'
     'captures':
       '1':
-        'name': 'punctuation.separator.prompt.python-session'
+        'name': 'punctuation.separator.prompt.python.console'
       '2':
         'patterns': [
           'include': 'source.python'
