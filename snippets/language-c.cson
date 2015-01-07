@@ -38,6 +38,9 @@
   'If Condition':
     'prefix': 'if'
     'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}'
+  'If Else':
+    'prefix': 'ife'
+    'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}\nelse {\n\t${3:/* code */}\n}'
   'Switch Statement':
     'prefix': 'switch'
     'body': 'switch (${1:/* expression */}) {\n\tcase ${2:/* value */}:\n}'
