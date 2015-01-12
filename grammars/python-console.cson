@@ -1,7 +1,8 @@
 'scopeName': 'text.python.console'
 'name': 'Python Console'
 'fileTypes': [
-  'pycon'
+  'pycon',
+  'doctest'
 ]
 'patterns': [
   {
