@@ -91,7 +91,7 @@
     'body': "http.Error(${1:w}, ${2:err}.Error(), ${3:http.StatusInternalServerError})"
   'listenandserve':
     'prefix': 'las'
-    'body': "http.ListenAndServe(\"${1:\:8080}\", ${2:nil})"
+    'body': "http.ListenAndServe(\"${1::8080}\", ${2:nil})"
   'serve':
     'prefix': 'sv'
     'body': "http.Serve(\"${1::8080}\", ${2:nil})"
