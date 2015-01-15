@@ -13,6 +13,7 @@
   'Sconstruct'
   'sconstruct'
   'Snakefile'
+  'tac'
   'wsgi'
 ]
 'firstLineMatch': '^#!/.*\\bpython\\b'
