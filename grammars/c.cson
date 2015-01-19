@@ -295,7 +295,7 @@
             'name': 'variable.other.c'
           '2':
             'name': 'punctuation.definition.parameters.c'
-        'match': '(?x)\n\t\t\t        (?x)\n\t\t\t(?:  \n\t\t\t     (?: (?= \\s )           (?<!else|new|return) (?<=\\w)\\s+      #  or word + space before name\n\t\t\t     )\n\t\t\t)\n\t\t\t(\n\t\t\t\t(?: [A-Za-z_][A-Za-z0-9_]*+ | :: )++    |              # actual name\n\t\t\t\t(?: (?<=operator) (?: [-*&<>=+!]+ | \\(\\) | \\[\\] ) )?  # if it is a C++ operator\n\t\t\t)\n\t\t\t \\s*(\\()'
+        'match': '(?x)\n\t\t\t        (?x)\n\t\t\t(?:  \n\t\t\t     (?: (?= \\s )           (?<!else|new|return) (?<=\\w)\\s+      #  or word + space before name\n\t\t\t     )\n\t\t\t)\n\t\t\t(\n\t\t\t\t(?: [A-Za-z_][A-Za-z0-9_]*+ | :: )++    |              # actual name\n\t\t\t\t(?: (?<=operator) (?: [-*&<>=+!]+ | \\(\\) | \\[\\] ) )  # if it is a C++ operator\n\t\t\t)\n\t\t\t \\s*(\\()'
         'name': 'meta.initialization.c'
       }
       {
