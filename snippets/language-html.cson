@@ -8,16 +8,16 @@
     'body': '<abbr title="$1">$2</abbr>$0'
   'Address':
     'prefix': 'address'
-    'body': '<address ${1:id="$2"}>\n\t$3\n</address>'
+    'body': '<address ${1:class="$2"}>\n\t$3\n</address>'
   'Area':
     'prefix': 'area'
     'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"} />$0'
   'Article':
     'prefix': 'article'
-    'body': '<article id="$1">\n\t$2\n</article>'
+    'body': '<article class="$1">\n\t$2\n</article>'
   'Aside':
     'prefix': 'aside'
-    'body': '<aside id="$1">\n\t$2\n</aside>'
+    'body': '<aside class="$1">\n\t$2\n</aside>'
   'Audio':
     'prefix': 'audio'
     'body': '<audio src="$1">\n\t$2\n</audio>'
@@ -77,7 +77,7 @@
     'body': '<data value="$1">$2</data>$0'
   'Data List':
     'prefix': 'datalist'
-    'body': '<datalist id="$1">\n\t$2\n</datalist>'
+    'body': '<datalist class="$1">\n\t$2\n</datalist>'
   'Description':
     'prefix': 'dd'
     'body': '<dd>$1</dd>$0'
@@ -92,13 +92,13 @@
     'body': '<dfn>$1</dfn>$0'
   'Description List':
     'prefix': 'dl'
-    'body': '<dl id="$1">\n\t$2\n</dl>'
+    'body': '<dl class="$1">\n\t$2\n</dl>'
   'Definition Term':
     'prefix': 'dt'
     'body': '<dt>$1</dt>$0'
   'Div':
     'prefix': 'div'
-    'body': '<div${1: id="${2:name}"}>\n\t$3\n</div>'
+    'body': '<div${1: class="${2:name}"}>\n\t$3\n</div>'
   # E
   'Emphasis':
     'prefix': 'em'
@@ -121,7 +121,7 @@
     'body': '<footer>$1</footer>$0'
   'Form':
     'prefix': 'form'
-    'body': '<form id="${1:form_id}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
+    'body': '<form class="${1:form_class}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
   # G
   # H
   'Heading 1':
@@ -284,7 +284,7 @@
     'body': '<section>\n\t$1\n</section>'
   'Select':
     'prefix': 'select'
-    'body': '<select id="$1" name="$2">\n\t$3\n</select>'
+    'body': '<select class="$1" name="$2">\n\t$3\n</select>'
   'Small':
     'prefix': 'small'
     'body': '<small>$1</small>$0'
