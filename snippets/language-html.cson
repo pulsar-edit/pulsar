@@ -98,7 +98,7 @@
     'body': '<dt>$1</dt>$0'
   'Div':
     'prefix': 'div'
-    'body': '<div${1: class="${2:name}"}>\n\t$3\n</div>'
+    'body': '<div${1: class="$2"}>\n\t$3\n</div>'
   # E
   'Emphasis':
     'prefix': 'em'
@@ -121,7 +121,7 @@
     'body': '<footer>$1</footer>$0'
   'Form':
     'prefix': 'form'
-    'body': '<form class="${1:name}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
+    'body': '<form class="$1" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
   # G
   # H
   'Heading 1':
