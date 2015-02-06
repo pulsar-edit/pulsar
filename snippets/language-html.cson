@@ -121,7 +121,7 @@
     'body': '<footer>$1</footer>$0'
   'Form':
     'prefix': 'form'
-    'body': '<form class="${1:form_class}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
+    'body': '<form class="${1:name}" action="${2:index.html}" method="${3:post}">\n\t$4\n</form>'
   # G
   # H
   'Heading 1':
@@ -163,7 +163,7 @@
     'body': '<iframe src="$1" width="$2" height="$3">$4</iframe>$0'
   'Input':
     'prefix': 'input'
-    'body': '<input type="${1:button}" name="${2:some_name}" value="$3">$0'
+    'body': '<input type="${1:button}" name="${2:name}" value="$3">$0'
   'Image':
     'prefix': 'img'
     'body': '<img src="$1" alt="$2" />$0'
@@ -324,7 +324,7 @@
     'body': '<template id="$1">\n\t$2\n</template>'
   'Text Area':
     'prefix': 'textarea'
-    'body': '<textarea name="${1:Name}" rows="${2:8}" cols="${3:40}">$4</textarea>$0'
+    'body': '<textarea name="${1:name}" rows="${2:8}" cols="${3:40}">$4</textarea>$0'
   'Table Foot':
     'prefix': 'tfoot'
     'body': '<tfoot>\n\t$1\n</tfoot>'
