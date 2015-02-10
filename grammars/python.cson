@@ -44,11 +44,11 @@
     'name': 'constant.numeric.integer.hexadecimal.python'
   }
   {
-    'match': '\\b(?i:(0[0-7]+)L)'
+    'match': '\\b(?i:(0[oO]?[0-7]+)L)'
     'name': 'constant.numeric.integer.long.octal.python'
   }
   {
-    'match': '\\b(0[0-7]+)'
+    'match': '\\b(0[oO]?[0-7]+)'
     'name': 'constant.numeric.integer.octal.python'
   }
   {
