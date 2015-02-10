@@ -44,12 +44,20 @@
     'name': 'constant.numeric.integer.hexadecimal.python'
   }
   {
-    'match': '\\b(?i:(0[oO]?[0-7]+)L)'
+    'match': '\\b(?i:(0o?[0-7]+)L)'
     'name': 'constant.numeric.integer.long.octal.python'
   }
   {
-    'match': '\\b(0[oO]?[0-7]+)'
+    'match': '\\b(?i:(0o?[0-7]+))'
     'name': 'constant.numeric.integer.octal.python'
+  }
+  {
+    'match': '\\b(?i:(0b[01]+)L)',
+    'name': 'constant.numeric.integer.long.binary.python'
+  }
+  {
+    'match': '\\b(?i:(0b[01]+))',
+    'name': 'constant.numeric.integer.binary.python'
   }
   {
     'match': '\\b(?i:(((\\d+(\\.(?=[^a-zA-Z_])\\d*)?|(?<=[^0-9a-zA-Z_])\\.\\d+)(e[\\-\\+]?\\d+)?))J)'
