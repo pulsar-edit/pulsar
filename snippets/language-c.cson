@@ -53,6 +53,15 @@
   'scanf':
     'prefix': 'scanf'
     'body': 'scanf(\"${1:%s}\\n\", $2);$3'
+  'cout':
+    'prefix': 'cout'
+    'body': 'std::cout<< \"${1:/* message */}\" << std::endl;'
+  'cin':
+    'prefix': 'cin'
+    'body': 'std::cin >> ${1:/* variable */};'
+  'cerr':
+    'prefix': 'cerr'
+    'body': 'std::cerr<< \"${1:/* error message */}\" << std::endl;'
   'Struct':
     'prefix': 'st'
     'body': 'struct ${1:name_t} {\n\t${2:/* data */}\n};'
