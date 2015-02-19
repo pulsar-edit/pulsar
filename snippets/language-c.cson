@@ -62,6 +62,12 @@
   'any function':
     'prefix': 'func'
     'body': '${1:int} ${2:name}(${3:/* arguments */}) {\n\t${5:/* code */}\n\treturn ${4:0};\n}'
+  'write file':
+    'prefix': 'wf'
+    'body': 'FILE *${1:fp};\n${1:fp} = fopen ("${2:filename.txt}","w");\nif (${1:fp}!=NULL)\n{\n\tfprintf(${1:fp},"${3:Some String\\n}");\n\tfclose (${1:fp});\n}'
+  'read file':
+    'prefix': 'rf'
+    'body': 'FILE *${1:fp};\n${1:fp} = fopen ("${2:filename.txt}","r");\nif (${1:fp}!=NULL)\n{\n\tfscanf(${1:fp},"${3:Some String\\n}", ${3:&var});\n\tfclose (${1:fp});\n}'
 '.source.cpp, .source.objcpp':
   'Enumeration':
     'prefix': 'enum'
@@ -93,3 +99,9 @@
   'template <typename>':
     'prefix': 'tp'
     'body': 'template <typename ${1:_InputIter}>'
+  'output file':
+    'prefix': 'of'
+    'body': 'ofstream ${1:afile} ("${2:filename.txt}", ios::out);\nif (${1:afile}.is_open()) { \n\t${1:afile} << "${3:This is a line.}\\n";\n\t${1:afile}.close();\n}'
+  'input file':
+    'prefix': 'if'
+    'body': 'ifstream ${1:afile} ("${2:filename.txt}",ios::in);\nif (${1:afile}.is_open()) { \n\tstring buffer;\n\twhile( getline(myfile,buffer) ) {\n\t\tcout << line << endl;\n\t}\n\t\t${1:afile}.close();\n\t}\nelse {\n\tcout << "Unable to open file" << endl;\n}'
