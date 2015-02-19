@@ -123,19 +123,19 @@
     'body': '<?php echo ${1:$var} ?>$0'
   '<?php echo htmlentities(…) ?>':
     'prefix': 'echoh'
-    'body': '<?php echo htmlentities(${1:$var}, ENT_QUOTES, \'utf-8\') ?>$0'
+    'body': '<?php echo htmlentities(${1:$var}, ENT_QUOTES, \'utf-8\'); ?>$0'
   '<?php else: ?>':
     'prefix': 'else'
     'body': '<?php else: ?>'
   '<?php foreach (…) … <?php endforeach ?>':
     'prefix': 'foreach'
-    'body': '<?php foreach ($${1:variable} as $${2:key}${3: => $${4:value}}): ?>\n\t${0}\n<?php endforeach ?>'
+    'body': '<?php foreach ($${1:variable} as $${2:key}${3: => $${4:value}}): ?>\n\t${0}\n<?php endforeach; ?>'
   '<?php if (…) ?> … <?php else ?> … <?php endif ?>':
     'prefix': 'ifelse'
-    'body': '<?php if (${1:condition}): ?>\n\t$2\n<?php else: ?>\n\t$0\n<?php endif ?>'
+    'body': '<?php if (${1:condition}): ?>\n\t$2\n<?php else: ?>\n\t$0\n<?php endif; ?>'
   '<?php if (…) ?> … <?php endif ?>':
     'prefix': 'if'
-    'body': '<?php if (${1:condition}): ?>\n\t$0\n<?php endif ?>'
+    'body': '<?php if (${1:condition}): ?>\n\t$0\n<?php endif; ?>'
   'var_dump("…")':
     'prefix': 'dump'
     'body': 'var_dump($1);$0'
