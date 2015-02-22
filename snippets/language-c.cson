@@ -100,8 +100,8 @@
     'prefix': 'tp'
     'body': 'template <typename ${1:_InputIter}>'
   'output file':
-    'prefix': 'of'
+    'prefix': 'outf'
     'body': 'ofstream ${1:afile} ("${2:filename.txt}", ios::out);\nif(${1:afile}.is_open()) { \n\t${1:afile} << "${3:This is a line.}\\n";\n\t${1:afile}.close();\n}'
   'input file':
-    'prefix': 'if'
+    'prefix': 'inf'
     'body': 'ifstream ${1:afile} ("${2:filename.txt}",ios::in);\nif(${1:afile}.is_open()) { \n\tstring buffer;\n\twhile( getline(myfile,buffer) ) {\n\t\tcout << line << endl;\n\t}\n\t\t${1:afile}.close();\n\t}\nelse {\n\tcout << "Unable to open file" << endl;\n}'
