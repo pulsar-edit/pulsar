@@ -14,7 +14,7 @@
   'npmrc'
   'PKGBUILD'
 ]
-'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
+'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
 'name': 'Shell Script'
 'patterns': [
   {
