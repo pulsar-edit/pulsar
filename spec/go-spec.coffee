@@ -215,13 +215,15 @@ describe 'Go grammar', ->
 
   it 'tokenizes built-in functions', ->
     funcs = [
-      'append', 'cap', 'close', 'complex', 'copy', 'delete', 'imag', 'len', 'make', 'new',
-      'panic', 'print', 'println', 'real', 'recover'
+      'append(x)', 'cap(x)', 'close(x)', 'complex(x)', 'copy(x)', 'delete(x)', 'imag(x)', 'len(x)', 'make(x)', 'new(x)',
+      'panic(x)', 'print(x)', 'println(x)', 'real(x)', 'recover(x)'
     ]
-
+    funcVals = ['append', 'cap', 'close', 'complex', 'copy', 'delete', 'imag', 'len', 'make', 'new', 'panic', 'print', 'println', 'real', 'recover']
+    
     for func in funcs
+      funcVal = funcVals[funcs.indexOf(func)]
       {tokens} = grammar.tokenizeLine func
-      expect(tokens[0].value).toEqual func
+      expect(tokens[0].value).toEqual funcVal
       expect(tokens[0].scopes).toEqual ['source.go', 'support.function.built-in.go']
 
   it 'tokenizes operators', ->
