@@ -42,7 +42,7 @@
     'body': '<br>'
   'Button':
     'prefix': 'button'
-    'body': '<button name="${1:button}">$2</button>$0'
+    'body': '<button type="${1:button}"${2: name="${3:button}"}>$4</button>$0'
   # C
   'Canvas':
     'prefix': 'canvas'
