@@ -311,7 +311,7 @@
         'name': 'punctuation.whitespace.function-call.leading.c'
       '2':
         'name': 'support.function.any-method.c'
-      '3':
+      '4':
         'name': 'punctuation.definition.parameters.c'
     'match': '(?x) (?: (?= \\s )  (?:(?<=else|new|return) | (?<!\\w)) (\\s+))?\n\t\t\t(\\b \n\t\t\t\t(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | :: )++                  # actual name\n\t\t\t)\n\t\t\t \\s*(\\()'
     'name': 'meta.function-call.c'
