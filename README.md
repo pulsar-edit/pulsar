@@ -1,4 +1,4 @@
-# PHP language support in Atom
+# PHP language support in Atom [![Build Status](https://travis-ci.org/atom/language-php.svg?branch=master)](https://travis-ci.org/atom/language-php)
 
 Adds syntax highlighting and snippets to PHP files in Atom.
 
