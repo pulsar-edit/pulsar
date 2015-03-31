@@ -181,7 +181,7 @@
   # L
   'Label':
     'prefix': 'label'
-    'body': '<label ${1:for="$2"}></label>$0'
+    'body': '<label${1: for="$2"}>$3</label>$0'
   'Legend':
     'prefix': 'legend'
     'body': '<legend>$1</legend>$0'
