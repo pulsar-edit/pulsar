@@ -44,6 +44,15 @@
     'captures':
       '1':
         'name': 'keyword.go'
+      '3':
+        'patterns': [
+          {
+            'include': '#operators'
+          }
+          {
+            'include': '#variables'
+          }
+        ]
       '4':
         'name': 'support.function.decl.go'
     'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
@@ -134,8 +143,7 @@
     'include': '#operators'
   }
   {
-    'match': '\\b[\\w_][\\w\\d_]*\\b'
-    'name': 'variable.go'
+    'include': '#variables'
   }
 ]
 'repository':
@@ -163,6 +171,13 @@
       {
         "name": "keyword.operator.punctuation.go",
         "match": "(\\.|,)"
+      }
+    ]
+  'variables': {
+    'patterns': [
+      {
+        'match': '\\b[\\w_][\\w\\d_]*\\b',
+        'name': 'variable.go'
       }
     ]
   'printf_verbs':
