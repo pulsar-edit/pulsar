@@ -66,10 +66,6 @@
   }
   {
     'name': 'storage.type.go'
-    'match': '\\bfunc\\b'
-  }
-  {
-    'name': 'storage.type.go'
     'match': '\\b(chan|map|bool|string|error|int|int8|int16|int32|int64|rune|byte|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128)\\b'
   }
   {
@@ -80,8 +76,13 @@
         'name': 'support.function.built-in.go'
   }
   {
-    'name': 'support.function.go'
-    'match': '([\\w_][\\w\\d_]*)(?=\\()'
+    'comment': 'Functions'
+    'match': '(func)|([\\w_][\\w\\d_]*)(?=\\()'
+    'captures':
+      '1':
+        'name': 'keyword.go'
+      '2':
+        'name': 'support.function.go'
   }
   {
     'name': 'invalid.illegal.numeric.go'
@@ -101,7 +102,7 @@
   }
   {
     'name': 'keyword.go'
-    'match': '\\b(var|const|type|struct|interface|case|default)\\b'
+    'match': '\\b(func|var|const|type|struct|interface|case|default)\\b'
   }
   {
     'name': 'keyword.directive.go'
