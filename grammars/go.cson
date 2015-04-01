@@ -41,10 +41,6 @@
     'match': '<\\-([\\t ]+)chan\\b'
   }
   {
-    'name': 'invalid.illegal.go'
-    'match': '[\\t ]+$'
-  }
-  {
     'captures':
       '1':
         'name': 'keyword.go'
