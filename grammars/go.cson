@@ -65,14 +65,6 @@
         'name': 'variable.go'
   }
   {
-    'match': '^(type)\\s+([\\w_][\\w\\d_]*)\\s+'
-    'captures':
-      '1':
-        'name': 'keyword.go'
-      '2':
-        'name': 'storage.type.go'
-  }
-  {
     'name': 'storage.type.go'
     'match': '\\bfunc\\b'
   }
@@ -81,13 +73,11 @@
     'match': '\\b(chan|map|bool|string|error|int|int8|int16|int32|int64|rune|byte|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128)\\b'
   }
   {
-    'comment': 'Built-in functions & their argument types'
+    'comment': 'Built-in functions'
     'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b(\\()(\\S*(?=\\)))'
     'captures':
       '1':
         'name': 'support.function.built-in.go'
-      '3':
-        'name': 'storage.type.go'
   }
   {
     'name': 'support.function.go'
