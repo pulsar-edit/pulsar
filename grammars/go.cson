@@ -164,7 +164,7 @@
         "match": "(\\.|,)"
       }
     ]
-  'variables': {
+  'variables':
     'patterns': [
       {
         'match': '\\b[\\w_][\\w\\d_]*\\b',
