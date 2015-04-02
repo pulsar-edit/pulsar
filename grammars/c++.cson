@@ -12,7 +12,10 @@
   'hpp'
   'hxx'
   'h++'
+  'inl'
   'ipp'
+  'tcc'
+  'tpp'
 ]
 'firstLineMatch': '-\\*- C\\+\\+ -\\*-'
 'name': 'C++'
