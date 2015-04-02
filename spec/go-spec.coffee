@@ -92,7 +92,7 @@ describe 'Go grammar', ->
 
   it 'tokenizes keywords', ->
     keywordLists =
-      'keyword.go': ['var', 'const', 'type', 'struct', 'interface', 'case', 'default']
+      'keyword.go': ['func', 'var', 'const', 'type', 'struct', 'interface', 'case', 'default']
       'keyword.directive.go': ['package', 'import']
       'keyword.statement.go': ['defer', 'go', 'goto', 'return', 'break', 'continue', 'fallthrough']
       'keyword.conditional.go': ['if', 'else', 'switch', 'select']
@@ -116,7 +116,7 @@ describe 'Go grammar', ->
       expect(tokens[0].value).toEqual type
       expect(tokens[0].scopes).toEqual ['source.go', 'storage.type.go']
 
-  it 'tokenizes "func" as a keyword or type based on context', ->
+  it 'tokenizes "func" as a keyword regardless of the context', ->
     funcKeyword = ['func f()', 'func (x) f()', 'func(x) f()', 'func']
     for line in funcKeyword
       {tokens} = grammar.tokenizeLine line
@@ -184,6 +184,36 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
+      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+
+  it 'tokenizes receiver types in method declarations', ->
+    tests = [
+      {
+        'line': 'func (T) f()'
+        'tokenPos': 3
+      }
+      {
+        'line': 'func (t T) f()'
+        'tokenPos': 5
+      }
+      {
+        'line': 'func (t *T) f()'
+        'tokenPos': 6
+      }
+    ]
+
+    for t in tests
+      {tokens} = grammar.tokenizeLine t.line
+      expect(tokens[0].value).toEqual 'func'
+      expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
+
+      relevantToken = tokens[t.tokenPos]
+      expect(relevantToken).toBeDefined()
+      expect(relevantToken.value).toEqual 'T'
+      expect(relevantToken.scopes).toEqual ['source.go', 'variable.go']
+
+      next = tokens[t.tokenPos + 1]
+      expect(next.value).toEqual ')'
       expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
 
   it 'tokenizes numerics', ->
@@ -261,7 +291,7 @@ describe 'Go grammar', ->
 
   it 'tokenizes punctuation operators', ->
     opers = [
-      '.', ','
+      '.', ',', ':'
     ]
 
     for op in opers

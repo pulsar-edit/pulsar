@@ -70,7 +70,7 @@
   }
   {
     'comment': 'Built-in functions'
-    'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b(\\()(\\S*(?=\\)))'
+    'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
     'captures':
       '1':
         'name': 'support.function.built-in.go'
@@ -161,7 +161,7 @@
       }
       {
         "name": "keyword.operator.punctuation.go",
-        "match": "(\\.|,)"
+        "match": "(\\.|,|:)"
       }
     ]
   'variables':
