@@ -41,6 +41,12 @@
   'If Else':
     'prefix': 'ife'
     'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}\nelse {\n\t${3:/* code */}\n}'
+  'If ElseIf':
+    'prefix': 'iff'
+    'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}\nelse if (${3:/* condition */}) {\n\t${4:/* code */}\n}'
+  'If ElseIf Else':
+    'prefix': 'iffe'
+    'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}\nelse if (${3:/* condition */}) {\n\t${4:/* code */}\n}\nelse {\n\t${5:/* code */}\n}'
   'Switch Statement':
     'prefix': 'switch'
     'body': 'switch (${1:/* expression */}) {\n\tcase ${2:/* value */}:\n}'
@@ -58,7 +64,7 @@
     'body': 'struct ${1:name_t} {\n\t${2:/* data */}\n};'
   'void':
     'prefix': 'void'
-    'body': 'void ${1:name} (${2:/* arguments */}) {\n\t${3:/* code */}\n}'
+    'body': 'void ${1:name}(${2:/* arguments */}) {\n\t${3:/* code */}\n}'
   'any function':
     'prefix': 'func'
     'body': '${1:int} ${2:name}(${3:/* arguments */}) {\n\t${5:/* code */}\n\treturn ${4:0};\n}'
@@ -80,13 +86,13 @@
     'body': 'namespace ${1:name} {\n\t$2\n} /* $1 */'
   'cout':
     'prefix': 'cout'
-    'body': 'std::cout<< \"${1:/* message */}\" << std::endl;'
+    'body': 'std::cout << \"${1:/* message */}\" << std::endl;'
   'cin':
     'prefix': 'cin'
     'body': 'std::cin >> ${1:/* variable */};'
   'cerr':
     'prefix': 'cerr'
-    'body': 'std::cerr<< \"${1:/* error message */}\" << std::endl;'
+    'body': 'std::cerr << \"${1:/* error message */}\" << std::endl;'
   'std::map':
     'prefix': 'map'
     'body': 'std::map<${1:key}, ${2:value}> map$3;'
