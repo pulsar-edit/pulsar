@@ -84,8 +84,6 @@ describe 'Go grammar', ->
     invalids =
       'chan <- sendonly': ' '
       '<- chan recvonly': ' '
-      'trailingspace   ': '   '
-      'trailingtab\t': '\t'
 
     for expr, invalid of invalids
       {tokens} = grammar.tokenizeLine(expr)
@@ -94,7 +92,7 @@ describe 'Go grammar', ->
 
   it 'tokenizes keywords', ->
     keywordLists =
-      'keyword.go': ['var', 'const', 'type', 'struct', 'interface', 'case', 'default']
+      'keyword.go': ['func', 'var', 'const', 'type', 'struct', 'interface', 'case', 'default']
       'keyword.directive.go': ['package', 'import']
       'keyword.statement.go': ['defer', 'go', 'goto', 'return', 'break', 'continue', 'fallthrough']
       'keyword.conditional.go': ['if', 'else', 'switch', 'select']
@@ -118,7 +116,7 @@ describe 'Go grammar', ->
       expect(tokens[0].value).toEqual type
       expect(tokens[0].scopes).toEqual ['source.go', 'storage.type.go']
 
-  it 'tokenizes "func" as a keyword or type based on context', ->
+  it 'tokenizes "func" as a keyword regardless of the context', ->
     funcKeyword = ['func f()', 'func (x) f()', 'func(x) f()', 'func']
     for line in funcKeyword
       {tokens} = grammar.tokenizeLine line
@@ -148,7 +146,7 @@ describe 'Go grammar', ->
 
       relevantToken = tokens[t.tokenPos]
       expect(relevantToken.value).toEqual 'func'
-      expect(relevantToken.scopes).toEqual ['source.go', 'storage.type.go']
+      expect(relevantToken.scopes).toEqual ['source.go', 'keyword.go']
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
@@ -162,15 +160,15 @@ describe 'Go grammar', ->
       }
       {
         'line': 'func (T) f()'
-        'tokenPos': 2
+        'tokenPos': 6
       }
       {
         'line': 'func (t T) f()'
-        'tokenPos': 2
+        'tokenPos': 8
       }
       {
         'line': 'func (t *T) f()'
-        'tokenPos': 2
+        'tokenPos': 9
       }
     ]
 
@@ -186,6 +184,36 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
+      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+
+  it 'tokenizes receiver types in method declarations', ->
+    tests = [
+      {
+        'line': 'func (T) f()'
+        'tokenPos': 3
+      }
+      {
+        'line': 'func (t T) f()'
+        'tokenPos': 5
+      }
+      {
+        'line': 'func (t *T) f()'
+        'tokenPos': 6
+      }
+    ]
+
+    for t in tests
+      {tokens} = grammar.tokenizeLine t.line
+      expect(tokens[0].value).toEqual 'func'
+      expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
+
+      relevantToken = tokens[t.tokenPos]
+      expect(relevantToken).toBeDefined()
+      expect(relevantToken.value).toEqual 'T'
+      expect(relevantToken.scopes).toEqual ['source.go', 'variable.go']
+
+      next = tokens[t.tokenPos + 1]
+      expect(next.value).toEqual ')'
       expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
 
   it 'tokenizes numerics', ->
@@ -219,7 +247,7 @@ describe 'Go grammar', ->
       'panic(x)', 'print(x)', 'println(x)', 'real(x)', 'recover(x)'
     ]
     funcVals = ['append', 'cap', 'close', 'complex', 'copy', 'delete', 'imag', 'len', 'make', 'new', 'panic', 'print', 'println', 'real', 'recover']
-    
+
     for func in funcs
       funcVal = funcVals[funcs.indexOf(func)]
       {tokens} = grammar.tokenizeLine func
@@ -231,7 +259,7 @@ describe 'Go grammar', ->
       '+', '&', '+=', '&=', '&&', '==', '!=', '-', '|', '-=', '|=', '||', '<',
       '<=', '*', '^', '*=', '^=', '<-', '>', '>=', '/', '<<', '/=',
       '<<=', '++', '=', ':=', ';', '%', '>>', '%=', '>>=', '--', '!', '...',
-      ':', '&^', '&^='
+      '&^', '&^='
     ]
 
     for op in opers
@@ -263,7 +291,7 @@ describe 'Go grammar', ->
 
   it 'tokenizes punctuation operators', ->
     opers = [
-      '.', ','
+      '.', ',', ':'
     ]
 
     for op in opers
@@ -333,29 +361,6 @@ describe 'Go grammar', ->
         expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
       else
         expect(relevantToken.scopes).not.toEqual want
-
-  it 'tokenizes type names in their declarations', ->
-    {tokens} = grammar.tokenizeLine 'type Stringer interface {'
-    expect(tokens[0].value).toBe 'type'
-    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
-    expect(tokens[2].value).toBe 'Stringer'
-    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
-
-    {tokens} = grammar.tokenizeLine 'type Duration int64'
-    expect(tokens[0].value).toBe 'type'
-    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
-    expect(tokens[2].value).toBe 'Duration'
-    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
-
-    {tokens} = grammar.tokenizeLine 'type   byLength []string'
-    expect(tokens[0].value).toBe 'type'
-    expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
-    expect(tokens[2].value).toBe 'byLength'
-    expect(tokens[2].scopes).toEqual ['source.go', 'storage.type.go']
-
-    {tokens} = grammar.tokenizeLine '  type T'
-    expect(tokens[3].value).toBe 'T'
-    expect(tokens[3].scopes).not.toEqual ['source.go', 'storage.type.go']
 
   describe 'in variable declarations', ->
     testVar = (token) ->
