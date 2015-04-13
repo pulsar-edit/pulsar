@@ -275,7 +275,7 @@
     'body': '<samp>$1</samp>$0'
   'Script':
     'prefix': 'script'
-    'body': '<script charset="utf-8">\n\t$1\n</script>'
+    'body': '<script${1: type="${2:text/javascript}"}>\n\t$3\n</script>'
   'Script With External Source':
     'prefix': 'scriptsrc'
     'body': '<script src="$1" charset="${2:utf-8}"></script>$0'
