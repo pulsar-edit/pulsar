@@ -85,6 +85,10 @@
         'name': 'support.function.go'
   }
   {
+    'name': 'constant.rune.go'
+    'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
+  }
+  {
     'name': 'invalid.illegal.numeric.go'
     'match': '\\b0[0-7]*[89]\\d*\\b'
   }
@@ -204,32 +208,14 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.string.begin.go'
-        'end': '((?<=`)(`)|`)'
-        'endCaptures':
-          '1':
-            'name': 'punctuation.definition.string.end.go'
-          '2':
-            'name': 'meta.empty-string.double.go'
-        'name': 'string.quoted.double.raw.backtick.go',
-        'patterns': [
-          {
-            'include': 'source.gotemplate'
-          }
-        ]
-      }
-      {
-        'begin': '\''
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.string.begin.go'
-        'end': '\''
+        'end': '`'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.string.end.go'
-        'name': 'string.quoted.single.go'
+        'name': 'string.quoted.raw.go',
         'patterns': [
           {
-            'include': '#string_escaped_char'
+            'include': '#printf_verbs'
           }
         ]
       }

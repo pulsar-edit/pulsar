@@ -30,8 +30,7 @@ describe 'Go grammar', ->
   it 'tokenizes strings', ->
     delims =
       'string.quoted.double.go': '"'
-      'string.quoted.single.go': '\''
-      'string.quoted.double.raw.backtick.go': '`'
+      'string.quoted.raw.go': '`'
 
     for scope, delim of delims
       {tokens} = grammar.tokenizeLine(delim + 'I am a string' + delim)
@@ -76,9 +75,37 @@ describe 'Go grammar', ->
     expect(tokens[1].value).toEqual '\\"'
     expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.double.go', 'constant.character.escape.go']
 
-    {tokens} = grammar.tokenizeLine('\'\\\'\'')
-    expect(tokens[1].value).toEqual '\\\'',
-    expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.single.go', 'constant.character.escape.go']
+  it 'tokenizes Printf verbs in raw strings', ->
+    # Taken from go/src/pkg/fmt/fmt_test.go
+    verbs = [
+      '%# x', '%-5s', '%5s', '%05s', '%.5s', '%10.1q', '%10v', '%-10v', '%.0d'
+      '%.d', '%+07.2f', '%0100d', '%0.100f', '%#064x', '%+.3F', '%-#20.8x',
+      '%[1]d', '%[2]*[1]d', '%[3]*.[2]*[1]f', '%[3]*.[2]f', '%3.[2]d', '%.[2]d'
+      '%-+[1]x', '%d', '%-d', '%+d', '%#d', '% d', '%0d', '%1.2d', '%-1.2d'
+      '%+1.2d', '%-+1.2d', '%*d', '%.*d', '%*.*d', '%0*d', '%-*d'
+    ]
+
+    for verb in verbs
+      {tokens} = grammar.tokenizeLine('`' + verb + '`')
+      expect(tokens[0].value).toEqual '`',
+      expect(tokens[0].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.begin.go']
+      expect(tokens[1].value).toEqual verb
+      expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'constant.escape.format-verb.go']
+      expect(tokens[2].value).toEqual '`',
+      expect(tokens[2].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']
+
+  it 'tokenizes runes', ->
+    # Taken from go/src/pkg/fmt/fmt_test.go
+    verbs = [
+      'u', 'X', '$', ':', '(', '.', '2', '=', '!', '@',
+      '\\a', '\\b', '\\f', '\\n', '\\r', '\\t', '\\v', '\\\\'
+      '\\000', '\\007', '\\377', '\\x07', '\\xff', '\\u12e4', '\\U00101234'
+    ]
+
+    for verb in verbs
+      {tokens} = grammar.tokenizeLine('\'' + verb + '\'')
+      expect(tokens[0].value).toEqual '\'' + verb + '\'',
+      expect(tokens[0].scopes).toEqual ['source.go', 'constant.rune.go']
 
   it 'tokenizes invalid whitespace around chan annotations', ->
     invalids =
