@@ -85,10 +85,6 @@
         'name': 'support.function.go'
   }
   {
-    'name': 'constant.rune.go'
-    'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
-  }
-  {
     'name': 'invalid.illegal.numeric.go'
     'match': '\\b0[0-7]*[89]\\d*\\b'
   }
@@ -133,6 +129,9 @@
   }
   {
     'include': '#strings'
+  }
+  {
+    'include': '#runes'
   }
   {
     'include': '#operators'
@@ -218,5 +217,16 @@
             'include': '#printf_verbs'
           }
         ]
+      }
+    ]
+  'runes':
+    'patterns': [
+      {
+        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
+        'name': 'constant.other.rune.go'
+      }
+      {
+        'match': '\\\'.*\\\''
+        'name': 'invalid.illegal.rune.go'
       }
     ]
