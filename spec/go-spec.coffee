@@ -95,7 +95,6 @@ describe 'Go grammar', ->
       expect(tokens[2].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']
 
   it 'tokenizes runes', ->
-    # Taken from go/src/pkg/fmt/fmt_test.go
     verbs = [
       'u', 'X', '$', ':', '(', '.', '2', '=', '!', '@',
       '\\a', '\\b', '\\f', '\\n', '\\r', '\\t', '\\v', '\\\\'
@@ -105,7 +104,16 @@ describe 'Go grammar', ->
     for verb in verbs
       {tokens} = grammar.tokenizeLine('\'' + verb + '\'')
       expect(tokens[0].value).toEqual '\'' + verb + '\'',
-      expect(tokens[0].scopes).toEqual ['source.go', 'constant.rune.go']
+      expect(tokens[0].scopes).toEqual ['source.go', 'constant.other.rune.go']
+
+  it 'tokenizes invalid runes and single quote strings', ->
+    {tokens} = grammar.tokenizeLine('\'ab\'')
+    expect(tokens[0].value).toEqual '\'ab\''
+    expect(tokens[0].scopes).toEqual ['source.go', 'invalid.illegal.rune.go']
+
+    {tokens} = grammar.tokenizeLine('\'some single quote string\'')
+    expect(tokens[0].value).toEqual '\'some single quote string\''
+    expect(tokens[0].scopes).toEqual ['source.go', 'invalid.illegal.rune.go']
 
   it 'tokenizes invalid whitespace around chan annotations', ->
     invalids =
