@@ -204,16 +204,14 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.string.begin.go'
-        'end': '((?<=`)(`)|`)'
+        'end': '`'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.string.end.go'
-          '2':
-            'name': 'meta.empty-string.double.go'
-        'name': 'string.quoted.double.raw.backtick.go',
+        'name': 'string.quoted.raw.go',
         'patterns': [
           {
-            'include': 'source.gotemplate'
+            'include': '#printf_verbs'
           }
         ]
       }
