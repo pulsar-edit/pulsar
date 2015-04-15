@@ -85,6 +85,10 @@
         'name': 'support.function.go'
   }
   {
+    'name': 'constant.rune.go'
+    'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
+  }
+  {
     'name': 'invalid.illegal.numeric.go'
     'match': '\\b0[0-7]*[89]\\d*\\b'
   }
@@ -212,22 +216,6 @@
         'patterns': [
           {
             'include': '#printf_verbs'
-          }
-        ]
-      }
-      {
-        'begin': '\''
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.string.begin.go'
-        'end': '\''
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.string.end.go'
-        'name': 'string.quoted.single.go'
-        'patterns': [
-          {
-            'include': '#string_escaped_char'
           }
         ]
       }
