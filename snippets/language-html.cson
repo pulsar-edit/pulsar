@@ -1,4 +1,4 @@
-'.text.html':
+'.html.scope.outside-tag, .html.scope.between-tag-pair':
   # A
   'Anchor':
     'prefix': 'a'
@@ -22,6 +22,9 @@
     'prefix': 'audio'
     'body': '<audio src="$1">\n\t$2\n</audio>'
   # B
+  'Body':
+    'prefix': 'body'
+    'body': '<body>\n\t$1\n</body>'
   'Bold':
     'prefix': 'b'
     'body': '<b>$1</b>$0'
@@ -361,10 +364,6 @@
   'Word Break Opportunity':
     'prefix': 'wbr'
     'body': '<wbr>'
-'.text.html:not(.meta.tag)':
-  'Body':
-    'prefix': 'body'
-    'body': '<body>\n\t$1\n</body>'
 '.text.html:not(.text.blog)':
   'Title':
     'prefix': 'title'
