@@ -364,7 +364,8 @@
   'Word Break Opportunity':
     'prefix': 'wbr'
     'body': '<wbr>'
-'.text.html:not(.text.blog)':
+
+'.html.scope.outside-tag:not(.text.blog), .html.scope.between-tag-pair:not(.text.blog)':
   'Title':
     'prefix': 'title'
     'body': '<title>${1:Page Title}</title>$0'
