@@ -13,6 +13,7 @@
   '.textmate_init'
   'npmrc'
   'PKGBUILD'
+  'cygport'
 ]
 'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
 'name': 'Shell Script'
