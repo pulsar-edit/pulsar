@@ -336,7 +336,7 @@
     'name': 'invalid.illegal.incomplete.html'
   }
   {
-    'begin': '(?<=>)'
+    'begin': '(?<=>).{1}'
     'end': '(?=<)'
     'name': 'meta.scope.outside-tag.html'
     'patterns': [
@@ -346,7 +346,7 @@
     ]
   }
   {
-    'begin': '\\A'
+    'begin': '(?=\\A).{1}'
     'end': '(?=<)'
     'name': 'meta.scope.outside-tag.html'
     'patterns': [
