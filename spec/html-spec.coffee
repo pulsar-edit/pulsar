@@ -15,6 +15,35 @@ describe 'HTML grammar', ->
     expect(grammar).toBeTruthy()
     expect(grammar.scopeName).toBe 'text.html.basic'
 
+  describe 'meta.scope.outside-tag scope', ->
+    it 'tokenizes an empty file as outside-tag', ->
+      lines = grammar.tokenizeLines ''
+      expect(lines[0][0]).toEqual value: '', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
+
+    it 'tokenizes a single < as outside-tag and does not freeze', ->
+      lines = grammar.tokenizeLines '<'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html', 'punctuation.definition.tag.begin.html']
+
+    it 'tokenizes >< as html punctuation', ->
+      lines = grammar.tokenizeLines '><'
+      expect(lines[0][0]).toEqual value: '>', scopes: ['text.html.basic', 'meta.scope.outside-tag.html', 'punctuation.definition.tag.end.html']
+      expect(lines[0][1]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html', 'punctuation.definition.tag.begin.html']
+
+    it 'tokenizes the single line content between the tags as outside-tag', ->
+      lines = grammar.tokenizeLines '''
+        <span class="" >  </span>
+      '''
+      expect(lines[0][7].scopes).not.toContain 'meta.scope.outside-tag.html'
+      expect(lines[0][9].scopes).toContain 'meta.scope.outside-tag.html'
+
+    it 'tokenizes the multiline content between the tags as outside-tag', ->
+      lines = grammar.tokenizeLines '''
+        <span class="" >
+          test
+        </span>
+      '''
+      expect(lines[1][0].scopes).toContain 'meta.scope.outside-tag.html'
+
   describe 'template script tags', ->
     it 'tokenizes the content inside the tag as HTML', ->
       lines = grammar.tokenizeLines '''
@@ -23,7 +52,7 @@ describe 'HTML grammar', ->
         </script>
       '''
 
-      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'text.embedded.html']
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'text.embedded.html', 'meta.scope.outside-tag.html']
       expect(lines[1][1]).toEqual value: '<', scopes: ['text.html.basic', 'text.embedded.html', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
 
   describe 'CoffeeScript script tags', ->
