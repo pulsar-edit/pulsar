@@ -18,7 +18,7 @@
         'name': 'punctuation.definition.tag.html'
       '2':
         'name': 'entity.name.tag.html'
-    'end': '(>(<)/)(\\2)(>)'
+    'end': '(>(\\s*<)/)(\\2)(>)'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
@@ -334,6 +334,26 @@
   {
     'match': '<>'
     'name': 'invalid.illegal.incomplete.html'
+  }
+  {
+    'begin': '(?<=>).{1}'
+    'end': '(?=<)'
+    'name': 'meta.scope.outside-tag.html'
+    'patterns': [
+      {
+        'include': '#entities'
+      }
+    ]
+  }
+  {
+    'begin': '(?=\\A).{1}'
+    'end': '(?=<)'
+    'name': 'meta.scope.outside-tag.html'
+    'patterns': [
+      {
+        'include': '#entities'
+      }
+    ]
   }
 ]
 'repository':
