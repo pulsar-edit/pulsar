@@ -18,11 +18,15 @@ describe 'HTML grammar', ->
   describe 'meta.scope.outside-tag scope', ->
     it 'tokenizes an empty file as outside-tag', ->
       lines = grammar.tokenizeLines ''
-      expect(lines[0][0]).toEqual value: '', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
+      expect(lines[0][0]).toEqual value: '', scopes: ['text.html.basic']
 
     it 'tokenizes a single < as outside-tag and does not freeze', ->
       lines = grammar.tokenizeLines '<'
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic']
+
+    it 'tokenizes <? without locking up', ->
+      lines = grammar.tokenizeLines '<?'
+      expect(lines[0][0]).toEqual value: '<?', scopes: ['text.html.basic']
 
     it 'tokenizes >< as html punctuation', ->
       lines = grammar.tokenizeLines '><'

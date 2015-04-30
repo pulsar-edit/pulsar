@@ -336,13 +336,6 @@
     'name': 'invalid.illegal.incomplete.html'
   }
   {
-    'match': '\\A(<)$'
-    'name': 'meta.scope.outside-tag.html'
-    'captures':
-      '1':
-        'name': 'punctuation.definition.tag.begin.html'
-  }
-  {
     'match': '(>)(<)'
     'name': 'meta.scope.outside-tag.html'
     'captures':
@@ -353,16 +346,6 @@
   }
   {
     'begin': '(?<=>)'
-    'end': '(?=<)'
-    'name': 'meta.scope.outside-tag.html'
-    'patterns': [
-      {
-        'include': '#entities'
-      }
-    ]
-  }
-  {
-    'begin': '(?<=\\A)'
     'end': '(?=<)'
     'name': 'meta.scope.outside-tag.html'
     'patterns': [
