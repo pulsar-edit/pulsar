@@ -18,23 +18,23 @@ describe 'HTML grammar', ->
   describe 'meta.scope.outside-tag scope', ->
     it 'tokenizes an empty file as outside-tag', ->
       lines = grammar.tokenizeLines ''
-      expect(lines[0][0]).toEqual value: '', scopes: ['text.html.basic']
+      expect(lines[0][0]).toEqual value: '', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
 
     it 'tokenizes a single < as outside-tag and does not freeze', ->
       lines = grammar.tokenizeLines '<'
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
 
     it 'tokenizes <? without locking up', ->
       lines = grammar.tokenizeLines '<?'
-      expect(lines[0][0]).toEqual value: '<?', scopes: ['text.html.basic']
-
-    it 'tokenizes < after tags without locking up', ->
-      lines = grammar.tokenizeLines '<span><'
-      expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
 
     it 'tokenizes >< as html without locking up', ->
       lines = grammar.tokenizeLines '><'
       expect(lines[0][0]).toEqual value: '><', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
+
+    it 'tokenizes < after tags without locking up', ->
+      lines = grammar.tokenizeLines '<span><'
+      expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
 
     it 'tokenizes the single line content between the tags as outside-tag', ->
       lines = grammar.tokenizeLines '''
