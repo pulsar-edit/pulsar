@@ -28,10 +28,13 @@ describe 'HTML grammar', ->
       lines = grammar.tokenizeLines '<?'
       expect(lines[0][0]).toEqual value: '<?', scopes: ['text.html.basic']
 
-    it 'tokenizes >< as html punctuation', ->
+    it 'tokenizes < after tags without locking up', ->
+      lines = grammar.tokenizeLines '<span><'
+      expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
+
+    it 'tokenizes >< as html without locking up', ->
       lines = grammar.tokenizeLines '><'
-      expect(lines[0][0]).toEqual value: '>', scopes: ['text.html.basic', 'meta.scope.outside-tag.html', 'punctuation.definition.tag.end.html']
-      expect(lines[0][1]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[0][0]).toEqual value: '><', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
 
     it 'tokenizes the single line content between the tags as outside-tag', ->
       lines = grammar.tokenizeLines '''
