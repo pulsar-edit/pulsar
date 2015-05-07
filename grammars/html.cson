@@ -353,20 +353,6 @@
       }
     ]
   }
-  {
-    'match': '(?<=\\A)<'
-    'name': 'meta.scope.outside-tag.html'
-  }
-  {
-    'begin': '(?<=\\A)'
-    'end': '(?=<)'
-    'name': 'meta.scope.outside-tag.html'
-    'patterns': [
-      {
-        'include': '#entities'
-      }
-    ]
-  }
 ]
 'repository':
   'embedded-code':
