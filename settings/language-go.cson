@@ -1,3 +1,5 @@
 '.source.go':
   'editor':
     'commentStart': '// '
+    'increaseIndentPattern': '^.*(case.*:|default:|((func|if|else|switch|select|for|struct).*|\\w)\\{[^}]*|\\([^)]*|\\+)$'
+    'decreaseIndentPattern': '^\\s*(case.*:|default:|\\}[),]?|\\))$'
