@@ -8,6 +8,7 @@
 'foldingStopMarker': '(}|\\))\\s*$'
 'patterns': [
   {
+    'comment': 'Block comments'
     'begin': '/\\*'
     'captures':
       '0':
@@ -16,31 +17,37 @@
     'name': 'comment.block.go'
   }
   {
+    'comment': 'Line comments'
+    'match': '(//).*$\\n?'
     'captures':
       '1':
         'name': 'punctuation.definition.comment.go'
-    'match': '(//).*$\\n?'
     'name': 'comment.line.double-slash.go'
   }
   {
-    'captures':
-      '1':
-        'name': 'invalid.illegal.go'
+    'comment': 'Syntax error'
     'match': '\\[\\](\\s+)'
-  }
-  {
     'captures':
       '1':
         'name': 'invalid.illegal.go'
+  }
+  {
+    'comment': 'Syntax error sending channels'
     'match': '\\bchan([\\t ]+)<\-'
-  }
-  {
     'captures':
       '1':
         'name': 'invalid.illegal.go'
-    'match': '<\\-([\\t ]+)chan\\b'
   }
   {
+    'comment': 'Syntax error receiving channels'
+    'match': '<\\-([\\t ]+)chan\\b'
+    'captures':
+      '1':
+        'name': 'invalid.illegal.go'
+  }
+  {
+    'comment': 'Function declarations'
+    'match': '^(\\bfunc\\b)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
     'captures':
       '1':
         'name': 'keyword.go'
@@ -55,34 +62,30 @@
         ]
       '4':
         'name': 'support.function.decl.go'
-    'match': '^(func)(\\s+(\\([^\\)]+\\)\\s+)?([\\w_][\\w_\\d]*)(?=\\())?'
   }
   {
-    'comment': 'Short declarations'
+    'comment': 'Short variable declarations'
     'match': '([\\w_][\\w\\d_]*)(?=\\s*:=)'
     'captures':
       '1':
         'name': 'variable.go'
   }
   {
-    'name': 'storage.type.go'
-    'match': '\\b(chan|map|bool|string|error|int|int8|int16|int32|int64|rune|byte|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128)\\b'
-  }
-  {
-    'comment': 'Built-in functions'
+    'name': 'support.function.built-in.go'
     'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
-    'captures':
-      '1':
-        'name': 'support.function.built-in.go'
   }
   {
     'comment': 'Functions'
-    'match': '(func)|([\\w_][\\w\\d_]*)(?=\\()'
+    'match': '(\\bfunc\\b)|([\\w_][\\w\\d_]*)(?=\\()'
     'captures':
       '1':
         'name': 'keyword.go'
       '2':
         'name': 'support.function.go'
+  }
+  {
+    'name': 'storage.type.go'
+    'match': '\\b(chan|map|bool|string|error|int|int8|int16|int32|int64|rune|byte|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128)\\b'
   }
   {
     'name': 'invalid.illegal.numeric.go'
@@ -144,12 +147,12 @@
   'string_escaped_char':
     'patterns': [
       {
-        'match': '\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})'
         'name': 'constant.character.escape.go'
+        'match': '\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})'
       }
       {
-        'match': '\\\\[^0-7xuUabfnrtv\\\'"]'
         'name': 'invalid.illegal.unknown-escape.go'
+        'match': '\\\\[^0-7xuUabfnrtv\\\'"]'
       }
     ]
   'operators':
@@ -170,15 +173,15 @@
   'variables':
     'patterns': [
       {
-        'match': '\\b[\\w_][\\w\\d_]*\\b',
         'name': 'variable.go'
+        'match': '\\b[\\w_][\\w\\d_]*\\b',
       }
     ]
   'printf_verbs':
     'patterns': [
       {
-        'match': '%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]'
         'name': 'constant.escape.format-verb.go'
+        'match': '%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]'
       }
     ]
   'strings':
@@ -222,11 +225,11 @@
   'runes':
     'patterns': [
       {
-        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
         'name': 'constant.other.rune.go'
+        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
       }
       {
-        'match': '\\\'.*\\\''
         'name': 'invalid.illegal.rune.go'
+        'match': '\\\'.*\\\''
       }
     ]

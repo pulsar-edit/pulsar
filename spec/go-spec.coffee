@@ -187,6 +187,13 @@ describe 'Go grammar', ->
       expect(next.value).toEqual '('
       expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
 
+  it 'only tokenizes "func" when it is an exact match', ->
+    tests = ['myfunc', 'funcMap']
+    for test in tests
+      {tokens} = grammar.tokenizeLine test
+      expect(tokens[0].value).not.toEqual 'func'
+      expect(tokens[0].scopes).not.toEqual ['source.go', 'keyword.go']
+
   it 'tokenizes func names in their declarations', ->
     tests = [
       {

@@ -14,24 +14,24 @@
         'name': 'punctuation.section.embedded.end.gotemplate'
     'patterns': [
       {
-        'match': ':='
         'name': 'keyword.operator.initialize.gotemplate'
+        'match': ':='
       }
       {
-        'match': '\\|'
         'name': 'keyword.operator.pipe.gotemplate'
+        'match': '\\|'
       }
       {
-        'match': '[.$][\\w]*'
         'name': 'variable.other.gotemplate'
+        'match': '[.$][\\w]*'
       }
       {
-        'match': '\\b(if|else|range|template|with|end|nil|with|define)\\b'
         'name': 'keyword.control.gotemplate'
+        'match': '\\b(if|else|range|template|with|end|nil|with|define)\\b'
       }
       {
-        'match': '\\b(and|call|html|index|js|len|not|or|print|printf|println|urlquery|eq|ne|lt|le|gt|ge)\\b'
         'name': 'support.function.builtin.gotemplate'
+        'match': '\\b(and|call|html|index|js|len|not|or|print|printf|println|urlquery|eq|ne|lt|le|gt|ge)\\b'
       }
       {
         'begin': '/\\*'
@@ -80,22 +80,22 @@
   'string_escaped_char':
     'patterns': [
       {
-        'match': '\\\\(\\\\|[abfnrtv\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{3})'
         'name': 'constant.character.escape.gotemplate'
+        'match': '\\\\(\\\\|[abfnrtv\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{3})'
       }
       {
-        'match': '\\\\.'
         'name': 'invalid.illegal.unknown-escape.gotemplate'
+        'match': '\\\\.'
       }
     ]
   'string_placeholder':
     'patterns': [
       {
-        'match': '(?x)%\n                        (\\d+\\$)?                                    # field (argument #)\n                        [#0\\- +\']*                                  # flags\n                        [,;:_]?                                     # separator character (AltiVec)\n                        ((-?\\d+)|\\*(-?\\d+\\$)?)?                     # minimum field width\n                        (\\.((-?\\d+)|\\*(-?\\d+\\$)?)?)?                # precision\n                        [diouxXDOUeEfFgGaAcCsSqpnvtTbyYhHmMzZ%]     # conversion type\n                    '
         'name': 'constant.other.placeholder.gotemplate'
+        'match': '(?x)%\n                        (\\d+\\$)?                                    # field (argument #)\n                        [#0\\- +\']*                                  # flags\n                        [,;:_]?                                     # separator character (AltiVec)\n                        ((-?\\d+)|\\*(-?\\d+\\$)?)?                     # minimum field width\n                        (\\.((-?\\d+)|\\*(-?\\d+\\$)?)?)?                # precision\n                        [diouxXDOUeEfFgGaAcCsSqpnvtTbyYhHmMzZ%]     # conversion type\n                    '
       }
       {
-        'match': '%'
         'name': 'invalid.illegal.placeholder.gotemplate'
+        'match': '%'
       }
     ]
