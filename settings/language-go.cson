@@ -1,5 +1,5 @@
 '.source.go':
   'editor':
     'commentStart': '// '
-    'increaseIndentPattern': '^.*(\\bcase\\b.*:|\\bdefault\\b:|(\\b(func|if|else|switch|select|for|struct)\\b.*|\\w)\\{[^}]*|\\([^)]*|\\+)$'
+    'increaseIndentPattern': '^.*(\\bcase\\b.*:|\\bdefault\\b:|(\\b(func|if|else|switch|select|for|struct)\\b.*|\\w)\\{[^}]*|\\([^)]*)$'
     'decreaseIndentPattern': '^\\s*(\\bcase\\b.*:|\\bdefault\\b:|\\}[),]?|\\))$'
