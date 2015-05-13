@@ -325,8 +325,10 @@
           '4':
             'name': 'punctuation.definition.variable.php'
           '5':
-            'name': 'support.function.construct.php'
+            'name': ''
           '6':
+            'name': 'support.function.construct.php'
+          '7':
             'name': 'punctuation.definition.short.array.begin.php'
         'contentName': 'meta.array.php'
         'end': '\\\]'
