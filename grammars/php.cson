@@ -314,7 +314,7 @@
         ]
       }
       {
-        'begin': '(?x)\n\t\t\t\t\t\t\t\\s*(array) # Typehint\n\t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n\t\t\t\t\t\t\t\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n\t\t\t\t\t\t\t\\s*(=)\t# A default value\n\t\t\t\t\t\t\t\\s*\\\[\n\t\t\t\t\t\t\t'
+        'begin': '(?x)\n\t\t\t\t\t\t\t\\s*(array) # Typehint\n\t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n\t\t\t\t\t\t\t\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n\t\t\t\t\t\t\t\\s*(=)\t# A default value\n\t\t\t\t\t\t\t\\s*()\\s*(\\\[)\n\t\t\t\t\t\t\t'
         'beginCaptures':
           '1':
             'name': 'storage.type.php'
@@ -330,8 +330,8 @@
             'name': 'support.function.construct.php'
           '7':
             'name': 'punctuation.definition.short.array.begin.php'
-        'contentName': 'meta.array.php'
-        'end': '\\\]'
+        'contentName': 'meta.short.array.php'
+        'end': '(\\\])'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.short.array.end.php'
