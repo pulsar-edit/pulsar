@@ -721,7 +721,7 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(namespace)\\b\\s+(?=([a-z0-9_\\\\]+\\s*($|[;{]|(\\/[\\/*])))|$)'
+        'begin': '(?i)(?:^\\s*|\\s*)(namespace)\\b\\s+(?=([a-z0-9_\\\\]+\\s*($|[;{]|(\\/[\\/*])))|$)'
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
