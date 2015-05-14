@@ -314,6 +314,41 @@
         ]
       }
       {
+        'begin': '(?x)\n\t\t\t\t\t\t\t\\s*(array) # Typehint\n\t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n\t\t\t\t\t\t\t\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n\t\t\t\t\t\t\t\\s*(=)\t# A default value\n\t\t\t\t\t\t\t\\s*()\\s*(\\\[)\n\t\t\t\t\t\t\t'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.php'
+          '2':
+            'name': 'storage.modifier.reference.php'
+          '3':
+            'name': 'variable.other.php'
+          '4':
+            'name': 'punctuation.definition.variable.php'
+          '5':
+            'name': ''
+          '6':
+            'name': 'support.function.construct.php'
+          '7':
+            'name': 'punctuation.definition.short.array.begin.php'
+        'contentName': 'meta.short.array.php'
+        'end': '(\\\])'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.short.array.end.php'
+        'name': 'meta.function.argument.short.array.php'
+        'patterns': [
+          {
+            'include': '#comments'
+          }
+          {
+            'include': '#strings'
+          }
+          {
+            'include': '#numbers'
+          }
+        ]
+      }
+      {
         'captures':
           '1':
             'name': 'storage.type.php'
