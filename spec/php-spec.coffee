@@ -234,7 +234,7 @@ describe 'PHP grammar', ->
         expect(tokens[1][16]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
         expect(tokens[1][17]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
-      it 'should tokenize default arrat type with short array value correctly', ->
+      it 'should tokenize default array type with short array value correctly', ->
         tokens = grammar.tokenizeLines "<?php\nfunction array_test(array $value = []) {}"
 
         expect(tokens[1][0]).toEqual value: 'function', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'storage.type.function.php']
