@@ -1,6 +1,7 @@
 '.source.python':
   'editor':
     'autoIndentOnPaste': false
+    'softTabs': true
     'tabLength': 4
     'foldEndPattern': '^\\s*"""\\s*$'
     'commentStart': '# '
