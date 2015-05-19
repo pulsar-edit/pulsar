@@ -1,6 +1,6 @@
 {
   "name": "language-php",
-  "version": "0.24.0",
+  "version": "0.23.0",
   "description": "PHP language support in Atom",
   "engines": {
     "atom": "*",
