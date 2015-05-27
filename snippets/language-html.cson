@@ -1,4 +1,4 @@
-'.html.scope.outside-tag, .html.scope.between-tag-pair':
+'.text.html, .text.html .meta.scope.between-tag-pair, .text.html .punctuation.tag.begin':
   # A
   'Anchor':
     'prefix': 'a'
@@ -340,6 +340,9 @@
   'Time':
     'prefix': 'time'
     'body': '<time>$1</time>$0'
+  'Title':
+    'prefix': 'title'
+    'body': '<title>${1:Page Title}</title>$0'
   'Table Row':
     'prefix': 'tr'
     'body': '<tr>\n\t$1\n</tr>'
@@ -365,7 +368,259 @@
     'prefix': 'wbr'
     'body': '<wbr>'
 
-'.html.scope.outside-tag:not(.text.blog), .html.scope.between-tag-pair:not(.text.blog)':
+
+# These null out the snippets so the snippets are no available when in a tag
+'.text.html .meta.tag':
+  # A
+  'Anchor':
+    'prefix': 'a'
+  'Abbreviation':
+    'prefix': 'abbr'
+  'Address':
+    'prefix': 'address'
+  'Area':
+    'prefix': 'area'
+  'Article':
+    'prefix': 'article'
+  'Aside':
+    'prefix': 'aside'
+  'Audio':
+    'prefix': 'audio'
+  # B
+  'Body':
+    'prefix': 'body'
+  'Bold':
+    'prefix': 'b'
+  'Base':
+    'prefix': 'base'
+  'Bi-Directional Isolation':
+    'prefix': 'bdi'
+  'Bi-Directional Override':
+    'prefix': 'bdo'
+  'Blockquote':
+    'prefix': 'blockquote'
+  'Line Breaker':
+    'prefix': 'br'
+  'Button':
+    'prefix': 'button'
+  # C
+  'Canvas':
+    'prefix': 'canvas'
+  'Caption':
+    'prefix': 'caption'
+  'Citation':
+    'prefix': 'cite'
+  'Code':
+    'prefix': 'code'
+  'Column':
+    'prefix': 'col'
+  'Column Group':
+    'prefix': 'colgroup'
+  'Content':
+    'prefix': 'content'
+  'Comment':
+    'prefix': '--'
+  # D
+  'HTML — 5':
+    'prefix': 'doctype'
+  'Data':
+    'prefix': 'data'
+  'Data List':
+    'prefix': 'datalist'
+  'Description':
+    'prefix': 'dd'
+  'Deleted Text':
+    'prefix': 'del'
+  'Details':
+    'prefix': 'details'
+  'Definition':
+    'prefix': 'dfn'
+  'Description List':
+    'prefix': 'dl'
+  'Definition Term':
+    'prefix': 'dt'
+  'Div':
+    'prefix': 'div'
+  # E
+  'Emphasis':
+    'prefix': 'em'
+  'Embed':
+    'prefix': 'embed'
+  # F
+  'Fieldset':
+    'prefix': 'fieldset'
+  'Figure Caption':
+    'prefix': 'figcaption'
+  'Figure':
+    'prefix': 'figure'
+  'Footer':
+    'prefix': 'footer'
+  'Form':
+    'prefix': 'form'
+  # G
+  # H
+  'Heading 1':
+    'prefix': 'h1'
+  'Heading 2':
+    'prefix': 'h2'
+  'Heading 3':
+    'prefix': 'h3'
+  'Heading 4':
+    'prefix': 'h4'
+  'Heading 5':
+    'prefix': 'h5'
+  'Heading 6':
+    'prefix': 'h6'
+  'Head':
+    'prefix': 'head'
+  'Header':
+    'prefix': 'header'
+  'Horizontal Rule':
+    'prefix': 'hr'
+  'HTML':
+    'prefix': 'html'
+  # I
+  'Italic':
+    'prefix': 'i'
+  'Inline Frame':
+    'prefix': 'iframe'
+  'Input':
+    'prefix': 'input'
+  'Image':
+    'prefix': 'img'
+  'Inserted Text':
+    'prefix': 'ins'
+  # J
+  # K
+  'Keyboard Input':
+    'prefix': 'kbd'
+  'Keygen':
+    'prefix': 'keygen'
+  # L
+  'Label':
+    'prefix': 'label'
+  'Legend':
+    'prefix': 'legend'
+  'List Item':
+    'prefix': 'li'
+  'Link':
+    'prefix': 'link'
+  # M
+  'Main':
+    'prefix': 'main'
+  'Map':
+    'prefix': 'map'
+  'Mark':
+    'prefix': 'mark'
+  'Menu':
+    'prefix': 'menu'
+  'Menu Item':
+    'prefix': 'menuitem'
+  'Meter':
+    'prefix': 'meter'
+  'Mail Anchor':
+    'prefix': 'mailto'
+  'Meta':
+    'prefix': 'meta'
+  # N
+  'Navigation':
+    'prefix': 'nav'
+  'Noscript':
+    'prefix': 'noscript'
+  # O
+  'Object':
+    'prefix': 'object'
+  'Ordered List':
+    'prefix': 'ol'
+  'Option Group':
+    'prefix': 'optgroup'
+  'Option':
+    'prefix': 'opt'
+  'Output':
+    'prefix': 'output'
+  # P
+  'Paragraph':
+    'prefix': 'p'
+  'Parameter':
+    'prefix': 'param'
+  'Preformatted Text':
+    'prefix': 'pre'
+  'Progress':
+    'prefix': 'progress'
+  # Q
+  'Quote':
+    'prefix': 'q'
+  # R
+  'Ruby Parenthesis':
+    'prefix': 'rp'
+  'Ruby Pronunciation':
+    'prefix': 'rt'
+  'Ruby Annotation':
+    'prefix': 'ruby'
+  # S
+  'Strikethrough':
+    'prefix': 's'
+  'Sample Output':
+    'prefix': 'samp'
+  'Script':
+    'prefix': 'script'
+  'Script With External Source':
+    'prefix': 'scriptsrc'
+  'Section':
+    'prefix': 'section'
+  'Select':
+    'prefix': 'select'
+  'Small':
+    'prefix': 'small'
+  'Source':
+    'prefix': 'source'
+  'Span':
+    'prefix': 'span'
+  'Strong':
+    'prefix': 'strong'
+  'Style':
+    'prefix': 'style'
+  'Subscript':
+    'prefix': 'sub'
+  'Summary':
+    'prefix': 'summary'
+  'Superscript':
+    'prefix': 'sup'
+  # T
+  'Table':
+    'prefix': 'table'
+  'Table Body':
+    'prefix': 'tbody'
+  'Table Cell':
+    'prefix': 'td'
+  'Template':
+    'prefix': 'template'
+  'Text Area':
+    'prefix': 'textarea'
+  'Table Foot':
+    'prefix': 'tfoot'
+  'Table Header Cell':
+    'prefix': 'th'
+  'Table Head':
+    'prefix': 'thead'
+  'Time':
+    'prefix': 'time'
   'Title':
     'prefix': 'title'
-    'body': '<title>${1:Page Title}</title>$0'
+  'Table Row':
+    'prefix': 'tr'
+  'Track':
+    'prefix': 'track'
+  # U
+  'Underline':
+    'prefix': 'u'
+  'Unordered List':
+    'prefix': 'ul'
+  # V
+  'Variable':
+    'prefix': 'var'
+  'Video':
+    'prefix': 'video'
+  # W
+  'Word Break Opportunity':
+    'prefix': 'wbr'

@@ -24,32 +24,20 @@ describe 'HTML grammar', ->
       lines = grammar.tokenizeLines '<'
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic']
 
+      lines = grammar.tokenizeLines ' <'
+      expect(lines[0][0]).toEqual value: ' <', scopes: ['text.html.basic']
+
     it 'tokenizes <? without locking up', ->
       lines = grammar.tokenizeLines '<?'
       expect(lines[0][0]).toEqual value: '<?', scopes: ['text.html.basic']
 
     it 'tokenizes >< as html without locking up', ->
       lines = grammar.tokenizeLines '><'
-      expect(lines[0][0]).toEqual value: '><', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
+      expect(lines[0][0]).toEqual value: '><', scopes: ['text.html.basic']
 
     it 'tokenizes < after tags without locking up', ->
       lines = grammar.tokenizeLines '<span><'
-      expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic', 'meta.scope.outside-tag.html']
-
-    it 'tokenizes the single line content between the tags as outside-tag', ->
-      lines = grammar.tokenizeLines '''
-        <span class="" >  </span>
-      '''
-      expect(lines[0][7].scopes).not.toContain 'meta.scope.outside-tag.html'
-      expect(lines[0][9].scopes).toContain 'meta.scope.outside-tag.html'
-
-    it 'tokenizes the multiline content between the tags as outside-tag', ->
-      lines = grammar.tokenizeLines '''
-        <span class="" >
-          test
-        </span>
-      '''
-      expect(lines[1][0].scopes).toContain 'meta.scope.outside-tag.html'
+      expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic']
 
   describe 'template script tags', ->
     it 'tokenizes the content inside the tag as HTML', ->
@@ -59,7 +47,7 @@ describe 'HTML grammar', ->
         </script>
       '''
 
-      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'text.embedded.html', 'meta.scope.outside-tag.html']
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'text.embedded.html']
       expect(lines[1][1]).toEqual value: '<', scopes: ['text.html.basic', 'text.embedded.html', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
 
   describe 'CoffeeScript script tags', ->

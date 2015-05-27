@@ -335,24 +335,6 @@
     'match': '<>'
     'name': 'invalid.illegal.incomplete.html'
   }
-  {
-    'match': '><'
-    'name': 'meta.scope.outside-tag.html'
-  }
-  {
-    'match': '(?<=>)(<)'
-    'name': 'meta.scope.outside-tag.html'
-  }
-  {
-    'begin': '(?<=>)'
-    'end': '(?=<)'
-    'name': 'meta.scope.outside-tag.html'
-    'patterns': [
-      {
-        'include': '#entities'
-      }
-    ]
-  }
 ]
 'repository':
   'embedded-code':
