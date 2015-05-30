@@ -195,3 +195,33 @@ describe "Python grammar", ->
     expect(tokens[0][6].scopes).toEqual ['source.python', 'comment.line.number-sign.python', 'punctuation.definition.comment.python']
     expect(tokens[0][7].value).toBe 'foo'
     expect(tokens[0][7].scopes).toEqual ['source.python', 'comment.line.number-sign.python']
+
+  it "terminates referencing an item in a list variable after a sequence of a closing and opening bracket", ->
+    tokens = grammar.tokenizeLines('foo[i[0]][j[0]]')
+
+    expect(tokens[0][0].value).toBe 'foo'
+    expect(tokens[0][0].scopes).toEqual ['source.python', 'meta.item-access.python']
+    expect(tokens[0][1].value).toBe '['
+    expect(tokens[0][1].scopes).toEqual ['source.python', 'meta.item-access.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[0][2].value).toBe 'i'
+    expect(tokens[0][2].scopes).toEqual ['source.python', 'meta.item-access.python', 'meta.item-access.arguments.python', 'meta.item-access.python']
+    expect(tokens[0][3].value).toBe '['
+    expect(tokens[0][3].scopes).toEqual ['source.python', 'meta.item-access.python', 'meta.item-access.arguments.python', 'meta.item-access.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[0][4].value).toBe '0'
+    expect(tokens[0][4].scopes).toEqual ['source.python', 'meta.item-access.python', 'meta.item-access.arguments.python', 'meta.item-access.python', 'meta.item-access.arguments.python', 'constant.numeric.integer.decimal.python']
+    expect(tokens[0][5].value).toBe ']'
+    expect(tokens[0][5].scopes).toEqual ['source.python', 'meta.item-access.python', 'meta.item-access.arguments.python', 'meta.item-access.python', 'punctuation.definition.arguments.end.python']
+    expect(tokens[0][6].value).toBe ']'
+    expect(tokens[0][6].scopes).toEqual ['source.python', 'meta.item-access.python', 'punctuation.definition.arguments.end.python']
+    expect(tokens[0][7].value).toBe '['
+    expect(tokens[0][7].scopes).toEqual ['source.python', 'meta.structure.list.python', 'punctuation.definition.list.begin.python']
+    expect(tokens[0][8].value).toBe 'j'
+    expect(tokens[0][8].scopes).toEqual ['source.python', 'meta.structure.list.python', 'meta.structure.list.item.python', 'meta.item-access.python']
+    expect(tokens[0][9].value).toBe '['
+    expect(tokens[0][9].scopes).toEqual ['source.python', 'meta.structure.list.python', 'meta.structure.list.item.python', 'meta.item-access.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[0][10].value).toBe '0'
+    expect(tokens[0][10].scopes).toEqual ['source.python', 'meta.structure.list.python', 'meta.structure.list.item.python', 'meta.item-access.python', 'meta.item-access.arguments.python', 'constant.numeric.integer.decimal.python']
+    expect(tokens[0][11].value).toBe ']'
+    expect(tokens[0][11].scopes).toEqual ['source.python', 'meta.structure.list.python', 'meta.structure.list.item.python', 'meta.item-access.python', 'punctuation.definition.arguments.end.python']
+    expect(tokens[0][12].value).toBe ']'
+    expect(tokens[0][12].scopes).toEqual ['source.python', 'meta.structure.list.python', 'punctuation.definition.list.end.python']
