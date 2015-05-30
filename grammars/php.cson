@@ -784,12 +784,12 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(trait)\\s+([a-z0-9_]+)\\s*'
+        'begin': '(?i)^\\s*(trait)\\s+([a-z0-9_]+)'
         'beginCaptures':
           '1':
             'name': 'storage.type.trait.php'
           '2':
-            'name': 'entity.name.type.class.php'
+            'name': 'entity.name.type.trait.php'
         'end': '(?=[{])'
         'name': 'meta.trait.php'
         'patterns': [
@@ -857,16 +857,6 @@
             'match': '\\s*,\\s*'
           }
         ]
-      }
-      {
-        'begin': '(?i)^\\s*(trait)\\s+([a-zA-Z0-9_]+)'
-        'beginCaptures':
-          '1':
-            'name': 'storage.type.trait.php'
-          '2':
-            'name': 'entity.name.type.trait.php'
-        'end': '(?=\\{)'
-        'name': 'meta.trait.php'
       }
       {
         'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+([a-z0-9_]+)\\s*'
