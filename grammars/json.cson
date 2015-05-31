@@ -7,6 +7,7 @@
   'jslintrc'
   'json'
   'topojson'
+  'webapp'
 ]
 'name': 'JSON'
 'patterns': [
