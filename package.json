@@ -14,5 +14,8 @@
   "engines": {
     "atom": "*",
     "node": "*"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
   }
 }
