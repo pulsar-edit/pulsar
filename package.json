@@ -14,5 +14,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-shellscript/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
   }
 }
