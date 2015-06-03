@@ -14,5 +14,8 @@
   },
   "bugs": {
     "url": "https://github.com/atom/language-go/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
   }
 }
