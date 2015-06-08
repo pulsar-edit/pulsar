@@ -65,7 +65,7 @@
     'name': 'comment.block.html'
     'patterns': [
       {
-        'match': '--'
+        'match': '--(?!-*\\s*>)'
         'name': 'invalid.illegal.bad-comments-or-CDATA.html'
       }
       {

@@ -60,3 +60,19 @@ describe 'HTML grammar', ->
 
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.coffee.embedded.html']
       expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'storage.type.function.coffee']
+
+  describe "comments", ->
+    it "tokenizes -- as an error", ->
+      {tokens} = grammar.tokenizeLine '<!-- some comment --->'
+
+      expect(tokens[0]).toEqual value: '<!--', scopes: ['text.html.basic', 'comment.block.html', 'punctuation.definition.comment.html']
+      expect(tokens[1]).toEqual value: ' some comment -', scopes: ['text.html.basic', 'comment.block.html']
+      expect(tokens[2]).toEqual value: '-->', scopes: ['text.html.basic', 'comment.block.html', 'punctuation.definition.comment.html']
+
+      {tokens} = grammar.tokenizeLine '<!-- -- -->'
+
+      expect(tokens[0]).toEqual value: '<!--', scopes: ['text.html.basic', 'comment.block.html', 'punctuation.definition.comment.html']
+      expect(tokens[1]).toEqual value: ' ', scopes: ['text.html.basic', 'comment.block.html']
+      expect(tokens[2]).toEqual value: '--', scopes: ['text.html.basic', 'comment.block.html', 'invalid.illegal.bad-comments-or-CDATA.html']
+      expect(tokens[3]).toEqual value: ' ', scopes: ['text.html.basic', 'comment.block.html']
+      expect(tokens[4]).toEqual value: '-->', scopes: ['text.html.basic', 'comment.block.html', 'punctuation.definition.comment.html']
