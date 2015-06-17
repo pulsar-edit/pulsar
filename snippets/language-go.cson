@@ -17,6 +17,9 @@
   'Import':
     'prefix': 'Im'
     'body': "import (\n\t\"${1:fmt}\"\n)$0"
+  'package':
+    'prefix': 'pkg'
+    'body': "package ${1:main}"
   'type interface':
     'prefix': 'tyi'
     'body': "type ${1:Name} interface {\n\t$0\n}"
