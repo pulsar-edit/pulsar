@@ -1367,7 +1367,7 @@
         'match': '(@xlink)\\s+(.+)\\s*$'
       }
       {
-        'match': '\\@(a(bstract|uthor)|c(ategory|opyright)|example|global|internal|li(cense|nk)|pa(ckage|ram)|return|s(ee|ince|tatic|ubpackage)|t(hrows|odo)|v(ar|ersion)|uses|deprecated|final|ignore)\\b'
+        'match': '\\@(a(pi|bstract|uthor)|c(ategory|opyright)|example|global|internal|li(cense|nk)|pa(ckage|ram)|return|s(ee|ince|tatic|ubpackage)|t(hrows|odo)|v(ar|ersion)|uses|deprecated|final|ignore)\\b'
         'name': 'keyword.other.phpdoc.php'
       }
       {
