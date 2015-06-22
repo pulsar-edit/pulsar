@@ -2,9 +2,9 @@
   '$GLOBALS[\'…\']':
     'prefix': 'globals'
     'body': '$GLOBALS[\'${1:variable}\']${2: = }${3:something}${4:;}$0'
-  '?>…<?php':
+  '<?php … ?>':
     'prefix': 'php'
-    'body': '?>$0<?php'
+    'body': 'php $0 ?>'
   'function __construct':
     'prefix': 'con'
     'body': 'function __construct(${1:$${2:foo} ${3:= ${4:null}}}) {\n\t${2:$this->$0 = $$0;}$0\n}'
