@@ -131,9 +131,11 @@
     ]
   }
   {
-    'begin': '^\\s*#\\s*(include|import)\\b\\s+'
+    'begin': '^\\s*(#)\\s*(include|import)\\b\\s+'
     'captures':
       '1':
+        'name': 'punctuation.definition.keyword.c'
+      '2':
         'name': 'keyword.control.import.include.c'
     'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.c.include'
