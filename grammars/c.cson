@@ -117,9 +117,11 @@
     ]
   }
   {
-    'begin': '^\\s*#\\s*(error|warning)\\b'
+    'begin': '^\\s*(#)\\s*(error|warning)\\b'
     'captures':
       '1':
+        'name': 'punctuation.definition.keyword.c'
+      '2':
         'name': 'keyword.control.import.error.c'
     'end': '(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.diagnostic.c'
