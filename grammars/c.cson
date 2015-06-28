@@ -90,19 +90,21 @@
     ]
   }
   {
-    'begin': '(?x)\n        \t\t^\\s*\\#\\s*(define)\\s+             # define\n        \t\t((?<id>[a-zA-Z_][a-zA-Z0-9_]*))  # macro name\n        \t\t(?:                              # and optionally:\n        \t\t    (\\()                         # an open parenthesis\n        \t\t        (\n        \t\t            \\s* \\g<id> \\s*       # first argument\n        \t\t            ((,) \\s* \\g<id> \\s*)*  # additional arguments\n        \t\t            (?:\\.\\.\\.)?          # varargs ellipsis?\n        \t\t        )\n        \t\t    (\\))                         # a close parenthesis\n        \t\t)?\n        \t'
+    'begin': '(?x)\n        \t\t^\\s*(\\#)\\s*(define)\\s+             # define\n        \t\t((?<id>[a-zA-Z_][a-zA-Z0-9_]*))  # macro name\n        \t\t(?:                              # and optionally:\n        \t\t    (\\()                         # an open parenthesis\n        \t\t        (\n        \t\t            \\s* \\g<id> \\s*       # first argument\n        \t\t            ((,) \\s* \\g<id> \\s*)*  # additional arguments\n        \t\t            (?:\\.\\.\\.)?          # varargs ellipsis?\n        \t\t        )\n        \t\t    (\\))                         # a close parenthesis\n        \t\t)?\n        \t'
     'beginCaptures':
       '1':
-        'name': 'keyword.control.import.define.c'
+        'name': 'punctuation.definition.keyword.c'
       '2':
+        'name': 'keyword.control.import.define.c'
+      '3':
         'name': 'entity.name.function.preprocessor.c'
-      '4':
-        'name': 'punctuation.definition.parameters.begin.c'
       '5':
+        'name': 'punctuation.definition.parameters.begin.c'
+      '6':
         'name': 'variable.parameter.preprocessor.c'
-      '7':
-        'name': 'punctuation.separator.parameters.c'
       '8':
+        'name': 'punctuation.separator.parameters.c'
+      '9':
         'name': 'punctuation.definition.parameters.end.c'
     'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.macro.c'
