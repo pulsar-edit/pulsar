@@ -581,13 +581,15 @@
       }
     ]
   'preprocessor-rule-other':
-    'begin': '^\\s*(#\\s*(if(n?def)?)\\b.*?(?:(?=(?://|/\\*))|$))'
+    'begin': '^\\s*((#)\\s*(if(n?def)?)\\b.*?(?:(?=(?://|/\\*))|$))'
     'captures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
+        'name': 'punctuation.definition.keyword.c'
+      '3':
         'name': 'keyword.control.import.c'
-    'end': '^\\s*(#\\s*(endif)\\b)'
+    'end': '^\\s*((#)\\s*(endif)\\b)'
     'patterns': [
       {
         'include': '$base'
