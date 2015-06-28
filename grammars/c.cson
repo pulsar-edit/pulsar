@@ -170,9 +170,11 @@
     'include': '#pragma-mark'
   }
   {
-    'begin': '^\\s*#\\s*(define|defined|elif|else|if|ifdef|ifndef|line|pragma|undef)\\b'
+    'begin': '^\\s*(#)\\s*(define|defined|elif|else|if|ifdef|ifndef|line|pragma|undef)\\b'
     'captures':
       '1':
+        'name': 'punctuation.definition.keyword.c'
+      '2':
         'name': 'keyword.control.import.c'
     'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.c'
