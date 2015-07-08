@@ -106,7 +106,7 @@
     'body': 'throw new $1Exception(${2:"${3:Error Processing Request}"}${4:, ${5:1}});\n$0'
   'try …':
     'prefix': 'try'
-    'body': 'try {\n\t${0:# code...}\n} catch (${1:Exception $e}) {\n\t$2\n}\n'
+    'body': 'try {\n\t$0\n} catch (${1:Exception $e}) {\n\t$2\n}\n'
   'while …':
     'prefix': 'while'
     'body': 'while (${1:$a <= 10}) {\n\t${0:# code...}\n}'
