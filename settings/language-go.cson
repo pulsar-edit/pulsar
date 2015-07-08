@@ -2,5 +2,5 @@
   'editor':
     'commentStart': '// '
     'increaseIndentPattern': '^.*(\\bcase\\b.*:|\\bdefault\\b:|(\\b(func|if|else|switch|select|for|struct)\\b.*|\\w)\\{[^}]*|\\([^)]*)$'
+    'decreaseNextIndentPattern': '^\\s*[^\\s()}]+(?<m>[^()]*\\((?:\\g<m>|[^()]*)\\)[^()]*)*[^()]*\\)$'
     'decreaseIndentPattern': '^\\s*(\\bcase\\b.*:|\\bdefault\\b:|\\}[),]?|\\))$'
-    'dedentNextLinePattern': '^\\s*[^\\s()}]+(?<m>[^()]*\\((?:\\g<m>|[^()]*)\\)[^()]*)*[^()]*\\)$'
