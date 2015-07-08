@@ -1,4 +1,5 @@
 'fileTypes': [
+  'babelrc'
   'bowerrc'
   'eslintrc'
   'geojson'
