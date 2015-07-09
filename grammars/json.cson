@@ -7,6 +7,9 @@
   'jshintrc'
   'jslintrc'
   'json'
+  'jsonl'
+  'ldj'
+  'ldjson'
   'topojson'
   'webapp'
 ]
