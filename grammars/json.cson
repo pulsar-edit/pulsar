@@ -10,6 +10,7 @@
   'jsonl'
   'ldj'
   'ldjson'
+  'schema'
   'topojson'
   'webapp'
 ]
