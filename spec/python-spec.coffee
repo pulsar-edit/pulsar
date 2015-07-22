@@ -225,3 +225,23 @@ describe "Python grammar", ->
     expect(tokens[0][11].scopes).toEqual ['source.python', 'meta.structure.list.python', 'meta.structure.list.item.python', 'meta.item-access.python', 'punctuation.definition.arguments.end.python']
     expect(tokens[0][12].value).toBe ']'
     expect(tokens[0][12].scopes).toEqual ['source.python', 'meta.structure.list.python', 'punctuation.definition.list.end.python']
+
+  it "tokenizes properties of self as variables", ->
+    tokens = grammar.tokenizeLines('self.foo')
+    expect(tokens[0].length).toBe 3
+    expect(tokens[0][0].value).toBe 'self'
+    expect(tokens[0][0].scopes).toEqual ['source.python', 'variable.language.python']
+    expect(tokens[0][1].value).toBe '.'
+    expect(tokens[0][1].scopes).toEqual ['source.python']
+    expect(tokens[0][2].value).toBe 'foo'
+    expect(tokens[0][2].scopes).toEqual ['source.python']
+
+  it "tokenizes properties of a variable as variables", ->
+    tokens = grammar.tokenizeLines('bar.foo')
+    expect(tokens[0].length).toBe 3
+    expect(tokens[0][0].value).toBe 'bar'
+    expect(tokens[0][0].scopes).toEqual ['source.python']
+    expect(tokens[0][1].value).toBe '.'
+    expect(tokens[0][1].scopes).toEqual ['source.python']
+    expect(tokens[0][2].value).toBe 'foo'
+    expect(tokens[0][2].scopes).toEqual ['source.python']
