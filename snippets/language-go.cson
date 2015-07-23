@@ -64,7 +64,7 @@
     'body': "fmt.Println(\"$1\")$0"
   'fmt printf':
     'prefix': 'ff'
-    'body': "fmt.Printf(\"$1  %+v \\\\n\", ${1:e})$0"
+    'body': "fmt.Printf(\"$1  %#+v \\\\n\", ${1:e})$0"
   'log println':
     'prefix': 'lp'
     'body': "log.Println(\"$1\")$0"
