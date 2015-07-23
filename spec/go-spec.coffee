@@ -141,7 +141,7 @@ describe 'Go grammar', ->
 
   it 'tokenizes types', ->
     types = [
-      'chan',   'map',     'bool',    'string',  'error',     'int',        'int8',   'int16'
+      'bool',   'string',  'error',   'int',     'int8',      'int16'
       'int32',  'int64',   'rune',    'byte',    'uint',      'uint8',      'uint16', 'uint32'
       'uint64', 'uintptr', 'float32', 'float64', 'complex64', 'complex128'
     ]
@@ -185,7 +185,7 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
-      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+      expect(next.scopes).toEqual ['source.go', 'meta.brace.round.go']
 
   it 'only tokenizes "func" when it is an exact match', ->
     tests = ['myfunc', 'funcMap']
@@ -196,28 +196,33 @@ describe 'Go grammar', ->
 
   it 'tokenizes func names in their declarations', ->
     tests = [
-      {
-        'line': 'func f()'
-        'tokenPos': 2
-      }
+      # {
+      #   'line': 'func f()'
+      #   'tokenPos': 2
+      # }
       {
         'line': 'func (T) f()'
         'tokenPos': 6
       }
-      {
-        'line': 'func (t T) f()'
-        'tokenPos': 8
-      }
-      {
-        'line': 'func (t *T) f()'
-        'tokenPos': 9
-      }
+      # {
+      #   'line': 'func (t T) f()'
+      #   'tokenPos': 8
+      # }
+      # {
+      #   'line': 'func (t *T) f()'
+      #   'tokenPos': 9
+      # }
     ]
 
     for t in tests
       {tokens} = grammar.tokenizeLine t.line
       expect(tokens[0].value).toEqual 'func'
       expect(tokens[0].scopes).toEqual ['source.go', 'keyword.go']
+      expect(tokens[1].value).toEqual ' '
+      expect(tokens[2].value).toEqual '('
+      expect(tokens[3].value).toEqual 'T'
+      expect(tokens[4].value).toEqual ')'
+      expect(tokens[5].value).toEqual ' '
 
       relevantToken = tokens[t.tokenPos]
       expect(relevantToken).toBeDefined()
@@ -226,7 +231,7 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
-      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+      expect(next.scopes).toEqual ['source.go', 'meta.brace.round.go']
 
   it 'tokenizes receiver types in method declarations', ->
     tests = [
@@ -252,11 +257,11 @@ describe 'Go grammar', ->
       relevantToken = tokens[t.tokenPos]
       expect(relevantToken).toBeDefined()
       expect(relevantToken.value).toEqual 'T'
-      expect(relevantToken.scopes).toEqual ['source.go', 'variable.go']
+      expect(relevantToken.scopes).toEqual ['source.go']
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual ')'
-      expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+      expect(next.scopes).toEqual ['source.go', 'meta.brace.round.go']
 
   it 'tokenizes numerics', ->
     numerics = [
@@ -300,7 +305,7 @@ describe 'Go grammar', ->
     opers = [
       '+', '&', '+=', '&=', '&&', '==', '!=', '-', '|', '-=', '|=', '||', '<',
       '<=', '*', '^', '*=', '^=', '<-', '>', '>=', '/', '<<', '/=',
-      '<<=', '++', '=', ':=', ';', '%', '>>', '%=', '>>=', '--', '!', '...',
+      '<<=', '++', '=', ':=', '%', '>>', '%=', '>>=', '--', '!', '...',
       '&^', '&^='
     ]
 
@@ -317,33 +322,56 @@ describe 'Go grammar', ->
 
   it 'tokenizes bracket operators', ->
     opers = [
-      '[', ']', '(', ')', '{', '}'
+      {
+        values: [ '[', ']' ]
+        scope: 'meta.brace.square.go'
+      }
+      {
+        values: [ '(', ')' ]
+        scope: 'meta.brace.round.go'
+      }
+      {
+        values: [ '{', '}' ]
+        scope: 'meta.brace.curly.go'
+      }
     ]
 
-    for op in opers
-      {tokens} = grammar.tokenizeLine op
+    for ops in opers
+      for op in ops
+        {tokens} = grammar.tokenizeLine op
 
-      fullOp = tokens.map((tok) -> tok.value).join('')
-      expect(fullOp).toEqual op
+        fullOp = tokens.map((tok) -> tok.value).join('')
+        expect(fullOp).toEqual op
 
-      scopes = tokens.map (tok) -> tok.scopes
-      allKeywords = scopes.every (scope) -> 'keyword.operator.bracket.go' in scope
+        scopes = tokens.map (tok) -> tok.scopes
+        allKeywords = scopes.every (scope) -> ops.scope in scope
 
-      expect(allKeywords).toBe true
+        expect(allKeywords).toBe true
 
   it 'tokenizes punctuation operators', ->
     opers = [
-      '.', ',', ':'
+      {
+        value: ','
+        scope: 'meta.delimiter.comma.go'
+      }
+      {
+        value: '.'
+        scope: 'meta.delimiter.period.go'
+      }
+      {
+        value: ':'
+        scope: 'meta.delimiter.colon.go'
+      }
     ]
 
     for op in opers
-      {tokens} = grammar.tokenizeLine op
+      {tokens} = grammar.tokenizeLine op.value
 
       fullOp = tokens.map((tok) -> tok.value).join('')
-      expect(fullOp).toEqual op
+      expect(fullOp).toEqual op.value
 
       scopes = tokens.map (tok) -> tok.scopes
-      allKeywords = scopes.every (scope) -> 'keyword.operator.punctuation.go' in scope
+      allKeywords = scopes.every (scope) -> op.scope in scope
 
       expect(allKeywords).toBe true
 
@@ -400,7 +428,7 @@ describe 'Go grammar', ->
 
         next = tokens[t.tokenPos + 1]
         expect(next.value).toEqual '('
-        expect(next.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+        expect(next.scopes).toEqual ['source.go', 'meta.brace.round.go']
       else
         expect(relevantToken.scopes).not.toEqual want
 
@@ -409,11 +437,16 @@ describe 'Go grammar', ->
       expect(token.value).toBe 'var'
       expect(token.scopes).toEqual ['source.go', 'keyword.go']
 
-    wantedScope = ['source.go', 'variable.go']
+    plainScope = ['source.go']
+    declaredScope = plainScope.concat('variable.go')
 
     testName = (token, name) ->
       expect(token.value).toBe name
-      expect(token.scopes).toEqual wantedScope
+      expect(token.scopes).toEqual plainScope
+
+    testDeclaredName = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual declaredScope
 
     testOp = (token, op) ->
       expect(token.value).toBe op
@@ -421,11 +454,11 @@ describe 'Go grammar', ->
 
     testOpBracket = (token, op) ->
       expect(token.value).toBe op
-      expect(token.scopes).toEqual ['source.go', 'keyword.operator.bracket.go']
+      expect(token.scopes).toEqual ['source.go', 'meta.brace.round.go']
 
     testOpPunctuation = (token, op) ->
       expect(token.value).toBe op
-      expect(token.scopes).toEqual ['source.go', 'keyword.operator.punctuation.go']
+      expect(token.scopes).toEqual ['source.go', 'meta.delimiter.comma.go']
 
     testType = (token, name) ->
       expect(token.value).toBe name
@@ -543,21 +576,21 @@ describe 'Go grammar', ->
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->
           {tokens} = grammar.tokenizeLine 'f := func() int { return 7 }'
-          testName tokens[0], 'f'
+          testDeclaredName tokens[0], 'f'
           testOp tokens[2], ':='
 
           {tokens} = grammar.tokenizeLine 'ch := make(chan int)'
-          testName tokens[0], 'ch'
+          testDeclaredName tokens[0], 'ch'
           testOp tokens[2], ':='
 
         xit 'tokenizes multiple names', ->
           {tokens} = grammar.tokenizeLine 'i, j := 0, 10'
-          testName tokens[0], 'i'
+          testDeclaredName tokens[0], 'i'
           testOpPunctuation tokens[1], ','
-          testName tokens[3], 'j'
+          testDeclaredName tokens[3], 'j'
 
           {tokens} = grammar.tokenizeLine 'if _, y, z := coord(p); z > 0'
-          testName tokens[2], '_'
-          testName tokens[5], 'y'
-          testName tokens[8], 'z'
+          testDeclaredName tokens[2], '_'
+          testDeclaredName tokens[5], 'y'
+          testDeclaredName tokens[8], 'z'
           testOp tokens[10], ':='
