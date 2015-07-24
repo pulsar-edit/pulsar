@@ -108,5 +108,5 @@
     'prefix': 'gf'
     'body': 'go ${1:func}($0)'
   'test function':
-    'prefix': 'test'
+    'prefix': 'tf'
     'body': "func Test$1(t *testing.T) {\n\t$0\n}"
