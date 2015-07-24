@@ -223,7 +223,6 @@
     'endCaptures':
       '2':
         'name': 'punctuation.definition.tag.html'
-    'name': 'source.js.embedded.html'
     'patterns': [
       {
         'include': '#tag-stuff'
