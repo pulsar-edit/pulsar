@@ -257,7 +257,7 @@ describe 'Go grammar', ->
       relevantToken = tokens[t.tokenPos]
       expect(relevantToken).toBeDefined()
       expect(relevantToken.value).toEqual 'T'
-      expect(relevantToken.scopes).toEqual ['source.go']
+      expect(relevantToken.scopes).toEqual ['source.go', 'variable.go']
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual ')'
@@ -437,16 +437,11 @@ describe 'Go grammar', ->
       expect(token.value).toBe 'var'
       expect(token.scopes).toEqual ['source.go', 'keyword.go']
 
-    plainScope = ['source.go']
-    declaredScope = plainScope.concat('variable.go')
+    plainScope = ['source.go', 'variable.go']
 
     testName = (token, name) ->
       expect(token.value).toBe name
       expect(token.scopes).toEqual plainScope
-
-    testDeclaredName = (token, name) ->
-      expect(token.value).toBe name
-      expect(token.scopes).toEqual declaredScope
 
     testOp = (token, op) ->
       expect(token.value).toBe op
@@ -576,21 +571,21 @@ describe 'Go grammar', ->
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->
           {tokens} = grammar.tokenizeLine 'f := func() int { return 7 }'
-          testDeclaredName tokens[0], 'f'
+          testName tokens[0], 'f'
           testOp tokens[2], ':='
 
           {tokens} = grammar.tokenizeLine 'ch := make(chan int)'
-          testDeclaredName tokens[0], 'ch'
+          testName tokens[0], 'ch'
           testOp tokens[2], ':='
 
         xit 'tokenizes multiple names', ->
           {tokens} = grammar.tokenizeLine 'i, j := 0, 10'
-          testDeclaredName tokens[0], 'i'
+          testName tokens[0], 'i'
           testOpPunctuation tokens[1], ','
-          testDeclaredName tokens[3], 'j'
+          testName tokens[3], 'j'
 
           {tokens} = grammar.tokenizeLine 'if _, y, z := coord(p); z > 0'
-          testDeclaredName tokens[2], '_'
-          testDeclaredName tokens[5], 'y'
-          testDeclaredName tokens[8], 'z'
+          testName tokens[2], '_'
+          testName tokens[5], 'y'
+          testName tokens[8], 'z'
           testOp tokens[10], ':='

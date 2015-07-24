@@ -112,7 +112,7 @@
     'match': '\\bimport\\b'
   }
   {
-    'match': '\\b(package)\\b\\s+([\\w_][\\w\\d_]*)'
+    'match': '\\b(package)\\b\\s+([\\w_][\\w\\d_]*)?'
     'captures':
       '1':
         'name': 'keyword.directive.go'
