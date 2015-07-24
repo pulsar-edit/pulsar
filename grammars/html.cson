@@ -253,7 +253,12 @@
             'name': 'comment.block.js'
           }
           {
-            'include': 'source.js'
+            'begin': '(?=.)'
+            'end': '(?=</script)'
+            'name': 'source.js.embedded.html'
+            'patterns': [{
+              'include': 'source.js'
+            }]
           }
         ]
       }
