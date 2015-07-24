@@ -109,7 +109,15 @@
   }
   {
     'name': 'keyword.directive.go'
-    'match': '\\b(package|import)\\b'
+    'match': '\\bimport\\b'
+  }
+  {
+    'match': '\\b(package)\\b\\s+([\\w_][\\w\\d_]*)'
+    'captures':
+      '1':
+        'name': 'keyword.directive.go'
+      '2':
+        'name': 'entity.name.package.go'
   }
   {
     'name': 'keyword.statement.go'
@@ -129,7 +137,7 @@
   }
   {
     'match': '\\;'
-    'name': 'punctuation.terminator.statement.go'
+    'name': 'meta.terminator.semicolon.go'
   }
   {
     'include': '#string_escaped_char'
@@ -184,6 +192,7 @@
   'variables':
     'patterns': [
       {
+        'name': 'variable.go'
         'match': '\\b[\\w_][\\w\\d_]*\\b'
       }
     ]
