@@ -535,9 +535,6 @@
     'include': '#line_continuation'
   }
   {
-    'include': '#language_variables'
-  }
-  {
     'match': '\\b(None|True|False|Ellipsis|NotImplemented)\\b'
     'name': 'constant.language.python'
   }
@@ -549,6 +546,9 @@
   }
   {
     'include': '#dotted_name'
+  }
+  {
+    'include': '#language_variables'
   }
   {
     'begin': '(\\()'
