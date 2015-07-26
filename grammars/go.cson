@@ -109,14 +109,12 @@
   }
   {
     'name': 'keyword.directive.go'
-    'match': '\\bimport\\b'
+    'match': '\\b(package|import)\\b'
   }
   {
-    'match': '\\b(package)\\b\\s+([\\w_][\\w\\d_]*)?'
+    'match': '\\bpackage\\b\\s+([\\w_][\\w\\d_]*)'
     'captures':
       '1':
-        'name': 'keyword.directive.go'
-      '2':
         'name': 'entity.name.package.go'
   }
   {
