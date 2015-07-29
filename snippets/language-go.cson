@@ -13,7 +13,7 @@
     'body': "var ${1:ok} ${2:bool}$0"
   'switch':
     'prefix': 'switch'
-    'body': "switch ${1:var} {\ncase ${2:cond}:\n\t$0\n}"
+    'body': "switch ${1:value} {\ncase ${2:cond}:\n\t$0\n}"
   'Import':
     'prefix': 'Im'
     'body': "import (\n\t\"${1:fmt}\"\n)$0"
@@ -64,10 +64,16 @@
     'body': "fmt.Println(\"$1\")$0"
   'fmt printf':
     'prefix': 'ff'
-    'body': "fmt.Printf(\"$1  %#+v \\\\n\", ${1:e})$0"
+    'body': "fmt.Printf(\"$1\", ${2:value})$0"
   'log println':
     'prefix': 'lp'
     'body': "log.Println(\"$1\")$0"
+  'log printf':
+    'prefix': 'lf'
+    'body': "log.Printf(\"$1\", ${2:value})$0"
+  'log variable content':
+    'prefix': 'lv'
+    'body': "log.Printf(\"$1: %#+v\\\\n\", ${1:value})$0"
   'make':
     'prefix': 'make'
     'body': "make(${1:[]string}, ${0:0})"
