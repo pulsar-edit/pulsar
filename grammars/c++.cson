@@ -48,7 +48,11 @@
     'name': 'variable.other.readwrite.member.cpp'
   }
   {
-    'match': '\\b(this|nullptr)\\b'
+    'match': '\\bthis\\b'
+    'name': 'variable.language.this.cpp'
+  }
+  {
+    'match': '\\bnullptr\\b'
     'name': 'variable.language.cpp'
   }
   {

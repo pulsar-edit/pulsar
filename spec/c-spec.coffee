@@ -104,6 +104,11 @@ describe 'Language-C', ->
       expect(grammar).toBeTruthy()
       expect(grammar.scopeName).toBe 'source.cpp'
 
+    it 'tokenizes this with `.this` class', ->
+      {tokens} = grammar.tokenizeLine 'this.x'
+
+      expect(tokens[0]).toEqual value: 'this', scopes: ['source.cpp', 'variable.language.this.cpp']
+
     it 'tokenizes classes', ->
       lines = grammar.tokenizeLines '''
         class Thing {
