@@ -235,6 +235,7 @@
           '2':
             'name': 'entity.name.tag.script.html'
         'end': '(</)((?i:script))'
+        'contentName': 'source.js.embedded.html'
         'patterns': [
           {
             'captures':
@@ -252,12 +253,7 @@
             'name': 'comment.block.js'
           }
           {
-            'begin': '(?=.)'
-            'end': '(?=</script)'
-            'name': 'source.js.embedded.html'
-            'patterns': [{
-              'include': 'source.js'
-            }]
+            'include': 'source.js'
           }
         ]
       }
