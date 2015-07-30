@@ -184,7 +184,7 @@
     'endCaptures':
       '2':
         'name': 'punctuation.definition.tag.html'
-    'name': 'source.coffee.embedded.html'
+    'contentName': 'source.coffee.embedded.html'
     'patterns': [
       {
         'include': '#tag-stuff'
