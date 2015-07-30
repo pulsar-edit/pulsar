@@ -152,7 +152,7 @@
     'endCaptures':
       '2':
         'name': 'punctuation.definition.tag.html'
-    'name': 'text.embedded.html'
+    'contentName': 'text.embedded.html'
     'patterns': [
       {
         'include': '#tag-stuff'
