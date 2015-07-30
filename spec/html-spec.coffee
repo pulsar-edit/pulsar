@@ -61,6 +61,22 @@ describe 'HTML grammar', ->
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.coffee.embedded.html']
       expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'storage.type.function.coffee']
 
+  describe 'JavaScript script tags', ->
+    beforeEach ->
+      waitsForPromise -> atom.packages.activatePackage('language-javascript')
+
+    it 'tokenizes the content inside the tag as JavaScript', ->
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/javascript'>
+          var hi = 'hi'
+        </script>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
+
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.js.embedded.html']
+      expect(lines[1][1]).toEqual value: 'var', scopes: ['text.html.basic', 'source.js.embedded.html', 'storage.modifier.js']
+
   describe "comments", ->
     it "tokenizes -- as an error", ->
       {tokens} = grammar.tokenizeLine '<!-- some comment --->'
