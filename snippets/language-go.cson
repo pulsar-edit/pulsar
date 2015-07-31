@@ -13,7 +13,7 @@
     'body': "const ${1:name} = ${2:value}"
   'multiple constants':
     'prefix': 'cos'
-    'body': "const (\n\t\"${1:name} = {2:value}\"\n)"
+    'body': "const (\n\t${1:name} = ${2:value}\n)"
   'type interface declaration':
     'prefix': 'tyi'
     'body': "type ${1:name} interface {\n\t$0\n}"
