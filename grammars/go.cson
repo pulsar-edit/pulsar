@@ -18,9 +18,10 @@
   }
   {
     'comment': 'Line comments'
-    'match': '(//).*$\\n?'
-    'captures':
-      '1':
+    'begin': '//'
+    'end': '$'
+    'beginCaptures':
+      '0':
         'name': 'punctuation.definition.comment.go'
     'name': 'comment.line.double-slash.go'
   }
