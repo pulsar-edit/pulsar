@@ -227,7 +227,7 @@ describe 'Go grammar', ->
       relevantToken = tokens[t.tokenPos]
       expect(relevantToken).toBeDefined()
       expect(relevantToken.value).toEqual 'f'
-      expect(relevantToken.scopes).toEqual ['source.go', 'support.function.decl.go']
+      expect(relevantToken.scopes).toEqual ['source.go', 'entity.name.function']
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('

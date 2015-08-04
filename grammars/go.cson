@@ -62,7 +62,7 @@
           }
         ]
       '4':
-        'name': 'support.function.decl.go'
+        'name': 'entity.name.function'
   }
   {
     'comment': 'Short variable declarations'
