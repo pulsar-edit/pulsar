@@ -7,6 +7,7 @@
   'install'
   'module'
   'php'
+  'php_cs'
   'php3'
   'php4'
   'php5'
