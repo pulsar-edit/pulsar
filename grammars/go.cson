@@ -142,34 +142,39 @@
     'name': 'meta.terminator.semicolon.go'
   }
   {
-    'include': '#string_escaped_char'
-  }
-  {
-    'include': '#strings'
-  }
-  {
-    'include': '#runes'
+    'include': '#delimiters'
   }
   {
     'include': '#operators'
   }
   {
-    'include': '#variables'
+    'include': '#runes'
   }
   {
-    'include': '#delimiters'
+    'include': '#strings'
   }
+  {
+    'include': '#string_escaped_char'
+  }
+  {
+    'include': '#variables'
+  }
+
 ]
 'repository':
-  'string_escaped_char':
+  'delimiters':
     'patterns': [
       {
-        'name': 'constant.character.escape.go'
-        'match': '\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})'
+        'match': ','
+        'name': 'meta.delimiter.comma.go'
       }
       {
-        'name': 'invalid.illegal.unknown-escape.go'
-        'match': '\\\\[^0-7xuUabfnrtv\\\'"]'
+        'match': '\\.(?!\\.\\.)'
+        'name': 'meta.delimiter.period.go'
+      }
+      {
+        'match': ':(?!=)'
+        'name': 'meta.delimiter.colon.go'
       }
     ]
   'operators':
@@ -191,33 +196,15 @@
         'name': 'meta.brace.square.go'
       }
     ]
-  'variables':
+  'runes':
     'patterns': [
       {
-        'name': 'variable.go'
-        'match': '\\b[\\w_][\\w\\d_]*\\b'
-      }
-    ]
-  'delimiters':
-    'patterns': [
-      {
-        'match': ','
-        'name': 'meta.delimiter.comma.go'
+        'name': 'constant.other.rune.go'
+        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
       }
       {
-        'match': '\\.'
-        'name': 'meta.delimiter.period.go'
-      }
-      {
-        'match': ':'
-        'name': 'meta.delimiter.colon.go'
-      }
-    ]
-  'printf_verbs':
-    'patterns': [
-      {
-        'name': 'constant.escape.format-verb.go'
-        'match': '%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]'
+        'name': 'invalid.illegal.rune.go'
+        'match': '\\\'.*\\\''
       }
     ]
   'strings':
@@ -237,7 +224,7 @@
             'include': '#string_escaped_char'
           }
           {
-            'include': '#printf_verbs'
+            'include': '#string_format_verbs'
           }
         ]
       }
@@ -253,19 +240,33 @@
         'name': 'string.quoted.raw.go',
         'patterns': [
           {
-            'include': '#printf_verbs'
+            'include': '#string_format_verbs'
           }
         ]
       }
     ]
-  'runes':
+  'string_escaped_char':
     'patterns': [
       {
-        'name': 'constant.other.rune.go'
-        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
+        'name': 'constant.character.escape.go'
+        'match': '\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})'
       }
       {
-        'name': 'invalid.illegal.rune.go'
-        'match': '\\\'.*\\\''
+        'name': 'invalid.illegal.unknown-escape.go'
+        'match': '\\\\[^0-7xuUabfnrtv\\\'"]'
+      }
+    ]
+  'string_format_verbs':
+    'patterns': [
+      {
+        'name': 'constant.character.escape.go'
+        'match': '%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]'
+      }
+    ]
+  'variables':
+    'patterns': [
+      {
+        'name': 'variable.go'
+        'match': '\\b[\\w_][\\w\\d_]*\\b'
       }
     ]

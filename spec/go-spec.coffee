@@ -56,7 +56,7 @@ describe 'Go grammar', ->
       expect(tokens[0].value).toEqual '"',
       expect(tokens[0].scopes).toEqual ['source.go', 'string.quoted.double.go', 'punctuation.definition.string.begin.go']
       expect(tokens[1].value).toEqual verb
-      expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.double.go', 'constant.escape.format-verb.go']
+      expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.double.go', 'constant.character.escape.go']
       expect(tokens[2].value).toEqual '"',
       expect(tokens[2].scopes).toEqual ['source.go', 'string.quoted.double.go', 'punctuation.definition.string.end.go']
 
@@ -90,7 +90,7 @@ describe 'Go grammar', ->
       expect(tokens[0].value).toEqual '`',
       expect(tokens[0].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.begin.go']
       expect(tokens[1].value).toEqual verb
-      expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'constant.escape.format-verb.go']
+      expect(tokens[1].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'constant.character.escape.go']
       expect(tokens[2].value).toEqual '`',
       expect(tokens[2].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']
 
