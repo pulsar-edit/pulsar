@@ -72,8 +72,11 @@
         'name': 'variable.go'
   }
   {
-    'name': 'support.function.built-in.go'
-    'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b'
+    'comment': 'Built-in functions'
+    'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b(?=\\()'
+    'captures':
+      '1':
+        'name': 'support.function.built-in.go'
   }
   {
     'comment': 'Functions'
