@@ -1,5 +1,6 @@
 'scopeName': 'text.html.basic'
 'fileTypes': [
+  'ejs'
   'htm'
   'html'
   'kit'
