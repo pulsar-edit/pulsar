@@ -66,13 +66,13 @@
     'prefix': 'while'
     'body': 'while ${1:condition}:\n\t${2:pass}'
   'Try/Except/Else/Finally':
-    'prefix': 'try'
+    'prefix': 'tryef'
     'body': 'try:\n\t${1:pass}\nexcept${2: ${3:Exception} as ${4:e}}:\n\t${5:raise}\nelse:\n\t${6:pass}\nfinally:\n\t${7:pass}'
   'Try/Except/Else':
-    'prefix': 'try'
+    'prefix': 'trye'
     'body': 'try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}\nelse:\n\t${5:pass}'
   'Try/Except/Finally':
-    'prefix': 'try'
+    'prefix': 'tryf'
     'body': 'try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}\nfinally:\n\t${5:pass}'
   'Try/Except':
     'prefix': 'try'
