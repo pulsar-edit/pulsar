@@ -3,14 +3,14 @@ describe "JSON grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-json")
+      atom.packages.activatePackage('language-json')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.json")
+      grammar = atom.grammars.grammarForScopeName('source.json')
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()
-    expect(grammar.scopeName).toBe "source.json"
+    expect(grammar.scopeName).toBe 'source.json'
 
   it "tokenizes arrays", ->
     baseScopes = ['source.json', 'meta.structure.array.json']
