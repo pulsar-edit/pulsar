@@ -1,4 +1,4 @@
-# JSON language support in Atom
+# JSON language support in Atom [![Build Status](https://travis-ci.org/atom/language-json.svg?branch=master)](https://travis-ci.org/atom/language-json)
 
 Adds syntax highlighting of JSON files in Atom.
 
