@@ -267,6 +267,9 @@
         'end': '(?=\\)\\s*\\:)'
         'patterns': [
           {
+            'include': '#line_comments'
+          }
+          {
             'include': '#keyword_arguments'
           }
           {
