@@ -19,21 +19,7 @@
 'firstLineMatch': '^#!/.*\\bpython[\\d\\.]*\\b'
 'patterns': [
   {
-    'begin': '(^[ \\t]+)?(?=#)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.whitespace.comment.leading.python'
-    'end': '(?!\\G)'
-    'patterns': [
-      {
-        'begin': '#'
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.comment.python'
-        'end': '\\n'
-        'name': 'comment.line.number-sign.python'
-      }
-    ]
+    'include': '#line_comments'
   }
   {
     'match': '\\b(?i:(0x\\h*)L)'
@@ -691,6 +677,22 @@
             'include': '#string_quoted_single'
           }
         ]
+      }
+    ]
+  'line_comments':
+    'begin': '(^[ \\t]+)?(?=#)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.whitespace.comment.leading.python'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '#'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.python'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.python'
       }
     ]
   'dotted_name':
