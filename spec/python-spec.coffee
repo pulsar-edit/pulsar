@@ -245,3 +245,21 @@ describe "Python grammar", ->
     expect(tokens[0][1].scopes).toEqual ['source.python']
     expect(tokens[0][2].value).toBe 'foo'
     expect(tokens[0][2].scopes).toEqual ['source.python']
+
+  it "tokenizes comments inside function parameters", ->
+    tokens = grammar.tokenizeLines('def test(arg, # comment')
+    expect(tokens[0].length).toBe 10
+    expect(tokens[0][0].value).toBe 'def'
+    expect(tokens[0][0].scopes).toEqual ['source.python', 'meta.function.python', 'storage.type.function.python']
+    expect(tokens[0][2].value).toBe 'test'
+    expect(tokens[0][2].scopes).toEqual ['source.python', 'meta.function.python', 'entity.name.function.python']
+    expect(tokens[0][3].value).toBe '('
+    expect(tokens[0][3].scopes).toEqual ['source.python', 'meta.function.python', 'punctuation.definition.parameters.begin.python']
+    expect(tokens[0][4].value).toBe 'arg'
+    expect(tokens[0][4].scopes).toEqual ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'variable.parameter.function.python']
+    expect(tokens[0][5].value).toBe ','
+    expect(tokens[0][5].scopes).toEqual ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'punctuation.separator.parameters.python']
+    expect(tokens[0][7].value).toBe '#'
+    expect(tokens[0][7].scopes).toEqual ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'comment.line.number-sign.python', 'punctuation.definition.comment.python']
+    expect(tokens[0][8].value).toBe ' comment'
+    expect(tokens[0][8].scopes).toEqual ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'comment.line.number-sign.python']
