@@ -100,17 +100,17 @@ describe "Shell session grammar", ->
     expect(tokens[1][0].value).toBe 'foo'
     expect(tokens[1][0].scopes).toEqual ['text.shell-session', 'meta.output.shell-session']
 
-  it "", ->
-    tokens = grammar.tokenizeLines("${'root'}")
+  it "tokenizes strings inside variable constructs", ->
+    {tokens} = grammar.tokenizeLine("${'root'}")
     temporaryScopeHack(tokens)
 
-    expect(tokens[0][0].value).toBe "${"
-    expect(tokens[0][0].scopes).toEqual ['variable.other.bracket.shell', 'punctuation.definition.variable.shell']
-    expect(tokens[0][1].value).toBe "'"
-    expect(tokens[0][1].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.begin.shell']
-    expect(tokens[0][2].value).toBe "root"
-    expect(tokens[0][2].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell']
-    expect(tokens[0][3].value).toBe "'"
-    expect(tokens[0][3].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.end.shell']
-    expect(tokens[0][4].value).toBe '}'
-    expect(tokens[0][4].scopes).toEqual ['variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[0].value).toBe "${"
+    expect(tokens[0].scopes).toEqual ['variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[1].value).toBe "'"
+    expect(tokens[1].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.begin.shell']
+    expect(tokens[2].value).toBe "root"
+    expect(tokens[2].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell']
+    expect(tokens[3].value).toBe "'"
+    expect(tokens[3].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.end.shell']
+    expect(tokens[4].value).toBe '}'
+    expect(tokens[4].scopes).toEqual ['variable.other.bracket.shell', 'punctuation.definition.variable.shell']
