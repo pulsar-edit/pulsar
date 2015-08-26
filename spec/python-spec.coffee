@@ -228,7 +228,7 @@ describe "Python grammar", ->
 
   it "tokenizes properties of self as variables", ->
     tokens = grammar.tokenizeLines('self.foo')
-    expect(tokens[0].length).toBe 3
+
     expect(tokens[0][0].value).toBe 'self'
     expect(tokens[0][0].scopes).toEqual ['source.python', 'variable.language.python']
     expect(tokens[0][1].value).toBe '.'
@@ -238,10 +238,43 @@ describe "Python grammar", ->
 
   it "tokenizes properties of a variable as variables", ->
     tokens = grammar.tokenizeLines('bar.foo')
-    expect(tokens[0].length).toBe 3
+
     expect(tokens[0][0].value).toBe 'bar'
     expect(tokens[0][0].scopes).toEqual ['source.python']
     expect(tokens[0][1].value).toBe '.'
     expect(tokens[0][1].scopes).toEqual ['source.python']
     expect(tokens[0][2].value).toBe 'foo'
     expect(tokens[0][2].scopes).toEqual ['source.python']
+
+  it "tokenizes comments inside function parameters", ->
+    {tokens} = grammar.tokenizeLine('def test(arg, # comment')
+
+    expect(tokens[0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
+    expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python']
+    expect(tokens[3]).toEqual value: '(', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.begin.python']
+    expect(tokens[4]).toEqual value: 'arg', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'variable.parameter.function.python']
+    expect(tokens[5]).toEqual value: ',', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'punctuation.separator.parameters.python']
+    expect(tokens[7]).toEqual value: '#', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'comment.line.number-sign.python', 'punctuation.definition.comment.python']
+    expect(tokens[8]).toEqual value: ' comment', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'comment.line.number-sign.python']
+
+    tokens = grammar.tokenizeLines("""
+      def __init__(
+        self,
+        codec, # comment
+        config
+      ):
+    """)
+
+    expect(tokens[0][0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
+    expect(tokens[0][2]).toEqual value: '__init__', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python', 'support.function.magic.python']
+    expect(tokens[0][3]).toEqual value: '(', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.begin.python']
+    expect(tokens[1][1]).toEqual value: 'self', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'variable.parameter.function.python']
+    expect(tokens[1][2]).toEqual value: ',', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'punctuation.separator.parameters.python']
+    expect(tokens[2][1]).toEqual value: 'codec', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'variable.parameter.function.python']
+    expect(tokens[2][2]).toEqual value: ',', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'punctuation.separator.parameters.python']
+    expect(tokens[2][4]).toEqual value: '#', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'comment.line.number-sign.python', 'punctuation.definition.comment.python']
+    expect(tokens[2][5]).toEqual value: ' comment', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'comment.line.number-sign.python']
+    expect(tokens[3][1]).toEqual value: 'config', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'variable.parameter.function.python']
+    expect(tokens[4][0]).toEqual value: ')', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.end.python']
+    expect(tokens[4][1]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'punctuation.section.function.begin.python']
+
