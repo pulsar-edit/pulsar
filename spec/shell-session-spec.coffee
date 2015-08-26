@@ -108,3 +108,16 @@ describe "Shell session grammar", ->
     expect(tokens[2]).toEqual value: "root", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell']
     expect(tokens[3]).toEqual value: "'", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.end.shell']
     expect(tokens[4]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+
+  it "tokenizes if correctly when it's a parameter", ->
+    {tokens} = grammar.tokenizeLine('dd if=/dev/random of=/dev/null')
+    temporaryScopeHack(tokens)
+
+    expect(tokens[0]).toEqual value: 'dd if=/dev/random of=/dev/null', scopes: ['source.shell']
+
+  it "tokenizes if contruct", ->
+    {tokens} = grammar.tokenizeLine('if [ -f /var/log/messages ]')
+    temporaryScopeHack(tokens)
+
+    expect(tokens[0]).toEqual value: 'if', scopes: ['source.shell', 'meta.scope.if-block.shell', 'keyword.control.shell']
+    expect(tokens[1]).toEqual value: ' [ -f /var/log/messages ]', scopes: ['source.shell', 'meta.scope.if-block.shell']
