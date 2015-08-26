@@ -978,6 +978,9 @@
                 'name': 'punctuation.section.array.shell'
             'match': '(\\[)([^\\]]+)(\\])'
           }
+          {
+            'include': '#string'
+          }
         ]
       }
     ]
