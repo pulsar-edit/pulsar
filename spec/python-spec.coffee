@@ -228,7 +228,7 @@ describe "Python grammar", ->
 
   it "tokenizes properties of self as variables", ->
     tokens = grammar.tokenizeLines('self.foo')
-    expect(tokens[0].length).toBe 3
+
     expect(tokens[0][0].value).toBe 'self'
     expect(tokens[0][0].scopes).toEqual ['source.python', 'variable.language.python']
     expect(tokens[0][1].value).toBe '.'
@@ -238,7 +238,7 @@ describe "Python grammar", ->
 
   it "tokenizes properties of a variable as variables", ->
     tokens = grammar.tokenizeLines('bar.foo')
-    expect(tokens[0].length).toBe 3
+
     expect(tokens[0][0].value).toBe 'bar'
     expect(tokens[0][0].scopes).toEqual ['source.python']
     expect(tokens[0][1].value).toBe '.'
@@ -248,7 +248,7 @@ describe "Python grammar", ->
 
   it "tokenizes comments inside function parameters", ->
     {tokens} = grammar.tokenizeLine('def test(arg, # comment')
-    expect(tokens.length).toBe 10
+
     expect(tokens[0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
     expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python']
     expect(tokens[3]).toEqual value: '(', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.begin.python']
@@ -264,6 +264,7 @@ describe "Python grammar", ->
         config
       ):
     """)
+
     expect(tokens[0][0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
     expect(tokens[0][2]).toEqual value: '__init__', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python', 'support.function.magic.python']
     expect(tokens[0][3]).toEqual value: '(', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.begin.python']
