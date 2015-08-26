@@ -8,7 +8,6 @@ describe "Shell session grammar", ->
 
     runs ->
       grammar_session = atom.grammars.grammarForScopeName("text.shell-session")
-    runs ->
       grammar = atom.grammars.grammarForScopeName("source.shell")
 
   # Remove this and fix assertions when Atom is upgraded to first-mate 4.x on master
