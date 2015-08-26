@@ -104,13 +104,8 @@ describe "Shell session grammar", ->
     {tokens} = grammar.tokenizeLine("${'root'}")
     temporaryScopeHack(tokens)
 
-    expect(tokens[0].value).toBe "${"
-    expect(tokens[0].scopes).toEqual ['variable.other.bracket.shell', 'punctuation.definition.variable.shell']
-    expect(tokens[1].value).toBe "'"
-    expect(tokens[1].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.begin.shell']
-    expect(tokens[2].value).toBe "root"
-    expect(tokens[2].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell']
-    expect(tokens[3].value).toBe "'"
-    expect(tokens[3].scopes).toEqual ['variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.end.shell']
-    expect(tokens[4].value).toBe '}'
-    expect(tokens[4].scopes).toEqual ['variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[0]).toEqual value: '${', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[1]).toEqual value: "'", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.begin.shell']
+    expect(tokens[2]).toEqual value: "root", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell']
+    expect(tokens[3]).toEqual value: "'", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.end.shell']
+    expect(tokens[4]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
