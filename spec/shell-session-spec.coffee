@@ -43,7 +43,10 @@ describe "Shell session grammar", ->
     expect(tokens[4]).toEqual value: 'echo', scopes: ['text.shell-session', 'source.shell', 'support.function.builtin.shell']
 
   it "tokenizes shell output", ->
-    tokens = grammarSession.tokenizeLines('$ echo $FOO\nfoo')
+    tokens = grammarSession.tokenizeLines '''
+      $ echo $FOO
+      foo
+    '''
 
     expect(tokens[1][0]).toEqual value: 'foo', scopes: ['text.shell-session', 'meta.output.shell-session']
 
