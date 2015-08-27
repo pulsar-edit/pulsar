@@ -1,7 +1,7 @@
 describe "Shell script grammar", ->
-	grammar = null
+  grammar = null
 
-	beforeEach ->
+  beforeEach ->
     waitsForPromise ->
       atom.packages.activatePackage("language-shellscript")
 
@@ -12,7 +12,7 @@ describe "Shell script grammar", ->
     expect(grammar).toBeDefined()
     expect(grammar.scopeName).toBe "source.shell"
 
-	it "tokenizes strings inside variable constructs", ->
+  it "tokenizes strings inside variable constructs", ->
     {tokens} = grammar.tokenizeLine("${'root'}")
 
     expect(tokens[0]).toEqual value: '${', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
