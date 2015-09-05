@@ -285,7 +285,7 @@ describe "Python grammar", ->
       "string.quoted.single.block.sql.python": "'''"
 
     for scope, delim in delimsByScope
-      tokens =  grammar.tokenizeLines(
+      tokens = grammar.tokenizeLines(
         delim +
         'SELECT bar
         FROM foo'
