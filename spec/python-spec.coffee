@@ -278,3 +278,28 @@ describe "Python grammar", ->
     expect(tokens[4][0]).toEqual value: ')', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.end.python']
     expect(tokens[4][1]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'punctuation.section.function.begin.python']
 
+
+  it "correctly enables SQL inline highlighting on blocks", ->
+    tokens = grammar.tokenizeLines('''
+      """
+      SELECT bar
+      FROM foo
+      """
+    ''')
+
+    expect(tokens[0][0]).toEqual value: '"""', scopes: ['source.python', 'string.quoted.double.block.sql.python', 'punctuation.definition.string.begin.python']
+    expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', 'string.quoted.double.block.sql.python']
+    expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', 'string.quoted.double.block.sql.python']
+    expect(tokens[3][0]).toEqual value: '"""', scopes: ['source.python', 'string.quoted.double.block.sql.python', 'punctuation.definition.string.end.python']
+
+    tokens = grammar.tokenizeLines("""
+      '''
+      SELECT bar
+      FROM foo
+      '''
+    """)
+
+    expect(tokens[0][0]).toEqual value: '\'\'\'', scopes: ['source.python', 'string.quoted.single.block.sql.python', 'punctuation.definition.string.begin.python']
+    expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', 'string.quoted.single.block.sql.python']
+    expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', 'string.quoted.single.block.sql.python']
+    expect(tokens[3][0]).toEqual value: '\'\'\'', scopes: ['source.python', 'string.quoted.single.block.sql.python', 'punctuation.definition.string.end.python']
