@@ -1137,7 +1137,7 @@
         ]
       }
       {
-        'begin': '(""")(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+        'begin': '(""")'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.begin.python'
@@ -1151,13 +1151,19 @@
         'name': 'string.quoted.double.block.sql.python'
         'patterns': [
           {
+             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+             'end': '(?=\\s*""")'
+             'patterns': [
+                {
+                  'include': 'source.sql'
+                }
+             ]
+          }
+          {
             'include': '#constant_placeholder'
           }
           {
             'include': '#escaped_char'
-          }
-          {
-            'include': 'source.sql'
           }
         ]
       }
@@ -1499,7 +1505,7 @@
         ]
       }
       {
-        'begin': '(\'\'\')(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+        'begin': '(\'\'\')'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.begin.python'
@@ -1510,16 +1516,22 @@
             'name': 'punctuation.definition.string.end.python'
           '2':
             'name': 'meta.empty-string.single.python'
-        'name': 'string.quoted.single.block.python'
+        'name': 'string.quoted.single.block.sql.python'
         'patterns': [
+          {
+             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+             'end': '(?=\\s*\'\'\')'
+             'patterns': [
+                {
+                  'include': 'source.sql'
+                }
+             ]
+          }
           {
             'include': '#constant_placeholder'
           }
           {
             'include': '#escaped_char'
-          }
-          {
-            'include': 'source.sql'
           }
         ]
       }

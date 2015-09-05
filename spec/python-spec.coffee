@@ -278,3 +278,21 @@ describe "Python grammar", ->
     expect(tokens[4][0]).toEqual value: ')', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.end.python']
     expect(tokens[4][1]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'punctuation.section.function.begin.python']
 
+
+  it "tokenizes SQL inline highlighting on blocks", ->
+    delimsByScope =
+      "string.quoted.double.block.sql.python": '"""'
+      "string.quoted.single.block.sql.python": "'''"
+
+    for scope, delim in delimsByScope
+      tokens = grammar.tokenizeLines(
+        delim +
+        'SELECT bar
+        FROM foo'
+        + delim
+      )
+
+      expect(tokens[0][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
+      expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope]
+      expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope]
+      expect(tokens[3][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
