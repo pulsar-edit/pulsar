@@ -279,7 +279,7 @@ describe "Python grammar", ->
     expect(tokens[4][1]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'punctuation.section.function.begin.python']
 
 
-  it "correctly enables SQL inline highlighting on blocks", ->
+  it "tokenizes SQL inline highlighting on blocks", ->
     tokens = grammar.tokenizeLines('''
       """
       SELECT bar
