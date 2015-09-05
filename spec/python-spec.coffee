@@ -289,7 +289,7 @@ describe "Python grammar", ->
         """
         '''
         quotes: '"""'
-        scope: 'string.quoted.double.block.sql.python'
+        blockScope: 'string.quoted.double.block.sql.python'
       }
       {
         text: """
@@ -299,14 +299,14 @@ describe "Python grammar", ->
         '''
         """
         quotes: "'''"
-        scope: 'string.quoted.single.block.sql.python'
+        blockScope: 'string.quoted.single.block.sql.python'
       }
     ]
 
     for test in testCases
       tokens =  grammar.tokenizeLines(test['text'])
 
-      expect(tokens[0][0]).toEqual value: test['quotes'], scopes: ['source.python', test['scope'], 'punctuation.definition.string.begin.python']
-      expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', test['scope']]
-      expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', test['scope']]
-      expect(tokens[3][0]).toEqual value: test['quotes'], scopes: ['source.python', test['scope'], 'punctuation.definition.string.end.python']
+      expect(tokens[0][0]).toEqual value: test['quotes'], scopes: ['source.python', test['blockScope'], 'punctuation.definition.string.begin.python']
+      expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', test['blockScope']]
+      expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', test['blockScope']]
+      expect(tokens[3][0]).toEqual value: test['quotes'], scopes: ['source.python', test['blockScope'], 'punctuation.definition.string.end.python']
