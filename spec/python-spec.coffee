@@ -280,26 +280,33 @@ describe "Python grammar", ->
 
 
   it "tokenizes SQL inline highlighting on blocks", ->
-    tokens = grammar.tokenizeLines('''
-      """
-      SELECT bar
-      FROM foo
-      """
-    ''')
+    testCases = [
+      {
+        text: '''
+        """
+        SELECT bar
+        FROM foo
+        """
+        '''
+        quotes: '"""'
+        scope: 'string.quoted.double.block.sql.python'
+      }
+      {
+        text: """
+        '''
+        SELECT bar
+        FROM foo
+        '''
+        """
+        quotes: "'''"
+        scope: 'string.quoted.single.block.sql.python'
+      }
+    ]
 
-    expect(tokens[0][0]).toEqual value: '"""', scopes: ['source.python', 'string.quoted.double.block.sql.python', 'punctuation.definition.string.begin.python']
-    expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', 'string.quoted.double.block.sql.python']
-    expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', 'string.quoted.double.block.sql.python']
-    expect(tokens[3][0]).toEqual value: '"""', scopes: ['source.python', 'string.quoted.double.block.sql.python', 'punctuation.definition.string.end.python']
+    for test in testCases
+      tokens =  grammar.tokenizeLines(test['text'])
 
-    tokens = grammar.tokenizeLines("""
-      '''
-      SELECT bar
-      FROM foo
-      '''
-    """)
-
-    expect(tokens[0][0]).toEqual value: '\'\'\'', scopes: ['source.python', 'string.quoted.single.block.sql.python', 'punctuation.definition.string.begin.python']
-    expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', 'string.quoted.single.block.sql.python']
-    expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', 'string.quoted.single.block.sql.python']
-    expect(tokens[3][0]).toEqual value: '\'\'\'', scopes: ['source.python', 'string.quoted.single.block.sql.python', 'punctuation.definition.string.end.python']
+      expect(tokens[0][0]).toEqual value: test['quotes'], scopes: ['source.python', test['scope'], 'punctuation.definition.string.begin.python']
+      expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', test['scope']]
+      expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', test['scope']]
+      expect(tokens[3][0]).toEqual value: test['quotes'], scopes: ['source.python', test['scope'], 'punctuation.definition.string.end.python']
