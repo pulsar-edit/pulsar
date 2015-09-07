@@ -128,7 +128,10 @@ describe "Shell session grammar", ->
       "string.quoted.single.shell": "'"
 
     for scope, delim of delimsByScope
-      tokens = grammar.tokenizeLines "$cmd <<<" + delim + "\nlorem ipsum" + delim
+      tokens = grammar.tokenizeLines """
+      $cmd <<<#{delim}
+      lorem ipsum#{delim}
+      """
       temporaryScopeHack(tokens)
 
       expect(tokens[0][0]).toEqual value: '$', scopes: ['variable.other.normal.shell', 'punctuation.definition.variable.shell']
