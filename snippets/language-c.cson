@@ -40,7 +40,7 @@
     'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}'
   'If Else':
     'prefix': 'ife'
-    'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}\nelse {\n\t${3:/* code */}\n}'
+    'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n} else {\n\t${3:/* code */}\n}'
   'If ElseIf':
     'prefix': 'iff'
     'body': 'if (${1:/* condition */}) {\n\t${2:/* code */}\n}\nelse if (${3:/* condition */}) {\n\t${4:/* code */}\n}'
