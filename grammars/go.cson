@@ -195,7 +195,7 @@
     'begin': '(\\bvar\\b)\\s+(\\()'
     'beginCaptures':
       '1':
-        'name': 'keyword.variable.go'
+        'name': 'keyword.var.go'
       '2':
         'name': 'punctuation.other.bracket.round.go'
     'end': '\\)'
@@ -276,7 +276,7 @@
       }
       {
         'match': '\\bconst\\b'
-        'name': 'keyword.constant.go'
+        'name': 'keyword.const.go'
       }
       {
         'match': '\\bfunc\\b'
@@ -308,7 +308,7 @@
       }
       {
         'match': '\\bvar\\b'
-        'name': 'keyword.variable.go'
+        'name': 'keyword.var.go'
       }
     ]
   'operators':
