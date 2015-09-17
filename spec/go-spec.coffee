@@ -136,7 +136,7 @@ describe 'Go grammar', ->
     keywordLists =
       'keyword.control.go': ['break', 'case', 'continue', 'default', 'defer', 'else', 'fallthrough', 'for', 'go', 'goto', 'if', 'range', 'return', 'select', 'switch']
       'keyword.channel.go': ['chan']
-      'keyword.constant.go': ['const']
+      'keyword.const.go': ['const']
       'keyword.function.go': ['func']
       'keyword.interface.go': ['interface']
       'keyword.import.go': ['import']
@@ -144,7 +144,7 @@ describe 'Go grammar', ->
       'keyword.package.go': ['package']
       'keyword.struct.go': ['struct']
       'keyword.type.go': ['type']
-      'keyword.variable.go': ['var']
+      'keyword.var.go': ['var']
 
     for scope, list of keywordLists
       for keyword in list
@@ -430,7 +430,7 @@ describe 'Go grammar', ->
   describe 'in variable declarations', ->
     testVar = (token) ->
       expect(token.value).toBe 'var'
-      expect(token.scopes).toEqual ['source.go', 'keyword.variable.go']
+      expect(token.scopes).toEqual ['source.go', 'keyword.var.go']
 
     testVarAssignment = (token, name) ->
       expect(token.value).toBe name
