@@ -239,13 +239,17 @@
     'beginCaptures':
       '1':
         'name': 'storage.type.function.python'
-    'end': '(\\))\\s*(?:(\\:)|(.*$\\n?))'
+    'end': '(\\))\\s*(?:(->)\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*)?(?:(\\:)|(.*$\\n?))'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.parameters.end.python'
       '2':
-        'name': 'punctuation.section.function.begin.python'
+        'name': 'punctuation.definition.annotation.return.python'
       '3':
+        'name': 'variable.annotation.function.python'
+      '4':
+        'name': 'punctuation.section.function.begin.python'
+      '5':
         'name': 'invalid.illegal.missing-section-begin.python'
     'name': 'meta.function.python'
     'patterns': [
@@ -278,8 +282,12 @@
               '1':
                 'name': 'variable.parameter.function.python'
               '2':
+                'name': 'punctuation.definition.annotation.parameter.python'
+              '3':
+                'name': 'variable.annotation.function.python'
+              '4':
                 'name': 'punctuation.separator.parameters.python'
-            'match': '\\b([a-zA-Z_][a-zA-Z_0-9]*)\\s*(?:(,)|\\:\\s*\\w*(,*))'
+            'match': '\\b([a-zA-Z_][a-zA-Z_0-9]*)\\s*(?:(:)\\s*([a-zA-Z_][a-zA-Z_0-9]*))?(?:(,)|(?=[\\n\\)]))'
           }
         ]
       }
