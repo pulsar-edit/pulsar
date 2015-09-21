@@ -369,8 +369,9 @@
     'body': '<wbr>'
 
 
-# These null out the snippets so the snippets are no available when in a tag
-'.text.html .meta.tag':
+# These null out the snippets so the snippets are not available when in a tag or
+# in embedded contexts like <script> and <style>
+'.text.html .meta.tag, .text.html .embedded':
   # A
   'Anchor':
     'prefix': 'a'
