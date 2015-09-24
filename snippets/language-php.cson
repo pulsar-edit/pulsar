@@ -7,7 +7,7 @@
     'body': 'php $0 ?>'
   'function __construct':
     'prefix': 'con'
-    'body': 'function __construct(${1:$${2:foo} ${3:= ${4:null}}}) {\n\t${2:$this->$0 = $$0;}$0\n}'
+    'body': '${1:public }function __construct(${2:${3:Type }$${4:foo} ${5:= ${6:null}}})\n{\n\t${2:$this->${4:foo} = $${4:foo};}$0\n}'
   'Heredoc':
     'prefix': '<<<'
     'body': '<<<${1:HTML}\n${2:content here}\n$1;\n'
