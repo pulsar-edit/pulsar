@@ -5,17 +5,6 @@
 ]
 'patterns': [
   {
-    'match': '^(>)(.*)$'
-    'captures':
-      '1':
-        'name': 'punctuation.separator.prompt.shell-session'
-      '2':
-        'name': 'source.shell'
-        'patterns': [
-          'include': 'source.shell'
-        ]
-  }
-  {
     'match': '(?x)
       ^
       (?:
@@ -30,7 +19,7 @@
         \\s*
       )
       (
-        [$#%]
+        [>$#%]
       )
       \\s+
       (.*)
