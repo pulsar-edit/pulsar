@@ -137,11 +137,11 @@
   'compound-command':
     'patterns': [
       {
-        'begin': '(\\[{2})'
+        'begin': '(\\[{1,2})'
         'captures':
           '1':
             'name': 'punctuation.definition.logical-expression.shell'
-        'end': '(\\]{2})'
+        'end': '(\\]{1,2})'
         'name': 'meta.scope.logical-expression.shell'
         'patterns': [
           {
