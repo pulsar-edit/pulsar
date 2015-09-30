@@ -534,30 +534,40 @@
   'herestring':
     'patterns': [
       {
-        'captures':
+        'begin': '(<<<)\s*((\'))'
+        'beginCaptures':
           '1':
             'name': 'keyword.operator.herestring.shell'
           '2':
-            'name': 'string.quoted.single.herestring.shell'
+            'name': 'string.quoted.single.shell'
           '3':
             'name': 'punctuation.definition.string.begin.shell'
-          '4':
+        'end': '(\')'
+        'endCaptures':
+          '0':
+            'name': 'string.quoted.single.shell'
+          '1':
             'name': 'punctuation.definition.string.end.shell'
-        'match': '(<<<)((\')[^\']*(\'))'
         'name': 'meta.herestring.shell'
+        'contentName': 'string.quoted.single.shell'
       }
       {
-        'captures':
+        'begin': '(<<<)\s*(("))'
+        'beginCaptures':
           '1':
             'name': 'keyword.operator.herestring.shell'
           '2':
-            'name': 'string.quoted.double.herestring.shell'
+            'name': 'string.quoted.double.shell'
           '3':
             'name': 'punctuation.definition.string.begin.shell'
-          '6':
+        'end': '(")'
+        'endCaptures':
+          '0':
+            'name': 'string.quoted.double.shell'
+          '1':
             'name': 'punctuation.definition.string.end.shell'
-        'match': '(<<<)((")(\\\\("|\\\\)|[^"])*("))'
         'name': 'meta.herestring.shell'
+        'contentName': 'string.quoted.double.shell'
       }
       {
         'captures':
