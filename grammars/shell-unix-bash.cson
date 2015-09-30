@@ -503,6 +503,50 @@
         ]
       }
       {
+        'begin': '(<<)-("|\'|)(BASH|SHELL)\\2'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.operator.heredoc.shell'
+          '3':
+            'name': 'keyword.control.heredoc-token.shell'
+        'captures':
+          '0':
+            'name': 'punctuation.definition.string.shell'
+        'contentName': 'source.shell.embedded.shell'
+        'end': '^\\t*(\\3)\\b'
+        'endCaptures':
+          '1':
+            'name': 'keyword.control.heredoc-token.shell'
+        'name': 'string.unquoted.heredoc.no-indent.shell.shell'
+        'patterns': [
+          {
+            'include': 'source.shell'
+          }
+        ]
+      }
+      {
+        'begin': '(<<)("|\'|)(BASH|SHELL)\\2'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.operator.heredoc.shell'
+          '3':
+            'name': 'keyword.control.heredoc-token.shell'
+        'captures':
+          '0':
+            'name': 'punctuation.definition.string.shell'
+        'contentName': 'source.shell.embedded.shell'
+        'end': '^(\\3)\\b'
+        'endCaptures':
+          '1':
+            'name': 'keyword.control.heredoc-token.shell'
+        'name': 'string.unquoted.heredoc.shell.shell'
+        'patterns': [
+          {
+            'include': 'source.shell'
+          }
+        ]
+      }
+      {
         'begin': '(<<)-("|\'|)\\\\?(\\w+)\\2'
         'beginCaptures':
           '1':
