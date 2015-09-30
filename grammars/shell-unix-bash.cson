@@ -118,12 +118,20 @@
       }
     ]
   'comment':
-    'begin': '(^[ \\t]+)?(?<!\\S)(?=#)(?!#\\{)'
+    'begin': '(^[ \\s]+)?(?<!\\S)(?=#)(?!#\\{)'
     'beginCaptures':
       '1':
         'name': 'punctuation.whitespace.comment.leading.shell'
     'end': '(?!\\G)'
     'patterns': [
+      {
+        'begin': '#!'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.shebang.shell'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.shebang.shell'
+      }
       {
         'begin': '#'
         'beginCaptures':

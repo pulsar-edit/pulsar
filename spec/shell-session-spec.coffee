@@ -140,3 +140,17 @@ describe "Shell session grammar", ->
       expect(tokens[0][4]).toEqual value: delim, scopes: ['meta.herestring.shell', scope, 'punctuation.definition.string.begin.shell']
       expect(tokens[1][0]).toEqual value: 'lorem ipsum', scopes: ['meta.herestring.shell', scope]
       expect(tokens[1][1]).toEqual value: delim, scopes: ['meta.herestring.shell', scope, 'punctuation.definition.string.end.shell']
+
+  it "tokenizes shebangs", ->
+    {tokens} = grammar.tokenizeLine('#!/bin/sh')
+    temporaryScopeHack(tokens)
+
+    expect(tokens[0]).toEqual value: '#!', scopes: ['source.shell', 'comment.line.number-sign.shebang.shell', 'punctuation.definition.comment.shebang.shell']
+    expect(tokens[1]).toEqual value: '/bin/sh', scopes: ['source.shell', 'comment.line.number-sign.shebang.shell']
+
+  it "tokenizes comments", ->
+    {tokens} = grammar.tokenizeLine('#comment')
+    temporaryScopeHack(tokens)
+
+    expect(tokens[0]).toEqual value: '#', scopes: ['source.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']
+    expect(tokens[1]).toEqual value: 'comment', scopes: ['source.shell', 'comment.line.number-sign.shell']
