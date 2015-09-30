@@ -992,6 +992,9 @@
             'match': '(\\[)([^\\]]+)(\\])'
           }
           {
+            'include': '#variable'
+          }
+          {
             'include': '#string'
           }
         ]
