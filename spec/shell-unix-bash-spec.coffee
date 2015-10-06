@@ -32,6 +32,16 @@ describe "Shell script grammar", ->
     expect(tokens[0]).toEqual value: 'if', scopes: ['source.shell', 'meta.scope.if-block.shell', 'keyword.control.shell']
     expect(tokens[1]).toEqual value: ' [ -f /var/log/messages ]', scopes: ['source.shell', 'meta.scope.if-block.shell']
 
+  it "doesn't tokenize keywords when they're part of a phrase", ->
+    {tokens} = grammar.tokenizeLine('grep --ignore-case "something"')
+
+    expect(tokens[0]).toEqual value: 'grep --ignore-case ', scopes: ['source.shell']
+    expect(tokens[1]).toEqual value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']
+
+    {tokens} = grammar.tokenizeLine('iffy')
+
+    expect(tokens[0]).toEqual value: 'iffy', scopes: ['source.shell']
+
   it "tokenizes herestrings", ->
     delimsByScope =
       "string.quoted.double.shell": '"'
@@ -91,3 +101,12 @@ describe "Shell script grammar", ->
     expect(tokens[0][1]).toEqual value: 'RANDOMTHING', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
     expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.shell']
     expect(tokens[2][0]).toEqual value: 'RANDOMTHING', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+
+  it "tokenizes nested variable expansions", ->
+    {tokens} = grammar.tokenizeLine('${${C}}')
+
+    expect(tokens[0]).toEqual value: '${', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[1]).toEqual value: '${', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[2]).toEqual value: 'C', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell']
+    expect(tokens[3]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[4]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
