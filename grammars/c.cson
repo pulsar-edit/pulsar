@@ -213,7 +213,7 @@
   }
   {
     'comment': 'Reserved POSIX types'
-    'match': '\\b([a-z0-9_]+_t)\\b'
+    'match': '\\b([A-Za-z0-9_]+_t)\\b'
     'name': 'support.type.posix-reserved.c'
   }
   {
