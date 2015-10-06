@@ -11,6 +11,7 @@ describe "Shell session grammar", ->
   it "parses the grammar", ->
     expect(grammar).toBeDefined()
     expect(grammar.scopeName).toBe "text.shell-session"
+
   it "tokenizes prompts", ->
     prompts = [">", "$", "#", "%"]
 
