@@ -32,6 +32,16 @@ describe "Shell script grammar", ->
     expect(tokens[0]).toEqual value: 'if', scopes: ['source.shell', 'meta.scope.if-block.shell', 'keyword.control.shell']
     expect(tokens[1]).toEqual value: ' [ -f /var/log/messages ]', scopes: ['source.shell', 'meta.scope.if-block.shell']
 
+  it "doesn't tokenize keywords when they're part of a phrase", ->
+    {tokens} = grammar.tokenizeLine('grep --ignore-case "something"')
+
+    expect(tokens[0]).toEqual value: 'grep --ignore-case ', scopes: ['source.shell']
+    expect(tokens[1]).toEqual value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']
+
+    {tokens} = grammar.tokenizeLine('iffy')
+
+    expect(tokens[0]).toEqual value: 'iffy', scopes: ['source.shell']
+
   it "tokenizes herestrings", ->
     delimsByScope =
       "string.quoted.double.shell": '"'
