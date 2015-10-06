@@ -119,7 +119,7 @@
       }
     ]
   'comment':
-    'begin': '(^[ \\s]+)?(?<!\\S)(?=#)(?!#\\{)'
+    'begin': '(^\\s+)?(?<!\\S)(?=#)(?!#\\{)'
     'beginCaptures':
       '1':
         'name': 'punctuation.whitespace.comment.leading.shell'
