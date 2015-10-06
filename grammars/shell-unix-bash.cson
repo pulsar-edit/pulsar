@@ -649,7 +649,7 @@
   'keyword':
     'patterns': [
       {
-        'match': '\\b(?:then|else|elif|fi|for|in|do|done|select|case|continue|esac|while|until|return)\\b'
+        'match': '(?<!-)\\b(then|else|elif|fi|for|in|do|done|select|case|continue|esac|while|until|return)\\b(?!-)'
         'name': 'keyword.control.shell'
       }
       {
@@ -741,7 +741,7 @@
         ]
       }
       {
-        'begin': '\\b(case)\\b'
+        'begin': '(?<!-)\\b(case)\\b(?!-)'
         'captures':
           '1':
             'name': 'keyword.control.shell'
@@ -773,7 +773,7 @@
         ]
       }
       {
-        'begin': '\\b(if)(?!\s*=)'
+        'begin': '(?<!-)\\b(if)\\b(?!-|\\s*=)'
         'captures':
           '1':
             'name': 'keyword.control.shell'
@@ -999,6 +999,9 @@
               '3':
                 'name': 'punctuation.section.array.shell'
             'match': '(\\[)([^\\]]+)(\\])'
+          }
+          {
+            'include': '#variable'
           }
           {
             'include': '#string'
