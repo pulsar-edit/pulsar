@@ -12,15 +12,8 @@ describe "Shell session grammar", ->
     expect(grammar).toBeDefined()
     expect(grammar.scopeName).toBe "text.shell-session"
 
-  it "tokenizes > prompts", ->
-    {tokens} = grammar.tokenizeLine('> echo $FOO')
-
-    expect(tokens[0]).toEqual value: '>', scopes: ['text.shell-session', 'punctuation.separator.prompt.shell-session']
-    expect(tokens[1]).toEqual value: ' ', scopes: ['text.shell-session', 'source.shell']
-    expect(tokens[2]).toEqual value: 'echo', scopes: ['text.shell-session', 'source.shell', 'support.function.builtin.shell']
-
-  it "tokenizes $, pound, and % prompts", ->
-    prompts = ["$", "#", "%"]
+  it "tokenizes prompts", ->
+    prompts = [">", "$", "#", "%"]
 
     for delim in prompts
       {tokens} = grammar.tokenizeLine(delim + ' echo $FOO')
