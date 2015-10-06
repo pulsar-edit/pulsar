@@ -1,9 +1,14 @@
+'scopeName': 'source.shell'
+'name': 'Shell Script'
 'fileTypes': [
   'sh'
   'bash'
   'ksh'
   'zsh'
   'zshenv'
+  'zlogin'
+  'zlogout'
+  'zprofile'
   'zshrc'
   'bashrc'
   'bash_profile'
@@ -16,7 +21,6 @@
   'cygport'
 ]
 'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
-'name': 'Shell Script'
 'patterns': [
   {
     'include': '#comment'
@@ -994,4 +998,3 @@
         ]
       }
     ]
-'scopeName': 'source.shell'
