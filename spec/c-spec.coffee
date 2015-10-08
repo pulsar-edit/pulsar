@@ -24,6 +24,41 @@ describe 'Language-C', ->
 
       expect(lines[0][0]).toEqual value: 'int', scopes: ["source.c", "storage.type.c"]
       expect(lines[0][2]).toEqual value: 'something', scopes: ["source.c", "meta.function.c", "entity.name.function.c"]
+      expect(lines[0][3]).toEqual value: '(', scopes: ["source.c", "meta.function.c", "meta.parens.c", "punctuation.section.parens.begin.c"]
+      expect(lines[0][6]).toEqual value: '{', scopes: ["source.c", "meta.function.c", "meta.block.c", "punctuation.section.block.begin.c"]
+
+    it 'tokenizes if-true-else preprocessor blocks', ->
+      lines = grammar.tokenizeLines '''
+        #if 1
+        int something() {
+          return 0;
+        }
+        #else
+        int something() {
+          return 0;
+        }
+        #endif
+      '''
+
+      expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
+      expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+      expect(lines[0][3]).toEqual value: '1', scopes: ['source.c', 'meta.preprocessor.c', 'constant.numeric.preprocessor.c']
+      expect(lines[1][0]).toEqual value: 'int', scopes: ['source.c', 'storage.type.c']
+      expect(lines[1][2]).toEqual value: 'something', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
+      expect(lines[5][0]).toEqual value: 'int something() {', scopes: ['source.c', 'comment.block.preprocessor.else-branch']
+
+    it 'tokenizes various _t types', ->
+      {tokens} = grammar.tokenizeLine("size_t var;")
+      expect(tokens[0]).toEqual value: 'size_t', scopes: ['source.c', 'support.type.sys-types.c']
+
+      {tokens} = grammar.tokenizeLine("pthread_t var;")
+      expect(tokens[0]).toEqual value: 'pthread_t', scopes: ['source.c', 'support.type.pthread.c']
+
+      {tokens} = grammar.tokenizeLine("int32_t var;")
+      expect(tokens[0]).toEqual value: 'int32_t', scopes: ['source.c', 'support.type.stdint.c']
+
+      {tokens} = grammar.tokenizeLine("myType_t var;")
+      expect(tokens[0]).toEqual value: 'myType_t', scopes: ['source.c', 'support.type.posix-reserved.c']
 
     describe "indentation", ->
       editor = null
