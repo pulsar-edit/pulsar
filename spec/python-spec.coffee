@@ -303,21 +303,27 @@ describe "Python grammar", ->
       "string.quoted.double.block.sql.python": '"""'
       "string.quoted.single.block.sql.python": "'''"
 
-    for scope, delim in delimsByScope
-      tokens = grammar.tokenizeLines(
-        delim +
-        'WITH example_cte AS (
-        SELECT      bar
-        FROM        foo
-        GROUP BY    bar
+    for scope, delim of delimsByScope
+      tokens = grammar.tokenizeLines("""
+        #{delim}
+        WITH example_cte AS (
+        SELECT bar
+        FROM foo
+        GROUP BY bar
         )
 
-        SELECT      COUNT(*)
-        FROM        example_cte'
-        + delim
-      )
+        SELECT COUNT(*)
+        FROM example_cte
+        #{delim}
+      """)
 
       expect(tokens[0][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
-      expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope]
-      expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope]
-      expect(tokens[3][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
+      expect(tokens[1][0]).toEqual value: 'WITH example_cte AS (', scopes: ['source.python', scope]
+      expect(tokens[2][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope]
+      expect(tokens[3][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope]
+      expect(tokens[4][0]).toEqual value: 'GROUP BY bar', scopes: ['source.python', scope]
+      expect(tokens[5][0]).toEqual value: ')', scopes: ['source.python', scope]
+      expect(tokens[6][0]).toEqual value: '', scopes: ['source.python', scope]
+      expect(tokens[7][0]).toEqual value: 'SELECT COUNT(*)', scopes: ['source.python', scope]
+      expect(tokens[8][0]).toEqual value: 'FROM example_cte', scopes: ['source.python', scope]
+      expect(tokens[9][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
