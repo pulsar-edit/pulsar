@@ -1151,7 +1151,7 @@
         'name': 'string.quoted.double.block.sql.python'
         'patterns': [
           {
-             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
              'end': '(?=\\s*""")'
              'patterns': [
                 {
@@ -1168,7 +1168,7 @@
         ]
       }
       {
-        'begin': '(")(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+        'begin': '(")(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.begin.python'
@@ -1519,7 +1519,7 @@
         'name': 'string.quoted.single.block.sql.python'
         'patterns': [
           {
-             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER))'
+             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
              'end': '(?=\\s*\'\'\')'
              'patterns': [
                 {
