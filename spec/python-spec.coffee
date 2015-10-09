@@ -316,7 +316,7 @@ describe "Python grammar", ->
         FROM        example_cte'
         + delim
       )
-      print(tokens)
+
       expect(tokens[0][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
       expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope]
       expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope]
