@@ -68,6 +68,47 @@ describe "Shell script grammar", ->
       expect(tokens[1][0]).toEqual value: 'lorem ipsum', scopes: ['source.shell', 'meta.herestring.shell', scope]
       expect(tokens[1][1]).toEqual value: delim, scopes: ['source.shell', 'meta.herestring.shell', scope, 'punctuation.definition.string.end.shell']
 
+  it "tokenizes heredocs", ->
+    delimsByScope =
+      "ruby": "RUBY"
+      "python": "PYTHON"
+      "applescript": "APPLESCRIPT"
+      "shell": "SHELL"
+
+    for scope, delim of delimsByScope
+      tokens = grammar.tokenizeLines """
+        <<#{delim}
+        stuff
+        #{delim}
+      """
+
+      expect(tokens[0][0]).toEqual value: '<<', scopes: ['source.shell', 'string.unquoted.heredoc.' + scope + '.shell', 'keyword.operator.heredoc.shell']
+      expect(tokens[0][1]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.' + scope + '.shell', 'keyword.control.heredoc-token.shell']
+      expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.' + scope + '.shell', 'source.' + scope + '.embedded.shell']
+      expect(tokens[2][0]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.' + scope + '.shell', 'keyword.control.heredoc-token.shell']
+
+      tokens = grammar.tokenizeLines """
+        <<-#{delim}
+        stuff
+        #{delim}
+      """
+
+      expect(tokens[0][0]).toEqual value: '<<', scopes: ['source.shell', 'string.unquoted.heredoc.no-indent.' + scope + '.shell', 'keyword.operator.heredoc.shell']
+      expect(tokens[0][2]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.no-indent.' + scope + '.shell', 'keyword.control.heredoc-token.shell']
+      expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.no-indent.' + scope + '.shell', 'source.' + scope + '.embedded.shell']
+      expect(tokens[2][0]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.no-indent.' + scope + '.shell', 'keyword.control.heredoc-token.shell']
+
+    tokens = grammar.tokenizeLines """
+      <<RANDOMTHING
+      stuff
+      RANDOMTHING
+    """
+
+    expect(tokens[0][0]).toEqual value: '<<', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.operator.heredoc.shell']
+    expect(tokens[0][1]).toEqual value: 'RANDOMTHING', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+    expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.shell']
+    expect(tokens[2][0]).toEqual value: 'RANDOMTHING', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+
   it "tokenizes shebangs", ->
     {tokens} = grammar.tokenizeLine('#!/bin/sh')
 
