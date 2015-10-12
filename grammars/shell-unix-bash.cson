@@ -119,12 +119,20 @@
       }
     ]
   'comment':
-    'begin': '(^[ \\t]+)?(?<!\\S)(?=#)(?!#\\{)'
+    'begin': '(^\\s+)?(?<!\\S)(?=#)(?!#\\{)'
     'beginCaptures':
       '1':
         'name': 'punctuation.whitespace.comment.leading.shell'
     'end': '(?!\\G)'
     'patterns': [
+      {
+        'begin': '#!'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.shebang.shell'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.shebang.shell'
+      }
       {
         'begin': '#'
         'beginCaptures':
@@ -137,11 +145,11 @@
   'compound-command':
     'patterns': [
       {
-        'begin': '(\\[{2})'
+        'begin': '(\\[{1,2})'
         'captures':
           '1':
             'name': 'punctuation.definition.logical-expression.shell'
-        'end': '(\\]{2})'
+        'end': '(\\]{1,2})'
         'name': 'meta.scope.logical-expression.shell'
         'patterns': [
           {
@@ -503,7 +511,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(BASH|SHELL)\\2'
+        'begin': '(<<)-("|\'|)(SHELL)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -525,7 +533,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(BASH|SHELL)\\2'
+        'begin': '(<<)("|\'|)(SHELL)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
