@@ -260,12 +260,18 @@
     'prefix': 'q'
     'body': '<q cite="$1">$2</q>$0'
   # R
+  'Ruby Base':
+    'prefix': 'rb'
+    'body': '<rb>$1</rb>$0'
   'Ruby Parenthesis':
     'prefix': 'rp'
     'body': '<rp>$1</rp>$0'
   'Ruby Pronunciation':
     'prefix': 'rt'
     'body': '<rt>$1</rt>$0'
+  'Ruby Text Container':
+    'prefix': 'rtc'
+    'body': '<rtc>$1</rtc>$0'
   'Ruby Annotation':
     'prefix': 'ruby'
     'body': '<ruby>$1</ruby>$0'
