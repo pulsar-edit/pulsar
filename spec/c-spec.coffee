@@ -1,4 +1,10 @@
-{TextEditor} = require 'atom'
+TextEditor = null
+buildTextEditor = (params) ->
+  if atom.workspace.buildTextEditor?
+    atom.workspace.buildTextEditor(params)
+  else
+    TextEditor ?= require('atom').TextEditor
+    new TextEditor(params)
 
 describe 'Language-C', ->
   grammar = null
@@ -29,7 +35,7 @@ describe 'Language-C', ->
       editor = null
 
       beforeEach ->
-        editor = atom.workspace.buildTextEditor()
+        editor = buildTextEditor()
         editor.setGrammar(grammar)
 
       expectPreservedIndentation = (text) ->
