@@ -1,5 +1,3 @@
-{TextEditor} = require 'atom'
-
 describe 'PHP grammar', ->
   grammar = null
 
