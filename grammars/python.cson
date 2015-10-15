@@ -107,7 +107,7 @@
   {
     'comment': 'keywords that alter flow from within a block'
     'name': 'keyword.control.statement.python'
-    'match': '\\b(with|break|continue|pass|return|yield)\\b'
+    'match': '\\b(with|break|continue|pass|return|yield|await)\\b'
   }
   {
     'comment': 'keyword operators that evaluate to True or False'
@@ -834,7 +834,7 @@
   'generic_names':
     'match': '[A-Za-z_][A-Za-z0-9_]*'
   'illegal_names':
-    'match': '\\b(and|as|assert|break|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|print|raise|return|try|while|with|yield)\\b'
+    'match': '\\b(and|as|assert|break|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|print|raise|return|try|while|with|yield|await)\\b'
     'name': 'invalid.illegal.name.python'
   'keyword_arguments':
     'begin': '\\b([a-zA-Z_][a-zA-Z_0-9]*)\\s*(=)(?!=)'
