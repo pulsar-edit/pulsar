@@ -729,7 +729,7 @@ describe "Python grammar", ->
     tokens = grammar.tokenizeLines('def f(a: int) -> int:')
 
     expect(tokens[0][0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
-    expect(tokens[0][2]).toEqual value: 'f', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python', 'support.function.magic.python']
+    expect(tokens[0][2]).toEqual value: 'f', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python']
     expect(tokens[0][3]).toEqual value: '(', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.begin.python']
     expect(tokens[1][1]).toEqual value: 'a', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'variable.parameter.function.python']
     expect(tokens[1][2]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'meta.function.parameters.python', 'punctuation.definition.annotation.parameter.python']

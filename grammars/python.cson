@@ -246,7 +246,7 @@
       '2':
         'name': 'punctuation.definition.annotation.return.python'
       '3':
-        'name': 'variable.annotation.function.python'
+        'name': 'variable.other.annotation'
       '4':
         'name': 'punctuation.section.function.begin.python'
       '5':
