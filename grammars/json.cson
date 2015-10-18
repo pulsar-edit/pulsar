@@ -12,6 +12,7 @@
   'ldj'
   'ldjson'
   'schema'
+  'template'
   'topojson'
   'webapp'
 ]
