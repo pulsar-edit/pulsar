@@ -576,7 +576,7 @@ describe 'Go grammar', ->
           testOpBracket closing[0], ')'
 
         it 'tokenizes multiple names', ->
-          [kwd, _, decl, closing] = grammar.tokenizeLines 'var (\n\n\tfoo, bar = baz, quux\n)'
+          [kwd, decl, closing] = grammar.tokenizeLines 'var (\n\tfoo, bar = baz, quux\n)'
           testVar kwd[0]
           testOpBracket kwd[2], '('
           testVarAssignment decl[1], 'foo'
@@ -584,6 +584,18 @@ describe 'Go grammar', ->
           testVarAssignment decl[4], 'bar'
           testOpAssignment decl[6], '='
           testOpPunctuation decl[8], ','
+          testOpBracket closing[0], ')'
+
+        it 'tokenizes non variable declarations (e.g. comments)', ->
+          [kwd, comment, decl, closing] = grammar.tokenizeLines 'var (\n\t// I am a comment\n\tfoo *bar\n)'
+          testVar kwd[0]
+          testOpBracket kwd[2], '('
+          expect(comment[1].value).toEqual '//'
+          expect(comment[1].scopes).toEqual ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
+          expect(comment[2].value).toEqual ' I am a comment'
+          expect(comment[2].scopes).toEqual ['source.go', 'comment.line.double-slash.go']
+          testVarDeclaration decl[1], 'foo'
+          testOpAddress decl[3], '*'
           testOpBracket closing[0], ')'
 
       describe 'in shorthand variable declarations', ->
