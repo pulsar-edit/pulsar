@@ -2,5 +2,5 @@
   'editor':
     'commentStart': '# '
     'foldEndPattern': '^\\s*(\\}|(done|fi|esac)\\b)'
-    'increaseIndentPattern': '^\\s*(if|elif|else|case)\\b|^.*(\\{|\\b(do)\\b)$'
+    'increaseIndentPattern': '^\\s*(else|case)\\b|^.*(\\{|\\b(then|do)\\b)$'
     'decreaseIndentPattern': '^\\s*(\\}|(elif|else|fi|esac|done)\\b)'
