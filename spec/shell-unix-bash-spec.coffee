@@ -1,3 +1,11 @@
+TextEditor = null
+buildTextEditor = (params) ->
+  if atom.workspace.buildTextEditor?
+    atom.workspace.buildTextEditor(params)
+  else
+    TextEditor ?= require('atom').TextEditor
+    new TextEditor(params)
+
 describe "Shell script grammar", ->
   grammar = null
 
@@ -129,3 +137,64 @@ describe "Shell script grammar", ->
     expect(tokens[2]).toEqual value: 'C', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell']
     expect(tokens[3]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
     expect(tokens[4]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+
+  describe "indentation", ->
+    editor = null
+
+    beforeEach ->
+      editor = buildTextEditor()
+      editor.setGrammar(grammar)
+
+    expectPreservedIndentation = (text) ->
+      editor.setText(text)
+      editor.autoIndentBufferRows(0, editor.getLineCount() - 1)
+
+      expectedLines = text.split("\n")
+      actualLines = editor.getText().split("\n")
+      for actualLine, i in actualLines
+        expect([
+          actualLine,
+          editor.indentLevelForLine(actualLine)
+        ]).toEqual([
+          expectedLines[i],
+          editor.indentLevelForLine(expectedLines[i])
+        ])
+
+    it "indents semicolon-style conditional", ->
+      expectPreservedIndentation """
+        if [ $? -eq 0 ]; then
+          echo "0"
+        elif [ $? -eq 1 ]; then
+          echo "1"
+        else
+          echo "other"
+        fi
+      """
+
+    it "indents newline-style conditional", ->
+      expectPreservedIndentation """
+        if [ $? -eq 0 ]
+        then
+          echo "0"
+        elif [ $? -eq 1 ]
+        then
+          echo "1"
+        else
+          echo "other"
+        fi
+      """
+
+    it "indents semicolon-style while loop", ->
+      expectPreservedIndentation """
+        while [ $x -gt 0 ]; do
+          x=$(($x-1))
+        done
+      """
+
+    it "indents newline-style while loop", ->
+      expectPreservedIndentation """
+        while [ $x -gt 0 ]
+        do
+          x=$(($x-1))
+        done
+      """
