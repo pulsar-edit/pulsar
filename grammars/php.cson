@@ -410,7 +410,7 @@
       }
       {
         'match': '(?i)\\b(print|echo)\\b'
-        'name': 'support.function.construct.php'
+        'name': 'support.function.construct.output.php'
       }
       {
         'begin': '(?i)(\\\\)?(?=\\b[a-z_][a-z_0-9]*\\s*\\()'
