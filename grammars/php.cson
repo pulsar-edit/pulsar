@@ -334,7 +334,7 @@
             'name': 'punctuation.section.array.end.php'
           '9':
             'name': 'invalid.illegal.non-null-typehinted.php'
-        'match': '(?xi)\n\t\t\t\t\t\t\t\\s*(array) # Typehint\n\t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n\t\t\t\t\t\t\t\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n\t\t\t\t\t\t\t(?:\n\t\t\t\t\t\t\t\t\\s*(?:(=)\\s*(?:(null)|(\\[)\\s*(\\])|((?:\\S*?\\(\\))|(?:\\S*?))))\t# A default value\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t\\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment\n\t\t\t\t\t\t\t'
+        'match': '(?xi)\n\t\t\t\t\t\t\t\\s*(array|callable) # Typehint\n\t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n\t\t\t\t\t\t\t\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n\t\t\t\t\t\t\t(?:\n\t\t\t\t\t\t\t\t\\s*(?:(=)\\s*(?:(null)|(\\[)\\s*(\\])|((?:\\S*?\\(\\))|(?:\\S*?))))\t# A default value\n\t\t\t\t\t\t\t)?\n\t\t\t\t\t\t\t\\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment\n\t\t\t\t\t\t\t'
         'name': 'meta.function.argument.array.php'
       }
       {
