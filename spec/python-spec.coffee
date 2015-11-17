@@ -296,3 +296,41 @@ describe "Python grammar", ->
       expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope]
       expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope]
       expect(tokens[3][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
+
+  it "tokenizes SQL inline highlighting on blocks with a CTE", ->
+    delimsByScope =
+      "string.quoted.double.block.sql.python": '"""'
+      "string.quoted.single.block.sql.python": "'''"
+
+    for scope, delim of delimsByScope
+      tokens = grammar.tokenizeLines("""
+        #{delim}
+        WITH example_cte AS (
+        SELECT bar
+        FROM foo
+        GROUP BY bar
+        )
+
+        SELECT COUNT(*)
+        FROM example_cte
+        #{delim}
+      """)
+
+      expect(tokens[0][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
+      expect(tokens[1][0]).toEqual value: 'WITH example_cte AS (', scopes: ['source.python', scope]
+      expect(tokens[2][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope]
+      expect(tokens[3][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope]
+      expect(tokens[4][0]).toEqual value: 'GROUP BY bar', scopes: ['source.python', scope]
+      expect(tokens[5][0]).toEqual value: ')', scopes: ['source.python', scope]
+      expect(tokens[6][0]).toEqual value: '', scopes: ['source.python', scope]
+      expect(tokens[7][0]).toEqual value: 'SELECT COUNT(*)', scopes: ['source.python', scope]
+      expect(tokens[8][0]).toEqual value: 'FROM example_cte', scopes: ['source.python', scope]
+      expect(tokens[9][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
+
+  it "tokenizes SQL inline highlighting on single line with a CTE", ->
+
+    {tokens} = grammar.tokenizeLine('\'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte\'')
+
+    expect(tokens[0]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.begin.python']
+    expect(tokens[1]).toEqual value: 'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte', scopes: ['source.python', 'string.quoted.single.single-line.python']
+    expect(tokens[2]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.end.python']
