@@ -329,8 +329,9 @@ describe "Python grammar", ->
 
   it "tokenizes SQL inline highlighting on single line with a CTE", ->
 
-    tokens = grammar.tokenizeLines('WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte')
+    tokens = grammar.tokenizeLines('\'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte\'')
+    console.log(tokens)
 
-    expect(tokens[0][0]).toEqual value: '\'', scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
-    expect(tokens[1][0]).toEqual value: 'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte', scopes: ['source.python', scope]
-    expect(tokens[2][0]).toEqual value: '\'', scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
+    expect(tokens[0][0]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.begin.python']
+    expect(tokens[0][1]).toEqual value: 'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte', scopes: ['source.python', 'string.quoted.single.single-line.python']
+    expect(tokens[0][2]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.end.python']
