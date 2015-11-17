@@ -327,3 +327,11 @@ describe "Python grammar", ->
       expect(tokens[7][0]).toEqual value: 'SELECT COUNT(*)', scopes: ['source.python', scope]
       expect(tokens[8][0]).toEqual value: 'FROM example_cte', scopes: ['source.python', scope]
       expect(tokens[9][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
+
+it "tokenizes SQL inline highlighting on single line with a CTE", ->
+
+  tokens = grammar.tokenizeLines('WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte')
+
+  expect(tokens[0][0]).toEqual value: '\'', scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
+  expect(tokens[1][0]).toEqual value: 'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte', scopes: ['source.python', scope]
+  expect(tokens[2][0]).toEqual value: '\'', scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
