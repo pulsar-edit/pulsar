@@ -472,6 +472,10 @@ describe 'Go grammar', ->
       expect(token.value).toBe value
       expect(token.scopes).toEqual ['source.go', 'constant.numeric.integer.go']
 
+    testString = (token, value) ->
+      expect(token.value).toBe value
+      expect(token.scopes).toEqual ['source.go', 'string.quoted.double.go']
+
     describe 'in var statements', ->
       it 'tokenizes a single variable assignment', ->
         {tokens} = grammar.tokenizeLine 'i = 7'
@@ -596,6 +600,16 @@ describe 'Go grammar', ->
           expect(comment[2].scopes).toEqual ['source.go', 'comment.line.double-slash.go']
           testVarDeclaration decl[1], 'foo'
           testOpAddress decl[3], '*'
+          testOpBracket closing[0], ')'
+          
+        it 'tokenizes all parts of variable initializations correctly', ->
+          [kwd, decl, init, _, closing] = grammar.tokenizeLines 'var (\n\tm = map[string]int{\n\t\t"key": 10,\n\t}\n)'
+          testVar kwd[0]
+          testOpBracket kwd[2], '('
+          testVarAssignment decl[1], 'm'
+          testOpAssignment decl[3], '='
+          testString init[2], 'key'
+          testNum init[6], '10'
           testOpBracket closing[0], ')'
 
       describe 'in shorthand variable declarations', ->
