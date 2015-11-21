@@ -213,7 +213,7 @@
   }
   {
     'comment': 'Reserved POSIX types'
-    'match': '\\b([a-z0-9_]+_t)\\b'
+    'match': '\\b([A-Za-z0-9_]+_t)\\b'
     'name': 'support.type.posix-reserved.c'
   }
   {
@@ -450,9 +450,9 @@
         ]
       }
       {
-        'begin': ''
+        'begin': '\\G'
         'end': '(?=^\\s*#\\s*(else|endif)\\b)'
-        'name': 'comment.block.preprocessor.if-branch'
+        'contentName': 'comment.block.preprocessor.if-branch'
         'patterns': [
           {
             'include': '#disabled'
@@ -489,9 +489,9 @@
         ]
       }
       {
-        'begin': ''
+        'begin': '\\G'
         'end': '(?=^\\s*#\\s*(else|endif)\\b)'
-        'name': 'comment.block.preprocessor.if-branch.in-block'
+        'contentName': 'comment.block.preprocessor.if-branch.in-block'
         'patterns': [
           {
             'include': '#disabled'
@@ -532,7 +532,7 @@
         ]
       }
       {
-        'begin': ''
+        'begin': '\\G'
         'end': '(?=^\\s*#\\s*(else|endif)\\b)'
         'patterns': [
           {
@@ -571,7 +571,7 @@
         ]
       }
       {
-        'begin': ''
+        'begin': '\\G'
         'end': '(?=^\\s*#\\s*(else|endif)\\b)'
         'patterns': [
           {
