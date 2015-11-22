@@ -53,49 +53,49 @@ describe 'Language-C', ->
     describe "preprocessor directives", ->
       it 'tokenizes `#line`', ->
         {tokens} = grammar.tokenizeLine '#line 151 "copy.c"'
-        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "punctuation.definition.keyword.c"]
-        expect(tokens[1]).toEqual value: 'line', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.import.c"]
+        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c", "punctuation.definition.directive.c"]
+        expect(tokens[1]).toEqual value: 'line', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c"]
         expect(tokens[2]).toEqual value: ' 151 "copy.c"', scopes: ["source.c", "meta.preprocessor.c"]
 
       it 'tokenizes `#undef`', ->
         {tokens} = grammar.tokenizeLine '#undef FOO'
-        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "punctuation.definition.keyword.c"]
-        expect(tokens[1]).toEqual value: 'undef', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.import.c"]
+        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c", "punctuation.definition.directive.c"]
+        expect(tokens[1]).toEqual value: 'undef', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c"]
         expect(tokens[2]).toEqual value: ' FOO', scopes: ["source.c", "meta.preprocessor.c"]
 
       it 'tokenizes `#pragma`', ->
         {tokens} = grammar.tokenizeLine '#pragma once'
-        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "punctuation.definition.keyword.c"]
-        expect(tokens[1]).toEqual value: 'pragma', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.import.c"]
+        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c", "punctuation.definition.directive.c"]
+        expect(tokens[1]).toEqual value: 'pragma', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c"]
         expect(tokens[2]).toEqual value: ' once', scopes: ["source.c", "meta.preprocessor.c"]
 
         {tokens} = grammar.tokenizeLine '#pragma clang diagnostic push'
-        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "punctuation.definition.keyword.c"]
-        expect(tokens[1]).toEqual value: 'pragma', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.import.c"]
+        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c", "punctuation.definition.directive.c"]
+        expect(tokens[1]).toEqual value: 'pragma', scopes: ["source.c", "meta.preprocessor.c", "keyword.control.directive.c"]
         expect(tokens[2]).toEqual value: ' clang diagnostic push', scopes: ["source.c", "meta.preprocessor.c"]
 
         {tokens} = grammar.tokenizeLine '#pragma mark – Initialization'
-        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.section", "meta.preprocessor.c",  "punctuation.definition.keyword.c"]
-        expect(tokens[1]).toEqual value: 'pragma mark', scopes: ["source.c", "meta.section",  "meta.preprocessor.c", "keyword.control.import.pragma.c"]
+        expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.section", "meta.preprocessor.c", "keyword.control.directive.pragma.pragma-mark.c",  "punctuation.definition.directive.c"]
+        expect(tokens[1]).toEqual value: 'pragma mark', scopes: ["source.c", "meta.section",  "meta.preprocessor.c", "keyword.control.directive.pragma.pragma-mark.c"]
         expect(tokens[3]).toEqual value: '– Initialization', scopes: ["source.c", "meta.section",  "meta.preprocessor.c", "meta.toc-list.pragma-mark.c"]
 
       describe "define", ->
         it 'tokenizes `#define [identifier name]`', ->
           {tokens} = grammar.tokenizeLine '#define _FILE_NAME_H_'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
           expect(tokens[3]).toEqual value: '_FILE_NAME_H_', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
 
         it 'tokenizes `#define [identifier name] [value]`', ->
           {tokens} = grammar.tokenizeLine '#define WIDTH 80'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
           expect(tokens[3]).toEqual value: 'WIDTH', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
           expect(tokens[5]).toEqual value: '80', scopes: ["source.c", "meta.preprocessor.macro.c", "constant.numeric.c"]
 
           {tokens} = grammar.tokenizeLine '#define ABC XYZ(1)'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
           expect(tokens[3]).toEqual value: 'ABC', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
           expect(tokens[4]).toEqual value: ' ', scopes: ["source.c", "meta.preprocessor.macro.c", "meta.function.c", "punctuation.whitespace.function.leading.c"]
           expect(tokens[5]).toEqual value: 'XYZ', scopes: ["source.c", "meta.preprocessor.macro.c", "meta.function.c", "entity.name.function.c"]
@@ -104,8 +104,8 @@ describe 'Language-C', ->
           expect(tokens[8]).toEqual value: ')', scopes: ["source.c", "meta.preprocessor.macro.c", "meta.function.c", "meta.parens.c", "punctuation.section.parens.end.c"]
 
           {tokens} = grammar.tokenizeLine '#define PI_PLUS_ONE (3.14 + 1)'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
           expect(tokens[3]).toEqual value: 'PI_PLUS_ONE', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
           expect(tokens[4]).toEqual value: ' (', scopes: ["source.c", "meta.preprocessor.macro.c"]
           expect(tokens[5]).toEqual value: '3.14', scopes: ["source.c", "meta.preprocessor.macro.c", "constant.numeric.c"]
@@ -116,8 +116,8 @@ describe 'Language-C', ->
         describe "macros", ->
           it 'tokenizes them', ->
             {tokens} = grammar.tokenizeLine '#define INCREMENT(x) x++'
-            expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-            expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+            expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+            expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
             expect(tokens[3]).toEqual value: 'INCREMENT', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
             expect(tokens[4]).toEqual value: '(', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.parameters.begin.c"]
             expect(tokens[5]).toEqual value: 'x', scopes: ["source.c", "meta.preprocessor.macro.c", "variable.parameter.preprocessor.c"]
@@ -125,8 +125,8 @@ describe 'Language-C', ->
             expect(tokens[7]).toEqual value: ' x++', scopes: ["source.c", "meta.preprocessor.macro.c"]
 
             {tokens} = grammar.tokenizeLine '#define MULT(x, y) (x) * (y)'
-            expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-            expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+            expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+            expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
             expect(tokens[3]).toEqual value: 'MULT', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
             expect(tokens[4]).toEqual value: '(', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.parameters.begin.c"]
             expect(tokens[5]).toEqual value: 'x', scopes: ["source.c", "meta.preprocessor.macro.c", "variable.parameter.preprocessor.c"]
@@ -136,8 +136,8 @@ describe 'Language-C', ->
             expect(tokens[9]).toEqual value: ' (x) * (y)', scopes: ["source.c", "meta.preprocessor.macro.c"]
 
             {tokens} = grammar.tokenizeLine '#define SWAP(a, b)  do { a ^= b; b ^= a; a ^= b; } while ( 0 )'
-            expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-            expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+            expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+            expect(tokens[1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
             expect(tokens[3]).toEqual value: 'SWAP', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
             expect(tokens[4]).toEqual value: '(', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.parameters.begin.c"]
             expect(tokens[5]).toEqual value: 'a', scopes: ["source.c", "meta.preprocessor.macro.c", "variable.parameter.preprocessor.c"]
@@ -161,8 +161,8 @@ describe 'Language-C', ->
                 a ^= b; \\
               }
             '''
-            expect(lines[0][0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-            expect(lines[0][1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+            expect(lines[0][0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+            expect(lines[0][1]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
             expect(lines[0][3]).toEqual value: 'SWAP', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
             expect(lines[0][4]).toEqual value: '(', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.parameters.begin.c"]
             expect(lines[0][5]).toEqual value: 'a', scopes: ["source.c", "meta.preprocessor.macro.c", "variable.parameter.preprocessor.c"]
@@ -179,38 +179,38 @@ describe 'Language-C', ->
       describe 'includes', ->
         it 'tokenizes `#include`', ->
           {tokens} = grammar.tokenizeLine '#include <stdio.h>'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c.include", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'include', scopes: ["source.c", "meta.preprocessor.c.include", "keyword.control.import.include.c"]
-          expect(tokens[3]).toEqual value: '<', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.begin.c"]
-          expect(tokens[4]).toEqual value: 'stdio.h', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c"]
-          expect(tokens[5]).toEqual value: '>', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.end.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'include', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c"]
+          expect(tokens[3]).toEqual value: '<', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.begin.c"]
+          expect(tokens[4]).toEqual value: 'stdio.h', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c"]
+          expect(tokens[5]).toEqual value: '>', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.end.c"]
 
           {tokens} = grammar.tokenizeLine '#include "file">'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c.include", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'include', scopes: ["source.c", "meta.preprocessor.c.include", "keyword.control.import.include.c"]
-          expect(tokens[3]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.double.include.c", "punctuation.definition.string.begin.c"]
-          expect(tokens[4]).toEqual value: 'file', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.double.include.c"]
-          expect(tokens[5]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.double.include.c", "punctuation.definition.string.end.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'include', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c"]
+          expect(tokens[3]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.double.include.c", "punctuation.definition.string.begin.c"]
+          expect(tokens[4]).toEqual value: 'file', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.double.include.c"]
+          expect(tokens[5]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.double.include.c", "punctuation.definition.string.end.c"]
 
         it 'tokenizes `#import`', ->
           {tokens} = grammar.tokenizeLine '#import "file"'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c.include", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'import', scopes: ["source.c", "meta.preprocessor.c.include", "keyword.control.import.include.c"]
-          expect(tokens[3]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.double.include.c", "punctuation.definition.string.begin.c"]
-          expect(tokens[4]).toEqual value: 'file', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.double.include.c"]
-          expect(tokens[5]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.double.include.c", "punctuation.definition.string.end.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.import.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'import', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.import.c"]
+          expect(tokens[3]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.double.include.c", "punctuation.definition.string.begin.c"]
+          expect(tokens[4]).toEqual value: 'file', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.double.include.c"]
+          expect(tokens[5]).toEqual value: '"', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.double.include.c", "punctuation.definition.string.end.c"]
 
       describe 'diagnostics', ->
         it 'tokenizes `#error`', ->
           {tokens} = grammar.tokenizeLine '#error C++ compiler required.'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'error', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "keyword.control.import.error.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "keyword.control.directive.diagnostic.error.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'error', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "keyword.control.directive.diagnostic.error.c"]
           expect(tokens[2]).toEqual value: ' C++ compiler required.', scopes: ["source.c", "meta.preprocessor.diagnostic.c"]
 
         it 'tokenizes `#warning`', ->
           {tokens} = grammar.tokenizeLine '#warning This is a warning.'
-          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "punctuation.definition.keyword.c"]
-          expect(tokens[1]).toEqual value: 'warning', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "keyword.control.import.error.c"]
+          expect(tokens[0]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "keyword.control.directive.diagnostic.warning.c", "punctuation.definition.directive.c"]
+          expect(tokens[1]).toEqual value: 'warning', scopes: ["source.c", "meta.preprocessor.diagnostic.c", "keyword.control.directive.diagnostic.warning.c"]
           expect(tokens[2]).toEqual value: ' This is a warning.', scopes: ["source.c", "meta.preprocessor.diagnostic.c"]
 
       describe 'conditionals', ->
@@ -224,25 +224,25 @@ describe 'Language-C', ->
                 printerror();
             #endif
           '''
-          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[0][2]).toEqual value: ' defined(CREDIT)', scopes: ['source.c', 'meta.preprocessor.c']
           expect(lines[1][1]).toEqual value: 'credit', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
           expect(lines[1][2]).toEqual value: '(', scopes: ['source.c', 'meta.function.c', 'meta.parens.c', 'punctuation.section.parens.begin.c']
           expect(lines[1][3]).toEqual value: ')', scopes: ['source.c', 'meta.function.c', 'meta.parens.c', 'punctuation.section.parens.end.c']
-          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[2][1]).toEqual value: 'elif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[2][1]).toEqual value: 'elif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[2][2]).toEqual value: ' defined(DEBIT)', scopes: ['source.c', 'meta.preprocessor.c']
           expect(lines[3][1]).toEqual value: 'debit', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
           expect(lines[3][2]).toEqual value: '(', scopes: ['source.c', 'meta.function.c', 'meta.parens.c', 'punctuation.section.parens.begin.c']
           expect(lines[3][3]).toEqual value: ')', scopes: ['source.c', 'meta.function.c', 'meta.parens.c', 'punctuation.section.parens.end.c']
-          expect(lines[4][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[4][1]).toEqual value: 'else', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[4][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[4][1]).toEqual value: 'else', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[5][1]).toEqual value: 'printerror', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
           expect(lines[5][2]).toEqual value: '(', scopes: ['source.c', 'meta.function.c', 'meta.parens.c', 'punctuation.section.parens.begin.c']
           expect(lines[5][3]).toEqual value: ')', scopes: ['source.c', 'meta.function.c', 'meta.parens.c', 'punctuation.section.parens.end.c']
-          expect(lines[6][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[6][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[6][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[6][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
 
         it 'tokenizes if-true-else blocks', ->
           lines = grammar.tokenizeLines '''
@@ -260,26 +260,26 @@ describe 'Language-C', ->
             }
             #endif
           '''
-          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
-          expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[0][3]).toEqual value: '1', scopes: ['source.c', 'meta.preprocessor.c', 'constant.numeric.preprocessor.c']
           expect(lines[1][0]).toEqual value: 'int', scopes: ['source.c', 'storage.type.c']
           expect(lines[1][2]).toEqual value: 'something', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
-          expect(lines[2][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
-          expect(lines[2][2]).toEqual value: 'if', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[2][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[2][2]).toEqual value: 'if', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[2][4]).toEqual value: '1', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'constant.numeric.preprocessor.c']
           expect(lines[3][1]).toEqual value: 'return', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'keyword.control.c']
           expect(lines[3][3]).toEqual value: '1', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'constant.numeric.c']
-          expect(lines[4][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
-          expect(lines[4][2]).toEqual value: 'else', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.import.else.c']
+          expect(lines[4][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[4][2]).toEqual value: 'else', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[5][0]).toEqual value: '    return 0;', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'comment.block.preprocessor.else-branch.in-block']
-          expect(lines[6][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
-          expect(lines[6][2]).toEqual value: 'endif', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
-          expect(lines[8][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
-          expect(lines[8][1]).toEqual value: 'else', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.else.c']
+          expect(lines[6][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[6][2]).toEqual value: 'endif', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
+          expect(lines[8][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[8][1]).toEqual value: 'else', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[9][0]).toEqual value: 'int something() {', scopes: ['source.c', 'comment.block.preprocessor.else-branch']
-          expect(lines[12][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
-          expect(lines[12][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[12][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[12][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
 
         it 'tokenizes if-false-else blocks', ->
           lines = grammar.tokenizeLines '''
@@ -293,28 +293,28 @@ describe 'Language-C', ->
           '''
           expect(lines[0][0]).toEqual value: 'int', scopes: ['source.c', 'storage.type.c']
           expect(lines[0][2]).toEqual value: 'something', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
-          expect(lines[1][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
-          expect(lines[1][2]).toEqual value: 'if', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[1][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[1][2]).toEqual value: 'if', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[1][4]).toEqual value: '0', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'constant.numeric.preprocessor.c']
           expect(lines[2][0]).toEqual value: '    return 1;', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'comment.block.preprocessor.if-branch.in-block']
-          expect(lines[3][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
-          expect(lines[3][2]).toEqual value: 'else', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.import.else.c']
+          expect(lines[3][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[3][2]).toEqual value: 'else', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[4][1]).toEqual value: 'return', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'keyword.control.c']
           expect(lines[4][3]).toEqual value: '0', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'constant.numeric.c']
-          expect(lines[5][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
-          expect(lines[5][2]).toEqual value: 'endif', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[5][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[5][2]).toEqual value: 'endif', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
 
           lines = grammar.tokenizeLines '''
             #if 0
               something();
             #endif
           '''
-          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
-          expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[0][3]).toEqual value: '0', scopes: ['source.c', 'meta.preprocessor.c', 'constant.numeric.preprocessor.c']
           expect(lines[1][0]).toEqual value: '  something();', scopes: ['source.c', 'comment.block.preprocessor.if-branch']
-          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
-          expect(lines[2][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
+          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[2][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
 
         it 'tokenizes ifdef-elif blocks', ->
           lines = grammar.tokenizeLines '''
@@ -324,29 +324,30 @@ describe 'Language-C', ->
               # include <windows.h>
             #endif
           '''
-          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[0][1]).toEqual value: 'ifdef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[0][1]).toEqual value: 'ifdef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[0][2]).toEqual value: ' __unix__ ', scopes: ['source.c', 'meta.preprocessor.c']
           expect(lines[0][3]).toEqual value: '/*', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.begin.c']
           expect(lines[0][4]).toEqual value: ' is defined by compilers targeting Unix systems ', scopes: ['source.c', 'comment.block.c']
           expect(lines[0][5]).toEqual value: '*/', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.end.c']
-          expect(lines[1][1]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.c.include", "punctuation.definition.keyword.c"]
-          expect(lines[1][3]).toEqual value: 'include', scopes: ["source.c", "meta.preprocessor.c.include", "keyword.control.import.include.c"]
-          expect(lines[1][5]).toEqual value: '<', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.begin.c"]
-          expect(lines[1][6]).toEqual value: 'unistd.h', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c"]
-          expect(lines[1][7]).toEqual value: '>', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.end.c"]
-          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[2][1]).toEqual value: 'elif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[1][1]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c", "punctuation.definition.directive.c"]
+          expect(lines[1][2]).toEqual value: ' include', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c"]
+          expect(lines[1][4]).toEqual value: '<', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.begin.c"]
+          expect(lines[1][5]).toEqual value: 'unistd.h', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c"]
+          expect(lines[1][6]).toEqual value: '>', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.end.c"]
+          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[2][1]).toEqual value: 'elif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[2][2]).toEqual value: ' defined _WIN32 ', scopes: ['source.c', 'meta.preprocessor.c']
           expect(lines[2][3]).toEqual value: '/*', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.begin.c']
           expect(lines[2][4]).toEqual value: ' is defined by compilers targeting Windows systems ', scopes: ['source.c', 'comment.block.c']
           expect(lines[2][5]).toEqual value: '*/', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.end.c']
-          expect(lines[3][3]).toEqual value: 'include', scopes: ["source.c", "meta.preprocessor.c.include", "keyword.control.import.include.c"]
-          expect(lines[3][5]).toEqual value: '<', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.begin.c"]
-          expect(lines[3][6]).toEqual value: 'windows.h', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c"]
-          expect(lines[3][7]).toEqual value: '>', scopes: ["source.c", "meta.preprocessor.c.include", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.end.c"]
-          expect(lines[4][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[4][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[3][1]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c", "punctuation.definition.directive.c"]
+          expect(lines[3][2]).toEqual value: ' include', scopes: ["source.c", "meta.preprocessor.include.c", "keyword.control.directive.include.c"]
+          expect(lines[3][4]).toEqual value: '<', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.begin.c"]
+          expect(lines[3][5]).toEqual value: 'windows.h', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c"]
+          expect(lines[3][6]).toEqual value: '>', scopes: ["source.c", "meta.preprocessor.include.c", "string.quoted.other.lt-gt.include.c", "punctuation.definition.string.end.c"]
+          expect(lines[4][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[4][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
 
         it 'tokenizes ifndef blocks', ->
           lines = grammar.tokenizeLines '''
@@ -354,14 +355,14 @@ describe 'Language-C', ->
               #define _INCL_GUARD
             #endif
           '''
-          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[0][1]).toEqual value: 'ifndef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[0][1]).toEqual value: 'ifndef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
           expect(lines[0][2]).toEqual value: ' _INCL_GUARD', scopes: ['source.c', 'meta.preprocessor.c']
-          expect(lines[1][1]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "punctuation.definition.keyword.c"]
-          expect(lines[1][2]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.import.define.c"]
+          expect(lines[1][1]).toEqual value: '#', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c", "punctuation.definition.directive.c"]
+          expect(lines[1][2]).toEqual value: 'define', scopes: ["source.c", "meta.preprocessor.macro.c", "keyword.control.directive.define.c"]
           expect(lines[1][4]).toEqual value: '_INCL_GUARD', scopes: ["source.c", "meta.preprocessor.macro.c", "entity.name.function.preprocessor.c"]
-          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'punctuation.definition.keyword.c']
-          expect(lines[2][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.c']
+          expect(lines[2][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
+          expect(lines[2][1]).toEqual value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
 
     describe "indentation", ->
       editor = null
