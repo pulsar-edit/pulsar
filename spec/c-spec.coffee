@@ -27,7 +27,6 @@ describe 'Language-C', ->
           return 0;
         }
       '''
-
       expect(lines[0][0]).toEqual value: 'int', scopes: ["source.c", "storage.type.c"]
       expect(lines[0][2]).toEqual value: 'something', scopes: ["source.c", "meta.function.c", "entity.name.function.c"]
       expect(lines[0][3]).toEqual value: '(', scopes: ["source.c", "meta.function.c", "meta.parens.c", "punctuation.section.parens.begin.c"]
@@ -54,7 +53,6 @@ describe 'Language-C', ->
         }
         #endif
       '''
-
       expect(lines[0][0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c']
       expect(lines[0][1]).toEqual value: 'if', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.import.if.c']
       expect(lines[0][3]).toEqual value: '1', scopes: ['source.c', 'meta.preprocessor.c', 'constant.numeric.preprocessor.c']
@@ -89,7 +87,6 @@ describe 'Language-C', ->
           something();
         #endif
       '''
-
       expect(lines[0][0]).toEqual value: 'int', scopes: ['source.c', 'storage.type.c']
       expect(lines[0][2]).toEqual value: 'something', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
       expect(lines[1][1]).toEqual value: '#', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'meta.preprocessor.c']
@@ -203,7 +200,6 @@ describe 'Language-C', ->
 
     it 'tokenizes this with `.this` class', ->
       {tokens} = grammar.tokenizeLine 'this.x'
-
       expect(tokens[0]).toEqual value: 'this', scopes: ['source.cpp', 'variable.language.this.cpp']
 
     it 'tokenizes classes', ->
@@ -212,6 +208,5 @@ describe 'Language-C', ->
           int x;
         }
       '''
-
       expect(lines[0][0]).toEqual value: 'class', scopes: ["source.cpp", "meta.class-struct-block.cpp", "storage.type.cpp"]
       expect(lines[0][2]).toEqual value: 'Thing', scopes: ["source.cpp", "meta.class-struct-block.cpp", "entity.name.type.cpp"]
