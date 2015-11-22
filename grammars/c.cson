@@ -90,7 +90,19 @@
     ]
   }
   {
-    'begin': '(?x)\n        \t\t^\\s*(\\#)\\s*(define)\\s+             # define\n        \t\t((?<id>[a-zA-Z_][a-zA-Z0-9_]*))  # macro name\n        \t\t(?:                              # and optionally:\n        \t\t    (\\()                         # an open parenthesis\n        \t\t        (\n        \t\t            \\s* \\g<id> \\s*       # first argument\n        \t\t            ((,) \\s* \\g<id> \\s*)*  # additional arguments\n        \t\t            (?:\\.\\.\\.)?          # varargs ellipsis?\n        \t\t        )\n        \t\t    (\\))                         # a close parenthesis\n        \t\t)?\n        \t'
+    'begin': '''(?x)
+      ^\\s*(\\#)\\s*(define)\\s+        # define
+      ((?<id>[a-zA-Z_][a-zA-Z0-9_]*))   # macro name
+      (?:                               # and optionally:
+        (\\()
+          (
+            \\s* \\g<id> \\s*         # first argument
+            ((,) \\s* \\g<id> \\s*)*  # additional arguments
+            (?:\\.\\.\\.)?            # varargs ellipsis?
+          )
+        (\\))
+      )?
+    '''
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.keyword.c'
