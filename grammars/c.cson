@@ -177,7 +177,7 @@
     ]
   }
   {
-    'begin': '^\\s*(?:((#)\\s*(?:define|defined|pragma|undef))|((#)\\s*(?:elif|else|if|ifdef|ifndef)))\\b'
+    'begin': '^\\s*(?:((#)\\s*(?:pragma|undef))|((#)\\s*(?:elif|else|if|ifdef|ifndef)))\\b'
     'beginCaptures':
       '1':
         'name': 'keyword.control.directive.c'
