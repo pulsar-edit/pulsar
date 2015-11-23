@@ -62,19 +62,19 @@ describe "Language-C", ->
 
       it "tokenizes '#undef'", ->
         {tokens} = grammar.tokenizeLine '#undef FOO'
-        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c', 'punctuation.definition.directive.c']
-        expect(tokens[1]).toEqual value: 'undef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c']
+        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.undef.c', 'punctuation.definition.directive.c']
+        expect(tokens[1]).toEqual value: 'undef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.undef.c']
         expect(tokens[2]).toEqual value: ' FOO', scopes: ['source.c', 'meta.preprocessor.c']
 
       it "tokenizes '#pragma'", ->
         {tokens} = grammar.tokenizeLine '#pragma once'
-        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c', 'punctuation.definition.directive.c']
-        expect(tokens[1]).toEqual value: 'pragma', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c']
+        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.pragma.c', 'punctuation.definition.directive.c']
+        expect(tokens[1]).toEqual value: 'pragma', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.pragma.c']
         expect(tokens[2]).toEqual value: ' once', scopes: ['source.c', 'meta.preprocessor.c']
 
         {tokens} = grammar.tokenizeLine '#pragma clang diagnostic push'
-        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c', 'punctuation.definition.directive.c']
-        expect(tokens[1]).toEqual value: 'pragma', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c']
+        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.pragma.c', 'punctuation.definition.directive.c']
+        expect(tokens[1]).toEqual value: 'pragma', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.pragma.c']
         expect(tokens[2]).toEqual value: ' clang diagnostic push', scopes: ['source.c', 'meta.preprocessor.c']
 
         {tokens} = grammar.tokenizeLine '#pragma mark – Initialization'
