@@ -53,9 +53,12 @@ describe "Language-C", ->
     describe "preprocessor directives", ->
       it "tokenizes '#line'", ->
         {tokens} = grammar.tokenizeLine '#line 151 "copy.c"'
-        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c', 'punctuation.definition.directive.c']
-        expect(tokens[1]).toEqual value: 'line', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.c']
-        expect(tokens[2]).toEqual value: ' 151 "copy.c"', scopes: ['source.c', 'meta.preprocessor.c']
+        expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.line.c', 'punctuation.definition.directive.c']
+        expect(tokens[1]).toEqual value: 'line', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.line.c']
+        expect(tokens[3]).toEqual value: '151', scopes: ['source.c', 'meta.preprocessor.c', 'constant.numeric.c']
+        expect(tokens[5]).toEqual value: '"', scopes: ['source.c', 'meta.preprocessor.c', 'string.quoted.double.c', 'punctuation.definition.string.begin.c']
+        expect(tokens[6]).toEqual value: 'copy.c', scopes: ['source.c', 'meta.preprocessor.c', 'string.quoted.double.c']
+        expect(tokens[7]).toEqual value: '"', scopes: ['source.c', 'meta.preprocessor.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']
 
       it "tokenizes '#undef'", ->
         {tokens} = grammar.tokenizeLine '#undef FOO'
