@@ -430,15 +430,15 @@
     ]
   'pragma-mark':
     'captures':
-      '0':
-        'name': 'meta.preprocessor.c'
       '1':
-        'name': 'keyword.control.directive.pragma.pragma-mark.c'
+        'name': 'meta.preprocessor.c'
       '2':
-        'name': 'punctuation.definition.directive.c'
+        'name': 'keyword.control.directive.pragma.pragma-mark.c'
       '3':
+        'name': 'punctuation.definition.directive.c'
+      '4':
         'name': 'meta.toc-list.pragma-mark.c'
-    'match': '^\\s*((#)\\s*pragma\\s+mark)\\s+(.*)'
+    'match': '^\\s*(((#)\\s*pragma\\s+mark)\\s+(.*))'
     'name': 'meta.section'
   'preprocessor-rule-disabled':
     'begin': '^\\s*(((#)if)\\s+(0)\\b).*'
