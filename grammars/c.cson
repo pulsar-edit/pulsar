@@ -148,7 +148,7 @@
   }
   {
     'begin': '^\\s*((#)\\s*(include|import))\\b\\s+'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'keyword.control.directive.$3.c'
       '2':
@@ -189,7 +189,7 @@
   }
   {
     'begin': '^\\s*(?:((#)\\s*(?:define|defined|line|pragma|undef))|((#)\\s*(?:elif|else|if|ifdef|ifndef)))\\b'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'keyword.control.directive.c'
       '2':
@@ -442,7 +442,7 @@
     'name': 'meta.section'
   'preprocessor-rule-disabled':
     'begin': '^\\s*(((#)if)\\s+(0)\\b).*'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
@@ -452,10 +452,17 @@
       '4':
         'name': 'constant.numeric.preprocessor.c'
     'end': '^\\s*(((#)\\s*endif)\\b)'
+    'endCaptures':
+      '1':
+        'name': 'meta.preprocessor.c'
+      '2':
+        'name': 'keyword.control.directive.conditional.c'
+      '3':
+        'name': 'punctuation.definition.directive.c'
     'patterns': [
       {
         'begin': '^\\s*(((#)\\s*else)\\b)'
-        'captures':
+        'beginCaptures':
           '1':
             'name': 'meta.preprocessor.c'
           '2':
@@ -485,7 +492,7 @@
     ]
   'preprocessor-rule-disabled-block':
     'begin': '^\\s*(((#)if)\\s+(0)\\b).*'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
@@ -495,10 +502,17 @@
       '4':
         'name': 'constant.numeric.preprocessor.c'
     'end': '^\\s*(((#)\\s*endif)\\b)'
+    'endCaptures':
+      '1':
+        'name': 'meta.preprocessor.c'
+      '2':
+        'name': 'keyword.control.directive.conditional.c'
+      '3':
+        'name': 'punctuation.definition.directive.c'
     'patterns': [
       {
         'begin': '^\\s*(((#)\\s*else\\b))'
-        'captures':
+        'beginCaptures':
           '1':
             'name': 'meta.preprocessor.c'
           '2':
@@ -528,7 +542,7 @@
     ]
   'preprocessor-rule-enabled':
     'begin': '^\\s*(((#)if)\\s+(0*1)\\b)'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
@@ -538,10 +552,17 @@
       '4':
         'name': 'constant.numeric.preprocessor.c'
     'end': '^\\s*(((#)\\s*endif)\\b)'
+    'endCaptures':
+      '1':
+        'name': 'meta.preprocessor.c'
+      '2':
+        'name': 'keyword.control.directive.conditional.c'
+      '3':
+        'name': 'punctuation.definition.directive.c'
     'patterns': [
       {
         'begin': '^\\s*(((#)\\s*else)\\b).*'
-        'captures':
+        'beginCaptures':
           '1':
             'name': 'meta.preprocessor.c'
           '2':
@@ -571,7 +592,7 @@
     ]
   'preprocessor-rule-enabled-block':
     'begin': '^\\s*(((#)if)\\s+(0*1)\\b)'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
@@ -581,10 +602,17 @@
       '4':
         'name': 'constant.numeric.preprocessor.c'
     'end': '^\\s*(((#)\\s*endif)\\b)'
+    'endCaptures':
+      '1':
+        'name': 'meta.preprocessor.c'
+      '2':
+        'name': 'keyword.control.directive.conditional.c'
+      '3':
+        'name': 'punctuation.definition.directive.c'
     'patterns': [
       {
         'begin': '^\\s*(((#)\\s*else)\\b).*'
-        'captures':
+        'beginCaptures':
           '1':
             'name': 'meta.preprocessor.c'
           '2':
@@ -614,7 +642,7 @@
     ]
   'preprocessor-rule-other':
     'begin': '^\\s*(((#)\\s*if(n?def)?)\\b.*?(?:(?=(?://|/\\*))|$))'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
@@ -622,6 +650,13 @@
       '3':
         'name': 'punctuation.definition.directive.c'
     'end': '^\\s*(((#)\\s*(endif))\\b)'
+    'endCaptures':
+      '1':
+        'name': 'meta.preprocessor.c'
+      '2':
+        'name': 'keyword.control.directive.conditional.c'
+      '3':
+        'name': 'punctuation.definition.directive.c'
     'patterns': [
       {
         'include': '$base'
@@ -629,7 +664,7 @@
     ]
   'preprocessor-rule-other-block':
     'begin': '^\\s*(((#)\\s*if(n?def)?)\\b.*?(?:(?=(?://|/\\*))|$))'
-    'captures':
+    'beginCaptures':
       '1':
         'name': 'meta.preprocessor.c'
       '2':
@@ -637,6 +672,13 @@
       '3':
         'name': 'punctuation.definition.directive.c'
     'end': '^\\s*(((#)\\s*endif)\\b)'
+    'endCaptures':
+      '1':
+        'name': 'meta.preprocessor.c'
+      '2':
+        'name': 'keyword.control.directive.conditional.c'
+      '3':
+        'name': 'punctuation.definition.directive.c'
     'patterns': [
       {
         'include': '#block_innards'
