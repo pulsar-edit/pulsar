@@ -177,15 +177,15 @@
     ]
   }
   {
-    'begin': '^\\s*(?:((#)\\s*(pragma|undef))|((#)\\s*(?:elif|else|if|ifdef|ifndef)))\\b'
+    'begin': '^\\s*(?:((#)\\s*(?:elif|else|if|ifdef|ifndef))|((#)\\s*(pragma|undef)))\\b'
     'beginCaptures':
       '1':
-        'name': 'keyword.control.directive.$3.c'
+        'name': 'keyword.control.directive.conditional.c'
       '2':
         'name': 'punctuation.definition.directive.c'
+      '3':
+        'name': 'keyword.control.directive.$5.c'
       '4':
-        'name': 'keyword.control.directive.conditional.c'
-      '5':
         'name': 'punctuation.definition.directive.c'
     'end': '(?=(?://|/\\*))|(?<!\\\\)(?=\\n)'
     'name': 'meta.preprocessor.c'
