@@ -170,6 +170,9 @@
   'Image':
     'prefix': 'img'
     'body': '<img src="$1" alt="$2" />$0'
+  'Import':
+    'prefix': 'import'
+    'body': '<link rel="import" href="$1">$0'
   'Inserted Text':
     'prefix': 'ins'
     'body': '<ins>$1</ins>$0'
