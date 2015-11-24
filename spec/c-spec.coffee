@@ -50,6 +50,12 @@ describe "Language-C", ->
       {tokens} = grammar.tokenizeLine('myType_t var;')
       expect(tokens[0]).toEqual value: 'myType_t', scopes: ['source.c', 'support.type.posix-reserved.c']
 
+    it "tokenizes 'line continuation' character", ->
+      {tokens} = grammar.tokenizeLine('ma\\\nin(){);')
+      expect(tokens[0]).toEqual value: 'ma', scopes: ['source.c']
+      expect(tokens[1]).toEqual value: '\\', scopes: ['source.c', 'constant.character.escape.line-continuation.c']
+      expect(tokens[3]).toEqual value: 'in', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
+
     describe "strings", ->
       it "tokenizes them", ->
         delimsByScope =
@@ -61,6 +67,13 @@ describe "Language-C", ->
           expect(tokens[0]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.begin.c']
           expect(tokens[1]).toEqual value: 'a', scopes: ['source.c', scope]
           expect(tokens[2]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.end.c']
+
+          {tokens} = grammar.tokenizeLine delim + 'a' + '\\' + '\n' + 'b' + delim
+          expect(tokens[0]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.begin.c']
+          expect(tokens[1]).toEqual value: 'a', scopes: ['source.c', scope]
+          expect(tokens[2]).toEqual value: '\\', scopes: ['source.c', scope, 'constant.character.escape.line-continuation.c']
+          expect(tokens[4]).toEqual value: 'b', scopes: ['source.c', scope]
+          expect(tokens[5]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.end.c']
 
     describe "comments", ->
       it "tokenizes them", ->
@@ -184,6 +197,12 @@ describe "Language-C", ->
 
           it "tokenizes multiline macros", ->
             lines = grammar.tokenizeLines '''
+              #define max(a,b) (a>b)? \\
+                                a:b
+            '''
+            expect(lines[0][10]).toEqual value: '\\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'constant.character.escape.line-continuation.c']
+
+            lines = grammar.tokenizeLines '''
               #define SWAP(a, b)  { \\
                 a ^= b; \\
                 b ^= a; \\
@@ -199,10 +218,13 @@ describe "Language-C", ->
             expect(lines[0][7]).toEqual value: ' b', scopes: ['source.c', 'meta.preprocessor.macro.c', 'variable.parameter.preprocessor.c']
             expect(lines[0][8]).toEqual value: ')', scopes: ['source.c', 'meta.preprocessor.macro.c', 'punctuation.definition.parameters.end.c']
             expect(lines[0][10]).toEqual value: '{', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'punctuation.section.block.begin.c']
-            expect(lines[0][11]).toEqual value: ' \\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
-            expect(lines[1][0]).toEqual value: '  a ^= b; \\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
-            expect(lines[2][0]).toEqual value: '  b ^= a; \\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
-            expect(lines[3][0]).toEqual value: '  a ^= b; \\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
+            expect(lines[0][12]).toEqual value: '\\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'constant.character.escape.line-continuation.c']
+            expect(lines[1][0]).toEqual value: '  a ^= b; ', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
+            expect(lines[1][1]).toEqual value: '\\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'constant.character.escape.line-continuation.c']
+            expect(lines[2][0]).toEqual value: '  b ^= a; ', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
+            expect(lines[2][1]).toEqual value: '\\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'constant.character.escape.line-continuation.c']
+            expect(lines[3][0]).toEqual value: '  a ^= b; ', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c']
+            expect(lines[3][1]).toEqual value: '\\', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'constant.character.escape.line-continuation.c']
             expect(lines[4][0]).toEqual value: '}', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'punctuation.section.block.end.c']
 
       describe "includes", ->
@@ -507,5 +529,5 @@ describe "Language-C", ->
         '''
         expect(lines[0][0]).toEqual value: '//', scopes: ['source.cpp', 'comment.line.double-slash.c++', 'punctuation.definition.comment.c++']
         expect(lines[0][1]).toEqual value: ' separated', scopes: ['source.cpp', 'comment.line.double-slash.c++']
-        expect(lines[0][2]).toEqual value: '\\', scopes: ['source.cpp', 'comment.line.double-slash.c++', 'punctuation.separator.continuation.c++']
+        expect(lines[0][2]).toEqual value: '\\', scopes: ['source.cpp', 'comment.line.double-slash.c++', 'constant.character.escape.line-continuation.c']
         expect(lines[1][0]).toEqual value: 'comment', scopes: ['source.cpp', 'comment.line.double-slash.c++']
