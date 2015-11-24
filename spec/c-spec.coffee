@@ -50,6 +50,18 @@ describe "Language-C", ->
       {tokens} = grammar.tokenizeLine('myType_t var;')
       expect(tokens[0]).toEqual value: 'myType_t', scopes: ['source.c', 'support.type.posix-reserved.c']
 
+    describe "strings", ->
+      it "tokenizes them", ->
+        delimsByScope =
+          'string.quoted.double.c': '"'
+          'string.quoted.single.c': '\''
+
+        for scope, delim of delimsByScope
+          {tokens} = grammar.tokenizeLine delim + 'a' + delim
+          expect(tokens[0]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.begin.c']
+          expect(tokens[1]).toEqual value: 'a', scopes: ['source.c', scope]
+          expect(tokens[2]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.end.c']
+
     describe "preprocessor directives", ->
       it "tokenizes '#line'", ->
         {tokens} = grammar.tokenizeLine '#line 151 "copy.c"'
