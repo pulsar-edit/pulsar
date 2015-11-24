@@ -62,6 +62,20 @@ describe "Language-C", ->
           expect(tokens[1]).toEqual value: 'a', scopes: ['source.c', scope]
           expect(tokens[2]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.end.c']
 
+    describe "comments", ->
+      it "tokenizes them", ->
+        {tokens} = grammar.tokenizeLine '/**/'
+        expect(tokens[0]).toEqual value: '/*', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.begin.c']
+        expect(tokens[1]).toEqual value: '*/', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.end.c']
+
+        {tokens} = grammar.tokenizeLine '/* foo */'
+        expect(tokens[0]).toEqual value: '/*', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.begin.c']
+        expect(tokens[1]).toEqual value: ' foo ', scopes: ['source.c', 'comment.block.c']
+        expect(tokens[2]).toEqual value: '*/', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.end.c']
+
+        {tokens} = grammar.tokenizeLine '*/*'
+        expect(tokens[0]).toEqual value: '*/*', scopes: ['source.c', 'invalid.illegal.stray-comment-end.c']
+
     describe "preprocessor directives", ->
       it "tokenizes '#line'", ->
         {tokens} = grammar.tokenizeLine '#line 151 "copy.c"'
@@ -470,3 +484,18 @@ describe "Language-C", ->
       '''
       expect(lines[0][0]).toEqual value: 'class', scopes: ['source.cpp', 'meta.class-struct-block.cpp', 'storage.type.cpp']
       expect(lines[0][2]).toEqual value: 'Thing', scopes: ['source.cpp', 'meta.class-struct-block.cpp', 'entity.name.type.cpp']
+
+    describe "comments", ->
+      it "tokenizes them", ->
+        {tokens} = grammar.tokenizeLine '// comment'
+        expect(tokens[0]).toEqual value: '//', scopes: ['source.cpp', 'comment.line.double-slash.c++', 'punctuation.definition.comment.c++']
+        expect(tokens[1]).toEqual value: ' comment', scopes: ['source.cpp', 'comment.line.double-slash.c++']
+
+        lines = grammar.tokenizeLines '''
+          // separated\\
+          comment
+        '''
+        expect(lines[0][0]).toEqual value: '//', scopes: ['source.cpp', 'comment.line.double-slash.c++', 'punctuation.definition.comment.c++']
+        expect(lines[0][1]).toEqual value: ' separated', scopes: ['source.cpp', 'comment.line.double-slash.c++']
+        expect(lines[0][2]).toEqual value: '\\', scopes: ['source.cpp', 'comment.line.double-slash.c++', 'punctuation.separator.continuation.c++']
+        expect(lines[1][0]).toEqual value: 'comment', scopes: ['source.cpp', 'comment.line.double-slash.c++']
