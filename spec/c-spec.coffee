@@ -214,6 +214,16 @@ describe "Language-C", ->
           expect(tokens[4]).toEqual value: 'stdio.h', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.other.lt-gt.include.c']
           expect(tokens[5]).toEqual value: '>', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.other.lt-gt.include.c', 'punctuation.definition.string.end.c']
 
+          {tokens} = grammar.tokenizeLine '#include<stdio.h>'
+          expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include.c', 'punctuation.definition.directive.c']
+          expect(tokens[1]).toEqual value: 'include', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include.c']
+          expect(tokens[2]).toEqual value: '<', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.other.lt-gt.include.c', 'punctuation.definition.string.begin.c']
+          expect(tokens[3]).toEqual value: 'stdio.h', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.other.lt-gt.include.c']
+          expect(tokens[4]).toEqual value: '>', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.other.lt-gt.include.c', 'punctuation.definition.string.end.c']
+
+          {tokens} = grammar.tokenizeLine '#include_<stdio.h>'
+          expect(tokens[0]).toEqual value: '#include_<stdio.h>', scopes: ['source.c']
+
           {tokens} = grammar.tokenizeLine '#include "file"'
           expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include.c', 'punctuation.definition.directive.c']
           expect(tokens[1]).toEqual value: 'include', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include.c']

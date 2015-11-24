@@ -114,7 +114,7 @@
     ]
   }
   {
-    'begin': '^\\s*((#)\\s*(include|import))\\b\\s+'
+    'begin': '^\\s*((#)\\s*(include|import))\\b\\s*'
     'beginCaptures':
       '1':
         'name': 'keyword.control.directive.$3.c'
