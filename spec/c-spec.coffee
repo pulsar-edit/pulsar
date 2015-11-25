@@ -38,20 +38,20 @@ describe "Language-C", ->
       expect(lines[2][0]).toEqual value: '}', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.section.block.end.c']
 
     it "tokenizes various _t types", ->
-      {tokens} = grammar.tokenizeLine('size_t var;')
+      {tokens} = grammar.tokenizeLine 'size_t var;'
       expect(tokens[0]).toEqual value: 'size_t', scopes: ['source.c', 'support.type.sys-types.c']
 
-      {tokens} = grammar.tokenizeLine('pthread_t var;')
+      {tokens} = grammar.tokenizeLine 'pthread_t var;'
       expect(tokens[0]).toEqual value: 'pthread_t', scopes: ['source.c', 'support.type.pthread.c']
 
-      {tokens} = grammar.tokenizeLine('int32_t var;')
+      {tokens} = grammar.tokenizeLine 'int32_t var;'
       expect(tokens[0]).toEqual value: 'int32_t', scopes: ['source.c', 'support.type.stdint.c']
 
-      {tokens} = grammar.tokenizeLine('myType_t var;')
+      {tokens} = grammar.tokenizeLine 'myType_t var;'
       expect(tokens[0]).toEqual value: 'myType_t', scopes: ['source.c', 'support.type.posix-reserved.c']
 
     it "tokenizes 'line continuation' character", ->
-      {tokens} = grammar.tokenizeLine('ma\\\nin(){);')
+      {tokens} = grammar.tokenizeLine 'ma\\\nin(){);'
       expect(tokens[0]).toEqual value: 'ma', scopes: ['source.c']
       expect(tokens[1]).toEqual value: '\\', scopes: ['source.c', 'constant.character.escape.line-continuation.c']
       expect(tokens[3]).toEqual value: 'in', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
