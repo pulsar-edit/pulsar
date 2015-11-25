@@ -51,7 +51,7 @@ describe "Language-C", ->
       expect(tokens[0]).toEqual value: 'myType_t', scopes: ['source.c', 'support.type.posix-reserved.c']
 
     it "tokenizes 'line continuation' character", ->
-      {tokens} = grammar.tokenizeLine 'ma\\\nin(){);'
+      {tokens} = grammar.tokenizeLine 'ma' + '\\' + '\n' + 'in(){};'
       expect(tokens[0]).toEqual value: 'ma', scopes: ['source.c']
       expect(tokens[1]).toEqual value: '\\', scopes: ['source.c', 'constant.character.escape.line-continuation.c']
       expect(tokens[3]).toEqual value: 'in', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
