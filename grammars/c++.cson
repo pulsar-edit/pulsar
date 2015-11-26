@@ -17,7 +17,7 @@
   'tcc'
   'tpp'
 ]
-'firstLineMatch': '-\\*- C\\+\\+ -\\*-'
+'firstLineMatch': '-\\*-\\s*([Mm]ode: )?C\\+\\+;?\\s*-\\*-'
 'name': 'C++'
 'patterns': [
   {
