@@ -58,6 +58,10 @@ describe "Shell script grammar", ->
 
     expect(tokens[0]).toEqual value: 'iffy', scopes: ['source.shell']
 
+    {tokens} = grammar.tokenizeLine('enable-something')
+
+    expect(tokens[0]).toEqual value: 'enable-something', scopes: ['source.shell']
+
   it "tokenizes herestrings", ->
     delimsByScope =
       "string.quoted.double.shell": '"'
