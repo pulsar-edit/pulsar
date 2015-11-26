@@ -3,7 +3,7 @@
   'c'
   'h'
 ]
-'firstLineMatch': '-[*]-( Mode:)? C -[*]-'
+'firstLineMatch': '-\\*-\\s*([Mm]ode: )?C;?\\s*-\\*-'
 'name': 'C'
 'patterns': [
   {
