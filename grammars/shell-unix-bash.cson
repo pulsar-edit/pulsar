@@ -736,15 +736,22 @@
         ]
       }
       {
-        'begin': '\\b(for)\\s+((?:[^\\s\\\\]|\\\\.)+)\\b'
+        'begin': '\\b(for)\\b\\s+(.+)\\s+\\b(in)\\b'
         'beginCaptures':
           '1':
             'name': 'keyword.control.shell'
           '2':
             'name': 'variable.other.loop.shell'
-        'end': '\\b(done)\\b'
+            'patterns': [
+              {
+                'include': '#string'
+              }
+            ]
+          '3':
+            'name': 'keyword.control.shell'
+        'end': '(?<![-/])\\bdone\\b(?![-/])'
         'endCaptures':
-          '1':
+          '0':
             'name': 'keyword.control.shell'
         'name': 'meta.scope.for-in-loop.shell'
         'patterns': [

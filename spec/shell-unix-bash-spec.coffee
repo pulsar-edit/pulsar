@@ -48,6 +48,36 @@ describe "Shell script grammar", ->
       expect(tokens[5]).toEqual value: ' /var/log/messages ', scopes: ['source.shell', 'meta.scope.if-block.shell', 'meta.scope.logical-expression.shell']
       expect(tokens[6]).toEqual value: closingBracket, scopes: ['source.shell', 'meta.scope.if-block.shell', 'meta.scope.logical-expression.shell', 'punctuation.definition.logical-expression.shell']
 
+  it "tokenizes for...in loops", ->
+    {tokens} = grammar.tokenizeLine('for variable in file do do-something-done done')
+
+    expect(tokens[0]).toEqual value: 'for', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[2]).toEqual value: 'variable', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'variable.other.loop.shell']
+    expect(tokens[4]).toEqual value: 'in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[5]).toEqual value: ' file ', scopes: ['source.shell', 'meta.scope.for-in-loop.shell']
+    expect(tokens[6]).toEqual value: 'do', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[7]).toEqual value: ' do-something-done ', scopes: ['source.shell', 'meta.scope.for-in-loop.shell']
+    expect(tokens[8]).toEqual value: 'done', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+
+    {tokens} = grammar.tokenizeLine('for "variable" in "${list[@]}" do something done')
+
+    expect(tokens[0]).toEqual value: 'for', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[2]).toEqual value: '"', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'variable.other.loop.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']
+    expect(tokens[3]).toEqual value: 'variable', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'variable.other.loop.shell', 'string.quoted.double.shell']
+    expect(tokens[4]).toEqual value: '"', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'variable.other.loop.shell', 'string.quoted.double.shell', 'punctuation.definition.string.end.shell']
+    expect(tokens[6]).toEqual value: 'in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[8]).toEqual value: '"', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']
+    expect(tokens[9]).toEqual value: '${', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[10]).toEqual value: 'list', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'variable.other.bracket.shell']
+    expect(tokens[11]).toEqual value: '[', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'variable.other.bracket.shell', 'punctuation.section.array.shell']
+    expect(tokens[12]).toEqual value: '@', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'variable.other.bracket.shell']
+    expect(tokens[13]).toEqual value: ']', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'variable.other.bracket.shell', 'punctuation.section.array.shell']
+    expect(tokens[14]).toEqual value: '}', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[15]).toEqual value: '"', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'string.quoted.double.shell', 'punctuation.definition.string.end.shell']
+    expect(tokens[17]).toEqual value: 'do', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[18]).toEqual value: ' something ', scopes: ['source.shell', 'meta.scope.for-in-loop.shell']
+    expect(tokens[19]).toEqual value: 'done', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+
   it "doesn't tokenize keywords when they're part of a phrase", ->
     {tokens} = grammar.tokenizeLine('grep --ignore-case "something"')
 
