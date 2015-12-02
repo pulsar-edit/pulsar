@@ -1,7 +1,6 @@
 'fileTypes': [
   'babelrc'
   'bowerrc'
-  'eslintrc'
   'geojson'
   'ipynb'
   'jscsrc'
