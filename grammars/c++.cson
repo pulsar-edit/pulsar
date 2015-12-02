@@ -301,7 +301,7 @@
         'beginCaptures':
           '1':
             'name': 'storage.modifier.cpp'
-        'end': '(?<=\\})|(?=\\w)'
+        'end': '(?<=\\})|(?=\\w)|(?=\\s*#\\s*endif\\b)'
         'name': 'meta.extern-block.cpp'
         'patterns': [
           {
@@ -309,7 +309,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.section.block.begin.c'
-            'end': '\\}'
+            'end': '\\}|(?=\\s*#\\s*endif\\b)'
             'endCaptures':
               '0':
                 'name': 'punctuation.section.block.end.c'
