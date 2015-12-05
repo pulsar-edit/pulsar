@@ -368,22 +368,22 @@
           '1':
             'name': 'meta.toc-list.banner.line.c'
         'match': '^// =(\\s*.*?)\\s*=\\s*$\\n?'
-        'name': 'comment.line.banner.c++'
+        'name': 'comment.line.banner.cpp'
       }
       {
         'begin': '(^[ \\t]+)?(?=//)'
         'beginCaptures':
           '1':
-            'name': 'punctuation.whitespace.comment.leading.c++'
+            'name': 'punctuation.whitespace.comment.leading.cpp'
         'end': '(?!\\G)'
         'patterns': [
           {
             'begin': '//'
             'beginCaptures':
               '0':
-                'name': 'punctuation.definition.comment.c++'
+                'name': 'punctuation.definition.comment.cpp'
             'end': '\\n'
-            'name': 'comment.line.double-slash.c++'
+            'name': 'comment.line.double-slash.cpp'
             'patterns': [
               {
                 'include': '#line_continuation_character'
