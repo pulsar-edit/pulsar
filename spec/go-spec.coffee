@@ -464,9 +464,13 @@ describe 'Go grammar', ->
       expect(token.value).toBe op
       expect(token.scopes).toEqual ['source.go', 'punctuation.terminator.go']
 
-    testType = (token, name) ->
+    testNumType = (token, name) ->
       expect(token.value).toBe name
       expect(token.scopes).toEqual ['source.go', 'storage.type.numeric.go']
+
+    testStringType = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual ['source.go', 'storage.type.string.go']
 
     testNum = (token, value) ->
       expect(token.value).toBe value
@@ -496,7 +500,13 @@ describe 'Go grammar', ->
         {tokens} = grammar.tokenizeLine 'var i int'
         testVar tokens[0]
         testVarDeclaration tokens[2], 'i'
-        testType tokens[4], 'int'
+        testNumType tokens[4], 'int'
+
+      it 'tokenizes a single name and a type', ->
+        {tokens} = grammar.tokenizeLine 'var s []string'
+        testVar tokens[0]
+        testVarDeclaration tokens[2], 's'
+        testStringType tokens[6], 'string'
 
       it 'tokenizes a single name and its initialization', ->
         {tokens} = grammar.tokenizeLine ' var k =  0'
@@ -543,7 +553,7 @@ describe 'Go grammar', ->
         testVarAssignment tokens[2], 'x'
         testOpPunctuation tokens[3], ','
         testVarAssignment tokens[5], 'y'
-        testType tokens[7], 'float32'
+        testNumType tokens[7], 'float32'
         testOpAssignment tokens[9], '='
         testOpPunctuation tokens[11], ','
 
