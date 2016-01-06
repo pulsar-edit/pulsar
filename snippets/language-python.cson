@@ -92,10 +92,10 @@
   'iPDB set trace':
     'prefix': 'ipdb'
     'body': 'import ipdb; ipdb.set_trace()'
-  'rPDB set trace - ':
+  'rPDB set trace':
     'prefix': 'rpdb'
     'body': 'import rpdb2; rpdb2.start_embedded_debugger(\'${1:debug_password}\')$0'
-  'PuDB set trace - ':
+  'PuDB set trace':
     'prefix': 'pudb'
     'body': 'import pudb; pudb.set_trace()'
   '__magic__':
