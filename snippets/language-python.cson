@@ -88,10 +88,10 @@
     'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
   'PDB set trace':
     'prefix': 'pdb'
-    'body': 'import pdb; pdb.set_trace()\n'
+    'body': 'import pdb; pdb.set_trace()'
   'iPDB set trace':
     'prefix': 'ipdb'
-    'body': 'import ipdb; ipdb.set_trace()\n'
+    'body': 'import ipdb; ipdb.set_trace()'
   '__magic__':
     'prefix': '__'
     'body': '__${1:init}__'
