@@ -46,6 +46,7 @@ describe 'Go settings', ->
 
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"))')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something")),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.testSync('  fmt.Println(fmt.Sprint("something"))),')).toBeTruthy()
 
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something")')).toBeFalsy()
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"),')).toBeFalsy()
