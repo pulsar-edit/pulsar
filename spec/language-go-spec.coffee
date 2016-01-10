@@ -46,7 +46,14 @@ describe 'Go settings', ->
 
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"))')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something")),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"), "x"),')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('  fmt.Println(fmt.Sprint("something"))),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.testSync('  fmt.Println(fmt.Sprint("something"), "x")),')).toBeTruthy()
 
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something")')).toBeFalsy()
     expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"),')).toBeFalsy()
+
+    # a line with many (), testing for catastrophic backtracking.
+    # see https://github.com/atom/language-go/issues/78
+    longLine = 'first.second().third().fourth().fifth().sixth().seventh().eighth().ninth().tenth()'
+    expect(decreaseNextIndentRegex.testSync(longLine)).toBeFalsy()

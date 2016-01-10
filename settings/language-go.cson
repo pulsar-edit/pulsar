@@ -3,4 +3,4 @@
     'commentStart': '// '
     'increaseIndentPattern': '^.*(\\bcase\\b.*:|\\bdefault\\b:|(\\b(func|if|else|switch|select|for|struct)\\b.*|\\w)\\{[^}]*|\\([^)]*)$'
     'decreaseIndentPattern': '^\\s*(\\bcase\\b.*:|\\bdefault\\b:|\\}[),]?|\\)[,]?)$'
-    'decreaseNextIndentPattern': '^\\s*[^\\s()}]+(?<m>[^()]*\\((?:\\g<m>|[^()]*)\\)[^()]*)*[^()]*\\)[,]?$'
+    'decreaseNextIndentPattern': '^\\s*[^\\s()}]+(?<m>[^()]*\\((?:\\g<m>[^()]*|[^()]*)\\))*[^()]*\\)[,]?$'
