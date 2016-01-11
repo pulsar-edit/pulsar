@@ -112,7 +112,7 @@
   # F
   'Favicon':
     'prefix': 'favicon'
-    'body': '<link rel="shortcut icon" href="$1.ico" />$0'
+    'body': '<link rel="shortcut icon" href="$1.ico">$0'
   'Fieldset':
     'prefix': 'fieldset'
     'body': '<fieldset>$1</fieldset>$0'
