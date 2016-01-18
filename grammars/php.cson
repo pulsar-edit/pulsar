@@ -373,7 +373,7 @@
             'name': 'variable.other.php'
           '3':
             'name': 'punctuation.definition.variable.php'
-        'match': '(?:\\s*(&))?\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\)|/[/*]|\\#)'
+        'match': '(?:\\s*(&))?\\s*((?:\\.\\.\\.)?(\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\)|/[/*]|\\#)'
         'name': 'meta.function.argument.no-default.php'
       }
       {
