@@ -246,13 +246,8 @@ describe 'PHP grammar', ->
       it 'should tokenize variadic arguments correctly', ->
         tokens = grammar.tokenizeLines "<?php\nfunction test(...$value) {}"
 
-        expect(tokens[1][0]).toEqual value: 'function', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'storage.type.function.php']
-        expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php']
-        expect(tokens[1][2]).toEqual value: 'test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'entity.name.function.php']
-        expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.php']
         expect(tokens[1][4]).toEqual value: '...', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.arguments.php', 'meta.function.argument.no-default.php', 'variable.other.php']
         expect(tokens[1][5]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.arguments.php', 'meta.function.argument.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
-        expect(tokens[1][6]).toEqual value: 'value', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.arguments.php', 'meta.function.argument.no-default.php', 'variable.other.php']
 
       it 'should tokenize default array type with short array value correctly', ->
         tokens = grammar.tokenizeLines "<?php\nfunction array_test(array $value = []) {}"
