@@ -344,7 +344,7 @@
         'name': 'meta.function.argument.array.php'
       }
       {
-        'begin': '(?i)(?=[a-z_0-9\\\\]*[a-z_][a-z_0-9]*\\s*&?\\s*\\$)'
+        'begin': '(?i)(?=[a-z_0-9\\\\]*[a-z_][a-z_0-9]*\\s*&?\\s*(?:\\.\\.\\.)?\\$)'
         'end': '(?=,|\\)|/[/*]|\\#|$)'
         'name': 'meta.function.argument.typehinted.php'
         'patterns': [
@@ -367,7 +367,7 @@
                 'name': 'constant.language.php'
               '7':
                 'name': 'invalid.illegal.non-null-typehinted.php'
-            'match': '(?xi)\n        \t\t\t\t\t\t\t\\s*([a-z_][a-z_0-9]*)? # Typehinted class name\n        \t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n        \t\t\t\t\t\t\t\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n        \t\t\t\t\t\t\t(?:\n        \t\t\t\t\t\t\t\t\\s*(?:(=)\\s*(?:(null)|((?:\\S*?\\(\\))|(?:\\S*?))))\t# A default value\n        \t\t\t\t\t\t\t)?\n        \t\t\t\t\t\t\t\\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma\n\t\t\t\t\t        '
+            'match': '(?xi)\n        \t\t\t\t\t\t\t\\s*([a-z_][a-z_0-9]*)? # Typehinted class name\n        \t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n        \t\t\t\t\t\t\t\\s*(((?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n        \t\t\t\t\t\t\t(?:\n        \t\t\t\t\t\t\t\t\\s*(?:(=)\\s*(?:(null)|((?:\\S*?\\(\\))|(?:\\S*?))))\t# A default value\n        \t\t\t\t\t\t\t)?\n        \t\t\t\t\t\t\t\\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma\n\t\t\t\t\t        '
           }
         ]
       }
@@ -379,7 +379,7 @@
             'name': 'variable.other.php'
           '3':
             'name': 'punctuation.definition.variable.php'
-        'match': '(?:\\s*(&))?\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\)|/[/*]|\\#)'
+        'match': '(?:\\s*(&))?\\s*(((?:\\.\\.\\.)?\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\)|/[/*]|\\#)'
         'name': 'meta.function.argument.no-default.php'
       }
       {

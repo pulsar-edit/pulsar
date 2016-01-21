@@ -243,6 +243,17 @@ describe 'PHP grammar', ->
         expect(tokens[1][16]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
         expect(tokens[1][17]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
+      it 'should tokenize variadic arguments correctly', ->
+        tokens = grammar.tokenizeLines "<?php\nfunction test(...$value) {}"
+
+        expect(tokens[1][4]).toEqual value: '...$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.arguments.php', 'meta.function.argument.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+
+      it 'should tokenize variadic arguments and typehinted scope correctly', ->
+        tokens = grammar.tokenizeLines "<?php\nfunction test(class_name ...$value) {}"
+
+        expect(tokens[1][4]).toEqual value: 'class_name', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.arguments.php', 'meta.function.argument.typehinted.php', 'support.class.php']
+        expect(tokens[1][6]).toEqual value: '...$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.arguments.php', 'meta.function.argument.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+
       it 'should tokenize default array type with short array value correctly', ->
         tokens = grammar.tokenizeLines "<?php\nfunction array_test(array $value = []) {}"
 
