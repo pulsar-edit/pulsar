@@ -119,3 +119,16 @@
   'test function':
     'prefix': 'tf'
     'body': "func Test$1(t *testing.T) {\n\t$0\n}"
+  'go template':
+    'prefix': 'got'
+    'body': """
+      package ${1:main}
+
+      import (
+        "${2:fmt}"
+      )
+
+      func ${1:main}() {
+          $3
+      }
+    """
