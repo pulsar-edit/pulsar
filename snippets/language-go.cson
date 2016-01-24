@@ -89,6 +89,9 @@
   'http ResponseWriter *Request':
     'prefix': 'wr'
     'body': "${1:w} http.ResponseWriter, ${2:r} *http.Request"
+  'http Context ResponseWriter *Request':
+    'prefix': 'cwr'
+    'body': "${1:c} context.Context, ${2:w} http.ResponseWriter, ${3:r} *http.Request"
   'http.HandleFunc':
     'prefix': 'hf'
     'body': "${1:http}.HandleFunc(\"${2:/}\", ${3:handler})"
