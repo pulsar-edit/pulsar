@@ -356,9 +356,9 @@
             'name': 'punctuation.definition.entity.begin.html'
           '2':
             'name': 'entity.name.entity.other.html'
-        'end': '(;)'
+        'end': ';'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.entity.end.html'
         'name': 'constant.character.entity.html'
       }
