@@ -125,7 +125,7 @@
       package ${1:main}
 
       import (
-        "${2:fmt}"
+          "${2:fmt}"
       )
 
       func ${1:main}() {
