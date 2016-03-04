@@ -1,0 +1,29 @@
+<!-- SYNTAX TEST "text.html.basic" -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test HTML</title>
+        <script><!--
+        <!-- ^ entity.name.tag.script.html -->
+            var foo = 100;
+            var baz = function() {
+            <!-- <- source.js.embedded -->
+            }
+        //--></script>
+        <!-- ^ source.js.embedded.html -->
+        <!--     ^ entity.name.tag.script.html -->
+        <style type="text/css">
+        <!--    ^ entity.other.attribute-name -->
+            h2 {
+            <!-- <- source.css.embedded -->
+                font-family: "Arial";
+            }
+        </style>
+        <!-- ^ entity.name.tag.style.html -->
+        <style />
+    </head>
+    <body>
+        <!-- Comment -->
+        <!-- ^ comment.block.html -->
+    </body>
+</html>
