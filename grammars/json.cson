@@ -10,6 +10,7 @@
   'jslintrc'
   'json'
   'jsonl'
+  'jsonld'
   'ldj'
   'ldjson'
   'schema'
