@@ -84,13 +84,35 @@ describe "Shell script grammar", ->
     expect(tokens[0]).toEqual value: 'grep --ignore-case ', scopes: ['source.shell']
     expect(tokens[1]).toEqual value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']
 
-    {tokens} = grammar.tokenizeLine('iffy')
+    strings = [
+      'iffy'
+      'enable-something'
+      'there.for'
+      'be+done'
+      'little,while'
+      'rest@until'
+      'lets:select words'
+      'in🚀case of stuff'
+      'the#fi%nal countdown'
+      'time⏰out'
+    ]
 
-    expect(tokens[0]).toEqual value: 'iffy', scopes: ['source.shell']
+    for string of strings
+      {tokens} = grammar.tokenizeLine(string)
 
-    {tokens} = grammar.tokenizeLine('enable-something')
+      expect(tokens[0]).toEqual value: string, scopes: ['source.shell']
 
-    expect(tokens[0]).toEqual value: 'enable-something', scopes: ['source.shell']
+    {tokens} = grammar.tokenizeLine('this/function ()')
+
+    expect(tokens[0]).toEqual value: 'this/function', scopes: ['source.shell', 'meta.function.shell', 'entity.name.function.shell']
+    expect(tokens[2]).toEqual value: '()', scopes: ['source.shell', 'meta.function.shell', 'punctuation.definition.arguments.shell']
+
+    {tokens} = grammar.tokenizeLine('and,for (( this ))')
+
+    expect(tokens[0]).toEqual value: 'and,for ', scopes: ['source.shell']
+    expect(tokens[1]).toEqual value: '((', scopes: ['source.shell', 'string.other.math.shell', 'punctuation.definition.string.begin.shell']
+
+    {tokens} = grammar.tokenizeLine('in🚀case of stuff')
 
   it "tokenizes herestrings", ->
     delimsByScope =
@@ -140,16 +162,22 @@ describe "Shell script grammar", ->
       expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.no-indent.' + scope + '.shell', 'source.' + scope + '.embedded.shell']
       expect(tokens[2][0]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.no-indent.' + scope + '.shell', 'keyword.control.heredoc-token.shell']
 
-    tokens = grammar.tokenizeLines """
-      <<RANDOMTHING
-      stuff
-      RANDOMTHING
-    """
+    delims = [
+      "RANDOMTHING"
+      "RUBY@1.8"
+    ]
 
-    expect(tokens[0][0]).toEqual value: '<<', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.operator.heredoc.shell']
-    expect(tokens[0][1]).toEqual value: 'RANDOMTHING', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
-    expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.shell']
-    expect(tokens[2][0]).toEqual value: 'RANDOMTHING', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+    for delim of delims
+      tokens = grammar.tokenizeLines """
+        <<#{delim}
+        stuff
+        #{delim}
+      """
+
+      expect(tokens[0][0]).toEqual value: '<<', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.operator.heredoc.shell']
+      expect(tokens[0][1]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+      expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.shell']
+      expect(tokens[2][0]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
 
   it "tokenizes shebangs", ->
     {tokens} = grammar.tokenizeLine('#!/bin/sh')
@@ -171,6 +199,19 @@ describe "Shell script grammar", ->
     expect(tokens[2]).toEqual value: 'C', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell']
     expect(tokens[3]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
     expect(tokens[4]).toEqual value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']
+
+  it "tokenizes case blocks", ->
+    {tokens} = grammar.tokenizeLine('case word in esac);; esac')
+
+    expect(tokens[0]).toEqual value: 'case', scopes: ['source.shell', 'meta.scope.case-block.shell', 'keyword.control.shell']
+    expect(tokens[1]).toEqual value: ' word ', scopes: ['source.shell', 'meta.scope.case-block.shell']
+    expect(tokens[2]).toEqual value: 'in', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell', 'keyword.control.shell']
+    expect(tokens[3]).toEqual value: ' ', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell']
+    expect(tokens[4]).toEqual value: 'esac', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell', 'meta.scope.case-clause.shell', 'meta.scope.case-pattern.shell']
+    expect(tokens[5]).toEqual value: ')', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell', 'meta.scope.case-clause.shell', 'meta.scope.case-pattern.shell', 'punctuation.definition.case-pattern.shell']
+    expect(tokens[6]).toEqual value: ';;', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell', 'meta.scope.case-clause.shell', 'punctuation.terminator.case-clause.shell']
+    expect(tokens[7]).toEqual value: ' ', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell']
+    expect(tokens[8]).toEqual value: 'esac', scopes: ['source.shell', 'meta.scope.case-block.shell', 'keyword.control.shell']
 
   describe "indentation", ->
     editor = null

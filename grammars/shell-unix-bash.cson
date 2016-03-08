@@ -206,7 +206,7 @@
   'function-definition':
     'patterns': [
       {
-        'begin': '\\b(function)\\s+([^\\s\\\\]+)(?:\\s*(\\(\\)))?'
+        'begin': '(?<=^|;|&|\\s)(function)\\s+([^\\s\\\\]+)(?:\\s*(\\(\\)))?'
         'beginCaptures':
           '1':
             'name': 'storage.type.function.shell'
@@ -226,7 +226,7 @@
         ]
       }
       {
-        'begin': '\\b([^\\s\\\\=]+)\\s*(\\(\\))'
+        'begin': '(?<=^|;|&|\\s)([^\\s\\\\=]+)\\s*(\\(\\))'
         'beginCaptures':
           '1':
             'name': 'entity.name.function.shell'
@@ -257,7 +257,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.ruby.embedded.shell'
-        'end': '^\\t*(RUBY)\\b'
+        'end': '^\\t*(RUBY)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -279,7 +279,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.ruby.embedded.shell'
-        'end': '^(RUBY)\\b'
+        'end': '^(RUBY)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -301,7 +301,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.python.embedded.shell'
-        'end': '^\\t*(PYTHON)\\b'
+        'end': '^\\t*(PYTHON)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -323,7 +323,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.python.embedded.shell'
-        'end': '^(PYTHON)\\b'
+        'end': '^(PYTHON)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -345,7 +345,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.applescript.embedded.shell'
-        'end': '^\\t*(APPLESCRIPT)\\b'
+        'end': '^\\t*(APPLESCRIPT)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -367,7 +367,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.applescript.embedded.shell'
-        'end': '^(APPLESCRIPT)\\b'
+        'end': '^(APPLESCRIPT)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -389,7 +389,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'text.html.embedded.shell'
-        'end': '^\\t*(HTML)\\b'
+        'end': '^\\t*(HTML)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -411,7 +411,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'text.html.embedded.shell'
-        'end': '^(HTML)\\b'
+        'end': '^(HTML)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -433,7 +433,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'text.html.markdown.embedded.shell'
-        'end': '^\\t*(MARKDOWN)\\b'
+        'end': '^\\t*(MARKDOWN)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -455,7 +455,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'text.html.markdown.embedded.shell'
-        'end': '^(MARKDOWN)\\b'
+        'end': '^(MARKDOWN)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -477,7 +477,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'text.html.textile.embedded.shell'
-        'end': '^\\t*(TEXTILE)\\b'
+        'end': '^\\t*(TEXTILE)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -499,7 +499,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'text.html.textile.embedded.shell'
-        'end': '^(TEXTILE)\\b'
+        'end': '^(TEXTILE)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -521,7 +521,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.shell.embedded.shell'
-        'end': '^\\t*(\\3)\\b'
+        'end': '^\\t*(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -543,7 +543,7 @@
           '0':
             'name': 'punctuation.definition.string.shell'
         'contentName': 'source.shell.embedded.shell'
-        'end': '^(\\3)\\b'
+        'end': '^(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -564,7 +564,7 @@
         'captures':
           '0':
             'name': 'punctuation.definition.string.shell'
-        'end': '^\\t*(\\3)\\b'
+        'end': '^\\t*(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -580,7 +580,7 @@
         'captures':
           '0':
             'name': 'punctuation.definition.string.shell'
-        'end': '^(\\3)\\b'
+        'end': '^(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
@@ -693,11 +693,11 @@
   'keyword':
     'patterns': [
       {
-        'match': '(?<!-)\\b(then|else|elif|fi|for|in|do|done|select|case|continue|esac|while|until|return)\\b(?!-)'
+        'match': '(?<=^|;|&|\\s)(then|else|elif|fi|for|in|do|done|select|case|continue|esac|while|until|return)(?=\\s|;|&|$)'
         'name': 'keyword.control.shell'
       }
       {
-        'match': '(?<![-/])\\b(?:export|declare|typeset|local|readonly)\\b'
+        'match': '(?<=^|;|&|\\s)(?:export|declare|typeset|local|readonly)(?=\\s|;|&|$)'
         'name': 'storage.modifier.shell'
       }
     ]
@@ -723,11 +723,11 @@
   'loop':
     'patterns': [
       {
-        'begin': '\\b(for)\\s+(?=\\({2})'
+        'begin': '(?<=^|;|&|\\s)(for)\\s+(?=\\({2})'
         'captures':
           '1':
             'name': 'keyword.control.shell'
-        'end': '\\b(done)\\b'
+        'end': '(?<=^|;|&|\\s)(done)(?=\\s|;|&|$)'
         'name': 'meta.scope.for-loop.shell'
         'patterns': [
           {
@@ -736,7 +736,7 @@
         ]
       }
       {
-        'begin': '\\b(for)\\b\\s+(.+)\\s+\\b(in)\\b'
+        'begin': '(?<=^|;|&|\\s)(for)\\s+(.+)\\s+(in)(?=\\s|;|&|$)'
         'beginCaptures':
           '1':
             'name': 'keyword.control.shell'
@@ -749,7 +749,7 @@
             ]
           '3':
             'name': 'keyword.control.shell'
-        'end': '(?<![-/])\\bdone\\b(?![-/])'
+        'end': '(?<=^|;|&|\\s)done(?=\\s|;|&|$)'
         'endCaptures':
           '0':
             'name': 'keyword.control.shell'
@@ -761,11 +761,11 @@
         ]
       }
       {
-        'begin': '\\b(while|until)\\b'
+        'begin': '(?<=^|;|&|\\s)(while|until)(?=\\s|;|&|$)'
         'captures':
           '1':
             'name': 'keyword.control.shell'
-        'end': '\\b(done)\\b'
+        'end': '(?<=^|;|&|\\s)(done)(?=\\s|;|&|$)'
         'name': 'meta.scope.while-loop.shell'
         'patterns': [
           {
@@ -774,13 +774,13 @@
         ]
       }
       {
-        'begin': '\\b(select)\\s+((?:[^\\s\\\\]|\\\\.)+)\\b'
+        'begin': '(?<=^|;|&|\\s)(select)\\s+((?:[^\\s\\\\]|\\\\.)+)(?=\\s|;|&|$)'
         'beginCaptures':
           '1':
             'name': 'keyword.control.shell'
           '2':
             'name': 'variable.other.loop.shell'
-        'end': '\\b(done)\\b'
+        'end': '(?<=^|;|&|\\s)(done)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.shell'
@@ -792,19 +792,19 @@
         ]
       }
       {
-        'begin': '(?<!-)\\b(case)\\b(?!-)'
+        'begin': '(?<=^|;|&|\\s)(case)(?=\\s|;|&|$)'
         'captures':
           '1':
             'name': 'keyword.control.shell'
-        'end': '\\b(esac)\\b'
+        'end': '(?<=^|;|&|\\s)(esac)(?=\\s|;|&|$)'
         'name': 'meta.scope.case-block.shell'
         'patterns': [
           {
-            'begin': '\\b(?:in)\\b'
+            'begin': '(?<=^|;|&|\\s)(in)(?=\\s|;|&|$)'
             'beginCaptures':
               '1':
                 'name': 'keyword.control.shell'
-            'end': '(?=\\b(?:esac)\\b)'
+            'end': '(?<=^|;|&|\\s)(?=(?:esac)(?:\\s|;|&|$))'
             'name': 'meta.scope.case-body.shell'
             'patterns': [
               {
@@ -824,11 +824,11 @@
         ]
       }
       {
-        'begin': '(?<!-)\\b(if)\\b(?!-|\\s*=)'
+        'begin': '(?<=^|;|&|\\s)(if)(?=\\s|;|&|$)'
         'captures':
           '1':
             'name': 'keyword.control.shell'
-        'end': '\\b(fi)\\b'
+        'end': '(?<=^|;|&|\\s)(fi)(?=\\s|;|&|$)'
         'name': 'meta.scope.if-block.shell'
         'patterns': [
           {
@@ -895,7 +895,7 @@
   'pipeline':
     'patterns': [
       {
-        'match': '\\b(time)\\b'
+        'match': '(?<=^|;|&|\\s)(time)(?=\\s|;|&|$)'
         'name': 'keyword.other.shell'
       }
       {
@@ -1000,11 +1000,11 @@
   'support':
     'patterns': [
       {
-        'match': '(?<=^|\\s)(?::|\\.)(?=\\s|;|&|$)'
+        'match': '(?<=^|;|&|\\s)(?::|\\.)(?=\\s|;|&|$)'
         'name': 'support.function.builtin.shell'
       }
       {
-        'match': '(?<![-/])\\b(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)\\b(?![-/])'
+        'match': '(?<=^|;|&|\\s)(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)(?=\\s|;|&|$)'
         'name': 'support.function.builtin.shell'
       }
     ]
