@@ -2,6 +2,7 @@
   'avsc'
   'babelrc'
   'bowerrc'
+  'composer.lock'
   'geojson'
   'gltf'
   'ipynb'
