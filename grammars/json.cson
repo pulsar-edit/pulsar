@@ -16,6 +16,8 @@
   'ldjson'
   'schema'
   'template'
+  'tern-config'
+  'tern-project'
   'topojson'
   'webapp'
 ]
