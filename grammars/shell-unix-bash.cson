@@ -19,6 +19,7 @@
   'npmrc'
   'PKGBUILD'
   'cygport'
+  'bats'
 ]
 'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
 'patterns': [
