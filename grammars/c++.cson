@@ -68,7 +68,7 @@
     'name': 'keyword.operator.cpp'
   }
   {
-    'match': '\\b(class|wchar_t)\\b'
+    'match': '\\b(class|decltype|wchar_t)\\b'
     'name': 'storage.type.cpp'
   }
   {
