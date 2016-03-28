@@ -81,9 +81,11 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.separator.dictionary.key-value.json'
-        'end': '(,)|(?=\\})'
+        'end': '(,)(?=[\\s\\n]*\\})|(,)|(?=\\})'
         'endCaptures':
           '1':
+            'name': 'invalid.illegal.trailing-dictionary-separator.json'
+          '2':
             'name': 'punctuation.separator.dictionary.pair.json'
         'name': 'meta.structure.dictionary.value.json'
         'patterns': [
