@@ -1,6 +1,6 @@
 {
   "name": "language-python",
-  "version": "0.43.0",
+  "version": "0.43.1",
   "engines": {
     "atom": "*",
     "node": "*"
