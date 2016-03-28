@@ -28,6 +28,18 @@ describe "JSON grammar", ->
     expect(tokens[7]).toEqual value: '3', scopes: numericScopes
     expect(tokens[8]).toEqual value: ']', scopes: [baseScopes..., 'punctuation.definition.array.end.json']
 
+  it "identifies trailing commas in arrays", ->
+    baseScopes = ['source.json', 'meta.structure.array.json']
+    numericScopes = [baseScopes..., 'constant.numeric.json']
+    separatorScopes = [baseScopes..., 'punctuation.separator.array.json']
+
+    {tokens} = grammar.tokenizeLine('[1, ]')
+    expect(tokens[0]).toEqual value: '[', scopes: [baseScopes..., 'punctuation.definition.array.begin.json']
+    expect(tokens[1]).toEqual value: '1', scopes: numericScopes
+    expect(tokens[2]).toEqual value: ',', scopes: [baseScopes..., 'invalid.illegal.trailing-array-separator.json']
+    expect(tokens[3]).toEqual value: ' ', scopes: [baseScopes...]
+    expect(tokens[4]).toEqual value: ']', scopes: [baseScopes..., 'punctuation.definition.array.end.json']
+
   it "tokenizes objects", ->
     baseScopes = ['source.json', 'meta.structure.dictionary.json']
     keyScopes = [baseScopes..., 'string.quoted.double.json']

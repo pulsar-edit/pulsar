@@ -33,9 +33,11 @@
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.array.begin.json'
-    'end': '\\]'
+    'end': '(,?)[\\s\\n]*(\\])'
     'endCaptures':
-      '0':
+      '1':
+        'name': 'invalid.illegal.trailing-array-separator.json'
+      '2':
         'name': 'punctuation.definition.array.end.json'
     'name': 'meta.structure.array.json'
     'patterns': [
