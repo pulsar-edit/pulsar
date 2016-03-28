@@ -854,7 +854,7 @@
     ]
   'language_variables':
     'match': '\\b(self|cls)\\b'
-    'name': 'variable.language.python'
+    'name': 'variable.language.self.python'
   'line_continuation':
     'captures':
       '1':
