@@ -33,9 +33,11 @@
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.array.begin.json'
-    'end': '\\]'
+    'end': '(,?)[\\s\\n]*(\\])'
     'endCaptures':
-      '0':
+      '1':
+        'name': 'invalid.illegal.trailing-array-separator.json'
+      '2':
         'name': 'punctuation.definition.array.end.json'
     'name': 'meta.structure.array.json'
     'patterns': [
@@ -79,9 +81,11 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.separator.dictionary.key-value.json'
-        'end': '(,)|(?=\\})'
+        'end': '(,)(?=[\\s\\n]*\\})|(,)|(?=\\})'
         'endCaptures':
           '1':
+            'name': 'invalid.illegal.trailing-dictionary-separator.json'
+          '2':
             'name': 'punctuation.separator.dictionary.pair.json'
         'name': 'meta.structure.dictionary.value.json'
         'patterns': [
