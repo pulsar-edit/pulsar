@@ -251,7 +251,7 @@
         'include': '#parens'
       }
       {
-        'match': '\\b(const|override|final|noexcept)\\b'
+        'match': '\\b(const)\\b'
         'name': 'storage.modifier.c'
       }
       {
