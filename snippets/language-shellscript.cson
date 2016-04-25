@@ -29,3 +29,9 @@
   'while … done':
     'prefix': 'while'
     'body': 'while ${2:[[ ${1:condition} ]]}; do\n\t${0:#statements}\ndone'
+  'alias ...':
+    'prefix': 'alias'
+    'body': 'alias ${1:name}="${2:#statement}"'
+  'function ...':
+    'prefix': 'function'
+    'body': 'function ${1:name}(${2:parameter}) {\n\t${3:#statements}\n}'    
