@@ -11,6 +11,9 @@
   '#!/usr/bin/env zsh':
     'prefix': 'zsh'
     'body': '#!/usr/bin/env zsh\n'
+  'alias …':
+    'prefix': 'alias'
+    'body': 'alias ${1:name}="${2:#statement}"'
   'case … esac':
     'prefix': 'case'
     'body': 'case ${1:word} in\n\t${2:pattern} )\n\t\t$0;;\nesac'
@@ -20,6 +23,9 @@
   'for … done':
     'prefix': 'for'
     'body': 'for (( i = 0; i < ${1:10}; i++ )); do\n\t${0:#statements}\ndone'
+  'function …':
+    'prefix': 'function'
+    'body': 'function ${1:name}(${2:parameter}) {\n\t${3:#statements}\n}'
   'if … fi':
     'prefix': 'if'
     'body': 'if ${2:[[ ${1:condition} ]]}; then\n\t${0:#statements}\nfi'
