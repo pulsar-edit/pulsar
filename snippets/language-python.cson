@@ -46,7 +46,7 @@
     'body': 'self.fail(\'${1:message}\')$0'
   'New Class':
     'prefix': 'class'
-    'body': 'class ${1:ClassName}(${2:object}):\n\t"""${3:docstring for $1}"""\n\tdef __init__(self, ${4:arg}):\n\t\t${5:super($1, self).__init__()}\n\t\tself.arg = arg\n\t\t$0'
+    'body': 'class ${1:ClassName}(${2:object}):\n\t"""${3:docstring for $1.}"""\n\tdef __init__(self, ${4:arg}):\n\t\t${5:super($1, self).__init__()}\n\t\tself.arg = arg\n\t\t$0'
   'New Method':
     'prefix': 'defs'
     'body': 'def ${1:mname}(self, ${2:arg}):\n\t${3:pass}'
