@@ -21,7 +21,7 @@
   'cygport'
   'bats'
 ]
-'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
+'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh|rc)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
 'patterns': [
   {
     'include': '#comment'
