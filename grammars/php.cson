@@ -1504,6 +1504,11 @@
     'name': 'string.regexp.single-quoted.php'
     'patterns': [
       {
+        'comment': 'Support both PHP string and regex escaping'
+        'match': '(?x) \\\\ (?: \\\\ (?: \\\\ [\\\\\']? | [^\'] ) | . )'
+        'name': 'constant.character.escape.php'
+      }
+      {
         'captures':
           '1':
             'name': 'punctuation.definition.arbitrary-repetition.php'
@@ -1519,25 +1524,25 @@
             'name': 'punctuation.definition.character-class.php'
         'end': '\\]'
         'name': 'string.regexp.character-class.php'
-        'patterns': [
-          {
-            'include': '#single_quote_regex_escape'
-          }
-        ]
+        # 'patterns': [
+        #   {
+        #     # 'include': '#single_quote_regex_escape'
+        #   }
+        # ]
       }
       {
         'match': '[$^+*]'
         'name': 'keyword.operator.regexp.php'
       }
-      {
-        'include': '#single_quote_regex_escape'
-      }
+      # {
+      #   'include': '#single_quote_regex_escape'
+      # }
     ]
-    'repository':
-      'single_quote_regex_escape':
-        'comment': 'Support both PHP string and regex escaping'
-        'match': '(?x) \\\\ (?: \\\\ (?: \\\\ [\\\\\']? | [^\'] ) | . )'
-        'name': 'constant.character.escape.php'
+    # 'repository':
+    #   'single_quote_regex_escape':
+    #     'comment': 'Support both PHP string and regex escaping'
+    #     'match': '(?x) \\\\ (?: \\\\ (?: \\\\ [\\\\\']? | [^\'] ) | . )'
+    #     'name': 'constant.character.escape.php'
   'sql-string-double-quoted':
     'begin': '"\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER)\\b)'
     'beginCaptures':
