@@ -18,6 +18,7 @@
   '.textmate_init'
   'npmrc'
   'PKGBUILD'
+  'install'
   'cygport'
   'bats'
 ]
