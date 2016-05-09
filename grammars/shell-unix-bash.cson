@@ -5,6 +5,7 @@
   'bash'
   'ksh'
   'zsh'
+  'zsh-theme'
   'zshenv'
   'zlogin'
   'zlogout'
