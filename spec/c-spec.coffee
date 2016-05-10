@@ -500,6 +500,33 @@ describe "Language-C", ->
         {tokens} = grammar.tokenizeLine '0b101010'
         expect(tokens[0]).toEqual value: '0b101010', scopes: ['source.c', 'constant.numeric.c']
 
+    describe "access", ->
+      it "should tokenizes dot access", ->
+        lines = grammar.tokenizeLines '''
+          int main() {
+            A a;
+            a.b = NULL;
+            return 0;
+          }
+        '''
+
+        expect(lines[2][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
+        expect(lines[2][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+      it "should tokenizes pointer access", ->
+        lines = grammar.tokenizeLines '''
+          int main() {
+            A *a;
+            a->b = NULL;
+            return 0;
+          }
+        '''
+
+        expect(lines[2][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
+        expect(lines[2][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
   describe "C++", ->
     beforeEach ->
       grammar = atom.grammars.grammarForScopeName('source.cpp')
