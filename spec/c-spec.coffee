@@ -496,6 +496,10 @@ describe "Language-C", ->
           };
         '''
 
+      it "tokenizes binary literal", ->
+        {tokens} = grammar.tokenizeLine '0b101010'
+        expect(tokens[0]).toEqual value: '0b101010', scopes: ['source.c', 'constant.numeric.c']
+
   describe "C++", ->
     beforeEach ->
       grammar = atom.grammars.grammarForScopeName('source.cpp')
