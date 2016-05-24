@@ -13,10 +13,10 @@
   'hxx'
   'h++'
   'inl'
+  'ino'
   'ipp'
   'tcc'
   'tpp'
-  'ino'
 ]
 'firstLineMatch': '(?i)-\\*-[^*]*(Mode:\\s*)?C\\+\\+(\\s*;.*?)?\\s*-\\*-'
 'name': 'C++'
