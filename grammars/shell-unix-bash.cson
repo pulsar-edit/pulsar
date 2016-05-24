@@ -22,6 +22,7 @@
   'install'
   'cygport'
   'bats'
+  'ebuild'
 ]
 'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh|rc)|(?i:^\\s*#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-)'
 'patterns': [
