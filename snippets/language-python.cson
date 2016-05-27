@@ -8,6 +8,9 @@
   'Import':
     'prefix': 'im'
     'body': 'import ${1:package/module}'
+  'From/Import':
+    'prefix': 'fim'
+    'body': 'from ${1:package/module} import ${2:names}'
   'Assert Equal':
     'prefix': 'ase'
     'body': 'self.assertEqual(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
