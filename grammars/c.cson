@@ -59,7 +59,7 @@
   {
     'begin': '''(?x)
       ^\\s* ((\\#)\\s*define) \\s+     # define
-      ((?<id>[a-zA-Z_][a-zA-Z0-9_]*))  # macro name
+      ((?<id>[a-zA-Z_$][\\w$]*))  # macro name
       (?:
         (\\()
           (
