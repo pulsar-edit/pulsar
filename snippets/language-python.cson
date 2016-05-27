@@ -5,6 +5,9 @@
   '# coding=utf-8':
     'prefix': 'enc'
     'body': '# coding=utf-8\n'
+  'Import':
+    'prefix': 'im'
+    'body': 'import ${1:package/module}'
   'Assert Equal':
     'prefix': 'ase'
     'body': 'self.assertEqual(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
