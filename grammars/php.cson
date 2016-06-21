@@ -1213,7 +1213,7 @@
         'name': 'keyword.operator.assignment.php'
       }
       {
-        'match': '(<=|>=|<|>)'
+        'match': '(<=>|<=|>=|<|>)'
         'name': 'keyword.operator.comparison.php'
       }
       {
