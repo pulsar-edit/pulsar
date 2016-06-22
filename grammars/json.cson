@@ -20,6 +20,7 @@
   'tern-project'
   'topojson'
   'webapp'
+  'webmanifest'
 ]
 'name': 'JSON'
 'patterns': [
