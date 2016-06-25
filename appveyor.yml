@@ -1,17 +1,27 @@
 version: "{build}"
 
-os: Windows Server 2012 R2
+platform: x64
+
+branches:
+    only:
+      - master
+
+clone_depth: 10
+
+skip_tags: true
+
+environment:
+  APM_TEST_PACKAGES:
+
+  matrix:
+  - ATOM_CHANNEL: stable
+  - ATOM_CHANNEL: beta
 
 install:
-  - choco install atom -y
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - "%LOCALAPPDATA%/atom/bin/apm clean"
-  - "%LOCALAPPDATA%/atom/bin/apm install"
+  - ps: Install-Product node 4
 
 build_script:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - "%LOCALAPPDATA%/atom/bin/apm test --path %LOCALAPPDATA%/atom/bin/atom.cmd"
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/atom/ci/master/build-package.ps1'))
 
 test: off
-
 deploy: off
