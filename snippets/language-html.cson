@@ -199,7 +199,7 @@
     'body': '<li>$1</li>$0'
   'Link':
     'prefix': 'link'
-    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}">$0'
+    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" media="${3:screen}" title="${4:no title}">$0'
   # M
   'Main':
     'prefix': 'main'
