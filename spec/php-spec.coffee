@@ -455,6 +455,13 @@ describe 'PHP grammar', ->
         expect(tokens[1][4]).toEqual value: '/\'', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.end.php']
         expect(tokens[1][5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
+      it 'should tokenize single quoted string regex with escaped bracket', ->
+        tokens = grammar.tokenizeLines "<?php\n'/\\[/'"
+
+        expect(tokens[1][0]).toEqual value: '\'/', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.begin.php']
+        expect(tokens[1][1]).toEqual value: '\\[', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.regexp.single-quoted.php', 'constant.character.escape.php']
+        expect(tokens[1][2]).toEqual value: '/\'', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.end.php']
+
       it 'should tokenize opening scope of a closure correctly', ->
         tokens = grammar.tokenizeLines "<?php\n$a = function() {};"
 
