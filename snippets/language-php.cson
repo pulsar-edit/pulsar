@@ -110,6 +110,9 @@
   'while …':
     'prefix': 'while'
     'body': 'while (${1:$a <= 10}) {\n\t${0:# code...}\n}'
+  'var_dump("…")':
+    'prefix': 'dump'
+    'body': 'var_dump($1);$0'
 '.text.html.php:not(.source)':
   '<?php $this->… ?>':
     'prefix': 'this'
@@ -139,9 +142,6 @@
   '<?php if (…) ?> … <?php endif ?>':
     'prefix': 'if'
     'body': '<?php if (${1:condition}): ?>\n\t$0\n<?php endif; ?>'
-  'var_dump("…")':
-    'prefix': 'dump'
-    'body': 'var_dump($1);$0'
   'PHPDoc function …':
     'prefix': 'doc_f'
     'body': '/**\n * ${6:undocumented function summary}\n *\n * ${7:Undocumented function long description}\n *\n * @param ${8:type} ${9:var} ${10:Description}\n * @return {11:return type}\n */\n${1:public }function ${2:FunctionName}(${3:$${4:value}${5:=\'\'}})\n{\n\t${0:# code...}\n}'
