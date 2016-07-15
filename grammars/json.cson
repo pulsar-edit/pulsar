@@ -18,6 +18,7 @@
   'template'
   'tern-config'
   'tern-project'
+  'tfstate'
   'topojson'
   'webapp'
   'webmanifest'
