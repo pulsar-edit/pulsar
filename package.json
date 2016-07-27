@@ -15,8 +15,10 @@
   "bugs": {
     "url": "https://github.com/atom/language-html/issues"
   },
+  "dependencies": {
+    "atom-grammar-test": "0.6.0"
+  },
   "devDependencies": {
-    "atom-grammar-test": "^0.3.0",
     "coffeelint": "^1.10.1"
   }
 }
