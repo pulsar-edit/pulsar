@@ -12,6 +12,7 @@
   'zprofile'
   'zshrc'
   'bashrc'
+  'bash_aliases'
   'bash_profile'
   'bash_login'
   'profile'
