@@ -25,6 +25,9 @@
     'include': '#special_block'
   }
   {
+    'include': '#strings'
+  }
+  {
     'include': 'source.c'
   }
   {
@@ -327,5 +330,56 @@
             'include': '$base'
           }
         ]
+      }
+    ]
+  'strings':
+    'patterns': [
+      {
+        'begin': '(u|u8|U|L)?"'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.cpp'
+          '1':
+            'name': 'meta.encoding.cpp'
+        'end': '"'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.cpp'
+        'name': 'string.quoted.double.cpp'
+        'patterns': [
+          {
+            'match': '\\\\u\\h{4}|\\\\U\\h{8}'
+            'name': 'constant.character.escape.cpp'
+          }
+          {
+            'match': '\\\\[\'"?\\\\abfnrtv]'
+            'name': 'constant.character.escape.cpp'
+          }
+          {
+            'match': '\\\\[0-7]{1,3}'
+            'name': 'constant.character.escape.cpp'
+          }
+          {
+            'match': '\\\\x\\h+'
+            'name': 'constant.character.escape.cpp'
+          }
+        ]
+      }
+      {
+        'begin': '(u|u8|U|L)?R"(?:([^ ()\\\\\\t]{0,16})|([^ ()\\\\\\t]*))\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.cpp'
+          '1':
+            'name': 'meta.encoding.cpp'
+          '3':
+            'name': 'invalid.illegal.delimiter-too-long.cpp'
+        'end': '\\)\\2(\\3)"'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.cpp'
+          '1':
+            'name': 'invalid.illegal.delimiter-too-long.cpp'
+        'name': 'string.quoted.double.raw.cpp'
       }
     ]
