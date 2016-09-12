@@ -124,7 +124,7 @@
       }
     ]
   'comment':
-    'begin': '(^\\s+)?(?<!\\S)(?=#)(?!#\\{)'
+    'begin': '(^\\s+)?(?<=^|\\W)(?=#)(?!#{)'
     'beginCaptures':
       '1':
         'name': 'punctuation.whitespace.comment.leading.shell'
@@ -672,6 +672,24 @@
           {
             'match': '\\\\[`\\\\$]'
             'name': 'constant.character.escape.shell'
+          }
+          {
+            # Lifted from the #comment section to handle ending on ` instead of $
+            'begin': '(?<=\\W)(?=#)(?!#{)'
+            'beginCaptures':
+              '1':
+                'name': 'punctuation.whitespace.comment.leading.shell'
+            'end': '(?!\\G)'
+            'patterns': [
+              {
+                'begin': '#'
+                'beginCaptures':
+                  '0':
+                    'name': 'punctuation.definition.comment.shell'
+                'end': '(?=`)'
+                'name': 'comment.line.number-sign.shell'
+              }
+            ]
           }
           {
             'include': '$self'

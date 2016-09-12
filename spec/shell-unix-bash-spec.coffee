@@ -163,6 +163,12 @@ describe "Shell script grammar", ->
     expect(tokens[0]).toEqual value: '#', scopes: ['source.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']
     expect(tokens[1]).toEqual value: 'comment', scopes: ['source.shell', 'comment.line.number-sign.shell']
 
+  it "tokenizes comments in interpolated strings", ->
+    {tokens} = grammar.tokenizeLine('`#comment`')
+
+    expect(tokens[1]).toEqual value: '#', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']
+    expect(tokens[3]).toEqual value: '`', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'punctuation.definition.string.end.shell']
+
   it "tokenizes nested variable expansions", ->
     {tokens} = grammar.tokenizeLine('${${C}}')
 
