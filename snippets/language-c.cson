@@ -80,19 +80,19 @@
     'body': 'enum ${1:name} { $0 };'
   'Class':
     'prefix': 'cl'
-    'body': 'class ${1:name_t} {\nprivate:\n\t${0:/* data */}\npublic:\n\t${1:name_t} (${2:arguments});\n\tvirtual ~${1:name_t} ();\n\n};'
+    'body': 'class ${1:name_t} {\nprivate:\n\t${0:/* data */}\n\npublic:\n\t${1:name_t} (${2:arguments});\n\tvirtual ~${1:name_t} ();\n};'
   'Namespace':
     'prefix': 'ns'
     'body': 'namespace ${1:name} {\n\t$2\n} /* $1 */'
   'cout':
     'prefix': 'cout'
-    'body': 'std::cout << \"${1:/* message */}\" << std::endl;'
+    'body': 'std::cout << \"${1:/* message */}\" << \'\\\\n\';'
   'cin':
     'prefix': 'cin'
     'body': 'std::cin >> ${1:/* variable */};'
   'cerr':
     'prefix': 'cerr'
-    'body': 'std::cerr << \"${1:/* error message */}\" << std::endl;'
+    'body': 'std::cerr << \"${1:/* error message */}\" << \'\\\\n\';'
   'std::map':
     'prefix': 'map'
     'body': 'std::map<${1:key}, ${2:value}> map$3;'
@@ -101,13 +101,13 @@
     'body': 'std::string'
   'std::vector':
     'prefix': 'vector'
-    'body': 'std::vector<${1:char}> v$2;'
+    'body': 'std::vector<${1:int}> v$2;'
   'template <typename>':
     'prefix': 'tp'
-    'body': 'template <typename ${1:_InputIter}>'
+    'body': 'template <typename ${1:T}>'
   'output file':
     'prefix': 'outf'
-    'body': 'ofstream ${1:afile} ("${2:filename.txt}", ios::out);\nif(${1:afile}.is_open()) { \n\t${1:afile} << "${3:This is a line.}\\\\n";\n\t${1:afile}.close();\n}'
+    'body': 'std::ofstream ${1:afile}("${2:filename.txt}", std::ios::out);\nif (${1:afile}.is_open()) {\n\t${1:afile} << "${3:This is a line.}\\\\n";\n\t${1:afile}.close();\n}'
   'input file':
     'prefix': 'inf'
-    'body': 'ifstream ${1:afile} ("${2:filename.txt}",ios::in);\nif(${1:afile}.is_open()) { \n\tstring buffer;\n\twhile( getline(myfile,buffer) ) {\n\t\tcout << line << endl;\n\t}\n\t\t${1:afile}.close();\n\t}\nelse {\n\tcout << "Unable to open file" << endl;\n}'
+    'body': 'std::ifstream ${1:afile}("${2:filename.txt}", std::ios::in);\nif (${1:afile}.is_open()) {\n\tstd::string line;\n\twhile (std::getline(${1:afile}, line)) {\n\t\tstd::cout << line << \'\\\\n\';\n\t}\n\t${1:afile}.close();\n}\nelse {\n\tstd::cerr << "Unable to open file\\\\n";\n}'
