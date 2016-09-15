@@ -527,6 +527,112 @@ describe "Language-C", ->
         expect(lines[2][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
         expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
+    describe "operators", ->
+      it "tokenizes the sizeof operator", ->
+        {tokens} = grammar.tokenizeLine('sizeof unary_expression')
+        expect(tokens[0]).toEqual value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']
+        expect(tokens[1]).toEqual value: ' unary_expression', scopes: ['source.c']
+
+        {tokens} = grammar.tokenizeLine('sizeof (int)')
+        expect(tokens[0]).toEqual value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']
+        expect(tokens[1]).toEqual value: ' (', scopes: ['source.c']
+        expect(tokens[2]).toEqual value: 'int', scopes: ['source.c', 'storage.type.c']
+        expect(tokens[3]).toEqual value: ')', scopes: ['source.c']
+
+      it "tokenizes the increment operator", ->
+        {tokens} = grammar.tokenizeLine('i++')
+        expect(tokens[0]).toEqual value: 'i', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '++', scopes: ['source.c', 'keyword.operator.increment.c']
+
+        {tokens} = grammar.tokenizeLine('++i')
+        expect(tokens[0]).toEqual value: '++', scopes: ['source.c', 'keyword.operator.increment.c']
+        expect(tokens[1]).toEqual value: 'i', scopes: ['source.c']
+
+      it "tokenizes the decrement operator", ->
+        {tokens} = grammar.tokenizeLine('i--')
+        expect(tokens[0]).toEqual value: 'i', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '--', scopes: ['source.c', 'keyword.operator.decrement.c']
+
+        {tokens} = grammar.tokenizeLine('--i')
+        expect(tokens[0]).toEqual value: '--', scopes: ['source.c', 'keyword.operator.decrement.c']
+        expect(tokens[1]).toEqual value: 'i', scopes: ['source.c']
+
+      it "tokenizes logical operators", ->
+        {tokens} = grammar.tokenizeLine('!a')
+        expect(tokens[0]).toEqual value: '!', scopes: ['source.c', 'keyword.operator.logical.c']
+        expect(tokens[1]).toEqual value: 'a', scopes: ['source.c']
+
+        operators = ['&&', '||']
+        for operator in operators
+          {tokens} = grammar.tokenizeLine('a ' + operator + ' b')
+          expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+          expect(tokens[1]).toEqual value: operator, scopes: ['source.c', 'keyword.operator.logical.c']
+          expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
+      it "tokenizes comparison operators", ->
+        operators = ['<=', '>=', '!=', '==', '<', '>' ]
+
+        for operator in operators
+          {tokens} = grammar.tokenizeLine('a ' + operator + ' b')
+          expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+          expect(tokens[1]).toEqual value: operator, scopes: ['source.c', 'keyword.operator.comparison.c']
+          expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
+      it "tokenizes arithmetic operators", ->
+        operators = ['+', '-', '*', '/', '%']
+
+        for operator in operators
+          {tokens} = grammar.tokenizeLine('a ' + operator + ' b')
+          expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+          expect(tokens[1]).toEqual value: operator, scopes: ['source.c', 'keyword.operator.c']
+          expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
+      it "tokenizes ternary operators", ->
+        {tokens} = grammar.tokenizeLine('a ? b : c')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' b ', scopes: ['source.c']
+        expect(tokens[3]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[4]).toEqual value: ' c', scopes: ['source.c']
+
+      describe "bitwise", ->
+        it "tokenizes bitwise 'not'", ->
+          {tokens} = grammar.tokenizeLine('~a')
+          expect(tokens[0]).toEqual value: '~', scopes: ['source.c', 'keyword.operator.c']
+          expect(tokens[1]).toEqual value: 'a', scopes: ['source.c']
+
+        it "tokenizes them", ->
+          operators = ['|', '^', '&', '<<', '>>']
+
+          for operator in operators
+            {tokens} = grammar.tokenizeLine('a ' + operator + ' b')
+            expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+            expect(tokens[1]).toEqual value: operator, scopes: ['source.c', 'keyword.operator.c']
+            expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
+      describe "assignment", ->
+        it "tokenizes the assignment operator", ->
+          {tokens} = grammar.tokenizeLine('a = b')
+          expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+          expect(tokens[1]).toEqual value: '=', scopes: ['source.c', 'keyword.operator.assignment.c']
+          expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
+        it "tokenizes compound assignment operators", ->
+          operators = ['+=', '-=', '*=', '/=', '%=']
+          for operator in operators
+            {tokens} = grammar.tokenizeLine('a ' + operator + ' b')
+            expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+            expect(tokens[1]).toEqual value: operator, scopes: ['source.c', 'keyword.operator.assignment.compound.c']
+            expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
+        it "tokenizes bitwise compound operators", ->
+          operators = ['<<=', '>>=', '&=', '^=', '|=']
+          for operator in operators
+            {tokens} = grammar.tokenizeLine('a ' + operator + ' b')
+            expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+            expect(tokens[1]).toEqual value: operator, scopes: ['source.c', 'keyword.operator.assignment.compound.bitwise.c']
+            expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+
   describe "C++", ->
     beforeEach ->
       grammar = atom.grammars.grammarForScopeName('source.cpp')
