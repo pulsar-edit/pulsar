@@ -320,7 +320,20 @@
             'name': 'variable.other.c'
           '2':
             'name': 'punctuation.definition.parameters.c'
-        'match': '(?x)\n\t\t\t        (?x)\n\t\t\t(?:  \n\t\t\t     (?: (?= \\s )           (?<!else|new|return) (?<=\\w)\\s+      #  or word + space before name\n\t\t\t     )\n\t\t\t)\n\t\t\t(\n\t\t\t\t(?: [A-Za-z_][A-Za-z0-9_]*+ | :: )++    |              # actual name\n\t\t\t\t(?: (?<=operator) (?: [-*&<>=+!]+ | \\(\\) | \\[\\] ) )  # if it is a C++ operator\n\t\t\t)\n\t\t\t \\s*(\\()'
+        'match': '''(?x)
+          (?:
+            (?:
+              (?=\\s)(?<!else|new|return)
+              (?<=\\w) \\s+  # or word + space before name
+            )
+          )
+          (
+            (?:[A-Za-z_][A-Za-z0-9_]*+ | :: )++   # actual name
+            |
+            (?:(?<=operator) (?:[-*&<>=+!]+ | \\(\\) | \\[\\]))  # if it is a C++ operator
+          )
+          \\s*(\\()
+        '''
         'name': 'meta.initialization.c'
       }
       {
@@ -338,7 +351,22 @@
         'name': 'support.function.any-method.c'
       '4':
         'name': 'punctuation.definition.parameters.c'
-    'match': '(?x) (?: (?= \\s )  (?:(?<=else|new|return) | (?<!\\w)) (\\s+))?\n\t\t\t(\\b \n\t\t\t\t(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | :: )++                  # actual name\n\t\t\t)\n\t\t\t \\s*(\\()'
+    'match': '''(?x)
+      (?:
+        (?=\\s)
+        (?:(?<=else|new|return) | (?<!\\w)) (\\s+)
+      )?
+      
+      # Actual name
+      (
+        \\b (?!
+          (while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)
+          \\s* \\(
+        )
+        (?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | ::)++
+      )
+      \\s*(\\()
+    '''
     'name': 'meta.function-call.c'
   'comments':
     'patterns': [
@@ -761,7 +789,15 @@
   'string_placeholder':
     'patterns': [
       {
-        'match': '(?x)%\n    \t\t\t\t\t\t(\\d+\\$)?                             # field (argument #)\n    \t\t\t\t\t\t[#0\\- +\']*                           # flags\n    \t\t\t\t\t\t[,;:_]?                              # separator character (AltiVec)\n    \t\t\t\t\t\t((-?\\d+)|\\*(-?\\d+\\$)?)?              # minimum field width\n    \t\t\t\t\t\t(\\.((-?\\d+)|\\*(-?\\d+\\$)?)?)?         # precision\n    \t\t\t\t\t\t(hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)? # length modifier\n    \t\t\t\t\t\t[diouxXDOUeEfFgGaACcSspn%]           # conversion type\n    \t\t\t\t\t'
+        'match': '''(?x) %
+          (\\d+\\$)?                           # field (argument #)
+          [#0\\- +']*                          # flags
+          [,;:_]?                              # separator character (AltiVec)
+          ((-?\\d+)|\\*(-?\\d+\\$)?)?          # minimum field width
+          (\\.((-?\\d+)|\\*(-?\\d+\\$)?)?)?    # precision
+          (hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)? # length modifier
+          [diouxXDOUeEfFgGaACcSspn%]           # conversion type
+        '''
         'name': 'constant.other.placeholder.c'
       }
       {
