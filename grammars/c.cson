@@ -30,7 +30,7 @@
     'name': 'storage.modifier.c'
   }
   {
-    'comment': 'common C constant naming idiom -- kConstantVariable'
+    # Common naming idiom for C constants: "kConstantVariable"
     'match': '\\bk[A-Z]\\w*\\b'
     'name': 'constant.other.variable.mac-classic.c'
   }
@@ -222,7 +222,7 @@
     'name': 'support.type.mac-classic.c'
   }
   {
-    'comment': 'Reserved POSIX types'
+    # Reserved POSIX types
     'match': '\\b([A-Za-z0-9_]+_t)\\b'
     'name': 'support.type.posix-reserved.c'
   }
@@ -437,8 +437,8 @@
       }
     ]
   'disabled':
+    # Consume nested preprocessor if(def)s
     'begin': '^\\s*#\\s*if(n?def)?\\b.*$'
-    'comment': 'eat nested preprocessor if(def)s'
     'end': '^\\s*#\\s*endif\\b'
     'patterns': [
       {

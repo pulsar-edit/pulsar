@@ -47,7 +47,7 @@
     'name': 'keyword.control.cpp'
   }
   {
-    'comment': 'common C++ instance var naming idiom -- fMemberName'
+    # Common naming idiom for C++ instanced vars: "fMemberName"
     'match': '\\b(f|m)[A-Z]\\w*\\b'
     'name': 'variable.other.readwrite.member.cpp'
   }
