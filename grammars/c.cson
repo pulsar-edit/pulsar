@@ -219,7 +219,7 @@
     'begin': '''(?x)
       (?:
         ^ |
-       (?:
+        (?:
           (?=\\s)(?<!else|new|return)(?<=\\w)  # word + space before name
           |
           (?=\\s*[A-Za-z_])(?<!&&)(?<=[*&>])   # type modifier before name
