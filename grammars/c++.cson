@@ -86,7 +86,7 @@
         (?:(?<!else|new|=))  # or word + space before name
       )
       ((?:[A-Za-z_][A-Za-z0-9_]*::)*+~[A-Za-z_][A-Za-z0-9_]*) # actual name
-      \\s*(\\()              # start bracket or end-of-line
+      \\s*(\\()              # opening bracket
     '''
     'beginCaptures':
       '1':
@@ -111,7 +111,7 @@
         (?:(?<!else|new|=))  # or word + space before name
       )
       ((?:[A-Za-z_][A-Za-z0-9_]*::)*+~[A-Za-z_][A-Za-z0-9_]*) # actual name
-      \\s*(\\()              # terminating semicolon
+      \\s*(\\()              # opening bracket
     '''
     'beginCaptures':
       '1':
@@ -165,7 +165,7 @@
             (?!while|for|do|if|else|switch|catch|enumerate|return|r?iterate)
             (?:\\b[A-Za-z_][A-Za-z0-9_]*+\\b|::)*+ # actual name
           )
-          \\s*(\\()
+          \\s*(\\() # opening bracket
         '''
         'name': 'meta.function-call.c'
       }
@@ -179,7 +179,7 @@
         'begin': '''(?x)
           (?:^\\s*)  # beginning of line
           ((?!while|for|do|if|else|switch|catch|enumerate|r?iterate)[A-Za-z_][A-Za-z0-9_:]*) # actual name
-          \\s*(\\()  # start bracket or end-of-line
+          \\s*(\\()  # opening bracket
         '''
         'beginCaptures':
           '1':
@@ -199,11 +199,11 @@
       }
       {
         'begin': '''(?x)
-          (:) # beginning of line
+          (:)
           (
             (?=
               \\s*[A-Za-z_][A-Za-z0-9_:]* # actual name
-              \\s* (\\() # start bracket or end-of-line
+              \\s* (\\() # opening bracket
             )
           )
         '''

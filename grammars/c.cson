@@ -243,7 +243,7 @@
       (
         (?:[A-Za-z_][A-Za-z0-9_]*+|::)++  # actual name
         |
-        (?:(?<=operator)(?:[-*&<>=+!]+|\\(\\)|\\[\\]))  # if it is a C++ operator
+        (?:(?<=operator)(?:[-*&<>=+!]+|\\(\\)|\\[\\]))
       )
       \\s*(?=\\()
     '''
@@ -344,9 +344,9 @@
           (
             (?:[A-Za-z_][A-Za-z0-9_]*+ | :: )++   # actual name
             |
-            (?:(?<=operator) (?:[-*&<>=+!]+ | \\(\\) | \\[\\]))  # if it is a C++ operator
+            (?:(?<=operator) (?:[-*&<>=+!]+ | \\(\\) | \\[\\]))
           )
-          \\s*(\\()
+          \\s*(\\() # opening bracket
         '''
         'name': 'meta.initialization.c'
       }
@@ -380,7 +380,7 @@
         )
         (?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | ::)++
       )
-      \\s*(\\()
+      \\s*(\\() # Opening bracket
     '''
     'name': 'meta.function-call.c'
   'comments':
