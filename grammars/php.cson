@@ -15,7 +15,25 @@
   'phtml'
   'profile'
 ]
-'firstLineMatch': '^#!.*(?<!-)php[0-9]{0,1}\\b'
+'firstLineMatch': '''(?x)
+  # Hashbang
+  ^\\#!.*(?:\\s|\\/)
+    php\\d?
+  (?:$|\\s)
+  |
+  # Modeline
+  (?i:
+    # Emacs
+    -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+      php
+    (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+    |
+    # Vim
+    (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+      (?:php|phtml)
+    (?=\\s|:|$)
+  )
+'''
 'foldingStartMarker': '(/\\*|\\{\\s*$|<<<HTML)'
 'foldingStopMarker': '(\\*/|^\\s*\\}|^HTML;)'
 'injections':
