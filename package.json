@@ -1,6 +1,6 @@
 {
   "name": "language-shellscript",
-  "version": "0.22.5",
+  "version": "0.23.0",
   "description": "ShellScript language support in Atom",
   "engines": {
     "atom": "*",
