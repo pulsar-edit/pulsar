@@ -9,7 +9,20 @@
   'tpl'
   'xhtml'
 ]
-'firstLineMatch': '<(?i:(!DOCTYPE\\s*)?html)'
+'firstLineMatch': '''(?xi)
+  # Document type definition
+  <(?:!DOCTYPE\\s*)?html
+  |
+  # Emacs modeline
+  -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+    html
+  (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+  |
+  # Vim modeline
+  (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+    x?html
+  (?=\\s|:|$)
+'''
 'name': 'HTML'
 'patterns': [
   {
