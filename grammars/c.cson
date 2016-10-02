@@ -1,6 +1,7 @@
 'scopeName': 'source.c'
 'fileTypes': [
   'c'
+  'h.in'
 ]
 'firstLineMatch': '(?i)-\\*-[^*]*(Mode:\\s*)?C(\\s*;.*?)?\\s*-\\*-'
 'name': 'C'
