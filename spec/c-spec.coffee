@@ -619,8 +619,15 @@ describe "Language-C", ->
           expect(tokens[0]).toEqual value: '~', scopes: ['source.c', 'keyword.operator.c']
           expect(tokens[1]).toEqual value: 'a', scopes: ['source.c']
 
+        it "tokenizes shift operators", ->
+          {tokens} = grammar.tokenizeLine('>>')
+          expect(tokens[0]).toEqual value: '>>', scopes: ['source.c', 'keyword.operator.bitwise.shift.c']
+
+          {tokens} = grammar.tokenizeLine('<<')
+          expect(tokens[0]).toEqual value: '<<', scopes: ['source.c', 'keyword.operator.bitwise.shift.c']
+
         it "tokenizes them", ->
-          operators = ['|', '^', '&', '<<', '>>']
+          operators = ['|', '^', '&']
 
           for operator in operators
             {tokens} = grammar.tokenizeLine('a ' + operator + ' b')

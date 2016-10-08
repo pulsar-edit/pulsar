@@ -793,7 +793,7 @@
       }
       {
         'match': '<<|>>'
-        'name': 'keyword.operator.c'
+        'name': 'keyword.operator.bitwise.shift.c'
       }
       {
         'match': '!=|<=|>=|==|<|>'
