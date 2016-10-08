@@ -371,7 +371,7 @@
         (?=\\s)
         (?:(?<=else|new|return) | (?<!\\w)) (\\s+)
       )?
-      
+
       # Actual name
       (
         \\b
@@ -772,7 +772,7 @@
   'operators':
     'patterns': [
       {
-        'match': '\\b(sizeof)\\b'
+        'match': '(?<![\\w$])(sizeof)(?![\\w$])'
         'name': 'keyword.operator.sizeof.c'
       }
       {

@@ -548,6 +548,15 @@ describe "Language-C", ->
         expect(tokens[2]).toEqual value: 'int', scopes: ['source.c', 'storage.type.c']
         expect(tokens[3]).toEqual value: ')', scopes: ['source.c']
 
+        {tokens} = grammar.tokenizeLine('$sizeof')
+        expect(tokens[1]).not.toEqual value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']
+
+        {tokens} = grammar.tokenizeLine('sizeof$')
+        expect(tokens[0]).not.toEqual value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']
+
+        {tokens} = grammar.tokenizeLine('sizeof_')
+        expect(tokens[0]).not.toEqual value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']
+
       it "tokenizes the increment operator", ->
         {tokens} = grammar.tokenizeLine('i++')
         expect(tokens[0]).toEqual value: 'i', scopes: ['source.c']
