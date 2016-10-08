@@ -11,7 +11,7 @@
     'body': '<address ${1:class="$2"}>\n\t$3\n</address>'
   'Area':
     'prefix': 'area'
-    'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"} />$0'
+    'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"}>$0'
   'Article':
     'prefix': 'article'
     'body': '<article class="$1">\n\t$2\n</article>'
@@ -30,7 +30,7 @@
     'body': '<b>$1</b>$0'
   'Base':
     'prefix': 'base'
-    'body': '<base href="${1:#}" target="${2:_blank}" />$0'
+    'body': '<base href="${1:#}" target="${2:_blank}">$0'
   'Bi-Directional Isolation':
     'prefix': 'bdi'
     'body': '<bdi dir="${1:auto}">$2</bdi>$0'
@@ -172,7 +172,7 @@
     'body': '<input type="${1:button}" name="${2:name}" value="$3">$0'
   'Image':
     'prefix': 'img'
-    'body': '<img src="$1" alt="$2" />$0'
+    'body': '<img src="$1" alt="$2">$0'
   'Import':
     'prefix': 'import'
     'body': '<link rel="import" href="$1">$0'
