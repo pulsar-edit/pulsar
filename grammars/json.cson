@@ -19,6 +19,7 @@
   'tern-config'
   'tern-project'
   'tfstate'
+  'tfstate.backup'
   'topojson'
   'webapp'
   'webmanifest'
