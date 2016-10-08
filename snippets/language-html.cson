@@ -8,10 +8,10 @@
     'body': '<abbr title="$1">$2</abbr>$0'
   'Address':
     'prefix': 'address'
-    'body': '<address ${1:class="$2"}>\n\t$3\n</address>'
+    'body': '<address${1: class="$2"}>\n\t$3\n</address>'
   'Area':
     'prefix': 'area'
-    'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"}>$0'
+    'body': '<area${1: shape="${2:default}"} coords="$3"${4: href="${5:#}" alt="$6"}>$0'
   'Article':
     'prefix': 'article'
     'body': '<article class="$1">\n\t$2\n</article>'
@@ -89,7 +89,7 @@
     'body': '<del>$1</del>$0'
   'Details':
     'prefix': 'details'
-    'body': '<details ${1:open}>$2</details>$0'
+    'body': '<details${1: open}>$2</details>$0'
   'Definition':
     'prefix': 'dfn'
     'body': '<dfn>$1</dfn>$0'
