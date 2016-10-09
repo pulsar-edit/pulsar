@@ -143,6 +143,36 @@
         'name': 'entity.name.package.go'
   }
   {
+    'comment': 'Single line import declarations'
+    'match': '(?<=import)\\s+([^\\s]*)?\\s?"([^"]*)"'
+    'captures':
+      '1':
+        'name': 'entity.alias.import.go'
+      '2':
+        'name': 'entity.name.import.go'
+  }
+  {
+    'comment': 'Multiline import declarations'
+    'begin': '(?<=import)\\s+(\\()'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.other.bracket.round.go'
+    'patterns': [
+      {
+        'match': '((?!\\s+")[^\\s]*)?\\s+"([^"]*)"'
+        'captures':
+          '1':
+            'name': 'entity.alias.import.go'
+          '2':
+            'name': 'entity.name.import.go'
+      }
+    ]
+    'end': '\\)'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.other.bracket.round.go'
+  }
+  {
     'comment': 'Type declarations'
     'match': '(?<=type)\\s+([a-zA-Z_]\\w*)'
     'captures':

@@ -611,7 +611,7 @@ describe 'Go grammar', ->
           testVarDeclaration decl[1], 'foo'
           testOpAddress decl[3], '*'
           testOpBracket closing[0], ')'
-          
+
         it 'tokenizes all parts of variable initializations correctly', ->
           [kwd, decl, init, _, closing] = grammar.tokenizeLines 'var (\n\tm = map[string]int{\n\t\t"key": 10,\n\t}\n)'
           testVar kwd[0]
@@ -644,3 +644,69 @@ describe 'Go grammar', ->
           testVarAssignment tokens[8], 'z'
           testOpAssignment tokens[10], ':='
           testOpTermination tokens[16], ';'
+
+  describe 'in imports declarations', ->
+    testImport = (token) ->
+      expect(token.value).toBe 'import'
+      expect(token.scopes).toEqual ['source.go', 'keyword.import.go']
+
+    testImportAlias = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual ['source.go', 'entity.alias.import.go']
+
+    testImportPackage = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual ['source.go', 'entity.name.import.go']
+
+    testOpBracket = (token, op) ->
+      expect(token.value).toBe op
+      expect(token.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+
+    describe 'when it is a single line declaration', ->
+      it 'tokenizes declarations with a package name', ->
+        {tokens} = grammar.tokenizeLine 'import "fmt"'
+        testImport tokens[0]
+        testImportPackage tokens[2], 'fmt'
+
+      it 'tokenizes declarations with a package name and an alias', ->
+        {tokens} = grammar.tokenizeLine 'import . "fmt"'
+        testImport tokens[0]
+        testImportAlias tokens[2], '.'
+        testImportPackage tokens[4], 'fmt'
+        {tokens} = grammar.tokenizeLine 'import otherpackage "github.com/test/package"'
+        testImport tokens[0]
+        testImportAlias tokens[2], 'otherpackage'
+        testImportPackage tokens[4], 'github.com/test/package'
+
+    describe 'when it is a multi line declaration', ->
+      it 'tokenizes single declarations with a package name', ->
+        [kwd, decl, closing] = grammar.tokenizeLines 'import (\n\t"github.com/test/package"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testImportPackage decl[1], 'github.com/test/package'
+        testOpBracket closing[0], ')'
+
+      it 'tokenizes multiple declarations with a package name', ->
+        [kwd, decl, decl2, closing] = grammar.tokenizeLines 'import (\n\t"github.com/test/package"\n\t"fmt"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testImportPackage decl[1], 'github.com/test/package'
+        testImportPackage decl2[1], 'fmt'
+        testOpBracket closing[0], ')'
+
+      it 'tokenizes single imports with an alias for a multi-line declaration', ->
+        [kwd, decl, closing] = grammar.tokenizeLines 'import (\n\t. "github.com/test/package"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testImportAlias decl[1], '.'
+        testImportPackage decl[3], 'github.com/test/package'
+        testOpBracket closing[0], ')'
+
+      it 'tokenizes multiple imports with an alias for a multi-line declaration', ->
+        [kwd, decl, decl2, closing] = grammar.tokenizeLines 'import (\n\t. "github.com/test/package"\n\t"fmt"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testImportAlias decl[1], '.'
+        testImportPackage decl[3], 'github.com/test/package'
+        testImportPackage decl2[1], 'fmt'
+        testOpBracket closing[0], ')'
