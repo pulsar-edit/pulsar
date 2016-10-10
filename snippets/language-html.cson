@@ -215,7 +215,7 @@
     'body': '<menuitem type="${1:command}" label="${2:Save}">$0'
   'Meter':
     'prefix': 'meter'
-    'body': '<meter min="${1:200}" max="${2:500}" value="${3:350}">$0'
+    'body': '<meter value="$1"${2: min="${3:0}" max="${4:100}"}>$5</meter>$0'
   'Mail Anchor':
     'prefix': 'mailto'
     'body': '<a href="mailto:${1:joe@example.com}?subject=${2:feedback}">${3:email me}</a>$0'
