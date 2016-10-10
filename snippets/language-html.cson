@@ -86,7 +86,7 @@
     'body': '<del>$1</del>$0'
   'Details':
     'prefix': 'details'
-    'body': '<details${1: open}>$2</details>$0'
+    'body': '<details${1: open}>\n\t$2\n</details>'
   'Definition':
     'prefix': 'dfn'
     'body': '<dfn>$1</dfn>$0'
