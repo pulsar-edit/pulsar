@@ -65,9 +65,6 @@
   'Column Group':
     'prefix': 'colgroup'
     'body': '<colgroup>$1</colgroup>$0'
-  'Content':
-    'prefix': 'content'
-    'body': '<content select="$1">$2</content>$0'
   'Comment':
     'prefix': '--'
     'body': '<!-- $1 -->$0'
