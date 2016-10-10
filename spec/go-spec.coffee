@@ -611,7 +611,7 @@ describe 'Go grammar', ->
           testVarDeclaration decl[1], 'foo'
           testOpAddress decl[3], '*'
           testOpBracket closing[0], ')'
-          
+
         it 'tokenizes all parts of variable initializations correctly', ->
           [kwd, decl, init, _, closing] = grammar.tokenizeLines 'var (\n\tm = map[string]int{\n\t\t"key": 10,\n\t}\n)'
           testVar kwd[0]
@@ -644,3 +644,95 @@ describe 'Go grammar', ->
           testVarAssignment tokens[8], 'z'
           testOpAssignment tokens[10], ':='
           testOpTermination tokens[16], ';'
+
+  describe 'in imports declarations', ->
+    testImport = (token) ->
+      expect(token.value).toBe 'import'
+      expect(token.scopes).toEqual ['source.go', 'keyword.import.go']
+
+    testImportAlias = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual ['source.go', 'entity.alias.import.go']
+
+    testImportPackage = (token, name) ->
+      expect(token.value).toBe name
+      expect(token.scopes).toEqual ['source.go', 'string.quoted.double.go', 'entity.name.import.go']
+
+    testOpBracket = (token, op) ->
+      expect(token.value).toBe op
+      expect(token.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+
+    testBeginQuoted = (token) ->
+      expect(token.value).toBe '"'
+      expect(token.scopes).toEqual ['source.go', 'string.quoted.double.go', 'punctuation.definition.string.begin.go']
+
+    testEndQuoted = (token) ->
+      expect(token.value).toBe '"'
+      expect(token.scopes).toEqual ['source.go', 'string.quoted.double.go', 'punctuation.definition.string.end.go']
+
+    describe 'when it is a single line declaration', ->
+      it 'tokenizes declarations with a package name', ->
+        {tokens} = grammar.tokenizeLine 'import "fmt"'
+        testImport tokens[0]
+        testBeginQuoted tokens[2]
+        testImportPackage tokens[3], 'fmt'
+        testEndQuoted tokens[4]
+
+      it 'tokenizes declarations with a package name and an alias', ->
+        {tokens} = grammar.tokenizeLine 'import . "fmt"'
+        testImport tokens[0]
+        testImportAlias tokens[2], '.'
+        testBeginQuoted tokens[4]
+        testImportPackage tokens[5], 'fmt'
+        testEndQuoted tokens[6]
+        {tokens} = grammar.tokenizeLine 'import otherpackage "github.com/test/package"'
+        testImport tokens[0]
+        testImportAlias tokens[2], 'otherpackage'
+        testBeginQuoted tokens[4]
+        testImportPackage tokens[5], 'github.com/test/package'
+        testEndQuoted tokens[6]
+
+    describe 'when it is a multi line declaration', ->
+      it 'tokenizes single declarations with a package name', ->
+        [kwd, decl, closing] = grammar.tokenizeLines 'import (\n\t"github.com/test/package"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testBeginQuoted decl[1]
+        testImportPackage decl[2], 'github.com/test/package'
+        testEndQuoted decl[3]
+        testOpBracket closing[0], ')'
+
+      it 'tokenizes multiple declarations with a package name', ->
+        [kwd, decl, decl2, closing] = grammar.tokenizeLines 'import (\n\t"github.com/test/package"\n\t"fmt"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testBeginQuoted decl[1]
+        testImportPackage decl[2], 'github.com/test/package'
+        testEndQuoted decl[3]
+        testBeginQuoted decl2[1]
+        testImportPackage decl2[2], 'fmt'
+        testEndQuoted decl2[3]
+        testOpBracket closing[0], ')'
+
+      it 'tokenizes single imports with an alias for a multi-line declaration', ->
+        [kwd, decl, closing] = grammar.tokenizeLines 'import (\n\t. "github.com/test/package"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testImportAlias decl[1], '.'
+        testBeginQuoted decl[3]
+        testImportPackage decl[4], 'github.com/test/package'
+        testEndQuoted decl[5]
+        testOpBracket closing[0], ')'
+
+      it 'tokenizes multiple imports with an alias for a multi-line declaration', ->
+        [kwd, decl, decl2, closing] = grammar.tokenizeLines 'import (\n\t. "github.com/test/package"\n\t"fmt"\n)'
+        testImport kwd[0]
+        testOpBracket kwd[2], '('
+        testImportAlias decl[1], '.'
+        testBeginQuoted decl[3]
+        testImportPackage decl[4], 'github.com/test/package'
+        testEndQuoted decl[5]
+        testBeginQuoted decl2[1]
+        testImportPackage decl2[2], 'fmt'
+        testEndQuoted decl2[3]
+        testOpBracket closing[0], ')'
