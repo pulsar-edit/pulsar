@@ -144,17 +144,17 @@
   }
   {
     'comment': 'Single line import declarations'
-    'match': '(?<=import)\\s+([^\\s]*)?\\s?((")([^"]*)("))'
+    'match': '(?<=import)(\\s+((?!\\s+")[^\\s]*)?\\s*)((")([^"]*)("))'
     'captures':
-      '1':
-        'name': 'entity.alias.import.go'
       '2':
-        'name': 'string.quoted.double.go'
+        'name': 'entity.alias.import.go'
       '3':
-        'name': 'punctuation.definition.string.begin.go'
+        'name': 'string.quoted.double.go'
       '4':
-        'name': 'entity.name.import.go'
+        'name': 'punctuation.definition.string.begin.go'
       '5':
+        'name': 'entity.name.import.go'
+      '6':
         'name': 'punctuation.definition.string.end.go'
   }
   {
