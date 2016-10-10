@@ -251,10 +251,10 @@
     'body': '<p>$1</p>$0'
   'Parameter':
     'prefix': 'param'
-    'body': '<param name="${1:foo}" value="${2:bar}">$0'
+    'body': '<param name="$1" value="$2">$0'
   'Preformatted Text':
     'prefix': 'pre'
-    'body': '<pre>\n\t$1\n</pre>'
+    'body': '<pre>$1</pre>$0'
   'Progress':
     'prefix': 'progress'
     'body': '<progress value="${1:50}" max="${2:100}">${3:50%}</progress>$0'
