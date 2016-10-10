@@ -232,7 +232,7 @@
   # O
   'Object':
     'prefix': 'object'
-    'body': '<object data="${1:http://}" type="${2:mimetype}">$3</object>$0'
+    'body': '<object${1: type="$2"}${3: data="${4:https://}"}>\n\t$5\n</object>'
   'Ordered List':
     'prefix': 'ol'
     'body': '<ol>\n\t$1\n</ol>'
