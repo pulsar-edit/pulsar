@@ -112,7 +112,7 @@
     'body': '<link rel="shortcut icon" href="$1.ico">$0'
   'Fieldset':
     'prefix': 'fieldset'
-    'body': '<fieldset>$1</fieldset>$0'
+    'body': '<fieldset>\n\t$1\n</fieldset>'
   'Figure Caption':
     'prefix': 'figcaption'
     'body': '<figcaption>$1</figcaption>$0'
