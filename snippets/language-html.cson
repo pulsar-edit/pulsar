@@ -118,7 +118,7 @@
     'body': '<figcaption>$1</figcaption>$0'
   'Figure':
     'prefix': 'figure'
-    'body': '<figure>$1</figure>$0'
+    'body': '<figure>\n\t$1\n</figure>'
   'Footer':
     'prefix': 'footer'
     'body': '<footer>$1</footer>$0'
