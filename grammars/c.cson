@@ -48,7 +48,7 @@
     'name': 'constant.language.c'
   }
   {
-    'include': '#sizeof'
+    'include': '#operators'
   }
   {
     'include': '#numbers'
@@ -371,7 +371,7 @@
         (?=\\s)
         (?:(?<=else|new|return) | (?<!\\w)) (\\s+)
       )?
-      
+
       # Actual name
       (
         \\b
@@ -769,9 +769,68 @@
         'include': '#block_innards'
       }
     ]
-  'sizeof':
-    'match': '\\b(sizeof)\\b'
-    'name': 'keyword.operator.sizeof.c'
+  'operators':
+    'patterns': [
+      {
+        'match': '(?<![\\w$])(sizeof)(?![\\w$])'
+        'name': 'keyword.operator.sizeof.c'
+      }
+      {
+        'match': '--'
+        'name': 'keyword.operator.decrement.c'
+      }
+      {
+        'match': '\\+\\+'
+        'name': 'keyword.operator.increment.c'
+      }
+      {
+        'match': '%=|\\+=|-=|\\*=|(?<!\\()/='
+        'name': 'keyword.operator.assignment.compound.c'
+      }
+      {
+        'match': '&=|\\^=|<<=|>>=|\\|='
+        'name': 'keyword.operator.assignment.compound.bitwise.c'
+      }
+      {
+        'match': '<<|>>'
+        'name': 'keyword.operator.bitwise.shift.c'
+      }
+      {
+        'match': '!=|<=|>=|==|<|>'
+        'name': 'keyword.operator.comparison.c'
+      }
+      {
+        'match': '&&|!|\\|\\|'
+        'name': 'keyword.operator.logical.c'
+      }
+      {
+        'match': '&|\\||\\^|~'
+        'name': 'keyword.operator.c'
+      }
+      {
+        'match': '='
+        'name': 'keyword.operator.assignment.c'
+      }
+      {
+        'match': '%|\\*|/|-|\\+'
+        'name': 'keyword.operator.c'
+      }
+      {
+        'begin': '\\?'
+        'beginCaptures':
+          '0':
+            'name': 'keyword.operator.ternary.c'
+        'end': ':'
+        'endCaptures':
+          '0':
+            'name': 'keyword.operator.ternary.c'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
   'strings':
     'patterns': [
       {
