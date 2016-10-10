@@ -238,17 +238,17 @@
     'body': '<ol>\n\t$1\n</ol>'
   'Option Group':
     'prefix': 'optgroup'
-    'body': '<optgroup label="${1:Group 1}">\n\t$2\n</optgroup>'
+    'body': '<optgroup label="$1">\n\t$2\n</optgroup>'
   'Option':
-    'prefix': 'opt'
-    'body': '<option${1: value="${2:option}"}>${3:option}</option>$0'
+    'prefix': 'option'
+    'body': '<option${1: value="$2"}>$3</option>$0'
   'Output':
     'prefix': 'output'
     'body': '<output name="${1:result}">$2</output>$0'
   # P
   'Paragraph':
     'prefix': 'p'
-    'body': '<p>\n\t$1\n</p>'
+    'body': '<p>$1</p>$0'
   'Parameter':
     'prefix': 'param'
     'body': '<param name="${1:foo}" value="${2:bar}">$0'
