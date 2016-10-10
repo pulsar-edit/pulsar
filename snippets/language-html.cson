@@ -33,10 +33,10 @@
     'body': '<base href="${1:#}" target="${2:_blank}">$0'
   'Bi-Directional Isolation':
     'prefix': 'bdi'
-    'body': '<bdi dir="${1:auto}">$2</bdi>$0'
+    'body': '<bdi${1: dir="${2:rtl}"}>$3</bdi>$0'
   'Bi-Directional Override':
     'prefix': 'bdo'
-    'body': '<bdo dir="${1:auto}">$2</bdo>$0'
+    'body': '<bdo dir="${1:rtl}">$2</bdo>$0'
   'Blockquote':
     'prefix': 'blockquote'
     'body': '<blockquote cite="${1:http://}">\n\t$2\n</blockquote>'
