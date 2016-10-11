@@ -336,7 +336,7 @@
     'body': '<template id="$1">\n\t$2\n</template>'
   'Text Area':
     'prefix': 'textarea'
-    'body': '<textarea name="${1:name}" rows="${2:8}" cols="${3:40}">$4</textarea>$0'
+    'body': '<textarea name="${1:name}" rows="${2:8}" cols="${3:80}">$4</textarea>$0'
   'Table Foot':
     'prefix': 'tfoot'
     'body': '<tfoot>\n\t$1\n</tfoot>'
@@ -351,7 +351,7 @@
     'body': '<time>$1</time>$0'
   'Title':
     'prefix': 'title'
-    'body': '<title>${1:Page Title}</title>$0'
+    'body': '<title>${1:Home}</title>$0'
   'Table Row':
     'prefix': 'tr'
     'body': '<tr>\n\t$1\n</tr>'
