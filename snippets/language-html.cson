@@ -77,7 +77,7 @@
     'body': '<data value="$1">$2</data>$0'
   'Data List':
     'prefix': 'datalist'
-    'body': '<datalist class="$1">\n\t$2\n</datalist>'
+    'body': '<datalist${1: class="$2"}>\n\t$3\n</datalist>'
   'Description':
     'prefix': 'dd'
     'body': '<dd>$1</dd>$0'
@@ -92,13 +92,13 @@
     'body': '<dfn>$1</dfn>$0'
   'Description List':
     'prefix': 'dl'
-    'body': '<dl class="$1">\n\t$2\n</dl>'
+    'body': '<dl${1: class="$2"}>\n\t$3\n</dl>'
   'Definition Term':
     'prefix': 'dt'
     'body': '<dt>$1</dt>$0'
   'Div':
     'prefix': 'div'
-    'body': '<div class="$2">\n\t$3\n</div>'
+    'body': '<div class="$1">\n\t$2\n</div>'
   # E
   'Emphasis':
     'prefix': 'em'
@@ -166,7 +166,7 @@
     'body': '<iframe src="$1" width="$2" height="$3">$4</iframe>$0'
   'Input':
     'prefix': 'input'
-    'body': '<input type="${1:button}" name="${2:name}" value="$3">$0'
+    'body': '<input type="${1:text}" name="$2" value="$3">$0'
   'Image':
     'prefix': 'img'
     'body': '<img src="$1" alt="$2">$0'
@@ -196,7 +196,7 @@
     'body': '<li>$1</li>$0'
   'Link':
     'prefix': 'link'
-    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" media="${3:screen}" title="${4:no title}">$0'
+    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}">$0'
   # M
   'Main':
     'prefix': 'main'
