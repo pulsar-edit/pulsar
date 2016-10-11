@@ -151,6 +151,9 @@
   'Header':
     'prefix': 'header'
     'body': '<header>\n\t$1\n</header>'
+  'Heading Group':
+    'prefix': 'hgroup'
+    'body': '<hgroup>\n\t$1\n</hgroup>'
   'Horizontal Rule':
     'prefix': 'hr'
     'body': '<hr>'
