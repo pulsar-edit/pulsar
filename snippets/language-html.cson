@@ -207,6 +207,9 @@
   'Mark':
     'prefix': 'mark'
     'body': '<mark>$1</mark>$0'
+  'MathML':
+    'prefix': 'math'
+    'body': '<math>\n\t$1\n</math>'
   'Menu':
     'prefix': 'menu'
     'body': '<menu>\n\t$1\n</menu>'
@@ -321,6 +324,9 @@
   'Superscript':
     'prefix': 'sup'
     'body': '<sup>$1</sup>$0'
+  'SVG':
+    'prefix': 'svg'
+    'body': '<svg>\n\t$1\n</svg>'
   # T
   'Table':
     'prefix': 'table'
