@@ -330,7 +330,7 @@
     'body': '<tbody>\n\t$1\n</tbody>'
   'Table Cell':
     'prefix': 'td'
-    'body': '<td>\n\t$1\n</td>'
+    'body': '<td>$1</td>$0'
   'Template':
     'prefix': 'template'
     'body': '<template id="$1">\n\t$2\n</template>'
@@ -342,7 +342,7 @@
     'body': '<tfoot>\n\t$1\n</tfoot>'
   'Table Header Cell':
     'prefix': 'th'
-    'body': '<th>\n\t$1\n</th>'
+    'body': '<th>$1</th>$0'
   'Table Head':
     'prefix': 'thead'
     'body': '<thead>\n\t$1\n</thead>'
