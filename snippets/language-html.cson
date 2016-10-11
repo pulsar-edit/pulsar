@@ -257,11 +257,11 @@
     'body': '<pre>$1</pre>$0'
   'Progress':
     'prefix': 'progress'
-    'body': '<progress value="${1:50}" max="${2:100}">${3:50%}</progress>$0'
+    'body': '<progress value="${1:0}" max="${2:100}">${3:0%}</progress>$0'
   # Q
   'Quote':
     'prefix': 'q'
-    'body': '<q cite="$1">$2</q>$0'
+    'body': '<q${1: cite="$2"}>$3</q>$0'
   # R
   'Ruby Base':
     'prefix': 'rb'
@@ -302,7 +302,7 @@
     'body': '<small>$1</small>$0'
   'Source':
     'prefix': 'source'
-    'body': '<source src="${1:http://}" type="${2:mimetype}">$0'
+    'body': '<source src="${1:https://}" type="${2:video/}">$0'
   'Span':
     'prefix': 'span'
     'body': '<span>$1</span>$0'
