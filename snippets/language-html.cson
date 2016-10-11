@@ -164,12 +164,12 @@
   'Inline Frame':
     'prefix': 'iframe'
     'body': '<iframe src="$1" width="$2" height="$3">$4</iframe>$0'
-  'Input':
-    'prefix': 'input'
-    'body': '<input type="${1:text}" name="$2" value="$3">$0'
   'Image':
     'prefix': 'img'
     'body': '<img src="$1" alt="$2">$0'
+  'Input':
+    'prefix': 'input'
+    'body': '<input type="${1:text}" name="$2" value="$3">$0'
   'Import':
     'prefix': 'import'
     'body': '<link rel="import" href="$1">$0'
@@ -224,7 +224,7 @@
     'body': '<a href="mailto:${1:joe@example.com}?subject=${2:feedback}">${3:email me}</a>$0'
   'Meta':
     'prefix': 'meta'
-    'body': '<meta name="${1:name}" content="${2:content}">$0'
+    'body': '<meta name="${1:twitter:}" content="$2">$0'
   # N
   'Navigation':
     'prefix': 'nav'
