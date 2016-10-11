@@ -61,7 +61,7 @@
     'body': '<code>$1</code>$0'
   'Column':
     'prefix': 'col'
-    'body': '<col>$1</col>$0'
+    'body': '<col${1: span="${2:2}"}>$0'
   'Column Group':
     'prefix': 'colgroup'
     'body': '<colgroup>$1</colgroup>$0'
