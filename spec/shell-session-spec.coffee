@@ -21,7 +21,7 @@ describe "Shell session grammar", ->
       expect(tokens[1]).toEqual value: ' ', scopes: ['text.shell-session']
       expect(tokens[2]).toEqual value: 'echo', scopes: ['text.shell-session', 'source.shell', 'support.function.builtin.shell']
 
-  it "dose not tokenize prompts with indents", ->
+  it "does not tokenize prompts with indents", ->
     for delim in prompts
       {tokens} = grammar.tokenizeLine('  ' + delim + ' echo $FOO')
 
