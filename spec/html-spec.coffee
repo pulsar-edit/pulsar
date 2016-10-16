@@ -108,7 +108,7 @@ describe 'HTML grammar', ->
       expect(tokens[0]).toEqual value: '&', scopes: ['text.html.basic', 'invalid.illegal.bad-ampersand.html']
       expect(tokens[3]).toEqual value: 'amp', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
       expect(tokens[4]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
-      expect(tokens[7]).toEqual value: 'a', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[7]).toEqual value: 'a', scopes: ['text.html.basic']
 
   describe "firstLineMatch", ->
     it "recognises HTML5 doctypes", ->
