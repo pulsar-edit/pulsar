@@ -252,21 +252,6 @@
         'end': '(</)((?i:script))'
         'patterns': [
           {
-            'captures':
-              '1':
-                'name': 'punctuation.definition.comment.js'
-            'match': '(//).*?((?=</script)|$\\n?)'
-            'name': 'comment.line.double-slash.js'
-          }
-          {
-            'begin': '/\\*'
-            'captures':
-              '0':
-                'name': 'punctuation.definition.comment.js'
-            'end': '\\*/|(?=</script)'
-            'name': 'comment.block.js'
-          }
-          {
             'include': 'source.js'
           }
         ]
