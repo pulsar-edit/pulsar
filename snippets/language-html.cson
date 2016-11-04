@@ -8,10 +8,10 @@
     'body': '<abbr title="$1">$2</abbr>$0'
   'Address':
     'prefix': 'address'
-    'body': '<address ${1:class="$2"}>\n\t$3\n</address>'
+    'body': '<address${1: class="$2"}>\n\t$3\n</address>'
   'Area':
     'prefix': 'area'
-    'body': '<area ${1:shape="${2:default}"} coords="$3" ${4:href="${5:#}"} />$0'
+    'body': '<area${1: shape="${2:default}"} coords="$3"${4: href="${5:#}" alt="$6"}>$0'
   'Article':
     'prefix': 'article'
     'body': '<article class="$1">\n\t$2\n</article>'
@@ -30,13 +30,13 @@
     'body': '<b>$1</b>$0'
   'Base':
     'prefix': 'base'
-    'body': '<base href="${1:#}" target="${2:_blank}" />$0'
+    'body': '<base href="${1:#}" target="${2:_blank}">$0'
   'Bi-Directional Isolation':
     'prefix': 'bdi'
-    'body': '<bdi dir="${1:auto}">$2</bdi>$0'
+    'body': '<bdi${1: dir="${2:rtl}"}>$3</bdi>$0'
   'Bi-Directional Override':
     'prefix': 'bdo'
-    'body': '<bdo dir="${1:auto}">$2</bdo>$0'
+    'body': '<bdo dir="${1:rtl}">$2</bdo>$0'
   'Blockquote':
     'prefix': 'blockquote'
     'body': '<blockquote cite="${1:http://}">\n\t$2\n</blockquote>'
@@ -61,13 +61,10 @@
     'body': '<code>$1</code>$0'
   'Column':
     'prefix': 'col'
-    'body': '<col>$1</col>$0'
+    'body': '<col${1: span="${2:2}"}>$0'
   'Column Group':
     'prefix': 'colgroup'
     'body': '<colgroup>$1</colgroup>$0'
-  'Content':
-    'prefix': 'content'
-    'body': '<content select="$1">$2</content>$0'
   'Comment':
     'prefix': '--'
     'body': '<!-- $1 -->$0'
@@ -80,7 +77,7 @@
     'body': '<data value="$1">$2</data>$0'
   'Data List':
     'prefix': 'datalist'
-    'body': '<datalist class="$1">\n\t$2\n</datalist>'
+    'body': '<datalist${1: class="$2"}>\n\t$3\n</datalist>'
   'Description':
     'prefix': 'dd'
     'body': '<dd>$1</dd>$0'
@@ -89,19 +86,19 @@
     'body': '<del>$1</del>$0'
   'Details':
     'prefix': 'details'
-    'body': '<details ${1:open}>$2</details>$0'
+    'body': '<details${1: open}>\n\t$2\n</details>'
   'Definition':
     'prefix': 'dfn'
     'body': '<dfn>$1</dfn>$0'
   'Description List':
     'prefix': 'dl'
-    'body': '<dl class="$1">\n\t$2\n</dl>'
+    'body': '<dl${1: class="$2"}>\n\t$3\n</dl>'
   'Definition Term':
     'prefix': 'dt'
     'body': '<dt>$1</dt>$0'
   'Div':
     'prefix': 'div'
-    'body': '<div class="$2">\n\t$3\n</div>'
+    'body': '<div class="$1">\n\t$2\n</div>'
   # E
   'Emphasis':
     'prefix': 'em'
@@ -115,13 +112,13 @@
     'body': '<link rel="shortcut icon" href="$1.ico">$0'
   'Fieldset':
     'prefix': 'fieldset'
-    'body': '<fieldset>$1</fieldset>$0'
+    'body': '<fieldset>\n\t$1\n</fieldset>'
   'Figure Caption':
     'prefix': 'figcaption'
     'body': '<figcaption>$1</figcaption>$0'
   'Figure':
     'prefix': 'figure'
-    'body': '<figure>$1</figure>$0'
+    'body': '<figure>\n\t$1\n</figure>'
   'Footer':
     'prefix': 'footer'
     'body': '<footer>$1</footer>$0'
@@ -154,6 +151,9 @@
   'Header':
     'prefix': 'header'
     'body': '<header>\n\t$1\n</header>'
+  'Heading Group':
+    'prefix': 'hgroup'
+    'body': '<hgroup>\n\t$1\n</hgroup>'
   'Horizontal Rule':
     'prefix': 'hr'
     'body': '<hr>'
@@ -167,12 +167,12 @@
   'Inline Frame':
     'prefix': 'iframe'
     'body': '<iframe src="$1" width="$2" height="$3">$4</iframe>$0'
-  'Input':
-    'prefix': 'input'
-    'body': '<input type="${1:button}" name="${2:name}" value="$3">$0'
   'Image':
     'prefix': 'img'
-    'body': '<img src="$1" alt="$2" />$0'
+    'body': '<img src="$1" alt="$2">$0'
+  'Input':
+    'prefix': 'input'
+    'body': '<input type="${1:text}" name="$2" value="$3">$0'
   'Import':
     'prefix': 'import'
     'body': '<link rel="import" href="$1">$0'
@@ -199,7 +199,7 @@
     'body': '<li>$1</li>$0'
   'Link':
     'prefix': 'link'
-    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}" media="${3:screen}" title="${4:no title}">$0'
+    'body': '<link rel="${1:stylesheet}" href="${2:/css/master.css}">$0'
   # M
   'Main':
     'prefix': 'main'
@@ -210,6 +210,9 @@
   'Mark':
     'prefix': 'mark'
     'body': '<mark>$1</mark>$0'
+  'MathML':
+    'prefix': 'math'
+    'body': '<math>\n\t$1\n</math>'
   'Menu':
     'prefix': 'menu'
     'body': '<menu>\n\t$1\n</menu>'
@@ -218,13 +221,13 @@
     'body': '<menuitem type="${1:command}" label="${2:Save}">$0'
   'Meter':
     'prefix': 'meter'
-    'body': '<meter min="${1:200}" max="${2:500}" value="${3:350}">$0'
+    'body': '<meter value="$1"${2: min="${3:0}" max="${4:100}"}>$5</meter>$0'
   'Mail Anchor':
     'prefix': 'mailto'
     'body': '<a href="mailto:${1:joe@example.com}?subject=${2:feedback}">${3:email me}</a>$0'
   'Meta':
     'prefix': 'meta'
-    'body': '<meta name="${1:name}" content="${2:content}">$0'
+    'body': '<meta name="${1:twitter:}" content="$2">$0'
   # N
   'Navigation':
     'prefix': 'nav'
@@ -235,36 +238,36 @@
   # O
   'Object':
     'prefix': 'object'
-    'body': '<object data="${1:http://}" type="${2:mimetype}">$3</object>$0'
+    'body': '<object${1: type="$2"}${3: data="${4:https://}"}>\n\t$5\n</object>'
   'Ordered List':
     'prefix': 'ol'
     'body': '<ol>\n\t$1\n</ol>'
   'Option Group':
     'prefix': 'optgroup'
-    'body': '<optgroup label="${1:Group 1}">\n\t$2\n</optgroup>'
+    'body': '<optgroup label="$1">\n\t$2\n</optgroup>'
   'Option':
-    'prefix': 'opt'
-    'body': '<option${1: value="${2:option}"}>${3:option}</option>$0'
+    'prefix': 'option'
+    'body': '<option${1: value="$2"}>$3</option>$0'
   'Output':
     'prefix': 'output'
     'body': '<output name="${1:result}">$2</output>$0'
   # P
   'Paragraph':
     'prefix': 'p'
-    'body': '<p>\n\t$1\n</p>'
+    'body': '<p>$1</p>$0'
   'Parameter':
     'prefix': 'param'
-    'body': '<param name="${1:foo}" value="${2:bar}">$0'
+    'body': '<param name="$1" value="$2">$0'
   'Preformatted Text':
     'prefix': 'pre'
-    'body': '<pre>\n\t$1\n</pre>'
+    'body': '<pre>$1</pre>$0'
   'Progress':
     'prefix': 'progress'
-    'body': '<progress value="${1:50}" max="${2:100}">${3:50%}</progress>$0'
+    'body': '<progress value="${1:0}" max="${2:100}">${3:0%}</progress>$0'
   # Q
   'Quote':
     'prefix': 'q'
-    'body': '<q cite="$1">$2</q>$0'
+    'body': '<q${1: cite="$2"}>$3</q>$0'
   # R
   'Ruby Base':
     'prefix': 'rb'
@@ -305,7 +308,7 @@
     'body': '<small>$1</small>$0'
   'Source':
     'prefix': 'source'
-    'body': '<source src="${1:http://}" type="${2:mimetype}">$0'
+    'body': '<source src="${1:https://}" type="${2:video/}">$0'
   'Span':
     'prefix': 'span'
     'body': '<span>$1</span>$0'
@@ -324,6 +327,9 @@
   'Superscript':
     'prefix': 'sup'
     'body': '<sup>$1</sup>$0'
+  'SVG':
+    'prefix': 'svg'
+    'body': '<svg>\n\t$1\n</svg>'
   # T
   'Table':
     'prefix': 'table'
@@ -333,19 +339,19 @@
     'body': '<tbody>\n\t$1\n</tbody>'
   'Table Cell':
     'prefix': 'td'
-    'body': '<td>\n\t$1\n</td>'
+    'body': '<td>$1</td>$0'
   'Template':
     'prefix': 'template'
     'body': '<template id="$1">\n\t$2\n</template>'
   'Text Area':
     'prefix': 'textarea'
-    'body': '<textarea name="${1:name}" rows="${2:8}" cols="${3:40}">$4</textarea>$0'
+    'body': '<textarea name="${1:name}" rows="${2:8}" cols="${3:80}">$4</textarea>$0'
   'Table Foot':
     'prefix': 'tfoot'
     'body': '<tfoot>\n\t$1\n</tfoot>'
   'Table Header Cell':
     'prefix': 'th'
-    'body': '<th>\n\t$1\n</th>'
+    'body': '<th>$1</th>$0'
   'Table Head':
     'prefix': 'thead'
     'body': '<thead>\n\t$1\n</thead>'
@@ -354,7 +360,7 @@
     'body': '<time>$1</time>$0'
   'Title':
     'prefix': 'title'
-    'body': '<title>${1:Page Title}</title>$0'
+    'body': '<title>${1:Home}</title>$0'
   'Table Row':
     'prefix': 'tr'
     'body': '<tr>\n\t$1\n</tr>'
