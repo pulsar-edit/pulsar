@@ -82,21 +82,6 @@ describe 'HTML grammar', ->
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.js.embedded.html']
       expect(lines[1][1]).toEqual value: 'var', scopes: ['text.html.basic', 'source.js.embedded.html', 'storage.type.var.js']
 
-    it 'detects </script> tags even if they would otherwise be valid JavaScript', ->
-      # This spec relies on language-javascript's "embedded javascript.cson", so if it fails, look there
-      lines = grammar.tokenizeLines '''
-        <script>
-          var test = 'test</script>';
-          var shouldntbematched;
-      '''
-
-      expect(lines[1][1]).toEqual value: 'var', scopes: ['text.html.basic', 'source.js.embedded.html', 'storage.type.var.js']
-      expect(lines[1][5]).toEqual value: "'", scopes: ['text.html.basic', 'source.js.embedded.html', 'string.quoted.single.js', 'punctuation.definition.string.begin.js']
-      expect(lines[1][6]).toEqual value: 'test', scopes: ['text.html.basic', 'source.js.embedded.html', 'string.quoted.single.js']
-      expect(lines[1][7]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.begin.html']
-      expect(lines[1][10]).toEqual value: "';", scopes: ['text.html.basic']
-      expect(lines[2][0]).toEqual value: '  var shouldntbematched;', scopes: ['text.html.basic']
-
   describe "comments", ->
     it "tokenizes -- as an error", ->
       {tokens} = grammar.tokenizeLine '<!-- some comment --->'
