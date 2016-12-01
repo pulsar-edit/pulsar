@@ -828,6 +828,15 @@
           {
             'include': '$self'
           }
+          {
+            'include': '#access'
+          }
+          {
+            'include': '#libc'
+          }
+          {
+            'include': '#c_function_call'
+          }
         ]
       }
     ]
