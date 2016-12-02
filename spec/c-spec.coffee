@@ -624,6 +624,17 @@ describe "Language-C", ->
         expect(tokens[6]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
         expect(tokens[7]).toEqual value: ' d', scopes: ['source.c']
 
+      it "tokenizes ternary operators with pointer dereferencing", ->
+        {tokens} = grammar.tokenizeLine('a ? b->c : d')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+        expect(tokens[3]).toEqual value: '->', scopes: ['source.c', 'punctuation.separator.pointer-access.c']
+        expect(tokens[4]).toEqual value: 'c', scopes: ['source.c', 'variable.other.member.c']
+        expect(tokens[5]).toEqual value: ' ', scopes: ['source.c']
+        expect(tokens[6]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[7]).toEqual value: ' d', scopes: ['source.c']
+
       it "tokenizes ternary operators with function invocation", ->
         {tokens} = grammar.tokenizeLine('a ? f(b) : c')
         expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']

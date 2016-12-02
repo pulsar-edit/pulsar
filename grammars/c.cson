@@ -826,10 +826,10 @@
             'name': 'keyword.operator.ternary.c'
         'patterns': [
           {
-            'include': '$self'
+            'include': '#access'
           }
           {
-            'include': '#access'
+            'include': '$self'
           }
           {
             'include': '#libc'
