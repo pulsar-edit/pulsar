@@ -318,9 +318,6 @@
         'include': '#preprocessor-rule-other-block'
       }
       {
-        'include': '#sizeof'
-      }
-      {
         'include': '#access'
       }
       {
