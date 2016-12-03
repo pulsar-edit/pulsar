@@ -485,7 +485,7 @@
   'line_continuation_character':
     'patterns': [
       {
-        'match': '(\\\\)\\s*\\n'
+        'match': '(\\\\)\\n'
         'captures':
           '1':
             'name': 'constant.character.escape.line-continuation.c'
