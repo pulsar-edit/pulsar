@@ -823,6 +823,15 @@
             'name': 'keyword.operator.ternary.c'
         'patterns': [
           {
+            'include': '#access'
+          }
+          {
+            'include': '#libc'
+          }
+          {
+            'include': '#c_function_call'
+          }
+          {
             'include': '$self'
           }
         ]
