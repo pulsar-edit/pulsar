@@ -829,13 +829,13 @@
             'include': '#access'
           }
           {
-            'include': '$self'
-          }
-          {
             'include': '#libc'
           }
           {
             'include': '#c_function_call'
+          }
+          {
+            'include': '$self'
           }
         ]
       }
