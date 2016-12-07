@@ -795,3 +795,12 @@ describe "Language-C", ->
         expect(lines[0][1]).toEqual value: ' separated', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
         expect(lines[0][2]).toEqual value: '\\', scopes: ['source.cpp', 'comment.line.double-slash.cpp', 'constant.character.escape.line-continuation.c']
         expect(lines[1][0]).toEqual value: 'comment', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
+
+        lines = grammar.tokenizeLines '''
+          // The space character \x20 is used to prevent stripping trailing whitespace
+          // not separated\\\x20
+          comment
+        '''
+        expect(lines[1][0]).toEqual value: '//', scopes: ['source.cpp', 'comment.line.double-slash.cpp', 'punctuation.definition.comment.cpp']
+        expect(lines[1][1]).toEqual value: ' not separated\\ ', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
+        expect(lines[2][0]).toEqual value: 'comment', scopes: ['source.cpp']
