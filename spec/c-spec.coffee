@@ -802,7 +802,7 @@ describe "Language-C", ->
       '''
       expect(lines[0][0]).toEqual value: '#', scopes: ['source.cpp', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c', 'punctuation.definition.directive.c']
       expect(lines[0][1]).toEqual value: 'ifdef', scopes: ['source.cpp', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']
-      expect(lines[0][3]).toEqual value: '__cplusplus', scopes: ['source.cpp', 'meta.preprocessor.c' ,'entity.name.function.preprocessor.c']
+      expect(lines[0][3]).toEqual value: '__cplusplus', scopes: ['source.cpp', 'meta.preprocessor.c', 'entity.name.function.preprocessor.c']
       expect(lines[1][0]).toEqual value: 'extern', scopes: ['source.cpp', 'meta.extern-block.cpp', 'storage.modifier.cpp']
       expect(lines[1][2]).toEqual value: '"', scopes: ['source.cpp', 'meta.extern-block.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.begin.cpp']
       expect(lines[1][3]).toEqual value: 'C', scopes: ['source.cpp', 'meta.extern-block.cpp', 'string.quoted.double.cpp']
