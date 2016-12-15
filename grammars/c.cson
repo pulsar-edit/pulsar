@@ -100,9 +100,15 @@
         'name': 'keyword.control.directive.diagnostic.$3.c'
       '2':
         'name': 'punctuation.definition.directive.c'
-    'end': '(?<!\\\\)(?=\\n)'
+    'end': '(?<!\\\\)(?=\\n)|(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))'
     'name': 'meta.preprocessor.diagnostic.c'
     'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#strings'
+      }
       {
         'include': '#line_continuation_character'
       }

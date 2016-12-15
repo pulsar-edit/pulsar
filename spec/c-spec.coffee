@@ -278,16 +278,16 @@ describe "Language-C", ->
 
       describe "diagnostics", ->
         it "tokenizes '#error'", ->
-          {tokens} = grammar.tokenizeLine '#error C++ compiler required.'
+          {tokens} = grammar.tokenizeLine '#error "C++ compiler required."'
           expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.error.c', 'punctuation.definition.directive.c']
           expect(tokens[1]).toEqual value: 'error', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.error.c']
-          expect(tokens[2]).toEqual value: ' C++ compiler required.', scopes: ['source.c', 'meta.preprocessor.diagnostic.c']
+          expect(tokens[4]).toEqual value: 'C++ compiler required.', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'string.quoted.double.c']
 
         it "tokenizes '#warning'", ->
-          {tokens} = grammar.tokenizeLine '#warning This is a warning.'
+          {tokens} = grammar.tokenizeLine '#warning "This is a warning."'
           expect(tokens[0]).toEqual value: '#', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.warning.c', 'punctuation.definition.directive.c']
           expect(tokens[1]).toEqual value: 'warning', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.warning.c']
-          expect(tokens[2]).toEqual value: ' This is a warning.', scopes: ['source.c', 'meta.preprocessor.diagnostic.c']
+          expect(tokens[4]).toEqual value: 'This is a warning.', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'string.quoted.double.c']
 
       describe "conditionals", ->
         it "tokenizes if-elif-else preprocessor blocks", ->
