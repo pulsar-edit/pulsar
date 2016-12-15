@@ -346,7 +346,7 @@
         'include': '#preprocessor-rule-disabled-block'
       }
       {
-        'include': '#preprocessor-rule-other-block'
+        'include': '#preprocessor-rule-conditional-block'
       }
       {
         'include': '#access'
