@@ -325,7 +325,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.section.block.begin.c'
-        'end': '\\}|(?=\\s*#\\s*endif\\b)'
+        'end': '\\}|(?=\\s*#\\s*(?:elif|else|endif)\\b)'
         'endCaptures':
           '0':
             'name': 'punctuation.section.block.end.c'
