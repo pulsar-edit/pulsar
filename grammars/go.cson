@@ -8,22 +8,7 @@
 'foldingStopMarker': '(}|\\))\\s*$'
 'patterns': [
   {
-    'comment': 'Block comments'
-    'begin': '/\\*'
-    'end': '\\*/'
-    'captures':
-      '0':
-        'name': 'punctuation.definition.comment.go'
-    'name': 'comment.block.go'
-  }
-  {
-    'comment': 'Line comments'
-    'begin': '//'
-    'beginCaptures':
-      '0':
-        'name': 'punctuation.definition.comment.go'
-    'end': '$'
-    'name': 'comment.line.double-slash.go'
+    'include': '#comments'
   }
   {
     'comment': 'Interpreted string literals'
@@ -178,6 +163,9 @@
           '5':
             'name': 'punctuation.definition.string.end.go'
       }
+      {
+        'include': '#comments'
+      }
     ]
     'end': '\\)'
     'endCaptures':
@@ -291,6 +279,25 @@
       {
         'match': '\\[|\\]'
         'name': 'punctuation.other.bracket.square.go'
+      }
+    ]
+  'comments':
+    'patterns': [
+      {
+        'begin': '/\\*'
+        'end': '\\*/'
+        'captures':
+          '0':
+            'name': 'punctuation.definition.comment.go'
+        'name': 'comment.block.go'
+      }
+      {
+        'begin': '//'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.go'
+        'end': '$'
+        'name': 'comment.line.double-slash.go'
       }
     ]
   'delimiters':

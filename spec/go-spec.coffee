@@ -27,6 +27,14 @@ describe 'Go grammar', ->
     expect(tokens[2][0].value).toEqual '*/'
     expect(tokens[2][0].scopes).toEqual ['source.go', 'comment.block.go', 'punctuation.definition.comment.go']
 
+  it 'tokenizes comments in imports', ->
+    lines = grammar.tokenizeLines '''
+      import (
+        // comment!
+      )
+    '''
+    expect(lines[1][1]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
+
   it 'tokenizes strings', ->
     delims =
       'string.quoted.double.go': '"'
