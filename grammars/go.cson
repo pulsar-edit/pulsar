@@ -109,7 +109,7 @@
           }
         ]
       '3':
-        'name': 'entity.name.function'
+        'name': 'entity.name.function.go'
   }
   {
     'comment': 'Functions'
