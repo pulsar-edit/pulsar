@@ -138,6 +138,20 @@ describe "Shell script grammar", ->
       expect(tokens[1][0]).toEqual value: 'lorem ipsum', scopes: ['source.shell', 'meta.herestring.shell', scope]
       expect(tokens[1][1]).toEqual value: delim, scopes: ['source.shell', 'meta.herestring.shell', scope, 'punctuation.definition.string.end.shell']
 
+    for scope, delim of delimsByScope
+      tokens = grammar.tokenizeLines """
+      $cmd <<< #{delim}
+      lorem ipsum#{delim}
+      """
+
+      expect(tokens[0][0]).toEqual value: '$', scopes: ['source.shell', 'variable.other.normal.shell', 'punctuation.definition.variable.shell']
+      expect(tokens[0][1]).toEqual value: 'cmd', scopes: ['source.shell', 'variable.other.normal.shell']
+      expect(tokens[0][3]).toEqual value: '<<<', scopes: ['source.shell', 'meta.herestring.shell', 'keyword.operator.herestring.shell']
+      expect(tokens[0][4]).toEqual value: ' ', scopes: ['source.shell', 'meta.herestring.shell']
+      expect(tokens[0][5]).toEqual value: delim, scopes: ['source.shell', 'meta.herestring.shell', scope, 'punctuation.definition.string.begin.shell']
+      expect(tokens[1][0]).toEqual value: 'lorem ipsum', scopes: ['source.shell', 'meta.herestring.shell', scope]
+      expect(tokens[1][1]).toEqual value: delim, scopes: ['source.shell', 'meta.herestring.shell', scope, 'punctuation.definition.string.end.shell']
+
   it "tokenizes heredocs", ->
     delimsByScope =
       "ruby": "RUBY"
