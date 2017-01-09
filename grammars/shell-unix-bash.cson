@@ -1060,7 +1060,7 @@
         'name': 'variable.other.bracket.shell'
         'patterns': [
           {
-            'match': '!|:[-=?]?|\\*|@|#{1,2}|%{1,2}|/'
+            'match': '!|:[-=?]?|\\*|@|\#\{1,2}|%{1,2}|/' # #{ is escaped to prevent coffeelint complaining about interpolation
             'name': 'keyword.operator.expansion.shell'
           }
           {
