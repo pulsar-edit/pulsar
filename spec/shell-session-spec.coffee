@@ -12,15 +12,20 @@ describe "Shell session grammar", ->
     expect(grammar).toBeDefined()
     expect(grammar.scopeName).toBe "text.shell-session"
 
+  prompts = [">", "$", "#", "%"]
   it "tokenizes prompts", ->
-    prompts = [">", "$", "#", "%"]
-
     for delim in prompts
       {tokens} = grammar.tokenizeLine(delim + ' echo $FOO')
 
       expect(tokens[0]).toEqual value: delim, scopes: ['text.shell-session', 'punctuation.separator.prompt.shell-session']
       expect(tokens[1]).toEqual value: ' ', scopes: ['text.shell-session']
       expect(tokens[2]).toEqual value: 'echo', scopes: ['text.shell-session', 'source.shell', 'support.function.builtin.shell']
+
+  it "does not tokenize prompts with indents", ->
+    for delim in prompts
+      {tokens} = grammar.tokenizeLine('  ' + delim + ' echo $FOO')
+
+      expect(tokens[0]).toEqual value: '  ' + delim + ' echo $FOO', scopes: ['text.shell-session', 'meta.output.shell-session']
 
   it "tokenizes prompts with prefixes", ->
     {tokens} = grammar.tokenizeLine('user@machine $ echo $FOO')

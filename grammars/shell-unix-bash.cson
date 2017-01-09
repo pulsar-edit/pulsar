@@ -5,12 +5,14 @@
   'bash'
   'ksh'
   'zsh'
+  'zsh-theme'
   'zshenv'
   'zlogin'
   'zlogout'
   'zprofile'
   'zshrc'
   'bashrc'
+  'bash_aliases'
   'bash_profile'
   'bash_login'
   'profile'
@@ -18,9 +20,30 @@
   '.textmate_init'
   'npmrc'
   'PKGBUILD'
+  'install'
   'cygport'
+  'bats'
+  'ebuild'
 ]
-'firstLineMatch': '^#!.*\\b(bash|zsh|sh|tcsh|ksh|dash|ash|csh)|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-'
+'firstLineMatch': '''(?x)
+  # Hashbang
+  ^\\#!.*(?:\\s|\\/)
+    (?:bash|zsh|sh|tcsh|ksh|dash|ash|csh|rc)
+  (?:$|\\s)
+  |
+  # Modeline
+  (?i:
+    # Emacs
+    -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+      (?:shell-script|sh)
+    (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+    |
+    # Vim
+    (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s* set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+      sh
+    (?=\\s|:|$)
+  )
+'''
 'patterns': [
   {
     'include': '#comment'
@@ -119,7 +142,7 @@
       }
     ]
   'comment':
-    'begin': '(^\\s+)?(?<!\\S)(?=#)(?!#\\{)'
+    'begin': '(^\\s+)?(?<=^|\\W)(?=#)(?!#{)'
     'beginCaptures':
       '1':
         'name': 'punctuation.whitespace.comment.leading.shell'
@@ -130,7 +153,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.comment.shebang.shell'
-        'end': '\\n'
+        'end': '$'
         'name': 'comment.line.number-sign.shebang.shell'
       }
       {
@@ -138,7 +161,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.comment.shell'
-        'end': '\\n'
+        'end': '$'
         'name': 'comment.line.number-sign.shell'
       }
     ]
@@ -667,6 +690,24 @@
           {
             'match': '\\\\[`\\\\$]'
             'name': 'constant.character.escape.shell'
+          }
+          {
+            # Lifted from the #comment section to handle ending on ` instead of $
+            'begin': '(?<=\\W)(?=#)(?!#{)'
+            'beginCaptures':
+              '1':
+                'name': 'punctuation.whitespace.comment.leading.shell'
+            'end': '(?!\\G)'
+            'patterns': [
+              {
+                'begin': '#'
+                'beginCaptures':
+                  '0':
+                    'name': 'punctuation.definition.comment.shell'
+                'end': '(?=`)'
+                'name': 'comment.line.number-sign.shell'
+              }
+            ]
           }
           {
             'include': '$self'
