@@ -78,6 +78,12 @@ describe "Shell script grammar", ->
     expect(tokens[18]).toEqual value: ' something ', scopes: ['source.shell', 'meta.scope.for-in-loop.shell']
     expect(tokens[19]).toEqual value: 'done', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
 
+    {tokens} = grammar.tokenizeLine('for variable in something do # in')
+
+    expect(tokens[4]).toEqual value: 'in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']
+    expect(tokens[8]).toEqual value: '#', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']
+    expect(tokens[9]).toEqual value: ' in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'comment.line.number-sign.shell']
+
   it "doesn't tokenize keywords when they're part of a phrase", ->
     {tokens} = grammar.tokenizeLine('grep --ignore-case "something"')
 

@@ -777,7 +777,7 @@
         ]
       }
       {
-        'begin': '\\b(for)\\b\\s+(.+)\\s+\\b(in)\\b'
+        'begin': '\\b(for)\\b\\s+(.+?)\\s+\\b(in)\\b'
         'beginCaptures':
           '1':
             'name': 'keyword.control.shell'
