@@ -613,7 +613,7 @@
   'herestring':
     'patterns': [
       {
-        'begin': '(<<<)\s*((\'))'
+        'begin': '(<<<)\\s*((\'))'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.herestring.shell'
@@ -631,7 +631,7 @@
         'contentName': 'string.quoted.single.shell'
       }
       {
-        'begin': '(<<<)\s*(("))'
+        'begin': '(<<<)\\s*(("))'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.herestring.shell'
