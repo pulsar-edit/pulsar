@@ -286,7 +286,7 @@
         'name': 'punctuation.separator.pointer-access.c'
       '4':
         'name': 'variable.other.member.c'
-    'match': '((\\.)|(->)\\s*)([a-zA-Z_][a-zA-Z_0-9]*)\\b(?!\\s*\\()'
+    'match': '((\\.)|(->))\\s*([a-zA-Z_][a-zA-Z_0-9]*)\\b(?!\\s*\\()'
   'block':
     'patterns': [
       {
