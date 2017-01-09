@@ -103,11 +103,14 @@
         'name': 'meta.scope.case-clause.shell'
         'patterns': [
           {
-            'begin': '(\\(|(?=\\S))'
-            'captures':
+            'begin': '\\(|(?=\\S)'
+            'beginCaptures':
               '0':
                 'name': 'punctuation.definition.case-pattern.shell'
             'end': '\\)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.case-pattern.shell'
             'name': 'meta.scope.case-pattern.shell'
             'patterns': [
               {
@@ -168,11 +171,14 @@
   'compound-command':
     'patterns': [
       {
-        'begin': '(\\[{1,2})'
-        'captures':
-          '1':
+        'begin': '\\[{1,2}'
+        'beginCaptures':
+          '0':
             'name': 'punctuation.definition.logical-expression.shell'
-        'end': '(\\]{1,2})'
+        'end': '\\]{1,2}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.logical-expression.shell'
         'name': 'meta.scope.logical-expression.shell'
         'patterns': [
           {
@@ -184,11 +190,11 @@
         ]
       }
       {
-        'begin': '(\\({2})'
+        'begin': '\\({2}'
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.string.begin.shell'
-        'end': '(\\){2})'
+        'end': '\\){2}'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.string.end.shell'
@@ -200,11 +206,14 @@
         ]
       }
       {
-        'begin': '(\\()'
-        'captures':
-          '1':
+        'begin': '\\('
+        'beginCaptures':
+          '0':
             'name': 'punctuation.definition.subshell.shell'
-        'end': '(\\))'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.subshell.shell'
         'name': 'meta.scope.subshell.shell'
         'patterns': [
           {
@@ -213,11 +222,14 @@
         ]
       }
       {
-        'begin': '(?<=\\s|^)(\\{)(?=\\s|$)'
-        'captures':
+        'begin': '(?<=\\s|^){(?=\\s|$)'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.group.shell'
+        'end': '(?<=^|;)\\s*(})'
+        'endCaptures':
           '1':
             'name': 'punctuation.definition.group.shell'
-        'end': '(?<=^|;)\\s*(\\})'
         'name': 'meta.scope.group.shell'
         'patterns': [
           {
@@ -276,15 +288,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.ruby.embedded.shell'
         'end': '^\\t*(RUBY)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.no-indent.ruby.shell'
+        'contentName': 'source.ruby.embedded.shell'
         'patterns': [
           {
             'include': 'source.ruby'
@@ -298,15 +307,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.ruby.embedded.shell'
         'end': '^(RUBY)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.ruby.shell'
+        'contentName': 'source.ruby.embedded.shell'
         'patterns': [
           {
             'include': 'source.ruby'
@@ -320,15 +326,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.python.embedded.shell'
         'end': '^\\t*(PYTHON)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.no-indent.python.shell'
+        'contentName': 'source.python.embedded.shell'
         'patterns': [
           {
             'include': 'source.python'
@@ -342,15 +345,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.python.embedded.shell'
         'end': '^(PYTHON)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.python.shell'
+        'contentName': 'source.python.embedded.shell'
         'patterns': [
           {
             'include': 'source.python'
@@ -364,15 +364,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.applescript.embedded.shell'
         'end': '^\\t*(APPLESCRIPT)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.no-indent.applescript.shell'
+        'contentName': 'source.applescript.embedded.shell'
         'patterns': [
           {
             'include': 'source.applescript'
@@ -386,15 +383,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.applescript.embedded.shell'
         'end': '^(APPLESCRIPT)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.applescript.shell'
+        'contentName': 'source.applescript.embedded.shell'
         'patterns': [
           {
             'include': 'source.applescript'
@@ -408,15 +402,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'text.html.embedded.shell'
         'end': '^\\t*(HTML)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.no-indent.html.shell'
+        'contentName': 'text.html.embedded.shell'
         'patterns': [
           {
             'include': 'text.html.basic'
@@ -430,15 +421,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'text.html.embedded.shell'
         'end': '^(HTML)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.html.shell'
+        'contentName': 'text.html.embedded.shell'
         'patterns': [
           {
             'include': 'text.html.basic'
@@ -452,15 +440,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'text.html.markdown.embedded.shell'
         'end': '^\\t*(MARKDOWN)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.no-indent.markdown.shell'
+        'contentName': 'text.html.markdown.embedded.shell'
         'patterns': [
           {
             'include': 'text.html.markdown'
@@ -474,15 +459,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'text.html.markdown.embedded.shell'
         'end': '^(MARKDOWN)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.markdown.shell'
+        'contentName': 'text.html.markdown.embedded.shell'
         'patterns': [
           {
             'include': 'text.html.markdown'
@@ -496,15 +478,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'text.html.textile.embedded.shell'
         'end': '^\\t*(TEXTILE)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.no-indent.textile.shell'
+        'contentName': 'text.html.textile.embedded.shell'
         'patterns': [
           {
             'include': 'text.html.textile'
@@ -518,15 +497,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'text.html.textile.embedded.shell'
         'end': '^(TEXTILE)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.textile.shell'
+        'contentName': 'text.html.textile.embedded.shell'
         'patterns': [
           {
             'include': 'text.html.textile'
@@ -540,14 +516,11 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.shell.embedded.shell'
         'end': '^\\t*(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
+        'contentName': 'source.shell.embedded.shell'
         'name': 'string.unquoted.heredoc.no-indent.shell.shell'
         'patterns': [
           {
@@ -562,15 +535,12 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
-        'contentName': 'source.shell.embedded.shell'
         'end': '^(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
             'name': 'keyword.control.heredoc-token.shell'
         'name': 'string.unquoted.heredoc.shell.shell'
+        'contentName': 'source.shell.embedded.shell'
         'patterns': [
           {
             'include': 'source.shell'
@@ -584,9 +554,6 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
         'end': '^\\t*(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
@@ -600,9 +567,6 @@
             'name': 'keyword.operator.heredoc.shell'
           '3':
             'name': 'keyword.control.heredoc-token.shell'
-        'captures':
-          '0':
-            'name': 'punctuation.definition.string.shell'
         'end': '^(\\3)(?=\\s|;|&|$)'
         'endCaptures':
           '1':
@@ -765,10 +729,13 @@
     'patterns': [
       {
         'begin': '(?<=^|;|&|\\s)(for)\\s+(?=\\({2})'
-        'captures':
+        'beginCaptures':
           '1':
             'name': 'keyword.control.shell'
-        'end': '(?<=^|;|&|\\s)(done)(?=\\s|;|&|$)'
+        'end': '(?<=^|;|&|\\s)done(?=\\s|;|&|$)'
+        'endCaptures':
+          '0':
+            'name': 'keyword.control.shell'
         'name': 'meta.scope.for-loop.shell'
         'patterns': [
           {
@@ -803,10 +770,13 @@
       }
       {
         'begin': '(?<=^|;|&|\\s)(while|until)(?=\\s|;|&|$)'
-        'captures':
+        'beginCaptures':
           '1':
             'name': 'keyword.control.shell'
-        'end': '(?<=^|;|&|\\s)(done)(?=\\s|;|&|$)'
+        'end': '(?<=^|;|&|\\s)done(?=\\s|;|&|$)'
+        'endCaptures':
+          '0':
+            'name': 'keyword.control.shell'
         'name': 'meta.scope.while-loop.shell'
         'patterns': [
           {
@@ -833,19 +803,22 @@
         ]
       }
       {
-        'begin': '(?<=^|;|&|\\s)(case)(?=\\s|;|&|$)'
-        'captures':
-          '1':
+        'begin': '(?<=^|;|&|\\s)case(?=\\s|;|&|$)'
+        'beginCaptures':
+          '0':
             'name': 'keyword.control.shell'
-        'end': '(?<=^|;|&|\\s)(esac)(?=\\s|;|&|$)'
+        'end': '(?<=^|;|&|\\s)esac(?=\\s|;|&|$)'
+        'endCaptures':
+          '0':
+            'name': 'keyword.control.shell'
         'name': 'meta.scope.case-block.shell'
         'patterns': [
           {
-            'begin': '(?<=^|;|&|\\s)(in)(?=\\s|;|&|$)'
+            'begin': '(?<=^|;|&|\\s)in(?=\\s|;|&|$)'
             'beginCaptures':
-              '1':
+              '0':
                 'name': 'keyword.control.shell'
-            'end': '(?<=^|;|&|\\s)(?=(?:esac)(?:\\s|;|&|$))'
+            'end': '(?<=^|;|&|\\s)(?=esac(\\s|;|&|$))'
             'name': 'meta.scope.case-body.shell'
             'patterns': [
               {
@@ -865,11 +838,14 @@
         ]
       }
       {
-        'begin': '(?<=^|;|&|\\s)(if)(?=\\s|;|&|$)'
-        'captures':
-          '1':
+        'begin': '(?<=^|;|&|\\s)if(?=\\s|;|&|$)'
+        'beginCaptures':
+          '0':
             'name': 'keyword.control.shell'
-        'end': '(?<=^|;|&|\\s)(fi)(?=\\s|;|&|$)'
+        'end': '(?<=^|;|&|\\s)fi(?=\\s|;|&|$)'
+        'endCaptures':
+          '0':
+            'name': 'keyword.control.shell'
         'name': 'meta.scope.if-block.shell'
         'patterns': [
           {
@@ -921,9 +897,9 @@
             'name': 'keyword.operator.extglob.shell'
           '2':
             'name': 'punctuation.definition.extglob.shell'
-        'end': '(\\))'
+        'end': '\\)'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.extglob.shell'
         'name': 'meta.structure.extglob.shell'
         'patterns': [
@@ -963,7 +939,7 @@
         ]
       }
       {
-        'comment': 'valid: &>word >&word >word [n]>&[n] [n]<word [n]>word [n]>>word [n]<&word (last one is duplicate)'
+        # valid: &>word >&word >word [n]>&[n] [n]<word [n]>word [n]>>word [n]<&word (last one is duplicate)
         'match': '&>|\\d*>&\\d*|\\d*(>>|>|<)|\\d*<&|\\d*<>'
         'name': 'keyword.operator.redirect.shell'
       }
@@ -1073,11 +1049,14 @@
         'name': 'variable.other.positional.shell'
       }
       {
-        'begin': '\\$\\{'
-        'captures':
+        'begin': '\\${'
+        'beginCaptures':
           '0':
             'name': 'punctuation.definition.variable.shell'
-        'end': '\\}'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.variable.shell'
         'name': 'variable.other.bracket.shell'
         'patterns': [
           {
