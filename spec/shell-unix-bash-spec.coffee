@@ -97,7 +97,7 @@ describe "Shell script grammar", ->
       'time⏰out'
     ]
 
-    for string of strings
+    for string in strings
       {tokens} = grammar.tokenizeLine(string)
 
       expect(tokens[0]).toEqual value: string, scopes: ['source.shell']
