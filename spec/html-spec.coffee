@@ -446,27 +446,27 @@ describe 'HTML grammar', ->
       expect(lines[0][1]).toEqual value: 'span', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'entity.name.tag.inline.any.html']
       expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.end.html']
 
-    it "dosn't tokenize XML namespaces as tags if the prefix is a valid style tags", ->
+    it "doesn't tokenize XML namespaces as tags if the prefix is a valid style tag", ->
       lines = grammar.tokenizeLines '<style:foo>'
       expect(lines[0][1].value).toNotEqual 'style'
       expect(lines[0][1].scopes).not.toContain 'entity.name.tag.style.html'
 
-    it "dosn't tokenize XML namespaces as tags if the prefix is a valid script tags", ->
+    it "doesn't tokenize XML namespaces as tags if the prefix is a valid script tag", ->
       lines = grammar.tokenizeLines '<script:foo>'
       expect(lines[0][1].value).toNotEqual 'script'
       expect(lines[0][1].scopes).not.toContain 'entity.name.tag.script.html'
 
-    it "dosn't tokenize XML namespaces as tags if the prefix is a valid structure tags", ->
+    it "doesn't tokenize XML namespaces as tags if the prefix is a valid structure tag", ->
       lines = grammar.tokenizeLines '<html:foo>'
       expect(lines[0][1].value).toNotEqual 'html'
       expect(lines[0][1].scopes).not.toContain 'entity.name.tag.structure.any.html'
 
-    it "dosn't tokenize XML namespaces as tags if the prefix is a valid block tags", ->
+    it "doesn't tokenize XML namespaces as tags if the prefix is a valid block tag", ->
       lines = grammar.tokenizeLines '<div:foo>'
       expect(lines[0][1].value).toNotEqual 'div'
       expect(lines[0][1].scopes).not.toContain 'entity.name.tag.block.any.html'
 
-    it "dosn't tokenize XML namespaces as tags if the prefix is a valid inline tags", ->
+    it "doesn't tokenize XML namespaces as tags if the prefix is a valid inline tag", ->
       lines = grammar.tokenizeLines '<span:foo>'
       expect(lines[0][1].value).toNotEqual 'span'
       expect(lines[0][1].scopes).not.toContain 'entity.name.tag.inline.any.html'
