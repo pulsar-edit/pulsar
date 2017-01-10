@@ -510,31 +510,71 @@ describe "Language-C", ->
         expect(tokens[0]).toEqual value: '0b101010', scopes: ['source.c', 'constant.numeric.c']
 
     describe "access", ->
-      it "should tokenizes dot access", ->
+      it "tokenizes the dot access operator", ->
         lines = grammar.tokenizeLines '''
-          int main() {
-            A a;
-            a.b = NULL;
-            return 0;
+          void f() {
+            a.b;
           }
         '''
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
-        expect(lines[2][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
-        expect(lines[2][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
-        expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
-
-      it "should tokenizes pointer access", ->
         lines = grammar.tokenizeLines '''
-          int main() {
-            A *a;
-            a->b = NULL;
-            return 0;
+          void f() {
+            a. b;
           }
         '''
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
-        expect(lines[2][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
-        expect(lines[2][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
-        expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a .b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a . b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+      it "tokenizes the pointer access operator", ->
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a->b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a-> b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a ->b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a -> b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
     describe "operators", ->
       it "tokenizes the sizeof operator", ->
