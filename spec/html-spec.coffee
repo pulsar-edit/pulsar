@@ -414,3 +414,69 @@ describe 'HTML grammar', ->
       """
       for line in invalid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+
+  describe "tags", ->
+    it "tokenizes style tags as such", ->
+      lines = grammar.tokenizeLines '<style>'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'source.css.embedded.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'style', scopes: ['text.html.basic', 'source.css.embedded.html', 'entity.name.tag.style.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'source.css.embedded.html', 'punctuation.definition.tag.html']
+
+    it "tokenizes script tags as such", ->
+      lines = grammar.tokenizeLines '<script>'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'entity.name.tag.script.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'source.js.embedded.html', 'punctuation.definition.tag.html']
+
+    it "tokenizes structure tags as such", ->
+      lines = grammar.tokenizeLines '<html>'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.structure.any.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'html', scopes: ['text.html.basic', 'meta.tag.structure.any.html', 'entity.name.tag.structure.any.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.structure.any.html', 'punctuation.definition.tag.html']
+
+    it "tokenizes block tags as such", ->
+      lines = grammar.tokenizeLines '<div>'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[0][1]).toEqual value: 'div', scopes: ['text.html.basic', 'meta.tag.block.any.html', 'entity.name.tag.block.any.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.block.any.html', 'punctuation.definition.tag.end.html']
+
+    it "tokenizes inline tags as such", ->
+      lines = grammar.tokenizeLines '<span>'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[0][1]).toEqual value: 'span', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'entity.name.tag.inline.any.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.end.html']
+
+    it "dosn't tokenize XML namespaces as tags if the prefix is a valid style tags", ->
+      lines = grammar.tokenizeLines '<style:foo>'
+      expect(lines[0][1].value).toNotEqual 'style'
+      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.style.html'
+
+    it "dosn't tokenize XML namespaces as tags if the prefix is a valid script tags", ->
+      lines = grammar.tokenizeLines '<script:foo>'
+      expect(lines[0][1].value).toNotEqual 'script'
+      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.script.html'
+
+    it "dosn't tokenize XML namespaces as tags if the prefix is a valid structure tags", ->
+      lines = grammar.tokenizeLines '<html:foo>'
+      expect(lines[0][1].value).toNotEqual 'html'
+      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.structure.any.html'
+
+    it "dosn't tokenize XML namespaces as tags if the prefix is a valid block tags", ->
+      lines = grammar.tokenizeLines '<div:foo>'
+      expect(lines[0][1].value).toNotEqual 'div'
+      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.block.any.html'
+
+    it "dosn't tokenize XML namespaces as tags if the prefix is a valid inline tags", ->
+      lines = grammar.tokenizeLines '<span:foo>'
+      expect(lines[0][1].value).toNotEqual 'span'
+      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.inline.any.html'
+
+    it "tokenizes other tags as such", ->
+      lines = grammar.tokenizeLines '<foo>'
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.other.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[0][1]).toEqual value: 'foo', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.other.html', 'punctuation.definition.tag.end.html']
+
+    it "tolerates colons in other tag names", ->
+      lines = grammar.tokenizeLines '<foo:bar>'
+      expect(lines[0][1]).toEqual value: 'foo:bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
