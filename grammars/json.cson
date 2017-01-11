@@ -1,3 +1,5 @@
+'scopeName': 'source.json'
+'name': 'JSON'
 'fileTypes': [
   'avsc'
   'babelrc'
@@ -24,7 +26,6 @@
   'webapp'
   'webmanifest'
 ]
-'name': 'JSON'
 'patterns': [
   {
     'include': '#value'
@@ -36,7 +37,7 @@
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.array.begin.json'
-    'end': '(,?)[\\s\\n]*(\\])'
+    'end': '(,)?[\\s\\n]*(\\])'
     'endCaptures':
       '1':
         'name': 'invalid.illegal.trailing-array-separator.json'
@@ -57,26 +58,24 @@
       }
     ]
   'constant':
-    'match': '\\b(?:true|false|null)\\b'
+    'match': '\\b(true|false|null)\\b'
     'name': 'constant.language.json'
   'number':
-    'comment': 'handles integer and decimal numbers'
     'match': '-?(?=[1-9]|0(?!\\d))\\d+(\\.\\d+)?([eE][+-]?\\d+)?'
     'name': 'constant.numeric.json'
   'object':
-    'begin': '\\{'
+    'begin': '{'
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.dictionary.begin.json'
-    'comment': 'a JSON object'
-    'end': '\\}'
+    'end': '}'
     'endCaptures':
       '0':
         'name': 'punctuation.definition.dictionary.end.json'
     'name': 'meta.structure.dictionary.json'
     'patterns': [
       {
-        'comment': 'the JSON object key'
+        # the key
         'include': '#string'
       }
       {
@@ -84,7 +83,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.separator.dictionary.key-value.json'
-        'end': '(,)(?=[\\s\\n]*\\})|(,)|(?=\\})'
+        'end': '(,)(?=[\\s\\n]*})|(,)|(?=})'
         'endCaptures':
           '1':
             'name': 'invalid.illegal.trailing-dictionary-separator.json'
@@ -93,7 +92,7 @@
         'name': 'meta.structure.dictionary.value.json'
         'patterns': [
           {
-            'comment': 'the JSON object value'
+            # the value
             'include': '#value'
           }
           {
@@ -103,7 +102,7 @@
         ]
       }
       {
-        'match': '[^\\s\\}]'
+        'match': '[^\\s}]'
         'name': 'invalid.illegal.expected-dictionary-separator.json'
       }
     ]
@@ -119,7 +118,14 @@
     'name': 'string.quoted.double.json'
     'patterns': [
       {
-        'match': '(?x:                # turn on extended mode\n                     \\\\                # a literal backslash\n                     (?:               # ...followed by...\n                       ["\\\\/bfnrt]     # one of these characters\n                       |               # ...or...\n                       u               # a u\n                       [0-9a-fA-F]{4}  # and four hex digits\n                     )\n                   )'
+        'match': '''(?x)
+          \\\\                # a literal backslash
+          (                   # followed by
+            ["\\\\/bfnrt]     # one of these characters
+            |                 # or
+            u[0-9a-fA-F]{4}   # a u and four hex digits
+          )
+        '''
         'name': 'constant.character.escape.json'
       }
       {
@@ -128,7 +134,7 @@
       }
     ]
   'value':
-    'comment': 'the \'value\' diagram at http://json.org'
+    # the 'value' diagram at http://json.org
     'patterns': [
       {
         'include': '#constant'
@@ -146,4 +152,3 @@
         'include': '#object'
       }
     ]
-'scopeName': 'source.json'
