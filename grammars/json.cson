@@ -76,7 +76,14 @@
     'patterns': [
       {
         # the key
-        'include': '#string'
+        'begin': '(?=")'
+        'end': '(?<=")'
+        'name': 'meta.structure.dictionary.key.json'
+        'patterns': [
+          {
+            'include': '#string'
+          }
+        ]
       }
       {
         'begin': ':'
