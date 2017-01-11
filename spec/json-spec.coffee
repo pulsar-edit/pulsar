@@ -42,7 +42,7 @@ describe "JSON grammar", ->
 
   it "tokenizes objects", ->
     baseScopes = ['source.json', 'meta.structure.dictionary.json']
-    keyScopes = [baseScopes..., 'string.quoted.double.json']
+    keyScopes = [baseScopes..., 'meta.structure.dictionary.key.json', 'string.quoted.double.json']
     keyBeginScopes = [keyScopes..., 'punctuation.definition.string.begin.json']
     keyEndScopes = [keyScopes..., 'punctuation.definition.string.end.json']
     valueScopes = [baseScopes..., 'meta.structure.dictionary.value.json']
@@ -80,7 +80,7 @@ describe "JSON grammar", ->
 
   it "identifies trailing commas in objects", ->
     baseScopes = ['source.json', 'meta.structure.dictionary.json']
-    keyScopes = [baseScopes..., 'string.quoted.double.json']
+    keyScopes = [baseScopes..., 'meta.structure.dictionary.key.json', 'string.quoted.double.json']
     keyBeginScopes = [keyScopes..., 'punctuation.definition.string.begin.json']
     keyEndScopes = [keyScopes..., 'punctuation.definition.string.end.json']
     valueScopes = [baseScopes..., 'meta.structure.dictionary.value.json']
