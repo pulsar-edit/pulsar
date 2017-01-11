@@ -21,10 +21,10 @@ describe "JSON grammar", ->
     expect(tokens[0]).toEqual value: '[', scopes: [baseScopes..., 'punctuation.definition.array.begin.json']
     expect(tokens[1]).toEqual value: '1', scopes: numericScopes
     expect(tokens[2]).toEqual value: ',', scopes: separatorScopes
-    expect(tokens[3]).toEqual value: ' ', scopes: [baseScopes...]
+    expect(tokens[3]).toEqual value: ' ', scopes: baseScopes
     expect(tokens[4]).toEqual value: '2', scopes: numericScopes
     expect(tokens[5]).toEqual value: ',', scopes: separatorScopes
-    expect(tokens[6]).toEqual value: ' ', scopes: [baseScopes...]
+    expect(tokens[6]).toEqual value: ' ', scopes: baseScopes
     expect(tokens[7]).toEqual value: '3', scopes: numericScopes
     expect(tokens[8]).toEqual value: ']', scopes: [baseScopes..., 'punctuation.definition.array.end.json']
 
@@ -37,7 +37,7 @@ describe "JSON grammar", ->
     expect(tokens[0]).toEqual value: '[', scopes: [baseScopes..., 'punctuation.definition.array.begin.json']
     expect(tokens[1]).toEqual value: '1', scopes: numericScopes
     expect(tokens[2]).toEqual value: ',', scopes: [baseScopes..., 'invalid.illegal.trailing-array-separator.json']
-    expect(tokens[3]).toEqual value: ' ', scopes: [baseScopes...]
+    expect(tokens[3]).toEqual value: ' ', scopes: baseScopes
     expect(tokens[4]).toEqual value: ']', scopes: [baseScopes..., 'punctuation.definition.array.end.json']
 
   it "tokenizes objects", ->
