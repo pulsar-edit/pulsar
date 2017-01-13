@@ -14,6 +14,7 @@
   'json'
   'jsonl'
   'jsonld'
+  'languagebabel'
   'ldj'
   'ldjson'
   'schema'
