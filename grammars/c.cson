@@ -903,7 +903,6 @@
       {
         'include': '#operators'
       }
-      
       {
         'match': '\\b(NULL|true|false|TRUE|FALSE)\\b'
         'name': 'constant.language.c'
