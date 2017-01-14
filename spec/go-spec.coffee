@@ -630,6 +630,11 @@ describe 'Go grammar', ->
           testNum init[6], '10'
           testOpBracket closing[0], ')'
 
+        it 'tokenizes non-ASCII variable names', ->
+          {tokens} = grammar.tokenizeLine 'über = test'
+          testVarAssignment tokens[0], 'über'
+          testOpAssignment tokens[2], '='
+
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->
           {tokens} = grammar.tokenizeLine 'f := func() int { return 7 }'
