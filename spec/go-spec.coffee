@@ -527,9 +527,25 @@ describe 'Go grammar', ->
         {tokens} = grammar.tokenizeLine 'var z blub = 7'
         testVar tokens[0]
         testVarAssignment tokens[2], 'z'
-        expect(tokens[3].scopes).toEqual ['source.go']
+        expect(tokens[3]).toEqual value: ' blub ', scopes: ['source.go']
         testOpAssignment tokens[4], '='
         testNum tokens[6], '7'
+
+      it 'does not tokenize more than necessary', ->
+        # This test is worded vaguely because it's hard to describe.
+        # Basically, make sure that the variable match isn't tokenizing the entire line
+        # in a (=.+) style match. This prevents multiline stuff after the assignment
+        # from working correctly, because match can only tokenize single lines.
+        lines = grammar.tokenizeLines '''
+          var multiline string = `wow!
+          this should work!`
+        '''
+        testVar lines[0][0]
+        testVarAssignment lines[0][2], 'multiline'
+        testStringType lines[0][4], 'string'
+        testOpAssignment lines[0][6], '='
+        expect(lines[0][8]).toEqual value: '`', scopes: ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.begin.go']
+        expect(lines[1][1]).toEqual value: '`', scopes: ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']
 
       it 'tokenizes multiple names and a type', ->
         {tokens} = grammar.tokenizeLine 'var U, V,  W  float64'
