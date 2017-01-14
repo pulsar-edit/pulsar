@@ -415,10 +415,6 @@
         # Assignments to existing variables
         # a =
         # a, b, whatever =
-        # TODO: This rule is currently redundant since none of the other variable rules
-        # check for var. However, in the future, I'd like to axe #keywords and make
-        # individual rules responsible for tokenizing keywords, at which point this will
-        # probably become more useful.
         'match': '(?<!var)\\s*([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(?=\\s*=(?!=))'
         'captures':
           '1':
@@ -454,7 +450,7 @@
         # var a string =
         # var a, b =
         # var a, b *c =
-        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+\\*?[a-zA-Z_]\\w*\\s*)?(?=\\s*=)'
+        'match': '(?<=var)\\s+([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+\\*?[a-zA-Z_]\\w*\\s*)?(?=\\s*=)'
         'captures':
           '1':
             'patterns': [
@@ -485,6 +481,28 @@
             'name': 'punctuation.other.bracket.round.go'
         'patterns': [
           {
+            # Copy of below, but without the leading var
+            # var (a *b)
+            'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
+            'captures':
+              '1':
+                'patterns': [
+                  {
+                    'match': '[a-zA-Z_]\\w*'
+                    'name': 'variable.other.declaration.go'
+                  }
+                  {
+                    'include': '#delimiters'
+                  }
+                ]
+              '2':
+                'patterns': [
+                  {
+                    'include': '$self'
+                  }
+                ]
+          }
+          {
             'include': '$self'
           }
         ]
@@ -493,9 +511,8 @@
         # var a
         # var a string
         # var a, b string
-        # a *b
         # var a []string
-        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
+        'match': '(?<=var)\\s+([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [
