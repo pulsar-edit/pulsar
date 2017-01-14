@@ -434,8 +434,8 @@
       }
       {
         # Shorthand variable declaration and assignments
-        # var a :=
-        # var a, b :=
+        # a :=
+        # a, b :=
         'match': '[a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*(?=\\s*:=)'
         'captures':
           '0':
