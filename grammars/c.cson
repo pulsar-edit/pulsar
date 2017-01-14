@@ -868,7 +868,7 @@
     'patterns':[
       {
         #the valid "defined" keyword usage
-        'match': '(?:\\bdefined\\b\\s*$)|(?:\\bdefined\\b(?=\\s*\\(*\\s*(?:(?!defined\\b)[a-zA-Z_$][\\w$]*\\b)\\s*\\)*\\s*(?:\\n|//|/\\*|&&|\\|\\||\\\\\\s*\\n)))'
+        'match': '(?:\\bdefined\\b\\s*$)|(?:\\bdefined\\b(?=\\s*\\(*\\s*(?:(?!defined\\b)[a-zA-Z_$][\\w$]*\\b)\\s*\\)*\\s*(?:\\n|//|/\\*|\\?|\\:|&&|\\|\\||\\\\\\s*\\n)))'
         'name': 'keyword.control.directive.conditional.c'
       }
       {
@@ -885,9 +885,25 @@
       {
         'include': '#numbers'
       }
+      { #Catch ternary operators here and implement a custom one
+        'begin': '\\?'
+        'beginCaptures':
+          '0':
+            'name': 'keyword.operator.ternary.c'
+        'end': ':'
+        'endCaptures':
+          '0':
+            'name': 'keyword.operator.ternary.c'
+        'patterns': [
+          {
+            'include': '#preprocessor-rule-conditional-line-parens-innards'
+          }
+        ]
+      }
       {
         'include': '#operators'
       }
+      
       {
         'match': '\\b(NULL|true|false|TRUE|FALSE)\\b'
         'name': 'constant.language.c'
