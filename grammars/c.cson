@@ -885,7 +885,8 @@
       {
         'include': '#numbers'
       }
-      { #Catch ternary operators here and implement a custom one
+      {
+        #Catch ternary operators here and implement a custom one
         'begin': '\\?'
         'beginCaptures':
           '0':
