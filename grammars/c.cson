@@ -286,7 +286,7 @@
         'name': 'punctuation.separator.pointer-access.c'
       '4':
         'name': 'variable.other.member.c'
-    'match': '((\\.)|(->))(([a-zA-Z_][a-zA-Z_0-9]*)\\b(?!\\s*\\())?'
+    'match': '((\\.)|(->))\\s*(([a-zA-Z_][a-zA-Z_0-9]*)\\b(?!\\s*\\())?'
   'block':
     'patterns': [
       {
@@ -316,9 +316,6 @@
       }
       {
         'include': '#preprocessor-rule-other-block'
-      }
-      {
-        'include': '#sizeof'
       }
       {
         'include': '#access'
@@ -485,7 +482,7 @@
   'line_continuation_character':
     'patterns': [
       {
-        'match': '(\\\\)\\s*\\n'
+        'match': '(\\\\)\\n'
         'captures':
           '1':
             'name': 'constant.character.escape.line-continuation.c'
@@ -825,6 +822,15 @@
           '0':
             'name': 'keyword.operator.ternary.c'
         'patterns': [
+          {
+            'include': '#access'
+          }
+          {
+            'include': '#libc'
+          }
+          {
+            'include': '#c_function_call'
+          }
           {
             'include': '$self'
           }

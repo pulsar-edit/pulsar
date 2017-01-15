@@ -510,25 +510,16 @@ describe "Language-C", ->
         expect(tokens[0]).toEqual value: '0b101010', scopes: ['source.c', 'constant.numeric.c']
 
     describe "access", ->
-      it "should tokenizes dot access", ->
+      it "tokenizes the dot access operator", ->
         lines = grammar.tokenizeLines '''
-          int main() {
-            A a;
-            a.b = NULL;
-            return 0;
+          void f() {
+            a.b;
           }
         '''
-        expect(lines[2][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
-        expect(lines[2][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
-        expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
-        lines = grammar.tokenizeLines '''
-          {
-            a.
-          }
-        '''
-        expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.block.c']
-        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
         lines = grammar.tokenizeLines '''
           {
@@ -537,30 +528,68 @@ describe "Language-C", ->
         '''
         expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.block.c']
         expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.block.c', 'variable.other.member.c']
 
-      it "should tokenizes pointer access", ->
         lines = grammar.tokenizeLines '''
-          int main() {
-            A *a;
-            a->b = NULL;
-            return 0;
+          void f() {
+            a. b;
           }
         '''
-        expect(lines[2][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
-        expect(lines[2][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
-        expect(lines[2][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a .b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a . b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+      it "tokenizes the pointer access operator", ->
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a->b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a-> b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a ->b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+
+        lines = grammar.tokenizeLines '''
+          void f() {
+            a -> b;
+          }
+        '''
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
+        expect(lines[1][3]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
 
         lines = grammar.tokenizeLines '''
           {
             a->
-          }
-        '''
-        expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.block.c']
-        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
-
-        lines = grammar.tokenizeLines '''
-          {
-            a->b()
           }
         '''
         expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.block.c']
@@ -642,6 +671,39 @@ describe "Language-C", ->
         expect(tokens[2]).toEqual value: ' b ', scopes: ['source.c']
         expect(tokens[3]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
         expect(tokens[4]).toEqual value: ' c', scopes: ['source.c']
+
+      it "tokenizes ternary operators with member access", ->
+        {tokens} = grammar.tokenizeLine('a ? b.c : d')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+        expect(tokens[3]).toEqual value: '.', scopes: ['source.c', 'punctuation.separator.dot-access.c']
+        expect(tokens[4]).toEqual value: 'c', scopes: ['source.c', 'variable.other.member.c']
+        expect(tokens[5]).toEqual value: ' ', scopes: ['source.c']
+        expect(tokens[6]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[7]).toEqual value: ' d', scopes: ['source.c']
+
+      it "tokenizes ternary operators with pointer dereferencing", ->
+        {tokens} = grammar.tokenizeLine('a ? b->c : d')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' b', scopes: ['source.c']
+        expect(tokens[3]).toEqual value: '->', scopes: ['source.c', 'punctuation.separator.pointer-access.c']
+        expect(tokens[4]).toEqual value: 'c', scopes: ['source.c', 'variable.other.member.c']
+        expect(tokens[5]).toEqual value: ' ', scopes: ['source.c']
+        expect(tokens[6]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[7]).toEqual value: ' d', scopes: ['source.c']
+
+      it "tokenizes ternary operators with function invocation", ->
+        {tokens} = grammar.tokenizeLine('a ? f(b) : c')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' ', scopes: ['source.c', 'meta.function-call.c', 'punctuation.whitespace.function-call.leading.c']
+        expect(tokens[3]).toEqual value: 'f', scopes: ['source.c', 'meta.function-call.c', 'support.function.any-method.c']
+        expect(tokens[4]).toEqual value: '(', scopes: ['source.c', 'meta.function-call.c', 'punctuation.definition.parameters.c']
+        expect(tokens[5]).toEqual value: 'b) ', scopes: ['source.c']
+        expect(tokens[6]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[7]).toEqual value: ' c', scopes: ['source.c']
 
       describe "bitwise", ->
         it "tokenizes bitwise 'not'", ->
@@ -825,3 +887,12 @@ describe "Language-C", ->
         expect(lines[0][1]).toEqual value: ' separated', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
         expect(lines[0][2]).toEqual value: '\\', scopes: ['source.cpp', 'comment.line.double-slash.cpp', 'constant.character.escape.line-continuation.c']
         expect(lines[1][0]).toEqual value: 'comment', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
+
+        lines = grammar.tokenizeLines '''
+          // The space character \x20 is used to prevent stripping trailing whitespace
+          // not separated\\\x20
+          comment
+        '''
+        expect(lines[1][0]).toEqual value: '//', scopes: ['source.cpp', 'comment.line.double-slash.cpp', 'punctuation.definition.comment.cpp']
+        expect(lines[1][1]).toEqual value: ' not separated\\ ', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
+        expect(lines[2][0]).toEqual value: 'comment', scopes: ['source.cpp']
