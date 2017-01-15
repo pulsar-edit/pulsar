@@ -562,6 +562,14 @@ describe "Language-C", ->
         '''
         expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
         expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
+        
+        lines = grammar.tokenizeLines '''
+          {
+            a->b()
+          }
+        '''
+        expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.block.c']
+        expect(lines[1][1]).toEqual value: '->', scopes: ['source.c', 'meta.block.c', 'punctuation.separator.pointer-access.c']
 
         lines = grammar.tokenizeLines '''
           void f() {
