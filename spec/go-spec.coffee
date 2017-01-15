@@ -427,6 +427,11 @@ describe 'Go grammar', ->
       expect(tokens[0].scopes).toEqual ['source.go', 'keyword.package.go']
       expect(tokens[2].scopes).toEqual ['source.go', 'entity.name.package.go']
 
+  it 'tokenizes invalid package names as such', ->
+    {tokens} = grammar.tokenizeLine 'package 0mypackage'
+    expect(tokens[0]).toEqual value: 'package', scopes: ['source.go', 'keyword.package.go']
+    expect(tokens[2]).toEqual value: '0mypackage', scopes: ['source.go', 'invalid.illegal.identifier.go']
+
   it 'tokenizes type names', ->
     tests = ['type mystring string', 'type mytype interface{']
 
@@ -434,6 +439,11 @@ describe 'Go grammar', ->
       {tokens} = grammar.tokenizeLine test
       expect(tokens[0].scopes).toEqual ['source.go', 'keyword.type.go']
       expect(tokens[2].scopes).toEqual ['source.go', 'entity.name.type.go']
+
+  it 'tokenizes invalid type names as such', ->
+    {tokens} = grammar.tokenizeLine 'type 0mystring string'
+    expect(tokens[0]).toEqual value: 'type', scopes: ['source.go', 'keyword.type.go']
+    expect(tokens[2]).toEqual value: '0mystring', scopes: ['source.go', 'invalid.illegal.identifier.go']
 
   describe 'in variable declarations', ->
     testVar = (token) ->
@@ -634,6 +644,11 @@ describe 'Go grammar', ->
           {tokens} = grammar.tokenizeLine 'über = test'
           testVarAssignment tokens[0], 'über'
           testOpAssignment tokens[2], '='
+
+        it 'tokenizes invalid variable names as such', ->
+          {tokens} = grammar.tokenizeLine 'var 0test = 0'
+          testVar tokens[0]
+          expect(tokens[2]).toEqual value: '0test', scopes: ['source.go', 'invalid.illegal.identifier.go']
 
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->

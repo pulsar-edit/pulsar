@@ -80,7 +80,7 @@
   }
   {
     'comment': 'Function declarations'
-    'match': '^(\\bfunc\\b)(?:\\s+(\\([^\\)]+\\)\\s+)?([\\w&&[^0-9]]\\w*)(?=\\())?'
+    'match': '^(\\bfunc\\b)(?:\\s+(\\([^\\)]+\\)\\s+)?(\\w+)(?=\\())?'
     'captures':
       '1':
         'name': 'keyword.function.go'
@@ -94,16 +94,34 @@
           }
         ]
       '3':
-        'name': 'entity.name.function.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'entity.name.function.go'
+          }
+        ]
   }
   {
     'comment': 'Functions'
-    'match': '(\\bfunc\\b)|([\\w&&[^0-9]]\\w*)(?=\\()'
+    'match': '(\\bfunc\\b)|(\\w+)(?=\\()'
     'captures':
       '1':
         'name': 'keyword.function.go'
       '2':
-        'name': 'support.function.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'support.function.go'
+          }
+        ]
   }
   {
     'comment': 'Floating-point literals'
@@ -122,10 +140,19 @@
   }
   {
     'comment': 'Package declarations'
-    'match': '(?<=package)\\s+([\\w&&[^0-9]]\\w*)'
+    'match': '(?<=package)\\s+(\\w+)'
     'captures':
       '1':
-        'name': 'entity.name.package.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'entity.name.package.go'
+          }
+        ]
   }
   {
     'comment': 'Single line import declarations'
@@ -174,19 +201,32 @@
   }
   {
     'comment': 'Type declarations'
-    'match': '(?<=type)\\s+([\\w&&[^0-9]]\\w*)'
+    'match': '(?<=type)\\s+(\\w+)'
     'captures':
       '1':
-        'name': 'entity.name.type.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'entity.name.type.go'
+          }
+        ]
   }
   {
     'comment': 'Shorthand variable declaration and assignments'
-    'match': '[\\w&&[^0-9]]\\w*(?:,\\s*[\\w&&[^0-9]]\\w*)*(?=\\s*:=)'
+    'match': '\\w+(?:,\\s*\\w+)*(?=\\s*:=)'
     'captures':
       '0':
         'patterns': [
           {
-            'match': '[\\w&&[^0-9]]\\w*'
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
             'name': 'variable.other.assignment.go'
           }
           {
@@ -196,12 +236,16 @@
   }
   {
     'comment': 'Assignments to existing variables'
-    'match': '(?<!var )\\s*([\\w&&[^0-9]]\\w*(?:,\\s*[\\w&&[^0-9]]\\w*)*)(?=\\s*=[^=])'
+    'match': '(?<!var )\\s*(\\w+(?:,\\s*\\w+)*)(?=\\s*=[^=])'
     'captures':
       '1':
         'patterns': [
           {
-            'match': '[\\w&&[^0-9]]\\w*'
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
             'name': 'variable.other.assignment.go'
           }
           {
@@ -471,12 +515,16 @@
     'comment': 'First add tests and make sure existing tests still pass when changing anything here!'
     'patterns': [
       {
-        'match': '([\\w&&[^0-9]]\\w*(?:,\\s*[\\w&&[^0-9]]\\w*)*)\\s*(=.*)'
+        'match': '(\\w+(?:,\\s*\\w+)*)\\s*(=.*)'
         'captures':
           '1':
             'patterns': [
               {
-                'match': '[\\w&&[^0-9]]\\w*'
+                'match': '\\d\\w*'
+                'name': 'invalid.illegal.identifier.go'
+              }
+              {
+                'match': '\\w+'
                 'name': 'variable.other.assignment.go'
               }
               {
@@ -491,12 +539,16 @@
             ]
       }
       {
-        'match': '([\\w&&[^0-9]]\\w*(?:,\\s*[\\w&&[^0-9]]\\w*)*)(\\s+[\\*]?[\\w&&[^0-9]]\\w*\\s*)(=.*)'
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+[\\*]?\\w+\\s*)(=.*)'
         'captures':
           '1':
             'patterns': [
               {
-                'match': '[\\w&&[^0-9]]\\w*'
+                'match': '\\d\\w*'
+                'name': 'invalid.illegal.identifier.go'
+              }
+              {
+                'match': '\\w+'
                 'name': 'variable.other.assignment.go'
               }
               {
@@ -517,12 +569,16 @@
             ]
       }
       {
-        'match': '([\\w&&[^0-9]]\\w*(?:,\\s*[\\w&&[^0-9]]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[\\w&&[^0-9]]\\w*\\s*[^=].*)'
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+[\\[\\]\\*]{0,3}\\w+\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [
               {
-                'match': '[\\w&&[^0-9]]\\w*'
+                'match': '\\d\\w*'
+                'name': 'invalid.illegal.identifier.go'
+              }
+              {
+                'match': '\\w+'
                 'name': 'variable.other.declaration.go'
               }
               {
