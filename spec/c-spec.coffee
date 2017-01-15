@@ -512,6 +512,14 @@ describe "Language-C", ->
     describe "access", ->
       it "tokenizes the dot access operator", ->
         lines = grammar.tokenizeLines '''
+          {
+            a.
+          }
+        '''
+        expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.block.c']
+        expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
+
+        lines = grammar.tokenizeLines '''
           void f() {
             a.b;
           }
