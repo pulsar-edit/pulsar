@@ -516,7 +516,6 @@ describe "Language-C", ->
             a.b;
           }
         '''
-
         expect(lines[1][0]).toEqual value: '  a', scopes: ['source.c', 'meta.function.c', 'meta.block.c']
         expect(lines[1][1]).toEqual value: '.', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'punctuation.separator.dot-access.c']
         expect(lines[1][2]).toEqual value: 'b', scopes: ['source.c', 'meta.function.c', 'meta.block.c', 'variable.other.member.c']
