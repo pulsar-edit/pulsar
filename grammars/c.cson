@@ -455,7 +455,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.comment.cpp'
-            'end': '\\n'
+            'end': '(?=\\n)'
             'name': 'comment.line.double-slash.cpp'
             'patterns': [
               {
@@ -1001,7 +1001,7 @@
             ]
           }
           {
-            'begin': '^'
+            'begin': '\\n'
             'end': '(?=^\\s*((#)\\s*(?:else|elif|endif)\\b))'
             'contentName': 'comment.block.preprocessor.if-branch.c'
             'patterns': [
@@ -1085,7 +1085,7 @@
             ]
           }
           {
-            'begin': '^'
+            'begin': '\\n'
             'end': '(?=^\\s*((#)\\s*(?:else|elif|endif)\\b))'
             'contentName': 'comment.block.preprocessor.if-branch.in-block.c'
             'patterns': [
@@ -1125,7 +1125,7 @@
         'include': '#comments'
       }
       {
-        'begin': '^'
+        'begin': '\\n'
         'end': '(?=^\\s*((#)\\s*(?:else|elif|endif)\\b))'
         'contentName': 'comment.block.preprocessor.elif-branch.c'
         'patterns': [
@@ -1214,7 +1214,7 @@
             ]
           }
           {
-            'begin': '^'
+            'begin': '\\n'
             'end': '(?=^\\s*((#)\\s*(?:else|elif|endif)\\b))'
             'patterns': [
               {
@@ -1299,7 +1299,7 @@
             ]
           }
           {
-            'begin': '^'
+            'begin': '\\n'
             'end': '(?=^\\s*((#)\\s*(?:else|elif|endif)\\b))'
             'patterns': [
               {
@@ -1335,7 +1335,7 @@
         'include': '#comments'
       }
       {
-        'begin': '^'
+        'begin': '\\n'
         'end': '(?=^\\s*((#)\\s*(?:endif)\\b))'
         'patterns': [
           {
@@ -1409,7 +1409,7 @@
         'include': '#comments'
       }
       {
-        'begin': '^'
+        'begin': '\\n'
         'end': '(?=^\\s*((#)\\s*(?:endif)\\b))'
         'patterns': [
           {
