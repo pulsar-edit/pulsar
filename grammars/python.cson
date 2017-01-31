@@ -16,7 +16,7 @@
   'tac'
   'wsgi'
 ]
-'firstLineMatch': '^#!/.*\\bpython[\\d\\.]*\\b'
+'firstLineMatch': '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
 'patterns': [
   {
     'include': '#line_comments'
