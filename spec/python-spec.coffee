@@ -8,6 +8,10 @@ describe "Python grammar", ->
     runs ->
       grammar = atom.grammars.grammarForScopeName("source.python")
 
+  it "recognises shebang on firstline", ->
+    expect(grammar.firstLineRegex.scanner.findNextMatchSync("#!/usr/bin/env python")).not.toBeNull()
+    expect(grammar.firstLineRegex.scanner.findNextMatchSync("#! /usr/bin/env python")).not.toBeNull()
+
   it "parses the grammar", ->
     expect(grammar).toBeDefined()
     expect(grammar.scopeName).toBe "source.python"
