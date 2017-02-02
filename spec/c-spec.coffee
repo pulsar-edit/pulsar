@@ -61,8 +61,8 @@ describe "Language-C", ->
         {tokens} = grammar.tokenizeLine '1\'000'
         expect(tokens[0]).toEqual value: '1\'000', scopes: ['source.c', 'constant.numeric.c']
 
-        {tokens} = grammar.tokenizeLine '0.500\'000e-1\'5'
-        expect(tokens[0]).toEqual value: '0.500\'000e-1\'5', scopes: ['source.c', 'constant.numeric.c']
+        {tokens} = grammar.tokenizeLine '123\'456.500\'000e-1\'5'
+        expect(tokens[0]).toEqual value: '123\'456.500\'000e-1\'5', scopes: ['source.c', 'constant.numeric.c']
 
         {tokens} = grammar.tokenizeLine '0x1234\'5678'
         expect(tokens[0]).toEqual value: '0x1234\'5678', scopes: ['source.c', 'constant.numeric.c']
