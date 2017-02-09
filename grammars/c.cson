@@ -702,8 +702,10 @@
         'name': 'constant.other.placeholder.c'
       }
       {
-        'match': '%'
-        'name': 'invalid.illegal.placeholder.c'
+        'match': '(%)(?!"\\s*(PRI|SCN))'
+        'captures':
+          '1':
+            'name': 'invalid.illegal.placeholder.c'
       }
     ]
   'preprocessor-rule-conditional':
