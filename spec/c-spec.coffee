@@ -92,6 +92,26 @@ describe "Language-C", ->
           expect(tokens[4]).toEqual value: 'b', scopes: ['source.c', scope]
           expect(tokens[5]).toEqual value: delim, scopes: ['source.c', scope, 'punctuation.definition.string.end.c']
 
+        {tokens} = grammar.tokenizeLine '"%d"'
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.begin.c']
+        expect(tokens[1]).toEqual value: '%d', scopes: ['source.c', 'string.quoted.double.c', 'constant.other.placeholder.c']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']
+
+        {tokens} = grammar.tokenizeLine '"%"'
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.begin.c']
+        expect(tokens[1]).toEqual value: '%', scopes: ['source.c', 'string.quoted.double.c', 'invalid.illegal.placeholder.c']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']
+
+        {tokens} = grammar.tokenizeLine '"%" PRId32'
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.begin.c']
+        expect(tokens[1]).toEqual value: '%', scopes: ['source.c', 'string.quoted.double.c']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']
+
+        {tokens} = grammar.tokenizeLine '"%" SCNd32'
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.begin.c']
+        expect(tokens[1]).toEqual value: '%', scopes: ['source.c', 'string.quoted.double.c']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']
+
     describe "comments", ->
       it "tokenizes them", ->
         {tokens} = grammar.tokenizeLine '/**/'
