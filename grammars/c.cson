@@ -23,8 +23,7 @@
     'name': 'keyword.control.c'
   }
   {
-    'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-    'name': 'storage.type.c'
+    'include': '#storage_types'
   }
   {
     'match': '\\b(const|extern|register|restrict|static|volatile|inline)\\b'
@@ -767,6 +766,13 @@
         'captures':
           '1':
             'name': 'invalid.illegal.placeholder.c'
+      }
+    ]
+  'storage_types':
+    'patterns': [
+      {
+        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
+        'name': 'storage.type.c'
       }
     ]
   'preprocessor-rule-conditional':
@@ -1716,8 +1722,10 @@
   'preprocessor-rule-define-line-functions':
     'patterns': [
       {
-        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-        'name': 'storage.type.c'
+        'include': '#storage_types'
+      }
+      {
+        'include': '#access'
       }
       {
         'include': '#operators'
@@ -1773,8 +1781,10 @@
   'preprocessor-rule-define-line-functions-inparens':
     'patterns': [
       {
-        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-        'name': 'storage.type.c'
+        'include': '#storage_types'
+      }
+      {
+        'include': '#access'
       }
       {
         'include': '#operators'
@@ -1871,8 +1881,7 @@
   'meta-function-scope-innards':
     'patterns': [
       {
-        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-        'name': 'storage.type.c'
+        'include': '#storage_types'
       }
       {
         'include': '#operators'
@@ -1927,8 +1936,7 @@
   'meta-function-scope-innards-inparens':
     'patterns': [
       {
-        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-        'name': 'storage.type.c'
+        'include': '#storage_types'
       }
       {
         'include': '#operators'
@@ -1982,8 +1990,10 @@
   'meta-function-call-scope-innards':
     'patterns': [
       {
-        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-        'name': 'storage.type.c'
+        'include': '#storage_types'
+      }
+      {
+        'include': '#access'
       }
       {
         'include': '#operators'
@@ -2038,8 +2048,10 @@
   'meta-function-call-scope-innards-inparens':
     'patterns': [
       {
-        'match': '\\b(asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\b'
-        'name': 'storage.type.c'
+        'include': '#storage_types'
+      }
+      {
+        'include': '#access'
       }
       {
         'include': '#operators'
