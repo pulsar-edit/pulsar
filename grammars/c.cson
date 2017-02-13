@@ -1722,6 +1722,9 @@
   'preprocessor-rule-define-line-functions':
     'patterns': [
       {
+        'include': '#comments'
+      }
+      {
         'include': '#storage_types'
       }
       {
@@ -1780,6 +1783,9 @@
     ]
   'preprocessor-rule-define-line-functions-inparens':
     'patterns': [
+      {
+        'include': '#comments'
+      }
       {
         'include': '#storage_types'
       }
@@ -1881,6 +1887,9 @@
   'meta-function-scope-innards':
     'patterns': [
       {
+        'include': '#comments'
+      }
+      {
         'include': '#storage_types'
       }
       {
@@ -1936,6 +1945,9 @@
   'meta-function-scope-innards-inparens':
     'patterns': [
       {
+        'include': '#comments'
+      }
+      {
         'include': '#storage_types'
       }
       {
@@ -1989,6 +2001,9 @@
     ]
   'meta-function-call-scope-innards':
     'patterns': [
+      {
+        'include': '#comments'
+      }
       {
         'include': '#storage_types'
       }
@@ -2047,6 +2062,9 @@
     ]
   'meta-function-call-scope-innards-inparens':
     'patterns': [
+      {
+        'include': '#comments'
+      }
       {
         'include': '#storage_types'
       }
