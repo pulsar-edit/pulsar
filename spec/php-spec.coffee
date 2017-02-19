@@ -488,6 +488,154 @@ describe 'PHP grammar', ->
         expect(tokens[1][4]).toEqual value: '\'', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
         expect(tokens[1][5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
+      it 'should tokenize a simple heredoc correctly', ->
+        tokens = grammar.tokenizeLines """<?php
+        $a = <<<HEREDOC
+        I am a heredoc
+        HEREDOC;"""
+
+        expect(tokens[1][0]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(tokens[1][1]).toEqual value: 'a', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
+        expect(tokens[1][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][3]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.assignment.php']
+        expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][5]).toEqual value: '<<<', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+        expect(tokens[1][6]).toEqual value: 'HEREDOC', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[2][0]).toEqual value: 'I am a heredoc', scopes ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[3][0]).toEqual value: 'HEREDOC', scopes ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[3][1]).toEqual value: ';', scopes ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+      it 'should tokenize a longer heredoc correctly', ->
+        tokens = grammar.tokenizeLines """<?php
+        $a = <<<GITHUB
+        This is a plain string.
+        SELECT * FROM github WHERE octocat = 'awesome' and ID = 1;
+        <strong>rainbows</strong>
+
+        if(awesome) {
+            doSomething(10, function(x){
+              console.log(x*x);
+            });
+        }
+        GITHUB;"""
+
+        expect(tokens[1][0]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(tokens[1][1]).toEqual value: 'a', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
+        expect(tokens[1][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][3]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.assignment.php']
+        expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][5]).toEqual value: '<<<', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+        expect(tokens[1][6]).toEqual value: 'GITHUB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[2][0]).toEqual value: 'This is a plain string.', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[3][0]).toEqual value: 'SELECT * FROM github WHERE octocat = \'awesome\' and ID = 1;', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[4][0]).toEqual value: '<strong>rainbows</strong>', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[5][0]).toEqual value: '', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[6][0]).toEqual value: 'if(awesome) {', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[7][0]).toEqual value: '    doSomething(10, function(x){', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[8][0]).toEqual value: '      console.log(x*x);', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[9][0]).toEqual value: '    });', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[10][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[11][0]).toEqual value: 'GITHUB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[11][1]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+      it 'should tokenize a longer heredoc with interpolated values and escaped characters correctly', ->
+        tokens = grammar.tokenizeLines """<?php
+        $a = <<<GITHUB
+        This is a plain string.
+        Jumpin' Juniper is \\"The $thing\\"
+        SELECT * FROM github WHERE octocat = 'awesome' and ID = 1;
+        <strong>rainbows</strong>
+
+        if(awesome) {
+            doSomething(10, function(x){
+              console.log(x*x);
+            });
+        }
+        GITHUB;"""
+
+        expect(tokens[1][0]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(tokens[1][1]).toEqual value: 'a', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
+        expect(tokens[1][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][3]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.assignment.php']
+        expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][5]).toEqual value: '<<<', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+        expect(tokens[1][6]).toEqual value: 'GITHUB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[2][0]).toEqual value: 'This is a plain string.', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[3][0]).toEqual value: 'Jumpin\' Juniper is ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[3][1]).toEqual value: '\\"', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']
+        expect(tokens[3][2]).toEqual value: 'The ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[3][3]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(tokens[3][4]).toEqual value: 'thing', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'variable.other.php']
+        expect(tokens[3][5]).toEqual value: '\\"', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']
+        expect(tokens[4][0]).toEqual value: 'SELECT * FROM github WHERE octocat = \'awesome\' and ID = 1;', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[5][0]).toEqual value: '<strong>rainbows</strong>', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[6][0]).toEqual value: '', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[7][0]).toEqual value: 'if(awesome) {', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[8][0]).toEqual value: '    doSomething(10, function(x){', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[9][0]).toEqual value: '      console.log(x*x);', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[10][0]).toEqual value: '    });', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[11][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[12][0]).toEqual value: 'GITHUB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[12][1]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+      it 'should tokenize a nowdoc with interpolated values correctly', ->
+        tokens = grammar.tokenizeLines """<?php
+        $a = <<<'GITHUB'
+        This is a plain string.
+        Jumpin' Juniper is \\"The $thing\\"
+        SELECT * FROM github WHERE octocat = 'awesome' and ID = 1;
+        <strong>rainbows</strong>
+
+        if(awesome) {
+            doSomething(10, function(x){
+              console.log(x*x);
+            });
+        }
+        GITHUB;"""
+
+        expect(tokens[1][0]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(tokens[1][1]).toEqual value: 'a', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
+        expect(tokens[1][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][3]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.assignment.php']
+        expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][5]).toEqual value: '<<<', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+        expect(tokens[1][6]).toEqual value: 'GITHUB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[2][0]).toEqual value: 'This is a plain string.', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[3][0]).toEqual value: 'Jumpin\' Juniper is "The $thing"', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[4][0]).toEqual value: 'SELECT * FROM github WHERE octocat = \'awesome\' and ID = 1;', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[5][0]).toEqual value: '<strong>rainbows</strong>', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[6][0]).toEqual value: '', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[7][0]).toEqual value: 'if(awesome) {', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[8][0]).toEqual value: '    doSomething(10, function(x){', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[9][0]).toEqual value: '      console.log(x*x);', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[10][0]).toEqual value: '    });', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[11][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+        expect(tokens[12][0]).toEqual value: 'GITHUB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[12][1]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+      it 'should tokenize a heredoc with embedded HTML correctly', ->
+        tokens = grammar.tokenizeLines """<?php
+        $a = <<<HTML
+        <strong>rainbows</strong>
+        HTML;"""
+
+        expect(tokens[1][0]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(tokens[1][1]).toEqual value: 'a', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
+        expect(tokens[1][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][3]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.assignment.php']
+        expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+        expect(tokens[1][5]).toEqual value: '<<<', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+        expect(tokens[1][6]).toEqual value: 'HTML', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[2][0]).toEqual value: '<', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.begin.html']
+        expect(tokens[2][1]).toEqual value: 'strong', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic', 'meta.tag.inline.any.html', 'entity.name.tag.inline.any.html']
+        expect(tokens[2][2]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.end.html']
+        expect(tokens[2][3]).toEqual value: 'rainbows', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic']
+        expect(tokens[2][4]).toEqual value: '</', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.begin.html']
+        expect(tokens[2][5]).toEqual value: 'strong', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic', 'meta.tag.inline.any.html', 'entity.name.tag.inline.any.html']
+        expect(tokens[2][6]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.end.html']
+        expect(tokens[3][0]).toEqual value: 'HTML', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+        expect(tokens[3][1]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
   describe 'firstLineMatch', ->
     it "recognises interpreter directives", ->
       valid = """
