@@ -56,7 +56,7 @@
   'function …':
     'prefix': 'fun'
     'body': '${1:public }function ${2:FunctionName}(${3:$${4:value}${5:=\'\'}})\n{\n\t${0:# code...}\n}'
-  'annonymous function':
+  'anonymous function':
     'prefix': 'f',
     'body': 'function (${1:$${2:value}${3:=\'\'}}) {\n\t${0:# code...}\n}'
   'if … else …':
