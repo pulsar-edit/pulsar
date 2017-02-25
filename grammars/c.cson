@@ -300,14 +300,14 @@
   'block':
     'patterns': [
       {
-        'begin': '\\{'
+        'begin': '{'
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.block.begin.c'
-        'end': '\\}|(?=\\s*#\\s*(?:elif|else|endif)\\b)'
+            'name': 'punctuation.section.block.begin.bracket.curly.c'
+        'end': '}|(?=\\s*#\\s*(?:elif|else|endif)\\b)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.block.end.c'
+            'name': 'punctuation.section.block.end.bracket.curly.c'
         'name': 'meta.block.c'
         'patterns': [
           {
@@ -360,14 +360,14 @@
       }
       {
         # Prevent unnecessary nesting of meta.block.c scope
-        'begin': '\\{'
+        'begin': '{'
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.block.begin.c'
-        'end': '\\}|(?=\\s*#\\s*(?:elif|else|endif)\\b)'
+            'name': 'punctuation.section.block.begin.bracket.curly.c'
+        'end': '}|(?=\\s*#\\s*(?:elif|else|endif)\\b)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.block.end.c'
+            'name': 'punctuation.section.block.end.bracket.curly.c'
         #'name': 'meta.block.c'
         'patterns': [
           {
@@ -775,6 +775,9 @@
         'name': 'storage.type.c'
       }
     ]
+  'vararg_ellipses':
+    'match': '(?<!\\.)\\.\\.\\.(?!\\.)'
+    'name': 'punctuation.vararg-ellipses.c'
   'preprocessor-rule-conditional':
     'patterns': [
       {
@@ -1560,15 +1563,18 @@
   'preprocessor-rule-define-line-contents':
     'patterns': [
       {
+        'include': '#vararg_ellipses'
+      }
+      {
         # block pattern for #define lines (terminates at newline w/o line_continuation_character)
-        'begin': '\\{'
+        'begin': '{'
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.block.begin.c'
-        'end': '\\}|(?=\\s*#\\s*(?:elif|else|endif)\\b)|(?<!\\\\)(?=\\s*\\n)'
+            'name': 'punctuation.section.block.begin.bracket.curly.c'
+        'end': '}|(?=\\s*#\\s*(?:elif|else|endif)\\b)|(?<!\\\\)(?=\\s*\\n)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.block.end.c'
+            'name': 'punctuation.section.block.end.bracket.curly.c'
         'name': 'meta.block.c'
         'patterns': [
           {
@@ -1657,14 +1663,14 @@
     'patterns': [
       {
         # Prevent unnecessary nesting of meta.block.c scope
-        'begin': '\\{'
+        'begin': '{'
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.block.begin.c'
-        'end': '\\}|(?=\\s*#\\s*(?:elif|else|endif)\\b)|(?<!\\\\)(?=\\s*\\n)'
+            'name': 'punctuation.section.block.begin.bracket.curly.c'
+        'end': '}|(?=\\s*#\\s*(?:elif|else|endif)\\b)|(?<!\\\\)(?=\\s*\\n)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.block.end.c'
+            'name': 'punctuation.section.block.end.bracket.curly.c'
         #'name': 'meta.block.c'  <-- DO NOT NAME THE SECTION THIS TIME!
         'patterns': [
           {
@@ -1726,6 +1732,9 @@
       }
       {
         'include': '#storage_types'
+      }
+      {
+        'include': '#vararg_ellipses'
       }
       {
         'include': '#access'
@@ -1894,6 +1903,9 @@
       }
       {
         'include': '#operators'
+      }
+      {
+        'include': '#vararg_ellipses'
       }
       {
         'begin': '''(?x)
