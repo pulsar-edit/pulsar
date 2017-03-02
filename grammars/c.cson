@@ -1500,7 +1500,12 @@
         ]
       }
       {
-        'include': '#preprocessor-rule-define-line-parens'
+        'match': '\\('
+        'name': 'punctuation.section.parens.begin.c'
+      }
+      {
+        'match': '\\)'
+        'name': 'punctuation.section.parens.end.c'
       }
       {
         # Function scope patterns for #define lines (terminates at newline w/o line_continuation_character)
@@ -1598,21 +1603,6 @@
           }
         ]
       }
-      {
-        'include': '#preprocessor-rule-define-line-contents'
-      }
-    ]
-  'preprocessor-rule-define-line-parens':
-    # provides un-balanced paranthesis' in #define lines (terminates at newline w/o line_continuation_character)
-    'begin': '\\('
-    'beginCaptures':
-      '0':
-        'name': 'punctuation.section.parens.begin.c'
-    'end': '\\)|(?<!\\\\)(?=\\s*\\n)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.section.parens.end.c'
-    'patterns': [
       {
         'include': '#preprocessor-rule-define-line-contents'
       }
