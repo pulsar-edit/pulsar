@@ -147,11 +147,11 @@
     'begin': '\\{'
     'beginCaptures':
       '0':
-        'name': 'punctuation.section.block.begin.c'
+        'name': 'punctuation.section.block.begin.bracket.curly.c'
     'end': '\\}'
     'endCaptures':
       '0':
-        'name': 'punctuation.section.block.end.c'
+        'name': 'punctuation.section.block.end.bracket.curly.c'
     'name': 'meta.block.cpp'
     'patterns': [
       {
@@ -308,11 +308,11 @@
             'begin': '\\{'
             'beginCaptures':
               '0':
-                'name': 'punctuation.section.block.begin.cpp'
+                'name': 'punctuation.section.block.begin.bracket.curly.cpp'
             'end': '(\\})(\\s*\\n)?'
             'endCaptures':
               '1':
-                'name': 'punctuation.section.block.end.cpp'
+                'name': 'punctuation.section.block.end.bracket.curly.cpp'
               '2':
                 'name': 'invalid.illegal.you-forgot-semicolon.cpp'
             'patterns': [
@@ -344,11 +344,11 @@
             'begin': '\\{'
             'beginCaptures':
               '0':
-                'name': 'punctuation.section.block.begin.c'
+                'name': 'punctuation.section.block.begin.bracket.curly.c'
             'end': '\\}|(?=\\s*#\\s*endif\\b)'
             'endCaptures':
               '0':
-                'name': 'punctuation.section.block.end.c'
+                'name': 'punctuation.section.block.end.bracket.curly.c'
             'patterns': [
               {
                 'include': '#special_block'
