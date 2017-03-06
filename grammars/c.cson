@@ -264,8 +264,7 @@
     'include': '#parens'
   }
   {
-    # NEW FUNCTION/MACRO IMPLEMENTATION
-    # FIRST CAPTURE meta.function.c scope (provides an injectable scope, balanced paranthesis and prevents unnecessary scope nesting)
+    # FIRST CAPTURE meta.function.c scope (provides an injectable scope, balanced parentheses and prevents unnecessary scope nesting)
     'begin': '''(?x)
       (?!(?:while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate|asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\s*\\()
       (?=
@@ -278,8 +277,7 @@
     'name': 'meta.function.c'
     'patterns': [
       {
-        # NOW CONSUME TOKENS
-        'include': '#meta-function-scope-innards'
+        'include': '#function-innards'
       }
     ]
   }
@@ -368,7 +366,6 @@
         'endCaptures':
           '0':
             'name': 'punctuation.section.block.end.bracket.curly.c'
-        #'name': 'meta.block.c'
         'patterns': [
           {
             'include': '#block_innards'
@@ -383,8 +380,7 @@
       }
     ]
   'c_function_call':
-    # NEW FUNCTION/MACRO IMPLEMENTATION
-    # FIRST CAPTURE meta.function-call.c scope (provides an injectable scope, balanced paranthesis and prevents unnecessary scope nesting)
+    # FIRST CAPTURE meta.function-call.c scope (provides an injectable scope, balanced parentheses and prevents unnecessary scope nesting)
     'begin': '''(?x)
       (?!(?:while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()
       (?=
@@ -397,8 +393,7 @@
     'name': 'meta.function-call.c'
     'patterns': [
       {
-        # NOW CONSUME TOKENS
-        'include': '#meta-function-call-scope-innards'
+        'include': '#function-call-innards'
       }
     ]
   'comments':
@@ -519,11 +514,11 @@
     'begin': '\\('
     'beginCaptures':
       '0':
-        'name': 'punctuation.section.parens.begin.c'
+        'name': 'punctuation.section.parens.begin.bracket.round.c'
     'end': '\\)'
     'endCaptures':
       '0':
-        'name': 'punctuation.section.parens.end.c'
+        'name': 'punctuation.section.parens.end.bracket.round.c'
     'patterns': [
       {
         'include': '$base'
@@ -533,11 +528,11 @@
     'begin': '\\('
     'beginCaptures':
       '0':
-        'name': 'punctuation.section.parens.begin.c'
+        'name': 'punctuation.section.parens.begin.bracket.round.c'
     'end': '\\)'
     'endCaptures':
       '0':
-        'name': 'punctuation.section.parens.end.c'
+        'name': 'punctuation.section.parens.end.bracket.round.c'
     'patterns': [
       {
         'include': '#block_innards'
@@ -909,11 +904,11 @@
         'begin': '\\('
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.parens.begin.c'
+            'name': 'punctuation.section.parens.begin.bracket.round.c'
         'end': '\\)|(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.parens.end.c'
+            'name': 'punctuation.section.parens.end.bracket.round.c'
         'patterns': [
           {
             'include': '#preprocessor-rule-conditional-line'
@@ -1501,16 +1496,15 @@
       }
       {
         'match': '\\('
-        'name': 'punctuation.section.parens.begin.c'
+        'name': 'punctuation.section.parens.begin.bracket.round.c'
       }
       {
         'match': '\\)'
-        'name': 'punctuation.section.parens.end.c'
+        'name': 'punctuation.section.parens.end.bracket.round.c'
       }
       {
         # Function scope patterns for #define lines (terminates at newline w/o line_continuation_character)
-        # NEW FUNCTION/MACRO IMPLEMENTATION
-        # FIRST CAPTURE meta.function.c scope (provides an injectable scope, balanced paranthesis and prevents unnecessary scope nesting)
+        # FIRST CAPTURE meta.function.c scope (provides an injectable scope, balanced parentheses and prevents unnecessary scope nesting)
         'begin': '''(?x)
           (?!(?:while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate|asm|__asm__|auto|bool|_Bool|char|_Complex|double|enum|float|_Imaginary|int|long|short|signed|struct|typedef|union|unsigned|void)\\s*\\()
           (?=
@@ -1523,7 +1517,6 @@
         'name': 'meta.function.c'
         'patterns': [
           {
-            # NOW CONSUME TOKENS
             'include': '#preprocessor-rule-define-line-functions'
           }
         ]
@@ -1593,7 +1586,6 @@
         'endCaptures':
           '0':
             'name': 'punctuation.section.block.end.bracket.curly.c'
-        #'name': 'meta.block.c'  <-- DO NOT NAME THE SECTION THIS TIME!
         'patterns': [
           {
             'include': '#preprocessor-rule-define-line-blocks'
@@ -1639,11 +1631,11 @@
           '1':
             'name': 'entity.name.function.c'
           '2':
-            'name': 'punctuation.section.parameters.begin.c'
+            'name': 'punctuation.section.arguments.begin.bracket.round.c'
         'end': '(\\))|(?<!\\\\)(?=\\s*\\n)'
         'endCaptures':
           '1':
-            'name': 'punctuation.section.parameters.end.c'
+            'name': 'punctuation.section.arguments.end.bracket.round.c'
         'patterns': [
           {
             'include': '#preprocessor-rule-define-line-functions'
@@ -1651,15 +1643,15 @@
         ]
       }
       {
-        # Capture paranthesis' (terminates at newline w/o line_continuation_character)
+        # Capture parantheses (terminates at newline w/o line_continuation_character)
         'begin': '\\('
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.parens.begin.c'
+            'name': 'punctuation.section.parens.begin.bracket.round.c'
         'end': '(\\))|(?<!\\\\)(?=\\s*\\n)'
         'endCaptures':
           '1':
-            'name': 'punctuation.section.parens.end.c'
+            'name': 'punctuation.section.parens.end.bracket.round.c'
         'patterns': [
           {
             # Provides right matching of inner paranthesis couples
@@ -1671,7 +1663,7 @@
         'include': '#preprocessor-rule-define-line-contents'
       }
     ]
-  'meta-function-scope-innards':
+  'function-innards':
     'patterns': [
       {
         'include': '#comments'
@@ -1699,30 +1691,29 @@
           '1':
             'name': 'entity.name.function.c'
           '2':
-            'name': 'punctuation.section.parameters.begin.c'
+            'name': 'punctuation.section.arguments.begin.bracket.round.c'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.parameters.end.c'
+            'name': 'punctuation.section.arguments.end.bracket.round.c'
         'patterns': [
           {
-            'include': '#meta-function-scope-innards'
+            'include': '#function-innards'
           }
         ]
       }
       {
-        # Capture paranthesis'
         'begin': '\\('
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.parens.begin.c'
+            'name': 'punctuation.section.parens.begin.bracket.round.c'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.parens.end.c'
+            'name': 'punctuation.section.parens.end.bracket.round.c'
         'patterns': [
           {
-            'include': '#meta-function-scope-innards'
+            'include': '#function-innards'
           }
         ]
       }
@@ -1730,7 +1721,7 @@
         'include': '$base'
       }
     ]
-  'meta-function-call-scope-innards':
+  'function-call-innards':
     'patterns': [
       {
         'include': '#comments'
@@ -1758,30 +1749,29 @@
           '1':
             'name': 'entity.name.function.c'
           '2':
-            'name': 'punctuation.section.parameters.begin.c'
+            'name': 'punctuation.section.arguments.begin.bracket.round.c'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.parameters.end.c'
+            'name': 'punctuation.section.arguments.end.bracket.round.c'
         'patterns': [
           {
-            'include': '#meta-function-call-scope-innards'
+            'include': '#function-call-innards'
           }
         ]
       }
       {
-        # Capture paranthesis'
         'begin': '\\('
         'beginCaptures':
           '0':
-            'name': 'punctuation.section.parens.begin.c'
+            'name': 'punctuation.section.parens.begin.bracket.round.c'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.parens.end.c'
+            'name': 'punctuation.section.parens.end.bracket.round.c'
         'patterns': [
           {
-            'include': '#meta-function-call-scope-innards'
+            'include': '#function-call-innards'
           }
         ]
       }
