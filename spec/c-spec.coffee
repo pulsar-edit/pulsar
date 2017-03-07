@@ -21,6 +21,17 @@ describe "Language-C", ->
       expect(grammar).toBeTruthy()
       expect(grammar.scopeName).toBe 'source.c'
 
+    it "tokenizes punctuation", ->
+      {tokens} = grammar.tokenizeLine 'hi;'
+      expect(tokens[1]).toEqual value: ';', scopes: ['source.c', 'punctuation.terminator.statement.c']
+
+      {tokens} = grammar.tokenizeLine 'a[b]'
+      expect(tokens[1]).toEqual value: '[', scopes: ['source.c', 'punctuation.definition.begin.bracket.square.c']
+      expect(tokens[3]).toEqual value: ']', scopes: ['source.c', 'punctuation.definition.end.bracket.square.c']
+
+      {tokens} = grammar.tokenizeLine 'a, b'
+      expect(tokens[1]).toEqual value: ',', scopes: ['source.c', 'punctuation.separator.delimiter.c']
+
     it "tokenizes functions", ->
       lines = grammar.tokenizeLines '''
         int something(int param) {
