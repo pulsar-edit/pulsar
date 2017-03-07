@@ -284,6 +284,22 @@
   {
     'include': '#line_continuation_character'
   }
+  {
+    'match': '(\\[)|(\\])'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.begin.bracket.square.c'
+      '2':
+        'name': 'punctuation.definition.end.bracket.square.c'
+  }
+  {
+    'match': ';'
+    'name': 'punctuation.terminator.statement.c'
+  }
+  {
+    'match': ','
+    'name': 'punctuation.separator.delimiter.c'
+  }
 ]
 'repository':
   'access':
@@ -850,7 +866,7 @@
       }
     ]
   'preprocessor-rule-conditional-line':
-    'patterns':[
+    'patterns': [
       {
         #the valid "defined" keyword usage
         'match': '(?:\\bdefined\\b\\s*$)|(?:\\bdefined\\b(?=\\s*\\(*\\s*(?:(?!defined\\b)[a-zA-Z_$][\\w$]*\\b)\\s*\\)*\\s*(?:\\n|//|/\\*|\\?|\\:|&&|\\|\\||\\\\\\s*\\n)))'
@@ -1643,7 +1659,7 @@
         ]
       }
       {
-        # Capture parantheses (terminates at newline w/o line_continuation_character)
+        # Capture parentheses (terminates at newline w/o line_continuation_character)
         'begin': '\\('
         'beginCaptures':
           '0':
@@ -1654,7 +1670,7 @@
             'name': 'punctuation.section.parens.end.bracket.round.c'
         'patterns': [
           {
-            # Provides right matching of inner paranthesis couples
+            # Provides right matching of inner parentheses
             'include': '#preprocessor-rule-define-line-functions'
           }
         ]
@@ -1691,11 +1707,11 @@
           '1':
             'name': 'entity.name.function.c'
           '2':
-            'name': 'punctuation.section.arguments.begin.bracket.round.c'
+            'name': 'punctuation.section.parameters.begin.bracket.round.c'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.section.arguments.end.bracket.round.c'
+            'name': 'punctuation.section.parameters.end.bracket.round.c'
         'patterns': [
           {
             'include': '#function-innards'
