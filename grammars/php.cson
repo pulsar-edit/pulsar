@@ -482,7 +482,7 @@
       {
         'begin': '(?=<<<\\s*\'([a-zA-Z_]+[a-zA-Z0-9_]*)\'[ \\t]*$)'
         'end': '(?!\\G)'
-        'name': 'string.unquoted.heredoc.nowdoc.php'
+        'name': 'string.unquoted.nowdoc.php'
         'patterns': [
           {
             'include': '#nowdoc_interior'
