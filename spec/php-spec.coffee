@@ -626,6 +626,7 @@ describe 'PHP grammar', ->
       it 'should tokenize a heredoc with embedded HTML and interpolation correctly', ->
         waitsForPromise ->
           atom.packages.activatePackage('language-html')
+
         runs ->
           tokens = grammar.tokenizeLines """
             <?php
