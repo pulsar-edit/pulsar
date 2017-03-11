@@ -758,7 +758,7 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'text.html'
@@ -767,7 +767,7 @@
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'name': 'meta.embedded.html'
         'patterns': [
           {
@@ -783,7 +783,7 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'text.xml'
@@ -792,7 +792,7 @@
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'name': 'meta.embedded.xml'
         'patterns': [
           {
@@ -808,7 +808,7 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.sql'
@@ -817,7 +817,7 @@
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'name': 'meta.embedded.sql'
         'patterns': [
           {
@@ -833,7 +833,7 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.js'
@@ -842,7 +842,7 @@
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'name': 'meta.embedded.js'
         'patterns': [
           {
@@ -858,7 +858,7 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.json'
@@ -867,7 +867,7 @@
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'name': 'meta.embedded.json'
         'patterns': [
           {
@@ -883,7 +883,7 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.css'
@@ -892,7 +892,7 @@
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'name': 'meta.embedded.css'
         'patterns': [
           {
@@ -908,16 +908,16 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
-        'contentName': 'string.regexp.heredoc.php'
+        'contentName': 'string.regexp.nowdoc.php'
         'end': '^(\\2)\\b'
         'endCaptures':
           '0':
             'name': 'punctuation.section.embedded.end.php'
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
         'patterns': [
           {
             'comment': 'Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)'
@@ -971,13 +971,13 @@
           '1':
             'name': 'punctuation.definition.string.php'
           '2':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
           '3':
             'name': 'invalid.illegal.trailing-whitespace.php'
         'end': '^(\\2)\\b'
         'endCaptures':
           '1':
-            'name': 'keyword.operator.heredoc.php'
+            'name': 'keyword.operator.nowdoc.php'
       }
     ]
   'instantiation':
