@@ -502,7 +502,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'text.html'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -530,7 +530,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'text.xml'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -558,7 +558,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.sql'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -586,7 +586,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.js'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -614,7 +614,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.json'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -642,7 +642,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.css'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -670,7 +670,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'string.regexp.heredoc.php'
         'end': '^(\\3)\\b'
         'endCaptures':
@@ -736,7 +736,7 @@
           '3':
             'name': 'keyword.operator.heredoc.php'
           '5':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'end': '^(\\3)\\b'
         'endCaptures':
           '1':
@@ -760,7 +760,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'text.html'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -785,7 +785,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'text.xml'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -810,7 +810,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.sql'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -835,7 +835,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.js'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -860,7 +860,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.json'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -885,7 +885,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'source.css'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -910,7 +910,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'contentName': 'string.regexp.heredoc.php'
         'end': '^(\\2)\\b'
         'endCaptures':
@@ -973,7 +973,7 @@
           '2':
             'name': 'keyword.operator.heredoc.php'
           '3':
-            'name': 'invalid.illegal.whitespace-in-end-of-line.php'
+            'name': 'invalid.illegal.trailing-whitespace.php'
         'end': '^(\\2)\\b'
         'endCaptures':
           '1':
