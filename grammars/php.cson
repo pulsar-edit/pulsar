@@ -493,7 +493,7 @@
   'heredoc_interior':
     'patterns': [
       {
-        'begin': '(<<<)\\s*("?)(HTML)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(HTML)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -521,7 +521,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(XML)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(XML)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -549,7 +549,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(SQL)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(SQL)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -577,7 +577,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(JAVASCRIPT)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(JAVASCRIPT)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -605,7 +605,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(JSON)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(JSON)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -633,7 +633,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(CSS)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(CSS)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -661,7 +661,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(REGEXP?)(\\2)(\\s+)?$'
+        'begin': '(<<<)\\s*("?)(REGEXP?)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -729,7 +729,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)([a-zA-Z_]+[a-zA-Z0-9_]*)(\\2)(\\s+)?'
+        'begin': '(<<<)\\s*("?)([a-zA-Z_]+[a-zA-Z0-9_]*)(\\2)(\\s*)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.php'
@@ -751,7 +751,7 @@
   'nowdoc_interior':
     'patterns': [
       {
-        'begin': '(<<<)\\s*\'(HTML)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(HTML)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -776,7 +776,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(XML)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(XML)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -801,7 +801,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(SQL)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(SQL)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -826,7 +826,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(JAVASCRIPT)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(JAVASCRIPT)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -851,7 +851,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(JSON)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(JSON)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -876,7 +876,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(CSS)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(CSS)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -901,7 +901,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(REGEXP?)\'(\\s+)?$'
+        'begin': '(<<<)\\s*\'(REGEXP?)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -966,7 +966,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'([a-zA-Z_]+[a-zA-Z0-9_]*)\'(\\s+)?'
+        'begin': '(<<<)\\s*\'([a-zA-Z_]+[a-zA-Z0-9_]*)\'(\\s*)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.php'
