@@ -475,30 +475,13 @@
             ]
       }
       {
-        # Multiline variable declarations/assignments
-        'begin': '(\\()'
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.other.bracket.round.go'
-        'end': '\\)'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.other.bracket.round.go'
-        'patterns': [
-          {
-            'include': '#variables'
-          }
-          {
-            'include': '$self'
-          }
-        ]
-      }
-      {
         # var a
         # var a string
         # var a, b string
         # var a []string
-        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
+        # var a [3]string
+        # var a [][]*string
+        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+(\\[\\d*\\])*\\*?[a-zA-Z_]\\w*\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [
@@ -516,5 +499,24 @@
                 'include': '$self'
               }
             ]
+      }
+      {
+        # Multiline variable declarations/assignments
+        'begin': '(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.other.bracket.round.go'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.other.bracket.round.go'
+        'patterns': [
+          {
+            'include': '#variables'
+          }
+          {
+            'include': '$self'
+          }
+        ]
       }
     ]

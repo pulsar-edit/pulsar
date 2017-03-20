@@ -516,6 +516,26 @@ describe 'Go grammar', ->
         testVarDeclaration tokens[2], 's'
         testStringType tokens[6], 'string'
 
+      it 'tokenizes a single name and a type with length', ->
+        {tokens} = grammar.tokenizeLine 'var s [4]string'
+        testVar tokens[0]
+        testVarDeclaration tokens[2], 's'
+        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[5]).toEqual value: '4', scopes: ['source.go', 'constant.numeric.integer.go']
+        expect(tokens[6]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        testStringType tokens[7], 'string'
+
+      it 'tokenizes a single name and multi-dimensional types with an address', ->
+        {tokens} = grammar.tokenizeLine 'var e [][]*string'
+        testVar tokens[0]
+        testVarDeclaration tokens[2], 'e'
+        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[5]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[6]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[7]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        testOpAddress tokens[8], '*'
+        testStringType tokens[9], 'string'
+
       it 'tokenizes a single name and its initialization', ->
         {tokens} = grammar.tokenizeLine ' var k =  0'
         testVar tokens[1]
