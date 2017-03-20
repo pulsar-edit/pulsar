@@ -30,6 +30,7 @@ describe 'Go settings', ->
     expect(increaseIndentRegex.testSync('  for i := 0; i < 10; i++ {')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  type something struct {')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  fmt.Printf("some%s",')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('  aSlice := []string{}{')).toBeTruthy()
 
   it 'matches lines correctly using the decreaseIndentPattern', ->
     decreaseIndentRegex = languageMode.decreaseIndentRegexForScopeDescriptor(['source.go'])
