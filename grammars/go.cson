@@ -183,7 +183,50 @@
         'name': 'entity.name.type.go'
   }
   {
-    'include': '#variables'
+    'begin': '\\b(var)\\s+'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.var.go'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'include': '#variables'
+      }
+    ]
+  }
+  {
+    # Assignments to existing variables
+    # a =
+    # a, b, whatever =
+    'match': '(?<!var)\\s*([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(?=\\s*=(?!=))'
+    'captures':
+      '1':
+        'patterns': [
+          {
+            'match': '[a-zA-Z_]\\w*'
+            'name': 'variable.other.assignment.go'
+          }
+          {
+            'include': '#delimiters'
+          }
+        ]
+  }
+  {
+    # Shorthand variable declaration and assignments
+    # a :=
+    # a, b :=
+    'match': '[a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*(?=\\s*:=)'
+    'captures':
+      '0':
+        'patterns': [
+          {
+            'match': '[a-zA-Z_]\\w*'
+            'name': 'variable.other.assignment.go'
+          }
+          {
+            'include': '#delimiters'
+          }
+        ]
   }
   {
     'comment': 'Terminators'
@@ -299,10 +342,6 @@
         'match': '\\btype\\b'
         'name': 'keyword.type.go'
       }
-      {
-        'match': '\\bvar\\b'
-        'name': 'keyword.var.go'
-      }
     ]
   'operators':
     'comment': 'Note that the order here is very important!'
@@ -412,45 +451,11 @@
     # First add tests and make sure existing tests still pass when changing anything here!
     'patterns': [
       {
-        # Assignments to existing variables
-        # a =
-        # a, b, whatever =
-        'match': '(?<!var)\\s*([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(?=\\s*=(?!=))'
-        'captures':
-          '1':
-            'patterns': [
-              {
-                'match': '[a-zA-Z_]\\w*'
-                'name': 'variable.other.assignment.go'
-              }
-              {
-                'include': '#delimiters'
-              }
-            ]
-      }
-      {
-        # Shorthand variable declaration and assignments
-        # a :=
-        # a, b :=
-        'match': '[a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*(?=\\s*:=)'
-        'captures':
-          '0':
-            'patterns': [
-              {
-                'match': '[a-zA-Z_]\\w*'
-                'name': 'variable.other.assignment.go'
-              }
-              {
-                'include': '#delimiters'
-              }
-            ]
-      }
-      {
         # var a =
         # var a string =
         # var a, b =
         # var a, b *c =
-        'match': '(?<=var)\\s+([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+\\*?[a-zA-Z_]\\w*\\s*)?(?=\\s*=)'
+        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+\\*?[a-zA-Z_]\\w*\\s*)?(?=\\s*=)'
         'captures':
           '1':
             'patterns': [
@@ -471,7 +476,7 @@
       }
       {
         # Multiline variable declarations/assignments
-        'begin': '(?<=var)\\s+(\\()'
+        'begin': '(\\()'
         'beginCaptures':
           '1':
             'name': 'punctuation.other.bracket.round.go'
@@ -481,26 +486,7 @@
             'name': 'punctuation.other.bracket.round.go'
         'patterns': [
           {
-            # Copy of below, but without the leading var
-            # var (a *b)
-            'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
-            'captures':
-              '1':
-                'patterns': [
-                  {
-                    'match': '[a-zA-Z_]\\w*'
-                    'name': 'variable.other.declaration.go'
-                  }
-                  {
-                    'include': '#delimiters'
-                  }
-                ]
-              '2':
-                'patterns': [
-                  {
-                    'include': '$self'
-                  }
-                ]
+            'include': '#variables'
           }
           {
             'include': '$self'
@@ -512,7 +498,7 @@
         # var a string
         # var a, b string
         # var a []string
-        'match': '(?<=var)\\s+([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
+        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\[\\]\\*]{0,3}[a-zA-Z_]\\w*\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [

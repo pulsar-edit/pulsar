@@ -595,6 +595,11 @@ describe 'Go grammar', ->
         testVarAssignment tokens[5], 'found'
         testOpAssignment tokens[7], '='
 
+      it 'does not treat words that have a trailing var as a variable declaration', ->
+        {tokens} = grammar.tokenizeLine 'func test(envvar string)'
+        expect(tokens[4]).toEqual value: 'envvar ', scopes: ['source.go']
+        expect(tokens[5]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
+
       describe 'in var statement blocks', ->
         it 'tokenizes single names with a type', ->
           [kwd, decl, closing] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
