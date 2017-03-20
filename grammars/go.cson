@@ -121,9 +121,6 @@
     'name': 'constant.language.go'
   }
   {
-    'include': '#keywords'
-  }
-  {
     'comment': 'Package declarations'
     'match': '(?<=package)\\s+([a-zA-Z_]\\w*)'
     'captures':
@@ -238,6 +235,9 @@
   }
   {
     'include': '#delimiters'
+  }
+  {
+    'include': '#keywords'
   }
   {
     'include': '#operators'
