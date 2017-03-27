@@ -80,7 +80,7 @@
   }
   {
     'comment': 'Function declarations'
-    'match': '^(\\bfunc\\b)(?:\\s+(\\([^\\)]+\\)\\s+)?([a-zA-Z_]\\w*)(?=\\())?'
+    'match': '^(\\bfunc\\b)(?:\\s+(\\([^\\)]+\\)\\s+)?(\\w+)(?=\\())?'
     'captures':
       '1':
         'name': 'keyword.function.go'
@@ -94,16 +94,34 @@
           }
         ]
       '3':
-        'name': 'entity.name.function.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'entity.name.function.go'
+          }
+        ]
   }
   {
     'comment': 'Functions'
-    'match': '(\\bfunc\\b)|([a-zA-Z_]\\w*)(?=\\()'
+    'match': '(\\bfunc\\b)|(\\w+)(?=\\()'
     'captures':
       '1':
         'name': 'keyword.function.go'
       '2':
-        'name': 'support.function.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'support.function.go'
+          }
+        ]
   }
   {
     'comment': 'Floating-point literals'
@@ -122,10 +140,19 @@
   }
   {
     'comment': 'Package declarations'
-    'match': '(?<=package)\\s+([a-zA-Z_]\\w*)'
+    'match': '(?<=package)\\s+(\\w+)'
     'captures':
       '1':
-        'name': 'entity.name.package.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'entity.name.package.go'
+          }
+        ]
   }
   {
     'comment': 'Single line import declarations'
@@ -174,10 +201,19 @@
   }
   {
     'comment': 'Type declarations'
-    'match': '(?<=type)\\s+([a-zA-Z_]\\w*)'
+    'match': '(?<=type)\\s+(\\w+)'
     'captures':
       '1':
-        'name': 'entity.name.type.go'
+        'patterns': [
+          {
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
+            'name': 'entity.name.type.go'
+          }
+        ]
   }
   {
     'begin': '\\b(var)\\s+'
@@ -195,12 +231,16 @@
     # Assignments to existing variables
     # a =
     # a, b, whatever =
-    'match': '(?<!var)\\s*([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(?=\\s*=(?!=))'
+    'match': '(?<!var)\\s*(\\w+(?:,\\s*\\w+)*)(?=\\s*=(?!=))'
     'captures':
       '1':
         'patterns': [
           {
-            'match': '[a-zA-Z_]\\w*'
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
             'name': 'variable.other.assignment.go'
           }
           {
@@ -212,12 +252,16 @@
     # Shorthand variable declaration and assignments
     # a :=
     # a, b :=
-    'match': '[a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*(?=\\s*:=)'
+    'match': '\\w+(?:,\\s*\\w+)*(?=\\s*:=)'
     'captures':
       '0':
         'patterns': [
           {
-            'match': '[a-zA-Z_]\\w*'
+            'match': '\\d\\w*'
+            'name': 'invalid.illegal.identifier.go'
+          }
+          {
+            'match': '\\w+'
             'name': 'variable.other.assignment.go'
           }
           {
@@ -455,12 +499,16 @@
         # var a string =
         # var a, b =
         # var a, b *c =
-        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+\\*?[a-zA-Z_]\\w*\\s*)?(?=\\s*=)'
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+\\*?\\w+\\s*)?(?=\\s*=)'
         'captures':
           '1':
             'patterns': [
               {
-                'match': '[a-zA-Z_]\\w*'
+                'match': '\\d\\w*'
+                'name': 'invalid.illegal.identifier.go'
+              }
+              {
+                'match': '\\w+'
                 'name': 'variable.other.assignment.go'
               }
               {
@@ -481,12 +529,16 @@
         # var a []string
         # var a [3]string
         # var a [][]*string
-        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+(\\[\\d*\\])*\\*?[a-zA-Z_]\\w*\\s*[^=].*)'
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+(\\[\\d*\\])*\\*?\\w+\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [
               {
-                'match': '[a-zA-Z_]\\w*'
+                'match': '\\d\\w*'
+                'name': 'invalid.illegal.identifier.go'
+              }
+              {
+                'match': '\\w+'
                 'name': 'variable.other.declaration.go'
               }
               {
