@@ -502,9 +502,9 @@
       }
       {
         # Multiline variable declarations/assignments
-        'begin': '(\\()'
+        'begin': '\\('
         'beginCaptures':
-          '1':
+          '0':
             'name': 'punctuation.other.bracket.round.go'
         'end': '\\)'
         'endCaptures':
