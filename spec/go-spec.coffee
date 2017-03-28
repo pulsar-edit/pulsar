@@ -434,8 +434,8 @@ describe 'Go grammar', ->
 
   it 'does not treat words that have a trailing package as a package name', ->
     {tokens} = grammar.tokenizeLine 'func myFunc(Varpackage string)'
-    expect(tokens[5]).toEqual value: 'Varpackage', scopes: ['source.go']
-    expect(tokens[6]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
+    expect(tokens[4]).toEqual value: 'Varpackage ', scopes: ['source.go']
+    expect(tokens[5]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
 
   it 'tokenizes type names', ->
     tests = ['type mystring string', 'type mytype interface{']
@@ -452,8 +452,8 @@ describe 'Go grammar', ->
 
   it 'does not treat words that have a trailing type as a type name', ->
     {tokens} = grammar.tokenizeLine 'func myFunc(Vartype string)'
-    expect(tokens[5]).toEqual value: 'Vartype', scopes: ['source.go']
-    expect(tokens[6]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
+    expect(tokens[4]).toEqual value: 'Vartype ', scopes: ['source.go']
+    expect(tokens[5]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
 
   describe 'in variable declarations', ->
     testVar = (token) ->
@@ -773,8 +773,8 @@ describe 'Go grammar', ->
 
       it 'does not treat words that have a trailing import as a import declaration', ->
         {tokens} = grammar.tokenizeLine 'func myFunc(Varimport string)'
-        expect(tokens[5]).toEqual value: 'Varimport', scopes: ['source.go']
-        expect(tokens[6]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
+        expect(tokens[4]).toEqual value: 'Varimport ', scopes: ['source.go']
+        expect(tokens[5]).toEqual value: 'string', scopes: ['source.go', 'storage.type.string.go']
 
     describe 'when it is a multi line declaration', ->
       it 'tokenizes single declarations with a package name', ->
