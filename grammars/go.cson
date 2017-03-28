@@ -139,83 +139,58 @@
     'name': 'constant.language.go'
   }
   {
-    'comment': 'Package declarations'
-    'match': '(?<=package)\\s+(\\w+)'
-    'captures':
-      '1':
-        'patterns': [
-          {
-            'match': '\\d\\w*'
-            'name': 'invalid.illegal.identifier.go'
-          }
-          {
-            'match': '\\w+'
-            'name': 'entity.name.package.go'
-          }
-        ]
-  }
-  {
-    'comment': 'Single line import declarations'
-    'match': '(?<=import)(\\s+((?!\\s+")[^\\s]*)?\\s*)((")([^"]*)("))'
-    'captures':
-      '2':
-        'name': 'entity.alias.import.go'
-      '3':
-        'name': 'string.quoted.double.go'
-      '4':
-        'name': 'punctuation.definition.string.begin.go'
-      '5':
-        'name': 'entity.name.import.go'
-      '6':
-        'name': 'punctuation.definition.string.end.go'
-  }
-  {
-    'comment': 'Multiline import declarations'
-    'begin': '(?<=import)\\s+(\\()'
+    # Package declarations
+    # Using a begin/end here allows us to match the package keyword before the package name is typed
+    'begin': '\\b(package)\\s+'
     'beginCaptures':
       '1':
-        'name': 'punctuation.other.bracket.round.go'
+        'name': 'keyword.package.go'
+    'end': '(?!\\G)'
     'patterns': [
       {
-        'match': '((?!\\s+")[^\\s]*)?\\s+((")([^"]*)("))'
-        'captures':
-          '1':
-            'name': 'entity.alias.import.go'
-          '2':
-            'name': 'string.quoted.double.go'
-          '3':
-            'name': 'punctuation.definition.string.begin.go'
-          '4':
-            'name': 'entity.name.import.go'
-          '5':
-            'name': 'punctuation.definition.string.end.go'
+        'match': '\\d\\w*'
+        'name': 'invalid.illegal.identifier.go'
       }
       {
-        'include': '#comments'
+        'match': '\\w+'
+        'name': 'entity.name.package.go'
       }
     ]
-    'end': '\\)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.other.bracket.round.go'
   }
   {
-    'comment': 'Type declarations'
-    'match': '(?<=type)\\s+(\\w+)'
-    'captures':
+    # Type declarations
+    # Using a begin/end here allows us to match the type keyword before the type name is typed
+    'begin': '\\b(type)\\s+'
+    'beginCaptures':
       '1':
-        'patterns': [
-          {
-            'match': '\\d\\w*'
-            'name': 'invalid.illegal.identifier.go'
-          }
-          {
-            'match': '\\w+'
-            'name': 'entity.name.type.go'
-          }
-        ]
+        'name': 'keyword.type.go'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'match': '\\d\\w*'
+        'name': 'invalid.illegal.identifier.go'
+      }
+      {
+        'match': '\\w+'
+        'name': 'entity.name.type.go'
+      }
+    ]
   }
   {
+    # Imports
+    'begin': '\\b(import)\\s+'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.import.go'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'include': '#imports'
+      }
+    ]
+  }
+  {
+    # Variables
     'begin': '\\b(var)\\s+'
     'beginCaptures':
       '1':
@@ -343,6 +318,43 @@
         'name': 'punctuation.other.colon.go'
       }
     ]
+  'imports':
+    'patterns': [
+      {
+        # Single line import declarations
+        'match': '((?!\\s+")[^\\s]*)?\\s*((")([^"]*)("))'
+        'captures':
+          '1':
+            'name': 'entity.alias.import.go'
+          '2':
+            'name': 'string.quoted.double.go'
+          '3':
+            'name': 'punctuation.definition.string.begin.go'
+          '4':
+            'name': 'entity.name.import.go'
+          '5':
+            'name': 'punctuation.definition.string.end.go'
+      }
+      {
+        # Multiline import declarations
+        'begin': '\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.other.bracket.round.go'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.other.bracket.round.go'
+        'patterns': [
+          {
+            'include': '#imports'
+          }
+          {
+            'include': '#comments'
+          }
+        ]
+      }
+    ]
   'keywords':
     'patterns': [
       {
@@ -367,24 +379,12 @@
         'name': 'keyword.interface.go'
       }
       {
-        'match': '\\bimport\\b'
-        'name': 'keyword.import.go'
-      }
-      {
         'match': '\\bmap\\b'
         'name': 'keyword.map.go'
       }
       {
-        'match': '\\bpackage\\b'
-        'name': 'keyword.package.go'
-      }
-      {
         'match': '\\bstruct\\b'
         'name': 'keyword.struct.go'
-      }
-      {
-        'match': '\\btype\\b'
-        'name': 'keyword.type.go'
       }
     ]
   'operators':
