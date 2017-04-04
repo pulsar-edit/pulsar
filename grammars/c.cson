@@ -618,7 +618,7 @@
           '0':
             'name': 'keyword.operator.ternary.c'
         'end': ':'
-        'applyEndPatternLast': true
+        'applyEndPatternLast': true # To prevent matching C++ namespace access ::
         'endCaptures':
           '0':
             'name': 'keyword.operator.ternary.c'
