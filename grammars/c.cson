@@ -617,7 +617,8 @@
         'beginCaptures':
           '0':
             'name': 'keyword.operator.ternary.c'
-        'end': '(?<!:):(?!:)'
+        'end': ':'
+        'applyEndPatternLast': true
         'endCaptures':
           '0':
             'name': 'keyword.operator.ternary.c'
@@ -632,7 +633,7 @@
             'include': '#c_function_call'
           }
           {
-            'include': '$self'
+            'include': '$base'
           }
         ]
       }
