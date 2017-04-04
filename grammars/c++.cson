@@ -65,6 +65,10 @@
     'name': 'keyword.operator.cast.cpp'
   }
   {
+    'match': '::'
+    'name': 'punctuation.separator.namespace.access.cpp'
+  }
+  {
     'match': '\\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|typeid|xor|xor_eq|alignof|alignas)\\b'
     'name': 'keyword.operator.cpp'
   }

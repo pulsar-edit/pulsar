@@ -618,6 +618,7 @@
           '0':
             'name': 'keyword.operator.ternary.c'
         'end': ':'
+        'applyEndPatternLast': true # To prevent matching C++ namespace access ::
         'endCaptures':
           '0':
             'name': 'keyword.operator.ternary.c'
@@ -632,7 +633,7 @@
             'include': '#c_function_call'
           }
           {
-            'include': '$self'
+            'include': '$base'
           }
         ]
       }

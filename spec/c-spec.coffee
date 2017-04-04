@@ -1098,3 +1098,16 @@ describe "Language-C", ->
         expect(lines[1][0]).toEqual value: '//', scopes: ['source.cpp', 'comment.line.double-slash.cpp', 'punctuation.definition.comment.cpp']
         expect(lines[1][1]).toEqual value: ' not separated\\ ', scopes: ['source.cpp', 'comment.line.double-slash.cpp']
         expect(lines[2][0]).toEqual value: 'comment', scopes: ['source.cpp']
+
+    describe "operators", ->
+      it "tokenizes ternary operators with namespace resolution", ->
+        {tokens} = grammar.tokenizeLine('a ? ns::b : ns::c')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.cpp']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.cpp', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' ns', scopes: ['source.cpp']
+        expect(tokens[3]).toEqual value: '::', scopes: ['source.cpp', 'punctuation.separator.namespace.access.cpp']
+        expect(tokens[4]).toEqual value: 'b ', scopes: ['source.cpp']
+        expect(tokens[5]).toEqual value: ':', scopes: ['source.cpp', 'keyword.operator.ternary.c']
+        expect(tokens[6]).toEqual value: ' ns', scopes: ['source.cpp']
+        expect(tokens[7]).toEqual value: '::', scopes: ['source.cpp', 'punctuation.separator.namespace.access.cpp']
+        expect(tokens[8]).toEqual value: 'c', scopes: ['source.cpp']
