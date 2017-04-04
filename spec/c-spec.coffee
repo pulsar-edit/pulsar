@@ -907,6 +907,14 @@ describe "Language-C", ->
         expect(tokens[8]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
         expect(tokens[9]).toEqual value: ' c', scopes: ['source.c']
 
+      it "tokenizes ternary operators with namespace resolution", ->
+        {tokens} = grammar.tokenizeLine('a ? ns::b : ns::c')
+        expect(tokens[0]).toEqual value: 'a ', scopes: ['source.c']
+        expect(tokens[1]).toEqual value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[2]).toEqual value: ' ns::b ', scopes: ['source.c']
+        expect(tokens[3]).toEqual value: ':', scopes: ['source.c', 'keyword.operator.ternary.c']
+        expect(tokens[4]).toEqual value: ' ns::c', scopes: ['source.c']
+
       describe "bitwise", ->
         it "tokenizes bitwise 'not'", ->
           {tokens} = grammar.tokenizeLine('~a')

@@ -617,7 +617,7 @@
         'beginCaptures':
           '0':
             'name': 'keyword.operator.ternary.c'
-        'end': ':'
+        'end': '(?<!:):(?!:)'
         'endCaptures':
           '0':
             'name': 'keyword.operator.ternary.c'
