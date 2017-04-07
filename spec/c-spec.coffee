@@ -75,23 +75,6 @@ describe "Language-C", ->
       expect(tokens[1]).toEqual value: '\\', scopes: ['source.c', 'constant.character.escape.line-continuation.c']
       expect(tokens[3]).toEqual value: 'in', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']
 
-    describe "numerics", ->
-      it "recognizes numbers with digit separators", ->
-        {tokens} = grammar.tokenizeLine "1'000"
-        expect(tokens[0]).toEqual value: "1'000", scopes: ['source.c', 'constant.numeric.c']
-
-        {tokens} = grammar.tokenizeLine "123'456.500'000e-1'5"
-        expect(tokens[0]).toEqual value: "123'456.500'000e-1'5", scopes: ['source.c', 'constant.numeric.c']
-
-        {tokens} = grammar.tokenizeLine "0x1234'5678"
-        expect(tokens[0]).toEqual value: "0x1234'5678", scopes: ['source.c', 'constant.numeric.c']
-
-        {tokens} = grammar.tokenizeLine "0'123'456"
-        expect(tokens[0]).toEqual value: "0'123'456", scopes: ['source.c', 'constant.numeric.c']
-
-        {tokens} = grammar.tokenizeLine "0b1100'0011'1111'0000"
-        expect(tokens[0]).toEqual value: "0b1100'0011'1111'0000", scopes: ['source.c', 'constant.numeric.c']
-
     describe "strings", ->
       it "tokenizes them", ->
         delimsByScope =
@@ -1074,6 +1057,32 @@ describe "Language-C", ->
       expect(tokens[2]).toEqual value: ')', scopes: ['source.cpp', 'meta.function.destructor.cpp', 'punctuation.definition.parameters.end.c']
       expect(tokens[4]).toEqual value: '{', scopes: ['source.cpp', 'meta.block.c', 'punctuation.section.block.begin.bracket.curly.c']
       expect(tokens[5]).toEqual value: '}', scopes: ['source.cpp', 'meta.block.c', 'punctuation.section.block.end.bracket.curly.c']
+
+    describe "digit separators", ->
+      it "recognizes numbers with digit separators", ->
+        {tokens} = grammar.tokenizeLine "1'000"
+        expect(tokens[0]).toEqual value: "1'000", scopes: ['source.cpp', 'constant.numeric.c']
+
+        {tokens} = grammar.tokenizeLine "123'456.500'000e-1'5"
+        expect(tokens[0]).toEqual value: "123'456.500'000e-1'5", scopes: ['source.cpp', 'constant.numeric.c']
+
+        {tokens} = grammar.tokenizeLine "0x1234'5678"
+        expect(tokens[0]).toEqual value: "0x1234'5678", scopes: ['source.cpp', 'constant.numeric.c']
+
+        {tokens} = grammar.tokenizeLine "0'123'456"
+        expect(tokens[0]).toEqual value: "0'123'456", scopes: ['source.cpp', 'constant.numeric.c']
+
+        {tokens} = grammar.tokenizeLine "0b1100'0011'1111'0000"
+        expect(tokens[0]).toEqual value: "0b1100'0011'1111'0000", scopes: ['source.cpp', 'constant.numeric.c']
+
+      it "does not tokenize single quotes at the beginning or end of numbers as digit separators", ->
+        {tokens} = grammar.tokenizeLine "'1000"
+        expect(tokens[0]).toEqual value: "'", scopes: ['source.cpp', 'string.quoted.single.c', 'punctuation.definition.string.begin.c']
+        expect(tokens[1]).toEqual value: "1000", scopes: ['source.cpp', 'string.quoted.single.c']
+
+        {tokens} = grammar.tokenizeLine "1000'"
+        expect(tokens[0]).toEqual value: "1000", scopes: ['source.cpp', 'constant.numeric.c']
+        expect(tokens[1]).toEqual value: "'", scopes: ['source.cpp', 'string.quoted.single.c', 'punctuation.definition.string.begin.c']
 
     describe "comments", ->
       it "tokenizes them", ->
