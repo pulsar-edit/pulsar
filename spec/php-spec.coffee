@@ -340,6 +340,13 @@ describe 'PHP grammar', ->
         expect(tokens[2][1]).toEqual value: '@source', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
         expect(tokens[3][0]).toEqual value: '*/', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']
 
+      it 'should tokenize an inline phpdoc correctly', ->
+        tokens = grammar.tokenizeLines "<?php\n/** @var */"
+
+        expect(tokens[1][0]).toEqual value: '/** ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']
+        expect(tokens[1][1]).toEqual value: '@var', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
+        expect(tokens[1][2]).toEqual value: ' */', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']
+
       it 'should tokenize default value with non-lowercase array type hinting correctly', ->
         tokens = grammar.tokenizeLines "<?php\nfunction array_test(Array $value = []) {}"
 
