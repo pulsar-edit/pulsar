@@ -178,12 +178,15 @@
   'comments':
     'patterns': [
       {
-        'begin': '/\\*\\*(?:(?:(?:#@\\+)?\\s*$)|\\s+)'
-        'captures':
+        'begin': '(/\\*\\*)(((#@\\+)?\\s*$)|\\s+)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.comment.php'
+        'comment': 'This now only highlights a docblock if the first line contains only /**\n\t\t\t\t\t\t\t\t- this is to stop highlighting everything as invalid when people do comment banners with /******** ...\n\t\t\t\t\t\t\t\t- Now matches /**#@+ too - used for docblock templates: https://codingexplained.com/coding/php/how-to-use-docblock-templates-in-phpdoc'
+        'end': '\\*/'
+        'endCaptures':
           '0':
             'name': 'punctuation.definition.comment.php'
-        'comment': 'This now only highlights a docblock if the first line contains only /**\n\t\t\t\t\t\t\t\t- this is to stop highlighting everything as invalid when people do comment banners with /******** ...\n\t\t\t\t\t\t\t\t- Now matches /**#@+ too - used for docblock templates: http://manual.phpdoc.org/HTMLframesConverter/default/phpDocumentor/tutorial_phpDocumentor.howto.pkg.html#basics.docblocktemplate'
-        'end': '\\s*\\*/'
         'name': 'comment.block.documentation.phpdoc.php'
         'patterns': [
           {
