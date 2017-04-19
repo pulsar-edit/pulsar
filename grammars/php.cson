@@ -192,6 +192,19 @@
         ]
       }
       {
+        'begin': '/\\*\\*\\s+'
+        'captures':
+          '0':
+            'name': 'punctuation.definition.comment.php'
+        'end': '\\s+\\*/'
+        'name': 'comment.block.documentation.phpdoc.php'
+        'patterns': [
+          {
+            'include': '#php_doc'
+          }
+        ]
+      }
+      {
         'begin': '/\\*'
         'captures':
           '0':
