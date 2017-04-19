@@ -180,7 +180,7 @@
       {
         # This only highlights a docblock if the first line contains only two *s
         # to stop highlighting everything as invalid when people do comment banners with /******** ...
-        'begin': '(/\\*\\*)(?=\\s+)'
+        'begin': '(/\\*\\*)(?=\\s)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.comment.php'
