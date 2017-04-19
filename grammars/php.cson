@@ -178,11 +178,12 @@
   'comments':
     'patterns': [
       {
-        'begin': '(/\\*\\*)($|\\s+)'
+        # This only highlights a docblock if the first line contains only two *s
+        # to stop highlighting everything as invalid when people do comment banners with /******** ...
+        'begin': '(/\\*\\*)(?=$|\\s+)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.comment.php'
-        'comment': 'This now only highlights a docblock if the first line contains only two *`s - this is to stop highlighting everything as invalid when people do comment banners with /******** ...'
         'end': '\\*/'
         'endCaptures':
           '0':
