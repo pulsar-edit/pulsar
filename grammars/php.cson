@@ -581,7 +581,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)(JAVASCRIPT)(\\2)(\\s*)$'
+        'begin': '(<<<)\\s*("?)(JAVASCRIPT|JS)(\\2)(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
@@ -830,7 +830,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'(JAVASCRIPT)\'(\\s*)$'
+        'begin': '(<<<)\\s*\'(JAVASCRIPT|JS)\'(\\s*)$'
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
