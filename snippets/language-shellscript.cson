@@ -20,6 +20,9 @@
   'elif …':
     'prefix': 'elif'
     'body': 'elif ${2:[[ ${1:condition} ]]}; then\n\t${0:#statements}'
+  'fi':
+    'prefix': 'fi'
+    'body': 'fi'
   'for … done':
     'prefix': 'for'
     'body': 'for (( i = 0; i < ${1:10}; i++ )); do\n\t${0:#statements}\ndone'
