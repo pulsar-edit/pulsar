@@ -30,10 +30,15 @@ describe 'Go grammar', ->
   it 'tokenizes comments in imports', ->
     lines = grammar.tokenizeLines '''
       import (
+        //"fmt"
+        "os" // comment
         // comment!
       )
     '''
     expect(lines[1][1]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
+    expect(lines[2][5]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
+    expect(lines[3][1]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
+
 
   it 'tokenizes strings', ->
     delims =

@@ -347,10 +347,10 @@
             'name': 'punctuation.other.bracket.round.go'
         'patterns': [
           {
-            'include': '#imports'
+            'include': '#comments'
           }
           {
-            'include': '#comments'
+            'include': '#imports'
           }
         ]
       }
