@@ -1723,7 +1723,7 @@
         'match': '(@xlink)\\s+(.+)\\s*$'
       }
       {
-        'match': '\\@(a(pi|bstract|uthor)|c(ategory|opyright)|example|global|in(herit|ternal)|li(cense|nk)|method|p(roperty(\\-read|\\-write|)|ackage|aram)|return|s(ee|ince|ource|tatic|ubpackage)|t(hrows|odo)|v(ar|ersion)|uses|deprecated|final|ignore)\\b'
+        'match': '\\@(a(pi|bstract|uthor)|c(ategory|opyright)|example|global|in(heritdoc|ternal)|li(cense|nk)|method|p(roperty(\\-read|\\-write|)|ackage|aram)|return|s(ee|ince|ource|tatic|ubpackage)|t(hrows|odo)|v(ar|ersion)|uses|deprecated|final|ignore)\\b'
         'name': 'keyword.other.phpdoc.php'
       }
       {
