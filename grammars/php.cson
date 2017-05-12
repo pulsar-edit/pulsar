@@ -1489,7 +1489,7 @@
         'match': '(?:(\\=)(&))|(&(?=[$A-Za-z_]))'
       }
       {
-        'match': '(f)'
+        'match': '(@)'
         'name': 'keyword.operator.error-control.php'
       }
       {
