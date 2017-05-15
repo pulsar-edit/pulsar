@@ -556,15 +556,13 @@ describe 'Go grammar', ->
         testVarDeclaration tokens[2], 'i'
         testNumType tokens[4], 'int'
 
-      it 'tokenizes a qualified name and a qualified type', ->
-        {tokens} = grammar.tokenizeLine 'var a.b c.d'
+      it 'tokenizes a name and a qualified type', ->
+        {tokens} = grammar.tokenizeLine 'var a b.c'
         testVar tokens[0]
         expect(tokens[2]).toEqual value: 'a', scopes: ['source.go', 'variable.other.declaration.go']
-        expect(tokens[3]).toEqual value: '.', scopes: ['source.go', 'variable.other.declaration.go', 'punctuation.other.period.go']
-        expect(tokens[4]).toEqual value: 'b', scopes: ['source.go', 'variable.other.declaration.go']
-        expect(tokens[5]).toEqual value: ' c', scopes: ['source.go']
-        expect(tokens[6]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
-        expect(tokens[7]).toEqual value: 'd', scopes: ['source.go']
+        expect(tokens[3]).toEqual value: ' b', scopes: ['source.go']
+        expect(tokens[4]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
+        expect(tokens[5]).toEqual value: 'c', scopes: ['source.go']
 
       it 'tokenizes a single name and an array type', ->
         {tokens} = grammar.tokenizeLine 'var s []string'
@@ -616,17 +614,15 @@ describe 'Go grammar', ->
         testOpAssignment tokens[4], '='
         testNum tokens[6], '7'
 
-      it 'tokenizes a qualified name, a qualified type, and an initialization', ->
-        {tokens} = grammar.tokenizeLine 'var a.b c.d = 5'
+      it 'tokenizes a single name, a qualified type, and an initialization', ->
+        {tokens} = grammar.tokenizeLine 'var a b.c = 5'
         testVar tokens[0]
         expect(tokens[2]).toEqual value: 'a', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[3]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-        expect(tokens[4]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[5]).toEqual value: ' c', scopes: ['source.go']
-        expect(tokens[6]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
-        expect(tokens[7]).toEqual value: 'd ', scopes: ['source.go']
-        testOpAssignment tokens[8], '='
-        testNum tokens[10], '5'
+        expect(tokens[3]).toEqual value: ' b', scopes: ['source.go']
+        expect(tokens[4]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
+        expect(tokens[5]).toEqual value: 'c ', scopes: ['source.go']
+        testOpAssignment tokens[6], '='
+        testNum tokens[8], '5'
 
       it 'does not tokenize more than necessary', ->
         # This test is worded vaguely because it's hard to describe.
@@ -653,19 +649,15 @@ describe 'Go grammar', ->
         testOpPunctuation tokens[6], ','
         testVarDeclaration tokens[8], 'W'
 
-      it 'tokenizes multiple qualified names and a qualified type', ->
-        {tokens} = grammar.tokenizeLine 'var a.b, c.d e.f'
+      it 'tokenizes multiple names and a qualified type', ->
+        {tokens} = grammar.tokenizeLine 'var a, b c.d'
         testVar tokens[0]
         expect(tokens[2]).toEqual value: 'a', scopes: ['source.go', 'variable.other.declaration.go']
-        expect(tokens[3]).toEqual value: '.', scopes: ['source.go', 'variable.other.declaration.go', 'punctuation.other.period.go']
-        expect(tokens[4]).toEqual value: 'b', scopes: ['source.go', 'variable.other.declaration.go']
-        testOpPunctuation tokens[5], ','
-        expect(tokens[7]).toEqual value: 'c', scopes: ['source.go', 'variable.other.declaration.go']
-        expect(tokens[8]).toEqual value: '.', scopes: ['source.go', 'variable.other.declaration.go', 'punctuation.other.period.go']
-        expect(tokens[9]).toEqual value: 'd', scopes: ['source.go', 'variable.other.declaration.go']
-        expect(tokens[10]).toEqual value: ' e', scopes: ['source.go']
-        expect(tokens[11]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
-        expect(tokens[12]).toEqual value: 'f', scopes: ['source.go']
+        testOpPunctuation tokens[3], ','
+        expect(tokens[5]).toEqual value: 'b', scopes: ['source.go', 'variable.other.declaration.go']
+        expect(tokens[6]).toEqual value: ' c', scopes: ['source.go']
+        expect(tokens[7]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
+        expect(tokens[8]).toEqual value: 'd', scopes: ['source.go']
 
       it 'tokenizes multiple names and initialization expressions', ->
         {tokens} = grammar.tokenizeLine 'var x, y, z = 1, 2, 3'
@@ -682,21 +674,6 @@ describe 'Go grammar', ->
         testOpPunctuation tokens[16], ','
         testNum tokens[18], '3'
 
-      it 'tokenizes multiple qualified names and initialization expression', ->
-        {tokens} = grammar.tokenizeLine 'var a.b, c.d = 1, 2'
-        testVar tokens[0]
-        expect(tokens[2]).toEqual value: 'a', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[3]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-        expect(tokens[4]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
-        testOpPunctuation tokens[5], ','
-        expect(tokens[7]).toEqual value: 'c', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[8]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-        expect(tokens[9]).toEqual value: 'd', scopes: ['source.go', 'variable.other.assignment.go']
-        testOpAssignment tokens[11], '='
-        testNum tokens[13], '1'
-        testOpPunctuation tokens[14], ','
-        testNum tokens[16], '2'
-
       it 'tokenizes multiple names, a type, and initialization expressions', ->
         {tokens} = grammar.tokenizeLine 'var x, y float32 = float, thirtytwo'
         testVar tokens[0]
@@ -707,23 +684,19 @@ describe 'Go grammar', ->
         testOpAssignment tokens[9], '='
         testOpPunctuation tokens[11], ','
 
-      it 'tokenizes multiple qualified names, a qualified type, and initialization expression', ->
-        {tokens} = grammar.tokenizeLine 'var a.b, c.d e.f = 1, 2'
+      it 'tokenizes multiple names, a qualified type, and initialization expression', ->
+        {tokens} = grammar.tokenizeLine 'var a, b c.d = 1, 2'
         testVar tokens[0]
         expect(tokens[2]).toEqual value: 'a', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[3]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-        expect(tokens[4]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
-        testOpPunctuation tokens[5], ','
-        expect(tokens[7]).toEqual value: 'c', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[8]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-        expect(tokens[9]).toEqual value: 'd', scopes: ['source.go', 'variable.other.assignment.go']
-        expect(tokens[10]).toEqual value: ' e', scopes: ['source.go']
-        expect(tokens[11]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
-        expect(tokens[12]).toEqual value: 'f ', scopes: ['source.go']
-        testOpAssignment tokens[13], '='
-        testNum tokens[15], '1'
-        testOpPunctuation tokens[16], ','
-        testNum tokens[18], '2'
+        testOpPunctuation tokens[3], ','
+        expect(tokens[5]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
+        expect(tokens[6]).toEqual value: ' c', scopes: ['source.go']
+        expect(tokens[7]).toEqual value: '.', scopes: ['source.go', 'punctuation.other.period.go']
+        expect(tokens[8]).toEqual value: 'd ', scopes: ['source.go']
+        testOpAssignment tokens[9], '='
+        testNum tokens[11], '1'
+        testOpPunctuation tokens[12], ','
+        testNum tokens[14], '2'
 
       it 'tokenizes multiple names and a function call', ->
         {tokens} = grammar.tokenizeLine 'var re, im = complexSqrt(-1)'
@@ -815,13 +788,6 @@ describe 'Go grammar', ->
           testVarAssignment tokens[0], 'ch'
           testOpAssignment tokens[2], ':='
 
-        it 'tokenizes single qualified names', ->
-          {tokens} = grammar.tokenizeLine 'ch.test := make(chan int)'
-          expect(tokens[0]).toEqual value: 'ch', scopes: ['source.go', 'variable.other.assignment.go']
-          expect(tokens[1]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-          expect(tokens[2]).toEqual value: 'test', scopes: ['source.go', 'variable.other.assignment.go']
-          testOpAssignment tokens[4], ':='
-
         it 'tokenizes multiple names', ->
           {tokens} = grammar.tokenizeLine 'i, j := 0, 10'
           testVarAssignment tokens[0], 'i'
@@ -834,17 +800,6 @@ describe 'Go grammar', ->
           testVarAssignment tokens[8], 'z'
           testOpAssignment tokens[10], ':='
           testOpTermination tokens[16], ';'
-
-        it 'tokenizes multiple qualified names', ->
-          {tokens} = grammar.tokenizeLine 'a.b, c.d := 0, 10'
-          expect(tokens[0]).toEqual value: 'a', scopes: ['source.go', 'variable.other.assignment.go']
-          expect(tokens[1]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-          expect(tokens[2]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
-          testOpPunctuation tokens[3], ','
-          expect(tokens[5]).toEqual value: 'c', scopes: ['source.go', 'variable.other.assignment.go']
-          expect(tokens[6]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
-          expect(tokens[7]).toEqual value: 'd', scopes: ['source.go', 'variable.other.assignment.go']
-          testOpAssignment tokens[9], ':='
 
   describe 'in imports declarations', ->
     testImport = (token) ->

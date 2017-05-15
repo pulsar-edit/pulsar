@@ -235,8 +235,7 @@
     # Shorthand variable declaration and assignments
     # a :=
     # a, b :=
-    # a.b, c.d :=
-    'match': '\\w+(?:\\.\\w+)?(?:,\\s*\\w+(?:\\.\\w+)?)*(?=\\s*:=)'
+    'match': '\\w+(?:,\\s*\\w+)*(?=\\s*:=)'
     'captures':
       '0':
         'patterns': [
@@ -245,15 +244,8 @@
             'name': 'invalid.illegal.identifier.go'
           }
           {
-            'match': '\\w+(?:\\.\\w+)?'
+            'match': '\\w+'
             'name': 'variable.other.assignment.go'
-            'captures':
-              '0':
-                'patterns': [
-                  {
-                    'include': '#delimiters'
-                  }
-                ]
           }
           {
             'include': '#delimiters'
@@ -515,9 +507,10 @@
         # var a string =
         # var a, b =
         # var a, b *c =
-        # var a.b string =
-        # var a.b *c.d =
-        'match': '(\\w+(?:\\.\\w+)?(?:,\\s*\\w+(?:\\.\\w+)?)*)(\\s+\\*?\\w+(?:\\.\\w+)?\\s*)?(?=\\s*=)'
+        # var a string =
+        # var a b.c
+        # var a *b.c =
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+\\*?\\w+(?:\\.\\w+)?\\s*)?(?=\\s*=)'
         'captures':
           '1':
             'patterns': [
@@ -526,15 +519,8 @@
                 'name': 'invalid.illegal.identifier.go'
               }
               {
-                'match': '\\w+(?:\\.\\w+)?'
+                'match': '\\w+'
                 'name': 'variable.other.assignment.go'
-                'captures':
-                  '0':
-                    'patterns': [
-                      {
-                        'include': '#delimiters'
-                      }
-                    ]
               }
               {
                 'include': '#delimiters'
@@ -555,9 +541,9 @@
         # var a [3]string
         # var a [...]string
         # var a [][]*string
-        # var a.b c.d
-        # var a.b []c.d
-        'match': '(\\w+(?:\\.\\w+)?(?:,\\s*\\w+(?:\\.\\w+)?)*)(\\s+(\\[(\\d*|\\.\\.\\.)\\])*\\*?\\w+(?:\\.\\w+)?\\s*[^=].*)'
+        # var a c.d
+        # var a []c.d
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+(\\[(\\d*|\\.\\.\\.)\\])*\\*?\\w+(?:\\.\\w+)?\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [
@@ -566,15 +552,8 @@
                 'name': 'invalid.illegal.identifier.go'
               }
               {
-                'match': '\\w+(?:\\.\\w+)?'
+                'match': '\\w+'
                 'name': 'variable.other.declaration.go'
-                'captures':
-                  '0':
-                    'patterns': [
-                      {
-                        'include': '#delimiters'
-                      }
-                    ]
               }
               {
                 'include': '#delimiters'
