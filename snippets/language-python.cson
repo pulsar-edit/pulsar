@@ -4,7 +4,7 @@
     'body': '#!/usr/bin/env python\n'
   '# coding=utf-8':
     'prefix': 'enc'
-    'body': '# coding=utf-8\n'
+    'body': '# -*- coding: utf-8 -*-\n'
   'Import':
     'prefix': 'im'
     'body': 'import ${1:package/module}'
