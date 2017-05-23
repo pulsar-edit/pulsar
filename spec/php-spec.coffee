@@ -354,6 +354,14 @@ describe 'PHP grammar', ->
 
         expect(tokens[1][0].scopes).not.toContain 'comment.block.documentation.phpdoc.php'
 
+      it 'should tokenize malformed phpDocumentor DocBlock line that contains closing tag correctly', ->
+        tokens = grammar.tokenizeLines "<?php\n/**\ninvalid*/$a=1;"
+
+        expect(tokens[1][0]).toEqual value: '/**', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']
+        expect(tokens[2][0]).toEqual value: 'invalid', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'invalid.illegal.missing-asterisk.phpdoc.php']
+        expect(tokens[2][1]).toEqual value: '*/', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']
+        expect(tokens[2][2]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+
       it 'should tokenize default value with non-lowercase array type hinting correctly', ->
         tokens = grammar.tokenizeLines "<?php\nfunction array_test(Array $value = []) {}"
 
