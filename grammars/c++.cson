@@ -400,22 +400,7 @@
             'name': 'constant.character.escape.cpp'
           }
           {
-            'match': '''(?x) %
-              (\\d+\\$)?                           # field (argument #)
-              [#0\\- +']*                          # flags
-              [,;:_]?                              # separator character (AltiVec)
-              ((-?\\d+)|\\*(-?\\d+\\$)?)?          # minimum field width
-              (\\.((-?\\d+)|\\*(-?\\d+\\$)?)?)?    # precision
-              (hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)? # length modifier
-              [diouxXDOUeEfFgGaACcSspn%]           # conversion type
-            '''
-            'name': 'constant.other.placeholder.c'
-          }
-          {
-            'match': '(%)(?!"\\s*(PRI|SCN))'
-            'captures':
-              '1':
-                'name': 'invalid.illegal.placeholder.c'
+            'include': 'source.c#string_placeholder'
           }
         ]
       }
