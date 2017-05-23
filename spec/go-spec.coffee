@@ -758,11 +758,19 @@ describe 'Go grammar', ->
           testOpPunctuation lines[1][8], ','
           testOpBracket lines[2][0], ')'
 
-        it 'tokenizes non variable declarations (e.g. comments)', ->
+        it 'tokenizes non variable declarations', ->
           lines = grammar.tokenizeLines '''
             var (
               // I am a comment
               foo *bar
+              userRegister = &routers.Handler{
+            		Handler: func(c echo.Context) error {
+            			if err := userService.Register(&user); err != nil {
+            				return err
+            			}
+            			return nil
+            		},
+            	}
             )
           '''
           testVar lines[0][0]
@@ -771,7 +779,11 @@ describe 'Go grammar', ->
           expect(lines[1][2]).toEqual value: ' I am a comment', scopes: ['source.go', 'comment.line.double-slash.go']
           testVarDeclaration lines[2][1], 'foo'
           testOpAddress lines[2][3], '*'
-          testOpBracket lines[3][0], ')'
+          testVarAssignment lines[3][1], 'userRegister'
+          expect(lines[4][3]).toEqual value: 'func', scopes: ['source.go', 'keyword.function.go']
+          expect(lines[5][1]).toEqual value: 'if', scopes: ['source.go', 'keyword.control.go']
+          expect(lines[8][3]).toEqual value: 'nil', scopes: ['source.go', 'constant.language.go']
+          testOpBracket lines[11][0], ')'
 
         it 'tokenizes all parts of variable initializations correctly', ->
           lines = grammar.tokenizeLines '''
