@@ -409,7 +409,13 @@
               (hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)? # length modifier
               [diouxXDOUeEfFgGaACcSspn%]           # conversion type
             '''
-            'name': 'constant.other.placeholder.cpp'
+            'name': 'constant.other.placeholder.c'
+          }
+          {
+            'match': '(%)(?!"\\s*(PRI|SCN))'
+            'captures':
+              '1':
+                'name': 'invalid.illegal.placeholder.c'
           }
         ]
       }
