@@ -1701,7 +1701,7 @@
     'patterns': [
       {
         'comment': 'PHPDocumentor only recognises lines with an asterisk as the first non-whitespaces character'
-        'match': '^(?!\\s*\\*).*$\\n?'
+        'match': '^(?!\\s*\\*).*?(?:(?=\\*\\/)|$\\n?)'
         'name': 'invalid.illegal.missing-asterisk.phpdoc.php'
       }
       {
