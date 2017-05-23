@@ -1018,6 +1018,22 @@ describe "Language-C", ->
       expect(lines[0][11]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.end.cpp']
       expect(lines[0][12]).toEqual value: ';', scopes: ['source.cpp', 'punctuation.terminator.statement.c']
 
+    it "tokenizes % format specifiers", ->
+      {tokens} = grammar.tokenizeLine '"%d"'
+      expect(tokens[0]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.begin.cpp']
+      expect(tokens[1]).toEqual value: '%d', scopes: ['source.cpp', 'string.quoted.double.cpp', 'constant.other.placeholder.c']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.end.cpp']
+
+      {tokens} = grammar.tokenizeLine '"%"'
+      expect(tokens[0]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.begin.cpp']
+      expect(tokens[1]).toEqual value: '%', scopes: ['source.cpp', 'string.quoted.double.cpp', 'invalid.illegal.placeholder.c']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.end.cpp']
+
+      {tokens} = grammar.tokenizeLine '"%" PRId32'
+      expect(tokens[0]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.begin.cpp']
+      expect(tokens[1]).toEqual value: '%', scopes: ['source.cpp', 'string.quoted.double.cpp']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.end.cpp']
+
     it "tokenizes raw string literals", ->
       lines = grammar.tokenizeLines '''
         string str = R"test(
