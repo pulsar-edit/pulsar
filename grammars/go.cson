@@ -578,10 +578,10 @@
             'name': 'punctuation.other.bracket.round.go'
         'patterns': [
           {
-            'include': '#variables'
+            'include': '$self'
           }
           {
-            'include': '$self'
+            'include': '#variables'
           }
         ]
       }

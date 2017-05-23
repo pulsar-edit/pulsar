@@ -719,64 +719,97 @@ describe 'Go grammar', ->
 
       describe 'in var statement blocks', ->
         it 'tokenizes single names with a type', ->
-          [kwd, decl, closing] = grammar.tokenizeLines '\tvar (\n\t\tfoo *bar\n\t)'
-          testVar kwd[1]
-          testOpBracket kwd[3], '('
-          testVarDeclaration decl[1], 'foo'
-          testOpAddress decl[3], '*'
-          testOpBracket closing[1], ')'
+          lines = grammar.tokenizeLines '''
+            var (
+              foo *bar
+            )
+          '''
+          testVar lines[0][0]
+          testOpBracket lines[0][2], '('
+          testVarDeclaration lines[1][1], 'foo'
+          testOpAddress lines[1][3], '*'
+          testOpBracket lines[2][0], ')'
 
         it 'tokenizes single names with an initializer', ->
-          [kwd, decl, closing] = grammar.tokenizeLines 'var (\n\tfoo = 42\n)'
-          testVar kwd[0], 'var'
-          testOpBracket kwd[2], '('
-          testVarAssignment decl[1], 'foo'
-          testOpAssignment decl[3], '='
-          testNum decl[5], '42'
-          testOpBracket closing[0], ')'
+          lines = grammar.tokenizeLines '''
+            var (
+              foo = 42
+            )
+          '''
+          testVar lines[0][0], 'var'
+          testOpBracket lines[0][2], '('
+          testVarAssignment lines[1][1], 'foo'
+          testOpAssignment lines[1][3], '='
+          testNum lines[1][5], '42'
+          testOpBracket lines[2][0], ')'
 
         it 'tokenizes multiple names', ->
-          [kwd, decl, closing] = grammar.tokenizeLines 'var (\n\tfoo, bar = baz, quux\n)'
-          testVar kwd[0]
-          testOpBracket kwd[2], '('
-          testVarAssignment decl[1], 'foo'
-          testOpPunctuation decl[2], ','
-          testVarAssignment decl[4], 'bar'
-          testOpAssignment decl[6], '='
-          testOpPunctuation decl[8], ','
-          testOpBracket closing[0], ')'
+          lines = grammar.tokenizeLines '''
+            var (
+              foo, bar = baz, quux
+            )
+          '''
+          testVar lines[0][0]
+          testOpBracket lines[0][2], '('
+          testVarAssignment lines[1][1], 'foo'
+          testOpPunctuation lines[1][2], ','
+          testVarAssignment lines[1][4], 'bar'
+          testOpAssignment lines[1][6], '='
+          testOpPunctuation lines[1][8], ','
+          testOpBracket lines[2][0], ')'
 
-        it 'tokenizes non variable declarations (e.g. comments)', ->
-          [kwd, comment, decl, closing] = grammar.tokenizeLines 'var (\n\t// I am a comment\n\tfoo *bar\n)'
-          testVar kwd[0]
-          testOpBracket kwd[2], '('
-          expect(comment[1].value).toEqual '//'
-          expect(comment[1].scopes).toEqual ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
-          expect(comment[2].value).toEqual ' I am a comment'
-          expect(comment[2].scopes).toEqual ['source.go', 'comment.line.double-slash.go']
-          testVarDeclaration decl[1], 'foo'
-          testOpAddress decl[3], '*'
-          testOpBracket closing[0], ')'
+        it 'tokenizes non variable declarations', ->
+          lines = grammar.tokenizeLines '''
+            var (
+              // I am a comment
+              foo *bar
+              userRegister = &routers.Handler{
+            		Handler: func(c echo.Context) error {
+            			if err := userService.Register(&user); err != nil {
+            				return err
+            			}
+            			return nil
+            		},
+            	}
+            )
+          '''
+          testVar lines[0][0]
+          testOpBracket lines[0][2], '('
+          expect(lines[1][1]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
+          expect(lines[1][2]).toEqual value: ' I am a comment', scopes: ['source.go', 'comment.line.double-slash.go']
+          testVarDeclaration lines[2][1], 'foo'
+          testOpAddress lines[2][3], '*'
+          testVarAssignment lines[3][1], 'userRegister'
+          expect(lines[4][3]).toEqual value: 'func', scopes: ['source.go', 'keyword.function.go']
+          expect(lines[5][1]).toEqual value: 'if', scopes: ['source.go', 'keyword.control.go']
+          expect(lines[8][3]).toEqual value: 'nil', scopes: ['source.go', 'constant.language.go']
+          testOpBracket lines[11][0], ')'
 
         it 'tokenizes all parts of variable initializations correctly', ->
-          [kwd, decl, init, _, closing] = grammar.tokenizeLines 'var (\n\tm = map[string]int{\n\t\t"key": 10,\n\t}\n)'
-          testVar kwd[0]
-          testOpBracket kwd[2], '('
-          testVarAssignment decl[1], 'm'
-          testOpAssignment decl[3], '='
-          testString init[2], 'key'
-          testNum init[6], '10'
-          testOpBracket closing[0], ')'
+          lines = grammar.tokenizeLines '''
+            var (
+              m = map[string]int{
+                "key": 10,
+              }
+            )
+          '''
+          testVar lines[0][0]
+          testOpBracket lines[0][2], '('
+          testVarAssignment lines[1][1], 'm'
+          testOpAssignment lines[1][3], '='
+          testString lines[2][2], 'key'
+          testNum lines[2][6], '10'
+          testOpBracket lines[4][0], ')'
 
-        it 'tokenizes non-ASCII variable names', ->
-          {tokens} = grammar.tokenizeLine 'über = test'
-          testVarAssignment tokens[0], 'über'
-          testOpAssignment tokens[2], '='
+      it 'tokenizes non-ASCII variable names', ->
+        {tokens} = grammar.tokenizeLine 'über = test'
+        testVarAssignment tokens[0], 'über'
+        testOpAssignment tokens[2], '='
 
-        it 'tokenizes invalid variable names as such', ->
-          {tokens} = grammar.tokenizeLine 'var 0test = 0'
-          testVar tokens[0]
-          expect(tokens[2]).toEqual value: '0test', scopes: ['source.go', 'invalid.illegal.identifier.go']
+      it 'tokenizes invalid variable names as such', ->
+        {tokens} = grammar.tokenizeLine 'var 0test = 0'
+        testVar tokens[0]
+        expect(tokens[2]).toEqual value: '0test', scopes: ['source.go', 'invalid.illegal.identifier.go']
 
       describe 'in shorthand variable declarations', ->
         it 'tokenizes single names', ->
