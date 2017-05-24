@@ -399,6 +399,9 @@
             'match': '\\\\x\\h+'
             'name': 'constant.character.escape.cpp'
           }
+          {
+            'include': 'source.c#string_placeholder'
+          }
         ]
       }
       {
