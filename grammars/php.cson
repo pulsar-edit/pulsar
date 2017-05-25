@@ -138,11 +138,69 @@
   'class-builtin':
     'patterns': [
       {
+        'match': '''(?xi)
+          (\\\\)?\\b
+          ((APC|Append)Iterator|Array(Access|Iterator|Object)
+          |Bad(Function|Method)CallException
+          |(Caching|CallbackFilter)Iterator|Collator|Collectable|Cond|Countable|CURLFile
+          |Date(Interval|Period|Time(Interface|Immutable|Zone)?)?|Directory(Iterator)?|DomainException
+          |DOM(Attr|CdataSection|CharacterData|Comment|Document(Fragment)?|Element|EntityReference
+              |Implementation|NamedNodeMap|Node(list)?|ProcessingInstruction|Text|XPath)
+          |(Error)?Exception|EmptyIterator
+          |finfo
+          |Ev(Check|Child|Embed|Fork|Idle|Io|Loop|Periodic|Prepare|Signal|Stat|Timer|Watcher)?
+          |Event(Base|Buffer(Event)?|SslContext|Http(Request|Connection)?|Config|DnsBase|Util|Listener)?
+          |FANNConnection|(Filter|Filesystem)Iterator
+          |Gender\\\\Gender|GlobIterator|Gmagick(Draw|Pixel)?
+          |Haru(Annotation|Destination|Doc|Encoder|Font|Image|Outline|Page)
+          |Http((Inflate|Deflate)?Stream|Message|Request(Pool)?|Response|QueryString)
+          |HRTime\\\\(PerformanceCounter|StopWatch)
+          |Intl(Calendar|((CodePoint|RuleBased)?Break|Parts)?Iterator|DateFormatter|TimeZone)
+          |Imagick(Draw|Pixel(Iterator)?)?
+          |InfiniteIterator|InvalidArgumentException|Iterator(Aggregate|Iterator)?
+          |JsonSerializable
+          |KTaglib_(MPEG_(File|AudioProperties)|Tag|ID3v2_(Tag|(AttachedPicture)?Frame))
+          |Lapack|(Length|Locale|Logic)Exception|LimitIterator|Lua(Closure)?
+          |Mongo(BinData|Client|Code|Collection|CommandCursor|Cursor(Exception)?|Date|DB(Ref)?|DeleteBatch
+                |Grid(FS(Cursor|File)?)|Id|InsertBatch|Int(32|64)|Log|Pool|Regex|ResultException|Timestamp
+                |UpdateBatch|Write(Batch|ConcernException))?
+          |Memcache(d)?|MessageFormatter|MultipleIterator|Mutex
+          |mysqli(_(driver|stmt|warning_result))?
+          |MysqlndUh(Connection|PreparedStatement)
+          |NoRewindIterator|Normalizer|NumberFormatter
+          |OCI-(Collection|Lob)|OuterIterator|(OutOf(Bounds|Range)|Overflow)Exception
+          |ParentIterator|PDO(Statement)?|Phar(Data|FileInfo)?|php_user_filter|Pool
+          |QuickHash(Int(Set|StringHash)|StringIntHash)
+          |Recursive(Array|Caching|Directory|Fallback|Filter|Iterator|Regex|Tree)?Iterator
+          |Reflection(Class|Function(Abstract)?|Method|Object|Parameter|Property|(Zend)?Extension)?
+          |RangeException|Reflector|RegexIterator|ResourceBundle|RuntimeException|RRD(Creator|Graph|Updater)
+          |SAM(Connection|Message)|SCA(_(SoapProxy|LocalProxy))?
+          |SDO_(DAS_(ChangeSummary|Data(Factory|Object)|Relational|Setting|XML(_Document)?)
+               |Data(Factory|Object)|Exception|List|Model_(Property|ReflectionDataObject|Type)|Sequence)
+          |SeekableIterator|Serializable|SessionHandler(Interface)?|SimpleXML(Iterator|Element)|SNMP
+          |Soap(Client|Fault|Header|Param|Server|Var)
+          |SphinxClient|Spoofchecker
+          |Spl(DoublyLinkedList|Enum|File(Info|Object)|FixedArray|(Max|Min)?Heap|Observer|ObjectStorage
+              |(Priority)?Queue|Stack|Subject|Type|TempFileObject)
+          |SQLite(3(Result|Stmt)?|Database|Result|Unbuffered)
+          |stdClass|streamWrapper|SVM(Model)?|Swish(Result(s)?|Search)?|Sync(Event|Mutex|ReaderWriter|Semaphore)
+          |Thread(ed)?|tidy(Node)?|TokyoTyrant(Table|Iterator|Query)?|Transliterator|Traversable
+          |UConverter|(Underflow|UnexpectedValue)Exception
+          |V8Js(Exception)?|Varnish(Admin|Log|Stat)
+          |Worker|Weak(Map|Ref)
+          |XML(Diff\\\\(Base|DOM|File|Memory)|Reader|Writer)|XsltProcessor
+          |Yaf_(Route_(Interface|Map|Regex|Rewrite|Simple|Supervar)
+               |Action_Abstract|Application|Config_(Simple|Ini|Abstract)|Controller_Abstract
+               |Dispatcher|Exception|Loader|Plugin_Abstract|Registry|Request_(Abstract|Simple|Http)
+               |Response_Abstract|Router|Session|View_(Simple|Interface))
+          |Yar_(Client(_Exception)?|Concurrent_Client|Server(_Exception)?)
+          |ZipArchive|ZMQ(Context|Device|Poll|Socket)?)
+          \\b
+        '''
+        'name': 'support.class.builtin.php'
         'captures':
           '1':
             'name': 'punctuation.separator.inheritance.php'
-        'match': '(?i)(\\\\)?\\b(st(dClass|reamWrapper)|R(RD(Graph|Creator|Updater)|untimeException|e(sourceBundle|cursive(RegexIterator|Ca(chingIterator|llbackFilterIterator)|TreeIterator|Iterator(Iterator)?|DirectoryIterator|FilterIterator|ArrayIterator)|flect(ion(Method|Class|ZendExtension|Object|P(arameter|roperty)|Extension|Function(Abstract)?)?|or)|gexIterator)|angeException)|G(ender\\Gender|lobIterator|magick(Draw|Pixel)?)|X(sltProcessor|ML(Reader|Diff\\\\(Memory|Base|DOM|File)|Writer)|SLTProcessor)|M(ysqlndUh(Connection|PreparedStatement)|ongo(Re(sultException|gex)|Grid(fsFile|FS(Cursor|File)?)|BinData|C(o(de|llection|mmandCursor)|ursor(Exception)?|lient)|Timestamp|I(n(sertBatch|t(32|64))|d)|D(B(Ref)?|eleteBatch|ate)|UpdateBatch|Pool|Write(Batch|ConcernException)|Log)?|u(tex|ltipleIterator)|e(ssageFormatter|mcache(d)?))|Bad(MethodCallException|FunctionCallException)|tidy(Node)?|S(ync(ReaderWriter|Mutex|Semaphore|Event)|impleXML(Iterator|Element)|oap(Server|Header|Client|Param|Var|Fault)|NMP|CA(_(SoapProxy|LocalProxy))?|p(hinxClient|oofchecker|l(M(inHeap|axHeap)|S(tack|ubject)|Heap|T(ype|empFileObject)|Ob(server|jectStorage)|DoublyLinkedList|PriorityQueue|Enum|Queue|Fi(le(Info|Object)|xedArray)))|e(ssionHandler(Interface)?|ekableIterator|rializable)|DO_(Model_(ReflectionDataObject|Type|Property)|Sequence|D(ata(Object|Factory)|AS_(Relational|XML(_Document)?|Setting|ChangeSummary|Data(Object|Factory)))|Exception|List)|wish(Result(s)?|Search)?|VM(Model)?|QLite(Result|3(Result|Stmt)?|Database|Unbuffered)|AM(Message|Connection))|H(RTime\\\\(StopWatch|PerformanceCounter)|ttp(Re(sponse|quest(Pool)?)|Message|InflateStream|DeflateStream|QueryString)|aru(Image|Outline|D(oc|estination)|Page|Encoder|Font|Annotation))|Ya(f_(R(oute(_(Re(write|gex)|Map|S(tatic|imple|upervar)|Interface)|r)|e(sponse_Abstract|quest_(Simple|Http|Abstract)|gistry))|Session|Con(troller_Abstract|fig_(Simple|Ini|Abstract))|Dispatcher|Plugin_Abstract|Exception|View_(Simple|Interface)|Loader|A(ction_Abstract|pplication))|r_(Server(_Exception)?|C(oncurrent_Client|lient(_Exception)?)))|N(o(RewindIterator|rmalizer)|umberFormatter)|C(o(nd|untable|ll(ectable|ator))|URLFile|a(chingIterator|llbackFilterIterator))|T(hread(ed)?|okyoTyrant(Table|Iterator|Query)?|ra(nsliterator|versable))|I(n(tl(RuleBasedBreakIterator|BreakIterator|C(odePointBreakIterator|alendar)|TimeZone|Iterator|DateFormatter|PartsIterator)|validArgumentException|finiteIterator)|terator(Iterator|Aggregate)?|magick(Draw|Pixel(Iterator)?)?)|php_user_filter|Z(MQ(Socket|Context|Device|Poll)?|ipArchive)|O(CI-(Collection|Lob)|ut(erIterator|Of(RangeException|BoundsException))|verflowException)|D(irectory(Iterator)?|omainException|OM(XPath|N(ode(list)?|amedNodeMap)|C(haracterData|omment|dataSection)|Text|Implementation|Document(Fragment)?|ProcessingInstruction|E(ntityReference|lement)|Attr)|ate(Time(I(nterface|mmutable)|Zone)?|Interval|Period))|U(n(derflowException|expectedValueException)|Converter)|JsonSerializable|finfo|P(har(Data|FileInfo)?|ool|DO(Statement)?|arentIterator)|E(v(S(tat|ignal)|Ch(ild|eck)|Timer|I(o|dle)|ent(B(uffer(Event)?|ase)|SslContext|Http(Request|Connection)?|Config|DnsBase|Util|Listener)?|P(eriodic|repare)|Embed|Fork|Watcher|Loop)?|rrorException|xception|mptyIterator)|V(8Js(Exception)?|arnish(Stat|Log|Admin))|KTaglib_(MPEG_(File|AudioProperties)|Tag|ID3v2_(Tag|Frame|AttachedPictureFrame))|QuickHash(StringIntHash|Int(S(tringHash|et)|Hash))|F(il(terIterator|esystemIterator)|ANNConnection)|mysqli(_(stmt|driver|warning|result))?|W(orker|eak(Map|ref))|L(imitIterator|o(cale|gicException)|ua(Closure)?|engthException|apack)|A(ppendIterator|PCIterator|rray(Iterator|Object|Access)))\\b'
-        'name': 'support.class.builtin.php'
       }
     ]
   'class-name':
