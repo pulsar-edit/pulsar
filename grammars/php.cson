@@ -503,7 +503,7 @@
             'match': '''(?x)
               (\\\\)?\\b
               (T_(RETURN|REQUIRE(_ONCE)?|GOTO|GLOBAL|(MINUS|MOD|MUL|XOR)_EQUAL|METHOD_C|ML_COMMENT|BREAK
-                 |BOOL_CAST|BOOLEAN_(AND|OR)|BAD_CHARACTER|SR(_EQUAL)?|STRING(_CAST|VARNAME))?|START_HEREDOC|STATIC
+                 |BOOL_CAST|BOOLEAN_(AND|OR)|BAD_CHARACTER|SR(_EQUAL)?|STRING(_CAST|VARNAME)?|START_HEREDOC|STATIC
                  |SWITCH|SL(_EQUAL)?|HALT_COMPILER|NS_(C|SEPARATOR)|NUM_STRING|NEW|NAMESPACE|CHARACTER|COMMENT
                  |CONSTANT(_ENCAPSED_STRING)?|CONCAT_EQUAL|CONTINUE|CURLY_OPEN|CLOSE_TAG|CLONE|CLASS(_C)?
                  |CASE|CATCH|TRY|THROW|IMPLEMENTS|ISSET|IS_((GREATER|SMALLER)_OR_EQUAL|(NOT_)?(IDENTICAL|EQUAL))
@@ -522,8 +522,10 @@
                 'name': 'punctuation.separator.inheritance.php'
           }
           {
-            'comment': 'In PHP, any identifier which is not a variable is taken to be a constant.\n        \t\t\t\tHowever, if there is no constant defined with the given name then a notice\n        \t\t\t\tis generated and the constant is assumed to have the value of its name.'
-            'match': '[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*'
+            # In PHP, any identifier which is not a variable is taken to be a constant.
+            # However, if there is not a constant defined with the given name then a notice
+            # is generated and the constant is assumed to have the value of its name.
+            'match': '[a-zA-Z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*'
             'name': 'constant.other.php'
           }
         ]
