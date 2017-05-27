@@ -537,7 +537,11 @@
         'include': '#comments'
       }
       {
-        'begin': '(?xi)\n\t\t\t\t\t\t\t\\s*(array) # Typehint\n\t\t\t\t\t\t\t\\s*(&)? \t\t\t\t\t# Reference\n\t\t\t\t\t\t\t\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*) # The variable name\n\t\t\t\t\t\t\t\\s*(=)\t# A default value\n\t\t\t\t\t\t\t\\s*(array)\\s*(\\()\n\t\t\t\t\t\t\t'
+        'begin': '''(?xi)
+          (array)                                                        # Typehint
+          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          \\s*(=)\\s*(array)\\s*(\\()                                    # Default value
+        '''
         'beginCaptures':
           '1':
             'name': 'storage.type.php'
