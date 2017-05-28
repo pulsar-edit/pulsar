@@ -954,7 +954,7 @@
             'include': '#interpolation'
           }
           {
-            'comment': 'Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)'
+            # Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)
             'match': '(\\\\){1,2}[.$^\\[\\]{}]'
             'name': 'constant.character.escape.regex.php'
           }
@@ -964,7 +964,7 @@
                 'name': 'punctuation.definition.arbitrary-repitition.php'
               '3':
                 'name': 'punctuation.definition.arbitrary-repitition.php'
-            'match': '(\\{)\\d+(,\\d+)?(\\})'
+            'match': '({)\\d+(,\\d+)?(})'
             'name': 'string.regexp.arbitrary-repitition.php'
           }
           {
@@ -986,12 +986,13 @@
             'name': 'keyword.operator.regexp.php'
           }
           {
+            # We are restrictive in what we allow to go after the comment to avoid false positives,
+            # since the availability of comments depend on regexp flags.
             'begin': '(?<=^|\\s)(#)\\s(?=[[a-zA-Z0-9,. \\t?!-][^\\x{00}-\\x{7F}]]*$)'
             'beginCaptures':
               '1':
                 'name': 'punctuation.definition.comment.php'
-            'comment': 'We are restrictive in what we allow to go after the comment character to avoid false positives, since the availability of comments depend on regexp flags.'
-            'end': '$\\n?'
+            'end': '$'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.comment.php'
@@ -1191,7 +1192,7 @@
             'name': 'keyword.operator.nowdoc.php'
         'patterns': [
           {
-            'comment': 'Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)'
+            # Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)
             'match': '(\\\\){1,2}[.$^\\[\\]{}]'
             'name': 'constant.character.escape.regex.php'
           }
@@ -1201,7 +1202,7 @@
                 'name': 'punctuation.definition.arbitrary-repitition.php'
               '3':
                 'name': 'punctuation.definition.arbitrary-repitition.php'
-            'match': '(\\{)\\d+(,\\d+)?(\\})'
+            'match': '({)\\d+(,\\d+)?(})'
             'name': 'string.regexp.arbitrary-repitition.php'
           }
           {
@@ -1223,12 +1224,13 @@
             'name': 'keyword.operator.regexp.php'
           }
           {
+            # We are restrictive in what we allow to go after the comment to avoid false positives,
+            # since the availability of comments depend on regexp flags.
             'begin': '(?<=^|\\s)(#)\\s(?=[[a-zA-Z0-9,. \\t?!-][^\\x{00}-\\x{7F}]]*$)'
             'beginCaptures':
               '1':
                 'name': 'punctuation.definition.comment.php'
-            'comment': 'We are restrictive in what we allow to go after the comment character to avoid false positives, since the availability of comments depend on regexp flags.'
-            'end': '$\\n?'
+            'end': '$'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.comment.php'
