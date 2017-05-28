@@ -1431,7 +1431,7 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+([a-z0-9_]+)\\s*'
+        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+(\\w+)\\s*'
         'beginCaptures':
           '1':
             'name': 'storage.modifier.abstract.php'
@@ -1451,11 +1451,11 @@
               '1':
                 'name': 'storage.modifier.extends.php'
             'contentName': 'meta.other.inherited-class.php'
-            'end': '(?i)(?=[^a-z_0-9\\\\])'
+            'end': '(?i)(?=[^\\w\\\\])'
             'patterns': [
               {
-                'begin': '(?i)(?=\\\\?[a-z_0-9]+\\\\)'
-                'end': '(?i)([a-z_][a-z_0-9]*)?(?=[^a-z0-9_\\\\])'
+                'begin': '(?i)(?=\\\\?\\w+\\\\)'
+                'end': '(?i)([a-z_]\\w*)?(?=[^\\w\\\\])'
                 'endCaptures':
                   '1':
                     'name': 'entity.other.inherited-class.php'
@@ -1472,7 +1472,7 @@
                 'include': '#namespace'
               }
               {
-                'match': '(?i)[a-z_][a-z_0-9]*'
+                'match': '(?i)[a-z_]\\w*'
                 'name': 'entity.other.inherited-class.php'
               }
             ]
@@ -1488,13 +1488,13 @@
                 'include': '#comments'
               }
               {
-                'begin': '(?i)(?=[a-z0-9_\\\\]+)'
+                'begin': '(?i)(?=[\\w\\\\]+)'
                 'contentName': 'meta.other.inherited-class.php'
-                'end': '(?i)(?:\\s*(?:,|(?=[^a-z0-9_\\\\\\s]))\\s*)'
+                'end': '(?i)(?:\\s*(?:,|(?=[^\\w\\\\\\s]))\\s*)'
                 'patterns': [
                   {
-                    'begin': '(?i)(?=\\\\?[a-z_0-9]+\\\\)'
-                    'end': '(?i)([a-z_][a-z_0-9]*)?(?=[^a-z0-9_\\\\])'
+                    'begin': '(?i)(?=\\\\?\\w+\\\\)'
+                    'end': '(?i)([a-z_]\\w*)?(?=[^\\w\\\\])'
                     'endCaptures':
                       '1':
                         'name': 'entity.other.inherited-class.php'
@@ -1511,7 +1511,7 @@
                     'include': '#namespace'
                   }
                   {
-                    'match': '(?i)[a-z_][a-z_0-9]*'
+                    'match': '(?i)[a-z_]\\w*'
                     'name': 'entity.other.inherited-class.php'
                   }
                 ]
