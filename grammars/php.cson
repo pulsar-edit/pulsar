@@ -546,9 +546,9 @@
           '1':
             'name': 'storage.type.php'
           '2':
-            'name': 'storage.modifier.reference.php'
-          '3':
             'name': 'variable.other.php'
+          '3':
+            'name': 'storage.modifier.reference.php'
           '4':
             'name': 'punctuation.definition.variable.php'
           '5':
@@ -585,7 +585,7 @@
               (null)
               |
               (\\[)((?>[^\\[\\]]+|\\[\\g<8>\\])*)(\\])
-              |((?:\\S*?\\(\\))|(?:\\S*?)
+              |((?:\\S*?\\(\\))|(?:\\S*?))
             )
           )?
           \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
@@ -595,9 +595,9 @@
           '1':
             'name': 'storage.type.php'
           '2':
-            'name': 'storage.modifier.reference.php'
-          '3':
             'name': 'variable.other.php'
+          '3':
+            'name': 'storage.modifier.reference.php'
           '4':
             'name': 'punctuation.definition.variable.php'
           '5':
@@ -630,9 +630,9 @@
               '1':
                 'name': 'support.class.php'
               '2':
-                'name': 'storage.modifier.reference.php'
-              '3':
                 'name': 'variable.other.php'
+              '3':
+                'name': 'storage.modifier.reference.php'
               '4':
                 'name': 'punctuation.definition.variable.php'
               '5':
@@ -643,7 +643,7 @@
                 'name': 'invalid.illegal.non-null-typehinted.php'
             'match': '''(?xi)
               ([a-z_][\\w]*)?                                                              # Typehinted class name
-              \\s*(((&)?\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+              \\s*((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
               (?:                                                                          # Optional default value
                 \\s*(=)\\s*
                 (?:(null)|(\\S*?\\(\\)|(?:\\S*?)))
@@ -656,28 +656,28 @@
       {
         'captures':
           '1':
-            'name': 'storage.modifier.reference.php'
-          '2':
             'name': 'variable.other.php'
+          '2':
+            'name': 'storage.modifier.reference.php'
           '3':
             'name': 'punctuation.definition.variable.php'
         'match': '''(?xi)
-          (((&)?\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
           \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
         '''
         'name': 'meta.function.argument.no-default.php'
       }
       {
         'begin': '''(?xi)
-          (((&)?\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
           \\s*(=)\\s*
           (?:(\\[)((?>[^\\[\\]]+|\\[\\g<6>\\])*)(\\]))?                            # Optional default type
         '''
         'beginCaptures':
           '1':
-            'name': 'storage.modifier.reference.php'
-          '2':
             'name': 'variable.other.php'
+          '2':
+            'name': 'storage.modifier.reference.php'
           '3':
             'name': 'punctuation.definition.variable.php'
           '4':
