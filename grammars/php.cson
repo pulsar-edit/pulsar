@@ -1258,10 +1258,10 @@
     'beginCaptures':
       '1':
         'name': 'keyword.other.new.php'
-    'end': '(?i)(?=[^$a-z0-9_\\\\])'
+    'end': '(?i)(?=[^\\w\\\\])'
     'patterns': [
       {
-        'match': '(parent|static|self)(?=[^a-z0-9_])'
+        'match': '(?i)(parent|static|self)(?!\\w)'
         'name': 'storage.type.php'
       }
       {
