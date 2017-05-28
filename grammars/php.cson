@@ -1272,7 +1272,7 @@
       }
     ]
   'interpolation':
-    'comment': 'http://www.php.net/manual/en/language.types.string.php#language.types.string.parsing'
+    # http://www.php.net/manual/en/language.types.string.php#language.types.string.parsing
     'patterns': [
       {
         'match': '\\\\[0-7]{1,3}'
@@ -1287,13 +1287,13 @@
         'name': 'constant.character.escape.php'
       }
       {
-        'begin': '(\\{)(?=\\$.*?\\})'
+        'begin': '{(?=\\$.*?})'
         'beginCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.variable.php'
-        'end': '(\\})'
+        'end': '}'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.variable.php'
         'patterns': [
           {
