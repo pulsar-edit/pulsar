@@ -1311,7 +1311,7 @@
         'name': 'punctuation.definition.variable.php'
       '2':
         'name': 'variable.other.php'
-    'match': '(?i)(\\$+)([a-z_][a-z_0-9]*)(?=\\s*\\()'
+    'match': '(?i)(\\$+)([a-z_][\\w]*)(?=\\s*\\()'
     'name': 'meta.function-call.invoke.php'
   'language':
     'patterns': [
