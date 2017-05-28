@@ -704,9 +704,9 @@
   'function-call':
     'patterns': [
       {
-        'begin': '(?i)(?=\\\\?[a-z_0-9\\\\]+\\\\[a-z_][a-z0-9_]*\\s*\\()'
+        'begin': '(?i)(?=\\\\?[\\w\\\\]+\\\\[a-z_][\\w]*\\s*\\()'
         'comment': 'Functions in a user-defined namespace (overrides any built-ins)'
-        'end': '(?=\\s*\\()'
+        'end': '(?=\\()'
         'patterns': [
           {
             'include': '#user-function-call'
@@ -718,15 +718,15 @@
         'name': 'support.function.construct.output.php'
       }
       {
-        'begin': '(?i)(\\\\)?(?=\\b[a-z_][a-z_0-9]*\\s*\\()'
+        # Root namespace function calls (built-in or user)
+        'begin': '(?i)(\\\\)?(?=\\b[a-z_][\\w]*\\s*\\()'
         'beginCaptures':
           '1':
             'name': 'punctuation.separator.inheritance.php'
-        'comment': 'Root namespace function calls (built-in or user)'
         'end': '(?=\\s*\\()'
         'patterns': [
           {
-            'match': '(?i)\\b(isset|unset|e(val|mpty)|list)(?=\\s*\\()'
+            'match': '(?i)\\b(isset|unset|eval|empty|list)(?=\\s*\\()'
             'name': 'support.function.construct.php'
           }
           {
