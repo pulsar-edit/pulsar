@@ -1319,15 +1319,15 @@
         'include': '#comments'
       }
       {
-        'match': '\\{'
+        'match': '{'
         'name': 'punctuation.section.scope.begin.php'
       }
       {
-        'match': '\\}'
+        'match': '}'
         'name': 'punctuation.section.scope.end.php'
       }
       {
-        'begin': '(?i)^\\s*(interface)\\s+([a-z0-9_]+)\\s*(extends)?\\s*'
+        'begin': '(?i)^\\s*(interface)\\s+([\\w]+)\\s*(extends)?\\s*'
         'beginCaptures':
           '1':
             'name': 'storage.type.interface.php'
@@ -1335,12 +1335,12 @@
             'name': 'entity.name.type.interface.php'
           '3':
             'name': 'storage.modifier.extends.php'
-        'end': '((?:[a-zA-Z0-9_]+\\s*,\\s*)*)([a-zA-Z0-9_]+)?\\s*(?:(?=\\{)|$)'
+        'end': '((?:\\w+\\s*,\\s*)*)(\\w+)?\\s*(?:(?={)|$)'
         'endCaptures':
           '1':
             'patterns': [
               {
-                'match': '[a-zA-Z0-9_]+'
+                'match': '\\w+'
                 'name': 'entity.other.inherited-class.php'
               }
               {
@@ -1358,13 +1358,13 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(trait)\\s+([a-z0-9_]+)'
+        'begin': '(?i)^\\s*(trait)\\s+(\\w+)'
         'beginCaptures':
           '1':
             'name': 'storage.type.trait.php'
           '2':
             'name': 'entity.name.type.trait.php'
-        'end': '(?=[{])'
+        'end': '(?={)'
         'name': 'meta.trait.php'
         'patterns': [
           {
@@ -1373,12 +1373,12 @@
         ]
       }
       {
-        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\b\\s+(?=([a-z0-9_\\\\]+\\s*($|[;{]|(\\/[\\/*])))|$)'
+        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\b\\s+(?=([\\w\\\\]+\\s*($|[;{]|(/[/*])))|$)'
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
         'contentName': 'entity.name.type.namespace.php'
-        'end': '(?i)(?=\\s*$|[^a-z0-9_\\\\])'
+        'end': '(?i)(?=\\s*$|[^\\w\\\\])'
         'name': 'meta.namespace.php'
         'patterns': [
           {
@@ -1388,14 +1388,12 @@
         ]
       }
       {
-        'begin': '(?i)\\s*\\b(use)\\s+(?:((const)|(function))\\s+)?'
+        'begin': '(?i)\\b(use)\\s+(?:(const|function)\\s+)?'
         'beginCaptures':
           '1':
             'name': 'keyword.other.use.php'
-          '3':
-            'name': 'storage.type.const.php'
-          '4':
-            'name': 'storage.type.function.php'
+          '2':
+            'name': 'storage.type.${2:/downcase}.php'
         'end': '(?=;|(?:^\\s*$))'
         'name': 'meta.use.php'
         'patterns': [
@@ -1403,8 +1401,8 @@
             'include': '#comments'
           }
           {
-            'begin': '(?i)\\s*(?=[a-z_0-9\\\\])'
-            'end': '(?xi)(?:\n    \t\t\t                (?:\\s*(as)\\b\\s*([a-z_0-9]*)\\s*(?=,|;|$))\n    \t\t\t                |(?=,|;|$)\n    \t\t\t            )'
+            'begin': '(?i)\\s*(?=[\\w\\\\])'
+            'end': '(?i)(?:\\s*(as)\\s+(\\w*))?\\s*(?=,|;|$)'
             'endCaptures':
               '1':
                 'name': 'keyword.other.use-as.php'
@@ -1415,7 +1413,7 @@
                 'include': '#class-builtin'
               }
               {
-                'begin': '(?i)\\s*(?=[\\\\a-z_0-9])'
+                'begin': '(?i)\\s*(?=[\\\\\\w])'
                 'end': '$|(?=[\\s,;])'
                 'name': 'support.other.namespace.use.php'
                 'patterns': [
