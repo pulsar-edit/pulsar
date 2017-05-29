@@ -1986,8 +1986,12 @@
         'include': '#instantiation'
       }
       {
-        'begin': '(?xi)\\s*(?=\n\t\t\t\t        [a-z_0-9\\\\]+(::)\n    \t\t\t\t    ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?\n\t\t\t\t    )'
-        'end': '(?i)(::)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?'
+        'begin': '''(?xi)
+          (?=[\\w\\\\]+(::)
+            ([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)?
+          )
+        '''
+        'end': '(?i)(::)([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)?'
         'endCaptures':
           '1':
             'name': 'keyword.operator.class.php'
