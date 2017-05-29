@@ -1521,13 +1521,17 @@
         ]
       }
       {
-        'captures':
-          '1':
-            'name': 'keyword.control.php'
-        'match': '\\s*\\b((break|c(ase|ontinue)|d(e(clare|fault)|ie|o)|e(lse(if)?|nd(declare|for(each)?|if|switch|while)|xit)|for(each)?|if|return|switch|use|while|yield))\\b'
+        'match': '''(?x)
+          \\b(
+            break|case|continue|declare|default|die|do|
+            else(if)?|end(declare|for(each)?|if|switch|while)|exit|
+            for(each)?|if|return|switch|use|while|yield
+          )\\b
+        '''
+        'name': 'keyword.control.php'
       }
       {
-        'begin': '(?i)\\b((?:require|include)(?:_once)?)\\b\\s*'
+        'begin': '(?i)\\b((?:require|include)(?:_once)?)\\s+'
         'beginCaptures':
           '1':
             'name': 'keyword.control.import.include.php'
@@ -1540,11 +1544,11 @@
         ]
       }
       {
-        'begin': '\\b(catch)\\b\\s*\\(\\s*'
+        'begin': '\\b(catch)\\s+\\(\\s*'
         'beginCaptures':
           '1':
             'name': 'keyword.control.exception.catch.php'
-        'end': '([A-Za-z_][A-Za-z_0-9]*)\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*\\)'
+        'end': '(?i)([a-z_]\\w*)\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)\\s*\\)'
         'endCaptures':
           '1':
             'name': 'support.class.exception.php'
@@ -1564,24 +1568,24 @@
         'name': 'keyword.control.exception.php'
       }
       {
-        'begin': '(?i)\\b(function)\\s*(&\\s*)?(?=\\()'
+        'begin': '(?i)\\b(function)\\s*(&)?\\s*(?=\\()'
         'beginCaptures':
           '1':
             'name': 'storage.type.function.php'
           '2':
             'name': 'storage.modifier.reference.php'
-        'end': '(?=\\{)'
+        'end': '(?={)'
         'name': 'meta.function.closure.php'
         'patterns': [
           {
-            'begin': '(\\()'
+            'begin': '\\('
             'beginCaptures':
-              '1':
+              '0':
                 'name': 'punctuation.definition.parameters.begin.php'
             'contentName': 'meta.function.arguments.php'
-            'end': '(\\))'
+            'end': '\\)'
             'endCaptures':
-              '1':
+              '0':
                 'name': 'punctuation.definition.parameters.end.php'
             'patterns': [
               {
@@ -1596,20 +1600,20 @@
                 'name': 'keyword.other.function.use.php'
               '2':
                 'name': 'punctuation.definition.parameters.begin.php'
-            'end': '(\\))'
+            'end': '\\)'
             'endCaptures':
-              '1':
+              '0':
                 'name': 'punctuation.definition.parameters.end.php'
             'patterns': [
               {
                 'captures':
                   '1':
-                    'name': 'storage.modifier.reference.php'
-                  '2':
                     'name': 'variable.other.php'
+                  '2':
+                    'name': 'storage.modifier.reference.php'
                   '3':
                     'name': 'punctuation.definition.variable.php'
-                'match': '(?:\\s*(&))?\\s*((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\))'
+                'match': '(?i)((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)\\s*(?=,|\\))'
                 'name': 'meta.function.closure.use.php'
               }
             ]
@@ -1617,7 +1621,17 @@
         ]
       }
       {
-        'begin': '(?x)\\s*\n\t\t\t\t\t    ((?:(?:final|abstract|public|private|protected|static)\\s+)*)\n\t\t\t\t        (function)\n\t\t\t\t        (?:\\s+|(\\s*&\\s*))\n\t\t\t\t        (?:\n\t\t\t\t            (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|clone|set_state|sleep|wakeup|autoload|invoke|callStatic))\n\t\t\t\t            |([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\n\t\t\t\t        )\n\t\t\t\t        \\s*\n\t\t\t\t        (\\()'
+        'begin': '''(?x)
+          ((?:(?:final|abstract|public|private|protected|static)\\s+)*)
+          (function)
+          \\s*(&)?\\s*
+          (?i:
+            (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|
+                  clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
+            |([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)
+          )
+          \\s*(\\()
+        '''
         'beginCaptures':
           '1':
             'patterns': [
@@ -1637,9 +1651,9 @@
           '6':
             'name': 'punctuation.definition.parameters.begin.php'
         'contentName': 'meta.function.arguments.php'
-        'end': '(\\))'
+        'end': '\\)'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.parameters.end.php'
         'name': 'meta.function.php'
         'patterns': [
@@ -1652,8 +1666,28 @@
         'include': '#invoke-call'
       }
       {
-        'begin': '(?xi)\\s*(?=\n\t\t\t\t        [a-z_0-9$\\\\]+(::)\n                        (?:\n        \t\t\t\t    ([a-z_][a-z_0-9]*)\\s*\\(\n        \t\t\t\t    |\n        \t\t\t\t    ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\n        \t\t\t\t    |\n        \t\t\t\t    ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\n        \t\t\t\t)?\n\t\t\t\t    )'
-        'end': '(?x)(::)\n                        (?:\n        \t\t\t\t    ([A-Za-z_][A-Za-z_0-9]*)\\s*\\(\n        \t\t\t\t    |\n        \t\t\t\t    ((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\n        \t\t\t\t    |\n        \t\t\t\t    ([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\n        \t\t\t\t)?'
+        'begin': '''(?xi)
+          (?=
+            [\\w$\\\\]+(::)
+            (?:
+              ([a-z_]\\w*)\\s*\\(
+              |
+              ((\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable
+              |
+              ([a-zA-Z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)    # Constant
+            )?
+          )
+        '''
+        'end': '''(?xi)
+          (::)
+          (?:
+            ([a-z_]\\w*)\\s*\\(
+            |
+            ((\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable
+            |
+            ([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)       # Constant
+          )?
+        '''
         'endCaptures':
           '1':
             'name': 'keyword.operator.class.php'
@@ -1717,14 +1751,14 @@
         'captures':
           '1':
             'name': 'storage.type.php'
-        'match': '(?i)\\s*\\(\\s*(array|real|double|float|int(eger)?|bool(ean)?|string|object|binary|unset)\\s*\\)'
+        'match': '(?i)\\(\\s*(array|real|double|float|int(eger)?|bool(ean)?|string|object|binary|unset)\\s*\\)'
       }
       {
         'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|clone|var|function|interface|trait|parent|self|object)\\b'
         'name': 'storage.type.php'
       }
       {
-        'match': '(?i)\\b(global|abstract|const|extends|implements|final|p(r(ivate|otected)|ublic)|static)\\b'
+        'match': '(?i)\\b(global|abstract|const|extends|implements|final|private|protected|public|static)\\b'
         'name': 'storage.modifier.php'
       }
       {
@@ -1753,14 +1787,14 @@
             'name': 'storage.modifier.reference.php'
           '3':
             'name': 'storage.modifier.reference.php'
-        'match': '(?:(\\=)(&))|(&(?=[$A-Za-z_]))'
+        'match': '(?i)(\\=)(&)|(&)(?=[$a-z_])'
       }
       {
-        'match': '(@)'
+        'match': '@'
         'name': 'keyword.operator.error-control.php'
       }
       {
-        'match': '(===|==|!==|!=|<>)'
+        'match': '===|==|!==|!=|<>'
         'name': 'keyword.operator.comparison.php'
       }
       {
@@ -1768,15 +1802,15 @@
         'name': 'keyword.operator.assignment.php'
       }
       {
-        'match': '(<=>|<=|>=|<|>)'
+        'match': '<=>|<=|>=|<|>'
         'name': 'keyword.operator.comparison.php'
       }
       {
-        'match': '(\\-\\-|\\+\\+)'
+        'match': '\\-\\-|\\+\\+'
         'name': 'keyword.operator.increment-decrement.php'
       }
       {
-        'match': '(\\-|\\+|\\*|/|%)'
+        'match': '\\-|\\+|\\*|/|%'
         'name': 'keyword.operator.arithmetic.php'
       }
       {
@@ -1791,11 +1825,11 @@
         'name': 'keyword.operator.bitwise.php'
       }
       {
-        'begin': '(?i)\\b(instanceof)\\b\\s+(?=[\\\\$a-z_])'
+        'begin': '(?i)\\b(instanceof)\\s+(?=[\\\\$a-z_])'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.type.php'
-        'end': '(?=[^\\\\$A-Za-z_0-9])'
+        'end': '(?=[^\\\\$\\w])'
         'patterns': [
           {
             'include': '#class-name'
@@ -1817,13 +1851,13 @@
             'name': 'keyword.control.goto.php'
           '2':
             'name': 'support.other.php'
-        'match': '(?i)(goto)\\s+([a-z_][a-z_0-9]*)'
+        'match': '(?i)(goto)\\s+([a-z_]\\w*)'
       }
       {
         'captures':
           '1':
             'name': 'entity.name.goto-label.php'
-        'match': '(?i)^\\s*([a-z_][a-z_0-9]*)\\s*:'
+        'match': '(?i)^\\s*([a-z_]\\w*)\\s*:'
       }
       {
         'include': '#string-backtick'
