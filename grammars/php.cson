@@ -1902,15 +1902,15 @@
   'object':
     'patterns': [
       {
-        'begin': '(->)(\\$?\\{)'
+        'begin': '(->)(\\$?{)'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.class.php'
           '2':
             'name': 'punctuation.definition.variable.php'
-        'end': '(\\})'
+        'end': '}'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.variable.php'
         'patterns': [
           {
@@ -1928,7 +1928,14 @@
             'name': 'variable.other.property.php'
           '4':
             'name': 'punctuation.definition.variable.php'
-        'match': '(?x)(->)\n            \t\t\t\t(?:\n            \t\t\t\t    ([A-Za-z_][A-Za-z_0-9]*)\\s*\\(\n            \t\t\t\t    |\n            \t\t\t\t    ((\\$+)?[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\n            \t\t\t\t)?'
+        'match': '''(?xi)
+          (->)
+          (?:
+            ([a-z_]\\w*)\\s*\\(
+            |
+            ((\\$+)?[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)
+          )?
+        '''
       }
     ]
   'parameter-default-types':
