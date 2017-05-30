@@ -2034,11 +2034,11 @@
       }
       {
         'match': '''(?x)
-          \\@
+          @
           (
             api|abstract|author|category|copyright|example|global|inherit[Dd]oc|internal|
-            license|link|method|property-(read|write)|package|param|return|see|since|source
-            |static|subpackage|throws|todo|var|version|uses|deprecated|final|ignore
+            license|link|method|property(-(read|write))?|package|param|return|see|since|source|
+            static|subpackage|throws|todo|var|version|uses|deprecated|final|ignore
           )\\b
         '''
         'name': 'keyword.other.phpdoc.php'
@@ -2098,7 +2098,7 @@
       }
     ]
   'regex-single-quoted':
-    'begin': '\'/(?=(\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])|.)|[^\'/] )++/[imsxeADSUXu]*\')'
+    'begin': '\'/(?=(\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])|.)|[^\'/])++/[imsxeADSUXu]*\')'
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
@@ -2135,7 +2135,7 @@
     ]
   'single_quote_regex_escape':
     # Support both PHP string and regex escaping
-    'match': '\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])| .)'
+    'match': '\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])|.)'
     'name': 'constant.character.escape.php'
   'sql-string-double-quoted':
     'begin': '"\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER)\\b)'
