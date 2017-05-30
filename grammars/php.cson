@@ -2213,11 +2213,11 @@
     'name': 'string.quoted.single.sql.php'
     'patterns': [
       {
-        'match': '#(\\\\\'|[^\'])*(?=\'|$\\n?)'
+        'match': '#(\\\\\'|[^\'])*(?=\'|$)'
         'name': 'comment.line.number-sign.sql'
       }
       {
-        'match': '--(\\\\\'|[^\'])*(?=\'|$\\n?)'
+        'match': '--(\\\\\'|[^\'])*(?=\'|$)'
         'name': 'comment.line.double-dash.sql'
       }
       {
@@ -2225,12 +2225,14 @@
         'name': 'constant.character.escape.php'
       }
       {
-        'comment': 'Unclosed strings must be captured to avoid them eating the remainder of the PHP script\n\t\t\t\t\tSample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
+        # Unclosed strings must be captured to avoid them eating the remainder of the PHP script
+        # Sample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
         'match': '`(?=((\\\\`)|[^`\'])*(\'|$))'
         'name': 'string.quoted.other.backtick.unclosed.sql'
       }
       {
-        'comment': 'Unclosed strings must be captured to avoid them eating the remainder of the PHP script\n\t\t\t\t\tSample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
+        # Unclosed strings must be captured to avoid them eating the remainder of the PHP script
+        # Sample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
         'match': '"(?=((\\\\")|[^"\'])*(\'|$))'
         'name': 'string.quoted.double.unclosed.sql'
       }
