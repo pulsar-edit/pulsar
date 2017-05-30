@@ -2010,7 +2010,7 @@
   'php_doc':
     'patterns': [
       {
-        'comment': 'PHPDocumentor only recognises lines with an asterisk as the first non-whitespaces character'
+        # PHPDocumentor only recognises lines with an asterisk as the first non-whitespaces character
         'match': '^(?!\\s*\\*).*?(?:(?=\\*\\/)|$\\n?)'
         'name': 'invalid.illegal.missing-asterisk.phpdoc.php'
       }
@@ -2033,14 +2033,21 @@
         'match': '(@xlink)\\s+(.+)\\s*$'
       }
       {
-        'match': '\\@(a(pi|bstract|uthor)|c(ategory|opyright)|example|global|in(herit[Dd]oc|ternal)|li(cense|nk)|method|p(roperty(\\-read|\\-write|)|ackage|aram)|return|s(ee|ince|ource|tatic|ubpackage)|t(hrows|odo)|v(ar|ersion)|uses|deprecated|final|ignore)\\b'
+        'match': '''(?x)
+          \\@
+          (
+            api|abstract|author|category|copyright|example|global|inherit[Dd]oc|internal|
+            license|link|method|property-(read|write)|package|param|return|see|since|source
+            |static|subpackage|throws|todo|var|version|uses|deprecated|final|ignore
+          )\\b
+        '''
         'name': 'keyword.other.phpdoc.php'
       }
       {
         'captures':
           '1':
             'name': 'keyword.other.phpdoc.php'
-        'match': '\\{(@(link|inherit[Dd]oc)).+?\\}'
+        'match': '{(@(link|inherit[Dd]oc)).+?}'
         'name': 'meta.tag.inline.phpdoc.php'
       }
     ]
