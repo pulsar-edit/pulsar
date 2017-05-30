@@ -2098,7 +2098,7 @@
       }
     ]
   'regex-single-quoted':
-    'begin': '(?x)\'/ (?= ( \\\\ (?: \\\\ (?: \\\\ [\\\\\']? | [^\'] ) | . ) | [^\'/] )++/[imsxeADSUXu]*\' )'
+    'begin': '\'/(?=(\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])|.)|[^\'/] )++/[imsxeADSUXu]*\')'
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
@@ -2117,7 +2117,7 @@
             'name': 'punctuation.definition.arbitrary-repetition.php'
           '3':
             'name': 'punctuation.definition.arbitrary-repetition.php'
-        'match': '(\\{)\\d+(,\\d+)?(\\})'
+        'match': '({)\\d+(,\\d+)?(})'
         'name': 'string.regexp.arbitrary-repetition.php'
       }
       {
