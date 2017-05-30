@@ -2052,7 +2052,7 @@
       }
     ]
   'regex-double-quoted':
-    'begin': '(?x)"/ (?= (\\\\.|[^"/])++/[imsxeADSUXu]*" )'
+    'begin': '"/(?=(\\\\.|[^"/])++/[imsxeADSUXu]*")'
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
@@ -2063,7 +2063,7 @@
     'name': 'string.regexp.double-quoted.php'
     'patterns': [
       {
-        'comment': 'Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)'
+        # Escaped from the regexp – there can also be 2 backslashes (since 1 will escape the first)
         'match': '(\\\\){1,2}[.$^\\[\\]{}]'
         'name': 'constant.character.escape.regex.php'
       }
@@ -2076,7 +2076,7 @@
             'name': 'punctuation.definition.arbitrary-repetition.php'
           '3':
             'name': 'punctuation.definition.arbitrary-repetition.php'
-        'match': '(\\{)\\d+(,\\d+)?(\\})'
+        'match': '({)\\d+(,\\d+)?(})'
         'name': 'string.regexp.arbitrary-repetition.php'
       }
       {
