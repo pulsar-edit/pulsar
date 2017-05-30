@@ -2134,8 +2134,8 @@
       }
     ]
   'single_quote_regex_escape':
-    'comment': 'Support both PHP string and regex escaping'
-    'match': '(?x) \\\\ (?: \\\\ (?: \\\\ [\\\\\']? | [^\'] ) | . )'
+    # Support both PHP string and regex escaping
+    'match': '\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])| .)'
     'name': 'constant.character.escape.php'
   'sql-string-double-quoted':
     'begin': '"\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER)\\b)'
