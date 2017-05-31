@@ -2317,19 +2317,42 @@
   'support':
     'patterns': [
       {
-        'match': '(?i)\\bapc_(s(tore|ma_info)|c(ompile_file|lear_cache|a(s|che_info))|inc|de(c|fine_constants|lete(_file)?)|exists|fetch|load_constants|add|bin_(dump(file)?|load(file)?))\\b'
+        'match': '''(?xi)
+          \\b
+          apc_(
+            store|sma_info|compile_file|clear_cache|cas|cache_info|inc|dec|define_constants|delete(_file)?|
+            exists|fetch|load_constants|add|bin_(dump|load)(file)?
+          )\\b
+        '''
         'name': 'support.function.apc.php'
       }
       {
-        'match': '(?i)\\b(s(huffle|izeof|ort)|n(ext|at(sort|casesort))|c(o(unt|mpact)|urrent)|in_array|u(sort|ksort|asort)|p(os|rev)|e(nd|ach|xtract)|k(sort|ey(_exists)?|rsort)|list|a(sort|r(sort|ray(_(s(hift|um|plice|earch|lice)|c(h(unk|ange_key_case)|o(unt_values|lumn|mbine))|intersect(_(u(key|assoc)|key|assoc))?|diff(_(u(key|assoc)|key|assoc))?|u(n(shift|ique)|intersect(_(uassoc|assoc))?|diff(_(uassoc|assoc))?)|p(op|ush|ad|roduct)|values|key(s|_exists)|f(il(ter|l(_keys)?)|lip)|walk(_recursive)?|r(e(duce|place(_recursive)?|verse)|and)|m(ultisort|erge(_recursive)?|ap)))?))|r(sort|eset|ange))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            shuffle|sizeof|sort|next|nat(case)?sort|count|compact|current|in_array|usort|uksort|uasort|
+            poas|prev|end|each|extract|ksort|key(_exists)?|krsort|list|asort|arsort|rsort|reset|range|
+            array(_(shift|sum|splice|search|slice|chunk|change_key_case|count_values|column|combine|
+                    (diff|intersect)(_(u)?(key|assoc))?|unshift|unique|pop|push|pad|product|values|
+                    keys|key_exists|filter|fill(_keys)?|flip|walk(_recursive)?|reduce|replace(_recursive)?
+                    reverse|rand|multisort|merge(_recursive)?|map)?)
+          )\\b
+        '''
         'name': 'support.function.array.php'
       }
       {
-        'match': '(?i)\\b(s(how_source|ys_getloadavg|leep)|highlight_(string|file)|con(stant|nection_(status|aborted))|time_(sleep_until|nanosleep)|ignore_user_abort|d(ie|efine(d)?)|u(sleep|n(iqid|pack))|__halt_compiler|p(hp_(strip_whitespace|check_syntax)|ack)|e(val|xit)|get_browser)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            show_source|sys_getloadavg|sleep|highlight_(file|string)|constant|connection_(aborted|status)|
+            time_(nanosleep|sleep_until)|ignore_user_abort|die|define(d)?|usleep|uniqid|unpack|__halt_compiler|
+            php_(check_syntax|strip_whitespace)|pack|eval|exit|get_browser
+          )\\b
+        '''
         'name': 'support.function.basic_functions.php'
       }
       {
-        'match': '(?i)\\bbc(s(cale|ub|qrt)|comp|div|pow(mod)?|add|m(od|ul))\\b'
+        'match': '(?i)\\bbc(scale|sub|sqrt|comp|div|pow(mod)?|add|mod|mul)\\b'
         'name': 'support.function.bcmath.php'
       }
       {
@@ -2337,67 +2360,117 @@
         'name': 'support.function.blenc.php'
       }
       {
-        'match': '(?i)\\bbz(c(ompress|lose)|open|decompress|err(str|no|or)|flush|write|read)\\b'
+        'match': '(?i)\\bbz(compress|close|open|decompress|errstr|errno|error|flush|write|read)\\b'
         'name': 'support.function.bz2.php'
       }
       {
-        'match': '(?i)\\b(GregorianToJD|cal_(to_jd|info|days_in_month|from_jd)|unixtojd|jdto(unix|jewish)|easter_da(ys|te)|J(ulianToJD|ewishToJD|D(MonthName|To(Gregorian|Julian|French)|DayOfWeek))|FrenchToJD)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            (French|Gregorian|Jewish|Julian)ToJD|cal_(to_jd|info|days_in_month|from_jd)|unixtojd|
+            jdto(unix|jewish)|easter_(date|days)|JD(MonthName|To(Gregorian|Julian|French)|DayOfWeek)
+          )\\b
+        '''
         'name': 'support.function.calendar.php'
       }
       {
-        'match': '(?i)\\b(c(lass_(exists|alias)|all_user_method(_array)?)|trait_exists|i(s_(subclass_of|a)|nterface_exists)|__autoload|property_exists|get_(c(lass(_(vars|methods))?|alled_class)|object_vars|declared_(classes|traits|interfaces)|parent_class)|method_exists)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            class_alias|all_user_method(_array)?|is_(a|subclass_of)|__autoload|(class|interface|method|property|trait)_exists|
+            get_(class(_(vars|methods))?|(called|parent)_class|object_vars|declared_(classes|interfaces|traits))
+          )\\b
+        '''
         'name': 'support.function.classobj.php'
       }
       {
-        'match': '(?i)\\b(com_(create_guid|print_typeinfo|event_sink|load_typelib|get_active_object|message_pump)|variant_(s(ub|et(_type)?)|n(ot|eg)|c(a(st|t)|mp)|i(nt|div|mp)|or|d(iv|ate_(to_timestamp|from_timestamp))|pow|eqv|fix|a(nd|dd|bs)|round|get_type|xor|m(od|ul)))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            com_(create_guid|print_typeinfo|event_sink|load_typelib|get_active_object|message_pump)|
+            variant_(sub|set(_type)?|not|neg|cast|cat|cmp|int|idiv|imp|or|div|date_(from|to)_timestamp)|
+                     pow|eqv|fix|and|add|abs|round|get_type|xor|mod|mul
+          )\\b
+        '''
         'name': 'support.function.com.php'
       }
       {
-        'match': '(?i)\\bctype_(space|cntrl|digit|upper|p(unct|rint)|lower|al(num|pha)|graph|xdigit)\\b'
+        'match': '(?i)\\bctype_(space|cntrl|digit|upper|punct|print|lower|alnum|alpha|graph|xdigit)\\b'
         'name': 'support.function.ctype.php'
       }
       {
-        'match': '(?i)\\bcurl_(s(hare_(setopt|close|init)|trerror|etopt(_array)?)|c(opy_handle|lose)|init|unescape|pause|e(scape|rr(no|or)|xec)|version|file_create|reset|getinfo|multi_(s(trerror|e(topt|lect))|close|in(it|fo_read)|exec|add_handle|remove_handle|getcontent))\\b'
+        'match': '''(?xi)
+          \\b
+          curl_(
+            share_(close|init|setopt)|strerror|setopt(_array)?|copy_handle|close|init|unescape|pause|escape|
+            errno|error|exec|version|file_create|reset|getinfo|
+            multi_(strerror|setopt|select|close|init|info_read|(add|remove)_handle|getcontent)
+          )\\b
+        '''
         'name': 'support.function.curl.php'
       }
       {
-        'match': '(?i)\\b(str(totime|ptime|ftime)|checkdate|time(zone_(name_(from_abbr|get)|transitions_get|identifiers_list|o(pen|ffset_get)|version_get|location_get|abbreviations_list))?|idate|date(_(su(n(set|_info|rise)|b)|create(_(immutable(_from_format)?|from_format))?|time(stamp_(set|get)|zone_(set|get)|_set)|i(sodate_set|nterval_(create_from_date_string|format))|offset_get|d(iff|efault_timezone_(set|get)|ate_set)|parse(_from_format)?|format|add|get_last_errors|modify))?|localtime|g(et(timeofday|date)|m(strftime|date|mktime))|m(icrotime|ktime))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            strtotime|strptime|stftime|checkdate|time|timezone_name_(from_abbr|get)|idate|
+            timezone_((offset|transitions|version)_get|(abbreviations|identifiers)_list|open|location|get)|
+            date(_(sun(rise|set)|sun_info|sub|create(_(immutable_)?from_format)?|timestamp_(get|set)|timezone_(get|set)|time_set|
+                   isodate_set|interval_(create_from_date_string|format)|offset_get|diff|default_timezone_(get|set)|date_set|
+                   parse(_from_format)?|format|add|get_last_errors|modify))?
+            localtime|get(date|timeofday)|gmstrftime|gmdate|gmmktime|microtime|mktime
+          )\\b
+        '''
         'name': 'support.function.datetime.php'
       }
       {
-        'match': '(?i)\\bdba_(sync|handlers|nextkey|close|insert|op(timize|en)|delete|popen|exists|key_split|f(irstkey|etch)|list|replace)\\b'
+        'match': '(?i)\\bdba_(sync|handlers|nextkey|close|insert|optimize|open|delete|popen|exists|key_split|firstkey|fetch|list|replace)\\b'
         'name': 'support.function.dba.php'
       }
       {
-        'match': '(?i)\\bdbx_(sort|c(o(nnect|mpare)|lose)|e(scape_string|rror)|query|fetch_row)\\b'
+        'match': '(?i)\\bdbx_(sort|connect|compare|close|escape_string|error|query|fetch_row)\\b'
         'name': 'support.function.dbx.php'
       }
       {
-        'match': '(?i)\\b(scandir|c(h(dir|root)|losedir)|opendir|dir|re(winddir|addir)|getcwd)\\b'
+        'match': '(?i)\\b(scandir|chdir|chroot|closedir|opendir|dir|rewinddir|readdir|getcwd)\\b'
         'name': 'support.function.dir.php'
       }
       {
-        'match': '(?i)\\beio_(s(y(nc(_file_range|fs)?|mlink)|tat(vfs)?|e(ndfile|t_m(in_parallel|ax_(idle|p(oll_(time|reqs)|arallel)))|ek))|n(threads|op|pending|re(qs|ady))|c(h(own|mod)|ustom|lose|ancel)|truncate|init|open|dup2|u(nlink|time)|poll|event_loop|f(s(ync|tat(vfs)?)|ch(own|mod)|truncate|datasync|utime|allocate)|write|l(stat|ink)|r(e(name|a(d(dir|link|ahead)?|lpath))|mdir)|g(et_(event_stream|last_error)|rp(_(cancel|limit|add))?)|mk(nod|dir)|busy)\\b'
+        'match': '''(?xi)
+          \\b
+          eio_(
+            sync(_(file_range|fs))?|symlink|stat(vfs)?|sendfile|set_min_parallel|set_max_(idle|poll_(reqs|time)|parallel)|
+            seek|n(threads|op|pending|reqs|ready)|chown|chmod|custom|close|cancel|truncate|init|open|dup2|unlink|time|poll|
+            event_loop|f(sync|stat(vfs)?|chown|chmod|truncate|datasync|utime|allocate)|write|lstat|link|rename|
+            read(ahead|dir|link)?|rmdir|get_(event_stream|last_error)|grp(_(add|cancel|limit))?|mknod|mkdir|busy
+          )\\b
+        '''
         'name': 'support.function.eio.php'
       }
       {
-        'match': '(?i)\\benchant_(dict_(s(tore_replacement|uggest)|check|is_in_session|describe|quick_check|add_to_(session|personal)|get_error)|broker_(set_ordering|init|d(ict_exists|escribe)|free(_dict)?|list_dicts|request_(dict|pwl_dict)|get_error))\\b'
+        'match': '''(?xi)
+          \\b
+          enchant_(
+            dict_(store_replacement|suggest|check|is_in_session|describe|quick_check|add_to_(personal|session)|get_error)|
+            broker_(set_ordering|init|dict_exists|describe|free(_dict)?|list_dicts|request_(pwl_)?dict|get_error)
+          )\\b
+        '''
         'name': 'support.function.enchant.php'
       }
       {
-        'match': '(?i)\\b(s(plit(i)?|ql_regcase)|ereg(i(_replace)?|_replace)?)\\b'
+        'match': '(?i)\\bsplit(i)?|sql_regcase|ereg(i)?(_replace)?\\b'
         'name': 'support.function.ereg.php'
       }
       {
-        'match': '(?i)\\b(set_e(rror_handler|xception_handler)|trigger_error|debug_(print_backtrace|backtrace)|user_error|error_(log|reporting|get_last)|restore_e(rror_handler|xception_handler))\\b'
+        'match': '(?i)\\b((restore|set)_(error_handler|exception_handler)|trigger_error|debug_(print_)?backtrace|user_error|error_(log|reporting|get_last))\\b'
         'name': 'support.function.errorfunc.php'
       }
       {
-        'match': '(?i)\\b(s(hell_exec|ystem)|p(assthru|roc_(nice|close|terminate|open|get_status))|e(scapeshell(cmd|arg)|xec))\\b'
+        'match': '(?i)\\bshell_exec|system|passthru|proc_(nice|close|terminate|open|get_status)|escapeshell(arg|cmd)|exec\\b'
         'name': 'support.function.exec.php'
       }
       {
-        'match': '(?i)\\b(exif_(t(humbnail|agname)|imagetype|read_data)|read_exif_data)\\b'
+        'match': '(?i)\\b(exif_(thumbnail|tagname|imagetype|read_data)|read_exif_data)\\b'
         'name': 'support.function.exif.php'
       }
       {
