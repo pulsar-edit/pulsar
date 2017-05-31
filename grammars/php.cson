@@ -2474,11 +2474,45 @@
         'name': 'support.function.exif.php'
       }
       {
-        'match': '(?i)\\bfann_(s(huffle_train_data|cale_(train(_data)?|input(_train_data)?|output(_train_data)?)|ubset_train_data|et_(s(caling_params|arprop_(step_error_(shift|threshold_factor)|temperature|weight_decay_shift))|ca(scade_(num_candidate_groups|candidate_(stagnation_epochs|change_fraction|limit)|output_(stagnation_epochs|change_fraction)|weight_multiplier|activation_(steepnesses|functions)|m(in_(cand_epochs|out_epochs)|ax_(cand_epochs|out_epochs)))|llback)|train(ing_algorithm|_(stop_function|error_function))|input_scaling_params|output_scaling_params|error_log|quickprop_(decay|mu)|weight(_array)?|learning_(rate|momentum)|activation_(steepness(_(hidden|output|layer))?|function(_(hidden|output|layer))?)|rprop_(increase_factor|de(crease_factor|lta_(zero|m(in|ax))))|bit_fail_limit)|ave(_train)?)|num_(input_train_data|output_train_data)|c(opy|lear_scaling_params|ascadetrain_on_(data|file)|reate_(s(hortcut(_array)?|tandard(_array)?|parse(_array)?)|train(_from_callback)?|from_file))|t(est(_data)?|rain(_(on_(data|file)|epoch))?)|init_weights|d(uplicate_train_data|es(cale_(train|input|output)|troy(_train)?))|print_error|length_train_data|r(un|e(set_(MSE|err(str|no))|ad_train_from_file)|andomize_weights)|get_(sarprop_(step_error_(shift|threshold_factor)|temperature|weight_decay_shift)|n(um_(input|output|layers)|etwork_type)|MSE|c(onnection_(array|rate)|ascade_(num_candidate(s|_groups)|candidate_(stagnation_epochs|change_fraction|limit)|output_(stagnation_epochs|change_fraction)|weight_multiplier|activation_(steepnesses(_count)?|functions(_count)?)|m(in_(cand_epochs|out_epochs)|ax_(cand_epochs|out_epochs))))|t(otal_(neurons|connections)|rain(ing_algorithm|_(stop_function|error_function)))|err(str|no)|quickprop_(decay|mu)|l(earning_(rate|momentum)|ayer_array)|activation_(steepness|function)|rprop_(increase_factor|de(crease_factor|lta_(zero|m(in|ax))))|bi(t_fail(_limit)?|as_array))|merge_train_data)\\b'
+        'match': '''(?xi)
+          \\b
+          fann_(
+            (duplicate|length|merge|shuffle|subset)_train_data|scale_(train(_data)?|(input|output)(_train_data)?)|
+            set_(scaling_params|sarprop_(step_error_(shift|threshold_factor)|temperature|weight_decay_shift)|
+                 cascade_(num_candidate_groups|candidate_(change_fraction|limit|stagnation_epochs)|
+                          output_(change_fraction|stagnation_epochs)|weight_multiplier|activation_(functions|steepnesses)|
+                          (max|min)_(cand|out)_epochs)|
+                 callback|training_algorithm|train_(error|stop)_function|(input|output)_scaling_params|error_log|
+                 quickprop_(decay|mu)|weight(_array)?|learning_(momentum|rate)|bit_fail_limit|
+                 activation_(function|steepness)(_(hidden|layer|output))?|
+                 rprop_((decrease|increase)_factor|delta_(max|min|zero)))|
+            save(_train)?|num_(input|output)_train_data|copy|clear_scaling_params|cascadetrain_on_(file|data)|
+            create_((parse|shortcut|standard)(_array)?|train(_from_callback)?|from_file)|
+            test(_data)?|train(_(on_(file|data)|epoch))?|init_weights|descale_(input|output|train)|destroy(_train)?|
+            print_error|run|reset_(MSE|err(no|str))|read_train_from_file|randomize_weights|
+            get_(sarprop_(step_error_(shift|threshold_factor)|temperature|weight_decay_shift)|num_(input|output|layers)|
+                 network_type|MSE|connection_(array|rate)|bias_array|bit_fail_limit|
+                 cascade_(num_(candidates|candidate_groups)|(candidate|output)_(change_fraction|limit|stagnation_epochs)|
+                          weight_multiplier|activation_(functions|steepnesses)(_count)?|(max|min)_(cand|out)_epochs)|
+                 total_(connections|neurons)|training_algorithm|train_(error|stop)_function|err(no|str)|
+                 quickprop_(decay|mu)|learning_(momentum_rate)|layer_array|activation_(function|steepness)|
+                 rprop_((decrease|increase)_factor|delta_(max|min|zero)))
+          )\\b
+        '''
         'name': 'support.function.fann.php'
       }
       {
-        'match': '(?i)\\b(s(ymlink|tat|et_file_buffer)|c(h(own|grp|mod)|opy|learstatcache)|t(ouch|empnam|mpfile)|is_(dir|uploaded_file|executable|file|writ(eable|able)|link|readable)|d(i(sk(_(total_space|free_space)|freespace)|rname)|elete)|u(nlink|mask)|p(close|open|a(thinfo|rse_ini_(string|file)))|f(s(canf|tat|eek)|nmatch|close|t(ell|runcate)|ile(size|ctime|type|inode|owner|_(put_contents|exists|get_contents)|perms|atime|group|mtime)?|open|p(ut(s|csv)|assthru)|eof|flush|write|lock|read|get(s(s)?|c(sv)?))|l(stat|ch(own|grp)|ink(info)?)|r(e(name|wind|a(d(file|link)|lpath(_cache_(size|get))?))|mdir)|glob|m(ove_uploaded_file|kdir)|basename)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            symlink|stat|set_file_buffer|chown|chgrp|chmod|copy|clearstatcache|touch|tempnam|tempfile|
+            is_(dir|(uploaded_)?file|executable|link|readable|writ(e)?able)|disk_(free|total)_space|diskfreespace|
+            dirname|delete|unlink|umask|pclose|popen|pathinfo|parse_ini_(file|string)|fscanf|fstat|fseek|fnmatch|
+            fclose|ftell|ftruncate|file(size|[acm]time|type|inode|owner|perms|group)?|file_(exists|(get|put)_contents)|
+            open|puts|putcsv|passthru|eof|flush|write|lock|read|gets(s)?|getc(sv)?|lstat|lchown|lgrp|link(info)?|
+            rename|rewind|read(file|link)|relpath(_cache_(get|size))?|rmdir|glob|move_uploaded_file|mkdir|basename
+          )\\b
+        '''
         'name': 'support.function.file.php'
       }
       {
@@ -2486,7 +2520,7 @@
         'name': 'support.function.fileinfo.php'
       }
       {
-        'match': '(?i)\\bfilter_(has_var|i(nput(_array)?|d)|var(_array)?|list)\\b'
+        'match': '(?i)\\bfilter_(has_var|input(_array)?|id|var(_array)?|list)\\b'
         'name': 'support.function.filter.php'
       }
       {
@@ -2494,19 +2528,26 @@
         'name': 'support.function.fpm.php'
       }
       {
-        'match': '(?i)\\b(c(all_user_func(_array)?|reate_function)|unregister_tick_function|f(orward_static_call(_array)?|unc(tion_exists|_(num_args|get_arg(s)?)))|register_(shutdown_function|tick_function)|get_defined_functions)\\b'
+        'match': '(?i)\\b(call_user_func(_array)?|create_function|unregister_tick_function|forward_static_call(_array)?|function_exists|func_(num_args|get_arg(s)?)|register_(shutdown|tick)_function|get_defined_functions)\\b'
         'name': 'support.function.funchand.php'
       }
       {
-        'match': '(?i)\\b(ngettext|textdomain|d(ngettext|c(ngettext|gettext)|gettext)|gettext|bind(textdomain|_textdomain_codeset))\\b'
+        'match': '(?i)\\b((n)?gettext|textdomain|d((n)?gettext|c(n)?gettext)|bind(textdomain|_textdomain_codeset))\\b'
         'name': 'support.function.gettext.php'
       }
       {
-        'match': '(?i)\\bgmp_(s(can(1|0)|trval|ign|ub|etbit|qrt(rem)?)|hamdist|ne(g|xtprime)|c(om|lrbit|mp)|testbit|i(n(tval|it|vert)|mport)|or|div(_(q(r)?|r)|exact)?|jacobi|p(o(pcount|w(m)?)|erfect_square|rob_prime)|export|fact|legendre|a(nd|dd|bs)|r(oot(rem)?|andom(_(range|bits))?)|gcd(ext)?|xor|m(od|ul))\\b'
+        'match': '''(?xi)
+          \\b
+          gmp_(
+            scan[01]|strval|sign|sub|setbit|sqrt(rem)?|hamdist|neg|nextprime|com|clrbit|cmp|testbit|
+            intval|init|invert|import|or|div(_(q)?r|exact)?|jacobi|popcount|pow(m)?|perfect_square|
+            prob_prime|export|fact|legendre|and|add|abs|root(rem)?|random(_(bits|range))?|gcd(ext)?|xor|mod|mul
+          )\\b
+        '''
         'name': 'support.function.gmp.php'
       }
       {
-        'match': '(?i)\\bhash(_(hmac(_file)?|copy|init|update(_(stream|file))?|pbkdf2|equals|fi(nal|le)|algos))?\\b'
+        'match': '(?i)\\bhash(_(hmac(_file)?|copy|init|update(_(file|stream))?|pbkdf2|equals|file|final|algos))?\\b'
         'name': 'support.function.hash.php'
       }
       {
