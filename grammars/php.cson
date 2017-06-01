@@ -2551,15 +2551,25 @@
         'name': 'support.function.hash.php'
       }
       {
-        'match': '(?i)\\b(http_(s(upport|end_(st(atus|ream)|content_(type|disposition)|data|file|last_modified))|head|negotiate_(c(harset|ontent_type)|language)|c(hunked_decode|ache_(etag|last_modified))|throttle|inflate|d(eflate|ate)|p(ost_(data|fields)|ut_(stream|data|file)|ersistent_handles_(c(ount|lean)|ident)|arse_(headers|cookie|params|message))|re(direct|quest(_(method_(name|unregister|exists|register)|body_encode))?)|get(_request_(headers|body(_stream)?))?|match_(etag|request_header|modified)|build_(str|cookie|url))|ob_(inflatehandler|deflatehandler|etaghandler))\\b'
+        'match': '''(?xi)
+          \\b
+          http_(
+            support|send_(status|stream)|content_(disposition|type)|data|file|last_modified|head|
+            negotiate_(charset|content_type|language)|chunked_decode|cache_(etag|last_modified)|throttle|
+            inflate|deflate|date|post_(data|fields)|put_(data|file|stream)|persistent_handles_(count|clean|ident)|
+            parse_(cookie|headers|message|params)|redirect|request(_method_(exists|name|(un)?register)|body_encode)?|
+            get(_request_(headers|body(_stream)?))?|match_(etag|modified|request_header)|build_(cookie|str|url)|
+            ob_(etag|deflate|inflate)handler
+          )\\b
+        '''
         'name': 'support.function.http.php'
       }
       {
-        'match': '(?i)\\b(iconv(_(s(tr(pos|len|rpos)|ubstr|et_encoding)|get_encoding|mime_(decode(_headers)?|encode)))?|ob_iconv_handler)\\b'
+        'match': '(?i)\\b(iconv(_(str(pos|len|rpos)|substr|(get|set)_encoding|mime_(decode(_headers)?|encode)))?|ob_iconv_handler)\\b'
         'name': 'support.function.iconv.php'
       }
       {
-        'match': '(?i)\\biis_(s(t(op_serv(ice|er)|art_serv(ice|er))|et_(s(cript_map|erver_rights)|dir_security|app_settings))|add_server|remove_server|get_(s(cript_map|erv(ice_state|er_(rights|by_(comment|path))))|dir_security))\\b'
+        'match': '(?i)\\biis_((start|stop)_(service|server)|set_(script_map|server_rights|dir_security|app_settings)|(add|remove)_server|get_(script_map|service_state|server_(rights|by_(comment|path))|dir_security))\\b'
         'name': 'support.function.iisfunc.php'
       }
       {
