@@ -2678,11 +2678,31 @@
         'name': 'support.function.math.php'
       }
       {
-        'match': '(?i)\\bmb_(s(tr(str|cut|to(upper|lower)|i(str|pos|mwidth)|pos|width|len|r(chr|i(chr|pos)|pos))|ubst(itute_character|r(_count)?)|plit|end_mail)|http_(input|output)|c(heck_encoding|onvert_(case|encoding|variables|kana))|internal_encoding|output_handler|de(code_(numericentity|mimeheader)|tect_(order|encoding))|p(arse_str|referred_mime_name)|e(ncod(ing_aliases|e_(numericentity|mimeheader))|reg(i(_replace)?|_(search(_(setpos|init|pos|regs|get(pos|regs)))?|replace(_callback)?|match))?)|l(ist_encodings|anguage)|regex_(set_options|encoding)|get_info)\\b'
+        'match': '''(?xi)
+          \\b
+          mb_(
+            str(cut|str|to(lower|upper)|istr|ipos|imwidth|pos|width|len|rchr|richr|ripos|rpos)|
+            substitute_character|substr(_count)?|split|send_mail|http_(input|output)|check_encoding|
+            convert_(case|encoding|kana|variables)|internal_encoding|output_handler|decode_(numericentity|mimeheader)|
+            detect_(encoding|order)|parse_str|preferred_mime_name|encoding_aliases|encode_(numericentity|mimeheader)|
+            ereg(i(_replace)?)?|ereg_(search(_(get(pos|regs)|init|regs|(set)?pos))?|replace(_callback)?|match)|
+            list_encodings|language|regex_(set_options|encoding)|get_info
+          )\\b
+        '''
         'name': 'support.function.mbstring.php'
       }
       {
-        'match': '(?i)\\bm(crypt_(c(fb|reate_iv|bc)|ofb|decrypt|e(nc(_(self_test|is_block_(algorithm(_mode)?|mode)|get_(supported_key_sizes|iv_size|key_size|algorithms_name|modes_name|block_size))|rypt)|cb)|list_(algorithms|modes)|ge(neric(_(init|deinit|end))?|t_(cipher_name|iv_size|key_size|block_size))|module_(self_test|close|is_block_(algorithm(_mode)?|mode)|open|get_(supported_key_sizes|algo_(key_size|block_size))))|decrypt_generic)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            mcrypt_(
+              cfb|create_iv|cbc|ofb|decrypt|encrypt|ecb|list_(algorithms|modes)|generic(_((de)?init|end))?
+              enc_(self_test|is_block_(algorithm_)?mode|get_(supported_key_sizes|(block|iv|key)_size|(algorithms|modes)_name))|
+              get_(cipher_name|(block|iv|key)_size)|
+              module_(close|self_test|is_block_(algorithm_)?mode|open|get_(supported_key_sizes|algo_(block|key)_size)))|
+            mdecrypt_generic
+          )\\b
+        '''
         'name': 'support.function.mcrypt.php'
       }
       {
@@ -2698,7 +2718,16 @@
         'name': 'support.function.mongo.php'
       }
       {
-        'match': '(?i)\\bmysql_(s(tat|e(t_charset|lect_db))|num_(fields|rows)|c(onnect|l(ient_encoding|ose)|reate_db)|t(hread_id|ablename)|in(sert_id|fo)|d(ata_seek|rop_db|b_(name|query))|unbuffered_query|p(connect|ing)|e(scape_string|rr(no|or))|query|f(ield_(seek|name|t(ype|able)|flags|len)|etch_(object|field|lengths|a(ssoc|rray)|row)|ree_result)|list_(tables|dbs|processes|fields)|affected_rows|re(sult|al_escape_string)|get_(server_info|host_info|client_info|proto_info))\\b'
+        'match': '''(?xi)
+          \\b
+          mysql_(
+            stat|state_charset|select_db|num_(fields|rows)|connect|client_encoding|close|create_db|escape_string|
+            thread_id|tablename|insert_id|info|data_seek|drop_db|db_(name|query)|unbuffered_query|pconnect|ping|
+            errno|error|query|field_(seek|name|type|table|flags|len)|fetch_(object|field|lengths|assoc|array|row)|
+            free_result|list_(tables|dbs|processes|fields)|affected_rows|result|real_escape_string|
+            get_(client|host|proto|server)_info
+          )\\b
+        '''
         'name': 'support.function.mysql.php'
       }
       {
