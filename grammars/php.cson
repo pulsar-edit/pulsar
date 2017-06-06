@@ -2731,7 +2731,23 @@
         'name': 'support.function.mysql.php'
       }
       {
-        'match': '(?i)\\bmysqli_(s(sl_set|t(ore_result|at|mt_(s(tore_result|end_long_data)|next_result|close|init|data_seek|prepare|execute|f(etch|ree_result)|attr_(set|get)|res(ult_metadata|et)|get_(warnings|result)|more_results|bind_(param|result)))|e(nd_(query|long_data)|t_(charset|opt|local_infile_(handler|default))|lect_db)|lave_query|avepoint)|next_result|c(ha(nge_user|racter_set_name)|o(nnect|mmit)|l(ient_encoding|ose))|thread_safe|init|options|d(isable_r(pl_parse|eads_from_master)|ump_debug_info|ebug|ata_seek)|use_result|p(ing|oll|aram_count|repare)|e(scape_string|nable_r(pl_parse|eads_from_master)|xecute|mbedded_server_(start|end))|kill|query|f(ield_seek|etch(_(object|field(s|_direct)?|a(ssoc|ll|rray)|row))?|ree_result)|autocommit|r(ollback|pl_(p(arse_enabled|robe)|query_type)|e(port|fresh|lease_savepoint|a(p_async_query|l_(connect|escape_string|query))))|get_(c(harset|onnection_stats|lient_(stats|info|version)|ache_stats)|warnings|links_stats|metadata)|m(ore_results|ulti_query|aster_query)|b(ind_(param|result)|egin_transaction))\\b'
+        'match': '(?i)\\bmysqli_(m(ore_results|ulti_query|aster_query)|b(ind_(param|result)|egin_transaction))\\b'
+        'match': '''(?xi)
+          \\b
+          mysqli_(
+            ssl_set|store_result|stat|send_(query|long_data)|set_(charset|opt|local_infile_(default|handler))
+            stmt_(store_result|send_long_data|next_result|close|init|data_seek|prepare|execute|fetch|free_result|
+                  attr_(get|set)|result_metadata|reset|get_(result|warnings)|more_results|bind_(param|result))|
+            select_db|slave_query|savepoint|next_result|change_user|character_set_name|connect|commit|
+            client_encoding|close|thread_safe|init|options|(enable|disable)_(reads_from_master|rpl_parse)|
+            dump_debug_info|debug|data_seek|use_result|ping|poll|param_count|prepare|escape_string|execute|
+            embedded_server_(start|end)|kill|query|field_seek|free_result|autocommit|rollback|report|refresh|
+            fetch(_(object|fields|field(_direct)?|assoc|all|array|row))?|rpl_(parse_enabled|probe|query_type)|
+            release_savepoint|reap_async_query|real_(connect|escape_string|query)|more_results|multi_query|
+            get_(charset|connection_stats|client_(stats|info|version)|cache_stats|warnings|links_stats|metadata)|
+            master_query|bind_(param|result)|begin_transaction
+          )\\b
+        '''
         'name': 'support.function.mysqli.php'
       }
       {
@@ -2743,23 +2759,46 @@
         'name': 'support.function.mysqlnd-ms.php'
       }
       {
-        'match': '(?i)\\bmysqlnd_qc_(set_(storage_handler|cache_condition|is_select|user_handlers)|clear_cache|get_(normalized_query_trace_log|c(ore_stats|ache_info)|query_trace_log|available_handlers))\\b'
+        'match': '(?i)\\bmysqlnd_qc_(set_(storage_handler|cache_condition|is_select|user_handlers)|clear_cache|get_(normalized_query_trace_log|core_stats|cache_info|query_trace_log|available_handlers))\\b'
         'name': 'support.function.mysqlnd-qc.php'
       }
       {
-        'match': '(?i)\\bmysqlnd_uh_(set_(statement_proxy|connection_proxy)|convert_to_mysqlnd)\\b'
+        'match': '(?i)\\bmysqlnd_uh_(set_(statement|connection)_proxy|convert_to_mysqlnd)\\b'
         'name': 'support.function.mysqlnd-uh.php'
       }
       {
-        'match': '(?i)\\b(s(yslog|ocket_(set_(timeout|blocking)|get_status)|et(cookie|rawcookie))|h(ttp_response_code|eader(s_(sent|list)|_re(gister_callback|move))?)|c(heckdnsrr|loselog)|i(net_(ntop|pton)|p2long)|openlog|d(ns_(check_record|get_(record|mx))|efine_syslog_variables)|pfsockopen|fsockopen|long2ip|get(servby(name|port)|host(name|by(name(l)?|addr))|protobyn(umber|ame)|mxrr))\\b'
+        'match': '(?i)\\b(pfsockopen|fsockopen|long2ip|get(protobyn(umber|ame)|mxrr))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            syslog|socket_(set_(blocking|timeout)|get_status)|set(raw)?cookie|http_response_code|openlog|
+            headers_(list|sent)|header(_(register_callback|remove))?|checkdnsrr|closelog|inet_(ntop|pton)|ip2long|
+            openlog|dns_(check_record|get_(record|mx))|define_syslog_variables|(p)?fsockopen|long2ip|
+            get(servby(name|port)|host(name|by(name(l)?|addr))|protoby(name|number)|mxrr)
+          )\\b
+        '''
         'name': 'support.function.network.php'
       }
       {
-        'match': '(?i)\\bnsapi_(virtual|re(sponse_headers|quest_headers))\\b'
+        'match': '(?i)\\bnsapi_(virtual|response_headers|request_headers)\\b'
         'name': 'support.function.nsapi.php'
       }
       {
-        'match': '(?i)\\boci(s(tatementtype|e(tprefetch|rverversion)|avelob(file)?)|n(umcols|ew(c(ollection|ursor)|descriptor)|logon)|c(o(l(umn(s(cale|ize)|name|type(raw)?|isnull|precision)|l(size|trim|a(ssign(elem)?|ppend)|getelem|max))|mmit)|loselob|ancel)|internaldebug|definebyname|_(s(tatement_type|e(t_(client_i(nfo|dentifier)|prefetch|edition|action|module_name)|rver_version))|n(um_(fields|rows)|ew_(c(o(nnect|llection)|ursor)|descriptor))|c(o(nnect|mmit)|l(ient_version|ose)|ancel)|internal_debug|define_by_name|p(connect|a(ssword_change|rse))|e(rror|xecute)|f(ield_(s(cale|ize)|name|type(_raw)?|is_null|precision)|etch(_(object|a(ssoc|ll|rray)|row))?|ree_(statement|descriptor))|lob_(copy|is_equal)|r(ollback|esult)|get_implicit_resultset|bind_(array_by_name|by_name))|p(logon|arse)|e(rror|xecute)|f(etch(statement|into)?|ree(statement|c(ollection|ursor)|desc))|write(temporarylob|lobtofile)|lo(adlob|go(n|ff))|r(o(wcount|llback)|esult)|bindbyname)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            oci(statementtype|setprefetch|serverversion|savelob(file)?|numcols|new(collection|cursor|descriptor)|nlogon|
+                column(scale|size|name|type(raw)?|isnull|precision)|coll(size|trim|assign(elem)?|append|getelem|max)|commit|
+                closelob|cancel|internaldebug|definebyname|plogon|parse|error|execute|fetch(statement|into)?|
+                free(statement|collection|cursor|desc)|write(temporarylob|lobtofile)|loadlob|log(on|off)|rowcount|rollback|
+                result|bindbyname)|
+            oci_(statement_type|set_(client_(info|identifier)|prefetch|edition|action|module_name)|server_version|
+                 num_(fields|rows)|new_(connect|collection|cursor|descriptor)|connect|commit|client_version|close|cancel|
+                 internal_debug|define_by_name|pconnect|password_change|parse|error|execute|bind_(array_)?by_name|
+                 field_(scale|size|name|type(_raw)?|is_null|precision)|fetch(_(object|assoc|all|array|row))?|
+                 free_(statement|descriptor)|lob_(copy|is_equal)|rollback|result|get_implicit_resultset)
+          )\\b
+        '''
         'name': 'support.function.oci8.php'
       }
       {
