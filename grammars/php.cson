@@ -2509,7 +2509,7 @@
             is_(dir|(uploaded_)?file|executable|link|readable|writ(e)?able)|disk_(free|total)_space|diskfreespace|
             dirname|delete|unlink|umask|pclose|popen|pathinfo|parse_ini_(file|string)|fscanf|fstat|fseek|fnmatch|
             fclose|ftell|ftruncate|file(size|[acm]time|type|inode|owner|perms|group)?|file_(exists|(get|put)_contents)|
-            open|puts|putcsv|passthru|eof|flush|write|lock|read|gets(s)?|getc(sv)?|lstat|lchown|lgrp|link(info)?|
+            open|puts|putcsv|passthru|eof|fflush|write|lock|read|gets(s)?|getc(sv)?|lstat|lchown|lgrp|link(info)?|
             rename|rewind|read(file|link)|relpath(_cache_(get|size))?|rmdir|glob|move_uploaded_file|mkdir|basename
           )\\b
         '''
