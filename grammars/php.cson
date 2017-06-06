@@ -2806,11 +2806,28 @@
         'name': 'support.function.opcache.php'
       }
       {
-        'match': '(?i)\\bopenssl_(s(ign|pki_(new|export(_challenge)?|verify)|eal)|c(sr_(sign|new|export(_to_file)?|get_(subject|public_key))|ipher_iv_length)|open|d(h_compute_key|igest|ecrypt)|p(ublic_(decrypt|encrypt)|k(cs(12_(export(_to_file)?|read)|7_(sign|decrypt|encrypt|verify))|ey_(new|export(_to_file)?|free|get_(details|p(ublic|rivate))))|rivate_(decrypt|encrypt)|bkdf2)|e(ncrypt|rror_string)|verify|free_key|random_pseudo_bytes|get_(c(ipher_methods|ert_locations)|p(ublickey|rivatekey)|md_methods)|x509_(check(_private_key|purpose)|parse|export(_to_file)?|f(ingerprint|ree)|read))\\b'
+        'match': '''(?xi)
+          \\b
+          openssl_(
+            sign|pki_(new|export(_challenge)?|verify)|seal|csr_(sign|new|export(_to_file)?|get_(subject|public_key))|
+            cipher_iv_length|open|dh_compute_key|digest|encrypt|public_(decrypt|encrypt)|encrypt|error_string|
+            pkcs12_(export(_to_file)?|read)|pkcs7_(sign|decrypt|encrypt|verify)|verify|free_key|random_pseudo_bytes|
+            pkey_(new|export(_to_file)?|free|get_(details|public|private))|private_(decrypt|encrypt)|pbkdf2|
+            get_((cipher|md)_methods|cert_locations|(public|private)key)|
+            x509_(check_private_key|checkpurpose|parse|export(_to_file)?|fingerprint|free|read)
+          )\\b
+        '''
         'name': 'support.function.openssl.php'
       }
       {
-        'match': '(?i)\\b(o(utput_(add_rewrite_var|reset_rewrite_vars)|b_(start|clean|implicit_flush|end_(clean|flush)|flush|list_handlers|g(zhandler|et_(status|c(ontents|lean)|flush|le(ngth|vel)))))|flush)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            output_(add_rewrite_var|reset_rewrite_vars)|flush|
+            ob_(start|clean|implicit_flush|end_(clean|flush)|flush|list_handlers|gzhandler|get_(status|contents|clean|
+                flush|length|level))
+          )\\b
+        '''
         'name': 'support.function.output.php'
       }
       {
@@ -2818,7 +2835,13 @@
         'name': 'support.function.password.php'
       }
       {
-        'match': '(?i)\\bpcntl_(s(trerror|ig(nal(_dispatch)?|timedwait|procmask|waitinfo)|etpriority)|e(rrno|xec)|fork|w(stopsig|termsig|if(s(topped|ignaled)|exited)|exitstatus|ait(pid)?)|alarm|get(_last_error|priority))\\b'
+        'match': '''(?xi)
+          \\b
+          pcntl_(
+            strerror|signal(_dispatch)?|sig(timedwait|procmask|waitinfo)|setpriority|errno|exec|fork|
+            w(stopsig|termsig|if(stopped|signaled|exited))|wait(pid)?|alarm|getpriority|get_last_error
+          )\\b
+        '''
         'name': 'support.function.pcntl.php'
       }
       {
