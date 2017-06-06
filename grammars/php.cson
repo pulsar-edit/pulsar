@@ -2845,11 +2845,23 @@
         'name': 'support.function.pcntl.php'
       }
       {
-        'match': '(?i)\\bpg_(s(ocket|e(nd_(prepare|execute|query(_params)?)|t_(client_encoding|error_verbosity)|lect))|host|num_(fields|rows)|c(o(n(sume_input|nect(ion_(status|reset|busy)|_poll)?|vert)|py_(to|from))|l(ient_encoding|ose)|ancel_query)|t(ty|ra(nsaction_status|ce))|insert|options|d(elete|bname)|u(n(trace|escape_bytea)|pdate)|p(connect|ing|ort|ut_line|arameter_status|repare)|e(scape_(string|identifier|literal|bytea)|nd_copy|xecute)|version|query(_params)?|f(ield_(size|n(um|ame)|t(ype(_oid)?|able)|is_null|prtlen)|etch_(object|a(ssoc|ll(_columns)?|rray)|r(ow|esult))|lush|ree_result)|l(o_(seek|c(lose|reate)|t(ell|runcate)|import|open|unlink|export|write|read(_all)?)|ast_(notice|oid|error))|affected_rows|result_(s(tatus|eek)|error(_field)?)|get_(notify|pid|result)|meta_data)\\b'
+        'match': '''(?xi)
+          \\b
+          pg_(
+            socket|send_(prepare|execute|query(_params)?)|set_(client_encoding|error_verbosity)|select|host|
+            num_(fields|rows)|consume_input|connection_(status|reset|busy)|connect(_poll)?|convert|copy_(from|to)|
+            client_encoding|close|cancel_query|tty|transaction_status|trace|insert|options|delete|dbname|untrace|
+            unescape_bytes|update|pconnect|ping|port|put_line|parameter_status|prepare|version|query(_params)?|
+            escape_(string|identifier|literal|bytea)|end_copy|execute|flush|free_result|last_(notice|error|oid)|
+            field_(size|num|name|type(_oid)?|table|is_null|prtlen)|affected_rows|result_(status|seek|error(_field)?)|
+            fetch_(object|assoc|all(_columns)?|array|row|result)|get_(notify|pid|result)|meta_data|
+            lo_(seek|close|create|tell|truncate|import|open|unlink|export|write|read(_all)?)|
+          )\\b
+        '''
         'name': 'support.function.pgsql.php'
       }
       {
-        'match': '(?i)\\b(virtual|apache_(setenv|note|child_terminate|lookup_uri|re(s(ponse_headers|et_timeout)|quest_headers)|get(_(version|modules)|env))|getallheaders)\\b'
+        'match': '(?i)\\b(virtual|apache_((get|set)env|note|child_terminate|lookup_uri|response_headers|reset_timeout|request_headers|getallheaders|get_(version|modules)))\\b'
         'name': 'support.function.php_apache.php'
       }
       {
@@ -2857,15 +2869,38 @@
         'name': 'support.function.php_dom.php'
       }
       {
-        'match': '(?i)\\bftp_(s(sl_connect|ystype|i(te|ze)|et_option)|n(list|b_(continue|put|f(put|get)|get))|c(h(dir|mod)|onnect|dup|lose)|delete|p(ut|wd|asv)|exec|quit|f(put|get)|login|alloc|r(ename|aw(list)?|mdir)|get(_option)?|m(dtm|kdir))\\b'
+        'match': '''(?xi)
+          \\b
+          ftp_(
+            ssl_connect|systype|site|size|set_option|nlist|nb_(continue|f?(put|get))|ch(dir|mod)|connect|cdup|close|
+            delete|put|pwd|pasv|exec|quit|f(put|get)|login|alloc|rename|raw(list)?|rmdir|get(_option)?|mdtm|mkdir
+          )\\b
+        '''
         'name': 'support.function.php_ftp.php'
       }
       {
-        'match': '(?i)\\bimap_(s(can(mailbox)?|tatus|ort|ubscribe|e(t(_quota|flag_full|acl)|arch)|avebody)|header(s|info)?|num_(recent|msg)|c(heck|l(ose|earflag_full)|reate(mailbox)?)|t(hread|imeout)|open|delete(mailbox)?|8bit|u(n(subscribe|delete)|tf(7_(decode|encode)|8)|id)|ping|e(rrors|xpunge)|qprint|fetch(structure|header|text|_overview|mime|body)|l(sub|ist(s(can|ubscribed)|mailbox)?|ast_error)|a(ppend|lerts)|r(e(name(mailbox)?|open)|fc822_(parse_(headers|adrlist)|write_address))|g(c|et(subscribed|_quota(root)?|acl|mailboxes))|m(sgno|ime_header_decode|ail(_(co(py|mpose)|move)|boxmsginfo)?)|b(inary|ody(struct)?|ase64))\\b'
+        'match': '''(?xi)
+          \\b
+          imap_(
+            (create|delete|list|rename|scan)(mailbox)?|status|sort|subscribe|set_(quota|flag_full|acl)|setarch|savebody|
+            num_(recent|msg)|check|close|clearflag_full|thread|timeout|open|header(info)?|headers|append|alerts|reopen|
+            8bit|unsubscribe|undelete|utf7_(decode|encode)|utf8|uid|ping|errors|expunge|qprint|gc
+            fetch(structure|header|text|mime|body)|fetch_overview|lsub|list(scan|subscribed)|last_error|
+            rfc822_(parse_(headers|adrlist)|write_address)|get(subscribed|acl|mailboxes)|get_quota(root)?|
+            msgno|mime_header_decode|mail_(copy|compose|move)|mail|mailboxmsginfo|binary|body(struct)?|base64
+          )\\b
+        '''
         'name': 'support.function.php_imap.php'
       }
       {
-        'match': '(?i)\\bmssql_(select_db|n(um_(fields|rows)|ext_result)|c(onnect|lose)|init|data_seek|pconnect|execute|query|f(ield_(seek|name|type|length)|etch_(object|field|a(ssoc|rray)|row|batch)|ree_(statement|result))|r(ows_affected|esult)|g(uid_string|et_last_message)|min_(error_severity|message_severity)|bind)\\b'
+        'match': '''(?xi)
+          \\b
+          mssql_(
+            select_db|num_(fields|rows)|next_result|connect|close|init|data_seek|pconnect|execute|query|
+            field_(seek|name|type|length)|fetch_(object|field|assoc|array|row|batch)|free_(statement|result)|
+            rows_affected|result|guid_string|get_last_message|min_(error|message)_severity|bind
+          )\\b
+        '''
         'name': 'support.function.php_mssql.php'
       }
       {
