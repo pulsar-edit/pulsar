@@ -3045,19 +3045,64 @@
         'name': 'support.function.sqlsrv.php'
       }
       {
-        'match': '(?i)\\bstats_(s(ta(ndard_deviation|t_(noncentral_t|correlation|in(nerproduct|dependent_t)|p(owersum|ercentile|aired_t)|gennch|binomial_coef))|kew)|harmonic_mean|c(ovariance|df_(n(oncentral_(chisquare|f)|egative_binomial)|c(hisquare|auchy)|t|uniform|poisson|exponential|f|weibull|l(ogistic|aplace)|gamma|b(inomial|eta)))|den(s_(n(ormal|egative_binomial)|c(hisquare|auchy)|t|pmf_(hypergeometric|poisson|binomial)|exponential|f|weibull|l(ogistic|aplace)|gamma|beta)|_uniform)|variance|kurtosis|absolute_deviation|rand_(setall|phrase_to_seeds|ranf|ge(n_(no(ncen(tral_(t|f)|ral_chisquare)|rmal)|chisquare|t|i(nt|uniform|poisson|binomial(_negative)?)|exponential|f(uniform)?|gamma|beta)|t_seeds)))\\b'
+        'match': '''(?xi)
+          \\b
+          stats_(
+            harmonic_mean|covariance|standard_deviation|skew|
+            cdf_(noncentral_(chisquare|f)|negative_binomial|chisquare|cauchy|t|uniform|poisson|exponential|f|weibull|
+                 logistic|laplace|gamma|binomial|beta)|
+            stat_(noncentral_t|correlation|innerproduct|independent_t|powersum|percentile|paired_t|gennch|binomial_coef)|
+            dens_(normal|negative_binomial|chisquare|cauchy|t|pmf_(hypergeometric|poisson|binomial)|exponential|f|
+                  weibull|logistic|laplace|gamma|beta)|
+            den_uniform|variance|kurtosis|absolute_deviation|
+            rand_(setall|phrase_to_seeds|ranf|get_seeds|
+                  gen_(noncentral_[ft]|noncenral_chisquare|normal|chisquare|t|int|
+                       i(uniform|poisson|binomial(_negative)?)|exponential|f(uniform)?|gamma|beta))
+          )\\b
+        '''
         'name': 'support.function.stats.php'
       }
       {
-        'match': '(?i)\\bs(tream_(s(ocket_(s(hutdown|e(ndto|rver))|client|pair|enable_crypto|accept|recvfrom|get_name)|upports_lock|e(t_(chunk_size|timeout|write_buffer|read_buffer|blocking)|lect))|notification_callback|co(ntext_(set_(option|default|params)|create|get_(options|default|params))|py_to_stream)|is_local|encoding|filter_(prepend|append|re(gister|move))|wrapper_(unregister|re(store|gister))|re(solve_include_path|gister_wrapper)|get_(contents|transports|filters|wrappers|line|meta_data)|bucket_(new|prepend|append|make_writeable))|et_socket_blocking)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            set_socket_blocking|
+            stream_(socket_(shutdown|sendto|server|client|pair|enable_crypto|accept|recvfrom|get_name)|
+              set_(chunk_size|timeout|(read|write)_buffer|blocking)|select|notification_callback|supports_lock|
+              context_(set_(option|default|params)|create|get_(options|default|params))|copy_to_stream|is_local|
+              encoding|filter_(append|prepend|register|remove)|wrapper_((un)?register|restore)|
+              resolve_include_path|register_wrapper|get_(contents|transports|filters|wrappers|line|meta_data)|
+              bucket_(new|prepend|append|make_writeable)
+            )
+          )\\b
+        '''
         'name': 'support.function.streamsfuncs.php'
       }
       {
-        'match': '(?i)\\b(s(scanf|ha1(_file)?|tr(s(tr|pn)|n(c(asecmp|mp)|atc(asecmp|mp))|c(spn|hr|oll|asecmp|mp)|t(o(upper|k|lower)|r)|i(str|p(slashes|cslashes|os|_tags))|_(s(huffle|plit)|ireplace|pad|word_count|r(ot13|ep(eat|lace))|getcsv)|p(os|brk)|len|r(chr|ipos|pos|ev))|imilar_text|oundex|ubstr(_(co(unt|mpare)|replace))?|printf|etlocale)|h(tml(specialchars(_decode)?|_entity_decode|entities)|e(x2bin|brev(c)?))|n(umber_format|l(2br|_langinfo))|c(h(op|unk_split|r)|o(nvert_(cyr_string|uu(decode|encode))|unt_chars)|r(ypt|c32))|trim|implode|ord|uc(first|words)|join|p(arse_str|rint(f)?)|e(cho|xplode)|v(sprintf|printf|fprintf)|quote(d_printable_(decode|encode)|meta)|fprintf|wordwrap|l(cfirst|trim|ocaleconv|evenshtein)|add(slashes|cslashes)|rtrim|get_html_translation_table|m(oney_format|d5(_file)?|etaphone)|bin2hex)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            sscanf|sha1(_file)?|str(str|c?spn|n(at)?(case)?cmp|chr|coll|cmp|to(upper|lower)|tok|tr|istr)|
+            str_(shuffle|split|ireplace|pad|word_count|rot13|repeat|replace|getcsv|pos|pbrk|len|rchr|ri?pos|rev)|
+            strip(c?slashes|os)|strip_tags|similar_text|soundex|substr(_(count|compare|replace))?|setlocale|
+            html(specialchars(_decode)?|entities)|html_entity_decode|hex2bin|hebrev(c)?|number_format|nl2br|nl_langinfo|
+            chop|chunk_split|chr|convert_(cyr_string|uu(decode|encode))|count_chars|crypt|crc32|trim|implode|ord|
+            uc(first|words)|join|parse_str|print(f)?|echo|explode|v?[fs]?printf|quoted_printable_(decode|encode)|
+            quotemeta|wordwrap|lcfirst|[lr]trim|localeconv|levenshtein|addc?slashes|get_html_translation_table|
+            money_format|md5(_file)?|metaphone|bin2hex
+          )\\b
+        '''
         'name': 'support.function.string.php'
       }
       {
-        'match': '(?i)\\bsybase_(se(t_message_handler|lect_db)|num_(fields|rows)|c(onnect|lose)|d(eadlock_retry_count|ata_seek)|unbuffered_query|pconnect|query|f(ield_seek|etch_(object|field|a(ssoc|rray)|row)|ree_result)|affected_rows|result|get_last_message|min_(server_severity|client_severity|error_severity|message_severity))\\b'
+        'match': '''(?xi)
+          \\b
+          sybase_(
+            set_message_handler|select_db|num_(fields|rows)|connect|close|deadlock_retry_count|data_seek|
+            unbuffered_query|pconnect|query|field_seek|fetch_(object|field|assoc|array|row)|free_result|
+            affected_rows|result|get_last_message|min_(client|error|message|server)_severity
+          )\\b
+        '''
         'name': 'support.function.sybase.php'
       }
       {
@@ -3065,7 +3110,15 @@
         'name': 'support.function.taint.php'
       }
       {
-        'match': '(?i)\\b(tidy_(s(et(opt|_encoding)|ave_config)|c(onfig_count|lean_repair)|is_x(html|ml)|diagnose|parse_(string|file)|error_count|warning_count|load_config|access_count|re(set_config|pair_(string|file))|get(opt|_(status|h(tml(_ver)?|ead)|config|o(utput|pt_doc)|r(oot|elease)|body)))|ob_tidyhandler)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            tidy_((get|set)opt|set_encoding|save_config|config_count|clean_repair|is_(xhtml|xml)|diagnose|
+                  (access|error|warning)_count|load_config|reset_config|(parse|repair)_(string|file)|
+                  get_(status|html(_ver)?|head|config|output|opt_doc|root|release|body))|
+            ob_tidyhandler
+          )\\b
+        '''
         'name': 'support.function.tidy.php'
       }
       {
