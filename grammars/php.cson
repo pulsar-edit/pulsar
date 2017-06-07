@@ -3242,7 +3242,7 @@
         'captures':
           '1':
             'name': 'punctuation.definition.variable.php'
-        'match': '(?x)\n        \t\t\t            (\\$+)[a-zA-Z_\\x{7f}-\\x{ff}]\n        \t\t\t            [a-zA-Z0-9_\\x{7f}-\\x{ff}]*?\\b'
+        'match': '(?i)(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\b'
         'name': 'variable.other.php'
       }
     ]
