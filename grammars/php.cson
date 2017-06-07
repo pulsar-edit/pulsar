@@ -2904,7 +2904,15 @@
         'name': 'support.function.php_mssql.php'
       }
       {
-        'match': '(?i)\\bodbc_(s(tatistics|pecialcolumns|etoption)|n(um_(fields|rows)|ext_result)|c(o(nnect|lumn(s|privileges)|mmit)|ursor|lose(_all)?)|table(s|privileges)|d(o|ata_source)|p(connect|r(imarykeys|ocedure(s|columns)|epare))|e(rror(msg)?|xec(ute)?)|f(ield_(scale|n(um|ame)|type|precision|len)|oreignkeys|etch_(into|object|array|row)|ree_result)|longreadlen|autocommit|r(ollback|esult(_all)?)|gettypeinfo|binmode)\\b'
+        'match': '''(?xi)
+          \\b
+          obdc_(
+            statistics|specialcolumns|setoption|num_(fields|rows)|next_result|connect|columns|columnprivileges|commit|
+            cursor|close(_all)?|tables|tableprivileges|do|data_source|pconnect|primarykeys|procedures|procedurecolumns|
+            prepare|error(msg)?|exec(ute)?|field_(scale|num|name|type|precision|len)|foreignkeys|free_result|
+            fetch_(into|object|array|row)|longreadlen|autocommit|rollback|result(_all)?|gettypeinfo|binmode
+          )\\b
+        '''
         'name': 'support.function.php_odbc.php'
       }
       {
@@ -2916,23 +2924,36 @@
         'name': 'support.function.php_spl.php'
       }
       {
-        'match': '(?i)\\bzip_(close|open|entry_(name|c(ompress(ionmethod|edsize)|lose)|open|filesize|read)|read)\\b'
+        'match': '(?i)\\bzip_(close|open|entry_(name|compressionmethod|compressedsize|close|open|filesize|read)|read)\\b'
         'name': 'support.function.php_zip.php'
       }
       {
-        'match': '(?i)\\bposix_(s(trerror|et(sid|uid|pgid|e(uid|gid)|gid))|ctermid|t(tyname|imes)|i(satty|nitgroups)|uname|errno|kill|access|get(sid|cwd|uid|_last_error|p(id|pid|w(nam|uid)|g(id|rp))|e(uid|gid)|login|rlimit|g(id|r(nam|oups|gid)))|mk(nod|fifo))\\b'
+        'match': '''(?xi)
+          \\b
+          posix_(
+            strerror|set(s|e?u|[ep]?g)id|ctermid|ttyname|times|isatty|initgroups|uname|errno|kill|access|
+            get(sid|cwd|uid|pid|ppid|pwnam|pwuid|pgid|pgrp|euid|egid|login|rlimit|gid|grnam|groups|ggid)|
+            get_last_error|mknod|mkfifo
+          )\\b
+        '''
         'name': 'support.function.posix.php'
       }
       {
-        'match': '(?i)\\bset(threadtitle|proctitle)\\b'
+        'match': '(?i)\\bset(thread|proc)title\\b'
         'name': 'support.function.proctitle.php'
       }
       {
-        'match': '(?i)\\bpspell_(s(tore_replacement|uggest|ave_wordlist)|new(_(config|personal))?|c(heck|onfig_(save_repl|create|ignore|d(ict_dir|ata_dir)|personal|r(untogether|epl)|mode)|lear_session)|add_to_(session|personal))\\b'
+        'match': '''(?xi)
+          \\b
+          pspell_(
+            store_replacement|suggest|save_wordlist|new(_(config|personal))?|check|clear_session|
+            config_(save_repl|create|ignore|(data|dict)_dir|personal|runtogether|repl|mode)|add_to_(session|personal)
+          )\\b
+        '''
         'name': 'support.function.pspell.php'
       }
       {
-        'match': '(?i)\\breadline(_(c(ompletion_function|lear_history|allback_(handler_(install|remove)|read_char))|info|on_new_line|write_history|list_history|add_history|re(display|ad_history)))?\\b'
+        'match': '(?i)\\breadline(_(completion_function|clear_history|callback_(handler_(install|remove)|read_char)|info|on_new_line|write_history|list_history|add_history|redisplay|read_history))?\\b'
         'name': 'support.function.readline.php'
       }
       {
@@ -2940,15 +2961,28 @@
         'name': 'support.function.recode.php'
       }
       {
-        'match': '(?i)\\brrd(c_disconnect|_(create|tune|info|update|error|version|f(irst|etch)|last(update)?|restore|graph|xport))\\b'
+        'match': '(?i)\\brrd(c_disconnect|_(create|tune|info|update|error|version|first|fetch|last(update)?|restore|graph|xport))\\b'
         'name': 'support.function.rrd.php'
       }
       {
-        'match': '(?i)\\b(s(hm_(has_var|detach|put_var|attach|remove(_var)?|get_var)|em_(acquire|re(lease|move)|get))|ftok|msg_(s(tat_queue|e(nd|t_queue))|queue_exists|re(ceive|move_queue)|get_queue))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            shm_((get|has|remove|put)_var|detach|attach|remove)|sem_(acquire|release|remove|get)|ftok|
+            msg_((get|remove|set|stat)_queue|send|queue_exists|receive)
+          )\\b
+        '''
         'name': 'support.function.sem.php'
       }
       {
-        'match': '(?i)\\bsession_(s(ta(tus|rt)|et_(save_handler|cookie_params)|ave_path)|name|c(ommit|ache_(expire|limiter))|i(s_registered|d)|de(stroy|code)|un(set|register)|encode|write_close|abort|re(set|g(ister(_shutdown)?|enerate_id))|get_cookie_params|module_name)\\b'
+        'match': '''(?xi)
+          \\b
+          session_(
+            status|start|set_(save_handler|cookie_params)|save_path|name|commit|cache_(expire|limiter)|
+            is_registered|id|destroy|decode|unset|register|encode|write_close|abort|reset|register(_shutdown)?|
+            regenerate_id|get_cookie_params|module_name
+          )\\b
+        '''
         'name': 'support.function.session.php'
       }
       {
@@ -2960,7 +2994,15 @@
         'name': 'support.function.simplexml.php'
       }
       {
-        'match': '(?i)\\bsnmp(set|2_(set|walk|real_walk|get(next)?)|_(set_(oid_(numeric_print|output_format)|enum_print|valueretrieval|quick_print)|read_mib|get_(valueretrieval|quick_print))|3_(set|walk|real_walk|get(next)?)|walk(oid)?|realwalk|get(next)?)\\b'
+        'match': '(?i)\\bsnmp(walk(oid)?|realwalk|get(next)?)\\b'
+        'match': '''(?xi)
+          \\b
+          snmpwalkoid|
+          snmp_(set_(valueretrieval|quick_print|enum_print|oid_(numeric_print|output_format))|read_mib|
+                get_(valueretrieval|quick_print))|
+          snmp[23]?_(set|walk|real_walk|get(next)?)
+          \\b
+        '''
         'name': 'support.function.snmp.php'
       }
       {
@@ -2968,15 +3010,38 @@
         'name': 'support.function.soap.php'
       }
       {
-        'match': '(?i)\\bsocket_(s(hutdown|trerror|e(nd(to|msg)?|t_(nonblock|option|block)|lect))|c(onnect|l(ose|ear_error)|reate(_(pair|listen))?|msg_space)|import_stream|write|l(isten|ast_error)|accept|re(cv(from|msg)?|ad)|get(sockname|_option|peername)|bind)\\b'
+        'match': '''(?xi)
+          \\b
+          socket_(
+            shutdown|strerror|send(to|msg)?|set_((non)?block|option)|select|connect|close|clear_error|bind|
+            create(_(pair|listen))?|cmsg_space|import_stream|write|listen|last_error|accept|recv(from|msg)?|
+            read|get(peer|sock)name|get_option
+          )\\b
+        '''
         'name': 'support.function.sockets.php'
       }
       {
-        'match': '(?i)\\bsqlite_(s(ingle_query|eek)|has_(prev|more)|n(um_(fields|rows)|ext)|c(hanges|olumn|urrent|lose|reate_(function|aggregate))|open|u(nbuffered_query|df_(decode_binary|encode_binary))|p(open|rev)|e(scape_string|rror_string|xec)|valid|key|query|f(ield_name|etch_(s(tring|ingle)|column_types|object|a(ll|rray))|actory)|l(ib(encoding|version)|ast_(insert_rowid|error))|array_query|rewind|busy_timeout)\\b'
+        'match': '''(?xi)
+          \\b
+          sqlite_(
+            single_query|seek|has_(more|prev)|num_(fields|rows)|next|changes|column|current|close|
+            create_(aggregate|function)|open|unbuffered_query|udf_(decode|encode)_binary|popen|prev|
+            escape_string|error_string|exec|valid|key|query|field_name|factory|
+            fetch_(string|single|column_types|object|all|array)|lib(encoding|version)|
+            last_(insert_rowid|error)|array_query|rewind|busy_timeout
+          )\\b
+        '''
         'name': 'support.function.sqlite.php'
       }
       {
-        'match': '(?i)\\bsqlsrv_(se(nd_stream_data|rver_info)|has_rows|n(um_(fields|rows)|ext_result)|c(o(n(nect|figure)|mmit)|l(ient_info|ose)|ancel)|prepare|e(rrors|xecute)|query|f(ield_metadata|etch(_(object|array))?|ree_stmt)|ro(ws_affected|llback)|get_(config|field)|begin_transaction)\\b'
+        'match': '''(?xi)
+          \\b
+          sqlsrv_(
+            send_stream_data|server_info|has_rows|num_(fields|rows)|next_result|connect|configure|commit|
+            client_info|close|cancel|prepare|errors|execute|query|field_metadata|fetch(_(array|object))?|
+            free_stmt|rows_affected|rollback|get_(config|field)|begin_transaction
+          )\\b
+        '''
         'name': 'support.function.sqlsrv.php'
       }
       {
