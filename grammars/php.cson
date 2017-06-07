@@ -165,7 +165,7 @@
                 |Grid(FS(Cursor|File)?)|Id|InsertBatch|Int(32|64)|Log|Pool|Regex|ResultException|Timestamp
                 |UpdateBatch|Write(Batch|ConcernException))?
           |Memcache(d)?|MessageFormatter|MultipleIterator|Mutex
-          |mysqli(_(driver|stmt|warning_result))?
+          |mysqli(_(driver|stmt|warning|result))?
           |MysqlndUh(Connection|PreparedStatement)
           |NoRewindIterator|Normalizer|NumberFormatter
           |OCI-(Collection|Lob)|OuterIterator|(OutOf(Bounds|Range)|Overflow)Exception
@@ -499,7 +499,6 @@
                 'name': 'punctuation.separator.inheritance.php'
           }
           {
-            'match': '(\\\\)?\\bT_(A(RRAY(_CAST)?|BSTRACT|S|ND_EQUAL))\\b'
             'match': '''(?x)
               (\\\\)?\\b
               (T_(RETURN|REQUIRE(_ONCE)?|GOTO|GLOBAL|(MINUS|MOD|MUL|XOR)_EQUAL|METHOD_C|ML_COMMENT|BREAK
@@ -2331,11 +2330,11 @@
           \\b
           (
             shuffle|sizeof|sort|next|nat(case)?sort|count|compact|current|in_array|usort|uksort|uasort|
-            poas|prev|end|each|extract|ksort|key(_exists)?|krsort|list|asort|arsort|rsort|reset|range|
+            pos|prev|end|each|extract|ksort|key(_exists)?|krsort|list|asort|arsort|rsort|reset|range|
             array(_(shift|sum|splice|search|slice|chunk|change_key_case|count_values|column|combine|
-                    (diff|intersect)(_(u)?(key|assoc))?|unshift|unique|pop|push|pad|product|values|
-                    keys|key_exists|filter|fill(_keys)?|flip|walk(_recursive)?|reduce|replace(_recursive)?
-                    reverse|rand|multisort|merge(_recursive)?|map)?)
+                    (diff|intersect)(_(u)?(key|assoc))?|u(diff|intersect)(_(u)?assoc)?|unshift|unique|
+                    pop|push|pad|product|values|keys|key_exists|filter|fill(_keys)?|flip|walk(_recursive)?|
+                    reduce|replace(_recursive)?|reverse|rand|multisort|merge(_recursive)?|map)?)
           )\\b
         '''
         'name': 'support.function.array.php'
@@ -2388,8 +2387,8 @@
           \\b
           (
             com_(create_guid|print_typeinfo|event_sink|load_typelib|get_active_object|message_pump)|
-            variant_(sub|set(_type)?|not|neg|cast|cat|cmp|int|idiv|imp|or|div|date_(from|to)_timestamp)|
-                     pow|eqv|fix|and|add|abs|round|get_type|xor|mod|mul
+            variant_(sub|set(_type)?|not|neg|cast|cat|cmp|int|idiv|imp|or|div|date_(from|to)_timestamp|
+                     pow|eqv|fix|and|add|abs|round|get_type|xor|mod|mul)
           )\\b
         '''
         'name': 'support.function.com.php'
@@ -2404,7 +2403,7 @@
           curl_(
             share_(close|init|setopt)|strerror|setopt(_array)?|copy_handle|close|init|unescape|pause|escape|
             errno|error|exec|version|file_create|reset|getinfo|
-            multi_(strerror|setopt|select|close|init|info_read|(add|remove)_handle|getcontent)
+            multi_(strerror|setopt|select|close|init|info_read|(add|remove)_handle|getcontent|exec)
           )\\b
         '''
         'name': 'support.function.curl.php'
@@ -2413,12 +2412,12 @@
         'match': '''(?xi)
           \\b
           (
-            strtotime|strptime|stftime|checkdate|time|timezone_name_(from_abbr|get)|idate|
-            timezone_((offset|transitions|version)_get|(abbreviations|identifiers)_list|open|location|get)|
+            strtotime|str[fp]time|checkdate|time|timezone_name_(from_abbr|get)|idate|
+            timezone_((location|offset|transitions|version)_get|(abbreviations|identifiers)_list|open)|
             date(_(sun(rise|set)|sun_info|sub|create(_(immutable_)?from_format)?|timestamp_(get|set)|timezone_(get|set)|time_set|
                    isodate_set|interval_(create_from_date_string|format)|offset_get|diff|default_timezone_(get|set)|date_set|
-                   parse(_from_format)?|format|add|get_last_errors|modify))?
-            localtime|get(date|timeofday)|gmstrftime|gmdate|gmmktime|microtime|mktime
+                   parse(_from_format)?|format|add|get_last_errors|modify))?|
+            localtime|get(date|timeofday)|gm(strftime|date|mktime)|microtime|mktime
           )\\b
         '''
         'name': 'support.function.datetime.php'
@@ -2439,9 +2438,9 @@
         'match': '''(?xi)
           \\b
           eio_(
-            sync(_(file_range|fs))?|symlink|stat(vfs)?|sendfile|set_min_parallel|set_max_(idle|poll_(reqs|time)|parallel)|
-            seek|n(threads|op|pending|reqs|ready)|chown|chmod|custom|close|cancel|truncate|init|open|dup2|unlink|time|poll|
-            event_loop|f(sync|stat(vfs)?|chown|chmod|truncate|datasync|utime|allocate)|write|lstat|link|rename|
+            sync(fs)?|sync_file_range|symlink|stat(vfs)?|sendfile|set_min_parallel|set_max_(idle|poll_(reqs|time)|parallel)|
+            seek|n(threads|op|pending|reqs|ready)|chown|chmod|custom|close|cancel|truncate|init|open|dup2|unlink|utime|poll|
+            event_loop|f(sync|stat(vfs)?|chown|chmod|truncate|datasync|utime|allocate)|write|lstat|link|rename|realpath|
             read(ahead|dir|link)?|rmdir|get_(event_stream|last_error)|grp(_(add|cancel|limit))?|mknod|mkdir|busy
           )\\b
         '''
@@ -2487,15 +2486,15 @@
                  activation_(function|steepness)(_(hidden|layer|output))?|
                  rprop_((decrease|increase)_factor|delta_(max|min|zero)))|
             save(_train)?|num_(input|output)_train_data|copy|clear_scaling_params|cascadetrain_on_(file|data)|
-            create_((parse|shortcut|standard)(_array)?|train(_from_callback)?|from_file)|
+            create_((sparse|shortcut|standard)(_array)?|train(_from_callback)?|from_file)|
             test(_data)?|train(_(on_(file|data)|epoch))?|init_weights|descale_(input|output|train)|destroy(_train)?|
             print_error|run|reset_(MSE|err(no|str))|read_train_from_file|randomize_weights|
             get_(sarprop_(step_error_(shift|threshold_factor)|temperature|weight_decay_shift)|num_(input|output|layers)|
-                 network_type|MSE|connection_(array|rate)|bias_array|bit_fail_limit|
+                 network_type|MSE|connection_(array|rate)|bias_array|bit_fail(_limit)?|
                  cascade_(num_(candidates|candidate_groups)|(candidate|output)_(change_fraction|limit|stagnation_epochs)|
                           weight_multiplier|activation_(functions|steepnesses)(_count)?|(max|min)_(cand|out)_epochs)|
                  total_(connections|neurons)|training_algorithm|train_(error|stop)_function|err(no|str)|
-                 quickprop_(decay|mu)|learning_(momentum_rate)|layer_array|activation_(function|steepness)|
+                 quickprop_(decay|mu)|learning_(momentum|rate)|layer_array|activation_(function|steepness)|
                  rprop_((decrease|increase)_factor|delta_(max|min|zero)))
           )\\b
         '''
@@ -2505,12 +2504,12 @@
         'match': '''(?xi)
           \\b
           (
-            symlink|stat|set_file_buffer|chown|chgrp|chmod|copy|clearstatcache|touch|tempnam|tempfile|
+            symlink|stat|set_file_buffer|chown|chgrp|chmod|copy|clearstatcache|touch|tempnam|tmpfile|
             is_(dir|(uploaded_)?file|executable|link|readable|writ(e)?able)|disk_(free|total)_space|diskfreespace|
             dirname|delete|unlink|umask|pclose|popen|pathinfo|parse_ini_(file|string)|fscanf|fstat|fseek|fnmatch|
             fclose|ftell|ftruncate|file(size|[acm]time|type|inode|owner|perms|group)?|file_(exists|(get|put)_contents)|
-            open|puts|putcsv|passthru|eof|fflush|write|lock|read|gets(s)?|getc(sv)?|lstat|lchown|lgrp|link(info)?|
-            rename|rewind|read(file|link)|relpath(_cache_(get|size))?|rmdir|glob|move_uploaded_file|mkdir|basename
+            f(open|puts|putcsv|passthru|eof|flush|write|lock|read|gets(s)?|getc(sv)?)|lstat|lchown|lchgrp|link(info)?|
+            rename|rewind|read(file|link)|realpath(_cache_(get|size))?|rmdir|glob|move_uploaded_file|mkdir|basename
           )\\b
         '''
         'name': 'support.function.file.php'
@@ -2528,7 +2527,7 @@
         'name': 'support.function.fpm.php'
       }
       {
-        'match': '(?i)\\b(call_user_func(_array)?|create_function|unregister_tick_function|forward_static_call(_array)?|function_exists|func_(num_args|get_arg(s)?)|register_(shutdown|tick)_function|get_defined_functions)\\b'
+        'match': '(?i)\\b(call_user_(func|method)(_array)?|create_function|unregister_tick_function|forward_static_call(_array)?|function_exists|func_(num_args|get_arg(s)?)|register_(shutdown|tick)_function|get_defined_functions)\\b'
         'name': 'support.function.funchand.php'
       }
       {
@@ -2540,7 +2539,7 @@
           \\b
           gmp_(
             scan[01]|strval|sign|sub|setbit|sqrt(rem)?|hamdist|neg|nextprime|com|clrbit|cmp|testbit|
-            intval|init|invert|import|or|div(_(q)?r|exact)?|jacobi|popcount|pow(m)?|perfect_square|
+            intval|init|invert|import|or|div(exact)?|div_(q|qr|r)|jacobi|popcount|pow(m)?|perfect_square|
             prob_prime|export|fact|legendre|and|add|abs|root(rem)?|random(_(bits|range))?|gcd(ext)?|xor|mod|mul
           )\\b
         '''
@@ -2553,12 +2552,12 @@
       {
         'match': '''(?xi)
           \\b
-          http_(
-            support|send_(status|stream)|content_(disposition|type)|data|file|last_modified|head|
-            negotiate_(charset|content_type|language)|chunked_decode|cache_(etag|last_modified)|throttle|
-            inflate|deflate|date|post_(data|fields)|put_(data|file|stream)|persistent_handles_(count|clean|ident)|
-            parse_(cookie|headers|message|params)|redirect|request(_method_(exists|name|(un)?register)|body_encode)?|
-            get(_request_(headers|body(_stream)?))?|match_(etag|modified|request_header)|build_(cookie|str|url)|
+          (
+            http_(support|send_(status|stream|content_(disposition|type)|data|file|last_modified)|head|
+                  negotiate_(charset|content_type|language)|chunked_decode|cache_(etag|last_modified)|throttle|
+                  inflate|deflate|date|post_(data|fields)|put_(data|file|stream)|persistent_handles_(count|clean|ident)|
+                  parse_(cookie|headers|message|params)|redirect|request(_(method_(exists|name|(un)?register)|body_encode))?|
+                  get(_request_(headers|body(_stream)?))?|match_(etag|modified|request_header)|build_(cookie|str|url))|
             ob_(etag|deflate|inflate)handler
           )\\b
         '''
@@ -2579,9 +2578,9 @@
             iptc(embed|parse)|(jpeg|png)2wbmp|gd_info|getimagesize(fromstring)?|
             image(s[xy]|scale|(char|string)(up)?|set(style|thickness|tile|interpolation|pixel|brush)|savealpha|
                   convolution|copy(resampled|resized|merge(gray)?)?|colors(forindex|total)|
-                  color(set|closest(alpha|hwb)?|transparent|deallocate|(allocate|exact|resolve)(alpha)?|at|match|
-                        crop(auto)?|create(truecolor|from(string|jpeg|png|wbmp|webp|gif|gd(2(part)?)?|xpm|xbm))?)|
-                  types|tf(bbox|text)|truecolortopalette|istruecolor|interlace|2wbmp|destroy|dashedline|jpeg|
+                  color(set|closest(alpha|hwb)?|transparent|deallocate|(allocate|exact|resolve)(alpha)?|at|match)|
+                  crop(auto)?|create(truecolor|from(string|jpeg|png|wbmp|webp|gif|gd(2(part)?)?|xpm|xbm))?|
+                  types|ttf(bbox|text)|truecolortopalette|istruecolor|interlace|2wbmp|destroy|dashedline|jpeg|
                   _type_to_(extension|mime_type)|ps(slantfont|text|(encode|extend|free|load)font|bbox)|png|polygon|
                   palette(copy|totruecolor)|ellipse|ft(text|bbox)|filter|fill|filltoborder|
                   filled(arc|ellipse|polygon|rectangle)|font(height|width)|flip|webp|wbmp|line|loadfont|layereffect|
@@ -2599,8 +2598,9 @@
             ini_(alter|get(_all)?|restore|set)|zend_(thread_id|version|logo_guid)|dl|php(credits|info|version)|
             php_(sapi_name|ini_(scanned_files|loaded_file)|uname|logo_guid)|putenv|extension_loaded|version_compare|
             assert(_options)?|restore_include_path|gc_(collect_cycles|disable|enable(d)?)|getopt|
-            get_(current_user|fg_var|included_files|include_path|defined_constants|extension_funcs|loaded_extensions|
-                 required_files|magic_quotes_(gpc|runtime)|env|lastmod|rusage|my(inode|[gup]id))|
+            get_(cfg_var|current_user|defined_constants|extension_funcs|include_path|included_files|loaded_extensions|
+                 magic_quotes_(gpc|runtime)|required_files|resources)|
+            get(env|lastmod|rusage|my(inode|[gup]id))|
             memory_get_(peak_)?usage|main|magic_quotes_runtime
           )\\b
         '''
@@ -2626,7 +2626,7 @@
             normalizer_(normalize|is_normalized)|idn_to_(unicode|utf8|ascii)|
             numfmt_(set_(symbol|(text_)?attribute|pattern)|create|(parse|format)(_currency)?|
                     get_(symbol|(text_)?attribute|pattern|error_(code|message)|locale))|
-            collater_(sort(_with_sort_keys)?|set_(attribute|strength)|compare|create|asort|
+            collator_(sort(_with_sort_keys)?|set_(attribute|strength)|compare|create|asort|
                       get_(strength|sort_key|error_(code|message)|locale|attribute))|
             transliterator_(create(_(inverse|from_rules))?|transliterate|list_ids|get_error_(code|message))|
             intl(cal|tz)_get_error_(code|message)|intl_(is_failure|error_name|get_error_(code|message))|
@@ -2634,9 +2634,9 @@
                      get_(calendar(_object)?|time(type|zone(_id)?)|datetype|pattern|error_(code|message)|locale))|
             locale_(set_default|compose|canonicalize|parse|filter_matches|lookup|accept_from_http|
                     get_(script|display_(script|name|variant|language|region)|default|primary_language|keywords|all_variants|region))|
-            resourcebundle_(create|count|locales|get(_(error_code|message))?)|
-            grapheme_(str(str|istr|ipos|len|ripos|rpos)|substr|extract)|
-            msgfmt_(set_pattern|create|(format|parse)(_message)?|get_(pattern|error(_code|message)|locale))
+            resourcebundle_(create|count|locales|get(_(error_(code|message)))?)|
+            grapheme_(str(i?str|r?i?pos|len)|substr|extract)|
+            msgfmt_(set_pattern|create|(format|parse)(_message)?|get_(pattern|error_(code|message)|locale))
           )\\b
         '''
         'name': 'support.function.intl.php'
@@ -2651,8 +2651,8 @@
           ldap_(
             start|tls|sort|search|sasl_bind|set_(option|rebind_proc)|(first|next)_(attribute|entry|reference)|
             connect|control_paged_result(_response)?|count_entries|compare|close|t61_to_8859|8859_to_t61|
-            dn2ufn|delete|unbind|parse_(reference|result)|escape|errno|err2str|error|explode_dn|bind
-            free_result|list|add|rename|read|get_(option|dn|entries|value(_len)?|attributes)|modify(_batch)?|
+            dn2ufn|delete|unbind|parse_(reference|result)|escape|errno|err2str|error|explode_dn|bind|
+            free_result|list|add|rename|read|get_(option|dn|entries|values(_len)?|attributes)|modify(_batch)?|
             mod_(add|del|replace)
           )\\b
         '''
@@ -2696,10 +2696,12 @@
           \\b
           (
             mcrypt_(
-              cfb|create_iv|cbc|ofb|decrypt|encrypt|ecb|list_(algorithms|modes)|generic(_((de)?init|end))?
-              enc_(self_test|is_block_(algorithm_)?mode|get_(supported_key_sizes|(block|iv|key)_size|(algorithms|modes)_name))|
+              cfb|create_iv|cbc|ofb|decrypt|encrypt|ecb|list_(algorithms|modes)|generic(_((de)?init|end))?|
+              enc_(self_test|is_block_(algorithm|algorithm_mode|mode)|
+              get_(supported_key_sizes|(block|iv|key)_size|(algorithms|modes)_name))|
               get_(cipher_name|(block|iv|key)_size)|
-              module_(close|self_test|is_block_(algorithm_)?mode|open|get_(supported_key_sizes|algo_(block|key)_size)))|
+              module_(close|self_test|is_block_(algorithm|algorithm_mode|mode)|open|
+                      get_(supported_key_sizes|algo_(block|key)_size)))|
             mdecrypt_generic
           )\\b
         '''
@@ -2721,7 +2723,7 @@
         'match': '''(?xi)
           \\b
           mysql_(
-            stat|state_charset|select_db|num_(fields|rows)|connect|client_encoding|close|create_db|escape_string|
+            stat|set_charset|select_db|num_(fields|rows)|connect|client_encoding|close|create_db|escape_string|
             thread_id|tablename|insert_id|info|data_seek|drop_db|db_(name|query)|unbuffered_query|pconnect|ping|
             errno|error|query|field_(seek|name|type|table|flags|len)|fetch_(object|field|lengths|assoc|array|row)|
             free_result|list_(tables|dbs|processes|fields)|affected_rows|result|real_escape_string|
@@ -2731,11 +2733,10 @@
         'name': 'support.function.mysql.php'
       }
       {
-        'match': '(?i)\\bmysqli_(m(ore_results|ulti_query|aster_query)|b(ind_(param|result)|egin_transaction))\\b'
         'match': '''(?xi)
           \\b
           mysqli_(
-            ssl_set|store_result|stat|send_(query|long_data)|set_(charset|opt|local_infile_(default|handler))
+            ssl_set|store_result|stat|send_(query|long_data)|set_(charset|opt|local_infile_(default|handler))|
             stmt_(store_result|send_long_data|next_result|close|init|data_seek|prepare|execute|fetch|free_result|
                   attr_(get|set)|result_metadata|reset|get_(result|warnings)|more_results|bind_(param|result))|
             select_db|slave_query|savepoint|next_result|change_user|character_set_name|connect|commit|
@@ -2809,8 +2810,8 @@
         'match': '''(?xi)
           \\b
           openssl_(
-            sign|pki_(new|export(_challenge)?|verify)|seal|csr_(sign|new|export(_to_file)?|get_(subject|public_key))|
-            cipher_iv_length|open|dh_compute_key|digest|encrypt|public_(decrypt|encrypt)|encrypt|error_string|
+            sign|spki_(new|export(_challenge)?|verify)|seal|csr_(sign|new|export(_to_file)?|get_(subject|public_key))|
+            cipher_iv_length|open|dh_compute_key|digest|decrypt|public_(decrypt|encrypt)|encrypt|error_string|
             pkcs12_(export(_to_file)?|read)|pkcs7_(sign|decrypt|encrypt|verify)|verify|free_key|random_pseudo_bytes|
             pkey_(new|export(_to_file)?|free|get_(details|public|private))|private_(decrypt|encrypt)|pbkdf2|
             get_((cipher|md)_methods|cert_locations|(public|private)key)|
@@ -2824,8 +2825,8 @@
           \\b
           (
             output_(add_rewrite_var|reset_rewrite_vars)|flush|
-            ob_(start|clean|implicit_flush|end_(clean|flush)|flush|list_handlers|gzhandler|get_(status|contents|clean|
-                flush|length|level))
+            ob_(start|clean|implicit_flush|end_(clean|flush)|flush|list_handlers|gzhandler|
+                get_(status|contents|clean|flush|length|level))
           )\\b
         '''
         'name': 'support.function.output.php'
@@ -2851,7 +2852,7 @@
             socket|send_(prepare|execute|query(_params)?)|set_(client_encoding|error_verbosity)|select|host|
             num_(fields|rows)|consume_input|connection_(status|reset|busy)|connect(_poll)?|convert|copy_(from|to)|
             client_encoding|close|cancel_query|tty|transaction_status|trace|insert|options|delete|dbname|untrace|
-            unescape_bytes|update|pconnect|ping|port|put_line|parameter_status|prepare|version|query(_params)?|
+            unescape_bytea|update|pconnect|ping|port|put_line|parameter_status|prepare|version|query(_params)?|
             escape_(string|identifier|literal|bytea)|end_copy|execute|flush|free_result|last_(notice|error|oid)|
             field_(size|num|name|type(_oid)?|table|is_null|prtlen)|affected_rows|result_(status|seek|error(_field)?)|
             fetch_(object|assoc|all(_columns)?|array|row|result)|get_(notify|pid|result)|meta_data|
@@ -2861,7 +2862,7 @@
         'name': 'support.function.pgsql.php'
       }
       {
-        'match': '(?i)\\b(virtual|apache_((get|set)env|note|child_terminate|lookup_uri|response_headers|reset_timeout|request_headers|getallheaders|get_(version|modules)))\\b'
+        'match': '(?i)\\b(virtual|getallheaders|apache_((get|set)env|note|child_terminate|lookup_uri|response_headers|reset_timeout|request_headers|get_(version|modules)))\\b'
         'name': 'support.function.php_apache.php'
       }
       {
@@ -2882,9 +2883,9 @@
         'match': '''(?xi)
           \\b
           imap_(
-            (create|delete|list|rename|scan)(mailbox)?|status|sort|subscribe|set_(quota|flag_full|acl)|setarch|savebody|
+            (create|delete|list|rename|scan)(mailbox)?|status|sort|subscribe|set_quota|set(flag_full|acl)|search|savebody|
             num_(recent|msg)|check|close|clearflag_full|thread|timeout|open|header(info)?|headers|append|alerts|reopen|
-            8bit|unsubscribe|undelete|utf7_(decode|encode)|utf8|uid|ping|errors|expunge|qprint|gc
+            8bit|unsubscribe|undelete|utf7_(decode|encode)|utf8|uid|ping|errors|expunge|qprint|gc|
             fetch(structure|header|text|mime|body)|fetch_overview|lsub|list(scan|subscribed)|last_error|
             rfc822_(parse_(headers|adrlist)|write_address)|get(subscribed|acl|mailboxes)|get_quota(root)?|
             msgno|mime_header_decode|mail_(copy|compose|move)|mail|mailboxmsginfo|binary|body(struct)?|base64
@@ -2906,7 +2907,7 @@
       {
         'match': '''(?xi)
           \\b
-          obdc_(
+          odbc_(
             statistics|specialcolumns|setoption|num_(fields|rows)|next_result|connect|columns|columnprivileges|commit|
             cursor|close(_all)?|tables|tableprivileges|do|data_source|pconnect|primarykeys|procedures|procedurecolumns|
             prepare|error(msg)?|exec(ute)?|field_(scale|num|name|type|precision|len)|foreignkeys|free_result|
@@ -2932,7 +2933,7 @@
           \\b
           posix_(
             strerror|set(s|e?u|[ep]?g)id|ctermid|ttyname|times|isatty|initgroups|uname|errno|kill|access|
-            get(sid|cwd|uid|pid|ppid|pwnam|pwuid|pgid|pgrp|euid|egid|login|rlimit|gid|grnam|groups|ggid)|
+            get(sid|cwd|uid|pid|ppid|pwnam|pwuid|pgid|pgrp|euid|egid|login|rlimit|gid|grnam|groups|grgid)|
             get_last_error|mknod|mkfifo
           )\\b
         '''
@@ -2979,7 +2980,7 @@
           \\b
           session_(
             status|start|set_(save_handler|cookie_params)|save_path|name|commit|cache_(expire|limiter)|
-            is_registered|id|destroy|decode|unset|register|encode|write_close|abort|reset|register(_shutdown)?|
+            is_registered|id|destroy|decode|unset|unregister|encode|write_close|abort|reset|register(_shutdown)?|
             regenerate_id|get_cookie_params|module_name
           )\\b
         '''
@@ -2994,14 +2995,14 @@
         'name': 'support.function.simplexml.php'
       }
       {
-        'match': '(?i)\\bsnmp(walk(oid)?|realwalk|get(next)?)\\b'
         'match': '''(?xi)
           \\b
-          snmpwalkoid|
-          snmp_(set_(valueretrieval|quick_print|enum_print|oid_(numeric_print|output_format))|read_mib|
-                get_(valueretrieval|quick_print))|
-          snmp[23]?_(set|walk|real_walk|get(next)?)
-          \\b
+          (
+            snmp(walk(oid)?|realwalk|get(next)?|set)|
+            snmp_(set_(valueretrieval|quick_print|enum_print|oid_(numeric_print|output_format))|read_mib|
+                  get_(valueretrieval|quick_print))|
+            snmp[23]_(set|walk|real_walk|get(next)?)
+          )\\b
         '''
         'name': 'support.function.snmp.php'
       }
@@ -3082,14 +3083,14 @@
         'match': '''(?xi)
           \\b
           (
-            sscanf|sha1(_file)?|str(str|c?spn|n(at)?(case)?cmp|chr|coll|cmp|to(upper|lower)|tok|tr|istr)|
-            str_(shuffle|split|ireplace|pad|word_count|rot13|repeat|replace|getcsv|pos|pbrk|len|rchr|ri?pos|rev)|
+            money_format|md5(_file)?|metaphone|bin2hex|sscanf|sha1(_file)?|
+            str(str|c?spn|n(at)?(case)?cmp|chr|coll|(case)?cmp|to(upper|lower)|tok|tr|istr|pos|pbrk|len|rchr|ri?pos|rev)|
+            str_(getcsv|ireplace|pad|repeat|replace|rot13|shuffle|split|word_count)|
             strip(c?slashes|os)|strip_tags|similar_text|soundex|substr(_(count|compare|replace))?|setlocale|
             html(specialchars(_decode)?|entities)|html_entity_decode|hex2bin|hebrev(c)?|number_format|nl2br|nl_langinfo|
             chop|chunk_split|chr|convert_(cyr_string|uu(decode|encode))|count_chars|crypt|crc32|trim|implode|ord|
             uc(first|words)|join|parse_str|print(f)?|echo|explode|v?[fs]?printf|quoted_printable_(decode|encode)|
-            quotemeta|wordwrap|lcfirst|[lr]trim|localeconv|levenshtein|addc?slashes|get_html_translation_table|
-            money_format|md5(_file)?|metaphone|bin2hex
+            quotemeta|wordwrap|lcfirst|[lr]trim|localeconv|levenshtein|addc?slashes|get_html_translation_table
           )\\b
         '''
         'name': 'support.function.string.php'
