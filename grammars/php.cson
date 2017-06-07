@@ -3127,43 +3127,99 @@
         'name': 'support.function.tokenizer.php'
       }
       {
-        'match': '(?i)\\btrader_(s(t(och(f|rsi)?|ddev)|in(h)?|u(m|b)|et_(compat|unstable_period)|qrt|ar(ext)?|ma)|ht_(sine|trend(line|mode)|dcp(hase|eriod)|phasor)|natr|c(ci|o(s(h)?|rrel)|dl(s(ho(otingstar|rtline)|t(icksandwich|alledpattern)|pinningtop|eparatinglines)|h(i(kkake(mod)?|ghwave)|omingpigeon|a(ngingman|rami(cross)?|mmer))|c(o(ncealbabyswall|unterattack)|losingmarubozu)|t(hrusting|a(sukigap|kuri)|ristar)|i(n(neck|vertedhammer)|dentical3crows)|2crows|onneck|d(oji(star)?|arkcloudcover|ragonflydoji)|u(nique3river|psidegap2crows)|3(starsinsouth|inside|outside|whitesoldiers|linestrike|blackcrows)|piercing|e(ngulfing|vening(star|dojistar))|kicking(bylength)?|l(ongl(ine|eggeddoji)|adderbottom)|a(dvanceblock|bandonedbaby)|ri(sefall3methods|ckshawman)|g(apsidesidewhite|ravestonedoji)|xsidegap3methods|m(orning(star|dojistar)|a(t(hold|chinglow)|rubozu))|b(elthold|reakaway))|eil|mo)|t(sf|ypprice|3|ema|an(h)?|r(i(x|ma)|ange))|obv|d(iv|ema|x)|ultosc|p(po|lus_d(i|m))|e(rrno|xp|ma)|var|kama|floor|w(clprice|illr|ma)|l(n|inearreg(_(slope|intercept|angle))?|og10)|a(sin|cos|t(an|r)|d(osc|d|x(r)?)?|po|vgprice|roon(osc)?)|r(si|oc(p|r(100)?)?)|get_(compat|unstable_period)|m(i(n(index|us_d(i|m)|max(index)?)?|dp(oint|rice))|om|ult|edprice|fi|a(cd(ext|fix)?|vp|x(index)?|ma)?)|b(op|eta|bands))\\b'
+        'match': '''(?xi)
+          \\b
+          trader_(
+            stoch(f|r|rsi)?|stddev|sin(h)?|sum|sub|set_(compat|unstable_period)|sqrt|sar(ext)?|sma|
+            ht_(sine|trend(line|mode)|dc(period|phase)|phasor)|natr|cci|cos(h)?|correl|
+            cdl(shootingstar|shortline|sticksandwich|stalledpattern|spinningtop|separatinglines|
+                hikkake(mod)?|highwave|homingpigeon|hangingman|harami(cross)?|hammer|concealbabyswall|
+                counterattack|closingmarubozu|thrusting|tasukigap|takuri|tristar|inneck|invertedhammer|
+                identical3crows|2crows|onneck|doji(star)?|darkcloudcover|dragonflydoji|unique3river|
+                upsidegap2crows|3(starsinsouth|inside|outside|whitesoldiers|linestrike|blackcrows)|
+                piercing|engulfing|evening(doji)?star|kicking(bylength)?|longline|longleggeddoji|
+                ladderbottom|advanceblock|abandonedbaby|risefall3methods|rickshawman|gapsidesidewhite|
+                gravestonedoji|xsidegap3methods|morning(doji)?star|mathold|matchinglow|marubozu|
+                belthold|breakaway)|
+            ceil|cmo|tsf|typprice|t3|tema|tan(h)?|trix|trima|trange|obv|div|dema|dx|ultosc|ppo|
+            plus_d[im]|errno|exp|ema|var|kama|floor|wclprice|willr|wma|ln|log10|bop|beta|bbands|
+            linearreg(_(slope|intercept|angle))?|asin|acos|atan|atr|adosc|ad|add|adx(r)?|apo|avgprice|
+            aroon(osc)?|rsi|roc|rocp|rocr(100)?|get_(compat|unstable_period)|min(index)?|minus_d[im]|
+            minmax(index)?|mid(point|price)|mom|mult|medprice|mfi|macd(ext|fix)?|mavp|max(index)?|ma(ma)?
+          )\\b
+        '''
         'name': 'support.function.trader.php'
       }
       {
-        'match': '(?i)\\buopz_(co(py|mpose)|implement|overload|delete|undefine|extend|f(unction|lags)|re(store|name|define)|backup)\\b'
+        'match': '(?i)\\buopz_(copy|compose|implement|overload|delete|undefine|extend|function|flags|restore|rename|redefine|backup)\\b'
         'name': 'support.function.uopz.php'
       }
       {
-        'match': '(?i)\\b(http_build_query|url(decode|encode)|parse_url|rawurl(decode|encode)|get_(headers|meta_tags)|base64_(decode|encode))\\b'
+        'match': '(?i)\\b(http_build_query|(raw)?url(decode|encode)|parse_url|get_(headers|meta_tags)|base64_(decode|encode))\\b'
         'name': 'support.function.url.php'
       }
       {
-        'match': '(?i)\\b(s(trval|e(ttype|rialize))|i(s(set|_(s(calar|tring)|nu(ll|meric)|callable|int(eger)?|object|double|float|long|array|re(source|al)|bool))|ntval|mport_request_variables)|d(oubleval|ebug_zval_dump)|unse(t|rialize)|print_r|empty|var_(dump|export)|floatval|get(type|_(defined_vars|resource_type))|boolval)\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            strval|settype|serialize|(bool|double|float)val|debug_zval_dump|intval|import_request_variables|isset|
+            is_(scalar|string|null|numeric|callable|int(eger)?|object|double|float|long|array|resource|real|bool)|
+            unset|unserialize|print_r|empty|var_(dump|export)|gettype|get_(defined_vars|resource_type)
+          )\\b
+        '''
         'name': 'support.function.var.php'
       }
       {
-        'match': '(?i)\\bwddx_(serialize_va(lue|rs)|deserialize|packet_(start|end)|add_vars)\\b'
+        'match': '(?i)\\bwddx_(serialize_(value|vars)|deserialize|packet_(start|end)|add_vars)\\b'
         'name': 'support.function.wddx.php'
       }
       {
-        'match': '(?i)\\bxhprof_(sample_(disable|enable)|disable|enable)\\b'
+        'match': '(?i)\\bxhprof_(sample_)?(disable|enable)\\b'
         'name': 'support.function.xhprof.php'
       }
       {
-        'match': '(?i)\\b(utf8_(decode|encode)|xml_(set_(start_namespace_decl_handler|notation_decl_handler|character_data_handler|object|default_handler|unparsed_entity_decl_handler|processing_instruction_handler|e(nd_namespace_decl_handler|lement_handler|xternal_entity_ref_handler))|parse(_into_struct|r_(set_option|create(_ns)?|free|get_option))?|error_string|get_(current_(column_number|line_number|byte_index)|error_code)))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            utf8_(decode|encode)|
+            xml_(set_((notation|(end|start)_namespace|unparsed_entity)_decl_handler|
+                      (character_data|default|element|external_entity_ref|processing_instruction)_handler|object)|
+                 parse(_into_struct)?|parser_((get|set)_option|create(_ns)?|free)|error_string|
+                 get_(current_((column|line)_number|byte_index)|error_code))
+          )\\b
+        '''
         'name': 'support.function.xml.php'
       }
       {
-        'match': '(?i)\\bxmlrpc_(se(t_type|rver_(c(all_method|reate)|destroy|add_introspection_data|register_(introspection_callback|method)))|is_fault|decode(_request)?|parse_method_descriptions|encode(_request)?|get_type)\\b'
+        'match': '''(?xi)
+          \\b
+          xmlrpc_(
+            server_(call_method|create|destroy|add_introspection_data|register_(introspection_callback|method))|
+            is_fault|decode(_request)?|parse_method_descriptions|encode(_request)?|(get|set)_type
+          )\\b
+        '''
         'name': 'support.function.xmlrpc.php'
       }
       {
-        'match': '(?i)\\bxmlwriter_(s(tart_(c(omment|data)|d(td(_(e(ntity|lement)|attlist))?|ocument)|pi|element(_ns)?|attribute(_ns)?)|et_indent(_string)?)|text|o(utput_memory|pen_(uri|memory))|end_(c(omment|data)|d(td(_(e(ntity|lement)|attlist))?|ocument)|pi|element|attribute)|f(ull_end_element|lush)|write_(c(omment|data)|dtd(_(e(ntity|lement)|attlist))?|pi|element(_ns)?|attribute(_ns)?|raw))\\b'
+        'match': '''(?xi)
+          \\b
+          xmlwriter_(
+            (end|start|write)_(comment|cdata|dtd(_(attlist|entity|element))?|document|pi|attribute|element)|
+            (start|write)_(attribute|element)_ns|write_raw|set_indent(_string)?|text|output_memory|open_(memory|uri)|
+            full_end_element|flush|
+          )\\b
+        '''
         'name': 'support.function.xmlwriter.php'
       }
       {
-        'match': '(?i)\\b(zlib_(decode|encode|get_coding_type)|readgzfile|gz(seek|c(ompress|lose)|tell|inflate|open|de(code|flate)|uncompress|p(uts|assthru)|e(ncode|of)|file|write|re(wind|ad)|get(s(s)?|c)))\\b'
+        'match': '''(?xi)
+          \\b
+          (
+            zlib_(decode|encode|get_coding_type)|readgzfile|
+            gz(seek|compress|close|tell|inflate|open|decode|deflate|uncompress|puts|passthru|encode|eof|file|
+               write|rewind|read|getc|getss?)
+          )\\b
+        '''
         'name': 'support.function.zlib.php'
       }
       {
