@@ -210,6 +210,15 @@ describe 'PHP grammar', ->
         expect(tokens[1][5]).toEqual value: '2', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'constant.numeric.php']
         expect(tokens[1][6]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
+  it 'should tokenize $this', ->
+    tokens = grammar.tokenizeLines "<?php $this"
+    expect(tokens[0][2]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.language.this.php', 'punctuation.definition.variable.php']
+    expect(tokens[0][3]).toEqual value: 'this', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.language.this.php']
+
+    tokens = grammar.tokenizeLines "<?php $thistles"
+    expect(tokens[0][2]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(tokens[0][3]).toEqual value: 'thistles', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
+
   it 'should tokenize namespace at the same line as <?php', ->
     tokens = grammar.tokenizeLines "<?php namespace Test;"
     expect(tokens[0][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
