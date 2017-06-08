@@ -3288,8 +3288,15 @@
             'name': 'string.unquoted.index.php'
           '11':
             'name': 'punctuation.section.array.end.php'
-        'comment': 'Simple syntax: $foo, $foo[0], $foo[$bar], $foo->bar'
-        'match': '(?x)\n\t\t\t\t\t\t((\\$)(?<name>[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))\n\t\t\t\t\t\t(?:\n\t\t\t\t\t\t\t(->)(\\g<name>)\n\t\t\t\t\t\t\t|\n\t\t\t\t\t\t\t(\\[)\n\t\t\t\t\t\t\t\t(?:(\\d+)|((\\$)\\g<name>)|(\\w+))\n\t\t\t\t\t\t\t(\\])\n\t\t\t\t\t\t)?\n\t\t\t\t\t\t'
+        # Simple syntax: $foo, $foo[0], $foo[$bar], $foo->bar
+        'match': '''(?x)
+          ((\\$)(?<name>[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))
+          (?:
+            (->)(\\g<name>)
+            |
+            (\\[)(?:(\\d+)|((\\$)\\g<name>)|([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))(\\])
+          )?
+        '''
       }
       {
         'captures':
@@ -3299,8 +3306,8 @@
             'name': 'punctuation.definition.variable.php'
           '4':
             'name': 'punctuation.definition.variable.php'
-        'comment': 'Simple syntax with braces: "foo${bar}baz"'
-        'match': '(?x)\n\t\t\t\t\t\t((\\$\\{)(?<name>[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)(\\}))\n\t\t\t\t\t\t'
+        # Simple syntax with braces: foo${bar}baz
+        'match': '(?i)((\\${)(?<name>[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(}))'
       }
     ]
   'variables':
