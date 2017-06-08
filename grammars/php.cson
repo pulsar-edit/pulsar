@@ -3322,13 +3322,13 @@
         'include': '#var_basic'
       }
       {
-        'begin': '(\\$\\{)(?=.*?\\})'
+        'begin': '\\${(?=.*?})'
         'beginCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.variable.php'
-        'end': '(\\})'
+        'end': '}'
         'endCaptures':
-          '1':
+          '0':
             'name': 'punctuation.definition.variable.php'
         'patterns': [
           {
