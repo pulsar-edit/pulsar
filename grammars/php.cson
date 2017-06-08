@@ -299,235 +299,211 @@
   'constants':
     'patterns': [
       {
-        'begin': '''(?xi)
-          (?=
-            ((\\\\)?[a-z_][\\w]*\\\\[a-z_][\\w\\\\]*)
-            [^\\w\\\\]
-          )
-        '''
-        'end': '(?i)([a-z_][\\w]*)?(?=[^\\w\\\\])'
-        'endCaptures':
-          '1':
-            'name': 'constant.other.php'
-        'patterns': [
-          {
-            'include': '#namespace'
-          }
-        ]
+        'match': '(?i)\\b(TRUE|FALSE|NULL|__(FILE|DIR|FUNCTION|CLASS|METHOD|LINE|NAMESPACE)__|ON|OFF|YES|NO|NL|BR|TAB)\\b'
+        'name': 'constant.language.php'
       }
       {
-        'begin': '(?=\\\\?[a-zA-Z_\\x{7f}-\\x{ff}])'
-        'end': '(?=[^\\\\a-zA-Z_\\x{7f}-\\x{ff}])'
-        'patterns': [
-          {
-            'match': '(?i)\\b(TRUE|FALSE|NULL|__(FILE|DIR|FUNCTION|CLASS|METHOD|LINE|NAMESPACE)__|ON|OFF|YES|NO|NL|BR|TAB)\\b'
-            'name': 'constant.language.php'
-          }
-          {
-            'match': '''(?x)
-              (\\\\)?\\b
-              (DEFAULT_INCLUDE_PATH
-              |EAR_(INSTALL|EXTENSION)_DIR
-              |E_(ALL|COMPILE_(ERROR|WARNING)|CORE_(ERROR|WARNING)|DEPRECATED|ERROR|NOTICE
-                 |PARSE|RECOVERABLE_ERROR|STRICT|USER_(DEPRECATED|ERROR|NOTICE|WARNING)|WARNING)
-              |PHP_(ROUND_HALF_(DOWN|EVEN|ODD|UP)|(MAJOR|MINOR|RELEASE)_VERSION|MAXPATHLEN
-                   |BINDIR|SHLIB_SUFFIX|SYSCONFDIR|SAPI|CONFIG_FILE_(PATH|SCAN_DIR)
-                   |INT_(MAX|SIZE)|ZTS|OS|OUTPUT_HANDLER_(START|CONT|END)|DEBUG|DATADIR
-                   |URL_(SCHEME|HOST|USER|PORT|PASS|PATH|QUERY|FRAGMENT)|PREFIX
-                   |EXTRA_VERSION|EXTENSION_DIR|EOL|VERSION(_ID)?
-                   |WINDOWS_(NT_(SERVER|DOMAIN_CONTROLLER|WORKSTATION)
-                            |VERSION_(MAJOR|MINOR)|BUILD|SUITEMASK|SP_(MAJOR|MINOR)
-                            |PRODUCTTYPE|PLATFORM)
-                   |LIBDIR|LOCALSTATEDIR)
-              |STD(ERR|IN|OUT)|ZEND_(DEBUG_BUILD|THREAD_SAFE))
-              \\b
-            '''
-            'name': 'support.constant.core.php'
-            'captures':
-              '1':
-                'name': 'punctuation.separator.inheritance.php'
-          }
-          {
-            'match': '''(?x)
-              (\\\\)?\\b
-              (__COMPILER_HALT_OFFSET__|AB(MON_(1|2|3|4|5|6|7|8|9|10|11|12)|DAY[1-7])
-              |AM_STR|ASSERT_(ACTIVE|BAIL|CALLBACK_QUIET_EVAL|WARNING)|ALT_DIGITS
-              |CASE_(UPPER|LOWER)|CHAR_MAX|CONNECTION_(ABORTED|NORMAL|TIMEOUT)|CODESET|COUNT_(NORMAL|RECURSIVE)
-              |CREDITS_(ALL|DOCS|FULLPAGE|GENERAL|GROUP|MODULES|QA|SAPI)
-              |CRYPT_(BLOWFISH|EXT_DES|MD5|SHA(256|512)|SALT_LENGTH|STD_DES)|CURRENCY_SYMBOL
-              |D_(T_)?FMT|DATE_(ATOM|COOKIE|ISO8601|RFC(822|850|1036|1123|2822|3339)|RSS|W3C)
-              |DAY_[1-7]|DECIMAL_POINT|DIRECTORY_SEPARATOR
-              |ENT_(COMPAT|IGNORE|(NO)?QUOTES)|EXTR_(IF_EXISTS|OVERWRITE|PREFIX_(ALL|IF_EXISTS|INVALID|SAME)|REFS|SKIP)
-              |ERA(_(D_(T_)?FMT)|T_FMT|YEAR)?|FRAC_DIGITS|GROUPING|HASH_HMAC|HTML_(ENTITIES|SPECIALCHARS)
-              |INF|INFO_(ALL|CREDITS|CONFIGURATION|ENVIRONMENT|GENERAL|LICENSEMODULES|VARIABLES)
-              |INI_(ALL|CANNER_(NORMAL|RAW)|PERDIR|SYSTEM|USER)|INT_(CURR_SYMBOL|FRAC_DIGITS)
-              |LC_(ALL|COLLATE|CTYPE|MESSAGES|MONETARY|NUMERIC|TIME)|LOCK_(EX|NB|SH|UN)
-              |LOG_(ALERT|AUTH(PRIV)?|CRIT|CRON|CONS|DAEMON|DEBUG|EMERG|ERR|INFO|LOCAL[1-7]|LPR|KERN|MAIL
-                   |NEWS|NODELAY|NOTICE|NOWAIT|ODELAY|PID|PERROR|WARNING|SYSLOG|UCP|USER)
-              |M_(1_PI|SQRT(1_2|2|3|PI)|2_(SQRT)?PI|PI(_(2|4))?|E(ULER)?|LN(10|2|PI)|LOG(10|2)E)
-              |MON_(1|2|3|4|5|6|7|8|9|10|11|12|DECIMAL_POINT|GROUPING|THOUSANDS_SEP)
-              |N_(CS_PRECEDES|SEP_BY_SPACE|SIGN_POSN)|NAN|NEGATIVE_SIGN|NO(EXPR|STR)
-              |P_(CS_PRECEDES|SEP_BY_SPACE|SIGN_POSN)|PM_STR|POSITIVE_SIGN
-              |PATH(_SEPARATOR|INFO_(EXTENSION|(BASE|DIR|FILE)NAME))|RADIXCHAR
-              |SEEK_(CUR|END|SET)|SORT_(ASC|DESC|LOCALE_STRING|REGULAR|STRING)|STR_PAD_(BOTH|LEFT|RIGHT)
-              |T_FMT(_AMPM)?|THOUSEP|THOUSANDS_SEP
-              |UPLOAD_ERR_(CANT_WRITE|EXTENSION|(FORM|INI)_SIZE|NO_(FILE|TMP_DIR)|OK|PARTIAL)
-              |YES(EXPR|STR))
-              \\b
-            '''
-            'name': 'support.constant.std.php'
-            'captures':
-              '1':
-                'name': 'punctuation.separator.inheritance.php'
-          }
-          {
-            # Good luck to whoever wants to alphabetize this.
-            'match': '''(?x)
-              (\\\\)?\\b
-              (GLOB_(MARK|BRACE|NO(SORT|CHECK|ESCAPE)|ONLYDIR|ERR|AVAILABLE_FLAGS)
-              |XML_(SAX_IMPL|(DTD|DOCUMENT(_(FRAG|TYPE))?|HTML_DOCUMENT|NOTATION|NAMESPACE_DECL|PI|COMMENT|DATA_SECTION|TEXT)_NODE
-                   |OPTION_(SKIP_(TAGSTART|WHITE)|CASE_FOLDING|TARGET_ENCODING)
-                   |ERROR_((BAD_CHAR|(ATTRIBUTE_EXTERNAL|BINARY|PARAM|RECURSIVE)_ENTITY)_REF|MISPLACED_XML_PI|SYNTAX|NONE
-                          |NO_(MEMORY|ELEMENTS)|TAG_MISMATCH|INCORRECT_ENCODING|INVALID_TOKEN|DUPLICATE_ATTRIBUTE
-                          |UNCLOSED_(CDATA_SECTION|TOKEN)|UNDEFINED_ENTITY|UNKNOWN_ENCODING|JUNK_AFTER_DOC_ELEMENT
-                          |PARTIAL_CHAR|EXTERNAL_ENTITY_HANDLING|ASYNC_ENTITY)
-                   |ENTITY_(((REF|DECL)_)?NODE)|ELEMENT(_DECL)?_NODE|LOCAL_NAMESPACE|ATTRIBUTE_(NMTOKEN(S)?|NOTATION|NODE)
-                   |CDATA|ID(REF(S)?)?|DECL_NODE|ENTITY|ENUMERATION)
-              |MHASH_(RIPEMD(128|160|256|320)|GOST|MD(2|4|5)|SHA(1|224|256|384|512)|SNEFRU256|HAVAL(128|160|192|224|256)
-                     |CRC23(B)?|TIGER(128|160)?|WHIRLPOOL|ADLER32)
-              |MYSQL_(BOTH|NUM|CLIENT_(SSL|COMPRESS|IGNORE_SPACE|INTERACTIVE|ASSOC))
-              |MYSQLI_(REPORT_(STRICT|INDEX|OFF|ERROR|ALL)|REFRESH_(GRANT|MASTER|BACKUP_LOG|STATUS|SLAVE|HOSTS|THREADS|TABLES|LOG)
-                      |READ_DEFAULT_(FILE|GROUP)|(GROUP|MULTIPLE_KEY|BINARY|BLOB)_FLAG|BOTH
-                      |STMT_ATTR_(CURSOR_TYPE|UPDATE_MAX_LENGTH|PREFETCH_ROWS)|STORE_RESULT
-                      |SERVER_QUERY_(NO_((GOOD_)?INDEX_USED)|WAS_SLOW)|SET_(CHARSET_NAME|FLAG)
-                      |NO_(DEFAULT_VALUE_FLAG|DATA)|NOT_NULL_FLAG|NUM(_FLAG)?
-                      |CURSOR_TYPE_(READ_ONLY|SCROLLABLE|NO_CURSOR|FOR_UPDATE)
-                      |CLIENT_(SSL|NO_SCHEMA|COMPRESS|IGNORE_SPACE|INTERACTIVE|FOUND_ROWS)
-                      |TYPE_(GEOMETRY|((MEDIUM|LONG|TINY)_)?BLOB|BIT|SHORT|STRING|SET|YEAR|NULL|NEWDECIMAL|NEWDATE|CHAR
-                            |TIME(STAMP)?|TINY|INT24|INTERVAL|DOUBLE|DECIMAL|DATE(TIME)?|ENUM|VAR_STRING|FLOAT|LONG(LONG)?)
-                      |TIME_STAMP_FLAG|INIT_COMMAND|ZEROFILL_FLAG|ON_UPDATE_NOW_FLAG
-                      |OPT_(NET_((CMD|READ)_BUFFER_SIZE)|CONNECT_TIMEOUT|INT_AND_FLOAT_NATIVE|LOCAL_INFILE)
-                      |DEBUG_TRACE_ENABLED|DATA_TRUNCATED|USE_RESULT|(ENUM|(PART|PRI|UNIQUE)_KEY|UNSIGNED)_FLAG
-                      |ASSOC|ASYNC|AUTO_INCREMENT_FLAG)
-              |MCRYPT_(RC(2|6)|RIJNDAEL_(128|192|256)|RAND|GOST|XTEA|MODE_(STREAM|NOFB|CBC|CFB|OFB|ECB)|MARS
-                      |BLOWFISH(_COMPAT)?|SERPENT|SKIPJACK|SAFER(64|128|PLUS)|CRYPT|CAST_(128|256)|TRIPLEDES|THREEWAY
-                      |TWOFISH|IDEA|(3)?DES|DECRYPT|DEV_(U)?RANDOM|PANAMA|ENCRYPT|ENIGNA|WAKE|LOKI97|ARCFOUR(_IV)?)
-              |STREAM_(REPORT_ERRORS|MUST_SEEK|MKDIR_RECURSIVE|BUFFER_(NONE|FULL|LINE)|SHUT_(RD)?WR
-                      |SOCK_(RDM|RAW|STREAM|SEQPACKET|DGRAM)|SERVER_(BIND|LISTEN)
-                      |NOTIFY_(REDIRECTED|RESOLVE|MIME_TYPE_IS|SEVERITY_(INFO|ERR|WARN)|COMPLETED|CONNECT|PROGRESS
-                              |FILE_SIZE_IS|FAILURE|AUTH_(REQUIRED|RESULT))
-                      |CRYPTO_METHOD_((SSLv2(3)?|SSLv3|TLS)_(CLIENT|SERVER))|CLIENT_((ASYNC_)?CONNECT|PERSISTENT)
-                      |CAST_(AS_STREAM|FOR_SELECT)|(IGNORE|IS)_URL|IPPROTO_(RAW|TCP|ICMP|IP|UDP)|OOB
-                      |OPTION_(READ_(BUFFER|TIMEOUT)|BLOCKING|WRITE_BUFFER)|URL_STAT_(LINK|QUIET)|USE_PATH
-                      |PEEK|PF_(INET(6)?|UNIX)|ENFORCE_SAFE_MODE|FILTER_(ALL|READ|WRITE))
-              |SUNFUNCS_RET_(DOUBLE|STRING|TIMESTAMP)
-              |SQLITE_(READONLY|ROW|MISMATCH|MISUSE|BOTH|BUSY|SCHEMA|NOMEM|NOTFOUND|NOTADB|NOLFS|NUM|CORRUPT
-                      |CONSTRAINT|CANTOPEN|TOOBIG|INTERRUPT|INTERNAL|IOERR|OK|DONE|PROTOCOL|PERM|ERROR|EMPTY
-                      |FORMAT|FULL|LOCKED|ABORT|ASSOC|AUTH)
-              |SQLITE3_(BOTH|BLOB|NUM|NULL|TEXT|INTEGER|OPEN_(READ(ONLY|WRITE)|CREATE)|FLOAT_ASSOC)
-              |CURL(M_(BAD_((EASY)?HANDLE)|CALL_MULTI_PERFORM|INTERNAL_ERROR|OUT_OF_MEMORY|OK)
-                   |MSG_DONE|SSH_AUTH_(HOST|NONE|DEFAULT|PUBLICKEY|PASSWORD|KEYBOARD)
-                   |CLOSEPOLICY_(SLOWEST|CALLBACK|OLDEST|LEAST_(RECENTLY_USED|TRAFFIC)
-                   |INFO_(REDIRECT_(COUNT|TIME)|REQUEST_SIZE|SSL_VERIFYRESULT|STARTTRANSFER_TIME
-                         |(SIZE|SPEED)_(DOWNLOAD|UPLOAD)|HTTP_CODE|HEADER_(OUT|SIZE)|NAMELOOKUP_TIME
-                         |CONNECT_TIME|CONTENT_(TYPE|LENGTH_(DOWNLOAD|UPLOAD))|CERTINFO|TOTAL_TIME
-                         |PRIVATE|PRETRANSFER_TIME|EFFECTIVE_URL|FILETIME)
-                   |OPT_(RESUME_FROM|RETURNTRANSFER|REDIR_PROTOCOLS|REFERER|READ(DATA|FUNCTION)|RANGE|RANDOM_FILE
-                        |MAX(CONNECTS|REDIRS)|BINARYTRANSFER|BUFFERSIZE
-                        |SSH_(HOST_PUBLIC_KEY_MD5|(PRIVATE|PUBLIC)_KEYFILE)|AUTH_TYPES)
-                        |SSL(CERT(TYPE|PASSWD)?|ENGINE(_DEFAULT)?|VERSION|KEY(TYPE|PASSWD)?)
-                        |SSL_(CIPHER_LIST|VERIFY(HOST|PEER))
-                        |STDERR|HTTP(GET|HEADER|200ALIASES|_VERSION|PROXYTUNNEL|AUTH)
-                        |HEADER(FUNCTION)?|NO(BODY|SIGNAL|PROGRESS)|NETRC|CRLF|CONNECTTIMEOUT(_MS)?
-                        |COOKIE(SESSION|JAR|FILE)?|CUSTOMREQUEST|CERTINFO|CLOSEPOLICY|CA(INFO|PATH)|TRANSFERTEXT
-                        |TCP_NODELAY|TIME(CONDITION|OUT(_MS)?|VALUE)|INTERFACE|INFILE(SIZE)?|IPRESOLVE
-                        |DNS_(CACHE_TIMEOUT|USE_GLOBAL_CACHE)|URL|USER(AGENT|PWD)|UNRESTRICTED_AUTH|UPLOAD
-                        |PRIVATE|PROGRESSFUNCTION|PROXY(TYPE|USERPWD|PORT|AUTH)?|PROTOCOLS|PORT
-                        |POST(REDIR|QUOTE|FIELDS)?|PUT|EGDSOCKET|ENCODING|VERBOSE|KRB4LEVEL|KEYPASSWD|QUOTE|FRESH_CONNECT
-                        |FTP(APPEND|LISTONLY|PORT|SSLAUTH)
-                        |FTP_(SSL|SKIP_PASV_IP|CREATE_MISSING_DIRS|USE_EP(RT|SV)|FILEMETHOD)
-                        |FILE(TIME)?|FORBID_REUSE|FOLLOWLOCATION|FAILONERROR|WRITE(FUNCTION|HEADER)|LOW_SPEED_(LIMIT|TIME)
-                        |AUTOREFERER)
-                   |PROXY_(HTTP|SOCKS(4|5))|PROTO_(SCP|SFTP|HTTP(S)?|TELNET|TFTP|DICT|FTP(S)?|FILE|LDAP(S)?|ALL)
-                   |E_((RECV|READ)_ERROR|GOT_NOTHING|MALFORMAT_USER
-                      |BAD_(CONTENT_ENCODING|CALLING_ORDER|PASSWORD_ENTERED|FUNCTION_ARGUMENT)
-                      |SSH|SSL_(CIPHER|CONNECT_ERROR|CERTPROBLEM|CACERT|PEER_CERTIFICATE|ENGINE_(NOTFOUND|SETFAILED))
-                      |SHARE_IN_USE|SEND_ERROR|HTTP_(RANGE_ERROR|NOT_FOUND|PORT_FAILED|POST_ERROR)
-                      |COULDNT_(RESOLVE_(HOST|PROXY)|CONNECT)|TOO_MANY_REDIRECTS|TELNET_OPTION_SYNTAX|OBSOLETE
-                      |OUT_OF_MEMORY|OPERATION|TIMEOUTED|OK|URL_MALFORMAT(_USER)?|UNSUPPORTED_PROTOCOL
-                      |UNKNOWN_TELNET_OPTION|PARTIAL_FILE
-                      |FTP_(BAD_DOWNLOAD_RESUME|SSL_FAILED|COULDNT_(RETR_FILE|GET_SIZE|STOR_FILE|SET_(BINARY|ASCII)|USE_REST)
-                           |CANT_(GET_HOST|RECONNECT)|USER_PASSWORD_INCORRECT|PORT_FAILED|QUOTE_ERROR|WRITE_ERROR
-                           |WEIRD_((PASS|PASV|SERVER|USER)_REPLY|227_FORMAT)|ACCESS_DENIED)
-                      |FILESIZE_EXCEEDED|FILE_COULDNT_READ_FILE|FUNCTION_NOT_FOUND|FAILED_INIT|WRITE_ERROR|LIBRARY_NOT_FOUND
-                      |LDAP_(SEARCH_FAILED|CANNOT_BIND|INVALID_URL)|ABORTED_BY_CALLBACK)
-                   |VERSION_NOW
-                   |FTP(METHOD_(MULTI|SINGLE|NO)CWD|SSL_(ALL|NONE|CONTROL|TRY)|AUTH_(DEFAULT|SSL|TLS))
-                   |AUTH_(ANY(SAFE)?|BASIC|DIGEST|GSSNEGOTIATE|NTLM))
-              |CURL_(HTTP_VERSION_(1_(0|1)|NONE)|NETRC_(REQUIRED|IGNORED|OPTIONAL)|TIMECOND_(IF(UN)?MODSINCE|LASTMOD)
-                    |IPRESOLVE_(V(4|6)|WHATEVER)|VERSION_(SSL|IPV6|KERBEROS4|LIBZ))
-              |IMAGETYPE_(GIF|XBM|BMP|SWF|COUNT|TIFF_(MM|II)|ICO|IFF|UNKNOWN|JB2|JPX|JP2|JPC|JPEG(2000)?|PSD|PNG|WBMP)
-              |INPUT_(REQUEST|GET|SERVER|SESSION|COOKIE|POST|ENV)|ICONV_(MIME_DECODE_(STRICT|CONTINUE_ON_ERROR)|IMPL|VERSION)
-              |DNS_(MX|SRV|SOA|HINFO|NS|NAPTR|CNAME|TXT|PTR|ANY|ALL|AAAA|A(6)?)
-              |DOM(STRING_SIZE_ERR)
-              |DOM_((SYNTAX|HIERARCHY_REQUEST|NO_(MODIFICATION_ALLOWED|DATA_ALLOWED)|NOT_(FOUND|SUPPORTED)|NAMESPACE
-                   |INDEX_SIZE|USE_ATTRIBUTE|VALID_(MODIFICATION|STATE|CHARACTER|ACCESS)|PHP|VALIDATION|WRONG_DOCUMENT)_ERR)
-              |JSON_(HEX_(TAG|QUOT|AMP|APOS)|NUMERIC_CHECK|ERROR_(SYNTAX|STATE_MISMATCH|NONE|CTRL_CHAR|DEPTH|UTF8)|FORCE_OBJECT)
-              |PREG_((D_UTF8(_OFFSET)?|NO|INTERNAL|(BACKTRACK|RECURSION)_LIMIT)_ERROR|GREP_INVERT
-                    |SPLIT_(NO_EMPTY|(DELIM|OFFSET)_CAPTURE)|SET_ORDER|OFFSET_CAPTURE|PATTERN_ORDER)
-              |PSFS_(PASS_ON|ERR_FATAL|FEED_ME|FLAG_(NORMAL|FLUSH_(CLOSE|INC)))
-              |PCRE_VERSION|POSIX_((F|R|W|X)_OK|S_IF(REG|BLK|SOCK|CHR|IFO))
-              |FNM_(NOESCAPE|CASEFOLD|PERIOD|PATHNAME)
-              |FILTER_(REQUIRE_(SCALAR|ARRAY)|NULL_ON_FAILURE|CALLBACK|DEFAULT|UNSAFE_RAW
-                      |SANITIZE_(MAGIC_QUOTES|STRING|STRIPPED|SPECIAL_CHARS|NUMBER_(INT|FLOAT)|URL
-                                |EMAIL|ENCODED|FULL_SPCIAL_CHARS)
-                      |VALIDATE_(REGEXP|BOOLEAN|INT|IP|URL|EMAIL|FLOAT)
-                      |FORCE_ARRAY
-                      |FLAG_(SCHEME_REQUIRED|STRIP_(BACKTICK|HIGH|LOW)|HOST_REQUIRED|NONE|NO_(RES|PRIV)_RANGE|ENCODE_QUOTES
-                            |IPV(4|6)|PATH_REQUIRED|EMPTY_STRING_NULL|ENCODE_(HIGH|LOW|AMP)|QUERY_REQUIRED
-                            |ALLOW_(SCIENTIFIC|HEX|THOUSAND|OCTAL|FRACTION)))
-              |FILE_(BINARY|SKIP_EMPTY_LINES|NO_DEFAULT_CONTEXT|TEXT|IGNORE_NEW_LINES|USE_INCLUDE_PATH|APPEND)
-              |FILEINFO_(RAW|MIME(_(ENCODING|TYPE))?|SYMLINK|NONE|CONTINUE|DEVICES|PRESERVE_ATIME)
-              |FORCE_(DEFLATE|GZIP)
-              |LIBXML_(XINCLUDE|NSCLEAN|NO(XMLDECL|BLANKS|NET|CDATA|ERROR|EMPTYTAG|ENT|WARNING)
-                      |COMPACT|DTD(VALID|LOAD|ATTR)|((DOTTED|LOADED)_)?VERSION|PARSEHUGE|ERR_(NONE|ERROR|FATAL|WARNING)))
-              \\b
-            '''
-            'name': 'support.constant.ext.php'
-            'captures':
-              '1':
-                'name': 'punctuation.separator.inheritance.php'
-          }
-          {
-            'match': '''(?x)
-              (\\\\)?\\b
-              (T_(RETURN|REQUIRE(_ONCE)?|GOTO|GLOBAL|(MINUS|MOD|MUL|XOR)_EQUAL|METHOD_C|ML_COMMENT|BREAK
-                 |BOOL_CAST|BOOLEAN_(AND|OR)|BAD_CHARACTER|SR(_EQUAL)?|STRING(_CAST|VARNAME)?|START_HEREDOC|STATIC
-                 |SWITCH|SL(_EQUAL)?|HALT_COMPILER|NS_(C|SEPARATOR)|NUM_STRING|NEW|NAMESPACE|CHARACTER|COMMENT
-                 |CONSTANT(_ENCAPSED_STRING)?|CONCAT_EQUAL|CONTINUE|CURLY_OPEN|CLOSE_TAG|CLONE|CLASS(_C)?
-                 |CASE|CATCH|TRY|THROW|IMPLEMENTS|ISSET|IS_((GREATER|SMALLER)_OR_EQUAL|(NOT_)?(IDENTICAL|EQUAL))
-                 |INSTANCEOF|INCLUDE(_ONCE)?|INC|INT_CAST|INTERFACE|INLINE_HTML|IF|OR_EQUAL|OBJECT_(CAST|OPERATOR)
-                 |OPEN_TAG(_WITH_ECHO)?|OLD_FUNCTION|DNUMBER|DIR|DIV_EQUAL|DOC_COMMENT|DOUBLE_(ARROW|CAST|COLON)
-                 |DOLLAR_OPEN_CURLY_BRACES|DO|DEC|DECLARE|DEFAULT|USE|UNSET(_CAST)?|PRINT|PRIVATE|PROTECTED|PUBLIC
-                 |PLUS_EQUAL|PAAMAYIM_NEKUDOTAYIM|EXTENDS|EXIT|EMPTY|ENCAPSED_AND_WHITESPACE
-                 |END(SWITCH|IF|DECLARE|FOR(EACH)?|WHILE)|END_HEREDOC|ECHO|EVAL|ELSE(IF)?|VAR(IABLE)?|FINAL|FILE
-                 |FOR(EACH)?|FUNC_C|FUNCTION|WHITESPACE|WHILE|LNUMBER|LIST|LINE|LOGICAL_(AND|OR|XOR)
-                 |ARRAY_(CAST)?|ABSTRACT|AS|AND_EQUAL))
-              \\b
-            '''
-            'name': 'support.constant.parser-token.php'
-            'captures':
-              '1':
-                'name': 'punctuation.separator.inheritance.php'
-          }
-          {
-            # In PHP, any identifier which is not a variable is taken to be a constant.
-            # However, if there is not a constant defined with the given name then a notice
-            # is generated and the constant is assumed to have the value of its name.
-            'match': '[a-zA-Z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*'
-            'name': 'constant.other.php'
-          }
-        ]
+        'match': '''(?x)
+          (\\\\)?\\b
+          (DEFAULT_INCLUDE_PATH
+          |EAR_(INSTALL|EXTENSION)_DIR
+          |E_(ALL|COMPILE_(ERROR|WARNING)|CORE_(ERROR|WARNING)|DEPRECATED|ERROR|NOTICE
+             |PARSE|RECOVERABLE_ERROR|STRICT|USER_(DEPRECATED|ERROR|NOTICE|WARNING)|WARNING)
+          |PHP_(ROUND_HALF_(DOWN|EVEN|ODD|UP)|(MAJOR|MINOR|RELEASE)_VERSION|MAXPATHLEN
+               |BINDIR|SHLIB_SUFFIX|SYSCONFDIR|SAPI|CONFIG_FILE_(PATH|SCAN_DIR)
+               |INT_(MAX|SIZE)|ZTS|OS|OUTPUT_HANDLER_(START|CONT|END)|DEBUG|DATADIR
+               |URL_(SCHEME|HOST|USER|PORT|PASS|PATH|QUERY|FRAGMENT)|PREFIX
+               |EXTRA_VERSION|EXTENSION_DIR|EOL|VERSION(_ID)?
+               |WINDOWS_(NT_(SERVER|DOMAIN_CONTROLLER|WORKSTATION)
+                        |VERSION_(MAJOR|MINOR)|BUILD|SUITEMASK|SP_(MAJOR|MINOR)
+                        |PRODUCTTYPE|PLATFORM)
+               |LIBDIR|LOCALSTATEDIR)
+          |STD(ERR|IN|OUT)|ZEND_(DEBUG_BUILD|THREAD_SAFE))
+          \\b
+        '''
+        'name': 'support.constant.core.php'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.inheritance.php'
+      }
+      {
+        'match': '''(?x)
+          (\\\\)?\\b
+          (__COMPILER_HALT_OFFSET__|AB(MON_(1|2|3|4|5|6|7|8|9|10|11|12)|DAY[1-7])
+          |AM_STR|ASSERT_(ACTIVE|BAIL|CALLBACK_QUIET_EVAL|WARNING)|ALT_DIGITS
+          |CASE_(UPPER|LOWER)|CHAR_MAX|CONNECTION_(ABORTED|NORMAL|TIMEOUT)|CODESET|COUNT_(NORMAL|RECURSIVE)
+          |CREDITS_(ALL|DOCS|FULLPAGE|GENERAL|GROUP|MODULES|QA|SAPI)
+          |CRYPT_(BLOWFISH|EXT_DES|MD5|SHA(256|512)|SALT_LENGTH|STD_DES)|CURRENCY_SYMBOL
+          |D_(T_)?FMT|DATE_(ATOM|COOKIE|ISO8601|RFC(822|850|1036|1123|2822|3339)|RSS|W3C)
+          |DAY_[1-7]|DECIMAL_POINT|DIRECTORY_SEPARATOR
+          |ENT_(COMPAT|IGNORE|(NO)?QUOTES)|EXTR_(IF_EXISTS|OVERWRITE|PREFIX_(ALL|IF_EXISTS|INVALID|SAME)|REFS|SKIP)
+          |ERA(_(D_(T_)?FMT)|T_FMT|YEAR)?|FRAC_DIGITS|GROUPING|HASH_HMAC|HTML_(ENTITIES|SPECIALCHARS)
+          |INF|INFO_(ALL|CREDITS|CONFIGURATION|ENVIRONMENT|GENERAL|LICENSEMODULES|VARIABLES)
+          |INI_(ALL|CANNER_(NORMAL|RAW)|PERDIR|SYSTEM|USER)|INT_(CURR_SYMBOL|FRAC_DIGITS)
+          |LC_(ALL|COLLATE|CTYPE|MESSAGES|MONETARY|NUMERIC|TIME)|LOCK_(EX|NB|SH|UN)
+          |LOG_(ALERT|AUTH(PRIV)?|CRIT|CRON|CONS|DAEMON|DEBUG|EMERG|ERR|INFO|LOCAL[1-7]|LPR|KERN|MAIL
+               |NEWS|NODELAY|NOTICE|NOWAIT|ODELAY|PID|PERROR|WARNING|SYSLOG|UCP|USER)
+          |M_(1_PI|SQRT(1_2|2|3|PI)|2_(SQRT)?PI|PI(_(2|4))?|E(ULER)?|LN(10|2|PI)|LOG(10|2)E)
+          |MON_(1|2|3|4|5|6|7|8|9|10|11|12|DECIMAL_POINT|GROUPING|THOUSANDS_SEP)
+          |N_(CS_PRECEDES|SEP_BY_SPACE|SIGN_POSN)|NAN|NEGATIVE_SIGN|NO(EXPR|STR)
+          |P_(CS_PRECEDES|SEP_BY_SPACE|SIGN_POSN)|PM_STR|POSITIVE_SIGN
+          |PATH(_SEPARATOR|INFO_(EXTENSION|(BASE|DIR|FILE)NAME))|RADIXCHAR
+          |SEEK_(CUR|END|SET)|SORT_(ASC|DESC|LOCALE_STRING|REGULAR|STRING)|STR_PAD_(BOTH|LEFT|RIGHT)
+          |T_FMT(_AMPM)?|THOUSEP|THOUSANDS_SEP
+          |UPLOAD_ERR_(CANT_WRITE|EXTENSION|(FORM|INI)_SIZE|NO_(FILE|TMP_DIR)|OK|PARTIAL)
+          |YES(EXPR|STR))
+          \\b
+        '''
+        'name': 'support.constant.std.php'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.inheritance.php'
+      }
+      {
+        'match': '''(?x)
+          (\\\\)?\\b
+          (GLOB_(MARK|BRACE|NO(SORT|CHECK|ESCAPE)|ONLYDIR|ERR|AVAILABLE_FLAGS)
+          |XML_(SAX_IMPL|(DTD|DOCUMENT(_(FRAG|TYPE))?|HTML_DOCUMENT|NOTATION|NAMESPACE_DECL|PI|COMMENT|DATA_SECTION|TEXT)_NODE
+               |OPTION_(SKIP_(TAGSTART|WHITE)|CASE_FOLDING|TARGET_ENCODING)
+               |ERROR_((BAD_CHAR|(ATTRIBUTE_EXTERNAL|BINARY|PARAM|RECURSIVE)_ENTITY)_REF|MISPLACED_XML_PI|SYNTAX|NONE
+                      |NO_(MEMORY|ELEMENTS)|TAG_MISMATCH|INCORRECT_ENCODING|INVALID_TOKEN|DUPLICATE_ATTRIBUTE
+                      |UNCLOSED_(CDATA_SECTION|TOKEN)|UNDEFINED_ENTITY|UNKNOWN_ENCODING|JUNK_AFTER_DOC_ELEMENT
+                      |PARTIAL_CHAR|EXTERNAL_ENTITY_HANDLING|ASYNC_ENTITY)
+               |ENTITY_(((REF|DECL)_)?NODE)|ELEMENT(_DECL)?_NODE|LOCAL_NAMESPACE|ATTRIBUTE_(NMTOKEN(S)?|NOTATION|NODE)
+               |CDATA|ID(REF(S)?)?|DECL_NODE|ENTITY|ENUMERATION)
+          |MHASH_(RIPEMD(128|160|256|320)|GOST|MD(2|4|5)|SHA(1|224|256|384|512)|SNEFRU256|HAVAL(128|160|192|224|256)
+                 |CRC23(B)?|TIGER(128|160)?|WHIRLPOOL|ADLER32)
+          |MYSQL_(BOTH|NUM|CLIENT_(SSL|COMPRESS|IGNORE_SPACE|INTERACTIVE|ASSOC))
+          |MYSQLI_(REPORT_(STRICT|INDEX|OFF|ERROR|ALL)|REFRESH_(GRANT|MASTER|BACKUP_LOG|STATUS|SLAVE|HOSTS|THREADS|TABLES|LOG)
+                  |READ_DEFAULT_(FILE|GROUP)|(GROUP|MULTIPLE_KEY|BINARY|BLOB)_FLAG|BOTH
+                  |STMT_ATTR_(CURSOR_TYPE|UPDATE_MAX_LENGTH|PREFETCH_ROWS)|STORE_RESULT
+                  |SERVER_QUERY_(NO_((GOOD_)?INDEX_USED)|WAS_SLOW)|SET_(CHARSET_NAME|FLAG)
+                  |NO_(DEFAULT_VALUE_FLAG|DATA)|NOT_NULL_FLAG|NUM(_FLAG)?
+                  |CURSOR_TYPE_(READ_ONLY|SCROLLABLE|NO_CURSOR|FOR_UPDATE)
+                  |CLIENT_(SSL|NO_SCHEMA|COMPRESS|IGNORE_SPACE|INTERACTIVE|FOUND_ROWS)
+                  |TYPE_(GEOMETRY|((MEDIUM|LONG|TINY)_)?BLOB|BIT|SHORT|STRING|SET|YEAR|NULL|NEWDECIMAL|NEWDATE|CHAR
+                        |TIME(STAMP)?|TINY|INT24|INTERVAL|DOUBLE|DECIMAL|DATE(TIME)?|ENUM|VAR_STRING|FLOAT|LONG(LONG)?)
+                  |TIME_STAMP_FLAG|INIT_COMMAND|ZEROFILL_FLAG|ON_UPDATE_NOW_FLAG
+                  |OPT_(NET_((CMD|READ)_BUFFER_SIZE)|CONNECT_TIMEOUT|INT_AND_FLOAT_NATIVE|LOCAL_INFILE)
+                  |DEBUG_TRACE_ENABLED|DATA_TRUNCATED|USE_RESULT|(ENUM|(PART|PRI|UNIQUE)_KEY|UNSIGNED)_FLAG
+                  |ASSOC|ASYNC|AUTO_INCREMENT_FLAG)
+          |MCRYPT_(RC(2|6)|RIJNDAEL_(128|192|256)|RAND|GOST|XTEA|MODE_(STREAM|NOFB|CBC|CFB|OFB|ECB)|MARS
+                  |BLOWFISH(_COMPAT)?|SERPENT|SKIPJACK|SAFER(64|128|PLUS)|CRYPT|CAST_(128|256)|TRIPLEDES|THREEWAY
+                  |TWOFISH|IDEA|(3)?DES|DECRYPT|DEV_(U)?RANDOM|PANAMA|ENCRYPT|ENIGNA|WAKE|LOKI97|ARCFOUR(_IV)?)
+          |STREAM_(REPORT_ERRORS|MUST_SEEK|MKDIR_RECURSIVE|BUFFER_(NONE|FULL|LINE)|SHUT_(RD)?WR
+                  |SOCK_(RDM|RAW|STREAM|SEQPACKET|DGRAM)|SERVER_(BIND|LISTEN)
+                  |NOTIFY_(REDIRECTED|RESOLVE|MIME_TYPE_IS|SEVERITY_(INFO|ERR|WARN)|COMPLETED|CONNECT|PROGRESS
+                          |FILE_SIZE_IS|FAILURE|AUTH_(REQUIRED|RESULT))
+                  |CRYPTO_METHOD_((SSLv2(3)?|SSLv3|TLS)_(CLIENT|SERVER))|CLIENT_((ASYNC_)?CONNECT|PERSISTENT)
+                  |CAST_(AS_STREAM|FOR_SELECT)|(IGNORE|IS)_URL|IPPROTO_(RAW|TCP|ICMP|IP|UDP)|OOB
+                  |OPTION_(READ_(BUFFER|TIMEOUT)|BLOCKING|WRITE_BUFFER)|URL_STAT_(LINK|QUIET)|USE_PATH
+                  |PEEK|PF_(INET(6)?|UNIX)|ENFORCE_SAFE_MODE|FILTER_(ALL|READ|WRITE))
+          |SUNFUNCS_RET_(DOUBLE|STRING|TIMESTAMP)
+          |SQLITE_(READONLY|ROW|MISMATCH|MISUSE|BOTH|BUSY|SCHEMA|NOMEM|NOTFOUND|NOTADB|NOLFS|NUM|CORRUPT
+                  |CONSTRAINT|CANTOPEN|TOOBIG|INTERRUPT|INTERNAL|IOERR|OK|DONE|PROTOCOL|PERM|ERROR|EMPTY
+                  |FORMAT|FULL|LOCKED|ABORT|ASSOC|AUTH)
+          |SQLITE3_(BOTH|BLOB|NUM|NULL|TEXT|INTEGER|OPEN_(READ(ONLY|WRITE)|CREATE)|FLOAT_ASSOC)
+          |CURL(M_(BAD_((EASY)?HANDLE)|CALL_MULTI_PERFORM|INTERNAL_ERROR|OUT_OF_MEMORY|OK)
+               |MSG_DONE|SSH_AUTH_(HOST|NONE|DEFAULT|PUBLICKEY|PASSWORD|KEYBOARD)
+               |CLOSEPOLICY_(SLOWEST|CALLBACK|OLDEST|LEAST_(RECENTLY_USED|TRAFFIC)
+               |INFO_(REDIRECT_(COUNT|TIME)|REQUEST_SIZE|SSL_VERIFYRESULT|STARTTRANSFER_TIME
+                     |(SIZE|SPEED)_(DOWNLOAD|UPLOAD)|HTTP_CODE|HEADER_(OUT|SIZE)|NAMELOOKUP_TIME
+                     |CONNECT_TIME|CONTENT_(TYPE|LENGTH_(DOWNLOAD|UPLOAD))|CERTINFO|TOTAL_TIME
+                     |PRIVATE|PRETRANSFER_TIME|EFFECTIVE_URL|FILETIME)
+               |OPT_(RESUME_FROM|RETURNTRANSFER|REDIR_PROTOCOLS|REFERER|READ(DATA|FUNCTION)|RANGE|RANDOM_FILE
+                    |MAX(CONNECTS|REDIRS)|BINARYTRANSFER|BUFFERSIZE
+                    |SSH_(HOST_PUBLIC_KEY_MD5|(PRIVATE|PUBLIC)_KEYFILE)|AUTH_TYPES)
+                    |SSL(CERT(TYPE|PASSWD)?|ENGINE(_DEFAULT)?|VERSION|KEY(TYPE|PASSWD)?)
+                    |SSL_(CIPHER_LIST|VERIFY(HOST|PEER))
+                    |STDERR|HTTP(GET|HEADER|200ALIASES|_VERSION|PROXYTUNNEL|AUTH)
+                    |HEADER(FUNCTION)?|NO(BODY|SIGNAL|PROGRESS)|NETRC|CRLF|CONNECTTIMEOUT(_MS)?
+                    |COOKIE(SESSION|JAR|FILE)?|CUSTOMREQUEST|CERTINFO|CLOSEPOLICY|CA(INFO|PATH)|TRANSFERTEXT
+                    |TCP_NODELAY|TIME(CONDITION|OUT(_MS)?|VALUE)|INTERFACE|INFILE(SIZE)?|IPRESOLVE
+                    |DNS_(CACHE_TIMEOUT|USE_GLOBAL_CACHE)|URL|USER(AGENT|PWD)|UNRESTRICTED_AUTH|UPLOAD
+                    |PRIVATE|PROGRESSFUNCTION|PROXY(TYPE|USERPWD|PORT|AUTH)?|PROTOCOLS|PORT
+                    |POST(REDIR|QUOTE|FIELDS)?|PUT|EGDSOCKET|ENCODING|VERBOSE|KRB4LEVEL|KEYPASSWD|QUOTE|FRESH_CONNECT
+                    |FTP(APPEND|LISTONLY|PORT|SSLAUTH)
+                    |FTP_(SSL|SKIP_PASV_IP|CREATE_MISSING_DIRS|USE_EP(RT|SV)|FILEMETHOD)
+                    |FILE(TIME)?|FORBID_REUSE|FOLLOWLOCATION|FAILONERROR|WRITE(FUNCTION|HEADER)|LOW_SPEED_(LIMIT|TIME)
+                    |AUTOREFERER)
+               |PROXY_(HTTP|SOCKS(4|5))|PROTO_(SCP|SFTP|HTTP(S)?|TELNET|TFTP|DICT|FTP(S)?|FILE|LDAP(S)?|ALL)
+               |E_((RECV|READ)_ERROR|GOT_NOTHING|MALFORMAT_USER
+                  |BAD_(CONTENT_ENCODING|CALLING_ORDER|PASSWORD_ENTERED|FUNCTION_ARGUMENT)
+                  |SSH|SSL_(CIPHER|CONNECT_ERROR|CERTPROBLEM|CACERT|PEER_CERTIFICATE|ENGINE_(NOTFOUND|SETFAILED))
+                  |SHARE_IN_USE|SEND_ERROR|HTTP_(RANGE_ERROR|NOT_FOUND|PORT_FAILED|POST_ERROR)
+                  |COULDNT_(RESOLVE_(HOST|PROXY)|CONNECT)|TOO_MANY_REDIRECTS|TELNET_OPTION_SYNTAX|OBSOLETE
+                  |OUT_OF_MEMORY|OPERATION|TIMEOUTED|OK|URL_MALFORMAT(_USER)?|UNSUPPORTED_PROTOCOL
+                  |UNKNOWN_TELNET_OPTION|PARTIAL_FILE
+                  |FTP_(BAD_DOWNLOAD_RESUME|SSL_FAILED|COULDNT_(RETR_FILE|GET_SIZE|STOR_FILE|SET_(BINARY|ASCII)|USE_REST)
+                       |CANT_(GET_HOST|RECONNECT)|USER_PASSWORD_INCORRECT|PORT_FAILED|QUOTE_ERROR|WRITE_ERROR
+                       |WEIRD_((PASS|PASV|SERVER|USER)_REPLY|227_FORMAT)|ACCESS_DENIED)
+                  |FILESIZE_EXCEEDED|FILE_COULDNT_READ_FILE|FUNCTION_NOT_FOUND|FAILED_INIT|WRITE_ERROR|LIBRARY_NOT_FOUND
+                  |LDAP_(SEARCH_FAILED|CANNOT_BIND|INVALID_URL)|ABORTED_BY_CALLBACK)
+               |VERSION_NOW
+               |FTP(METHOD_(MULTI|SINGLE|NO)CWD|SSL_(ALL|NONE|CONTROL|TRY)|AUTH_(DEFAULT|SSL|TLS))
+               |AUTH_(ANY(SAFE)?|BASIC|DIGEST|GSSNEGOTIATE|NTLM))
+          |CURL_(HTTP_VERSION_(1_(0|1)|NONE)|NETRC_(REQUIRED|IGNORED|OPTIONAL)|TIMECOND_(IF(UN)?MODSINCE|LASTMOD)
+                |IPRESOLVE_(V(4|6)|WHATEVER)|VERSION_(SSL|IPV6|KERBEROS4|LIBZ))
+          |IMAGETYPE_(GIF|XBM|BMP|SWF|COUNT|TIFF_(MM|II)|ICO|IFF|UNKNOWN|JB2|JPX|JP2|JPC|JPEG(2000)?|PSD|PNG|WBMP)
+          |INPUT_(REQUEST|GET|SERVER|SESSION|COOKIE|POST|ENV)|ICONV_(MIME_DECODE_(STRICT|CONTINUE_ON_ERROR)|IMPL|VERSION)
+          |DNS_(MX|SRV|SOA|HINFO|NS|NAPTR|CNAME|TXT|PTR|ANY|ALL|AAAA|A(6)?)
+          |DOM(STRING_SIZE_ERR)
+          |DOM_((SYNTAX|HIERARCHY_REQUEST|NO_(MODIFICATION_ALLOWED|DATA_ALLOWED)|NOT_(FOUND|SUPPORTED)|NAMESPACE
+               |INDEX_SIZE|USE_ATTRIBUTE|VALID_(MODIFICATION|STATE|CHARACTER|ACCESS)|PHP|VALIDATION|WRONG_DOCUMENT)_ERR)
+          |JSON_(HEX_(TAG|QUOT|AMP|APOS)|NUMERIC_CHECK|ERROR_(SYNTAX|STATE_MISMATCH|NONE|CTRL_CHAR|DEPTH|UTF8)|FORCE_OBJECT)
+          |PREG_((D_UTF8(_OFFSET)?|NO|INTERNAL|(BACKTRACK|RECURSION)_LIMIT)_ERROR|GREP_INVERT
+                |SPLIT_(NO_EMPTY|(DELIM|OFFSET)_CAPTURE)|SET_ORDER|OFFSET_CAPTURE|PATTERN_ORDER)
+          |PSFS_(PASS_ON|ERR_FATAL|FEED_ME|FLAG_(NORMAL|FLUSH_(CLOSE|INC)))
+          |PCRE_VERSION|POSIX_((F|R|W|X)_OK|S_IF(REG|BLK|SOCK|CHR|IFO))
+          |FNM_(NOESCAPE|CASEFOLD|PERIOD|PATHNAME)
+          |FILTER_(REQUIRE_(SCALAR|ARRAY)|NULL_ON_FAILURE|CALLBACK|DEFAULT|UNSAFE_RAW
+                  |SANITIZE_(MAGIC_QUOTES|STRING|STRIPPED|SPECIAL_CHARS|NUMBER_(INT|FLOAT)|URL
+                            |EMAIL|ENCODED|FULL_SPCIAL_CHARS)
+                  |VALIDATE_(REGEXP|BOOLEAN|INT|IP|URL|EMAIL|FLOAT)
+                  |FORCE_ARRAY
+                  |FLAG_(SCHEME_REQUIRED|STRIP_(BACKTICK|HIGH|LOW)|HOST_REQUIRED|NONE|NO_(RES|PRIV)_RANGE|ENCODE_QUOTES
+                        |IPV(4|6)|PATH_REQUIRED|EMPTY_STRING_NULL|ENCODE_(HIGH|LOW|AMP)|QUERY_REQUIRED
+                        |ALLOW_(SCIENTIFIC|HEX|THOUSAND|OCTAL|FRACTION)))
+          |FILE_(BINARY|SKIP_EMPTY_LINES|NO_DEFAULT_CONTEXT|TEXT|IGNORE_NEW_LINES|USE_INCLUDE_PATH|APPEND)
+          |FILEINFO_(RAW|MIME(_(ENCODING|TYPE))?|SYMLINK|NONE|CONTINUE|DEVICES|PRESERVE_ATIME)
+          |FORCE_(DEFLATE|GZIP)
+          |LIBXML_(XINCLUDE|NSCLEAN|NO(XMLDECL|BLANKS|NET|CDATA|ERROR|EMPTYTAG|ENT|WARNING)
+                  |COMPACT|DTD(VALID|LOAD|ATTR)|((DOTTED|LOADED)_)?VERSION|PARSEHUGE|ERR_(NONE|ERROR|FATAL|WARNING)))
+          \\b
+        '''
+        'name': 'support.constant.ext.php'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.inheritance.php'
+      }
+      {
+        'match': '''(?x)
+          (\\\\)?\\b
+          (T_(RETURN|REQUIRE(_ONCE)?|GOTO|GLOBAL|(MINUS|MOD|MUL|XOR)_EQUAL|METHOD_C|ML_COMMENT|BREAK
+             |BOOL_CAST|BOOLEAN_(AND|OR)|BAD_CHARACTER|SR(_EQUAL)?|STRING(_CAST|VARNAME)?|START_HEREDOC|STATIC
+             |SWITCH|SL(_EQUAL)?|HALT_COMPILER|NS_(C|SEPARATOR)|NUM_STRING|NEW|NAMESPACE|CHARACTER|COMMENT
+             |CONSTANT(_ENCAPSED_STRING)?|CONCAT_EQUAL|CONTINUE|CURLY_OPEN|CLOSE_TAG|CLONE|CLASS(_C)?
+             |CASE|CATCH|TRY|THROW|IMPLEMENTS|ISSET|IS_((GREATER|SMALLER)_OR_EQUAL|(NOT_)?(IDENTICAL|EQUAL))
+             |INSTANCEOF|INCLUDE(_ONCE)?|INC|INT_CAST|INTERFACE|INLINE_HTML|IF|OR_EQUAL|OBJECT_(CAST|OPERATOR)
+             |OPEN_TAG(_WITH_ECHO)?|OLD_FUNCTION|DNUMBER|DIR|DIV_EQUAL|DOC_COMMENT|DOUBLE_(ARROW|CAST|COLON)
+             |DOLLAR_OPEN_CURLY_BRACES|DO|DEC|DECLARE|DEFAULT|USE|UNSET(_CAST)?|PRINT|PRIVATE|PROTECTED|PUBLIC
+             |PLUS_EQUAL|PAAMAYIM_NEKUDOTAYIM|EXTENDS|EXIT|EMPTY|ENCAPSED_AND_WHITESPACE
+             |END(SWITCH|IF|DECLARE|FOR(EACH)?|WHILE)|END_HEREDOC|ECHO|EVAL|ELSE(IF)?|VAR(IABLE)?|FINAL|FILE
+             |FOR(EACH)?|FUNC_C|FUNCTION|WHITESPACE|WHILE|LNUMBER|LIST|LINE|LOGICAL_(AND|OR|XOR)
+             |ARRAY_(CAST)?|ABSTRACT|AS|AND_EQUAL))
+          \\b
+        '''
+        'name': 'support.constant.parser-token.php'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.inheritance.php'
+      }
+      {
+        # In PHP, any identifier which is not a variable is taken to be a constant.
+        # However, if there is not a constant defined with the given name then a notice
+        # is generated and the constant is assumed to have the value of its name.
+        'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+        'name': 'constant.other.php'
       }
     ]
   'function-arguments':
@@ -537,9 +513,9 @@
       }
       {
         'begin': '''(?xi)
-          (array)                                                        # Typehint
-          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
-          \\s*(=)\\s*(array)\\s*(\\()                                    # Default value
+          (array)                                                            # Typehint
+          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          \\s*(=)\\s*(array)\\s*(\\()                                        # Default value
         '''
         'beginCaptures':
           '1':
@@ -576,9 +552,9 @@
       }
       {
         'match': '''(?xi)
-          (array|callable)                                               # Typehint
-          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
-          (?:                                                            # Optional default value
+          (array|callable)                                                   # Typehint
+          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          (?:                                                                # Optional default value
             \\s*(=)\\s*
             (?:
               (null)
@@ -617,7 +593,7 @@
             'name': 'invalid.illegal.non-null-typehinted.php'
       }
       {
-        'begin': '(?i)(?=[\\w\\\\]*[a-z_][\\w]*\\s*&?\\s*(?:\\.\\.\\.)?\\$)'
+        'begin': '(?i)(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\]*[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*&?\\s*(?:\\.\\.\\.)?\\$)'
         'end': '(?=,|\\)|/[/*]|\\#|$)'
         'name': 'meta.function.argument.typehinted.php'
         'patterns': [
@@ -641,9 +617,9 @@
               '7':
                 'name': 'invalid.illegal.non-null-typehinted.php'
             'match': '''(?xi)
-              ([a-z_][\\w]*)?                                                              # Typehinted class name
-              \\s*((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
-              (?:                                                                          # Optional default value
+              ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?                                # Typehinted class name
+              \\s*((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+              (?:                                                                              # Optional default value
                 \\s*(=)\\s*
                 (?:(null)|(\\S*?\\(\\)|(?:\\S*?)))
               )?
@@ -661,16 +637,16 @@
           '3':
             'name': 'punctuation.definition.variable.php'
         'match': '''(?xi)
-          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
           \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
         '''
         'name': 'meta.function.argument.no-default.php'
       }
       {
         'begin': '''(?xi)
-          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
           \\s*(=)\\s*
-          (?:(\\[)((?>[^\\[\\]]+|\\[\\g<6>\\])*)(\\]))?                            # Optional default type
+          (?:(\\[)((?>[^\\[\\]]+|\\[\\g<6>\\])*)(\\]))?                                # Optional default type
         '''
         'beginCaptures':
           '1':
@@ -703,8 +679,8 @@
   'function-call':
     'patterns': [
       {
-        'begin': '(?i)(?=\\\\?[\\w\\\\]+\\\\[a-z_][\\w]*\\s*\\()'
-        'comment': 'Functions in a user-defined namespace (overrides any built-ins)'
+        'begin': '(?i)(?=\\\\?[a-z0-9_\\x{7f}-\\x{ff}\\\\]+\\\\[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*\\()'
+        # Functions in a user-defined namespace (overrides any built-ins)
         'end': '(?=\\()'
         'patterns': [
           {
@@ -718,7 +694,7 @@
       }
       {
         # Root namespace function calls (built-in or user)
-        'begin': '(?i)(\\\\)?(?=\\b[a-z_][\\w]*\\s*\\()'
+        'begin': '(?i)(\\\\)?(?=\\b[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*\\()'
         'beginCaptures':
           '1':
             'name': 'punctuation.separator.inheritance.php'
@@ -740,7 +716,7 @@
   'heredoc':
     'patterns': [
       {
-        'begin': '(?=<<<\\s*("?)([a-zA-Z_]+[a-zA-Z0-9_]*)(\\1)\\s*$)'
+        'begin': '(?i)(?=<<<\\s*("?)([a-z_\\x{7f}-\\x{ff}]+[a-z0-9_\\x{7f}-\\x{ff}]*)(\\1)\\s*$)'
         'end': '(?!\\G)'
         'name': 'string.unquoted.heredoc.php'
         'patterns': [
@@ -987,7 +963,7 @@
           {
             # We are restrictive in what we allow to go after the comment to avoid false positives,
             # since the availability of comments depend on regexp flags.
-            'begin': '(?<=^|\\s)(#)\\s(?=[[a-zA-Z0-9,. \\t?!-][^\\x{00}-\\x{7F}]]*$)'
+            'begin': '(?i)(?<=^|\\s)(#)\\s(?=[[a-z0-9_\\x{7f}-\\x{ff},. \\t?!-][^\\x{00}-\\x{7f}]]*$)'
             'beginCaptures':
               '1':
                 'name': 'punctuation.definition.comment.php'
@@ -1000,7 +976,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*("?)([a-zA-Z_]+[a-zA-Z0-9_]*)(\\2)(\\s*)'
+        'begin': '(?i)(<<<)\\s*("?)([a-z_\\x{7f}-\\x{ff}]+[a-z0-9_\\x{7f}-\\x{ff}]*)(\\2)(\\s*)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.php'
@@ -1225,7 +1201,7 @@
           {
             # We are restrictive in what we allow to go after the comment to avoid false positives,
             # since the availability of comments depend on regexp flags.
-            'begin': '(?<=^|\\s)(#)\\s(?=[[a-zA-Z0-9,. \\t?!-][^\\x{00}-\\x{7F}]]*$)'
+            'begin': '(?i)(?<=^|\\s)(#)\\s(?=[[a-z0-9_\\x{7f}-\\x{ff},. \\t?!-][^\\x{00}-\\x{7f}]]*$)'
             'beginCaptures':
               '1':
                 'name': 'punctuation.definition.comment.php'
@@ -1238,7 +1214,7 @@
         ]
       }
       {
-        'begin': '(<<<)\\s*\'([a-zA-Z_]+[a-zA-Z0-9_]*)\'(\\s*)'
+        'begin': '(?i)(<<<)\\s*\'([a-z_\\x{7f}-\\x{ff}]+[a-z0-9_\\x{7f}-\\x{ff}]*)\'(\\s*)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.string.php'
@@ -1257,10 +1233,10 @@
     'beginCaptures':
       '1':
         'name': 'keyword.other.new.php'
-    'end': '(?i)(?=[^\\w\\\\])'
+    'end': '(?i)(?=[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
     'patterns': [
       {
-        'match': '(?i)(parent|static|self)(?!\\w)'
+        'match': '(?i)(parent|static|self)(?![a-z0-9_\\x{7f}-\\x{ff}])'
         'name': 'storage.type.php'
       }
       {
@@ -1310,7 +1286,7 @@
         'name': 'punctuation.definition.variable.php'
       '2':
         'name': 'variable.other.php'
-    'match': '(?i)(\\$+)([a-z_][\\w]*)(?=\\s*\\()'
+    'match': '(?i)(\\$+)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(?=\\s*\\()'
     'name': 'meta.function-call.invoke.php'
   'language':
     'patterns': [
@@ -1326,7 +1302,7 @@
         'name': 'punctuation.section.scope.end.php'
       }
       {
-        'begin': '(?i)^\\s*(interface)\\s+([\\w]+)\\s*(extends)?\\s*'
+        'begin': '(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(extends)?\\s*'
         'beginCaptures':
           '1':
             'name': 'storage.type.interface.php'
@@ -1334,12 +1310,12 @@
             'name': 'entity.name.type.interface.php'
           '3':
             'name': 'storage.modifier.extends.php'
-        'end': '((?:\\w+\\s*,\\s*)*)(\\w+)?\\s*(?:(?={)|$)'
+        'end': '(?i)((?:[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*,\\s*)*)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?\\s*(?:(?={)|$)'
         'endCaptures':
           '1':
             'patterns': [
               {
-                'match': '\\w+'
+                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
                 'name': 'entity.other.inherited-class.php'
               }
               {
@@ -1357,7 +1333,7 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(trait)\\s+(\\w+)'
+        'begin': '(?i)^\\s*(trait)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
         'beginCaptures':
           '1':
             'name': 'storage.type.trait.php'
@@ -1372,12 +1348,12 @@
         ]
       }
       {
-        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\b\\s+(?=([\\w\\\\]+\\s*($|[;{]|(/[/*])))|$)'
+        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\b\\s+(?=([a-z0-9_\\x{7f}-\\x{ff}\\\\]+\\s*($|[;{]|(/[/*])))|$)'
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
         'contentName': 'entity.name.type.namespace.php'
-        'end': '(?i)(?=\\s*$|[^\\w\\\\])'
+        'end': '(?i)(?=\\s*$|[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
         'name': 'meta.namespace.php'
         'patterns': [
           {
@@ -1400,8 +1376,8 @@
             'include': '#comments'
           }
           {
-            'begin': '(?i)\\s*(?=[\\w\\\\])'
-            'end': '(?i)(?:\\s*(as)\\s+(\\w*))?\\s*(?=,|;|$)'
+            'begin': '(?i)\\s*(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\])'
+            'end': '(?i)(?:\\s*(as)\\s+([a-z0-9_\\x{7f}-\\x{ff}]*))?\\s*(?=,|;|$)'
             'endCaptures':
               '1':
                 'name': 'keyword.other.use-as.php'
@@ -1412,7 +1388,7 @@
                 'include': '#class-builtin'
               }
               {
-                'begin': '(?i)\\s*(?=[\\\\\\w])'
+                'begin': '(?i)\\s*(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\])'
                 'end': '$|(?=[\\s,;])'
                 'name': 'support.other.namespace.use.php'
                 'patterns': [
@@ -1430,7 +1406,7 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+(\\w+)\\s*'
+        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*+)\\s*'
         'beginCaptures':
           '1':
             'name': 'storage.modifier.abstract.php'
@@ -1450,11 +1426,11 @@
               '1':
                 'name': 'storage.modifier.extends.php'
             'contentName': 'meta.other.inherited-class.php'
-            'end': '(?i)(?=[^\\w\\\\])'
+            'end': '(?i)(?=[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
             'patterns': [
               {
-                'begin': '(?i)(?=\\\\?\\w+\\\\)'
-                'end': '(?i)([a-z_]\\w*)?(?=[^\\w\\\\])'
+                'begin': '(?i)(?=\\\\?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\\\)'
+                'end': '(?i)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(?=[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
                 'endCaptures':
                   '1':
                     'name': 'entity.other.inherited-class.php'
@@ -1471,7 +1447,7 @@
                 'include': '#namespace'
               }
               {
-                'match': '(?i)[a-z_]\\w*'
+                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
                 'name': 'entity.other.inherited-class.php'
               }
             ]
@@ -1487,13 +1463,13 @@
                 'include': '#comments'
               }
               {
-                'begin': '(?i)(?=[\\w\\\\]+)'
+                'begin': '(?i)(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\]+)'
                 'contentName': 'meta.other.inherited-class.php'
-                'end': '(?i)(?:\\s*(?:,|(?=[^\\w\\\\\\s]))\\s*)'
+                'end': '(?i)(?:\\s*(?:,|(?=[^a-z0-9_\\x{7f}-\\x{ff}\\\\\\s]))\\s*)'
                 'patterns': [
                   {
-                    'begin': '(?i)(?=\\\\?\\w+\\\\)'
-                    'end': '(?i)([a-z_]\\w*)?(?=[^\\w\\\\])'
+                    'begin': '(?i)(?=\\\\?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\\\)'
+                    'end': '(?i)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(?=[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
                     'endCaptures':
                       '1':
                         'name': 'entity.other.inherited-class.php'
@@ -1510,7 +1486,7 @@
                     'include': '#namespace'
                   }
                   {
-                    'match': '(?i)[a-z_]\\w*'
+                    'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
                     'name': 'entity.other.inherited-class.php'
                   }
                 ]
@@ -1547,7 +1523,7 @@
         'beginCaptures':
           '1':
             'name': 'keyword.control.exception.catch.php'
-        'end': '(?i)([a-z_]\\w*)\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)\\s*\\)'
+        'end': '(?i)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\)'
         'endCaptures':
           '1':
             'name': 'support.class.exception.php'
@@ -1612,7 +1588,7 @@
                     'name': 'storage.modifier.reference.php'
                   '3':
                     'name': 'punctuation.definition.variable.php'
-                'match': '(?i)((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)\\s*(?=,|\\))'
+                'match': '(?i)((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\))'
                 'name': 'meta.function.closure.use.php'
               }
             ]
@@ -1627,7 +1603,7 @@
           (?i:
             (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|
                   clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
-            |([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)
+            |([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
           )
           \\s*(\\()
         '''
@@ -1667,24 +1643,24 @@
       {
         'begin': '''(?xi)
           (?=
-            [\\w$\\\\]+(::)
+            [a-z0-9_\\x{7f}-\\x{ff}$\\\\]+(::)
             (?:
-              ([a-z_]\\w*)\\s*\\(
+              ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\(
               |
-              ((\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable
+              ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable
               |
-              ([a-zA-Z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)    # Constant
+              ([a-zA-Z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)    # Constant
             )?
           )
         '''
         'end': '''(?xi)
           (::)
           (?:
-            ([a-z_]\\w*)\\s*\\(
+            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\(
             |
-            ((\\$+)[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*) # Variable
+            ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable
             |
-            ([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)       # Constant
+            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)       # Constant
           )?
         '''
         'endCaptures':
@@ -1828,7 +1804,7 @@
         'beginCaptures':
           '1':
             'name': 'keyword.operator.type.php'
-        'end': '(?=[^\\\\$\\w])'
+        'end': '(?=[^\\\\$a-z0-9_\\x{7f}-\\x{ff}])'
         'patterns': [
           {
             'include': '#class-name'
@@ -1850,13 +1826,13 @@
             'name': 'keyword.control.goto.php'
           '2':
             'name': 'support.other.php'
-        'match': '(?i)(goto)\\s+([a-z_]\\w*)'
+        'match': '(?i)(goto)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
       }
       {
         'captures':
           '1':
             'name': 'entity.name.goto-label.php'
-        'match': '(?i)^\\s*([a-z_]\\w*)\\s*:'
+        'match': '(?i)^\\s*([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*:'
       }
       {
         'include': '#string-backtick'
@@ -1881,13 +1857,13 @@
       }
     ]
   'namespace':
-    'begin': '(?i)(?:(namespace)|\\w+)?(\\\\)(?=.*?[^\\w\\\\])'
+    'begin': '(?i)(?:(namespace)|[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(\\\\)(?=.*?[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
     'beginCaptures':
       '1':
         'name': 'variable.language.namespace.php'
       '2':
         'name': 'punctuation.separator.inheritance.php'
-    'end': '(?i)(?=\\w*[^\\w\\\\])'
+    'end': '(?i)(?=[a-z0-9_\\x{7f}-\\x{ff}]*[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
     'name': 'support.other.namespace.php'
     'patterns': [
       {
@@ -1930,9 +1906,9 @@
         'match': '''(?xi)
           (->)
           (?:
-            ([a-z_]\\w*)\\s*\\(
+            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\(
             |
-            ((\\$+)?[a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)
+            ((\\$+)?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
           )?
         '''
       }
@@ -1986,11 +1962,11 @@
       }
       {
         'begin': '''(?xi)
-          (?=[\\w\\\\]+(::)
-            ([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)?
+          (?=[a-z0-9_\\x{7f}-\\x{ff}\\\\]+(::)
+            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?
           )
         '''
-        'end': '(?i)(::)([a-z_\\x{7f}-\\x{ff}][\\w\\x{7f}-\\x{ff}]*)?'
+        'end': '(?i)(::)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?'
         'endCaptures':
           '1':
             'name': 'keyword.operator.class.php'
@@ -2326,8 +2302,7 @@
         'name': 'support.function.apc.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             shuffle|sizeof|sort|next|nat(case)?sort|count|compact|current|in_array|usort|uksort|uasort|
             pos|prev|end|each|extract|ksort|key(_exists)?|krsort|list|asort|arsort|rsort|reset|range|
@@ -2340,8 +2315,7 @@
         'name': 'support.function.array.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             show_source|sys_getloadavg|sleep|highlight_(file|string)|constant|connection_(aborted|status)|
             time_(nanosleep|sleep_until)|ignore_user_abort|die|define(d)?|usleep|uniqid|unpack|__halt_compiler|
@@ -2363,8 +2337,7 @@
         'name': 'support.function.bz2.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             (French|Gregorian|Jewish|Julian)ToJD|cal_(to_jd|info|days_in_month|from_jd)|unixtojd|
             jdto(unix|jewish)|easter_(date|days)|JD(MonthName|To(Gregorian|Julian|French)|DayOfWeek)
@@ -2373,8 +2346,7 @@
         'name': 'support.function.calendar.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             class_alias|all_user_method(_array)?|is_(a|subclass_of)|__autoload|(class|interface|method|property|trait)_exists|
             get_(class(_(vars|methods))?|(called|parent)_class|object_vars|declared_(classes|interfaces|traits))
@@ -2383,8 +2355,7 @@
         'name': 'support.function.classobj.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             com_(create_guid|print_typeinfo|event_sink|load_typelib|get_active_object|message_pump)|
             variant_(sub|set(_type)?|not|neg|cast|cat|cmp|int|idiv|imp|or|div|date_(from|to)_timestamp|
@@ -2398,8 +2369,7 @@
         'name': 'support.function.ctype.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           curl_(
             share_(close|init|setopt)|strerror|setopt(_array)?|copy_handle|close|init|unescape|pause|escape|
             errno|error|exec|version|file_create|reset|getinfo|
@@ -2409,8 +2379,7 @@
         'name': 'support.function.curl.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             strtotime|str[fp]time|checkdate|time|timezone_name_(from_abbr|get)|idate|
             timezone_((location|offset|transitions|version)_get|(abbreviations|identifiers)_list|open)|
@@ -2435,8 +2404,7 @@
         'name': 'support.function.dir.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           eio_(
             sync(fs)?|sync_file_range|symlink|stat(vfs)?|sendfile|set_min_parallel|set_max_(idle|poll_(reqs|time)|parallel)|
             seek|n(threads|op|pending|reqs|ready)|chown|chmod|custom|close|cancel|truncate|init|open|dup2|unlink|utime|poll|
@@ -2447,8 +2415,7 @@
         'name': 'support.function.eio.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           enchant_(
             dict_(store_replacement|suggest|check|is_in_session|describe|quick_check|add_to_(personal|session)|get_error)|
             broker_(set_ordering|init|dict_exists|describe|free(_dict)?|list_dicts|request_(pwl_)?dict|get_error)
@@ -2473,8 +2440,7 @@
         'name': 'support.function.exif.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           fann_(
             (duplicate|length|merge|shuffle|subset)_train_data|scale_(train(_data)?|(input|output)(_train_data)?)|
             set_(scaling_params|sarprop_(step_error_(shift|threshold_factor)|temperature|weight_decay_shift)|
@@ -2501,8 +2467,7 @@
         'name': 'support.function.fann.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             symlink|stat|set_file_buffer|chown|chgrp|chmod|copy|clearstatcache|touch|tempnam|tmpfile|
             is_(dir|(uploaded_)?file|executable|link|readable|writ(e)?able)|disk_(free|total)_space|diskfreespace|
@@ -2535,8 +2500,7 @@
         'name': 'support.function.gettext.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           gmp_(
             scan[01]|strval|sign|sub|setbit|sqrt(rem)?|hamdist|neg|nextprime|com|clrbit|cmp|testbit|
             intval|init|invert|import|or|div(exact)?|div_(q|qr|r)|jacobi|popcount|pow(m)?|perfect_square|
@@ -2550,8 +2514,7 @@
         'name': 'support.function.hash.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             http_(support|send_(status|stream|content_(disposition|type)|data|file|last_modified)|head|
                   negotiate_(charset|content_type|language)|chunked_decode|cache_(etag|last_modified)|throttle|
@@ -2572,8 +2535,7 @@
         'name': 'support.function.iisfunc.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             iptc(embed|parse)|(jpeg|png)2wbmp|gd_info|getimagesize(fromstring)?|
             image(s[xy]|scale|(char|string)(up)?|set(style|thickness|tile|interpolation|pixel|brush)|savealpha|
@@ -2591,8 +2553,7 @@
         'name': 'support.function.image.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             sys_get_temp_dir|set_(time_limit|include_path|magic_quotes_runtime)|cli_(get|set)_process_title|
             ini_(alter|get(_all)?|restore|set)|zend_(thread_id|version|logo_guid)|dl|php(credits|info|version)|
@@ -2607,8 +2568,7 @@
         'name': 'support.function.info.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           ibase_(
             set_event_handler|service_(attach|detach)|server_info|num_(fields|params)|name_result|connect|
             commit(_ret)?|close|trans|delete_user|drop_db|db_info|pconnect|param_info|prepare|err(code|msg)|
@@ -2620,8 +2580,7 @@
         'name': 'support.function.interbase.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             normalizer_(normalize|is_normalized)|idn_to_(unicode|utf8|ascii)|
             numfmt_(set_(symbol|(text_)?attribute|pattern)|create|(parse|format)(_currency)?|
@@ -2646,8 +2605,7 @@
         'name': 'support.function.json.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           ldap_(
             start|tls|sort|search|sasl_bind|set_(option|rebind_proc)|(first|next)_(attribute|entry|reference)|
             connect|control_paged_result(_response)?|count_entries|compare|close|t61_to_8859|8859_to_t61|
@@ -2667,8 +2625,7 @@
         'name': 'support.function.mail.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             (a)?(cos|sin|tan)(h)?|sqrt|srand|hypot|hexdec|ceil|is_(nan|(in)?finite)|octdec|dec(hex|oct|bin)|deg2rad|
             pi|pow|exp(m1)?|floor|fmod|lcg_value|log(1(p|0))?|atan2|abs|round|rand|rad2deg|getrandmax|
@@ -2678,8 +2635,7 @@
         'name': 'support.function.math.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           mb_(
             str(cut|str|to(lower|upper)|istr|ipos|imwidth|pos|width|len|rchr|richr|ripos|rpos)|
             substitute_character|substr(_count)?|split|send_mail|http_(input|output)|check_encoding|
@@ -2692,8 +2648,7 @@
         'name': 'support.function.mbstring.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             mcrypt_(
               cfb|create_iv|cbc|ofb|decrypt|encrypt|ecb|list_(algorithms|modes)|generic(_((de)?init|end))?|
@@ -2720,8 +2675,7 @@
         'name': 'support.function.mongo.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           mysql_(
             stat|set_charset|select_db|num_(fields|rows)|connect|client_encoding|close|create_db|escape_string|
             thread_id|tablename|insert_id|info|data_seek|drop_db|db_(name|query)|unbuffered_query|pconnect|ping|
@@ -2733,8 +2687,7 @@
         'name': 'support.function.mysql.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           mysqli_(
             ssl_set|store_result|stat|send_(query|long_data)|set_(charset|opt|local_infile_(default|handler))|
             stmt_(store_result|send_long_data|next_result|close|init|data_seek|prepare|execute|fetch|free_result|
@@ -2768,9 +2721,7 @@
         'name': 'support.function.mysqlnd-uh.php'
       }
       {
-        'match': '(?i)\\b(pfsockopen|fsockopen|long2ip|get(protobyn(umber|ame)|mxrr))\\b'
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             syslog|socket_(set_(blocking|timeout)|get_status)|set(raw)?cookie|http_response_code|openlog|
             headers_(list|sent)|header(_(register_callback|remove))?|checkdnsrr|closelog|inet_(ntop|pton)|ip2long|
@@ -2785,8 +2736,7 @@
         'name': 'support.function.nsapi.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             oci(statementtype|setprefetch|serverversion|savelob(file)?|numcols|new(collection|cursor|descriptor)|nlogon|
                 column(scale|size|name|type(raw)?|isnull|precision)|coll(size|trim|assign(elem)?|append|getelem|max)|commit|
@@ -2807,8 +2757,7 @@
         'name': 'support.function.opcache.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           openssl_(
             sign|spki_(new|export(_challenge)?|verify)|seal|csr_(sign|new|export(_to_file)?|get_(subject|public_key))|
             cipher_iv_length|open|dh_compute_key|digest|decrypt|public_(decrypt|encrypt)|encrypt|error_string|
@@ -2821,8 +2770,7 @@
         'name': 'support.function.openssl.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             output_(add_rewrite_var|reset_rewrite_vars)|flush|
             ob_(start|clean|implicit_flush|end_(clean|flush)|flush|list_handlers|gzhandler|
@@ -2836,8 +2784,7 @@
         'name': 'support.function.password.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           pcntl_(
             strerror|signal(_dispatch)?|sig(timedwait|procmask|waitinfo)|setpriority|errno|exec|fork|
             w(stopsig|termsig|if(stopped|signaled|exited))|wait(pid)?|alarm|getpriority|get_last_error
@@ -2846,8 +2793,7 @@
         'name': 'support.function.pcntl.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           pg_(
             socket|send_(prepare|execute|query(_params)?)|set_(client_encoding|error_verbosity)|select|host|
             num_(fields|rows)|consume_input|connection_(status|reset|busy)|connect(_poll)?|convert|copy_(from|to)|
@@ -2870,8 +2816,7 @@
         'name': 'support.function.php_dom.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           ftp_(
             ssl_connect|systype|site|size|set_option|nlist|nb_(continue|f?(put|get))|ch(dir|mod)|connect|cdup|close|
             delete|put|pwd|pasv|exec|quit|f(put|get)|login|alloc|rename|raw(list)?|rmdir|get(_option)?|mdtm|mkdir
@@ -2880,8 +2825,7 @@
         'name': 'support.function.php_ftp.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           imap_(
             (create|delete|list|rename|scan)(mailbox)?|status|sort|subscribe|set_quota|set(flag_full|acl)|search|savebody|
             num_(recent|msg)|check|close|clearflag_full|thread|timeout|open|header(info)?|headers|append|alerts|reopen|
@@ -2894,8 +2838,7 @@
         'name': 'support.function.php_imap.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           mssql_(
             select_db|num_(fields|rows)|next_result|connect|close|init|data_seek|pconnect|execute|query|
             field_(seek|name|type|length)|fetch_(object|field|assoc|array|row|batch)|free_(statement|result)|
@@ -2905,8 +2848,7 @@
         'name': 'support.function.php_mssql.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           odbc_(
             statistics|specialcolumns|setoption|num_(fields|rows)|next_result|connect|columns|columnprivileges|commit|
             cursor|close(_all)?|tables|tableprivileges|do|data_source|pconnect|primarykeys|procedures|procedurecolumns|
@@ -2929,8 +2871,7 @@
         'name': 'support.function.php_zip.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           posix_(
             strerror|set(s|e?u|[ep]?g)id|ctermid|ttyname|times|isatty|initgroups|uname|errno|kill|access|
             get(sid|cwd|uid|pid|ppid|pwnam|pwuid|pgid|pgrp|euid|egid|login|rlimit|gid|grnam|groups|grgid)|
@@ -2944,8 +2885,7 @@
         'name': 'support.function.proctitle.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           pspell_(
             store_replacement|suggest|save_wordlist|new(_(config|personal))?|check|clear_session|
             config_(save_repl|create|ignore|(data|dict)_dir|personal|runtogether|repl|mode)|add_to_(session|personal)
@@ -2966,8 +2906,7 @@
         'name': 'support.function.rrd.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             shm_((get|has|remove|put)_var|detach|attach|remove)|sem_(acquire|release|remove|get)|ftok|
             msg_((get|remove|set|stat)_queue|send|queue_exists|receive)
@@ -2976,8 +2915,7 @@
         'name': 'support.function.sem.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           session_(
             status|start|set_(save_handler|cookie_params)|save_path|name|commit|cache_(expire|limiter)|
             is_registered|id|destroy|decode|unset|unregister|encode|write_close|abort|reset|register(_shutdown)?|
@@ -2995,8 +2933,7 @@
         'name': 'support.function.simplexml.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             snmp(walk(oid)?|realwalk|get(next)?|set)|
             snmp_(set_(valueretrieval|quick_print|enum_print|oid_(numeric_print|output_format))|read_mib|
@@ -3011,8 +2948,7 @@
         'name': 'support.function.soap.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           socket_(
             shutdown|strerror|send(to|msg)?|set_((non)?block|option)|select|connect|close|clear_error|bind|
             create(_(pair|listen))?|cmsg_space|import_stream|write|listen|last_error|accept|recv(from|msg)?|
@@ -3022,8 +2958,7 @@
         'name': 'support.function.sockets.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           sqlite_(
             single_query|seek|has_(more|prev)|num_(fields|rows)|next|changes|column|current|close|
             create_(aggregate|function)|open|unbuffered_query|udf_(decode|encode)_binary|popen|prev|
@@ -3035,8 +2970,7 @@
         'name': 'support.function.sqlite.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           sqlsrv_(
             send_stream_data|server_info|has_rows|num_(fields|rows)|next_result|connect|configure|commit|
             client_info|close|cancel|prepare|errors|execute|query|field_metadata|fetch(_(array|object))?|
@@ -3046,8 +2980,7 @@
         'name': 'support.function.sqlsrv.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           stats_(
             harmonic_mean|covariance|standard_deviation|skew|
             cdf_(noncentral_(chisquare|f)|negative_binomial|chisquare|cauchy|t|uniform|poisson|exponential|f|weibull|
@@ -3064,8 +2997,7 @@
         'name': 'support.function.stats.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             set_socket_blocking|
             stream_(socket_(shutdown|sendto|server|client|pair|enable_crypto|accept|recvfrom|get_name)|
@@ -3080,8 +3012,7 @@
         'name': 'support.function.streamsfuncs.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             money_format|md5(_file)?|metaphone|bin2hex|sscanf|sha1(_file)?|
             str(str|c?spn|n(at)?(case)?cmp|chr|coll|(case)?cmp|to(upper|lower)|tok|tr|istr|pos|pbrk|len|rchr|ri?pos|rev)|
@@ -3096,8 +3027,7 @@
         'name': 'support.function.string.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           sybase_(
             set_message_handler|select_db|num_(fields|rows)|connect|close|deadlock_retry_count|data_seek|
             unbuffered_query|pconnect|query|field_seek|fetch_(object|field|assoc|array|row)|free_result|
@@ -3111,8 +3041,7 @@
         'name': 'support.function.taint.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             tidy_((get|set)opt|set_encoding|save_config|config_count|clean_repair|is_(xhtml|xml)|diagnose|
                   (access|error|warning)_count|load_config|reset_config|(parse|repair)_(string|file)|
@@ -3127,8 +3056,7 @@
         'name': 'support.function.tokenizer.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           trader_(
             stoch(f|r|rsi)?|stddev|sin(h)?|sum|sub|set_(compat|unstable_period)|sqrt|sar(ext)?|sma|
             ht_(sine|trend(line|mode)|dc(period|phase)|phasor)|natr|cci|cos(h)?|correl|
@@ -3159,8 +3087,7 @@
         'name': 'support.function.url.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             strval|settype|serialize|(bool|double|float)val|debug_zval_dump|intval|import_request_variables|isset|
             is_(scalar|string|null|numeric|callable|int(eger)?|object|double|float|long|array|resource|real|bool)|
@@ -3191,8 +3118,7 @@
         'name': 'support.function.xml.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           xmlrpc_(
             server_(call_method|create|destroy|add_introspection_data|register_(introspection_callback|method))|
             is_fault|decode(_request)?|parse_method_descriptions|encode(_request)?|(get|set)_type
@@ -3201,8 +3127,7 @@
         'name': 'support.function.xmlrpc.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           xmlwriter_(
             (end|start|write)_(comment|cdata|dtd(_(attlist|entity|element))?|document|pi|attribute|element)|
             (start|write)_(attribute|element)_ns|write_raw|set_indent(_string)?|text|output_memory|open_(memory|uri)|
@@ -3212,8 +3137,7 @@
         'name': 'support.function.xmlwriter.php'
       }
       {
-        'match': '''(?xi)
-          \\b
+        'match': '''(?xi)\\b
           (
             zlib_(decode|encode|get_coding_type)|readgzfile|
             gz(seek|compress|close|tell|inflate|open|decode|deflate|uncompress|puts|passthru|encode|eof|file|
