@@ -364,7 +364,7 @@
     # https://www.w3.org/TR/html5/syntax.html#consume-a-character-reference
     'patterns': [
       {
-        'begin': '(&)([a-zA-Z0-9]+|#\\d+|#[xX]\\h+)'
+        'begin': '(&)([a-zA-Z0-9]+|#\\d+|#[xX][0-9a-fA-F]+)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.entity.begin.html'
@@ -387,7 +387,7 @@
     # make sure that an equals sign or the end of a string does not follow a potential reference.
     'patterns': [
       {
-        'begin': '(&)(#\\d+|#[xX]\\h+)'
+        'begin': '(&)(#\\d+|#[xX][0-9a-fA-F]+)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.entity.begin.html'
