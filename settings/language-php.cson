@@ -3337,11 +3337,11 @@
     ]
 '.source.php .meta.array.php':
   'editor':
-    'decreaseIndentPattern': '(?x)\n\t    ^ (.* \\*/)? \\s*\n\t    (\\)+)\n\t'
+    'decreaseIndentPattern': '^(.*\\*/)?\\s*(\\)+)'
 '.source.php:not(.string)':
   'editor':
-    'increaseIndentPattern': '(?x)\n\t    (   \\{ (?! .+ \\} ) .*\n\t    |   \\(\n\t    |   (\\[)\n\t    |   ((else)?if|else|for(each)?|while|switch) .* :\n\t    )   \\s* (/[/*] .*)? $'
-    'decreaseIndentPattern': '(?x)\n\t    ^ (.* \\*/)? \\s*\n\t    (\n\t        (\\})         |\n\t        (\\)+([;,]|\\s*\\{))    |\n\t        (\\]\\)*([;,]|$))     |\n\t        (else:)      |\n\t        ((end(if|for(each)?|while|switch));)\n\t    )\n\t'
+    'increaseIndentPattern': '({(?!.+}).*|\\(|\\[|((else)?if|else|for(each)?|while|switch).*:)\\s*(/[/*].*)?$'
+    'decreaseIndentPattern': '^(.*\\*/)?\\s*(}|(\\)+([;,]|\\s*{))|(\\]\\)*([;,]|$))|else:|((end(if|for(each)?|while|switch));))'
 '.text.html.php':
   'editor':
     'nonWordCharacters': '/\\()"\':,.;<>~!@#%^&*|+=[]{}`?-'
