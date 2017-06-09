@@ -1545,7 +1545,7 @@
         ]
       }
       {
-        'begin': '\\b(catch)\\s+(\\()'
+        'begin': '\\b(catch)\\s*(\\()'
         'beginCaptures':
           '1':
             'name': 'keyword.control.exception.catch.php'
@@ -1675,47 +1675,7 @@
         'include': '#invoke-call'
       }
       {
-        'begin': '(?i)\\b([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(::)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
-        'beginCaptures':
-          '1':
-            'patterns': [
-              {
-                'match': '\\b(self|static|parent)\\b'
-                'name': 'storage.type.php'
-              }
-              {
-                'include': '#class-name'
-              }
-              {
-                'include': '#variable-name'
-              }
-            ]
-          '2':
-            'name': 'keyword.operator.class.php'
-          '3':
-            'name': 'entity.name.function.php'
-          '4':
-            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
-        'end': '\\)'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.arguments.end.bracket.round.php'
-        'name': 'meta.method-call.static.php'
-        'patterns': [
-          {
-            'include': '#language'
-          }
-        ]
-      }
-      {
-        'match': '''(?xi)
-          \\b([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(::)
-          (?:
-            ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable
-            |
-            ([a-zA-Z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)    # Constant
-          )?
-        '''
+        'match': '(?i)\\b([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(?=\\s*::)'
         'captures':
           '1':
             'patterns': [
@@ -1730,6 +1690,39 @@
                 'include': '#variable-name'
               }
             ]
+      }
+      {
+        'begin': '(?i)(::)\\s*([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.operator.class.php'
+          '2':
+            'name': 'entity.name.function.php'
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.php'
+        'name': 'meta.method-call.static.php'
+        'patterns': [
+          {
+            'include': '#language'
+          }
+        ]
+      }
+      {
+        'match': '''(?xi)
+          (::)\\s*
+          (?:
+            ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable
+            |
+            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)       # Constant
+          )?
+        '''
+        'captures':
+          '1':
+            'name': 'keyword.operator.class.php'
           '2':
             'name': 'variable.other.class.php'
           '3':
