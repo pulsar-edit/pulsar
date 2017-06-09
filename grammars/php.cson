@@ -3182,6 +3182,12 @@
         'name': 'punctuation.definition.variable.php'
     'match': '(\\$)((GLOBALS|_(ENV|SERVER|SESSION)))'
     'name': 'variable.other.global.safer.php'
+  'var_language':
+    'match': '(\\$)this\\b'
+    'name': 'variable.language.this.php'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.variable.php'
   'variable-name':
     'patterns': [
       {
@@ -3236,6 +3242,9 @@
     ]
   'variables':
     'patterns': [
+      {
+        'include': '#var_language'
+      }
       {
         'include': '#var_global'
       }
