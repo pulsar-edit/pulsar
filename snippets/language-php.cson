@@ -1,10 +1,14 @@
+'.punctuation.section.embedded.begin.php':
+  'php … ?>':
+    'prefix': 'php'
+    'body': 'php $0 ?>'
 '.source.php':
   '$GLOBALS[\'…\']':
     'prefix': 'globals'
     'body': '$GLOBALS[\'${1:variable}\']${2: = }${3:something}${4:;}$0'
-  '<?php … ?>':
+  '?>…<?php':
     'prefix': 'php'
-    'body': 'php $0 ?>'
+    'body': '?>$0<?php'
   'shorthand echo':
     'prefix': '<?'
     'body': '<?= $0 ?>'
