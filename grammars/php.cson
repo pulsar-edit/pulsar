@@ -2239,8 +2239,6 @@
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
-    # This contentName is just to allow the usage of "select scope" to select the string contents first, then the string with quotes
-    'contentName': 'meta.string-contents.quoted.double.php'
     'end': '"'
     'endCaptures':
       '0':
@@ -2256,7 +2254,6 @@
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
-    'contentName': 'meta.string-contents.quoted.single.php'
     'end': '\''
     'endCaptures':
       '0':
