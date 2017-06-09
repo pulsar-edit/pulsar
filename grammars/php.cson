@@ -531,12 +531,12 @@
           '6':
             'name': 'support.function.construct.php'
           '7':
-            'name': 'punctuation.definition.array.begin.php'
+            'name': 'punctuation.definition.array.begin.bracket.round.php'
         'contentName': 'meta.array.php'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.definition.array.end.php'
+            'name': 'punctuation.definition.array.end.bracket.round.php'
         'name': 'meta.function.argument.array.php'
         'patterns': [
           {
@@ -679,12 +679,58 @@
   'function-call':
     'patterns': [
       {
-        'begin': '(?i)(?=\\\\?[a-z0-9_\\x{7f}-\\x{ff}\\\\]+\\\\[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*\\()'
         # Functions in a user-defined namespace (overrides any built-ins)
-        'end': '(?=\\()'
+        'begin': '(?i)(\\\\?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\\\[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#namespace'
+              }
+              {
+                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+                'name': 'entity.name.function.php'
+              }
+            ]
+          '2':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.php'
+        'name': 'meta.function-call.php'
         'patterns': [
           {
-            'include': '#user-function-call'
+            'include': '#language'
+          }
+        ]
+      }
+      {
+        # Root namespace function calls (built-in or user)
+        'begin': '(?i)(\\\\)?\\b([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.separator.inheritance.php'
+          '2':
+            'patterns': [
+              {
+                'include': '#support'
+              }
+              {
+                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+                'name': 'entity.name.function.php'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.php'
+        'name': 'meta.function-call.php'
+        'patterns': [
+          {
+            'include': '#language'
           }
         ]
       }
@@ -692,31 +738,11 @@
         'match': '(?i)\\b(print|echo)\\b'
         'name': 'support.function.construct.output.php'
       }
-      {
-        # Root namespace function calls (built-in or user)
-        'begin': '(?i)(\\\\)?(?=\\b[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*\\()'
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.separator.inheritance.php'
-        'end': '(?=\\s*\\()'
-        'patterns': [
-          {
-            'match': '(?i)\\b(isset|unset|eval|empty|list)(?=\\s*\\()'
-            'name': 'support.function.construct.php'
-          }
-          {
-            'include': '#support'
-          }
-          {
-            'include': '#user-function-call'
-          }
-        ]
-      }
     ]
   'heredoc':
     'patterns': [
       {
-        'begin': '(?i)(?=<<<\\s*("?)([a-z_\\x{7f}-\\x{ff}]+[a-z0-9_\\x{7f}-\\x{ff}]*)(\\1)\\s*$)'
+        'begin': '(?i)(?=<<<\\s*("?)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(\\1)\\s*$)'
         'end': '(?!\\G)'
         'name': 'string.unquoted.heredoc.php'
         'patterns': [
@@ -1519,22 +1545,30 @@
         ]
       }
       {
-        'begin': '\\b(catch)\\s+\\(\\s*'
+        'begin': '\\b(catch)\\s*(\\()'
         'beginCaptures':
           '1':
             'name': 'keyword.control.exception.catch.php'
-        'end': '(?i)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\)'
-        'endCaptures':
-          '1':
-            'name': 'support.class.exception.php'
           '2':
-            'name': 'variable.other.php'
-          '3':
-            'name': 'punctuation.definition.variable.php'
+            'name': 'punctuation.definition.parameters.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.parameters.end.bracket.round.php'
         'name': 'meta.catch.php'
         'patterns': [
           {
             'include': '#namespace'
+          }
+          {
+            'match': '(?i)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
+            'captures':
+              '1':
+                'name': 'support.class.exception.php'
+              '2':
+                'name': 'variable.other.php'
+              '3':
+                'name': 'punctuation.definition.variable.php'
           }
         ]
       }
@@ -1556,12 +1590,12 @@
             'begin': '\\('
             'beginCaptures':
               '0':
-                'name': 'punctuation.definition.parameters.begin.php'
+                'name': 'punctuation.definition.parameters.begin.bracket.round.php'
             'contentName': 'meta.function.arguments.php'
             'end': '\\)'
             'endCaptures':
               '0':
-                'name': 'punctuation.definition.parameters.end.php'
+                'name': 'punctuation.definition.parameters.end.bracket.round.php'
             'patterns': [
               {
                 'include': '#function-arguments'
@@ -1574,11 +1608,11 @@
               '1':
                 'name': 'keyword.other.function.use.php'
               '2':
-                'name': 'punctuation.definition.parameters.begin.php'
+                'name': 'punctuation.definition.parameters.begin.bracket.round.php'
             'end': '\\)'
             'endCaptures':
               '0':
-                'name': 'punctuation.definition.parameters.end.php'
+                'name': 'punctuation.definition.parameters.end.bracket.round.php'
             'patterns': [
               {
                 'captures':
@@ -1624,12 +1658,12 @@
           '5':
             'name': 'entity.name.function.php'
           '6':
-            'name': 'punctuation.definition.parameters.begin.php'
+            'name': 'punctuation.definition.parameters.begin.bracket.round.php'
         'contentName': 'meta.function.arguments.php'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.definition.parameters.end.php'
+            'name': 'punctuation.definition.parameters.end.bracket.round.php'
         'name': 'meta.function.php'
         'patterns': [
           {
@@ -1641,51 +1675,60 @@
         'include': '#invoke-call'
       }
       {
-        'begin': '''(?xi)
-          (?=
-            [a-z0-9_\\x{7f}-\\x{ff}$\\\\]+(::)
-            (?:
-              ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\(
-              |
-              ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable
-              |
-              ([a-zA-Z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)    # Constant
-            )?
-          )
-        '''
-        'end': '''(?xi)
-          (::)
+        'match': '(?i)\\b([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(?=\\s*::)'
+        'captures':
+          '1':
+            'patterns': [
+              {
+                'match': '\\b(self|static|parent)\\b'
+                'name': 'storage.type.php'
+              }
+              {
+                'include': '#class-name'
+              }
+              {
+                'include': '#variable-name'
+              }
+            ]
+      }
+      {
+        'begin': '(?i)(::)\\s*([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.operator.class.php'
+          '2':
+            'name': 'entity.name.function.php'
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.php'
+        'name': 'meta.method-call.static.php'
+        'patterns': [
+          {
+            'include': '#language'
+          }
+        ]
+      }
+      {
+        'match': '''(?xi)
+          (::)\\s*
           (?:
-            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\(
-            |
             ((\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable
             |
             ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)       # Constant
           )?
         '''
-        'endCaptures':
+        'captures':
           '1':
             'name': 'keyword.operator.class.php'
           '2':
-            'name': 'meta.function-call.static.php'
-          '3':
             'name': 'variable.other.class.php'
-          '4':
+          '3':
             'name': 'punctuation.definition.variable.php'
-          '5':
+          '4':
             'name': 'constant.other.class.php'
-        'patterns': [
-          {
-            'match': '(self|static|parent)\\b'
-            'name': 'storage.type.php'
-          }
-          {
-            'include': '#class-name'
-          }
-          {
-            'include': '#variable-name'
-          }
-        ]
       }
       {
         'include': '#variables'
@@ -1698,9 +1741,9 @@
           '1':
             'name': 'support.function.construct.php'
           '2':
-            'name': 'punctuation.definition.array.begin.php'
+            'name': 'punctuation.definition.array.begin.bracket.round.php'
           '3':
-            'name': 'punctuation.definition.array.end.php'
+            'name': 'punctuation.definition.array.end.bracket.round.php'
         'match': '(array)(\\()(\\))'
         'name': 'meta.array.empty.php'
       }
@@ -1710,11 +1753,11 @@
           '1':
             'name': 'support.function.construct.php'
           '2':
-            'name': 'punctuation.definition.array.begin.php'
+            'name': 'punctuation.definition.array.begin.bracket.round.php'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.definition.array.end.php'
+            'name': 'punctuation.definition.array.end.bracket.round.php'
         'name': 'meta.array.php'
         'patterns': [
           {
@@ -1723,10 +1766,14 @@
         ]
       }
       {
+        'match': '(?i)(\\()\\s*(array|real|double|float|int(?:eger)?|bool(?:ean)?|string|object|binary|unset)\\s*(\\))'
         'captures':
           '1':
+            'name': 'punctuation.definition.storage-type.begin.bracket.round.php'
+          '2':
             'name': 'storage.type.php'
-        'match': '(?i)\\(\\s*(array|real|double|float|int(eger)?|bool(ean)?|string|object|binary|unset)\\s*\\)'
+          '3':
+            'name': 'punctuation.definition.storage-type.end.bracket.round.php'
       }
       {
         'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|clone|var|function|interface|trait|parent|self|object)\\b'
@@ -1832,7 +1879,7 @@
         'captures':
           '1':
             'name': 'entity.name.goto-label.php'
-        'match': '(?i)^\\s*([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*:'
+        'match': '(?i)^\\s*([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*:(?!:)'
       }
       {
         'include': '#string-backtick'
@@ -1846,6 +1893,21 @@
         'endCaptures':
           '0':
             'name': 'punctuation.section.array.end.php'
+        'patterns': [
+          {
+            'include': '#language'
+          }
+        ]
+      }
+      {
+        'begin': '\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.end.bracket.round.php'
         'patterns': [
           {
             'include': '#language'
@@ -1894,23 +1956,34 @@
         ]
       }
       {
+        'begin': '(?i)(->)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.operator.class.php'
+          '2':
+            'name': 'entity.name.function.php'
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.php'
+        'name': 'meta.method-call.php'
+        'patterns': [
+          {
+            'include': '#language'
+          }
+        ]
+      }
+      {
         'captures':
           '1':
             'name': 'keyword.operator.class.php'
           '2':
-            'name': 'meta.function-call.object.php'
-          '3':
             'name': 'variable.other.property.php'
-          '4':
+          '3':
             'name': 'punctuation.definition.variable.php'
-        'match': '''(?xi)
-          (->)
-          (?:
-            ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*\\(
-            |
-            ((\\$+)?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
-          )?
-        '''
+        'match': '(?i)(->)((\\$+)?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?'
       }
     ]
   'parameter-default-types':
@@ -1945,11 +2018,11 @@
           '1':
             'name': 'support.function.construct.php'
           '2':
-            'name': 'punctuation.definition.array.begin.php'
+            'name': 'punctuation.definition.array.begin.bracket.round.php'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.definition.array.end.php'
+            'name': 'punctuation.definition.array.end.bracket.round.php'
         'name': 'meta.array.php'
         'patterns': [
           {
@@ -2360,6 +2433,14 @@
           )\\b
         '''
         'name': 'support.function.com.php'
+      }
+      {
+        'begin': '(?i)\\b(isset|unset|eval|empty|list)\\b'
+        'name': 'support.function.construct.php'
+      }
+      {
+        'match': '(?i)\\b(print|echo)\\b'
+        'name': 'support.function.construct.output.php'
       }
       {
         'match': '(?i)\\bctype_(space|cntrl|digit|upper|punct|print|lower|alnum|alpha|graph|xdigit)\\b'
@@ -3146,15 +3227,6 @@
       {
         'match': '(?i)\\bis_int(eger)?\\b'
         'name': 'support.function.alias.php'
-      }
-    ]
-  'user-function-call':
-    'begin': '(?i)(?=[a-z_0-9\\\\]*[a-z_][a-z0-9_]*\\s*\\()'
-    'end': '(?i)[a-z_][a-z_0-9]*(?=\\s*\\()'
-    'name': 'meta.function-call.php'
-    'patterns': [
-      {
-        'include': '#namespace'
       }
     ]
   'var_basic':
