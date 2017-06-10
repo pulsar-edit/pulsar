@@ -1433,10 +1433,10 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*+)\\s*'
+        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
         'beginCaptures':
           '1':
-            'name': 'storage.modifier.abstract.php'
+            'name': 'storage.modifier.${1:/downcase}.php'
           '2':
             'name': 'storage.type.class.php'
           '3':
