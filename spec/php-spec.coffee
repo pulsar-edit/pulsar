@@ -502,37 +502,56 @@ describe 'PHP grammar', ->
       expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
       expect(tokens[1][4]).toEqual value: 'constant', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'constant.other.class.php']
 
-  it 'should tokenize try/catch correctly', ->
-    tokens = grammar.tokenizeLines "<?php\ntry {} catch(Exception $e) {}"
+  describe 'try/catch', ->
+    it 'tokenizes a basic try/catch block', ->
+      tokens = grammar.tokenizeLines "<?php\ntry {} catch(Exception $e) {}"
 
-    expect(tokens[1][0]).toEqual value: 'try', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.control.exception.php']
-    expect(tokens[1][2]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
-    expect(tokens[1][3]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
-    expect(tokens[1][5]).toEqual value: 'catch', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'keyword.control.exception.catch.php']
-    expect(tokens[1][6]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.begin.bracket.round.php']
-    expect(tokens[1][7]).toEqual value: 'Exception', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
-    expect(tokens[1][8]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
-    expect(tokens[1][9]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php', 'punctuation.definition.variable.php']
-    expect(tokens[1][10]).toEqual value: 'e', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php']
-    expect(tokens[1][11]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']
-    expect(tokens[1][13]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
-    expect(tokens[1][14]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
+      expect(tokens[1][0]).toEqual value: 'try', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.control.exception.php']
+      expect(tokens[1][2]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
+      expect(tokens[1][3]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
+      expect(tokens[1][5]).toEqual value: 'catch', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'keyword.control.exception.catch.php']
+      expect(tokens[1][6]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[1][7]).toEqual value: 'Exception', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
+      expect(tokens[1][8]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
+      expect(tokens[1][9]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1][10]).toEqual value: 'e', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php']
+      expect(tokens[1][11]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']
+      expect(tokens[1][13]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
+      expect(tokens[1][14]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
-    tokens = grammar.tokenizeLines "<?php\ntry {} catch (Exception $e) {}"
+      tokens = grammar.tokenizeLines "<?php\ntry {} catch (Exception $e) {}"
 
-    expect(tokens[1][0]).toEqual value: 'try', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.control.exception.php']
-    expect(tokens[1][2]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
-    expect(tokens[1][3]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
-    expect(tokens[1][5]).toEqual value: 'catch', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'keyword.control.exception.catch.php']
-    expect(tokens[1][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
-    expect(tokens[1][7]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.begin.bracket.round.php']
-    expect(tokens[1][8]).toEqual value: 'Exception', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
-    expect(tokens[1][9]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
-    expect(tokens[1][10]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php', 'punctuation.definition.variable.php']
-    expect(tokens[1][11]).toEqual value: 'e', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php']
-    expect(tokens[1][12]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']
-    expect(tokens[1][14]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
-    expect(tokens[1][15]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
+      expect(tokens[1][0]).toEqual value: 'try', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.control.exception.php']
+      expect(tokens[1][2]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
+      expect(tokens[1][3]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
+      expect(tokens[1][5]).toEqual value: 'catch', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'keyword.control.exception.catch.php']
+      expect(tokens[1][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
+      expect(tokens[1][7]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[1][8]).toEqual value: 'Exception', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
+      expect(tokens[1][9]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
+      expect(tokens[1][10]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1][11]).toEqual value: 'e', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php']
+      expect(tokens[1][12]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']
+      expect(tokens[1][14]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
+      expect(tokens[1][15]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
+
+    it 'tokenizes a catch block containing multiple exceptions', ->
+      tokens = grammar.tokenizeLines "<?php\ntry {} catch(AException | BException | CException $e) {}"
+
+      expect(tokens[1][5]).toEqual value: 'catch', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'keyword.control.exception.catch.php']
+      expect(tokens[1][6]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[1][7]).toEqual value: 'AException', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
+      expect(tokens[1][8]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
+      expect(tokens[1][9]).toEqual value: '|', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][10]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php']
+      expect(tokens[1][11]).toEqual value: 'BException', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
+      expect(tokens[1][13]).toEqual value: '|', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][15]).toEqual value: 'CException', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'support.class.exception.php']
+      expect(tokens[1][17]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1][18]).toEqual value: 'e', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'variable.other.php']
+      expect(tokens[1][19]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']
+      expect(tokens[1][21]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
+      expect(tokens[1][22]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
   it 'should tokenize storage types correctly', ->
     tokens = grammar.tokenizeLines "<?php\n(int)"
