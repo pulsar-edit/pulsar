@@ -506,7 +506,7 @@
         'name': 'constant.other.php'
       }
     ]
-  'function-arguments':
+  'function-parameters':
     'patterns': [
       {
         'include': '#comments'
@@ -537,7 +537,7 @@
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
-        'name': 'meta.function.argument.array.php'
+        'name': 'meta.function.parameter.array.php'
         'patterns': [
           {
             'include': '#comments'
@@ -565,7 +565,7 @@
           )?
           \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
         '''
-        'name': 'meta.function.argument.array.php'
+        'name': 'meta.function.parameter.array.php'
         'captures':
           '1':
             'name': 'storage.type.php'
@@ -593,38 +593,35 @@
             'name': 'invalid.illegal.non-null-typehinted.php'
       }
       {
-        'begin': '(?i)(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\]*[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\s*&?\\s*(?:\\.\\.\\.)?\\$)'
-        'end': '(?=,|\\)|/[/*]|\\#|$)'
-        'name': 'meta.function.argument.typehinted.php'
+        'begin': '''(?xi)
+          ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)                               # Typehinted class name
+          \\s*((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+        '''
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.php'
+          '2':
+            'name': 'variable.other.php'
+          '3':
+            'name': 'storage.modifier.reference.php'
+          '4':
+            'name': 'keyword.operator.variadic.php'
+          '5':
+            'name': 'punctuation.definition.variable.php'
+        'end': '(?=,|\\)|/[/*]|\\#)'
+        'name': 'meta.function.parameter.typehinted.php'
         'patterns': [
           {
-            'include': '#class-name'
-          }
-          {
-            'captures':
-              '1':
-                'name': 'support.class.php'
-              '2':
-                'name': 'variable.other.php'
-              '3':
-                'name': 'storage.modifier.reference.php'
-              '4':
-                'name': 'punctuation.definition.variable.php'
-              '5':
+            'begin': '='
+            'beginCaptures':
+              '0':
                 'name': 'keyword.operator.assignment.php'
-              '6':
-                'name': 'constant.language.php'
-              '7':
-                'name': 'invalid.illegal.non-null-typehinted.php'
-            'match': '''(?xi)
-              ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?                                # Typehinted class name
-              \\s*((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
-              (?:                                                                              # Optional default value
-                \\s*(=)\\s*
-                (?:(null)|(\\S*?\\(\\)|(?:\\S*?)))
-              )?
-              \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
-            '''
+            'end': '(?=,|\\)|/[/*]|\\#)'
+            'patterns': [
+              {
+                'include': '#language'
+              }
+            ]
           }
         ]
       }
@@ -635,18 +632,20 @@
           '2':
             'name': 'storage.modifier.reference.php'
           '3':
+            'name': 'keyword.operator.variadic.php'
+          '4':
             'name': 'punctuation.definition.variable.php'
         'match': '''(?xi)
-          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          ((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
           \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
         '''
-        'name': 'meta.function.argument.no-default.php'
+        'name': 'meta.function.parameter.no-default.php'
       }
       {
         'begin': '''(?xi)
-          ((&)?(\\s*(?:\\.\\.\\.)?\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          ((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
           \\s*(=)\\s*
-          (?:(\\[)((?>[^\\[\\]]+|\\[\\g<6>\\])*)(\\]))?                                # Optional default type
+          (?:(\\[)((?>[^\\[\\]]+|\\[\\g<6>\\])*)(\\]))?                              # Optional default type
         '''
         'beginCaptures':
           '1':
@@ -654,21 +653,23 @@
           '2':
             'name': 'storage.modifier.reference.php'
           '3':
-            'name': 'punctuation.definition.variable.php'
+            'name': 'keyword.operator.variadic.php'
           '4':
-            'name': 'keyword.operator.assignment.php'
+            'name': 'punctuation.definition.variable.php'
           '5':
-            'name': 'punctuation.section.array.begin.php'
+            'name': 'keyword.operator.assignment.php'
           '6':
+            'name': 'punctuation.section.array.begin.php'
+          '7':
             'patterns': [
               {
                 'include': '#parameter-default-types'
               }
             ]
-          '7':
+          '8':
             'name': 'punctuation.section.array.end.php'
-        'end': '(?=,|\\)|/[/*]|\\#|$)'
-        'name': 'meta.function.argument.default.php'
+        'end': '(?=,|\\)|/[/*]|\\#)'
+        'name': 'meta.function.parameter.default.php'
         'patterns': [
           {
             'include': '#parameter-default-types'
@@ -1607,14 +1608,14 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-            'contentName': 'meta.function.arguments.php'
+            'contentName': 'meta.function.parameters.php'
             'end': '\\)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
             'patterns': [
               {
-                'include': '#function-arguments'
+                'include': '#function-parameters'
               }
             ]
           }
@@ -1653,7 +1654,7 @@
           (?i:
             (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|
                   clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
-            |([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
+            |([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)
           )
           \\s*(\\()
         '''
@@ -1675,7 +1676,7 @@
             'name': 'entity.name.function.php'
           '6':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-        'contentName': 'meta.function.arguments.php'
+        'contentName': 'meta.function.parameters.php'
         'end': '\\)'
         'endCaptures':
           '0':
@@ -1683,7 +1684,7 @@
         'name': 'meta.function.php'
         'patterns': [
           {
-            'include': '#function-arguments'
+            'include': '#function-parameters'
           }
         ]
       }
