@@ -2219,12 +2219,18 @@
     'name': 'string.quoted.double.sql.php'
     'patterns': [
       {
-        'match': '#(\\\\"|[^"])*(?="|$)'
+        'match': '(#)(\\\\"|[^"])*(?="|$)'
         'name': 'comment.line.number-sign.sql'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.comment.sql'
       }
       {
-        'match': '--(\\\\"|[^"])*(?="|$)'
+        'match': '(--)(\\\\"|[^"])*(?="|$)'
         'name': 'comment.line.double-dash.sql'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.comment.sql'
       }
       {
         'match': '\\\\[\\\\"`\']'
@@ -2282,12 +2288,18 @@
     'name': 'string.quoted.single.sql.php'
     'patterns': [
       {
-        'match': '#(\\\\\'|[^\'])*(?=\'|$)'
+        'match': '(#)(\\\\\'|[^\'])*(?=\'|$)'
         'name': 'comment.line.number-sign.sql'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.comment.sql'
       }
       {
-        'match': '--(\\\\\'|[^\'])*(?=\'|$)'
+        'match': '(--)(\\\\\'|[^\'])*(?=\'|$)'
         'name': 'comment.line.double-dash.sql'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.comment.sql'
       }
       {
         'match': '\\\\[\\\\\'`"]'

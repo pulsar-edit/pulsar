@@ -791,6 +791,28 @@ describe 'PHP grammar', ->
     expect(tokens[1][13]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
     expect(tokens[1][14]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
+  it 'should tokenize embedded SQL in a string', ->
+    waitsForPromise ->
+      atom.packages.activatePackage('language-sql')
+
+    runs ->
+      delimsByScope =
+        "string.quoted.double.sql.php": '"'
+        "string.quoted.single.sql.php": "'"
+
+      for scope, delim of delimsByScope
+        tokens = grammar.tokenizeLines "<?php\n#{delim}SELECT something#{delim}"
+
+        expect(tokens[1][0]).toEqual value: delim, scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'punctuation.definition.string.begin.php']
+        expect(tokens[1][1]).toEqual value: 'SELECT', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'source.sql.embedded.php', 'keyword.other.DML.sql']
+        expect(tokens[1][2]).toEqual value: ' something', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'source.sql.embedded.php']
+        expect(tokens[1][3]).toEqual value: delim, scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'punctuation.definition.string.end.php']
+
+        tokens = grammar.tokenizeLines "<?php\n#{delim}SELECT something\n-- uh oh a comment SELECT#{delim}"
+        expect(tokens[2][0]).toEqual value: '--', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'source.sql.embedded.php', 'comment.line.double-dash.sql', 'punctuation.definition.comment.sql']
+        expect(tokens[2][1]).toEqual value: ' uh oh a comment SELECT', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'source.sql.embedded.php', 'comment.line.double-dash.sql']
+        expect(tokens[2][2]).toEqual value: delim, scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', scope, 'punctuation.definition.string.end.php']
+
   it 'should tokenize single quoted string regex escape characters correctly', ->
     tokens = grammar.tokenizeLines "<?php\n'/[\\\\\\\\]/';"
 
