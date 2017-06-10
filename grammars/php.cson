@@ -1677,10 +1677,14 @@
           '6':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
         'contentName': 'meta.function.parameters.php'
-        'end': '\\)'
+        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?'
         'endCaptures':
-          '0':
+          '1':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
+          '2':
+            'name': 'keyword.operator.return-value.php'
+          '3':
+            'name': 'storage.type.php'
         'name': 'meta.function.php'
         'patterns': [
           {
