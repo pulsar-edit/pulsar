@@ -138,6 +138,31 @@
   'class-body':
     'patterns': [
       {
+        'match': '''(?xi)
+          \\b(use)\\s+
+          ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
+          ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)*)
+          (?=\\s*;)
+        '''
+        'name': 'meta.use.php'
+        'captures':
+          '1':
+            'name': 'keyword.other.use.php'
+          '2':
+            'name': 'support.class.php'
+          '3':
+            'patterns': [
+              {
+                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+                'name': 'support.class.php'
+              }
+              {
+                'match': ','
+                'name': 'punctuation.separator.delimiter.php'
+              }
+            ]
+      }
+      {
         'begin': '(?i)\\buse\\b'
         'beginCaptures':
           '0':
