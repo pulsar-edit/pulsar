@@ -1536,7 +1536,7 @@
         'beginCaptures':
           '1':
             'name': 'keyword.control.import.include.php'
-        'end': '(?=\\s|;|$)'
+        'end': '(?=\\s|;|$|\\?>)'
         'name': 'meta.include.php'
         'patterns': [
           {
