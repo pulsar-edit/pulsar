@@ -2317,6 +2317,14 @@
         ]
       }
       {
+        'match': '(?i)(::)\\s*(class)\\b'
+        'captures':
+          '1':
+            'name': 'keyword.operator.class.php'
+          '2':
+            'name': 'keyword.other.class.php'
+      }
+      {
         'match': '''(?xi)
           (::)\\s*
           (?:
