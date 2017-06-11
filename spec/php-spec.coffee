@@ -711,6 +711,13 @@ describe 'PHP grammar', ->
       expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
       expect(tokens[1][4]).toEqual value: 'class', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.other.class.php']
 
+      # Should NOT be tokenized as `keyword.other.class`
+      tokens = grammar.tokenizeLines "<?php\nobj::classic"
+
+      expect(tokens[1][0]).toEqual value: 'obj', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.class.php']
+      expect(tokens[1][1]).toEqual value: '::', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.class.php']
+      expect(tokens[1][2]).toEqual value: 'classic', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'constant.other.class.php']
+
   describe 'try/catch', ->
     it 'tokenizes a basic try/catch block', ->
       tokens = grammar.tokenizeLines "<?php\ntry {} catch(Exception $e) {}"
