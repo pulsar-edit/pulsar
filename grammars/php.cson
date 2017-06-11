@@ -212,7 +212,7 @@
                 '''
                 'captures':
                   '1':
-                    'name': 'keyword.operator.use-as.php'
+                    'name': 'keyword.other.use-as.php'
                   '2':
                     'patterns': [
                       {
@@ -231,7 +231,7 @@
                 'match': '(?i)\\b(insteadof)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
                 'captures':
                   '1':
-                    'name': 'keyword.operator.use-insteadof.php'
+                    'name': 'keyword.other.use-insteadof.php'
                   '2':
                     'name': 'support.class.php'
               }
@@ -1545,7 +1545,7 @@
         ]
       }
       {
-        'begin': '(?i)^\\s*(abstract|final)?\\s*(class)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
+        'begin': '(?i)^\\s*(?:(abstract|final)\\s+)?(class)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
         'beginCaptures':
           '1':
             'name': 'storage.modifier.${1:/downcase}.php'

@@ -243,6 +243,135 @@ describe 'PHP grammar', ->
     expect(tokens[0][7]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']
     expect(tokens[0][8]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']
 
+  describe 'classes', ->
+    it 'tokenizes class declarations', ->
+      tokens = grammar.tokenizeLines "<?php\nclass Test { /* stuff */ }"
+
+      expect(tokens[1][0]).toEqual value: 'class', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php']
+      expect(tokens[1][2]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'entity.name.type.class.php']
+      expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php']
+      expect(tokens[1][4]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'punctuation.definition.class.begin.bracket.curly.php']
+      expect(tokens[1][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php']
+      expect(tokens[1][6]).toEqual value: '/*', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'comment.block.php', 'punctuation.definition.comment.php']
+      expect(tokens[1][10]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']
+
+    it 'tokenizes class modifiers', ->
+      tokens = grammar.tokenizeLines "<?php\nabstract class Test {}"
+
+      expect(tokens[1][0]).toEqual value: 'abstract', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'storage.modifier.abstract.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php']
+      expect(tokens[1][2]).toEqual value: 'class', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php']
+      expect(tokens[1][4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'entity.name.type.class.php']
+
+      tokens = grammar.tokenizeLines "<?php\nfinal class Test {}"
+
+      expect(tokens[1][0]).toEqual value: 'final', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'storage.modifier.final.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php']
+      expect(tokens[1][2]).toEqual value: 'class', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php']
+      expect(tokens[1][4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'entity.name.type.class.php']
+
+    describe "use statements", ->
+      it 'tokenizes basic use statements', ->
+        tokens = grammar.tokenizeLines """
+          <?php
+          class Test {
+            use A;
+          }
+        """
+
+        expect(tokens[2][1]).toEqual value: 'use', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'keyword.other.use.php']
+        expect(tokens[2][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']
+        expect(tokens[2][3]).toEqual value: 'A', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[2][4]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']
+
+        tokens = grammar.tokenizeLines """
+          <?php
+          class Test {
+            use A, B;
+          }
+        """
+
+        expect(tokens[2][1]).toEqual value: 'use', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'keyword.other.use.php']
+        expect(tokens[2][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']
+        expect(tokens[2][3]).toEqual value: 'A', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[2][4]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
+        expect(tokens[2][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']
+        expect(tokens[2][6]).toEqual value: 'B', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[2][7]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']
+
+      it 'tokenizes complex use statements', ->
+        tokens = grammar.tokenizeLines """
+          <?php
+          class Test {
+            use A, B {
+              B::smallTalk insteadof A;
+            }
+          }
+        """
+
+        expect(tokens[2][1]).toEqual value: 'use', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'keyword.other.use.php']
+        expect(tokens[2][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']
+        expect(tokens[2][3]).toEqual value: 'A', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[2][4]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
+        expect(tokens[2][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']
+        expect(tokens[2][6]).toEqual value: 'B', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[2][7]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']
+        expect(tokens[2][8]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.begin.bracket.curly.php']
+        expect(tokens[3][1]).toEqual value: 'B', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'support.class.php']
+        expect(tokens[3][2]).toEqual value: '::', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'keyword.operator.class.php']
+        expect(tokens[3][3]).toEqual value: 'smallTalk', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'constant.other.class.php']
+        expect(tokens[3][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][5]).toEqual value: 'insteadof', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'keyword.other.use-insteadof.php']
+        expect(tokens[3][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][7]).toEqual value: 'A', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'support.class.php']
+        expect(tokens[3][8]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'punctuation.terminator.expression.php']
+        expect(tokens[4][1]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
+
+      it 'tokenizes aliases', ->
+        tokens = grammar.tokenizeLines """
+          <?php
+          class Aliased_Talker {
+              use A, B {
+                  B::smallTalk as private talk;
+              }
+          }
+        """
+
+        expect(tokens[3][1]).toEqual value: 'B', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'support.class.php']
+        expect(tokens[3][2]).toEqual value: '::', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'keyword.operator.class.php']
+        expect(tokens[3][3]).toEqual value: 'smallTalk', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'constant.other.class.php']
+        expect(tokens[3][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][5]).toEqual value: 'as', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'keyword.other.use-as.php']
+        expect(tokens[3][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][7]).toEqual value: 'private', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'storage.modifier.php']
+        expect(tokens[3][8]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][9]).toEqual value: 'talk', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'entity.other.alias.php']
+        expect(tokens[3][10]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'punctuation.terminator.expression.php']
+        expect(tokens[4][1]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
+
+      it 'tokenizes aliases', ->
+        tokens = grammar.tokenizeLines """
+          <?php
+          class Aliased_Talker {
+              use A, B {
+                  B::smallTalk as talk;
+              }
+          }
+        """
+
+        expect(tokens[3][1]).toEqual value: 'B', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'support.class.php']
+        expect(tokens[3][2]).toEqual value: '::', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'keyword.operator.class.php']
+        expect(tokens[3][3]).toEqual value: 'smallTalk', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'constant.other.class.php']
+        expect(tokens[3][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][5]).toEqual value: 'as', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'keyword.other.use-as.php']
+        expect(tokens[3][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php']
+        expect(tokens[3][7]).toEqual value: 'talk', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'entity.other.alias.php']
+        expect(tokens[3][8]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'meta.use.body.php', 'punctuation.terminator.expression.php']
+        expect(tokens[4][1]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
+
   describe 'functions', ->
     it 'tokenizes functions with no arguments', ->
       tokens = grammar.tokenizeLines "<?php\nfunction test() {}"
