@@ -2,6 +2,9 @@
   '#!/usr/bin/env python':
     'prefix': 'env'
     'body': '#!/usr/bin/env python\n'
+  '#!/usr/bin/env python3':
+    'prefix': 'env3'
+    'body': '#!/usr/bin/env python3\n'
   '# coding=utf-8':
     'prefix': 'enc'
     'body': '# -*- coding: utf-8 -*-\n'
@@ -52,7 +55,7 @@
     'body': 'self.fail(\'${1:message}\')$0'
   'New Class':
     'prefix': 'class'
-    'body': 'class ${1:ClassName}(${2:object}):\n\t"""${3:docstring for $1.}"""\n\tdef __init__(self, ${4:arg}):\n\t\t${5:super($1, self).__init__()}\n\t\tself.arg = arg\n\t\t$0'
+    'body': 'class ${1:ClassName}(${2:object}):\n\t"""${3:docstring for $1}"""\n\tdef __init__(self, ${4:arg}):\n\t\t${5:super($1, self).__init__()}\n\t\tself.arg = arg\n\t\t$0'
   'New Method':
     'prefix': 'defs'
     'body': 'def ${1:mname}(self, ${2:arg}):\n\t${3:pass}'
@@ -95,6 +98,9 @@
   'Dictionary Comprehension':
     'prefix': 'dc'
     'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
+  'Set Comprehension':
+    'prefix': 'sc'
+    'body': '{${1:value} for ${2:value} in ${3:variable}}'
   'PDB set trace':
     'prefix': 'pdb'
     'body': 'import pdb; pdb.set_trace()'
