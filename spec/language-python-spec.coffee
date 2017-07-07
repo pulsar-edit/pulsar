@@ -85,5 +85,6 @@ describe 'Python settings', ->
     expect(decreaseNextIndentRegex.testSync('    yield expression()')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('    continue')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('    break')).toBeTruthy()
+    expect(decreaseNextIndentRegex.testSync('    pass')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('    raise')).toBeTruthy()
     expect(decreaseNextIndentRegex.testSync('    raise Exception()')).toBeTruthy()
