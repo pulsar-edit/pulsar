@@ -5,5 +5,5 @@
     'tabLength': 4
     'commentStart': '# '
     'increaseIndentPattern': '^\\s*(class|def|elif|else|except|finally|for|if|try|with|while)\\b.*:\\s*$'
-    'decreaseIndentPattern': '^\\s*(elif|else|except|finally)\\b.*:'
+    'decreaseIndentPattern': '^\\s*(elif|else|except|finally)\\b.*:\\s*$'
     'decreaseNextIndentPattern': '^\\s*(return|yield|continue|break|raise)\\b.*$'
