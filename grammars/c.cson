@@ -2,6 +2,7 @@
 'fileTypes': [
   'c'
   'h.in'
+  'xpm'
 ]
 'firstLineMatch': '(?i)-\\*-[^*]*(Mode:\\s*)?C(\\s*;.*?)?\\s*-\\*-'
 'name': 'C'
