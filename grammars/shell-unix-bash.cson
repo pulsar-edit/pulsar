@@ -864,7 +864,7 @@
         'name': 'keyword.operator.arithmetic.shell'
       }
       {
-        'match': '0[xX]\\h+'
+        'match': '0[xX][0-9A-Fa-f]+'
         'name': 'constant.numeric.hex.shell'
       }
       {
