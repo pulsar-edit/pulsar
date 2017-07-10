@@ -1651,6 +1651,9 @@
         ]
       }
       {
+        'include': '#switch_statement'
+      }
+      {
         'match': '''(?x)
           \\b(
             break|case|continue|declare|default|die|do|
@@ -3402,6 +3405,75 @@
       {
         'match': '(?i)\\bis_int(eger)?\\b'
         'name': 'support.function.alias.php'
+      }
+    ]
+  'switch_statement':
+    'patterns': [
+      {
+        # switch(expression) {...}
+        # but NOT switch(expression):
+        'begin': '\\bswitch\\b(?!\\s*\\(.*\\)\\s*:)'
+        'beginCaptures':
+          '0':
+            'name': 'keyword.control.switch.php'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.section.switch-block.end.bracket.curly.php'
+        'name': 'meta.switch-statement.php'
+        'patterns': [
+          {
+            'begin': '\\('
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.switch-expression.begin.bracket.round.php'
+            'end': '\\)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.switch-expression.end.bracket.round.php'
+            'patterns': [
+              {
+                'include': '#language'
+              }
+            ]
+          }
+          {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.section.switch-block.begin.bracket.curly.php'
+            'end': '(?=})'
+            'patterns': [
+              {
+                'begin': '\\bcase\\b'
+                'beginCaptures':
+                  '0':
+                    'name': 'keyword.control.case.php'
+                'end': ':'
+                'endCaptures':
+                  '0':
+                    'name': 'punctuation.terminator.statement.php'
+                'patterns': [
+                  {
+                    'include': '#language'
+                  }
+                ]
+              }
+              {
+                # Leading whitespace match is to overrule goto-label regex
+                'match': '(?:^\\s*)?\\b(default)\\s*(:)'
+                'captures':
+                  '1':
+                    'name': 'keyword.control.default.php'
+                  '2':
+                    'name': 'punctuation.terminator.statement.php'
+              }
+              {
+                'include': '#language'
+              }
+            ]
+          }
+        ]
       }
     ]
   'var_basic':

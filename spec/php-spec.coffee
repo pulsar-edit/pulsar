@@ -769,6 +769,41 @@ describe 'PHP grammar', ->
       expect(tokens[1][21]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
       expect(tokens[1][22]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
+  it 'should tokenize switch statements correctly', ->
+    tokens = grammar.tokenizeLines """
+      <?php
+      switch($something)
+      {
+        case 'string':
+          return 1;
+        case 1:
+          break;
+        default:
+          continue;
+      }
+    """
+
+    expect(tokens[1][0]).toEqual value: 'switch', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.switch.php']
+    expect(tokens[1][1]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.definition.switch-expression.begin.bracket.round.php']
+    expect(tokens[1][2]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(tokens[1][3]).toEqual value: 'something', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'variable.other.php']
+    expect(tokens[1][4]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.definition.switch-expression.end.bracket.round.php']
+    expect(tokens[2][0]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.definition.section.switch-block.begin.bracket.curly.php']
+    expect(tokens[3][1]).toEqual value: 'case', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.case.php']
+    expect(tokens[3][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php']
+    expect(tokens[3][3]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+    expect(tokens[3][6]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.terminator.statement.php']
+    expect(tokens[4][1]).toEqual value: 'return', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.php']
+    expect(tokens[5][1]).toEqual value: 'case', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.case.php']
+    expect(tokens[5][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php']
+    expect(tokens[5][3]).toEqual value: '1', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'constant.numeric.php']
+    expect(tokens[5][4]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.terminator.statement.php']
+    expect(tokens[6][1]).toEqual value: 'break', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.php']
+    expect(tokens[7][1]).toEqual value: 'default', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.default.php']
+    expect(tokens[7][2]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.terminator.statement.php']
+    expect(tokens[8][1]).toEqual value: 'continue', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'keyword.control.php']
+    expect(tokens[9][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.switch-statement.php', 'punctuation.definition.section.switch-block.end.bracket.curly.php']
+
   it 'should tokenize storage types correctly', ->
     tokens = grammar.tokenizeLines "<?php\n(int)"
 
