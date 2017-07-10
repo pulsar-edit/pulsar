@@ -382,6 +382,11 @@ describe 'PHP grammar', ->
       expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
       expect(tokens[1][4]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
 
+      # Should NOT be tokenized as an actual function
+      tokens = grammar.tokenizeLines "<?php\nfunction_test() {}"
+
+      expect(tokens[1][0]).toEqual value: 'function_test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
     it 'tokenizes default array type with old array value', ->
       tokens = grammar.tokenizeLines "<?php\nfunction array_test(array $value = array()) {}"
 
@@ -512,6 +517,20 @@ describe 'PHP grammar', ->
       expect(tokens[1][7]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php']
       expect(tokens[1][8]).toEqual value: 'Client', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'storage.type.php']
       expect(tokens[1][9]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+
+    it 'tokenizes function names with characters other than letters or numbers', ->
+      # The space between foo and bar is a nbsp (char 160/hex 0xA0), not an actual space (char 32/hex 0x20)
+      # 0xA0 is between 0x7F and 0xFF, making it a valid PHP identifier
+      tokens = grammar.tokenizeLines "<?php\nfunction foo bar() {}"
+
+      expect(tokens[1][0]).toEqual value: 'function', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php']
+      expect(tokens[1][2]).toEqual value: 'foo bar', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[1][4]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+      expect(tokens[1][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
+      expect(tokens[1][6]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
+      expect(tokens[1][7]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
   describe 'function calls', ->
     # TODO: Still needs coverage of namespaced function calls
@@ -1800,18 +1819,6 @@ describe 'PHP grammar', ->
     expect(tokens[2][2]).toEqual value: '/', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php']
     expect(tokens[3][0]).toEqual value: 'REGEXP', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.nowdoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']
     expect(tokens[3][1]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
-
-  it 'should tokenize function name with other characters than letters or numbers', ->
-    tokens = grammar.tokenizeLines "<?php\nfunction foo bar() {}"
-
-    expect(tokens[1][0]).toEqual value: 'function', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'storage.type.function.php']
-    expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php']
-    expect(tokens[1][2]).toEqual value: 'foo bar', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'entity.name.function.php']
-    expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
-    expect(tokens[1][4]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
-    expect(tokens[1][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
-    expect(tokens[1][6]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.begin.php']
-    expect(tokens[1][7]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
   describe 'punctuation', ->
     it 'tokenizes parentheses', ->

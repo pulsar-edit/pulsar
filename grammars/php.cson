@@ -707,7 +707,7 @@
       {
         'begin': '''(?xi)
           ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)                               # Typehinted class name
-          \\s*((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
+          \\s+((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
         '''
         'beginCaptures':
           '1':
@@ -1722,12 +1722,10 @@
         'name': 'keyword.control.exception.php'
       }
       {
-        'begin': '(?i)\\b(function)\\s*(&)?\\s*(?=\\()'
+        'begin': '(?i)\\b(function)\\s*(?=\\()'
         'beginCaptures':
           '1':
             'name': 'storage.type.function.php'
-          '2':
-            'name': 'storage.modifier.reference.php'
         'end': '(?={)'
         'name': 'meta.function.closure.php'
         'patterns': [
@@ -1777,8 +1775,7 @@
       {
         'begin': '''(?x)
           ((?:(?:final|abstract|public|private|protected|static)\\s+)*)
-          (function)
-          \\s*(&)?\\s*
+          (function)\\s+
           (?i:
             (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|
                   clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
@@ -1797,12 +1794,10 @@
           '2':
             'name': 'storage.type.function.php'
           '3':
-            'name': 'storage.modifier.reference.php'
-          '4':
             'name': 'support.function.magic.php'
-          '5':
+          '4':
             'name': 'entity.name.function.php'
-          '6':
+          '5':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
         'contentName': 'meta.function.parameters.php'
         'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?'
