@@ -3459,7 +3459,7 @@
           '11':
             'name': 'punctuation.section.array.end.php'
         # Simple syntax: $foo, $foo[0], $foo[$bar], $foo->bar
-        'match': '''(?x)
+        'match': '''(?xi)
           ((\\$)(?<name>[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))
           (?:
             (->)(\\g<name>)
