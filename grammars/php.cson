@@ -1775,8 +1775,7 @@
       {
         'begin': '''(?x)
           ((?:(?:final|abstract|public|private|protected|static)\\s+)*)
-          (function)
-          \\s+
+          (function)\\s+
           (?i:
             (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|
                   clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
