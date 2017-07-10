@@ -706,19 +706,32 @@
       }
       {
         'begin': '''(?xi)
+          (\\\\?(?:[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\\\)*)                 # Optional namespace
           ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)                               # Typehinted class name
           \\s+((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
         '''
         'beginCaptures':
           '1':
-            'name': 'storage.type.php'
+            'name': 'support.other.namespace.php'
+            'patterns': [
+              {
+                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+                'name': 'storage.type.php'
+              }
+              {
+                'match': '\\\\'
+                'name': 'punctuation.separator.inheritance.php'
+              }
+            ]
           '2':
-            'name': 'variable.other.php'
+            'name': 'storage.type.php'
           '3':
-            'name': 'storage.modifier.reference.php'
+            'name': 'variable.other.php'
           '4':
-            'name': 'keyword.operator.variadic.php'
+            'name': 'storage.modifier.reference.php'
           '5':
+            'name': 'keyword.operator.variadic.php'
+          '6':
             'name': 'punctuation.definition.variable.php'
         'end': '(?=,|\\)|/[/*]|\\#)'
         'name': 'meta.function.parameter.typehinted.php'
