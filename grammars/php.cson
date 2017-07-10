@@ -624,6 +624,10 @@
         'include': '#comments'
       }
       {
+        'match': ','
+        'name': 'punctuation.separator.delimiter.php'
+      }
+      {
         'begin': '''(?xi)
           (array)                                                            # Typehint
           \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*) # Variable name with possible reference
@@ -2020,6 +2024,10 @@
       }
       {
         'include': '#constants'
+      }
+      {
+        'match': ','
+        'name': 'punctuation.separator.delimiter.php'
       }
     ]
   'namespace':
