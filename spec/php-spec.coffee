@@ -528,14 +528,15 @@ describe 'PHP grammar', ->
       expect(tokens[1][11]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
       expect(tokens[1][12]).toEqual value: 'no subject', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'string.quoted.single.php']
       expect(tokens[1][13]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][14]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php']
-      expect(tokens[1][15]).toEqual value: 'string', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
-      expect(tokens[1][17]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
-      expect(tokens[1][18]).toEqual value: 'body', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
-      expect(tokens[1][20]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.assignment.php']
-      expect(tokens[1][21]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
-      expect(tokens[1][22]).toEqual value: 'null', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'constant.language.php']
-      expect(tokens[1][23]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+      expect(tokens[1][14]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][15]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php']
+      expect(tokens[1][16]).toEqual value: 'string', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+      expect(tokens[1][18]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1][19]).toEqual value: 'body', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+      expect(tokens[1][21]).toEqual value: '=', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.assignment.php']
+      expect(tokens[1][22]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
+      expect(tokens[1][23]).toEqual value: 'null', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'constant.language.php']
+      expect(tokens[1][24]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
 
     it 'tokenizes return values', ->
       tokens = grammar.tokenizeLines "<?php\nfunction test() : Client {}"
@@ -588,11 +589,12 @@ describe 'PHP grammar', ->
       expect(tokens[1][0]).toEqual value: 'inverse', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
       expect(tokens[1][1]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[1][2]).toEqual value: '5', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'constant.numeric.php']
-      expect(tokens[1][3]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php']
-      expect(tokens[1][4]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
-      expect(tokens[1][5]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php']
-      expect(tokens[1][6]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][7]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[1][3]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php']
+      expect(tokens[1][5]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[1][6]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php']
+      expect(tokens[1][7]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[1][8]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
       tokens = grammar.tokenizeLines "<?php\ninverse (5, 'b')"
 
@@ -600,11 +602,12 @@ describe 'PHP grammar', ->
       expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php']
       expect(tokens[1][2]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[1][3]).toEqual value: '5', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'constant.numeric.php']
-      expect(tokens[1][4]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php']
-      expect(tokens[1][5]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
-      expect(tokens[1][6]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php']
-      expect(tokens[1][7]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][8]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[1][4]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php']
+      expect(tokens[1][6]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[1][7]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php']
+      expect(tokens[1][8]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[1][9]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
     it 'tokenizes builtin function calls', ->
       tokens = grammar.tokenizeLines "<?php\necho('Hi!')"
@@ -647,11 +650,12 @@ describe 'PHP grammar', ->
       expect(tokens[1][2]).toEqual value: 'method', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'entity.name.function.php']
       expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[1][4]).toEqual value: '5', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'constant.numeric.php']
-      expect(tokens[1][5]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php']
-      expect(tokens[1][6]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
-      expect(tokens[1][7]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php']
-      expect(tokens[1][8]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][9]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[1][5]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php']
+      expect(tokens[1][7]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[1][8]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php']
+      expect(tokens[1][9]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[1][10]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
       tokens = grammar.tokenizeLines "<?php\nobj->method (5, 'b')"
 
@@ -659,11 +663,12 @@ describe 'PHP grammar', ->
       expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php']
       expect(tokens[1][4]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[1][5]).toEqual value: '5', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'constant.numeric.php']
-      expect(tokens[1][6]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php']
-      expect(tokens[1][7]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
-      expect(tokens[1][8]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php']
-      expect(tokens[1][9]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][10]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[1][6]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][7]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php']
+      expect(tokens[1][8]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[1][9]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php']
+      expect(tokens[1][10]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[1][11]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
   describe 'the scope resolution operator', ->
     it 'tokenizes static method calls with no arguments', ->
@@ -694,11 +699,12 @@ describe 'PHP grammar', ->
       expect(tokens[1][2]).toEqual value: 'method', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'entity.name.function.php']
       expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[1][4]).toEqual value: '5', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'constant.numeric.php']
-      expect(tokens[1][5]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php']
-      expect(tokens[1][6]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
-      expect(tokens[1][7]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php']
-      expect(tokens[1][8]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][9]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[1][5]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][6]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php']
+      expect(tokens[1][7]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[1][8]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php']
+      expect(tokens[1][9]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[1][10]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
       tokens = grammar.tokenizeLines "<?php\nobj :: method (5, 'b')"
 
@@ -710,11 +716,12 @@ describe 'PHP grammar', ->
       expect(tokens[1][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php']
       expect(tokens[1][6]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[1][7]).toEqual value: '5', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'constant.numeric.php']
-      expect(tokens[1][8]).toEqual value: ', ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php']
-      expect(tokens[1][9]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
-      expect(tokens[1][10]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php']
-      expect(tokens[1][11]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
-      expect(tokens[1][12]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[1][8]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[1][9]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php']
+      expect(tokens[1][10]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[1][11]).toEqual value: 'b', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php']
+      expect(tokens[1][12]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[1][13]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
     it 'tokenizes class variables', ->
       tokens = grammar.tokenizeLines "<?php\nobj::$variable"
