@@ -74,7 +74,6 @@ describe 'Python settings', ->
     expect(decreaseIndentRegex.testSync('else')).toBeFalsy()
     expect(decreaseIndentRegex.testSync('  "finally:"')).toBeFalsy()
 
-
   it 'matches lines correctly using the decreaseNextIndentPattern', ->
     decreaseNextIndentRegex = languageMode.decreaseNextIndentRegexForScopeDescriptor(['source.python'])
 
