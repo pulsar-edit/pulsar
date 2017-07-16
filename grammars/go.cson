@@ -442,12 +442,25 @@
   'runes':
     'patterns': [
       {
-        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
-        'name': 'constant.other.rune.go'
-      }
-      {
-        'match': '\\\'.*\\\''
-        'name': 'invalid.illegal.unknown-rune.go'
+        'begin': "'"
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.go'
+        'end': "'"
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.go'
+        'name': 'string.quoted.rune.go'
+        'patterns': [
+          {
+            'match': "\\G(\\\\([0-7]{3}|[abfnrtv\\\\'\"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|.)(?=')"
+            'name': 'constant.other.rune.go'
+          }
+          {
+            'match': "[^']+"
+            'name': 'invalid.illegal.unknown-rune.go'
+          }
+        ]
       }
     ]
   'storage_types':
