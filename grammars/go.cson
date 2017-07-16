@@ -280,16 +280,38 @@
   'brackets':
     'patterns': [
       {
-        'match': '\\{|\\}'
-        'name': 'punctuation.other.bracket.curly.go'
+        'begin': '{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.begin.bracket.curly.go'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.end.bracket.curly.go'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
       }
       {
-        'match': '\\(|\\)'
-        'name': 'punctuation.other.bracket.round.go'
+        'begin': '\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.begin.bracket.round.go'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.end.bracket.round.go'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
       }
       {
         'match': '\\[|\\]'
-        'name': 'punctuation.other.bracket.square.go'
+        'name': 'punctuation.definition.bracket.square.go'
       }
     ]
   'comments':
@@ -348,11 +370,11 @@
         'begin': '\\('
         'beginCaptures':
           '0':
-            'name': 'punctuation.other.bracket.round.go'
+            'name': 'punctuation.definition.imports.begin.bracket.round.go'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.other.bracket.round.go'
+            'name': 'punctuation.definition.imports.end.bracket.round.go'
         'patterns': [
           {
             'include': '#comments'
@@ -571,11 +593,11 @@
         'begin': '\\('
         'beginCaptures':
           '0':
-            'name': 'punctuation.other.bracket.round.go'
+            'name': 'punctuation.definition.variables.begin.bracket.round.go'
         'end': '\\)'
         'endCaptures':
           '0':
-            'name': 'punctuation.other.bracket.round.go'
+            'name': 'punctuation.definition.variables.end.bracket.round.go'
         'patterns': [
           {
             'include': '$self'
