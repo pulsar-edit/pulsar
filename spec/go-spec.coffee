@@ -108,25 +108,33 @@ describe 'Go grammar', ->
       expect(tokens[2].scopes).toEqual ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']
 
   it 'tokenizes runes', ->
-    verbs = [
+    runes = [
       'u', 'X', '$', ':', '(', '.', '2', '=', '!', '@',
-      '\\a', '\\b', '\\f', '\\n', '\\r', '\\t', '\\v', '\\\\'
+      '\\a', '\\b', '\\f', '\\n', '\\r', '\\t', '\\v', '\\\\', "\\'", '\\"',
       '\\000', '\\007', '\\377', '\\x07', '\\xff', '\\u12e4', '\\U00101234'
     ]
 
-    for verb in verbs
-      {tokens} = grammar.tokenizeLine('\'' + verb + '\'')
-      expect(tokens[0].value).toEqual '\'' + verb + '\'',
-      expect(tokens[0].scopes).toEqual ['source.go', 'constant.other.rune.go']
+    for rune in runes
+      {tokens} = grammar.tokenizeLine("'#{rune}'")
+      expect(tokens[0]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.begin.go']
+      expect(tokens[1]).toEqual value: rune, scopes: ['source.go', 'string.quoted.rune.go', 'constant.other.rune.go']
+      expect(tokens[2]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.end.go']
 
   it 'tokenizes invalid runes and single quoted strings', ->
-    {tokens} = grammar.tokenizeLine('\'ab\'')
-    expect(tokens[0].value).toEqual '\'ab\''
-    expect(tokens[0].scopes).toEqual ['source.go', 'invalid.illegal.unknown-rune.go']
+    {tokens} = grammar.tokenizeLine("'\\c'")
+    expect(tokens[0]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.begin.go']
+    expect(tokens[1]).toEqual value: '\\c', scopes: ['source.go', 'string.quoted.rune.go', 'invalid.illegal.unknown-rune.go']
+    expect(tokens[2]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.end.go']
 
-    {tokens} = grammar.tokenizeLine('\'some single quote string\'')
-    expect(tokens[0].value).toEqual '\'some single quote string\''
-    expect(tokens[0].scopes).toEqual ['source.go', 'invalid.illegal.unknown-rune.go']
+    {tokens} = grammar.tokenizeLine("'ab'")
+    expect(tokens[0]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.begin.go']
+    expect(tokens[1]).toEqual value: 'ab', scopes: ['source.go', 'string.quoted.rune.go', 'invalid.illegal.unknown-rune.go']
+    expect(tokens[2]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.end.go']
+
+    {tokens} = grammar.tokenizeLine("'some single quote string'")
+    expect(tokens[0]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.begin.go']
+    expect(tokens[1]).toEqual value: 'some single quote string', scopes: ['source.go', 'string.quoted.rune.go', 'invalid.illegal.unknown-rune.go']
+    expect(tokens[2]).toEqual value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.end.go']
 
   it 'tokenizes invalid whitespace around chan annotations', ->
     invalid_send =
