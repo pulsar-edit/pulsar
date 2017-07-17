@@ -39,7 +39,6 @@ describe 'Go grammar', ->
     expect(lines[2][5]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
     expect(lines[3][1]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
 
-
   it 'tokenizes strings', ->
     delims =
       'string.quoted.double.go': '"'
@@ -222,7 +221,7 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
-      expect(next.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+      expect(next.scopes).toEqual ['source.go', 'punctuation.definition.begin.bracket.round.go']
 
   it 'only tokenizes func when it is an exact match', ->
     tests = ['myfunc', 'funcMap']
@@ -263,7 +262,7 @@ describe 'Go grammar', ->
 
       next = tokens[t.tokenPos + 1]
       expect(next.value).toEqual '('
-      expect(next.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+      expect(next.scopes).toEqual ['source.go', 'punctuation.definition.begin.bracket.round.go']
 
   it 'tokenizes operators method declarations', ->
     tests = [
@@ -353,16 +352,13 @@ describe 'Go grammar', ->
         expect(tokens[0].scopes).toEqual ['source.go', scope]
 
   it 'tokenizes punctuation brackets', ->
-    brackets =
-      'punctuation.other.bracket.square.go': [ '[', ']' ]
-      'punctuation.other.bracket.round.go': [ '(', ')' ]
-      'punctuation.other.bracket.curly.go': [ '{', '}' ]
-
-    for scope, brkts of brackets
-      for brkt in brkts
-        {tokens} = grammar.tokenizeLine brkt
-        expect(tokens[0].value).toEqual brkt
-        expect(tokens[0].scopes).toEqual ['source.go', scope]
+    {tokens} = grammar.tokenizeLine '{([])}'
+    expect(tokens[0]).toEqual value: '{', scopes: ['source.go', 'punctuation.definition.begin.bracket.curly.go']
+    expect(tokens[1]).toEqual value: '(', scopes: ['source.go', 'punctuation.definition.begin.bracket.round.go']
+    expect(tokens[2]).toEqual value: '[', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
+    expect(tokens[3]).toEqual value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
+    expect(tokens[4]).toEqual value: ')', scopes: ['source.go', 'punctuation.definition.end.bracket.round.go']
+    expect(tokens[5]).toEqual value: '}', scopes: ['source.go', 'punctuation.definition.end.bracket.curly.go']
 
   it 'tokenizes punctuation delimiters', ->
     delims =
@@ -428,7 +424,7 @@ describe 'Go grammar', ->
 
         next = tokens[t.tokenPos + 1]
         expect(next.value).toEqual '('
-        expect(next.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+        expect(next.scopes).toEqual ['source.go', 'punctuation.definition.begin.bracket.round.go']
       else
         expect(relevantToken.scopes).not.toEqual want
 
@@ -493,9 +489,9 @@ describe 'Go grammar', ->
       expect(token.value).toBe op
       expect(token.scopes).toEqual ['source.go', 'keyword.operator.assignment.go']
 
-    testOpBracket = (token, op) ->
+    testOpBracket = (token, op, type) ->
       expect(token.value).toBe op
-      expect(token.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+      expect(token.scopes).toEqual ['source.go', "punctuation.definition.variables.#{type}.bracket.round.go"]
 
     testOpPunctuation = (token, op) ->
       expect(token.value).toBe op
@@ -582,28 +578,28 @@ describe 'Go grammar', ->
         {tokens} = grammar.tokenizeLine 'var s [4]string'
         testVar tokens[0]
         testVarDeclaration tokens[2], 's'
-        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
         expect(tokens[5]).toEqual value: '4', scopes: ['source.go', 'constant.numeric.integer.go']
-        expect(tokens[6]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[6]).toEqual value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
         testStringType tokens[7], 'string'
 
       it 'tokenizes a single name and an array type with variadic length', ->
         {tokens} = grammar.tokenizeLine 'var s [...]string'
         testVar tokens[0]
         testVarDeclaration tokens[2], 's'
-        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
         expect(tokens[5]).toEqual value: '...', scopes: ['source.go', 'keyword.operator.ellipsis.go']
-        expect(tokens[6]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[6]).toEqual value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
         testStringType tokens[7], 'string'
 
       it 'tokenizes a single name and multi-dimensional types with an address', ->
         {tokens} = grammar.tokenizeLine 'var e [][]*string'
         testVar tokens[0]
         testVarDeclaration tokens[2], 'e'
-        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
-        expect(tokens[5]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
-        expect(tokens[6]).toEqual value: '[', scopes: ['source.go', 'punctuation.other.bracket.square.go']
-        expect(tokens[7]).toEqual value: ']', scopes: ['source.go', 'punctuation.other.bracket.square.go']
+        expect(tokens[4]).toEqual value: '[', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
+        expect(tokens[5]).toEqual value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
+        expect(tokens[6]).toEqual value: '[', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
+        expect(tokens[7]).toEqual value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
         testOpAddress tokens[8], '*'
         testStringType tokens[9], 'string'
 
@@ -733,10 +729,10 @@ describe 'Go grammar', ->
             )
           '''
           testVar lines[0][0]
-          testOpBracket lines[0][2], '('
+          testOpBracket lines[0][2], '(', 'begin'
           testVarDeclaration lines[1][1], 'foo'
           testOpAddress lines[1][3], '*'
-          testOpBracket lines[2][0], ')'
+          testOpBracket lines[2][0], ')', 'end'
 
         it 'tokenizes single names with an initializer', ->
           lines = grammar.tokenizeLines '''
@@ -745,11 +741,11 @@ describe 'Go grammar', ->
             )
           '''
           testVar lines[0][0], 'var'
-          testOpBracket lines[0][2], '('
+          testOpBracket lines[0][2], '(', 'begin'
           testVarAssignment lines[1][1], 'foo'
           testOpAssignment lines[1][3], '='
           testNum lines[1][5], '42'
-          testOpBracket lines[2][0], ')'
+          testOpBracket lines[2][0], ')', 'end'
 
         it 'tokenizes multiple names', ->
           lines = grammar.tokenizeLines '''
@@ -758,13 +754,13 @@ describe 'Go grammar', ->
             )
           '''
           testVar lines[0][0]
-          testOpBracket lines[0][2], '('
+          testOpBracket lines[0][2], '(', 'begin'
           testVarAssignment lines[1][1], 'foo'
           testOpPunctuation lines[1][2], ','
           testVarAssignment lines[1][4], 'bar'
           testOpAssignment lines[1][6], '='
           testOpPunctuation lines[1][8], ','
-          testOpBracket lines[2][0], ')'
+          testOpBracket lines[2][0], ')', 'end'
 
         it 'tokenizes non variable declarations', ->
           lines = grammar.tokenizeLines '''
@@ -782,7 +778,7 @@ describe 'Go grammar', ->
             )
           '''
           testVar lines[0][0]
-          testOpBracket lines[0][2], '('
+          testOpBracket lines[0][2], '(', 'begin'
           expect(lines[1][1]).toEqual value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']
           expect(lines[1][2]).toEqual value: ' I am a comment', scopes: ['source.go', 'comment.line.double-slash.go']
           testVarDeclaration lines[2][1], 'foo'
@@ -791,7 +787,7 @@ describe 'Go grammar', ->
           expect(lines[4][3]).toEqual value: 'func', scopes: ['source.go', 'keyword.function.go']
           expect(lines[5][1]).toEqual value: 'if', scopes: ['source.go', 'keyword.control.go']
           expect(lines[8][3]).toEqual value: 'nil', scopes: ['source.go', 'constant.language.go']
-          testOpBracket lines[11][0], ')'
+          testOpBracket lines[11][0], ')', 'end'
 
         it 'tokenizes all parts of variable initializations correctly', ->
           lines = grammar.tokenizeLines '''
@@ -802,12 +798,12 @@ describe 'Go grammar', ->
             )
           '''
           testVar lines[0][0]
-          testOpBracket lines[0][2], '('
+          testOpBracket lines[0][2], '(', 'begin'
           testVarAssignment lines[1][1], 'm'
           testOpAssignment lines[1][3], '='
           testString lines[2][2], 'key'
           testNum lines[2][6], '10'
-          testOpBracket lines[4][0], ')'
+          testOpBracket lines[4][0], ')', 'end'
 
       it 'tokenizes non-ASCII variable names', ->
         {tokens} = grammar.tokenizeLine 'über = test'
@@ -855,9 +851,9 @@ describe 'Go grammar', ->
       expect(token.value).toBe name
       expect(token.scopes).toEqual ['source.go', 'string.quoted.double.go', 'entity.name.import.go']
 
-    testOpBracket = (token, op) ->
+    testOpBracket = (token, op, type) ->
       expect(token.value).toBe op
-      expect(token.scopes).toEqual ['source.go', 'punctuation.other.bracket.round.go']
+      expect(token.scopes).toEqual ['source.go', "punctuation.definition.imports.#{type}.bracket.round.go"]
 
     testBeginQuoted = (token) ->
       expect(token.value).toBe '"'
@@ -896,40 +892,58 @@ describe 'Go grammar', ->
 
     describe 'when it is a multi line declaration', ->
       it 'tokenizes single declarations with a package name', ->
-        [kwd, decl, closing] = grammar.tokenizeLines 'import (\n\t"github.com/test/package"\n)'
+        [kwd, decl, closing] = grammar.tokenizeLines '''
+          import (
+            "github.com/test/package"
+          )
+        '''
         testImport kwd[0]
-        testOpBracket kwd[2], '('
+        testOpBracket kwd[2], '(', 'begin'
         testBeginQuoted decl[1]
         testImportPackage decl[2], 'github.com/test/package'
         testEndQuoted decl[3]
-        testOpBracket closing[0], ')'
+        testOpBracket closing[0], ')', 'end'
 
       it 'tokenizes multiple declarations with a package name', ->
-        [kwd, decl, decl2, closing] = grammar.tokenizeLines 'import (\n\t"github.com/test/package"\n\t"fmt"\n)'
+        [kwd, decl, decl2, closing] = grammar.tokenizeLines '''
+          import (
+            "github.com/test/package"
+            "fmt"
+          )
+        '''
         testImport kwd[0]
-        testOpBracket kwd[2], '('
+        testOpBracket kwd[2], '(', 'begin'
         testBeginQuoted decl[1]
         testImportPackage decl[2], 'github.com/test/package'
         testEndQuoted decl[3]
         testBeginQuoted decl2[1]
         testImportPackage decl2[2], 'fmt'
         testEndQuoted decl2[3]
-        testOpBracket closing[0], ')'
+        testOpBracket closing[0], ')', 'end'
 
       it 'tokenizes single imports with an alias for a multi-line declaration', ->
-        [kwd, decl, closing] = grammar.tokenizeLines 'import (\n\t. "github.com/test/package"\n)'
+        [kwd, decl, closing] = grammar.tokenizeLines '''
+          import (
+            . "github.com/test/package"
+          )
+        '''
         testImport kwd[0]
-        testOpBracket kwd[2], '('
+        testOpBracket kwd[2], '(', 'begin'
         testImportAlias decl[1], '.'
         testBeginQuoted decl[3]
         testImportPackage decl[4], 'github.com/test/package'
         testEndQuoted decl[5]
-        testOpBracket closing[0], ')'
+        testOpBracket closing[0], ')', 'end'
 
       it 'tokenizes multiple imports with an alias for a multi-line declaration', ->
-        [kwd, decl, decl2, closing] = grammar.tokenizeLines 'import (\n\t. "github.com/test/package"\n\t"fmt"\n)'
+        [kwd, decl, decl2, closing] = grammar.tokenizeLines '''
+          import (
+            . "github.com/test/package"
+            "fmt"
+          )
+        '''
         testImport kwd[0]
-        testOpBracket kwd[2], '('
+        testOpBracket kwd[2], '(', 'begin'
         testImportAlias decl[1], '.'
         testBeginQuoted decl[3]
         testImportPackage decl[4], 'github.com/test/package'
@@ -937,4 +951,4 @@ describe 'Go grammar', ->
         testBeginQuoted decl2[1]
         testImportPackage decl2[2], 'fmt'
         testEndQuoted decl2[3]
-        testOpBracket closing[0], ')'
+        testOpBracket closing[0], ')', 'end'
