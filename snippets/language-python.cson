@@ -2,6 +2,9 @@
   '#!/usr/bin/env python':
     'prefix': 'env'
     'body': '#!/usr/bin/env python\n'
+  '#!/usr/bin/env python3':
+    'prefix': 'env3'
+    'body': '#!/usr/bin/env python3\n'
   '# coding=utf-8':
     'prefix': 'enc'
     'body': '# -*- coding: utf-8 -*-\n'
@@ -95,6 +98,9 @@
   'Dictionary Comprehension':
     'prefix': 'dc'
     'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
+  'Set Comprehension':
+    'prefix': 'sc'
+    'body': '{${1:value} for ${2:value} in ${3:variable}}'
   'PDB set trace':
     'prefix': 'pdb'
     'body': 'import pdb; pdb.set_trace()'
