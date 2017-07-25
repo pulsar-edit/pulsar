@@ -1529,35 +1529,7 @@
         'name': 'meta.use.php'
         'patterns': [
           {
-            'include': '#comments'
-          }
-          {
-            'begin': '(?i)\\s*(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\])'
-            'end': '(?i)(?:\\s*(as)\\s+([a-z0-9_\\x{7f}-\\x{ff}]*))?\\s*(?=,|;|$)'
-            'endCaptures':
-              '1':
-                'name': 'keyword.other.use-as.php'
-              '2':
-                'name': 'support.other.namespace.use-as.php'
-            'patterns': [
-              {
-                'include': '#class-builtin'
-              }
-              {
-                'begin': '(?i)\\s*(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\])'
-                'end': '$|(?=[\\s,;])'
-                'name': 'support.other.namespace.use.php'
-                'patterns': [
-                  {
-                    'match': '\\\\'
-                    'name': 'punctuation.separator.inheritance.php'
-                  }
-                ]
-              }
-            ]
-          }
-          {
-            'match': '\\s*,\\s*'
+            'include': '#use-inner'
           }
         ]
       }
@@ -3570,6 +3542,51 @@
             ]
           }
         ]
+      }
+    ]
+  'use-inner':
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'begin': '{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.use.group.end.bracket.curly.php'
+        'patterns': [
+          {
+            'include': '#use-inner'
+          }
+        ]
+      }
+      {
+        'begin': '(?i)\\b(as)\\s+'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.other.use-as.php'
+        'end': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+        'endCaptures':
+          '0':
+            'name': 'support.other.namespace.use-as.php'
+      }
+      {
+        'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
+        'captures':
+          '0':
+            'patterns': [
+              {
+                'include': '#class-name'
+              }
+            ]
+      }
+      {
+        'match': ','
+        'name': 'punctuation.definition.separator.delimiter.php'
       }
     ]
   'var_basic':
