@@ -1504,17 +1504,59 @@
         ]
       }
       {
-        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\b\\s+(?=([a-z0-9_\\x{7f}-\\x{ff}\\\\]+\\s*($|[;{]|(/[/*])))|$)'
+        'match': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\s+([a-z0-9_\\x{7f}-\\x{ff}\\\\]+)(?=\\s*;)'
+        'name': 'meta.namespace.php'
+        'captures':
+          '1':
+            'name': 'keyword.other.namespace.php'
+          '2':
+            'name': 'entity.name.type.namespace.php'
+            'patterns': [
+              {
+                'match': '\\\\'
+                'name': 'punctuation.separator.inheritance.php'
+              }
+            ]
+      }
+      {
+        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\s+'
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
-        'contentName': 'entity.name.type.namespace.php'
-        'end': '(?i)(?=\\s*$|[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
+        'end': '(?<=})'
         'name': 'meta.namespace.php'
         'patterns': [
           {
-            'match': '\\\\'
-            'name': 'punctuation.separator.inheritance.php'
+            'include': '#comments'
+          }
+          {
+            'match': '(?i)[a-z0-9_\\x{7f}-\\x{ff}\\\\]+'
+            'name': 'entity.name.type.namespace.php'
+            'patterns': [
+              {
+                'match': '\\\\'
+                'name': 'punctuation.separator.inheritance.php'
+              }
+            ]
+          }
+          {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.namespace.begin.bracket.curly.php'
+            'end': '}'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.namespace.end.bracket.curly.php'
+            'patterns': [
+              {
+                'include': '#language'
+              }
+            ]
+          }
+          {
+            'match': '[^\\s]+'
+            'name': 'invalid.illegal.identifier.php'
           }
         ]
       }

@@ -212,36 +212,108 @@ describe 'PHP grammar', ->
 
   it 'should tokenize $this', ->
     tokens = grammar.tokenizeLines "<?php $this"
+
     expect(tokens[0][2]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.language.this.php', 'punctuation.definition.variable.php']
     expect(tokens[0][3]).toEqual value: 'this', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.language.this.php']
 
     tokens = grammar.tokenizeLines "<?php $thistles"
+
     expect(tokens[0][2]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php', 'punctuation.definition.variable.php']
     expect(tokens[0][3]).toEqual value: 'thistles', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.php']
-
-  it 'should tokenize namespace at the same line as <?php', ->
-    tokens = grammar.tokenizeLines "<?php namespace Test;"
-    expect(tokens[0][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
-    expect(tokens[0][2]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
-    expect(tokens[0][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
-    expect(tokens[0][4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
-    expect(tokens[0][5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
-
-  it 'should tokenize namespace correctly', ->
-    tokens = grammar.tokenizeLines "<?php\nnamespace Test;"
-    expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
-    expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
-    expect(tokens[1][2]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
-    expect(tokens[1][3]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
   it 'should tokenize include on the same line as <?php', ->
     # https://github.com/atom/language-php/issues/154
     tokens = grammar.tokenizeLines "<?php include 'test'?>"
+
     expect(tokens[0][2]).toEqual value: 'include', scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'keyword.control.import.include.php']
     expect(tokens[0][4]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
     expect(tokens[0][6]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
     expect(tokens[0][7]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']
     expect(tokens[0][8]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']
+
+  describe 'namespaces', ->
+    it 'tokenize namespaces immediately following <?php', ->
+      tokens = grammar.tokenizeLines "<?php namespace Test;"
+
+      expect(tokens[0][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[0][2]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[0][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[0][4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[0][5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+    it 'tokenizes namespaces', ->
+      tokens = grammar.tokenizeLines "<?php\nnamespace Test;"
+
+      expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[1][2]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[1][3]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+    it 'tokenizes sub-namespaces', ->
+      tokens = grammar.tokenizeLines "<?php\nnamespace One\\Two\\Three;"
+
+      expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[1][2]).toEqual value: 'One', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[1][3]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][4]).toEqual value: 'Two', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[1][5]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][6]).toEqual value: 'Three', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[1][7]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+    it 'tokenizes bracketed namespaces', ->
+      tokens = grammar.tokenizeLines """<?php
+        namespace Test {
+          // code
+        }
+      """
+
+      expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[1][2]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[1][4]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.begin.bracket.curly.php']
+      expect(tokens[2][1]).toEqual value: '//', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']
+      expect(tokens[3][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']
+
+      tokens = grammar.tokenizeLines """<?php
+        namespace Test
+        {
+          // code
+        }
+      """
+
+      expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[1][2]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[2][0]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.begin.bracket.curly.php']
+      expect(tokens[3][1]).toEqual value: '//', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']
+      expect(tokens[4][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']
+
+    it 'tokenizes global namespaces', ->
+      tokens = grammar.tokenizeLines """<?php
+        namespace {
+          // code
+        }
+      """
+
+      expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[1][2]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.begin.bracket.curly.php']
+      expect(tokens[2][1]).toEqual value: '//', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']
+      expect(tokens[3][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']
+
+      tokens = grammar.tokenizeLines """<?php
+        namespace
+        {
+          // code
+        }
+      """
+
+      expect(tokens[1][0]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[2][0]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.begin.bracket.curly.php']
+      expect(tokens[3][1]).toEqual value: '//', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']
+      expect(tokens[4][0]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']
 
   describe 'classes', ->
     it 'tokenizes class declarations', ->
