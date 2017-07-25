@@ -567,8 +567,6 @@ describe 'PHP grammar', ->
       expect(tokens[1][7]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.section.scope.end.php']
 
   describe 'function calls', ->
-    # TODO: Still needs coverage of namespaced function calls
-
     it 'tokenizes function calls with no arguments', ->
       tokens = grammar.tokenizeLines "<?php\ninverse()"
 
@@ -628,6 +626,53 @@ describe 'PHP grammar', ->
       expect(tokens[1][4]).toEqual value: 'Hi!', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php']
       expect(tokens[1][5]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
       expect(tokens[1][6]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+
+    it 'tokenizes root-namespaced function calls', ->
+      tokens = grammar.tokenizeLines "<?php\n\\test()"
+
+      expect(tokens[1][0]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][1]).toEqual value: 'test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
+    it 'tokenizes user-namespaced function calls', ->
+      tokens = grammar.tokenizeLines "<?php\nhello\\test()"
+
+      expect(tokens[1][0]).toEqual value: 'hello', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][2]).toEqual value: 'test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
+      tokens = grammar.tokenizeLines "<?php\none\\two\\test()"
+
+      expect(tokens[1][0]).toEqual value: 'one', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php']
+      expect(tokens[1][1]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][2]).toEqual value: 'two', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php']
+      expect(tokens[1][3]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][4]).toEqual value: 'test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
+    it 'tokenizes absolutely-namespaced function calls', ->
+      tokens = grammar.tokenizeLines "<?php\n\\hello\\test()"
+
+      expect(tokens[1][0]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][1]).toEqual value: 'hello', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php']
+      expect(tokens[1][2]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][3]).toEqual value: 'test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
+      tokens = grammar.tokenizeLines "<?php\n\\one\\two\\test()"
+
+      expect(tokens[1][0]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][1]).toEqual value: 'one', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php']
+      expect(tokens[1][2]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][3]).toEqual value: 'two', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php']
+      expect(tokens[1][4]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][5]).toEqual value: 'test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
+    it 'does not treat user-namespaced functions as builtins', ->
+      tokens = grammar.tokenizeLines "<?php\nhello\\apc_store()"
+
+      expect(tokens[1][2]).toEqual value: 'apc_store', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
+
+      tokens = grammar.tokenizeLines "<?php\n\\hello\\apc_store()"
+
+      expect(tokens[1][3]).toEqual value: 'apc_store', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function-call.php', 'entity.name.function.php']
 
   describe 'method calls', ->
     it 'tokenizes method calls with no arguments', ->
