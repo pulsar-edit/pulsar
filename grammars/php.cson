@@ -1583,6 +1583,21 @@
         'name': 'meta.use.php'
         'patterns': [
           {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
+            'end': '}'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.use.group.end.bracket.curly.php'
+            'patterns': [
+              {
+                'include': '#use-inner'
+              }
+            ]
+          }
+          {
             'include': '#use-inner'
           }
         ]
@@ -3602,21 +3617,6 @@
     'patterns': [
       {
         'include': '#comments'
-      }
-      {
-        'begin': '{'
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
-        'end': '}'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.use.group.end.bracket.curly.php'
-        'patterns': [
-          {
-            'include': '#use-inner'
-          }
-        ]
       }
       {
         'begin': '(?i)\\b(as)\\s+'
