@@ -810,7 +810,13 @@
     'patterns': [
       {
         # Functions in a user-defined namespace (overrides any built-ins)
-        'begin': '(?i)(\\\\?[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*\\\\[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
+        'begin': '''(?xi)
+          (
+            \\\\?\\b                                                # Optional root namespace
+            [a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*          # First namespace
+            (?:\\\\[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)+ # Additional namespaces
+          )\\s*(\\()
+        '''
         'beginCaptures':
           '1':
             'patterns': [
@@ -840,7 +846,11 @@
         'begin': '(?i)(\\\\)?\\b([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(\\()'
         'beginCaptures':
           '1':
-            'name': 'punctuation.separator.inheritance.php'
+            'patterns': [
+              {
+                'include': '#namespace'
+              }
+            ]
           '2':
             'patterns': [
               {
@@ -1504,17 +1514,61 @@
         ]
       }
       {
-        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\b\\s+(?=([a-z0-9_\\x{7f}-\\x{ff}\\\\]+\\s*($|[;{]|(/[/*])))|$)'
+        'match': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\s+([a-z0-9_\\x{7f}-\\x{ff}\\\\]+)(?=\\s*;)'
+        'name': 'meta.namespace.php'
+        'captures':
+          '1':
+            'name': 'keyword.other.namespace.php'
+          '2':
+            'name': 'entity.name.type.namespace.php'
+            'patterns': [
+              {
+                'match': '\\\\'
+                'name': 'punctuation.separator.inheritance.php'
+              }
+            ]
+      }
+      {
+        'begin': '(?i)(?:^|(?<=<\\?php))\\s*(namespace)\\s+'
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
-        'contentName': 'entity.name.type.namespace.php'
-        'end': '(?i)(?=\\s*$|[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
+        'end': '(?<=})'
         'name': 'meta.namespace.php'
         'patterns': [
           {
-            'match': '\\\\'
-            'name': 'punctuation.separator.inheritance.php'
+            'include': '#comments'
+          }
+          {
+            'match': '(?i)[a-z0-9_\\x{7f}-\\x{ff}\\\\]+'
+            'name': 'entity.name.type.namespace.php'
+            'captures':
+              '0':
+                'patterns': [
+                  {
+                    'match': '\\\\'
+                    'name': 'punctuation.separator.inheritance.php'
+                  }
+                ]
+          }
+          {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.namespace.begin.bracket.curly.php'
+            'end': '}'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.namespace.end.bracket.curly.php'
+            'patterns': [
+              {
+                'include': '#language'
+              }
+            ]
+          }
+          {
+            'match': '[^\\s]+'
+            'name': 'invalid.illegal.identifier.php'
           }
         ]
       }
@@ -2170,7 +2224,7 @@
       {
         # Tags followed by a type expression
         # -  @<tag> type
-        'begin': '(@(?:global|param|property(-(read|write))?|return|throws|var))\\s+(?=[A-Za-z_\\x{7f}-\\x{ff}]|\\()'
+        'begin': '(@(?:global|param|property(-(read|write))?|return|throws|var))\\s+(?=[A-Za-z_\\x{7f}-\\x{ff}\\\\]|\\()'
         'beginCaptures':
           '1':
             'name': 'keyword.other.phpdoc.php'
@@ -2208,7 +2262,7 @@
       }
     ]
   'php_doc_types':
-    'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*(\\|[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)*'
+    'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*(\\|[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)*'
     'captures':
       '0':
         'patterns': [
@@ -2256,7 +2310,7 @@
     ]
   'php_doc_types_array_single':
     # Singular type array: int[]
-    'match': '(?i)([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)(\\[\\])'
+    'match': '(?i)([a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)(\\[\\])'
     'captures':
       '1':
         'patterns': [
