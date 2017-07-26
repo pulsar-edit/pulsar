@@ -1532,12 +1532,14 @@
           {
             'match': '(?i)[a-z0-9_\\x{7f}-\\x{ff}\\\\]+'
             'name': 'entity.name.type.namespace.php'
-            'patterns': [
-              {
-                'match': '\\\\'
-                'name': 'punctuation.separator.inheritance.php'
-              }
-            ]
+            'captures':
+              '0':
+                'patterns': [
+                  {
+                    'match': '\\\\'
+                    'name': 'punctuation.separator.inheritance.php'
+                  }
+                ]
           }
           {
             'begin': '{'
