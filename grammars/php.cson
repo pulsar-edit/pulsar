@@ -3629,14 +3629,7 @@
             'name': 'support.other.namespace.use-as.php'
       }
       {
-        'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
-        'captures':
-          '0':
-            'patterns': [
-              {
-                'include': '#class-name'
-              }
-            ]
+        'include': '#class-name'
       }
       {
         'match': ','
