@@ -1583,35 +1583,22 @@
         'name': 'meta.use.php'
         'patterns': [
           {
-            'include': '#comments'
-          }
-          {
-            'begin': '(?i)\\s*(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\])'
-            'end': '(?i)(?:\\s*(as)\\s+([a-z0-9_\\x{7f}-\\x{ff}]*))?\\s*(?=,|;|$)'
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
+            'end': '}'
             'endCaptures':
-              '1':
-                'name': 'keyword.other.use-as.php'
-              '2':
-                'name': 'support.other.namespace.use-as.php'
+              '0':
+                'name': 'punctuation.definition.use.group.end.bracket.curly.php'
             'patterns': [
               {
-                'include': '#class-builtin'
-              }
-              {
-                'begin': '(?i)\\s*(?=[a-z0-9_\\x{7f}-\\x{ff}\\\\])'
-                'end': '$|(?=[\\s,;])'
-                'name': 'support.other.namespace.use.php'
-                'patterns': [
-                  {
-                    'match': '\\\\'
-                    'name': 'punctuation.separator.inheritance.php'
-                  }
-                ]
+                'include': '#use-inner'
               }
             ]
           }
           {
-            'match': '\\s*,\\s*'
+            'include': '#use-inner'
           }
         ]
       }
@@ -3624,6 +3611,29 @@
             ]
           }
         ]
+      }
+    ]
+  'use-inner':
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'begin': '(?i)\\b(as)\\s+'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.other.use-as.php'
+        'end': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+        'endCaptures':
+          '0':
+            'name': 'support.other.namespace.use-as.php'
+      }
+      {
+        'include': '#class-name'
+      }
+      {
+        'match': ','
+        'name': 'punctuation.definition.separator.delimiter.php'
       }
     ]
   'var_basic':
