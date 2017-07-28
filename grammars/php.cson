@@ -1928,7 +1928,7 @@
             'name': 'punctuation.definition.storage-type.end.bracket.round.php'
       }
       {
-        'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|clone|var|function|interface|trait|parent|self|object)\\b'
+        'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|var|function|interface|trait|parent|self|object)\\b'
         'name': 'storage.type.php'
       }
       {
@@ -1944,6 +1944,10 @@
       }
       {
         'include': '#heredoc'
+      }
+      {
+        'match': '(?i)\\bclone'
+        'name': 'keyword.operator.clone.php'
       }
       {
         'match': '\\.=?'
