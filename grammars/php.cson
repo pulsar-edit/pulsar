@@ -149,12 +149,15 @@
           '1':
             'name': 'keyword.other.use.php'
           '2':
-            'name': 'support.class.php'
+            'patterns': [
+              {
+                'include': '#class-name'
+              }
+            ]
           '3':
             'patterns': [
               {
-                'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
-                'name': 'support.class.php'
+                'include': '#class-name'
               }
               {
                 'match': ','
@@ -180,12 +183,15 @@
             '''
             'captures':
               '1':
-                'name': 'support.class.php'
+                'patterns': [
+                  {
+                    'include': '#class-name'
+                  }
+                ]
               '2':
                 'patterns': [
                   {
-                    'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
-                    'name': 'support.class.php'
+                    'include': '#class-name'
                   }
                   {
                     'match': ','
