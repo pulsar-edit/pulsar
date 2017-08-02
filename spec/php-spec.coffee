@@ -1313,6 +1313,11 @@ describe 'PHP grammar', ->
         expect(tokens[2][21]).toEqual value: '[]', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.array.phpdoc.php']
         expect(tokens[2][22]).toEqual value: ' description', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php']
 
+      it 'should end the PHPDoc at the ending comment even if there are malformed types', ->
+        tokens = grammar.tokenizeLines "<?php\n/** @var array(string) */"
+
+        expect(tokens[1][8]).toEqual value: '*/', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']
+
     it 'should not tokenize /*** as phpdoc', ->
       tokens = grammar.tokenizeLines "<?php\n/*** @var */"
 
