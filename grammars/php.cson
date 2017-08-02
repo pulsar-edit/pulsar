@@ -140,8 +140,8 @@
       {
         'match': '''(?xi)
           \\b(use)\\s+
-          ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
-          ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)*)
+          ([a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)
+          ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)*)
           (?=\\s*;)
         '''
         'name': 'meta.use.php'
@@ -149,12 +149,15 @@
           '1':
             'name': 'keyword.other.use.php'
           '2':
-            'name': 'support.class.php'
+            'patterns': [
+              {
+                'include': '#class-name'
+              }
+            ]
           '3':
             'patterns': [
               {
-                'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
-                'name': 'support.class.php'
+                'include': '#class-name'
               }
               {
                 'match': ','
@@ -175,17 +178,20 @@
         'patterns': [
           {
             'match': '''(?xi)
-              ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
-              ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)*)
+              ([a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)
+              ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)*)
             '''
             'captures':
               '1':
-                'name': 'support.class.php'
+                'patterns': [
+                  {
+                    'include': '#class-name'
+                  }
+                ]
               '2':
                 'patterns': [
                   {
-                    'match': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
-                    'name': 'support.class.php'
+                    'include': '#class-name'
                   }
                   {
                     'match': ','
