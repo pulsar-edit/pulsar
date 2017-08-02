@@ -2302,7 +2302,7 @@
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.type.begin.bracket.round.phpdoc.php'
-    'end': '(\\))(\\[\\])'
+    'end': '(\\))(\\[\\])|(?=\\*/)'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.type.end.bracket.round.phpdoc.php'
