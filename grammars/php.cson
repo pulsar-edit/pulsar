@@ -1947,7 +1947,7 @@
       }
       {
         'match': '(?i)\\bclone\\b'
-        'name': 'keyword.operator.clone.php'
+        'name': 'keyword.other.clone.php'
       }
       {
         'match': '\\.=?'
