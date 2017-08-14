@@ -1540,7 +1540,7 @@
             'name': 'keyword.other.use.php'
           '2':
             'name': 'storage.type.${2:/downcase}.php'
-        'end': '(?=;|(?:^\\s*$))'
+        'end': '(?=;)'
         'name': 'meta.use.php'
         'patterns': [
           {
