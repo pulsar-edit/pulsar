@@ -1466,14 +1466,6 @@
         'include': '#comments'
       }
       {
-        'match': '{'
-        'name': 'punctuation.section.scope.begin.php'
-      }
-      {
-        'match': '}'
-        'name': 'punctuation.section.scope.end.php'
-      }
-      {
         'begin': '(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\s*(extends)?\\s*'
         'beginCaptures':
           '1':
@@ -2045,6 +2037,21 @@
       }
       {
         'include': '#string-backtick'
+      }
+      {
+        'begin': '{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.begin.bracket.curly.php'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.end.bracket.curly.php'
+        'patterns': [
+          {
+            'include': '#language'
+          }
+        ]
       }
       {
         'begin': '\\['
