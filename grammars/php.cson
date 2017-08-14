@@ -138,73 +138,36 @@
   'class-body':
     'patterns': [
       {
-        'match': '''(?xi)
-          \\b(use)\\s+
-          ([a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)
-          ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)*)
-          (?=\\s*;)
-        '''
-        'name': 'meta.use.php'
-        'captures':
-          '1':
-            'name': 'keyword.other.use.php'
-          '2':
-            'patterns': [
-              {
-                'include': '#class-name'
-              }
-            ]
-          '3':
-            'patterns': [
-              {
-                'include': '#class-name'
-              }
-              {
-                'match': ','
-                'name': 'punctuation.separator.delimiter.php'
-              }
-            ]
-      }
-      {
         'begin': '(?i)\\buse\\b'
         'beginCaptures':
           '0':
             'name': 'keyword.other.use.php'
-        'end': '}'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.use.end.bracket.curly.php'
+        'end': '(?=;)'
         'name': 'meta.use.php'
         'patterns': [
           {
-            'match': '''(?xi)
-              ([a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)
-              ((?:\\s*,\\s*[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*)*)
-            '''
+            'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
             'captures':
-              '1':
+              '0':
                 'patterns': [
                   {
                     'include': '#class-name'
                   }
                 ]
-              '2':
-                'patterns': [
-                  {
-                    'include': '#class-name'
-                  }
-                  {
-                    'match': ','
-                    'name': 'punctuation.separator.delimiter.php'
-                  }
-                ]
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.delimiter.php'
           }
           {
             'begin': '{'
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.use.begin.bracket.curly.php'
-            'end': '(?=})'
+            'end': '}'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.use.end.bracket.curly.php'
             'contentName': 'meta.use.body.php'
             'patterns': [
               {
@@ -3650,7 +3613,7 @@
       }
       {
         'match': ','
-        'name': 'punctuation.definition.separator.delimiter.php'
+        'name': 'punctuation.separator.delimiter.php'
       }
     ]
   'var_basic':

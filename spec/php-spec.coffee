@@ -370,6 +370,23 @@ describe 'PHP grammar', ->
       expect(tokens[1][6]).toEqual value: 'NSname', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
       expect(tokens[1][7]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
+    it 'tokenizes multiline use statements', ->
+      tokens = grammar.tokenizeLines """
+        <?php
+          use One\\Two,
+              Three\\Four;
+      """
+
+      expect(tokens[1][1]).toEqual value: 'use', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'keyword.other.use.php']
+      expect(tokens[1][3]).toEqual value: 'One', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php']
+      expect(tokens[1][4]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][5]).toEqual value: 'Two', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
+      expect(tokens[1][6]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[2][1]).toEqual value: 'Three', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php']
+      expect(tokens[2][2]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[2][3]).toEqual value: 'Four', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
+      expect(tokens[2][4]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
     it 'tokenizes use function statements', ->
       tokens = grammar.tokenizeLines "<?php\nuse function My\\Full\\functionName;"
 
@@ -422,7 +439,7 @@ describe 'PHP grammar', ->
       expect(tokens[1][6]).toEqual value: 'Classname', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
       expect(tokens[1][8]).toEqual value: 'as', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'keyword.other.use-as.php']
       expect(tokens[1][10]).toEqual value: 'Another', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.use-as.php']
-      expect(tokens[1][11]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.definition.separator.delimiter.php']
+      expect(tokens[1][11]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
       expect(tokens[1][12]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php']
       expect(tokens[1][13]).toEqual value: 'My', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php']
       expect(tokens[1][14]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
@@ -447,9 +464,9 @@ describe 'PHP grammar', ->
       expect(tokens[1][5]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
       expect(tokens[1][6]).toEqual value: '{', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.definition.use.group.begin.bracket.curly.php']
       expect(tokens[2][1]).toEqual value: 'ClassA', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
-      expect(tokens[2][2]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.definition.separator.delimiter.php']
+      expect(tokens[2][2]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
       expect(tokens[3][1]).toEqual value: 'ClassB', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
-      expect(tokens[3][2]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.definition.separator.delimiter.php']
+      expect(tokens[3][2]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
       expect(tokens[4][1]).toEqual value: 'ClassC', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'support.class.php']
       expect(tokens[4][2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php']
       expect(tokens[4][3]).toEqual value: 'as', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.use.php', 'keyword.other.use-as.php']
@@ -530,6 +547,25 @@ describe 'PHP grammar', ->
         expect(tokens[2][4]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
         expect(tokens[2][5]).toEqual value: 'B', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
         expect(tokens[2][6]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']
+
+      it 'tokenizes multiline use statements', ->
+        tokens = grammar.tokenizeLines """
+          <?php
+            class Test {
+              use One\\Two,
+                  Three\\Four;
+            }
+        """
+
+        expect(tokens[2][1]).toEqual value: 'use', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'keyword.other.use.php']
+        expect(tokens[2][3]).toEqual value: 'One', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php']
+        expect(tokens[2][4]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+        expect(tokens[2][5]).toEqual value: 'Two', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[2][6]).toEqual value: ',', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
+        expect(tokens[3][1]).toEqual value: 'Three', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php']
+        expect(tokens[3][2]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+        expect(tokens[3][3]).toEqual value: 'Four', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
+        expect(tokens[3][4]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']
 
       it 'tokenizes complex use statements', ->
         tokens = grammar.tokenizeLines """
