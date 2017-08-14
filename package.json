@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "TypeScript language support in Atom",
   "engines": {
-    "atom": ">=1.19.0",
+    "atom": ">=1.19.1",
     "node": "*"
   },
   "homepage": "https://atom.io/packages/language-typescript",
