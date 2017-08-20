@@ -447,7 +447,7 @@
       }
     ]
   'tag-generic-attribute':
-    'match': '(?<=[^=])\\b([a-zA-Z0-9:-]+)'
+    'match': '(?<=[^=]|^)\\b([a-zA-Z0-9:-]+)'
     'name': 'entity.other.attribute-name.html'
   'tag-id-attribute':
     'begin': '\\b(id)\\b\\s*(=)'
