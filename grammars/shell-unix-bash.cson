@@ -282,7 +282,7 @@
   'heredoc':
     'patterns': [
       {
-        'begin': '(<<)-("|\'|)(RUBY)\\2'
+        'begin': '(<<)-("|\'|)\\s*(RUBY)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -301,7 +301,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(RUBY)\\2'
+        'begin': '(<<)("|\'|)\\s*(RUBY)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -320,7 +320,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(PYTHON)\\2'
+        'begin': '(<<)-("|\'|)\\s*(PYTHON)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -339,7 +339,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(PYTHON)\\2'
+        'begin': '(<<)("|\'|)\\s*(PYTHON)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -358,7 +358,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(APPLESCRIPT)\\2'
+        'begin': '(<<)-("|\'|)\\s*(APPLESCRIPT)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -377,7 +377,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(APPLESCRIPT)\\2'
+        'begin': '(<<)("|\'|)\\s*(APPLESCRIPT)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -396,7 +396,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(HTML)\\2'
+        'begin': '(<<)-("|\'|)\\s*(HTML)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -415,7 +415,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(HTML)\\2'
+        'begin': '(<<)("|\'|)\\s*(HTML)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -434,7 +434,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(MARKDOWN)\\2'
+        'begin': '(<<)-("|\'|)\\s*(MARKDOWN)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -453,7 +453,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(MARKDOWN)\\2'
+        'begin': '(<<)("|\'|)\\s*(MARKDOWN)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -472,7 +472,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(TEXTILE)\\2'
+        'begin': '(<<)-("|\'|)\\s*(TEXTILE)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -491,7 +491,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(TEXTILE)\\2'
+        'begin': '(<<)("|\'|)\\s*(TEXTILE)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -510,7 +510,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)(SHELL)\\2'
+        'begin': '(<<)-("|\'|)\\s*(SHELL)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -529,7 +529,7 @@
         ]
       }
       {
-        'begin': '(<<)("|\'|)(SHELL)\\2'
+        'begin': '(<<)("|\'|)\\s*(SHELL)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -548,7 +548,7 @@
         ]
       }
       {
-        'begin': '(<<)-("|\'|)\\\\?(\\w+)\\2'
+        'begin': '(<<)-("|\'|)\\s*\\\\?(\\w+)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
@@ -561,7 +561,7 @@
         'name': 'string.unquoted.heredoc.no-indent.shell'
       }
       {
-        'begin': '(<<)("|\'|)\\\\?(\\w+)\\2'
+        'begin': '(<<)("|\'|)\\s*\\\\?(\\w+)\\2'
         'beginCaptures':
           '1':
             'name': 'keyword.operator.heredoc.shell'
