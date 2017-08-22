@@ -191,9 +191,10 @@ describe "Shell script grammar", ->
     delims = [
       "RANDOMTHING"
       "RUBY@1.8"
+      "END-INPUT"
     ]
 
-    for delim of delims
+    for delim in delims
       tokens = grammar.tokenizeLines """
         <<#{delim}
         stuff
