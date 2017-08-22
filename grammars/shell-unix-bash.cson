@@ -61,10 +61,10 @@
     'include': '#loop'
   }
   {
-    'include': '#function-definition'
+    'include': '#string'
   }
   {
-    'include': '#string'
+    'include': '#function-definition'
   }
   {
     'include': '#variable'
