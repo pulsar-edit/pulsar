@@ -101,6 +101,11 @@ describe 'HTML grammar', ->
   grammarTest path.join(__dirname, 'fixtures/syntax_test_html.html')
   grammarTest path.join(__dirname, 'fixtures/syntax_test_html_template_fragments.html')
 
+  describe "attributes", ->
+    it "recognizes attributes", ->
+      lines = grammar.tokenizeLines '<span\nclass="foo">'
+      expect(lines[1][0]).toEqual value: 'class', scopes: ["text.html.basic", "meta.tag.inline.any.html", "entity.other.attribute-name.html"]
+
   describe "entities", ->
     it "tokenizes & and characters after it", ->
       {tokens} = grammar.tokenizeLine '& &amp; &a'
