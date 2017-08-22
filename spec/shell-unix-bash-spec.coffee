@@ -240,6 +240,13 @@ describe "Shell script grammar", ->
     expect(tokens[7]).toEqual value: ' ', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell']
     expect(tokens[8]).toEqual value: 'esac', scopes: ['source.shell', 'meta.scope.case-block.shell', 'keyword.control.shell']
 
+  it "does not confuse strings and functions", ->
+    {tokens} = grammar.tokenizeLine('echo "()"')
+    expect(tokens[0]).toEqual value: 'echo', scopes: ['source.shell', 'support.function.builtin.shell']
+    expect(tokens[2]).toEqual value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']
+    expect(tokens[3]).toEqual value: '()', scopes: ['source.shell', 'string.quoted.double.shell']
+    expect(tokens[4]).toEqual value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.end.shell']
+
   describe "indentation", ->
     editor = null
 
