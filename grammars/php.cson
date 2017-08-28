@@ -1383,17 +1383,22 @@
     ]
   'interpolation':
     # http://www.php.net/manual/en/language.types.string.php#language.types.string.parsing
+    # http://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.double
     'patterns': [
       {
         'match': '\\\\[0-7]{1,3}'
-        'name': 'constant.numeric.octal.php'
+        'name': 'constant.character.escape.octal.php'
       }
       {
         'match': '\\\\x[0-9A-Fa-f]{1,2}'
-        'name': 'constant.numeric.hex.php'
+        'name': 'constant.character.escape.octal.php'
       }
       {
-        'match': '\\\\[enrt\\\\\\$\\"]'
+        'match': '\\\\u{[0-9A-Fa-f]+}'
+        'name': 'constant.character.escape.unicode.php'
+      }
+      {
+        'match': '\\\\[nrtvef$"\\\\]'
         'name': 'constant.character.escape.php'
       }
       {
@@ -2070,8 +2075,40 @@
       }
     ]
   'numbers':
-    'match': '(?i)\\b((0x[0-9a-f]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))(e(\\+|-)?[0-9]+)?)\\b'
-    'name': 'constant.numeric.php'
+    'patterns': [
+      {
+        'match': '\\b(?<!\\$)0[xX][0-9a-fA-F]+\\b(?!\\$)'
+        'name': 'constant.numeric.hex.php'
+      }
+      {
+        'match': '\\b(?<!\\$)0[bB][01]+\\b(?!\\$)'
+        'name': 'constant.numeric.binary.php'
+      }
+      {
+        'match': '\\b(?<!\\$)0[0-7]+\\b(?!\\$)'
+        'name': 'constant.numeric.octal.php'
+      }
+      {
+        'match': '''(?x)
+          (?<!\\$)(?:
+            (?:[0-9]*(\\.)[0-9]+)|
+            (?:[0-9]+(\\.)[0-9]*)|
+            (?:[0-9]+|[0-9]*(\\.)[0-9]+|[0-9]+(\\.)[0-9]*)[eE][+-]?[0-9]+
+          )(?!\\$)
+        '''
+        'captures':
+          '0':
+            'name': 'constant.numeric.decimal.php'
+          '1':
+            'name': 'punctuation.separator.decimal.period.php'
+          '2':
+            'name': 'punctuation.separator.decimal.period.php'
+          '3':
+            'name': 'punctuation.separator.decimal.period.php'
+          '4':
+            'name': 'punctuation.separator.decimal.period.php'
+      }
+    ]
   'object':
     'patterns': [
       {
