@@ -820,11 +820,11 @@ describe 'PHP grammar', ->
     it 'tokenizes function names with characters other than letters or numbers', ->
       # The space between foo and bar is a nbsp (char 160/hex 0xA0), not an actual space (char 32/hex 0x20)
       # 0xA0 is between 0x7F and 0xFF, making it a valid PHP identifier
-      tokens = grammar.tokenizeLines "<?php\nfunction foo bar() {}"
+      tokens = grammar.tokenizeLines "<?php\nfunction foo bar() {}"
 
       expect(tokens[1][0]).toEqual value: 'function', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'storage.type.function.php']
       expect(tokens[1][1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php']
-      expect(tokens[1][2]).toEqual value: 'foo bar', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[1][2]).toEqual value: 'foo bar', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'entity.name.function.php']
       expect(tokens[1][3]).toEqual value: '(', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
       expect(tokens[1][4]).toEqual value: ')', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
       expect(tokens[1][5]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
