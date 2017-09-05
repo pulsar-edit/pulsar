@@ -64,7 +64,11 @@ describe 'HTML grammar', ->
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.coffee.embedded.html']
-      expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'storage.type.function.coffee']
+      # TODO: Remove when Atom 1.22 reaches stable
+      if parseFloat(atom.getVersion()) <= 1.21
+        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'storage.type.function.coffee']
+      else
+        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
 
   describe 'JavaScript script tags', ->
     beforeEach ->
