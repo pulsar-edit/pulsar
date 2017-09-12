@@ -164,7 +164,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.use.begin.bracket.curly.php'
-            'end': '}'
+            'end': '}|(?=\\?>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.use.end.bracket.curly.php'
@@ -618,7 +618,7 @@
           '7':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
         'contentName': 'meta.array.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
@@ -799,7 +799,7 @@
             ]
           '2':
             'name': 'punctuation.definition.arguments.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
@@ -832,7 +832,7 @@
             ]
           '3':
             'name': 'punctuation.definition.arguments.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
@@ -1522,7 +1522,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.namespace.begin.bracket.curly.php'
-            'end': '}'
+            'end': '}|(?=\\?>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.namespace.end.bracket.curly.php'
@@ -1553,7 +1553,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
-            'end': '}'
+            'end': '}|(?=\\?>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.use.group.end.bracket.curly.php'
@@ -1577,7 +1577,7 @@
             'name': 'storage.type.class.php'
           '3':
             'name': 'entity.name.type.class.php'
-        'end': '}'
+        'end': '}|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.class.end.bracket.curly.php'
@@ -1664,7 +1664,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.class.begin.bracket.curly.php'
-            'end': '(?=})'
+            'end': '(?=}|\\?>)'
             'contentName': 'meta.class.body.php'
             'patterns': [
               {
@@ -1707,7 +1707,7 @@
             'name': 'keyword.control.exception.catch.php'
           '2':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1762,7 +1762,7 @@
               '0':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
             'contentName': 'meta.function.parameters.php'
-            'end': '\\)'
+            'end': '\\)|(?=\\?>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1779,7 +1779,7 @@
                 'name': 'keyword.other.function.use.php'
               '2':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-            'end': '\\)'
+            'end': '\\)|(?=\\?>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1827,7 +1827,7 @@
           '5':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
         'contentName': 'meta.function.parameters.php'
-        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?'
+        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?|(?=\\?>)'
         'endCaptures':
           '1':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1872,7 +1872,7 @@
             'name': 'support.function.construct.php'
           '2':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
@@ -2011,7 +2011,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.begin.bracket.curly.php'
-        'end': '}'
+        'end': '}|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.end.bracket.curly.php'
@@ -2026,7 +2026,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.section.array.begin.php'
-        'end': '\\]'
+        'end': '\\]|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.section.array.end.php'
@@ -2041,7 +2041,7 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.end.bracket.round.php'
@@ -2136,7 +2136,7 @@
             'name': 'entity.name.function.php'
           '3':
             'name': 'punctuation.definition.arguments.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
@@ -2191,7 +2191,7 @@
             'name': 'support.function.construct.php'
           '2':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
@@ -2461,7 +2461,7 @@
             'name': 'entity.name.function.php'
           '3':
             'name': 'punctuation.definition.arguments.begin.bracket.round.php'
-        'end': '\\)'
+        'end': '\\)|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
@@ -3569,7 +3569,7 @@
         'beginCaptures':
           '0':
             'name': 'keyword.control.switch.php'
-        'end': '}'
+        'end': '}|(?=\\?>)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.section.switch-block.end.bracket.curly.php'
@@ -3580,7 +3580,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.switch-expression.begin.bracket.round.php'
-            'end': '\\)'
+            'end': '\\)|(?=\\?>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.switch-expression.end.bracket.round.php'
@@ -3595,7 +3595,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.section.switch-block.begin.bracket.curly.php'
-            'end': '(?=})'
+            'end': '(?=}|\\?>)'
             'patterns': [
               {
                 'begin': '\\bcase\\b'
