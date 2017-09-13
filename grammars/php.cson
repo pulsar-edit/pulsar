@@ -135,87 +135,6 @@
   }
 ]
 'repository':
-  'class-body':
-    'patterns': [
-      {
-        'begin': '(?i)\\buse\\b'
-        'beginCaptures':
-          '0':
-            'name': 'keyword.other.use.php'
-        'end': '(?=;)'
-        'name': 'meta.use.php'
-        'patterns': [
-          {
-            'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
-            'captures':
-              '0':
-                'patterns': [
-                  {
-                    'include': '#class-name'
-                  }
-                ]
-          }
-          {
-            'match': ','
-            'name': 'punctuation.separator.delimiter.php'
-          }
-          {
-            'begin': '{'
-            'beginCaptures':
-              '0':
-                'name': 'punctuation.definition.use.begin.bracket.curly.php'
-            'end': '}'
-            'endCaptures':
-              '0':
-                'name': 'punctuation.definition.use.end.bracket.curly.php'
-            'contentName': 'meta.use.body.php'
-            'patterns': [
-              {
-                'include': '#scope-resolution'
-              }
-              {
-                'match': '''(?xi)
-                  \\b(as)\\s+
-                  ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\b       # Visibility modifier OR alias
-                  (?:\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))? # alias
-                '''
-                'captures':
-                  '1':
-                    'name': 'keyword.other.use-as.php'
-                  '2':
-                    'patterns': [
-                      {
-                        'match': '\\b(final|abstract|public|private|protected|static)\\b'
-                        'name': 'storage.modifier.php'
-                      }
-                      {
-                        'match': '[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
-                        'name': 'entity.other.alias.php'
-                      }
-                    ]
-                  '3':
-                    'name': 'entity.other.alias.php'
-              }
-              {
-                'match': '(?i)\\b(insteadof)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
-                'captures':
-                  '1':
-                    'name': 'keyword.other.use-insteadof.php'
-                  '2':
-                    'name': 'support.class.php'
-              }
-              {
-                'match': ';'
-                'name': 'punctuation.terminator.expression.php'
-              }
-            ]
-          }
-        ]
-      }
-      {
-        'include': '#language'
-      }
-    ]
   'class-builtin':
     'patterns': [
       {
@@ -1539,25 +1458,62 @@
         ]
       }
       {
-        'begin': '(?i)\\b(use)\\s+(?:(const|function)\\s+)?'
+        'begin': '(?i)\\buse\\b'
         'beginCaptures':
-          '1':
+          '0':
             'name': 'keyword.other.use.php'
-          '2':
-            'name': 'storage.type.${2:/downcase}.php'
-        'end': '(?=;)'
+        'end': '(?<=})|(?=;)'
         'name': 'meta.use.php'
         'patterns': [
+          {
+            'match': '\\b(const|function)\\b'
+            'name': 'storage.type.${1:/downcase}.php'
+          }
           {
             'begin': '{'
             'beginCaptures':
               '0':
-                'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
+                'name': 'punctuation.definition.use.begin.bracket.curly.php'
             'end': '}'
             'endCaptures':
               '0':
-                'name': 'punctuation.definition.use.group.end.bracket.curly.php'
+                'name': 'punctuation.definition.use.end.bracket.curly.php'
+            'contentName': 'meta.use.body.php'
             'patterns': [
+              {
+                'include': '#scope-resolution'
+              }
+              {
+                'match': '''(?xi)
+                  \\b(as)\\s+
+                  ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\b       # Visibility modifier OR alias
+                  (?:\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))? # alias
+                '''
+                'captures':
+                  '1':
+                    'name': 'keyword.other.use-as.php'
+                  '2':
+                    'patterns': [
+                      {
+                        'match': '\\b(final|abstract|public|private|protected|static)\\b'
+                        'name': 'storage.modifier.php'
+                      }
+                      {
+                        'match': '[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
+                        'name': 'entity.other.alias.php'
+                      }
+                    ]
+                  '3':
+                    'name': 'entity.other.alias.php'
+              }
+              {
+                'match': '(?i)\\b(insteadof)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
+                'captures':
+                  '1':
+                    'name': 'keyword.other.use-insteadof.php'
+                  '2':
+                    'name': 'support.class.php'
+              }
               {
                 'include': '#use-inner'
               }
@@ -1668,7 +1624,7 @@
             'contentName': 'meta.class.body.php'
             'patterns': [
               {
-                'include': '#class-body'
+                'include': '#language'
               }
             ]
           }
