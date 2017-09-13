@@ -1731,7 +1731,7 @@
             'name': 'keyword.control.exception.catch.php'
           '2':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-        'end': '\\)|(?=\\?>)'
+        'end': '\\)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
