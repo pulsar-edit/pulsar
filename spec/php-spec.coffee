@@ -818,8 +818,7 @@ describe 'PHP grammar', ->
       expect(tokens[1][9]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
 
     it 'tokenizes function names with characters other than letters or numbers', ->
-      # The space between foo and bar is a nbsp (char 160/hex 0xA0), not an actual space (char 32/hex 0x20)
-      # 0xA0 is between 0x7F and 0xFF, making it a valid PHP identifier
+      # Char 160 is hex0xA0, which is between 0x7F and 0xFF, making it a valid PHP identifier
       functionName = "foo#{String.fromCharCode 160}bar"
       tokens = grammar.tokenizeLines "<?php\nfunction #{functionName}() {}"
 
