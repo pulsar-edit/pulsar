@@ -603,10 +603,67 @@
         'include': '#unquoted-attribute'
       }
     ]
+  'tag-class-attribute':
+    'begin': '\\b(class)\\b\\s*(=)'
+    'captures':
+      '1':
+        'name': 'entity.other.attribute.name.class.html'
+      '2':
+        'name': 'punctuation.separator.key-value.html'
+    'end': '(?<=\'|")|(?=\\s|>)'
+    'name': 'meta.attribute-with-value.clsss.html'
+    'patterns': [
+      {
+        'begin': '"'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.html'
+        'contentName': 'meta.toc-list.class.html'
+        'end': '"'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.html'
+        'name': 'string.quoted.double.html'
+        'patterns': [
+          {
+            'include': '#embedded-code'
+          }
+          {
+            'include': '#entities'
+          }
+        ]
+      }
+      {
+        'begin': '\''
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.html'
+        'contentName': 'meta.toc-list.class.html'
+        'end': '\''
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.html'
+        'name': 'string.quoted.single.html'
+        'patterns': [
+          {
+            'include': '#embedded-code'
+          }
+          {
+            'include': '#entities'
+          }
+        ]
+      }
+      {
+        'include': '#unquoted-attribute'
+      }
+    ]
   'tag-stuff':
     'patterns': [
       {
         'include': '#tag-id-attribute'
+      }
+      {
+        'include': '#tag-class-attribute'
       }
       {
         'include': '#tag-generic-attribute'
