@@ -1478,32 +1478,35 @@
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.use.end.bracket.curly.php'
-            'contentName': 'meta.use.body.php'
             'patterns': [
               {
                 'include': '#scope-resolution'
               }
               {
                 'match': '''(?xi)
-                  \\b(as)\\s+
-                  ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\b       # Visibility modifier OR alias
-                  (?:\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))? # alias
+                  \\b(as)
+                  \\s+(final|abstract|public|private|protected|static)
+                  \\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
+                  \\b
                 '''
                 'captures':
                   '1':
                     'name': 'keyword.other.use-as.php'
                   '2':
-                    'patterns': [
-                      {
-                        'match': '\\b(final|abstract|public|private|protected|static)\\b'
-                        'name': 'storage.modifier.php'
-                      }
-                      {
-                        'match': '[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
-                        'name': 'entity.other.alias.php'
-                      }
-                    ]
+                    'name': 'storage.modifier.php'
                   '3':
+                    'name': 'entity.other.alias.php'
+              }
+              {
+                'match': '''(?xi)
+                  \\b(as)
+                  \\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
+                  \\b
+                '''
+                'captures':
+                  '1':
+                    'name': 'keyword.other.use-as.php'
+                  '2':
                     'name': 'entity.other.alias.php'
               }
               {
@@ -1513,6 +1516,10 @@
                     'name': 'keyword.other.use-insteadof.php'
                   '2':
                     'name': 'support.class.php'
+              }
+              {
+                'match': ';'
+                'name': 'punctuation.terminator.expression.php'
               }
               {
                 'include': '#use-inner'
@@ -3598,7 +3605,7 @@
         'end': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
         'endCaptures':
           '0':
-            'name': 'support.other.namespace.use-as.php'
+            'name': 'entity.other.alias.php'
       }
       {
         'include': '#class-name'
