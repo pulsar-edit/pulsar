@@ -135,87 +135,6 @@
   }
 ]
 'repository':
-  'class-body':
-    'patterns': [
-      {
-        'begin': '(?i)\\buse\\b'
-        'beginCaptures':
-          '0':
-            'name': 'keyword.other.use.php'
-        'end': '(?=;)'
-        'name': 'meta.use.php'
-        'patterns': [
-          {
-            'match': '(?i)[a-z_\\x{7f}-\\x{ff}\\\\][a-z0-9_\\x{7f}-\\x{ff}\\\\]*'
-            'captures':
-              '0':
-                'patterns': [
-                  {
-                    'include': '#class-name'
-                  }
-                ]
-          }
-          {
-            'match': ','
-            'name': 'punctuation.separator.delimiter.php'
-          }
-          {
-            'begin': '{'
-            'beginCaptures':
-              '0':
-                'name': 'punctuation.definition.use.begin.bracket.curly.php'
-            'end': '}|(?=\\?>)'
-            'endCaptures':
-              '0':
-                'name': 'punctuation.definition.use.end.bracket.curly.php'
-            'contentName': 'meta.use.body.php'
-            'patterns': [
-              {
-                'include': '#scope-resolution'
-              }
-              {
-                'match': '''(?xi)
-                  \\b(as)\\s+
-                  ([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)\\b       # Visibility modifier OR alias
-                  (?:\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*))? # alias
-                '''
-                'captures':
-                  '1':
-                    'name': 'keyword.other.use-as.php'
-                  '2':
-                    'patterns': [
-                      {
-                        'match': '\\b(final|abstract|public|private|protected|static)\\b'
-                        'name': 'storage.modifier.php'
-                      }
-                      {
-                        'match': '[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
-                        'name': 'entity.other.alias.php'
-                      }
-                    ]
-                  '3':
-                    'name': 'entity.other.alias.php'
-              }
-              {
-                'match': '(?i)\\b(insteadof)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
-                'captures':
-                  '1':
-                    'name': 'keyword.other.use-insteadof.php'
-                  '2':
-                    'name': 'support.class.php'
-              }
-              {
-                'match': ';'
-                'name': 'punctuation.terminator.expression.php'
-              }
-            ]
-          }
-        ]
-      }
-      {
-        'include': '#language'
-      }
-    ]
   'class-builtin':
     'patterns': [
       {
@@ -618,7 +537,7 @@
           '7':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
         'contentName': 'meta.array.php'
-        'end': '\\)|(?=\\?>)'
+        'end': '\\)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
@@ -1499,7 +1418,7 @@
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
-        'end': '(?<=})'
+        'end': '(?<=})|(?=\\?>)'
         'name': 'meta.namespace.php'
         'patterns': [
           {
@@ -1539,25 +1458,81 @@
         ]
       }
       {
-        'begin': '(?i)\\b(use)\\s+(?:(const|function)\\s+)?'
+        'match': '\\s+(?=use\\b)'
+      }
+      {
+        'begin': '(?i)\\buse\\b'
         'beginCaptures':
-          '1':
+          '0':
             'name': 'keyword.other.use.php'
-          '2':
-            'name': 'storage.type.${2:/downcase}.php'
-        'end': '(?=;)'
+        'end': '(?<=})|(?=;)'
         'name': 'meta.use.php'
         'patterns': [
+          {
+            'match': '\\b(const|function)\\b'
+            'name': 'storage.type.${1:/downcase}.php'
+          }
           {
             'begin': '{'
             'beginCaptures':
               '0':
-                'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
-            'end': '}|(?=\\?>)'
+                'name': 'punctuation.definition.use.begin.bracket.curly.php'
+            'end': '}'
             'endCaptures':
               '0':
-                'name': 'punctuation.definition.use.group.end.bracket.curly.php'
+                'name': 'punctuation.definition.use.end.bracket.curly.php'
             'patterns': [
+              {
+                'include': '#scope-resolution'
+              }
+              {
+                'match': '''(?xi)
+                  \\b(as)
+                  \\s+(final|abstract|public|private|protected|static)
+                  \\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
+                  \\b
+                '''
+                'captures':
+                  '1':
+                    'name': 'keyword.other.use-as.php'
+                  '2':
+                    'name': 'storage.modifier.php'
+                  '3':
+                    'name': 'entity.other.alias.php'
+              }
+              {
+                'match': '''(?xi)
+                  \\b(as)
+                  \\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)
+                  \\b
+                '''
+                'captures':
+                  '1':
+                    'name': 'keyword.other.use-as.php'
+                  '2':
+                    'patterns': [
+                      {
+                        'match': '^(?:final|abstract|public|private|protected|static)$'
+                        'name': 'storage.modifier.php'
+                      }
+                      {
+                        'match': '.+'
+                        'name': 'entity.other.alias.php'
+                      }
+                    ]
+              }
+              {
+                'match': '(?i)\\b(insteadof)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
+                'captures':
+                  '1':
+                    'name': 'keyword.other.use-insteadof.php'
+                  '2':
+                    'name': 'support.class.php'
+              }
+              {
+                'match': ';'
+                'name': 'punctuation.terminator.expression.php'
+              }
               {
                 'include': '#use-inner'
               }
@@ -1668,7 +1643,7 @@
             'contentName': 'meta.class.body.php'
             'patterns': [
               {
-                'include': '#class-body'
+                'include': '#language'
               }
             ]
           }
@@ -1679,13 +1654,16 @@
       }
       {
         'match': '''(?x)
+          \\s*
           \\b(
             break|case|continue|declare|default|die|do|
             else(if)?|end(declare|for(each)?|if|switch|while)|exit|
             for(each)?|if|return|switch|use|while|yield
           )\\b
         '''
-        'name': 'keyword.control.php'
+        'captures':
+          '1':
+            'name': 'keyword.control.${1:/downcase}.php'
       }
       {
         'begin': '(?i)\\b((?:require|include)(?:_once)?)\\s+'
@@ -1707,7 +1685,7 @@
             'name': 'keyword.control.exception.catch.php'
           '2':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-        'end': '\\)|(?=\\?>)'
+        'end': '\\)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1762,7 +1740,7 @@
               '0':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
             'contentName': 'meta.function.parameters.php'
-            'end': '\\)|(?=\\?>)'
+            'end': '\\)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1779,7 +1757,7 @@
                 'name': 'keyword.other.function.use.php'
               '2':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-            'end': '\\)|(?=\\?>)'
+            'end': '\\)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1827,7 +1805,7 @@
           '5':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
         'contentName': 'meta.function.parameters.php'
-        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?|(?=\\?>)'
+        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?'
         'endCaptures':
           '1':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1907,6 +1885,10 @@
       {
         'match': ';'
         'name': 'punctuation.terminator.expression.php'
+      }
+      {
+        'match': ':'
+        'name': 'punctuation.terminator.statement.php'
       }
       {
         'include': '#heredoc'
@@ -2191,7 +2173,7 @@
             'name': 'support.function.construct.php'
           '2':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
-        'end': '\\)|(?=\\?>)'
+        'end': '\\)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
@@ -3563,6 +3545,9 @@
   'switch_statement':
     'patterns': [
       {
+        'match': '\\s+(?=switch\\b)'
+      }
+      {
         # switch(expression) {...}
         # but NOT switch(expression):
         'begin': '\\bswitch\\b(?!\\s*\\(.*\\)\\s*:)'
@@ -3598,30 +3583,6 @@
             'end': '(?=}|\\?>)'
             'patterns': [
               {
-                'begin': '\\bcase\\b'
-                'beginCaptures':
-                  '0':
-                    'name': 'keyword.control.case.php'
-                'end': ':'
-                'endCaptures':
-                  '0':
-                    'name': 'punctuation.terminator.statement.php'
-                'patterns': [
-                  {
-                    'include': '#language'
-                  }
-                ]
-              }
-              {
-                # Leading whitespace match is to overrule goto-label regex
-                'match': '(?:^\\s*)?\\b(default)\\s*(:)'
-                'captures':
-                  '1':
-                    'name': 'keyword.control.default.php'
-                  '2':
-                    'name': 'punctuation.terminator.statement.php'
-              }
-              {
                 'include': '#language'
               }
             ]
@@ -3642,7 +3603,7 @@
         'end': '(?i)[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*'
         'endCaptures':
           '0':
-            'name': 'support.other.namespace.use-as.php'
+            'name': 'entity.other.alias.php'
       }
       {
         'include': '#class-name'
