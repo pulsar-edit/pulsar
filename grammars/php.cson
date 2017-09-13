@@ -164,7 +164,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.use.begin.bracket.curly.php'
-            'end': '}|(?=\\?>)'
+            'end': '}'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.use.end.bracket.curly.php'
@@ -618,7 +618,7 @@
           '7':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
         'contentName': 'meta.array.php'
-        'end': '\\)|(?=\\?>)'
+        'end': '\\)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
@@ -1499,7 +1499,7 @@
         'beginCaptures':
           '1':
             'name': 'keyword.other.namespace.php'
-        'end': '(?<=})'
+        'end': '(?<=})|(?=\\?>)'
         'name': 'meta.namespace.php'
         'patterns': [
           {
@@ -1553,7 +1553,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.use.group.begin.bracket.curly.php'
-            'end': '}|(?=\\?>)'
+            'end': '}'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.use.group.end.bracket.curly.php'
@@ -1678,6 +1678,30 @@
         'include': '#switch_statement'
       }
       {
+        'begin': '\\bcase\\b'
+        'beginCaptures':
+          '0':
+            'name': 'keyword.control.case.php'
+        'end': ':'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.terminator.statement.php'
+        'patterns': [
+          {
+            'include': '#language'
+          }
+        ]
+      }
+      {
+        # Leading whitespace match is to overrule goto-label regex
+        'match': '(?:^\\s*)?\\b(default)\\s*(:)'
+        'captures':
+          '1':
+            'name': 'keyword.control.default.php'
+          '2':
+            'name': 'punctuation.terminator.statement.php'
+      }
+      {
         'match': '''(?x)
           \\b(
             break|case|continue|declare|default|die|do|
@@ -1762,7 +1786,7 @@
               '0':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
             'contentName': 'meta.function.parameters.php'
-            'end': '\\)|(?=\\?>)'
+            'end': '\\)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1779,7 +1803,7 @@
                 'name': 'keyword.other.function.use.php'
               '2':
                 'name': 'punctuation.definition.parameters.begin.bracket.round.php'
-            'end': '\\)|(?=\\?>)'
+            'end': '\\)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -1827,7 +1851,7 @@
           '5':
             'name': 'punctuation.definition.parameters.begin.bracket.round.php'
         'contentName': 'meta.function.parameters.php'
-        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?|(?=\\?>)'
+        'end': '(\\))(?:\\s*(:)\\s*([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*))?'
         'endCaptures':
           '1':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
@@ -3597,30 +3621,6 @@
                 'name': 'punctuation.definition.section.switch-block.begin.bracket.curly.php'
             'end': '(?=}|\\?>)'
             'patterns': [
-              {
-                'begin': '\\bcase\\b'
-                'beginCaptures':
-                  '0':
-                    'name': 'keyword.control.case.php'
-                'end': ':'
-                'endCaptures':
-                  '0':
-                    'name': 'punctuation.terminator.statement.php'
-                'patterns': [
-                  {
-                    'include': '#language'
-                  }
-                ]
-              }
-              {
-                # Leading whitespace match is to overrule goto-label regex
-                'match': '(?:^\\s*)?\\b(default)\\s*(:)'
-                'captures':
-                  '1':
-                    'name': 'keyword.control.default.php'
-                  '2':
-                    'name': 'punctuation.terminator.statement.php'
-              }
               {
                 'include': '#language'
               }
