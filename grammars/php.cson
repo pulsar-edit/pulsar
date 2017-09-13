@@ -1458,6 +1458,9 @@
         ]
       }
       {
+        'match': '\\s+(?=use\\b)'
+      }
+      {
         'begin': '(?i)\\buse\\b'
         'beginCaptures':
           '0':
@@ -1651,14 +1654,16 @@
       }
       {
         'match': '''(?x)
-          (^\\s*)?
+          \\s*
           \\b(
             break|case|continue|declare|default|die|do|
             else(if)?|end(declare|for(each)?|if|switch|while)|exit|
             for(each)?|if|return|switch|use|while|yield
           )\\b
         '''
-        'name': 'keyword.control.php'
+        'captures':
+          '1':
+            'name': 'keyword.control.${1:/downcase}.php'
       }
       {
         'begin': '(?i)\\b((?:require|include)(?:_once)?)\\s+'
@@ -1880,6 +1885,10 @@
       {
         'match': ';'
         'name': 'punctuation.terminator.expression.php'
+      }
+      {
+        'match': ':'
+        'name': 'punctuation.terminator.statement.php'
       }
       {
         'include': '#heredoc'
@@ -3535,6 +3544,9 @@
     ]
   'switch_statement':
     'patterns': [
+      {
+        'match': '\\s+(?=switch\\b)'
+      }
       {
         # switch(expression) {...}
         # but NOT switch(expression):
