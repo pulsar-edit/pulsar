@@ -1507,7 +1507,16 @@
                   '1':
                     'name': 'keyword.other.use-as.php'
                   '2':
-                    'name': 'entity.other.alias.php'
+                    'patterns': [
+                      {
+                        'match': '^(?:final|abstract|public|private|protected|static)$'
+                        'name': 'storage.modifier.php'
+                      }
+                      {
+                        'match': '.+'
+                        'name': 'entity.other.alias.php'
+                      }
+                    ]
               }
               {
                 'match': '(?i)\\b(insteadof)\\s+([a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)'
