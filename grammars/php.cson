@@ -2215,7 +2215,7 @@
             'name': 'support.function.construct.php'
           '2':
             'name': 'punctuation.definition.array.begin.bracket.round.php'
-        'end': '\\)|(?=\\?>)'
+        'end': '\\)'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.bracket.round.php'
