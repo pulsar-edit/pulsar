@@ -1650,31 +1650,8 @@
         'include': '#switch_statement'
       }
       {
-        'begin': '\\bcase\\b'
-        'beginCaptures':
-          '0':
-            'name': 'keyword.control.case.php'
-        'end': ':'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.terminator.statement.php'
-        'patterns': [
-          {
-            'include': '#language'
-          }
-        ]
-      }
-      {
-        # Leading whitespace match is to overrule goto-label regex
-        'match': '(?:^\\s*)?\\b(default)\\s*(:)'
-        'captures':
-          '1':
-            'name': 'keyword.control.default.php'
-          '2':
-            'name': 'punctuation.terminator.statement.php'
-      }
-      {
         'match': '''(?x)
+          (^\\s*)?
           \\b(
             break|case|continue|declare|default|die|do|
             else(if)?|end(declare|for(each)?|if|switch|while)|exit|
