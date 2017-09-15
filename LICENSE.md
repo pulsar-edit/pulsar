@@ -23,5 +23,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------
 
 This package was derived from a TextMate grammar located at
-https://github.com/dotnet/csharp-tmlanguage and distributed under the
+https://github.com/Microsoft/TypeScript-TmLanguage and distributed under the
 MIT licence.
