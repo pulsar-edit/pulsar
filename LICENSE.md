@@ -1,3 +1,4 @@
+Copyright (c) Microsoft Corporation
 Copyright (c) 2017 GitHub Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining
