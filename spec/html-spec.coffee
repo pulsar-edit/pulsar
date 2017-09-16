@@ -42,6 +42,30 @@ describe 'HTML grammar', ->
       lines = grammar.tokenizeLines '<span><'
       expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic']
 
+  describe 'script tags', ->
+    it 'tokenizes the tag attributes', ->
+      tokens = grammar.tokenizeLines '''
+        <script id="id" type="text/html">
+        </script>
+      '''
+
+      expect(tokens[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(tokens[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(tokens[0][3]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'entity.other.attribute-name.id.html']
+      expect(tokens[0][4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'punctuation.separator.key-value.html']
+      expect(tokens[0][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(tokens[0][6]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'meta.toc-list.id.html']
+      expect(tokens[0][7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(tokens[0][9]).toEqual value: 'type', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.other.attribute-name.html']
+      expect(tokens[0][10]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html']
+      expect(tokens[0][11]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(tokens[0][12]).toEqual value: 'text/html', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html']
+      expect(tokens[0][13]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(tokens[0][14]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(tokens[1][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(tokens[1][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(tokens[1][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
   describe 'template script tags', ->
     it 'tokenizes the content inside the tag as HTML', ->
       lines = grammar.tokenizeLines '''
