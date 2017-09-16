@@ -50,9 +50,9 @@ describe 'HTML grammar', ->
         </script>
       '''
 
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
-      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'text.embedded.html']
-      expect(lines[1][1]).toEqual value: '<', scopes: ['text.html.basic', 'text.embedded.html', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html']
+      expect(lines[1][1]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
 
   describe 'CoffeeScript script tags', ->
     it 'tokenizes the content inside the tag as CoffeeScript', ->
@@ -62,13 +62,33 @@ describe 'HTML grammar', ->
         </script>
       '''
 
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
-      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.coffee.embedded.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html']
       # TODO: Remove when Atom 1.21 reaches stable
       if parseFloat(atom.getVersion()) <= 1.20
-        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'storage.type.function.coffee']
+        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
       else
-        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+
+    it 'recognizes closing script tags in comments', ->
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/coffeescript'>
+          # comment </script>
+      '''
+
+      expect(lines[1][1]).toEqual value: '#', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'comment.line.number-sign.coffee', 'punctuation.definition.comment.coffee']
+      expect(lines[1][2]).toEqual value: ' comment ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'comment.line.number-sign.coffee']
+      expect(lines[1][3]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/coffeescript'>
+          ###
+          comment </script>
+      '''
+
+      expect(lines[1][1]).toEqual value: '###', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'comment.block.coffee', 'punctuation.definition.comment.coffee']
+      expect(lines[2][0]).toEqual value: '  comment ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'comment.block.coffee']
+      expect(lines[2][1]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
   describe 'JavaScript script tags', ->
     beforeEach ->
@@ -81,10 +101,30 @@ describe 'HTML grammar', ->
         </script>
       '''
 
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
-      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'source.js.embedded.html']
-      expect(lines[1][1]).toEqual value: 'var', scopes: ['text.html.basic', 'source.js.embedded.html', 'storage.type.var.js']
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html']
+      expect(lines[1][1]).toEqual value: 'var', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'storage.type.var.js']
+
+    it 'recognizes closing script tags in comments', ->
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/javascript'>
+          // comment </script>
+      '''
+
+      expect(lines[1][1]).toEqual value: '//', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'comment.line.double-slash.js', 'punctuation.definition.comment.js']
+      expect(lines[1][2]).toEqual value: ' comment ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'comment.line.double-slash.js']
+      expect(lines[1][3]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/javascript'>
+          /*
+          comment </script>
+      '''
+
+      expect(lines[1][1]).toEqual value: '/*', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'comment.block.js', 'punctuation.definition.comment.begin.js']
+      expect(lines[2][0]).toEqual value: '  comment ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'comment.block.js']
+      expect(lines[2][1]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
   describe "comments", ->
     it "tokenizes -- as an error", ->
