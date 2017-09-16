@@ -201,7 +201,7 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i)script)\\b(\\s+.*?\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?.*?)(>)'
+    'begin': '(?:^\\s+)?(<)((?i)script)(\\s+.*?\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?.*?)(>)'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
