@@ -8,9 +8,6 @@ describe 'HTML grammar', ->
     waitsForPromise ->
       atom.packages.activatePackage('language-html')
 
-    waitsForPromise ->
-      atom.packages.activatePackage('language-coffee-script')
-
     runs ->
       grammar = atom.grammars.grammarForScopeName('text.html.basic')
 
@@ -42,29 +39,130 @@ describe 'HTML grammar', ->
       lines = grammar.tokenizeLines '<span><'
       expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic']
 
+  describe 'style tags', ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-css')
+
+    it 'tokenizes the tag attributes', ->
+      lines = grammar.tokenizeLines '''
+        <style id="id" class="very-classy">
+        </style>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']
+      expect(lines[0][3]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'entity.other.attribute-name.id.html']
+      expect(lines[0][4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'punctuation.separator.key-value.html']
+      expect(lines[0][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][6]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'meta.toc-list.id.html']
+      expect(lines[0][7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[0][9]).toEqual value: 'class', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.other.attribute-name.html']
+      expect(lines[0][10]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.style.html']
+      expect(lines[0][11]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][12]).toEqual value: 'very-classy', scopes: ['text.html.basic', 'meta.tag.style.html', 'string.quoted.double.html']
+      expect(lines[0][13]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[0][14]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[1][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[1][1]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']
+      expect(lines[1][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes multiline tag attributes', ->
+      lines = grammar.tokenizeLines '''
+        <style id="id"
+         class="very-classy"
+        >
+        </style>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']
+      expect(lines[0][3]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'entity.other.attribute-name.id.html']
+      expect(lines[0][4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'punctuation.separator.key-value.html']
+      expect(lines[0][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][6]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'meta.toc-list.id.html']
+      expect(lines[0][7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[1][1]).toEqual value: 'class', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.other.attribute-name.html']
+      expect(lines[1][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.style.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[2][0]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[3][1]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']
+      expect(lines[3][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes the content inside the tag as CSS', ->
+      lines = grammar.tokenizeLines '''
+        <style class="very-classy">
+          span { color: red; }
+        </style>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.style.html', 'source.css.embedded.html']
+      expect(lines[1][1]).toEqual value: 'span', scopes: ['text.html.basic', 'meta.tag.style.html', 'source.css.embedded.html', 'meta.selector.css', 'entity.name.tag.css']
+      expect(lines[2][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes multiline tags', ->
+      lines = grammar.tokenizeLines '''
+        <style
+         class="very-classy">
+          span { color: red; }
+        </style>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[2][1]).toEqual value: 'span', scopes: ['text.html.basic', 'meta.tag.style.html', 'source.css.embedded.html', 'meta.selector.css', 'entity.name.tag.css']
+      expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+
   describe 'script tags', ->
     it 'tokenizes the tag attributes', ->
-      tokens = grammar.tokenizeLines '''
+      lines = grammar.tokenizeLines '''
         <script id="id" type="text/html">
         </script>
       '''
 
-      expect(tokens[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
-      expect(tokens[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
-      expect(tokens[0][3]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'entity.other.attribute-name.id.html']
-      expect(tokens[0][4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'punctuation.separator.key-value.html']
-      expect(tokens[0][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
-      expect(tokens[0][6]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'meta.toc-list.id.html']
-      expect(tokens[0][7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
-      expect(tokens[0][9]).toEqual value: 'type', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.other.attribute-name.html']
-      expect(tokens[0][10]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html']
-      expect(tokens[0][11]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
-      expect(tokens[0][12]).toEqual value: 'text/html', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html']
-      expect(tokens[0][13]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
-      expect(tokens[0][14]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
-      expect(tokens[1][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
-      expect(tokens[1][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
-      expect(tokens[1][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[0][3]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'entity.other.attribute-name.id.html']
+      expect(lines[0][4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'punctuation.separator.key-value.html']
+      expect(lines[0][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][6]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'meta.toc-list.id.html']
+      expect(lines[0][7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[0][9]).toEqual value: 'type', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.other.attribute-name.html']
+      expect(lines[0][10]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html']
+      expect(lines[0][11]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][12]).toEqual value: 'text/html', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html']
+      expect(lines[0][13]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[0][14]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[1][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[1][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[1][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes multiline tag attributes', ->
+      lines = grammar.tokenizeLines '''
+        <script id="id" type="text/html"
+         class="very-classy"
+        >
+        </script>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[0][3]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'entity.other.attribute-name.id.html']
+      expect(lines[0][4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'punctuation.separator.key-value.html']
+      expect(lines[0][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][6]).toEqual value: 'id', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'meta.toc-list.id.html']
+      expect(lines[0][7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'meta.attribute-with-value.id.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[0][9]).toEqual value: 'type', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.other.attribute-name.html']
+      expect(lines[0][10]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.script.html']
+      expect(lines[0][11]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(lines[0][12]).toEqual value: 'text/html', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html']
+      expect(lines[0][13]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[1][1]).toEqual value: 'class', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.other.attribute-name.html']
+      expect(lines[1][5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.script.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(lines[2][0]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[3][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[3][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
   describe 'template script tags', ->
     it 'tokenizes the content inside the tag as HTML', ->
@@ -77,8 +175,25 @@ describe 'HTML grammar', ->
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html']
       expect(lines[1][1]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[2][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes multiline tags', ->
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/template'
+         class='very-classy'>
+          <div>test</div>
+        </script>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[2][1]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html', 'meta.tag.block.any.html', 'punctuation.definition.tag.begin.html']
+      expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
   describe 'CoffeeScript script tags', ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-coffee-script')
+
     it 'tokenizes the content inside the tag as CoffeeScript', ->
       lines = grammar.tokenizeLines '''
         <script id='id' type='text/coffeescript'>
@@ -93,6 +208,23 @@ describe 'HTML grammar', ->
         expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
       else
         expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+      expect(lines[2][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes multiline tags', ->
+      lines = grammar.tokenizeLines '''
+        <script id='id' type='text/coffeescript'
+         class='very-classy'>
+          -> console.log 'hi'
+        </script>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      # TODO: Remove when Atom 1.21 reaches stable
+      if parseFloat(atom.getVersion()) <= 1.20
+        expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
+      else
+        expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+      expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it 'recognizes closing script tags in comments', ->
       lines = grammar.tokenizeLines '''
@@ -126,9 +258,21 @@ describe 'HTML grammar', ->
       '''
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
-
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html']
       expect(lines[1][1]).toEqual value: 'var', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'storage.type.var.js']
+      expect(lines[2][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+    it 'tokenizes multiline tags', ->
+      lines = grammar.tokenizeLines '''
+        <script id='id'
+         class='very-classy'>
+          var hi = 'hi'
+        </script>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[2][1]).toEqual value: 'var', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'storage.type.var.js']
+      expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it 'recognizes closing script tags in comments', ->
       lines = grammar.tokenizeLines '''
