@@ -124,21 +124,8 @@
     'include': '#embedded-code'
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i)style)(\\s+.*)?\\s*(>)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.definition.tag.html'
-      '2':
-        'name': 'entity.name.tag.style.html'
-      '3':
-        'patterns': [
-          {
-            'include': '#tag-stuff'
-          }
-        ]
-      '4':
-        'name': 'punctuation.definition.tag.html'
-    'end': '(</)((?i)style)(>)'
+    'begin': '(?i)(?=<style(\\s+|>))'
+    'end': '(?i)(</)(style)(>)'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
@@ -147,11 +134,28 @@
       '3':
         'name': 'punctuation.definition.tag.html'
     'name': 'meta.tag.style.html'
-    'contentName': 'source.css.embedded.html'
     'patterns': [
       {
-        'begin': '\\G'
-        'end': '(?=</(?i:style)>)'
+        'begin': '(?i)\\G(<)(style)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.tag.html'
+          '2':
+            'name': 'entity.name.tag.style.html'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
+        'patterns': [
+          {
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</style>)'
+        'name': 'source.css.embedded.html'
         'patterns': [
           {
             'include': '#embedded-code'
@@ -164,20 +168,7 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i)script)(\\s+.*?\\btype\\s*=\\s*[\'"]?text/(?:x-handlebars|(?:x-(?:handlebars-)?|ng-)?template|html)[\'"]?.*?)(>)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.definition.tag.html'
-      '2':
-        'name': 'entity.name.tag.script.html'
-      '3':
-        'patterns': [
-          {
-            'include': '#tag-stuff'
-          }
-        ]
-      '4':
-        'name': 'punctuation.definition.tag.html'
+    'begin': '(?i)(?=<script\\s+.*?\\btype\\s*=\\s*[\'"]?text/(?:x-handlebars|(?:x-(?:handlebars-)?|ng-)?template|html)[\'"]?(\\s+|>))'
     'end': '(</)((?i)script)(>)'
     'endCaptures':
       '1':
@@ -187,11 +178,28 @@
       '3':
         'name': 'punctuation.definition.tag.html'
     'name': 'meta.tag.script.html'
-    'contentName': 'text.embedded.html'
     'patterns': [
       {
-        'begin': '\\G'
-        'end': '(?=</(?i:script)>)'
+        'begin': '(?i)\\G(<)(script)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.tag.html'
+          '2':
+            'name': 'entity.name.tag.script.html'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
+        'patterns': [
+          {
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</script>)'
+        'name': 'text.embedded.html'
         'patterns': [
           {
             'include': 'text.html.basic'
@@ -201,20 +209,7 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i)script)(\\s+.*?\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?.*?)(>)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.definition.tag.html'
-      '2':
-        'name': 'entity.name.tag.script.html'
-      '3':
-        'patterns': [
-          {
-            'include': '#tag-stuff'
-          }
-        ]
-      '4':
-        'name': 'punctuation.definition.tag.html'
+    'begin': '(?i)(?=<script\\s+.*?\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?(\\s+|>))'
     'end': '(</)((?i)script)(>)'
     'endCaptures':
       '1':
@@ -224,11 +219,28 @@
       '3':
         'name': 'punctuation.definition.tag.html'
     'name': 'meta.tag.script.html'
-    'contentName': 'source.coffee.embedded.html'
     'patterns': [
       {
-        'begin': '\\G'
-        'end': '(?=</(?i:script)>)'
+        'begin': '(?i)\\G(<)(script)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.tag.html'
+          '2':
+            'name': 'entity.name.tag.script.html'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
+        'patterns': [
+          {
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</script>)'
+        'name': 'source.coffee.embedded.html'
         'patterns': [
           {
             'begin': '###'
@@ -236,6 +248,9 @@
               '0':
                 'name': 'punctuation.definition.comment.coffee'
             'end': '###|(?=</script>)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.comment.coffee'
             'name': 'comment.block.coffee'
           }
           {
@@ -254,20 +269,7 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i)script)(\\s+.*?)?(>)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.definition.tag.html'
-      '2':
-        'name': 'entity.name.tag.script.html'
-      '3':
-        'patterns': [
-          {
-            'include': '#tag-stuff'
-          }
-        ]
-      '4':
-        'name': 'punctuation.definition.tag.html'
+    'begin': '(?i)(?=<script(\\s+|>))'
     'end': '(</)((?i)script)(>)'
     'endCaptures':
       '1':
@@ -277,11 +279,28 @@
       '3':
         'name': 'punctuation.definition.tag.html'
     'name': 'meta.tag.script.html'
-    'contentName': 'source.js.embedded.html'
     'patterns': [
       {
-        'begin': '\\G'
-        'end': '(?=</(?i:script)>)'
+        'begin': '(?i)\\G(<)(script)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.tag.html'
+          '2':
+            'name': 'entity.name.tag.script.html'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
+        'patterns': [
+          {
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</script>)'
+        'name': 'source.js.embedded.html'
         'patterns': [
           {
             'begin': '//'
