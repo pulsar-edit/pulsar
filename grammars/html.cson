@@ -247,7 +247,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.comment.coffee'
-            'end': '###|(?=</script>)'
+            'end': '###|(?=(?i)</script>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.comment.coffee'
@@ -258,7 +258,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.comment.coffee'
-            'end': '(?=</script>|$)'
+            'end': '(?=(?i)</script>|$)'
             'name': 'comment.line.number-sign.coffee'
           }
           {
@@ -307,7 +307,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.comment.js'
-            'end': '(?=</script>|$)'
+            'end': '(?=(?i)</script>|$)'
             'name': 'comment.line.double-slash.js'
           }
           {
@@ -315,7 +315,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.comment.begin.js'
-            'end': '\\*/|(?=</script)'
+            'end': '\\*/|(?=(?i)</script)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.comment.begin.js'
