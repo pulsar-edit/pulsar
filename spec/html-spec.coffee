@@ -449,52 +449,52 @@ describe 'HTML grammar', ->
     it "doesn't tokenize XML namespaces as tags if the prefix is a valid style tag", ->
       lines = grammar.tokenizeLines '<style:foo>'
       expect(lines[0][1].value).toNotEqual 'style'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.style.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "doesn't tokenize XML namespaces as tags if the prefix is a valid script tag", ->
       lines = grammar.tokenizeLines '<script:foo>'
       expect(lines[0][1].value).toNotEqual 'script'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.script.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "doesn't tokenize XML namespaces as tags if the prefix is a valid structure tag", ->
       lines = grammar.tokenizeLines '<html:foo>'
       expect(lines[0][1].value).toNotEqual 'html'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.structure.any.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "doesn't tokenize XML namespaces as tags if the prefix is a valid block tag", ->
       lines = grammar.tokenizeLines '<div:foo>'
       expect(lines[0][1].value).toNotEqual 'div'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.block.any.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "doesn't tokenize XML namespaces as tags if the prefix is a valid inline tag", ->
       lines = grammar.tokenizeLines '<span:foo>'
       expect(lines[0][1].value).toNotEqual 'span'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.inline.any.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "it doesn't treat only the part before a hyphen as tag name if this part is a is a valid style tag", ->
       lines = grammar.tokenizeLines '<style-foo>'
       expect(lines[0][1].value).toNotEqual 'style'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.style.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "it doesn't treat only the part before a hyphen as tag name if this part is a is a valid script tag", ->
       lines = grammar.tokenizeLines '<script-foo>'
       expect(lines[0][1].value).toNotEqual 'script'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.script.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "it doesn't treat only the part before a hyphen as tag name if this part is a is a valid structure tag", ->
       lines = grammar.tokenizeLines '<html-foo>'
       expect(lines[0][1].value).toNotEqual 'html'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.structure.any.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "it doesn't treat only the part before a hyphen as tag name if this part is a is a valid block tag", ->
       lines = grammar.tokenizeLines '<div-foo>'
       expect(lines[0][1].value).toNotEqual 'div'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.block.any.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "it doesn't treat only the part before a hyphen as tag name if this part is a is a valid inline tag", ->
       lines = grammar.tokenizeLines '<span-foo>'
       expect(lines[0][1].value).toNotEqual 'span'
-      expect(lines[0][1].scopes).not.toContain 'entity.name.tag.inline.any.html'
+      expect(lines[0][1].scopes).toEqual ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
 
     it "tokenizes other tags as such", ->
       lines = grammar.tokenizeLines '<foo>'
