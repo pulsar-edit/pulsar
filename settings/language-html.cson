@@ -15,7 +15,7 @@
       (</(?!html)
         [-_\\.A-Za-z0-9]+\\b[^>]*>
         |-->
-        |<\\?(php)?\\s+(else(if)?|end(if|for(each)?|while))
+        |<\\?(php)?\\s+(else(if)?|end(if|for(each)?|while)|\\})
         |\\}
       )
     '''

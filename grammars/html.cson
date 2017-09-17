@@ -124,26 +124,38 @@
     'include': '#embedded-code'
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i:style))\\b(?![^>]*/>)'
-    'captures':
+    'begin': '(?i)(?=<style(\\s+|>))'
+    'end': '(?i)(</)(style)(>)'
+    'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
       '2':
         'name': 'entity.name.tag.style.html'
       '3':
         'name': 'punctuation.definition.tag.html'
-    'end': '(</)((?i:style))(>)(?:\\s*\\n)?'
-    'name': 'source.css.embedded.html'
+    'name': 'meta.tag.style.html'
     'patterns': [
       {
-        'include': '#tag-stuff'
-      }
-      {
-        'begin': '(>)'
+        'begin': '(?i)\\G(<)(style)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.tag.html'
-        'end': '(?=</(?i:style))'
+          '2':
+            'name': 'entity.name.tag.style.html'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
+        'patterns': [
+          {
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</style>)'
+        'name': 'source.css.embedded.html'
         'patterns': [
           {
             'include': '#embedded-code'
@@ -156,29 +168,38 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?=[^>]*\\btype\\s*=\\s*[\'"]?text/(x-handlebars|(x-(handlebars-)?|ng-)?template|html)[\'"]?)(?![^>]*/>)'
-    'beginCaptures':
+    'begin': '(?i)(?=<script\\s+.*?\\btype\\s*=\\s*[\'"]?text/(?:x-handlebars|(?:x-(?:handlebars-)?|ng-)?template|html)[\'"]?(\\s+|>))'
+    'end': '(</)((?i)script)(>)'
+    'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
       '2':
         'name': 'entity.name.tag.script.html'
-    'end': '(?<=</(script|SCRIPT))(>)(?:\\s*\\n)?'
-    'endCaptures':
-      '2':
+      '3':
         'name': 'punctuation.definition.tag.html'
-    'contentName': 'text.embedded.html'
+    'name': 'meta.tag.script.html'
     'patterns': [
       {
-        'include': '#tag-stuff'
-      }
-      {
-        'begin': '(?<!</(?:script|SCRIPT))(>)'
-        'captures':
+        'begin': '(?i)\\G(<)(script)'
+        'beginCaptures':
           '1':
             'name': 'punctuation.definition.tag.html'
           '2':
             'name': 'entity.name.tag.script.html'
-        'end': '(</)((?i:script))'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
+        'patterns': [
+          {
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</script>)'
+        'name': 'text.embedded.html'
         'patterns': [
           {
             'include': 'text.html.basic'
@@ -188,35 +209,56 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?=[^>]*\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?)(?![^>]*/>)'
-    'beginCaptures':
+    'begin': '(?i)(?=<script\\s+.*?\\btype\\s*=\\s*[\'"]?text/coffeescript[\'"]?(\\s+|>))'
+    'end': '(</)((?i)script)(>)'
+    'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
       '2':
         'name': 'entity.name.tag.script.html'
-    'end': '(?<=</(script|SCRIPT))(>)(?:\\s*\\n)?'
-    'endCaptures':
-      '2':
+      '3':
         'name': 'punctuation.definition.tag.html'
-    'contentName': 'source.coffee.embedded.html'
+    'name': 'meta.tag.script.html'
     'patterns': [
       {
-        'include': '#tag-stuff'
-      }
-      {
-        'begin': '(?<!</(?:script|SCRIPT))(>)'
-        'captures':
+        'begin': '(?i)\\G(<)(script)'
+        'beginCaptures':
           '1':
             'name': 'punctuation.definition.tag.html'
           '2':
             'name': 'entity.name.tag.script.html'
-        'end': '(</)((?i:script))'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
         'patterns': [
           {
-            'captures':
-              '1':
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</script>)'
+        'name': 'source.coffee.embedded.html'
+        'patterns': [
+          {
+            'begin': '###'
+            'beginCaptures':
+              '0':
                 'name': 'punctuation.definition.comment.coffee'
-            'match': '(#).*?((?=</script)|$\\n?)'
+            'end': '###|(?=(?i)</script>)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.comment.coffee'
+            'name': 'comment.block.coffee'
+          }
+          {
+            'begin': '#'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.comment.coffee'
+            'end': '(?=(?i)</script>|$)'
             'name': 'comment.line.number-sign.coffee'
           }
           {
@@ -227,43 +269,56 @@
     ]
   }
   {
-    'begin': '(?:^\\s+)?(<)((?i:script))\\b(?![^>]*/>)'
-    'beginCaptures':
+    'begin': '(?i)(?=<script(\\s+|>))'
+    'end': '(</)((?i)script)(>)'
+    'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.html'
       '2':
         'name': 'entity.name.tag.script.html'
-    'end': '(?<=</(script|SCRIPT))(>)(?:\\s*\\n)?'
-    'endCaptures':
-      '2':
+      '3':
         'name': 'punctuation.definition.tag.html'
-    'contentName': 'source.js.embedded.html'
+    'name': 'meta.tag.script.html'
     'patterns': [
       {
-        'include': '#tag-stuff'
-      }
-      {
-        'begin': '(?<!</(?:script|SCRIPT))(>)'
-        'captures':
+        'begin': '(?i)\\G(<)(script)'
+        'beginCaptures':
           '1':
             'name': 'punctuation.definition.tag.html'
           '2':
             'name': 'entity.name.tag.script.html'
-        'end': '(</)((?i:script))'
+        'end': '>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.tag.html'
         'patterns': [
           {
-            'captures':
-              '1':
+            'include': '#tag-stuff'
+          }
+        ]
+      }
+      {
+        'begin': '(?!\\G)'
+        'end': '(?i)(?=</script>)'
+        'name': 'source.js.embedded.html'
+        'patterns': [
+          {
+            'begin': '//'
+            'beginCaptures':
+              '0':
                 'name': 'punctuation.definition.comment.js'
-            'match': '(//).*?((?=</script)|$\\n?)'
+            'end': '(?=(?i)</script>|$)'
             'name': 'comment.line.double-slash.js'
           }
           {
             'begin': '/\\*'
-            'captures':
+            'beginCaptures':
               '0':
-                'name': 'punctuation.definition.comment.js'
-            'end': '\\*/|(?=</script)'
+                'name': 'punctuation.definition.comment.begin.js'
+            'end': '\\*/|(?=(?i)</script)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.comment.begin.js'
             'name': 'comment.block.js'
           }
           {
@@ -274,7 +329,7 @@
     ]
   }
   {
-    'begin': '(</?)((?i:body|head|html)\\b)'
+    'begin': '(</?)((?i:body|head|html)(?=\\s|/?>))'
     'captures':
       '1':
         'name': 'punctuation.definition.tag.html'
@@ -289,7 +344,7 @@
     ]
   }
   {
-    'begin': '(</?)((?i:address|blockquote|dd|div|section|article|aside|header|footer|nav|menu|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|pre)\\b)'
+    'begin': '(</?)((?i:address|blockquote|dd|div|section|article|aside|header|footer|nav|menu|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|pre)(?=\\s|/?>))'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.begin.html'
@@ -307,7 +362,7 @@
     ]
   }
   {
-    'begin': '(</?)((?i:a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var)\\b)'
+    'begin': '(</?)((?i:a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var)(?=\\s|/?>))'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.begin.html'
@@ -487,16 +542,45 @@
       }
     ]
   'tag-generic-attribute':
-    'match': '(?<=[^=])\\b([a-zA-Z0-9:-]+)'
-    'name': 'entity.other.attribute-name.html'
+    # https://www.w3.org/TR/html51/syntax.html#attribute-name-state
+    'patterns': [
+      {
+        'begin': '([^\\s/=>"\'<]+)(=)'
+        'beginCaptures':
+          '1':
+            'name': 'entity.other.attribute-name.html'
+          '2':
+            'name': 'punctuation.separator.key-value.html'
+        'end': '(?=\\s|/?>)'
+        'name': 'meta.attribute-with-value.html'
+        'patterns': [
+          {
+            'include': '#string-double-quoted'
+          }
+          {
+            'include': '#string-single-quoted'
+          }
+          {
+            'include': '#unquoted-attribute'
+          }
+        ]
+      }
+      {
+        'match': '[^\\s/=>"\'<]+'
+        'captures':
+          '0':
+            'name': 'entity.other.attribute-name.html'
+        'name': 'meta.attribute-without-value.html'
+      }
+    ]
   'tag-id-attribute':
-    'begin': '\\b(id)\\b\\s*(=)'
+    'begin': '\\b(id)(=)'
     'captures':
       '1':
         'name': 'entity.other.attribute-name.id.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
-    'end': '(?<=\'|")|(?=\\s|>)'
+    'end': '(?=\\s|>)'
     'name': 'meta.attribute-with-value.id.html'
     'patterns': [
       {
@@ -560,10 +644,15 @@
       {
         'include': '#embedded-code'
       }
-      {
-        'include': '#unquoted-attribute'
-      }
     ]
   'unquoted-attribute':
-    'match': '(?<==)(?:[^\\s<>/\'"]|/(?!>))+'
-    'name': 'string.unquoted.html'
+    'patterns': [
+      {
+        'include': '#entities'
+      }
+      {
+        # https://www.w3.org/TR/html51/syntax.html#attribute-value-unquoted-state
+        'match': '([^\\s&>"\'<=`]|&(?=>))+'
+        'name': 'string.unquoted.html'
+      }
+    ]
