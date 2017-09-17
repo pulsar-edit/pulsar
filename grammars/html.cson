@@ -502,16 +502,45 @@
       }
     ]
   'tag-generic-attribute':
-    'match': '(?<!=)\\b([a-zA-Z0-9:-]+)'
-    'name': 'entity.other.attribute-name.html'
+    # https://www.w3.org/TR/html51/syntax.html#attribute-name-state
+    'patterns': [
+      {
+        'begin': '([^\\s/=>"\'<]+)(=)'
+        'beginCaptures':
+          '1':
+            'name': 'entity.other.attribute-name.html'
+          '2':
+            'name': 'punctuation.separator.key-value.html'
+        'end': '(?=\\s|/?>)'
+        'name': 'meta.attribute-with-value.html'
+        'patterns': [
+          {
+            'include': '#string-double-quoted'
+          }
+          {
+            'include': '#string-single-quoted'
+          }
+          {
+            'include': '#unquoted-attribute'
+          }
+        ]
+      }
+      {
+        'match': '[^\\s/=>"\'<]+'
+        'captures':
+          '0':
+            'name': 'entity.other.attribute-name.html'
+        'name': 'meta.attribute-without-value.html'
+      }
+    ]
   'tag-id-attribute':
-    'begin': '\\b(id)\\b\\s*(=)'
+    'begin': '\\b(id)(=)'
     'captures':
       '1':
         'name': 'entity.other.attribute-name.id.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
-    'end': '(?<=\'|")|(?=\\s|>)'
+    'end': '(?=\\s|>)'
     'name': 'meta.attribute-with-value.id.html'
     'patterns': [
       {
@@ -575,10 +604,15 @@
       {
         'include': '#embedded-code'
       }
-      {
-        'include': '#unquoted-attribute'
-      }
     ]
   'unquoted-attribute':
-    'match': '(?<==)(?:[^\\s<>/\'"]|/(?!>))+'
-    'name': 'string.unquoted.html'
+    'patterns': [
+      {
+        'include': '#entities'
+      }
+      {
+        # https://www.w3.org/TR/html51/syntax.html#attribute-value-unquoted-state
+        'match': '([^\\s&>"\'<=`]|&(?=>))+'
+        'name': 'string.unquoted.html'
+      }
+    ]
