@@ -418,15 +418,15 @@ describe 'HTML grammar', ->
   describe "tags", ->
     it "tokenizes style tags as such", ->
       lines = grammar.tokenizeLines '<style>'
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'source.css.embedded.html', 'punctuation.definition.tag.html']
-      expect(lines[0][1]).toEqual value: 'style', scopes: ['text.html.basic', 'source.css.embedded.html', 'entity.name.tag.style.html']
-      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'source.css.embedded.html', 'punctuation.definition.tag.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']
 
     it "tokenizes script tags as such", ->
       lines = grammar.tokenizeLines '<script>'
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'punctuation.definition.tag.html']
-      expect(lines[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'entity.name.tag.script.html']
-      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'source.js.embedded.html', 'punctuation.definition.tag.html']
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it "tokenizes structure tags as such", ->
       lines = grammar.tokenizeLines '<html>'
