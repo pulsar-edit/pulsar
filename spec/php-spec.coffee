@@ -574,6 +574,7 @@ describe 'PHP grammar', ->
             use A, B {
               B::smallTalk insteadof A;
             }
+            /* comment */
           }
         """
 
@@ -594,6 +595,7 @@ describe 'PHP grammar', ->
         expect(tokens[3][7]).toEqual value: 'A', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']
         expect(tokens[3][8]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.terminator.expression.php']
         expect(tokens[4][1]).toEqual value: '}', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
+        expect(tokens[5][1]).toEqual value: '/*', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.class.php', 'meta.class.body.php', 'comment.block.php', 'punctuation.definition.comment.php']
 
       it 'tokenizes aliases', ->
         tokens = grammar.tokenizeLines """
