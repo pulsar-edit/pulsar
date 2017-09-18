@@ -1782,7 +1782,7 @@
           ((?:(?:final|abstract|public|private|protected|static)\\s+)*)
           (function)\\s+
           (?i:
-            (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|tostring|
+            (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|toString|
                   clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
             |([a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)
           )
