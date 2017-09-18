@@ -611,7 +611,7 @@
       '2':
         'name': 'punctuation.separator.key-value.html'
     'end': '(?<=\'|")|(?=\\s|>)'
-    'name': 'meta.attribute-with-value.clsss.html'
+    'name': 'meta.attribute-with-value.class.html'
     'patterns': [
       {
         'begin': '"'
