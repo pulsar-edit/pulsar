@@ -603,6 +603,18 @@
           '3':
             'name': 'punctuation.definition.string.end.html'
       }
+      {
+        'match': '([^\\s&>"\'<=`]|&(?=>))+'
+        'name': 'string.unquoted.html'
+        'captures':
+          '0':
+            'name': 'source.css.style.html'
+            'patterns': [
+              {
+                'include': 'source.css#rule-list-innards'
+              }
+            ]
+      }
     ]
   'tag-id-attribute':
     'begin': '\\b(id)(=)'
