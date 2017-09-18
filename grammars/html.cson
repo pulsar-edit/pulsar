@@ -607,7 +607,7 @@
     'begin': '\\b(class)\\b\\s*(=)'
     'captures':
       '1':
-        'name': 'entity.other.attribute.name.class.html'
+        'name': 'entity.other.attribute-name.class.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
     'end': '(?<=\'|")|(?=\\s|>)'
