@@ -648,7 +648,7 @@
   'unquoted-attribute':
     'patterns': [
       {
-        'include': '#entities'
+        'include': '#attribute-entities'
       }
       {
         # https://www.w3.org/TR/html51/syntax.html#attribute-value-unquoted-state
