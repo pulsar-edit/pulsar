@@ -416,7 +416,7 @@
       }
     ]
   'text-entities':
-    # https://www.w3.org/TR/html5/syntax.html#consume-a-character-reference
+    # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
     'patterns': [
       {
         'begin': '(&)([a-zA-Z0-9]+|#\\d+|#[xX][0-9a-fA-F]+)'
@@ -437,7 +437,7 @@
       }
     ]
   'attribute-entities':
-    # https://www.w3.org/TR/html5/syntax.html#consume-a-character-reference
+    # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
     # Because it would be infeasible to include the entire list of allowed entities,
     # make sure that an equals sign or the end of a string does not follow a potential reference.
     'patterns': [
