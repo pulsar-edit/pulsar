@@ -168,7 +168,7 @@
     ]
   }
   {
-    'begin': '(?i)(?=<script\\s+.*?\\btype\\s*=\\s*[\'"]?text/(?:x-handlebars|(?:x-(?:handlebars-)?|ng-)?template|html)[\'"]?(\\s+|>))'
+    'begin': '(?i)(?=<script\\s+.*?\\btype\\s*=\\s*[\'"]?text/(?:x-handlebars|(?:x-(?:handlebars-)?|ng-)?template|html|ractive)[\'"]?(\\s+|>))'
     'end': '(</)((?i)script)(>)'
     'endCaptures':
       '1':
