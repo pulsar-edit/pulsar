@@ -398,7 +398,7 @@
     ]
   }
   {
-    'include': '#entities'
+    'include': '#text-entities'
   }
   {
     'match': '<>'
@@ -415,21 +415,61 @@
         'include': '#python'
       }
     ]
-  'entities':
+  'text-entities':
+    # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
     'patterns': [
       {
-        'match': '(&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)'
-        'captures':
+        'begin': '(&)([a-zA-Z0-9]+|#\\d+|#[xX][0-9a-fA-F]+)'
+        'beginCaptures':
           '1':
             'name': 'punctuation.definition.entity.begin.html'
           '2':
             'name': 'entity.name.entity.other.html'
-          '3':
+        'end': ';'
+        'endCaptures':
+          '0':
             'name': 'punctuation.definition.entity.end.html'
         'name': 'constant.character.entity.html'
       }
       {
-        'match': '&'
+        'match': '&(?!\\s|<|&)'
+        'name': 'invalid.illegal.bad-ampersand.html'
+      }
+    ]
+  'attribute-entities':
+    # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
+    # Because it would be infeasible to include the entire list of allowed entities,
+    # make sure that an equals sign or the end of a string does not follow a potential reference.
+    'patterns': [
+      {
+        'begin': '(&)(#\\d+|#[xX][0-9a-fA-F]+)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.entity.begin.html'
+          '2':
+            'name': 'entity.name.entity.other.html'
+        'end': ';'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.entity.end.html'
+        'name': 'constant.character.entity.html'
+      }
+      {
+        'begin': '(&)([a-zA-Z0-9]++)(?!["\'=])'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.entity.begin.html'
+          '2':
+            'name': 'entity.name.entity.other.html'
+        'end': ';'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.entity.end.html'
+        'name': 'constant.character.entity.html'
+      }
+      {
+        # In attributes, potential references that end with an equals sign are fine
+        'match': '&(?!\\s|<|&|[a-zA-Z0-9]+=)'
         'name': 'invalid.illegal.bad-ampersand.html'
       }
     ]
@@ -480,7 +520,7 @@
         'include': '#embedded-code'
       }
       {
-        'include': '#entities'
+        'include': '#attribute-entities'
       }
     ]
   'string-single-quoted':
@@ -498,7 +538,7 @@
         'include': '#embedded-code'
       }
       {
-        'include': '#entities'
+        'include': '#attribute-entities'
       }
     ]
   'tag-generic-attribute':
@@ -559,7 +599,7 @@
             'include': '#embedded-code'
           }
           {
-            'include': '#entities'
+            'include': '#attribute-entities'
           }
         ]
       }
@@ -579,7 +619,7 @@
             'include': '#embedded-code'
           }
           {
-            'include': '#entities'
+            'include': '#attribute-entities'
           }
         ]
       }
@@ -608,7 +648,7 @@
   'unquoted-attribute':
     'patterns': [
       {
-        'include': '#entities'
+        'include': '#attribute-entities'
       }
       {
         # https://www.w3.org/TR/html51/syntax.html#attribute-value-unquoted-state

@@ -376,14 +376,82 @@ describe 'HTML grammar', ->
       expect(lines[2][1]).toEqual value: 'disabled', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']
       expect(lines[2][2]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'punctuation.definition.tag.end.html']
 
-  describe "entities", ->
+  describe "entities in text", ->
     it "tokenizes & and characters after it", ->
       {tokens} = grammar.tokenizeLine '& &amp; &a'
 
-      expect(tokens[0]).toEqual value: '&', scopes: ['text.html.basic', 'invalid.illegal.bad-ampersand.html']
-      expect(tokens[3]).toEqual value: 'amp', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
-      expect(tokens[4]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
-      expect(tokens[7]).toEqual value: 'a', scopes: ['text.html.basic']
+      expect(tokens[0]).toEqual value: '& ', scopes: ['text.html.basic']
+      expect(tokens[1]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
+      expect(tokens[2]).toEqual value: 'amp', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[3]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
+      expect(tokens[5]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
+      expect(tokens[6]).toEqual value: 'a', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+
+      lines = grammar.tokenizeLines '&\n'
+      expect(lines[0][0]).toEqual value: '&', scopes: ['text.html.basic']
+
+    it "tokenizes hexadecimal and digit entities", ->
+      {tokens} = grammar.tokenizeLine '&#x00022; &#X00022; &#34;'
+
+      expect(tokens[0]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
+      expect(tokens[1]).toEqual value: '#x00022', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[2]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
+      expect(tokens[4]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
+      expect(tokens[5]).toEqual value: '#X00022', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[6]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
+      expect(tokens[8]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
+      expect(tokens[9]).toEqual value: '#34', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[10]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
+
+    it "tokenizes invalid ampersands", ->
+      {tokens} = grammar.tokenizeLine 'PSE&>'
+      expect(tokens[0]).toEqual value: 'PSE', scopes: ['text.html.basic']
+      expect(tokens[1]).toEqual value: '&', scopes: ['text.html.basic', 'invalid.illegal.bad-ampersand.html']
+      expect(tokens[2]).toEqual value: '>', scopes: ['text.html.basic']
+
+      {tokens} = grammar.tokenizeLine 'PSE&'
+      expect(tokens[0]).toEqual value: 'PSE&', scopes: ['text.html.basic']
+
+      {tokens} = grammar.tokenizeLine '&<'
+      expect(tokens[0]).toEqual value: '&<', scopes: ['text.html.basic']
+
+      {tokens} = grammar.tokenizeLine '& '
+      expect(tokens[0]).toEqual value: '& ', scopes: ['text.html.basic']
+
+      {tokens} = grammar.tokenizeLine '&'
+      expect(tokens[0]).toEqual value: '&', scopes: ['text.html.basic']
+
+      {tokens} = grammar.tokenizeLine '&&'
+      expect(tokens[0]).toEqual value: '&&', scopes: ['text.html.basic']
+
+  describe "entities in attributes", ->
+    it "tokenizes entities", ->
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?&amp;">'
+      expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
+      expect(tokens[8]).toEqual value: 'amp', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[9]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
+
+    it "does not tokenize query parameters as entities", ->
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?one=1&type=json&topic=css">'
+      expect(tokens[6]).toEqual value: 'http://example.com?one=1&type=json&topic=css', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+
+    it "tokenizes invalid ampersands", ->
+      # Note: in order to replicate the following tests' behaviors, make sure you have language-hyperlink disabled
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?&">'
+      expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']
+
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?&=">'
+      expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']
+
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?& ">'
+      expect(tokens[6]).toEqual value: 'http://example.com?& ', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+
+      lines = grammar.tokenizeLines '<a href="http://example.com?&\n">'
+      expect(lines[0][6]).toEqual value: 'http://example.com?&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?&&">'
+      expect(tokens[6]).toEqual value: 'http://example.com?&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+      expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']
 
   describe "firstLineMatch", ->
     it "recognises HTML5 doctypes", ->
