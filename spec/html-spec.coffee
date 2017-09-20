@@ -387,6 +387,9 @@ describe 'HTML grammar', ->
       expect(tokens[5]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
       expect(tokens[6]).toEqual value: 'a', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
 
+      lines = grammar.tokenizeLines '&\n'
+      expect(lines[0][0]).toEqual value: '&', scopes: ['text.html.basic']
+
     it "tokenizes hexadecimal and digit entities", ->
       {tokens} = grammar.tokenizeLine '&#x00022; &#X00022; &#34;'
 
@@ -433,6 +436,7 @@ describe 'HTML grammar', ->
       expect(tokens[6]).toEqual value: 'http://example.com?one=1&type=json&topic=css', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
 
     it "tokenizes invalid ampersands", ->
+      # Note: in order to replicate the following tests' behaviors, make sure you have language-hyperlink disabled
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?&">'
       expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']
 
@@ -442,7 +446,9 @@ describe 'HTML grammar', ->
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?& ">'
       expect(tokens[6]).toEqual value: 'http://example.com?& ', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
 
-      # Note: in order to replicate this test's behavior, make sure you have language-hyperlink disabled
+      lines = grammar.tokenizeLines '<a href="http://example.com?&\n">'
+      expect(lines[0][6]).toEqual value: 'http://example.com?&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?&&">'
       expect(tokens[6]).toEqual value: 'http://example.com?&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
       expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.any.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']
