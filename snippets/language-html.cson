@@ -1,4 +1,4 @@
-'.text.html, .text.html .meta.scope.between-tag-pair, .text.html .punctuation.tag.begin':
+'.text.html - .punctuation.tag.begin':
   # A
   'Anchor':
     'prefix': 'a'
