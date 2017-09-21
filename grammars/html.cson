@@ -604,54 +604,20 @@
       }
     ]
   'tag-class-attribute':
-    'begin': '\\b(class)\\b\\s*(=)'
+    'begin': '\\b(class)(=)'
     'captures':
       '1':
         'name': 'entity.other.attribute-name.class.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
-    'end': '(?<=\'|")|(?=\\s|>)'
+    'end': '(?=\\s|>)'
     'name': 'meta.attribute-with-value.class.html'
     'patterns': [
       {
-        'begin': '"'
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.string.begin.html'
-        'contentName': 'meta.toc-list.class.html'
-        'end': '"'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.string.end.html'
-        'name': 'string.quoted.double.html'
-        'patterns': [
-          {
-            'include': '#embedded-code'
-          }
-          {
-            'include': '#entities'
-          }
-        ]
+        'include': '#string-double-quoted'
       }
       {
-        'begin': '\''
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.string.begin.html'
-        'contentName': 'meta.toc-list.class.html'
-        'end': '\''
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.string.end.html'
-        'name': 'string.quoted.single.html'
-        'patterns': [
-          {
-            'include': '#embedded-code'
-          }
-          {
-            'include': '#entities'
-          }
-        ]
+        'include': '#string-single-quoted'
       }
       {
         'include': '#unquoted-attribute'
