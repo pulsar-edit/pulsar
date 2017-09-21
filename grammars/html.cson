@@ -26,30 +26,6 @@
 'name': 'HTML'
 'patterns': [
   {
-    'begin': '(<)([a-zA-Z0-9:-]++)(?=[^>]*></\\2>)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.definition.tag.html'
-      '2':
-        'name': 'entity.name.tag.html'
-    'end': '(>(\\s*<)/)(\\2)(>)'
-    'endCaptures':
-      '1':
-        'name': 'punctuation.definition.tag.html'
-      '2':
-        'name': 'meta.scope.between-tag-pair.html'
-      '3':
-        'name': 'entity.name.tag.html'
-      '4':
-        'name': 'punctuation.definition.tag.html'
-    'name': 'meta.tag.any.html'
-    'patterns': [
-      {
-        'include': '#tag-stuff'
-      }
-    ]
-  }
-  {
     'begin': '(<\\?)(xml)'
     'captures':
       '1':
@@ -329,14 +305,14 @@
     ]
   }
   {
-    'begin': '(</?)((?i:body|head|html)(?=\\s|/?>))'
+    'begin': '(?i)(</?)(body|head|html)(?=\\s|/?>)'
     'captures':
       '1':
         'name': 'punctuation.definition.tag.html'
       '2':
-        'name': 'entity.name.tag.structure.any.html'
+        'name': 'entity.name.tag.structure.$2.html'
     'end': '(>)'
-    'name': 'meta.tag.structure.any.html'
+    'name': 'meta.tag.structure.$2.html'
     'patterns': [
       {
         'include': '#tag-stuff'
@@ -344,17 +320,17 @@
     ]
   }
   {
-    'begin': '(</?)((?i:address|blockquote|dd|div|section|article|aside|header|footer|nav|menu|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|pre)(?=\\s|/?>))'
+    'begin': '(?i)(</?)(address|blockquote|dd|div|section|article|aside|header|footer|nav|menu|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|pre)(?=\\s|/?>)'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.begin.html'
       '2':
-        'name': 'entity.name.tag.block.any.html'
+        'name': 'entity.name.tag.block.$2.html'
     'end': '(>)'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.end.html'
-    'name': 'meta.tag.block.any.html'
+    'name': 'meta.tag.block.$2.html'
     'patterns': [
       {
         'include': '#tag-stuff'
@@ -362,17 +338,17 @@
     ]
   }
   {
-    'begin': '(</?)((?i:a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var)(?=\\s|/?>))'
+    'begin': '(?i)(</?)(a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var)(?=\\s|/?>)'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.begin.html'
       '2':
-        'name': 'entity.name.tag.inline.any.html'
+        'name': 'entity.name.tag.inline.$2.html'
     'end': '((?: ?/)?>)'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.end.html'
-    'name': 'meta.tag.inline.any.html'
+    'name': 'meta.tag.inline.$2.html'
     'patterns': [
       {
         'include': '#tag-stuff'
