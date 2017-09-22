@@ -1641,6 +1641,23 @@ describe 'PHP grammar', ->
     expect(tokens[3][0]).toEqual value: 'HEREDOC', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
     expect(tokens[3][1]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
+  it 'does not match incorrect heredoc terminators', ->
+    tokens = grammar.tokenizeLines """
+      <?php
+      $a = <<<HEREDOC
+      I am a heredoc
+      HEREDOC ;
+    """
+    expect(tokens[3][0]).toEqual value: 'HEREDOC ;', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+
+    tokens = grammar.tokenizeLines """
+      <?php
+      $a = <<<HEREDOC
+      I am a heredoc
+      HEREDOC; // comment
+    """
+    expect(tokens[3][0]).toEqual value: 'HEREDOC; // comment', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'string.unquoted.heredoc.php']
+
   it 'should tokenize a longer heredoc correctly', ->
     tokens = grammar.tokenizeLines """
       <?php
