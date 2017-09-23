@@ -15,30 +15,6 @@ describe 'HTML grammar', ->
     expect(grammar).toBeTruthy()
     expect(grammar.scopeName).toBe 'text.html.basic'
 
-  describe 'meta.scope.outside-tag scope', ->
-    it 'tokenizes an empty file', ->
-      lines = grammar.tokenizeLines ''
-      expect(lines[0][0]).toEqual value: '', scopes: ['text.html.basic']
-
-    it 'tokenizes a single < as without freezing', ->
-      lines = grammar.tokenizeLines '<'
-      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic']
-
-      lines = grammar.tokenizeLines ' <'
-      expect(lines[0][0]).toEqual value: ' <', scopes: ['text.html.basic']
-
-    it 'tokenizes <? without locking up', ->
-      lines = grammar.tokenizeLines '<?'
-      expect(lines[0][0]).toEqual value: '<?', scopes: ['text.html.basic']
-
-    it 'tokenizes >< as html without locking up', ->
-      lines = grammar.tokenizeLines '><'
-      expect(lines[0][0]).toEqual value: '><', scopes: ['text.html.basic']
-
-    it 'tokenizes < after tags without locking up', ->
-      lines = grammar.tokenizeLines '<span><'
-      expect(lines[0][3]).toEqual value: '<', scopes: ['text.html.basic']
-
   describe 'style tags', ->
     beforeEach ->
       waitsForPromise ->
