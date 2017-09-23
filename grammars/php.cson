@@ -207,7 +207,7 @@
     'patterns': [
       {
         'begin': '(?i)(?=\\\\?[a-z_0-9]+\\\\)'
-        'end': '(?i)([a-z_][a-z_0-9]*)?(?=[^a-z0-9_\\\\])'
+        'end': '(?i)([a-z_][a-z_0-9]*)?(?![a-z0-9_\\\\])'
         'endCaptures':
           '1':
             'name': 'support.class.php'
@@ -222,7 +222,7 @@
       }
       {
         'begin': '(?=[\\\\a-zA-Z_])'
-        'end': '(?i)([a-z_][a-z_0-9]*)?(?=[^a-z0-9_\\\\])'
+        'end': '(?i)([a-z_][a-z_0-9]*)?(?![a-z0-9_\\\\])'
         'endCaptures':
           '1':
             'name': 'support.class.php'
@@ -2042,13 +2042,13 @@
       }
     ]
   'namespace':
-    'begin': '(?i)(?:(namespace)|[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(\\\\)(?=.*?[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
+    'begin': '(?i)(?:(namespace)|[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(\\\\)'
     'beginCaptures':
       '1':
         'name': 'variable.language.namespace.php'
       '2':
         'name': 'punctuation.separator.inheritance.php'
-    'end': '(?i)(?=[a-z0-9_\\x{7f}-\\x{ff}]*[^a-z0-9_\\x{7f}-\\x{ff}\\\\])'
+    'end': '(?i)(?![a-z0-9_\\x{7f}-\\x{ff}]*\\\\)'
     'name': 'support.other.namespace.php'
     'patterns': [
       {
