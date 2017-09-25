@@ -207,7 +207,7 @@
     # a =
     # a, b, whatever =
     # a.b, c.d =
-    'match': '(?<!var)\\s*(\\w+(?:\\.\\w+)?(?:,\\s*\\w+(?:\\.\\w+)?)*)(?=\\s*=(?!=))'
+    'match': '(?<!var)\\s*(\\w+(?:\\.\\w+)*(?>,\\s*\\w+(?:\\.\\w+)*)*)(?=\\s*=(?!=))'
     'captures':
       '1':
         'patterns': [
@@ -216,7 +216,7 @@
             'name': 'invalid.illegal.identifier.go'
           }
           {
-            'match': '\\w+(?:\\.\\w+)?'
+            'match': '\\w+(?:\\.\\w+)*'
             'name': 'variable.other.assignment.go'
             'captures':
               '0':
