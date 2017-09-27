@@ -607,6 +607,14 @@ describe 'Go grammar', ->
         testOpAddress tokens[8], '*'
         testStringType tokens[9], 'string'
 
+      it 'tokenizes a single name and a channel', ->
+        {tokens} = grammar.tokenizeLine 'var x <-chan bool'
+        testVar tokens[0]
+        testVarDeclaration tokens[2], 'x'
+        expect(tokens[4]).toEqual value: '<-', scopes: ['source.go', 'keyword.operator.channel.go']
+        expect(tokens[5]).toEqual value: 'chan', scopes: ['source.go', 'keyword.channel.go']
+        expect(tokens[7]).toEqual value: 'bool', scopes: ['source.go', 'storage.type.boolean.go']
+
       it 'tokenizes a single name and its initialization', ->
         {tokens} = grammar.tokenizeLine ' var k =  0'
         testVar tokens[1]
