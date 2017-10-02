@@ -443,6 +443,9 @@ describe 'HTML grammar', ->
         expect(tokens[12]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
       it 'ends invalid unquoted property lists correctly', ->
+        # TODO: Remove when Atom 1.23 reaches stable
+        return unless parseFloat(atom.getVersion()) >= 1.23
+
         {tokens} = grammar.tokenizeLine '<span style=s:></span>'
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
