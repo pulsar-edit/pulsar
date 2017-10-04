@@ -753,7 +753,7 @@
             'name': 'punctuation.definition.directive.c'
         'patterns': [
           {
-            'begin': '\\G(?=.)'
+            'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
             'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
             'name': 'meta.preprocessor.c'
             'patterns': [
@@ -821,7 +821,7 @@
             'name': 'punctuation.definition.directive.c'
         'patterns': [
           {
-            'begin': '\\G(?=.)'
+            'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
             'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
             'name': 'meta.preprocessor.c'
             'patterns': [
@@ -954,7 +954,7 @@
             'name': 'punctuation.definition.directive.c'
         'patterns': [
           {
-            'begin': '\\G(?=.)'
+            'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
             'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?=\\n)'
             'name': 'meta.preprocessor.c'
             'patterns': [
@@ -987,7 +987,7 @@
             'end': '(?=^\\s*((#)\\s*(?:elif|else|endif)\\b))'
             'patterns': [
               {
-                'begin': '\\G(?=.)'
+                'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
                 'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
                 'name': 'meta.preprocessor.c'
                 'patterns': [
@@ -1038,7 +1038,7 @@
             'name': 'punctuation.definition.directive.c'
         'patterns': [
           {
-            'begin': '\\G(?=.)'
+            'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
             'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?=\\n)'
             'name': 'meta.preprocessor.c'
             'patterns': [
@@ -1071,7 +1071,7 @@
             'end': '(?=^\\s*((#)\\s*(?:elif|else|endif)\\b))'
             'patterns': [
               {
-                'begin': '\\G(?=.)'
+                'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
                 'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
                 'name': 'meta.preprocessor.c'
                 'patterns': [
@@ -1113,7 +1113,7 @@
     'end': '(?=^\\s*((#)\\s*(?:elif|else|endif)\\b))'
     'patterns': [
       {
-        'begin': '\\G(?=.)'
+        'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
         'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
         'name': 'meta.preprocessor.c'
         'patterns': [
@@ -1162,7 +1162,7 @@
             'name': 'punctuation.definition.directive.c'
         'patterns': [
           {
-            'begin': '\\G(?=.)'
+            'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
             'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?=\\n)'
             'name': 'meta.preprocessor.c'
             'patterns': [
@@ -1247,7 +1247,7 @@
             'name': 'punctuation.definition.directive.c'
         'patterns': [
           {
-            'begin': '\\G(?=.)'
+            'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
             'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?=\\n)'
             'name': 'meta.preprocessor.c'
             'patterns': [
@@ -1323,7 +1323,7 @@
     'end': '(?=^\\s*((#)\\s*endif\\b))'
     'patterns': [
       {
-        'begin': '\\G(?=.)'
+        'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
         'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
         'name': 'meta.preprocessor.c'
         'patterns': [
@@ -1397,7 +1397,7 @@
     'end': '(?=^\\s*((#)\\s*endif\\b))'
     'patterns': [
       {
-        'begin': '\\G(?=.)'
+        'begin': '\\G(?=.)(?!//|/\\*(?!.*\\\\\\s*\\n))'
         'end': '(?=//)|(?=/\\*(?!.*\\\\\\s*\\n))|(?<!\\\\)(?=\\n)'
         'name': 'meta.preprocessor.c'
         'patterns': [
