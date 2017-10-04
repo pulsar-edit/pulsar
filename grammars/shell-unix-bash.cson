@@ -618,7 +618,12 @@
             'name': 'keyword.operator.herestring.shell'
           '2':
             'name': 'string.unquoted.herestring.shell'
-        'match': '(<<<)(([^\\s\\\\]|\\\\.)+)'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+        'match': '(<<<)\\s*(([^\\s\\\\]|\\\\.)+)'
         'name': 'meta.herestring.shell'
       }
     ]
@@ -940,7 +945,7 @@
       }
       {
         # valid: &>word >&word >word [n]>&[n] [n]<word [n]>word [n]>>word [n]<&word (last one is duplicate)
-        'match': '&>|\\d*>&\\d*|\\d*(>>|>|<)|\\d*<&|\\d*<>'
+        'match': '(?<![<>])(&>|\\d*>&\\d*|\\d*(>>|>|<)|\\d*<&|\\d*<>)(?![<>])'
         'name': 'keyword.operator.redirect.shell'
       }
     ]

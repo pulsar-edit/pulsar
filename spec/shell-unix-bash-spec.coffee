@@ -138,6 +138,18 @@ describe "Shell script grammar", ->
       expect(tokens[1][0]).toEqual value: 'lorem ipsum', scopes: ['source.shell', 'meta.herestring.shell', scope]
       expect(tokens[1][1]).toEqual value: delim, scopes: ['source.shell', 'meta.herestring.shell', scope, 'punctuation.definition.string.end.shell']
 
+    {tokens} = grammar.tokenizeLine '$cmd = something <<< $COUNTRIES'
+    expect(tokens[3]).toEqual value: '<<<', scopes: ['source.shell', 'meta.herestring.shell', 'keyword.operator.herestring.shell']
+    expect(tokens[4]).toEqual value: ' ', scopes: ['source.shell', 'meta.herestring.shell']
+    expect(tokens[5]).toEqual value: '$', scopes: ['source.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell', 'variable.other.normal.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[6]).toEqual value: 'COUNTRIES', scopes: ['source.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell', 'variable.other.normal.shell']
+
+    {tokens} = grammar.tokenizeLine '$cmd = something <<< TEST 1 2'
+    expect(tokens[3]).toEqual value: '<<<', scopes: ['source.shell', 'meta.herestring.shell', 'keyword.operator.herestring.shell']
+    expect(tokens[4]).toEqual value: ' ', scopes: ['source.shell', 'meta.herestring.shell']
+    expect(tokens[5]).toEqual value: 'TEST', scopes: ['source.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell']
+    expect(tokens[6]).toEqual value: ' 1 2', scopes: ['source.shell']
+
   it "tokenizes heredocs", ->
     delimsByScope =
       "ruby": "RUBY"
