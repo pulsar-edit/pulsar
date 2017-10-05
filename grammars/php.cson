@@ -2041,6 +2041,15 @@
         'match': ','
         'name': 'punctuation.separator.delimiter.php'
       }
+      {
+        'include': '#ternary_expression'
+      }
+      {
+        'include': '#ternary_shorthand'
+      }
+      {
+        'include': '#null_coalescing'
+      }
     ]
   'namespace':
     'begin': '(?i)(?:(namespace)|[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(\\\\)'
@@ -3695,6 +3704,7 @@
       }
     ]
   'variables':
+  
     'patterns': [
       {
         'include': '#var_language'
@@ -3724,3 +3734,32 @@
         ]
       }
     ]
+  
+  'ternary_shorthand':
+    'match': '\\s*(\\?:)\\s*'
+    'captures':
+      '1':
+        'name': 'keyword.operator.ternary.php'
+
+  'ternary_expression':
+    'begin': '(?<!\\?)\\s*(\\?)\\s*(?!:|\\?)'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.operator.ternary.php'
+    'end': '\\s*(:)\\s*'
+    'endCaptures':
+      '1':
+        'name': 'keyword.operator.ternary.php'
+    'patterns': [
+      {
+        'include': '#language'
+      }
+      {
+        'include': '$self'
+      }
+    ]
+  'null_coalescing':
+    'match': '\\s*(\\?\\?)\\s*'
+    'captures':
+      '1':
+        'name': 'keyword.operator.null-coalescing.php'
