@@ -209,6 +209,53 @@ describe 'PHP grammar', ->
         expect(tokens[1][4]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
         expect(tokens[1][5]).toEqual value: '2', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'constant.numeric.decimal.php']
         expect(tokens[1][6]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+      
+      it 'should tokenize ?? correctly', ->
+        tokens = grammar.tokenizeLines """<?php
+          $foo = $bar ?? 'bar';
+        """
+        expect(tokens[1][8]).toEqual value: '??', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.null-coalescing.php']
+      
+      describe 'ternaries', ->
+        it 'should tokenize ternary expressions', ->
+          tokens = grammar.tokenizeLines """<?php
+            $foo = 1 == 3 ? true : false;
+          """
+          expect(tokens[1][11]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[1][15]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+
+          tokens = grammar.tokenizeLines """<?php
+            $foo = 1 == 3
+            ? true
+            : false;
+          """
+          expect(tokens[2][0]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[3][0]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+
+          tokens = grammar.tokenizeLines """<?php
+            $foo=1==3?true:false;
+          """
+          expect(tokens[1][6]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[1][8]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+        
+        it 'should tokenize shorthand ternaries', ->
+          tokens = grammar.tokenizeLines """<?php
+            $foo = false ?: false ?: true ?: false;
+          """
+          expect(tokens[1][7]).toEqual value: '?:', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[1][7]).toEqual tokens[1][11]
+          expect(tokens[1][7]).toEqual tokens[1][15]
+
+        it 'should tokenize a combination of ternaries', ->
+          tokens = grammar.tokenizeLines """<?php
+            $foo = false ?: true == 1
+            ? true : false ?: false;
+          """
+          expect(tokens[1][7]).toEqual value: '?:', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[2][0]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[2][4]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+          expect(tokens[2][8]).toEqual value: '?:', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
+
 
   it 'should tokenize $this', ->
     tokens = grammar.tokenizeLines "<?php $this"
