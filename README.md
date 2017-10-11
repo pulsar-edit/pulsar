@@ -5,6 +5,6 @@
 
 Adds syntax highlighting and snippets for TypeScript in Atom.
 
-Originally [converted](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate) from the [Microsoft TypeScript TextMate grammar](https://github.com/Microsoft/TypeScript-TmLanguage).
+The grammar is the [Microsoft TypeScript TextMate grammar](https://github.com/Microsoft/TypeScript-TmLanguage) and copied here on a semi-regular basis.  Any issues relating to syntax highlighting are likely to be there.
 
 Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
