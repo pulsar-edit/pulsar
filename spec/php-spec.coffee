@@ -1067,6 +1067,19 @@ describe 'PHP grammar', ->
       expect(tokens[1][3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php']
       expect(tokens[1][4]).toEqual value: 'constant', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'constant.other.class.php']
 
+    it 'tokenizes namespaced classes', ->
+      tokens = grammar.tokenizeLines "<?php\n\\One\\Two\\Three::$var"
+
+      expect(tokens[1][0]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][1]).toEqual value: 'One', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.other.namespace.php']
+      expect(tokens[1][2]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][3]).toEqual value: 'Two', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.other.namespace.php']
+      expect(tokens[1][4]).toEqual value: '\\', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[1][5]).toEqual value: 'Three', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'support.class.php']
+      expect(tokens[1][6]).toEqual value: '::', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.class.php']
+      expect(tokens[1][7]).toEqual value: '$', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.class.php', 'punctuation.definition.variable.php']
+      expect(tokens[1][8]).toEqual value: 'var', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'variable.other.class.php']
+
     it 'tokenizes the special "class" keyword', ->
       tokens = grammar.tokenizeLines "<?php\nobj::class"
 
