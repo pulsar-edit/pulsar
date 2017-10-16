@@ -3749,9 +3749,6 @@
       {
         'include': '#language'
       }
-      {
-        'include': '$self'
-      }
     ]
   'null_coalescing':
     'match': '\\?\\?'
