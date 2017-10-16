@@ -1,4 +1,4 @@
-'.text.html - .punctuation.tag.begin':
+'.text.html:not(.embedded)':
   # A
   'Anchor':
     'prefix': 'a'
