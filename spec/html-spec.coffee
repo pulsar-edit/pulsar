@@ -611,3 +611,22 @@ describe 'HTML grammar', ->
     it "tolerates hyphens in other tag names", ->
       lines = grammar.tokenizeLines '<foo-bar>'
       expect(lines[0][1]).toEqual value: 'foo-bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
+
+  describe "snippets", ->
+    snippetsModule = null
+
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('snippets').then (p) -> snippetsModule = p.mainModule
+
+      runs ->
+        # Do not load user snippets
+        spyOn(snippetsModule, 'loadUserSnippets').andCallFake (callback) -> callback({})
+
+      waitsFor 'snippets to load', (done) -> snippetsModule.onDidLoadSnippets(done)
+
+    it "suggests snippets", ->
+      expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html'])).length).toBeGreaterThan 10
+
+    xit "does not suggest any HTML snippets when in embedded scripts", ->
+      expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html .source.js.embedded.html'])).length).toBe 0
