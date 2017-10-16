@@ -244,7 +244,7 @@ describe 'PHP grammar', ->
           """
           expect(tokens[1][7]).toEqual value: '?:', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
           expect(tokens[1][11]).toEqual tokens[1][7]
-          expect(tokens[1][7]).toEqual tokens[1][15]
+          expect(tokens[1][15]).toEqual tokens[1][7]
 
         it 'should tokenize a combination of ternaries', ->
           tokens = grammar.tokenizeLines """<?php

@@ -3741,9 +3741,9 @@
     'beginCaptures':
       '1':
         'name': 'keyword.operator.ternary.php'
-    'end': '\\s*(:)\\s*'
+    'end': ':'
     'endCaptures':
-      '1':
+      '0':
         'name': 'keyword.operator.ternary.php'
     'patterns': [
       {
