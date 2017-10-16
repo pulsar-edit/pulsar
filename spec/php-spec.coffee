@@ -243,7 +243,7 @@ describe 'PHP grammar', ->
             $foo = false ?: false ?: true ?: false;
           """
           expect(tokens[1][7]).toEqual value: '?:', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
-          expect(tokens[1][7]).toEqual tokens[1][11]
+          expect(tokens[1][11]).toEqual tokens[1][7]
           expect(tokens[1][7]).toEqual tokens[1][15]
 
         it 'should tokenize a combination of ternaries', ->
