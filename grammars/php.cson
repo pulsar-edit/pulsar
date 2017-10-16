@@ -3704,7 +3704,6 @@
       }
     ]
   'variables':
-  
     'patterns': [
       {
         'include': '#var_language'
@@ -3734,13 +3733,9 @@
         ]
       }
     ]
-  
   'ternary_shorthand':
-    'match': '\\s*(\\?:)\\s*'
-    'captures':
-      '1':
-        'name': 'keyword.operator.ternary.php'
-
+    'match': '\\?:'
+    'name': 'keyword.operator.ternary.php'
   'ternary_expression':
     'begin': '(?<!\\?)\\s*(\\?)\\s*(?!:|\\?)'
     'beginCaptures':
@@ -3759,7 +3754,5 @@
       }
     ]
   'null_coalescing':
-    'match': '\\s*(\\?\\?)\\s*'
-    'captures':
-      '1':
-        'name': 'keyword.operator.null-coalescing.php'
+    'match': '\\?\\?'
+    'name': 'keyword.operator.null-coalescing.php'
