@@ -1,4 +1,8 @@
-'.text.html:not(.embedded)':
+# Important: When adding a new snippet,
+# there is a second section halfway down this file
+# where you need to null-out the snippet to prevent it from
+# appearing in tags or embedded contexts
+'.text.html':
   # A
   'Anchor':
     'prefix': 'a'
@@ -386,7 +390,6 @@
     'prefix': 'wbr'
     'body': '<wbr>'
 
-
 # These null out the snippets so the snippets are not available when in a tag or
 # in embedded contexts like <script> and <style>
 '.text.html .meta.tag, .text.html .embedded':
@@ -466,6 +469,8 @@
   'Embed':
     'prefix': 'embed'
   # F
+  'Favicon':
+    'prefix': 'favicon'
   'Fieldset':
     'prefix': 'fieldset'
   'Figure Caption':
@@ -494,6 +499,8 @@
     'prefix': 'head'
   'Header':
     'prefix': 'header'
+  'Heading Group':
+    'prefix': 'hgroup'
   'Horizontal Rule':
     'prefix': 'hr'
   'HTML':
@@ -507,6 +514,8 @@
     'prefix': 'input'
   'Image':
     'prefix': 'img'
+  'Import':
+    'prefix': 'import'
   'Inserted Text':
     'prefix': 'ins'
   # J
@@ -531,6 +540,8 @@
     'prefix': 'map'
   'Mark':
     'prefix': 'mark'
+  'MathML':
+    'prefix': 'math'
   'Menu':
     'prefix': 'menu'
   'Menu Item':
@@ -554,7 +565,7 @@
   'Option Group':
     'prefix': 'optgroup'
   'Option':
-    'prefix': 'opt'
+    'prefix': 'option'
   'Output':
     'prefix': 'output'
   # P
@@ -570,10 +581,14 @@
   'Quote':
     'prefix': 'q'
   # R
+  'Ruby Base':
+    'prefix': 'rb'
   'Ruby Parenthesis':
     'prefix': 'rp'
   'Ruby Pronunciation':
     'prefix': 'rt'
+  'Ruby Text Container':
+    'prefix': 'rtc'
   'Ruby Annotation':
     'prefix': 'ruby'
   # S
@@ -605,6 +620,8 @@
     'prefix': 'summary'
   'Superscript':
     'prefix': 'sup'
+  'SVG':
+    'prefix': 'svg'
   # T
   'Table':
     'prefix': 'table'
