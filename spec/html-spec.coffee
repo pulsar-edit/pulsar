@@ -616,17 +616,21 @@ describe 'HTML grammar', ->
     snippetsModule = null
 
     beforeEach ->
-      waitsForPromise ->
-        atom.packages.activatePackage('snippets').then (p) -> snippetsModule = p.mainModule
+      # FIXME: This should just be atom.packages.loadPackage('snippets'),
+      # but a bug in PackageManager::resolvePackagePath where it finds language-html's
+      # `snippets` directory before the actual package necessitates passing an absolute path
+      snippetsPath = path.join(atom.packages.resourcePath, 'node_modules', 'snippets')
+      snippetsModule = require(atom.packages.loadPackage(snippetsPath).getMainModulePath())
 
-      runs ->
-        # Do not load user snippets
-        spyOn(snippetsModule, 'loadUserSnippets').andCallFake (callback) -> callback({})
+      # Disable loading of user snippets before the package is activated
+      spyOn(snippetsModule, 'loadUserSnippets').andCallFake (callback) -> callback({})
+
+      snippetsModule.activate()
 
       waitsFor 'snippets to load', (done) -> snippetsModule.onDidLoadSnippets(done)
 
     it "suggests snippets", ->
       expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html'])).length).toBeGreaterThan 10
 
-    xit "does not suggest any HTML snippets when in embedded scripts", ->
+    it "does not suggest any HTML snippets when in embedded scripts", ->
       expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html .source.js.embedded.html'])).length).toBe 0
