@@ -73,17 +73,3 @@ describe 'Python settings', ->
     expect(decreaseIndentRegex.testSync('  elif this_var == that_var')).toBeFalsy()
     expect(decreaseIndentRegex.testSync('else')).toBeFalsy()
     expect(decreaseIndentRegex.testSync('  "finally:"')).toBeFalsy()
-
-  it 'matches lines correctly using the decreaseNextIndentPattern', ->
-    decreaseNextIndentRegex = languageMode.decreaseNextIndentRegexForScopeDescriptor(['source.python'])
-
-    expect(decreaseNextIndentRegex.testSync('  return')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    return')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    return x')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    yield x')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    yield expression()')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    continue')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    break')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    pass')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    raise')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('    raise Exception()')).toBeTruthy()
