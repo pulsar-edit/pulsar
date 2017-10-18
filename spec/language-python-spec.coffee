@@ -6,7 +6,7 @@ describe 'Python settings', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.workspace.open('sample.py').then (o) ->
+      atom.workspace.open('../../sample.py').then (o) ->
         editor = o
         languageMode = editor.languageMode
 
