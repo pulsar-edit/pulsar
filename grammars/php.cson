@@ -41,37 +41,6 @@
   'text.html.php - (meta.embedded | meta.tag), L:text.html.php meta.tag, L:source.js.embedded.html':
     'patterns': [
       {
-        'begin': '(^\\s*)(?=<\\?(?![^?]*\\?>))'
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.whitespace.embedded.leading.php'
-        'end': '(?!\\G)(\\s*$\\n)?'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.whitespace.embedded.trailing.php'
-        'patterns': [
-          {
-            'begin': '<\\?(?i:php|=)?'
-            'beginCaptures':
-              '0':
-                'name': 'punctuation.section.embedded.begin.php'
-            'contentName': 'source.php'
-            'end': '(\\?)>'
-            'endCaptures':
-              '0':
-                'name': 'punctuation.section.embedded.end.php'
-              '1':
-                'name': 'source.php'
-            'name': 'meta.embedded.block.php'
-            'patterns': [
-              {
-                'include': '#language'
-              }
-            ]
-          }
-        ]
-      }
-      {
         'begin': '<\\?(?i:php|=)?(?![^?]*\\?>)'
         'beginCaptures':
           '0':
