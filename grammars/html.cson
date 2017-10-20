@@ -61,10 +61,12 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
-        'end': '\\?>'
+        'end': '(\\?)>'
         'endCaptures':
           '0':
             'name': 'punctuation.section.embedded.end.php'
+          '1':
+            'name': 'source.php'
         'name': 'meta.embedded.block.php'
         'contentName': 'source.php'
         'patterns': [
@@ -78,10 +80,12 @@
         'beginCaptures':
           '0':
             'name': 'punctuation.section.embedded.begin.php'
-        'end': '\\?>'
+        'end': '(\\?)>'
         'endCaptures':
           '0':
             'name': 'punctuation.section.embedded.end.php'
+          '1':
+            'name': 'source.php'
         'name': 'meta.embedded.line.php'
         'contentName': 'source.php'
         'patterns': [
