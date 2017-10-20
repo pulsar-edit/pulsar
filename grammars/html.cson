@@ -49,9 +49,6 @@
   {
     'include': 'text.html.basic'
   }
-  {
-    'include': '#php-tag'
-  }
 ]
 'repository':
   'php-tag':
