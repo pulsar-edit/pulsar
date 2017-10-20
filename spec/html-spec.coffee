@@ -61,3 +61,22 @@ describe 'PHP in HTML', ->
         expect(tokens[1][2]).toEqual value: '*/', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'comment.block.php', 'punctuation.definition.comment.php']
         expect(tokens[2][0]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.block.php', 'punctuation.section.embedded.end.php', 'source.php']
         expect(tokens[2][1]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.block.php', 'punctuation.section.embedded.end.php']
+
+    it 'tokenizes `include` on the same line as <?php', ->
+      # https://github.com/atom/language-php/issues/154
+      {tokens} = grammar.tokenizeLine "<?php include 'test'?>"
+
+      expect(tokens[2]).toEqual value: 'include', scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'keyword.control.import.include.php']
+      expect(tokens[4]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[6]).toEqual value: "'", scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(tokens[7]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']
+      expect(tokens[8]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']
+
+    it 'tokenize namespaces immediately following <?php', ->
+      {tokens} = grammar.tokenizeLine "<?php namespace Test;"
+
+      expect(tokens[1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[2]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
+      expect(tokens[3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
+      expect(tokens[4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
+      expect(tokens[5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
