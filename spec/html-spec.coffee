@@ -619,6 +619,7 @@ describe 'HTML grammar', ->
       # FIXME: This should just be atom.packages.loadPackage('snippets'),
       # but a bug in PackageManager::resolvePackagePath where it finds language-html's
       # `snippets` directory before the actual package necessitates passing an absolute path
+      # See https://github.com/atom/atom/issues/15953
       snippetsPath = path.join(atom.packages.resourcePath, 'node_modules', 'snippets')
       snippetsModule = require(atom.packages.loadPackage(snippetsPath).getMainModulePath())
 
