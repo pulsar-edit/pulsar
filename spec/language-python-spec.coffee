@@ -6,7 +6,7 @@ describe 'Python settings', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.workspace.open('sample.py').then (o) ->
+      atom.workspace.open().then (o) ->
         editor = o
         languageMode = editor.languageMode
 
@@ -18,10 +18,14 @@ describe 'Python settings', ->
 
     expect(increaseIndentRegex.testSync('for i in range(n):')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  for i in range(n):')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('async for i in range(n):')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('  async for i in range(n):')).toBeTruthy()
     expect(increaseIndentRegex.testSync('class TheClass(Object):')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  class TheClass(Object):')).toBeTruthy()
     expect(increaseIndentRegex.testSync('def f(x):')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  def f(x):')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('async def f(x):')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('  async def f(x):')).toBeTruthy()
     expect(increaseIndentRegex.testSync('if this_var == that_var:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  if this_var == that_var:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('elif this_var == that_var:')).toBeTruthy()
@@ -36,6 +40,8 @@ describe 'Python settings', ->
     expect(increaseIndentRegex.testSync('  finally:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('with open("filename") as f:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  with open("filename") as f:')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('async with open("filename") as f:')).toBeTruthy()
+    expect(increaseIndentRegex.testSync('  async with open("filename") as f:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('while True:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('  while True:')).toBeTruthy()
     expect(increaseIndentRegex.testSync('\t\t  while True:')).toBeTruthy()
