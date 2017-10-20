@@ -611,3 +611,27 @@ describe 'HTML grammar', ->
     it "tolerates hyphens in other tag names", ->
       lines = grammar.tokenizeLines '<foo-bar>'
       expect(lines[0][1]).toEqual value: 'foo-bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']
+
+  describe "snippets", ->
+    snippetsModule = null
+
+    beforeEach ->
+      # FIXME: This should just be atom.packages.loadPackage('snippets'),
+      # but a bug in PackageManager::resolvePackagePath where it finds language-html's
+      # `snippets` directory before the actual package necessitates passing an absolute path
+      # See https://github.com/atom/atom/issues/15953
+      snippetsPath = path.join(atom.packages.resourcePath, 'node_modules', 'snippets')
+      snippetsModule = require(atom.packages.loadPackage(snippetsPath).getMainModulePath())
+
+      # Disable loading of user snippets before the package is activated
+      spyOn(snippetsModule, 'loadUserSnippets').andCallFake (callback) -> callback({})
+
+      snippetsModule.activate()
+
+      waitsFor 'snippets to load', (done) -> snippetsModule.onDidLoadSnippets(done)
+
+    it "suggests snippets", ->
+      expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html'])).length).toBeGreaterThan 10
+
+    it "does not suggest any HTML snippets when in embedded scripts", ->
+      expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html .source.js.embedded.html'])).length).toBe 0
