@@ -527,7 +527,7 @@
             'name': 'entity.other.attribute-name.html'
           '2':
             'name': 'punctuation.separator.key-value.html'
-        'end': '(?=\\s|/?>)'
+        'end': '(?!\\G)|(?=\\s|/?>)'
         'name': 'meta.attribute-with-value.html'
         'patterns': [
           {
@@ -556,7 +556,7 @@
         'name': 'entity.other.attribute-name.id.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
-    'end': '(?=\\s|>)'
+    'end': '(?!\\G)|(?=\\s|/?>)'
     'name': 'meta.attribute-with-value.id.html'
     'patterns': [
       {
@@ -610,7 +610,7 @@
         'name': 'entity.other.attribute-name.class.html'
       '2':
         'name': 'punctuation.separator.key-value.html'
-    'end': '(?=\\s|>)'
+    'end': '(?!\\G)|(?=\\s|/?>)'
     'name': 'meta.attribute-with-value.class.html'
     'patterns': [
       {
