@@ -73,7 +73,7 @@ describe 'PHP in HTML', ->
       expect(tokens[8]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']
 
     it 'tokenize namespaces immediately following <?php', ->
-      {tokens} = grammar.tokenizeLine "<?php namespace Test;"
+      {tokens} = grammar.tokenizeLine '<?php namespace Test;'
 
       expect(tokens[1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
       expect(tokens[2]).toEqual value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']
@@ -82,8 +82,8 @@ describe 'PHP in HTML', ->
       expect(tokens[5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
   describe 'firstLineMatch', ->
-    it "recognises interpreter directives", ->
-      valid = """
+    it 'recognises interpreter directives', ->
+      valid = '''
         #!/usr/bin/php
         #!/usr/bin/php foo=bar/
         #!/usr/sbin/php5
@@ -97,11 +97,11 @@ describe 'PHP in HTML', ->
         #!\t/usr/bin/env --foo=bar php --quu=quux
         #! /usr/bin/php
         #!/usr/bin/env php
-      """
+      '''
       for line in valid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
 
-      invalid = """
+      invalid = '''
         \x20#!/usr/sbin/php
         \t#!/usr/sbin/php
         #!/usr/bin/env-php/node-env/
@@ -109,12 +109,12 @@ describe 'PHP in HTML', ->
         #! /usr/binphp
         #!/usr/bin.php
         #!\t/usr/bin/env --php=bar
-      """
+      '''
       for line in invalid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
 
-    it "recognises Emacs modelines", ->
-      valid = """
+    it 'recognises Emacs modelines', ->
+      valid = '''
         #-*- PHP -*-
         #-*- mode: PHP -*-
         /* -*-php-*- */
@@ -128,11 +128,11 @@ describe 'PHP in HTML', ->
         "-*-font-mode:foo;mode:php;foo-bar:quux-*-"
         "-*-font:x;foo:bar; mode : PHP; bar:foo;foooooo:baaaaar;fo:ba;-*-";
         "-*- font:x;foo : bar ; mode : php ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
-      """
+      '''
       for line in valid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
 
-      invalid = """
+      invalid = '''
         /* --*php-*- */
         /* -*-- php -*-
         /* -*- -- PHP -*-
@@ -146,12 +146,12 @@ describe 'PHP in HTML', ->
         // -*- mode: -*- php
         // -*- mode: stop-using-php -*-
         // -*-font:mode;mode:php--*-
-      """
+      '''
       for line in invalid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
 
-    it "recognises Vim modelines", ->
-      valid = """
+    it 'recognises Vim modelines', ->
+      valid = '''
         vim: se filetype=php:
         # vim: se ft=php:
         # vim: set ft=PHP:
@@ -173,11 +173,11 @@ describe 'PHP in HTML', ->
         # vim:noexpandtab:ft=php
         # vim:ts=4:sts=4 ft=phtml:noexpandtab:\x20
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=phtml ts=4
-      """
+      '''
       for line in valid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
 
-      invalid = """
+      invalid = '''
         ex: se filetype=php:
         _vi: se filetype=php:
          vi: se filetype=php
@@ -191,6 +191,6 @@ describe 'PHP in HTML', ->
         # vim:noexpandtab sts:4 ft:php ts:4
         # vim:noexpandtab titlestring=hi\\|there\\ ft=php ts=4
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=php ts=4
-      """
+      '''
       for line in invalid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
