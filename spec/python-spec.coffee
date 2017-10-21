@@ -230,6 +230,21 @@ describe "Python grammar", ->
     expect(tokens[0][12].value).toBe ']'
     expect(tokens[0][12].scopes).toEqual ['source.python', 'meta.structure.list.python', 'punctuation.definition.list.end.python']
 
+  it "tokenizes a hex escape inside a string", ->
+    tokens = grammar.tokenizeLines('"\\x5A"')
+
+    expect(tokens[0][0].value).toBe '"'
+    expect(tokens[0][0].scopes).toEqual ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+    expect(tokens[0][1].value).toBe '\\x5A'
+    expect(tokens[0][1].scopes).toEqual ['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.hex.python']
+
+    tokens = grammar.tokenizeLines('"\\x9f"')
+
+    expect(tokens[0][0].value).toBe '"'
+    expect(tokens[0][0].scopes).toEqual ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+    expect(tokens[0][1].value).toBe '\\x9f'
+    expect(tokens[0][1].scopes).toEqual ['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.hex.python']
+
   it "tokenizes properties of self as self-type variables", ->
     tokens = grammar.tokenizeLines('self.foo')
 

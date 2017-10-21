@@ -800,7 +800,7 @@
         'name': 'constant.character.escape.tab.python'
       '13':
         'name': 'constant.character.escape.vertical-tab.python'
-    'match': '(\\\\x[0-9A-F]{2})|(\\\\[0-7]{3})|(\\\\\\n)|(\\\\\\\\)|(\\\\\\")|(\\\\\')|(\\\\a)|(\\\\b)|(\\\\f)|(\\\\n)|(\\\\r)|(\\\\t)|(\\\\v)'
+    'match': '(\\\\x[0-9A-Fa-f]{2})|(\\\\[0-7]{3})|(\\\\\\n)|(\\\\\\\\)|(\\\\\\")|(\\\\\')|(\\\\a)|(\\\\b)|(\\\\f)|(\\\\n)|(\\\\r)|(\\\\t)|(\\\\v)'
   'escaped_unicode_char':
     'captures':
       '1':
