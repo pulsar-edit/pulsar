@@ -2010,6 +2010,15 @@
         'match': ','
         'name': 'punctuation.separator.delimiter.php'
       }
+      {
+        'include': '#ternary_shorthand'
+      }
+      {
+        'include': '#null_coalescing'
+      }
+      {
+        'include': '#ternary_expression'
+      }
     ]
   'namespace':
     'begin': '(?i)(?:(namespace)|[a-z_\\x{7f}-\\x{ff}][a-z0-9_\\x{7f}-\\x{ff}]*)?(\\\\)'
@@ -3693,3 +3702,23 @@
         ]
       }
     ]
+  'ternary_shorthand':
+    'match': '\\?:'
+    'name': 'keyword.operator.ternary.php'
+  'ternary_expression':
+    'begin': '\\?'
+    'beginCaptures':
+      '0':
+        'name': 'keyword.operator.ternary.php'
+    'end': ':'
+    'endCaptures':
+      '0':
+        'name': 'keyword.operator.ternary.php'
+    'patterns': [
+      {
+        'include': '#language'
+      }
+    ]
+  'null_coalescing':
+    'match': '\\?\\?'
+    'name': 'keyword.operator.null-coalescing.php'
