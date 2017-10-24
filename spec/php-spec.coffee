@@ -256,7 +256,6 @@ describe 'PHP grammar', ->
           expect(tokens[2][4]).toEqual value: ':', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
           expect(tokens[2][8]).toEqual value: '?:', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'keyword.operator.ternary.php']
 
-
   it 'should tokenize $this', ->
     tokens = grammar.tokenizeLines "<?php $this"
 
