@@ -2042,13 +2042,13 @@
         'name': 'punctuation.separator.delimiter.php'
       }
       {
-        'include': '#ternary_expression'
-      }
-      {
         'include': '#ternary_shorthand'
       }
       {
         'include': '#null_coalescing'
+      }
+      {
+        'include': '#ternary_expression'
       }
     ]
   'namespace':
@@ -3737,9 +3737,9 @@
     'match': '\\?:'
     'name': 'keyword.operator.ternary.php'
   'ternary_expression':
-    'begin': '(?<!\\?)\\s*(\\?)\\s*(?!:|\\?)'
+    'begin': '\\?'
     'beginCaptures':
-      '1':
+      '0':
         'name': 'keyword.operator.ternary.php'
     'end': ':'
     'endCaptures':
