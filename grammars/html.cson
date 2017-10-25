@@ -1,0 +1,105 @@
+# This grammar file is responsible for including the actual PHP grammar
+# by capturing <?php ?> tags
+'scopeName': 'text.html.php'
+'name': 'PHP'
+'fileTypes': [
+  'aw'
+  'ctp'
+  'inc'
+  'install'
+  'module'
+  'php'
+  'php_cs'
+  'php3'
+  'php4'
+  'php5'
+  'phpt'
+  'phtml'
+  'profile'
+]
+'firstLineMatch': '''(?x)
+  # Hashbang
+  ^\\#!.*(?:\\s|\\/)
+    php\\d?
+  (?:$|\\s)
+  |
+  # Modeline
+  (?i:
+    # Emacs
+    -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+      php
+    (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+    |
+    # Vim
+    (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+      (?:php|phtml)
+    (?=\\s|:|$)
+  )
+  |
+  # Regular opening PHP tags
+  ^\\s*<\\?(?i:php|=|\\s|$)
+'''
+'foldingStartMarker': '(/\\*|\\{\\s*$|<<<HTML)'
+'foldingStopMarker': '(\\*/|^\\s*\\}|^HTML;)'
+'injections':
+  'text.html.php - (meta.embedded | meta.tag), L:text.html.php meta.tag, L:source.js.embedded.html':
+    'patterns': [
+      {
+        'include': '#php-tag'
+      }
+    ]
+'patterns': [
+  {
+    'begin': '\\A#!'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.comment.php'
+    'end': '$'
+    'name': 'comment.line.shebang.php'
+  }
+  {
+    'include': 'text.html.basic'
+  }
+]
+'repository':
+  'php-tag':
+    'patterns': [
+      {
+        'begin': '<\\?(?i:php|=)?(?![^?]*\\?>)'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.begin.php'
+        'end': '(\\?)>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.end.php'
+          '1':
+            'name': 'source.php'
+        'name': 'meta.embedded.block.php'
+        'contentName': 'source.php'
+        'patterns': [
+          {
+            'include': 'source.php'
+          }
+        ]
+      }
+      {
+        'begin': '<\\?(?i:php|=)?'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.begin.php'
+        'end': '(\\?)>'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.end.php'
+          '1':
+            'name': 'source.php'
+        'name': 'meta.embedded.line.php'
+        'contentName': 'source.php'
+        'patterns': [
+          {
+            'include': 'source.php'
+          }
+        ]
+      }
+    ]
