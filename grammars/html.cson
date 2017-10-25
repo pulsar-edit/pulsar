@@ -35,6 +35,9 @@
       (?:php|phtml)
     (?=\\s|:|$)
   )
+  |
+  # Regular opening PHP tags
+  ^\\s*<\\?(?i:php|=|\\s|$)
 '''
 'foldingStartMarker': '(/\\*|\\{\\s*$|<<<HTML)'
 'foldingStopMarker': '(\\*/|^\\s*\\}|^HTML;)'
@@ -46,6 +49,14 @@
       }
     ]
 'patterns': [
+  {
+    'begin': '\\A#!'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.comment.php'
+    'end': '$'
+    'name': 'comment.line.shebang.php'
+  }
   {
     'include': 'text.html.basic'
   }
