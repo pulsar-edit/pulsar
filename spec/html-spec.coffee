@@ -81,6 +81,26 @@ describe 'PHP in HTML', ->
       expect(tokens[4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
       expect(tokens[5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
 
+  describe 'shebang', ->
+    it 'recognises shebang on the first line of document', ->
+      lines = grammar.tokenizeLines '''
+        #!/usr/bin/env php
+        <?php echo "test"; ?>
+      '''
+
+      expect(lines[0][0]).toEqual value: '#!', scopes: ['text.html.php', 'comment.line.shebang.php', 'punctuation.definition.comment.php']
+      expect(lines[0][1]).toEqual value: '/usr/bin/env php', scopes: ['text.html.php', 'comment.line.shebang.php']
+      expect(lines[1][0]).toEqual value: '<?php', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.begin.php']
+
+    it 'does not recognize shebang on any of the other lines', ->
+      lines = grammar.tokenizeLines '''
+
+        #!/usr/bin/env php
+        <?php echo "test"; ?>
+      '''
+
+      expect(lines[1][0]).toEqual value: '#!/usr/bin/env php', scopes: [ 'text.html.php' ]
+
   describe 'firstLineMatch', ->
     it 'recognises interpreter directives', ->
       valid = '''
