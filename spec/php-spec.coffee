@@ -216,33 +216,33 @@ describe 'PHP grammar', ->
 
       describe 'ternaries', ->
         it 'should tokenize ternary expressions', ->
-          {tokens} = grammar.tokenizeLine "$foo = 1 == 3 ? true : false;"
+          {tokens} = grammar.tokenizeLine '$foo = 1 == 3 ? true : false;'
           expect(tokens[11]).toEqual value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(tokens[15]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
 
-          lines = grammar.tokenizeLines """
+          lines = grammar.tokenizeLines '''
             $foo = 1 == 3
             ? true
             : false;
-          """
+          '''
           expect(lines[1][0]).toEqual value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(lines[2][0]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
 
-          {tokens} = grammar.tokenizeLine "$foo=1==3?true:false;"
+          {tokens} = grammar.tokenizeLine '$foo=1==3?true:false;'
           expect(tokens[6]).toEqual value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(tokens[8]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
 
         it 'should tokenize shorthand ternaries', ->
-          {tokens} = grammar.tokenizeLine "$foo = false ?: false ?: true ?: false;"
+          {tokens} = grammar.tokenizeLine '$foo = false ?: false ?: true ?: false;'
           expect(tokens[7]).toEqual value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(tokens[11]).toEqual tokens[7]
           expect(tokens[15]).toEqual tokens[7]
 
         it 'should tokenize a combination of ternaries', ->
-          lines = grammar.tokenizeLines """
+          lines = grammar.tokenizeLines '''
             $foo = false ?: true == 1
             ? true : false ?: false;
-          """
+          '''
           expect(lines[0][7]).toEqual value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(lines[1][0]).toEqual value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(lines[1][4]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']

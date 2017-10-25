@@ -99,7 +99,7 @@ describe 'PHP in HTML', ->
         <?php echo "test"; ?>
       '''
 
-      expect(lines[1][0]).toEqual value: '#!/usr/bin/env php', scopes: [ 'text.html.php' ]
+      expect(lines[1][0]).toEqual value: '#!/usr/bin/env php', scopes: ['text.html.php']
 
   describe 'firstLineMatch', ->
     it 'recognises opening PHP tags', ->
