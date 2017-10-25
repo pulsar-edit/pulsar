@@ -641,6 +641,15 @@
     'include': '#string-backtick'
   }
   {
+    'include': '#ternary_shorthand'
+  }
+  {
+    'include': '#null_coalescing'
+  }
+  {
+    'include': '#ternary_expression'
+  }
+  {
     'begin': '{'
     'beginCaptures':
       '0':
@@ -1896,15 +1905,6 @@
       }
       {
         'include': '#variable-name'
-      }
-      {
-        'include': '#ternary_shorthand'
-      }
-      {
-        'include': '#null_coalescing'
-      }
-      {
-        'include': '#ternary_expression'
       }
     ]
   'invoke-call':
@@ -3611,7 +3611,7 @@
         'name': 'keyword.operator.ternary.php'
     'patterns': [
       {
-        'include': '#language'
+        'include': '$self'
       }
     ]
   'null_coalescing':
