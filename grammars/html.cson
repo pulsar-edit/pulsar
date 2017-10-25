@@ -35,6 +35,9 @@
       (?:php|phtml)
     (?=\\s|:|$)
   )
+  |
+  # Regular opening PHP tags
+  ^\\s*<\\?(?i:php|=|\\s|$)
 '''
 'foldingStartMarker': '(/\\*|\\{\\s*$|<<<HTML)'
 'foldingStopMarker': '(\\*/|^\\s*\\}|^HTML;)'

@@ -102,6 +102,23 @@ describe 'PHP in HTML', ->
       expect(lines[1][0]).toEqual value: '#!/usr/bin/env php', scopes: [ 'text.html.php' ]
 
   describe 'firstLineMatch', ->
+    it 'recognises opening PHP tags', ->
+      valid = '''
+        <?php
+        <?PHP
+        <?=
+        <?
+        <? echo "test";
+        <?="test"
+        <?php namespace foo;
+      '''
+      for line in valid.split /\n/
+        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+
+      # Do not allow matching XML declaration until the grammar scoring system takes into account
+      # the length of the first line match so that longer matches get the priority over shorter matches.
+      expect(grammar.firstLineRegex.scanner.findNextMatchSync('<?xml version="1.0" encoding="UTF-8"?>')).toBeNull()
+
     it 'recognises interpreter directives', ->
       valid = '''
         #!/usr/bin/php
