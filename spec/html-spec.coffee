@@ -379,9 +379,9 @@ describe 'HTML grammar', ->
 
           expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
           expect(tokens[5]).toEqual value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'punctuation.definition.string.begin.html']
-          expect(tokens[6]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-          expect(tokens[9]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-value.css', 'support.constant.property-value.css']
-          expect(tokens[10]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'punctuation.terminator.rule.css']
+          expect(tokens[6]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+          expect(tokens[9]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'support.constant.property-value.css']
+          expect(tokens[10]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']
           expect(tokens[11]).toEqual value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'punctuation.definition.string.end.html']
           expect(tokens[12]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
@@ -389,12 +389,12 @@ describe 'HTML grammar', ->
 
           expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
           expect(tokens[5]).toEqual value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'punctuation.definition.string.begin.html']
-          expect(tokens[6]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-          expect(tokens[9]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-value.css', 'support.constant.property-value.css']
-          expect(tokens[10]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'punctuation.terminator.rule.css']
-          expect(tokens[12]).toEqual value: 'z-index', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-          expect(tokens[15]).toEqual value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-value.css', 'constant.numeric.css']
-          expect(tokens[16]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'punctuation.terminator.rule.css']
+          expect(tokens[6]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+          expect(tokens[9]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'support.constant.property-value.css']
+          expect(tokens[10]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']
+          expect(tokens[12]).toEqual value: 'z-index', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+          expect(tokens[15]).toEqual value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'constant.numeric.css']
+          expect(tokens[16]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']
           expect(tokens[17]).toEqual value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', "string.quoted.#{type}.html", 'punctuation.definition.string.end.html']
           expect(tokens[18]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
@@ -403,8 +403,8 @@ describe 'HTML grammar', ->
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
         expect(tokens[5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
-        expect(tokens[6]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-        expect(tokens[9]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-value.css', 'support.constant.property-value.css']
+        expect(tokens[6]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+        expect(tokens[9]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'support.constant.property-value.css']
         expect(tokens[10]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
         expect(tokens[11]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
@@ -416,8 +416,8 @@ describe 'HTML grammar', ->
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
         expect(tokens[5]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
-        expect(tokens[6]).toEqual value: 's', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-name.css']
-        expect(tokens[7]).toEqual value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'punctuation.separator.key-value.css']
+        expect(tokens[6]).toEqual value: 's', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css']
+        expect(tokens[7]).toEqual value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.separator.key-value.css']
         expect(tokens[8]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
         expect(tokens[9]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
@@ -426,20 +426,20 @@ describe 'HTML grammar', ->
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
         expect(tokens[4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'punctuation.separator.key-value.html']
-        expect(tokens[5]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-        expect(tokens[7]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-value.css', 'support.constant.property-value.css']
-        expect(tokens[8]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'punctuation.terminator.rule.css']
+        expect(tokens[5]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+        expect(tokens[7]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'support.constant.property-value.css']
+        expect(tokens[8]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']
         expect(tokens[9]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
         {tokens} = grammar.tokenizeLine '<span style=display:none;z-index:10></span>'
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
         expect(tokens[4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'punctuation.separator.key-value.html']
-        expect(tokens[5]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-        expect(tokens[7]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-value.css', 'support.constant.property-value.css']
-        expect(tokens[8]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'punctuation.terminator.rule.css']
-        expect(tokens[9]).toEqual value: 'z-index', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-        expect(tokens[11]).toEqual value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-value.css', 'constant.numeric.css']
+        expect(tokens[5]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+        expect(tokens[7]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'support.constant.property-value.css']
+        expect(tokens[8]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']
+        expect(tokens[9]).toEqual value: 'z-index', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+        expect(tokens[11]).toEqual value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'constant.numeric.css']
         expect(tokens[12]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
       it 'ends invalid unquoted property lists correctly', ->
@@ -450,16 +450,16 @@ describe 'HTML grammar', ->
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
         expect(tokens[4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'punctuation.separator.key-value.html']
-        expect(tokens[5]).toEqual value: 's', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-name.css']
-        expect(tokens[6]).toEqual value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'punctuation.separator.key-value.css']
+        expect(tokens[5]).toEqual value: 's', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css']
+        expect(tokens[6]).toEqual value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.separator.key-value.css']
         expect(tokens[7]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
         {tokens} = grammar.tokenizeLine '<span style=display: none></span>'
 
         expect(tokens[3]).toEqual value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']
         expect(tokens[4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'punctuation.separator.key-value.html']
-        expect(tokens[5]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-name.css', 'support.type.property-name.css']
-        expect(tokens[6]).toEqual value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'punctuation.separator.key-value.css']
+        expect(tokens[5]).toEqual value: 'display', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']
+        expect(tokens[6]).toEqual value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.separator.key-value.css']
         expect(tokens[7]).toEqual value: ' ', scopes: ['text.html.basic', 'meta.tag.inline.span.html']
         expect(tokens[8]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']
         expect(tokens[9]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']

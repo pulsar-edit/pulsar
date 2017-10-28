@@ -560,7 +560,7 @@
     'name': 'meta.attribute-with-value.style.html'
     'patterns': [
       {
-        'match': '(")(.+)(")'
+        'match': '(")([^"]*)(")'
         'name': 'string.quoted.double.html'
         'captures':
           '1':
@@ -569,20 +569,28 @@
             'name': 'source.css.style.html'
             'patterns': [
               {
-                'include': '#embedded-code'
-              }
-              {
-                'include': '#entities'
-              }
-              {
-                'include': 'source.css#rule-list-innards'
+                'match': '.+'
+                'name': 'meta.property-list.css'
+                'captures':
+                  '0':
+                    'patterns': [
+                      {
+                        'include': '#embedded-code'
+                      }
+                      {
+                        'include': '#entities'
+                      }
+                      {
+                        'include': 'source.css#rule-list-innards'
+                      }
+                    ]
               }
             ]
           '3':
             'name': 'punctuation.definition.string.end.html'
       }
       {
-        'match': "(')(.+)(')"
+        'match': "(')([^']*)(')"
         'name': 'string.quoted.single.html'
         'captures':
           '1':
@@ -591,13 +599,21 @@
             'name': 'source.css.style.html'
             'patterns': [
               {
-                'include': '#embedded-code'
-              }
-              {
-                'include': '#entities'
-              }
-              {
-                'include': 'source.css#rule-list-innards'
+                'match': '.+'
+                'name': 'meta.property-list.css'
+                'captures':
+                  '0':
+                    'patterns': [
+                      {
+                        'include': '#embedded-code'
+                      }
+                      {
+                        'include': '#entities'
+                      }
+                      {
+                        'include': 'source.css#rule-list-innards'
+                      }
+                    ]
               }
             ]
           '3':
@@ -611,7 +627,15 @@
             'name': 'source.css.style.html'
             'patterns': [
               {
-                'include': 'source.css#rule-list-innards'
+                'match': '.+'
+                'name': 'meta.property-list.css'
+                'captures':
+                  '0':
+                    'patterns': [
+                      {
+                        'include': 'source.css#rule-list-innards'
+                      }
+                    ]
               }
             ]
       }
