@@ -262,6 +262,9 @@
   'Parameter':
     'prefix': 'param'
     'body': '<param name="$1" value="$2">$0'
+  'Picture':
+    'prefix': 'picture'
+    'body': '<picture>\n\t$1\n</picture>'
   'Preformatted Text':
     'prefix': 'pre'
     'body': '<pre>$1</pre>$0'
@@ -573,6 +576,8 @@
     'prefix': 'p'
   'Parameter':
     'prefix': 'param'
+  'Picture':
+    'prefix': 'picture'
   'Preformatted Text':
     'prefix': 'pre'
   'Progress':
