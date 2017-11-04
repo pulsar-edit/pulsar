@@ -163,7 +163,7 @@
     'body': '<hr>'
   'HTML':
     'prefix': 'html'
-    'body': '<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset="utf-8">\n\t\t<title>$1</title>\n\t</head>\n\t<body>\n\t\t$2\n\t</body>\n</html>'
+    'body': '<!DOCTYPE html>\n<html lang="${1:en}" dir="${2:ltr}">\n\t<head>\n\t\t<meta charset="utf-8">\n\t\t<title>$3</title>\n\t</head>\n\t<body>\n\t\t$4\n\t</body>\n</html>'
   # I
   'Italic':
     'prefix': 'i'
