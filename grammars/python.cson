@@ -12,7 +12,8 @@
   'SConstruct'
   'Sconstruct'
   'sconstruct'
-  'Snakefile'
+  'Snakefile'  # Snakemake support
+  'smk'        # Snakemake support
   'tac'
   'wsgi'
 ]
