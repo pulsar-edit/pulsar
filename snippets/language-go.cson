@@ -20,6 +20,9 @@
   'type struct declaration':
     'prefix': 'tys'
     'body': "type ${1:name} struct {\n\t$0\n}"
+  'type function declaration':
+    'prefix': 'tyf'
+    'body': 'type ${1:name} func(${2:commonParam}) ${3:returnParam}'
   'main package':
     'prefix': 'pkgm'
     'body': "package main\n\nfunc main() {\n\t$0\n}"
