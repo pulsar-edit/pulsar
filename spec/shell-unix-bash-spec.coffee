@@ -150,6 +150,12 @@ describe "Shell script grammar", ->
     expect(tokens[5]).toEqual value: 'TEST', scopes: ['source.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell']
     expect(tokens[6]).toEqual value: ' 1 2', scopes: ['source.shell']
 
+    {tokens} = grammar.tokenizeLine '$cmd = "$(3 / x <<< $WORD)"'
+    expect(tokens[6]).toEqual value: '<<<', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'meta.herestring.shell', 'keyword.operator.herestring.shell']
+    expect(tokens[8]).toEqual value: '$', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell', 'variable.other.normal.shell', 'punctuation.definition.variable.shell']
+    expect(tokens[9]).toEqual value: 'WORD', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell', 'variable.other.normal.shell']
+    expect(tokens[10]).toEqual value: ')', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'punctuation.definition.string.end.shell']
+
   it "tokenizes heredocs", ->
     delimsByScope =
       "ruby": "RUBY"

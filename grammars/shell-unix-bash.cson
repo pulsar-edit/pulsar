@@ -623,7 +623,7 @@
                 'include': '$self'
               }
             ]
-        'match': '(<<<)\\s*(([^\\s\\\\]|\\\\.)+)'
+        'match': '(<<<)\\s*(([^\\s)\\\\]|\\\\.)+)'
         'name': 'meta.herestring.shell'
       }
     ]
