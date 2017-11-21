@@ -496,7 +496,7 @@
     'name': 'meta.array.empty.php'
   }
   {
-    'begin': '(array)(\\()'
+    'begin': '(array)\\s*(\\()'
     'beginCaptures':
       '1':
         'name': 'support.function.construct.php'
