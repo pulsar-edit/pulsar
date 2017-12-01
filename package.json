@@ -14,5 +14,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-typescript/issues"
+  },
+  "dependencies": {
+    "tree-sitter-typescript": "^0.4.2"
   }
 }
