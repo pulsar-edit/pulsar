@@ -36,7 +36,7 @@ scopes:
   '"map"': 'keyword.map'
   '"chan"': 'keyword.chan'
 
-  'type_identifier': 'support.type'
+  'type_identifier': 'support.storage.type'
   'field_identifier': 'variable.other.object.property'
   'package_identifier': 'entity.name.package'
 
@@ -61,3 +61,9 @@ scopes:
   'function_declaration > identifier': 'entity.name.function'
   'method_declaration > field_identifier': 'entity.name.function'
   'call_expression > selector_expression > field_identifier': 'entity.name.function'
+
+  '":="': 'keyword.operator'
+  '"&"': 'keyword.operator'
+  '"*"': 'keyword.operator'
+  '"&&"': 'keyword.operator'
+  '"||"': 'keyword.operator'
