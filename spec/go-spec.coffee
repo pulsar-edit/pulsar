@@ -351,6 +351,15 @@ describe 'Go grammar', ->
         expect(tokens[0].value).toEqual op[0]
         expect(tokens[0].scopes).toEqual ['source.go', scope]
 
+  it 'does not treat values/variables attached to comparion operators as extensions of the operator', ->
+    {tokens} = grammar.tokenizeLine '2<3.0 && 12>bar'
+    expect(tokens[0]).toEqual value: '2', scopes: ['source.go', 'constant.numeric.integer.go']
+    expect(tokens[1]).toEqual value: '<', scopes: ['source.go', 'keyword.operator.comparison.go']
+    expect(tokens[2]).toEqual value: '3.0', scopes: ['source.go', 'constant.numeric.floating-point.go']
+    expect(tokens[6]).toEqual value: '12', scopes: ['source.go', 'constant.numeric.integer.go']
+    expect(tokens[7]).toEqual value: '>', scopes: ['source.go', 'keyword.operator.comparison.go']
+    expect(tokens[8]).toEqual value: 'bar', scopes: ['source.go']
+
   it 'tokenizes punctuation brackets', ->
     {tokens} = grammar.tokenizeLine '{([])}'
     expect(tokens[0]).toEqual value: '{', scopes: ['source.go', 'punctuation.definition.begin.bracket.curly.go']

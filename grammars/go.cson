@@ -437,7 +437,7 @@
         'name': 'keyword.operator.increment.go'
       }
       {
-        'match': '(==|!=|<=|>=|<[^<]|>[^>])'
+        'match': '(==|!=|<=|>=|<(?!<)|>(?!>))'
         'name': 'keyword.operator.comparison.go'
       }
       {
