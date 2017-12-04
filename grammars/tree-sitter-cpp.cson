@@ -1,0 +1,117 @@
+id: 'cpp'
+name: 'C++'
+type: 'tree-sitter'
+parser: 'tree-sitter-cpp'
+
+fileTypes: [
+  'cc'
+  'cpp'
+  'cp'
+  'cxx'
+  'c++'
+  'cu'
+  'cuh'
+  'h'
+  'hh'
+  'hpp'
+  'hxx'
+  'h++'
+  'inl'
+  'ino'
+  'ipp'
+  'tcc'
+  'tpp'
+]
+
+folds:
+  delimiters: [
+    ['{', '}']
+    ['(', ')']
+    ['[', ']']
+  ]
+
+  tokens: [
+    'comment'
+    'preproc_arg'
+  ]
+
+comments:
+  start: '// '
+
+scopes:
+  'translation_unit': 'source.cpp'
+  'comment': 'comment.block'
+  # 'ERROR': 'syntax-error'
+
+  '"#if"': 'keyword.control.directive'
+  '"#ifdef"': 'keyword.control.directive'
+  '"#ifndef"': 'keyword.control.directive'
+  '"#else"': 'keyword.control.directive'
+  '"#endif"': 'keyword.control.directive'
+  '"#define"': 'keyword.control.directive'
+  '"#include"': 'keyword.control.directive'
+
+  '"if"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"do"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"break"': 'keyword.control'
+  '"continue"': 'keyword.control'
+  '"return"': 'keyword.control'
+  '"switch"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"default"': 'keyword.control'
+
+  '"struct"': 'keyword.control'
+  '"enum"': 'keyword.control'
+  '"union"': 'keyword.control'
+  '"typedef"': 'keyword.control'
+  '"class"': 'keyword.control'
+  '"using"': 'keyword.control'
+  '"namespace"': 'keyword.control'
+  '"template"': 'keyword.control'
+  '"typename"': 'keyword.control'
+
+  'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
+  'preproc_arg': 'meta.preprocessor.macro'
+
+  'call_expression > identifier': 'entity.name.function'
+  'call_expression > field_expression > field_identifier': 'entity.name.function'
+  'call_expression > scoped_identifier > identifier': 'entity.name.function'
+  'template_function > identifier': 'entity.name.function'
+  'template_function > scoped_identifier > identifier': 'entity.name.function'
+  'function_declarator > identifier': 'entity.name.function'
+  'function_declarator > field_identifier': 'entity.name.function'
+  'function_declarator > scoped_identifier > identifier': 'entity.name.function'
+  'destructor_name > identifier': 'entity.name.function'
+
+  'field_identifier': 'variable.other.member'
+
+  'type_identifier': 'support.storage.type'
+  'primitive_type': 'support.storage.type'
+  '"unsigned"': 'support.storage.type'
+  'auto': 'storage.storage.type'
+
+  'string_literal': 'string.quoted.double'
+  'system_lib_string': 'string.quoted.other'
+
+  'number_literal': 'constant.numeric.decimal'
+  'null': 'constant.language.null'
+  'nullptr': 'constant.language.null'
+  'true': 'constant.language.boolean'
+  'false': 'constant.language.boolean'
+
+  '"static"': 'storage.modifier'
+  '"inline"': 'storage.modifier'
+  '"const"': 'storage.modifier'
+  'function_specifier': 'storage.modifier'
+  '"public"': 'storage.modifier'
+  '"private"': 'storage.modifier'
+  '"protected"': 'storage.modifier'
+
+  '"*"': 'keyword.operator'
+  '"&"': 'keyword.operator'
+  '"&&"': 'keyword.operator'
+  '"||"': 'keyword.operator'
+  '"|"': 'keyword.operator'

@@ -15,6 +15,10 @@
     "atom": "*",
     "node": "*"
   },
+  "dependencies": {
+    "tree-sitter-c": "^0.4.5",
+    "tree-sitter-cpp": "^0.3.3"
+  },
   "devDependencies": {
     "coffeelint": "^1.10.1"
   }

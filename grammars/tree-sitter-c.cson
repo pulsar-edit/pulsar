@@ -1,0 +1,88 @@
+id: 'c'
+name: 'C'
+type: 'tree-sitter'
+parser: 'tree-sitter-c'
+
+fileTypes: [
+  'h'
+  'c'
+  'h.in'
+]
+
+folds:
+  delimiters: [
+    ['{', '}']
+    ['(', ')']
+    ['[', ']']
+  ]
+
+  nodes: [
+    'comment'
+    'preproc_arg'
+  ]
+
+comments:
+  '// '
+
+scopes:
+  'translation_unit': 'source.c'
+  'comment': 'comment.block'
+  # 'ERROR': 'syntax-error'
+
+  '"#if"': 'keyword.control.directive'
+  '"#ifdef"': 'keyword.control.directive'
+  '"#ifndef"': 'keyword.control.directive'
+  '"#else"': 'keyword.control.directive'
+  '"#endif"': 'keyword.control.directive'
+  '"#define"': 'keyword.control.directive'
+  '"#include"': 'keyword.control.directive'
+
+  '"if"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"do"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"break"': 'keyword.control'
+  '"continue"': 'keyword.control'
+  '"return"': 'keyword.control'
+  '"switch"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"default"': 'keyword.control'
+
+  '"struct"': 'keyword.control'
+  '"enum"': 'keyword.control'
+  '"union"': 'keyword.control'
+  '"typedef"': 'keyword.control'
+
+  'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
+  'preproc_arg': 'meta.preprocessor.macro'
+
+  'call_expression > identifier': 'entity.name.function'
+  'call_expression > field_expression > field_identifier': 'entity.name.function'
+  'function_declarator > identifier': 'entity.name.function'
+
+  'field_identifier': 'variable.other.member'
+
+  'type_identifier': 'support.support.type'
+  'primitive_type': 'support.support.type'
+  '"unsigned"': 'support.support.type'
+
+  'string_literal': 'string.quoted.double'
+  'system_lib_string': 'string.quoted.other'
+
+  'number_literal': 'constant.numeric.decimal'
+  'null': 'constant.language.null'
+  'true': 'constant.language.boolean'
+  'false': 'constant.language.boolean'
+
+  'auto': 'storage.modifier'
+  '"static"': 'storage.modifier'
+  '"inline"': 'storage.modifier'
+  '"const"': 'storage.modifier'
+  'function_specifier': 'storage.modifier'
+
+  '"*"': 'keyword.operator'
+  '"&"': 'keyword.operator'
+  '"&&"': 'keyword.operator'
+  '"||"': 'keyword.operator'
+  '"|"': 'keyword.operator'
