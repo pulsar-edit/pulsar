@@ -207,7 +207,7 @@
     # a =
     # a, b, whatever =
     # a.b, c.d =
-    'match': '(?<!var)\\s*(\\w+(?:\\.\\w+)?(?:,\\s*\\w+(?:\\.\\w+)?)*)(?=\\s*=(?!=))'
+    'match': '(?<!var)\\s*(\\w+(?:\\.\\w+)*(?>,\\s*\\w+(?:\\.\\w+)*)*)(?=\\s*=(?!=))'
     'captures':
       '1':
         'patterns': [
@@ -216,7 +216,7 @@
             'name': 'invalid.illegal.identifier.go'
           }
           {
-            'match': '\\w+(?:\\.\\w+)?'
+            'match': '\\w+(?:\\.\\w+)*'
             'name': 'variable.other.assignment.go'
             'captures':
               '0':
@@ -437,7 +437,7 @@
         'name': 'keyword.operator.increment.go'
       }
       {
-        'match': '(==|!=|<=|>=|<[^<]|>[^>])'
+        'match': '(==|!=|<=|>=|<(?!<)|>(?!>))'
         'name': 'keyword.operator.comparison.go'
       }
       {
@@ -578,7 +578,8 @@
         # var a [][]*string
         # var a c.d
         # var a []c.d
-        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+(\\[(\\d*|\\.\\.\\.)\\])*\\*?\\w+(?:\\.\\w+)?\\s*[^=].*)'
+        # var a <-chan string
+        'match': '(\\w+(?:,\\s*\\w+)*)(\\s+(\\[(\\d*|\\.\\.\\.)\\])*\\*?(<-)?\\w+(?:\\.\\w+)?\\s*[^=].*)'
         'captures':
           '1':
             'patterns': [

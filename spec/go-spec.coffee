@@ -351,6 +351,15 @@ describe 'Go grammar', ->
         expect(tokens[0].value).toEqual op[0]
         expect(tokens[0].scopes).toEqual ['source.go', scope]
 
+  it 'does not treat values/variables attached to comparion operators as extensions of the operator', ->
+    {tokens} = grammar.tokenizeLine '2<3.0 && 12>bar'
+    expect(tokens[0]).toEqual value: '2', scopes: ['source.go', 'constant.numeric.integer.go']
+    expect(tokens[1]).toEqual value: '<', scopes: ['source.go', 'keyword.operator.comparison.go']
+    expect(tokens[2]).toEqual value: '3.0', scopes: ['source.go', 'constant.numeric.floating-point.go']
+    expect(tokens[6]).toEqual value: '12', scopes: ['source.go', 'constant.numeric.integer.go']
+    expect(tokens[7]).toEqual value: '>', scopes: ['source.go', 'keyword.operator.comparison.go']
+    expect(tokens[8]).toEqual value: 'bar', scopes: ['source.go']
+
   it 'tokenizes punctuation brackets', ->
     {tokens} = grammar.tokenizeLine '{([])}'
     expect(tokens[0]).toEqual value: '{', scopes: ['source.go', 'punctuation.definition.begin.bracket.curly.go']
@@ -525,12 +534,14 @@ describe 'Go grammar', ->
         testNum tokens[4], '7'
 
       it 'tokenizes a single qualified variable assignment', ->
-        {tokens} = grammar.tokenizeLine 'a.b = 7'
+        {tokens} = grammar.tokenizeLine 'a.b.cde = 7'
         expect(tokens[0]).toEqual value: 'a', scopes: ['source.go', 'variable.other.assignment.go']
         expect(tokens[1]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
         expect(tokens[2]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
-        testOpAssignment tokens[4], '='
-        testNum tokens[6], '7'
+        expect(tokens[3]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
+        expect(tokens[4]).toEqual value: 'cde', scopes: ['source.go', 'variable.other.assignment.go']
+        testOpAssignment tokens[6], '='
+        testNum tokens[8], '7'
 
       it 'tokenizes multiple variable assignments', ->
         {tokens} = grammar.tokenizeLine 'i, j = 7, 8'
@@ -542,7 +553,7 @@ describe 'Go grammar', ->
         testNum tokens[10], '8'
 
       it 'tokenizes multiple qualified variable assignment', ->
-        {tokens} = grammar.tokenizeLine 'a.b, c.d = 7, 8'
+        {tokens} = grammar.tokenizeLine 'a.b, c.d.efg = 7, 8'
         expect(tokens[0]).toEqual value: 'a', scopes: ['source.go', 'variable.other.assignment.go']
         expect(tokens[1]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
         expect(tokens[2]).toEqual value: 'b', scopes: ['source.go', 'variable.other.assignment.go']
@@ -550,9 +561,11 @@ describe 'Go grammar', ->
         expect(tokens[5]).toEqual value: 'c', scopes: ['source.go', 'variable.other.assignment.go']
         expect(tokens[6]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
         expect(tokens[7]).toEqual value: 'd', scopes: ['source.go', 'variable.other.assignment.go']
-        testOpAssignment tokens[9], '='
-        testNum tokens[11], '7'
-        testNum tokens[14], '8'
+        expect(tokens[8]).toEqual value: '.', scopes: ['source.go', 'variable.other.assignment.go', 'punctuation.other.period.go']
+        expect(tokens[9]).toEqual value: 'efg', scopes: ['source.go', 'variable.other.assignment.go']
+        testOpAssignment tokens[11], '='
+        testNum tokens[13], '7'
+        testNum tokens[16], '8'
 
       it 'tokenizes a single name and a type', ->
         {tokens} = grammar.tokenizeLine 'var i int'
@@ -602,6 +615,14 @@ describe 'Go grammar', ->
         expect(tokens[7]).toEqual value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']
         testOpAddress tokens[8], '*'
         testStringType tokens[9], 'string'
+
+      it 'tokenizes a single name and a channel', ->
+        {tokens} = grammar.tokenizeLine 'var x <-chan bool'
+        testVar tokens[0]
+        testVarDeclaration tokens[2], 'x'
+        expect(tokens[4]).toEqual value: '<-', scopes: ['source.go', 'keyword.operator.channel.go']
+        expect(tokens[5]).toEqual value: 'chan', scopes: ['source.go', 'keyword.channel.go']
+        expect(tokens[7]).toEqual value: 'bool', scopes: ['source.go', 'storage.type.boolean.go']
 
       it 'tokenizes a single name and its initialization', ->
         {tokens} = grammar.tokenizeLine ' var k =  0'

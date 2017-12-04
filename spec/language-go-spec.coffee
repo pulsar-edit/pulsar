@@ -6,7 +6,7 @@ describe 'Go settings', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.workspace.open('sample.go').then (o) ->
+      atom.workspace.open().then (o) ->
         editor = o
         languageMode = editor.languageMode
 
