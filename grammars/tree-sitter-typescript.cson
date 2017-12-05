@@ -3,24 +3,47 @@ name: 'TypeScript'
 type: 'tree-sitter'
 parser: 'tree-sitter-typescript'
 
-fileTypes: ["ts", "tsx", "js.flow"]
+fileTypes: ['ts', 'tsx']
 
 comments:
   start: '// '
 
-folds:
-  delimiters: [
-    ['{', '}']
-    ['(', ')']
-    ['[', ']']
-    ['jsx_opening_element', 'jsx_closing_element']
-    ['<', '>']
-  ]
-
-  tokens: [
-    ['comment', 2, 2]
-    ['template_string', 1, 1]
-  ]
+folds: [
+  {
+    type: ['comment', 'template_string']
+  }
+  {
+    type: 'jsx_element'
+    start: {index: 0}
+    end: {index: -1}
+  }
+  {
+    type: 'jsx_self_closing_element'
+    start: {index: 1}
+    end: {index: -2}
+  }
+  {
+    type: [
+      'object_type'
+      'template_arguments'
+      'template_parameters'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+  {
+    start: {index: 0, type: '{'}
+    end: {index: -1, type: '}'}
+  }
+  {
+    start: {index: 0, type: '['}
+    end: {index: -1, type: ']'}
+  }
+  {
+    start: {index: 0, type: '('}
+    end: {index: -1, type: ')'}
+  }
+]
 
 scopes:
   'program': 'source.js'
@@ -104,7 +127,7 @@ scopes:
   '"async"': 'keyword.control'
   '"await"': 'keyword.control'
 
-  'jsx_attribute': 'entity.other.attribute-name'
+  'jsx_attribute > property_identifier': 'entity.other.attribute-name'
   'jsx_opening_element > identifier': 'entity.name.tag'
   'jsx_closing_element > identifier': 'entity.name.tag'
   'jsx_self_closing_element > identifier': 'entity.name.tag'
