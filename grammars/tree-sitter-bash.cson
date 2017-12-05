@@ -1,0 +1,82 @@
+id: 'bash'
+name: 'Bash'
+type: 'tree-sitter'
+parser: 'tree-sitter-bash'
+
+fileTypes: [
+  'sh'
+]
+
+folds: [
+  {
+    type: 'heredoc'
+  }
+  {
+    type: 'if_statement'
+    start: {type: 'then'}
+    end: {index: -1}
+  }
+  {
+    type: 'case_statement'
+    start: {type: 'in'}
+    end: {index: -1}
+  }
+  {
+    type: 'elif_clause'
+    start: {type: 'then'}
+  }
+  {
+    type: 'else_clause'
+    start: {index: 0}
+  }
+  {
+    type: 'case_item'
+    start: {type: ')'}
+  }
+  {
+    type: [
+      'array'
+      'do_group'
+      'subshell'
+      'expansion'
+      'bracket_command'
+      'compound_statement'
+      'process_substitution'
+      'command_substitution'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+]
+
+comments:
+  start: '# '
+
+scopes:
+  'program': 'source.shell'
+
+  'comment': 'comment.block'
+
+  'string': 'string'
+  'raw_string': 'string'
+  'heredoc': 'string'
+
+  'command_name': 'entity.name.function'
+
+  'variable_name': 'variable.other.member'
+
+  '"if"': 'keyword.control'
+  '"fi"': 'keyword.control'
+  '"then"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"elif"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"do"': 'keyword.control'
+  '"done"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"esac"': 'keyword.control'
+  '"in"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"until"': 'keyword.control'
+
+  '"$"': 'punctuation.section.embedded'
