@@ -248,6 +248,31 @@ describe 'PHP grammar', ->
           expect(lines[1][4]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(lines[1][8]).toEqual value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']
 
+  describe 'identifiers', ->
+    it 'tokenizes identifiers with only letters', ->
+      {tokens} = grammar.tokenizeLine '$abc'
+
+      expect(tokens[1]).toEqual value: 'abc', scopes: ['source.php', 'variable.other.php']
+
+      {tokens} = grammar.tokenizeLine '$aBc'
+
+      expect(tokens[1]).toEqual value: 'aBc', scopes: ['source.php', 'variable.other.php']
+
+    it 'tokenizes identifiers with a combination of letters and numbers', ->
+      {tokens} = grammar.tokenizeLine '$a1B99c4'
+
+      expect(tokens[1]).toEqual value: 'a1B99c4', scopes: ['source.php', 'variable.other.php']
+
+    it 'tokenizes identifiers that contain accents, umlauts, or similar', ->
+      {tokens} = grammar.tokenizeLine '$ßÄÖÜäöüàésF4s3'
+
+      expect(tokens[1]).toEqual value: 'ßÄÖÜäöüàésF4s3', scopes: ['source.php', 'variable.other.php']
+
+    it 'tokenizes identifiers that contain Arabic', ->
+      {tokens} = grammar.tokenizeLine '$سن'
+
+      expect(tokens[1]).toEqual value: 'سن', scopes: ['source.php', 'variable.other.php']
+
   it 'should tokenize $this', ->
     {tokens} = grammar.tokenizeLine '$this'
 
