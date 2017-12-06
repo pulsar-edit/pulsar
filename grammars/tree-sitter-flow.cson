@@ -18,10 +18,10 @@ comments:
 
 folds: [
   {
-    type: ['comment', 'template_string']
+    type: 'comment'
   }
   {
-    type: 'jsx_element'
+    type: ['jsx_element', 'template_string']
     start: {index: 0}
     end: {index: -1}
   }
