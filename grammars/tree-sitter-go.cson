@@ -10,17 +10,23 @@ fileTypes: [
 comments:
   start: '// '
 
-folds:
-  delimiters: [
-    ['{', '}']
-    ['(', ')']
-    ['[', ']']
-  ]
-
-  nodes: [
-    'comment'
-    'raw_string_literal'
-  ]
+folds: [
+  {
+    type: ['comment', 'raw_string_literal']
+  }
+  {
+    start: {index: 0, type: '{'}
+    end: {index: -1, type: '}'}
+  }
+  {
+    start: {index: 0, type: '['}
+    end: {index: -1, type: ']'}
+  }
+  {
+    start: {index: 0, type: '('}
+    end: {index: -1, type: ')'}
+  }
+]
 
 scopes:
   'ERROR': 'syntax-error'
