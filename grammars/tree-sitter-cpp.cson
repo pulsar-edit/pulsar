@@ -23,17 +23,38 @@ fileTypes: [
   'tpp'
 ]
 
-folds:
-  delimiters: [
-    ['{', '}']
-    ['(', ')']
-    ['[', ']']
-  ]
-
-  tokens: [
-    'comment'
-    'preproc_arg'
-  ]
+folds: [
+  {
+    type: ['comment', 'preproc_arg']
+  }
+  {
+    type: ['preproc_if', 'preproc_ifdef'],
+    end: {type: 'preproc_else'}
+  }
+  {
+    type: ['preproc_if', 'preproc_ifdef'],
+    end: {index: -1}
+  }
+  {
+    type: ['preproc_else']
+    start: {index: 0}
+  }
+  {
+    type: [
+      'enumerator_list'
+      'compound_statement'
+      'field_declaration_list'
+      'parameter_list'
+      'argument_list'
+      'initializer_list'
+      'parenthesized_expression'
+      'template_parameter_list'
+      'template_argument_list'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+]
 
 comments:
   start: '// '
