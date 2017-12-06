@@ -10,3 +10,10 @@
     'decreaseIndentPattern': '(?x)
         ^ \\s* (\\s* /[*] .* [*]/ \\s*)* [}\\])]
       '
+
+'.meta.tag.tsx':
+  'editor':
+    'commentStart': '{/* ',
+    'commentEnd': ' */}',
+    'increaseIndentPattern': "{[^}\"']*$|\\[[^\\]\"']*$|\\([^)\"']*$|<[a-zA-Z][^/]*$|^\\s*>$",
+    'decreaseIndentPattern': "^\\s*(\\s*/[*].*[*]/\\s*)*[}\\])]|^\\s*(</|/>)"
