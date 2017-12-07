@@ -273,6 +273,11 @@ describe 'PHP grammar', ->
 
       expect(tokens[1]).toEqual value: 'سن', scopes: ['source.php', 'variable.other.php']
 
+    it 'tokenizes identifiers that contain emojis', ->
+      {tokens} = grammar.tokenizeLine '$🐘'
+
+      expect(tokens[1]).toEqual value: '🐘', scopes: ['source.php', 'variable.other.php']
+
   it 'should tokenize $this', ->
     {tokens} = grammar.tokenizeLine '$this'
 

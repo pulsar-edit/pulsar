@@ -149,7 +149,6 @@
               \\b(as)
               \\s+(final|abstract|public|private|protected|static)
               \\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)
-              \\b
             '''
             'captures':
               '1':
@@ -163,7 +162,6 @@
             'match': '''(?xi)
               \\b(as)
               \\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)
-              \\b
             '''
             'captures':
               '1':
@@ -1275,7 +1273,7 @@
         # Functions in a user-defined namespace (overrides any built-ins)
         'begin': '''(?xi)
           (
-            \\\\?\\b                                                # Optional root namespace
+            \\\\?(?<![a-z0-9_\\x{7f}-\\x{7fffffff}])                            # Optional root namespace
             [a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*          # First namespace
             (?:\\\\[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)+ # Additional namespaces
           )\\s*(\\()
@@ -1306,7 +1304,7 @@
       }
       {
         # Root namespace function calls (built-in or user)
-        'begin': '(?i)(\\\\)?\\b([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(\\()'
+        'begin': '(?i)(\\\\)?(?<![a-z0-9_\\x{7f}-\\x{7fffffff}])([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(\\()'
         'beginCaptures':
           '1':
             'patterns': [
@@ -3497,11 +3495,11 @@
   'var_basic':
     'patterns': [
       {
+        'match': '(?i)(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*'
+        'name': 'variable.other.php'
         'captures':
           '1':
             'name': 'punctuation.definition.variable.php'
-        'match': '(?i)(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*\\b'
-        'name': 'variable.other.php'
       }
     ]
   'var_global':
