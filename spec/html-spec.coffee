@@ -423,6 +423,10 @@ describe 'HTML grammar', ->
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?one=1&type=json&topic=css">'
       expect(tokens[6]).toEqual value: 'http://example.com?one=1&type=json&topic=css', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
 
+    it 'does not tokenize multiple ampersands followed by alphabetical characters as entities', ->
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?price&something&yummy:&wow">'
+      expect(tokens[6]).toEqual value: 'http://example.com?price&something&yummy:&wow', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+
     it 'tokenizes invalid ampersands', ->
       # Note: in order to replicate the following tests' behaviors, make sure you have language-hyperlink disabled
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?&">'
