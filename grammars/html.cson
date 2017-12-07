@@ -415,7 +415,7 @@
   'attribute-entities':
     # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
     # Because it would be infeasible to include the entire list of allowed entities,
-    # make sure that an equals sign or the end of a string does not follow a potential reference.
+    # make sure that a semicolon marks the end of a possible attribute reference.
     'patterns': [
       {
         'begin': '(&)(#\\d+|#[xX][0-9a-fA-F]+)'
@@ -431,7 +431,7 @@
         'name': 'constant.character.entity.html'
       }
       {
-        'begin': '(&)([a-zA-Z0-9]++)(?!["\'=])'
+        'begin': '(&)([a-zA-Z0-9]++)(?=;)'
         'beginCaptures':
           '1':
             'name': 'punctuation.definition.entity.begin.html'
@@ -444,8 +444,8 @@
         'name': 'constant.character.entity.html'
       }
       {
-        # In attributes, potential references that end with an equals sign are fine
-        'match': '&(?!\\s|<|&|[a-zA-Z0-9]+=)'
+        # In attributes, & followed by alphabetical characters are fine
+        'match': '&(?!\\s|<|&|[a-zA-Z0-9])'
         'name': 'invalid.illegal.bad-ampersand.html'
       }
     ]
