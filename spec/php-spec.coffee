@@ -1803,6 +1803,7 @@ describe 'PHP grammar', ->
           console.log(x*x);
         });
       }
+      C:\\\\no\\\\turning\\back.exe
       GITHUB;
     '''
 
@@ -1814,12 +1815,10 @@ describe 'PHP grammar', ->
     expect(lines[0][5]).toEqual value: '<<<', scopes: ['source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
     expect(lines[0][6]).toEqual value: 'GITHUB', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
     expect(lines[1][0]).toEqual value: 'This is a plain string.', scopes: ['source.php', 'string.unquoted.heredoc.php']
-    expect(lines[2][0]).toEqual value: 'Jumpin\' Juniper is ', scopes: ['source.php', 'string.unquoted.heredoc.php']
-    expect(lines[2][1]).toEqual value: '\\"', scopes: ['source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']
-    expect(lines[2][2]).toEqual value: 'The ', scopes: ['source.php', 'string.unquoted.heredoc.php']
-    expect(lines[2][3]).toEqual value: '$', scopes: ['source.php', 'string.unquoted.heredoc.php', 'variable.other.php', 'punctuation.definition.variable.php']
-    expect(lines[2][4]).toEqual value: 'thing', scopes: ['source.php', 'string.unquoted.heredoc.php', 'variable.other.php']
-    expect(lines[2][5]).toEqual value: '\\"', scopes: ['source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']
+    expect(lines[2][0]).toEqual value: 'Jumpin\' Juniper is \\"The ', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    expect(lines[2][1]).toEqual value: '$', scopes: ['source.php', 'string.unquoted.heredoc.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(lines[2][2]).toEqual value: 'thing', scopes: ['source.php', 'string.unquoted.heredoc.php', 'variable.other.php']
+    expect(lines[2][3]).toEqual value: '\\"', scopes: ['source.php', 'string.unquoted.heredoc.php']
     expect(lines[3][0]).toEqual value: 'SELECT * FROM github WHERE octocat = \'awesome\' and ID = 1;', scopes: ['source.php', 'string.unquoted.heredoc.php']
     expect(lines[4][0]).toEqual value: '<strong>rainbows</strong>', scopes: ['source.php', 'string.unquoted.heredoc.php']
     expect(lines[5][0]).toEqual value: '', scopes: ['source.php', 'string.unquoted.heredoc.php']
@@ -1828,8 +1827,13 @@ describe 'PHP grammar', ->
     expect(lines[8][0]).toEqual value: '    console.log(x*x);', scopes: ['source.php', 'string.unquoted.heredoc.php']
     expect(lines[9][0]).toEqual value: '  });', scopes: ['source.php', 'string.unquoted.heredoc.php']
     expect(lines[10][0]).toEqual value: '}', scopes: ['source.php', 'string.unquoted.heredoc.php']
-    expect(lines[11][0]).toEqual value: 'GITHUB', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
-    expect(lines[11][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+    expect(lines[11][0]).toEqual value: 'C:', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    expect(lines[11][1]).toEqual value: '\\\\', scopes: ['source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']
+    expect(lines[11][2]).toEqual value: 'no', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    expect(lines[11][3]).toEqual value: '\\\\', scopes: ['source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']
+    expect(lines[11][4]).toEqual value: 'turning\\back.exe', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    expect(lines[12][0]).toEqual value: 'GITHUB', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[12][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
   it 'should tokenize a nowdoc with interpolated values correctly', ->
     lines = grammar.tokenizeLines '''
@@ -1844,6 +1848,7 @@ describe 'PHP grammar', ->
           console.log(x*x);
         });
       }
+      C:\\\\no\\\\turning\\back.exe
       GITHUB;
     '''
 
@@ -1866,8 +1871,9 @@ describe 'PHP grammar', ->
     expect(lines[8][0]).toEqual value: '    console.log(x*x);', scopes: ['source.php', 'string.unquoted.nowdoc.php']
     expect(lines[9][0]).toEqual value: '  });', scopes: ['source.php', 'string.unquoted.nowdoc.php']
     expect(lines[10][0]).toEqual value: '}', scopes: ['source.php', 'string.unquoted.nowdoc.php']
-    expect(lines[11][0]).toEqual value: 'GITHUB', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'keyword.operator.nowdoc.php']
-    expect(lines[11][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+    expect(lines[11][0]).toEqual value: 'C:\\\\no\\\\turning\\back.exe', scopes: ['source.php', 'string.unquoted.nowdoc.php']
+    expect(lines[12][0]).toEqual value: 'GITHUB', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'keyword.operator.nowdoc.php']
+    expect(lines[12][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
   it 'should tokenize a heredoc with embedded HTML and interpolation correctly', ->
     waitsForPromise ->
@@ -1878,6 +1884,7 @@ describe 'PHP grammar', ->
         $a = <<<HTML
         <strong>rainbows</strong>
         Jumpin' Juniper is \\"The $thing\\"
+        C:\\\\no\\\\turning\\back.exe
         HTML;
       '''
 
@@ -1902,14 +1909,17 @@ describe 'PHP grammar', ->
       expect(lines[1][5].scopes).toContainAll ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
       expect(lines[1][6].value).toEqual '>'
       expect(lines[1][6].scopes).toContainAll ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
-      expect(lines[2][0]).toEqual value: 'Jumpin\' Juniper is ', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
-      expect(lines[2][1]).toEqual value: '\\"', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'constant.character.escape.php']
-      expect(lines[2][2]).toEqual value: 'The ', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
-      expect(lines[2][3]).toEqual value: '$', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'variable.other.php', 'punctuation.definition.variable.php']
-      expect(lines[2][4]).toEqual value: 'thing', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'variable.other.php']
-      expect(lines[2][5]).toEqual value: '\\"', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'constant.character.escape.php']
-      expect(lines[3][0]).toEqual value: 'HTML', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']
-      expect(lines[3][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+      expect(lines[2][0]).toEqual value: 'Jumpin\' Juniper is \\"The ', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
+      expect(lines[2][1]).toEqual value: '$', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(lines[2][2]).toEqual value: 'thing', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'variable.other.php']
+      expect(lines[2][3]).toEqual value: '\\"', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
+      expect(lines[3][0]).toEqual value: 'C:', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
+      expect(lines[3][1]).toEqual value: '\\\\', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'constant.character.escape.php']
+      expect(lines[3][2]).toEqual value: 'no', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
+      expect(lines[3][3]).toEqual value: '\\\\', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'constant.character.escape.php']
+      expect(lines[3][4]).toEqual value: 'turning\\back.exe', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']
+      expect(lines[4][0]).toEqual value: 'HTML', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']
+      expect(lines[4][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
   it 'should tokenize a nowdoc with embedded HTML and interpolation correctly', ->
     waitsForPromise ->

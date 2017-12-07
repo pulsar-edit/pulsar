@@ -1885,7 +1885,7 @@
         'name': 'constant.character.escape.unicode.php'
       }
       {
-        'match': '\\\\[nrtvef$"\\\\]'
+        'match': '\\\\[nrtvef$\\\\]'
         'name': 'constant.character.escape.php'
       }
       {
@@ -1905,6 +1905,16 @@
       }
       {
         'include': '#variable-name'
+      }
+    ]
+  'interpolation_double_quoted':
+    'patterns': [
+      {
+        'match': '\\\\"'
+        'name': 'constant.character.escape.php'
+      }
+      {
+        'include': '#interpolation'
       }
     ]
   'invoke-call':
@@ -2224,7 +2234,7 @@
         'name': 'constant.character.escape.regex.php'
       }
       {
-        'include': '#interpolation'
+        'include': '#interpolation_double_quoted'
       }
       {
         'captures':
@@ -2244,7 +2254,7 @@
         'name': 'string.regexp.character-class.php'
         'patterns': [
           {
-            'include': '#interpolation'
+            'include': '#interpolation_double_quoted'
           }
         ]
       }
@@ -2408,7 +2418,7 @@
         'name': 'string.quoted.single.sql'
         'patterns': [
           {
-            'include': '#interpolation'
+            'include': '#interpolation_double_quoted'
           }
         ]
       }
@@ -2418,12 +2428,12 @@
         'name': 'string.quoted.other.backtick.sql'
         'patterns': [
           {
-            'include': '#interpolation'
+            'include': '#interpolation_double_quoted'
           }
         ]
       }
       {
-        'include': '#interpolation'
+        'include': '#interpolation_double_quoted'
       }
       {
         'include': 'source.sql'
@@ -2487,7 +2497,7 @@
     'name': 'string.interpolated.php'
     'patterns': [
       {
-        'match': '\\\\.'
+        'match': '\\\\`'
         'name': 'constant.character.escape.php'
       }
       {
@@ -2506,7 +2516,7 @@
     'name': 'string.quoted.double.php'
     'patterns': [
       {
-        'include': '#interpolation'
+        'include': '#interpolation_double_quoted'
       }
     ]
   'string-single-quoted':
