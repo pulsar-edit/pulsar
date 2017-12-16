@@ -2,6 +2,7 @@ id: 'typescript'
 name: 'TypeScript'
 type: 'tree-sitter'
 parser: 'tree-sitter-typescript'
+legacyScopeName: 'source.ts'
 
 fileTypes: ['ts', 'tsx']
 
