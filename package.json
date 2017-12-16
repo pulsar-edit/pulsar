@@ -1,6 +1,6 @@
 {
   "name": "language-typescript",
-  "version": "0.3.0-1",
+  "version": "0.3.0-2",
   "description": "TypeScript language support in Atom",
   "engines": {
     "atom": ">=1.19.1",
