@@ -2,6 +2,7 @@ id: 'go'
 name: 'Go'
 type: 'tree-sitter'
 parser: 'tree-sitter-go'
+legacyScopeName: 'source.go'
 
 fileTypes: [
   'go'
