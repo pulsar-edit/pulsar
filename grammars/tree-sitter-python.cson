@@ -2,6 +2,7 @@ id: 'python'
 name: 'Python'
 type: 'tree-sitter'
 parser: 'tree-sitter-python'
+legacyScopeName: 'source.python'
 
 fileTypes: [
   'py'
