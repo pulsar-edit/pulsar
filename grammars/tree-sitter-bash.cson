@@ -2,6 +2,7 @@ id: 'bash'
 name: 'Bash'
 type: 'tree-sitter'
 parser: 'tree-sitter-bash'
+legacyScopeName: 'source.shell'
 
 fileTypes: [
   'sh'
