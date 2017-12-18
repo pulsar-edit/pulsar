@@ -98,6 +98,7 @@ scopes:
 
   'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
   'preproc_arg': 'meta.preprocessor.macro'
+  'preproc_directive': 'keyword.control.directive'
 
   'call_expression > identifier': 'entity.name.function'
   'call_expression > field_expression > field_identifier': 'entity.name.function'
