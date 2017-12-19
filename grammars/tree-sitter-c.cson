@@ -32,6 +32,7 @@ folds: [
     type: [
       'enumerator_list'
       'compound_statement'
+      'declaration_list'
       'field_declaration_list'
       'parameter_list'
       'argument_list'
