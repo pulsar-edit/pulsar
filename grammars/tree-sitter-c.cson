@@ -101,6 +101,7 @@ scopes:
   'false': 'constant.language.boolean'
 
   'auto': 'storage.modifier'
+  '"extern"': 'storage.modifier'
   '"static"': 'storage.modifier'
   '"inline"': 'storage.modifier'
   '"const"': 'storage.modifier'
@@ -109,5 +110,5 @@ scopes:
   '"*"': 'keyword.operator'
   '"&"': 'keyword.operator'
   '"&&"': 'keyword.operator'
-  '"||"': 'keyword.operator'
   '"|"': 'keyword.operator'
+  '"||"': 'keyword.operator'

@@ -127,6 +127,7 @@ scopes:
   'true': 'constant.language.boolean'
   'false': 'constant.language.boolean'
 
+  '"extern"': 'storage.modifier'
   '"static"': 'storage.modifier'
   '"inline"': 'storage.modifier'
   '"const"': 'storage.modifier'
@@ -135,8 +136,10 @@ scopes:
   '"private"': 'storage.modifier'
   '"protected"': 'storage.modifier'
 
+  '"new"': 'keyword.operator'
+  '"delete"': 'keyword.operator'
   '"*"': 'keyword.operator'
   '"&"': 'keyword.operator'
   '"&&"': 'keyword.operator'
-  '"||"': 'keyword.operator'
   '"|"': 'keyword.operator'
+  '"||"': 'keyword.operator'
