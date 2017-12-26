@@ -8,6 +8,8 @@ fileTypes: [
   'sh'
 ]
 
+contentRegExp: '^#!.*\\b(bash|sh)\\r?\\n'
+
 folds: [
   {
     type: 'heredoc'
