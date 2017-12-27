@@ -64,8 +64,10 @@ scopes:
   'raw_string': 'string'
   'heredoc': 'string'
 
+  'function_definition > word': 'entity.name.function'
   'command_name': 'entity.name.function'
 
+  'special_variable_name': 'variable.other.member'
   'variable_name': 'variable.other.member'
 
   '"if"': 'keyword.control'
@@ -81,5 +83,6 @@ scopes:
   '"in"': 'keyword.control'
   '"while"': 'keyword.control'
   '"until"': 'keyword.control'
+  '"function"': 'keyword.control'
 
   '"$"': 'punctuation.section.embedded'
