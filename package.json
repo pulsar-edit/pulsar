@@ -1,6 +1,6 @@
 {
   "name": "language-shellscript",
-  "version": "0.25.4",
+  "version": "0.26.0-3",
   "description": "ShellScript language support in Atom",
   "engines": {
     "atom": "*",
@@ -14,6 +14,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-shellscript/issues"
+  },
+  "dependencies": {
+    "tree-sitter-bash": "^0.4.0"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"
