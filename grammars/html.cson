@@ -291,7 +291,7 @@
             'beginCaptures':
               '0':
                 'name': 'punctuation.definition.comment.begin.js'
-            'end': '\\*/|(?=(?i)</script)'
+            'end': '\\*/|(?=(?i)</script>)'
             'endCaptures':
               '0':
                 'name': 'punctuation.definition.comment.begin.js'
@@ -527,6 +527,97 @@
         'name': 'meta.attribute-without-value.html'
       }
     ]
+  'tag-style-attribute':
+    'begin': '\\b(style)(=)'
+    'beginCaptures':
+      '1':
+        'name': 'entity.other.attribute-name.style.html'
+      '2':
+        'name': 'punctuation.separator.key-value.html'
+    'end': '(?!\\G)|(?=\\s|/?>)'
+    'name': 'meta.attribute-with-value.style.html'
+    'patterns': [
+      {
+        'match': '(")([^"]*)(")'
+        'name': 'string.quoted.double.html'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.html'
+          '2':
+            'name': 'source.css.style.html'
+            'patterns': [
+              {
+                'match': '.+'
+                'name': 'meta.property-list.css'
+                'captures':
+                  '0':
+                    'patterns': [
+                      {
+                        'include': '#embedded-code'
+                      }
+                      {
+                        'include': '#entities'
+                      }
+                      {
+                        'include': 'source.css#rule-list-innards'
+                      }
+                    ]
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.string.end.html'
+      }
+      {
+        'match': "(')([^']*)(')"
+        'name': 'string.quoted.single.html'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.html'
+          '2':
+            'name': 'source.css.style.html'
+            'patterns': [
+              {
+                'match': '.+'
+                'name': 'meta.property-list.css'
+                'captures':
+                  '0':
+                    'patterns': [
+                      {
+                        'include': '#embedded-code'
+                      }
+                      {
+                        'include': '#entities'
+                      }
+                      {
+                        'include': 'source.css#rule-list-innards'
+                      }
+                    ]
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.string.end.html'
+      }
+      {
+        'match': '([^\\s&>"\'<=`]|&(?=>))+'
+        'name': 'string.unquoted.html'
+        'captures':
+          '0':
+            'name': 'source.css.style.html'
+            'patterns': [
+              {
+                'match': '.+'
+                'name': 'meta.property-list.css'
+                'captures':
+                  '0':
+                    'patterns': [
+                      {
+                        'include': 'source.css#rule-list-innards'
+                      }
+                    ]
+              }
+            ]
+      }
+    ]
   'tag-id-attribute':
     'begin': '\\b(id)(=)'
     'captures':
@@ -608,6 +699,9 @@
       }
       {
         'include': '#tag-class-attribute'
+      }
+      {
+        'include': '#tag-style-attribute'
       }
       {
         'include': '#tag-generic-attribute'
