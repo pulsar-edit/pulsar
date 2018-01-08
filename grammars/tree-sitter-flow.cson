@@ -1,0 +1,141 @@
+id: 'flow-javascript'
+name: 'Flow JavaScript'
+type: 'tree-sitter'
+parser: 'tree-sitter-typescript'
+
+fileTypes: [
+  'js'
+  'flow.js'
+  'flow.jsx'
+  'js.flow'
+  'jsx.flow'
+]
+
+contentRegExp: '(/\\*([^*]|\\*[^/])*|//.*)@flow'
+
+comments:
+  start: '// '
+
+folds: [
+  {
+    type: 'comment'
+  }
+  {
+    type: ['jsx_element', 'template_string']
+    start: {index: 0}
+    end: {index: -1}
+  }
+  {
+    type: 'jsx_self_closing_element'
+    start: {index: 1}
+    end: {index: -2}
+  }
+  {
+    type: [
+      'object_type'
+      'template_arguments'
+      'template_parameters'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+  {
+    start: {index: 0, type: '{'}
+    end: {index: -1, type: '}'}
+  }
+  {
+    start: {index: 0, type: '['}
+    end: {index: -1, type: ']'}
+  }
+  {
+    start: {index: 0, type: '('}
+    end: {index: -1, type: ')'}
+  }
+]
+
+scopes:
+  'program': 'source.js'
+  'ERROR': 'syntax-error'
+
+  'property_identifier': 'variable.other.object.property'
+
+  'class > identifier': 'support.storage.type'
+  'type_identifier': 'support.storage.type'
+  'predefined_type': 'support.storage.type'
+
+  'function > identifier': 'entity.name.function'
+  'call_expression > identifier': 'entity.name.function'
+  'method_definition > property_identifier': 'entity.name.function'
+  'call_expression > member_expression > property_identifier': 'entity.name.function'
+
+  'new_expression > call_expression > identifier': 'meta.class.instance.constructor'
+
+  'number': 'constant.numeric.decimal'
+  'string': 'string.quoted.single'
+  'regex': 'string.regexp'
+  'template_string': 'string.quoted.template'
+  'undefined': 'constant.language'
+  'null': 'constant.language.null'
+  'true': 'constant.language.boolean.true'
+  'false': 'constant.language.boolean.false'
+  'comment': 'comment.block'
+
+  '"("': 'punctuation.definition.parameters.begin.bracket.round'
+  '")"': 'punctuation.definition.parameters.end.bracket.round'
+  '"{"': 'punctuation.definition.function.body.begin.bracket.curly'
+  '"}"': 'punctuation.definition.function.body.end.bracket.curly'
+
+  '"var"': 'storage.modifier'
+  '"declare"': 'storage.modifier'
+  '"let"': 'storage.modifier'
+  '"const"': 'storage.modifier'
+  '"static"': 'storage.modifier'
+  '"public"': 'storage.modifier'
+  '"private"': 'storage.modifier'
+  'readonly': 'storage.modifier'
+  '"class"': 'storage.type.class'
+  '"function"': 'storage.type.function'
+  '"type"': 'storage.type.type'
+
+  '"+"': 'keyword.operator'
+  '"-"': 'keyword.operator'
+  '"*"': 'keyword.operator'
+  '"/"': 'keyword.operator'
+  '"in"': 'keyword.operator.in'
+  '"instanceof"': 'keyword.operator.instanceof'
+  '"of"': 'keyword.operator.of'
+  '"new"': 'keyword.operator.new'
+  '"typeof"': 'keyword.operator.typeof'
+
+  '"get"': 'keyword.operator.setter'
+  '"set"': 'keyword.operator.setter'
+
+  '"."': 'meta.delimiter.property.period'
+  '","': 'meta.delimiter.object.comma'
+
+  '"if"': 'keyword.control'
+  '"do"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"return"': 'keyword.control'
+  '"break"': 'keyword.control'
+  '"continue"': 'keyword.control'
+  '"throw"': 'keyword.control'
+  '"try"': 'keyword.control'
+  '"catch"': 'keyword.control'
+  '"finally"': 'keyword.control'
+  '"switch"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"default"': 'keyword.control'
+  '"export"': 'keyword.control'
+  '"import"': 'keyword.control'
+  '"from"': 'keyword.control'
+  '"yield"': 'keyword.control'
+  '"async"': 'keyword.control'
+  '"await"': 'keyword.control'
+
+  'jsx_attribute > property_identifier': 'entity.other.attribute-name'
+  'jsx_opening_element > identifier': 'entity.name.tag'
+  'jsx_closing_element > identifier': 'entity.name.tag'
+  'jsx_self_closing_element > identifier': 'entity.name.tag'
