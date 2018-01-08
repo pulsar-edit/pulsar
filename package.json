@@ -1,6 +1,6 @@
 {
   "name": "language-python",
-  "version": "0.45.6",
+  "version": "0.46.0-2",
   "engines": {
     "atom": "*",
     "node": "*"
@@ -14,6 +14,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-python/issues"
+  },
+  "dependencies": {
+    "tree-sitter-python": "^0.3.0"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"

@@ -1,0 +1,93 @@
+id: 'python'
+name: 'Python'
+type: 'tree-sitter'
+parser: 'tree-sitter-python'
+legacyScopeName: 'source.python'
+
+fileTypes: [
+  'py'
+]
+
+folds: [
+  {
+    type: [
+      'if_statement'
+      'for_statement'
+      'try_statement'
+      'with_statement'
+      'while_statement'
+      'class_definition'
+      'function_definition'
+      'async_function_definition'
+    ]
+    start: {type: ':'}
+  }
+  {
+    start: {type: '(', index: 0}
+    end: {type: ')', index: -1}
+  },
+  {
+    start: {type: '[', index: 0}
+    end: {type: ']', index: -1}
+  },
+  {
+    start: {type: '{', index: 0}
+    end: {type: '}', index: -1}
+  }
+]
+
+comments:
+  start: '# '
+
+scopes:
+  'module': 'source.python'
+
+  'comment': 'comment.line'
+  'string': 'string.quoted'
+
+  'class_definition > identifier': 'entity.name.type.class'
+  'function_definition > identifier': 'entity.name.function'
+  'call > identifier:nth-child(0)': 'entity.name.function'
+  'call > attribute > identifier:nth-child(2)': 'entity.name.function'
+
+  'attribute > identifier:nth-child(2)': 'variable.other.object.property'
+
+  'decorator': 'entity.name.function.decorator'
+
+  'none': 'constant.language'
+  'true': 'constant.language'
+  'false': 'constant.language'
+
+  'type > identifier': 'support.storage.type'
+
+  '"class"': 'storage.type.class'
+  '"def"': 'storage.type.function'
+  '"lambda"': 'storage.type.function'
+
+  '"if"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"elif"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"return"': 'keyword.control'
+  '"break"': 'keyword.control'
+  '"continue"': 'keyword.control'
+  '"raise"': 'keyword.control'
+  '"try"': 'keyword.control'
+  '"except"': 'keyword.control'
+  '"with"': 'keyword.control'
+  '"as"': 'keyword.control'
+  '"finally"': 'keyword.control'
+  '"import"': 'keyword.control'
+  '"from"': 'keyword.control'
+
+  '"+"': 'keyword.operator'
+  '"-"': 'keyword.operator'
+  '"*"': 'keyword.operator'
+  '"/"': 'keyword.operator'
+  '"%"': 'keyword.operator'
+  '"in"': 'keyword.operator.in'
+  '"and"': 'keyword.operator.logical'
+  '"or"': 'keyword.operator.logical'
+  '"not"': 'keyword.operator.logical'
+  '"is"': 'keyword.operator.logical'
