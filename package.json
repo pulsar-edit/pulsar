@@ -1,6 +1,6 @@
 {
   "name": "language-html",
-  "version": "0.48.2",
+  "version": "0.48.5",
   "description": "HTML language support in Atom",
   "engines": {
     "atom": "*",

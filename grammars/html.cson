@@ -374,7 +374,7 @@
     ]
   }
   {
-    'include': '#text-entities'
+    'include': '#character-reference'
   }
   {
     'match': '<>'
@@ -391,31 +391,12 @@
         'include': '#python'
       }
     ]
-  'text-entities':
-    # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
-    'patterns': [
-      {
-        'begin': '(&)([a-zA-Z0-9]+|#\\d+|#[xX][0-9a-fA-F]+)'
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.definition.entity.begin.html'
-          '2':
-            'name': 'entity.name.entity.other.html'
-        'end': ';'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.entity.end.html'
-        'name': 'constant.character.entity.html'
-      }
-      {
-        'match': '&(?!\\s|<|&)'
-        'name': 'invalid.illegal.bad-ampersand.html'
-      }
-    ]
-  'attribute-entities':
-    # https://www.w3.org/TR/html51/syntax.html#consume-a-character-reference
-    # Because it would be infeasible to include the entire list of allowed entities,
-    # make sure that an equals sign or the end of a string does not follow a potential reference.
+  'character-reference':
+    # https://html.spec.whatwg.org/multipage/parsing.html#character-reference-state
+    # We're not fully compliant with the spec (we don't catch missing semicolons or invalid references)
+    # but that is mostly to prevent tokenizing ambiguous ampersands as errors.
+    # That could be added in the future though if we add the list of all valid character references,
+    # as language-css does with property names.
     'patterns': [
       {
         'begin': '(&)(#\\d+|#[xX][0-9a-fA-F]+)'
@@ -431,21 +412,18 @@
         'name': 'constant.character.entity.html'
       }
       {
-        'begin': '(&)([a-zA-Z0-9]++)(?!["\'=])'
-        'beginCaptures':
+        'match': '(&)([a-zA-Z0-9]+)(;)'
+        'name': 'constant.character.entity.html'
+        'captures':
           '1':
             'name': 'punctuation.definition.entity.begin.html'
           '2':
             'name': 'entity.name.entity.other.html'
-        'end': ';'
-        'endCaptures':
-          '0':
+          '3':
             'name': 'punctuation.definition.entity.end.html'
-        'name': 'constant.character.entity.html'
       }
       {
-        # In attributes, potential references that end with an equals sign are fine
-        'match': '&(?!\\s|<|&|[a-zA-Z0-9]+=)'
+        'match': '&(?!\\s|<|&|[a-zA-Z0-9])'
         'name': 'invalid.illegal.bad-ampersand.html'
       }
     ]
@@ -496,7 +474,7 @@
         'include': '#embedded-code'
       }
       {
-        'include': '#attribute-entities'
+        'include': '#character-reference'
       }
     ]
   'string-single-quoted':
@@ -514,7 +492,7 @@
         'include': '#embedded-code'
       }
       {
-        'include': '#attribute-entities'
+        'include': '#character-reference'
       }
     ]
   'tag-generic-attribute':
@@ -666,7 +644,7 @@
             'include': '#embedded-code'
           }
           {
-            'include': '#attribute-entities'
+            'include': '#character-reference'
           }
         ]
       }
@@ -686,7 +664,7 @@
             'include': '#embedded-code'
           }
           {
-            'include': '#attribute-entities'
+            'include': '#character-reference'
           }
         ]
       }
@@ -741,7 +719,7 @@
   'unquoted-attribute':
     'patterns': [
       {
-        'include': '#attribute-entities'
+        'include': '#character-reference'
       }
       {
         # https://www.w3.org/TR/html51/syntax.html#attribute-value-unquoted-state

@@ -464,21 +464,22 @@ describe 'HTML grammar', ->
         expect(tokens[8]).toEqual value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']
         expect(tokens[9]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
-  describe 'entities in text', ->
+  describe 'character references', ->
     it 'tokenizes & and characters after it', ->
+      # NOTE: &a should NOT be tokenized as a character reference as there is no semicolon following it
+      # We have no way of knowing if there will ever be a semicolon so we play conservatively.
       {tokens} = grammar.tokenizeLine '& &amp; &a'
 
       expect(tokens[0]).toEqual value: '& ', scopes: ['text.html.basic']
       expect(tokens[1]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
       expect(tokens[2]).toEqual value: 'amp', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
       expect(tokens[3]).toEqual value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
-      expect(tokens[5]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
-      expect(tokens[6]).toEqual value: 'a', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']
+      expect(tokens[4]).toEqual value: ' &a', scopes: ['text.html.basic']
 
       lines = grammar.tokenizeLines '&\n'
       expect(lines[0][0]).toEqual value: '&', scopes: ['text.html.basic']
 
-    it 'tokenizes hexadecimal and digit entities', ->
+    it 'tokenizes hexadecimal and digit character references', ->
       {tokens} = grammar.tokenizeLine '&#x00022; &#X00022; &#34;'
 
       expect(tokens[0]).toEqual value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
@@ -512,18 +513,21 @@ describe 'HTML grammar', ->
       {tokens} = grammar.tokenizeLine '&&'
       expect(tokens[0]).toEqual value: '&&', scopes: ['text.html.basic']
 
-  describe 'entities in attributes', ->
-    it 'tokenizes entities', ->
+    it 'tokenizes character references in attributes', ->
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?&amp;">'
       expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']
       expect(tokens[8]).toEqual value: 'amp', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'entity.name.entity.other.html']
       expect(tokens[9]).toEqual value: ';', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']
 
-    it 'does not tokenize query parameters as entities', ->
+    it 'does not tokenize query parameters as character references', ->
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?one=1&type=json&topic=css">'
       expect(tokens[6]).toEqual value: 'http://example.com?one=1&type=json&topic=css', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
 
-    it 'tokenizes invalid ampersands', ->
+    it 'does not tokenize multiple ampersands followed by alphabetical characters as character references', ->
+      {tokens} = grammar.tokenizeLine '<a href="http://example.com?price&something&yummy:&wow">'
+      expect(tokens[6]).toEqual value: 'http://example.com?price&something&yummy:&wow', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']
+
+    it 'tokenizes invalid ampersands in attributes', ->
       # Note: in order to replicate the following tests' behaviors, make sure you have language-hyperlink disabled
       {tokens} = grammar.tokenizeLine '<a href="http://example.com?&">'
       expect(tokens[7]).toEqual value: '&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']
