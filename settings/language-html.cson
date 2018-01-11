@@ -1,4 +1,6 @@
 '.text.html':
+  'autocomplete':
+    'extraWordCharacters': '-'
   'editor':
     'commentStart': '<!-- '
     'commentEnd': ' -->'
