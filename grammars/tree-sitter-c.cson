@@ -92,6 +92,7 @@ scopes:
   'primitive_type': 'support.support.type'
   '"unsigned"': 'support.support.type'
 
+  'char_literal': 'string.quoted.single'
   'string_literal': 'string.quoted.double'
   'system_lib_string': 'string.quoted.other'
 

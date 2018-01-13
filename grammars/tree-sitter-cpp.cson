@@ -118,8 +118,10 @@ scopes:
   '"unsigned"': 'support.storage.type'
   'auto': 'storage.storage.type'
 
+  'char_literal': 'string.quoted.single'
   'string_literal': 'string.quoted.double'
   'system_lib_string': 'string.quoted.other'
+  'raw_string_literal': 'string.quoted.other'
 
   'number_literal': 'constant.numeric.decimal'
   'null': 'constant.language.null'
