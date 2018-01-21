@@ -855,26 +855,8 @@
     'comment': 'magic variables which a class/module may have.'
     'match': '\\b__(all|annotations|bases|class|closure|code|debug|dict|doc|file|func|globals|kwdefaults|members|metaclass|methods|module|name|qualname|self|slots|weakref)__\\b'
     'name': 'support.variable.magic.python'
-  'regular_expressions':
-    'comment': 'Changed disabled to 1 to turn off syntax highlighting in “r” strings.'
-    'disabled': 0
-    'patterns': [
-      {
-        'include': 'source.regexp.python'
-      }
-    ]
-  'string_formatting':
+  'nested_replacement_field':
     'match': '''(?x)
-      # https://docs.python.org/2/library/stdtypes.html#string-formatting (deprecated)
-      %
-      (\\([a-zA-Z_]+\\))?             # mapping key
-      [#0+\\- ]?                      # conversion flags (space at the end is intentional)
-      (\\d+|\\*)?                     # minimum field width
-      (\\.(\\d+|\\*))?                # precision
-      [hlL]?                          # length modifier
-      [diouxXeEfFgGcrs%]              # conversion type
-      |
-      # https://docs.python.org/3/library/string.html#format-string-syntax
       {
         (
           (
@@ -903,6 +885,126 @@
       }
     '''
     'name': 'constant.other.placeholder.python'
+  'regular_expressions':
+    'comment': 'Changed disabled to 1 to turn off syntax highlighting in “r” strings.'
+    'disabled': 0
+    'patterns': [
+      {
+        'include': 'source.regexp.python'
+      }
+    ]
+  'string_formatting':
+    'patterns': [
+      {
+        # https://docs.python.org/2/library/stdtypes.html#string-formatting (deprecated)
+        'match': '''(?x)
+          %
+          (\\([a-zA-Z_]+\\))?             # mapping key
+          [#0+\\- ]?                      # conversion flags (space at the end is intentional)
+          (\\d+|\\*)?                     # minimum field width
+          (\\.(\\d+|\\*))?                # precision
+          [hlL]?                          # length modifier
+          [diouxXeEfFgGcrs%]              # conversion type
+        '''
+        'name': 'constant.other.placeholder.python'
+      }
+      {
+        # https://docs.python.org/3/library/string.html#format-string-syntax
+        'match': '''(?x)
+          {
+            (?:
+              (?:
+                \\d                       # integer
+                |
+                [a-zA-Z_]\\w*             # identifier
+              )
+              (?:
+                \\.[a-zA-Z_]\\w*          # attribute name
+                |
+                \\[[^\\]]+\\]             # element index
+              )*
+            )?
+            (?:![rsa])?                   # conversion
+            (?:
+              # Yup, this is disgusting. But top-level format specifiers can have nested replacement fields.
+              :
+              (?:(?:.|({[^}]*}))?(?:[<>=^]|({[^}]*})))?    # fill followed by align
+              (?:[+\\- ]|({[^}]*}))?                       # sign (space at the end is intentional)
+              (?:\\#|({[^}]*}))?                           # alternate form
+              (?:0|({[^}]*}))?
+              (?:\\d+|({[^}]*}))?                          # width
+              (?:[_,]|({[^}]*}))?                          # grouping option
+              (?:\\.(?:\\d+|({[^}]*}))|({[^}]*}))?         # precision
+              (?:[bcdeEfFgGnosxX%]|({[^}]*}))?             # type
+            )?
+          }
+        '''
+        'name': 'constant.other.placeholder.python'
+        'captures':
+          '1': 'patterns': [{'include': '#nested_replacement_field'}]
+          '2': 'patterns': [{'include': '#nested_replacement_field'}]
+          '3': 'patterns': [{'include': '#nested_replacement_field'}]
+          '4': 'patterns': [{'include': '#nested_replacement_field'}]
+          '5': 'patterns': [{'include': '#nested_replacement_field'}]
+          '6': 'patterns': [{'include': '#nested_replacement_field'}]
+          '7': 'patterns': [{'include': '#nested_replacement_field'}]
+          '8': 'patterns': [{'include': '#nested_replacement_field'}]
+          '9': 'patterns': [{'include': '#nested_replacement_field'}]
+          '10': 'patterns': [{'include': '#nested_replacement_field'}]
+      }
+    ]
+  'string_interpolation':
+    # https://docs.python.org/3/reference/lexical_analysis.html#f-strings
+    # and https://www.python.org/dev/peps/pep-0498/
+    # Unlike string_formatting, string_interpolation can contain expressions
+    'begin': '{'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.interpolation.begin.bracket.curly.python'
+    'end': '''(?x)(?!\\G)
+      (
+        (?:![rsa])?                   # conversion
+        (?:
+          # Yup, this is disgusting. But top-level format specifiers can have nested replacement fields.
+          :
+          (?:(?:.|({[^}]*}))?(?:[<>=^]|({[^}]*})))?    # fill followed by align
+          (?:[+\\- ]|({[^}]*}))?                       # sign (space at the end is intentional)
+          (?:\\#|({[^}]*}))?                           # alternate form
+          (?:0|({[^}]*}))?
+          (?:\\d+|({[^}]*}))?                          # width
+          (?:[_,]|({[^}]*}))?                          # grouping option
+          (?:\\.(?:\\d+|({[^}]*}))|({[^}]*}))?         # precision
+          (?:[bcdeEfFgGnosxX%]|({[^}]*}))?             # type
+        )?
+      )
+      (})
+    '''
+    'endCaptures':
+      '1':
+        'name': 'constant.other.placeholder.python'
+      '2': 'patterns': [{'include': '#nested_replacement_field'}]
+      '3': 'patterns': [{'include': '#nested_replacement_field'}]
+      '4': 'patterns': [{'include': '#nested_replacement_field'}]
+      '5': 'patterns': [{'include': '#nested_replacement_field'}]
+      '6': 'patterns': [{'include': '#nested_replacement_field'}]
+      '7': 'patterns': [{'include': '#nested_replacement_field'}]
+      '8': 'patterns': [{'include': '#nested_replacement_field'}]
+      '9': 'patterns': [{'include': '#nested_replacement_field'}]
+      '10': 'patterns': [{'include': '#nested_replacement_field'}]
+      '11': 'patterns': [{'include': '#nested_replacement_field'}]
+      '12':
+        'name': 'punctuation.definition.interpolation.end.bracket.curly.python'
+    'name': 'meta.interpolation.python'
+    'contentName': 'meta.embedded.python'
+    'patterns': [
+      {
+        'match': '\\\\'
+        'name': 'invalid.illegal.backslash.python'
+      }
+      {
+        'include': '$self'
+      }
+    ]
   'string_quoted_double':
     'patterns': [
       {
@@ -1041,6 +1143,65 @@
         ]
       }
       {
+        'begin': '([fF])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted unicode string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted unicode string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw-format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
         'captures':
           '1':
             'name': 'storage.type.string.python'
@@ -1158,6 +1319,70 @@
           }
           {
             'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.raw-format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
           }
         ]
       }
@@ -1407,10 +1632,66 @@
             'include': '#string_formatting'
           }
           {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
             'include': '#escaped_unicode_char'
           }
           {
             'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw-format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
           }
         ]
       }
@@ -1526,6 +1807,63 @@
           }
           {
             'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.raw-format.python'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
           }
         ]
       }
