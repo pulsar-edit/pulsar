@@ -115,7 +115,7 @@
         'name': 'punctuation.definition.character-class.begin.regexp'
       '2':
         'name': 'keyword.operator.negation.regexp'
-    'end': '\\]'
+    'end': '(?!\\G)\\]' # Character classes cannot be empty (if the first character is a ] it is treated literally)
     'endCaptures':
       '0':
         'name': 'punctuation.definition.character-class.end.regexp'
