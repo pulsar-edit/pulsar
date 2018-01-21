@@ -447,6 +447,15 @@ describe "Python grammar", ->
         expect(tokens[1]).toEqual value: '{0.players[2]!a:2>-#01_.3d}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
         expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
 
+      it "tokenizes {{ and }} as escape characters and not formatters", ->
+        {tokens} = grammar.tokenizeLine '"{{hello}}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{{', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.curly-bracket.python']
+        expect(tokens[2]).toEqual value: 'hello', scopes: ['source.python', 'string.quoted.double.single-line.python']
+        expect(tokens[3]).toEqual value: '}}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.curly-bracket.python']
+        expect(tokens[4]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
   it "tokenizes properties of self as self-type variables", ->
     tokens = grammar.tokenizeLines('self.foo')
 
