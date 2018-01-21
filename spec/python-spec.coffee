@@ -307,6 +307,22 @@ describe "Python grammar", ->
     expect(tokens[4][0]).toEqual value: ')', scopes: ['source.python', 'meta.function.python', 'punctuation.definition.parameters.end.python']
     expect(tokens[4][1]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'punctuation.section.function.begin.python']
 
+  it "tokenizes complex function calls", ->
+    {tokens} = grammar.tokenizeLine "torch.nn.BCELoss()(Variable(bayes_optimal_prob, 1, requires_grad=False), Yvar).data[0]"
+
+    expect(tokens[4]).toEqual value: 'BCELoss', scopes: ['source.python', 'meta.function-call.python']
+    expect(tokens[5]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[6]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
+    expect(tokens[7]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[8]).toEqual value: 'Variable', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python']
+    expect(tokens[9]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[10]).toEqual value: 'bayes_optimal_prob', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python']
+    expect(tokens[14]).toEqual value: 'requires_grad', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'variable.parameter.function.python']
+    expect(tokens[16]).toEqual value: 'False', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'constant.language.python']
+    expect(tokens[17]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
+    expect(tokens[18]).toEqual value: ', ', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python']
+    expect(tokens[20]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
+    expect(tokens[21]).toEqual value: '.', scopes: ['source.python']
 
   it "tokenizes SQL inline highlighting on blocks", ->
     delimsByScope =

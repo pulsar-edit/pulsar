@@ -406,57 +406,28 @@
     ]
   }
   {
-    'begin': '(?<=\\)|\\])\\s*(\\()'
+    'begin': '(?:([A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*)|(?<=\\)|\\]))\\s*(\\()'
     'beginCaptures':
       '1':
+        'patterns': [
+          {
+            'include': '#dotted_name'
+          }
+        ]
+      '2':
         'name': 'punctuation.definition.arguments.begin.python'
-    'contentName': 'meta.function-call.arguments.python'
-    'end': '(\\))'
+    'end': '\\)'
     'endCaptures':
-      '1':
+      '0':
         'name': 'punctuation.definition.arguments.end.python'
     'name': 'meta.function-call.python'
+    'contentName': 'meta.function-call.arguments.python'
     'patterns': [
       {
         'include': '#keyword_arguments'
       }
       {
         'include': '$self'
-      }
-    ]
-  }
-  {
-    'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*\\s*\\()'
-    'end': '(\\))'
-    'endCaptures':
-      '1':
-        'name': 'punctuation.definition.arguments.end.python'
-    'name': 'meta.function-call.python'
-    'patterns': [
-      {
-        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*\\s*\\()'
-        'end': '(?=\\s*\\()'
-        'patterns': [
-          {
-            'include': '#dotted_name'
-          }
-        ]
-      }
-      {
-        'begin': '(\\()'
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.definition.arguments.begin.python'
-        'contentName': 'meta.function-call.arguments.python'
-        'end': '(?=\\))'
-        'patterns': [
-          {
-            'include': '#keyword_arguments'
-          }
-          {
-            'include': '$self'
-          }
-        ]
       }
     ]
   }
