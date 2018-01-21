@@ -1,10 +1,10 @@
-'comment': 'Matches Python\'s regular expression syntax.'
+'name': 'Regular Expressions (Python)'
+'scopeName': 'source.regexp.python'
+'foldingStartMarker': '(/\\*|\\{|\\()'
+'foldingStopMarker': '(\\*/|\\}|\\))'
 'fileTypes': [
   're'
 ]
-'foldingStartMarker': '(/\\*|\\{|\\()'
-'foldingStopMarker': '(\\*/|\\}|\\))'
-'name': 'Regular Expressions (Python)'
 'patterns': [
   {
     'match': '\\\\[bBAZzG]|\\^|\\$'
@@ -109,14 +109,20 @@
     ]
   }
   {
-    'include': '#character-class'
-  }
-]
-'repository':
-  'character-class':
+    'begin': '(\\[)(\\^)?'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.character-class.begin.regexp'
+      '2':
+        'name': 'keyword.operator.negation.regexp'
+    'end': '\\]'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.character-class.end.regexp'
+    'name': 'constant.other.character-class.set.regexp'
     'patterns': [
       {
-        'match': '\\\\[wWsSdDhH]|\\.'
+        'match': '\\\\[wWsSdDhH]'
         'name': 'constant.character.character-class.regexp'
       }
       {
@@ -124,31 +130,14 @@
         'name': 'constant.character.escape.backslash.regexp'
       }
       {
-        'begin': '(\\[)(\\^)?'
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.definition.character-class.regexp'
+        'captures':
           '2':
-            'name': 'keyword.operator.negation.regexp'
-        'end': '(\\])'
-        'endCaptures':
-          '1':
-            'name': 'punctuation.definition.character-class.regexp'
-        'name': 'constant.other.character-class.set.regexp'
-        'patterns': [
-          {
-            'include': '#character-class'
-          }
-          {
-            'captures':
-              '2':
-                'name': 'constant.character.escape.backslash.regexp'
-              '4':
-                'name': 'constant.character.escape.backslash.regexp'
-            'match': '((\\\\.)|.)\\-((\\\\.)|[^\\]])'
-            'name': 'constant.other.character-class.range.regexp'
-          }
-        ]
+            'name': 'constant.character.escape.backslash.regexp'
+          '4':
+            'name': 'constant.character.escape.backslash.regexp'
+        'match': '((\\\\.)|.)\\-((\\\\.)|[^\\]])'
+        'name': 'constant.other.character-class.range.regexp'
       }
     ]
-'scopeName': 'source.regexp.python'
+  }
+]

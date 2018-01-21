@@ -70,7 +70,7 @@ describe "Python grammar", ->
     expect(tokens[0][2].value).toBe '%d'
     expect(tokens[0][2].scopes).toEqual ['source.python', 'string.quoted.single.single-line.raw-regex.python', 'constant.other.placeholder.python']
     expect(tokens[0][3].value).toBe '['
-    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.single.single-line.raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.regexp']
+    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.single.single-line.raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']
     expect(tokens[0][4].value).toBe "'"
     expect(tokens[0][4].scopes).toEqual ['source.python', 'string.quoted.single.single-line.raw-regex.python', 'punctuation.definition.string.end.python']
     expect(tokens[0][5].value).toBe ' '
@@ -110,7 +110,7 @@ describe "Python grammar", ->
     expect(tokens[0][2].value).toBe '%d'
     expect(tokens[0][2].scopes).toEqual ['source.python', 'string.quoted.double.single-line.raw-regex.python', 'constant.other.placeholder.python']
     expect(tokens[0][3].value).toBe '['
-    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.double.single-line.raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.regexp']
+    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.double.single-line.raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']
     expect(tokens[0][4].value).toBe '"'
     expect(tokens[0][4].scopes).toEqual ['source.python', 'string.quoted.double.single-line.raw-regex.python', 'punctuation.definition.string.end.python']
     expect(tokens[0][5].value).toBe ' '
@@ -150,7 +150,7 @@ describe "Python grammar", ->
     expect(tokens[0][2].value).toBe '%d'
     expect(tokens[0][2].scopes).toEqual ['source.python', 'string.quoted.single.single-line.unicode-raw-regex.python', 'constant.other.placeholder.python']
     expect(tokens[0][3].value).toBe '['
-    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.single.single-line.unicode-raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.regexp']
+    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.single.single-line.unicode-raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']
     expect(tokens[0][4].value).toBe "'"
     expect(tokens[0][4].scopes).toEqual ['source.python', 'string.quoted.single.single-line.unicode-raw-regex.python', 'punctuation.definition.string.end.python']
     expect(tokens[0][5].value).toBe ' '
@@ -190,7 +190,7 @@ describe "Python grammar", ->
     expect(tokens[0][2].value).toBe '%d'
     expect(tokens[0][2].scopes).toEqual ['source.python', 'string.quoted.double.single-line.unicode-raw-regex.python', 'constant.other.placeholder.python']
     expect(tokens[0][3].value).toBe '['
-    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.double.single-line.unicode-raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.regexp']
+    expect(tokens[0][3].scopes).toEqual ['source.python', 'string.quoted.double.single-line.unicode-raw-regex.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']
     expect(tokens[0][4].value).toBe '"'
     expect(tokens[0][4].scopes).toEqual ['source.python', 'string.quoted.double.single-line.unicode-raw-regex.python', 'punctuation.definition.string.end.python']
     expect(tokens[0][5].value).toBe ' '
