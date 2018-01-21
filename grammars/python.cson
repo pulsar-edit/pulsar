@@ -855,7 +855,7 @@
       (\\([a-zA-Z_]+\\))?             # mapping key
       [#0+\\- ]?                      # conversion flags
       (\\d+|\\*)?                     # minimum field width
-      (\\.(\\d+)|\\*)?                # precision
+      (\\.(\\d+|\\*))?                # precision
       [hlL]?                          # length modifier
       [diouxXeEfFgGcrs%]              # conversion type
       |
