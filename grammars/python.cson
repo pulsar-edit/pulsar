@@ -852,7 +852,7 @@
       # https://docs.python.org/2/library/stdtypes.html#string-formatting (deprecated)
       %
       (\\([a-zA-Z_]+\\))?             # mapping key
-      [#0+\\- ]?                      # conversion flags
+      [#0+\\- ]?                      # conversion flags (space at the end is intentional)
       (\\d+|\\*)?                     # minimum field width
       (\\.(\\d+|\\*))?                # precision
       [hlL]?                          # length modifier
