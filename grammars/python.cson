@@ -848,7 +848,6 @@
       }
     ]
   'string_formatting':
-    # TODO: Add $self highlighting?
     'match': '''(?x)
       # https://docs.python.org/2/library/stdtypes.html#string-formatting (deprecated)
       %
