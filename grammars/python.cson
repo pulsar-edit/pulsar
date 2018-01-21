@@ -628,9 +628,6 @@
   'builtin_types':
     'match': '(?x)\\b(\n\t\t\t\tbasestring|bool|buffer|bytearray|bytes|complex|dict|float|frozenset|int|\n\t\t\t\tlist|long|memoryview|object|range|set|slice|str|tuple|unicode|xrange\n\t\t\t)\\b'
     'name': 'support.type.python'
-  'constant_placeholder':
-    'match': '(?i:(%(\\([a-z_]+\\))?#?0?\\-?[ ]?\\+?([0-9]*|\\*)(\\.([0-9]*|\\*))?([hL][a-z]|[a-z%]))|(\\{([!\\[\\].:\\w ]+)?\\}))'
-    'name': 'constant.other.placeholder.python'
   'docstrings':
     'patterns': [
       {
@@ -850,6 +847,46 @@
         'include': 'source.regexp.python'
       }
     ]
+  'string_formatting':
+    'match': '''(?x)
+      # https://docs.python.org/2/library/stdtypes.html#string-formatting (deprecated)
+      %
+      (\\([a-zA-Z_]+\\))?             # mapping key
+      [#0+\\- ]?                      # conversion flags (space at the end is intentional)
+      (\\d+|\\*)?                     # minimum field width
+      (\\.(\\d+|\\*))?                # precision
+      [hlL]?                          # length modifier
+      [diouxXeEfFgGcrs%]              # conversion type
+      |
+      # https://docs.python.org/3/library/string.html#format-string-syntax
+      {
+        (
+          (
+            \\d                       # integer
+            |
+            [a-zA-Z_]\\w*             # identifier
+          )
+          (
+            \\.[a-zA-Z_]\\w*          # attribute name
+            |
+            \\[[^\\]]+\\]             # element index
+          )*
+        )?
+        (![rsa])?                     # conversion
+        (
+          :
+          (.?[<>=^])?                 # fill followed by align
+          [+\\- ]?                    # sign (space at the end is intentional)
+          \\#?                        # alternate form
+          0?
+          \\d*                        # width
+          [_,]?                       # grouping option
+          (\\.\\d+)?                  # precision
+          [bcdeEfFgGnosxX%]?          # type
+        )?
+      }
+    '''
+    'name': 'constant.other.placeholder.python'
   'string_quoted_double':
     'patterns': [
       {
@@ -869,7 +906,7 @@
         'name': 'string.quoted.double.block.unicode-raw-regex.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -899,7 +936,7 @@
         'name': 'string.quoted.double.block.unicode-raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -926,7 +963,7 @@
         'name': 'string.quoted.double.block.raw-regex.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -953,7 +990,7 @@
         'name': 'string.quoted.double.block.raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -977,7 +1014,7 @@
         'name': 'string.quoted.double.block.unicode.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -995,7 +1032,7 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              {'include': '#constant_placeholder'}
+              {'include': '#string_formatting'}
               {'include': '#escaped_unicode_char'}
               {'include': '#escaped_char'}
               {'include': '#regular_expressions'}
@@ -1025,7 +1062,7 @@
         'name': 'string.quoted.double.single-line.unicode-raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1043,7 +1080,7 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              {'include': '#constant_placeholder'}
+              {'include': '#string_formatting'}
               {'include': '#escaped_char'}
               {'include': '#regular_expressions'}
             ]
@@ -1072,7 +1109,7 @@
         'name': 'string.quoted.double.single-line.raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1098,7 +1135,7 @@
         'name': 'string.quoted.double.single-line.unicode.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1132,7 +1169,7 @@
              ]
           }
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1156,7 +1193,7 @@
         'name': 'string.quoted.double.single-line.sql.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1181,7 +1218,7 @@
         'name': 'string.quoted.double.block.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1205,7 +1242,7 @@
         'name': 'string.quoted.double.single-line.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1243,7 +1280,7 @@
         'name': 'string.quoted.single.block.unicode-raw-regex.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1273,7 +1310,7 @@
         'name': 'string.quoted.single.block.unicode-raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1300,7 +1337,7 @@
         'name': 'string.quoted.single.block.raw-regex.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1327,7 +1364,7 @@
         'name': 'string.quoted.single.block.raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1351,7 +1388,7 @@
         'name': 'string.quoted.single.block.unicode.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1369,7 +1406,7 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              {'include': '#constant_placeholder'}
+              {'include': '#string_formatting'}
               {'include': '#escaped_unicode_char'}
               {'include': '#escaped_char'}
               {'include': '#regular_expressions'}
@@ -1397,7 +1434,7 @@
         'name': 'string.quoted.single.single-line.unicode-raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1415,7 +1452,7 @@
             'name': 'punctuation.definition.string.begin.python'
           '3':
             'patterns': [
-              {'include': '#constant_placeholder'}
+              {'include': '#string_formatting'}
               {'include': '#escaped_char'}
               {'include': '#regular_expressions'}
             ]
@@ -1442,7 +1479,7 @@
         'name': 'string.quoted.single.single-line.raw.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1466,7 +1503,7 @@
         'name': 'string.quoted.single.single-line.unicode.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_unicode_char'
@@ -1500,7 +1537,7 @@
              ]
           }
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1522,7 +1559,7 @@
         'name': 'string.quoted.single.single-line.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1547,7 +1584,7 @@
         'name': 'string.quoted.single.block.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'
@@ -1569,7 +1606,7 @@
         'name': 'string.quoted.single.single-line.python'
         'patterns': [
           {
-            'include': '#constant_placeholder'
+            'include': '#string_formatting'
           }
           {
             'include': '#escaped_char'

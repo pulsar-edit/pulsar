@@ -245,6 +245,208 @@ describe "Python grammar", ->
     expect(tokens[0][1].value).toBe '\\x9f'
     expect(tokens[0][1].scopes).toEqual ['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.hex.python']
 
+  describe "string formatting", ->
+    describe "%-style formatting", ->
+      it "tokenizes the conversion type", ->
+        {tokens} = grammar.tokenizeLine '"%d"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%d', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes an optional mapping key", ->
+        {tokens} = grammar.tokenizeLine '"%(key)x"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%(key)x', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes an optional conversion flag", ->
+        {tokens} = grammar.tokenizeLine '"% F"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '% F', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes an optional field width", ->
+        {tokens} = grammar.tokenizeLine '"%11s"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%11s', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes * as the optional field width", ->
+        {tokens} = grammar.tokenizeLine '"%*g"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%*g', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes an optional precision", ->
+        {tokens} = grammar.tokenizeLine '"%.4r"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%.4r', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes * as the optional precision", ->
+        {tokens} = grammar.tokenizeLine '"%.*%"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%.*%', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes an optional length modifier", ->
+        {tokens} = grammar.tokenizeLine '"%Lo"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%Lo', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes complex formats", ->
+        {tokens} = grammar.tokenizeLine '"%(key)#5.*hc"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '%(key)#5.*hc', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+    describe "{}-style formatting", ->
+      it "tokenizes the empty replacement field", ->
+        {tokens} = grammar.tokenizeLine '"{}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes a number as the field name", ->
+        {tokens} = grammar.tokenizeLine '"{1}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{1}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes a variable name as the field name", ->
+        {tokens} = grammar.tokenizeLine '"{key}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{key}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes field name attributes", ->
+        {tokens} = grammar.tokenizeLine '"{key.length}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{key.length}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        {tokens} = grammar.tokenizeLine '"{4.width}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{4.width}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        {tokens} = grammar.tokenizeLine '"{python2[\'3\']}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{python2[\'3\']}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        {tokens} = grammar.tokenizeLine '"{2[4]}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{2[4]}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes multiple field name attributes", ->
+        {tokens} = grammar.tokenizeLine '"{nested.a[2][\'val\'].value}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{nested.a[2][\'val\'].value}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes conversions", ->
+        {tokens} = grammar.tokenizeLine '"{!r}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{!r}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      describe "format specifiers", ->
+        it "tokenizes alignment", ->
+          {tokens} = grammar.tokenizeLine '"{:<}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:<}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+          {tokens} = grammar.tokenizeLine '"{:a^}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:a^}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes signs", ->
+          {tokens} = grammar.tokenizeLine '"{:+}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:+}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+          {tokens} = grammar.tokenizeLine '"{: }"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{: }', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes the alternate form indicator", ->
+          {tokens} = grammar.tokenizeLine '"{:#}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:#}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes 0", ->
+          {tokens} = grammar.tokenizeLine '"{:0}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:0}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes the width", ->
+          {tokens} = grammar.tokenizeLine '"{:34}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:34}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes the grouping option", ->
+          {tokens} = grammar.tokenizeLine '"{:,}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:,}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes the precision", ->
+          {tokens} = grammar.tokenizeLine '"{:.5}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:.5}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+        it "tokenizes the type", ->
+          {tokens} = grammar.tokenizeLine '"{:b}"'
+
+          expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+          expect(tokens[1]).toEqual value: '{:b}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+          expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
+      it "tokenizes complex formats", ->
+        {tokens} = grammar.tokenizeLine '"{0.players[2]!a:2>-#01_.3d}"'
+
+        expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+        expect(tokens[1]).toEqual value: '{0.players[2]!a:2>-#01_.3d}', scopes: ['source.python', 'string.quoted.double.single-line.python', 'constant.other.placeholder.python']
+        expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
+
   it "tokenizes properties of self as self-type variables", ->
     tokens = grammar.tokenizeLines('self.foo')
 
