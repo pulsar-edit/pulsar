@@ -1159,13 +1159,13 @@
         'name': 'string.quoted.double.block.format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
-          }
-          {
             'include': '#escaped_unicode_char'
           }
           {
             'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1190,10 +1190,10 @@
         'name': 'string.quoted.double.block.raw-format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
+            'include': '#escaped_char'
           }
           {
-            'include': '#escaped_char'
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1340,13 +1340,13 @@
         'name': 'string.quoted.double.single-line.format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
-          }
-          {
             'include': '#escaped_unicode_char'
           }
           {
             'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1372,13 +1372,13 @@
         'name': 'string.quoted.double.single-line.raw-format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
-          }
-          {
             'include': '#escaped_unicode_char'
           }
           {
             'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1653,13 +1653,13 @@
         'name': 'string.quoted.single.block.format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
-          }
-          {
             'include': '#escaped_unicode_char'
           }
           {
             'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1684,10 +1684,10 @@
         'name': 'string.quoted.single.block.raw-format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
+            'include': '#escaped_char'
           }
           {
-            'include': '#escaped_char'
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1826,13 +1826,13 @@
         'name': 'string.quoted.single.single-line.format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
-          }
-          {
             'include': '#escaped_unicode_char'
           }
           {
             'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
@@ -1856,10 +1856,10 @@
         'name': 'string.quoted.single.single-line.raw-format.python'
         'patterns': [
           {
-            'include': '#string_interpolation'
+            'include': '#escaped_char'
           }
           {
-            'include': '#escaped_char'
+            'include': '#string_interpolation'
           }
           {
             'match': '}'
