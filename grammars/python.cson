@@ -328,6 +328,7 @@
         'contentName': 'meta.function.inline.parameters.python'
         'patterns': [
           {
+            # param = 3
             'begin': '\\b([a-zA-Z_][\\w_]*)\\s*(=)\\s*'
             'beginCaptures':
               '1':
@@ -342,6 +343,7 @@
             ]
           }
           {
+            # param
             'match': '\\b([a-zA-Z_][\\w_]*)\\b'
             'name': 'variable.parameter.function.python'
           }
