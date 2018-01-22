@@ -15,6 +15,7 @@
   'Snakefile'  # Snakemake support
   'smk'        # Snakemake support
   'tac'
+  'wscript'
   'wsgi'
 ]
 'firstLineMatch': '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
