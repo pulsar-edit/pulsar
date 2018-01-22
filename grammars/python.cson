@@ -236,9 +236,11 @@
     ]
   }
   {
-    'begin': '^\\s*(def)\\s+(?=[A-Za-z_][A-Za-z0-9_]*\\s*\\()'
+    'begin': '^\\s*(?:(async)\\s+)?(def)\\s+(?=[A-Za-z_][A-Za-z0-9_]*)'
     'beginCaptures':
       '1':
+        'name': 'storage.modifier.async.python'
+      '2':
         'name': 'storage.type.function.python'
     'end': '(\\))\\s*(?:(\\:)|(.*$\\n?))'
     'endCaptures':
@@ -284,30 +286,11 @@
           }
         ]
       }
-    ]
-  }
-  {
-    'begin': '^\\s*(def)\\s+(?=[A-Za-z_][A-Za-z0-9_]*)'
-    'beginCaptures':
-      '1':
-        'name': 'storage.type.function.python'
-    'end': '(\\()|\\s*($\\n?|#.*$\\n?)'
-    'endCaptures':
-      '1':
-        'name': 'punctuation.definition.parameters.begin.python'
-      '2':
-        'name': 'invalid.illegal.missing-parameters.python'
-    'name': 'meta.function.python'
-    'patterns': [
       {
-        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*)'
-        'contentName': 'entity.name.function.python'
-        'end': '(?![A-Za-z0-9_])'
-        'patterns': [
-          {
-            'include': '#entity_name_function'
-          }
-        ]
+        # No match, not at the end of the line, and no opening parentheses
+        'begin': '(?!\\G)(?!\\s*$)(?!.*\\()'
+        'end': '$'
+        'name': 'invalid.illegal.missing-parameters.python'
       }
     ]
   }
