@@ -16,6 +16,16 @@ describe "Python grammar", ->
     expect(grammar).toBeDefined()
     expect(grammar.scopeName).toBe "source.python"
 
+  it "tokenizes `yield`", ->
+    {tokens} = grammar.tokenizeLine 'yield v'
+
+    expect(tokens[0]).toEqual value: 'yield', scopes: ['source.python', 'keyword.control.statement.python']
+
+  it "tokenizes `yield from`", ->
+    {tokens} = grammar.tokenizeLine 'yield from v'
+
+    expect(tokens[0]).toEqual value: 'yield from', scopes: ['source.python', 'keyword.control.statement.python']
+
   it "tokenizes multi-line strings", ->
     tokens = grammar.tokenizeLines('"1\\\n2"')
 

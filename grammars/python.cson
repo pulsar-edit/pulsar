@@ -108,7 +108,7 @@
   {
     'comment': 'keywords that alter flow from within a block'
     'name': 'keyword.control.statement.python'
-    'match': '\\b(with|break|continue|pass|return|yield|await)\\b'
+    'match': '\\b(with|break|continue|pass|return|yield(\\s+from)?|await)\\b'
   }
   {
     'comment': 'keyword operators that evaluate to True or False'
