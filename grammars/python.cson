@@ -1136,7 +1136,6 @@
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'double quoted unicode string'
         'end': '((?<=""")(")""|""")'
         'endCaptures':
           '1':
@@ -1145,9 +1144,6 @@
             'name': 'meta.empty-string.double.python'
         'name': 'string.quoted.double.block.format.python'
         'patterns': [
-          {
-            'include': '#escaped_unicode_char'
-          }
           {
             'include': '#escaped_char'
           }
@@ -1167,7 +1163,6 @@
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'double quoted unicode string'
         'end': '((?<=""")(")""|""")'
         'endCaptures':
           '1':
@@ -1185,6 +1180,60 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
@@ -1327,9 +1376,6 @@
         'name': 'string.quoted.double.single-line.format.python'
         'patterns': [
           {
-            'include': '#escaped_unicode_char'
-          }
-          {
             'include': '#escaped_char'
           }
           {
@@ -1359,9 +1405,6 @@
         'name': 'string.quoted.double.single-line.raw-format.python'
         'patterns': [
           {
-            'include': '#escaped_unicode_char'
-          }
-          {
             'include': '#escaped_char'
           }
           {
@@ -1370,6 +1413,64 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
@@ -1630,7 +1731,6 @@
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'single quoted unicode string'
         'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
         'endCaptures':
           '1':
@@ -1639,9 +1739,6 @@
             'name': 'meta.empty-string.single.python'
         'name': 'string.quoted.single.block.format.python'
         'patterns': [
-          {
-            'include': '#escaped_unicode_char'
-          }
           {
             'include': '#escaped_char'
           }
@@ -1661,7 +1758,6 @@
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'single quoted unicode string'
         'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
         'endCaptures':
           '1':
@@ -1679,6 +1775,60 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
@@ -1813,9 +1963,6 @@
         'name': 'string.quoted.single.single-line.format.python'
         'patterns': [
           {
-            'include': '#escaped_unicode_char'
-          }
-          {
             'include': '#escaped_char'
           }
           {
@@ -1851,6 +1998,60 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }

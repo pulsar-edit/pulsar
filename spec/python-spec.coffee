@@ -378,6 +378,41 @@ describe "Python grammar", ->
             expect(tokens[4]).toEqual value: '\\', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'invalid.illegal.backslash.python']
             expect(tokens[6]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
+  describe "binary strings", ->
+    types =
+      'b': 'binary'
+      'B': 'binary'
+      'rb': 'raw-binary'
+      'RB': 'raw-binary'
+      'br': 'raw-binary'
+      'BR': 'raw-binary'
+
+    quotes =
+      '"': 'double.single-line'
+      "'": 'single.single-line'
+      '"""': 'double.block'
+      "'''": 'single.block'
+
+    for type, typeScope of types
+      for quote, quoteScope of quotes
+        it "tokenizes them", ->
+          {tokens} = grammar.tokenizeLine "#{type}#{quote}test#{quote}"
+
+          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
+          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
+          expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
+          expect(tokens[3]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
+
+        it "tokenizes invalid characters", ->
+          {tokens} = grammar.tokenizeLine "#{type}#{quote}tést#{quote}"
+
+          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
+          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
+          expect(tokens[2]).toEqual value: 't', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
+          expect(tokens[3]).toEqual value: 'é', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'invalid.illegal.character-out-of-range.python']
+          expect(tokens[4]).toEqual value: 'st', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
+          expect(tokens[5]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
+
   describe "string formatting", ->
     describe "%-style formatting", ->
       it "tokenizes the conversion type", ->
