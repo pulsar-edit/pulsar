@@ -1161,7 +1161,7 @@
         ]
       }
       {
-        'begin': '([rR][fF])(""")'
+        'begin': '([rR][fF]|[fF][rR])(""")'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
@@ -1342,7 +1342,7 @@
         ]
       }
       {
-        'begin': '([rR][fF])(")'
+        'begin': '([rR][fF]|[fF][rR])(")'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
@@ -1655,7 +1655,7 @@
         ]
       }
       {
-        'begin': '([rR][fF])(\'\'\')'
+        'begin': '([rR][fF]|[fF][rR])(\'\'\')'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
@@ -1828,7 +1828,7 @@
         ]
       }
       {
-        'begin': '([rR][fF])(\')'
+        'begin': '([rR][fF]|[fF][rR])(\')'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'

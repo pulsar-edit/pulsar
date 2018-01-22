@@ -260,9 +260,9 @@ describe "Python grammar", ->
       'f': 'format'
       'F': 'format'
       'rf': 'raw-format'
-      'rF': 'raw-format'
-      'Rf': 'raw-format'
       'RF': 'raw-format'
+      'fr': 'raw-format'
+      'FR': 'raw-format'
 
     quotes =
       '"': 'double.single-line'
