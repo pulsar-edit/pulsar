@@ -630,6 +630,27 @@ describe "Python grammar", ->
     expect(tokens[0][2].value).toBe 'foo'
     expect(tokens[0][2].scopes).toEqual ['source.python']
 
+  it "tokenizes async function definitions", ->
+    {tokens} = grammar.tokenizeLine 'async def test(param):'
+
+    expect(tokens[0]).toEqual value: 'async', scopes: ['source.python', 'meta.function.python', 'storage.modifier.async.python']
+    expect(tokens[1]).toEqual value: ' ', scopes: ['source.python', 'meta.function.python']
+    expect(tokens[2]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
+    expect(tokens[4]).toEqual value: 'test', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python']
+
+  it "tokenizes functions that are missing parameters", ->
+    {tokens} = grammar.tokenizeLine 'def test # whoops'
+
+    expect(tokens[0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
+    expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python']
+    expect(tokens[3]).toEqual value: ' # whoops', scopes: ['source.python', 'meta.function.python', 'invalid.illegal.missing-parameters.python']
+
+    {tokens} = grammar.tokenizeLine 'def test:'
+
+    expect(tokens[0]).toEqual value: 'def', scopes: ['source.python', 'meta.function.python', 'storage.type.function.python']
+    expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', 'meta.function.python', 'entity.name.function.python']
+    expect(tokens[3]).toEqual value: ':', scopes: ['source.python', 'meta.function.python', 'invalid.illegal.missing-parameters.python']
+
   it "tokenizes comments inside function parameters", ->
     {tokens} = grammar.tokenizeLine('def test(arg, # comment')
 
