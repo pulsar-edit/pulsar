@@ -453,6 +453,12 @@
     ]
   }
   {
+    'include': '#objects'
+  }
+  {
+    'include': '#properties'
+  }
+  {
     'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*\\s*\\[)'
     'end': '(\\])'
     'endCaptures':
@@ -883,6 +889,67 @@
     'comment': 'magic variables which a class/module may have.'
     'match': '\\b__(all|annotations|bases|class|closure|code|debug|dict|doc|file|func|globals|kwdefaults|members|metaclass|methods|module|name|qualname|self|slots|weakref)__\\b'
     'name': 'support.variable.magic.python'
+  'objects':
+    'patterns': [
+      {
+        # OBJ in OBJ.prop, OBJ.methodCall()
+        'match': '[A-Z][A-Z0-9_]*(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'name': 'constant.other.object.python'
+      }
+      {
+        # obj in obj.prop, obj.methodCall()
+        'match': '[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'name': 'variable.other.object.python'
+      }
+    ]
+  'properties':
+    'patterns': [
+      {
+        # PROP1 in obj.PROP1.prop2, func().PROP1.prop2
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_]*\\b\\$*)(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'constant.other.object.property.python'
+      }
+      {
+        # prop1 in obj.prop1.prop2, func().prop1.prop2
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'variable.other.object.property.python'
+      }
+      {
+        # PROP in obj.PROP, func().PROP
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'constant.other.property.python'
+      }
+      {
+        # prop in obj.prop, func().prop
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'variable.other.property.python'
+      }
+      {
+        # 123illegal in obj.123illegal, func().123illegal
+        'match': '(\\.)\\s*([0-9][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'invalid.illegal.identifier.python'
+      }
+    ]
   'nested_replacement_field':
     'match': '''(?x)
       {
