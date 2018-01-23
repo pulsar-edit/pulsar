@@ -256,162 +256,123 @@ describe "Python grammar", ->
     expect(tokens[0][1].scopes).toEqual ['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.hex.python']
 
   describe "f-strings", ->
-    types =
-      'f': 'format'
-      'F': 'format'
-      'rf': 'raw-format'
-      'RF': 'raw-format'
-      'fr': 'raw-format'
-      'FR': 'raw-format'
+    it "tokenizes them", ->
+      {tokens} = grammar.tokenizeLine "f'hello'"
 
-    quotes =
-      '"': 'double.single-line'
-      "'": 'single.single-line'
-      '"""': 'double.block'
-      "'''": 'single.block'
+      expect(tokens[0]).toEqual value: 'f', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'storage.type.string.python']
+      expect(tokens[1]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.begin.python']
+      expect(tokens[2]).toEqual value: 'hello', scopes: ['source.python', "string.quoted.single.single-line.format.python"]
+      expect(tokens[3]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.end.python']
 
-    for type, typeScope of types
-      for quote, quoteScope of quotes
-        it "tokenizes them", ->
-          {tokens} = grammar.tokenizeLine "#{type}#{quote}hello#{quote}"
+    it "tokenizes {{ and }} as escape characters", ->
+      {tokens} = grammar.tokenizeLine "f'he}}l{{lo'"
 
-          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
-          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
-          expect(tokens[2]).toEqual value: 'hello', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[3]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
+      expect(tokens[0]).toEqual value: 'f', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'storage.type.string.python']
+      expect(tokens[1]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.begin.python']
+      expect(tokens[2]).toEqual value: 'he', scopes: ['source.python', "string.quoted.single.single-line.format.python"]
+      expect(tokens[3]).toEqual value: '}}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'constant.character.escape.curly-bracket.python']
+      expect(tokens[4]).toEqual value: 'l', scopes: ['source.python', "string.quoted.single.single-line.format.python"]
+      expect(tokens[5]).toEqual value: '{{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'constant.character.escape.curly-bracket.python']
+      expect(tokens[6]).toEqual value: 'lo', scopes: ['source.python', "string.quoted.single.single-line.format.python"]
+      expect(tokens[7]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.end.python']
 
-        it "tokenizes {{ and }} as escape characters", ->
-          {tokens} = grammar.tokenizeLine "#{type}#{quote}he}}l{{lo#{quote}"
+    it "tokenizes unmatched closing curly brackets as invalid", ->
+      {tokens} = grammar.tokenizeLine "f'he}llo'"
 
-          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
-          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
-          expect(tokens[2]).toEqual value: 'he', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[3]).toEqual value: '}}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'constant.character.escape.curly-bracket.python']
-          expect(tokens[4]).toEqual value: 'l', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[5]).toEqual value: '{{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'constant.character.escape.curly-bracket.python']
-          expect(tokens[6]).toEqual value: 'lo', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[7]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
+      expect(tokens[0]).toEqual value: 'f', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'storage.type.string.python']
+      expect(tokens[1]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.begin.python']
+      expect(tokens[2]).toEqual value: 'he', scopes: ['source.python', "string.quoted.single.single-line.format.python"]
+      expect(tokens[3]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'invalid.illegal.closing-curly-bracket.python']
+      expect(tokens[4]).toEqual value: 'llo', scopes: ['source.python', "string.quoted.single.single-line.format.python"]
+      expect(tokens[5]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.end.python']
 
-        it "tokenizes unmatched closing curly brackets as invalid", ->
-          {tokens} = grammar.tokenizeLine "#{type}#{quote}he}llo#{quote}"
+    describe "in expressions", ->
+      it "tokenizes variables", ->
+        {tokens} = grammar.tokenizeLine "f'{abc}'"
 
-          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
-          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
-          expect(tokens[2]).toEqual value: 'he', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[3]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'invalid.illegal.closing-curly-bracket.python']
-          expect(tokens[4]).toEqual value: 'llo', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[5]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
+        expect(tokens[4]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
-        describe "in expressions", ->
-          it "tokenizes variables", ->
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{abc}#{quote}"
+      it "tokenizes arithmetic", ->
+        {tokens} = grammar.tokenizeLine "f'{5 - 3}'"
 
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python']
-            expect(tokens[4]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: '5', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'constant.numeric.integer.decimal.python']
+        expect(tokens[5]).toEqual value: '-', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'keyword.operator.arithmetic.python']
+        expect(tokens[7]).toEqual value: '3', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'constant.numeric.integer.decimal.python']
+        expect(tokens[8]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
-          it "tokenizes arithmetic", ->
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{5 - 3}#{quote}"
+      it "tokenizes function and method calls", ->
+        {tokens} = grammar.tokenizeLine "f'{name.decode(\"utf-8\").lower()}'"
 
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: '5', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'constant.numeric.integer.decimal.python']
-            expect(tokens[5]).toEqual value: '-', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'keyword.operator.arithmetic.python']
-            expect(tokens[7]).toEqual value: '3', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'constant.numeric.integer.decimal.python']
-            expect(tokens[8]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: 'name', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
+        expect(tokens[4]).toEqual value: '.', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
+        expect(tokens[5]).toEqual value: 'decode', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
+        expect(tokens[6]).toEqual value: '(', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
+        expect(tokens[7]).toEqual value: '"', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.double.single-line.python", 'punctuation.definition.string.begin.python']
+        expect(tokens[8]).toEqual value: 'utf-8', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.double.single-line.python"]
+        expect(tokens[9]).toEqual value: '"', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.double.single-line.python", 'punctuation.definition.string.end.python']
+        expect(tokens[10]).toEqual value: ')', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
+        expect(tokens[11]).toEqual value: '.', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
+        expect(tokens[12]).toEqual value: 'lower', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
+        expect(tokens[13]).toEqual value: '(', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
+        expect(tokens[14]).toEqual value: ')', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
+        expect(tokens[15]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
-          it "tokenizes function and method calls", ->
-            argumentQuote = '"'
-            argumentQuoteScope = 'double'
+      it "tokenizes conversion flags", ->
+        {tokens} = grammar.tokenizeLine "f'{abc!r}'"
 
-            if quote is '"'
-              argumentQuote = "'"
-              argumentQuoteScope = 'single'
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
+        expect(tokens[4]).toEqual value: '!r', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
+        expect(tokens[5]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{name.decode(#{argumentQuote}utf-8#{argumentQuote}).lower()}#{quote}"
+      it "tokenizes format specifiers", ->
+        {tokens} = grammar.tokenizeLine "f'{abc:^d}'"
 
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: 'name', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-            expect(tokens[4]).toEqual value: '.', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-            expect(tokens[5]).toEqual value: 'decode', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-            expect(tokens[6]).toEqual value: '(', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
-            expect(tokens[7]).toEqual value: argumentQuote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.#{argumentQuoteScope}.single-line.python", 'punctuation.definition.string.begin.python']
-            expect(tokens[8]).toEqual value: 'utf-8', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.#{argumentQuoteScope}.single-line.python"]
-            expect(tokens[9]).toEqual value: argumentQuote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.#{argumentQuoteScope}.single-line.python", 'punctuation.definition.string.end.python']
-            expect(tokens[10]).toEqual value: ')', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
-            expect(tokens[11]).toEqual value: '.', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python']
-            expect(tokens[12]).toEqual value: 'lower', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-            expect(tokens[13]).toEqual value: '(', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
-            expect(tokens[14]).toEqual value: ')', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
-            expect(tokens[15]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
+        expect(tokens[4]).toEqual value: ':^d', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
+        expect(tokens[5]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
-          it "tokenizes conversion flags", ->
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{abc!r}#{quote}"
+      it "tokenizes nested replacement fields in top-level format specifiers", ->
+        {tokens} = grammar.tokenizeLine "f'{abc:{align}d}'"
 
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python']
-            expect(tokens[4]).toEqual value: '!r', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
-            expect(tokens[5]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
+        expect(tokens[4]).toEqual value: ':', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
+        expect(tokens[5]).toEqual value: '{align}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'constant.other.placeholder.python', 'constant.other.placeholder.python']
+        expect(tokens[6]).toEqual value: 'd', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
+        expect(tokens[7]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
-          it "tokenizes format specifiers", ->
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{abc:^d}#{quote}"
+      it "tokenizes backslashes as invalid", ->
+        {tokens} = grammar.tokenizeLine "f'{ab\\n}'"
 
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python']
-            expect(tokens[4]).toEqual value: ':^d', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
-            expect(tokens[5]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
-
-          it "tokenizes nested replacement fields in top-level format specifiers", ->
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{abc:{align}d}#{quote}"
-
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: 'abc', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python']
-            expect(tokens[4]).toEqual value: ':', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
-            expect(tokens[5]).toEqual value: '{align}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'constant.other.placeholder.python', 'constant.other.placeholder.python']
-            expect(tokens[6]).toEqual value: 'd', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'constant.other.placeholder.python']
-            expect(tokens[7]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
-
-          it "tokenizes backslashes as invalid", ->
-            {tokens} = grammar.tokenizeLine "#{type}#{quote}{ab\\n}#{quote}"
-
-            expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-            expect(tokens[3]).toEqual value: 'ab', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python']
-            expect(tokens[4]).toEqual value: '\\', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'meta.embedded.python', 'invalid.illegal.backslash.python']
-            expect(tokens[6]).toEqual value: '}', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
+        expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
+        expect(tokens[3]).toEqual value: 'ab', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
+        expect(tokens[4]).toEqual value: '\\', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'invalid.illegal.backslash.python']
+        expect(tokens[6]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
   describe "binary strings", ->
-    types =
-      'b': 'binary'
-      'B': 'binary'
-      'rb': 'raw-binary'
-      'RB': 'raw-binary'
-      'br': 'raw-binary'
-      'BR': 'raw-binary'
+    it "tokenizes them", ->
+      {tokens} = grammar.tokenizeLine "b'test'"
 
-    quotes =
-      '"': 'double.single-line'
-      "'": 'single.single-line'
-      '"""': 'double.block'
-      "'''": 'single.block'
+      expect(tokens[0]).toEqual value: 'b', scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'storage.type.string.python']
+      expect(tokens[1]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'punctuation.definition.string.begin.python']
+      expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', "string.quoted.single.single-line.binary.python"]
+      expect(tokens[3]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'punctuation.definition.string.end.python']
 
-    for type, typeScope of types
-      for quote, quoteScope of quotes
-        it "tokenizes them", ->
-          {tokens} = grammar.tokenizeLine "#{type}#{quote}test#{quote}"
+    it "tokenizes invalid characters", ->
+      {tokens} = grammar.tokenizeLine "b'tést'"
 
-          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
-          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
-          expect(tokens[2]).toEqual value: 'test', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[3]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
-
-        it "tokenizes invalid characters", ->
-          {tokens} = grammar.tokenizeLine "#{type}#{quote}tést#{quote}"
-
-          expect(tokens[0]).toEqual value: type, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'storage.type.string.python']
-          expect(tokens[1]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.begin.python']
-          expect(tokens[2]).toEqual value: 't', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[3]).toEqual value: 'é', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'invalid.illegal.character-out-of-range.python']
-          expect(tokens[4]).toEqual value: 'st', scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python"]
-          expect(tokens[5]).toEqual value: quote, scopes: ['source.python', "string.quoted.#{quoteScope}.#{typeScope}.python", 'punctuation.definition.string.end.python']
+      expect(tokens[0]).toEqual value: 'b', scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'storage.type.string.python']
+      expect(tokens[1]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'punctuation.definition.string.begin.python']
+      expect(tokens[2]).toEqual value: 't', scopes: ['source.python', "string.quoted.single.single-line.binary.python"]
+      expect(tokens[3]).toEqual value: 'é', scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'invalid.illegal.character-out-of-range.python']
+      expect(tokens[4]).toEqual value: 'st', scopes: ['source.python', "string.quoted.single.single-line.binary.python"]
+      expect(tokens[5]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'punctuation.definition.string.end.python']
 
   describe "string formatting", ->
     describe "%-style formatting", ->
