@@ -15,6 +15,7 @@
   'Snakefile'  # Snakemake support
   'smk'        # Snakemake support
   'tac'
+  'wscript'
   'wsgi'
 ]
 'firstLineMatch': '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
@@ -108,7 +109,7 @@
   {
     'comment': 'keywords that alter flow from within a block'
     'name': 'keyword.control.statement.python'
-    'match': '\\b(with|break|continue|pass|return|yield|await)\\b'
+    'match': '\\b(with|break|continue|pass|return|yield(\\s+from)?|await)\\b'
   }
   {
     'comment': 'keyword operators that evaluate to True or False'
@@ -235,9 +236,11 @@
     ]
   }
   {
-    'begin': '^\\s*(def)\\s+(?=[A-Za-z_][\\w_]*\\s*\\()'
+    'begin': '^\\s*(?:(async)\\s+)?(def)\\s+(?=[A-Za-z_][A-Za-z0-9_]*)'
     'beginCaptures':
       '1':
+        'name': 'storage.modifier.async.python'
+      '2':
         'name': 'storage.type.function.python'
     'end': ':'
     'endCaptures':
@@ -315,63 +318,53 @@
           '2':
             'name': 'storage.type.python'
       }
-    ]
-  }
-  {
-    'begin': '^\\s*(def)\\s+(?=[A-Za-z_][A-Za-z0-9_]*)'
-    'beginCaptures':
-      '1':
-        'name': 'storage.type.function.python'
-    'end': '(\\()|\\s*($\\n?|#.*$\\n?)'
-    'endCaptures':
-      '1':
-        'name': 'punctuation.definition.parameters.begin.python'
-      '2':
-        'name': 'invalid.illegal.missing-parameters.python'
-    'name': 'meta.function.python'
-    'patterns': [
       {
-        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*)'
-        'contentName': 'entity.name.function.python'
-        'end': '(?![A-Za-z0-9_])'
-        'patterns': [
-          {
-            'include': '#entity_name_function'
-          }
-        ]
+        # No match, not at the end of the line, and no opening parentheses
+        'begin': '(?!\\G)(?!\\s*$)(?!.*\\()'
+        'end': '$'
+        'name': 'invalid.illegal.missing-parameters.python'
       }
     ]
   }
   {
-    'begin': '(lambda)(?=\\s+)'
+    'begin': '(lambda)\\s+'
     'beginCaptures':
       '1':
         'name': 'storage.type.function.inline.python'
-    'end': '(\\:)'
+    'end': ':'
     'endCaptures':
-      '1':
-        'name': 'punctuation.definition.parameters.end.python'
-      '2':
-        'name': 'punctuation.section.function.begin.python'
-      '3':
-        'name': 'invalid.illegal.missing-section-begin.python'
+      '0':
+        'name': 'punctuation.definition.function.begin.python'
     'name': 'meta.function.inline.python'
     'patterns': [
       {
-        'begin': '\\s+'
-        'contentName': 'meta.function.inline.parameters.python'
+        'begin': '\\G'
         'end': '(?=\\:)'
+        'contentName': 'meta.function.inline.parameters.python'
         'patterns': [
           {
-            'include': '#keyword_arguments'
-          }
-          {
-            'captures':
+            # param = 3
+            'begin': '\\b([a-zA-Z_][\\w_]*)\\s*(=)\\s*'
+            'beginCaptures':
               '1':
                 'name': 'variable.parameter.function.python'
               '2':
-                'name': 'punctuation.separator.parameters.python'
-            'match': '\\b([a-zA-Z_][a-zA-Z_0-9]*)\\s*(?:(,)|(?=[\\n\\)\\:]))'
+                'name': 'keyword.operator.assignment.python'
+            'end': '(?!\\G)'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+          {
+            # param
+            'match': '\\b([a-zA-Z_][\\w_]*)\\b'
+            'name': 'variable.parameter.function.python'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.parameters.python'
           }
         ]
       }
@@ -511,12 +504,6 @@
         'include': '$self'
       }
     ]
-  }
-  {
-    'captures':
-      '1':
-        'name': 'storage.type.function.python'
-    'match': '\\b(def|lambda)\\b'
   }
   {
     'captures':
@@ -1181,7 +1168,6 @@
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'double quoted unicode string'
         'end': '((?<=""")(")""|""")'
         'endCaptures':
           '1':
@@ -1190,9 +1176,6 @@
             'name': 'meta.empty-string.double.python'
         'name': 'string.quoted.double.block.format.python'
         'patterns': [
-          {
-            'include': '#escaped_unicode_char'
-          }
           {
             'include': '#escaped_char'
           }
@@ -1206,13 +1189,12 @@
         ]
       }
       {
-        'begin': '([rR][fF])(""")'
+        'begin': '([rR][fF]|[fF][rR])(""")'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'double quoted unicode string'
         'end': '((?<=""")(")""|""")'
         'endCaptures':
           '1':
@@ -1230,6 +1212,60 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
@@ -1372,9 +1408,6 @@
         'name': 'string.quoted.double.single-line.format.python'
         'patterns': [
           {
-            'include': '#escaped_unicode_char'
-          }
-          {
             'include': '#escaped_char'
           }
           {
@@ -1387,7 +1420,7 @@
         ]
       }
       {
-        'begin': '([rR][fF])(")'
+        'begin': '([rR][fF]|[fF][rR])(")'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
@@ -1404,9 +1437,6 @@
         'name': 'string.quoted.double.single-line.raw-format.python'
         'patterns': [
           {
-            'include': '#escaped_unicode_char'
-          }
-          {
             'include': '#escaped_char'
           }
           {
@@ -1415,6 +1445,64 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
@@ -1675,7 +1763,6 @@
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'single quoted unicode string'
         'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
         'endCaptures':
           '1':
@@ -1684,9 +1771,6 @@
             'name': 'meta.empty-string.single.python'
         'name': 'string.quoted.single.block.format.python'
         'patterns': [
-          {
-            'include': '#escaped_unicode_char'
-          }
           {
             'include': '#escaped_char'
           }
@@ -1700,13 +1784,12 @@
         ]
       }
       {
-        'begin': '([rR][fF])(\'\'\')'
+        'begin': '([rR][fF]|[fF][rR])(\'\'\')'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
           '2':
             'name': 'punctuation.definition.string.begin.python'
-        'comment': 'single quoted unicode string'
         'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
         'endCaptures':
           '1':
@@ -1724,6 +1807,60 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
@@ -1858,9 +1995,6 @@
         'name': 'string.quoted.single.single-line.format.python'
         'patterns': [
           {
-            'include': '#escaped_unicode_char'
-          }
-          {
             'include': '#escaped_char'
           }
           {
@@ -1873,7 +2007,7 @@
         ]
       }
       {
-        'begin': '([rR][fF])(\')'
+        'begin': '([rR][fF]|[fF][rR])(\')'
         'beginCaptures':
           '1':
             'name': 'storage.type.string.python'
@@ -1896,6 +2030,60 @@
           {
             'match': '}'
             'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
           }
         ]
       }
