@@ -399,58 +399,10 @@
     ]
   }
   {
-    'begin': '(?:([A-Za-z_][A-Za-z0-9_]*)|(?<=\\)|\\]))\\s*(\\()'
-    'beginCaptures':
-      '1':
-        'patterns': [
-          {
-            'include': '#function_names'
-          }
-        ]
-      '2':
-        'name': 'punctuation.definition.arguments.begin.bracket.round.python'
-    'end': '\\)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.definition.arguments.end.bracket.round.python'
-    'name': 'meta.function-call.python'
-    'contentName': 'meta.function-call.arguments.python'
-    'patterns': [
-      {
-        'include': '#keyword_arguments'
-      }
-      {
-        'include': '$self'
-      }
-    ]
+    'include': '#function_calls'
   }
   {
-    'begin': '(\\.)([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.separator.method.period.python'
-      '2':
-        'patterns': [
-          {
-            'include': '#function_names'
-          }
-        ]
-      '3':
-        'name': 'punctuation.definition.arguments.begin.bracket.round.python'
-    'end': '\\)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.definition.arguments.end.bracket.round.python'
-    'name': 'meta.method-call.python'
-    'contentName': 'meta.method-call.arguments.python'
-    'patterns': [
-      {
-        'include': '#keyword_arguments'
-      }
-      {
-        'include': '$self'
-      }
-    ]
+    'include': '#method_calls'
   }
   {
     'include': '#objects'
@@ -665,6 +617,35 @@
         'patterns': [
           {
             'include': '#string_quoted_single'
+          }
+        ]
+      }
+    ]
+  'function_calls':
+    'patterns': [
+      {
+        'begin': '(?:([A-Za-z_][A-Za-z0-9_]*)|(?<=\\)|\\]))\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#function_names'
+              }
+            ]
+          '2':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.python'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.python'
+        'name': 'meta.function-call.python'
+        'contentName': 'meta.function-call.arguments.python'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'include': '$self'
           }
         ]
       }
@@ -889,6 +870,37 @@
     'comment': 'magic variables which a class/module may have.'
     'match': '\\b__(all|annotations|bases|class|closure|code|debug|dict|doc|file|func|globals|kwdefaults|members|metaclass|methods|module|name|qualname|self|slots|weakref)__\\b'
     'name': 'support.variable.magic.python'
+  'method_calls':
+    'patterns': [
+      {
+        'begin': '(\\.)([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.separator.method.period.python'
+          '2':
+            'patterns': [
+              {
+                'include': '#function_names'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.python'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.python'
+        'name': 'meta.method-call.python'
+        'contentName': 'meta.method-call.arguments.python'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
   'objects':
     'patterns': [
       {
