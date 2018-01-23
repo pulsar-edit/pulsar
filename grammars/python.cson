@@ -318,12 +318,6 @@
           '2':
             'name': 'storage.type.python'
       }
-      {
-        # No match, not at the end of the line, and no opening parentheses
-        'begin': '(?!\\G)(?!\\s*$)(?!.*\\()'
-        'end': '$'
-        'name': 'invalid.illegal.missing-parameters.python'
-      }
     ]
   }
   {
