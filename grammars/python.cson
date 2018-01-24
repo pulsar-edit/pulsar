@@ -629,6 +629,9 @@
           '1':
             'patterns': [
               {
+                'include': '#builtin_functions'
+              }
+              {
                 'include': '#function_names'
               }
             ]
@@ -648,38 +651,6 @@
             'include': '$self'
           }
         ]
-      }
-    ]
-  'function_names':
-    'patterns': [
-      {
-        'include': '#magic_function_names'
-      }
-      {
-        'include': '#magic_variable_names'
-      }
-      {
-        'include': '#illegal_names'
-      }
-      {
-        'match': '[a-zA-Z_][a-zA-Z0-9_]*'
-        'name': 'entity.name.function.python'
-      }
-    ]
-  'line_comments':
-    'begin': '(^[ \\t]+)?(?=#)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.whitespace.comment.leading.python'
-    'end': '(?!\\G)'
-    'patterns': [
-      {
-        'begin': '#'
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.comment.python'
-        'end': '\\n'
-        'name': 'comment.line.number-sign.python'
       }
     ]
   'dotted_name':
@@ -810,25 +781,17 @@
       '3':
         'name': 'constant.character.escape.unicode.name.python'
     'match': '(\\\\U[0-9A-Fa-f]{8})|(\\\\u[0-9A-Fa-f]{4})|(\\\\N\\{[a-zA-Z ]+\\})'
-  'function_name':
+  'function_names':
     'patterns': [
       {
         'include': '#magic_function_names'
       }
       {
-        'include': '#magic_variable_names'
+        'include': '#illegal_names'
       }
       {
-        'include': '#builtin_exceptions'
-      }
-      {
-        'include': '#builtin_functions'
-      }
-      {
-        'include': '#builtin_types'
-      }
-      {
-        'include': '#generic_names'
+        'match': '[a-zA-Z_][a-zA-Z0-9_]*'
+        'name': 'entity.name.function.python'
       }
     ]
   'generic_names':
@@ -855,6 +818,22 @@
   'language_variables':
     'match': '\\b(self|cls)\\b'
     'name': 'variable.language.self.python'
+  'line_comments':
+    'begin': '(^[ \\t]+)?(?=#)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.whitespace.comment.leading.python'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '#'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.python'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.python'
+      }
+    ]
   'line_continuation':
     'captures':
       '1':
