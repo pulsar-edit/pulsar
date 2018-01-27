@@ -307,18 +307,18 @@ describe "Python grammar", ->
         {tokens} = grammar.tokenizeLine "f'{name.decode(\"utf-8\").lower()}'"
 
         expect(tokens[2]).toEqual value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']
-        expect(tokens[3]).toEqual value: 'name', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-        expect(tokens[4]).toEqual value: '.', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-        expect(tokens[5]).toEqual value: 'decode', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-        expect(tokens[6]).toEqual value: '(', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
-        expect(tokens[7]).toEqual value: '"', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.double.single-line.python", 'punctuation.definition.string.begin.python']
-        expect(tokens[8]).toEqual value: 'utf-8', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.double.single-line.python"]
-        expect(tokens[9]).toEqual value: '"', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'meta.function-call.arguments.python', "string.quoted.double.single-line.python", 'punctuation.definition.string.end.python']
-        expect(tokens[10]).toEqual value: ')', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
-        expect(tokens[11]).toEqual value: '.', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python']
-        expect(tokens[12]).toEqual value: 'lower', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python']
-        expect(tokens[13]).toEqual value: '(', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
-        expect(tokens[14]).toEqual value: ')', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
+        expect(tokens[3]).toEqual value: 'name', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'variable.other.object.python']
+        expect(tokens[4]).toEqual value: '.', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'punctuation.separator.method.period.python']
+        expect(tokens[5]).toEqual value: 'decode', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'entity.name.function.python']
+        expect(tokens[6]).toEqual value: '(', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'punctuation.definition.arguments.begin.bracket.round.python']
+        expect(tokens[7]).toEqual value: '"', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'meta.method-call.arguments.python', "string.quoted.double.single-line.python", 'punctuation.definition.string.begin.python']
+        expect(tokens[8]).toEqual value: 'utf-8', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'meta.method-call.arguments.python', "string.quoted.double.single-line.python"]
+        expect(tokens[9]).toEqual value: '"', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'meta.method-call.arguments.python', "string.quoted.double.single-line.python", 'punctuation.definition.string.end.python']
+        expect(tokens[10]).toEqual value: ')', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'punctuation.definition.arguments.end.bracket.round.python']
+        expect(tokens[11]).toEqual value: '.', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'punctuation.separator.method.period.python']
+        expect(tokens[12]).toEqual value: 'lower', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'entity.name.function.python']
+        expect(tokens[13]).toEqual value: '(', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'punctuation.definition.arguments.begin.bracket.round.python']
+        expect(tokens[14]).toEqual value: ')', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'meta.embedded.python', 'meta.method-call.python', 'punctuation.definition.arguments.end.bracket.round.python']
         expect(tokens[15]).toEqual value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']
 
       it "tokenizes conversion flags", ->
@@ -599,32 +599,23 @@ describe "Python grammar", ->
   it "tokenizes properties of self as self-type variables", ->
     tokens = grammar.tokenizeLines('self.foo')
 
-    expect(tokens[0][0].value).toBe 'self'
-    expect(tokens[0][0].scopes).toEqual ['source.python', 'variable.language.self.python']
-    expect(tokens[0][1].value).toBe '.'
-    expect(tokens[0][1].scopes).toEqual ['source.python']
-    expect(tokens[0][2].value).toBe 'foo'
-    expect(tokens[0][2].scopes).toEqual ['source.python']
+    expect(tokens[0][0]).toEqual value: 'self', scopes: ['source.python', 'variable.language.self.python']
+    expect(tokens[0][1]).toEqual value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']
+    expect(tokens[0][2]).toEqual value: 'foo', scopes: ['source.python', 'variable.other.property.python']
 
   it "tokenizes cls as a self-type variable", ->
     tokens = grammar.tokenizeLines('cls.foo')
 
-    expect(tokens[0][0].value).toBe 'cls'
-    expect(tokens[0][0].scopes).toEqual ['source.python', 'variable.language.self.python']
-    expect(tokens[0][1].value).toBe '.'
-    expect(tokens[0][1].scopes).toEqual ['source.python']
-    expect(tokens[0][2].value).toBe 'foo'
-    expect(tokens[0][2].scopes).toEqual ['source.python']
+    expect(tokens[0][0]).toEqual value: 'cls', scopes: ['source.python', 'variable.language.self.python']
+    expect(tokens[0][1]).toEqual value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']
+    expect(tokens[0][2]).toEqual value: 'foo', scopes: ['source.python', 'variable.other.property.python']
 
   it "tokenizes properties of a variable as variables", ->
     tokens = grammar.tokenizeLines('bar.foo')
 
-    expect(tokens[0][0].value).toBe 'bar'
-    expect(tokens[0][0].scopes).toEqual ['source.python']
-    expect(tokens[0][1].value).toBe '.'
-    expect(tokens[0][1].scopes).toEqual ['source.python']
-    expect(tokens[0][2].value).toBe 'foo'
-    expect(tokens[0][2].scopes).toEqual ['source.python']
+    expect(tokens[0][0]).toEqual value: 'bar', scopes: ['source.python', 'variable.other.object.python']
+    expect(tokens[0][1]).toEqual value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']
+    expect(tokens[0][2]).toEqual value: 'foo', scopes: ['source.python', 'variable.other.property.python']
 
   it "tokenizes async function definitions", ->
     {tokens} = grammar.tokenizeLine 'async def test(param):'
@@ -689,19 +680,19 @@ describe "Python grammar", ->
   it "tokenizes complex function calls", ->
     {tokens} = grammar.tokenizeLine "torch.nn.BCELoss()(Variable(bayes_optimal_prob, 1, requires_grad=False), Yvar).data[0]"
 
-    expect(tokens[4]).toEqual value: 'BCELoss', scopes: ['source.python', 'meta.function-call.python']
-    expect(tokens[5]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
-    expect(tokens[6]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
-    expect(tokens[7]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
-    expect(tokens[8]).toEqual value: 'Variable', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python']
-    expect(tokens[9]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.python']
+    expect(tokens[4]).toEqual value: 'BCELoss', scopes: ['source.python', 'meta.method-call.python', 'entity.name.function.python']
+    expect(tokens[5]).toEqual value: '(', scopes: ['source.python', 'meta.method-call.python', 'punctuation.definition.arguments.begin.bracket.round.python']
+    expect(tokens[6]).toEqual value: ')', scopes: ['source.python', 'meta.method-call.python', 'punctuation.definition.arguments.end.bracket.round.python']
+    expect(tokens[7]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.bracket.round.python']
+    expect(tokens[8]).toEqual value: 'Variable', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'entity.name.function.python']
+    expect(tokens[9]).toEqual value: '(', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'punctuation.definition.arguments.begin.bracket.round.python']
     expect(tokens[10]).toEqual value: 'bayes_optimal_prob', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python']
-    expect(tokens[14]).toEqual value: 'requires_grad', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'variable.parameter.function.python']
-    expect(tokens[16]).toEqual value: 'False', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'constant.language.python']
-    expect(tokens[17]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
-    expect(tokens[18]).toEqual value: ', ', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python']
-    expect(tokens[20]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.python']
-    expect(tokens[21]).toEqual value: '.', scopes: ['source.python']
+    expect(tokens[16]).toEqual value: 'requires_grad', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'variable.parameter.function.python']
+    expect(tokens[18]).toEqual value: 'False', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'constant.language.python']
+    expect(tokens[19]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.bracket.round.python']
+    expect(tokens[20]).toEqual value: ',', scopes: ['source.python', 'meta.function-call.python', 'meta.function-call.arguments.python', 'punctuation.separator.arguments.python']
+    expect(tokens[22]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.bracket.round.python']
+    expect(tokens[23]).toEqual value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']
 
   it "tokenizes lambdas", ->
     {tokens} = grammar.tokenizeLine "lambda x, z = 4: x * z"
@@ -714,7 +705,7 @@ describe "Python grammar", ->
     expect(tokens[7]).toEqual value: '=', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'keyword.operator.assignment.python']
     expect(tokens[9]).toEqual value: '4', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'constant.numeric.integer.decimal.python']
     expect(tokens[10]).toEqual value: ':', scopes: ['source.python', 'meta.function.inline.python', 'punctuation.definition.function.begin.python']
-    expect(tokens[11]).toEqual value: ' ', scopes: ['source.python']
+    expect(tokens[11]).toEqual value: ' x ', scopes: ['source.python']
 
   it "tokenizes SQL inline highlighting on blocks", ->
     delimsByScope =

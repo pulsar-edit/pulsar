@@ -24,6 +24,9 @@
     'include': '#line_comments'
   }
   {
+    'include': '#language_variables'
+  }
+  {
     'match': '\\b(?i:(0x\\h*)L)'
     'name': 'constant.numeric.integer.long.hexadecimal.python'
   }
@@ -425,30 +428,16 @@
     ]
   }
   {
-    'begin': '(?:([A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*)|(?<=\\)|\\]))\\s*(\\()'
-    'beginCaptures':
-      '1':
-        'patterns': [
-          {
-            'include': '#dotted_name'
-          }
-        ]
-      '2':
-        'name': 'punctuation.definition.arguments.begin.python'
-    'end': '\\)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.definition.arguments.end.python'
-    'name': 'meta.function-call.python'
-    'contentName': 'meta.function-call.arguments.python'
-    'patterns': [
-      {
-        'include': '#keyword_arguments'
-      }
-      {
-        'include': '$self'
-      }
-    ]
+    'include': '#function_calls'
+  }
+  {
+    'include': '#method_calls'
+  }
+  {
+    'include': '#objects'
+  }
+  {
+    'include': '#properties'
   }
   {
     'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*\\s*\\[)'
@@ -517,12 +506,6 @@
   }
   {
     'include': '#string_quoted_double'
-  }
-  {
-    'include': '#dotted_name'
-  }
-  {
-    'include': '#language_variables'
   }
   {
     'begin': '(\\()'
@@ -664,20 +647,40 @@
         ]
       }
     ]
-  'line_comments':
-    'begin': '(^[ \\t]+)?(?=#)'
-    'beginCaptures':
-      '1':
-        'name': 'punctuation.whitespace.comment.leading.python'
-    'end': '(?!\\G)'
+  'function_calls':
     'patterns': [
       {
-        'begin': '#'
+        'begin': '(?:([A-Za-z_][A-Za-z0-9_]*)|(?<=\\)|\\]))\\s*(\\()'
         'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#builtin_functions'
+              }
+              {
+                'include': '#function_names'
+              }
+            ]
+          '2':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.python'
+        'end': '\\)'
+        'endCaptures':
           '0':
-            'name': 'punctuation.definition.comment.python'
-        'end': '\\n'
-        'name': 'comment.line.number-sign.python'
+            'name': 'punctuation.definition.arguments.end.bracket.round.python'
+        'name': 'meta.function-call.python'
+        'contentName': 'meta.function-call.arguments.python'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.arguments.python'
+          }
+          {
+            'include': '$self'
+          }
+        ]
       }
     ]
   'dotted_name':
@@ -808,25 +811,17 @@
       '3':
         'name': 'constant.character.escape.unicode.name.python'
     'match': '(\\\\U[0-9A-Fa-f]{8})|(\\\\u[0-9A-Fa-f]{4})|(\\\\N\\{[a-zA-Z ]+\\})'
-  'function_name':
+  'function_names':
     'patterns': [
       {
         'include': '#magic_function_names'
       }
       {
-        'include': '#magic_variable_names'
+        'include': '#illegal_names'
       }
       {
-        'include': '#builtin_exceptions'
-      }
-      {
-        'include': '#builtin_functions'
-      }
-      {
-        'include': '#builtin_types'
-      }
-      {
-        'include': '#generic_names'
+        'match': '[a-zA-Z_][a-zA-Z0-9_]*'
+        'name': 'entity.name.function.python'
       }
     ]
   'generic_names':
@@ -853,6 +848,22 @@
   'language_variables':
     'match': '\\b(self|cls)\\b'
     'name': 'variable.language.self.python'
+  'line_comments':
+    'begin': '(^[ \\t]+)?(?=#)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.whitespace.comment.leading.python'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '#'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.python'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.python'
+      }
+    ]
   'line_continuation':
     'captures':
       '1':
@@ -868,6 +879,102 @@
     'comment': 'magic variables which a class/module may have.'
     'match': '\\b__(all|annotations|bases|class|closure|code|debug|dict|doc|file|func|globals|kwdefaults|members|metaclass|methods|module|name|qualname|self|slots|weakref)__\\b'
     'name': 'support.variable.magic.python'
+  'method_calls':
+    'patterns': [
+      {
+        'begin': '(\\.)([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.separator.method.period.python'
+          '2':
+            'patterns': [
+              {
+                'include': '#function_names'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.python'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.python'
+        'name': 'meta.method-call.python'
+        'contentName': 'meta.method-call.arguments.python'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.arguments.python'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  'objects':
+    'patterns': [
+      {
+        # OBJ in OBJ.prop, OBJ.methodCall()
+        'match': '[A-Z][A-Z0-9_]*(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'name': 'constant.other.object.python'
+      }
+      {
+        # obj in obj.prop, obj.methodCall()
+        'match': '[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'name': 'variable.other.object.python'
+      }
+    ]
+  'properties':
+    'patterns': [
+      {
+        # PROP1 in obj.PROP1.prop2, func().PROP1.prop2
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_]*\\b\\$*)(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'constant.other.object.property.python'
+      }
+      {
+        # prop1 in obj.prop1.prop2, func().prop1.prop2
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'variable.other.object.property.python'
+      }
+      {
+        # PROP in obj.PROP, func().PROP
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'constant.other.property.python'
+      }
+      {
+        # prop in obj.prop, func().prop
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'variable.other.property.python'
+      }
+      {
+        # 123illegal in obj.123illegal, func().123illegal
+        'match': '(\\.)\\s*([0-9][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'invalid.illegal.identifier.python'
+      }
+    ]
   'nested_replacement_field':
     'match': '''(?x)
       {
