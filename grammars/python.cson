@@ -24,6 +24,9 @@
     'include': '#line_comments'
   }
   {
+    'include': '#language_variables'
+  }
+  {
     'match': '\\b(?i:(0x\\h*)L)'
     'name': 'constant.numeric.integer.long.hexadecimal.python'
   }
@@ -505,9 +508,6 @@
     'include': '#string_quoted_double'
   }
   {
-    'include': '#language_variables'
-  }
-  {
     'begin': '(\\()'
     'end': '(\\))'
     'patterns': [
@@ -672,6 +672,10 @@
         'patterns': [
           {
             'include': '#keyword_arguments'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.arguments.python'
           }
           {
             'include': '$self'
@@ -899,6 +903,10 @@
         'patterns': [
           {
             'include': '#keyword_arguments'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.arguments.python'
           }
           {
             'include': '$self'
