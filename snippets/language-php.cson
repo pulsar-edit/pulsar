@@ -17,7 +17,7 @@
     'body': '${1:public }function __construct(${2:${3:Type }$${4:foo} ${5:= ${6:null}}})\n{\n\t${2:$this->${4:foo} = $${4:foo};}$0\n}'
   'Heredoc':
     'prefix': '<<<'
-    'body': '<<<${1:HTML}\n${2:content here}\n$1;\n'
+    'body': '<<<${1:HTML}\n${2:content here}\n${1:HTML};\n'
   'Class Variable':
     'prefix': 'doc_v'
     'body': '/**\n * ${3:undocumented class variable}\n *\n * @var ${4:string}\n */\n${1:var} $$2;$0'
