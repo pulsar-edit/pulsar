@@ -1,15 +1,41 @@
-language: objective-c
+### Project specific config ###
+language: generic
+
+env:
+  global:
+    - APM_TEST_PACKAGES=""
+    - ATOM_LINT_WITH_BUNDLED_NODE="true"
+
+  matrix:
+    - ATOM_CHANNEL=stable
+    - ATOM_CHANNEL=beta
+
+### Generic setup follows ###
+script:
+  - curl -s -O https://raw.githubusercontent.com/atom/ci/master/build-package.sh
+  - chmod u+x build-package.sh
+  - ./build-package.sh
 
 notifications:
   email:
     on_success: never
     on_failure: change
 
-script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
+branches:
+  only:
+    - master
 
 git:
   depth: 10
 
-branches:
-  only:
-    - master
+sudo: false
+
+dist: trusty
+
+addons:
+  apt:
+    packages:
+    - build-essential
+    - fakeroot
+    - git
+    - libsecret-1-dev
