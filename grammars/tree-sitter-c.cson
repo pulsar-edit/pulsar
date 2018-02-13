@@ -91,6 +91,8 @@ scopes:
   'type_identifier': 'support.support.type'
   'primitive_type': 'support.support.type'
   '"unsigned"': 'support.support.type'
+  '"short"': 'support.support.type'
+  '"long"': 'support.support.type'
 
   'char_literal': 'string.quoted.single'
   'string_literal': 'string.quoted.double'
