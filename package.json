@@ -16,6 +16,6 @@
     "url": "https://github.com/atom/language-typescript/issues"
   },
   "dependencies": {
-    "tree-sitter-typescript": "^0.6.0"
+    "tree-sitter-typescript": "^0.6.2"
   }
 }

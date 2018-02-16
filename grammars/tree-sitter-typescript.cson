@@ -48,7 +48,6 @@ folds: [
 
 scopes:
   'program': 'source.js'
-  'ERROR': 'syntax-error'
 
   'property_identifier': 'variable.other.object.property'
 
@@ -87,9 +86,11 @@ scopes:
   '"private"': 'storage.modifier'
   'readonly': 'storage.modifier'
   '"class"': 'storage.type.class'
-  '"function"': 'storage.type.function'
   '"type"': 'storage.type.type'
+  '"function"': 'storage.type.function'
+  '"=>"': 'storage.type.function'
 
+  '"="': 'keyword.operator'
   '"+"': 'keyword.operator'
   '"-"': 'keyword.operator'
   '"*"': 'keyword.operator'
