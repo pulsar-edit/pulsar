@@ -57,6 +57,8 @@ scopes:
   'none': 'constant.language'
   'true': 'constant.language'
   'false': 'constant.language'
+  'integer': 'constant.language'
+  'float': 'constant.language'
 
   'type > identifier': 'support.storage.type'
 
@@ -73,6 +75,7 @@ scopes:
   '"break"': 'keyword.control'
   '"continue"': 'keyword.control'
   '"raise"': 'keyword.control'
+  '"yield"': 'keyword.control'
   '"try"': 'keyword.control'
   '"except"': 'keyword.control'
   '"with"': 'keyword.control'
@@ -80,6 +83,8 @@ scopes:
   '"finally"': 'keyword.control'
   '"import"': 'keyword.control'
   '"from"': 'keyword.control'
+  '"print"': 'keyword.control'
+  '"assert"': 'keyword.control'
 
   '"+"': 'keyword.operator'
   '"-"': 'keyword.operator'
@@ -87,7 +92,7 @@ scopes:
   '"/"': 'keyword.operator'
   '"%"': 'keyword.operator'
   '"in"': 'keyword.operator.in'
-  '"and"': 'keyword.operator.logical'
-  '"or"': 'keyword.operator.logical'
-  '"not"': 'keyword.operator.logical'
-  '"is"': 'keyword.operator.logical'
+  '"and"': 'keyword.operator.logical.python'
+  '"or"': 'keyword.operator.logical.python'
+  '"not"': 'keyword.operator.logical.python'
+  '"is"': 'keyword.operator.logical.python'
