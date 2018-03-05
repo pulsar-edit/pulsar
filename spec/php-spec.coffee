@@ -553,6 +553,13 @@ describe 'PHP grammar', ->
       expect(tokens[3]).toEqual value: ' ', scopes: ['source.php', 'meta.class.php']
       expect(tokens[4]).toEqual value: 'Test', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
 
+    it 'tokenizes classes declared immediately after another class ends', ->
+      {tokens} = grammar.tokenizeLine 'class Test {}final class Test2 {}'
+
+      expect(tokens[6]).toEqual value: 'final', scopes: ['source.php', 'meta.class.php', 'storage.modifier.final.php']
+      expect(tokens[8]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(tokens[10]).toEqual value: 'Test2', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
+
     describe 'use statements', ->
       it 'tokenizes basic use statements', ->
         lines = grammar.tokenizeLines '''
