@@ -1687,7 +1687,7 @@ describe 'PHP grammar', ->
     expect(tokens[12]).toEqual value: 'func', scopes: ['source.php', 'meta.use.php', 'entity.other.alias.php']
     expect(tokens[13]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
-  it 'should tokenize yield correctly', ->
+  it 'tokenizes yield', ->
     {tokens} = grammar.tokenizeLine 'function test() { yield $a; }'
 
     expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
@@ -1705,6 +1705,23 @@ describe 'PHP grammar', ->
     expect(tokens[12]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
     expect(tokens[13]).toEqual value: ' ', scopes: ['source.php']
     expect(tokens[14]).toEqual value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']
+
+  it 'tokenizes `yield from`', ->
+    {tokens} = grammar.tokenizeLine 'function test() { yield from $a; }'
+
+    expect(tokens[8]).toEqual value: 'yield from', scopes: ['source.php', 'keyword.control.yield-from.php']
+    expect(tokens[9]).toEqual value: ' ', scopes: ['source.php']
+    expect(tokens[10]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(tokens[11]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
+    expect(tokens[12]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+
+    {tokens} = grammar.tokenizeLine 'function test() { yield      from $a; }'
+
+    expect(tokens[8]).toEqual value: 'yield      from', scopes: ['source.php', 'keyword.control.yield-from.php']
+    expect(tokens[9]).toEqual value: ' ', scopes: ['source.php']
+    expect(tokens[10]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(tokens[11]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
+    expect(tokens[12]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
   it 'should tokenize embedded SQL in a string', ->
     waitsForPromise ->

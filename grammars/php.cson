@@ -310,8 +310,15 @@
     'include': '#switch_statement'
   }
   {
+    # Special-case `yield from` so its scope isn't `keyword.control.yield from.php`
+    'match': '\\s*\\b(yield\\s+from)\\b'
+    'captures':
+      '1':
+        'name': 'keyword.control.yield-from.php'
+  }
+  {
     'match': '''(?x)
-      \\s*
+      \\s* # FIXME: Removing this causes specs to fail. Investigate.
       \\b(
         break|case|continue|declare|default|die|do|
         else(if)?|end(declare|for(each)?|if|switch|while)|exit|
