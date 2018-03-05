@@ -732,6 +732,22 @@ describe 'PHP grammar', ->
       expect(tokens[7]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
       expect(tokens[8]).toEqual value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
 
+    it 'tokenizes nullable typehints', ->
+      {tokens} = grammar.tokenizeLine 'function test(?class_name $value) {}'
+
+      expect(tokens[4]).toEqual value: '?', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.nullable-type.php']
+      expect(tokens[5]).toEqual value: 'class_name', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+      expect(tokens[7]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[8]).toEqual value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+
+      {tokens} = grammar.tokenizeLine 'function test(?   class_name $value) {}'
+
+      expect(tokens[4]).toEqual value: '?', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.nullable-type.php']
+      expect(tokens[5]).toEqual value: '   ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
+      expect(tokens[6]).toEqual value: 'class_name', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+      expect(tokens[8]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[9]).toEqual value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+
     it 'tokenizes namespaced and typehinted class names', ->
       {tokens} = grammar.tokenizeLine 'function test(\\class_name $value) {}'
 
@@ -860,9 +876,25 @@ describe 'PHP grammar', ->
       expect(tokens[8]).toEqual value: 'Client', scopes: ['source.php', 'meta.function.php', 'storage.type.php']
       expect(tokens[9]).toEqual value: ' ', scopes: ['source.php']
 
+    it 'tokenizes nullable return values', ->
+      {tokens} = grammar.tokenizeLine 'function test() : ?Client {}'
+
+      expect(tokens[6]).toEqual value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']
+      expect(tokens[7]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php']
+      expect(tokens[8]).toEqual value: '?', scopes: ['source.php', 'meta.function.php', 'keyword.operator.nullable-type.php']
+      expect(tokens[9]).toEqual value: 'Client', scopes: ['source.php', 'meta.function.php', 'storage.type.php']
+
+      {tokens} = grammar.tokenizeLine 'function test() : ?   Client {}'
+
+      expect(tokens[6]).toEqual value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']
+      expect(tokens[7]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php']
+      expect(tokens[8]).toEqual value: '?', scopes: ['source.php', 'meta.function.php', 'keyword.operator.nullable-type.php']
+      expect(tokens[9]).toEqual value: '   ', scopes: ['source.php', 'meta.function.php']
+      expect(tokens[10]).toEqual value: 'Client', scopes: ['source.php', 'meta.function.php', 'storage.type.php']
+
     it 'tokenizes function names with characters other than letters or numbers', ->
-      # Char 160 is hex0xA0, which is between 0x7F and 0xFF, making it a valid PHP identifier
-      functionName = "foo#{String.fromCharCode 160}bar"
+      # Char 160 is hex 0xA0, which is between 0x7F and 0xFF, making it a valid PHP identifier
+      functionName = "foo#{String.fromCharCode(160)}bar"
       {tokens} = grammar.tokenizeLine "function #{functionName}() {}"
 
       expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
