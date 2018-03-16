@@ -18,6 +18,7 @@
   'languagebabel'
   'ldj'
   'ldjson'
+  'pipfile.lock'
   'schema'
   'stylintrc'
   'template'
