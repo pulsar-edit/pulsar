@@ -19,6 +19,16 @@
   'wsgi'
 ]
 'firstLineMatch': '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
+'injections':
+  'L:source.python meta.embedded.sql':
+    'patterns': [
+      {
+        'include': '#string_formatting'
+      }
+      {
+        'include': '#escaped_char'
+      }
+    ]
 'patterns': [
   {
     'include': '#line_comments'
@@ -1620,6 +1630,7 @@
           '2':
             'name': 'meta.empty-string.double.python'
         'name': 'string.quoted.double.block.sql.python'
+        'contentName': 'meta.embedded.sql'
         'patterns': [
           {
              'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
@@ -1629,12 +1640,6 @@
                   'include': 'source.sql'
                 }
              ]
-          }
-          {
-            'include': '#string_formatting'
-          }
-          {
-            'include': '#escaped_char'
           }
         ]
       }
@@ -1653,13 +1658,8 @@
           '3':
             'name': 'invalid.illegal.unclosed-string.python'
         'name': 'string.quoted.double.single-line.sql.python'
+        'contentName': 'meta.embedded.sql'
         'patterns': [
-          {
-            'include': '#string_formatting'
-          }
-          {
-            'include': '#escaped_char'
-          }
           {
             'include': 'source.sql'
           }
@@ -2201,6 +2201,7 @@
           '2':
             'name': 'meta.empty-string.single.python'
         'name': 'string.quoted.single.block.sql.python'
+        'contentName': 'meta.embedded.sql'
         'patterns': [
           {
              'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
@@ -2210,12 +2211,6 @@
                   'include': 'source.sql'
                 }
              ]
-          }
-          {
-            'include': '#string_formatting'
-          }
-          {
-            'include': '#escaped_char'
           }
         ]
       }
@@ -2232,13 +2227,8 @@
           '2':
             'name': 'invalid.illegal.unclosed-string.python'
         'name': 'string.quoted.single.single-line.python'
+        'contentName': 'meta.embedded.sql'
         'patterns': [
-          {
-            'include': '#string_formatting'
-          }
-          {
-            'include': '#escaped_char'
-          }
           {
             'include': 'source.sql'
           }
