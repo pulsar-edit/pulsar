@@ -707,8 +707,11 @@ describe "Python grammar", ->
     expect(tokens[10]).toEqual value: ':', scopes: ['source.python', 'meta.function.inline.python', 'punctuation.definition.function.begin.python']
     expect(tokens[11]).toEqual value: ' x ', scopes: ['source.python']
 
-  # FIXME: These tests are quite useless as they don't actually use the language-sql package
   describe "SQL highlighting", ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-sql')
+
     it "tokenizes SQL inline highlighting on blocks", ->
       delimsByScope =
         "string.quoted.double.block.sql.python": '"""'
@@ -723,8 +726,10 @@ describe "Python grammar", ->
         )
 
         expect(tokens[0][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
-        expect(tokens[1][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[2][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[1][0]).toEqual value: 'SELECT', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[1][1]).toEqual value: ' bar', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[2][0]).toEqual value: 'FROM', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[2][1]).toEqual value ' foo', scopes: ['source.python', scope, 'meta.embedded.sql']
         expect(tokens[3][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
 
     it "tokenizes SQL inline highlighting on blocks with a CTE", ->
@@ -747,19 +752,55 @@ describe "Python grammar", ->
         """)
 
         expect(tokens[0][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.begin.python']
-        expect(tokens[1][0]).toEqual value: 'WITH example_cte AS (', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[2][0]).toEqual value: 'SELECT bar', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[3][0]).toEqual value: 'FROM foo', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[4][0]).toEqual value: 'GROUP BY bar', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[5][0]).toEqual value: ')', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[6][0]).toEqual value: '', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[7][0]).toEqual value: 'SELECT COUNT(*)', scopes: ['source.python', scope, 'meta.embedded.sql']
-        expect(tokens[8][0]).toEqual value: 'FROM example_cte', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[1][0]).toEqual value: 'WITH', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[1][1]).toEqual value: ' example_cte ', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[1][2]).toEqual value: 'AS', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.alias.sql']
+        expect(tokens[1][3]).toEqual value: ' ', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[1][4]).toEqual value: '(', scopes: ['source.python', scope, 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.begin.sql']
+        expect(tokens[2][0]).toEqual value: 'SELECT', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[2][1]).toEqual value: ' bar', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[3][0]).toEqual value: 'FROM', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[3][1]).toEqual value: ' foo', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[4][0]).toEqual value: 'GROUP BY', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[4][1]).toEqual value: ' bar', scopes: ['source.python', scope, 'meta.embedded.sql']
+        expect(tokens[5][0]).toEqual value: ')', scopes: ['source.python', scope, 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.end.sql']
+        expect(tokens[7][0]).toEqual value: 'SELECT', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
+        expect(tokens[8][0]).toEqual value: 'FROM', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']
         expect(tokens[9][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
 
     it "tokenizes SQL inline highlighting on single line with a CTE", ->
       {tokens} = grammar.tokenizeLine('\'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte\'')
 
       expect(tokens[0]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.begin.python']
-      expect(tokens[1]).toEqual value: 'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
-      expect(tokens[2]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.end.python']
+      expect(tokens[1]).toEqual value: 'WITH', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.other.DML.sql']
+      expect(tokens[2]).toEqual value: ' example_cte ', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[3]).toEqual value: 'AS', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.other.alias.sql']
+      expect(tokens[4]).toEqual value: ' ', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[5]).toEqual value: '(', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.begin.sql']
+      expect(tokens[6]).toEqual value: 'SELECT', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.other.DML.sql']
+      expect(tokens[7]).toEqual value: ' bar ', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[8]).toEqual value: 'FROM', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.other.DML.sql']
+      expect(tokens[9]).toEqual value: ' foo', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[10]).toEqual value: ')', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.end.sql']
+      expect(tokens[11]).toEqual value: ' ', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[12]).toEqual value: 'SELECT', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.other.DML.sql']
+      expect(tokens[13]).toEqual value: ' ', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[14]).toEqual value: 'COUNT', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'support.function.aggregate.sql']
+      expect(tokens[15]).toEqual value: '(', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.begin.sql']
+      expect(tokens[16]).toEqual value: '*', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.operator.star.sql']
+      expect(tokens[17]).toEqual value: ')', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.end.sql']
+      expect(tokens[18]).toEqual value: ' ', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[19]).toEqual value: 'FROM', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql', 'keyword.other.DML.sql']
+      expect(tokens[20]).toEqual value: ' example_cte', scopes: ['source.python', 'string.quoted.single.single-line.python', 'meta.embedded.sql']
+      expect(tokens[21]).toEqual value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.end.python']
+
+    it "tokenizes Python escape characters and formatting specifiers in SQL strings", ->
+      {tokens} = grammar.tokenizeLine('"INSERT INTO url (image_uri) VALUES (\\\'%s\\\');" % values')
+
+      expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'punctuation.definition.string.begin.python']
+      expect(tokens[10]).toEqual value: '\\\'', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'meta.embedded.sql', 'constant.character.escape.single-quote.python']
+      expect(tokens[11]).toEqual value: '%s', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'meta.embedded.sql', 'constant.other.placeholder.python']
+      expect(tokens[12]).toEqual value: '\\\'', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'meta.embedded.sql', 'constant.character.escape.single-quote.python']
+      expect(tokens[13]).toEqual value: ')', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'meta.embedded.sql', 'punctuation.definition.section.bracket.round.end.sql']
+      expect(tokens[15]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'punctuation.definition.string.end.python']
+      expect(tokens[17]).toEqual value: '%', scopes: ['source.python', 'keyword.operator.arithmetic.python']
