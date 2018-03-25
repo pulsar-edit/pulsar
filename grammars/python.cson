@@ -2226,7 +2226,7 @@
             'name': 'punctuation.definition.string.end.python'
           '2':
             'name': 'invalid.illegal.unclosed-string.python'
-        'name': 'string.quoted.single.single-line.python'
+        'name': 'string.quoted.single.single-line.sql.python'
         'contentName': 'meta.embedded.sql'
         'patterns': [
           {
