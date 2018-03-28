@@ -1629,11 +1629,11 @@
             'name': 'punctuation.definition.string.end.python'
           '2':
             'name': 'meta.empty-string.double.python'
-        'name': 'string.quoted.double.block.sql.python'
-        'contentName': 'meta.embedded.sql'
+        'name': 'string.quoted.double.block.python'
         'patterns': [
           {
              'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
+             'name': 'meta.embedded.sql'
              'end': '(?=\\s*""")'
              'patterns': [
                 {
@@ -2200,12 +2200,12 @@
             'name': 'punctuation.definition.string.end.python'
           '2':
             'name': 'meta.empty-string.single.python'
-        'name': 'string.quoted.single.block.sql.python'
-        'contentName': 'meta.embedded.sql'
+        'name': 'string.quoted.single.block.python'
         'patterns': [
           {
              'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH))'
              'end': '(?=\\s*\'\'\')'
+             'name': 'meta.embedded.sql'
              'patterns': [
                 {
                   'include': 'source.sql'

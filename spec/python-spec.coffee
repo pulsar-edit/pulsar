@@ -374,6 +374,29 @@ describe "Python grammar", ->
       expect(tokens[4]).toEqual value: 'st', scopes: ['source.python', "string.quoted.single.single-line.binary.python"]
       expect(tokens[5]).toEqual value: "'", scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'punctuation.definition.string.end.python']
 
+  describe "docstrings", ->
+    it "tokenizes them", ->
+      lines = grammar.tokenizeLines '''
+        """
+          Bla bla bla "wow" what's this?
+        """
+      '''
+
+      expect(lines[0][0]).toEqual value: '"""', scopes: ['source.python', 'string.quoted.double.block.python', 'punctuation.definition.string.begin.python']
+      expect(lines[1][0]).toEqual value: '  Bla bla bla "wow" what\'s this?', scopes: ['source.python', 'string.quoted.double.block.python']
+      expect(lines[2][0]).toEqual value: '"""', scopes: ['source.python', 'string.quoted.double.block.python', 'punctuation.definition.string.end.python']
+
+      lines = grammar.tokenizeLines """
+        '''
+          Bla bla bla "wow" what's this?
+        '''
+      """
+
+      expect(lines[0][0]).toEqual value: "'''", scopes: ['source.python', 'string.quoted.single.block.python', 'punctuation.definition.string.begin.python']
+      expect(lines[1][0]).toEqual value: '  Bla bla bla "wow" what\'s this?', scopes: ['source.python', 'string.quoted.single.block.python']
+      expect(lines[2][0]).toEqual value: "'''", scopes: ['source.python', 'string.quoted.single.block.python', 'punctuation.definition.string.end.python']
+
+
   describe "string formatting", ->
     describe "%-style formatting", ->
       it "tokenizes the conversion type", ->
@@ -733,9 +756,11 @@ describe "Python grammar", ->
         expect(tokens[3][0]).toEqual value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']
 
     it "tokenizes SQL inline highlighting on blocks with a CTE", ->
+      # Note that these scopes do not contain .sql because we can't definitively tell
+      # if the string contains SQL or not
       delimsByScope =
-        "string.quoted.double.block.sql.python": '"""'
-        "string.quoted.single.block.sql.python": "'''"
+        "string.quoted.double.block.python": '"""'
+        "string.quoted.single.block.python": "'''"
 
       for scope, delim of delimsByScope
         tokens = grammar.tokenizeLines("""
