@@ -6,6 +6,15 @@ legacyScopeName: 'source.python'
 
 fileTypes: [
   'py'
+  'pyi'
+  'pyw'
+  'gyp'
+  'gypi'
+  'SConstruct'
+  'Sconstruct'
+  'sconstruct'
+  'SConscript'
+  'wsgi'
 ]
 
 folds: [
