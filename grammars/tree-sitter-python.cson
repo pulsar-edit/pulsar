@@ -85,6 +85,8 @@ scopes:
   '"continue"': 'keyword.control'
   '"raise"': 'keyword.control'
   '"yield"': 'keyword.control'
+  '"await"': 'keyword.control'
+  '"async"': 'keyword.control'
   '"try"': 'keyword.control'
   '"except"': 'keyword.control'
   '"with"': 'keyword.control'
