@@ -16,7 +16,7 @@
     "url": "https://github.com/atom/language-python/issues"
   },
   "dependencies": {
-    "tree-sitter-python": "^0.11.2"
+    "tree-sitter-python": "^0.11.3"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"
