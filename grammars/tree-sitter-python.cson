@@ -102,7 +102,7 @@ scopes:
   '"*"': 'keyword.operator'
   '"/"': 'keyword.operator'
   '"%"': 'keyword.operator'
-  '"in"': 'keyword.operator.in'
+  '"in"': 'keyword.operator.logical.python'
   '"and"': 'keyword.operator.logical.python'
   '"or"': 'keyword.operator.logical.python'
   '"not"': 'keyword.operator.logical.python'
