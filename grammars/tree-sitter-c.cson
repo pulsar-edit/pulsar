@@ -61,6 +61,7 @@ scopes:
   '"#endif"': 'keyword.control.directive'
   '"#define"': 'keyword.control.directive'
   '"#include"': 'keyword.control.directive'
+  'preproc_directive': 'keyword.control.directive'
 
   '"if"': 'keyword.control'
   '"else"': 'keyword.control'
@@ -108,6 +109,9 @@ scopes:
   '"static"': 'storage.modifier'
   '"inline"': 'storage.modifier'
   '"const"': 'storage.modifier'
+  '"volatile"': 'storage.modifier'
+  '"restrict"': 'storage.modifier'
+  '"_Atomic"': 'storage.modifier'
   'function_specifier': 'storage.modifier'
 
   '"*"': 'keyword.operator'
