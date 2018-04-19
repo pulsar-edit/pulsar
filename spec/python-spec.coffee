@@ -730,6 +730,15 @@ describe "Python grammar", ->
     expect(tokens[10]).toEqual value: ':', scopes: ['source.python', 'meta.function.inline.python', 'punctuation.definition.function.begin.python']
     expect(tokens[11]).toEqual value: ' x ', scopes: ['source.python']
 
+  it "tokenizes lambdas without arguments", ->
+    {tokens} = grammar.tokenizeLine "lambda: None"
+    expect(tokens[0]).toEqual value: 'lambda', scopes: ['source.python', 'meta.function.inline.python', 'storage.type.function.inline.python']
+    expect(tokens[1]).toEqual value: ':', scopes: ['source.python', 'meta.function.inline.python', 'punctuation.definition.function.begin.python']
+
+  it "does not tokenizes a variable name containing lambda as a lambda", ->
+    {tokens} = grammar.tokenizeLine "not_a_lambda.foo"
+    expect(tokens[0]).toEqual value: 'not_a_lambda', scopes: ['source.python', 'variable.other.object.python']
+
   describe "SQL highlighting", ->
     beforeEach ->
       waitsForPromise ->
