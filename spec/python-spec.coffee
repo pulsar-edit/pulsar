@@ -720,20 +720,9 @@ describe "Python grammar", ->
     expect(tokens[22]).toEqual value: ')', scopes: ['source.python', 'meta.function-call.python', 'punctuation.definition.arguments.end.bracket.round.python']
     expect(tokens[23]).toEqual value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']
 
-  it "tokenizes lambdas", ->
-    {tokens} = grammar.tokenizeLine "lambda x, z = 4: x * z"
-
-    expect(tokens[0]).toEqual value: 'lambda', scopes: ['source.python', 'meta.function.inline.python', 'storage.type.function.inline.python']
-    expect(tokens[2]).toEqual value: 'x', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'variable.parameter.function.python']
-    expect(tokens[3]).toEqual value: ',', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'punctuation.separator.parameters.python']
-    expect(tokens[5]).toEqual value: 'z', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'variable.parameter.function.python']
-    expect(tokens[7]).toEqual value: '=', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'keyword.operator.assignment.python']
-    expect(tokens[9]).toEqual value: '4', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'constant.numeric.integer.decimal.python']
-    expect(tokens[10]).toEqual value: ':', scopes: ['source.python', 'meta.function.inline.python', 'punctuation.definition.function.begin.python']
-    expect(tokens[11]).toEqual value: ' x ', scopes: ['source.python']
-
   # Add the grammar test fixtures
   grammarTest path.join(__dirname, 'fixtures/grammar/syntax_test_python.py')
+  grammarTest path.join(__dirname, 'fixtures/grammar/syntax_test_python_lambdas.py')
   grammarTest path.join(__dirname, 'fixtures/grammar/syntax_test_python_typing.py')
 
   describe "SQL highlighting", ->
