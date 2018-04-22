@@ -289,15 +289,17 @@
           {
             # param = 3
             # param: int = 3
-            'begin': '\\b([a-zA-Z_][\\w_]*)\\s*(?:(:)\\s*([a-zA-Z_][\\w_]*))?\\s*(=)\\s*'
+            'begin': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\s*(?:(:)\\s*([a-zA-Z_][\\w_]*))?\\s*(=)\\s*'
             'beginCaptures':
               '1':
-                'name': 'variable.parameter.function.python'
+                'name': 'keyword.operator.unpacking.arguments.python'
               '2':
-                'name': 'punctuation.separator.python'
+                'name': 'variable.parameter.function.python'
               '3':
-                'name': 'storage.type.python'
+                'name': 'punctuation.separator.python'
               '4':
+                'name': 'storage.type.python'
+              '5':
                 'name': 'keyword.operator.assignment.python'
             'end': '(?!\\G)'
             'patterns': [
@@ -309,13 +311,15 @@
           {
             # param
             # param: int
-            'match': '\\b([a-zA-Z_][\\w_]*)\\s*(?:(:)\\s*([a-zA-Z_][\\w_]*))?'
+            'match': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\s*(?:(:)\\s*([a-zA-Z_][\\w_]*))?'
             'captures':
               '1':
-                'name': 'variable.parameter.function.python'
+                'name': 'keyword.operator.unpacking.arguments.python'
               '2':
-                'name': 'punctuation.separator.python'
+                'name': 'variable.parameter.function.python'
               '3':
+                'name': 'punctuation.separator.python'
+              '4':
                 'name': 'storage.type.python'
           }
           {
@@ -352,11 +356,13 @@
         'patterns': [
           {
             # param = 3
-            'begin': '\\b([a-zA-Z_][\\w_]*)\\s*(=)\\s*'
+            'begin': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\s*(=)\\s*'
             'beginCaptures':
               '1':
-                'name': 'variable.parameter.function.python'
+                'name': 'keyword.operator.unpacking.arguments.python'
               '2':
+                'name': 'variable.parameter.function.python'
+              '3':
                 'name': 'keyword.operator.assignment.python'
             'end': '(?!\\G)'
             'patterns': [
@@ -367,8 +373,12 @@
           }
           {
             # param
-            'match': '\\b([a-zA-Z_][\\w_]*)\\b'
-            'name': 'variable.parameter.function.python'
+            'match': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\b'
+            'captures':
+              '1':
+                'name': 'keyword.operator.unpacking.arguments.python'
+              '2':
+                'name': 'variable.parameter.function.python'
           }
           {
             'match': ','

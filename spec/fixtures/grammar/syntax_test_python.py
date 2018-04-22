@@ -11,8 +11,10 @@ def my_func(first, second=False, *third, **forth):
 #                        ^ keyword.operator.assignment
 #                         ^^^^^ constant
 #                              ^ punctuation.separator.parameters
+#                                ^ keyword.operator.unpacking.arguments
 #                                 ^^^^^ variable.parameter.function
 #                                      ^ punctuation.separator.parameters
+#                                        ^^ keyword.operator.unpacking.arguments
 #                                          ^^^^^ variable.parameter.function
 #                                                ^ punctuation.definition.function.begin
     pass
@@ -28,7 +30,9 @@ my_func2 = lambda x, y=2, *z, **kw: x + y + 1
 #                     ^ keyword.operator.assignment
 #                      ^ constant
 #                       ^ punctuation.separator.parameters
+#                         ^ keyword.operator.unpacking.arguments
 #                          ^ variable.parameter.function
 #                           ^ punctuation.separator.parameters
+#                             ^^ keyword.operator.unpacking.arguments
 #                               ^^ variable.parameter.function
 #                                 ^ punctuation.definition.function.begin
