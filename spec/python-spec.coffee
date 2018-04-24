@@ -721,7 +721,6 @@ describe "Python grammar", ->
     {tokens} = grammar.tokenizeLine "lambda x, z = 4: x * z"
 
     expect(tokens[0]).toEqual value: 'lambda', scopes: ['source.python', 'meta.function.inline.python', 'storage.type.function.inline.python']
-    expect(tokens[1]).toEqual value: ' ', scopes: ['source.python', 'meta.function.inline.python']
     expect(tokens[2]).toEqual value: 'x', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'variable.parameter.function.python']
     expect(tokens[3]).toEqual value: ',', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'punctuation.separator.parameters.python']
     expect(tokens[5]).toEqual value: 'z', scopes: ['source.python', 'meta.function.inline.python', 'meta.function.inline.parameters.python', 'variable.parameter.function.python']
@@ -735,9 +734,13 @@ describe "Python grammar", ->
     expect(tokens[0]).toEqual value: 'lambda', scopes: ['source.python', 'meta.function.inline.python', 'storage.type.function.inline.python']
     expect(tokens[1]).toEqual value: ':', scopes: ['source.python', 'meta.function.inline.python', 'punctuation.definition.function.begin.python']
 
-  it "does not tokenizes a variable name containing lambda as a lambda", ->
+  it "does not tokenizes a variable name ending with lambda as a lambda", ->
     {tokens} = grammar.tokenizeLine "not_a_lambda.foo"
     expect(tokens[0]).toEqual value: 'not_a_lambda', scopes: ['source.python', 'variable.other.object.python']
+
+  it "does not tokenizes a variable name starting with lambda as a lambda", ->
+    {tokens} = grammar.tokenizeLine "lambda_not.foo"
+    expect(tokens[0]).toEqual value: 'lambda_not', scopes: ['source.python', 'variable.other.object.python']
 
   describe "SQL highlighting", ->
     beforeEach ->
