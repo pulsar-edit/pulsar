@@ -335,7 +335,7 @@
     ]
   }
   {
-    'begin': '\\b(lambda)\\s?+'
+    'begin': '\\b(lambda)(?=[\\s\\:])'
     'beginCaptures':
       '1':
         'name': 'storage.type.function.inline.python'
