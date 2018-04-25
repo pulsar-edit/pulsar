@@ -87,6 +87,7 @@ scopes:
   '"switch"': 'keyword.control'
   '"case"': 'keyword.control'
   '"default"': 'keyword.control'
+  '"goto"': 'keyword.control'
 
   '"struct"': 'keyword.control'
   '"enum"': 'keyword.control'
@@ -111,6 +112,8 @@ scopes:
   'function_declarator > field_identifier': 'entity.name.function'
   'function_declarator > scoped_identifier > identifier': 'entity.name.function'
   'destructor_name > identifier': 'entity.name.function'
+
+  'statement_identifier': 'constant.variable'
 
   'field_identifier': 'variable.other.member'
 
