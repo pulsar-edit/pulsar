@@ -25,3 +25,17 @@ lambda x, z = 4: x * z
 #           ^ keyword.operator.assignment.python
 #             ^ constant.numeric.integer.decimal.python
 #              ^ punctuation.definition.function.begin.python
+
+
+lambda: None
+# ^^^^ meta.function.inline.python
+# <- storage.type.function.inline.python
+#     ^ punctuation.definition.function.begin.python
+
+
+not_a_lambda.foo
+# <- ! meta.function.inline.python
+
+
+lambda_not.foo
+# <- ! meta.function.inline.python
