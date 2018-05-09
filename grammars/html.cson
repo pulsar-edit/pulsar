@@ -610,20 +610,21 @@
         'contentName': 'source.css.style.html'
         'patterns': [
           {
-            'begin': '\\G'
-            'end': '(?=")'
+            'match': '[^"]+'
             'name': 'meta.property-list.css'
-            'patterns': [
-              {
-                'include': '#embedded-code'
-              }
-              {
-                'include': '#entities'
-              }
-              {
-                'include': 'source.css#rule-list-innards'
-              }
-            ]
+            'captures':
+              '0':
+                'patterns': [
+                  {
+                    'include': '#embedded-code'
+                  }
+                  {
+                    'include': '#entities'
+                  }
+                  {
+                    'include': 'source.css#rule-list-innards'
+                  }
+                ]
           }
         ]
       }
@@ -640,20 +641,21 @@
         'contentName': 'source.css.style.html'
         'patterns': [
           {
-            'begin': '\\G'
-            'end': "(?=')"
+            'match': "[^']+"
             'name': 'meta.property-list.css'
-            'patterns': [
-              {
-                'include': '#embedded-code'
-              }
-              {
-                'include': '#entities'
-              }
-              {
-                'include': 'source.css#rule-list-innards'
-              }
-            ]
+            'captures':
+              '0':
+                'patterns': [
+                  {
+                    'include': '#embedded-code'
+                  }
+                  {
+                    'include': '#entities'
+                  }
+                  {
+                    'include': 'source.css#rule-list-innards'
+                  }
+                ]
           }
         ]
       }
