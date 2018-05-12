@@ -309,6 +309,38 @@ describe 'HTML grammar', ->
       expect(tokens[7]).toEqual value: "'", scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.single.html', 'punctuation.definition.string.end.html']
       expect(tokens[8]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
 
+    it 'recognizes a single attribute with spaces around the equals sign', ->
+      {tokens} = grammar.tokenizeLine '<span class   ="foo">'
+
+      expect(tokens[3]).toEqual value: 'class', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'entity.other.attribute-name.class.html']
+      expect(tokens[4]).toEqual value: '   ', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html']
+      expect(tokens[5]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'punctuation.separator.key-value.html']
+      expect(tokens[6]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(tokens[7]).toEqual value: 'foo', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html']
+      expect(tokens[8]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(tokens[9]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
+
+      {tokens} = grammar.tokenizeLine '<span class=   "foo">'
+
+      expect(tokens[3]).toEqual value: 'class', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'entity.other.attribute-name.class.html']
+      expect(tokens[4]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'punctuation.separator.key-value.html']
+      expect(tokens[5]).toEqual value: '   ', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html']
+      expect(tokens[6]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(tokens[7]).toEqual value: 'foo', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html']
+      expect(tokens[8]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(tokens[9]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
+
+      {tokens} = grammar.tokenizeLine '<span class   =   "foo">'
+
+      expect(tokens[3]).toEqual value: 'class', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'entity.other.attribute-name.class.html']
+      expect(tokens[4]).toEqual value: '   ', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html']
+      expect(tokens[5]).toEqual value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'punctuation.separator.key-value.html']
+      expect(tokens[6]).toEqual value: '   ', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html']
+      expect(tokens[7]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(tokens[8]).toEqual value: 'foo', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html']
+      expect(tokens[9]).toEqual value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(tokens[10]).toEqual value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']
+
     it 'recognizes a single attribute with an unquoted value', ->
       {tokens} = grammar.tokenizeLine '<span class=foo-3+5@>'
 
