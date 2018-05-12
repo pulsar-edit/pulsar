@@ -548,7 +548,7 @@
     # https://www.w3.org/TR/html51/syntax.html#attribute-name-state
     'patterns': [
       {
-        'begin': '([^\\s/=>"\'<]+)(=)'
+        'begin': '([^\\s/=>"\'<]+)\\s*(=)\\s*'
         'beginCaptures':
           '1':
             'name': 'entity.other.attribute-name.html'
@@ -577,7 +577,7 @@
       }
     ]
   'tag-style-attribute':
-    'begin': '\\b(style)(=)'
+    'begin': '\\b(style)\\s*(=)\\s*'
     'beginCaptures':
       '1':
         'name': 'entity.other.attribute-name.style.html'
@@ -670,7 +670,7 @@
       }
     ]
   'tag-id-attribute':
-    'begin': '\\b(id)(=)'
+    'begin': '\\b(id)\\s*(=)\\s*'
     'captures':
       '1':
         'name': 'entity.other.attribute-name.id.html'
@@ -724,7 +724,7 @@
       }
     ]
   'tag-class-attribute':
-    'begin': '\\b(class)(=)'
+    'begin': '\\b(class)\\s*(=)\\s*'
     'captures':
       '1':
         'name': 'entity.other.attribute-name.class.html'
