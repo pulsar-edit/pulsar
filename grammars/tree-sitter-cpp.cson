@@ -108,6 +108,7 @@ scopes:
   'call_expression > scoped_identifier > identifier': 'entity.name.function'
   'template_function > identifier': 'entity.name.function'
   'template_function > scoped_identifier > identifier': 'entity.name.function'
+  'template_method > field_identifier': 'entity.name.function'
   'function_declarator > identifier': 'entity.name.function'
   'function_declarator > field_identifier': 'entity.name.function'
   'function_declarator > scoped_identifier > identifier': 'entity.name.function'
