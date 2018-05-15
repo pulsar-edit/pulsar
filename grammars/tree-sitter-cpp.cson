@@ -24,6 +24,8 @@ fileTypes: [
   'tpp'
 ]
 
+contentRegExp: '\n\\s*(namespace|class|template)\\s+'
+
 folds: [
   {
     type: ['comment', 'preproc_arg']
