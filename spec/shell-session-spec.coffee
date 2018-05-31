@@ -48,6 +48,14 @@ describe "Shell session grammar", ->
     expect(tokens[3]).toEqual value: ' ', scopes: ['text.shell-session']
     expect(tokens[4]).toEqual value: 'echo', scopes: ['text.shell-session', 'source.shell', 'support.function.builtin.shell']
 
+  it "tokenizes prompts with prefixes and a leading parenthetical", ->
+    {tokens} = grammar.tokenizeLine('(venv) machine:pwd user$ echo $FOO')
+
+    expect(tokens[0]).toEqual value: '(venv) machine:pwd user', scopes: ['text.shell-session', 'entity.other.prompt-prefix.shell-session']
+    expect(tokens[1]).toEqual value: '$', scopes: ['text.shell-session', 'punctuation.separator.prompt.shell-session']
+    expect(tokens[2]).toEqual value: ' ', scopes: ['text.shell-session']
+    expect(tokens[3]).toEqual value: 'echo', scopes: ['text.shell-session', 'source.shell', 'support.function.builtin.shell']
+
   it "tokenizes prompts with prefixes with brackets", ->
     {tokens} = grammar.tokenizeLine('[user@machine pwd]$ echo $FOO')
 
