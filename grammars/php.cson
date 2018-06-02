@@ -1890,8 +1890,8 @@
       }
     ]
   'interpolation':
-    # http://www.php.net/manual/en/language.types.string.php$self.types.string.parsing
-    # http://www.php.net/manual/en/language.types.string.php$self.types.string.syntax.double
+    # http://www.php.net/manual/en/language.types.string.php#language.types.string.parsing
+    # http://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.double
     'patterns': [
       {
         'match': '\\\\[0-7]{1,3}'
