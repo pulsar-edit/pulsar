@@ -70,7 +70,7 @@
       }
       {
         # Unclosed strings must be captured to avoid them eating the remainder of the PHP script
-        # Sample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
+        # Sample case: $sql = 'SELECT CONCAT(\'"\', TRIM(cr.code)) as code'
         'match': '"(?=((\\\\")|[^"\'])*(\'|$))'
         'name': 'string.quoted.double.unclosed.sql'
       }
@@ -96,30 +96,42 @@
         'name': 'constant.character.escape.php'
       }
       {
+        # language-sql has single-line rules for strings that prevent injections from working; override them
+        'match': '(\')([^\'\\\\]*)(\')'
+        'name': 'string.quoted.single.sql'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'patterns': [
+              {
+                'include': 'source.php#interpolation_double_quoted'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.string.end.sql'
+      }
+      {
+        # language-sql has single-line rules for strings that prevent injections from working; override them
+        'match': '(`)([^`\\\\]*)(`)'
+        'name': 'string.quoted.other.backtick.sql'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'patterns': [
+              {
+                'include': 'source.php#interpolation_double_quoted'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.string.end.sql'
+      }
+      {
         # Unclosed strings must be captured to avoid them eating the remainder of the PHP script
-        # Sample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
+        # Sample case: $sql = 'SELECT CONCAT(\'"\', TRIM(cr.code)) as code'
         'match': '\'(?=((\\\\\')|[^\'"])*("|$))'
         'name': 'string.quoted.single.unclosed.sql'
-      }
-      {
-        'begin': '\''
-        'end': '\''
-        'name': 'string.quoted.single.sql'
-        'patterns': [
-          {
-            'include': 'source.php#interpolation_double_quoted'
-          }
-        ]
-      }
-      {
-        'begin': '`'
-        'end': '`'
-        'name': 'string.quoted.other.backtick.sql'
-        'patterns': [
-          {
-            'include': 'source.php#interpolation_double_quoted'
-          }
-        ]
       }
       {
         'include': 'source.php#interpolation_double_quoted'
