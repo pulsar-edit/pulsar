@@ -68,12 +68,6 @@
         'match': '\\\\[\\\\\'`"]'
         'name': 'constant.character.escape.php'
       }
-      {
-        # Unclosed strings must be captured to avoid them eating the remainder of the PHP script
-        # Sample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
-        'match': '"(?=((\\\\")|[^"\'])*(\'|$))'
-        'name': 'string.quoted.double.unclosed.sql'
-      }
     ]
   'L:source.php string.quoted.double.sql.php source.sql.embedded.php':
     'patterns': [
@@ -96,30 +90,36 @@
         'name': 'constant.character.escape.php'
       }
       {
-        # Unclosed strings must be captured to avoid them eating the remainder of the PHP script
-        # Sample case: $sql = "SELECT * FROM bar WHERE foo = \'" . $variable . "\'"'
-        'match': '\'(?=((\\\\\')|[^\'"])*("|$))'
-        'name': 'string.quoted.single.unclosed.sql'
-      }
-      {
-        'begin': '\''
-        'end': '\''
+        # language-sql has single-line rules for strings that prevent injections from working; override them
+        'match': '(\')([^\'\\\\]*)(\')'
         'name': 'string.quoted.single.sql'
-        'patterns': [
-          {
-            'include': 'source.php#interpolation_double_quoted'
-          }
-        ]
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'patterns': [
+              {
+                'include': 'source.php#interpolation_double_quoted'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.string.end.sql'
       }
       {
-        'begin': '`'
-        'end': '`'
+        # language-sql has single-line rules for strings that prevent injections from working; override them
+        'match': '(`)([^`\\\\]*)(`)'
         'name': 'string.quoted.other.backtick.sql'
-        'patterns': [
-          {
-            'include': 'source.php#interpolation_double_quoted'
-          }
-        ]
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'patterns': [
+              {
+                'include': 'source.php#interpolation_double_quoted'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.string.end.sql'
       }
       {
         'include': 'source.php#interpolation_double_quoted'
