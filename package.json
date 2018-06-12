@@ -16,7 +16,8 @@
     "url": "https://github.com/atom/language-html/issues"
   },
   "dependencies": {
-    "atom-grammar-test": "^0.6.3"
+    "atom-grammar-test": "^0.6.3",
+    "tree-sitter-html": "^0.1.0"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"

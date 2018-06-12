@@ -1,0 +1,35 @@
+id: 'html'
+name: 'HTML'
+type: 'tree-sitter'
+parser: 'tree-sitter-html'
+legacyScopeName: 'text.html.basic'
+
+fileTypes: [
+  'html'
+]
+
+folds: [
+  {
+    type: ['start_tag', 'raw_start_tag', 'self_closing_tag'],
+    start: {index: 1},
+    end: {index: -1}
+  }
+  {
+    type: ['element', 'raw_element'],
+    start: {index: 0},
+    end: {index: -1}
+  }
+]
+
+comments:
+  start: '<!--'
+  end: '-->'
+
+scopes:
+  'tag_name': 'entity.name.tag'
+  'raw_tag_name': 'entity.name.tag'
+  'erroneous_end_tag_name': 'invalid.illegal'
+  'doctype': 'meta.tag.doctype.html'
+  'attribute_name': 'entity.other.attribute-name'
+  'attribute_value': 'string.html'
+  'comment': 'comment.block.html'
