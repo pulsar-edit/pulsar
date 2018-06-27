@@ -75,6 +75,9 @@ scopes:
   '"def"': 'storage.type.function'
   '"lambda"': 'storage.type.function'
 
+  '"global"': 'storage.modifier.global'
+  '"nonlocal"': 'storage.modifier.nonlocal'
+
   '"if"': 'keyword.control'
   '"else"': 'keyword.control'
   '"elif"': 'keyword.control'
@@ -83,6 +86,7 @@ scopes:
   '"return"': 'keyword.control'
   '"break"': 'keyword.control'
   '"continue"': 'keyword.control'
+  '"pass"': 'keyword.control'
   '"raise"': 'keyword.control'
   '"yield"': 'keyword.control'
   '"await"': 'keyword.control'
@@ -94,8 +98,11 @@ scopes:
   '"finally"': 'keyword.control'
   '"import"': 'keyword.control'
   '"from"': 'keyword.control'
-  '"print"': 'keyword.control'
-  '"assert"': 'keyword.control'
+
+  '"print"': 'keyword.other'
+  '"assert"': 'keyword.other'
+  '"exec"': 'keyword.other'
+  '"del"': 'keyword.other'
 
   '"+"': 'keyword.operator'
   '"-"': 'keyword.operator'
