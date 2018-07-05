@@ -8,6 +8,8 @@ fileTypes: [
   'html'
 ]
 
+injectionRegExp: '(HTML|html|Html)$'
+
 folds: [
   {
     type: ['start_tag', 'raw_start_tag', 'self_closing_tag'],
@@ -26,6 +28,7 @@ comments:
   end: '-->'
 
 scopes:
+  'fragment': 'source.html'
   'tag_name': 'entity.name.tag'
   'raw_tag_name': 'entity.name.tag'
   'erroneous_end_tag_name': 'invalid.illegal'

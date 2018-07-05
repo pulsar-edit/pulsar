@@ -1,5 +1,6 @@
 {
   "name": "language-html",
+  "main": "lib/main",
   "version": "0.50.1",
   "description": "HTML language support in Atom",
   "engines": {
