@@ -53,6 +53,10 @@ scopes:
 
   'comment': 'comment.line'
   'string': 'string.quoted'
+  'escape_sequence': 'constant.character.escape'
+  'interpolation': 'meta.embedded'
+  'interpolation > "{"': 'punctuation.section.embedded'
+  'interpolation > "}"': 'punctuation.section.embedded'
 
   'class_definition > identifier': 'entity.name.type.class'
   'function_definition > identifier': 'entity.name.function'
