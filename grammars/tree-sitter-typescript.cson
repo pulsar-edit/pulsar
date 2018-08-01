@@ -47,54 +47,106 @@ folds: [
 ]
 
 scopes:
-  'program': 'source.js'
+  'program': 'source.ts'
 
   'property_identifier': 'variable.other.object.property'
 
-  'class > identifier': 'support.storage.type'
-  'type_identifier': 'support.storage.type'
-  'predefined_type': 'support.storage.type'
-
   'function > identifier': 'entity.name.function'
-  'call_expression > identifier': 'entity.name.function'
+
+  'call_expression > identifier': [
+    {match: '^require$', scopes: 'support.function'},
+    {match: '^[A-Z]', scopes: 'meta.class'},
+    'entity.name.function'
+  ]
+
   'method_definition > property_identifier': 'entity.name.function'
   'call_expression > member_expression > property_identifier': 'entity.name.function'
 
-  'new_expression > call_expression > identifier': 'meta.class.instance.constructor'
-
-  'number': 'constant.numeric.decimal'
-  'string': 'string.quoted.single'
+  'number': 'constant.numeric'
+  'string': 'string.quoted'
   'regex': 'string.regexp'
+  'escape_sequence': 'constant.character.escape'
   'template_string': 'string.quoted.template'
   'undefined': 'constant.language'
   'null': 'constant.language.null'
   'true': 'constant.language.boolean.true'
   'false': 'constant.language.boolean.false'
   'comment': 'comment.block'
+  'hash_bang_line': 'comment.block'
+
+  'template_substitution > "${"': 'punctuation.section.embedded'
+  'template_substitution > "}"': 'punctuation.section.embedded'
+  'template_substitution': 'embedded.source'
 
   '"("': 'punctuation.definition.parameters.begin.bracket.round'
   '")"': 'punctuation.definition.parameters.end.bracket.round'
   '"{"': 'punctuation.definition.function.body.begin.bracket.curly'
   '"}"': 'punctuation.definition.function.body.end.bracket.curly'
 
-  '"var"': 'storage.modifier'
-  '"declare"': 'storage.modifier'
-  '"let"': 'storage.modifier'
+  'identifier': [
+    {
+      match: '^(global|module|exports|__filename|__dirname)$',
+      scopes: 'support.variable'
+    },
+    {
+      exact: 'require', scopes: 'support.function'
+    }
+    {
+      match: '^[\$A-Z\\d_]+$',
+      scopes: 'constant.other'
+    },
+    {
+      match: '^[A-Z]',
+      scopes: 'meta.class'
+    },
+  ]
+
+  'shorthand_property_identifier': [
+    {
+      match: '^[\$A-Z_]+$',
+      scopes: 'constant.other'
+    },
+    {
+      match: '^[A-Z]',
+      scopes: 'meta.class'
+    },
+  ]
+
+  '"var"': 'storage.type'
+  '"let"': 'storage.type'
+  '"class"': 'storage.type'
+  '"extends"': 'storage.modifier'
   '"const"': 'storage.modifier'
   '"static"': 'storage.modifier'
-  '"public"': 'storage.modifier'
-  '"private"': 'storage.modifier'
-  'readonly': 'storage.modifier'
-  '"class"': 'storage.type.class'
-  '"type"': 'storage.type.type'
   '"function"': 'storage.type.function'
   '"=>"': 'storage.type.function'
 
-  '"="': 'keyword.operator'
-  '"+"': 'keyword.operator'
-  '"-"': 'keyword.operator'
-  '"*"': 'keyword.operator'
-  '"/"': 'keyword.operator'
+  '"="': 'keyword.operator.js'
+  '"+"': 'keyword.operator.js'
+  '"-"': 'keyword.operator.js'
+  '"*"': 'keyword.operator.js'
+  '"/"': 'keyword.operator.js'
+  '"%"': 'keyword.operator.js'
+  '"=="': 'keyword.operator.js'
+  '"==="': 'keyword.operator.js'
+  '"!="': 'keyword.operator.js'
+  '"!=="': 'keyword.operator.js'
+  '">="': 'keyword.operator.js'
+  '"<="': 'keyword.operator.js'
+
+  # '">"': 'keyword.operator.js'
+  # '"<"': 'keyword.operator.js'
+  # '":"': 'keyword.operator.js'
+  # '"?"': 'keyword.operator.js'
+
+  '"&&"': 'keyword.operator.js'
+  '"||"': 'keyword.operator.js'
+  '"&"': 'keyword.operator.js'
+  '"|"': 'keyword.operator.js'
+  '"++"': 'keyword.operator.js'
+  '"--"': 'keyword.operator.js'
+  '"..."': 'keyword.operator.js'
+
   '"in"': 'keyword.operator.in'
   '"instanceof"': 'keyword.operator.instanceof'
   '"of"': 'keyword.operator.of'
@@ -104,8 +156,8 @@ scopes:
   '"get"': 'keyword.operator.setter'
   '"set"': 'keyword.operator.setter'
 
-  '"."': 'meta.delimiter.property.period'
-  '","': 'meta.delimiter.object.comma'
+  '"."': 'meta.delimiter'
+  '","': 'meta.delimiter'
 
   '"if"': 'keyword.control'
   '"do"': 'keyword.control'
@@ -128,8 +180,24 @@ scopes:
   '"yield"': 'keyword.control'
   '"async"': 'keyword.control'
   '"await"': 'keyword.control'
+  '"debugger"': 'keyword.control'
+  '"delete"': 'keyword.control'
 
   'jsx_attribute > property_identifier': 'entity.other.attribute-name'
   'jsx_opening_element > identifier': 'entity.name.tag'
   'jsx_closing_element > identifier': 'entity.name.tag'
   'jsx_self_closing_element > identifier': 'entity.name.tag'
+
+  'class > identifier': 'support.storage.type'
+  'type_identifier': 'support.storage.type'
+  'predefined_type': 'support.storage.type'
+
+  '"as"': 'keyword.control'
+  '"implements"': 'storage.modifier'
+  '"enum"': 'storage.type'
+  '"interface"': 'storage.type'
+  '"declare"': 'storage.modifier'
+  '"public"': 'storage.modifier'
+  '"private"': 'storage.modifier'
+  'readonly': 'storage.modifier'
+  '"type"': 'storage.type.type'
