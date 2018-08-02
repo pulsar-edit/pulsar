@@ -50,8 +50,12 @@ comments:
   start: '// '
 
 scopes:
+  'translation_unit': 'source.c'
   'comment': 'comment.block'
-  # 'ERROR': 'syntax-error'
+
+  'identifier': [
+    {match: '^[A-Z\\d_]+$', scopes: 'constant.other'}
+  ]
 
   '"#if"': 'keyword.control.directive'
   '"#ifdef"': 'keyword.control.directive'
@@ -101,6 +105,7 @@ scopes:
   'char_literal': 'string.quoted.single'
   'string_literal': 'string.quoted.double'
   'system_lib_string': 'string.quoted.other'
+  'escape_sequence': 'constant.character.escape'
 
   'number_literal': 'constant.numeric.decimal'
   'null': 'constant.language.null'

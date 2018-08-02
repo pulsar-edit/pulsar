@@ -16,8 +16,8 @@
     "node": "*"
   },
   "dependencies": {
-    "tree-sitter-c": "^0.13.0",
-    "tree-sitter-cpp": "^0.13.0"
+    "tree-sitter-c": "^0.13.2",
+    "tree-sitter-cpp": "^0.13.2"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"
