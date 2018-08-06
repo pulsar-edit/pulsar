@@ -201,6 +201,7 @@ scopes:
 
   '"as"': 'keyword.control'
   '"implements"': 'storage.modifier'
+  '"namespace"': 'storage.modifier'
   '"enum"': 'storage.type'
   '"interface"': 'storage.type'
   '"declare"': 'storage.modifier'
