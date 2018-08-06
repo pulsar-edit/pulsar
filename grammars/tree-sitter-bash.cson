@@ -16,13 +16,22 @@ folds: [
     type: 'heredoc'
   }
   {
+    type: 'if_statement',
+    start: {type: '"then"'}
+    end: {type: ['elif_clause', 'else_clause']}
+  }
+  {
+    type: 'elif_clause',
+    start: {type: '"then"'}
+  }
+  {
     type: 'if_statement'
-    start: {type: 'then'}
+    start: {type: '"then"'}
     end: {index: -1}
   }
   {
     type: 'case_statement'
-    start: {type: 'in'}
+    start: {type: '"in"'}
     end: {index: -1}
   }
   {
