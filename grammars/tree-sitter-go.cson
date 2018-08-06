@@ -64,6 +64,7 @@ scopes:
 
   'interpreted_string_literal': 'string.quoted.double'
   'raw_string_literal': 'string.quoted.double'
+  'escape_sequence': 'constant.character.escape'
   'rune_literal': 'constant.other.rune'
   'int_literal': 'constant.numeric.integer'
   'nil': 'constant.language.nil'
