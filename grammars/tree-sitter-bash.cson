@@ -9,7 +9,15 @@ fileTypes: [
   'bash'
 ]
 
-contentRegExp: '^#!.*\\b(bash|sh)\\r?\\n'
+injectionRegex: '^(bash|sh|BASH|SH)$'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(bash|sh)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=(sh|bash)'
+]
 
 folds: [
   {
