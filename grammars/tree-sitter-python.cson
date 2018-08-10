@@ -4,6 +4,14 @@ type: 'tree-sitter'
 parser: 'tree-sitter-python'
 legacyScopeName: 'source.python'
 
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(python)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=python'
+]
+
 fileTypes: [
   'py'
   'pyi'
