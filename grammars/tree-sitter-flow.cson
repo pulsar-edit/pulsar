@@ -11,7 +11,7 @@ fileTypes: [
   'jsx.flow'
 ]
 
-contentRegExp: '(/\\*([^*]|\\*[^/])*|//.*)@flow'
+contentRegex: '(/\\*([^*]|\\*[^/])*|//.*)@flow'
 
 comments:
   start: '// '
