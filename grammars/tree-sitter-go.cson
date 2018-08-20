@@ -1,8 +1,7 @@
-id: 'go'
 name: 'Go'
+scopeName: 'source.go'
 type: 'tree-sitter'
 parser: 'tree-sitter-go'
-legacyScopeName: 'source.go'
 
 fileTypes: [
   'go'
