@@ -1,5 +1,5 @@
-id: 'flow-javascript'
 name: 'Flow JavaScript'
+scopeName: 'source.flow'
 type: 'tree-sitter'
 parser: 'tree-sitter-typescript'
 
