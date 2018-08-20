@@ -1,8 +1,7 @@
-id: 'python'
 name: 'Python'
+scopeName: 'source.python'
 type: 'tree-sitter'
 parser: 'tree-sitter-python'
-legacyScopeName: 'source.python'
 
 firstLineRegex: [
   # shebang line
