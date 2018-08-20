@@ -1,8 +1,7 @@
-id: 'cpp'
 name: 'C++'
+scopeName: 'source.cpp'
 type: 'tree-sitter'
 parser: 'tree-sitter-cpp'
-legacyScopeName: 'source.cpp'
 
 fileTypes: [
   'cc'
@@ -24,7 +23,7 @@ fileTypes: [
   'tpp'
 ]
 
-contentRegExp: '\n\\s*(namespace|class|template)\\s+'
+contentRegex: '\n\\s*(namespace|class|template)\\s+'
 
 folds: [
   {
