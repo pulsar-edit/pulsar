@@ -1,5 +1,5 @@
-id: 'erb'
 name: 'ERB'
+scopeName: 'text.html.erb'
 type: 'tree-sitter'
 parser: 'tree-sitter-embedded-template'
 
@@ -26,6 +26,7 @@ scopes:
   'comment_directive': 'comment.block'
   'comment_directive > "%>"': 'comment.block'
 
+  '"<%#"': 'keyword.control.directive'
   '"<%"': 'keyword.control.directive'
   '"<%="': 'keyword.control.directive'
   '"<%_"': 'keyword.control.directive'
