@@ -1,10 +1,11 @@
-id: 'ejs'
 name: 'EJS'
+scopeName: 'text.html.ejs'
 type: 'tree-sitter'
 parser: 'tree-sitter-embedded-template'
 
 fileTypes: [
   'ejs'
+  'html.ejs'
 ]
 
 injectionRegExp: '^(ejs|EJS)$'

@@ -1,8 +1,7 @@
-id: 'html'
 name: 'HTML'
+scopeName: 'text.html.basic'
 type: 'tree-sitter'
 parser: 'tree-sitter-html'
-legacyScopeName: 'text.html.basic'
 
 fileTypes: [
   'html'
