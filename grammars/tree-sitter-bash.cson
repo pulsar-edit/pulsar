@@ -1,8 +1,7 @@
-id: 'bash'
 name: 'Shell Script'
+scopeName: 'source.shell'
 type: 'tree-sitter'
 parser: 'tree-sitter-bash'
-legacyScopeName: 'source.shell'
 
 fileTypes: [
   'sh'
