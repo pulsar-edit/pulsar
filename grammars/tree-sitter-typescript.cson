@@ -1,8 +1,7 @@
-id: 'typescript'
 name: 'TypeScript'
+scopeName: 'source.ts'
 type: 'tree-sitter'
 parser: 'tree-sitter-typescript'
-legacyScopeName: 'source.ts'
 
 fileTypes: ['ts', 'tsx']
 
