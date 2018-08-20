@@ -1,16 +1,13 @@
-id: 'c'
 name: 'C'
+scopeName: 'source.c'
 type: 'tree-sitter'
 parser: 'tree-sitter-c'
-legacyScopeName: 'source.c'
 
 fileTypes: [
   'h'
   'c'
   'h.in'
 ]
-
-legacyScopeName: 'source.c'
 
 folds: [
   {
