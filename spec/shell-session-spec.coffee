@@ -2,6 +2,8 @@ describe "Shell session grammar", ->
   grammar = null
 
   beforeEach ->
+    atom.config.set('core.useTreeSitterParsers', false)
+
     waitsForPromise ->
       atom.packages.activatePackage("language-shellscript")
 
