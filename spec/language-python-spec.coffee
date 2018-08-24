@@ -5,6 +5,8 @@ describe 'Python settings', ->
     editor.destroy()
 
   beforeEach ->
+    atom.config.set('core.useTreeSitterParsers', false)
+
     waitsForPromise ->
       atom.workspace.open().then (o) ->
         editor = o
