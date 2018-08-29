@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "atom-grammar-test": "^0.6.3",
-    "tree-sitter-html": "^0.13.1",
+    "tree-sitter-html": "^0.13.2",
     "tree-sitter-embedded-template": "^0.13.0"
   },
   "devDependencies": {
