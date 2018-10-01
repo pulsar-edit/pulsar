@@ -165,6 +165,8 @@ scopes:
   '"public"': 'storage.modifier'
   '"private"': 'storage.modifier'
   '"protected"': 'storage.modifier'
+  '"final"': 'storage.modifier'
+  '"override"': 'storage.modifier'
 
   '"sizeof"': 'keyword.operator.sizeof'
   '"new"': 'keyword.operator'
