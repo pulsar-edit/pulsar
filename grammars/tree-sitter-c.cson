@@ -119,6 +119,7 @@ scopes:
   '"_Atomic"': 'storage.modifier'
   'function_specifier': 'storage.modifier'
 
+  '"sizeof"': 'keyword.operator.sizeof'
   '"*"': 'keyword.operator'
   '"&"': 'keyword.operator'
   '"&&"': 'keyword.operator'

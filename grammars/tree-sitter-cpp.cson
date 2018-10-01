@@ -102,6 +102,8 @@ scopes:
   '"namespace"': 'keyword.control'
   '"template"': 'keyword.control'
   '"typename"': 'keyword.control'
+  '"try"': 'keyword.control'
+  '"catch"': 'keyword.control'
 
   'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
   'preproc_arg': 'meta.preprocessor.macro'
@@ -155,6 +157,7 @@ scopes:
   '"private"': 'storage.modifier'
   '"protected"': 'storage.modifier'
 
+  '"sizeof"': 'keyword.operator.sizeof'
   '"new"': 'keyword.operator'
   '"delete"': 'keyword.operator'
   '"*"': 'keyword.operator'
