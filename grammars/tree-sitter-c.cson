@@ -85,9 +85,11 @@ scopes:
   'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
   'preproc_arg': 'meta.preprocessor.macro'
 
-  'call_expression > identifier': 'entity.name.function'
-  'call_expression > field_expression > field_identifier': 'entity.name.function'
-  'function_declarator > identifier': 'entity.name.function'
+  '''
+  call_expression > identifier,
+  call_expression > field_expression > field_identifier,
+  function_declarator > identifier
+  ''': 'entity.name.function'
 
   'statement_identifier': 'constant.variable'
 
