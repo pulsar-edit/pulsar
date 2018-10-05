@@ -1,0 +1,9 @@
+'scopeName': 'source.sum'
+'name': 'Go checksum File'
+'fileTypes': [
+  'sum'
+]
+'patterns': [
+  {
+  }
+]

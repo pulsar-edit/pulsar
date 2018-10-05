@@ -1,0 +1,9 @@
+'scopeName': 'source.mod'
+'name': 'Go module file'
+'fileTypes': [
+  'mod'
+]
+'patterns': [
+  {
+  }
+]
