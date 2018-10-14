@@ -1,9 +1,38 @@
 'scopeName': 'source.mod'
-'name': 'Go module file'
+'name': 'Go Module File'
 'fileTypes': [
   'mod'
 ]
 'patterns': [
   {
+    'match': '\\bmodule\\b'
+    'name': 'keyword.module.module'
+  }
+  {
+    'match': '\\brequire\\b'
+    'name': 'keyword.module.require'
+  }
+  {
+    'match': '\\breplace\\b'
+    'name': 'keyword.module.replace'
+  }
+  {
+    'match': '\\bexclude\\b'
+    'name': 'keyword.module.exclude'
+  }
+  {
+    'begin': '\\('
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.begin.bracket.round.go'
+    'end': '\\)'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.end.bracket.round.go'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
   }
 ]

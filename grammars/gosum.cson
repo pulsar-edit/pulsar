@@ -1,5 +1,5 @@
 'scopeName': 'source.sum'
-'name': 'Go checksum File'
+'name': 'Go Checksum File'
 'fileTypes': [
   'sum'
 ]
