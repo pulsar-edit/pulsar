@@ -35,4 +35,12 @@
       }
     ]
   }
+  { 
+    'begin': '//'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.comment.go'
+    'end': '$'
+    'name': 'comment.line.double-slash.go'
+  }
 ]
