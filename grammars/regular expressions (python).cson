@@ -15,6 +15,10 @@
     'name': 'keyword.other.back-reference.regexp'
   }
   {
+    'match': '\\\\.'
+    'name': 'constant.character.escape.backslash.regexp'
+  }
+  {
     'match': '[?+*][?+]?|\\{(\\d+,\\d+|\\d+,|,\\d+|\\d+)\\}\\??'
     'name': 'keyword.operator.quantifier.regexp'
   }

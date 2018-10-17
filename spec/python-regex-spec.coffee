@@ -30,3 +30,23 @@ describe 'Python regular expression grammar', ->
       expect(tokens[1]).toEqual value: '^', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'keyword.operator.negation.regexp']
       expect(tokens[2]).toEqual value: '][', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp']
       expect(tokens[3]).toEqual value: ']', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.end.regexp']
+
+    it 'escapes the character following any backslash', ->
+      {tokens} = grammar.tokenizeLine '''\\q\\(\\[\\'\\"\\?\\^\\-\\*\\.\\#'''
+      expect(tokens[0]).toEqual value: '\\q', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[1]).toEqual value: '\\(', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[2]).toEqual value: '\\[', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[3]).toEqual value: '\\\'', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[4]).toEqual value: '\\"', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[5]).toEqual value: '\\?', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[6]).toEqual value: '\\^', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[7]).toEqual value: '\\-', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[8]).toEqual value: '\\*', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[9]).toEqual value: '\\.', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+      expect(tokens[10]).toEqual value: '\\#', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
+
+      {tokens} = grammar.tokenizeLine '''(\\()\\)'''
+      expect(tokens[0]).toEqual value: '(', scopes: ['source.regexp.python', 'meta.group.regexp', 'punctuation.definition.group.regexp']
+      expect(tokens[1]).toEqual value: '\\(', scopes: ['source.regexp.python', 'meta.group.regexp', 'constant.character.escape.backslash.regexp']
+      expect(tokens[2]).toEqual value: ')', scopes: ['source.regexp.python', 'meta.group.regexp', 'punctuation.definition.group.regexp']
+      expect(tokens[3]).toEqual value: '\\)', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']
