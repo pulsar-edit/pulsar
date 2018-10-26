@@ -11,7 +11,7 @@ fileTypes: [
   'jsx.flow'
 ]
 
-contentRegex: '(/\\*([^*]|\\*[^/])*|//.*)@flow'
+contentRegex: '(/\\*([^*]|\\*[^/])*|//.*)(@flow|flow-typed)\\b'
 
 comments:
   start: '// '
@@ -33,8 +33,8 @@ folds: [
   {
     type: [
       'object_type'
-      'template_arguments'
-      'template_parameters'
+      'type_arguments'
+      'type_parameters'
     ]
     start: {index: 0}
     end: {index: -1}
@@ -54,20 +54,68 @@ folds: [
 ]
 
 scopes:
-  'program': 'source.js'
+  'program': 'source.flow'
 
-  'property_identifier': 'variable.other.object.property'
+  'property_identifier': [
+    {
+      match: '^[\$A-Z_]+$',
+      scopes: 'constant.other.property.js'
+    }
+
+    'variable.other.object.property'
+  ]
+
+  'shorthand_property_identifier': [
+    {
+      match: '^[\$A-Z_]{2,}$',
+      scopes: 'constant.other'
+    }
+  ]
+
+  '
+    class > identifier,
+    new_expression > call_expression > identifier
+  ': 'support.type'
+
+  '
+    jsx_opening_element > identifier,
+    jsx_closing_element > identifier,
+    call_expression > identifier
+  ': [
+    {
+      match: '^[A-Z]',
+      scopes: 'support.type'
+    },
+  ]
 
   'function > identifier': 'entity.name.function'
+  'generator_function > identifier': 'entity.name.function'
 
   'call_expression > identifier': [
     {match: '^require$', scopes: 'support.function'},
-    {match: '^[A-Z]', scopes: 'meta.class'},
     'entity.name.function'
   ]
 
   'method_definition > property_identifier': 'entity.name.function'
   'call_expression > member_expression > property_identifier': 'entity.name.function'
+
+  'identifier': [
+    {
+      match: '^(global|module|exports|__filename|__dirname|window|document)$',
+      scopes: 'support.variable'
+    },
+    {
+      exact: 'require', scopes: 'support.function'
+    }
+    {
+      match: '^[\$A-Z_]{2,}$',
+      scopes: 'constant.other'
+    },
+    {
+      match: '^[A-Z]',
+      scopes: 'support.type'
+    },
+  ]
 
   'number': 'constant.numeric'
   'string': 'string.quoted'
@@ -81,43 +129,18 @@ scopes:
   'comment': 'comment.block'
   'hash_bang_line': 'comment.block'
 
-  'template_substitution > "${"': 'punctuation.section.embedded'
-  'template_substitution > "}"': 'punctuation.section.embedded'
+  '
+    jsx_expression > "{",
+    jsx_expression > "}",
+    template_substitution > "${",
+    template_substitution > "}"
+  ': 'punctuation.section.embedded'
   'template_substitution': 'embedded.source'
 
   '"("': 'punctuation.definition.parameters.begin.bracket.round'
   '")"': 'punctuation.definition.parameters.end.bracket.round'
   '"{"': 'punctuation.definition.function.body.begin.bracket.curly'
   '"}"': 'punctuation.definition.function.body.end.bracket.curly'
-
-  'identifier': [
-    {
-      match: '^(global|module|exports|__filename|__dirname)$',
-      scopes: 'support.variable'
-    },
-    {
-      exact: 'require', scopes: 'support.function'
-    }
-    {
-      match: '^[\$A-Z\\d_]+$',
-      scopes: 'constant.other'
-    },
-    {
-      match: '^[A-Z]',
-      scopes: 'meta.class'
-    },
-  ]
-
-  'shorthand_property_identifier': [
-    {
-      match: '^[\$A-Z_]+$',
-      scopes: 'constant.other'
-    },
-    {
-      match: '^[A-Z]',
-      scopes: 'meta.class'
-    },
-  ]
 
   '"var"': 'storage.type'
   '"let"': 'storage.type'
@@ -140,12 +163,10 @@ scopes:
   '"!=="': 'keyword.operator.js'
   '">="': 'keyword.operator.js'
   '"<="': 'keyword.operator.js'
-
-  # '">"': 'keyword.operator.js'
-  # '"<"': 'keyword.operator.js'
-  # '":"': 'keyword.operator.js'
-  # '"?"': 'keyword.operator.js'
-
+  '">"': 'keyword.operator.js'
+  '"<"': 'keyword.operator.js'
+  '":"': 'keyword.operator.js'
+  '"?"': 'keyword.operator.js'
   '"&&"': 'keyword.operator.js'
   '"||"': 'keyword.operator.js'
   '"&"': 'keyword.operator.js'
@@ -154,11 +175,11 @@ scopes:
   '"--"': 'keyword.operator.js'
   '"..."': 'keyword.operator.js'
 
-  '"in"': 'keyword.operator.in'
-  '"instanceof"': 'keyword.operator.instanceof'
-  '"of"': 'keyword.operator.of'
-  '"new"': 'keyword.operator.new'
-  '"typeof"': 'keyword.operator.typeof'
+  '"in"': 'keyword.control'
+  '"instanceof"': 'keyword.control'
+  '"of"': 'keyword.control'
+  '"new"': 'keyword.control'
+  '"typeof"': 'keyword.control'
 
   '"get"': 'keyword.operator.setter'
   '"set"': 'keyword.operator.setter'
@@ -199,13 +220,19 @@ scopes:
   'type_identifier': 'support.storage.type'
   'predefined_type': 'support.storage.type'
 
-  '"as"': 'keyword.control'
-  '"implements"': 'storage.modifier'
-  '"namespace"': 'storage.modifier'
-  '"enum"': 'storage.type'
-  '"interface"': 'storage.type'
-  '"declare"': 'storage.modifier'
-  '"public"': 'storage.modifier'
-  '"private"': 'storage.modifier'
-  'readonly': 'storage.modifier'
-  '"type"': 'storage.type.type'
+  '
+    method_signature > property_identifier,
+    function_signature > identifier
+  ': 'entity.name.function'
+
+  '"as"': 'keyword.modifier'
+  '"implements"': 'keyword.modifier'
+  '"namespace"': 'keyword.modifier'
+  '"enum"': 'keyword.modifier'
+  '"interface"': 'keyword.modifier'
+  '"module"': 'keyword.modifier'
+  '"declare"': 'keyword.modifier'
+  '"public"': 'keyword.modifier'
+  '"private"': 'keyword.modifier'
+  'readonly': 'keyword.modifier'
+  '"type"': 'keyword.modifier'
