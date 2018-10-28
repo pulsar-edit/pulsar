@@ -155,6 +155,7 @@ scopes:
   '"extern"': 'storage.modifier'
   '"static"': 'storage.modifier'
   '"register"': 'storage.modifier'
+  '"friend"': 'storage.modifier'
   '"inline"': 'storage.modifier'
   '"explicit"': 'storage.modifier'
   '"const"': 'storage.modifier'
