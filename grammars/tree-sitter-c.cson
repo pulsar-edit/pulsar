@@ -113,6 +113,7 @@ scopes:
 
   'auto': 'storage.modifier'
   '"extern"': 'storage.modifier'
+  '"register"': 'storage.modifier'
   '"static"': 'storage.modifier'
   '"inline"': 'storage.modifier'
   '"const"': 'storage.modifier'

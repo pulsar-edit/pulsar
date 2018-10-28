@@ -154,6 +154,7 @@ scopes:
 
   '"extern"': 'storage.modifier'
   '"static"': 'storage.modifier'
+  '"register"': 'storage.modifier'
   '"inline"': 'storage.modifier'
   '"explicit"': 'storage.modifier'
   '"const"': 'storage.modifier'
