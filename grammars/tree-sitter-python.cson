@@ -89,6 +89,8 @@ scopes:
   '"global"': 'storage.modifier.global'
   '"nonlocal"': 'storage.modifier.nonlocal'
 
+  'keyword_argument > identifier:nth-child(0)': 'variable.parameter.function'
+
   '"if"': 'keyword.control'
   '"else"': 'keyword.control'
   '"elif"': 'keyword.control'
