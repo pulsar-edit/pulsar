@@ -110,3 +110,4 @@ scopes:
   '"*"': 'keyword.operator'
   '"&&"': 'keyword.operator'
   '"||"': 'keyword.operator'
+  '"...'": 'keyword.operator'
