@@ -70,6 +70,8 @@ scopes:
   'float_literal': 'constant.numeric.float'
   'imaginary_literal': 'constant.numeric.integer'
   'nil': 'constant.language.nil'
+  'false': 'constant.language.false'
+  'true': 'constant.language.true'
 
   'call_expression > identifier': 'entity.name.function'
   'function_declaration > identifier': 'entity.name.function'
