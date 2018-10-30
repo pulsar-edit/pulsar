@@ -3,6 +3,8 @@ scopeName: 'source.c'
 type: 'tree-sitter'
 parser: 'tree-sitter-c'
 
+injectionRegex: 'c|C'
+
 fileTypes: [
   'h'
   'c'

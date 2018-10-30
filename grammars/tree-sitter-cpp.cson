@@ -3,6 +3,8 @@ scopeName: 'source.cpp'
 type: 'tree-sitter'
 parser: 'tree-sitter-cpp'
 
+injectionRegex: 'c++|C++|cpp|CPP'
+
 fileTypes: [
   'cc'
   'cpp'
