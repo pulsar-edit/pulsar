@@ -6,6 +6,7 @@
     "atom": ">=1.19.1",
     "node": "*"
   },
+  "main": "lib/main",
   "homepage": "https://atom.io/packages/language-typescript",
   "repository": {
     "type": "git",
