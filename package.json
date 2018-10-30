@@ -1,5 +1,5 @@
 {
-  "version": "0.60.10",
+  "version": "0.60.11",
   "name": "language-c",
   "description": "Atom language support for C/C++",
   "main": "lib/main",
