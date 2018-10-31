@@ -138,9 +138,9 @@ scopes:
   'type_identifier': 'support.storage.type'
   'primitive_type': 'support.storage.type'
   '"unsigned"': 'support.storage.type'
-  '"short"': 'support.support.type'
-  '"long"': 'support.support.type'
-  'auto': 'storage.storage.type'
+  '"short"': 'support.storage.type'
+  '"long"': 'support.storage.type'
+  'auto': 'support.storage.type'
 
   'char_literal': 'string.quoted.single'
   'string_literal': 'string.quoted.double'
