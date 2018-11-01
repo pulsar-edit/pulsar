@@ -29,6 +29,8 @@ folds: [
 ]
 
 scopes:
+  'source_file': 'source.go'
+
   'comment': 'comment.block'
 
   '"var"': 'keyword.import'
