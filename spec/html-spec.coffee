@@ -72,7 +72,7 @@ describe 'PHP in HTML', ->
       expect(tokens[7]).toEqual value: '?', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']
       expect(tokens[8]).toEqual value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']
 
-    it 'tokenize namespaces immediately following <?php', ->
+    it 'tokenizes namespaces immediately following <?php', ->
       {tokens} = grammar.tokenizeLine '<?php namespace Test;'
 
       expect(tokens[1]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
@@ -80,6 +80,54 @@ describe 'PHP in HTML', ->
       expect(tokens[3]).toEqual value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']
       expect(tokens[4]).toEqual value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
       expect(tokens[5]).toEqual value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']
+
+    it 'does not tokenize PHP tag syntax within PHP syntax itself inside HTML script tags (regression)', ->
+      lines = grammar.tokenizeLines '''
+        <script>
+        <?php
+          /*
+            ?>
+            <?php
+          */
+        ?>
+        </script>
+      '''
+
+      expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[0][1]).toEqual value: 'script', scopes: ['text.html.php', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[0][2]).toEqual value: '>', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[1][0]).toEqual value: '<?php', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'punctuation.section.embedded.begin.php']
+      expect(lines[2][0]).toEqual value: '  ', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'source.php']
+      expect(lines[2][1]).toEqual value: '/*', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'source.php', 'comment.block.php', 'punctuation.definition.comment.php']
+      expect(lines[3][0]).toEqual value: '    ?>', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'source.php', 'comment.block.php']
+      expect(lines[4][0]).toEqual value: '    <?php', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'source.php', 'comment.block.php']
+      expect(lines[5][0]).toEqual value: '  ', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'source.php', 'comment.block.php']
+      expect(lines[5][1]).toEqual value: '*/', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'source.php', 'comment.block.php', 'punctuation.definition.comment.php']
+      expect(lines[6][0]).toEqual value: '?', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'punctuation.section.embedded.end.php', 'source.php']
+      expect(lines[6][1]).toEqual value: '>', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'punctuation.section.embedded.end.php']
+      expect(lines[7][0]).toEqual value: '</', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+      expect(lines[7][1]).toEqual value: 'script', scopes: ['text.html.php', 'meta.tag.script.html', 'entity.name.tag.script.html']
+      expect(lines[7][2]).toEqual value: '>', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']
+
+    it 'does not tokenize PHP tag syntax within PHP syntax itself inside HTML attributes (regression)', ->
+      {tokens} = grammar.tokenizeLine '<img src="<?php /* ?> <?php */ ?>" />'
+
+      expect(tokens[0]).toEqual value: '<', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'punctuation.definition.tag.begin.html']
+      expect(tokens[1]).toEqual value: 'img', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'entity.name.tag.inline.img.html']
+      expect(tokens[2]).toEqual value: ' ', scopes: ['text.html.php', 'meta.tag.inline.img.html']
+      expect(tokens[3]).toEqual value: 'src', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'entity.other.attribute-name.html']
+      expect(tokens[4]).toEqual value: '=', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'punctuation.separator.key-value.html']
+      expect(tokens[5]).toEqual value: '"', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']
+      expect(tokens[6]).toEqual value: '<?php', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'punctuation.section.embedded.begin.php']
+      expect(tokens[7]).toEqual value: ' ', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'source.php']
+      expect(tokens[8]).toEqual value: '/*', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'source.php', 'comment.block.php', 'punctuation.definition.comment.php']
+      expect(tokens[9]).toEqual value: ' ?> <?php ', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'source.php', 'comment.block.php']
+      expect(tokens[10]).toEqual value: '*/', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'source.php', 'comment.block.php', 'punctuation.definition.comment.php']
+      expect(tokens[11]).toEqual value: ' ', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'source.php']
+      expect(tokens[12]).toEqual value: '?', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']
+      expect(tokens[13]).toEqual value: '>', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']
+      expect(tokens[14]).toEqual value: '"', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']
+      expect(tokens[15]).toEqual value: ' />', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'punctuation.definition.tag.end.html']
 
   describe 'shebang', ->
     it 'recognises shebang on the first line of document', ->
