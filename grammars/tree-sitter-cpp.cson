@@ -197,6 +197,8 @@ scopes:
   '"sizeof"': 'keyword.operator.sizeof'
   '"new"': 'keyword.operator'
   '"delete"': 'keyword.operator'
+  '"."': 'keyword.operator.member'
+  '"->"': 'keyword.operator.member'
   '"*"': 'keyword.operator'
   '"-"': 'keyword.operator'
   '"+"': 'keyword.operator'

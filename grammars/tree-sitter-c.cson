@@ -136,6 +136,8 @@ scopes:
   '")"': 'punctuation.section.parens.end.bracket.round'
 
   '"sizeof"': 'keyword.operator.sizeof'
+  '"."': 'keyword.operator.member'
+  '"->"': 'keyword.operator.member'
   '"*"': 'keyword.operator'
   '"-"': 'keyword.operator'
   '"+"': 'keyword.operator'
