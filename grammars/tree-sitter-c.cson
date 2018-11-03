@@ -124,6 +124,17 @@ scopes:
   '"_Atomic"': 'storage.modifier'
   'function_specifier': 'storage.modifier'
 
+  '";"': 'punctuation.terminator.statement'
+  '"["': 'punctuation.definition.begin.bracket.square'
+  '"]"': 'punctuation.definition.end.bracket.square'
+  '","': 'punctuation.separator.delimiter'
+  'char_literal > "\'"': 'punctuation.definition.string'
+  # 'string_literal > "\"': 'punctuation.definition.string' # TODO: Figure out why this doesn't work
+  '"{"': 'punctuation.section.block.begin.bracket.curly'
+  '"}"': 'punctuation.section.block.end.bracket.curly'
+  '"("': 'punctuation.section.parens.begin.bracket.round'
+  '")"': 'punctuation.section.parens.end.bracket.round'
+
   '"sizeof"': 'keyword.operator.sizeof'
   '"*"': 'keyword.operator'
   '"-"': 'keyword.operator'
