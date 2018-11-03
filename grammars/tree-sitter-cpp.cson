@@ -188,15 +188,11 @@ scopes:
   'template_argument_list > ">"': 'punctuation.definition.template.bracket.angle'
   'template_argument_list > "<"': 'punctuation.definition.template.bracket.angle'
   'char_literal > "\'"': 'punctuation.definition.string'
-  # 'char_literal > "\""': 'punctuation.definition.string'
+  # 'string_literal > "\""': 'punctuation.definition.string' # TODO: Figure out why this doesn't work
   '"{"': 'punctuation.section.block.begin.bracket.curly'
   '"}"': 'punctuation.section.block.end.bracket.curly'
-  'parameter_list > "("': 'punctuation.section.parameters.begin.bracket.round.c'
-  'parameter_list > ")"': 'punctuation.section.parameters.end.bracket.round.c'
-  'argument_list > "("': 'punctuation.section.parameters.begin.bracket.round.c'
-  'argument_list > ")"': 'punctuation.section.parameters.end.bracket.round.c'
-  'parenthesized_expression > "("': 'punctuation.section.parameters.begin.bracket.round'
-  'parenthesized_expression > ")"': 'punctuation.section.parameters.begin.bracket.round'
+  '"("': 'punctuation.section.parens.begin.bracket.round'
+  '")"': 'punctuation.section.parens.end.bracket.round'
 
   '"sizeof"': 'keyword.operator.sizeof'
   '"new"': 'keyword.operator'
