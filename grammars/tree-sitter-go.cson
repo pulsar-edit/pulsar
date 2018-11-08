@@ -26,6 +26,18 @@ folds: [
     start: {index: 0, type: '('}
     end: {index: -1, type: ')'}
   }
+  {
+    type: [
+      'type_switch_statement',
+      'type_case_clause',
+      'expression_switch_statement'
+      'expression_case_clause',
+      'select_statement',
+      'communication_clause'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
 ]
 
 scopes:
