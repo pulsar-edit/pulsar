@@ -67,7 +67,11 @@ scopes:
 
   'class_definition > identifier': 'entity.name.type.class'
   'function_definition > identifier': 'entity.name.function'
-  'call > identifier:nth-child(0)': 'entity.name.function'
+  'call > identifier:nth-child(0)': [
+    {match: '^(abs|all|any|ascii|bin|bool|breakpoint|bytearray|bytes|callable|chr|classmethod|compile|complex|delattr|dict|dir|divmod|enumerate|eval|exec|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|isinstance|issubclass|iter|len|list|locals|map|max|memoryview|min|next|object|oct|open|ord|pow|print|property|range|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|vars|zip|__import__)$',
+    scopes: 'support.function'},
+    'entity.name.function'
+   ]
   'call > attribute > identifier:nth-child(2)': 'entity.name.function'
 
   'attribute > identifier:nth-child(2)': 'variable.other.object.property'
