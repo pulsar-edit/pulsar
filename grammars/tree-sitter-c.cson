@@ -43,6 +43,15 @@ folds: [
     start: {index: 0}
     end: {index: -1}
   }
+  {
+    type: 'case_statement'
+    start: {index: 0}
+    end: {type: 'break_statement', index: -1}
+  }
+  {
+    type: 'case_statement'
+    start: {index: 0}
+  }
 ]
 
 comments:
