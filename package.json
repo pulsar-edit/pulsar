@@ -3,6 +3,9 @@
   "main": "lib/main",
   "version": "0.51.5",
   "description": "HTML language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
   "engines": {
     "atom": "*",
     "node": "*"
