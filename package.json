@@ -1,6 +1,9 @@
 {
   "name": "language-go",
   "description": "Go language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
   "version": "0.46.6",
   "license": "MIT",
   "engines": {
