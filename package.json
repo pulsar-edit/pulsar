@@ -6,6 +6,9 @@
     "node": "*"
   },
   "description": "Python language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
   "homepage": "https://atom.github.io/language-python",
   "repository": {
     "type": "git",
