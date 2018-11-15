@@ -2,6 +2,9 @@
   "name": "language-typescript",
   "version": "0.4.11",
   "description": "TypeScript language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
   "engines": {
     "atom": ">=1.19.1",
     "node": "*"
