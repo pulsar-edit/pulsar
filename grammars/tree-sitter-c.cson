@@ -108,6 +108,7 @@ scopes:
 
   'type_identifier': 'support.storage.type'
   'primitive_type': 'support.storage.type'
+  '"signed"': 'support.storage.type'
   '"unsigned"': 'support.storage.type'
   '"short"': 'support.storage.type'
   '"long"': 'support.storage.type'
