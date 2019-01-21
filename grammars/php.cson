@@ -2750,7 +2750,7 @@
         'name': 'support.function.com.php'
       }
       {
-        'begin': '(?i)\\b(isset|unset|eval|empty|list)\\b'
+        'match': '(?i)\\b(isset|unset|eval|empty|list)\\b'
         'name': 'support.function.construct.php'
       }
       {
