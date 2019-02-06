@@ -119,7 +119,3 @@
   'if __name__ == \'__main__\'':
     'prefix': 'ifmain'
     'body': 'if __name__ == \'__main__\':\n\t${1:main()}$0'
-'.source.python:not(.string)':
-  'self':
-    'prefix': '.'
-    'body': 'self.'
