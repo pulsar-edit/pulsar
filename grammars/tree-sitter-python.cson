@@ -27,7 +27,8 @@ fileTypes: [
 folds: [
   {
     type: [
-      'if_statement'
+      'elif_clause'
+      'else_clause'
       'for_statement'
       'try_statement'
       'with_statement'
@@ -37,6 +38,11 @@ folds: [
       'async_function_definition'
     ]
     start: {type: ':'}
+  },
+  {
+    type: ['if_statement']
+    start: {type: ':'}
+    end: {type: ['elif_clause', 'else_clause']}
   }
   {
     start: {type: '(', index: 0}
