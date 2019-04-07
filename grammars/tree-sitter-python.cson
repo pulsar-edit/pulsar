@@ -5,7 +5,7 @@ parser: 'tree-sitter-python'
 
 firstLineRegex: [
   # shebang line
-  '^#!.*\\b(python)\\r?\\n'
+  '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
 
   # vim modeline
   'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=python'
