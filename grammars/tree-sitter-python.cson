@@ -104,6 +104,8 @@ scopes:
   '"global"': 'storage.modifier.global'
   '"nonlocal"': 'storage.modifier.nonlocal'
 
+  'parameters > identifier': 'variable.parameter.function'
+  'default_parameter > identifier:nth-child(0)': 'variable.parameter.function'
   'keyword_argument > identifier:nth-child(0)': 'variable.parameter.function'
 
   '"if"': 'keyword.control'
