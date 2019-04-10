@@ -97,6 +97,11 @@ scopes:
 
   'type > identifier': 'support.storage.type'
 
+  'class_definition > argument_list > attribute': 'entity.other.inherited-class'
+  'class_definition > argument_list > identifier': 'entity.other.inherited-class'
+  'class_definition > argument_list > keyword_argument > attribute': 'entity.other.inherited-class'
+  'class_definition > argument_list > keyword_argument > identifier:nth-child(2)': 'entity.other.inherited-class'
+
   '"class"': 'storage.type.class'
   '"def"': 'storage.type.function'
   '"lambda"': 'storage.type.function'
