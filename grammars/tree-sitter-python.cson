@@ -80,6 +80,11 @@ scopes:
    ]
   'call > attribute > identifier:nth-child(2)': 'entity.name.function'
 
+  'identifier':
+    {match:
+      '^(BaseException|Exception|TypeError|StopAsyncIteration|StopIteration|ImportError|ModuleNotFoundError|OSError|ConnectionError|BrokenPipeError|ConnectionAbortedError|ConnectionRefusedError|ConnectionResetError|BlockingIOError|ChildProcessError|FileExistsError|FileNotFoundError|IsADirectoryError|NotADirectoryError|InterruptedError|PermissionError|ProcessLookupError|TimeoutError|EOFError|RuntimeError|RecursionError|NotImplementedError|NameError|UnboundLocalError|AttributeError|SyntaxError|IndentationError|TabError|LookupError|IndexError|KeyError|ValueError|UnicodeError|UnicodeEncodeError|UnicodeDecodeError|UnicodeTranslateError|AssertionError|ArithmeticError|FloatingPointError|OverflowError|ZeroDivisionError|SystemError|ReferenceError|BufferError|MemoryError|Warning|UserWarning|DeprecationWarning|PendingDeprecationWarning|SyntaxWarning|RuntimeWarning|FutureWarning|ImportWarning|UnicodeWarning|BytesWarning|ResourceWarning|GeneratorExit|SystemExit|KeyboardInterrupt)$'
+    scopes: 'support.type.exception'}
+
   'attribute > identifier:nth-child(2)': 'variable.other.object.property'
 
   'decorator': 'entity.name.function.decorator'
@@ -87,8 +92,8 @@ scopes:
   'none': 'constant.language'
   'true': 'constant.language'
   'false': 'constant.language'
-  'integer': 'constant.language'
-  'float': 'constant.language'
+  'integer': 'constant.numeric'
+  'float': 'constant.numeric'
 
   'type > identifier': 'support.storage.type'
 
@@ -155,6 +160,8 @@ scopes:
   '"~"': 'keyword.operator'
   '"<<"': 'keyword.operator'
   '">>"': 'keyword.operator'
+  'binary_operator > "@"': 'keyword.operator'
+  'binary_operator > "@="': 'keyword.operator'
   '"in"': 'keyword.operator.logical.python'
   '"and"': 'keyword.operator.logical.python'
   '"or"': 'keyword.operator.logical.python'
