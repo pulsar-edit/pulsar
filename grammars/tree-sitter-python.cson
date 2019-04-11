@@ -26,7 +26,13 @@ fileTypes: [
 
 folds: [
   {
+    type: ['if_statement']
+    start: {type: ':'}
+    end: {type: ['elif_clause', 'else_clause']}
+  },
+  {
     type: [
+      'if_statement'
       'elif_clause'
       'else_clause'
       'for_statement'
@@ -39,11 +45,6 @@ folds: [
     ]
     start: {type: ':'}
   },
-  {
-    type: ['if_statement']
-    start: {type: ':'}
-    end: {type: ['elif_clause', 'else_clause']}
-  }
   {
     start: {type: '(', index: 0}
     end: {type: ')', index: -1}
