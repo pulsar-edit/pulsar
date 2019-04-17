@@ -1863,6 +1863,28 @@ describe 'PHP grammar', ->
     expect(tokens[4]).toEqual value: '\'', scopes: ['source.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
     expect(tokens[5]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
+  it 'should tokenize heredoc in a function call correctly', ->
+    lines = grammar.tokenizeLines  '''
+    foo(
+      <<<HEREDOC
+      This is just a cool test.
+      HEREDOC,
+      $bar
+    );
+    '''
+
+    expect(lines[0][0]).toEqual value: 'foo', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']
+    expect(lines[0][1]).toEqual value: '(', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
+    expect(lines[1][1]).toEqual value: '<<<', scopes: ['source.php', 'meta.function-call.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+    expect(lines[1][2]).toEqual value: 'HEREDOC', scopes: ['source.php', 'meta.function-call.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[2][0]).toEqual value: '  This is just a cool test.', scopes: ['source.php', 'meta.function-call.php', 'string.unquoted.heredoc.php']
+    expect(lines[3][1]).toEqual value: 'HEREDOC', scopes: ['source.php', 'meta.function-call.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[3][2]).toEqual value: ',', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']
+    expect(lines[4][1]).toEqual value: '$', scopes: ['source.php', 'meta.function-call.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(lines[4][2]).toEqual value: 'bar', scopes: ['source.php', 'meta.function-call.php', 'variable.other.php']
+    expect(lines[5][0]).toEqual value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+    expect(lines[5][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+
   it 'should tokenize a simple heredoc correctly', ->
     lines = grammar.tokenizeLines '''
       $a = <<<HEREDOC
@@ -1899,20 +1921,42 @@ describe 'PHP grammar', ->
     expect(lines[2][0]).toEqual value: 'HEREDOC', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
     expect(lines[3][0]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
-  it 'does not match incorrect heredoc terminators', ->
     lines = grammar.tokenizeLines '''
       $a = <<<HEREDOC
       I am a heredoc
       HEREDOC ;
     '''
-    expect(lines[2][0]).toEqual value: 'HEREDOC ;', scopes: ['source.php', 'string.unquoted.heredoc.php']
+
+    expect(lines[0][0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(lines[0][1]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
+    expect(lines[0][2]).toEqual value: ' ', scopes: ['source.php']
+    expect(lines[0][3]).toEqual value: '=', scopes: ['source.php', 'keyword.operator.assignment.php']
+    expect(lines[0][4]).toEqual value: ' ', scopes: ['source.php']
+    expect(lines[0][5]).toEqual value: '<<<', scopes: ['source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+    expect(lines[0][6]).toEqual value: 'HEREDOC', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[1][0]).toEqual value: 'I am a heredoc', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    expect(lines[2][0]).toEqual value: 'HEREDOC', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[2][1]).toEqual value: ' ', scopes: ['source.php']
+    expect(lines[2][2]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
     lines = grammar.tokenizeLines '''
       $a = <<<HEREDOC
       I am a heredoc
       HEREDOC; // comment
     '''
-    expect(lines[2][0]).toEqual value: 'HEREDOC; // comment', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    
+    expect(lines[0][0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+    expect(lines[0][1]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
+    expect(lines[0][2]).toEqual value: ' ', scopes: ['source.php']
+    expect(lines[0][3]).toEqual value: '=', scopes: ['source.php', 'keyword.operator.assignment.php']
+    expect(lines[0][4]).toEqual value: ' ', scopes: ['source.php']
+    expect(lines[0][5]).toEqual value: '<<<', scopes: ['source.php', 'string.unquoted.heredoc.php', 'punctuation.definition.string.php']
+    expect(lines[0][6]).toEqual value: 'HEREDOC', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[1][0]).toEqual value: 'I am a heredoc', scopes: ['source.php', 'string.unquoted.heredoc.php']
+    expect(lines[2][0]).toEqual value: 'HEREDOC', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']
+    expect(lines[2][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+    expect(lines[2][2]).toEqual value: ' ', scopes: ['source.php']
+    expect(lines[2][3]).toEqual value: '//', scopes: ['source.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']
 
   it 'should tokenize a longer heredoc correctly', ->
     lines = grammar.tokenizeLines '''
