@@ -19,7 +19,7 @@
     "url": "https://github.com/atom/language-shellscript/issues"
   },
   "dependencies": {
-    "tree-sitter-bash": "^0.13.6"
+    "tree-sitter-bash": "^0.13.8"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"
