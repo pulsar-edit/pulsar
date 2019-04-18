@@ -182,6 +182,7 @@ scopes:
   '"protected"': 'storage.modifier'
   '"final"': 'storage.modifier'
   '"override"': 'storage.modifier'
+  '"virtual"': 'storage.modifier'
 
   '";"': 'punctuation.terminator.statement'
   '"["': 'punctuation.definition.begin.bracket.square'
