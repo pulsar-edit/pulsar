@@ -111,6 +111,8 @@ scopes:
   '"nonlocal"': 'storage.modifier.nonlocal'
 
   'parameters > identifier': 'variable.parameter.function'
+  'parameters > list_splat > identifier': 'variable.parameter.function'
+  'parameters > dictionary_splat > identifier': 'variable.parameter.function'
   'default_parameter > identifier:nth-child(0)': 'variable.parameter.function'
   'keyword_argument > identifier:nth-child(0)': 'variable.parameter.function'
 
