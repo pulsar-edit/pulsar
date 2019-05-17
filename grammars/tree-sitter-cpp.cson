@@ -200,7 +200,7 @@ scopes:
   'template_argument_list > ">"': 'punctuation.definition.template.bracket.angle'
   'template_argument_list > "<"': 'punctuation.definition.template.bracket.angle'
   'char_literal > "\'"': 'punctuation.definition.string'
-  # 'string_literal > "\""': 'punctuation.definition.string' # TODO: Figure out why this doesn't work
+  'string_literal > "\\""': 'punctuation.definition.string'
   '"{"': 'punctuation.section.block.begin.bracket.curly'
   '"}"': 'punctuation.section.block.end.bracket.curly'
   '"("': 'punctuation.section.parens.begin.bracket.round'
