@@ -1,17 +1,9 @@
-name: 'Flow JavaScript'
-scopeName: 'source.flow'
+name: 'TypeScriptReact'
+scopeName: 'source.tsx'
 type: 'tree-sitter'
 parser: 'tree-sitter-typescript/tsx'
 
-fileTypes: [
-  'js'
-  'flow.js'
-  'flow.jsx'
-  'js.flow'
-  'jsx.flow'
-]
-
-contentRegex: '(/\\*([^*]|\\*[^/])*|//.*)(@flow|flow-typed)\\b'
+fileTypes: ['tsx']
 
 comments:
   start: '// '
@@ -54,7 +46,7 @@ folds: [
 ]
 
 scopes:
-  'program': 'source.flow'
+  'program': 'source.ts'
 
   'property_identifier': [
     {
@@ -210,7 +202,7 @@ scopes:
   '"."': 'meta.delimiter.period'
   '","': 'meta.delimiter.comma'
 
-  '"as"': 'keyword.modifier'
+  '"as"': 'keyword.control'
   '"if"': 'keyword.control'
   '"do"': 'keyword.control'
   '"else"': 'keyword.control'
