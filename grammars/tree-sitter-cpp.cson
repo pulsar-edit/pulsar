@@ -115,6 +115,8 @@ scopes:
   '"typename"': 'keyword.control'
   '"try"': 'keyword.control'
   '"catch"': 'keyword.control'
+  '"throw"': 'keyword.control'
+  '"noexcept"': 'keyword.control'
   '"__attribute__"': 'keyword.attribute'
 
   'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
