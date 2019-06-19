@@ -29,7 +29,6 @@ comments:
 scopes:
   'fragment': 'source.html'
   'tag_name': 'entity.name.tag'
-  'raw_tag_name': 'entity.name.tag'
   'erroneous_end_tag_name': 'invalid.illegal'
   'doctype': 'meta.tag.doctype.html'
   'attribute_name': 'entity.other.attribute-name'
