@@ -116,7 +116,6 @@ scopes:
   '"try"': 'keyword.control'
   '"catch"': 'keyword.control'
   '"throw"': 'keyword.control'
-  '"noexcept"': 'keyword.control'
   '"__attribute__"': 'keyword.attribute'
 
   'preproc_function_def > identifier:nth-child(1)': 'entity.name.function.preprocessor'
@@ -186,6 +185,7 @@ scopes:
   '"final"': 'storage.modifier'
   '"override"': 'storage.modifier'
   '"virtual"': 'storage.modifier'
+  '"noexcept"': 'storage.modifier'
 
   '";"': 'punctuation.terminator.statement'
   '"["': 'punctuation.definition.begin.bracket.square'
