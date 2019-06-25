@@ -177,7 +177,6 @@ scopes:
   '"constexpr"': 'storage.modifier'
   '"volatile"': 'storage.modifier'
   '"restrict"': 'storage.modifier'
-  '"_Atomic"': 'storage.modifier'
   'function_specifier': 'storage.modifier'
   '"public"': 'storage.modifier'
   '"private"': 'storage.modifier'
@@ -186,6 +185,7 @@ scopes:
   '"override"': 'storage.modifier'
   '"virtual"': 'storage.modifier'
   '"noexcept"': 'storage.modifier'
+  '"mutable"': 'storage.modifier'
 
   '";"': 'punctuation.terminator.statement'
   '"["': 'punctuation.definition.begin.bracket.square'
