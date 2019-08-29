@@ -441,6 +441,16 @@
           }
         ]
       }
+      {
+        'match': '(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+)\\s*'
+        'captures':
+          '1':
+            'name': 'keyword.operator.return-value.php'
+          '2':
+            'name': 'keyword.operator.nullable-type.php'
+          '3':
+            'name': 'storage.type.php'
+      }
     ]
   }
   {
@@ -473,7 +483,7 @@
       '6':
         'name': 'punctuation.definition.parameters.begin.bracket.round.php'
     'contentName': 'meta.function.parameters.php'
-    'end': '(\\))(?:\\s*(:)\\s*(\\?)?\\s*([a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*))?'
+    'end': '(\\))(?:\\s*(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+))?'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.parameters.end.bracket.round.php'
