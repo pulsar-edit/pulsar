@@ -3555,7 +3555,7 @@
     'beginCaptures':
       '0':
         'name': 'keyword.operator.ternary.php'
-    'end': ':'
+    'end': '(?<!:):(?!:)'
     'endCaptures':
       '0':
         'name': 'keyword.operator.ternary.php'
