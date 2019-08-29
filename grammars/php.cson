@@ -399,6 +399,9 @@
     'name': 'meta.function.closure.php'
     'patterns': [
       {
+        'include': '#comments'
+      }
+      {
         'begin': '\\('
         'beginCaptures':
           '0':
