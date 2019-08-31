@@ -2650,7 +2650,7 @@
         'name': 'support.function.errorfunc.php'
       }
       {
-        'match': '(?i)\\bshell_exec|system|passthru|proc_(nice|close|terminate|open|get_status)|escapeshell(arg|cmd)|exec\\b'
+        'match': '(?i)\\b(shell_exec|system|passthru|proc_(nice|close|terminate|open|get_status)|escapeshell(arg|cmd)|exec)\\b'
         'name': 'support.function.exec.php'
       }
       {
