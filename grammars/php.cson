@@ -395,7 +395,7 @@
     'beginCaptures':
       '1':
         'name': 'storage.type.function.php'
-    'end': '(?={)'
+    'end': '(?=\\s*{)'
     'name': 'meta.function.closure.php'
     'patterns': [
       {
@@ -442,7 +442,7 @@
         ]
       }
       {
-        'match': '(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+)\\s*'
+        'match': '(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+)'
         'captures':
           '1':
             'name': 'keyword.operator.return-value.php'

@@ -1097,7 +1097,7 @@ describe 'PHP grammar', ->
       expect(tokens[4]).toEqual value: ':', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.return-value.php"]
       expect(tokens[5]).toEqual value: ' ', scopes: ["source.php", "meta.function.closure.php"]
       expect(tokens[6]).toEqual value: 'string', scopes: ["source.php", "meta.function.closure.php", "storage.type.php"]
-      expect(tokens[7]).toEqual value: ' ', scopes: ["source.php", "meta.function.closure.php"]
+      expect(tokens[7]).toEqual value: ' ', scopes: ["source.php"]
       expect(tokens[8]).toEqual value: '{', scopes: ["source.php", "punctuation.definition.begin.bracket.curly.php"]
       expect(tokens[9]).toEqual value: '}', scopes: ["source.php", "punctuation.definition.end.bracket.curly.php"]
 
@@ -1954,7 +1954,7 @@ describe 'PHP grammar', ->
     expect(tokens[5]).toEqual value: 'function', scopes: ['source.php', 'meta.function.closure.php', 'storage.type.function.php']
     expect(tokens[6]).toEqual value: '(', scopes: ['source.php', 'meta.function.closure.php', 'punctuation.definition.parameters.begin.bracket.round.php']
     expect(tokens[7]).toEqual value: ')', scopes: ['source.php', 'meta.function.closure.php', 'punctuation.definition.parameters.end.bracket.round.php']
-    expect(tokens[8]).toEqual value: ' ', scopes: ['source.php', 'meta.function.closure.php']
+    expect(tokens[8]).toEqual value: ' ', scopes: ['source.php']
     expect(tokens[9]).toEqual value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']
     expect(tokens[10]).toEqual value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']
     expect(tokens[11]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
