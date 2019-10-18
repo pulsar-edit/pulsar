@@ -248,6 +248,14 @@ describe 'PHP grammar', ->
           expect(lines[1][4]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
           expect(lines[1][8]).toEqual value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']
 
+        it 'should tokenize ternaries with double colons', ->
+          {tokens} = grammar.tokenizeLine 'true ? A::$a : B::$b'
+
+          expect(tokens[2]).toEqual value: '?', scopes: ["source.php", "keyword.operator.ternary.php"]
+          expect(tokens[5]).toEqual value: '::', scopes: ["source.php", "keyword.operator.class.php"]
+          expect(tokens[9]).toEqual value: ':', scopes: ["source.php", "keyword.operator.ternary.php"]
+          expect(tokens[12]).toEqual value: '::', scopes: ["source.php", "keyword.operator.class.php"]
+
   describe 'identifiers', ->
     it 'tokenizes identifiers with only letters', ->
       {tokens} = grammar.tokenizeLine '$abc'
@@ -1853,6 +1861,15 @@ describe 'PHP grammar', ->
     expect(tokens[10]).toEqual value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']
     expect(tokens[11]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
+  it 'should tokenize comments in closures correctly', ->
+    {tokens} = grammar.tokenizeLine '$a = function() /* use($b) */ {};'
+
+    expect(tokens[5]).toEqual value: 'function', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
+    expect(tokens[6]).toEqual value: '(', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.begin.bracket.round.php"]
+    expect(tokens[7]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]
+    expect(tokens[9]).toEqual value: '/*', scopes: ["source.php", "meta.function.closure.php", "comment.block.php", "punctuation.definition.comment.php"]
+    expect(tokens[11]).toEqual value: '*/', scopes: ["source.php", "meta.function.closure.php", "comment.block.php", "punctuation.definition.comment.php"]
+
   it 'should tokenize non-function-non-control operations correctly', ->
     {tokens} = grammar.tokenizeLine "echo 'test';"
 
@@ -1944,7 +1961,7 @@ describe 'PHP grammar', ->
       I am a heredoc
       HEREDOC; // comment
     '''
-    
+
     expect(lines[0][0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
     expect(lines[0][1]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
     expect(lines[0][2]).toEqual value: ' ', scopes: ['source.php']
