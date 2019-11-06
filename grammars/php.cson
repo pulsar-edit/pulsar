@@ -399,6 +399,9 @@
     'name': 'meta.function.closure.php'
     'patterns': [
       {
+              'include': '#comments'
+      }
+      {
         'begin': '(&)?\\s*(\\()'
         'beginCaptures':
           '1':
@@ -2653,7 +2656,7 @@
         'name': 'support.function.enchant.php'
       }
       {
-        'match': '(?i)\\bsplit(i)?|sql_regcase|ereg(i)?(_replace)?\\b'
+        'match': '(?i)\\b(split(i)?|sql_regcase|ereg(i)?(_replace)?)\\b'
         'name': 'support.function.ereg.php'
       }
       {
@@ -2661,7 +2664,7 @@
         'name': 'support.function.errorfunc.php'
       }
       {
-        'match': '(?i)\\bshell_exec|system|passthru|proc_(nice|close|terminate|open|get_status)|escapeshell(arg|cmd)|exec\\b'
+        'match': '(?i)\\b(shell_exec|system|passthru|proc_(nice|close|terminate|open|get_status)|escapeshell(arg|cmd)|exec)\\b'
         'name': 'support.function.exec.php'
       }
       {
@@ -3569,7 +3572,7 @@
     'beginCaptures':
       '0':
         'name': 'keyword.operator.ternary.php'
-    'end': ':'
+    'end': '(?<!:):(?!:)'
     'endCaptures':
       '0':
         'name': 'keyword.operator.ternary.php'
