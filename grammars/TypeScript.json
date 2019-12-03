@@ -7,6 +7,9 @@
 	"version": "https://github.com/Microsoft/TypeScript-TmLanguage/commit/4daff7b8904bc549dfbee8df1e2f7c82194b9f45",
 	"name": "TypeScript",
 	"scopeName": "source.ts",
+	"fileTypes": [
+		"ts"
+	],
 	"patterns": [
 		{
 			"include": "#directives"
