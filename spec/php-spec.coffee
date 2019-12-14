@@ -1176,6 +1176,41 @@ describe 'PHP grammar', ->
       expect(tokens[9]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]
       expect(tokens[10]).toEqual value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]
 
+  describe 'arrow functions', ->
+    it 'tokenizes arrow functions', ->
+      {tokens} = grammar.tokenizeLine '$pow = fn($x) => $x * 2;'
+
+      expect(tokens[5]).toEqual value: 'fn', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
+      expect(tokens[6]).toEqual value: '(', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.begin.bracket.round.php"]
+      expect(tokens[7]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.no-default.php", "variable.other.php", "punctuation.definition.variable.php"]
+      expect(tokens[8]).toEqual value: 'x', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.no-default.php", "variable.other.php"]
+      expect(tokens[9]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]
+      expect(tokens[11]).toEqual value: '=>', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.arrow.php"]
+      expect(tokens[13]).toEqual value: '$', scopes: ["source.php", "variable.other.php", "punctuation.definition.variable.php"]
+      expect(tokens[14]).toEqual value: 'x', scopes: ["source.php", "variable.other.php"]
+      expect(tokens[16]).toEqual value: '*', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[18]).toEqual value: '2', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[19]).toEqual value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]
+
+    it 'tokenizes parameters', ->
+      {tokens} = grammar.tokenizeLine '$pow = fn(int $x=0) => $x * 2;'
+
+      expect(tokens[5]).toEqual value: 'fn', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
+      expect(tokens[7]).toEqual value: 'int', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "storage.type.php"]
+      expect(tokens[9]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "variable.other.php", "punctuation.definition.variable.php"]
+      expect(tokens[10]).toEqual value: 'x', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "variable.other.php"]
+      expect(tokens[11]).toEqual value: '=', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "keyword.operator.assignment.php"]
+      expect(tokens[12]).toEqual value: '0', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "constant.numeric.decimal.php"]
+      expect(tokens[13]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]
+
+    it 'tokenizes return types', ->
+      {tokens} = grammar.tokenizeLine '$pow = fn($x) :? int => $x * 2;'
+
+      expect(tokens[5]).toEqual value: 'fn', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
+      expect(tokens[11]).toEqual value: ':', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.return-value.php"]
+      expect(tokens[12]).toEqual value: '?', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.nullable-type.php"]
+      expect(tokens[14]).toEqual value: 'int', scopes: ["source.php", "meta.function.closure.php", "storage.type.php"]
+
   describe 'the scope resolution operator', ->
     it 'tokenizes static method calls with no arguments', ->
       {tokens} = grammar.tokenizeLine 'obj::method()'
