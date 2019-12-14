@@ -1981,23 +1981,23 @@
   'numbers':
     'patterns': [
       {
-        'match': '0[xX][0-9a-fA-F]+'
+        'match': '0[xX][0-9a-fA-F]+(?:_[0-9a-fA-F]+)*'
         'name': 'constant.numeric.hex.php'
       }
       {
-        'match': '0[bB][01]+'
+        'match': '0[bB][01]+(?:_[01]+)*'
         'name': 'constant.numeric.binary.php'
       }
       {
-        'match': '0[0-7]+'
+        'match': '0(?:_?[0-7]+)+'
         'name': 'constant.numeric.octal.php'
       }
       {
         'match': '''(?x)
           (?:
-            [0-9]*(\\.)[0-9]+(?:[eE][+-]?[0-9]+)?|
-            [0-9]+(\\.)[0-9]*(?:[eE][+-]?[0-9]+)?|
-            [0-9]+[eE][+-]?[0-9]+
+            (?:[0-9]+(?:_[0-9]+)*)?(\\.)[0-9]+(?:_[0-9]+)*(?:[eE][+-]?[0-9]+(?:_[0-9]+)*)?| # .3
+            [0-9]+(?:_[0-9]+)*(\\.)(?:[0-9]+(?:_[0-9]+)*)?(?:[eE][+-]?[0-9]+(?:_[0-9]+)*)?| # 3.
+            [0-9]+(?:_[0-9]+)*[eE][+-]?[0-9]+(?:_[0-9]+)*                                   # 2e-3
           )
         '''
         'name': 'constant.numeric.decimal.php'
@@ -2008,7 +2008,7 @@
             'name': 'punctuation.separator.decimal.period.php'
       }
       {
-        'match': '0|[1-9][0-9]*'
+        'match': '0|[1-9](?:_?[0-9]+)*'
         'name': 'constant.numeric.decimal.php'
       }
     ]
