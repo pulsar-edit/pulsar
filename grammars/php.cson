@@ -201,7 +201,12 @@
     ]
   }
   {
-    'begin': '(?i)(?:^|(?<=}))\\s*(?:(abstract|final)\\s+)?(class)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)'
+    'begin':  '''(?ix)
+        (?:
+          (?:^|(?<=}))\\s*(?:(abstract|final)\\s+)?(class)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)
+          |\\b(new)\\s+(class)\\b # anonymous class
+        )
+      '''
     'beginCaptures':
       '1':
         'name': 'storage.modifier.${1:/downcase}.php'
@@ -209,6 +214,10 @@
         'name': 'storage.type.class.php'
       '3':
         'name': 'entity.name.type.class.php'
+      '4':
+        'name': 'keyword.other.new.php'
+      '5':
+        'name': 'storage.type.class.php'
     'end': '}|(?=\\?>)'
     'endCaptures':
       '0':
@@ -462,7 +471,7 @@
       (function)\\s+
       (?i:
         (__(?:call|construct|debugInfo|destruct|get|set|isset|unset|toString|
-              clone|set_state|sleep|wakeup|autoload|invoke|callStatic))
+              clone|set_state|sleep|wakeup|autoload|invoke|callStatic|serialize|unserialize))
         |(?:(&)?\\s*([a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*))
       )
       \\s*(\\()
@@ -502,6 +511,43 @@
         'include': '#function-parameters'
       }
     ]
+  }
+  {
+    'match': '''(?xi)
+      ((?:(?:public|private|protected|static)(?:\\s+|(?=\\?)))+)                     # At least one modifier
+      (?:(\\?)?\\s*                                                                  # Optional nullable
+        (\\\\?(?:[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*\\\\)*)   # Optional namespace
+        ([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*))?               # Typehinted class name
+      \\s+((\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)          # Variable name
+    '''
+    'captures':
+      '1':
+        'patterns': [
+          {
+            'match': 'public|private|protected|static'
+            'name': 'storage.modifier.php'
+          }
+        ]
+      '2':
+        'name': 'keyword.operator.nullable-type.php'
+      '3':
+        'name': 'support.other.namespace.php'
+        'patterns': [
+          {
+            'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*'
+            'name': 'storage.type.php'
+          }
+          {
+            'match': '\\\\'
+            'name': 'punctuation.separator.inheritance.php'
+          }
+        ]
+      '4':
+        'name': 'storage.type.php'
+      '5':
+        'name': 'variable.other.php'
+      '6':
+        'name': 'punctuation.definition.variable.php'
   }
   {
     'include': '#invoke-call'
@@ -1889,7 +1935,7 @@
       }
     ]
   'instantiation':
-    'begin': '(?i)(new)\\s+'
+    'begin': '(?i)(new)\\s+(?!class\\b)'
     'beginCaptures':
       '1':
         'name': 'keyword.other.new.php'
