@@ -595,6 +595,16 @@ describe 'PHP grammar', ->
       expect(tokens[6]).toEqual value: '/*', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.block.php', 'punctuation.definition.comment.php']
       expect(tokens[10]).toEqual value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']
 
+    it 'tokenizes class instantiation', ->
+      {tokens} = grammar.tokenizeLine '$a = new ClassName();'
+
+      expect(tokens[5]).toEqual value: 'new', scopes: ["source.php", "keyword.other.new.php"]
+      expect(tokens[6]).toEqual value: ' ', scopes: ["source.php"]
+      expect(tokens[7]).toEqual value: 'ClassName', scopes: ["source.php", "support.class.php"]
+      expect(tokens[8]).toEqual value: '(', scopes: ["source.php", "punctuation.definition.begin.bracket.round.php"]
+      expect(tokens[9]).toEqual value: ')', scopes: ["source.php", "punctuation.definition.end.bracket.round.php"]
+      expect(tokens[10]).toEqual value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]
+
     it 'tokenizes class modifiers', ->
       {tokens} = grammar.tokenizeLine 'abstract class Test {}'
 
@@ -618,6 +628,89 @@ describe 'PHP grammar', ->
       expect(tokens[6]).toEqual value: 'final', scopes: ['source.php', 'meta.class.php', 'storage.modifier.final.php']
       expect(tokens[8]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
       expect(tokens[10]).toEqual value: 'Test2', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
+
+    describe 'properties', ->
+      it 'tokenizes types', ->
+        lines = grammar.tokenizeLines '''
+          class A {
+            public int $a = 1;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[1][3]).toEqual value: 'int', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+        expect(lines[1][5]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[1][6]).toEqual value: 'a', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
+
+      it 'tokenizes nullable types', ->
+        lines = grammar.tokenizeLines '''
+          class A {
+            static ?string $b = 'Bee';
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'static', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[1][3]).toEqual value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]
+        expect(lines[1][4]).toEqual value: 'string', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+        expect(lines[1][6]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[1][7]).toEqual value: 'b', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
+
+        lines = grammar.tokenizeLines '''
+          class A {
+            static? string $b;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'static', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[1][2]).toEqual value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]
+        expect(lines[1][4]).toEqual value: 'string', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+
+      it 'tokenizes namespaces', ->
+        lines = grammar.tokenizeLines '''
+          class A {
+            public ?\\Space\\Test $c;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[1][3]).toEqual value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]
+        expect(lines[1][4]).toEqual value: '\\', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+        expect(lines[1][5]).toEqual value: 'Space', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "storage.type.php"]
+        expect(lines[1][6]).toEqual value: '\\', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+        expect(lines[1][7]).toEqual value: 'Test', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+        expect(lines[1][9]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[1][10]).toEqual value: 'c', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
+
+      it 'tokenizes multiple properties', ->
+        lines = grammar.tokenizeLines '''
+          class A {
+            static int $a = 1;
+            public \\Other\\Type $b;
+            private static ? array $c1, $c2;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'static', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[1][3]).toEqual value: 'int', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+        expect(lines[1][5]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[1][6]).toEqual value: 'a', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
+
+        expect(lines[2][1]).toEqual value: 'public', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[2][3]).toEqual value: '\\', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+        expect(lines[2][4]).toEqual value: 'Other', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "storage.type.php"]
+        expect(lines[2][5]).toEqual value: '\\', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+        expect(lines[2][6]).toEqual value: 'Type', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+        expect(lines[2][8]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[2][9]).toEqual value: 'b', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
+
+        expect(lines[3][1]).toEqual value: 'private', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[3][3]).toEqual value: 'static', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]
+        expect(lines[3][5]).toEqual value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]
+        expect(lines[3][7]).toEqual value: 'array', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
+        expect(lines[3][9]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[3][10]).toEqual value: 'c1', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
+        expect(lines[3][13]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
+        expect(lines[3][14]).toEqual value: 'c2', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
 
     describe 'use statements', ->
       it 'tokenizes basic use statements', ->
@@ -745,6 +838,33 @@ describe 'PHP grammar', ->
         expect(lines[2][7]).toEqual value: 'talk', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'entity.other.alias.php']
         expect(lines[2][8]).toEqual value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.terminator.expression.php']
         expect(lines[3][1]).toEqual value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
+
+    describe 'anonymous', ->
+
+      it 'tokenizes anonymous class declarations', ->
+        {tokens} = grammar.tokenizeLine '$a = new class{  /* stuff */ };'
+
+        expect(tokens[5]).toEqual value: 'new', scopes: ["source.php", "meta.class.php", "keyword.other.new.php"]
+        expect(tokens[6]).toEqual value: ' ', scopes: ["source.php", "meta.class.php"]
+        expect(tokens[7]).toEqual value: 'class', scopes: ["source.php", "meta.class.php", "storage.type.class.php"]
+        expect(tokens[8]).toEqual value: '{', scopes: ["source.php", "meta.class.php", "punctuation.definition.class.begin.bracket.curly.php"]
+        expect(tokens[9]).toEqual value: '  ', scopes: ["source.php", "meta.class.php", "meta.class.body.php"]
+        expect(tokens[10]).toEqual value: '/*', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "comment.block.php", "punctuation.definition.comment.php"]
+        expect(tokens[11]).toEqual value: ' stuff ', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "comment.block.php"]
+        expect(tokens[12]).toEqual value: '*/', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "comment.block.php", "punctuation.definition.comment.php"]
+        expect(tokens[13]).toEqual value: ' ', scopes: ["source.php", "meta.class.php", "meta.class.body.php"]
+        expect(tokens[14]).toEqual value: '}', scopes: ["source.php", "meta.class.php", "punctuation.definition.class.end.bracket.curly.php"]
+        expect(tokens[15]).toEqual value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]
+
+      it 'tokenizes inheritance correctly', ->
+        {tokens} = grammar.tokenizeLine '$a = new class extends Test implements ITest {  /* stuff */ };'
+
+        expect(tokens[5]).toEqual value: 'new', scopes: ["source.php", "meta.class.php", "keyword.other.new.php"]
+        expect(tokens[7]).toEqual value: 'class', scopes: ["source.php", "meta.class.php", "storage.type.class.php"]
+        expect(tokens[9]).toEqual value: 'extends', scopes: ["source.php", "meta.class.php", "storage.modifier.extends.php"]
+        expect(tokens[11]).toEqual value: 'Test', scopes: ["source.php", "meta.class.php", "meta.other.inherited-class.php", "entity.other.inherited-class.php"]
+        expect(tokens[13]).toEqual value: 'implements', scopes: ["source.php", "meta.class.php", "storage.modifier.implements.php"]
+        expect(tokens[15]).toEqual value: 'ITest', scopes: ["source.php", "meta.class.php", "meta.other.inherited-class.php", "entity.other.inherited-class.php"]
 
   describe 'functions', ->
     it 'tokenizes functions with no arguments', ->
