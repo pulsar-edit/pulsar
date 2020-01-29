@@ -1436,6 +1436,105 @@ describe 'PHP grammar', ->
       expect(tokens[1]).toEqual value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
       expect(tokens[2]).toEqual value: 'E3', scopes: ['source.php', 'constant.numeric.decimal.php']
 
+  describe 'numeric literal separator', ->
+    it 'tokenizes hexadecimals', ->
+      {tokens} = grammar.tokenizeLine '0xCAFE_F00D'
+      expect(tokens[0]).toEqual value: '0xCAFE_F00D', scopes: ['source.php', 'constant.numeric.hex.php']
+
+      {tokens} = grammar.tokenizeLine '0XFEED_D06_BEEF'
+      expect(tokens[0]).toEqual value: '0XFEED_D06_BEEF', scopes: ['source.php', 'constant.numeric.hex.php']
+
+    it 'tokenizes binary literals', ->
+      {tokens} = grammar.tokenizeLine '0b0111_0111_0111_0100_0110_0110'
+      expect(tokens[0]).toEqual value: '0b0111_0111_0111_0100_0110_0110', scopes: ['source.php', 'constant.numeric.binary.php']
+
+      {tokens} = grammar.tokenizeLine '0B0111_0111_0111_0100_0110_0110'
+      expect(tokens[0]).toEqual value: '0B0111_0111_0111_0100_0110_0110', scopes: ['source.php', 'constant.numeric.binary.php']
+
+    it 'tokenizes octal literals', ->
+      {tokens} = grammar.tokenizeLine '017_17'
+      expect(tokens[0]).toEqual value: '017_17', scopes: ['source.php', 'constant.numeric.octal.php']
+
+      {tokens} = grammar.tokenizeLine '0_655'
+      expect(tokens[0]).toEqual value: '0_655', scopes: ['source.php', 'constant.numeric.octal.php']
+
+    it 'tokenizes decimals', ->
+      {tokens} = grammar.tokenizeLine '1_234'
+      expect(tokens[0]).toEqual value: '1_234', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+      {tokens} = grammar.tokenizeLine '1_5e-1_0'
+      expect(tokens[0]).toEqual value: '1_5e-1_0', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+      {tokens} = grammar.tokenizeLine '1_5E+5'
+      expect(tokens[0]).toEqual value: '1_5E+5', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+      {tokens} = grammar.tokenizeLine '9_5.'
+      expect(tokens[0]).toEqual value: '9_5', scopes: ['source.php', 'constant.numeric.decimal.php']
+      expect(tokens[1]).toEqual value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+
+      {tokens} = grammar.tokenizeLine '.1_5'
+      expect(tokens[0]).toEqual value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+      expect(tokens[1]).toEqual value: '1_5', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+      {tokens} = grammar.tokenizeLine '3_6.4_4'
+      expect(tokens[0]).toEqual value: '3_6', scopes: ['source.php', 'constant.numeric.decimal.php']
+      expect(tokens[1]).toEqual value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+      expect(tokens[2]).toEqual value: '4_4', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+      {tokens} = grammar.tokenizeLine '.1e-2_3'
+      expect(tokens[0]).toEqual value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+      expect(tokens[1]).toEqual value: '1e-2_3', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+      {tokens} = grammar.tokenizeLine '1.E7_3'
+      expect(tokens[0]).toEqual value: '1', scopes: ['source.php', 'constant.numeric.decimal.php']
+      expect(tokens[1]).toEqual value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+      expect(tokens[2]).toEqual value: 'E7_3', scopes: ['source.php', 'constant.numeric.decimal.php']
+
+    it 'tokenizes expression', ->
+      {tokens} = grammar.tokenizeLine '2_0*0_7/(3e-1_3-2_0.3_4)*0b0_1+0Xf*_22'
+
+      expect(tokens[0]).toEqual value: '2_0', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[1]).toEqual value: '*', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[2]).toEqual value: '0_7', scopes: ["source.php", "constant.numeric.octal.php"]
+      expect(tokens[3]).toEqual value: '/', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[4]).toEqual value: '(', scopes: ["source.php", "punctuation.definition.begin.bracket.round.php"]
+      expect(tokens[5]).toEqual value: '3e-1_3', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[6]).toEqual value: '-', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[7]).toEqual value: '2_0', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[8]).toEqual value: '.', scopes: ["source.php", "constant.numeric.decimal.php", "punctuation.separator.decimal.period.php"]
+      expect(tokens[9]).toEqual value: '3_4', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[10]).toEqual value: ')', scopes: ["source.php", "punctuation.definition.end.bracket.round.php"]
+      expect(tokens[11]).toEqual value: '*', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[12]).toEqual value: '0b0_1', scopes: ["source.php", "constant.numeric.binary.php"]
+      expect(tokens[13]).toEqual value: '+', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[14]).toEqual value: '0Xf', scopes: ["source.php", "constant.numeric.hex.php"]
+      expect(tokens[15]).toEqual value: '*', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      # invalid number treated as const
+      expect(tokens[16]).toEqual value: '_22', scopes: ["source.php", "constant.other.php"]
+
+      {tokens} = grammar.tokenizeLine '_23(1_2)+0_655-[0B0_0,0Xf_8,5.4_8][0b1_0]'
+
+      # invalid number treated as function name
+      expect(tokens[0]).toEqual value: '_23', scopes: ["source.php", "meta.function-call.php", "entity.name.function.php"]
+      expect(tokens[1]).toEqual value: '(', scopes: ["source.php", "meta.function-call.php", "punctuation.definition.arguments.begin.bracket.round.php"]
+      expect(tokens[2]).toEqual value: '1_2', scopes: ["source.php", "meta.function-call.php", "constant.numeric.decimal.php"]
+      expect(tokens[3]).toEqual value: ')', scopes: ["source.php", "meta.function-call.php", "punctuation.definition.arguments.end.bracket.round.php"]
+      expect(tokens[4]).toEqual value: '+', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[5]).toEqual value: '0_655', scopes: ["source.php", "constant.numeric.octal.php"]
+      expect(tokens[6]).toEqual value: '-', scopes: ["source.php", "keyword.operator.arithmetic.php"]
+      expect(tokens[7]).toEqual value: '[', scopes: ["source.php", "punctuation.section.array.begin.php"]
+      expect(tokens[8]).toEqual value: '0B0_0', scopes: ["source.php", "constant.numeric.binary.php"]
+      expect(tokens[9]).toEqual value: ',', scopes: ["source.php", "punctuation.separator.delimiter.php"]
+      expect(tokens[10]).toEqual value: '0Xf_8', scopes: ["source.php", "constant.numeric.hex.php"]
+      expect(tokens[11]).toEqual value: ',', scopes: ["source.php", "punctuation.separator.delimiter.php"]
+      expect(tokens[12]).toEqual value: '5', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[13]).toEqual value: '.', scopes: ["source.php", "constant.numeric.decimal.php", "punctuation.separator.decimal.period.php"]
+      expect(tokens[14]).toEqual value: '4_8', scopes: ["source.php", "constant.numeric.decimal.php"]
+      expect(tokens[15]).toEqual value: ']', scopes: ["source.php", "punctuation.section.array.end.php"]
+      expect(tokens[16]).toEqual value: '[', scopes: ["source.php", "punctuation.section.array.begin.php"]
+      expect(tokens[17]).toEqual value: '0b1_0', scopes: ["source.php", "constant.numeric.binary.php"]
+      expect(tokens[18]).toEqual value: ']', scopes: ["source.php", "punctuation.section.array.end.php"]
+
   it 'should tokenize switch statements correctly', ->
     lines = grammar.tokenizeLines '''
       switch($something)
