@@ -728,11 +728,11 @@
     'name': 'keyword.operator.bitwise.php'
   }
   {
-    'begin': '(?i)\\b(instanceof)\\s+(?=[\\\\$a-zA-Z_])'
+    'begin': '(?i)\\b(instanceof)\\s+(?=[\\\\$a-z_])'
     'beginCaptures':
       '1':
         'name': 'keyword.operator.type.php'
-    'end': '(?=[^\\\\$a-zA-Z0-9_\\x{7f}-\\x{7fffffff}])'
+    'end': '(?i)(?=[^\\\\$a-z0-9_\\x{7f}-\\x{7fffffff}])'
     'patterns': [
       {
         'include': '#class-name'
