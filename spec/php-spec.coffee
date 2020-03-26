@@ -87,6 +87,16 @@ describe 'PHP grammar', ->
       expect(tokens[4]).toEqual value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']
       expect(tokens[5]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
+    it 'should tokenize instanceof correctly', ->
+      {tokens} = grammar.tokenizeLine '$x instanceof Foo'
+
+      expect(tokens[0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1]).toEqual value: 'x', scopes: ['source.php', 'variable.other.php']
+      expect(tokens[2]).toEqual value: ' ', scopes: ['source.php']
+      expect(tokens[3]).toEqual value: 'instanceof', scopes: ['source.php', 'keyword.operator.type.php']
+      expect(tokens[4]).toEqual value: ' ', scopes: ['source.php']
+      expect(tokens[5]).toEqual value: 'Foo', scopes: ['source.php', 'support.class.php']
+
     describe 'combined operators', ->
       it 'should tokenize === correctly', ->
         {tokens} = grammar.tokenizeLine '$test === 2;'

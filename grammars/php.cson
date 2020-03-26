@@ -732,7 +732,7 @@
     'beginCaptures':
       '1':
         'name': 'keyword.operator.type.php'
-    'end': '(?=[^\\\\$a-z0-9_\\x{7f}-\\x{7fffffff}])'
+    'end': '(?i)(?=[^\\\\$a-z0-9_\\x{7f}-\\x{7fffffff}])'
     'patterns': [
       {
         'include': '#class-name'
