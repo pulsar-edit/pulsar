@@ -6,6 +6,9 @@
 	],
 	"version": "https://github.com/Microsoft/TypeScript-TmLanguage/commit/4daff7b8904bc549dfbee8df1e2f7c82194b9f45",
 	"name": "TypeScriptReact",
+	"fileTypes": [
+		"tsx"
+	],
 	"scopeName": "source.tsx",
 	"patterns": [
 		{
