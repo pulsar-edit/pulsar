@@ -279,3 +279,18 @@ describe 'PHP in HTML', ->
       '''
       for line in invalid.split /\n/
         expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+
+    it 'should tokenize <?php use Some\\Name ?>', ->
+      lines = grammar.tokenizeLines '''
+       <?php use Some\\Name ?>
+       <article>
+       '''
+      expect(lines[0][0]).toEqual value : '<?php', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.begin.php' ]
+      expect(lines[0][1]).toEqual value : ' ', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'source.php' ]
+      expect(lines[0][2]).toEqual value : 'use', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php', 'keyword.other.use.php' ]
+      expect(lines[0][3]).toEqual value : ' ', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php' ]
+      expect(lines[0][4]).toEqual value : 'Some', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php', 'support.other.namespace.php' ]
+      expect(lines[0][5]).toEqual value : '\\', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php' ]
+      expect(lines[0][6]).toEqual value : 'Name', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php', 'support.class.php' ]
+      expect(lines[0][8]).toEqual value : '?', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php' ]
+      expect(lines[0][9]).toEqual value : '>', scopes : [ 'text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php' ]
