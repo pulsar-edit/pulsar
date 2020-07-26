@@ -4,7 +4,9 @@
             "@babel/preset-env",
             {
                 "targets": {
-                    "electron": 5
+                    "electron": 5,
+                    "node": true,
+                    "esmodules": false
                 }
             }
         ],
