@@ -1,8 +1,10 @@
 'use strict';
 
+require('babel-preset-atomic'); // included for electron-link bundle
+
 var crypto = require('crypto');
 var path = require('path');
-var defaultOptions = require('../static/babelrc.json');
+var defaultOptions = require('../static/babel.config.js');
 
 var babel = null;
 var babelVersionDirectory = null;
