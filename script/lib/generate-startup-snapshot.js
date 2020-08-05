@@ -136,13 +136,19 @@ module.exports = function(packagedAppPath) {
           path.join('..', 'node_modules', '@babel')
         ) ||
         requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', 'babel-preset-atomic')
+          path.join('..', 'node_modules', 'babel-plugin-add-module-exports')
         ) ||
         requiredModuleRelativePath.startsWith(
           path.join('node_modules', '@babel')
         ) ||
         requiredModuleRelativePath.startsWith(
-          path.join('node_modules', 'babel-preset-atomic')
+          path.join('node_modules', 'babel-plugin-add-module-exports')
+        ) ||
+        requiredModuleRelativePath.startsWith(
+          path.join('node_modules', 'babel-preset')
+        ) ||
+        requiredModuleRelativePath.startsWith(
+          path.join('..', 'node_modules', 'babel-preset')
         ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'debug', 'node.js') ||

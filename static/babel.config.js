@@ -1,8 +1,3 @@
-function electronLinkRequireHook() {
-  require('babel-preset-atomic');
-}
-electronLinkRequireHook();
-
 let presets = ['babel-preset-atomic'];
 
 let plugins = [];
