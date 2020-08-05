@@ -136,9 +136,6 @@ module.exports = function(packagedAppPath) {
           path.join('..', 'node_modules', '@babel', 'core')
         ) ||
         requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', '@babel', 'cli')
-        ) ||
-        requiredModuleRelativePath.startsWith(
           path.join('..', 'node_modules', 'babel-preset-atomic')
         ) ||
         requiredModuleRelativePath ===
