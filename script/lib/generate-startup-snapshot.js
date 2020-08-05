@@ -133,10 +133,16 @@ module.exports = function(packagedAppPath) {
             'command-event.js'
           ) ||
         requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', '@babel', 'core')
+          path.join('..', 'node_modules', '@babel')
         ) ||
         requiredModuleRelativePath.startsWith(
           path.join('..', 'node_modules', 'babel-preset-atomic')
+        ) ||
+        requiredModuleRelativePath.startsWith(
+          path.join('node_modules', '@babel')
+        ) ||
+        requiredModuleRelativePath.startsWith(
+          path.join('node_modules', 'babel-preset-atomic')
         ) ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'debug', 'node.js') ||
