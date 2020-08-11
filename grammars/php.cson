@@ -124,7 +124,7 @@
     'beginCaptures':
       '0':
         'name': 'keyword.other.use.php'
-    'end': '(?<=})|(?=;)'
+    'end': '(?<=})|(?=;)|(?=\\?>)'
     'name': 'meta.use.php'
     'patterns': [
       {
