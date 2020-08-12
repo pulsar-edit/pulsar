@@ -365,32 +365,37 @@
     'name': 'meta.catch.php'
     'patterns': [
       {
-        'include': '#namespace'
-      }
-      {
         'match': '''(?xi)
-          ([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)                 # Exception class
-          ((?:\\s*\\|\\s*[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)*) # Optional additional exception classes
+          ([a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)*) # union or single exception class
           \\s*
           ((\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)?           # Variable
         '''
         'captures':
           '1':
-            'name': 'support.class.exception.php'
-          '2':
             'patterns': [
-              {
-                'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*'
-                'name': 'support.class.exception.php'
-              }
               {
                 'match': '\\|'
                 'name': 'punctuation.separator.delimiter.php'
               }
+              {
+                'begin': '(?i)(?=[\\\\a-z_\\x{7f}-\\x{7fffffff}])'
+                'end': '''(?xi)
+                  ( [a-z_\\x{7f}-\\x{7fffffff}] [a-z0-9_\\x{7f}-\\x{7fffffff}]* )
+                  (?![a-z0-9_\\x{7f}-\\x{7fffffff}\\\\])
+                '''
+                'endCaptures':
+                  '1':
+                    'name': 'support.class.exception.php'
+                'patterns': [
+                  {
+                    'include': '#namespace'
+                  }
+                ]
+              }
             ]
-          '3':
+          '2':
             'name': 'variable.other.php'
-          '4':
+          '3':
             'name': 'punctuation.definition.variable.php'
       }
     ]
