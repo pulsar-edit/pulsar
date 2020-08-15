@@ -464,6 +464,7 @@
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
             [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           )
+          (?=\\s*(?:{|/[/*]|\\#|$))
         '''
         'captures':
           '1':
@@ -513,6 +514,7 @@
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
             [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           )
+          (?=\\s*(?:=>|/[/*]|\\#|$))
         '''
         'captures':
           '1':
@@ -561,6 +563,7 @@
         (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
         [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
       ) )?
+      (?=\\s*(?:{|/[/*]|\\#|$))
     '''
     'endCaptures':
       '1':
