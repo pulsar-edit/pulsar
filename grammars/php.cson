@@ -529,6 +529,96 @@
     ]
   }
   {
+    # constructor
+    'begin': '''(?x)
+      ((?:(?:final|abstract|public|private|protected)\\s+)*)
+      (function)\\s+(__construct)
+      \\s*(\\()
+    '''
+    'beginCaptures':
+      '1':
+        'patterns': [
+          {
+            'match': 'final|abstract|public|private|protected'
+            'name': 'storage.modifier.php'
+          }
+        ]
+      '2':
+        'name': 'storage.type.function.php'
+      '3':
+        'name': 'support.function.constructor.php'
+      '4':
+        'name': 'punctuation.definition.parameters.begin.bracket.round.php'
+    'contentName': 'meta.function.parameters.php'
+    'end': '''(?xi)
+      (\\)) \\s* ( : \\s*
+        (?:\\?\\s*)? (?!\\s) [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\\\s\\|]+ (?<!\\s)
+      )?
+      (?=\\s*(?:{|/[/*]|\\#|$))
+    '''
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.parameters.end.bracket.round.php'
+      '2':
+        'name': 'invalid.illegal.return-type.php'
+    'name': 'meta.function.php'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'match': ','
+        'name': 'punctuation.separator.delimiter.php'
+      }
+      {
+        # Constructor Property Promotion
+        'begin': '''(?xi)
+          (public|private|protected) \\s+
+          (?: (
+            (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+          ) \\s+ )?
+          ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
+        '''
+        'beginCaptures':
+          '1':
+            'name': 'storage.modifier.php'
+          '2':
+            'patterns': [
+              {
+                'include': '#php-types'
+              }
+            ]
+          '3':
+            'name': 'variable.other.php'
+          '4':
+            'name': 'storage.modifier.reference.php'
+          '5':
+            'name': 'punctuation.definition.variable.php'
+        'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
+        'name': 'meta.function.parameter.promoted-property.php'
+        'patterns': [
+          {
+            'begin': '='
+            'beginCaptures':
+              '0':
+                'name': 'keyword.operator.assignment.php'
+            'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
+            'patterns': [
+              {
+                'include': '#parameter-default-types'
+              }
+            ]
+          }
+        ]
+      }
+      {
+        'include': '#function-parameters'
+      }
+    ]
+  }
+  {
+    # method
     'begin': '''(?x)
       ((?:(?:final|abstract|public|private|protected|static)\\s+)*)
       (function)\\s+
