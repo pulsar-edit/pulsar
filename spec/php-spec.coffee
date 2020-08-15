@@ -592,6 +592,22 @@ describe 'PHP grammar', ->
       expect(tokens[4][0]).toEqual value: '}', scopes: ['source.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
       expect(tokens[4][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
+    it 'tokenizes trailing comma in use statements', ->
+      lines = grammar.tokenizeLines '''
+        use some\\namespace\\{
+          ClassA,
+          ClassB,
+        };
+      '''
+
+      expect(lines[0][0]).toEqual value: 'use', scopes: ['source.php', 'meta.use.php', 'keyword.other.use.php']
+      expect(lines[0][6]).toEqual value: '{', scopes: ['source.php', 'meta.use.php', 'punctuation.definition.use.begin.bracket.curly.php']
+      expect(lines[1][1]).toEqual value: 'ClassA', scopes: ['source.php', 'meta.use.php', 'support.class.php']
+      expect(lines[1][2]).toEqual value: ',', scopes: ['source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
+      expect(lines[2][1]).toEqual value: 'ClassB', scopes: ['source.php', 'meta.use.php', 'support.class.php']
+      expect(lines[2][2]).toEqual value: ',', scopes: ['source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']
+      expect(lines[3][0]).toEqual value: '}', scopes: ['source.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']
+
   describe 'classes', ->
     it 'tokenizes class declarations', ->
       {tokens} = grammar.tokenizeLine 'class Test { /* stuff */ }'
@@ -1058,6 +1074,20 @@ describe 'PHP grammar', ->
       expect(tokens[23]).toEqual value: 'null', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'constant.language.php']
       expect(tokens[24]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
 
+    it 'tokenizes trailing comma in function parameters', ->
+      {tokens} = grammar.tokenizeLine 'function abc($a, $b,){}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: 'abc', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[4]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[5]).toEqual value: 'a', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']
+      expect(tokens[6]).toEqual value: ',', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[8]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[9]).toEqual value: 'b', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']
+      expect(tokens[10]).toEqual value: ',', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[11]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+
     it 'tokenizes return values', ->
       {tokens} = grammar.tokenizeLine 'function test() : Client {}'
 
@@ -1151,6 +1181,15 @@ describe 'PHP grammar', ->
       expect(tokens[7]).toEqual value: 'b', scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php']
       expect(tokens[8]).toEqual value: "'", scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
       expect(tokens[9]).toEqual value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+
+    it 'tokenizes trailing comma in parameters of function call', ->
+      {tokens} = grammar.tokenizeLine 'add(1,2,)'
+
+      expect(tokens[0]).toEqual value: 'add', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']
+      expect(tokens[2]).toEqual value: '1', scopes: ['source.php', 'meta.function-call.php', 'constant.numeric.decimal.php']
+      expect(tokens[3]).toEqual value: ',', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[4]).toEqual value: '2', scopes: ['source.php', 'meta.function-call.php', 'constant.numeric.decimal.php']
+      expect(tokens[5]).toEqual value: ',', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']
 
     it 'tokenizes builtin function calls', ->
       {tokens} = grammar.tokenizeLine "echo('Hi!')"
@@ -1358,6 +1397,18 @@ describe 'PHP grammar', ->
       expect(tokens[8]).toEqual value: '&', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "storage.modifier.reference.php"]
       expect(tokens[9]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]
       expect(tokens[10]).toEqual value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]
+
+    it 'tokenizes trailing comma in closure parameters and use inheritance', ->
+      {tokens} = grammar.tokenizeLine 'function($a,)use($b,){}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.closure.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: '$', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[3]).toEqual value: 'a', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']
+      expect(tokens[4]).toEqual value: ',', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.parameters.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[6]).toEqual value: 'use', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'keyword.other.function.use.php']
+      expect(tokens[8]).toEqual value: '$', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[9]).toEqual value: 'b', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'variable.other.php']
+      expect(tokens[10]).toEqual value: ',', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'punctuation.separator.delimiter.php']
 
   describe 'arrow functions', ->
     it 'tokenizes arrow functions', ->
