@@ -575,7 +575,7 @@
           {
             # static is only allowed in return of methods
             'match': '\\b(static)\\b',
-            'name': 'support.class.php'
+            'name': 'storage.type.php'
           }
           {
             'include': '#php-types'
