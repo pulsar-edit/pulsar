@@ -1332,28 +1332,29 @@ describe 'PHP grammar', ->
       {tokens} = grammar.tokenizeLine 'function () use($a) {}'
 
       expect(tokens[0]).toEqual value: 'function', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
-      expect(tokens[5]).toEqual value: 'use', scopes: ["source.php", "meta.function.closure.php", "keyword.other.function.use.php"]
-      expect(tokens[6]).toEqual value: '(', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.begin.bracket.round.php"]
+      expect(tokens[5]).toEqual value: 'use', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "keyword.other.function.use.php"]
+      expect(tokens[6]).toEqual value: '(', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.definition.parameters.begin.bracket.round.php"]
       expect(tokens[7]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]
       expect(tokens[8]).toEqual value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]
-      expect(tokens[9]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]
+      expect(tokens[9]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.definition.parameters.end.bracket.round.php"]
 
       {tokens} = grammar.tokenizeLine 'function () use($a  ,$b) {}'
 
       expect(tokens[0]).toEqual value: 'function', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
-      expect(tokens[5]).toEqual value: 'use', scopes: ["source.php", "meta.function.closure.php", "keyword.other.function.use.php"]
-      expect(tokens[6]).toEqual value: '(', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.begin.bracket.round.php"]
+      expect(tokens[5]).toEqual value: 'use', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "keyword.other.function.use.php"]
+      expect(tokens[6]).toEqual value: '(', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.definition.parameters.begin.bracket.round.php"]
       expect(tokens[7]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]
       expect(tokens[8]).toEqual value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]
+      expect(tokens[10]).toEqual value: ',', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.separator.delimiter.php"]
       expect(tokens[11]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]
       expect(tokens[12]).toEqual value: 'b', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]
-      expect(tokens[13]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]
+      expect(tokens[13]).toEqual value: ')', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.definition.parameters.end.bracket.round.php"]
 
     it 'tokenizes use inheritance by reference', ->
       {tokens} = grammar.tokenizeLine 'function () use( &$a ) {}'
 
       expect(tokens[0]).toEqual value: 'function', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]
-      expect(tokens[5]).toEqual value: 'use', scopes: ["source.php", "meta.function.closure.php", "keyword.other.function.use.php"]
+      expect(tokens[5]).toEqual value: 'use', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "keyword.other.function.use.php"]
       expect(tokens[8]).toEqual value: '&', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "storage.modifier.reference.php"]
       expect(tokens[9]).toEqual value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]
       expect(tokens[10]).toEqual value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]

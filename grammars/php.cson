@@ -439,7 +439,12 @@
         'endCaptures':
           '0':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
+        'name': 'meta.function.closure.use.php'
         'patterns': [
+          {
+            'match': ','
+            'name': 'punctuation.separator.delimiter.php'
+          }
           {
             'captures':
               '1':
@@ -449,7 +454,6 @@
               '3':
                 'name': 'punctuation.definition.variable.php'
             'match': '(?i)((?:(&)\\s*)?(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(?=,|\\))'
-            'name': 'meta.function.closure.use.php'
           }
         ]
       }
