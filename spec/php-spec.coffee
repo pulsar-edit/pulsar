@@ -738,6 +738,62 @@ describe 'PHP grammar', ->
         expect(lines[3][13]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
         expect(lines[3][14]).toEqual value: 'c2', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
 
+    describe 'methods', ->
+      it 'tokenizes basic method', ->
+        lines = grammar.tokenizeLines '''
+          class Test {
+            public function Run($a, $b = false){}
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'storage.modifier.php']
+        expect(lines[1][3]).toEqual value: 'function', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'storage.type.function.php']
+        expect(lines[1][5]).toEqual value: 'Run', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'entity.name.function.php']
+        expect(lines[1][6]).toEqual value: '(', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+        expect(lines[1][7]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][8]).toEqual value: 'a', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']
+        expect(lines[1][9]).toEqual value: ',', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][11]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][12]).toEqual value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'variable.other.php']
+        expect(lines[1][14]).toEqual value: '=', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'keyword.operator.assignment.php']
+        expect(lines[1][16]).toEqual value: 'false', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'constant.language.php']
+
+      it 'tokenizes typehinted method', ->
+        lines = grammar.tokenizeLines '''
+          class Test {
+            public function Run(int $a, ? ClassB $b, self | bool $c = false) : float | ClassA {}
+          }
+        '''
+
+        expect(lines[1][7]).toEqual value: 'int', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+        expect(lines[1][9]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][10]).toEqual value: 'a', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+        expect(lines[1][13]).toEqual value: '?', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.nullable-type.php']
+        expect(lines[1][15]).toEqual value: 'ClassB', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']
+        expect(lines[1][17]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][18]).toEqual value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+        expect(lines[1][21]).toEqual value: 'self', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+        expect(lines[1][23]).toEqual value: '|', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][25]).toEqual value: 'bool', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+        expect(lines[1][27]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][28]).toEqual value: 'c', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+        expect(lines[1][30]).toEqual value: '=', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.assignment.php']
+        expect(lines[1][32]).toEqual value: 'false', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'constant.language.php']
+        expect(lines[1][35]).toEqual value: ':', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'keyword.operator.return-value.php']
+        expect(lines[1][37]).toEqual value: 'float', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'storage.type.php']
+        expect(lines[1][39]).toEqual value: '|', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][41]).toEqual value: 'ClassA', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'support.class.php']
+
+      it 'tokenizes static return type', ->
+        lines = grammar.tokenizeLines '''
+          class Test {
+            public function Me() :static {}
+          }
+        '''
+
+        expect(lines[1][9]).toEqual value: ':', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'keyword.operator.return-value.php']
+        expect(lines[1][10]).toEqual value: 'static', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'storage.type.php']
+
     describe 'use statements', ->
       it 'tokenizes basic use statements', ->
         lines = grammar.tokenizeLines '''
@@ -1074,6 +1130,38 @@ describe 'PHP grammar', ->
       expect(tokens[23]).toEqual value: 'null', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'constant.language.php']
       expect(tokens[24]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
 
+    it 'tokenizes union types in function parameters', ->
+      {tokens} = grammar.tokenizeLine 'function test(int|false $a){}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: 'test', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[4]).toEqual value: 'int', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+      expect(tokens[5]).toEqual value: '|', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[6]).toEqual value: 'false', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+      expect(tokens[7]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
+      expect(tokens[8]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[9]).toEqual value: 'a', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+      expect(tokens[10]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+
+      {tokens} = grammar.tokenizeLine 'function test(\\Abc\\ClassA | mixed $a){}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: 'test', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[4]).toEqual value: '\\', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[5]).toEqual value: 'Abc', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.other.namespace.php']
+      expect(tokens[6]).toEqual value: '\\', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[7]).toEqual value: 'ClassA', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']
+      expect(tokens[8]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
+      expect(tokens[9]).toEqual value: '|', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[10]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
+      expect(tokens[11]).toEqual value: 'mixed', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'storage.type.php']
+      expect(tokens[12]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']
+      expect(tokens[13]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[14]).toEqual value: 'a', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+      expect(tokens[15]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+
     it 'tokenizes trailing comma in function parameters', ->
       {tokens} = grammar.tokenizeLine 'function abc($a, $b,){}'
 
@@ -1117,6 +1205,17 @@ describe 'PHP grammar', ->
       expect(tokens[8]).toEqual value: '?', scopes: ['source.php', 'meta.function.php', 'keyword.operator.nullable-type.php']
       expect(tokens[9]).toEqual value: '   ', scopes: ['source.php', 'meta.function.php']
       expect(tokens[10]).toEqual value: 'Client', scopes: ['source.php', 'meta.function.php', 'support.class.php']
+
+    it 'tokenizes union return types', ->
+      {tokens} = grammar.tokenizeLine 'function test() : \\ClassB | null {}'
+
+      expect(tokens[6]).toEqual value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']
+      expect(tokens[8]).toEqual value: '\\', scopes: ['source.php', 'meta.function.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[9]).toEqual value: 'ClassB', scopes: ['source.php', 'meta.function.php', 'support.class.php']
+      expect(tokens[10]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php']
+      expect(tokens[11]).toEqual value: '|', scopes: ['source.php', 'meta.function.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[12]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php']
+      expect(tokens[13]).toEqual value: 'null', scopes: ['source.php', 'meta.function.php', 'storage.type.php']
 
     it 'tokenizes function names with characters other than letters or numbers', ->
       # Char 160 is hex 0xA0, which is between 0x7F and 0xFF, making it a valid PHP identifier
