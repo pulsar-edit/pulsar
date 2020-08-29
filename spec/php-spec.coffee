@@ -317,6 +317,22 @@ describe 'PHP grammar', ->
           expect(tokens[9]).toEqual value: ':', scopes: ["source.php", "keyword.operator.ternary.php"]
           expect(tokens[12]).toEqual value: '::', scopes: ["source.php", "keyword.operator.class.php"]
 
+        it 'should NOT tokenize goto label in ternary', ->
+          # See https://github.com/atom/language-php/issues/386
+          lines = grammar.tokenizeLines '''
+            $a ?
+              null :
+              $b
+          '''
+
+          expect(lines[0][0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+          expect(lines[0][1]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
+          expect(lines[0][3]).toEqual value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']
+          expect(lines[1][1]).toEqual value: 'null', scopes: ['source.php', 'constant.language.php']
+          expect(lines[1][3]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
+          expect(lines[2][1]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+          expect(lines[2][2]).toEqual value: 'b', scopes: ['source.php', 'variable.other.php']
+
   describe 'identifiers', ->
     it 'tokenizes identifiers with only letters', ->
       {tokens} = grammar.tokenizeLine '$abc'

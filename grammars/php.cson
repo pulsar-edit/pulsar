@@ -3669,6 +3669,18 @@
         'name': 'keyword.operator.ternary.php'
     'patterns': [
       {
+        # prevent matching goto label in ternary
+        # See https://github.com/atom/language-php/issues/386
+        'match': '(?i)^\\s*([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(?=:(?!:))'
+        'captures':
+          '1':
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+      }
+      {
         'include': '$self'
       }
     ]
