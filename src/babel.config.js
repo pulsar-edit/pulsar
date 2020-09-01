@@ -1,4 +1,4 @@
-let presets = ['babel-preset-atomic'];
+let presets = [require('babel-preset-atomic')];
 
 let plugins = [];
 

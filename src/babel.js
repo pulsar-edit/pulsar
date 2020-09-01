@@ -2,7 +2,7 @@
 
 var crypto = require('crypto');
 var path = require('path');
-var defaultOptions = require('../static/babel.config.js');
+var defaultOptions = require('./babel.config.js');
 
 var babel = null;
 var babelVersionDirectory = null;
