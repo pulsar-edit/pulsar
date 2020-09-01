@@ -2,7 +2,7 @@
 
 var crypto = require('crypto');
 var path = require('path');
-var defaultOptions = require('./babel.config.js');
+var defaultOptions;
 
 var babel = null;
 var babelVersionDirectory = null;
@@ -32,6 +32,9 @@ exports.shouldCompile = function(sourceCode) {
 exports.getCachePath = function(sourceCode) {
   if (babelVersionDirectory == null) {
     var babelVersion = require('@babel/core/package.json').version;
+    if (!defaultOptions) {
+      defaultOptions = require('./babel.config.js');
+    }
     babelVersionDirectory = path.join(
       'js',
       'babel',
@@ -52,7 +55,9 @@ exports.compile = function(sourceCode, filePath) {
   if (!babel) {
     babel = require('@babel/core');
   }
-
+  if (!defaultOptions) {
+    defaultOptions = require('./babel.config.js');
+  }
   if (process.platform === 'win32') {
     filePath = 'file:///' + path.resolve(filePath).replace(/\\/g, '/');
   }
