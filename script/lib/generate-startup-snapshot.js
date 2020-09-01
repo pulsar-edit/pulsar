@@ -132,24 +132,9 @@ module.exports = function(packagedAppPath) {
             'lib',
             'command-event.js'
           ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', '@babel')
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', 'babel-plugin-add-module-exports')
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join('node_modules', '@babel')
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join('node_modules', 'babel-plugin-add-module-exports')
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join('node_modules', 'babel-preset')
-        ) ||
-        requiredModuleRelativePath.startsWith(
-          path.join('..', 'node_modules', 'babel-preset')
-        ) ||
+        requiredModuleRelativePath.includes('@babel') ||
+        requiredModuleRelativePath.includes('babel-plugin') ||
+        requiredModuleRelativePath.includes('babel-preset') ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'debug', 'node.js') ||
         requiredModuleRelativePath ===
