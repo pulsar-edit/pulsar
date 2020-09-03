@@ -1424,6 +1424,13 @@
         ]
       }
     ]
+  'named-arguments':
+    'match': '(?i)(?<=^|\\(|,)\\s*([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(:)(?!:)'
+    'captures':
+      '1':
+        'name': 'entity.name.variable.parameter.php'
+      '2':
+        'name': 'punctuation.separator.colon.php'
   'function-call':
     'patterns': [
       {
@@ -1454,6 +1461,9 @@
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
         'name': 'meta.function-call.php'
         'patterns': [
+          {
+            'include': '#named-arguments'
+          }
           {
             'include': '$self'
           }
@@ -1487,6 +1497,9 @@
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
         'name': 'meta.function-call.php'
         'patterns': [
+          {
+            'include': '#named-arguments'
+          }
           {
             'include': '$self'
           }
@@ -2171,6 +2184,9 @@
         'name': 'meta.method-call.php'
         'patterns': [
           {
+            'include': '#named-arguments'
+          }
+          {
             'include': '$self'
           }
         ]
@@ -2534,6 +2550,9 @@
             'name': 'punctuation.definition.arguments.end.bracket.round.php'
         'name': 'meta.method-call.static.php'
         'patterns': [
+          {
+            'include': '#named-arguments'
+          }
           {
             'include': '$self'
           }
@@ -3740,6 +3759,18 @@
       '0':
         'name': 'keyword.operator.ternary.php'
     'patterns': [
+      {
+        # prevent matching goto label in ternary
+        # See https://github.com/atom/language-php/issues/386
+        'match': '(?i)^\\s*([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(?=:(?!:))'
+        'captures':
+          '1':
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+      }
       {
         'include': '$self'
       }
