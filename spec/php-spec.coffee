@@ -317,7 +317,7 @@ describe 'PHP grammar', ->
           expect(tokens[9]).toEqual value: ':', scopes: ["source.php", "keyword.operator.ternary.php"]
           expect(tokens[12]).toEqual value: '::', scopes: ["source.php", "keyword.operator.class.php"]
 
-        it 'should NOT tokenize goto label in ternary', ->
+        it 'should NOT tokenize a ternary statement as a goto label', ->
           # See https://github.com/atom/language-php/issues/386
           lines = grammar.tokenizeLines '''
             $a ?
