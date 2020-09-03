@@ -317,6 +317,22 @@ describe 'PHP grammar', ->
           expect(tokens[9]).toEqual value: ':', scopes: ["source.php", "keyword.operator.ternary.php"]
           expect(tokens[12]).toEqual value: '::', scopes: ["source.php", "keyword.operator.class.php"]
 
+        it 'should NOT tokenize a ternary statement as a goto label', ->
+          # See https://github.com/atom/language-php/issues/386
+          lines = grammar.tokenizeLines '''
+            $a ?
+              null :
+              $b
+          '''
+
+          expect(lines[0][0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+          expect(lines[0][1]).toEqual value: 'a', scopes: ['source.php', 'variable.other.php']
+          expect(lines[0][3]).toEqual value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']
+          expect(lines[1][1]).toEqual value: 'null', scopes: ['source.php', 'constant.language.php']
+          expect(lines[1][3]).toEqual value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']
+          expect(lines[2][1]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+          expect(lines[2][2]).toEqual value: 'b', scopes: ['source.php', 'variable.other.php']
+
   describe 'identifiers', ->
     it 'tokenizes identifiers with only letters', ->
       {tokens} = grammar.tokenizeLine '$abc'
@@ -1151,6 +1167,33 @@ describe 'PHP grammar', ->
       expect(tokens[7]).toEqual value: 'b', scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php']
       expect(tokens[8]).toEqual value: "'", scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
       expect(tokens[9]).toEqual value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+
+    it 'tokenizes function calls with named arguments', ->
+      {tokens} = grammar.tokenizeLine 'doSomething($a ? null : true, b: $b);'
+
+      expect(tokens[0]).toEqual value: 'doSomething', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']
+      expect(tokens[14]).toEqual value: 'b', scopes: ['source.php', 'meta.function-call.php', 'entity.name.variable.parameter.php']
+      expect(tokens[15]).toEqual value: ':', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.colon.php']
+      # ternary should be still tokenized
+      expect(tokens[7]).toEqual value: 'null', scopes: ['source.php', 'meta.function-call.php', 'constant.language.php']
+      expect(tokens[9]).toEqual value: ':', scopes: ['source.php', 'meta.function-call.php', 'keyword.operator.ternary.php']
+
+    it 'tokenizes multiline function calls with named arguments', ->
+      lines = grammar.tokenizeLines '''
+        doSomething(
+          x: $a ?
+          null : true,
+          a: $b);
+      '''
+
+      expect(lines[0][0]).toEqual value: 'doSomething', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']
+      expect(lines[1][1]).toEqual value: 'x', scopes: ['source.php', 'meta.function-call.php', 'entity.name.variable.parameter.php']
+      expect(lines[1][2]).toEqual value: ':', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.colon.php']
+      expect(lines[3][1]).toEqual value: 'a', scopes: ['source.php', 'meta.function-call.php', 'entity.name.variable.parameter.php']
+      expect(lines[3][2]).toEqual value: ':', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.colon.php']
+      # ternary should be still tokenized
+      expect(lines[2][1]).toEqual value: 'null', scopes: ['source.php', 'meta.function-call.php', 'constant.language.php']
+      expect(lines[2][3]).toEqual value: ':', scopes: ['source.php', 'meta.function-call.php', 'keyword.operator.ternary.php']
 
     it 'tokenizes builtin function calls', ->
       {tokens} = grammar.tokenizeLine "echo('Hi!')"
