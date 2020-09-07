@@ -132,7 +132,11 @@ module.exports = function(packagedAppPath) {
             'lib',
             'command-event.js'
           ) ||
-        requiredModuleRelativePath.includes('@babel') ||
+        (requiredModuleRelativePath.includes('@babel') &&
+          // GitHub package uses this in its relay dependency which is required on startup
+          !requiredModuleRelativePath.includes(
+            path.join('@babel', 'runtime')
+          )) ||
         requiredModuleRelativePath.includes('babel-plugin') ||
         requiredModuleRelativePath.includes('babel-preset') ||
         requiredModuleRelativePath ===
