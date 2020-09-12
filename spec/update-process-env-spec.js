@@ -1,3 +1,4 @@
+'not strict';
 /** @babel */
 
 import path from 'path';
