@@ -66,7 +66,7 @@ exports.compile = function(sourceCode, filePath) {
   for (var key in defaultOptions) {
     options[key] = defaultOptions[key];
   }
-  return babel.transform(sourceCode, options).code;
+  return babel.transformSync(sourceCode, options).code;
 };
 
 function createVersionAndOptionsDigest(version, options) {
