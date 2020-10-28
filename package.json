@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "atom-grammar-test": "^0.6.4",
-    "tree-sitter-python": "^0.15.1"
+    "tree-sitter-python": "^0.16.1"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1"
