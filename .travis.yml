@@ -30,7 +30,7 @@ git:
 
 sudo: false
 
-dist: trusty
+dist: bionic
 
 addons:
   apt:
