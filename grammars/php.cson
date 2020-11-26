@@ -439,7 +439,12 @@
         'endCaptures':
           '0':
             'name': 'punctuation.definition.parameters.end.bracket.round.php'
+        'name': 'meta.function.closure.use.php'
         'patterns': [
+          {
+            'match': ','
+            'name': 'punctuation.separator.delimiter.php'
+          }
           {
             'captures':
               '1':
@@ -448,20 +453,28 @@
                 'name': 'storage.modifier.reference.php'
               '3':
                 'name': 'punctuation.definition.variable.php'
-            'match': '(?i)((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(?=,|\\))'
-            'name': 'meta.function.closure.use.php'
+            'match': '(?i)((?:(&)\\s*)?(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(?=,|\\))'
           }
         ]
       }
       {
-        'match': '(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+)'
+        'match': '''(?xi)
+          (:)\\s*
+          (
+            (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+          )
+          (?=\\s*(?:{|/[/*]|\\#|$))
+        '''
         'captures':
           '1':
             'name': 'keyword.operator.return-value.php'
           '2':
-            'name': 'keyword.operator.nullable-type.php'
-          '3':
-            'name': 'storage.type.php'
+            'patterns': [
+              {
+                'include': '#php-types'
+              }
+            ]
       }
     ]
   }
@@ -477,7 +490,7 @@
     'name': 'meta.function.closure.php'
     'patterns': [
       {
-        'begin': '(&)?\\s*(\\()'
+        'begin': '(?:(&)\\s*)?(\\()'
         'beginCaptures':
           '1':
             'name': 'storage.modifier.reference.php'
@@ -495,18 +508,117 @@
         ]
       }
       {
-        'match': '(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+)\\s*'
+        'match': '''(?xi)
+          (:)\\s*
+          (
+            (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+          )
+          (?=\\s*(?:=>|/[/*]|\\#|$))
+        '''
         'captures':
           '1':
             'name': 'keyword.operator.return-value.php'
           '2':
-            'name': 'keyword.operator.nullable-type.php'
-          '3':
-            'name': 'storage.type.php'
+            'patterns': [
+              {
+                'include': '#php-types'
+              }
+            ]
       }
     ]
   }
   {
+    # constructor
+    'begin': '''(?x)
+      ((?:(?:final|abstract|public|private|protected)\\s+)*)
+      (function)\\s+(__construct)
+      \\s*(\\()
+    '''
+    'beginCaptures':
+      '1':
+        'patterns': [
+          {
+            'match': 'final|abstract|public|private|protected'
+            'name': 'storage.modifier.php'
+          }
+        ]
+      '2':
+        'name': 'storage.type.function.php'
+      '3':
+        'name': 'support.function.constructor.php'
+      '4':
+        'name': 'punctuation.definition.parameters.begin.bracket.round.php'
+    'contentName': 'meta.function.parameters.php'
+    'end': '''(?xi)
+      (\\)) \\s* ( : \\s*
+        (?:\\?\\s*)? (?!\\s) [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\\\s\\|]+ (?<!\\s)
+      )?
+      (?=\\s*(?:{|/[/*]|\\#|$))
+    '''
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.parameters.end.bracket.round.php'
+      '2':
+        'name': 'invalid.illegal.return-type.php'
+    'name': 'meta.function.php'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'match': ','
+        'name': 'punctuation.separator.delimiter.php'
+      }
+      {
+        # Constructor Property Promotion
+        'begin': '''(?xi)
+          (public|private|protected) \\s+
+          (?: (
+            (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+          ) \\s+ )?
+          ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
+        '''
+        'beginCaptures':
+          '1':
+            'name': 'storage.modifier.php'
+          '2':
+            'patterns': [
+              {
+                'include': '#php-types'
+              }
+            ]
+          '3':
+            'name': 'variable.other.php'
+          '4':
+            'name': 'storage.modifier.reference.php'
+          '5':
+            'name': 'punctuation.definition.variable.php'
+        'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
+        'name': 'meta.function.parameter.promoted-property.php'
+        'patterns': [
+          {
+            'begin': '='
+            'beginCaptures':
+              '0':
+                'name': 'keyword.operator.assignment.php'
+            'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
+            'patterns': [
+              {
+                'include': '#parameter-default-types'
+              }
+            ]
+          }
+        ]
+      }
+      {
+        'include': '#function-parameters'
+      }
+    ]
+  }
+  {
+    # method
     'begin': '''(?x)
       ((?:(?:final|abstract|public|private|protected|static)\\s+)*)
       (function)\\s+
@@ -536,16 +648,29 @@
       '6':
         'name': 'punctuation.definition.parameters.begin.bracket.round.php'
     'contentName': 'meta.function.parameters.php'
-    'end': '(\\))(?:\\s*(:)\\s*(\\?)?\\s*((?:\\\\?[a-zA-Z_\\x{7f}-\\x{7fffffff}][a-zA-Z0-9_\\x{7f}-\\x{7fffffff}]*)+))?'
+    'end': '''(?xi)
+      (\\)) (?: \\s* (:) \\s* (
+        (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+        [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+      ) )?
+      (?=\\s*(?:{|/[/*]|\\#|$))
+    '''
     'endCaptures':
       '1':
         'name': 'punctuation.definition.parameters.end.bracket.round.php'
       '2':
         'name': 'keyword.operator.return-value.php'
       '3':
-        'name': 'keyword.operator.nullable-type.php'
-      '4':
-        'name': 'storage.type.php'
+        'patterns': [
+          {
+            # static is only allowed in return of methods
+            'match': '\\b(static)\\b',
+            'name': 'storage.type.php'
+          }
+          {
+            'include': '#php-types'
+          }
+        ]
     'name': 'meta.function.php'
     'patterns': [
       {
@@ -556,10 +681,11 @@
   {
     'match': '''(?xi)
       ((?:(?:public|private|protected|static)(?:\\s+|(?=\\?)))+)                     # At least one modifier
-      (?:(\\?)?\\s*                                                                  # Optional nullable
-        (\\\\?(?:[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*\\\\)*)   # Optional namespace
-        ([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*))?               # Typehinted class name
-      \\s+((\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)          # Variable name
+      (
+        (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+        [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+      )?
+      \\s+ ((\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)          # Variable name
     '''
     'captures':
       '1':
@@ -570,24 +696,14 @@
           }
         ]
       '2':
-        'name': 'keyword.operator.nullable-type.php'
-      '3':
-        'name': 'support.other.namespace.php'
         'patterns': [
           {
-            'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*'
-            'name': 'storage.type.php'
-          }
-          {
-            'match': '\\\\'
-            'name': 'punctuation.separator.inheritance.php'
+            'include': '#php-types'
           }
         ]
-      '4':
-        'name': 'storage.type.php'
-      '5':
+      '3':
         'name': 'variable.other.php'
-      '6':
+      '4':
         'name': 'punctuation.definition.variable.php'
   }
   {
@@ -642,7 +758,7 @@
         'name': 'punctuation.definition.storage-type.end.bracket.round.php'
   }
   {
-    'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|var|function|interface|trait|parent|self|object)\\b'
+    'match': '(?i)\\b(array|real|double|float|int(eger)?|bool(ean)?|string|class|var|function|interface|trait|parent|self|object|mixed)\\b'
     'name': 'storage.type.php'
   }
   {
@@ -1206,123 +1322,55 @@
         'name': 'punctuation.separator.delimiter.php'
       }
       {
-        'begin': '''(?xi)
-          (?:(\\?)\\s*)?(array)                                              # Typehint
-          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
-          \\s*(=)\\s*(array)\\s*(\\()                                        # Default value
-        '''
-        'beginCaptures':
-          '1':
-            'name': 'keyword.operator.nullable-type.php'
-          '2':
-            'name': 'storage.type.php'
-          '3':
-            'name': 'variable.other.php'
-          '4':
-            'name': 'storage.modifier.reference.php'
-          '5':
-            'name': 'punctuation.definition.variable.php'
-          '6':
-            'name': 'keyword.operator.assignment.php'
-          '7':
-            'name': 'support.function.construct.php'
-          '8':
-            'name': 'punctuation.definition.array.begin.bracket.round.php'
-        'contentName': 'meta.array.php'
-        'end': '\\)'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.array.end.bracket.round.php'
-        'name': 'meta.function.parameter.array.php'
-        'patterns': [
-          {
-            'include': '#comments'
-          }
-          {
-            'include': '#strings'
-          }
-          {
-            'include': '#numbers'
-          }
-        ]
-      }
-      {
+        # Variadic
         'match': '''(?xi)
-          (?:(\\?)\\s*)?(array|callable)                                     # Typehint
-          \\s+((&)?\\s*(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
-          (?:                                                                # Optional default value
-            \\s*(=)\\s*
-            (?:
-              (null)
-              |
-              (\\[)((?>[^\\[\\]]+|\\[\\g<8>\\])*)(\\])
-              |((?:\\S*?\\(\\))|(?:\\S*?))
-            )
-          )?
-          \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
+          (?: (
+            (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+          ) \\s+ )?
+          ((?:(&)\\s*)?(\\.\\.\\.)(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
+          (?=\\s*(?:,|\\)|/[/*]|\\#|$)) # A closing parentheses (end of argument list) or a comma or a comment
         '''
-        'name': 'meta.function.parameter.array.php'
         'captures':
           '1':
-            'name': 'keyword.operator.nullable-type.php'
-          '2':
-            'name': 'storage.type.php'
-          '3':
-            'name': 'variable.other.php'
-          '4':
-            'name': 'storage.modifier.reference.php'
-          '5':
-            'name': 'punctuation.definition.variable.php'
-          '6':
-            'name': 'keyword.operator.assignment.php'
-          '7':
-            'name': 'constant.language.php'
-          '8':
-            'name': 'punctuation.section.array.begin.php'
-          '9':
             'patterns': [
               {
-                'include': '#parameter-default-types'
+                'include': '#php-types'
               }
             ]
-          '10':
-            'name': 'punctuation.section.array.end.php'
-          '11':
-            'name': 'invalid.illegal.non-null-typehinted.php'
+          '2':
+            'name': 'variable.other.php'
+          '3':
+            'name': 'storage.modifier.reference.php'
+          '4':
+            'name': 'keyword.operator.variadic.php'
+          '5':
+            'name': 'punctuation.definition.variable.php'
+        'name': 'meta.function.parameter.variadic.php'
       }
       {
+        # Typehinted
         'begin': '''(?xi)
-          (?:(\\?)\\s*)?
-          (\\\\?(?:[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*\\\\)*)                 # Optional namespace
-          ([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)                               # Typehinted class name
-          \\s+((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
+          (
+            (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+          )
+          \\s+ ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
         '''
         'beginCaptures':
           '1':
-            'name': 'keyword.operator.nullable-type.php'
-          '2':
-            'name': 'support.other.namespace.php'
             'patterns': [
               {
-                'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*'
-                'name': 'storage.type.php'
-              }
-              {
-                'match': '\\\\'
-                'name': 'punctuation.separator.inheritance.php'
+                'include': '#php-types'
               }
             ]
-          '3':
-            'name': 'storage.type.php'
-          '4':
+          '2':
             'name': 'variable.other.php'
-          '5':
+          '3':
             'name': 'storage.modifier.reference.php'
-          '6':
-            'name': 'keyword.operator.variadic.php'
-          '7':
+          '4':
             'name': 'punctuation.definition.variable.php'
-        'end': '(?=,|\\)|/[/*]|\\#)'
+        'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
         'name': 'meta.function.parameter.typehinted.php'
         'patterns': [
           {
@@ -1330,36 +1378,33 @@
             'beginCaptures':
               '0':
                 'name': 'keyword.operator.assignment.php'
-            'end': '(?=,|\\)|/[/*]|\\#)'
+            'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
             'patterns': [
               {
-                'include': '$self'
+                'include': '#parameter-default-types'
               }
             ]
           }
         ]
       }
       {
+        'match': '''(?xi)
+          ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
+          (?=\\s*(?:,|\\)|/[/*]|\\#|$)) # A closing parentheses (end of argument list) or a comma or a comment
+        '''
         'captures':
           '1':
             'name': 'variable.other.php'
           '2':
             'name': 'storage.modifier.reference.php'
           '3':
-            'name': 'keyword.operator.variadic.php'
-          '4':
             'name': 'punctuation.definition.variable.php'
-        'match': '''(?xi)
-          ((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
-          \\s*(?=,|\\)|/[/*]|\\#|$) # A closing parentheses (end of argument list) or a comma or a comment
-        '''
         'name': 'meta.function.parameter.no-default.php'
       }
       {
         'begin': '''(?xi)
-          ((&)?\\s*(\\.\\.\\.)?(\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
+          ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
           \\s*(=)\\s*
-          (?:(\\[)((?>[^\\[\\]]+|\\[\\g<6>\\])*)(\\]))?                              # Optional default type
         '''
         'beginCaptures':
           '1':
@@ -1367,22 +1412,10 @@
           '2':
             'name': 'storage.modifier.reference.php'
           '3':
-            'name': 'keyword.operator.variadic.php'
-          '4':
             'name': 'punctuation.definition.variable.php'
-          '5':
+          '4':
             'name': 'keyword.operator.assignment.php'
-          '6':
-            'name': 'punctuation.section.array.begin.php'
-          '7':
-            'patterns': [
-              {
-                'include': '#parameter-default-types'
-              }
-            ]
-          '8':
-            'name': 'punctuation.section.array.end.php'
-        'end': '(?=,|\\)|/[/*]|\\#)'
+        'end': '(?=\\s*(?:,|\\)|/[/*]|\\#))'
         'name': 'meta.function.parameter.default.php'
         'patterns': [
           {
@@ -2169,6 +2202,30 @@
         'match': '(?i)(->)((\\$+)?[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)?'
       }
     ]
+  'php-types':
+    'patterns': [
+      {
+        'match': '\\?'
+        'name': 'keyword.operator.nullable-type.php'
+      }
+      {
+        'match': '\\|'
+        'name': 'punctuation.separator.delimiter.php'
+      }
+      {
+        # false is allowed in unions
+        'match': '(?i)\\b(null|int|float|bool|string|array|object|callable|iterable|false|mixed)\\b',
+        'name': 'storage.type.php'
+      }
+      {
+        # static is only allowed in return of methods
+        'match': '(?i)\\b(parent|self)\\b',
+        'name': 'storage.type.php'
+      }
+      {
+        'include': '#class-name'
+      }
+    ]
   'parameter-default-types':
     'patterns': [
       {
@@ -2210,6 +2267,21 @@
         'patterns': [
           {
             'include': '#parameter-default-types'
+          }
+        ]
+      }
+      {
+        'begin': '\\['
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.section.array.begin.php'
+        'end': '\\]|(?=\\?>)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.section.array.end.php'
+        'patterns': [
+          {
+            'include': '$self'
           }
         ]
       }
@@ -2311,7 +2383,7 @@
           {
             'match': '''(?x)\\b
               (string|integer|int|boolean|bool|float|double|object|mixed
-              |array|resource|void|null|callback|false|true|self)\\b
+              |array|resource|void|null|callback|false|true|self|static)\\b
             '''
             'name': 'keyword.other.type.php'
           }
