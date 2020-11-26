@@ -1012,8 +1012,11 @@
   'class-name':
     'patterns': [
       {
-        'begin': '(?i)(?=\\\\?[a-z_0-9]+\\\\)'
-        'end': '(?i)([a-z_][a-z_0-9]*)?(?![a-z0-9_\\\\])'
+        'begin': '(?i)(?=\\\\?[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*\\\\)'
+        'end': '''(?xi)
+          ( [a-z_\\x{7f}-\\x{7fffffff}] [a-z0-9_\\x{7f}-\\x{7fffffff}]* )?
+          (?![a-z0-9_\\x{7f}-\\x{7fffffff}\\\\])
+        '''
         'endCaptures':
           '1':
             'name': 'support.class.php'
@@ -1027,8 +1030,11 @@
         'include': '#class-builtin'
       }
       {
-        'begin': '(?=[\\\\a-zA-Z_])'
-        'end': '(?i)([a-z_][a-z_0-9]*)?(?![a-z0-9_\\\\])'
+        'begin': '(?i)(?=[\\\\a-z_\\x{7f}-\\x{7fffffff}])'
+        'end': '''(?xi)
+          ( [a-z_\\x{7f}-\\x{7fffffff}] [a-z0-9_\\x{7f}-\\x{7fffffff}]* )?
+          (?![a-z0-9_\\x{7f}-\\x{7fffffff}\\\\])
+        '''
         'endCaptures':
           '1':
             'name': 'support.class.php'

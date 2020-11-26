@@ -395,6 +395,17 @@ describe 'PHP grammar', ->
       expect(tokens[6]).toEqual value: 'Three', scopes: ['source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']
       expect(tokens[7]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
 
+    it 'tokenizes namespace with emojis', ->
+      {tokens} = grammar.tokenizeLine 'namespace \\Emojis\\🐘;'
+
+      expect(tokens[0]).toEqual value: 'namespace', scopes: ["source.php", "meta.namespace.php", "keyword.other.namespace.php"]
+      expect(tokens[1]).toEqual value: ' ', scopes: ["source.php", "meta.namespace.php"]
+      expect(tokens[2]).toEqual value: '\\', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php", "punctuation.separator.inheritance.php"]
+      expect(tokens[3]).toEqual value: 'Emojis', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php"]
+      expect(tokens[4]).toEqual value: '\\', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php", "punctuation.separator.inheritance.php"]
+      expect(tokens[5]).toEqual value: '🐘', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php"]
+      expect(tokens[6]).toEqual value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]
+
     it 'tokenizes bracketed namespaces', ->
       lines = grammar.tokenizeLines '''
         namespace Test {
@@ -503,6 +514,19 @@ describe 'PHP grammar', ->
       expect(tokens[5]).toEqual value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
       expect(tokens[6]).toEqual value: 'NSname', scopes: ['source.php', 'meta.use.php', 'support.class.php']
       expect(tokens[7]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+
+    it 'tokenizes use statement with emojis', ->
+      {tokens} = grammar.tokenizeLine 'use \\Emojis\\🐘\\Big🐘;'
+
+      expect(tokens[0]).toEqual value: 'use', scopes: ["source.php", "meta.use.php", "keyword.other.use.php"]
+      expect(tokens[1]).toEqual value: ' ', scopes: ["source.php", "meta.use.php"]
+      expect(tokens[2]).toEqual value: '\\', scopes: ["source.php", "meta.use.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+      expect(tokens[3]).toEqual value: 'Emojis', scopes: ["source.php", "meta.use.php", "support.other.namespace.php"]
+      expect(tokens[4]).toEqual value: '\\', scopes: ["source.php", "meta.use.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+      expect(tokens[5]).toEqual value: '🐘', scopes: ["source.php", "meta.use.php", "support.other.namespace.php"]
+      expect(tokens[6]).toEqual value: '\\', scopes: ["source.php", "meta.use.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]
+      expect(tokens[7]).toEqual value: 'Big🐘', scopes: ["source.php", "meta.use.php", "support.class.php"]
+      expect(tokens[8]).toEqual value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]
 
     it 'tokenizes multiline use statements', ->
       lines = grammar.tokenizeLines '''
