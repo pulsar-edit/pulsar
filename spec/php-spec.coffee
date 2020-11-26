@@ -1469,6 +1469,14 @@ describe 'PHP grammar', ->
 
       expect(tokens[3]).toEqual value: 'apc_store', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']
 
+    it 'tokenizes closure calls', ->
+      {tokens} = grammar.tokenizeLine '$callback()'
+
+      expect(tokens[0]).toEqual value: '$', scopes: ["source.php", "meta.function-call.invoke.php", "variable.other.php", "punctuation.definition.variable.php"]
+      expect(tokens[1]).toEqual value: 'callback', scopes: ["source.php", "meta.function-call.invoke.php", "variable.other.php"]
+      expect(tokens[2]).toEqual value: '(', scopes: ["source.php", "punctuation.definition.begin.bracket.round.php"]
+      expect(tokens[3]).toEqual value: ')', scopes: ["source.php", "punctuation.definition.end.bracket.round.php"]
+
   describe 'method calls', ->
     it 'tokenizes method calls with no arguments', ->
       {tokens} = grammar.tokenizeLine 'obj->method()'

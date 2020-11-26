@@ -2101,10 +2101,10 @@
   'invoke-call':
     'captures':
       '1':
-        'name': 'punctuation.definition.variable.php'
-      '2':
         'name': 'variable.other.php'
-    'match': '(?i)(\\$+)([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)(?=\\s*\\()'
+      '2':
+        'name': 'punctuation.definition.variable.php'
+    'match': '(?i)((\\$+)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)(?=\\s*\\()'
     'name': 'meta.function-call.invoke.php'
   'namespace':
     'begin': '(?i)(?:(namespace)|[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)?(\\\\)'
