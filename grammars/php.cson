@@ -1032,10 +1032,7 @@
         ]
       }
       {
-        'match': '[a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+'
-        'patterns': {
-          'include': '#attribute-name'
-        }
+        'include': '#attribute-name'
       }
     ]
   'class-builtin':
