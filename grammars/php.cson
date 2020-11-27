@@ -9,6 +9,9 @@
 'scopeName': 'source.php'
 'patterns': [
   {
+    'include': '#attribute'
+  }
+  {
     'include': '#comments'
   }
   {
@@ -204,7 +207,7 @@
     'begin':  '''(?ix)
         (?:
           (?:^|(?<=}))\\s*(?:(abstract|final)\\s+)?(class)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)
-          |\\b(new)\\s+(class)\\b # anonymous class
+          |\\b(new)\\b\\s*(\\#\\[.*\\])?\\s*\\b(class)\\b # anonymous class
         )
       '''
     'beginCaptures':
@@ -217,6 +220,12 @@
       '4':
         'name': 'keyword.other.new.php'
       '5':
+        'patterns': [
+          {
+            'include': '#attribute'
+          }
+        ]
+      '6':
         'name': 'storage.type.class.php'
     'end': '}|(?=\\?>)'
     'endCaptures':
@@ -946,6 +955,89 @@
   }
 ]
 'repository':
+  'attribute-name':
+    'patterns': [
+      {
+        'begin': '(?i)(?=\\\\?[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*\\\\)'
+        'end': '''(?xi)
+          ( [a-z_\\x{7f}-\\x{7fffffff}] [a-z0-9_\\x{7f}-\\x{7fffffff}]* )?
+          (?![a-z0-9_\\x{7f}-\\x{7fffffff}\\\\])
+        '''
+        'endCaptures':
+          '1':
+            'name': 'support.attribute.php'
+        'patterns': [
+          {
+            'include': '#namespace'
+          }
+        ]
+      }
+      {
+        # There will be other attributes in the future
+        'match': '''(?xi)
+          (\\\\)?\\b(Attribute)\\b
+        '''
+        'name': 'support.attribute.builtin.php'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.inheritance.php'
+      }
+      {
+        'begin': '(?i)(?=[\\\\a-z_\\x{7f}-\\x{7fffffff}])'
+        'end': '''(?xi)
+          ( [a-z_\\x{7f}-\\x{7fffffff}] [a-z0-9_\\x{7f}-\\x{7fffffff}]* )?
+          (?![a-z0-9_\\x{7f}-\\x{7fffffff}\\\\])
+        '''
+        'endCaptures':
+          '1':
+            'name': 'support.attribute.php'
+        'patterns': [
+          {
+            'include': '#namespace'
+          }
+        ]
+      }
+    ]
+  'attribute':
+    'begin': '\\#\\['
+    'end': '\\]'
+    'name': 'meta.attribute.php'
+    'patterns': [
+      {
+        'match': ','
+        'name': 'punctuation.separator.delimiter.php'
+      }
+      {
+        'begin': '([a-zA-Z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#attribute-name'
+              }
+            ]
+          '2':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.php'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.php'
+        'patterns': [
+          {
+            'include': '#named-arguments'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+      {
+        'match': '[a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+'
+        'patterns': {
+          'include': '#attribute-name'
+        }
+      }
+    ]
   'class-builtin':
     'patterns': [
       {
