@@ -1043,7 +1043,7 @@
       {
         'match': '''(?xi)
           (\\\\)?\\b
-          ((APC|Append)Iterator|Array(Access|Iterator|Object)
+          (Attribute|(APC|Append)Iterator|Array(Access|Iterator|Object)
           |Bad(Function|Method)CallException
           |(Caching|CallbackFilter)Iterator|Collator|Collectable|Cond|Countable|CURLFile
           |Date(Interval|Period|Time(Interface|Immutable|Zone)?)?|Directory(Iterator)?|DomainException
