@@ -754,6 +754,6 @@ describe "Python grammar", ->
     it "recognizes DELETE as an HTTP method", ->
       {tokens} = grammar.tokenizeLine('"DELETE /api/v1/endpoint"')
 
-      expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.begin.python']
-      expect(tokens[1]).toEqual value: 'DELETE /api/v1/endpoint', scopes: ['source.python', 'string.quoted.single.single-line.python']
-      expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.single.single-line.python', 'punctuation.definition.string.end.python']
+      expect(tokens[0]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']
+      expect(tokens[1]).toEqual value: 'DELETE /api/v1/endpoint', scopes: ['source.python', 'string.quoted.double.single-line.python']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']
