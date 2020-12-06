@@ -316,6 +316,9 @@
     ]
   }
   {
+    'include': '#match_statement'
+  }
+  {
     'include': '#switch_statement'
   }
   {
@@ -3616,6 +3619,56 @@
                 'name': 'punctuation.definition.section.switch-block.begin.bracket.curly.php'
             'end': '(?=}|\\?>)'
             'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  'match_statement':
+    'patterns': [
+      {
+        'match': '\\s+(?=match\\b)'
+      }
+      {
+        'begin': '\\bmatch\\b'
+        'beginCaptures':
+          '0':
+            'name': 'keyword.control.match.php'
+        'end': '}|(?=\\?>)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.section.match-block.end.bracket.curly.php'
+        'name': 'meta.match-statement.php'
+        'patterns': [
+          {
+            'begin': '\\('
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.match-expression.begin.bracket.round.php'
+            'end': '\\)|(?=\\?>)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.match-expression.end.bracket.round.php'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+          {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.section.match-block.begin.bracket.curly.php'
+            'end': '(?=}|\\?>)'
+            'patterns': [
+              {
+                'match': '=>'
+                'name': 'keyword.definition.arrow.php'
+              }
               {
                 'include': '$self'
               }

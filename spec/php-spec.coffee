@@ -2065,6 +2065,44 @@ describe 'PHP grammar', ->
     expect(lines[7][1]).toEqual value: 'continue', scopes: ['source.php', 'meta.switch-statement.php', 'keyword.control.continue.php']
     expect(lines[8][0]).toEqual value: '}', scopes: ['source.php', 'meta.switch-statement.php', 'punctuation.definition.section.switch-block.end.bracket.curly.php']
 
+  it 'should tokenize match statements correctly', ->
+    lines = grammar.tokenizeLines '''
+      echo match (1) {
+          0 => 'Foo',
+          1, 2 => 'Bar',
+          default => 'Baz',
+      };
+    '''
+
+    expect(lines[0][0]).toEqual value: 'echo', scopes: ['source.php', 'support.function.construct.output.php']
+    expect(lines[0][2]).toEqual value: 'match', scopes: ['source.php', 'meta.match-statement.php', 'keyword.control.match.php']
+    expect(lines[0][4]).toEqual value: '(', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.definition.match-expression.begin.bracket.round.php']
+    expect(lines[0][5]).toEqual value: '1', scopes: ['source.php', 'meta.match-statement.php', 'constant.numeric.decimal.php']
+    expect(lines[0][6]).toEqual value: ')', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.definition.match-expression.end.bracket.round.php']
+    expect(lines[0][8]).toEqual value: '{', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.definition.section.match-block.begin.bracket.curly.php']
+    expect(lines[1][1]).toEqual value: '0', scopes: ['source.php', 'meta.match-statement.php', 'constant.numeric.decimal.php']
+    expect(lines[1][3]).toEqual value: '=>', scopes: ['source.php', 'meta.match-statement.php', 'keyword.definition.arrow.php']
+    expect(lines[1][5]).toEqual value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+    expect(lines[1][6]).toEqual value: 'Foo', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php']
+    expect(lines[1][7]).toEqual value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+    expect(lines[1][8]).toEqual value: ',', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.separator.delimiter.php']
+    expect(lines[2][1]).toEqual value: '1', scopes: ['source.php', 'meta.match-statement.php', 'constant.numeric.decimal.php']
+    expect(lines[2][2]).toEqual value: ',', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.separator.delimiter.php']
+    expect(lines[2][4]).toEqual value: '2', scopes: ['source.php', 'meta.match-statement.php', 'constant.numeric.decimal.php']
+    expect(lines[2][6]).toEqual value: '=>', scopes: ['source.php', 'meta.match-statement.php', 'keyword.definition.arrow.php']
+    expect(lines[2][8]).toEqual value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+    expect(lines[2][9]).toEqual value: 'Bar', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php']
+    expect(lines[2][10]).toEqual value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+    expect(lines[2][11]).toEqual value: ',', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.separator.delimiter.php']
+    expect(lines[3][1]).toEqual value: 'default', scopes: ['source.php', 'meta.match-statement.php', 'keyword.control.default.php']
+    expect(lines[3][3]).toEqual value: '=>', scopes: ['source.php', 'meta.match-statement.php', 'keyword.definition.arrow.php']
+    expect(lines[3][5]).toEqual value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+    expect(lines[3][6]).toEqual value: 'Baz', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php']
+    expect(lines[3][7]).toEqual value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+    expect(lines[3][8]).toEqual value: ',', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.separator.delimiter.php']
+    expect(lines[4][0]).toEqual value: '}', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.definition.section.match-block.end.bracket.curly.php']
+    expect(lines[4][1]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+
   it 'should tokenize storage types correctly', ->
     {tokens} = grammar.tokenizeLine '(int)'
 
