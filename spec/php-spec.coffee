@@ -2080,6 +2080,145 @@ describe 'PHP grammar', ->
     expect(tokens[3]).toEqual value: ' ', scopes: ['source.php']
     expect(tokens[4]).toEqual value: ')', scopes: ['source.php', 'punctuation.definition.storage-type.end.bracket.round.php']
 
+  describe 'attributes', ->
+    it 'should tokenize basic attribute', ->
+      lines = grammar.tokenizeLines '''
+        #[ExampleAttribute]
+        class Foo {}
+      '''
+
+      expect(lines[0][0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(lines[0][1]).toEqual value: 'ExampleAttribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(lines[0][2]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+      expect(lines[1][0]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(lines[1][2]).toEqual value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
+
+    it 'should tokenize inline attribute', ->
+      {tokens} = grammar.tokenizeLine '#[ExampleAttribute] class Foo {}'
+
+      expect(tokens[0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[1]).toEqual value: 'ExampleAttribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[2]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[4]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(tokens[6]).toEqual value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
+
+    it 'should tokenize attribute with namespace', ->
+      {tokens} = grammar.tokenizeLine '#[Foo\\Bar\\Attribute]'
+
+      expect(tokens[0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[1]).toEqual value: 'Foo', scopes: ['source.php', 'meta.attribute.php', 'support.other.namespace.php']
+      expect(tokens[2]).toEqual value: '\\', scopes: ['source.php', 'meta.attribute.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[3]).toEqual value: 'Bar', scopes: ['source.php', 'meta.attribute.php', 'support.other.namespace.php']
+      expect(tokens[4]).toEqual value: '\\', scopes: ['source.php', 'meta.attribute.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']
+      expect(tokens[5]).toEqual value: 'Attribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[6]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+
+    it 'should tokenize multiple attributes', ->
+      {tokens} = grammar.tokenizeLine '#[Attribute1, Attribute2]'
+
+      expect(tokens[0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[1]).toEqual value: 'Attribute1', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[2]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[4]).toEqual value: 'Attribute2', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[5]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+
+    it 'should tokenize attribute with arguments', ->
+      {tokens} = grammar.tokenizeLine '#[Attribute1, Attribute2(true, 2, [3.1, 3.2])]'
+
+      expect(tokens[0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[1]).toEqual value: 'Attribute1', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[2]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[4]).toEqual value: 'Attribute2', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[5]).toEqual value: '(', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.begin.bracket.round.php']
+      expect(tokens[6]).toEqual value: 'true', scopes: ['source.php', 'meta.attribute.php', 'constant.language.php']
+      expect(tokens[7]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[9]).toEqual value: '2', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php']
+      expect(tokens[10]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[12]).toEqual value: '[', scopes: ['source.php', 'meta.attribute.php', 'punctuation.section.array.begin.php']
+      expect(tokens[13]).toEqual value: '3', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php']
+      expect(tokens[14]).toEqual value: '.', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+      expect(tokens[15]).toEqual value: '1', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php']
+      expect(tokens[16]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[18]).toEqual value: '3', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php']
+      expect(tokens[19]).toEqual value: '.', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']
+      expect(tokens[20]).toEqual value: '2', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php']
+      expect(tokens[21]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php', 'punctuation.section.array.end.php']
+      expect(tokens[22]).toEqual value: ')', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[23]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+
+    it 'should tokenize multiline attribute', ->
+      lines = grammar.tokenizeLines '''
+        #[ExampleAttribute(
+          'Foo',
+          'Bar',
+        )]
+      '''
+
+      expect(lines[0][0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(lines[0][1]).toEqual value: 'ExampleAttribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(lines[0][2]).toEqual value: '(', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.begin.bracket.round.php']
+      expect(lines[1][1]).toEqual value: '\'', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(lines[1][2]).toEqual value: 'Foo', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php']
+      expect(lines[1][3]).toEqual value: '\'', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(lines[1][4]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(lines[2][1]).toEqual value: '\'', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']
+      expect(lines[2][2]).toEqual value: 'Bar', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php']
+      expect(lines[2][3]).toEqual value: '\'', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']
+      expect(lines[2][4]).toEqual value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']
+      expect(lines[3][0]).toEqual value: ')', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(lines[3][1]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+
+    it 'should tokenize attribute in anonymous class', ->
+      {tokens} = grammar.tokenizeLine '$foo = new #[ExampleAttribute] class {};'
+
+      expect(tokens[0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1]).toEqual value: 'foo', scopes: ['source.php', 'variable.other.php']
+      expect(tokens[3]).toEqual value: '=', scopes: ['source.php', 'keyword.operator.assignment.php']
+      expect(tokens[5]).toEqual value: 'new', scopes: ['source.php', 'meta.class.php', 'keyword.other.new.php']
+      expect(tokens[7]).toEqual value: '#[', scopes: ['source.php', 'meta.class.php', 'meta.attribute.php']
+      expect(tokens[8]).toEqual value: 'ExampleAttribute', scopes: ['source.php', 'meta.class.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[9]).toEqual value: ']', scopes: ['source.php', 'meta.class.php', 'meta.attribute.php']
+      expect(tokens[11]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(tokens[13]).toEqual value: '{', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.begin.bracket.curly.php']
+      expect(tokens[14]).toEqual value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']
+      expect(tokens[15]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+
+    it 'should tokenize attribute in arrow function', ->
+      {tokens} = grammar.tokenizeLine '$foo = #[ExampleAttribute] fn($x) => $x;'
+
+      expect(tokens[0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[1]).toEqual value: 'foo', scopes: ['source.php', 'variable.other.php']
+      expect(tokens[3]).toEqual value: '=', scopes: ['source.php', 'keyword.operator.assignment.php']
+      expect(tokens[5]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[6]).toEqual value: 'ExampleAttribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[7]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+      expect(tokens[9]).toEqual value: 'fn', scopes: ['source.php', 'meta.function.closure.php', 'storage.type.function.php']
+      expect(tokens[10]).toEqual value: '(', scopes: ['source.php', 'meta.function.closure.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[11]).toEqual value: '$', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[12]).toEqual value: 'x', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']
+      expect(tokens[13]).toEqual value: ')', scopes: ['source.php', 'meta.function.closure.php', 'punctuation.definition.parameters.end.bracket.round.php']
+      expect(tokens[15]).toEqual value: '=>', scopes: ['source.php', 'meta.function.closure.php', 'punctuation.definition.arrow.php']
+      expect(tokens[17]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[18]).toEqual value: 'x', scopes: ['source.php', 'variable.other.php']
+      expect(tokens[19]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+
+    it 'should tokenize builtin attribute', ->
+      lines = grammar.tokenizeLines '''
+        #[Attribute(Attribute::TARGET_CLASS)]
+        class FooAttribute {}
+      '''
+
+      expect(lines[0][0]).toEqual value: '#[', scopes: ['source.php', 'meta.attribute.php']
+      expect(lines[0][1]).toEqual value: 'Attribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.builtin.php']
+      expect(lines[0][2]).toEqual value: '(', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.begin.bracket.round.php']
+      expect(lines[0][3]).toEqual value: 'Attribute', scopes: ['source.php', 'meta.attribute.php', 'support.class.builtin.php']
+      expect(lines[0][4]).toEqual value: '::', scopes: ['source.php', 'meta.attribute.php', 'keyword.operator.class.php']
+      expect(lines[0][5]).toEqual value: 'TARGET_CLASS', scopes: ['source.php', 'meta.attribute.php', 'constant.other.class.php']
+      expect(lines[0][6]).toEqual value: ')', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(lines[0][7]).toEqual value: ']', scopes: ['source.php', 'meta.attribute.php']
+      expect(lines[1][0]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
+      expect(lines[1][2]).toEqual value: 'FooAttribute', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
+
   describe 'PHPDoc', ->
     it 'should tokenize @api tag correctly', ->
       lines = grammar.tokenizeLines '''
