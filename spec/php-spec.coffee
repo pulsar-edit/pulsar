@@ -1481,16 +1481,27 @@ describe 'PHP grammar', ->
     it 'tokenizes method calls with no arguments', ->
       {tokens} = grammar.tokenizeLine 'obj->method()'
 
+      expect(tokens[1]).toEqual value: '->', scopes: ['source.php', 'meta.method-call.php', 'keyword.operator.class.php']
       expect(tokens[2]).toEqual value: 'method', scopes: ['source.php', 'meta.method-call.php', 'entity.name.function.php']
       expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
       expect(tokens[4]).toEqual value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
-      {tokens} = grammar.tokenizeLine 'obj->method ()'
+      {tokens} = grammar.tokenizeLine 'obj-> method ()'
 
+      expect(tokens[1]).toEqual value: '->', scopes: ['source.php', 'meta.method-call.php', 'keyword.operator.class.php']
+      expect(tokens[2]).toEqual value: ' ', scopes: ['source.php', 'meta.method-call.php']
+      expect(tokens[3]).toEqual value: 'method', scopes: ['source.php', 'meta.method-call.php', 'entity.name.function.php']
+      expect(tokens[4]).toEqual value: ' ', scopes: ['source.php', 'meta.method-call.php']
+      expect(tokens[5]).toEqual value: '(', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
+      expect(tokens[6]).toEqual value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+
+    it 'tokenizes method calls with nullsafe operator', ->
+      {tokens} = grammar.tokenizeLine 'obj?->method()'
+
+      expect(tokens[1]).toEqual value: '?->', scopes: ['source.php', 'meta.method-call.php', 'keyword.operator.class.php']
       expect(tokens[2]).toEqual value: 'method', scopes: ['source.php', 'meta.method-call.php', 'entity.name.function.php']
-      expect(tokens[3]).toEqual value: ' ', scopes: ['source.php', 'meta.method-call.php']
-      expect(tokens[4]).toEqual value: '(', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
-      expect(tokens[5]).toEqual value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']
+      expect(tokens[4]).toEqual value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']
 
     it 'tokenizes method calls with arguments', ->
       {tokens} = grammar.tokenizeLine "obj->method(5, 'b')"
