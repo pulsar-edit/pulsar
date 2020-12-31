@@ -2577,6 +2577,31 @@ describe 'PHP grammar', ->
     expect(tokens[11]).toEqual value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']
     expect(tokens[12]).toEqual value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']
 
+  it 'should tokenize methods in interface correctly', ->
+    lines = grammar.tokenizeLines '''
+      interface Test {
+        public function testMethod();
+        public function __toString();
+      }
+    '''
+
+    expect(lines[0][0]).toEqual value: 'interface', scopes: ['source.php', 'meta.interface.php', 'storage.type.interface.php']
+    expect(lines[0][2]).toEqual value: 'Test', scopes: ['source.php', 'meta.interface.php', 'entity.name.type.interface.php']
+    expect(lines[0][4]).toEqual value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']
+    expect(lines[1][1]).toEqual value: 'public', scopes: ['source.php', 'meta.function.php', 'storage.modifier.php']
+    expect(lines[1][3]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+    expect(lines[1][5]).toEqual value: 'testMethod', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+    expect(lines[1][6]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+    expect(lines[1][7]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+    expect(lines[1][8]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+    expect(lines[2][1]).toEqual value: 'public', scopes: ['source.php', 'meta.function.php', 'storage.modifier.php']
+    expect(lines[2][3]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+    expect(lines[2][5]).toEqual value: '__toString', scopes: ['source.php', 'meta.function.php', 'support.function.magic.php']
+    expect(lines[2][6]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+    expect(lines[2][7]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+    expect(lines[2][8]).toEqual value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']
+    expect(lines[3][0]).toEqual value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']
+
   it 'should tokenize trait correctly', ->
     {tokens} = grammar.tokenizeLine 'trait Test {}'
 
