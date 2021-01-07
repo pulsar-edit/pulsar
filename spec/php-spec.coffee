@@ -2151,6 +2151,23 @@ describe 'PHP grammar', ->
       expect(tokens[4]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
       expect(tokens[6]).toEqual value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
 
+    it 'should tokenize attribute for method', ->
+      lines = grammar.tokenizeLines '''
+        class Foo {
+          #[ExampleAttribute]
+          public function bar() {}
+          # I'm a happy comment!
+          public function baz() {}
+        }
+      '''
+
+      expect(lines[1][1]).toEqual value: '#[', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.attribute.php']
+      expect(lines[1][2]).toEqual value: 'ExampleAttribute', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(lines[1][3]).toEqual value: ']', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.attribute.php']
+      expect(lines[3][0]).toEqual value: '  ', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.whitespace.comment.leading.php']
+      expect(lines[3][1]).toEqual value: '#', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.line.number-sign.php', 'punctuation.definition.comment.php']
+      expect(lines[3][2]).toEqual value: ' I\'m a happy comment!', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.line.number-sign.php']
+
     it 'should tokenize attribute with namespace', ->
       {tokens} = grammar.tokenizeLine '#[Foo\\Bar\\Attribute]'
 
