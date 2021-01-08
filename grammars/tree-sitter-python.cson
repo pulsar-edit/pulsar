@@ -177,3 +177,4 @@ scopes:
   '"or"': 'keyword.operator.logical.python'
   '"not"': 'keyword.operator.logical.python'
   '"is"': 'keyword.operator.logical.python'
+  '"->"': 'keyword.control.return'
