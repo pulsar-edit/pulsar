@@ -178,3 +178,11 @@ scopes:
   '"not"': 'keyword.operator.logical.python'
   '"is"': 'keyword.operator.logical.python'
   '"->"': 'keyword.control.return'
+
+  '"["': 'punctuation.definition.begin.bracket.square'
+  '"]"': 'punctuation.definition.end.bracket.square'
+  '","': 'punctuation.separator.delimiter'
+  '"{"': 'punctuation.section.block.begin.bracket.curly'
+  '"}"': 'punctuation.section.block.end.bracket.curly'
+  '"("': 'punctuation.section.parens.begin.bracket.round'
+  '")"': 'punctuation.section.parens.end.bracket.round'
