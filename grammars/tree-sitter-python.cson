@@ -121,6 +121,8 @@ scopes:
   'lambda_parameters > identifier': 'variable.parameter.function'
   'typed_parameter > identifier': 'variable.parameter.function'
 
+  'argument_list': 'meta.method-call.python'
+
   '"if"': 'keyword.control'
   '"else"': 'keyword.control'
   '"elif"': 'keyword.control'
