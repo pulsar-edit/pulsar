@@ -116,6 +116,7 @@ scopes:
   'parameters > dictionary_splat > identifier': 'variable.parameter.function'
   'default_parameter > identifier:nth-child(0)': 'variable.parameter.function'
   'keyword_argument > identifier:nth-child(0)': 'variable.parameter.function'
+  'lambda_parameters > identifier': 'variable.parameter.function'
 
   '"if"': 'keyword.control'
   '"else"': 'keyword.control'
