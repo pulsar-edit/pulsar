@@ -1188,7 +1188,7 @@
         ]
       }
       {
-        'begin': '(^\\s+)?(?=#)'
+        'begin': '(^\\s+)?(?=#)(?!#\\[)'
         'beginCaptures':
           '1':
             'name': 'punctuation.whitespace.comment.leading.php'
