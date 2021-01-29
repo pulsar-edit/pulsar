@@ -3344,4 +3344,4 @@
     'decreaseIndentPattern': '^(.*\\*/)?\\s*(}|(\\)+([;,]|\\s*{))|(\\]\\)*([;,]|$))|else:|((end(if|for(each)?|while|switch));))'
 '.text.html.php':
   'editor':
-    'nonWordCharacters': '/\\()"\':,.;<>~!@#%^&*|+=[]{}`?-'
+    'nonWordCharacters': '$/\\()"\':,.;<>~!@#%^&*|+=[]{}`?-'
