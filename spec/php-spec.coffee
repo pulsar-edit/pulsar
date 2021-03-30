@@ -731,6 +731,18 @@ describe 'PHP grammar', ->
         expect(lines[1][2]).toEqual value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]
         expect(lines[1][4]).toEqual value: 'string', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.type.php"]
 
+      it 'tokenizes 2 modifiers correctly', ->
+        lines = grammar.tokenizeLines '''
+          class Foo {
+            public static $bar = 'baz';
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[1][3]).toEqual value: 'static', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[1][5]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][6]).toEqual value: 'bar', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']
+
       it 'tokenizes namespaces', ->
         lines = grammar.tokenizeLines '''
           class A {

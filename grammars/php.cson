@@ -697,7 +697,7 @@
   }
   {
     'match': '''(?xi)
-      ((?:(?:public|private|protected|static)(?:\\s+|(?=\\?)))+)                     # At least one modifier
+      ((?:(?:public|private|protected|static)(?:\\s+|(?=\\?)))++)                     # At least one modifier
       (
         (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
         [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
