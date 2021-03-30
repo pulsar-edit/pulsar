@@ -1418,6 +1418,9 @@
   'function-parameters':
     'patterns': [
       {
+        'include': '#attribute'
+      }
+      {
         'include': '#comments'
       }
       {

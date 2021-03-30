@@ -2163,6 +2163,19 @@ describe 'PHP grammar', ->
       expect(tokens[4]).toEqual value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']
       expect(tokens[6]).toEqual value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']
 
+    it 'should tokenize parameter attribute', ->
+      {tokens} = grammar.tokenizeLine 'function Foo(#[ParameterAttribute] $parameter) {}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: 'Foo', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[4]).toEqual value: '#[', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.attribute.php']
+      expect(tokens[5]).toEqual value: 'ParameterAttribute', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.attribute.php', 'support.attribute.php']
+      expect(tokens[6]).toEqual value: ']', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.attribute.php']
+      expect(tokens[8]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[9]).toEqual value: 'parameter', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']
+      expect(tokens[10]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
+
     it 'should tokenize attribute for method', ->
       lines = grammar.tokenizeLines '''
         class Foo {
