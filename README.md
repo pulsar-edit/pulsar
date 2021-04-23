@@ -1,7 +1,5 @@
 # PHP language support in Atom
-[![macOS Build Status](https://travis-ci.org/atom/language-php.svg?branch=master)](https://travis-ci.org/atom/language-php)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/y9h45ag4b72726jy/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-php/branch/master)
-[![Dependency Status](https://david-dm.org/atom/language-php.svg)](https://david-dm.org/atom/language-php)
+![CI Status](https://github.com/atom/language-php/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to PHP files in Atom.
 
