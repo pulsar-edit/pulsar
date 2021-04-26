@@ -1,7 +1,5 @@
 # Go language support in Atom
-[![macOS Build Status](https://travis-ci.org/atom/language-go.svg?branch=master)](https://travis-ci.org/atom/language-go)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/3fxxvv05p4hv92pn/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-go/branch/master)
-[![Dependency Status](https://david-dm.org/atom/language-go.svg)](https://david-dm.org/atom/language-go)
+![CI Status](https://github.com/atom/language-go/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to Go files in Atom.
 
