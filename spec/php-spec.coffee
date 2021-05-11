@@ -374,6 +374,40 @@ describe 'PHP grammar', ->
     expect(tokens[0]).toEqual value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']
     expect(tokens[1]).toEqual value: 'thistles', scopes: ['source.php', 'variable.other.php']
 
+  describe 'include', ->
+    it 'should tokenize include and require correctly', ->
+      {tokens} = grammar.tokenizeLine 'include "foo.php";'
+
+      expect(tokens[0]).toEqual value: 'include', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[3]).toEqual value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']
+      expect(tokens[4]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']
+
+      {tokens} = grammar.tokenizeLine 'require "foo.php";'
+
+      expect(tokens[0]).toEqual value: 'require', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[3]).toEqual value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']
+      expect(tokens[4]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']
+
+    it 'should tokenize include_once correctly', ->
+      {tokens} = grammar.tokenizeLine 'include_once "foo.php";'
+
+      expect(tokens[0]).toEqual value: 'include_once', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[3]).toEqual value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']
+      expect(tokens[4]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']
+
+    it 'should tokenize parentheses correctly', ->
+      {tokens} = grammar.tokenizeLine 'include("foo.php");'
+
+      expect(tokens[0]).toEqual value: 'include', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']
+      expect(tokens[1]).toEqual value: '(', scopes: ['source.php', 'meta.include.php', 'punctuation.definition.begin.bracket.round.php']
+      expect(tokens[2]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']
+      expect(tokens[3]).toEqual value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']
+      expect(tokens[4]).toEqual value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']
+      expect(tokens[5]).toEqual value: ')', scopes: ['source.php', 'meta.include.php', 'punctuation.definition.end.bracket.round.php']
+
   describe 'declaring namespaces', ->
     it 'tokenizes namespaces', ->
       {tokens} = grammar.tokenizeLine 'namespace Test;'
