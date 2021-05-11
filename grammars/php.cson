@@ -2697,7 +2697,7 @@
     'match': '\\\\(?:\\\\(?:\\\\[\\\\\']?|[^\'])|.)'
     'name': 'constant.character.escape.php'
   'sql-string-double-quoted':
-    'begin': '"\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|AND)\\b)'
+    'begin': '"\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|AND|WITH)\\b)'
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
@@ -2766,7 +2766,7 @@
       }
     ]
   'sql-string-single-quoted':
-    'begin': '\'\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|AND)\\b)'
+    'begin': '\'\\s*(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|AND|WITH)\\b)'
     'beginCaptures':
       '0':
         'name': 'punctuation.definition.string.begin.php'
