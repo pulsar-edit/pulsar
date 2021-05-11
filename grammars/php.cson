@@ -2320,8 +2320,8 @@
       }
       {
         # false is allowed in unions
-        'match': '(?i)\\b(null|int|float|bool|string|array|object|callable|iterable|false|mixed)\\b',
-        'name': 'storage.type.php'
+        'match': '(?i)\\b(null|int|float|bool|string|array|object|callable|iterable|false|mixed|void)\\b',
+        'name': 'keyword.other.type.php'
       }
       {
         # static is only allowed in return of methods
