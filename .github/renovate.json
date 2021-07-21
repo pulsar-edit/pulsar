@@ -16,9 +16,5 @@
       "groupName": "dependencies",
       "semanticCommitType": "fix"
     }
-  ],
-  "postUpgradeTasks": {
-    "commands": ["pnpm install"],
-    "fileFilters": ["pnpm-lock.yaml"]
-  }
+  ]
 }
