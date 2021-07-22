@@ -48,6 +48,15 @@
         'include': '#php-tag'
       }
     ]
+  'L:meta.embedded.php.blade':
+    'patterns': [
+      {
+        "include": "text.html.basic"
+      }
+      {
+        'include': 'text.html.php.blade#blade'
+      }
+    ]
 'patterns': [
   {
     'begin': '\\A#!'
