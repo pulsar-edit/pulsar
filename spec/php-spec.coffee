@@ -852,6 +852,30 @@ describe 'PHP grammar', ->
         expect(lines[3][13]).toEqual value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]
         expect(lines[3][14]).toEqual value: 'c2', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]
 
+      it 'tokenizes readonly properties', ->
+        lines = grammar.tokenizeLines '''
+          class Foo {
+              public readonly mixed $a;
+              readonly string $b;
+              readonly public mixed $c;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[1][3]).toEqual value: 'readonly', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[1][5]).toEqual value: 'mixed', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']
+        expect(lines[1][7]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][8]).toEqual value: 'a', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']
+        expect(lines[2][1]).toEqual value: 'readonly', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[2][3]).toEqual value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']
+        expect(lines[2][5]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[2][6]).toEqual value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']
+        expect(lines[3][1]).toEqual value: 'readonly', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[3][3]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[3][5]).toEqual value: 'mixed', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']
+        expect(lines[3][7]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[3][8]).toEqual value: 'c', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']
+
     describe 'methods', ->
       it 'tokenizes basic method', ->
         lines = grammar.tokenizeLines '''
@@ -942,6 +966,26 @@ describe 'PHP grammar', ->
         expect(lines[1][15]).toEqual value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.other.type.php']
         expect(lines[1][17]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
         expect(lines[1][18]).toEqual value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+
+      it 'tokenizes readonly promoted properties', ->
+        lines = grammar.tokenizeLines '''
+          class Test {
+            public function __construct(public readonly int $a, readonly protected? string $b) {}
+          }
+        '''
+
+        expect(lines[1][5]).toEqual value: '__construct', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'support.function.constructor.php']
+        expect(lines[1][7]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'storage.modifier.php']
+        expect(lines[1][9]).toEqual value: 'readonly', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'storage.modifier.php']
+        expect(lines[1][11]).toEqual value: 'int', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'keyword.other.type.php']
+        expect(lines[1][13]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][14]).toEqual value: 'a', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php']
+        expect(lines[1][17]).toEqual value: 'readonly', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'storage.modifier.php']
+        expect(lines[1][19]).toEqual value: 'protected', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'storage.modifier.php']
+        expect(lines[1][20]).toEqual value: '?', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'keyword.operator.nullable-type.php']
+        expect(lines[1][22]).toEqual value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'keyword.other.type.php']
+        expect(lines[1][24]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][25]).toEqual value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php']
 
       it 'tokenizes constructor with illegal return type declaration', ->
         lines = grammar.tokenizeLines '''

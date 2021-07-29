@@ -590,7 +590,7 @@
       {
         # Constructor Property Promotion
         'begin': '''(?xi)
-          (public|private|protected) \\s+
+          ((?:(?:public|private|protected|readonly)(?:\\s+|(?=\\?)))++)
           (?: (
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
             [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
@@ -599,7 +599,12 @@
         '''
         'beginCaptures':
           '1':
-            'name': 'storage.modifier.php'
+            'patterns': [
+              {
+                'match': 'public|private|protected|readonly'
+                'name': 'storage.modifier.php'
+              }
+            ]
           '2':
             'patterns': [
               {
@@ -697,7 +702,7 @@
   }
   {
     'match': '''(?xi)
-      ((?:(?:public|private|protected|static)(?:\\s+|(?=\\?)))++)                     # At least one modifier
+      ((?:(?:public|private|protected|static|readonly)(?:\\s+|(?=\\?)))++)                     # At least one modifier
       (
         (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
         [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
@@ -708,7 +713,7 @@
       '1':
         'patterns': [
           {
-            'match': 'public|private|protected|static'
+            'match': 'public|private|protected|static|readonly'
             'name': 'storage.modifier.php'
           }
         ]
