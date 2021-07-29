@@ -479,7 +479,7 @@
           (:)\\s*
           (
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           )
           (?=\\s*(?:{|/[/*]|\\#|$))
         '''
@@ -529,7 +529,7 @@
           (:)\\s*
           (
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           )
           (?=\\s*(?:=>|/[/*]|\\#|$))
         '''
@@ -569,7 +569,7 @@
     'contentName': 'meta.function.parameters.php'
     'end': '''(?xi)
       (\\)) \\s* ( : \\s*
-        (?:\\?\\s*)? (?!\\s) [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\\\s\\|]+ (?<!\\s)
+        (?:\\?\\s*)? (?!\\s) [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\\\s\\|&]+ (?<!\\s)
       )?
       (?=\\s*(?:{|/[/*]|\\#|$|;))
     '''
@@ -593,7 +593,7 @@
           (public|private|protected) \\s+
           (?: (
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           ) \\s+ )?
           ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
         '''
@@ -668,7 +668,7 @@
     'end': '''(?xi)
       (\\)) (?: \\s* (:) \\s* (
         (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-        [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+        [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
       ) )?
       (?=\\s*(?:{|/[/*]|\\#|$|;))
     '''
@@ -700,7 +700,7 @@
       ((?:(?:public|private|protected|static)(?:\\s+|(?=\\?)))++)                     # At least one modifier
       (
         (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-        [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+        [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
       )?
       \\s+ ((\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)          # Variable name
     '''
@@ -1432,7 +1432,7 @@
         'match': '''(?xi)
           (?: (
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           ) \\s+ )?
           ((?:(&)\\s*)?(\\.\\.\\.)(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
           (?=\\s*(?:,|\\)|/[/*]|\\#|$)) # A closing parentheses (end of argument list) or a comma or a comment
@@ -1459,7 +1459,7 @@
         'begin': '''(?xi)
           (
             (?:\\?\\s*)? [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ |                                        # nullable type
-            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*\\|\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
+            [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+ (?: \\s*[|&]\\s* [a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]+)+ # union type
           )
           \\s+ ((?:(&)\\s*)?(\\$)[a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*) # Variable name with possible reference
         '''
@@ -2315,7 +2315,7 @@
         'name': 'keyword.operator.nullable-type.php'
       }
       {
-        'match': '\\|'
+        'match': '[|&]'
         'name': 'punctuation.separator.delimiter.php'
       }
       {
@@ -2482,7 +2482,7 @@
       }
     ]
   'php_doc_types':
-    'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*(\\|[a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*)*'
+    'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*([|&][a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*)*'
     'captures':
       '0':
         'patterns': [
@@ -2497,7 +2497,7 @@
             'include': '#class-name'
           }
           {
-            'match': '\\|'
+            'match': '[|&]'
             'name': 'punctuation.separator.delimiter.php'
           }
         ]
@@ -2524,7 +2524,7 @@
         'include': '#php_doc_types'
       }
       {
-        'match': '\\|'
+        'match': '[|&]'
         'name': 'punctuation.separator.delimiter.php'
       }
     ]

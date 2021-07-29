@@ -765,6 +765,34 @@ describe 'PHP grammar', ->
         expect(lines[1][2]).toEqual value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]
         expect(lines[1][4]).toEqual value: 'string', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.other.type.php"]
 
+      it 'tokenizes union types', ->
+        lines = grammar.tokenizeLines '''
+          class A {
+            public int|string $id;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[1][3]).toEqual value: 'int', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']
+        expect(lines[1][4]).toEqual value: '|', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][5]).toEqual value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']
+        expect(lines[1][7]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][8]).toEqual value: 'id', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']
+
+      it 'tokenizes intersection types', ->
+        lines = grammar.tokenizeLines '''
+          class A {
+            public FooInterface & BarInterface $foobar;
+          }
+        '''
+
+        expect(lines[1][1]).toEqual value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']
+        expect(lines[1][3]).toEqual value: 'FooInterface', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'support.class.php']
+        expect(lines[1][5]).toEqual value: '&', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][7]).toEqual value: 'BarInterface', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'support.class.php']
+        expect(lines[1][9]).toEqual value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']
+        expect(lines[1][10]).toEqual value: 'foobar', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']
+
       it 'tokenizes 2 modifiers correctly', ->
         lines = grammar.tokenizeLines '''
           class Foo {
@@ -1293,6 +1321,18 @@ describe 'PHP grammar', ->
       expect(tokens[14]).toEqual value: 'a', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
       expect(tokens[15]).toEqual value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']
 
+    it 'tokenizes intersection types in function parameters', ->
+      {tokens} = grammar.tokenizeLine 'function test(FooInterface&BarInterface $foobar){}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: 'test', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']
+      expect(tokens[4]).toEqual value: 'FooInterface', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']
+      expect(tokens[5]).toEqual value: '&', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[6]).toEqual value: 'BarInterface', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']
+      expect(tokens[8]).toEqual value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']
+      expect(tokens[9]).toEqual value: 'foobar', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']
+
     it 'tokenizes trailing comma in function parameters', ->
       {tokens} = grammar.tokenizeLine 'function abc($a, $b,){}'
 
@@ -1347,6 +1387,16 @@ describe 'PHP grammar', ->
       expect(tokens[11]).toEqual value: '|', scopes: ['source.php', 'meta.function.php', 'punctuation.separator.delimiter.php']
       expect(tokens[12]).toEqual value: ' ', scopes: ['source.php', 'meta.function.php']
       expect(tokens[13]).toEqual value: 'null', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.php']
+
+    it 'tokenizes intersection return types', ->
+      {tokens} = grammar.tokenizeLine 'function foobar() : FooInterface & BarInterface {}'
+
+      expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
+      expect(tokens[2]).toEqual value: 'foobar', scopes: ['source.php', 'meta.function.php', 'entity.name.function.php']
+      expect(tokens[6]).toEqual value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']
+      expect(tokens[8]).toEqual value: 'FooInterface', scopes: ['source.php', 'meta.function.php', 'support.class.php']
+      expect(tokens[10]).toEqual value: '&', scopes: ['source.php', 'meta.function.php', 'punctuation.separator.delimiter.php']
+      expect(tokens[12]).toEqual value: 'BarInterface', scopes: ['source.php', 'meta.function.php', 'support.class.php']
 
     it 'tokenizes function names with characters other than letters or numbers', ->
       # Char 160 is hex 0xA0, which is between 0x7F and 0xFF, making it a valid PHP identifier
@@ -2475,6 +2525,17 @@ describe 'PHP grammar', ->
         expect(lines[1][5]).toEqual value: 'Class', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
         expect(lines[1][6]).toEqual value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
 
+      it 'should tokenize intersection types', ->
+        lines = grammar.tokenizeLines '''
+          /**
+          *@param Foo&Bar description
+        '''
+
+        expect(lines[1][1]).toEqual value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
+        expect(lines[1][3]).toEqual value: 'Foo', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
+        expect(lines[1][4]).toEqual value: '&', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][5]).toEqual value: 'Bar', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
+
       it 'should tokenize multiple namespaced types', ->
         lines = grammar.tokenizeLines '''
           /**
@@ -2542,6 +2603,19 @@ describe 'PHP grammar', ->
         expect(lines[1][4]).toEqual value: 'int', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.type.php']
         expect(lines[1][5]).toEqual value: '|', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']
         expect(lines[1][6]).toEqual value: 'Class', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
+        expect(lines[1][7]).toEqual value: ')', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.definition.type.end.bracket.round.phpdoc.php']
+        expect(lines[1][8]).toEqual value: '[]', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.array.phpdoc.php']
+
+        lines = grammar.tokenizeLines '''
+          /**
+          *@param (Foo&Bar)[] description
+        '''
+
+        expect(lines[1][1]).toEqual value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
+        expect(lines[1][3]).toEqual value: '(', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.definition.type.begin.bracket.round.phpdoc.php']
+        expect(lines[1][4]).toEqual value: 'Foo', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
+        expect(lines[1][5]).toEqual value: '&', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][6]).toEqual value: 'Bar', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
         expect(lines[1][7]).toEqual value: ')', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.definition.type.end.bracket.round.phpdoc.php']
         expect(lines[1][8]).toEqual value: '[]', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.array.phpdoc.php']
 
