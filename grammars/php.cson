@@ -2237,6 +2237,10 @@
         'name': 'constant.numeric.binary.php'
       }
       {
+        'match': '0[oO][0-7]+(?:_[0-7]+)*'
+        'name': 'constant.numeric.octal.php'
+      }
+      {
         'match': '0(?:_?[0-7]+)+'
         'name': 'constant.numeric.octal.php'
       }

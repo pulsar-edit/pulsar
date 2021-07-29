@@ -2051,6 +2051,12 @@ describe 'PHP grammar', ->
       {tokens} = grammar.tokenizeLine '0010'
       expect(tokens[0]).toEqual value: '0010', scopes: ['source.php', 'constant.numeric.octal.php']
 
+      {tokens} = grammar.tokenizeLine '0o010'
+      expect(tokens[0]).toEqual value: '0o010', scopes: ['source.php', 'constant.numeric.octal.php']
+
+      {tokens} = grammar.tokenizeLine '0O10'
+      expect(tokens[0]).toEqual value: '0O10', scopes: ['source.php', 'constant.numeric.octal.php']
+
     it 'tokenizes decimals', ->
       {tokens} = grammar.tokenizeLine '1234'
       expect(tokens[0]).toEqual value: '1234', scopes: ['source.php', 'constant.numeric.decimal.php']
@@ -2104,6 +2110,12 @@ describe 'PHP grammar', ->
 
       {tokens} = grammar.tokenizeLine '0_655'
       expect(tokens[0]).toEqual value: '0_655', scopes: ['source.php', 'constant.numeric.octal.php']
+
+      {tokens} = grammar.tokenizeLine '0o6_4_4'
+      expect(tokens[0]).toEqual value: '0o6_4_4', scopes: ['source.php', 'constant.numeric.octal.php']
+
+      {tokens} = grammar.tokenizeLine '0O6_4_4'
+      expect(tokens[0]).toEqual value: '0O6_4_4', scopes: ['source.php', 'constant.numeric.octal.php']
 
     it 'tokenizes decimals', ->
       {tokens} = grammar.tokenizeLine '1_234'
