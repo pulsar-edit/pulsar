@@ -1721,12 +1721,12 @@ describe 'PHP grammar', ->
       expect(tokens[5]).toEqual value: '?', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.nullable-type.php"]
       expect(tokens[6]).toEqual value: 'Client', scopes: ["source.php", "meta.function.closure.php", "support.class.php"]
 
-    it 'tokenizes noreturn type', ->
-      {tokens} = grammar.tokenizeLine 'function app_exit() : noreturn {}'
+    it 'tokenizes never type', ->
+      {tokens} = grammar.tokenizeLine 'function app_exit() : never {}'
 
       expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
       expect(tokens[6]).toEqual value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']
-      expect(tokens[8]).toEqual value: 'noreturn', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.noreturn.php']
+      expect(tokens[8]).toEqual value: 'never', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.never.php']
 
     it 'tokenizes closure returning reference', ->
       {tokens} = grammar.tokenizeLine 'function&() {}'
