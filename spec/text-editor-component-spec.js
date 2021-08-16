@@ -18,15 +18,18 @@ const SAMPLE_TEXT = fs.readFileSync(
   'utf8'
 );
 
-document.registerElement('text-editor-component-test-element', {
-  prototype: Object.create(HTMLElement.prototype, {
-    attachedCallback: {
-      value: function() {
-        this.didAttach();
-      }
-    }
-  })
-});
+class DummyElement extends HTMLElement {
+  connectedCallback() {
+    this.didAttach();
+  }
+}
+
+window.customElements.define(
+  'text-editor-component-test-element',
+  DummyElement
+);
+
+document.createElement('text-editor-component-test-element');
 
 const editors = [];
 let verticalScrollbarWidth, horizontalScrollbarHeight;
@@ -605,8 +608,8 @@ describe('TextEditorComponent', () => {
     it('blinks cursors when the editor is focused and the cursors are not moving', async () => {
       assertDocumentFocused();
       const { component, element, editor } = buildComponent();
-      component.props.cursorBlinkPeriod = 40;
-      component.props.cursorBlinkResumeDelay = 40;
+      component.props.cursorBlinkPeriod = 30;
+      component.props.cursorBlinkResumeDelay = 30;
       editor.addCursorAtScreenPosition([1, 0]);
 
       element.focus();
