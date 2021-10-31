@@ -2457,7 +2457,7 @@
       {
         # Tags followed by a type expression
         # -  @<tag> type
-        'begin': '(@(?:global|param|property(-(read|write))?|return|throws|var))\\s+(?=[A-Za-z_\\x{7f}-\\x{7fffffff}\\\\]|\\()'
+        'begin': '(@(?:global|param|property(-(read|write))?|return|throws|var))\\s+(?=[?A-Za-z_\\x{7f}-\\x{7fffffff}\\\\]|\\()'
         'beginCaptures':
           '1':
             'name': 'keyword.other.phpdoc.php'
@@ -2495,7 +2495,7 @@
       }
     ]
   'php_doc_types':
-    'match': '(?i)[a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*([|&][a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*)*'
+    'match': '(?i)\\??[a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*([|&]\\??[a-z_\\x{7f}-\\x{7fffffff}\\\\][a-z0-9_\\x{7f}-\\x{7fffffff}\\\\]*)*'
     'captures':
       '0':
         'patterns': [
