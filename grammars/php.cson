@@ -2500,6 +2500,10 @@
       '0':
         'patterns': [
           {
+            'match': '\\?'
+            'name': 'keyword.operator.nullable-type.php'
+          }
+          {
             'match': '''(?x)\\b
               (string|integer|int|boolean|bool|float|double|object|mixed
               |array|resource|void|null|callback|false|true|self|static)\\b
