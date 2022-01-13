@@ -1721,12 +1721,12 @@ describe 'PHP grammar', ->
       expect(tokens[5]).toEqual value: '?', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.nullable-type.php"]
       expect(tokens[6]).toEqual value: 'Client', scopes: ["source.php", "meta.function.closure.php", "support.class.php"]
 
-    it 'tokenizes noreturn type', ->
-      {tokens} = grammar.tokenizeLine 'function app_exit() : noreturn {}'
+    it 'tokenizes never type', ->
+      {tokens} = grammar.tokenizeLine 'function app_exit() : never {}'
 
       expect(tokens[0]).toEqual value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']
       expect(tokens[6]).toEqual value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']
-      expect(tokens[8]).toEqual value: 'noreturn', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.noreturn.php']
+      expect(tokens[8]).toEqual value: 'never', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.never.php']
 
     it 'tokenizes closure returning reference', ->
       {tokens} = grammar.tokenizeLine 'function&() {}'
@@ -2561,6 +2561,29 @@ describe 'PHP grammar', ->
         expect(lines[1][3]).toEqual value: 'Test', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
         expect(lines[1][4]).toEqual value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
 
+      it 'should tokenize a single nullable type', ->
+        lines = grammar.tokenizeLines '''
+          /**
+          *@param ?int description
+        '''
+
+        expect(lines[1][1]).toEqual value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
+        expect(lines[1][2]).toEqual value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
+        expect(lines[1][3]).toEqual value: '?', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.operator.nullable-type.php']
+        expect(lines[1][4]).toEqual value: 'int', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.type.php']
+        expect(lines[1][5]).toEqual value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
+
+        lines = grammar.tokenizeLines '''
+          /**
+          *@param ?Test description
+        '''
+
+        expect(lines[1][1]).toEqual value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
+        expect(lines[1][2]).toEqual value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
+        expect(lines[1][3]).toEqual value: '?', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.operator.nullable-type.php']
+        expect(lines[1][4]).toEqual value: 'Test', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
+        expect(lines[1][5]).toEqual value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
+
       it 'should tokenize a single namespaced type', ->
         lines = grammar.tokenizeLines '''
           /**
@@ -2587,6 +2610,21 @@ describe 'PHP grammar', ->
         expect(lines[1][4]).toEqual value: '|', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']
         expect(lines[1][5]).toEqual value: 'Class', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
         expect(lines[1][6]).toEqual value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
+
+      it 'should tokenize multiple nullable types', ->
+        lines = grammar.tokenizeLines '''
+          /**
+          *@param ?int|?Class description
+        '''
+
+        expect(lines[1][1]).toEqual value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']
+        expect(lines[1][2]).toEqual value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
+        expect(lines[1][3]).toEqual value: '?', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.operator.nullable-type.php']
+        expect(lines[1][4]).toEqual value: 'int', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.type.php']
+        expect(lines[1][5]).toEqual value: '|', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']
+        expect(lines[1][6]).toEqual value: '?', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.operator.nullable-type.php']
+        expect(lines[1][7]).toEqual value: 'Class', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']
+        expect(lines[1][8]).toEqual value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']
 
       it 'should tokenize intersection types', ->
         lines = grammar.tokenizeLines '''

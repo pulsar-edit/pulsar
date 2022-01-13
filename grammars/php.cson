@@ -690,8 +690,8 @@
             'name': 'storage.type.php'
           }
           {
-            'match': '\\b(noreturn)\\b',
-            'name': 'keyword.other.type.noreturn.php'
+            'match': '\\b(never)\\b',
+            'name': 'keyword.other.type.never.php'
           }
           {
             'include': '#php-types'
@@ -2457,7 +2457,7 @@
       {
         # Tags followed by a type expression
         # -  @<tag> type
-        'begin': '(@(?:global|param|property(-(read|write))?|return|throws|var))\\s+(?=[A-Za-z_\\x{7f}-\\x{10ffff}\\\\]|\\()'
+        'begin': '(@(?:global|param|property(-(read|write))?|return|throws|var))\\s+(?=[?A-Za-z_\\x{7f}-\\x{10ffff}\\\\]|\\()'
         'beginCaptures':
           '1':
             'name': 'keyword.other.phpdoc.php'
@@ -2495,10 +2495,14 @@
       }
     ]
   'php_doc_types':
-    'match': '(?i)[a-z_\\x{7f}-\\x{10ffff}\\\\][a-z0-9_\\x{7f}-\\x{10ffff}\\\\]*([|&][a-z_\\x{7f}-\\x{10ffff}\\\\][a-z0-9_\\x{7f}-\\x{10ffff}\\\\]*)*'
+    'match': '(?i)\\??[a-z_\\x{7f}-\\x{10ffff}\\\\][a-z0-9_\\x{7f}-\\x{10ffff}\\\\]*([|&]\\??[a-z_\\x{7f}-\\x{10ffff}\\\\][a-z0-9_\\x{7f}-\\x{10ffff}\\\\]*)*'
     'captures':
       '0':
         'patterns': [
+          {
+            'match': '\\?'
+            'name': 'keyword.operator.nullable-type.php'
+          }
           {
             'match': '''(?x)\\b
               (string|integer|int|boolean|bool|float|double|object|mixed
