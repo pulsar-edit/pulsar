@@ -1888,6 +1888,31 @@
         ]
       }
       {
+        'begin': '(<<<)\\s*("?)(BLADE)(\\2)(\\s*)$'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.begin.php'
+          '1':
+            'name': 'punctuation.definition.string.php'
+          '3':
+            'name': 'keyword.operator.heredoc.php'
+          '5':
+            'name': 'invalid.illegal.trailing-whitespace.php'
+        'contentName': 'text.html.php.blade'
+        'end': '^\\s*(\\3)(?![A-Za-z0-9_\\x{7f}-\\x{10ffff}])'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.end.php'
+          '1':
+            'name': 'keyword.operator.heredoc.php'
+        'name': 'meta.embedded.php.blade'
+        'patterns': [
+          {
+            'include': '#interpolation'
+          }
+        ]
+      }
+      {
         'begin': '(?i)(<<<)\\s*("?)([a-z_\\x{7f}-\\x{10ffff}]+[a-z0-9_\\x{7f}-\\x{10ffff}]*)(\\2)(\\s*)'
         'beginCaptures':
           '1':
@@ -2124,6 +2149,26 @@
             'name': 'comment.line.number-sign.php'
           }
         ]
+      }
+      {
+        'begin': '(<<<)\\s*\'(BLADE)\'(\\s*)$'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.begin.php'
+          '1':
+            'name': 'punctuation.definition.string.php'
+          '2':
+            'name': 'keyword.operator.nowdoc.php'
+          '3':
+            'name': 'invalid.illegal.trailing-whitespace.php'
+        'contentName': 'text.html.php.blade'
+        'end': '^\\s*(\\2)(?![A-Za-z0-9_\\x{7f}-\\x{10ffff}])'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.section.embedded.end.php'
+          '1':
+            'name': 'keyword.operator.nowdoc.php'
+        'name': 'meta.embedded.php.blade'
       }
       {
         'begin': '(?i)(<<<)\\s*\'([a-z_\\x{7f}-\\x{10ffff}]+[a-z0-9_\\x{7f}-\\x{10ffff}]*)\'(\\s*)'
