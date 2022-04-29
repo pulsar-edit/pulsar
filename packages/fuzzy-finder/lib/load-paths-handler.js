@@ -18,7 +18,7 @@ const realRgPath = rgPath.replace(/\bapp\.asar\b/, 'app.asar.unpacked')
 // with a maximum value of 8 and minimum of 1.
 const MaxConcurrentCrawls = Math.min(Math.max(os.cpus().length - 1, 8), 1)
 
-const emittedPaths = new Set()
+const trackedPaths = new Set()
 
 class PathLoader {
   constructor (rootPath, options) {
@@ -82,7 +82,8 @@ class PathLoader {
         output = files.pop()
 
         for (const file of files) {
-          this.pathLoaded(path.join(this.rootPath, file))
+          let loadedPath = path.join(this.rootPath, file)
+            this.trackedPathLoaded(loadedPath, null)
         }
       })
       result.stderr.on('data', () => {
@@ -106,10 +107,10 @@ class PathLoader {
     }
   }
 
-  pathLoaded (loadedPath, done) {
-    if (!emittedPaths.has(loadedPath)) {
+  trackedPathLoaded (loadedPath, done) {
+    if (!trackedPaths.has(loadedPath)) {
+      trackedPaths.add(loadedPath)
       this.paths.push(loadedPath)
-      emittedPaths.add(loadedPath)
     }
 
     if (this.paths.length === PathsChunkSize) {
@@ -138,7 +139,7 @@ class PathLoader {
           }
 
           if (stats.isFile()) {
-            this.pathLoaded(pathToLoad, done)
+            this.trackedPathLoaded(pathToLoad, done)
           } else if (stats.isDirectory()) {
             if (this.traverseSymlinkDirectories) {
               this.loadFolder(pathToLoad, done)
@@ -154,7 +155,7 @@ class PathLoader {
         if (stats.isDirectory()) {
           this.loadFolder(pathToLoad, done)
         } else if (stats.isFile()) {
-          this.pathLoaded(pathToLoad, done)
+          this.trackedPathLoaded(pathToLoad, done)
         } else {
           done()
         }
