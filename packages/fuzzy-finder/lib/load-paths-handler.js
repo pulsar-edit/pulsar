@@ -21,16 +21,17 @@ const MaxConcurrentCrawls = Math.min(Math.max(os.cpus().length - 1, 8), 1)
 const emittedPaths = new Set()
 
 class PathLoader {
-  constructor (rootPath, ignoreVcsIgnores, traverseSymlinkDirectories, ignoredNames, useRipGrep) {
+  constructor (rootPath, options) {
     this.rootPath = rootPath
-    this.ignoreVcsIgnores = ignoreVcsIgnores
-    this.traverseSymlinkDirectories = traverseSymlinkDirectories
-    this.ignoredNames = ignoredNames
-    this.useRipGrep = useRipGrep
+    this.ignoreVcsIgnores = options.ignoreVcsIgnores
+    this.traverseSymlinkDirectories = options.followSymlinks
+    this.ignoredNames = options.ignoredNames
+    this.useRipGrep = options.useRipGrep
+    this.indexIgnoredPaths = options.indexIgnoredPaths
     this.paths = []
     this.inodes = new Set()
     this.repo = null
-    if (ignoreVcsIgnores && !this.useRipGrep) {
+    if (this.ignoreVcsIgnores && !this.useRipGrep) {
       const repo = GitRepository.open(this.rootPath, {refreshOnWindowFocus: false})
       if ((repo && repo.relativize(path.join(this.rootPath, 'test'))) === 'test') {
         this.repo = repo
@@ -174,30 +175,23 @@ class PathLoader {
   }
 }
 
-module.exports = function (rootPaths, followSymlinks, ignoreVcsIgnores, ignores, useRipGrep) {
-  const ignoredNames = []
-  for (let ignore of ignores) {
+module.exports = function (rootPaths, options) {
+  const ignoredNameMatchers = []
+  for (let ignore of options.ignoredNames) {
     if (ignore) {
       try {
-        ignoredNames.push(new Minimatch(ignore, {matchBase: true, dot: true}))
+        ignoredNameMatchers.push(new Minimatch(ignore, {matchBase: true, dot: true}))
       } catch (error) {
         console.warn(`Error parsing ignore pattern (${ignore}): ${error.message}`)
       }
     }
   }
+  options.ignoredNames = ignoredNameMatchers
 
   async.eachLimit(
     rootPaths,
     MaxConcurrentCrawls,
-    (rootPath, next) =>
-      new PathLoader(
-        rootPath,
-        ignoreVcsIgnores,
-        followSymlinks,
-        ignoredNames,
-        useRipGrep
-      ).load(next)
-    ,
+    (rootPath, next) => new PathLoader(rootPath, options).load(next),
     this.async()
   )
 }

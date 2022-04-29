@@ -15,10 +15,12 @@ module.exports = {
     const task = Task.once(
       taskPath,
       projectPaths,
-      followSymlinks,
-      ignoreVcsIgnores,
-      ignoredNames,
-      useRipGrep,
+      {
+          followSymlinks,
+          ignoreVcsIgnores,
+          ignoredNames,
+          useRipGrep,
+      },
       () => callback(results)
     )
 
