@@ -11,6 +11,7 @@ module.exports = {
     const ignoreVcsIgnores = atom.config.get('core.excludeVcsIgnoredPaths')
     const projectPaths = atom.project.getPaths().map((path) => fs.realpathSync(path))
     const useRipGrep = atom.config.get('fuzzy-finder.useRipGrep')
+    const indexIgnoredPaths = atom.config.get('fuzzy-finder.indexIgnoredPaths')
 
     const task = Task.once(
       taskPath,
@@ -20,6 +21,7 @@ module.exports = {
           ignoreVcsIgnores,
           ignoredNames,
           useRipGrep,
+          indexIgnoredPaths
       },
       () => callback(results)
     )
