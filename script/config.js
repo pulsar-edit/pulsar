@@ -3,7 +3,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 const spawnSync = require('./lib/spawn-sync');
 
@@ -64,6 +63,7 @@ module.exports = {
   homeDirPath,
   getApmBinPath,
   getNpmBinPath,
+  getLocalNpmBinPath,
   snapshotAuxiliaryData: {},
   REPO_OWNER,
   MAIN_REPO,
@@ -124,18 +124,20 @@ function getApmBinPath() {
   );
 }
 
-function getNpmBinPath(external = false) {
-  if (process.env.NPM_BIN_PATH) return process.env.NPM_BIN_PATH;
+function getNpmBinPath() {
+  return process.platform === 'win32' ? 'npm.cmd' : 'npm';
+}
 
+function getLocalNpmBinPath() {
+  // NOTE this assumes that npm is installed as a script-runner dependency
   const npmBinName = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const localNpmBinPath = path.resolve(
     repositoryRootPath,
     'script',
+    'script-runner',
     'node_modules',
     '.bin',
     npmBinName
   );
-  return !external && fs.existsSync(localNpmBinPath)
-    ? localNpmBinPath
-    : npmBinName;
+  return localNpmBinPath;
 }
