@@ -129,10 +129,12 @@ function getNpmBinPath() {
 }
 
 function getLocalNpmBinPath() {
+  // NOTE this assumes that npm is installed as a script-runner dependency
   const npmBinName = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const localNpmBinPath = path.resolve(
     repositoryRootPath,
     'script',
+    'script-runner',
     'node_modules',
     '.bin',
     npmBinName
