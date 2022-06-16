@@ -1,8 +1,11 @@
-# Atom
+# Atom Community
+ 
+> To get involved with Atom Community please reach out on the [Discord Server](https://discord.gg/2tD9evh8qP) or within the [Discussions Tab](https://github.com/atom-community/atom/discussions). The issues tab is only used for the technical issues.
+
+
+> Due to changes in the upstream, the original Atom and its repositories will be archived on December 15, 2022. If you'd like to learn more about the official Atom archiving, you can read about it in their [official announcement](https://github.blog/2022-06-08-sunsetting-atom/).
 
 [![Build status](https://dev.azure.com/github/Atom/_apis/build/status/Atom%20Production%20Branches?branchName=master)](https://dev.azure.com/github/Atom/_build/latest?definitionId=32&branchName=master)
-
-> Due to upstream changes, [Atom and all repositories under the original Atom branding will be archived on December 15, 2022](https://github.blog/2022-06-08-sunsetting-atom/). Get involved here and at [the discord](https://discord.gg/deuBJaqVud) while we work on the future of Atom-community.
 
 Atom is a hackable text editor for the 21st century, built on [Electron](https://github.com/electron/electron), and based on everything we love about our favorite editors. We designed it to be deeply customizable, but still approachable using the default configuration.
 
