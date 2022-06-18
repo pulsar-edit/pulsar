@@ -5,7 +5,7 @@
 
 > Due to changes in the upstream, the original Atom and its repositories will be archived on December 15, 2022. If you'd like to learn more about the official Atom archiving, you can read about it in their [official announcement](https://github.blog/2022-06-08-sunsetting-atom/).
 
-[![Build status](https://dev.azure.com/github/Atom/_apis/build/status/Atom%20Production%20Branches?branchName=master)](https://dev.azure.com/github/Atom/_build/latest?definitionId=32&branchName=master)
+[![Build Status](https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master)](https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master)
 
 Atom is a hackable text editor for the 21st century, built on [Electron](https://github.com/electron/electron), and based on everything we love about our favorite editors. We designed it to be deeply customizable, but still approachable using the default configuration.
 
@@ -28,8 +28,7 @@ If you want to read about using Atom or developing packages in Atom, the [Atom F
 The [API reference](https://atom.io/docs/api) for developing packages is also documented on Atom.io.
 
 ## Installing
-
-### Prerequisites
+<!-- ### Prerequisites
 - [Git](https://git-scm.com)
 
 ### macOS
@@ -71,7 +70,8 @@ sudo apt install git libasound2 libcurl4 libgbm1 libgcrypt20 libgtk-3-0 libnotif
 4. Launch Atom using the installed `atom` command from the newly extracted directory.
 
 The Linux version does not currently automatically update so you will need to
-repeat these steps to upgrade to future releases.
+repeat these steps to upgrade to future releases. -->
+Currently, to get binaries based on code by the Atom community, binaries can be downloaded from the [Azure Pipeline](https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master). From this pipeline, the latest run can be selected. From there, the `8 published` link should be selected to download the files.  
 
 ## Building
 
