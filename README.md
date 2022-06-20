@@ -85,9 +85,9 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 <!---------------------------{ Badges }--------------------------->
 
-[Badge Guidelines]: https://img.shields.io/badge/Logo-Guidelines-F68315.svg?style=for-the-badge
-[Badge Discord]: https://img.shields.io/badge/Discord-5865F2.svg?style=for-the-badge&logoColor=white&logo=Discord
-[Badge License]: https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge
+[Badge Guidelines]: https://img.shields.io/badge/Logo-Guidelines-d36e2d.svg?style=for-the-badge&labelColor=323232
+[Badge Discord]: https://img.shields.io/badge/Discord-6399c4.svg?style=for-the-badge&logoColor=white&logo=Discord
+[Badge License]: https://img.shields.io/badge/License-MIT-e5ab42.svg?style=for-the-badge&labelColor=323232
 [Badge Status]: https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master
 
 
