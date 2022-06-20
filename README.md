@@ -1,19 +1,31 @@
-# Atom Community   [![Badge License]][License]   [![Badge Discord]][Discord]
- 
+ [![Badge License]][License]   [![Badge Discord]][Discord]
 
 <div align = center>
 
+# Atom Community
+ 
+<br>
+
 <kbd>
+<br>
+ 
+   Due to changes in the upstream, the original Atom and   <br>
+   its repositories will be archived on `December 15, 2022`.   
 
-Due to changes in the upstream, the original Atom and <br>
-its repositories will be archived on `December 15, 2022`.
-
-If you'd like to learn more about the official Atom archiving, <br>
-you can read about it in their **[Official Announcement]**.
+   If you'd like to learn more about the official Atom archiving,   <br>
+   you can read about it in their **[Official Announcement]**.   
 
 </kbd>
 
 </div>
+
+<br>
+
+
+
+
+<br>
+<br>
 
 
 [![Badge Status]][Status]
