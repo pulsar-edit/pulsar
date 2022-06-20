@@ -1,21 +1,18 @@
 
+<div align = center>
+
+![Banner]
+
+<div align = left> 
+
 [![Badge License]][License]    
 [![Badge Guidelines]][Guidelines]    
 [![Badge Discord]][Discord]    
 [![Badge Status]][Status]
 
+</div>
+
 <br>
-
-<div align = center>
-
-# Atom Community
-
-*A hackable text editor for the 21st century, built on **[Electron]**,* <br>
-*and based on everything we love about our favorite editors.*
-
-*We designed it to be deeply customizable, but still* <br>
-*approachable using the default configuration.*
-
 <br>
 <br>
 
@@ -29,25 +26,27 @@
    you can read about it in their **[Official Announcement]**.   
 
 </kbd>
-
-</div>
-
+ 
 <br>
 <br>
-
-
-
-
-<div align = center>
-
-![Banner]
-
 <br>
+
+# Atom Community
 
 [![Button Install]][Install]   
 [![Button Documentation]][Documentation]   
 [![Button Build]][Build] 
 
+<br>
+ 
+*A hackable text editor for the 21st century, built on **[Electron]**,* <br>
+*and based on everything we love about our favorite editors.*
+
+*We designed it to be deeply customizable, but still* <br>
+*approachable using the default configuration.*
+
+<br>
+<br>
 <br>
 
 ![Preview]
