@@ -1,7 +1,5 @@
-# Atom Community
+# Atom Community   [![Badge License]][License]   [![Badge Discord]][Discord]
  
-> To get involved with Atom Community please reach out on the [Discord Server](https://discord.gg/2tD9evh8qP) or within the [Discussions Tab](https://github.com/atom-community/atom/discussions). The issues tab is only used for the technical issues.
-
 
 > Due to changes in the upstream, the original Atom and its repositories will be archived on December 15, 2022. If you'd like to learn more about the official Atom archiving, you can read about it in their [official announcement](https://github.blog/2022-06-08-sunsetting-atom/).
 
@@ -82,6 +80,13 @@ Currently, to get binaries based on code by the Atom community, binaries can be 
 
 ## License
 
-[MIT](https://github.com/atom/atom/blob/master/LICENSE.md)
-
 When using the Atom or other GitHub logos, be sure to follow the [GitHub logo guidelines](https://github.com/logos).
+
+
+<!---------------------------------------------------------------->
+
+[Badge Discord]: https://img.shields.io/badge/Discord-5865F2.svg?style=for-the-badge&logoColor=white&logo=Discord
+[Badge License]: https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge
+
+[Discord]: https://discord.gg/2tD9evh8qP
+[License]: LICENSE.md
