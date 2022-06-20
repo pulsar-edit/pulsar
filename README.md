@@ -1,7 +1,7 @@
 
 <div align = center>
 
-![Banner]
+[![Banner]][#]
 
 <div align = left> 
 
@@ -62,7 +62,7 @@
 [Discord]: https://discord.gg/2tD9evh8qP
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
 
-[Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png
+[Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png 'Preview of the editor.'
 [Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
 
 
@@ -70,6 +70,8 @@
 [Install]: docs/Installation.md
 [License]: LICENSE.md
 [Build]: docs/Building.md
+
+[#]: #
 
 
 <!---------------------------{ Badges }--------------------------->
