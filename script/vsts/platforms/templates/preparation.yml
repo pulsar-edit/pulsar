@@ -3,13 +3,8 @@ steps:
   # Linux Specific
   - script: |
       sudo apt-get update
-      sudo apt-get install -y wget software-properties-common
-      sudo apt-get install -y build-essential ca-certificates xvfb fakeroot git libsecret-1-dev rpm libx11-dev libxkbfile-dev xz-utils xorriso zsync libxss1 libgconf2-4 libgtk-3-0 libasound2 libicu-dev
+      sudo apt-get install -y build-essential ca-certificates xvfb fakeroot git rpm libsecret-1-dev libx11-dev libxkbfile-dev xz-utils xorriso zsync libxss1 libgtk-3-0 libasound2 libicu-dev software-properties-common wget dpkg
       # clang 9 is included in the image
-      sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 10
-      sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 10
-      sudo update-alternatives --config clang
-      sudo update-alternatives --config clang++
       clang -v
     displayName: Install apt dependencies
     condition: eq(variables['Agent.OS'], 'Linux')
@@ -20,48 +15,34 @@ steps:
     condition: eq(variables['Agent.OS'], 'Linux')
 
   # Common
+  - pwsh: |
+      if ($env:BUILD_ARCH -eq "x86") {
+        echo "##vso[task.setvariable variable=IsWinX86]true"
+      }
+    displayName: Set "IsWinX86" based on "BUILD_ARCH"
+    # Convert "BUILD_ARCH" to a boolean ("IsWinX86") for the following NodeTool task.
+    # Templates evaluate too early for the matrix variable "BUILD_ARCH" to be available in ${{ template expressions }}.
+    # Scripts are interpreted at runtime, so "BUILD_ARCH" will be available to this script, and we can set "IsWinX86".
+
   - task: NodeTool@0
     inputs:
-      versionSpec: 12.4.0
-    displayName: Install Node.js 12.4.0
+      versionSpec: 12.18.3
+      force32bit: $(IsWinX86)
+    displayName: Install Node.js 12.18.3
 
-  - script: npm install --global npm@6.9.0
+  - script: npm install --global npm@6.14.8
     displayName: Update npm
-    condition: ne(variables['Agent.OS'], 'Darwin')
 
   - pwsh: |
-      if ($env:AGENT_OS -eq "Windows_NT") {
-        $env:BUILD_ARCH=$env:buildArch
-        echo "##vso[task.setvariable variable=BUILD_ARCH]$env:BUILD_ARCH" # Azure syntax
-      }
-      echo BUILD_ARCH: $env:BUILD_ARCH
-    displayName: Setting globally used env variables
+      cd script/vsts
+      npm install
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
+    displayName: Install script/vsts dependencies
+    condition: or(eq(variables['Agent.OS'], 'Windows_NT'), eq(variables['IsReleaseBranch'], 'true'), eq(variables['IsSignedZipBranch'], true), eq(variables['IsNightlyBranch'], 'true'))
 
   # Windows Specific
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.8'
-    condition: eq(variables['Agent.OS'], 'Windows_NT')
-
-  - script: |
-      ECHO Installing npm-windows-upgrade
-      npm install --global --production npm-windows-upgrade
-    displayName: Install npm-windows-upgrade
-    condition: eq(variables['Agent.OS'], 'Windows_NT')
-
-  - script: |
-      ECHO Upgrading npm
-      npm-windows-upgrade --no-spinner --no-prompt --npm-version 6.9.0
-    displayName: Install npm 6.9.0
-    condition: eq(variables['Agent.OS'], 'Windows_NT')
-
-  - script: |
-      npm install --global --production windows-build-tools@4.0
-    displayName: Install windows build tools
-    condition: eq(variables['Agent.OS'], 'Windows_NT')
-
-  - script: |
-      cd script\vsts
-      npm install
-    displayName: Install Windows build dependencies
     condition: eq(variables['Agent.OS'], 'Windows_NT')

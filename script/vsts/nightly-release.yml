@@ -1,19 +1,18 @@
+# workaround for https://bit.ly/2CK8itc
+variables:
+  _ATOM_RELEASES_S3_KEY:  $[ variables.ATOM_RELEASES_S3_KEY ]
+  _ATOM_RELEASES_S3_SECRET:  $[ variables.ATOM_RELEASES_S3_SECRET ]
+  _ATOM_RELEASES_S3_BUCKET: $[ variables.ATOM_RELEASES_S3_BUCKET ]
+  _PACKAGE_CLOUD_API_KEY: $[ variables.PACKAGE_CLOUD_API_KEY ]
+
 jobs:
-  - job: GetReleaseVersion
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      # This has to be done separately because VSTS inexplicably
-      # exits the script block after `npm ci` completes.
-      - script: |
-          cd script/vsts
-          npm ci
-        displayName: npm ci
-      - script: node script/vsts/get-release-version.js --nightly
-        name: Version
-        env:
-          REPO_OWNER: $(REPO_OWNER)
-          NIGHTLY_RELEASE_REPO: $(NIGHTLY_RELEASE_REPO)
+  # GetReleaseVersion for nightly release
+  - template: platforms/templates/get-release-version.yml
+    parameters:
+      NightlyFlag: --nightly
+
+  # Import lint definition
+  - template: lint.yml
 
   # Import OS-specific build definitions
   - template: platforms/windows.yml
@@ -27,22 +26,17 @@ jobs:
 
     dependsOn:
       - GetReleaseVersion
-      - Windows
+      - Lint
+      - Windows_tests
       - Linux
       - macOS_tests
 
     variables:
       ReleaseVersion: $[ dependencies.GetReleaseVersion.outputs['Version.ReleaseVersion'] ]
+      IsNightlyBranch: true
 
     steps:
       - template: platforms/templates/preparation.yml
-
-       #This has to be done separately because VSTS inexplicably
-       #exits the script block after `npm ci` completes.
-      - script: |
-          cd script/vsts
-          npm ci
-        displayName: npm ci
 
       - task: DownloadBuildArtifacts@0
         inputs:
@@ -56,19 +50,17 @@ jobs:
           GITHUB_TOKEN: $(GITHUB_TOKEN)
           ATOM_RELEASE_VERSION: $(ReleaseVersion)
           ATOM_RELEASES_S3_KEY: $(ATOM_RELEASES_S3_KEY)
+          ATOM_RELEASES_AZURE_CONN_STRING: $(ATOM_RELEASES_AZURE_CONN_STRING)
           ATOM_RELEASES_S3_SECRET: $(ATOM_RELEASES_S3_SECRET)
           ATOM_RELEASES_S3_BUCKET: $(ATOM_RELEASES_S3_BUCKET)
           PACKAGE_CLOUD_API_KEY: $(PACKAGE_CLOUD_API_KEY)
-          REPO_OWNER: $(REPO_OWNER)
-          MAIN_REPO: $(MAIN_REPO)
-          NIGHTLY_RELEASE_REPO: $(NIGHTLY_RELEASE_REPO)
         displayName: Create Nightly Release
   - job: bump_dependencies
     displayName: Bump Dependencies
     timeoutInMinutes: 180
 
     pool:
-      vmImage: macos-10.14
+      vmImage: macos-10.15
 
     steps:
       - template: platforms/templates/preparation.yml
@@ -77,8 +69,8 @@ jobs:
 
       - script: |
           cd script/lib
-          npm ci
-        displayName: npm ci
+          npm install
+        displayName: npm install
       - script: |
           cd script/lib/update-dependency
           node index.js

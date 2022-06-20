@@ -7,14 +7,11 @@ const glob = require('glob');
 const spawnSync = require('../lib/spawn-sync');
 const publishRelease = require('publish-release');
 const releaseNotes = require('./lib/release-notes');
-const uploadToS3 = require('./lib/upload-to-s3');
+const uploadToAzure = require('./lib/upload-to-azure-blob');
 const uploadLinuxPackages = require('./lib/upload-linux-packages');
 
 const CONFIG = require('../config');
-
-const REPO_OWNER = process.env.REPO_OWNER;
-const MAIN_REPO = process.env.MAIN_REPO;
-const NIGHTLY_RELEASE_REPO = process.env.NIGHTLY_RELEASE_REPO;
+const { REPO_OWNER, MAIN_REPO, NIGHTLY_RELEASE_REPO } = CONFIG;
 
 const yargs = require('yargs');
 const argv = yargs
@@ -25,8 +22,8 @@ const argv = yargs
     'Path to the folder where all release assets are stored'
   )
   .describe(
-    's3-path',
-    'Indicates the S3 path in which the assets should be uploaded'
+    'azure-blob-path',
+    'Indicates the Azure Blob Path path in which the assets should be uploaded'
   )
   .describe(
     'create-github-release',
@@ -44,7 +41,7 @@ const assetsPath = argv.assetsPath || CONFIG.buildOutputPath;
 const assetsPattern =
   '/**/*(*.exe|*.zip|*.nupkg|*.tar.gz|*.rpm|*.deb|RELEASES*|atom-api.json)';
 const assets = glob.sync(assetsPattern, { root: assetsPath, nodir: true });
-const bucketPath = argv.s3Path || `releases/v${releaseVersion}/`;
+const azureBlobPath = argv.azureBlobPath || `releases/v${releaseVersion}/`;
 
 if (!assets || assets.length === 0) {
   console.error(`No assets found under specified path: ${assetsPath}`);
@@ -64,27 +61,41 @@ async function uploadArtifacts() {
     return;
   }
 
-  console.log(
-    `Uploading ${
-      assets.length
-    } release assets for ${releaseVersion} to S3 under '${bucketPath}'`
-  );
+  if (
+    process.env.ATOM_RELEASES_S3_KEY &&
+    process.env.ATOM_RELEASES_S3_SECRET &&
+    process.env.ATOM_RELEASES_S3_BUCKET
+  ) {
+    console.log(
+      `Uploading ${
+        assets.length
+      } release assets for ${releaseVersion} to Azure Blob Storage under '${azureBlobPath}'`
+    );
 
-  await uploadToS3(
-    process.env.ATOM_RELEASES_S3_KEY,
-    process.env.ATOM_RELEASES_S3_SECRET,
-    process.env.ATOM_RELEASES_S3_BUCKET,
-    bucketPath,
-    assets
-  );
-
-  if (argv.linuxRepoName) {
-    await uploadLinuxPackages(
-      argv.linuxRepoName,
-      process.env.PACKAGE_CLOUD_API_KEY,
-      releaseVersion,
+    await uploadToAzure(
+      process.env.ATOM_RELEASES_AZURE_CONN_STRING,
+      azureBlobPath,
       assets
     );
+  } else {
+    console.log(
+      '\nEnvironment variables "ATOM_RELEASES_S3_BUCKET", "ATOM_RELEASES_S3_KEY" and/or "ATOM_RELEASES_S3_SECRET" are not set, skipping S3 upload.'
+    );
+  }
+
+  if (argv.linuxRepoName) {
+    if (process.env.PACKAGE_CLOUD_API_KEY) {
+      await uploadLinuxPackages(
+        argv.linuxRepoName,
+        process.env.PACKAGE_CLOUD_API_KEY,
+        releaseVersion,
+        assets
+      );
+    } else {
+      console.log(
+        '\nEnvironment variable "PACKAGE_CLOUD_API_KEY" is not set, skipping PackageCloud upload.'
+      );
+    }
   } else {
     console.log(
       '\nNo Linux package repo name specified, skipping Linux package upload.'

@@ -4,22 +4,19 @@ trigger:
   - electron-*
 pr: none # no PR triggers
 
+# workaround for https://bit.ly/2CK8itc
+variables:
+  _ATOM_RELEASES_S3_KEY:  $[ variables.ATOM_RELEASES_S3_KEY ]
+  _ATOM_RELEASES_S3_SECRET:  $[ variables.ATOM_RELEASES_S3_SECRET ]
+  _ATOM_RELEASES_S3_BUCKET: $[ variables.ATOM_RELEASES_S3_BUCKET ]
+  _PACKAGE_CLOUD_API_KEY: $[ variables.PACKAGE_CLOUD_API_KEY ]
+
 jobs:
-  - job: GetReleaseVersion
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      # This has to be done separately because VSTS inexplicably
-      # exits the script block after `npm ci` completes.
-      - script: |
-          cd script/vsts
-          npm ci
-        displayName: npm ci
-      - script: node script/vsts/get-release-version.js
-        name: Version
-        env:
-          REPO_OWNER: $(REPO_OWNER)
-          NIGHTLY_RELEASE_REPO: $(NIGHTLY_RELEASE_REPO)
+  # GetReleaseVersion
+  - template: platforms/templates/get-release-version.yml
+
+  # Import lint definition
+  - template: lint.yml
 
   # Import OS-specific build definitions.
   - template: platforms/windows.yml
@@ -32,7 +29,8 @@ jobs:
 
     dependsOn:
       - GetReleaseVersion
-      - Windows
+      - Lint
+      - Windows_tests
       - Linux
       - macOS_tests
 
@@ -42,14 +40,7 @@ jobs:
       IsSignedZipBranch: $[ dependencies.GetReleaseVersion.outputs['Version.IsSignedZipBranch'] ]
 
     steps:
-      # This has to be done separately because VSTS inexplicably
-      # exits the script block after `npm ci` completes.
-      - script: |
-          cd script/vsts
-          npm ci
-        env:
-          GITHUB_TOKEN: $(GITHUB_TOKEN)
-        displayName: npm ci
+      - template: platforms/templates/preparation.yml
 
       - task: DownloadBuildArtifacts@0
         inputs:
@@ -63,24 +54,20 @@ jobs:
           GITHUB_TOKEN: $(GITHUB_TOKEN)
           ATOM_RELEASE_VERSION: $(ReleaseVersion)
           ATOM_RELEASES_S3_KEY: $(ATOM_RELEASES_S3_KEY)
+          ATOM_RELEASES_AZURE_CONN_STRING: $(ATOM_RELEASES_AZURE_CONN_STRING)
           ATOM_RELEASES_S3_SECRET: $(ATOM_RELEASES_S3_SECRET)
           ATOM_RELEASES_S3_BUCKET: $(ATOM_RELEASES_S3_BUCKET)
           PACKAGE_CLOUD_API_KEY: $(PACKAGE_CLOUD_API_KEY)
-          REPO_OWNER: $(REPO_OWNER)
-          MAIN_REPO: $(MAIN_REPO)
-          NIGHTLY_RELEASE_REPO: $(NIGHTLY_RELEASE_REPO)
         displayName: Create Draft Release
         condition: and(succeeded(), eq(variables['Atom.AutoDraftRelease'], 'true'), eq(variables['IsReleaseBranch'], 'true'))
 
       - script: |
-          node $(Build.SourcesDirectory)/script/vsts/upload-artifacts.js --assets-path "$(System.ArtifactsDirectory)" --s3-path "vsts-artifacts/$(Build.BuildId)/"
+          node $(Build.SourcesDirectory)/script/vsts/upload-artifacts.js --assets-path "$(System.ArtifactsDirectory)" --azure-blob-path "vsts-artifacts/$(Build.BuildId)/"
         env:
           ATOM_RELEASE_VERSION: $(ReleaseVersion)
           ATOM_RELEASES_S3_KEY: $(ATOM_RELEASES_S3_KEY)
+          ATOM_RELEASES_AZURE_CONN_STRING: $(ATOM_RELEASES_AZURE_CONN_STRING)
           ATOM_RELEASES_S3_SECRET: $(ATOM_RELEASES_S3_SECRET)
           ATOM_RELEASES_S3_BUCKET: $(ATOM_RELEASES_S3_BUCKET)
-          REPO_OWNER: $(REPO_OWNER)
-          MAIN_REPO: $(MAIN_REPO)
-          NIGHTLY_RELEASE_REPO: $(NIGHTLY_RELEASE_REPO)
         displayName: Upload CI Artifacts to S3
         condition: and(succeeded(), eq(variables['IsSignedZipBranch'], 'true'))

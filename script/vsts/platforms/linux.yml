@@ -5,8 +5,7 @@ jobs:
     variables:
       ReleaseVersion: $[ dependencies.GetReleaseVersion.outputs['Version.ReleaseVersion'] ]
     pool:
-      # This image is used to host the Docker container that runs the build
-      vmImage: ubuntu-16.04
+      vmImage: ubuntu-18.04
 
     steps:
       - template: templates/preparation.yml
@@ -17,9 +16,6 @@ jobs:
 
       - template: templates/bootstrap.yml
 
-      - script: script/lint
-        displayName: Run linter
-
       - template: templates/build.yml
 
       - template: templates/test.yml
@@ -27,12 +23,12 @@ jobs:
       - template: templates/publish.yml
         parameters:
           artifacts:
-            - filename: atom.x86_64.rpm
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: atom.x86_64.rpm
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-            - filename: atom-amd64.deb
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: atom-amd64.deb
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-            - filename: atom-amd64.tar.gz
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: atom-amd64.tar.gz
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

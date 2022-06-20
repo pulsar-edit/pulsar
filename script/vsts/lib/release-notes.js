@@ -3,14 +3,12 @@ const octokit = require('@octokit/rest')();
 const changelog = require('pr-changelog');
 const childProcess = require('child_process');
 
-const REPO_OWNER = process.env.REPO_OWNER;
-const MAIN_REPO = process.env.MAIN_REPO;
-const NIGHTLY_RELEASE_REPO = process.env.NIGHTLY_RELEASE_REPO;
+const { REPO_OWNER, MAIN_REPO, NIGHTLY_RELEASE_REPO } = require('../../config');
 
 module.exports.getRelease = async function(releaseVersion, githubToken) {
   if (githubToken) {
     octokit.authenticate({
-      type: 'oauth',
+      type: 'token',
       token: githubToken
     });
   }
@@ -41,7 +39,7 @@ module.exports.generateForVersion = async function(
   if (githubToken) {
     changelog.setGithubAccessToken(githubToken);
     octokit.authenticate({
-      type: 'oauth',
+      type: 'token',
       token: githubToken
     });
   }

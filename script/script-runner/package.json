@@ -1,0 +1,8 @@
+{
+  "name": "atom-build-scripts-runner",
+  "description": "Atom build scripts runner",
+  "dependencies": {
+    "threads": "^1.6.3",
+    "npm": "^6.14.16"
+  }
+}

@@ -1,15 +1,16 @@
 jobs:
-  - job: Windows
+  - job: Windows_build
+    displayName: Windows Build
     dependsOn: GetReleaseVersion
     timeoutInMinutes: 180
     strategy:
       maxParallel: 2
       matrix:
         x64:
-          buildArch: x64
+          BUILD_ARCH: x64
           RunCoreMainTests: true
         x86:
-          buildArch: x86
+          BUILD_ARCH: x86
           RunCoreMainTests: true
 
     pool:
@@ -30,11 +31,6 @@ jobs:
 
       - template: templates/bootstrap.yml
 
-      - script: node script\vsts\windows-run.js script\lint.cmd
-        env:
-          BUILD_ARCH: $(buildArch)
-        displayName: Run linter
-
       - template: templates/build.yml
 
       - template: templates/test.yml
@@ -46,32 +42,31 @@ jobs:
             $env:FileID=""
           }
           echo "##vso[task.setvariable variable=FileID]$env:FileID" # Azure syntax
-        env:
-          BUILD_ARCH: $(buildArch)
         displayName: Set FileID based on the arch
 
       - template: templates/publish.yml
         parameters:
           artifacts:
-            - filename: atom$(FileID)-windows.zip
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: atom$(FileID)-windows.zip
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and( succeeded(), or( eq(variables['BUILD_ARCH'], 'x64'), ne(variables['Build.Reason'], 'PullRequest') ) )
-            - filename: AtomSetup$(FileID).exe
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: AtomSetup$(FileID).exe
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), eq(variables['IsReleaseBranch'], 'true'))
-            - filename: $(AppName)$(FileID)-$(ReleaseVersion)-full.nupkg
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: $(AppName)$(FileID)-$(ReleaseVersion)-full.nupkg
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), eq(variables['IsReleaseBranch'], 'true'))
-            - filename: $(AppName)$(FileID)-$(ReleaseVersion)-delta.nupkg
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: $(AppName)$(FileID)-$(ReleaseVersion)-delta.nupkg
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), eq(variables['IsReleaseBranch'], 'true'))
               continueOnError: true # Nightly builds don't produce delta packages yet, so don't fail the build
-            - filename: RELEASES$(FileID)
-              dir: $(Build.SourcesDirectory)/out
+            - fileName: RELEASES$(FileID)
+              fileDir: $(Build.SourcesDirectory)/out
               condition: and(succeeded(), eq(variables['IsReleaseBranch'], 'true'))
 
-  - job: Windows_RendererTests
-    dependsOn: Windows
+  - job: Windows_tests
+    displayName: Windows Tests
+    dependsOn: Windows_build
     timeoutInMinutes: 180
     strategy:
       maxParallel: 2
@@ -79,14 +74,16 @@ jobs:
         x64_Renderer_Test1:
           RunCoreMainTests: false
           RunCoreRendererTests: 1
-          buildArch: x64
+          BUILD_ARCH: x64
+          os: windows-2019
         x64_Renderer_Test2:
           RunCoreMainTests: false
           RunCoreRendererTests: 2
-          buildArch: x64
+          BUILD_ARCH: x64
+          os: windows-2019
 
     pool:
-      vmImage: vs2017-win2016
+      vmImage: $(os)
 
     variables:
       AppName: $[ dependencies.GetReleaseVersion.outputs['Version.AppName'] ]
@@ -107,10 +104,10 @@ jobs:
       - pwsh: |
           if ($env:BUILD_ARCH -eq "x64") {
             $env:FileID="-x64"
-            echo "##vso[task.setvariable variable=FileID]$env:FileID" # Azure syntax
+          } else {
+            $env:FileID=""
           }
-        env:
-          BUILD_ARCH: $(buildArch)
+          echo "##vso[task.setvariable variable=FileID]$env:FileID" # Azure syntax
         displayName: Set FileID based on the arch
 
       - template: templates/download-unzip.yml
@@ -118,5 +115,5 @@ jobs:
           artifacts:
             -  atom$(FileID)-windows.zip
 
-      #  Core renderer tests
+      #  tests
       - template: templates/test.yml
