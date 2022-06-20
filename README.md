@@ -79,9 +79,6 @@ Currently, to get binaries based on code by the Atom community, binaries can be 
 * [macOS](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-mac)
 * [Windows](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-windows)
 
-## Discussion
-
-* Discuss Atom on [GitHub Discussions](https://github.com/atom/atom/discussions)
 
 ## License
 
