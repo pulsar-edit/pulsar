@@ -3,7 +3,13 @@
 <div align = center>
 
 # Atom Community
- 
+
+*A hackable text editor for the 21st century, built on **[Electron]**, <br>
+*and based on everything we love about our favorite editors.*
+
+*We designed it to be deeply customizable, but still* <br>
+*approachable using the default configuration.*
+
 <br>
 
 <kbd>
@@ -25,7 +31,6 @@
 
 [![Badge Status]][Status]
 
-Atom is a hackable text editor for the 21st century, built on [Electron](https://github.com/electron/electron), and based on everything we love about our favorite editors. We designed it to be deeply customizable, but still approachable using the default configuration.
 
 <div align = center>
 
@@ -60,12 +65,12 @@ When using the Atom or other GitHub logos, be sure to follow the [GitHub logo gu
 <!---------------------------------------------------------------->
 
 [Official Announcement]: https://github.blog/2022-06-08-sunsetting-atom/
+[Electron]: https://github.com/electron/electron
 [Discord]: https://discord.gg/2tD9evh8qP
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
 
-
-[Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
 [Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png
+[Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
 
 
 [Documentation]: docs/Documentation.md
@@ -83,7 +88,7 @@ When using the Atom or other GitHub logos, be sure to follow the [GitHub logo gu
 
 <!--------------------------{ Buttons }--------------------------->
 
-[Button Documentation]: https://img.shields.io/badge/Documentation-008FC7?style=for-the-badge&logoColor=white&logo=GitBook
-[Button Install]: https://img.shields.io/badge/Install-48A842?style=for-the-badge&logoColor=white&logo=DocuSign
-[Button Build]: https://img.shields.io/badge/Building-C2A633?style=for-the-badge&logoColor=white&logo=GNUBash
+[Button Documentation]: https://img.shields.io/badge/Documentation-6399c4?style=for-the-badge&logoColor=white&logo=GitBook
+[Button Install]: https://img.shields.io/badge/Install-78af9f?style=for-the-badge&logoColor=white&logo=DocuSign
+[Button Build]: https://img.shields.io/badge/Building-e5ab42?style=for-the-badge&logoColor=white&logo=GNUBash
 
