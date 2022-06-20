@@ -1,15 +1,27 @@
 # Atom Community   [![Badge License]][License]   [![Badge Discord]][Discord]
  
 
-> Due to changes in the upstream, the original Atom and its repositories will be archived on December 15, 2022. If you'd like to learn more about the official Atom archiving, you can read about it in their [official announcement](https://github.blog/2022-06-08-sunsetting-atom/).
+<div align = center>
 
-[![Build Status](https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master)](https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master)
+<kbd>
+
+Due to changes in the upstream, the original Atom and <br>
+its repositories will be archived on `December 15, 2022`.
+
+If you'd like to learn more about the official Atom archiving, <br>
+you can read about it in their **[Official Announcement]**.
+
+</kbd>
+
+</div>
+
+
+[![Badge Status]][Status]
 
 Atom is a hackable text editor for the 21st century, built on [Electron](https://github.com/electron/electron), and based on everything we love about our favorite editors. We designed it to be deeply customizable, but still approachable using the default configuration.
 
-![Atom](https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png)
-
-![Atom Screenshot](https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png)
+![Banner]
+![Preview]
 
 Visit [atom.io](https://atom.io) to learn more or visit the [Atom forum](https://github.com/atom/atom/discussions).
 
@@ -87,6 +99,13 @@ When using the Atom or other GitHub logos, be sure to follow the [GitHub logo gu
 
 [Badge Discord]: https://img.shields.io/badge/Discord-5865F2.svg?style=for-the-badge&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge
+[Badge Status]: https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master
 
+[Official Announcement]: https://github.blog/2022-06-08-sunsetting-atom/
 [Discord]: https://discord.gg/2tD9evh8qP
 [License]: LICENSE.md
+[Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
+
+
+[Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
+[Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png
