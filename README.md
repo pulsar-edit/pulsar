@@ -1,15 +1,22 @@
- [![Badge License]][License]   [![Badge Discord]][Discord]
+
+[![Badge License]][License]    
+[![Badge Guidelines]][Guidelines]    
+[![Badge Discord]][Discord]    
+[![Badge Status]][Status]
+
+<br>
 
 <div align = center>
 
 # Atom Community
 
-*A hackable text editor for the 21st century, built on **[Electron]**, <br>
+*A hackable text editor for the 21st century, built on **[Electron]**,* <br>
 *and based on everything we love about our favorite editors.*
 
 *We designed it to be deeply customizable, but still* <br>
 *approachable using the default configuration.*
 
+<br>
 <br>
 
 <kbd>
@@ -29,7 +36,6 @@
 <br>
 
 
-[![Badge Status]][Status]
 
 
 <div align = center>
@@ -56,15 +62,14 @@ announcements.
 This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior to atom@github.com.
 
-
-## License
-
-When using the Atom or other GitHub logos, be sure to follow the [GitHub logo guidelines](https://github.com/logos).
+<br>
+<br>
 
 
 <!---------------------------------------------------------------->
 
 [Official Announcement]: https://github.blog/2022-06-08-sunsetting-atom/
+[Guidelines]: https://github.com/logos
 [Electron]: https://github.com/electron/electron
 [Discord]: https://discord.gg/2tD9evh8qP
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
@@ -81,6 +86,7 @@ When using the Atom or other GitHub logos, be sure to follow the [GitHub logo gu
 
 <!---------------------------{ Badges }--------------------------->
 
+[Badge Guidelines]: https://img.shields.io/badge/Logo-Guidelines-F68315.svg?style=for-the-badge
 [Badge Discord]: https://img.shields.io/badge/Discord-5865F2.svg?style=for-the-badge&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge
 [Badge Status]: https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master
