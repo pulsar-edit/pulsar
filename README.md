@@ -53,12 +53,6 @@
 
 </div>
 
-Visit [atom.io](https://atom.io) to learn more or visit the [Atom forum](https://github.com/atom/atom/discussions).
-
-Follow [@AtomEditor](https://twitter.com/atomeditor) on Twitter for important
-announcements.
-
-
 <br>
 <br>
 
