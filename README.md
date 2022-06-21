@@ -53,11 +53,11 @@
 [Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
 
 
-[Documentation]: docs/Documentation.md
-[Retired]: docs/Retirement.md
-[Install]: docs/Installation.md
+[Documentation]: docs/Documentation.md 'Information how to use & work with Atom.'
+[Install]: docs/Installation.md 'How to install Atom on your system.'
+[Retired]: docs/Retirement.md 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
-[Build]: docs/Building.md
+[Build]: docs/Building.md 'Instructions on how to build Atom by yourself.'
 
 [#]: #
 
