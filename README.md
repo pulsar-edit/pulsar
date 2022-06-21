@@ -49,9 +49,10 @@
 [Discord]: https://discord.gg/2tD9evh8qP 'Join the Atom Community Discord today!'
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
 
-[Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png 'Preview of the editor.'
-[Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
+[#]: #
 
+
+<!---------------------------{ Files }--------------------------->
 
 [Documentation]: docs/Documentation.md 'Information how to use & work with Atom.'
 [Install]: docs/Installation.md 'How to install Atom on your system.'
@@ -59,7 +60,11 @@
 [License]: LICENSE.md
 [Build]: docs/Building.md 'Instructions on how to build Atom by yourself.'
 
-[#]: #
+
+<!---------------------------{ Images }--------------------------->
+
+[Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png 'Preview of the editor.'
+[Banner]: https://user-images.githubusercontent.com/378023/49132477-f4b77680-f31f-11e8-8357-ac6491761c6c.png
 
 
 <!---------------------------{ Badges }--------------------------->
