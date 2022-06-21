@@ -1,7 +1,7 @@
 
 <div align = center>
 
-[![Banner]][#]
+![Banner]
 
 [![Badge License]][License]    
 [![Badge Guidelines]][Guidelines]    
