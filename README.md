@@ -3,14 +3,10 @@
 
 [![Banner]][#]
 
-<div align = left> 
-
 [![Badge License]][License]    
 [![Badge Guidelines]][Guidelines]    
 [![Badge Retired]][Retired]    
 [![Badge Discord]][Discord]
-
-</div>
 
 <br>
 <br>
