@@ -44,9 +44,9 @@
 
 <!---------------------------------------------------------------->
 
-[Guidelines]: https://github.com/logos
+[Guidelines]: https://github.com/logos 'Branding Guidelines'
 [Electron]: https://github.com/electron/electron
-[Discord]: https://discord.gg/2tD9evh8qP
+[Discord]: https://discord.gg/2tD9evh8qP 'Join the Atom Community Discord today!'
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
 
 [Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png 'Preview of the editor.'
