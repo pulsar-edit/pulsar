@@ -1,0 +1,7 @@
+'.text.xml':
+  'editor':
+    'commentStart': '<!-- '
+    'commentEnd': ' -->'
+    'foldEndPattern': '^\\s*(</[^>]+>|[/%]>|-->)\\s*$'
+    'increaseIndentPattern': '^\\s*<(([^!/?]|%)(?!.+?([/%]>|</.+?>))|[%!]--\\s*$)'
+    'decreaseIndentPattern': '^\\s*(</[^>]+>|-->|--%>)'

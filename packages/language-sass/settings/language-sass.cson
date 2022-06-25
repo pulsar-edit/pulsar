@@ -1,0 +1,748 @@
+'.source.sass':
+  'editor':
+    'autoIndentOnPaste': false
+    'increaseIndentPattern': '''(?x)
+      ^(?!\\s*$)\\s* # Start of non empty line
+      (
+        [^:@,]+ # No colons, commas and at signs (for regular selectors like body)
+        |
+        [}\\w&-]+::?[#\\w&-]+ # Pseudo-elements/classes (something::before)
+        |
+        [}\\w&-]+:[\\w-]+\\(.*\\) # Functional pseudo-classes (something:not(.checked))
+        |
+        @(?!import|return).* # At-rule (except import and return) since some at-rules may contain colons (@media(max-width: 922px))
+      )
+      \\s*$ # End of line
+    '''
+
+'.source.css.scss':
+  'editor':
+    'increaseIndentPattern': '(^.*\\{[^}]*$)'
+    'decreaseIndentPattern': '^\\s*\\}'
+
+'.source.sass, .source.css.scss':
+  'editor':
+    'nonWordCharacters': '/\\()"\':,.;<>~!#%^&*|+=[]{}`?…'
+    'commentStart': '// '
+  'autocomplete':
+    'symbols':
+      'mixin':
+        'selector': '.meta.mixin .name, .meta.at-rule.include .function'
+        'typePriority': 4
+      'function':
+        'selector': '.entity.name.function, .support.function'
+        'typePriority': 3
+      'variable':
+        'selector': '.variable'
+        'typePriority': 2
+      'selector':
+        'selector': '.attribute-name.id, .attribute-name.class'
+        'typePriority': 1
+
+'.source.css.scss .meta.property-value':
+  'autocomplete':
+    'symbols':
+      'builtins':
+        'suggestions': [{
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'rgb(${1:$red}, ${2:$green}, ${3:$blue})${4:;}$0'
+          'description': "Creates a Color from red (0-255), green (0-255), and blue (0-255) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'rgba(${1:$red}, ${2:$red}, ${3:$red}, ${4:$alpha})${5:;}$0'
+          'description': "Creates a Color from red (0-255), green (0-255), blue (0-255), and alpha (0-1) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'red(${1:$color})${2:;}$0'
+          'description': "Gets the red component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'green(${1:$color})${2:;}$0'
+          'description': "Gets the green component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'blue(${1:$color})${2:;}$0'
+          'description': "Gets the blue component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'mix(${1:$color1}, ${2:$color2}, ${3:[$weight]})${4:;}$0'
+          'description': "Mixes two colors together."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'hsl(${1:$hue}, ${2:$saturation}, ${3:$lightness})${4:;}$0'
+          'description': "Creates a Color from hue (0-360), saturation (0-100%), and lightness (0-100%) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'hsla(${1:$hue}, ${2:$saturation}, ${3:$lightness}, ${4:$alpha})${5:;}$0'
+          'description': "Creates a Color from hue (0-360), saturation (0-100%), lightness (0-100%), and alpha (0-1) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'hue(${1:$color})${2:;}$0'
+          'description': "Gets the hue component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'saturation(${1:$color})${2:;}$0'
+          'description': "Gets the saturation component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'lightness(${1:$color})${2:;}$0'
+          'description': "Gets the lightness component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'adjust-hue(${1:$color}, ${2:$degrees})${3:;}$0'
+          'description': "Changes the hue of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'lighten(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color lighter."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'darken(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color darker."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'saturate(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color more saturated."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'desaturate(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color less saturated."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'grayscale(${1:$color})${2:;}$0'
+          'description': "Converts a color to grayscale."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'complement(${1:$color})${2:;}$0'
+          'description': "Returns the complement of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'invert(${1:$color})${2:;}$0'
+          'description': "Returns the inverse of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'alpha(${1:$color})${2:;}$0'
+          'description': "Gets the alpha component (opacity) of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'fade-in(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color more opaque."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'opacify(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color more opaque."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'fade-out(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color more transparent."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'transparentize(${1:$color}, ${2:$amount})${3:;}$0'
+          'description': "Makes a color more transparent."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'adjust-color(${1:$color}, ${2:[$red]}, ${3:[$green]}, ${4:[$blue]}, ${5:[$hue]}, ${6:[$saturation]}, ${7:[$lightness]}, ${8:[$alpha]})${9:;}$0'
+          'description': "Increases or decreases one or more components of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'scale-color(${1:$color}, ${2:[$red]}, ${3:[$green]}, ${4:[$blue]}, ${5:[$saturation]}, ${6:[$lightness]}, ${7:[$alpha]})${8:;}$0'
+          'description': "Fluidly scales one or more properties of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'change-color(${1:$color}, ${2:[$red]}, ${3:[$green]}, ${4:[$blue]}, ${5:[$hue]}, ${6:[$saturation]}, ${7:[$lightness]}, ${8:[$alpha]})${9:;}$0'
+          'description': "Changes one or more properties of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'unquote(${1:$string})${2:;}$0'
+          'description': "Removes quotes from a string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'quote(${1:$string})${2:;}$0'
+          'description': "Adds quotes to a string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'str-length(${1:$string})${2:;}$0'
+          'description': "Returns the number of characters in a string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'str-insert(${1:$string}, ${2:$insert}, ${3:$index})${4:;}$0'
+          'description': "Inserts $insert into $string at $index."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'str-index(${1:$string}, ${2:$substring})${3:;}$0'
+          'description': "Returns the index of the first occurance of $substring in $string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'str-slice(${1:$string}, ${2:$start-at}, ${3:[$end-at]})${4:;}$0'
+          'description': "Extracts a substring from ${1:$string}."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'to-upper-case(${1:$string})${2:;}$0'
+          'description': "Converts a string to upper case."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'to-lower-case(${1:$string})${2:;}$0'
+          'description': "Converts a string to lower case."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'percentage(${1:$number})${2:;}$0'
+          'description': "Converts a unitless number to a percentage."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'round(${1:$number})${2:;}$0'
+          'description': "Rounds a number to the nearest whole number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'ceil(${1:$number})${2:;}$0'
+          'description': "Rounds a number up to the next whole number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'floor(${1:$number})${2:;}$0'
+          'description': "Rounds a number down to the previous whole number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'abs(${1:$number})${2:;}$0'
+          'description': "Returns the absolute value of a number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'min(${1:$numbers...})${2:;}$0'
+          'description': "Finds the minimum of several numbers."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'max(${1:$numbers...})${2:;}$0'
+          'description': "Finds the maximum of several numbers."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'random(${1:[$limit]})${2:;}$0'
+          'description': "Returns a random number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'length(${1:$list})${2:;}$0'
+          'description': "Returns the length of a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'nth(${1:$list}, ${2:$n})${2:;}$0'
+          'description': "Returns a specific item in a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'set-nth(${1:$list}, ${2:$n}, ${3:$value})${4:;}$0'
+          'description': "Replaces the nth item in a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'join(${1:$list1}, ${2:$list2}, ${3:[$separator]})${4:;}$0'
+          'description': "Joins together two lists into one."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'append(${1:$list1}, ${2:$val}, ${3:[$separator]})${4:;}$0'
+          'description': "Appends a single value onto the end of a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'zip(${1:$lists...})${2:;}$0'
+          'description': "Combines several lists into a single multidimensional list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'index(${1:$list}, ${2:$value})${3:;}$0'
+          'description': "Returns the position of a value within a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'list-separator(${1:$list})${2:;}$0'
+          'description': "Returns the separator of a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'map-get(${1:$map}, ${2:$key})${3:;}$0'
+          'description': "Returns the value in a map associated with a given key."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'map-merge(${1:$map1}, ${2:$map2})${3:;}$0'
+          'description': "Merges two maps together into a new map."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'map-remove(${1:$map}, ${2:$keys...})${3:;}$0'
+          'description': "Returns a new map with keys removed."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'map-keys(${1:$map})${2:;}$0'
+          'description': "Returns a list of all keys in a map."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'map-values(${1:$map})${2:;}$0'
+          'description': "Returns a list of all values in a map."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'map-has-key(${1:$map}, ${2:$key})${3:;}$0'
+          'description': "Returns whether a map has a value associated with a given key."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SCSS builtin'
+          'snippet': 'keywords(${1:$args})${2:;}$0'
+          'description': "Returns the keywords passed to a function that takes variable arguments."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }]
+
+'.source.sass .meta.property-value':
+  'autocomplete':
+    'symbols':
+      'builtins':
+        'suggestions': [{
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'rgb(${1:$red}, ${2:$green}, ${3:$blue})$0'
+          'description': "Creates a Color from red (0-255), green (0-255), and blue (0-255) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'rgba(${1:$red}, ${2:$green}, ${3:$blue}, ${4:$alpha})$0'
+          'description': "Creates a Color from red (0-255), green (0-255), blue (0-255), and alpha (0-1) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'red(${1:$color})$0'
+          'description': "Gets the red component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'green(${1:$color})$0'
+          'description': "Gets the green component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'blue(${1:$color})$0'
+          'description': "Gets the blue component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'mix(${1:$color1}, ${2:$color2}, ${3:[$weight]})$0'
+          'description': "Mixes two colors together."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'hsl(${1:$hue}, ${2:$saturation}, ${3:$lightness})$0'
+          'description': "Creates a Color from hue (0-360), saturation (0-100%), and lightness (0-100%) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'hsla(${1:$hue}, ${2:$saturation}, ${3:$lightness}, ${4:$alpha})$0'
+          'description': "Creates a Color from hue (0-360), saturation (0-100%), lightness (0-100%), and alpha (0-1) values."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'hue(${1:$color})$0'
+          'description': "Gets the hue component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'saturation(${1:$color})$0'
+          'description': "Gets the saturation component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'lightness(${1:$color})$0'
+          'description': "Gets the lightness component of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'adjust-hue(${1:$color}, ${2:$degrees})$0'
+          'description': "Changes the hue of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'lighten(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color lighter."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'darken(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color darker."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'saturate(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color more saturated."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'desaturate(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color less saturated."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'grayscale(${1:$color})$0'
+          'description': "Converts a color to grayscale."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'complement(${1:$color})$0'
+          'description': "Returns the complement of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'invert(${1:$color})$0'
+          'description': "Returns the inverse of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'alpha(${1:$color})$0'
+          'description': "Gets the alpha component (opacity) of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'fade-in(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color more opaque."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'opacify(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color more opaque."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'fade-out(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color more transparent."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'transparentize(${1:$color}, ${2:$amount})$0'
+          'description': "Makes a color more transparent."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'adjust-color(${1:$color}, ${2:[$red]}, ${3:[$green]}, ${4:[$blue]}, ${5:[$hue]}, ${6:[$saturation]}, ${7:[$lightness]}, ${8:[$alpha]})$0'
+          'description': "Increases or decreases one or more components of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'scale-color(${1:$color}, ${2:[$red]}, ${3:[$green]}, ${4:[$blue]}, ${5:[$saturation]}, ${6:[$lightness]}, ${7:[$alpha]})$0'
+          'description': "Fluidly scales one or more properties of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'change-color(${1:$color}, ${2:[$red]}, ${3:[$green]}, ${4:[$blue]}, ${5:[$hue]}, ${6:[$saturation]}, ${7:[$lightness]}, ${8:[$alpha]})$0'
+          'description': "Changes one or more properties of a color."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'unquote(${1:$string})$0'
+          'description': "Removes quotes from a string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'quote(${1:$string})$0'
+          'description': "Adds quotes to a string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'str-length(${1:$string})$0'
+          'description': "Returns the number of characters in a string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'str-insert(${1:$string}, ${2:$insert}, ${3:$index})$0'
+          'description': "Inserts $insert into $string at $index."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'str-index(${1:$string}, ${2:$substring})$0'
+          'description': "Returns the index of the first occurance of $substring in $string."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'str-slice(${1:$string}, ${2:$start-at}, ${3:[$end-at]})$0'
+          'description': "Extracts a substring from ${1:$string}."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'to-upper-case(${1:$string})$0'
+          'description': "Converts a string to upper case."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'to-lower-case(${1:$string})$0'
+          'description': "Converts a string to lower case."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'percentage(${1:$number})$0'
+          'description': "Converts a unitless number to a percentage."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'round(${1:$number})$0'
+          'description': "Rounds a number to the nearest whole number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'ceil(${1:$number})$0'
+          'description': "Rounds a number up to the next whole number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'floor(${1:$number})$0'
+          'description': "Rounds a number down to the previous whole number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'abs(${1:$number})$0'
+          'description': "Returns the absolute value of a number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'min(${1:$numbers...})$0'
+          'description': "Finds the minimum of several numbers."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'max(${1:$numbers...})$0'
+          'description': "Finds the maximum of several numbers."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'random(${1:[$limit]})$0'
+          'description': "Returns a random number."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'length(${1:$list})$0'
+          'description': "Returns the length of a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'nth(${1:$list}, ${2:$n})$0'
+          'description': "Returns a specific item in a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'set-nth(${1:$list}, ${2:$n}, ${3:$value})$0'
+          'description': "Replaces the nth item in a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'join(${1:$list1}, ${2:$list2}, ${3:[$separator]})$0'
+          'description': "Joins together two lists into one."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'append(${1:$list1}, ${2:$val}, ${3:[$separator]})$0'
+          'description': "Appends a single value onto the end of a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'zip(${1:$lists...})$0'
+          'description': "Combines several lists into a single multidimensional list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'index(${1:$list}, ${2:$value})$0'
+          'description': "Returns the position of a value within a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'list-separator(${1:$list})$0'
+          'description': "Returns the separator of a list."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'map-get(${1:$map}, ${2:$key})$0'
+          'description': "Returns the value in a map associated with a given key."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'map-merge(${1:$map1}, ${2:$map2})$0'
+          'description': "Merges two maps together into a new map."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'map-remove(${1:$map}, ${2:$keys...})$0'
+          'description': "Returns a new map with keys removed."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'map-keys(${1:$map})$0'
+          'description': "Returns a list of all keys in a map."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'map-values(${1:$map})$0'
+          'description': "Returns a list of all values in a map."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'map-has-key(${1:$map}, ${2:$key})$0'
+          'description': "Returns whether a map has a value associated with a given key."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }, {
+          'type': 'function'
+          'rightLabel': 'SASS builtin'
+          'snippet': 'keywords(${1:$args})$0'
+          'description': "Returns the keywords passed to a function that takes variable arguments."
+          'descriptionMoreURL': 'http://sass-lang.com/documentation/Sass/Script/Functions.html'
+        }]

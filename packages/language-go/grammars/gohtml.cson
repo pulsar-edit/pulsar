@@ -1,0 +1,13 @@
+'scopeName': 'text.html.gohtml'
+'name': 'HTML (Go)'
+'fileTypes': [
+  'gohtml'
+]
+'patterns': [
+  {
+    'include': 'text.html.basic'
+  }
+  {
+    'include': 'source.gotemplate'
+  }
+]

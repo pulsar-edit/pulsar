@@ -1,0 +1,88 @@
+'scopeName': 'source.java.el'
+'patterns': [
+  {
+    'name': 'keyword.control.ternary.java.el'
+    'match': '\\?|(?<=\\s):'
+  }
+  {
+    'name': 'keyword.operator.comparison.java.el'
+    'match': '((==|!=|<=|>=|<|>)|\\b(eq|ne|le|ge|lt|gt)\\b)'
+  }
+  {
+    'name': 'keyword.operator.empty.java.el'
+    'match': '\\b(empty)\\b'
+  }
+  {
+    'name': 'keyword.operator.arithmetic.java.el'
+    'match': '(?:(\\-|\\+|\\*|\\/|%)|\\b(div|mod)\\b)'
+  }
+  {
+    'name': 'keyword.operator.logical.java.el'
+    'match': '(?:(!|&&|\\|\\|)|\\b(not|and|or)\\b)'
+  }
+  {
+    'name': 'namespace.java.el'
+    'match': '[a-zA-Z]+(:)'
+    'captures':
+      '1':
+        'name': 'punctuation.separator.namespace.java.el'
+  }
+  {
+    'match': ','
+    'name': 'meta.delimiter.java.el'
+  }
+  {
+    'match': '\\(|\\)'
+    'name': 'meta.brace.round.java.el'
+  }
+  {
+    'match': '\\[|\\]'
+    'name': 'meta.brace.square.java.el'
+  }
+  {
+    'name': 'constant.boolean.java.el'
+    'match': '\\b(true|false)\\b'
+  }
+  {
+    'name': 'constant.null.java.el'
+    'match': '\\bnull\\b'
+  }
+  {
+    'name': 'constant.numeric.java.el'
+    'match': '\\b([0-9]+\\.[0-9]+|[0-9]+)\\b'
+  }
+  {
+    'name': 'string.quoted.single.java.el'
+    'begin': '\''
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.java.el'
+    'end': '\''
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.java.el'
+    'patterns': [
+      {
+        'name': 'constant.character.escape.java.el'
+        'match': '\\\\.'
+      }
+    ]
+  }
+  {
+    'name': 'string.quoted.double.java.el'
+    'begin': '"'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.java.el'
+    'end': '"'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.java.el'
+    'patterns': [
+      {
+        'name': 'constant.character.escape.java.el'
+        'match': '\\\\.'
+      }
+    ]
+  }
+]

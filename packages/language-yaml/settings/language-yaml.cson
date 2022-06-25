@@ -1,0 +1,8 @@
+'.source.yaml':
+  'editor':
+    'autoIndentOnPaste': false
+    'commentStart': '# '
+    'foldEndPattern': '^\\s*$|^\\s*\\}|^\\s*\\]|^\\s*\\)'
+    'increaseIndentPattern': '^\\s*.*(:|-) ?(&\\w+)?(\\{[^}"\']*|\\([^)"\']*)?$'
+    'decreaseIndentPattern': '^\\s+\\}$'
+    'tabType': 'soft'

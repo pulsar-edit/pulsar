@@ -1,0 +1,27 @@
+'scopeName': 'source.sql.ruby'
+'name': 'SQL (Rails)'
+'fileTypes': [
+  'erbsql'
+  'sql.erb'
+]
+'foldingStartMarker': '\\s*\\(\\s*$'
+'foldingStopMarker': '^\\s*\\)'
+'patterns': [
+  {
+    'begin': '<%+(?!>)=?'
+    'end': '%>'
+    'name': 'source.ruby.rails.embedded.sql'
+    'patterns': [
+      {
+        'match': '#.*?(?=%>)'
+        'name': 'comment.line.number-sign.ruby'
+      }
+      {
+        'include': 'source.ruby.rails'
+      }
+    ]
+  }
+  {
+    'include': 'source.sql'
+  }
+]

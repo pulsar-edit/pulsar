@@ -1,0 +1,36 @@
+name: 'EJS'
+scopeName: 'text.html.ejs'
+type: 'tree-sitter'
+parser: 'tree-sitter-embedded-template'
+
+fileTypes: [
+  'ejs'
+  'html.ejs'
+]
+
+injectionRegExp: '^(ejs|EJS)$'
+
+folds: [
+  {
+    type: ['directive', 'output_directive'],
+    start: {index: 0},
+    end: {index: -1}
+  }
+]
+
+comments:
+  start: '<%#'
+  end: '%>'
+
+scopes:
+  'comment_directive': 'comment.block'
+  'comment_directive > "%>"': 'comment.block'
+
+  '"<%#"': 'keyword.control.directive'
+  '"<%"': 'keyword.control.directive'
+  '"<%="': 'keyword.control.directive'
+  '"<%_"': 'keyword.control.directive'
+  '"<%-"': 'keyword.control.directive'
+  '"%>"': 'keyword.control.directive'
+  '"-%>"': 'keyword.control.directive'
+  '"_%>"': 'keyword.control.directive'

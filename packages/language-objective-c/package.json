@@ -1,0 +1,21 @@
+{
+  "name": "language-objective-c",
+  "version": "0.16.0",
+  "description": "Objective-C language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-objective-c",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-objective-c.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-objective-c/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

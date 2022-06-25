@@ -1,0 +1,88 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        channel: [ stable, beta ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Atom and APM (Linux)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          curl -s -L "https://atom.io/download/deb?channel=${{ matrix.channel }}" -o "atom-amd64.deb"
+          /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16
+          dpkg-deb -x atom-amd64.deb ${HOME}/atom
+          if [ ${{ matrix.channel }} == "stable" ]; then
+            APP_DIR="${HOME}/atom/usr/share/atom"
+          else
+            APP_DIR="${HOME}/atom/usr/share/atom-${{ matrix.channel }}"
+          fi
+          echo DISPLAY=":99" >> $GITHUB_ENV
+          echo "${APP_DIR}" >> $GITHUB_PATH
+          echo "${APP_DIR}/resources/app/apm/node_modules/.bin" >> $GITHUB_PATH
+          echo "./node_modules/.bin" >> $GITHUB_PATH
+
+      - name: Install Atom and APM (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          curl -s -L "https://atom.io/download/mac?channel=${{ matrix.channel }}" -o "atom.zip"
+          mkdir ${HOME}/.atom && unzip -q atom.zip -d ${HOME}/.atom
+          if [ ${{ matrix.channel }} == "stable" ]; then
+            APP_DIR="${HOME}/.atom/Atom.app/Contents/Resources/app"
+          else
+            APP_DIR="${HOME}/.atom/Atom ${{ matrix.channel }}.app/Contents/Resources/app"
+          fi
+          ln -s "${APP_DIR}/atom.sh" "${APP_DIR}/atom"
+          echo "${APP_DIR}" >> $GITHUB_PATH
+          echo "${APP_DIR}/apm/bin" >> $GITHUB_PATH
+          echo "./node_modules/.bin" >> $GITHUB_PATH
+
+      - name: Install Atom and APM (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          Invoke-WebRequest -Uri "https://atom.io/download/windows_zip?channel=${{ matrix.channel }}" -OutFile "atom.zip"
+          Unzip "atom.zip"
+          $ATOM_CHANNEL = "Atom"
+          if ("${{ matrix.channel }}" -ne "stable") {
+            $ATOM_CHANNEL += " "
+            $ATOM_CHANNEL += "${{ matrix.channel }}".substring(0, 1).toupper()
+            $ATOM_CHANNEL += "${{ matrix.channel }}".substring(1).tolower()
+          }
+          echo npm_config_msvs_version="2019" >> ${env:GITHUB_ENV}
+          echo "$ATOM_CHANNEL/resources/cli" >> ${env:GITHUB_PATH}
+          echo "$ATOM_CHANNEL/resources/app/apm/bin" >> ${env:GITHUB_PATH}
+          echo "./node_modules/.bin" >> ${env:GITHUB_PATH}
+
+      - name: Print Atom and APM versions
+        run: |
+          atom -v
+          apm -v
+
+      - name: Install dependencies
+        run: |
+          apm install
+          apm clean
+          npm install
+
+      - name: Test
+        run: |
+          atom --test spec
+
+      - name: Lint
+        run: |
+          coffeelint grammars
+          coffeelint spec
