@@ -1,0 +1,19 @@
+'.source.tsx':
+  'editor':
+    'commentStart': '// '
+    'foldEndPattern': '^\\s*\\}|^\\s*\\]|^\\s*\\)'
+    'increaseIndentPattern': '(?x)
+        \\{ [^}"\']* $
+      | \\[ [^\\]"\']* $
+      | \\( [^)"\']* $
+      '
+    'decreaseIndentPattern': '(?x)
+        ^ \\s* (\\s* /[*] .* [*]/ \\s*)* [}\\])]
+      '
+
+'.meta.tag.tsx':
+  'editor':
+    'commentStart': '{/* ',
+    'commentEnd': ' */}',
+    'increaseIndentPattern': "{[^}\"']*$|\\[[^\\]\"']*$|\\([^)\"']*$|<[a-zA-Z][^/]*$|^\\s*>$",
+    'decreaseIndentPattern': "^\\s*(\\s*/[*].*[*]/\\s*)*[}\\])]|^\\s*(</|/>)"

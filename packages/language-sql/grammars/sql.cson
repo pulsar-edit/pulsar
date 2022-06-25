@@ -1,0 +1,451 @@
+'scopeName': 'source.sql'
+'name': 'SQL'
+'fileTypes': [
+  'ddl'
+  'dml'
+  'dsql'
+  'hql'
+  'pgsql'
+  'psql'
+  'q'
+  'sql'
+]
+'patterns': [
+  {
+    'include': '#comments'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.create.sql'
+      '2':
+        'name': 'keyword.other.sql'
+      '4':
+        'name': 'keyword.other.DML.sql'
+      '6':
+        'name': 'entity.name.function.sql'
+    'match': '(?i:^\\s*(create(?:\\s+or\\s+replace)?)\\s+(aggregate|conversion|database|domain|function|group|(unique\\s+)?index|language|operator class|operator|rule|schema|sequence|table|tablespace|trigger|type|user|view)\\b(?:\\s+(if\\s+not\\s+exists)\\b)?)(?:\\s+([\'"`]?)(\\w+)\\5)?'
+    'name': 'meta.create.sql'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.drop.sql'
+      '2':
+        'name': 'keyword.other.sql'
+      '3':
+        'name': 'keyword.other.DML.sql'
+      '5':
+        'name': 'entity.name.function.sql'
+    'match': '(?i:^\\s*(drop)\\s+(aggregate|check|constraint|conversion|database|domain|function|group|index|language|operator class|operator|rule|schema|sequence|table|tablespace|trigger|type|user|view)\\b(?:\\s+(if\\s+exists)\\b)?)(?:\\s+([\'"`]?)(\\w+)\\4)?'
+    'name': 'meta.drop.sql'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.create.sql'
+      '2':
+        'name': 'keyword.other.sql'
+    'match': '(?i:^\\s*(add)\\s+(check|constraint|(?:foreign|primary)\\s+key))'
+    'name': 'meta.add.sql'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.drop.sql'
+      '2':
+        'name': 'keyword.other.table.sql'
+      '3':
+        'name': 'entity.name.function.sql'
+      '4':
+        'name': 'keyword.other.cascade.sql'
+    'match': '(?i:\\s*(drop)\\s+(table)\\s+(\\w+)(\\s+cascade)?\\b)'
+    'name': 'meta.drop.sql'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.create.sql'
+      '2':
+        'name': 'keyword.other.table.sql'
+      '3':
+        'name': 'entity.name.function.sql'
+      '4':
+        'name': 'keyword.other.cascade.sql'
+    'match': '(?i:\\s*(truncate)\\s+(table)\\s+(\\w+)(\\s+cascade)?\\b)'
+    'name': 'meta.truncate.sql'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.create.sql'
+      '2':
+        'name': 'keyword.other.table.sql'
+      '4':
+        'name': 'entity.name.function.sql'
+    'match': '(?i:^\\s*(alter)\\s+(aggregate|conversion|database|domain|function|group|index|language|operator class|operator|rule|schema|sequence|table|tablespace|trigger|type|user|view)\\s+([\'"`]?)(\\w+)\\3)'
+    'name': 'meta.alter.sql'
+  }
+  {
+    'match': '(?i)\\b(bigserial|boolean|box|bytea|cidr|circle|date|datetime|datetime2|double\\s+precision|enum|inet|integer|interval|line|lseg|macaddr|money|oid|path|point|polygon|real|serial|sysdate|text|uniqueidentifier)\\b'
+    'name': 'storage.type.sql'
+  }
+  {
+    'match': '(?i)\\b(bigint|bit(?:\\s+varying)?|n?char|character(?:\\s+varying)?|float|int|number|smallint|time(?:stamp)?tz|tinyint|n?varchar\\d?)\\b(?:\\s*(\\()\\s*(\\d*)\\s*(\\)))?'
+    'captures':
+      '1':
+        'name': 'storage.type.sql'
+      '2':
+        'name': 'punctuation.definition.parameters.bracket.round.begin.sql'
+      '3':
+        'name': 'constant.numeric.sql'
+      '4':
+        'name': 'punctuation.definition.parameters.bracket.round.end.sql'
+  }
+  {
+    'match': '(?i)\\b(numeric|decimal)\\b(?:\\s*(\\()\\s*(\\d*)(?:\\s*(,)\\s*(\\d*))?\\s*(\\)))?'
+    'captures':
+      '1':
+        'name': 'storage.type.sql'
+      '2':
+        'name': 'punctuation.definition.parameters.bracket.round.begin.sql'
+      '3':
+        'name': 'constant.numeric.sql'
+      '4':
+        'name': 'punctuation.separator.parameters.comma.sql'
+      '5':
+        'name': 'constant.numeric.sql'
+      '6':
+        'name': 'punctuation.definition.parameters.bracket.round.end.sql'
+  }
+  {
+    'match': '(?i)\\b(time(?:stamp)?)\\b(?:\\s*(\\()\\s*(\\d*)\\s*(\\)))?(?:\\s*(with(?:out)?\\s+time\\s+zone)\\b)?'
+    'captures':
+      '1':
+        'name': 'storage.type.sql'
+      '2':
+        'name': 'punctuation.definition.parameters.bracket.round.begin.sql'
+      '3':
+        'name': 'constant.numeric.sql'
+      '4':
+        'name': 'punctuation.definition.parameters.bracket.round.end.sql'
+      '5':
+        'name': 'storage.type.sql'
+  }
+  {
+    'match': '(?i:\\b((?:primary|foreign)\\s+key|references|on\\s+delete(\\s+cascade)?|check|constraint|unique|default)\\b)'
+    'name': 'storage.modifier.sql'
+  }
+  {
+    'match': '\\b(\\d+\\.\\d+)|(\\d+\\.)|(\\.\\d+)|\\b(\\d+)\\b'
+    'name': 'constant.numeric.sql'
+  }
+  {
+    'match': '(?i:\\b(select(\\s+distinct)?|insert\\s+(ignore\\s+)?into|update|delete|from|use|declare|set|where|group\\s+by|or|like|between|and|(union|except|intersect)(\\s+all)?|having|order\\s+by|partition\\s+by|limit|offset|(inner|cross)\\s+join|join|straight_join|(left|right)(\\s+outer)?\\s+join|natural(\\s+(left|right)(\\s+outer)?)?\\s+join|using|regexp|rlike|with|exists)\\b)'
+    'name': 'keyword.other.DML.sql'
+  }
+  {
+    'match': '(?i:\\b(on|(is\\s+)?(not\\s+)?null|auto_increment)\\b)'
+    'name': 'keyword.other.DDL.create.II.sql'
+  }
+  {
+    'match': '(?i:\\b(values|go|into|exec|openquery)\\b)'
+    'name': 'keyword.other.DML.II.sql'
+  }
+  {
+    'match': '(?i:\\b(begin(\\s+work)?|start\\s+transaction|commit(\\s+work)?|rollback(\\s+work)?)\\b)'
+    'name': 'keyword.other.LUW.sql'
+  }
+  {
+    'match': '(?i:\\b(grant(\\swith\\sgrant\\soption)?|revoke)\\b)'
+    'name': 'keyword.other.authorization.sql'
+  }
+  {
+    'match': '(?i:(\\bnot\\s+)?\\bin\\b)'
+    'name': 'keyword.other.data-integrity.sql'
+  }
+  {
+    'match': '(?i:\\bnot\\b)'
+    'name': 'keyword.other.not.sql'
+  }
+  {
+    'match': '(?i:^\\s*(comment\\s+on\\s+(table|column|aggregate|constraint|database|domain|function|index|operator|rule|schema|sequence|trigger|type|view))\\s+.*?\\s+(is)\\s+)'
+    'name': 'keyword.other.object-comments.sql'
+  }
+  {
+    'match': '(?i)\\bAS\\b'
+    'name': 'keyword.other.alias.sql'
+  }
+  {
+    'match': '(?i)\\b(DESC|ASC)\\b'
+    'name': 'keyword.other.order.sql'
+  }
+  {
+    'match': '(?i)\\b(case|when|then|else|end)\\b'
+    'name': 'keyword.other.case.sql'
+  }
+  {
+    'match': '(?i)\\b(coalesce|nvl|nullif)\\b'
+    'name': 'keyword.other.conditional.sql'
+  }
+  {
+    'match': '\\*'
+    'name': 'keyword.operator.star.sql'
+  }
+  {
+    'match': '[!<>]?=|<>|<|>'
+    'name': 'keyword.operator.comparison.sql'
+  }
+  {
+    'match': '-|\\+|/'
+    'name': 'keyword.operator.math.sql'
+  }
+  {
+    'match': '\\|\\|'
+    'name': 'keyword.operator.concatenator.sql'
+  }
+  {
+    'comment': 'List of SQL99 built-in functions from http://www.oreilly.com/catalog/sqlnut/chapter/ch04.html'
+    'match': '(?i)\\b(CURRENT_(DATE|TIME(STAMP)?|USER)|(SESSION|SYSTEM)_USER|EXTRACT)\\b'
+    'name': 'support.function.scalar.sql'
+  }
+  {
+    'match': '(?i)\\b(ABS|ACOS|ASIN|ATAN|ATAN2|CEIL|CEILING|CONV|COS|COT|CRC32|DEGREES|EXP|FLOOR|LN|LOG|LOG10|LOG2|MOD|PI|POW|POWER|RADIANS|RAND|ROUND|SIGN|SIN|SQRT|TAN|TRUNCATE)\\b'
+    'name': 'support.function.math.sql'
+  }
+  {
+    'comment': 'List of SQL99 built-in functions from http://www.oreilly.com/catalog/sqlnut/chapter/ch04.html'
+    'match': '(?i)\\b(AVG|COUNT|MIN|MAX|SUM)(?=\\s*\\()'
+    'name': 'support.function.aggregate.sql'
+  }
+  {
+    'match': '(?i)\\b(CONCATENATE|CONVERT|LOWER|SUBSTRING|TRANSLATE|TRIM|UPPER)\\b'
+    'name': 'support.function.string.sql'
+  }
+  {
+    'match': '(?i)\\b(ROW_NUMBER|RANK|DENSE_RANK|PERCENT_RANK|CUME_DIST|NTILE|LAG|LEAD|FIRST_VALUE|LAST_VALUE|NTH_VALUE|OVER)\\b'
+    'name': 'support.function.window.sql'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'constant.other.database-name.sql'
+      '2':
+        'name': 'punctuation.separator.period.sql'
+      '3':
+        'name': 'constant.other.table-name.sql'
+    'match': '(\\w+?)(\\.)(\\w+)'
+  }
+  {
+    'include': '#strings'
+  }
+  {
+    'include': '#regexps'
+  }
+  {
+    'include': '#punctuation'
+  }
+]
+'repository':
+  'comments':
+    'patterns': [
+      {
+        'begin': '--'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.sql'
+        'end': '$'
+        'name': 'comment.line.double-dash.sql'
+      }
+      {
+        'begin': '/\\*'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.sql'
+        'end': '\\*/'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.sql'
+        'name': 'comment.block.sql'
+      }
+    ]
+  'punctuation':
+    'patterns': [
+      {
+        'begin': '\\('
+        'end': '\\)'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.section.bracket.round.begin.sql'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.section.bracket.round.end.sql'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+      {
+        'match': '\\)'
+        'name': 'punctuation.unmatched.bracket.round.end.sql'
+      }
+      {
+        'match': ','
+        'name': 'punctuation.separator.comma.sql'
+      }
+      {
+        'match': '\\.'
+        'name': 'punctuation.separator.period.sql'
+      }
+      {
+        'match': ';'
+        'name': 'punctuation.terminator.statement.semicolon.sql'
+      }
+    ]
+  'regexps':
+    'patterns': [
+      {
+        'begin': '/(?=\\S.*/)'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.sql'
+        'end': '/'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.sql'
+        'name': 'string.regexp.sql'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '\\\\/'
+            'name': 'constant.character.escape.slash.sql'
+          }
+        ]
+      }
+      {
+        'begin': '%r\\{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.sql'
+        'comment': 'We should probably handle nested bracket pairs!?! -- Allan'
+        'end': '\\}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.sql'
+        'name': 'string.regexp.modr.sql'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+        ]
+      }
+    ]
+  'string_escape':
+    'match': '\\\\.'
+    'name': 'constant.character.escape.sql'
+  'string_interpolation':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.string.end.sql'
+    'match': '(#\\{)([^\\}]*)(\\})'
+    'name': 'string.interpolated.sql'
+  'strings':
+    'patterns': [
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'name': 'punctuation.definition.string.end.sql'
+        'comment': 'this is faster than the next begin/end rule since sub-pattern will match till end-of-line and SQL files tend to have very long lines.'
+        'match': '(\')[^\'\\\\]*(\')'
+        'name': 'string.quoted.single.sql'
+      }
+      {
+        'begin': '\''
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.sql'
+        'end': '\''
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.sql'
+        'name': 'string.quoted.single.sql'
+        'patterns': [
+          {
+            'include': '#string_escape'
+          }
+        ]
+      }
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'name': 'punctuation.definition.string.end.sql'
+        'comment': 'this is faster than the next begin/end rule since sub-pattern will match till end-of-line and SQL files tend to have very long lines.'
+        'match': '(`)[^`\\\\]*(`)'
+        'name': 'string.quoted.other.backtick.sql'
+      }
+      {
+        'begin': '`'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.sql'
+        'end': '`'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.sql'
+        'name': 'string.quoted.other.backtick.sql'
+        'patterns': [
+          {
+            'include': '#string_escape'
+          }
+        ]
+      }
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.sql'
+          '2':
+            'name': 'punctuation.definition.string.end.sql'
+        'comment': 'this is faster than the next begin/end rule since sub-pattern will match till end-of-line and SQL files tend to have very long lines.'
+        'match': '(")[^"#]*(")'
+        'name': 'string.quoted.double.sql'
+      }
+      {
+        'begin': '"'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.sql'
+        'end': '"'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.sql'
+        'name': 'string.quoted.double.sql'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+        ]
+      }
+      {
+        'begin': '%\\{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.sql'
+        'end': '\\}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.sql'
+        'name': 'string.other.quoted.brackets.sql'
+        'patterns': [
+          {
+            'include': '#string_interpolation'
+          }
+        ]
+      }
+    ]

@@ -1,0 +1,24 @@
+{
+  "name": "language-java",
+  "version": "0.32.1",
+  "description": "Java language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-java",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-java.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-java/issues"
+  },
+  "dependencies": {
+    "tree-sitter-java-dev": "^0.16.0-dev2"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

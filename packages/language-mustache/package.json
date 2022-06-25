@@ -1,0 +1,21 @@
+{
+  "name": "language-mustache",
+  "version": "0.14.5",
+  "description": "Mustache language support in Atom",
+  "license": "MIT",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-mustache",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-mustache.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/language-mustache/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

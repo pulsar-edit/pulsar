@@ -1,0 +1,21 @@
+{
+  "name": "language-make",
+  "version": "0.23.0",
+  "description": "Make language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-make",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-make.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-make/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

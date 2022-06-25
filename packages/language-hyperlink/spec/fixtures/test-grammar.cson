@@ -1,0 +1,10 @@
+'name': 'TestGrammar'
+'scopeName': 'source.test'
+'fileTypes': []
+'patterns': [
+  {
+    'name': 'string.regexp.test'
+    'begin': 'regexp:'
+    'end': '$'
+  }
+]

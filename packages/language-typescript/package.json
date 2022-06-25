@@ -1,0 +1,25 @@
+{
+  "name": "language-typescript",
+  "version": "0.6.3",
+  "description": "TypeScript language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
+  "engines": {
+    "atom": ">=1.19.1",
+    "node": "*"
+  },
+  "main": "lib/main",
+  "homepage": "https://atom.io/packages/language-typescript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-typescript.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-typescript/issues"
+  },
+  "dependencies": {
+    "tree-sitter-typescript": "^0.16.1"
+  }
+}

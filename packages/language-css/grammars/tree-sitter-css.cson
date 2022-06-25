@@ -1,0 +1,107 @@
+name: 'CSS'
+scopeName: 'source.css'
+type: 'tree-sitter'
+parser: 'tree-sitter-css'
+
+fileTypes: [
+  'css'
+]
+
+injectionRegExp: '(css|CSS)'
+
+folds: [
+  {
+    start: {index: 0, type: '{'},
+    end: {index: -1, type: '}'}
+  }
+  {
+    type: 'comment'
+  }
+]
+
+comments:
+  start: '/*'
+  end: '*/'
+
+scopes:
+  'stylesheet': 'source.css'
+  'comment': 'comment'
+
+  'tag_name': 'entity.name.tag'
+  'nesting_selector, universal_selector': 'entity.name.tag'
+  'sibling_selector > "~"': 'keyword.operator.combinator'
+  'child_selector > ">"': 'keyword.operator.combinator'
+  'adjacent_sibling_selector > "+"': 'keyword.operator.combinator'
+  'attribute_selector > "="': 'keyword.operator.pattern'
+  'attribute_selector > "^="': 'keyword.operator.pattern'
+  'attribute_selector > "|="': 'keyword.operator.pattern'
+  'attribute_selector > "~="': 'keyword.operator.pattern'
+  'attribute_selector > "$="': 'keyword.operator.pattern'
+  'attribute_selector > "*="': 'keyword.operator.pattern'
+  'attribute_selector > plain_value': 'string.unquoted.attribute-value'
+  'pseudo_element_selector > tag_name': 'entity.other.attribute-name.pseudo-element'
+  'pseudo_class_selector > class_name': 'entity.other.attribute-name.pseudo-class'
+  'class_name': 'entity.other.attribute-name.class'
+  'id_name': 'entity.other.attribute-name.id'
+  'namespace_name': 'entity.namespace.name'
+  'function_name': 'support.function'
+
+  'property_name, plain_value': [
+    {match: '^--', scopes: 'variable.css'}
+  ]
+
+  'property_name': 'support.property-name'
+  'attribute_name': 'entity.other.attribute-name'
+
+  '
+    "@media",
+    "@import",
+    "@charset",
+    "@namespace",
+    "@supports",
+    "@keyframes",
+    at_keyword
+  ': 'keyword.control.at-rule'
+
+  'to, from': 'keyword.control'
+
+  'important': 'keyword.other.important.css'
+
+  'string_value': 'string'
+  'color_value': 'constant.other.color'
+  'integer_value': 'numeric.constant'
+  'integer_value > unit': 'keyword.other.unit'
+  'float_value': 'numeric.constant'
+  'float_value > unit': 'keyword.other.unit'
+  'plain_value': [
+    {match:'^(aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|orange|purple|red|silver|teal|white|yellow)$', scopes:'support.constant.color.w3c-standard'}
+    {match:'^(aliceblue|antiquewhite|aquamarine|azure|beige|bisque|blanchedalmond|blueviolet|brown|burlywood
+    |cadetblue|chartreuse|chocolate|coral|cornflowerblue|cornsilk|crimson|cyan|darkblue|darkcyan
+    |darkgoldenrod|darkgray|darkgreen|darkgrey|darkkhaki|darkmagenta|darkolivegreen|darkorange
+    |darkorchid|darkred|darksalmon|darkseagreen|darkslateblue|darkslategray|darkslategrey|darkturquoise
+    |darkviolet|deeppink|deepskyblue|dimgray|dimgrey|dodgerblue|firebrick|floralwhite|forestgreen
+    |gainsboro|ghostwhite|gold|goldenrod|greenyellow|grey|honeydew|hotpink|indianred|indigo|ivory|khaki
+    |lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow
+    |lightgray|lightgreen|lightgrey|lightpink|lightsalmon|lightseagreen|lightskyblue|lightslategray
+    |lightslategrey|lightsteelblue|lightyellow|limegreen|linen|magenta|mediumaquamarine|mediumblue
+    |mediumorchid|mediumpurple|mediumseagreen|mediumslateblue|mediumspringgreen|mediumturquoise
+    |mediumvioletred|midnightblue|mintcream|mistyrose|moccasin|navajowhite|oldlace|olivedrab|orangered
+    |orchid|palegoldenrod|palegreen|paleturquoise|palevioletred|papayawhip|peachpuff|peru|pink|plum
+    |powderblue|rebeccapurple|rosybrown|royalblue|saddlebrown|salmon|sandybrown|seagreen|seashell
+    |sienna|skyblue|slateblue|slategray|slategrey|snow|springgreen|steelblue|tan|thistle|tomato
+    |transparent|turquoise|violet|wheat|whitesmoke|yellowgreen)$', scopes: 'support.constant.color.w3c-extended'}
+    'support.constant.property-value.css'
+  ]
+
+  'feature_name': 'support.type.property-name'
+
+  'color_value > "#"': 'punctuation.definition.constant.css'
+  'id_selector > "#"': 'punctuation.definition.entity.css'
+  'selectors > ","': 'punctuation.separator.list.comma.css'
+
+  '"and", "or", "not", "only"': 'keyword.operator'
+  'keyword_query': 'keyword.operator'
+  'binary_expression > "+"': 'keyword.operator'
+  'binary_expression > "-"': 'keyword.operator'
+  'binary_expression > "/"': 'keyword.operator'
+  'binary_expression > "*"': 'keyword.operator'

@@ -1,0 +1,56 @@
+name: 'HTML'
+scopeName: 'text.html.basic'
+type: 'tree-sitter'
+parser: 'tree-sitter-html'
+
+fileTypes: [
+  'html'
+]
+
+injectionRegExp: '(HTML|html|Html)$'
+
+folds: [
+  {
+    type: ['start_tag', 'raw_start_tag', 'self_closing_tag'],
+    start: {index: 1},
+    end: {index: -1}
+  }
+  {
+    type: ['element', 'raw_element'],
+    start: {index: 0},
+    end: {index: -1}
+  }
+]
+
+comments:
+  start: '<!--'
+  end: '-->'
+
+scopes:
+  'fragment': 'source.html'
+  'tag_name': 'entity.name.tag'
+  'erroneous_end_tag_name': 'invalid.illegal'
+  'doctype': 'meta.tag.doctype.html'
+  'attribute_name': 'entity.other.attribute-name'
+  'attribute_value': 'string.html'
+  'comment': 'comment.block.html'
+
+  '
+    start_tag > "<",
+    end_tag > "</"
+  ': 'punctuation.definition.tag.begin'
+  '
+    start_tag > ">",
+    end_tag > ">"
+  ': 'punctuation.definition.tag.end'
+
+  'attribute > "="': 'punctuation.separator.key-value.html'
+
+  # quoted_attribute_value has three child nodes: ", attribute_value, and ".
+  # Target the first and last.
+  # Single quotes and double quotes are targeted in separate selectors because
+  # of quote-escaping difficulties.
+  "quoted_attribute_value > '\"':nth-child(0)": 'punctuation.definition.string.begin'
+  'quoted_attribute_value > "\'":nth-child(0)': 'punctuation.definition.string.begin'
+  "quoted_attribute_value > '\"':nth-child(2)": 'punctuation.definition.string.end'
+  'quoted_attribute_value > "\'":nth-child(2)': 'punctuation.definition.string.end'

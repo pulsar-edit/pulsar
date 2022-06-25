@@ -1,0 +1,24 @@
+{
+  "name": "language-json",
+  "version": "1.0.5",
+  "description": "JSON language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-json",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-json.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-json/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  },
+  "dependencies": {
+    "tree-sitter-json": "^0.15.1"
+  }
+}
