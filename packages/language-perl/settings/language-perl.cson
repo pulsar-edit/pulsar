@@ -1,0 +1,14 @@
+'.source.perl':
+  'editor':
+    'foldEndPattern': '(\\*/|^\\s*(\\}|\\]|\\)))'
+    'increaseIndentPattern': '^.*\\{\\}?\\s*$'
+    'decreaseIndentPattern': '^\\s*\\}'
+    'commentStart': '# '
+    'nonWordCharacters': '/\\()"\':,.;<>~!#^&*|+=[]{}`?-'
+'.source.perl6':
+  'editor':
+    'foldEndPattern': '(\\*/|^\\s*(\\}|\\]|\\)))'
+    'increaseIndentPattern': '^.*\\{\\}?\\s*$'
+    'decreaseIndentPattern': '^\\s*\\}'
+    'commentStart': '# '
+    'nonWordCharacters': '/\\()"\':,.;<>~!#^&*|+=[]{}`?-'

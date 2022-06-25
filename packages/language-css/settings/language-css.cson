@@ -1,0 +1,43 @@
+'.source.css':
+  'core':
+    'useTreeSitterParsers': false
+  'editor':
+    'commentStart': '/*'
+    'commentEnd': '*/'
+    'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}|\\/*\\s*@end\\s*\\*\\/'
+  'autocomplete':
+    'extraWordCharacters': '-'
+    'symbols':
+      'selector':
+        'selector': '.css.selector'
+        'typePriority': 1
+
+'.source.css .meta.property-value.css':
+  'autocomplete':
+    'symbols':
+      'builtins':
+        'suggestions': [{
+          'type': 'function'
+          'snippet': "rgb(${1:255}, ${2:0}, ${3:0})${4:;}$0"
+          'rightLabel': 'CSS builtin'
+          'description': "Creates a Color from red (0-255), green (0-255), and blue (0-255)."
+          'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#rgb()'
+        }, {
+          'type': 'function'
+          'snippet': "rgba(${1:255}, ${2:0}, ${3:0}, ${4:0.5})${5:;}$0"
+          'rightLabel': 'CSS builtin'
+          'description': "Creates a Color from red (0-255), green (0-255), blue (0-255), and alpha (0-1)."
+          'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#rgba()'
+        }, {
+          'type': 'function'
+          'snippet': "hsl(${1:360}, ${2:100%}, ${3:100%})${4:;}$0"
+          'rightLabel': 'CSS builtin'
+          'description': "Creates a Color from hue (0-360), saturation (0-100%), and lightness (0-100%)."
+          'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#hsl()'
+        },{
+          'type': 'function'
+          'snippet': "hsla(${1:360}, ${2:100%}, ${3:100%}, ${4:0.5})${5:;}$0"
+          'rightLabel': 'CSS builtin'
+          'description': "Creates a Color from hue (0-360), saturation (0-100%), lightness (0-100%), and alpha (0-1)."
+          'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#hsla()'
+        }]

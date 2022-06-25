@@ -1,0 +1,31 @@
+{
+  "name": "language-html",
+  "main": "lib/main",
+  "version": "0.53.1",
+  "description": "HTML language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-html",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-html.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-html/issues"
+  },
+  "dependencies": {
+    "atom-grammar-test": "^0.6.3",
+    "tree-sitter-embedded-template": "^0.15.2",
+    "tree-sitter-html": "^0.15.0"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1",
+    "dedent": "^0.7.0"
+  }
+}

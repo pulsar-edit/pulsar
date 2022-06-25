@@ -1,0 +1,28 @@
+{
+  "name": "language-python",
+  "version": "0.53.6",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "description": "Python language support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
+  "homepage": "https://atom.github.io/language-python",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-python.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-python/issues"
+  },
+  "dependencies": {
+    "atom-grammar-test": "^0.6.4",
+    "tree-sitter-python": "^0.17.0"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

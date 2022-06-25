@@ -1,0 +1,51 @@
+'.source.css':
+  '!important':
+    'prefix': '!'
+    'body': '!important${1:;}$0'
+  '@charset':
+    'prefix': 'charset'
+    'body': '@charset "${1:UTF-8}";$0'
+    'description': 'Specifies the character encoding used in the style sheet.'
+    'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/@charset'
+  '@font-face':
+    'prefix': 'fontface'
+    'body': '@font-face {\n\t$1\n}$0'
+    'description': 'Specify online fonts to display text on their web pages.'
+    'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face'
+   '@import':
+    'prefix': 'import'
+    'body': '@import "$0";'
+    'description': 'Import style rules from other style sheets.'
+    'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/@import'
+   '@keyframes':
+    'prefix': 'keyframes'
+    'body': '@keyframes ${1:identifier} {\n\t$2\n}$0'
+    'description': 'Specifies a CSS animation.'
+    'descriptionMoreURL': 'https://developer.mozilla.org/en/docs/Web/CSS/@keyframes'
+  '@media':
+    'prefix': 'media'
+    'body': '@media ${1:query} {\n\t$2\n}$0'
+    'description': 'A set of nested statements with a condition defined by a media query.'
+    'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/@media'
+  '@supports':
+    'prefix': 'supports'
+    'body': '@supports ${1:condition} {\n\t$2\n}$0'
+    'description': 'A set of nested statements with a condition defined by a supports condition.'
+    'descriptionMoreURL': 'https://developer.mozilla.org/en-US/docs/Web/CSS/@supports'
+
+# We dont want the snippets to show in properties
+'.source.css .meta.property-list':
+  '!important':
+    'prefix': '!'
+  '@charset':
+    'prefix': 'charset'
+  '@font-face':
+    'prefix': 'fontface'
+  '@import':
+    'prefix': 'import'
+  '@keyframes':
+    'prefix': 'keyframes'
+  '@media':
+    'prefix': 'media'
+  '@supports':
+    'prefix': 'supports'

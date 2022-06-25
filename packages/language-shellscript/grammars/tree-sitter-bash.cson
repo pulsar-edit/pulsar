@@ -1,0 +1,144 @@
+name: 'Shell Script'
+scopeName: 'source.shell'
+type: 'tree-sitter'
+parser: 'tree-sitter-bash'
+
+fileTypes: [
+  'sh'
+  'bash'
+]
+
+injectionRegex: '^(bash|sh|BASH|SH)$'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(bash|sh)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=(sh|bash)'
+]
+
+folds: [
+  {
+    type: 'heredoc_body'
+  }
+  {
+    type: 'if_statement',
+    start: {type: '"then"'}
+    end: {type: ['elif_clause', 'else_clause']}
+  }
+  {
+    type: 'elif_clause',
+    start: {type: '"then"'}
+  }
+  {
+    type: 'if_statement'
+    start: {type: '"then"'}
+    end: {index: -1}
+  }
+  {
+    type: 'case_statement'
+    start: {type: '"in"'}
+    end: {index: -1}
+  }
+  {
+    type: 'elif_clause'
+    start: {type: 'then'}
+  }
+  {
+    type: 'else_clause'
+    start: {index: 0}
+  }
+  {
+    type: 'case_item'
+    start: {type: ')'}
+  }
+  {
+    type: [
+      'array'
+      'do_group'
+      'subshell'
+      'expansion'
+      'test_command'
+      'compound_statement'
+      'process_substitution'
+      'command_substitution'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+]
+
+comments:
+  start: '# '
+
+scopes:
+  'program': 'source.shell'
+
+  'comment': 'comment.block'
+
+  'string': 'string'
+  'raw_string': 'string'
+  'ansii_c_string': 'string'
+  'heredoc_body': 'string'
+  'heredoc_start': 'string'
+  'regex': 'string.regexp'
+
+  '
+    "$",
+    expansion > "${",
+    expansion > "}"
+  ': 'punctuation.section.embedded'
+
+  'string > command_substitution': 'embedded.source'
+
+  'function_definition > word': 'entity.name.function'
+  'command_name': 'entity.name.function'
+
+  'file_descriptor': 'constant.numeric'
+
+  'command_name > word': [
+    {match: '^(cd|echo|eval|exit|false|getopts|pushd|popd|return|set|shift|true)$', scopes: 'support.function'}
+  ]
+
+  'test_operator': 'entity.other.attribute-name'
+  'word': [{match: '^-', scopes: 'entity.other.attribute-name'}]
+
+  'special_variable_name': 'variable.other.member'
+  'variable_name': 'variable.other.member'
+
+  '"if"': 'keyword.control'
+  '"fi"': 'keyword.control'
+  '"then"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"elif"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"do"': 'keyword.control'
+  '"done"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"esac"': 'keyword.control'
+  '"in"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"until"': 'keyword.control'
+  '"function"': 'keyword.control'
+  '"local"': 'keyword.control'
+  '"declare"': 'keyword.control'
+  '"export"': 'keyword.control'
+  '"readonly"': 'keyword.control'
+  '"typeset"': 'keyword.control'
+  '"unset"': 'keyword.control'
+  '"unsetenv"': 'keyword.control'
+
+  '"&"': 'keyword.operator'
+  '"&&"': 'keyword.operator'
+  '"|"': 'keyword.operator'
+  '"||"': 'keyword.operator'
+  '"<"': 'keyword.operator'
+  '">"': 'keyword.operator'
+  '">>"': 'keyword.operator'
+  '"&>"': 'keyword.operator'
+  '"&>>"': 'keyword.operator'
+  '"<&"': 'keyword.operator'
+  '">&"': 'keyword.operator'
+  '"<<-"': 'keyword.operator'
+  '"<<<"': 'keyword.operator'

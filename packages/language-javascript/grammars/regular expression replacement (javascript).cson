@@ -1,0 +1,22 @@
+'scopeName': 'source.js.regexp.replacement'
+'patterns': [
+  {
+    'include': '#regexp-replacement'
+  }
+]
+'repository':
+  'regexp-replacement':
+    'patterns': [
+      {
+        'match': '\\$([1-9][0-9]|[1-9]|0[1-9]|[&`\'])'
+        'name': 'variable.regexp.replacement'
+      }
+      {
+        'match': '\\$\\$'
+        'name': 'constant.character.escape.dollar.regexp.replacement'
+      }
+      {
+        'match': '\\\\[^$]'
+        'name': 'constant.character.escape.backslash.regexp.replacement'
+      }
+    ]

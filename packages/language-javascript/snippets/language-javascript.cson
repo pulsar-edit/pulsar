@@ -1,0 +1,130 @@
+'.source.js, .source.flow':
+  'Object Method':
+    'prefix': 'kf'
+    'body': '${1:methodName}: function (${2:attribute}) {\n\t$3\n}${4:,}'
+  'Object key — key: "value"':
+    'prefix': 'kv'
+    'body': '${1:key}: ${2:\'${3:value}\'}${4:, }'
+  'Prototype':
+    'prefix': 'proto'
+    'body': '${1:ClassName}.prototype.${2:methodName} = function ($3) {\n\t$0\n};'
+  'do':
+    'prefix': 'do'
+    'body': 'do {\n\t$2\n} while (${1:true});'
+  'condition ? true : false':
+    'prefix': 'tern'
+    'body': '${1:condition} ? ${2:true} : ${3:false}'
+  'if':
+    'prefix': 'if'
+    'body': 'if (${1:true}) {\n\t$2\n}'
+  'if … else':
+    'prefix': 'ife'
+    'body': 'if (${1:true}) {\n\t$2\n} else {\n\t$3\n}'
+  'else':
+    'prefix': 'else'
+    'body': 'else {\n\t$1\n}'
+  'else if':
+    'prefix': 'elseif'
+    'body': 'else if (${1:true}) {\n\t$2\n}'
+  'for':
+    'prefix' : 'for'
+    'body' : 'for (var ${2:i} = 0; ${2:i} < ${1:array}.length; ${2:i}++) {\n\t${1:array}[${2:i}]$3\n}'
+  'for in':
+    'prefix': 'forin'
+    'body': 'for (var ${1:variable} in ${2:object}) {\n\t${3:if (${2:object}.hasOwnProperty(${1:variable})) {\n\t\t$4\n\t\\}}\n}'
+  'for of':
+    'prefix': 'forof'
+    'body': 'for (var ${1:variable} of ${2:iterable}) {\n\t$3\n}'
+  'forEach':
+    'prefix' : 'foreach'
+    'body' : 'forEach((${1:item}, ${2:i}) => {\n\t$3\n});\n'
+  'Function':
+    'prefix': 'fun'
+    'body': 'function ${1:functionName}($2) {\n\t$0\n}'
+  'Anonymous Function':
+    'prefix': 'f'
+    'body': 'function ($1) {\n\t$2\n}'
+  'Arrow Function':
+    'prefix': 'af'
+    'body': '($1) => {\n\t$2\n}'
+  'Generator':
+    'prefix': 'gen',
+    'body': 'function* ${1:functionName}($2) {\n\t$0\n}'
+  'Anonymous Generator':
+    'prefix': 'g'
+    'body': 'function* ($1) {\n\t$2\n}'
+  'getElementsByClassName':
+    'prefix': 'get'
+    'body': 'getElementsByClassName(${1:\'${2:className}\'})$3'
+  'getElementsByName':
+    'prefix': 'getn'
+    'body': 'getElementsByName(${1:\'${2:name}\'})$3'
+  'getElementsByTagName':
+    'prefix': 'gett'
+    'body': 'getElementsByTagName(${1:\'${2:tagName}\'})$3'
+  'getElementById':
+    'prefix': 'geti'
+    'body': 'getElementById(${1:\'${2:id}\'})$3'
+  'querySelector':
+    'prefix': 'qs'
+    'body': 'querySelector(${1:\'${2:query}\'})$3'
+  'querySelectorAll':
+    'prefix': 'qsa'
+    'body': 'querySelectorAll(${1:\'${2:query}\'})$3'
+  'Immediately-Invoked Function Expression':
+    'prefix': 'iife'
+    'body': '(function() {\n\t${1:\'use strict\';\n}\t$2\n}());'
+  'log':
+    'prefix': 'log'
+    'body': 'console.log($1);$0'
+  'dir':
+    'prefix': 'dir'
+    'body': 'console.dir($1);$0'
+  'warn':
+    'prefix': 'warn'
+    'body': 'console.warn($1);$0'
+  'error':
+    'prefix': 'error'
+    'body': 'console.error($1);$0'
+  'inspect':
+    'prefix': 'inspect'
+    'body': 'console.log(require(\'util\').inspect($0, { depth: null }));'
+  'new Promise':
+    'prefix': 'prom'
+    'body': 'new Promise(function(resolve, reject) {\n\t$1\n});$0'
+  'setInterval function':
+    'prefix': 'interval'
+    'body': 'setInterval(${2:function () {\n\t$3\n\\}}, ${1:10});'
+  'setTimeout function':
+    'prefix': 'timeout'
+    'body': 'setTimeout(${2:function () {\n\t$3\n\\}}, ${1:10});'
+  'switch':
+    'prefix': 'switch'
+    'body': 'switch (${1:expression}) {\n\tcase ${2:expression}:\n\t\t$4\n\t\tbreak;$5\n\tdefault:\n\t\t$3\n}'
+  'case':
+    'prefix': 'case'
+    'body': 'case ${1:expression}:\n\t$2\n\tbreak;'
+  'try':
+    'prefix': 'try'
+    'body': 'try {\n\t$1\n} catch (${2:e}) {\n\t$3\n}${4: finally {\n\t$5\n\\}}'
+  'while':
+    'prefix': 'while'
+    'body': 'while (${1:true}) {\n\t$2\n}'
+  'Start Docblock':
+    'prefix': '/**'
+    'body': '/**\n * $1\n */$0'
+  'CommonJS require':
+    'prefix': 'req'
+    'body': 'const ${1:module} = require(\'${1:module}\');'
+  'Class':
+    'prefix': 'class'
+    'body': 'class ${1:ClassName} {\n\tconstructor($2) {\n\t\t$3\n\t}\n}'
+  'export function':
+    'prefix': 'expfun'
+    'body': 'exports.${1:functionName} = function ($2) {\n\t${3:// body...}\n};'
+  'export module':
+    'prefix': 'expmod'
+    'body': 'module.exports = ${1:name};'
+  'return':
+    'prefix': 'ret'
+    'body': 'return $1;$0'
