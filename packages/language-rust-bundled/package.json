@@ -1,6 +1,6 @@
 {
   "name": "language-rust-bundled",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rust support for Atom",
   "keywords": [
     "language",
@@ -11,7 +11,7 @@
   "repository": "https://github.com/atom/atom",
   "license": "MIT",
   "dependencies": {
-    "tree-sitter-rust": "^0.17.0"
+    "tree-sitter-rust": "0.20.1"
   },
   "engines": {
     "atom": ">=1.0.0 <2.0.0"

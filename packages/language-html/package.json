@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "atom-grammar-test": "^0.6.3",
-    "tree-sitter-embedded-template": "^0.15.2",
-    "tree-sitter-html": "^0.15.0"
+    "tree-sitter-embedded-template": "0.19.0",
+    "tree-sitter-html": "0.19.0"
   },
   "devDependencies": {
     "coffeelint": "^1.10.1",
