@@ -1,62 +1,66 @@
-exports.activate = function () {
+exports.activate = function() {
   for (const scopeName of ['source.ts', 'source.flow']) {
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'call_expression',
 
-      language (callExpression) {
-        const {firstChild} = callExpression
+      language(callExpression) {
+        const { firstChild } = callExpression;
         switch (firstChild.type) {
           case 'identifier':
-            return languageStringForTemplateTag(firstChild.text)
+            return languageStringForTemplateTag(firstChild.text);
           case 'member_expression':
             if (firstChild.startPosition.row === firstChild.endPosition.row) {
-              return languageStringForTemplateTag(firstChild.text)
+              return languageStringForTemplateTag(firstChild.text);
             }
         }
       },
 
-      content (callExpression) {
-        const {lastChild} = callExpression
+      content(callExpression) {
+        const { lastChild } = callExpression;
         if (lastChild.type === 'template_string') {
-          return lastChild
+          return lastChild;
         }
       }
-    })
+    });
 
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'assignment_expression',
 
-      language (callExpression) {
-        const {firstChild} = callExpression
+      language(callExpression) {
+        const { firstChild } = callExpression;
         if (firstChild.type === 'member_expression') {
           if (firstChild.lastChild.text === 'innerHTML') {
-            return 'html'
+            return 'html';
           }
         }
       },
 
-      content (callExpression) {
-        const {lastChild} = callExpression
+      content(callExpression) {
+        const { lastChild } = callExpression;
         if (lastChild.type === 'template_string') {
-          return lastChild
+          return lastChild;
         }
       }
-    })
+    });
 
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'regex_pattern',
-      language (regex) { return 'regex' },
-      content (regex) { return regex }
-    })
+      language(regex) {
+        return 'regex';
+      },
+      content(regex) {
+        return regex;
+      }
+    });
   }
-}
+};
 
-const STYLED_REGEX = /\bstyled\b/i
+const STYLED_REGEX = /\bstyled\b/i;
 
-function languageStringForTemplateTag (tag) {
+function languageStringForTemplateTag(tag) {
   if (STYLED_REGEX.test(tag)) {
-    return 'CSS'
+    return 'CSS';
   } else {
-    return tag
+    return tag;
   }
 }
