@@ -1,6 +1,6 @@
 {
   "name": "language-typescript",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "TypeScript language support in Atom",
   "keywords": [
     "tree-sitter"
@@ -20,6 +20,6 @@
     "url": "https://github.com/atom/language-typescript/issues"
   },
   "dependencies": {
-    "tree-sitter-typescript": "^0.16.1"
+    "tree-sitter-typescript": "0.20.1"
   }
 }
