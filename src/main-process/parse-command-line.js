@@ -5,7 +5,12 @@ const yargs = require('yargs');
 const { app } = require('electron');
 
 module.exports = function parseCommandLine(processArgs) {
-  const options = yargs(processArgs).wrap(yargs.terminalWidth());
+  // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Atom launches.
+  // (This happens for fresh downloads, new installs, or first launches after upgrading).
+  // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
+  const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
+
+  const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
   const version = app.getVersion();
   options.usage(
     dedent`Atom Editor v${version}
@@ -52,10 +57,7 @@ module.exports = function parseCommandLine(processArgs) {
     .alias('f', 'foreground')
     .boolean('f')
     .describe('f', 'Keep the main process in the foreground.');
-  options
-    .alias('h', 'help')
-    .boolean('h')
-    .describe('h', 'Print this usage message.');
+  options.help('help', 'Print this usage message.').alias('h', 'help');
   options
     .alias('l', 'log-file')
     .string('l')
@@ -131,7 +133,16 @@ module.exports = function parseCommandLine(processArgs) {
       'Enable low-level logging messages from Electron.'
     );
   options.boolean('uri-handler');
+  options
+    .version(
+      dedent`Atom    : ${version}
+             Electron: ${process.versions.electron}
+             Chrome  : ${process.versions.chrome}
+             Node    : ${process.versions.node}`
+    )
+    .alias('v', 'version');
 
+  // NB: if --help or --version are given, this also displays the relevant message and exits
   let args = options.argv;
 
   // If --uri-handler is set, then we parse NOTHING else
@@ -141,11 +152,6 @@ module.exports = function parseCommandLine(processArgs) {
       'uri-handler': true,
       _: args._.filter(str => str.startsWith('atom://')).slice(0, 1)
     };
-  }
-
-  if (args.help) {
-    process.stdout.write(options.help());
-    process.exit(0);
   }
 
   const addToLastWindow = args['add'];
@@ -187,6 +193,11 @@ module.exports = function parseCommandLine(processArgs) {
   let devMode = args['dev'];
 
   for (const path of args._) {
+    if (typeof path !== 'string') {
+      // Sometimes non-strings (such as numbers or boolean true) get into args._
+      // In the next block, .startsWith() only works on strings. So, skip non-string arguments.
+      continue;
+    }
     if (path.startsWith('atom://')) {
       urlsToOpen.push(path);
     } else {

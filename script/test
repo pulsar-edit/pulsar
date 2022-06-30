@@ -34,7 +34,7 @@ const argv = require('yargs')
   .help().argv;
 
 const assert = require('assert');
-const async = require('async');
+const asyncSeries = require('async/series');
 const childProcess = require('child_process');
 const fs = require('fs-extra');
 const glob = require('glob');
@@ -214,6 +214,7 @@ function isTimedOut(stderrOutput) {
   if (stderrOutput) {
     return (
       stderrOutput.includes('timeout: timed out after') || // happens in core renderer tests
+      stderrOutput.includes('Error: Timed out waiting on') || // happens in core renderer tests
       stderrOutput.includes('Error: timeout of') || // happens in core main tests
       stderrOutput.includes(
         'Error Downloading Update: Could not get code signature for running application'
@@ -475,7 +476,7 @@ function requestedTestSuites(platform) {
   return suites;
 }
 
-async.series(testSuitesToRun, function(err, results) {
+asyncSeries(testSuitesToRun, function(err, results) {
   if (err) {
     console.error(err);
     process.exit(1);

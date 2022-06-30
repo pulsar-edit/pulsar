@@ -831,6 +831,63 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
+      it('handles injections that are empty', async () => {
+        atom.grammars.addGrammar(jsGrammar);
+        atom.grammars.addGrammar(htmlGrammar);
+        buffer.setText('text = html');
+
+        const languageMode = new TreeSitterLanguageMode({
+          buffer,
+          grammar: jsGrammar,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+
+        expectTokensToEqual(editor, [[{ text: 'text = html', scopes: [] }]]);
+
+        buffer.append(' ``;');
+        expectTokensToEqual(editor, [
+          [
+            { text: 'text = ', scopes: [] },
+            { text: 'html', scopes: ['function'] },
+            { text: ' ', scopes: [] },
+            { text: '``', scopes: ['string'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+
+        buffer.insert(
+          { row: 0, column: buffer.getText().lastIndexOf('`') },
+          '<div>'
+        );
+        await nextHighlightingUpdate(languageMode);
+        expectTokensToEqual(editor, [
+          [
+            { text: 'text = ', scopes: [] },
+            { text: 'html', scopes: ['function'] },
+            { text: ' ', scopes: [] },
+            { text: '`', scopes: ['string'] },
+            { text: '<', scopes: ['string', 'html'] },
+            { text: 'div', scopes: ['string', 'html', 'tag'] },
+            { text: '>', scopes: ['string', 'html'] },
+            { text: '`', scopes: ['string'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+
+        buffer.undo();
+        await nextHighlightingUpdate(languageMode);
+        expectTokensToEqual(editor, [
+          [
+            { text: 'text = ', scopes: [] },
+            { text: 'html', scopes: ['function'] },
+            { text: ' ', scopes: [] },
+            { text: '``', scopes: ['string'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+      });
+
       it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async () => {
         const ejsGrammar = new TreeSitterGrammar(
           atom.grammars,
@@ -1546,7 +1603,7 @@ describe('TreeSitterLanguageMode', () => {
             type: 'else',
 
             // There are double quotes around the `else` type. This indicates that
-            // we're targetting an *anonymous* node in the syntax tree. The fold
+            // we're targeting an *anonymous* node in the syntax tree. The fold
             // should start at the token representing the literal string "else",
             // not at an `else` node.
             start: { type: '"else"' }

@@ -46,7 +46,7 @@ module.exports = class ApplicationDelegate {
 
   async getTemporaryWindowState() {
     const stateJSON = await ipcHelpers.call('get-temporary-window-state');
-    return JSON.parse(stateJSON);
+    return stateJSON && JSON.parse(stateJSON);
   }
 
   setTemporaryWindowState(state) {
@@ -231,7 +231,7 @@ module.exports = class ApplicationDelegate {
       remote.dialog
         .showMessageBox(remote.getCurrentWindow(), options)
         .then(result => {
-          callback(result.response);
+          callback(result.response, result.checkboxChecked);
         });
     } else {
       // Legacy sync version: options can only have `message`,

@@ -3,7 +3,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 const spawnSync = require('./lib/spawn-sync');
 
@@ -30,6 +29,12 @@ const channel = getChannel(computedAppVersion);
 const appName = getAppName(channel);
 const executableName = getExecutableName(channel, appName);
 const channelName = getChannelName(channel);
+
+// Sets the installation jobs to run maximally in parallel if the user has
+// not already configured this. This is applied just by requiring this file.
+if (process.env.npm_config_jobs === undefined) {
+  process.env.npm_config_jobs = 'max';
+}
 
 const REPO_OWNER = process.env.REPO_OWNER || 'atom';
 const MAIN_REPO = process.env.MAIN_REPO || 'atom';
@@ -58,6 +63,7 @@ module.exports = {
   homeDirPath,
   getApmBinPath,
   getNpmBinPath,
+  getLocalNpmBinPath,
   snapshotAuxiliaryData: {},
   REPO_OWNER,
   MAIN_REPO,
@@ -118,23 +124,20 @@ function getApmBinPath() {
   );
 }
 
-function getNpmBinPath(external = false) {
-  if (process.env.NPM_BIN_PATH) return process.env.NPM_BIN_PATH;
+function getNpmBinPath() {
+  return process.platform === 'win32' ? 'npm.cmd' : 'npm';
+}
 
+function getLocalNpmBinPath() {
+  // NOTE this assumes that npm is installed as a script-runner dependency
   const npmBinName = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const localNpmBinPath = path.resolve(
     repositoryRootPath,
     'script',
+    'script-runner',
     'node_modules',
     '.bin',
     npmBinName
   );
-  return !external && fs.existsSync(localNpmBinPath)
-    ? localNpmBinPath
-    : npmBinName;
-}
-
-// parallel build in node-gyp
-if (!process.env.JOBS) {
-  process.env.JOBS = 'max';
+  return localNpmBinPath;
 }

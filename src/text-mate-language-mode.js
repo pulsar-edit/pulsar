@@ -70,9 +70,7 @@ class TextMateLanguageMode {
 
   getNonWordCharacters(position) {
     const scope = this.scopeDescriptorForPosition(position);
-    const rawValue = this.config.getRawValue('editor.nonWordCharacters');
-    const scopedValue = this.config.get('editor.nonWordCharacters', { scope });
-    return `${scopedValue}${rawValue}`;
+    return this.config.get('editor.nonWordCharacters', { scope });
   }
 
   /*
@@ -331,7 +329,7 @@ class TextMateLanguageMode {
     let rowsRemaining = this.chunkSize;
 
     while (this.firstInvalidRow() != null && rowsRemaining > 0) {
-      var endRow, filledRegion;
+      let endRow, filledRegion;
       const startRow = this.invalidRows.shift();
       const lastRow = this.buffer.getLastRow();
       if (startRow > lastRow) continue;

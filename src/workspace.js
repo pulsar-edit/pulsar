@@ -15,7 +15,7 @@ const Panel = require('./panel');
 const PanelContainer = require('./panel-container');
 const Task = require('./task');
 const WorkspaceCenter = require('./workspace-center');
-const WorkspaceElement = require('./workspace-element');
+const { createWorkspaceElement } = require('./workspace-element');
 
 const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
 const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
@@ -267,7 +267,7 @@ module.exports = class Workspace extends Model {
 
   getElement() {
     if (!this.element) {
-      this.element = new WorkspaceElement().initialize(this, {
+      this.element = createWorkspaceElement().initialize(this, {
         config: this.config,
         project: this.project,
         viewRegistry: this.viewRegistry,
@@ -1547,12 +1547,12 @@ module.exports = class Workspace extends Model {
 
   // Essential: Get the active {Pane}'s active item.
   //
-  // Returns an pane item {Object}.
+  // Returns a pane item {Object}.
   getActivePaneItem() {
     return this.getActivePaneContainer().getActivePaneItem();
   }
 
-  // Essential: Get all text editors in the workspace.
+  // Essential: Get all text editors in the workspace, if they are pane items.
   //
   // Returns an {Array} of {TextEditor}s.
   getTextEditors() {
