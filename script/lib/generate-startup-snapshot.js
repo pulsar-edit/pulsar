@@ -139,6 +139,7 @@ module.exports = function(packagedAppPath) {
           )) ||
         requiredModuleRelativePath.includes('babel-plugin') ||
         requiredModuleRelativePath.includes('babel-preset') ||
+        requiredModuleRelativePath.includes('supports-color') ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'debug', 'node.js') ||
         requiredModuleRelativePath ===
