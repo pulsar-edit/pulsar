@@ -5,8 +5,11 @@
 
 [![Badge License]][License]    
 [![Badge Guidelines]][Guidelines]    
-[![Badge Retired]][Upstream Retiring soon]    
+[![Badge Retired]][Retired]
 [![Badge Discord]][Discord]
+
+<br>
+The retirement badge is regarding our UPSTREAM parent only. We are NOT retiring, infact we are in active and invite you to join in as we make this jump to our own project independent from them in the coming future after archival is done.
 
 <br>
 <br>
