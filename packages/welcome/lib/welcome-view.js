@@ -1,5 +1,5 @@
 /** @babel */
-/** @jsx etch.dom **/
+/** @jsx etch.dom */
 
 import etch from 'etch';
 
