@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const path = require('path');
 const defaultOptions = require('./babel.config.js');
+const configFile = path.join(__dirname, './babel.config.js');
 
 let babel = null;
 let babelVersionDirectory = null;
@@ -56,11 +57,10 @@ exports.compile = function(sourceCode, filePath) {
     filePath = 'file:///' + path.resolve(filePath).replace(/\\/g, '/');
   }
 
-  const options = { filename: filePath };
-  for (const key in defaultOptions) {
-    options[key] = defaultOptions[key];
-  }
-  return babel.transformSync(sourceCode, options).code;
+  return babel.transformSync(sourceCode, {
+    filename: filePath,
+    configFile
+  }).code;
 };
 
 function createVersionAndOptionsDigest(version, options) {
