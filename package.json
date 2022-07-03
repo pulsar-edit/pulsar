@@ -149,7 +149,7 @@
     "service-hub": "^0.7.4",
     "settings-view": "https://www.atom.io/api/packages/settings-view/versions/0.261.8/tarball",
     "sinon": "9.2.1",
-    "snippets": "https://www.atom.io/api/packages/snippets/versions/1.5.1/tarball",
+    "snippets": "https://github.com/atom-community/snippets/archive/cdde11928c19d4969aba9a8dc5b1030ab68c4be2.tar.gz",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "https://www.atom.io/api/packages/spell-check/versions/0.77.1/tarball",
