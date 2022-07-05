@@ -204,7 +204,7 @@
     "dev-live-reload": "file:./packages/dev-live-reload",
     "encoding-selector": "0.23.9",
     "exception-reporting": "file:./packages/exception-reporting",
-    "find-and-replace": "https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz",
+    "find-and-replace": "0.220.1",
     "fuzzy-finder": "1.14.3",
     "github": "0.36.10",
     "git-diff": "file:./packages/git-diff",
