@@ -261,6 +261,15 @@ module.exports = function(packagedAppPath) {
             'lib',
             'index.js'
           ) ||
+        requiredModuleRelativePath ===
+          path.join(
+            '..',
+            'node_modules',
+            'nsfw',
+            'js',
+            'src',
+            'index.js'
+          ) ||
         // The startup-time script is used by both the renderer and the main process and having it in the
         // snapshot causes issues.
         requiredModuleRelativePath === path.join('..', 'src', 'startup-time.js')
