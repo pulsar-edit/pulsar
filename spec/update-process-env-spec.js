@@ -1,4 +1,5 @@
 /** @babel */
+'not strict';
 
 import path from 'path';
 import childProcess from 'child_process';

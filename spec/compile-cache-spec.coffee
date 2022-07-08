@@ -1,6 +1,6 @@
 path = require 'path'
 temp = require('temp').track()
-Babel = require 'babel-core'
+babelCompiler = require '../src/babel'
 CoffeeScript = require 'coffee-script'
 {TypeScriptSimple} = require 'typescript-simple'
 CSON = require 'season'
@@ -16,7 +16,7 @@ describe 'CompileCache', ->
     CSON.setCacheDir(null)
     CompileCache.resetCacheStats()
 
-    spyOn(Babel, 'transform').andReturn {code: 'the-babel-code'}
+    spyOn(babelCompiler, 'compile')
     spyOn(CoffeeScript, 'compile').andReturn 'the-coffee-code'
     spyOn(TypeScriptSimple::, 'compile').andReturn 'the-typescript-code'
 
@@ -36,11 +36,11 @@ describe 'CompileCache', ->
       it 'compiles the file with babel and caches it', ->
         CompileCache.addPathToCache(path.join(fixtures, 'babel', 'babel-comment.js'), atomHome)
         expect(CompileCache.getCacheStats()['.js']).toEqual {hits: 0, misses: 1}
-        expect(Babel.transform.callCount).toBe 1
+        expect(babelCompiler.compile.callCount).toBe 1
 
         CompileCache.addPathToCache(path.join(fixtures, 'babel', 'babel-comment.js'), atomHome)
         expect(CompileCache.getCacheStats()['.js']).toEqual {hits: 1, misses: 1}
-        expect(Babel.transform.callCount).toBe 1
+        expect(babelCompiler.compile.callCount).toBe 1
 
     describe 'when the given file is coffee-script', ->
       it 'compiles the file with coffee-script and caches it', ->
