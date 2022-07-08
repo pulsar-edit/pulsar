@@ -5,7 +5,7 @@
 
 [![Badge License]][License]    
 [![Badge Guidelines]][Guidelines]    
-[![Badge Sunset]][Retired]
+[![Badge Sunset]][Retired]    
 [![Badge Discord]][Discord]
 
 <br>
