@@ -15,7 +15,6 @@
   "electronVersion": "11.5.0",
   "dependencies": {
     "@atom/fuzzy-native": "^1.2.1",
-    "@atom/nsfw": "^1.0.28",
     "@atom/source-map-support": "^0.3.4",
     "@atom/watcher": "^1.3.5",
     "@babel/core": "7.18.6",
@@ -129,6 +128,7 @@
     "mock-spawn": "^0.2.6",
     "normalize-package-data": "3.0.2",
     "notifications": "https://www.atom.io/api/packages/notifications/versions/0.72.1/tarball",
+    "nsfw": "2.2.2",
     "nslog": "^3.0.0",
     "one-dark-syntax": "file:packages/one-dark-syntax",
     "one-dark-ui": "file:packages/one-dark-ui",
