@@ -1,6 +1,4 @@
-@IF EXIST "%~dp0\node.exe" (
-  "%~dp0\node.exe"  "%~dp0\bootstrap" %*
-) ELSE (
-  node  "%~dp0\bootstrap" %*
-)
+@ECHO off
 
+echo `script\bootstrap.cmd` is deprecated. Use `node script/bootstrap.js` instead
+node  "%~dp0\bootstrap.js" %*

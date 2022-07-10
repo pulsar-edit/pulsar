@@ -1,5 +1,4 @@
-@IF EXIST "%~dp0\node.exe" (
-  "%~dp0\node.exe"  "%~dp0\build" %*
-) ELSE (
-  node  "%~dp0\build" %*
-)
+@ECHO off
+
+echo `script\build.cmd` is deprecated. Use `node script/build.js` instead
+node  "%~dp0\build.js" %*

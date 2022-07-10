@@ -8,5 +8,5 @@ jobs:
           cd script
           npm ci
         displayName: Install script dependencies
-      - script: script/lint
+      - script: node ./script/lint.js
         displayName: Run linter

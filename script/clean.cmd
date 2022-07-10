@@ -1,5 +1,4 @@
-@IF EXIST "%~dp0\node.exe" (
-  "%~dp0\node.exe"  "%~dp0\clean" %*
-) ELSE (
-  node  "%~dp0\clean" %*
-)
+@ECHO off
+
+echo `script\clean.cmd` is deprecated. Use `node script/clean.js` instead
+node  "%~dp0\clean.js" %*
