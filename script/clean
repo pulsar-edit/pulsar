@@ -1,3 +1,6 @@
 #!/usr/bin/env node
 
+console.warn(
+  '`script/clean` is deprecated. Use `node script/clean.js` instead'
+);
 require('./clean.js');
