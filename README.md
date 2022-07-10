@@ -2,12 +2,6 @@
 <div align = center>
 
 ![Banner]
-
-[![Badge License]][License]    
-[![Badge Guidelines]][Guidelines]    
-[![Badge Sunset]][Retired]    
-[![Badge Discord]][Discord]
-
 <br>
 <br>
 
@@ -16,6 +10,11 @@
 [![Button Install]][Install]   
 [![Button Documentation]][Documentation]   
 [![Button Build]][Build] 
+
+[![Badge License]][License]    
+[![Badge Guidelines]][Guidelines]    
+[![Badge Sunset]][Retired]    
+[![Badge Discord]][Discord]
 
 <br>
  
