@@ -1,19 +1,10 @@
-#!/usr/bin/env node
+#!/bin/sh
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
 
-'use strict'
+case `uname` in
+    *CYGWIN*|*MINGW*|*MSYS*) basedir=`cygpath -w "$basedir"`;;
+esac
 
-const cleanCaches = require('./lib/clean-caches')
-const cleanDependencies = require('./lib/clean-dependencies')
-const cleanOutputDirectory = require('./lib/clean-output-directory')
-const killRunningAtomInstances = require('./lib/kill-running-atom-instances')
-
-async function clean() {
-  killRunningAtomInstances()
-  return Promise.all([
-    cleanDependencies(),
-    cleanCaches(),
-     cleanOutputDirectory()
-  ])
-}
-
-clean().then(() => {process.exit(0)}).catch((e) =>  {throw e;})
+node  "$basedir/clean.js" "$@"
+ret=$?
+exit $ret

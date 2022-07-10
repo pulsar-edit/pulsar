@@ -1,0 +1,1 @@
+node  "%~dp0\verify-snapshot-script.js" %*
