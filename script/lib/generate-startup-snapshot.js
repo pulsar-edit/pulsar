@@ -285,7 +285,7 @@ module.exports = function(packagedAppPath) {
     const verifySnapshotScriptPath = path.join(
       CONFIG.repositoryRootPath,
       'script',
-      'verify-snapshot-script'
+      'verify-snapshot-script.js'
     );
     let nodeBundledInElectronPath;
     if (process.platform === 'darwin') {
