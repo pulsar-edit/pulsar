@@ -29,7 +29,7 @@ steps:
 
       # Build
       $esc = '--%'
-      script/build --no-bootstrap --compress-artifacts $esc $env:LinuxArgs $CodeSign $CreateWindowsInstallaer
+      node ./script/build.js --no-bootstrap --compress-artifacts $esc $env:LinuxArgs $CodeSign $CreateWindowsInstallaer
     displayName: Build Atom
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)

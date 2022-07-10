@@ -9,9 +9,9 @@ steps:
       # Test
       if ($env:AGENT_OS -eq "Darwin") {
         osascript -e 'tell application "System Events" to keystroke "x"' # clear screen saver
-        caffeinate -s script/test # Run with caffeinate to prevent screen saver
+        caffeinate -s 'node ./script/test.js' # Run with caffeinate to prevent screen saver
       } else {
-        script/test
+        node ./script/test.js
       }
     env:
       CI: true

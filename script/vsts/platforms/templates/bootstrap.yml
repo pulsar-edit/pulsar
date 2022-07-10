@@ -17,7 +17,7 @@ steps:
       }
 
       # Bootstrap
-      script/bootstrap
+      node ./script/bootstrap.js
     displayName: Bootstrap build environment
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
