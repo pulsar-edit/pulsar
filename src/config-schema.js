@@ -2,6 +2,26 @@
 // https://atom.io/docs/api/latest/Config for more information about config
 // schemas.
 const configSchema = {
+  branding: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        default: 'pulsar',
+        description: 'Casual name to refer to the Editor.'
+      },
+      properName: {
+        type: 'string',
+        default: 'Pulsar',
+        description: 'Captilized version of the standard name, to refer to the Editor.'
+      },
+      longName: {
+        type: 'string',
+        default: 'Pulsar Edit',
+        description: 'Proper Long Name of the Editor.'
+      }
+    }
+  },
   core: {
     type: 'object',
     properties: {
