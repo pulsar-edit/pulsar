@@ -5,7 +5,7 @@ const configSchema = {
   branding: {
     type: 'object',
     properties: {
-      name: {
+      propername: {
         type: 'string',
         default: 'Pulsar',
         description: 'Captilized version of the standard name, to refer to the Editor.'
