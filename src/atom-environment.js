@@ -46,6 +46,7 @@ const TextEditorRegistry = require('./text-editor-registry');
 const AutoUpdateManager = require('./auto-update-manager');
 const StartupTime = require('./startup-time');
 const getReleaseChannel = require('./get-release-channel');
+const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
 
@@ -219,6 +220,12 @@ class AtomEnvironment {
       commands: this.commands,
       stateStore: this.stateStore
     });
+    
+    this.branding = {
+      id: packagejson.branding.id,
+      fullName: packagejson.branding.fullName,
+      properName: packagejson.branding.properName
+    };
 
     // Keep instances of HistoryManager in sync
     this.disposables.add(
