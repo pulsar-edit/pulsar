@@ -274,8 +274,7 @@
     "test": "node script/test",
     "build": "electron-rebuild",
     "build:apm": "cd apm; yarn install; ./node_modules/atom-package-manager/bin/npm rebuild",
-    "start": "electron --enable-logging . -f",
-    "dist": "node script/electron-builder.js"
+    "start": "electron --enable-logging . -f"
   },
   "standard-engine": "./script/node_modules/standard",
   "standard": {
@@ -291,11 +290,7 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.22.2",
     "electron": "11.5.0",
-    "electron-builder": "23.3.1",
-    "electron-rebuild": "3.2.7",
-    "playwright": "^1.22.2",
-    "playwright-core": "^1.22.2"
+    "electron-rebuild": "3.2.7"
   }
 }
