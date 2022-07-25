@@ -102,14 +102,14 @@ export default class WelcomeView {
                   href="https://www.atom.io/docs"
                   dataset={{ event: 'atom-docs' }}
                 >
-                  Atom docs
+                  {atom.branding.properName} docs
                 </a>{' '}
                 for Guides and the API reference.
               </li>
               <li>
-                The Atom forum at{' '}
+                The {atom.branding.properName} forum at{' '}
                 <a
-                  href="https://github.com/atom/atom/discussions"
+                  href="https://github.com/pulsar-edit/pulsar/discussions"
                   dataset={{ event: 'discussions' }}
                 >
                   Github Discussions
@@ -118,12 +118,12 @@ export default class WelcomeView {
               <li>
                 The{' '}
                 <a
-                  href="https://github.com/atom"
+                  href="https://github.com/pulsar-edit"
                   dataset={{ event: 'atom-org' }}
                 >
-                  Atom org
+                  {atom.branding.properName} org
                 </a>
-                . This is where all GitHub-created Atom packages can be found.
+                . This is where all GitHub-created {atom.branding.properName} packages can be found.
               </li>
             </ul>
           </section>
@@ -136,7 +136,7 @@ export default class WelcomeView {
                 checked={atom.config.get('welcome.showOnStartup')}
                 onchange={this.didChangeShowOnStartup}
               />
-              Show Welcome Guide when opening Atom
+              Show Welcome Guide when opening {atom.branding.properName}
             </label>
           </section>
 

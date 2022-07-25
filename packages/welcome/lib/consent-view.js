@@ -68,8 +68,8 @@ export default class ConsentView {
           </div>
           <div className="welcome-consent">
             <p>
-              Help improve Atom by sending your anonymous{' '}
-              <strong>usage data</strong> to the Atom team. The resulting data
+              Help improve {atom.branding.properName} by sending your anonymous{' '}
+              <strong>usage data</strong> to the {atom.branding.properName} team. The resulting data
               plays a key role in deciding what we focus on next.
             </p>
 
