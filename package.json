@@ -5,7 +5,6 @@
   "description": "A hackable text editor for the 21st Century.",
   "branding": {
     "id": "pulsar",
-    "fullName": "Pulsar Edit",
     "properName": "Pulsar"
   },
   "main": "./src/main-process/main.js",

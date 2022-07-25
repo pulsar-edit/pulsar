@@ -223,7 +223,6 @@ class AtomEnvironment {
     
     this.branding = {
       id: packagejson.branding.id,
-      fullName: packagejson.branding.fullName,
       properName: packagejson.branding.properName
     };
 
