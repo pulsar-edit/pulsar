@@ -3,6 +3,10 @@
   "productName": "Atom",
   "version": "1.63.0-dev",
   "description": "A hackable text editor for the 21st Century.",
+  "branding": {
+    "id": "pulsar",
+    "properName": "Pulsar"
+  },
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
