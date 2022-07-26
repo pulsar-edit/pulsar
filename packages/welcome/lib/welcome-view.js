@@ -37,7 +37,7 @@ export default class WelcomeView {
       <div className="welcome">
         <div className="welcome-container">
           <header className="welcome-header">
-            <a href="https://atom.io/">
+            <a href={atom.branding.urlWeb}>
               <svg
                 className="welcome-logo"
                 width="330px"
@@ -99,6 +99,7 @@ export default class WelcomeView {
             <ul>
               <li>
                 The{' '}
+                // TODO: Update to our docs or test {atom.branding.urlWeb}+"/docs"
                 <a
                   href="https://www.atom.io/docs"
                   dataset={{ event: 'atom-docs' }}
