@@ -5,7 +5,9 @@
   "description": "A hackable text editor for the 21st Century.",
   "branding": {
     "id": "pulsar",
-    "properName": "Pulsar"
+    "name": "Pulsar",
+    "urlWeb": "https://atom.io/",
+    "urlGH": "https://github.com/pulsar-edit",
   },
   "main": "./src/main-process/main.js",
   "repository": {
