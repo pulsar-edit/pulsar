@@ -1,8 +1,8 @@
-# Contributing to Atom
+# Contributing to Pulsar
 
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
-The following is a set of guidelines for contributing to Atom and its packages, which are hosted in the [Atom Organization](https://github.com/atom) on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+The following is a set of guidelines for contributing to Pulsar and its packages, which are hosted in the [pulsar-edit Organization](https://github.com/pulsar-edit) on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 #### Table Of Contents
 
@@ -11,8 +11,8 @@ The following is a set of guidelines for contributing to Atom and its packages, 
 [I don't want to read this whole thing, I just have a question!!!](#i-dont-want-to-read-this-whole-thing-i-just-have-a-question)
 
 [What should I know before I get started?](#what-should-i-know-before-i-get-started)
-  * [Atom and Packages](#atom-and-packages)
-  * [Atom Design Decisions](#design-decisions)
+  * [Pulsar and Packages](#atom-and-packages)
+  * [Pulsar Design Decisions](#design-decisions)
 
 [How Can I Contribute?](#how-can-i-contribute)
   * [Reporting Bugs](#reporting-bugs)
