@@ -4,7 +4,7 @@
   "main": "./lib/main",
   "description": "Select the grammar to use for the current editor with `ctrl-shift-L`.",
   "license": "MIT",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": "*"
   },
@@ -36,7 +36,7 @@
     "showOnRightSideOfStatusBar": {
       "type": "boolean",
       "default": true,
-      "description": "Show the active pane item's language on the right side of Atom's status bar, instead of the left."
+      "description": "Show the active pane item's language on the right side of Pulsar's status bar, instead of the left."
     },
     "hideDuplicateTextMateGrammars": {
       "type": "boolean",

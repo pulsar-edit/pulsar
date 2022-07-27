@@ -2,14 +2,14 @@
   "name": "one-dark-ui",
   "theme": "ui",
   "version": "1.12.5",
-  "description": "Atom One dark UI theme",
+  "description": "Pulsar One dark UI theme",
   "keywords": [
     "dark",
     "adaptive",
     "ui"
   ],
   "license": "MIT",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "main": "lib/main",
   "engines": {
     "atom": ">0.40.0"
