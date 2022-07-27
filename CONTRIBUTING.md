@@ -45,11 +45,11 @@ We have an official message board with a detailed FAQ and where the community ch
 
 ## What should I know before I get started?
 
-### Atom and Packages
+### Pulsar and Packages
 
-Atom is a large open source project &mdash; it's made up of over [200 repositories](https://github.com/atom). When you initially consider contributing to Atom, you might be unsure about which of those 200 repositories implements the functionality you want to change or report a bug for. This section should help you with that.
+Pulsar is a large open source project &mdash; it's made up of over [200 repositories](https://github.com/pulsar-edit). When you initially consider contributing to Pulsar, you might be unsure about which of those 200 repositories implements the functionality you want to change or report a bug for. This section should help you with that.
 
-Atom is intentionally very modular. Nearly every non-editor UI element you interact with comes from a package, even fundamental things like tabs and the status-bar. These packages are packages in the same way that packages in the [Atom package repository](https://atom.io/packages) are packages, with one difference: they are bundled into the [default distribution](https://github.com/atom/atom/blob/10b8de6fc499a7def9b072739486e68530d67ab4/package.json#L58).
+Pulsar is intentionally very modular. Nearly every non-editor UI element you interact with comes from a package, even fundamental things like tabs and the status-bar. These packages are packages in the same way that packages in the [Atom package repository](https://atom.io/packages) are packages, with one difference: they are bundled into the [default distribution](https://github.com/atom/atom/blob/10b8de6fc499a7def9b072739486e68530d67ab4/package.json#L58).
 
 <a id="atom-packages-image"/>
 
@@ -59,21 +59,21 @@ To get a sense for the packages that are bundled with Atom, you can go to `Setti
 
 Here's a list of the big ones:
 
-* [atom/atom](https://github.com/atom/atom) - Atom Core! The core editor component is responsible for basic text editing (e.g. cursors, selections, scrolling), text indentation, wrapping, and folding, text rendering, editor rendering, file system operations (e.g. saving), and installation and auto-updating. You should also use this repository for feedback related to the [Atom API](https://atom.io/docs/api/latest) and for large, overarching design proposals.
-* [tree-view](https://github.com/atom/tree-view) - file and directory listing on the left of the UI.
-* [fuzzy-finder](https://github.com/atom/fuzzy-finder) - the quick file opener.
-* [find-and-replace](https://github.com/atom/find-and-replace) - all search and replace functionality.
-* [tabs](https://github.com/atom/tabs) - the tabs for open editors at the top of the UI.
-* [status-bar](https://github.com/atom/status-bar) - the status bar at the bottom of the UI.
-* [markdown-preview](https://github.com/atom/markdown-preview) - the rendered markdown pane item.
-* [settings-view](https://github.com/atom/settings-view) - the settings UI pane item.
-* [autocomplete-plus](https://github.com/atom/autocomplete-plus) - autocompletions shown while typing. Some languages have additional packages for autocompletion functionality, such as [autocomplete-html](https://github.com/atom/autocomplete-html).
-* [git-diff](https://github.com/atom/git-diff) - Git change indicators shown in the editor's gutter.
-* [language-javascript](https://github.com/atom/language-javascript) - all bundled languages are packages too, and each one has a separate package `language-[name]`. Use these for feedback on syntax highlighting issues that only appear for a specific language.
-* [one-dark-ui](https://github.com/atom/one-dark-ui) - the default UI styling for anything but the text editor. UI theme packages (i.e. packages with a `-ui` suffix) provide only styling and it's possible that a bundled package is responsible for a UI issue. There are other bundled UI themes, such as [one-light-ui](https://github.com/atom/one-light-ui).
-* [one-dark-syntax](https://github.com/atom/one-dark-syntax) - the default syntax highlighting styles applied for all languages. There are other bundled syntax themes, such as [solarized-dark-syntax](https://github.com/atom/solarized-dark-syntax). You should use these packages for reporting issues that appear in many languages, but disappear if you change to another syntax theme.
-* [apm](https://github.com/atom/apm) - the `apm` command line tool (Atom Package Manager). You should use this repository for any contributions related to the `apm` tool and for publishing packages.
-* [atom.io](https://github.com/atom/atom.io) - the repository for feedback on the [Atom.io website](https://atom.io) and the [Atom.io package API](https://github.com/atom/atom/blob/master/docs/apm-rest-api.md) used by [apm](https://github.com/atom/apm).
+* [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) - Atom Core! The core editor component is responsible for basic text editing (e.g. cursors, selections, scrolling), text indentation, wrapping, and folding, text rendering, editor rendering, file system operations (e.g. saving), and installation and auto-updating. You should also use this repository for feedback related to the [Atom API](https://atom.io/docs/api/latest) and for large, overarching design proposals.
+* [tree-view](https://github.com/pulsar-edit/tree-view) - file and directory listing on the left of the UI.
+* [fuzzy-finder](https://github.com/pulsar-edit/fuzzy-finder) - the quick file opener.
+* [find-and-replace](https://github.com/pulsar-edit/find-and-replace) - all search and replace functionality.
+* [tabs](https://github.com/pulsar-edit/tabs) - the tabs for open editors at the top of the UI.
+* [status-bar](https://github.com/pulsar-edit/status-bar) - the status bar at the bottom of the UI.
+* [markdown-preview](https://github.com/pulsar-edit/markdown-preview) - the rendered markdown pane item.
+* [settings-view](https://github.com/pulsar-edit/settings-view) - the settings UI pane item.
+* [autocomplete-plus](https://github.com/pulsar-edit/autocomplete-plus) - autocompletions shown while typing. Some languages have additional packages for autocompletion functionality, such as [autocomplete-html](https://github.com/pulsar-edit/autocomplete-html).
+* [git-diff](https://github.com/pulsar-edit/git-diff) - Git change indicators shown in the editor's gutter.
+* [language-javascript](https://github.com/pulsar-edit/language-javascript) - all bundled languages are packages too, and each one has a separate package `language-[name]`. Use these for feedback on syntax highlighting issues that only appear for a specific language.
+* [one-dark-ui](https://github.com/pulsar-edit/one-dark-ui) - the default UI styling for anything but the text editor. UI theme packages (i.e. packages with a `-ui` suffix) provide only styling and it's possible that a bundled package is responsible for a UI issue. There are other bundled UI themes, such as [one-light-ui](https://github.com/pulsar-edit/one-light-ui).
+* [one-dark-syntax](https://github.com/pulsar-edit/one-dark-syntax) - the default syntax highlighting styles applied for all languages. There are other bundled syntax themes, such as [solarized-dark-syntax](https://github.com/pulsar-edit/solarized-dark-syntax). You should use these packages for reporting issues that appear in many languages, but disappear if you change to another syntax theme.
+* [apm](https://github.com/pulsar-edit/apm) - the `apm` command line tool (Atom Package Manager). You should use this repository for any contributions related to the `apm` tool and for publishing packages.
+* [atom.io](https://github.com/pulsar-edit/atom.io) - the repository for feedback on the [Atom.io website](https://atom.io) and the [Atom.io package API](https://github.com/atom/atom/blob/master/docs/apm-rest-api.md) used by [ppm](https://github.com/pulsar-edit/ppm).
 
 There are many more, but this list should be a good starting point. For more information on how to work with Atom's official packages, see [Contributing to Atom Packages][contributing-to-official-atom-packages].
 
