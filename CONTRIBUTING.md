@@ -59,7 +59,7 @@ To get a sense for the packages that are bundled with Atom, you can go to `Setti
 
 Here's a list of the big ones:
 
-* [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) - Atom Core! The core editor component is responsible for basic text editing (e.g. cursors, selections, scrolling), text indentation, wrapping, and folding, text rendering, editor rendering, file system operations (e.g. saving), and installation and auto-updating. You should also use this repository for feedback related to the [Atom API](https://atom.io/docs/api/latest) and for large, overarching design proposals.
+* [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) - Pulsar Core! The core editor component is responsible for basic text editing (e.g. cursors, selections, scrolling), text indentation, wrapping, and folding, text rendering, editor rendering, file system operations (e.g. saving), and installation and auto-updating. You should also use this repository for feedback related to the [API](https://atom.io/docs/api/latest) and for large, overarching design proposals.
 * [tree-view](https://github.com/pulsar-edit/tree-view) - file and directory listing on the left of the UI.
 * [fuzzy-finder](https://github.com/pulsar-edit/fuzzy-finder) - the quick file opener.
 * [find-and-replace](https://github.com/pulsar-edit/find-and-replace) - all search and replace functionality.
