@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "0.48.1",
   "description": "Live reload atom themes and packages.",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "dependencies": {
     "fs-plus": "^3.0.0"

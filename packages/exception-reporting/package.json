@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "0.43.1",
   "description": "Reports uncaught Atom exceptions to the Atom team via bugsnag.com",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": ">0.48.0"

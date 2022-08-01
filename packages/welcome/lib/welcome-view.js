@@ -6,6 +6,7 @@ import etch from 'etch';
 export default class WelcomeView {
   constructor(props) {
     this.props = props;
+    this.brand = atom.branding.name;
     etch.initialize(this);
 
     this.element.addEventListener('click', event => {
@@ -36,7 +37,7 @@ export default class WelcomeView {
       <div className="welcome">
         <div className="welcome-container">
           <header className="welcome-header">
-            <a href="https://atom.io/">
+            <a href={atom.branding.urlWeb}>
               <svg
                 className="welcome-logo"
                 width="330px"
@@ -98,18 +99,19 @@ export default class WelcomeView {
             <ul>
               <li>
                 The{' '}
+                // TODO: Update to our docs or test {atom.branding.urlWeb}+"/docs"
                 <a
                   href="https://www.atom.io/docs"
                   dataset={{ event: 'atom-docs' }}
                 >
-                  Atom docs
+                  {this.brand} docs
                 </a>{' '}
                 for Guides and the API reference.
               </li>
               <li>
-                The Atom forum at{' '}
+                The {this.brand} forum at{' '}
                 <a
-                  href="https://github.com/atom/atom/discussions"
+                  href="https://github.com/pulsar-edit/pulsar/discussions"
                   dataset={{ event: 'discussions' }}
                 >
                   Github Discussions
@@ -118,12 +120,12 @@ export default class WelcomeView {
               <li>
                 The{' '}
                 <a
-                  href="https://github.com/atom"
+                  href={atom.branding.urlGH}
                   dataset={{ event: 'atom-org' }}
                 >
-                  Atom org
+                  {this.brand} org
                 </a>
-                . This is where all GitHub-created Atom packages can be found.
+                . This is where all GitHub-created {this.brand} packages can be found.
               </li>
             </ul>
           </section>
@@ -136,12 +138,12 @@ export default class WelcomeView {
                 checked={atom.config.get('welcome.showOnStartup')}
                 onchange={this.didChangeShowOnStartup}
               />
-              Show Welcome Guide when opening Atom
+              Show Welcome Guide when opening {this.brand}
             </label>
           </section>
 
           <footer className="welcome-footer">
-            <a href="https://atom.io/" dataset={{ event: 'footer-atom-io' }}>
+            <a href={atom.branding.urlWeb} dataset={{ event: 'footer-atom-io' }}>
               atom.io
             </a>{' '}
             <span className="text-subtle">×</span>{' '}

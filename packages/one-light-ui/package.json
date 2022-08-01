@@ -2,14 +2,14 @@
   "name": "one-light-ui",
   "theme": "ui",
   "version": "1.12.5",
-  "description": "Atom One light UI theme",
+  "description": "Pulsar One light UI theme",
   "keywords": [
     "light",
     "adaptive",
     "ui"
   ],
   "license": "MIT",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "main": "lib/main",
   "engines": {
     "atom": ">0.40.0"

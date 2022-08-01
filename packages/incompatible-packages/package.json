@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "0.27.3",
   "description": "Show incompatible packages",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"

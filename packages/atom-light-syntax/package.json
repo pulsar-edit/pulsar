@@ -3,7 +3,7 @@
   "theme": "syntax",
   "version": "0.29.1",
   "description": "A light syntax theme",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": ">0.40.0"

@@ -4,7 +4,7 @@
   "main": "./lib/link",
   "description": "Opens http(s) links under the cursor",
   "license": "MIT",
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": "*"
   },

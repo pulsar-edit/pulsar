@@ -3,9 +3,9 @@
   "author": "Machisté N. Quintana <mnquintana@users.noreply.github.com>",
   "main": "./lib/main",
   "version": "1.9.1",
-  "description": "View useful information about your Atom installation.",
+  "description": "View useful information about your Pulsar installation.",
   "keywords": [],
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "scripts": {
     "lint": "standard"
