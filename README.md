@@ -5,7 +5,7 @@
 <br>
 <br>
 
-# Atom Community
+# Pulsar
 
 [![Button Install]][Install]   
 [![Button Documentation]][Documentation]   
@@ -41,7 +41,7 @@
 
 [Guidelines]: https://github.com/logos 'Branding Guidelines'
 [Electron]: https://github.com/electron/electron
-[Discord]: https://discord.gg/2tD9evh8qP 'Join the Atom Community Discord today!'
+[Discord]: https://discord.gg/2tD9evh8qP 'Join the Pulsar Discord today!'
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
 
 [#]: #
@@ -49,11 +49,11 @@
 
 <!---------------------------{ Files }--------------------------->
 
-[Documentation]: docs/Documentation.md 'Information how to use & work with Atom.'
-[Install]: docs/Installation.md 'How to install Atom on your system.'
+[Documentation]: docs/Documentation.md 'Information how to use & work with Pulsar.'
+[Install]: docs/Installation.md 'How to install Pulsar on your system.'
 [Retired]: docs/Retirement.md 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
-[Build]: docs/Building.md 'Instructions on how to build Atom by yourself.'
+[Build]: docs/Building.md 'Instructions on how to build Pulsar by yourself.'
 
 
 <!---------------------------{ Images }--------------------------->
