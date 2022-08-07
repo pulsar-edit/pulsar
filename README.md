@@ -41,7 +41,7 @@
 
 [Guidelines]: https://github.com/logos 'Branding Guidelines'
 [Electron]: https://github.com/electron/electron
-[Discord]: https://discord.gg/2tD9evh8qP 'Join the Pulsar Discord today!'
+[Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
 [Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
 
 [#]: #
