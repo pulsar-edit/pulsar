@@ -49,11 +49,11 @@
 
 <!---------------------------{ Files }--------------------------->
 
-[Documentation]: docs/Documentation.md 'Information how to use & work with Atom.'
+[Documentation]: docs/Documentation.md 'How to use & work with Atom.'
 [Install]: docs/Installation.md 'How to install Atom on your system.'
 [Retired]: docs/Retirement.md 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
-[Build]: docs/Building.md 'Instructions on how to build Atom by yourself.'
+[Build]: docs/Building.md 'How to build Atom by yourself.'
 
 
 <!---------------------------{ Images }--------------------------->
