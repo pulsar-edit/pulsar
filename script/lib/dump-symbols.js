@@ -28,8 +28,12 @@ function dumpSymbol(binaryPath) {
     minidump.dumpSymbol(binaryPath, function(error, content) {
       if (error) {
         // fswin.node is only used on windows, ignore the error on other platforms
-        if (process.platform !== 'win32' && binaryPath.match(/fswin.node/))
+        if (process.platform !== 'win32') {
+          console.warn(
+            `\n##[warning] Failed to dump the symbols via minidump. ${error}. Ignoring the error...`
+          );
           return resolve();
+        }
         throw new Error(error);
       } else {
         const moduleLine = /MODULE [^ ]+ [^ ]+ ([0-9A-F]+) (.*)\n/.exec(

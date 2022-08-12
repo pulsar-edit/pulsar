@@ -132,8 +132,14 @@ module.exports = function(packagedAppPath) {
             'lib',
             'command-event.js'
           ) ||
-        requiredModuleRelativePath ===
-          path.join('..', 'node_modules', 'babel-core', 'index.js') ||
+        (requiredModuleRelativePath.includes('@babel') &&
+          // GitHub package uses this in its relay dependency which is required on startup
+          !requiredModuleRelativePath.includes(
+            path.join('@babel', 'runtime')
+          )) ||
+        requiredModuleRelativePath.includes('babel-plugin') ||
+        requiredModuleRelativePath.includes('babel-preset') ||
+        requiredModuleRelativePath.includes('supports-color') ||
         requiredModuleRelativePath ===
           path.join('..', 'node_modules', 'debug', 'node.js') ||
         requiredModuleRelativePath ===
@@ -255,6 +261,8 @@ module.exports = function(packagedAppPath) {
             'lib',
             'index.js'
           ) ||
+        requiredModuleRelativePath ===
+          path.join('..', 'node_modules', 'nsfw', 'js', 'src', 'index.js') ||
         // The startup-time script is used by both the renderer and the main process and having it in the
         // snapshot causes issues.
         requiredModuleRelativePath === path.join('..', 'src', 'startup-time.js')
@@ -277,7 +285,7 @@ module.exports = function(packagedAppPath) {
     const verifySnapshotScriptPath = path.join(
       CONFIG.repositoryRootPath,
       'script',
-      'verify-snapshot-script'
+      'verify-snapshot-script.js'
     );
     let nodeBundledInElectronPath;
     if (process.platform === 'darwin') {

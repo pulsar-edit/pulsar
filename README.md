@@ -2,12 +2,6 @@
 <div align = center>
 
 ![Banner]
-
-[![Badge License]][License]    
-[![Badge Guidelines]][Guidelines]    
-[![Badge Retired]][Retired]    
-[![Badge Discord]][Discord]
-
 <br>
 <br>
 
@@ -16,6 +10,11 @@
 [![Button Install]][Install]   
 [![Button Documentation]][Documentation]   
 [![Button Build]][Build] 
+
+[![Badge License]][License]    
+[![Badge Guidelines]][Guidelines]    
+[![Badge Sunset]][Retired]    
+[![Badge Discord]][Discord]
 
 <br>
  
@@ -66,7 +65,8 @@
 <!---------------------------{ Badges }--------------------------->
 
 [Badge Guidelines]: https://img.shields.io/badge/Logo-Guidelines-d36e2d.svg?style=for-the-badge&labelColor=323232
-[Badge Retired]: https://img.shields.io/badge/Retired-bb3c1f.svg?style=for-the-badge&labelColor=323232&logoColor=white&logo=Atom
+[Badge Retired]: https://img.shields.io/badge/Retired-bb3c1f.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
+[Badge Sunset]: https://img.shields.io/badge/Sunset-orange.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
 [Badge Discord]: https://img.shields.io/badge/Discord-6399c4.svg?style=for-the-badge&labelColor=323232&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-e5ab42.svg?style=for-the-badge&labelColor=323232
 [Badge Status]: https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master
