@@ -4,7 +4,7 @@
   "version": "0.2.2",
   "description": "EXTERMINATEs built-in packages installed in ~/.atom/packages",
   "keywords": [],
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "atomTestRunner": "./test/runner",
   "engines": {

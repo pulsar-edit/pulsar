@@ -2,12 +2,12 @@
   "name": "one-light-syntax",
   "theme": "syntax",
   "version": "1.8.4",
-  "description": "Atom One light syntax theme",
+  "description": "Pulsar One light syntax theme",
   "keywords": [
     "light",
     "syntax"
   ],
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": ">0.40.0"

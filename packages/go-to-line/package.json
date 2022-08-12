@@ -12,7 +12,7 @@
       "go-to-line:toggle"
     ]
   },
-  "repository": "https://github.com/atom/atom",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": "*"
   },
