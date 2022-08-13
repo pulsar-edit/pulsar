@@ -1,7 +1,7 @@
 name: 'Java'
 scopeName: 'source.java'
 type: 'tree-sitter'
-parser: 'tree-sitter-java-dev'
+parser: 'tree-sitter-java'
 
 fileTypes: [
   'java'
@@ -283,7 +283,7 @@ scopes:
 
   # Method access and reference
 
-  'method_invocation > method_invocation_name > identifier': 'entity.name.function'
+  'method_invocation > identifier': 'entity.name.function'
 
   # Method reference
   'method_reference > "::"': 'keyword.control.method'
