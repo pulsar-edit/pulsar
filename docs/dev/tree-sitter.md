@@ -66,7 +66,7 @@ But unfortunately, this does not solve the issue - both `obj` and `func2` are to
 
 ### Fixing this
 
-`src/tree-sitter-language-mode.js` is where the sintax tree is walked to generate tokens. It basically have methods like `seek`, `_moveDown`, etc that `.push` some token into `containingNodeTypes` and other local fields. Later, these are tokenized via `_currentScopeId` that basically tries to match the rule we're in inside `this.languageLayer.grammar.scopeMap` data structure.
+`src/tree-sitter-language-mode.js` is where the syntax tree is walked to generate tokens. It basically have methods like `seek`, `_moveDown`, etc that `.push` some token into `containingNodeTypes` and other local fields. Later, these are tokenized via `_currentScopeId` that basically tries to match the rule we're in inside `this.languageLayer.grammar.scopeMap` data structure.
 
 This data structure is defined in `src/syntax-scope-map.js`, and contains `anonymousScopeTable` (that is, AFAIK, a list of words that are tokenized always the same - think like "keywords" on the language) and a `namedScopeTable` (which, surprisingly, does not treat the "field name" even though it has `name` on it). This structure is basically a "leaf first" structure. So, tokenizing `obj.func("a string")`, we would get:
 
