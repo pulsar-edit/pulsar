@@ -100,4 +100,4 @@ To make `src/syntax-scope-map.js` aware of "named fields" (we can do that by che
 
 We will also need to decide on a syntax on the CSON file to this format, and also parse this format inside the `namedScopeTable`.
 
-Finally, we'll need to change the `get` method of the SyntaxScopeMap` to match things correctly and get tokenization for things filtered by the field name.
+Finally, we'll need to change the `get` method of the `SyntaxScopeMap` to match things correctly and get tokenization for things filtered by the field name.
