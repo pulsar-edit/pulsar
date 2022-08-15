@@ -1,5 +1,7 @@
 name: Package tests for Pulsar
-on: push
+on:
+  - push
+  - pull_request
 jobs:
   tests:
     name: tests

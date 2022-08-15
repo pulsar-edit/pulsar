@@ -1,5 +1,7 @@
 name: Editor tests
-on: push
+on:
+  - push
+  - pull_request
 jobs:
   tests:
     name: tests
