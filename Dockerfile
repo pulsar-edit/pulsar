@@ -1,7 +1,7 @@
 # VERSION:        0.2
 # DESCRIPTION:    Image to build Atom
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Install dependencies
 RUN apt-get update && \
