@@ -20,6 +20,5 @@ jobs:
 
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1
-      if: ${{ !contains(matrix.os, 'windows') }}
       with:
         run: yarn start --test spec
