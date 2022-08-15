@@ -1,0 +1,30 @@
+name: Package tests for Pulsar
+on: push
+jobs:
+  tests:
+    name: tests
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-2019]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+
+    - name: install dependencies
+      run: yarn install || yarn install || yarn install || yarn install
+
+    - name: build dependencies
+      run: yarn build
+
+    - name: Run the tests on sane OSes
+      uses: GabrielBB/xvfb-action@v1
+      if: ${{ !contains(matrix.os, 'windows') }}
+      with:
+        run: node script/run-package-tests.js
+
+    - name: Run the tests on Windows
+      if: ${{ contains(matrix.os, 'windows') }}
+      continue-on-error: true # due to https://github.com/atom/github/pull/2459#issuecomment-624725972
+      run: node script\run-package-tests.js

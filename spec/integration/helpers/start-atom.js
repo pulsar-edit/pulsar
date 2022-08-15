@@ -4,7 +4,7 @@ const temp = require('temp').track();
 const { remote } = require('electron');
 const { once } = require('underscore-plus');
 const { spawn } = require('child_process');
-const webdriverio = require('../../../script/node_modules/webdriverio');
+const webdriverio = require('webdriverio');
 
 const AtomPath = remote.process.argv[0];
 const AtomLauncherPath = path.join(
