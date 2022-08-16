@@ -114,6 +114,7 @@ export default class DeprecationCopView {
     if (packageNames.length === 0) {
       return <li className="list-item">No deprecated calls</li>;
     } else {
+      //TODO_PULSAR: Validate 'atom core'
       return packageNames.sort().map(packageName => (
         <li className="deprecation list-nested-item collapsed">
           <div
@@ -481,8 +482,8 @@ export default class DeprecationCopView {
     const packagePaths = this.getPackagePathsByPackageName();
     for (const [packageName, packagePath] of packagePaths) {
       if (
-        packagePath.includes('.atom/dev/packages') ||
-        packagePath.includes('.atom/packages')
+        packagePath.includes('.pulsar/dev/packages') ||
+        packagePath.includes('.pulsar/packages')
       ) {
         packagePaths.set(packageName, fs.absolute(packagePath));
       }
