@@ -72,7 +72,7 @@ class PanelContainerElement extends HTMLElement {
           // on activation. If there aren't any tabbable elements,
           // give focus to the panel element itself
           fallbackFocus: panelElement,
-          // closing is handled by core Atom commands and this already deactivates
+          // closing is handled by core Pulsar commands and this already deactivates
           // on visibility changes
           escapeDeactivates: false,
           delayInitialFocus: false
