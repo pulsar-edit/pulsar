@@ -165,8 +165,8 @@ class NativeWatcher {
   }
 }
 
-// Private: Emulate a "filesystem watcher" by subscribing to Atom events like buffers being saved. This will miss
-// any changes made to files outside of Atom, but it also has no overhead.
+// Private: Emulate a "filesystem watcher" by subscribing to Pulsar events like buffers being saved. This will miss
+// any changes made to files outside of Pulsar, but it also has no overhead.
 class AtomNativeWatcher extends NativeWatcher {
   async doStart() {
     const getRealPath = givenPath => {
@@ -590,7 +590,7 @@ class PathWatcher {
   }
 }
 
-// Private: Globally tracked state used to de-duplicate related [PathWatchers]{PathWatcher} backed by emulated Atom
+// Private: Globally tracked state used to de-duplicate related [PathWatchers]{PathWatcher} backed by emulated Pulsar
 // events or NSFW.
 class PathWatcherManager {
   // Private: Access the currently active manager instance, creating one if necessary.
