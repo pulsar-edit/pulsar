@@ -29,7 +29,7 @@ const argv = yargs
   .help('help')
   .describe(
     'existing-binaries',
-    'Use existing Atom binaries (skip clean/transpile/cache)'
+    'Use existing Pulsar binaries (skip clean/transpile/cache)'
   )
   .describe('code-sign', 'Code-sign executables (macOS and Windows only)')
   .describe('test-sign', 'Test-sign executables (macOS only)')
@@ -38,10 +38,10 @@ const argv = yargs
   .describe('create-rpm-package', 'Create .rpm package (Linux only)')
   .describe(
     'compress-artifacts',
-    'Compress Atom binaries (and symbols on macOS)'
+    'Compress Pulsar binaries (and symbols on macOS)'
   )
   .describe('generate-api-docs', 'Only build the API documentation')
-  .describe('install', 'Install Atom')
+  .describe('install', 'Install Pulsar')
   .string('install')
   .describe(
     'ci',
@@ -227,7 +227,7 @@ async function build() {
       compressArtifacts(packagedAppPath);
     } else {
       console.log(
-        'Skipping artifacts compression. Specify the --compress-artifacts option to compress Atom binaries (and symbols on macOS)'
+        'Skipping artifacts compression. Specify the --compress-artifacts option to compress Pulsar binaries (and symbols on macOS)'
           .gray
       );
     }
@@ -236,7 +236,7 @@ async function build() {
       installApplication(packagedAppPath, argv.install);
     } else {
       console.log(
-        'Skipping installation. Specify the --install option to install Atom'
+        'Skipping installation. Specify the --install option to install Pulsar'
           .gray
       );
     }
