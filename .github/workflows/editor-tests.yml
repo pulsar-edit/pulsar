@@ -1,0 +1,31 @@
+name: Editor tests
+on:
+  - push
+  - pull_request
+jobs:
+  tests:
+    name: tests
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-2019]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+
+    - name: Setup node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 16
+
+    - name: install dependencies
+      run: yarn install
+
+    - name: build dependencies
+      run: yarn build
+
+    - name: Run tests
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: yarn start --test spec

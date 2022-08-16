@@ -5,7 +5,7 @@ const packJson = require('../package.json')
 let packagePath = []
 
 for(let pack in packJson.packageDependencies) {
-  if(pack.match(/language|autocomplete/)) {
+  if(pack.match(/complete|language/)) {
     let basePath = path.join('node_modules', pack)
     let testPath = path.join(basePath, 'test')
     let specPath = path.join(basePath, 'spec')
@@ -14,8 +14,11 @@ for(let pack in packJson.packageDependencies) {
   }
 }
 
-cp.spawnSync('yarn', ['start', '--test', ...packagePath], {
+// console.log('yarn', 'start', '--test', ...packagePath)
+const res = cp.spawnSync('yarn', ['start', '--test', ...packagePath], {
   cwd: process.cwd(),
   detached: true,
   stdio: "inherit"
 })
+
+process.exit(res.status)
