@@ -64,7 +64,7 @@ function transpilePackagesWithCustomTranspilerPaths() {
         pathsToCompile.forEach(transpilePath);
       }
 
-      // Now that we've transpiled everything in-place, we no longer want Atom to try to transpile
+      // Now that we've transpiled everything in-place, we no longer want Pulsar to try to transpile
       // the same files when they're being required.
       delete metadata.atomTranspilers;
       fs.writeFileSync(
