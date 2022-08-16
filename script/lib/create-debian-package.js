@@ -10,9 +10,9 @@ const CONFIG = require('../config');
 
 module.exports = function(packagedAppPath) {
   console.log(`Creating Debian package for "${packagedAppPath}"`);
-  const atomExecutableName =
-    CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
-  const apmExecutableName =
+  const editorExecutableName =
+    CONFIG.channel === 'stable' ? 'pulsar' : `pulsar-${CONFIG.channel}`;
+  const pkgMgrExecutableName =
     CONFIG.channel === 'stable' ? 'apm' : `apm-${CONFIG.channel}`;
   const appDescription = CONFIG.appMetadata.description;
   const appVersion = CONFIG.appMetadata.version;
@@ -29,7 +29,7 @@ module.exports = function(packagedAppPath) {
 
   const outputDebianPackageFilePath = path.join(
     CONFIG.buildOutputPath,
-    `atom-${arch}.deb`
+    `pulsar-${arch}.deb`
   );
   const debianPackageDirPath = path.join(
     os.tmpdir(),
@@ -44,7 +44,7 @@ module.exports = function(packagedAppPath) {
   );
   const debianPackageAtomDirPath = path.join(
     debianPackageShareDirPath,
-    atomExecutableName
+    editorExecutableName
   );
   const debianPackageApplicationsDirPath = path.join(
     debianPackageShareDirPath,
@@ -57,7 +57,7 @@ module.exports = function(packagedAppPath) {
   const debianPackageDocsDirPath = path.join(
     debianPackageShareDirPath,
     'doc',
-    atomExecutableName
+    editorExecutableName
   );
 
   if (fs.existsSync(debianPackageDirPath)) {
@@ -97,14 +97,14 @@ module.exports = function(packagedAppPath) {
 
   console.log(`Copying binaries into "${debianPackageBinDirPath}"`);
   fs.copySync(
-    path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-    path.join(debianPackageBinDirPath, atomExecutableName)
+    path.join(CONFIG.repositoryRootPath, 'pulsar.sh'),
+    path.join(debianPackageBinDirPath, editorExecutableName)
   );
   fs.symlinkSync(
     path.join(
       '..',
       'share',
-      atomExecutableName,
+      editorExecutableName,
       'resources',
       'app',
       'apm',
@@ -112,7 +112,7 @@ module.exports = function(packagedAppPath) {
       '.bin',
       'apm'
     ),
-    path.join(debianPackageBinDirPath, apmExecutableName)
+    path.join(debianPackageBinDirPath, pkgMgrExecutableName)
   );
 
   fs.chmodSync(path.join(debianPackageAtomDirPath, 'chrome-sandbox'), '4755');
@@ -131,7 +131,7 @@ module.exports = function(packagedAppPath) {
     )
   );
   const controlFileContents = template(controlFileTemplate)({
-    appFileName: atomExecutableName,
+    appFileName: editorExecutableName,
     version: appVersion,
     arch: arch,
     installedSize: packageSizeInKilobytes,
@@ -150,20 +150,20 @@ module.exports = function(packagedAppPath) {
       CONFIG.repositoryRootPath,
       'resources',
       'linux',
-      'atom.desktop.in'
+      'pulsar.desktop.in'
     )
   );
   const desktopEntryContents = template(desktopEntryTemplate)({
     appName: CONFIG.appName,
-    appFileName: atomExecutableName,
+    appFileName: editorExecutableName,
     description: appDescription,
     installDir: '/usr',
-    iconPath: atomExecutableName
+    iconPath: editorExecutableName
   });
   fs.writeFileSync(
     path.join(
       debianPackageApplicationsDirPath,
-      `${atomExecutableName}.desktop`
+      `${editorExecutableName}.desktop`
     ),
     desktopEntryContents
   );
@@ -175,9 +175,9 @@ module.exports = function(packagedAppPath) {
       'resources',
       'app.asar.unpacked',
       'resources',
-      'atom.png'
+      'pulsar.png'
     ),
-    path.join(debianPackageIconsDirPath, `${atomExecutableName}.png`)
+    path.join(debianPackageIconsDirPath, `${editorExecutableName}.png`)
   );
 
   console.log(`Copying license into "${debianPackageDocsDirPath}"`);
@@ -190,12 +190,12 @@ module.exports = function(packagedAppPath) {
     `Copying polkit configuration into "${debianPackageShareDirPath}"`
   );
   fs.copySync(
-    path.join(CONFIG.repositoryRootPath, 'resources', 'linux', 'atom.policy'),
+    path.join(CONFIG.repositoryRootPath, 'resources', 'linux', 'pulsar.policy'),
     path.join(
       debianPackageShareDirPath,
       'polkit-1',
       'actions',
-      `atom-${CONFIG.channel}.policy`
+      `pulsar-${CONFIG.channel}.policy`
     )
   );
 

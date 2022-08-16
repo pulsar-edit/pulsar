@@ -20,7 +20,7 @@ module.exports = packagedAppPath => {
     authors: 'GitHub Inc.',
     iconUrl: `https://raw.githubusercontent.com/${REPO_OWNER}/${MAIN_REPO}/master/resources/app-icons/${
       CONFIG.channel
-    }/atom.ico`,
+    }/pulsar.ico`,
     loadingGif: path.join(
       CONFIG.repositoryRootPath,
       'resources',
@@ -32,13 +32,13 @@ module.exports = packagedAppPath => {
     remoteReleases: `${updateUrlPrefix}/api/updates${archSuffix}?version=${
       CONFIG.computedAppVersion
     }`,
-    setupExe: `AtomSetup${process.arch === 'x64' ? '-x64' : ''}.exe`,
+    setupExe: `PulsarSetup${process.arch === 'x64' ? '-x64' : ''}.exe`,
     setupIcon: path.join(
       CONFIG.repositoryRootPath,
       'resources',
       'app-icons',
       CONFIG.channel,
-      'atom.ico'
+      'pulsar.ico'
     )
   };
 
@@ -49,7 +49,7 @@ module.exports = packagedAppPath => {
     }
 
     let appName =
-      CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
+      CONFIG.channel === 'stable' ? 'pulsar' : `pulsar-${CONFIG.channel}`;
     for (let nupkgPath of glob.sync(
       `${CONFIG.buildOutputPath}/${appName}-*.nupkg`
     )) {
@@ -60,7 +60,7 @@ module.exports = packagedAppPath => {
         fs.unlinkSync(nupkgPath);
       } else {
         if (process.arch === 'x64') {
-          // Use the original .nupkg filename to generate the `atom-x64` name by inserting `-x64` after `atom`
+          // Use the original .nupkg filename to generate the `pulsar-x64` name by inserting `-x64` after `pulsar`
           const newNupkgPath = nupkgPath.replace(
             `${appName}-`,
             `${appName}-x64-`

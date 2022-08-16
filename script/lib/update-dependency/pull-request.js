@@ -4,7 +4,7 @@ const { REPO_OWNER, MAIN_REPO } = require('../../config');
 const requestWithAuth = request.defaults({
   baseUrl: 'https://api.github.com',
   headers: {
-    'user-agent': 'atom',
+    'user-agent': 'pulsar',
     authorization: `token ${process.env.AUTH_TOKEN}`
   },
   owner: REPO_OWNER,
@@ -18,7 +18,7 @@ module.exports = {
   ) => {
     let description = `Bumps ${moduleName} from ${installed} to ${latest}`;
     if (isCorePackage) {
-      description = `*List of changes between ${moduleName}@${installed} and ${moduleName}@${latest}: https://github.com/atom/${moduleName}/compare/v${installed}...v${latest}*`;
+      description = `*List of changes between ${moduleName}@${installed} and ${moduleName}@${latest}: https://github.com/pulsar-edit/${moduleName}/compare/v${installed}...v${latest}*`;
     }
     return requestWithAuth('POST /repos/:owner/:repo/pulls', {
       title: `⬆️ ${moduleName}@${latest}`,
@@ -34,7 +34,7 @@ module.exports = {
   },
   findOpenPRs: async () => {
     return requestWithAuth('GET /search/issues', {
-      q: 'type:pr repo:atom/atom state:open label:"depency ⬆️"'
+      q: 'type:pr repo:pulsar-edit/pulsar state:open label:"depency ⬆️"'
     });
   },
   checkCIstatus: async ({ ref }) => {

@@ -8,6 +8,7 @@ const git = (git, repositoryRootPath) => {
     'package-lock.json'
   );
   try {
+    //TODO_PULSAR: Update remotes
     git.getRemotes((err, remotes) => {
       if (!err && !remotes.map(({ name }) => name).includes('ATOM')) {
         git.addRemote(

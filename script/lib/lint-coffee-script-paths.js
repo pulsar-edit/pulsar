@@ -9,7 +9,7 @@ const CONFIG = require('../config');
 
 module.exports = function() {
   const globPathsToLint = [
-    path.join(CONFIG.repositoryRootPath, 'dot-atom/**/*.coffee'),
+    path.join(CONFIG.repositoryRootPath, 'templates/**/*.coffee'),
     path.join(CONFIG.repositoryRootPath, 'src/**/*.coffee'),
     path.join(CONFIG.repositoryRootPath, 'spec/*.coffee')
   ];

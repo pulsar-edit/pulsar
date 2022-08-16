@@ -10,7 +10,7 @@ const path = require('path');
 const CONFIG = require('../config');
 
 module.exports = function() {
-  const generatedJSONPath = path.join(CONFIG.docsOutputPath, 'atom-api.json');
+  const generatedJSONPath = path.join(CONFIG.docsOutputPath, 'pulsar-api.json');
   console.log(`Generating API docs at ${generatedJSONPath}`);
 
   // Unfortunately, correct relative paths depend on a specific working

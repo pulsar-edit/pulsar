@@ -13,7 +13,7 @@ module.exports = function() {
   console.log(`Copying assets to ${CONFIG.intermediateAppPath}`);
   let srcPaths = [
     path.join(CONFIG.repositoryRootPath, 'benchmarks', 'benchmark-runner.js'),
-    path.join(CONFIG.repositoryRootPath, 'dot-atom'),
+    path.join(CONFIG.repositoryRootPath, 'templates'),
     path.join(CONFIG.repositoryRootPath, 'exports'),
     path.join(CONFIG.repositoryRootPath, 'package.json'),
     path.join(CONFIG.repositoryRootPath, 'static'),
@@ -39,7 +39,7 @@ module.exports = function() {
   // We do this to ensure that symlinked repo-local bundled packages get
   // copied to the output folder correctly.  We dereference only the top-level
   // symlinks and not nested symlinks to avoid issues where symlinked binaries
-  // are duplicated in Atom's installation packages (see atom/atom#18490).
+  // are duplicated in Pulsar's installation packages (see atom/atom#18490).
   const nodeModulesPath = path.join(CONFIG.repositoryRootPath, 'node_modules');
   glob
     .sync(path.join(nodeModulesPath, '*'))
@@ -69,7 +69,7 @@ module.exports = function() {
         'png',
         '1024.png'
       ),
-      path.join(CONFIG.intermediateAppPath, 'resources', 'atom.png')
+      path.join(CONFIG.intermediateAppPath, 'resources', 'pulsar.png')
     )
   );
 
