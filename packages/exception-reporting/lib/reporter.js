@@ -29,7 +29,7 @@ export default class Reporter {
     return {
       apiKey: API_KEY,
       notifier: {
-        name: 'Atom',
+        name: 'Pulsar',
         version: LIB_VERSION,
         url: 'https://www.atom.io'
       },
@@ -245,7 +245,7 @@ export default class Reporter {
     ) {
       this.requestPrivateMetadataConsent(
         error,
-        'The Atom team would like to collect the following information to resolve this error:',
+        'The Pulsar team would like to collect the following information to resolve this error:',
         error => this.reportUncaughtException(error)
       );
       return;
@@ -269,7 +269,7 @@ export default class Reporter {
     ) {
       this.requestPrivateMetadataConsent(
         error,
-        'The Atom team would like to collect some information to resolve an unexpected condition:',
+        'The Pulsar team would like to collect some information to resolve an unexpected condition:',
         error => this.reportFailedAssertion(error)
       );
       return;
