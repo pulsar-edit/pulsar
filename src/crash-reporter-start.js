@@ -7,11 +7,12 @@ module.exports = function(params) {
 
   const parsedUploadToServer = uploadToServer !== null ? uploadToServer : false;
 
-  crashReporter.start({
-    productName: 'Atom',
-    companyName: 'GitHub',
-    submitURL: 'https://atom.io/crash_reports',
-    parsedUploadToServer,
-    extra: { platformRelease, arch, releaseChannel }
-  });
+  // FIXME: Move this to main process (crashReporter.start in renderer was deprecated)
+  // crashReporter.start({
+  //   productName: 'Pulsar',
+  //   companyName: 'GitHub',
+  //   submitURL: 'https://atom.io/crash_reports',
+  //   parsedUploadToServer,
+  //   extra: { platformRelease, arch, releaseChannel }
+  // });
 };
