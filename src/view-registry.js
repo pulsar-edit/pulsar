@@ -4,7 +4,7 @@ const { Disposable } = require('event-kit');
 const AnyConstructor = Symbol('any-constructor');
 
 // Essential: `ViewRegistry` handles the association between model and view
-// types in Atom. We call this association a View Provider. As in, for a given
+// types in Pulsar. We call this association a View Provider. As in, for a given
 // model, this class can provide a view via {::getView}, as long as the
 // model/view association was registered via {::addViewProvider}
 //
@@ -19,7 +19,7 @@ const AnyConstructor = Symbol('any-constructor');
 // View providers inform the workspace how your model objects should be
 // presented in the DOM. A view provider must always return a DOM node, which
 // makes [HTML 5 custom elements](http://www.html5rocks.com/en/tutorials/webcomponents/customelements/)
-// an ideal tool for implementing views in Atom.
+// an ideal tool for implementing views in Pulsar.
 //
 // You can access the `ViewRegistry` object via `atom.views`.
 module.exports = class ViewRegistry {
