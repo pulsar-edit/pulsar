@@ -74,7 +74,7 @@ module.exports.generateForVersion = async function(
       let prString = changelog.pullRequestsToString(pullRequests);
       let title = repo;
       if (repo === MAIN_REPO) {
-        title = 'Atom Core';
+        title = 'Pulsar Core';
         fromTag = oldVersionName;
         toTag = releaseVersion;
       }
@@ -126,7 +126,7 @@ module.exports.generateForNightly = async function(
 
     if (oldReleaseNotes) {
       const extractMatch = oldReleaseNotes.match(
-        /atom\/atom\/commit\/([0-9a-f]{5,40})/
+        /pulsar-edit\/pulsar\/commit\/([0-9a-f]{5,40})/
       );
       if (extractMatch.length > 1 && extractMatch[1]) {
         output.push('', '---', '');
