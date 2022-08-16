@@ -1,7 +1,8 @@
 {
-  "name": "atom",
-  "productName": "Atom",
-  "version": "1.63.0-dev",
+  "name": "pulsar",
+  "author": "Pulsar-Edit",
+  "productName": "Pulsar",
+  "version": "1.64.0-dev",
   "description": "A hackable text editor for the 21st Century.",
   "branding": {
     "id": "pulsar",
@@ -12,13 +13,13 @@
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atom/atom.git"
+    "url": "https://github.com/pulsar-edit/pulsar.git"
   },
   "bugs": {
-    "url": "https://github.com/atom/atom/issues"
+    "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
   "license": "MIT",
-  "electronVersion": "11.5.0",
+  "electronVersion": "12.2.3",
   "dependencies": {
     "@atom/fuzzy-native": "^1.2.1",
     "@atom/source-map-support": "^0.3.4",
@@ -74,7 +75,7 @@
     "fuzzaldrin": "^2.1",
     "fuzzy-finder": "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3",
     "git-diff": "file:packages/git-diff",
-    "git-utils": "5.7.1",
+    "git-utils": "5.7.3",
     "github": "https://github.com/pulsar-edit/github.git#v0.36.11",
     "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
@@ -297,8 +298,12 @@
     ]
   },
   "devDependencies": {
-    "electron": "11.5.0",
+    "@playwright/test": "^1.22.2",
+    "electron": "12.2.3",
+    "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
+    "playwright": "^1.22.2",
+    "playwright-core": "^1.22.2",
     "random-seed": "^0.3.0",
     "webdriverio": "^7.20.9"
   }
