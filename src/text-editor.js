@@ -36,7 +36,7 @@ const DEFAULT_NON_WORD_CHARACTERS = '/\\()"\':,.;<>~!@#$%^&*|+=[]{}`?-…';
 // If you're manipulating the state of an editor, use this class.
 //
 // A single {TextBuffer} can belong to multiple editors. For example, if the
-// same file is open in two different panes, Atom creates a separate editor for
+// same file is open in two different panes, Pulsar creates a separate editor for
 // each pane. If the buffer is manipulated the changes are reflected in both
 // editors, but each maintains its own cursor position, folded lines, etc.
 //
@@ -325,7 +325,7 @@ module.exports = class TextEditor {
       \`TextEditor.prototype.editorElement\` has always been private, but now
       it is gone. Reading the \`editorElement\` property still returns a
       reference to the editor element but this field will be removed in a
-      later version of Atom, so we recommend using the \`element\` property instead.\
+      later version of Pulsar, so we recommend using the \`element\` property instead.\
     `);
 
     return this.getElement();
