@@ -10,13 +10,13 @@ else
 fi
 
 case $(basename $0) in
-  atom-beta)
+  pulsar-beta)
     CHANNEL=beta
     ;;
-  atom-nightly)
+  pulsar-nightly)
     CHANNEL=nightly
     ;;
-  atom-dev)
+  pulsar-dev)
     CHANNEL=dev
     ;;
   *)
@@ -87,7 +87,7 @@ if [ $REDIRECT_STDERR ]; then
   exec 2> /dev/null
 fi
 
-ATOM_HOME="${ATOM_HOME:-$HOME/.atom}"
+ATOM_HOME="${ATOM_HOME:-$HOME/.pulsar}"
 mkdir -p "$ATOM_HOME"
 
 if [ $OS == 'Mac' ]; then
@@ -110,13 +110,13 @@ if [ $OS == 'Mac' ]; then
   else
     # Else choose it from the inferred channel name
     if [ "$CHANNEL" == 'beta' ]; then
-      ATOM_EXECUTABLE_NAME="Atom Beta"
+      ATOM_EXECUTABLE_NAME="Pulsar Beta"
     elif [ "$CHANNEL" == 'nightly' ]; then
-      ATOM_EXECUTABLE_NAME="Atom Nightly"
+      ATOM_EXECUTABLE_NAME="Pulsar Nightly"
     elif [ "$CHANNEL" == 'dev' ]; then
-      ATOM_EXECUTABLE_NAME="Atom Dev"
+      ATOM_EXECUTABLE_NAME="Pulsar Dev"
     else
-      ATOM_EXECUTABLE_NAME="Atom"
+      ATOM_EXECUTABLE_NAME="Pulsar"
     fi
   fi
 
@@ -127,10 +127,10 @@ if [ $OS == 'Mac' ]; then
     elif [ -x "$HOME/Applications/$ATOM_APP_NAME" ]; then
       ATOM_PATH="$HOME/Applications"
     else
-      # We haven't found an Atom.app, use spotlight to search for Atom
-      ATOM_PATH="$(mdfind "kMDItemCFBundleIdentifier == 'com.github.atom'" | grep -v ShipIt | head -1 | xargs -0 dirname)"
+      # We haven't found an Pulsar.app, use spotlight to search for Pulsar
+      ATOM_PATH="$(mdfind "kMDItemCFBundleIdentifier == 'com.github.pulsar'" | grep -v ShipIt | head -1 | xargs -0 dirname)"
 
-      # Exit if Atom can't be found
+      # Exit if Pulsar can't be found
       if [ ! -x "$ATOM_PATH/$ATOM_APP_NAME" ]; then
         echo "Cannot locate ${ATOM_APP_NAME}, it is usually located in /Applications. Set the ATOM_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
         exit 1
@@ -155,27 +155,27 @@ elif [ $OS == 'Linux' ]; then
 
   case $CHANNEL in
     beta)
-      ATOM_PATH="$USR_DIRECTORY/share/atom-beta/atom"
+      ATOM_PATH="$USR_DIRECTORY/share/pulsar-beta/pulsar"
       ;;
     nightly)
-      ATOM_PATH="$USR_DIRECTORY/share/atom-nightly/atom"
+      ATOM_PATH="$USR_DIRECTORY/share/pulsar-nightly/pulsar"
       ;;
     dev)
-      ATOM_PATH="$USR_DIRECTORY/share/atom-dev/atom"
+      ATOM_PATH="$USR_DIRECTORY/share/pulsar-dev/pulsar"
       ;;
     *)
-      ATOM_PATH="$USR_DIRECTORY/share/atom/atom"
+      ATOM_PATH="$USR_DIRECTORY/share/pulsar/pulsar"
       ;;
   esac
 
   #Will allow user to get context menu on cinnamon desktop enviroment
   if [[ "$(expr substr $(printenv | grep "DESKTOP_SESSION=") 17 8)" == "cinnamon" ]]; then
-    cp "resources/linux/desktopenviroment/cinnamon/atom.nemo_action" "/usr/share/nemo/actions/atom.nemo_action"
+    cp "resources/linux/desktopenviroment/cinnamon/pulsar.nemo_action" "/usr/share/nemo/actions/pulsar.nemo_action"
   fi
 
   : ${TMPDIR:=/tmp}
 
-  [ -x "$ATOM_PATH" ] || ATOM_PATH="$TMPDIR/atom-build/Atom/atom"
+  [ -x "$ATOM_PATH" ] || ATOM_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
 
   if [ $EXPECT_OUTPUT ]; then
     "$ATOM_PATH" --executed-from="$(pwd)" --pid=$$ "$@"
@@ -196,13 +196,13 @@ elif [ $OS == 'Linux' ]; then
   fi
 fi
 
-# Exits this process when Atom is used as $EDITOR
+# Exits this process when Pulsar is used as $EDITOR
 on_die() {
   exit 0
 }
 trap 'on_die' SIGQUIT SIGTERM
 
-# If the wait flag is set, don't exit this process until Atom kills it.
+# If the wait flag is set, don't exit this process until Pulsar kills it.
 if [ $WAIT ]; then
   WAIT_FIFO="$ATOM_HOME/.wait_fifo"
 
