@@ -1,8 +1,8 @@
 'menu': [
   {
-    label: 'Atom'
+    label: 'Pulsar'
     submenu: [
-      { label: 'About Atom', command: 'application:about' }
+      { label: 'About Pulsar', command: 'application:about' }
       { label: 'View License', command: 'application:open-license' }
       { label: 'VERSION', enabled: false }
       { label: 'Restart and Install Update', command: 'application:install-update', visible: false}
@@ -22,11 +22,11 @@
       { type: 'separator' }
       { label: 'Services', role: 'services', submenu: [] }
       { type: 'separator' }
-      { label: 'Hide Atom', command: 'application:hide' }
+      { label: 'Hide Pulsar', command: 'application:hide' }
       { label: 'Hide Others', command: 'application:hide-other-applications' }
       { label: 'Show All', command: 'application:unhide-all-applications' }
       { type: 'separator' }
-      { label: 'Quit Atom', command: 'application:quit' }
+      { label: 'Quit Pulsar', command: 'application:quit' }
     ]
   }
   {
