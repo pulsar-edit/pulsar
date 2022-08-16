@@ -39,7 +39,7 @@ const releaseVersion = CONFIG.computedAppVersion;
 const isNightlyRelease = CONFIG.channel === 'nightly';
 const assetsPath = argv.assetsPath || CONFIG.buildOutputPath;
 const assetsPattern =
-  '/**/*(*.exe|*.zip|*.nupkg|*.tar.gz|*.rpm|*.deb|RELEASES*|atom-api.json)';
+  '/**/*(*.exe|*.zip|*.nupkg|*.tar.gz|*.rpm|*.deb|RELEASES*|pulsar-api.json)';
 const assets = glob.sync(assetsPattern, { root: assetsPath, nodir: true });
 const azureBlobPath = argv.azureBlobPath || `releases/v${releaseVersion}/`;
 
