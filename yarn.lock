@@ -2041,9 +2041,9 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "0.17.5"
   resolved "https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5#a6b38bca90bdba18a2f40c366266cda93bf582c3"
 
-"autocomplete-html@https://codeload.github.com/atom/autocomplete-html/legacy.tar.gz/refs/tags/v0.8.8":
-  version "0.8.8"
-  resolved "https://codeload.github.com/atom/autocomplete-html/legacy.tar.gz/refs/tags/v0.8.8#2c07bb627e672d8dbc3aa1abc77d5bc1d211f4f1"
+"autocomplete-html@https://github.com/pulsar-edit/autocomplete-html.git#v0.8.9":
+  version "0.8.9"
+  resolved "https://github.com/pulsar-edit/autocomplete-html.git#4d0c180bade12e90ec3fce944ba3759723e64ba4"
 
 "autocomplete-plus@https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4":
   version "2.42.4"
