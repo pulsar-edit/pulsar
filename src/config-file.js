@@ -77,6 +77,7 @@ module.exports = class ConfigFile {
           this.requestLoad();
       });
     } catch (error) {
+      //TODO_PULSAR: Find out why the atom global variable isn't available at this point
       this.emitter.emit(
         'did-error',
         dedent`
