@@ -2,8 +2,8 @@
 # Get current path in Windows format
 if command -v "cygpath" > /dev/null; then
   # We have cygpath to do the conversion
-  ATOMCMD=$(cygpath "$(dirname "$0")/atom.cmd" -a -w)
-  ARGS=( $(cygpath -a -w "$@" | tr '\n' ' ') ) 
+  ATOMCMD=$(cygpath "$(dirname "$0")/pulsar.cmd" -a -w)
+  ARGS=( $(cygpath -a -w "$@" | tr '\n' ' ') )
 else
   ARGS=$@
   pushd "$(dirname "$0")" > /dev/null
@@ -13,10 +13,10 @@ else
     # If different root mount point defined in /etc/wsl.conf, use that instead
     eval $(grep "^root" /etc/wsl.conf | sed -e "s/ //g")
     root="$(echo $root | sed 's|/|\\/|g')"
-    ATOMCMD="$(echo $PWD | sed 's/\/mnt\/\([a-z]*\)\(.*\)/\1:\2/')/atom.cmd"
+    ATOMCMD="$(echo $PWD | sed 's/\/mnt\/\([a-z]*\)\(.*\)/\1:\2/')/pulsar.cmd"
   else
     # We don't have cygpath or WSL so try pwd -W
-    ATOMCMD="$(pwd -W)/atom.cmd"
+    ATOMCMD="$(pwd -W)/pulsar.cmd"
   fi
   popd > /dev/null
 fi

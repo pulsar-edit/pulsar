@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>Atom</string>
+	<string>Pulsar</string>
 	<key>CFBundleIconFile</key>
-	<string>atom.icns</string>
+	<string>pulsar.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.github.atom</string>
+	<string>com.github.pulsar</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Atom</string>
+	<string>Pulsar</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -43,10 +43,10 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>atom</string>
+				<string>pulsar</string>
 			</array>
 			<key>CFBundleURLName</key>
-			<string>Atom Shared Session Protocol</string>
+			<string>Pulsar Shared Session Protocol</string>
 		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>

@@ -3,7 +3,7 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
 <policyconfig>
-  <vendor>Atom</vendor>
+  <vendor>Pulsar</vendor>
   <action id="atom.pkexec.dd">
     <description gettext-domain="atom">Admin privileges required</description>
     <message gettext-domain="atom">Please enter your password to save this file</message>
