@@ -5,7 +5,7 @@ const yargs = require('yargs');
 const { app } = require('electron');
 
 module.exports = function parseCommandLine(processArgs) {
-  // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Atom launches.
+  // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Pulsar launches.
   // (This happens for fresh downloads, new installs, or first launches after upgrading).
   // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
   const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
@@ -13,30 +13,30 @@ module.exports = function parseCommandLine(processArgs) {
   const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
   const version = app.getVersion();
   options.usage(
-    dedent`Atom Editor v${version}
+    dedent`Pulsar Editor v${version}
 
     Usage:
-      atom
-      atom [options] [path ...]
-      atom file[:line[:column]]
+      pulsar
+      pulsar [options] [path ...]
+      pulsar file[:line[:column]]
 
     One or more paths to files or folders may be specified. If there is an
-    existing Atom window that contains all of the given folders, the paths
+    existing Pulsar window that contains all of the given folders, the paths
     will be opened in that window. Otherwise, they will be opened in a new
     window.
 
     A file may be opened at the desired line (and optionally column) by
-    appending the numbers right after the file name, e.g. \`atom file:5:8\`.
+    appending the numbers right after the file name, e.g. \`pulsar file:5:8\`.
 
     Paths that start with \`atom://\` will be interpreted as URLs.
 
     Environment Variables:
 
-      ATOM_DEV_RESOURCE_PATH  The path from which Atom loads source code in dev mode.
+      ATOM_DEV_RESOURCE_PATH  The path from which Pulsar loads source code in dev mode.
                               Defaults to \`~/github/atom\`.
 
       ATOM_HOME               The root path for all configuration files and folders.
-                              Defaults to \`~/.atom\`.`
+                              Defaults to \`~/.pulsar\`.`
   );
   // Deprecated 1.0 API preview flag
   options
@@ -77,13 +77,13 @@ module.exports = function parseCommandLine(processArgs) {
     .string('r')
     .describe(
       'r',
-      'Set the path to the Atom source directory and enable dev-mode.'
+      'Set the path to the Pulsar source directory and enable dev-mode.'
     );
   options
     .boolean('safe')
     .describe(
       'safe',
-      'Do not load packages from ~/.atom/packages or ~/.atom/dev/packages.'
+      'Do not load packages from ~/.pulsar/packages or ~/.pulsar/dev/packages.'
     );
   options
     .boolean('benchmark')
@@ -125,7 +125,7 @@ module.exports = function parseCommandLine(processArgs) {
   options.string('user-data-dir');
   options
     .boolean('clear-window-state')
-    .describe('clear-window-state', 'Delete all Atom environment state.');
+    .describe('clear-window-state', 'Delete all Pulsar environment state.');
   options
     .boolean('enable-electron-logging')
     .describe(
@@ -135,7 +135,7 @@ module.exports = function parseCommandLine(processArgs) {
   options.boolean('uri-handler');
   options
     .version(
-      dedent`Atom    : ${version}
+      dedent`Pulsar  : ${version}
              Electron: ${process.versions.electron}
              Chrome  : ${process.versions.chrome}
              Node    : ${process.versions.node}`
@@ -175,7 +175,7 @@ module.exports = function parseCommandLine(processArgs) {
     );
 
     // Exiting the main process with a nonzero exit code on MacOS causes the app open to fail with the mysterious
-    // message "LSOpenURLsWithRole() failed for the application /Applications/Atom Dev.app with error -10810."
+    // message "LSOpenURLsWithRole() failed for the application /Applications/Pulsar Dev.app with error -10810."
     process.exit(0);
   }
 
