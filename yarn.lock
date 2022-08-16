@@ -1755,9 +1755,9 @@ aproba@^1.0.3:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-"archive-view@https://www.atom.io/api/packages/archive-view/versions/0.66.0/tarball":
+"archive-view@https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0":
   version "0.66.0"
-  resolved "https://www.atom.io/api/packages/archive-view/versions/0.66.0/tarball#e4563bf7cf4d6916eee4a949ca260315e8b2fe06"
+  resolved "https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0#e4563bf7cf4d6916eee4a949ca260315e8b2fe06"
   dependencies:
     etch "0.9.0"
     fs-plus "^3.0.0"
@@ -1922,21 +1922,21 @@ atom-slick@^2, atom-slick@^2.0.0:
   resolved "https://registry.yarnpkg.com/atom-slick/-/atom-slick-2.0.0.tgz#ff0dbe15be2c4eda268b9d30d76e2517e0b7d3ca"
   integrity sha512-yKl/4ZHeP3v6gtncnX6pAPFNv3gQNNYlXMk1QYP5gYB6xq2xqkFXbpwQo3IixGUZMf+DHilAmHOrS21QKLLi9g==
 
-"autocomplete-atom-api@https://www.atom.io/api/packages/autocomplete-atom-api/versions/0.10.7/tarball":
+"autocomplete-atom-api@https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7":
   version "0.10.7"
-  resolved "https://www.atom.io/api/packages/autocomplete-atom-api/versions/0.10.7/tarball#c9d51fa721d543ccfc1b2189101155e81db6b97d"
+  resolved "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7#c9d51fa721d543ccfc1b2189101155e81db6b97d"
 
-"autocomplete-css@https://www.atom.io/api/packages/autocomplete-css/versions/0.17.5/tarball":
+"autocomplete-css@https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5":
   version "0.17.5"
-  resolved "https://www.atom.io/api/packages/autocomplete-css/versions/0.17.5/tarball#a6b38bca90bdba18a2f40c366266cda93bf582c3"
+  resolved "https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5#a6b38bca90bdba18a2f40c366266cda93bf582c3"
 
-"autocomplete-html@https://www.atom.io/api/packages/autocomplete-html/versions/0.8.8/tarball":
+"autocomplete-html@https://codeload.github.com/atom/autocomplete-html/legacy.tar.gz/refs/tags/v0.8.8":
   version "0.8.8"
-  resolved "https://www.atom.io/api/packages/autocomplete-html/versions/0.8.8/tarball#2c07bb627e672d8dbc3aa1abc77d5bc1d211f4f1"
+  resolved "https://codeload.github.com/atom/autocomplete-html/legacy.tar.gz/refs/tags/v0.8.8#2c07bb627e672d8dbc3aa1abc77d5bc1d211f4f1"
 
-"autocomplete-plus@https://www.atom.io/api/packages/autocomplete-plus/versions/2.42.4/tarball":
+"autocomplete-plus@https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4":
   version "2.42.4"
-  resolved "https://www.atom.io/api/packages/autocomplete-plus/versions/2.42.4/tarball#dcfe8ea2b844d27f3d30c7cae4621638ca13e0a8"
+  resolved "https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4#dcfe8ea2b844d27f3d30c7cae4621638ca13e0a8"
   dependencies:
     atom-slick "^2.0.0"
     dompurify "^2.0.7"
@@ -1949,18 +1949,18 @@ atom-slick@^2, atom-slick@^2.0.0:
     stable "^0.1.5"
     underscore-plus "^1.6.6"
 
-"autocomplete-snippets@https://www.atom.io/api/packages/autocomplete-snippets/versions/1.12.1/tarball":
+"autocomplete-snippets@https://codeload.github.com/atom/autocomplete-snippets/legacy.tar.gz/refs/tags/v1.12.1":
   version "1.12.1"
-  resolved "https://www.atom.io/api/packages/autocomplete-snippets/versions/1.12.1/tarball#701fb4dcc06eba178c798b65e557510e4326e0fd"
+  resolved "https://codeload.github.com/atom/autocomplete-snippets/legacy.tar.gz/refs/tags/v1.12.1#701fb4dcc06eba178c798b65e557510e4326e0fd"
 
 "autoflow@file:packages/autoflow":
   version "0.29.4"
   dependencies:
     underscore-plus "^1.7.0"
 
-"autosave@https://www.atom.io/api/packages/autosave/versions/0.24.6/tarball":
+"autosave@https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6":
   version "0.24.6"
-  resolved "https://www.atom.io/api/packages/autosave/versions/0.24.6/tarball#bbd25c3364cfa5b3c73f9d4d08da93aaac339020"
+  resolved "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6#bbd25c3364cfa5b3c73f9d4d08da93aaac339020"
   dependencies:
     fs-plus "^3.0.0"
 
@@ -2103,9 +2103,9 @@ babel-preset-atomic@^5.0.0:
     "@types/babel__core" "^7.1.19"
     "@types/babel__preset-env" "7.9.2"
 
-"background-tips@https://www.atom.io/api/packages/background-tips/versions/0.28.0/tarball":
+"background-tips@https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0":
   version "0.28.0"
-  resolved "https://www.atom.io/api/packages/background-tips/versions/0.28.0/tarball#efe8011deb2f17852a1dd68d80890105a80f0a05"
+  resolved "https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0#efe8011deb2f17852a1dd68d80890105a80f0a05"
   dependencies:
     underscore-plus "1.x"
 
@@ -2176,9 +2176,9 @@ bluebird@^3.5.0:
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
-"bookmarks@https://www.atom.io/api/packages/bookmarks/versions/0.46.0/tarball":
+"bookmarks@https://codeload.github.com/atom/bookmarks/legacy.tar.gz/refs/tags/v0.46.0":
   version "0.46.0"
-  resolved "https://www.atom.io/api/packages/bookmarks/versions/0.46.0/tarball#6370ab1681697a1f59fcb6bc07e42fc5caa84ad0"
+  resolved "https://codeload.github.com/atom/bookmarks/legacy.tar.gz/refs/tags/v0.46.0#6370ab1681697a1f59fcb6bc07e42fc5caa84ad0"
   dependencies:
     atom-select-list "^0.7.0"
 
@@ -2214,9 +2214,9 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@https://www.atom.io/api/packages/bracket-matcher/versions/0.92.0/tarball":
+"bracket-matcher@https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0":
   version "0.92.0"
-  resolved "https://www.atom.io/api/packages/bracket-matcher/versions/0.92.0/tarball#fe75cb7dd3f286d9f20b1d1edd7fec085730a866"
+  resolved "https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0#fe75cb7dd3f286d9f20b1d1edd7fec085730a866"
   dependencies:
     first-mate "^7.4.1"
     underscore-plus "1.x"
@@ -2663,9 +2663,9 @@ combined-stream@^1.0.5, combined-stream@^1.0.6, combined-stream@~1.0.5, combined
   dependencies:
     delayed-stream "~1.0.0"
 
-"command-palette@https://www.atom.io/api/packages/command-palette/versions/0.43.5/tarball":
+"command-palette@https://codeload.github.com/atom/command-palette/legacy.tar.gz/refs/tags/v0.43.5":
   version "0.43.5"
-  resolved "https://www.atom.io/api/packages/command-palette/versions/0.43.5/tarball#49a1d855ef778889219f97ce1d2102e3ac41bd18"
+  resolved "https://codeload.github.com/atom/command-palette/legacy.tar.gz/refs/tags/v0.43.5#49a1d855ef778889219f97ce1d2102e3ac41bd18"
   dependencies:
     atom-select-list "^0.7.1"
     fuzzaldrin "^2.1.0"
@@ -3204,9 +3204,9 @@ encodeurl@^1.0.2:
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==
 
-"encoding-selector@https://www.atom.io/api/packages/encoding-selector/versions/0.23.9/tarball":
+"encoding-selector@https://codeload.github.com/atom/encoding-selector/legacy.tar.gz/refs/tags/v0.23.9":
   version "0.23.9"
-  resolved "https://www.atom.io/api/packages/encoding-selector/versions/0.23.9/tarball#b83bcb48d46e7e5a22a0b7b5893ebadb40dddd92"
+  resolved "https://codeload.github.com/atom/encoding-selector/legacy.tar.gz/refs/tags/v0.23.9#b83bcb48d46e7e5a22a0b7b5893ebadb40dddd92"
   dependencies:
     atom-select-list "^0.7.0"
     iconv-lite "^0.4.4"
@@ -3604,15 +3604,7 @@ from@~0:
   resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
   integrity sha512-twe20eF1OxVxp/ML/kq2p1uc6KvFK/+vs8WjEbeKmV2He22MKm7YF2ANIt+EOqhJ5L3K/SuuPhk0hWQDjOM23g==
 
-fs-admin@0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/fs-admin/-/fs-admin-0.15.0.tgz#ffa7daab2f1184ca81df73e7db8365ee1747410c"
-  integrity sha512-2czA7rZNnu/RSVwxZUSX4fF48PRj8gJ7fKMKpY+G3ESiEzHMPCHvNQaC02PhU+PAyzBUiqfiMHJisnj4LONwLA==
-  dependencies:
-    nan "^2.13.2"
-    prebuild-install "5.3.5"
-
-fs-admin@^0.19.0:
+fs-admin@0.19.0, fs-admin@^0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/fs-admin/-/fs-admin-0.19.0.tgz#c2b077b21607ca1982bf9bc8c3fc096be7a1186e"
   integrity sha512-GtJUlSqX95Daw1zlH9PtqMIpr+yQqUnCRKxupuwdlPGy4ds+ICNT3apyQlnT1yXiXvAdnTK06ag/4jMS/jzhXQ==
@@ -3755,9 +3747,9 @@ fuzzaldrin@^2.0, fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
 
-"fuzzy-finder@https://www.atom.io/api/packages/fuzzy-finder/versions/1.14.3/tarball":
+"fuzzy-finder@https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3":
   version "1.14.3"
-  resolved "https://www.atom.io/api/packages/fuzzy-finder/versions/1.14.3/tarball#7cd40191b8930bb49039a860ab868f554f90f41d"
+  resolved "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3#7cd40191b8930bb49039a860ab868f554f90f41d"
   dependencies:
     "@atom/fuzzy-native" "^1.1.2"
     async "0.2.6"
@@ -4307,9 +4299,9 @@ image-size@~0.5.0:
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.5.5.tgz#09dfd4ab9d20e29eb1c3e80b8990378df9e3cb9c"
   integrity sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==
 
-"image-view@https://www.atom.io/api/packages/image-view/versions/0.64.0/tarball":
+"image-view@https://codeload.github.com/atom/image-view/legacy.tar.gz/refs/tags/v0.64.0":
   version "0.64.0"
-  resolved "https://www.atom.io/api/packages/image-view/versions/0.64.0/tarball#49cfc1c780ea30c813672802f3c54fd30217716d"
+  resolved "https://codeload.github.com/atom/image-view/legacy.tar.gz/refs/tags/v0.64.0#49cfc1c780ea30c813672802f3c54fd30217716d"
   dependencies:
     bytes "^3.0.0"
     etch "0.9.0"
@@ -4776,9 +4768,9 @@ key-path-helpers@^0.4.0:
   resolved "https://registry.yarnpkg.com/key-path-helpers/-/key-path-helpers-0.4.0.tgz#e87f6a159144adf2692e46f2a4641ce269c09119"
   integrity sha512-WGl1FG6zjyXCU6YrOVrvanyN3iiLFPLr/UmZ/jGiEOd7CXQV83/Ng5aLGK/Erehtr1nxU8dOwnRjseQDGElMQw==
 
-"keybinding-resolver@https://www.atom.io/api/packages/keybinding-resolver/versions/0.39.1/tarball":
+"keybinding-resolver@https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1":
   version "0.39.1"
-  resolved "https://www.atom.io/api/packages/keybinding-resolver/versions/0.39.1/tarball#a1c08beb144cfca145bf19fe0830b2e82514d4cb"
+  resolved "https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1#a1c08beb144cfca145bf19fe0830b2e82514d4cb"
   dependencies:
     etch "0.9.0"
     fs-plus "^3.0.0"
@@ -4815,170 +4807,127 @@ keyv@^4.0.0:
     compress-brotli "^1.3.8"
     json-buffer "3.0.1"
 
-"language-c@https://www.atom.io/api/packages/language-c/versions/0.60.19/tarball":
+"language-c@https://codeload.github.com/atom/language-c/legacy.tar.gz/refs/tags/v0.60.19":
   version "0.60.19"
-  resolved "https://www.atom.io/api/packages/language-c/versions/0.60.19/tarball#27e6c24739e0491111ee3cbd2c12283c07778ebc"
+  resolved "https://codeload.github.com/atom/language-c/legacy.tar.gz/refs/tags/v0.60.19#27e6c24739e0491111ee3cbd2c12283c07778ebc"
   dependencies:
     tree-sitter-c "^0.15.3"
     tree-sitter-cpp "^0.15.1"
 
-"language-clojure@https://www.atom.io/api/packages/language-clojure/versions/0.22.8/tarball":
+"language-clojure@file:packages/language-clojure":
   version "0.22.8"
-  resolved "https://www.atom.io/api/packages/language-clojure/versions/0.22.8/tarball#3887114cb34eadb0d974c785918d6c44550dd850"
 
-"language-coffee-script@https://www.atom.io/api/packages/language-coffee-script/versions/0.50.0/tarball":
+"language-coffee-script@file:packages/language-coffee-script":
   version "0.50.0"
-  resolved "https://www.atom.io/api/packages/language-coffee-script/versions/0.50.0/tarball#abced7a9e188335b085e789a3d2008b4a0e18d5b"
 
-"language-csharp@https://www.atom.io/api/packages/language-csharp/versions/1.1.0/tarball":
+"language-csharp@file:packages/language-csharp":
   version "1.1.0"
-  resolved "https://www.atom.io/api/packages/language-csharp/versions/1.1.0/tarball#a4a77c512bfd883ddc399c8631ef35a46dd62d29"
 
-"language-css@https://www.atom.io/api/packages/language-css/versions/0.45.1/tarball":
+"language-css@https://codeload.github.com/atom/language-css/legacy.tar.gz/refs/tags/v0.45.1":
   version "0.45.1"
-  resolved "https://www.atom.io/api/packages/language-css/versions/0.45.1/tarball#a1e5471edabe1c863a72e7a4bfc74bed6e0eb0e3"
+  resolved "https://codeload.github.com/atom/language-css/legacy.tar.gz/refs/tags/v0.45.1#a1e5471edabe1c863a72e7a4bfc74bed6e0eb0e3"
   dependencies:
     tree-sitter-css "^0.19.0"
 
-"language-gfm@https://www.atom.io/api/packages/language-gfm/versions/0.90.8/tarball":
+"language-gfm@file:packages/language-gfm":
   version "0.90.8"
-  resolved "https://www.atom.io/api/packages/language-gfm/versions/0.90.8/tarball#47eebceaf4290da491abc68f6a12006ce6171ae7"
 
-"language-git@https://www.atom.io/api/packages/language-git/versions/0.19.1/tarball":
+"language-git@file:packages/language-git":
   version "0.19.1"
-  resolved "https://www.atom.io/api/packages/language-git/versions/0.19.1/tarball#4e42383312e9979f50968031d6e5e1dea9ffc98f"
 
-"language-go@https://www.atom.io/api/packages/language-go/versions/0.47.2/tarball":
-  version "0.47.2"
-  resolved "https://www.atom.io/api/packages/language-go/versions/0.47.2/tarball#726785ac72cb8e18f524835f27a7ef3834f705d5"
-  dependencies:
-    tree-sitter-go "^0.15.1"
-
-"language-html@https://www.atom.io/api/packages/language-html/versions/0.53.1/tarball":
+"language-html@file:packages/language-html":
   version "0.53.1"
-  resolved "https://www.atom.io/api/packages/language-html/versions/0.53.1/tarball#d1f031b457a4d476bf742a9103e11433850dbe88"
   dependencies:
     atom-grammar-test "^0.6.3"
-    tree-sitter-embedded-template "^0.15.2"
-    tree-sitter-html "^0.15.0"
+    tree-sitter-embedded-template "0.19.0"
+    tree-sitter-html "0.19.0"
 
-"language-hyperlink@https://www.atom.io/api/packages/language-hyperlink/versions/0.17.1/tarball":
+"language-hyperlink@file:packages/language-hyperlink":
   version "0.17.1"
-  resolved "https://www.atom.io/api/packages/language-hyperlink/versions/0.17.1/tarball#d43adf5639fcf426399496cf439f2b3270456f74"
 
-"language-java@https://www.atom.io/api/packages/language-java/versions/0.32.1/tarball":
+"language-java@file:packages/language-java":
   version "0.32.1"
-  resolved "https://www.atom.io/api/packages/language-java/versions/0.32.1/tarball#0b9604dc26b5df0e378cb43ef3637b8acf92b3cf"
   dependencies:
-    tree-sitter-java-dev "^0.16.0-dev2"
+    tree-sitter-java "0.19.1"
 
-"language-javascript@https://www.atom.io/api/packages/language-javascript/versions/0.134.1/tarball":
-  version "0.134.1"
-  resolved "https://www.atom.io/api/packages/language-javascript/versions/0.134.1/tarball#3d237c3c42f5f4d204e906d302175aa256dcc566"
-  dependencies:
-    tree-sitter-javascript "^0.15.2"
-    tree-sitter-jsdoc "^0.15.2"
-    tree-sitter-regex "^0.15.1"
-
-"language-json@https://www.atom.io/api/packages/language-json/versions/1.0.5/tarball":
+"language-json@file:packages/language-json":
   version "1.0.5"
-  resolved "https://www.atom.io/api/packages/language-json/versions/1.0.5/tarball#2c1d86212f66606f0f2d63fe2ab1296c4208162a"
   dependencies:
-    tree-sitter-json "^0.15.1"
+    tree-sitter-json "0.20.0"
 
-"language-less@https://www.atom.io/api/packages/language-less/versions/0.34.3/tarball":
+"language-less@file:packages/language-less":
   version "0.34.3"
-  resolved "https://www.atom.io/api/packages/language-less/versions/0.34.3/tarball#aad0fb2660910e7e113a0751edb7c4820dadb06d"
 
-"language-make@https://www.atom.io/api/packages/language-make/versions/0.23.0/tarball":
+"language-make@file:packages/language-make":
   version "0.23.0"
-  resolved "https://www.atom.io/api/packages/language-make/versions/0.23.0/tarball#5ca4b570c56cc3aa09ade9337e7478fe640b9825"
 
-"language-mustache@https://www.atom.io/api/packages/language-mustache/versions/0.14.5/tarball":
+"language-mustache@file:packages/language-mustache":
   version "0.14.5"
-  resolved "https://www.atom.io/api/packages/language-mustache/versions/0.14.5/tarball#68c76cc0970eacf99fbe14667f80be164eb833dc"
 
-"language-objective-c@https://www.atom.io/api/packages/language-objective-c/versions/0.16.0/tarball":
+"language-objective-c@file:packages/language-objective-c":
   version "0.16.0"
-  resolved "https://www.atom.io/api/packages/language-objective-c/versions/0.16.0/tarball#38b9b5adbc1700e0f455fdf71d748a9837de2b40"
 
-"language-perl@https://www.atom.io/api/packages/language-perl/versions/0.38.1/tarball":
+"language-perl@file:packages/language-perl":
   version "0.38.1"
-  resolved "https://www.atom.io/api/packages/language-perl/versions/0.38.1/tarball#3fe16c1b24c5610082b9d0d1ad3ae838b06f7eb5"
 
-"language-php@https://www.atom.io/api/packages/language-php/versions/0.48.1/tarball":
+"language-php@file:packages/language-php":
   version "0.48.1"
-  resolved "https://www.atom.io/api/packages/language-php/versions/0.48.1/tarball#9606f7fd556f24d9fdf2aadfb8c59fd693cc0aac"
 
-"language-property-list@https://www.atom.io/api/packages/language-property-list/versions/0.9.1/tarball":
+"language-property-list@file:packages/language-property-list":
   version "0.9.1"
-  resolved "https://www.atom.io/api/packages/language-property-list/versions/0.9.1/tarball#d8686d95e1e656c894d1f0079963cc1deceefcbc"
 
-"language-python@https://www.atom.io/api/packages/language-python/versions/0.53.6/tarball":
+"language-python@file:packages/language-python":
   version "0.53.6"
-  resolved "https://www.atom.io/api/packages/language-python/versions/0.53.6/tarball#3b09b0afa634b2f8b638c2797e1da61d9614ebfa"
   dependencies:
     atom-grammar-test "^0.6.4"
-    tree-sitter-python "^0.17.0"
+    tree-sitter-python "0.19.0"
 
-"language-ruby-on-rails@https://www.atom.io/api/packages/language-ruby-on-rails/versions/0.25.3/tarball":
+"language-ruby-on-rails@file:packages/language-ruby-on-rails":
   version "0.25.3"
-  resolved "https://www.atom.io/api/packages/language-ruby-on-rails/versions/0.25.3/tarball#a6ad61c1d7b0697bf31605b5db85c1e14af9ba00"
 
-"language-ruby@https://www.atom.io/api/packages/language-ruby/versions/0.73.0/tarball":
+"language-ruby@file:packages/language-ruby":
   version "0.73.0"
-  resolved "https://www.atom.io/api/packages/language-ruby/versions/0.73.0/tarball#1beac72d0ed4f8523117c02480e1320af857b585"
   dependencies:
-    tree-sitter-ruby "^0.17.0"
+    tree-sitter-ruby "^0.19.0"
 
 "language-rust-bundled@file:packages/language-rust-bundled":
-  version "0.1.0"
+  version "0.1.1"
   dependencies:
-    tree-sitter-rust "^0.17.0"
+    tree-sitter-rust "0.20.1"
 
-"language-sass@https://www.atom.io/api/packages/language-sass/versions/0.62.1/tarball":
-  version "0.62.1"
-  resolved "https://www.atom.io/api/packages/language-sass/versions/0.62.1/tarball#a6cc2b197bc2e4c029c99f0737d5e79f148671f6"
+"language-sass@file:packages/language-sass":
+  version "0.62.2"
 
-"language-shellscript@https://www.atom.io/api/packages/language-shellscript/versions/0.28.2/tarball":
+"language-shellscript@file:packages/language-shellscript":
   version "0.28.2"
-  resolved "https://www.atom.io/api/packages/language-shellscript/versions/0.28.2/tarball#58b43b0d239953d157d79c0dccb2db4bb745e90c"
   dependencies:
-    tree-sitter-bash "^0.16.1"
+    tree-sitter-bash "0.19.0"
 
-"language-source@https://www.atom.io/api/packages/language-source/versions/0.9.0/tarball":
+"language-source@file:packages/language-source":
   version "0.9.0"
-  resolved "https://www.atom.io/api/packages/language-source/versions/0.9.0/tarball#e22e50ef026b8e703a0a9f09ff23ef90a97a04a8"
 
-"language-sql@https://www.atom.io/api/packages/language-sql/versions/0.25.10/tarball":
+"language-sql@file:packages/language-sql":
   version "0.25.10"
-  resolved "https://www.atom.io/api/packages/language-sql/versions/0.25.10/tarball#07061c5aeb21ebe079febf3e43740e681ef09b67"
 
-"language-text@https://www.atom.io/api/packages/language-text/versions/0.7.4/tarball":
+"language-text@file:packages/language-text":
   version "0.7.4"
-  resolved "https://www.atom.io/api/packages/language-text/versions/0.7.4/tarball#d97c38daa8200f004780380c90280e9143ba7d31"
 
-"language-todo@https://www.atom.io/api/packages/language-todo/versions/0.29.4/tarball":
+"language-todo@file:packages/language-todo":
   version "0.29.4"
-  resolved "https://www.atom.io/api/packages/language-todo/versions/0.29.4/tarball#7adf197762d779f225258adc692fbb15ded05a64"
 
-"language-toml@https://www.atom.io/api/packages/language-toml/versions/0.20.0/tarball":
+"language-toml@file:packages/language-toml":
   version "0.20.0"
-  resolved "https://www.atom.io/api/packages/language-toml/versions/0.20.0/tarball#2ed77c14e56e22b59dec29a2fc45fd8798eae339"
 
-"language-typescript@https://www.atom.io/api/packages/language-typescript/versions/0.6.3/tarball":
-  version "0.6.3"
-  resolved "https://www.atom.io/api/packages/language-typescript/versions/0.6.3/tarball#a315c84d29cdd1b29cded97ff13dd4e6ee0f4464"
+"language-typescript@file:packages/language-typescript":
+  version "0.6.4"
   dependencies:
-    tree-sitter-typescript "^0.16.1"
+    tree-sitter-typescript "0.20.1"
 
-"language-xml@https://www.atom.io/api/packages/language-xml/versions/0.35.3/tarball":
+"language-xml@file:packages/language-xml":
   version "0.35.3"
-  resolved "https://www.atom.io/api/packages/language-xml/versions/0.35.3/tarball#c408ff2dbbd623e51819e66ec8cae25f160c38c8"
 
-"language-yaml@https://www.atom.io/api/packages/language-yaml/versions/0.32.0/tarball":
+"language-yaml@file:packages/language-yaml":
   version "0.32.0"
-  resolved "https://www.atom.io/api/packages/language-yaml/versions/0.32.0/tarball#24155a81f19839889ff600303b6d22c1d242106c"
 
 lcid@^1.0.0:
   version "1.0.0"
@@ -5188,9 +5137,9 @@ map-stream@~0.1.0:
   resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.1.0.tgz#e56aa94c4c8055a16404a0674b78f215f7c8e194"
   integrity sha512-CkYQrPYZfWnu/DAmVCpTSX/xHpKZ80eKh2lAkyA6AJTef6bW+6JpbQZN5rofum7da+SyN1bi5ctTm+lTfcCW3g==
 
-"markdown-preview@https://www.atom.io/api/packages/markdown-preview/versions/0.160.2/tarball":
+"markdown-preview@https://codeload.github.com/atom/markdown-preview/legacy.tar.gz/refs/tags/v0.160.2":
   version "0.160.2"
-  resolved "https://www.atom.io/api/packages/markdown-preview/versions/0.160.2/tarball#6d6f4075ea5b5ec5a683104b12f2e91ad33fa392"
+  resolved "https://codeload.github.com/atom/markdown-preview/legacy.tar.gz/refs/tags/v0.160.2#6d6f4075ea5b5ec5a683104b12f2e91ad33fa392"
   dependencies:
     cheerio "^1.0.0-rc.3"
     dompurify "^1.0.2"
@@ -5246,9 +5195,9 @@ md5@^2.1.0:
     crypt "0.0.2"
     is-buffer "~1.1.6"
 
-"metrics@https://www.atom.io/api/packages/metrics/versions/1.8.1/tarball":
+"metrics@https://codeload.github.com/atom/metrics/legacy.tar.gz/refs/tags/v1.8.1":
   version "1.8.1"
-  resolved "https://www.atom.io/api/packages/metrics/versions/1.8.1/tarball#fbf921b4c9212a11f83d1f580620c3d6b1fff974"
+  resolved "https://codeload.github.com/atom/metrics/legacy.tar.gz/refs/tags/v1.8.1#fbf921b4c9212a11f83d1f580620c3d6b1fff974"
   dependencies:
     fs-plus "^3.0.0"
     grim "^2.0.1"
@@ -5551,7 +5500,7 @@ nan@2.14.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz#d7be34dfa3105b91494c3147089315eff8874b01"
   integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
 
-nan@^2.0.0, nan@^2.10.0, nan@^2.11.1, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2, nan@^2.8.0:
+nan@^2.10.0, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.16.0.tgz#664f43e45460fb98faf00edca0bb0d7b8dce7916"
   integrity sha512-UdAqHyFngu7TfQKsCBgAA6pWDkT8MAO7d0jyOecVhN5354xbLqdn8mV9Tat9gepAupm0bt2DbeaSC8vS52MuFA==
@@ -5735,9 +5684,9 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-"notifications@https://www.atom.io/api/packages/notifications/versions/0.72.1/tarball":
+"notifications@https://codeload.github.com/atom/notifications/legacy.tar.gz/refs/tags/v0.72.1":
   version "0.72.1"
-  resolved "https://www.atom.io/api/packages/notifications/versions/0.72.1/tarball#4e5a155624b1189bdcc3416a9f736ed1e030b56e"
+  resolved "https://codeload.github.com/atom/notifications/legacy.tar.gz/refs/tags/v0.72.1#4e5a155624b1189bdcc3416a9f736ed1e030b56e"
   dependencies:
     dompurify "^1.0.3"
     fs-plus "^3.0.0"
@@ -5894,9 +5843,9 @@ oniguruma@^7.2.3:
   dependencies:
     nan "^2.14.0"
 
-"open-on-github@https://www.atom.io/api/packages/open-on-github/versions/1.3.2/tarball":
+"open-on-github@https://codeload.github.com/atom/open-on-github/legacy.tar.gz/refs/tags/v1.3.2":
   version "1.3.2"
-  resolved "https://www.atom.io/api/packages/open-on-github/versions/1.3.2/tarball#1e1d9496b24bf608cc6cc06e68e4e93ac6cf760f"
+  resolved "https://codeload.github.com/atom/open-on-github/legacy.tar.gz/refs/tags/v1.3.2#1e1d9496b24bf608cc6cc06e68e4e93ac6cf760f"
 
 optimist@~0.3.5:
   version "0.3.7"
@@ -5975,9 +5924,9 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-"package-generator@https://www.atom.io/api/packages/package-generator/versions/1.3.0/tarball":
+"package-generator@https://codeload.github.com/atom/package-generator/legacy.tar.gz/refs/tags/v1.3.0":
   version "1.3.0"
-  resolved "https://www.atom.io/api/packages/package-generator/versions/1.3.0/tarball#ddf15bc1e1a2539b2c4d16ede9ec0cd4cec868e2"
+  resolved "https://codeload.github.com/atom/package-generator/legacy.tar.gz/refs/tags/v1.3.0#ddf15bc1e1a2539b2c4d16ede9ec0cd4cec868e2"
   dependencies:
     fs-plus "^3.0.0"
     temp "^0.8.1"
@@ -6183,27 +6132,6 @@ prebuild-install@5.3.3:
     tunnel-agent "^0.6.0"
     which-pm-runs "^1.0.0"
 
-prebuild-install@5.3.5:
-  version "5.3.5"
-  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.5.tgz#e7e71e425298785ea9d22d4f958dbaccf8bb0e1b"
-  integrity sha512-YmMO7dph9CYKi5IR/BzjOJlRzpxGGVo1EsLSUZ0mt/Mq0HWZIHOKHHcHdT69yG54C9m6i45GpItwRHpk0Py7Uw==
-  dependencies:
-    detect-libc "^1.0.3"
-    expand-template "^2.0.3"
-    github-from-package "0.0.0"
-    minimist "^1.2.3"
-    mkdirp "^0.5.1"
-    napi-build-utils "^1.0.1"
-    node-abi "^2.7.0"
-    noop-logger "^0.1.1"
-    npmlog "^4.0.1"
-    pump "^3.0.0"
-    rc "^1.2.7"
-    simple-get "^3.0.3"
-    tar-fs "^2.0.0"
-    tunnel-agent "^0.6.0"
-    which-pm-runs "^1.0.0"
-
 prebuild-install@6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-6.0.0.tgz#669022bcde57c710a869e39c5ca6bf9cd207f316"
@@ -6246,7 +6174,7 @@ prebuild-install@^5.0.0, prebuild-install@^5.3.3:
     tunnel-agent "^0.6.0"
     which-pm-runs "^1.0.0"
 
-prebuild-install@^6.0.0:
+prebuild-install@^6.0.0, prebuild-install@^6.0.1:
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-6.1.4.tgz#ae3c0142ad611d58570b89af4986088a4937e00f"
   integrity sha512-Z4vpywnK1lBg+zdPCVCsKq0xO66eEV9rWo2zrROGGiRS4JtueBOdlB1FnY8lcy7JsUud/Q3ijUxyWN26Ika0vQ==
@@ -6874,9 +6802,9 @@ setimmediate@^1.0.5:
   resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
   integrity sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==
 
-"settings-view@https://www.atom.io/api/packages/settings-view/versions/0.261.8/tarball":
+"settings-view@https://codeload.github.com/atom/settings-view/legacy.tar.gz/refs/tags/v0.261.8":
   version "0.261.8"
-  resolved "https://www.atom.io/api/packages/settings-view/versions/0.261.8/tarball#11b469b815ff2dfed0159261875f0cde567a3a0d"
+  resolved "https://codeload.github.com/atom/settings-view/legacy.tar.gz/refs/tags/v0.261.8#11b469b815ff2dfed0159261875f0cde567a3a0d"
   dependencies:
     async "^3.2.0"
     dompurify "^1.0.2"
@@ -7069,9 +6997,9 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.11.tgz#50c0d8c40a14ec1bf449bae69a0ea4685a9d9f95"
   integrity sha512-Ctl2BrFiM0X3MANYgj3CkygxhRmr9mi6xhejbdO960nF6EDJApTYpn0BQnDKlnNBULKiCN1n3w9EBkHK8ZWg+g==
 
-"spell-check@https://www.atom.io/api/packages/spell-check/versions/0.77.1/tarball":
+"spell-check@https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1":
   version "0.77.1"
-  resolved "https://www.atom.io/api/packages/spell-check/versions/0.77.1/tarball#231d2ed87c0333a1c1d652301f58062a4bd689b9"
+  resolved "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1#231d2ed87c0333a1c1d652301f58062a4bd689b9"
   dependencies:
     atom-pathspec "^0.0.0"
     atom-select-list "^0.7.0"
@@ -7161,9 +7089,9 @@ stacktrace-parser@^0.1.3:
   dependencies:
     type-fest "^0.7.1"
 
-"status-bar@https://www.atom.io/api/packages/status-bar/versions/1.8.17/tarball":
+"status-bar@https://codeload.github.com/atom/status-bar/legacy.tar.gz/refs/tags/v1.8.17":
   version "1.8.17"
-  resolved "https://www.atom.io/api/packages/status-bar/versions/1.8.17/tarball#539df70062d75397c3f49208ced60c8611e9ad3d"
+  resolved "https://codeload.github.com/atom/status-bar/legacy.tar.gz/refs/tags/v1.8.17#539df70062d75397c3f49208ced60c8611e9ad3d"
   dependencies:
     fs-plus "^3.0.1"
     grim "^2.0.1"
@@ -7290,9 +7218,9 @@ strip-json-comments@2.0.1, strip-json-comments@~2.0.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-"styleguide@https://www.atom.io/api/packages/styleguide/versions/0.49.12/tarball":
+"styleguide@https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12":
   version "0.49.12"
-  resolved "https://www.atom.io/api/packages/styleguide/versions/0.49.12/tarball#d2c09228e5da99017034227b8bc571fea56bc63b"
+  resolved "https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12#d2c09228e5da99017034227b8bc571fea56bc63b"
   dependencies:
     atom-select-list "^0.7.0"
     dedent "^0.7.0"
@@ -7348,9 +7276,9 @@ sylvester@^0.0.12:
   resolved "https://registry.yarnpkg.com/sylvester/-/sylvester-0.0.12.tgz#5a884415cd2d002c57e7a3aac99462a75ce9fdb4"
   integrity sha512-SzRP5LQ6Ts2G5NyAa/jg16s8e3R7rfdFjizy1zeoecYWw+nGL+YA1xZvW/+iJmidBGSdLkuvdwTYEyJEb+EiUw==
 
-"symbols-view@https://www.atom.io/api/packages/symbols-view/versions/0.118.4/tarball":
+"symbols-view@https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4":
   version "0.118.4"
-  resolved "https://www.atom.io/api/packages/symbols-view/versions/0.118.4/tarball#cd1b515d4a3d720402b85301ea8e4d6c8815aaf2"
+  resolved "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4#cd1b515d4a3d720402b85301ea8e4d6c8815aaf2"
   dependencies:
     async "^0.2.6"
     atom-select-list "^0.7.0"
@@ -7366,9 +7294,9 @@ tabbable@^5.1.5:
   resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-5.3.3.tgz#aac0ff88c73b22d6c3c5a50b1586310006b47fbf"
   integrity sha512-QD9qKY3StfbZqWOPLp0++pOrAVb/HbUi5xCc8cUo4XjP19808oaMiDzn0leBY5mCespIBM0CIZePzZjgzR83kA==
 
-"tabs@https://www.atom.io/api/packages/tabs/versions/0.110.2/tarball":
+"tabs@https://codeload.github.com/atom/tabs/legacy.tar.gz/refs/tags/v0.110.2":
   version "0.110.2"
-  resolved "https://www.atom.io/api/packages/tabs/versions/0.110.2/tarball#f62a36c30043a2b721b3c36d9a857531dd3360fb"
+  resolved "https://codeload.github.com/atom/tabs/legacy.tar.gz/refs/tags/v0.110.2#f62a36c30043a2b721b3c36d9a857531dd3360fb"
   dependencies:
     fs-plus "^3.0.0"
     temp "~0.8.1"
@@ -7491,7 +7419,7 @@ temp@^0.9.0, temp@~0.9.0:
     mkdirp "^0.5.1"
     rimraf "~2.6.2"
 
-text-buffer@^13.18.5:
+text-buffer@^13.18.6:
   version "13.18.6"
   resolved "https://registry.yarnpkg.com/text-buffer/-/text-buffer-13.18.6.tgz#0191a6185177b26e3560cb07988701ac2d30ae9f"
   integrity sha512-kgtWyJL9ktX0+ynDxUILaB/XGsaMOSzbKgyyDO9s4sN6X8Cq+ZIMNRDDMG29iztK8nZxuynzcuo1vHQojpdT9A==
@@ -7515,9 +7443,9 @@ through@2, through@2.3.x, through@~2.3, through@~2.3.1:
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
-"timecop@https://www.atom.io/api/packages/timecop/versions/0.36.2/tarball":
+"timecop@https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2":
   version "0.36.2"
-  resolved "https://www.atom.io/api/packages/timecop/versions/0.36.2/tarball#8965f20444701af3b6f86dfa9f144a46e1aaa9d0"
+  resolved "https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2#8965f20444701af3b6f86dfa9f144a46e1aaa9d0"
   dependencies:
     dedent "^0.7.0"
     etch "^0.12.6"
@@ -7570,10 +7498,10 @@ tree-kill@1.2.2:
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
-tree-sitter-bash@^0.16.1:
-  version "0.16.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-bash/-/tree-sitter-bash-0.16.1.tgz#7d171dfe3a912f7210cee2142804cba1f553939d"
-  integrity sha512-knkl96EkBSns9NSUmFVboOlnMNxkhHp/e7l5rKCt9kk7qZlT9NdCJQHsXLcjk8L2ameRnQFJfuSzCNG3DQeF7Q==
+tree-sitter-bash@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-bash/-/tree-sitter-bash-0.19.0.tgz#756332e3c5494a0b5ccda04c182e7206d65cf350"
+  integrity sha512-i/0NUZHSrxmYtQWMX+Tvuk9PBvsB0S3h0vD17qHSGuvPYgvpekRy8do75CAXyH6FlycMhejM39gNRppyvDeiVQ==
   dependencies:
     nan "^2.14.0"
     prebuild-install "^5.3.3"
@@ -7599,102 +7527,74 @@ tree-sitter-css@^0.19.0:
   dependencies:
     nan "^2.14.1"
 
-tree-sitter-embedded-template@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-embedded-template/-/tree-sitter-embedded-template-0.15.2.tgz#6cc0e3e46c1c3d4ee3ea644c11307ebcb329dcf4"
-  integrity sha512-DHT4KAzFbtj/5XhSZWCkf7LP1SYIi4gSSOZHVH9SqEv1DIc9rSmgNO3rzIyMoRclusLoL2susmokL/hYkj56+A==
-  dependencies:
-    nan "^2.0.0"
-
-tree-sitter-go@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-go/-/tree-sitter-go-0.15.1.tgz#51ad116d7fab4519d73b6381f608ee00d1fefa43"
-  integrity sha512-TCwvh7kz+2iMUjZI7aPnpImv5PFcWdbo8hJysjwV7FUlCTGeCgca2ItdxA5cdACcykRVLzoUTZN70qFGwYVQVw==
-  dependencies:
-    nan "^2.10.0"
-
-tree-sitter-html@^0.15.0:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-html/-/tree-sitter-html-0.15.1.tgz#9e670cc1cb55cda5e9b821fc61006cc74bd936dd"
-  integrity sha512-hf1dTxB6OIlDk+mkxLaHC1boKUxmnp0qxt8nApZZ6zf3VWj5FeYlWv93GX5+gLL3NkLAjaUKGZGFXpR+wE97Jg==
-  dependencies:
-    nan "^2.10.0"
-
-tree-sitter-java-dev@^0.16.0-dev2:
-  version "0.16.0-dev2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-java-dev/-/tree-sitter-java-dev-0.16.0-dev2.tgz#4fba63da5648e4650364ac36c387fea16f3ff930"
-  integrity sha512-BilPJ2SwvRKMTeq2WZdvVX5HiMYTLSncJATkqWiPRGUl157FcBjY42mzm3M42/5QQybb1nDJjW0tAvVA5iEHmw==
-  dependencies:
-    nan "^2.12.1"
-
-tree-sitter-javascript@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-javascript/-/tree-sitter-javascript-0.15.2.tgz#3c2c2b7c20a183f9266c4abf531172913a14ba97"
-  integrity sha512-AwgnkVqxglpxWUH07CWq1CmZ1g3emFHCUlMT6hEwNrk5K62I3gmkqMFtzFqXos6U2sEkwBn7IWp753X13KiAdQ==
-  dependencies:
-    nan "^2.12.1"
-
-tree-sitter-jsdoc@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-jsdoc/-/tree-sitter-jsdoc-0.15.2.tgz#510eac71f57998feff381333fd2ee6028f0819e8"
-  integrity sha512-ERhddQ4nj3i4ayi0L09ic/CLtwH/A82iauGWev15NGuWCyUG7qw9rz2ZNxpmy9R6KG8kXK1MsFQj/pab8lm5/w==
-  dependencies:
-    nan "^2.11.1"
-
-tree-sitter-json@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-json/-/tree-sitter-json-0.15.1.tgz#02bc1961b9de963d23e2fbeab7d360b1cbbcc50d"
-  integrity sha512-zSbxzlZlMuWEQ/WhyjR+AoECf/v9/dlE+6+0uxNgU5fb5m4kGc9Y0+HKWxLWZ4yhZNBdwCIrUQwo/oaBdmyXPg==
-  dependencies:
-    nan "^2.0.0"
-
-tree-sitter-python@^0.17.0:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-python/-/tree-sitter-python-0.17.1.tgz#69e19599478fdc4288102adf82d24dc214ca1479"
-  integrity sha512-T4vvjAzd7piW66zKbJ/+4YgGk5wOtqNI25FGVsr947+EeZqdSAfwPsgSD1/I2NAVe3mdpOh/EQbfvq+EOfAiJA==
+tree-sitter-embedded-template@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-embedded-template/-/tree-sitter-embedded-template-0.19.0.tgz#3234830a30b9b27de3b187d965005fe91e3e420d"
+  integrity sha512-J80/G0xRHlIxv0gNfvW8zHMZeD9nqnSKV4nMB5t0RAW/W/nM5io/gojk0ppWuWKMuyYNs3KKXIqP0i43jVkdkQ==
   dependencies:
     nan "^2.14.0"
 
-tree-sitter-regex@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-regex/-/tree-sitter-regex-0.15.1.tgz#36c53ea064812f689c6ed097fb2101870ecd0aa2"
-  integrity sha512-ORspHauiPTw3+mCKBAAZqYH4vQOT6T2B2RcYDrWmYfwxSjA7Wg3HPiqzkuMVvDwl5Z491EYIBTUvHEaBLoGI7w==
+tree-sitter-html@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-html/-/tree-sitter-html-0.19.0.tgz#abebe9950f5ce909b6e3e8da2e90246647a70a22"
+  integrity sha512-xH6XGSBWzb4oU/aG6gouMRQKsd96iKuy0zboUqo3wcIWrA++q9a7CmQTSeIINiSfOXjT2ZLJciXFDgAh6h04Bw==
   dependencies:
     nan "^2.14.0"
 
-tree-sitter-ruby@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/tree-sitter-ruby/-/tree-sitter-ruby-0.17.0.tgz#3da62b5cfdfe62ac2e0e2e04ca7220161e40cea6"
-  integrity sha512-Hpjnp7vfRjRsULeYWtDcwR6nb/lPeQfaY2jo9V3npUiaSlqYFJxlC5d45FfZ60aHxv74CI3ziocs9kMfjPS2oQ==
+tree-sitter-java@0.19.1:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-java/-/tree-sitter-java-0.19.1.tgz#c1bf59caaa81bf8a4a6dda99e7c97e51b3bd26d4"
+  integrity sha512-yVm+4q1D4niaHcEf2iqhOcIaiSp3wxHjeC4eoLAqSQNVxSrhThmT1FEfM4yDgHV4XaxH+62xpKHCwYG9NzRt6Q==
   dependencies:
-    nan "^2.12.1"
+    nan "^2.14.1"
+
+tree-sitter-json@0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-json/-/tree-sitter-json-0.20.0.tgz#e17bb4917e8d5fe9f2f0d5eaec603e2d3552b07c"
+  integrity sha512-PteOLH+Tx6Bz4ZA/d40/DbkiSXXRM/gKahhHI8hQ1lWNfFvdknnz9k3Mz84ol5srRyLboJ8wp8GSkhZ6ht9EGQ==
+  dependencies:
+    nan "^2.14.1"
+
+tree-sitter-python@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-python/-/tree-sitter-python-0.19.0.tgz#ad79a221fab7136559da0704f789173b81e0bdcd"
+  integrity sha512-UAJV73zCE+2b+X8XQOyL6C+MxVUV8BH0TxcOwhfgaDh6F6g4Ub0SqWGF19C1MDrGi25JNnZ8xlsH0aqrasyS3w==
+  dependencies:
+    nan "^2.14.0"
+
+tree-sitter-ruby@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-ruby/-/tree-sitter-ruby-0.19.0.tgz#a5fd70c7653beaa89c7d643a9b04e0f71eb075bd"
+  integrity sha512-uzASkTuC6wXnnshfDgij/Q9FYWxODCyIKVb0eHVGX9G5Cu5iFPvgJQgWTKIft1zomTjKjD25YIwFUnXnzZf4Ew==
+  dependencies:
+    nan "^2.14.1"
     prebuild-install "^5.0.0"
 
-tree-sitter-rust@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/tree-sitter-rust/-/tree-sitter-rust-0.17.0.tgz#830cff49c43058df33570816cdb8443326411766"
-  integrity sha512-dWYKrX4JbuLbKagTeCSsMZuFDKTzzaEHECsjLzIqbO/IhNHHLOzEcbF2YcIAGKG5thiT/lnNAjeOXDsILteCpg==
-  dependencies:
-    nan "^2.8.0"
-
-tree-sitter-typescript@^0.16.1:
-  version "0.16.3"
-  resolved "https://registry.yarnpkg.com/tree-sitter-typescript/-/tree-sitter-typescript-0.16.3.tgz#920a0a41edca661221fa3b7fb4beedbbe76e3446"
-  integrity sha512-qdRydjlnFuxwlkE/+oqOywzcKL2l3G1xkhR9DxDySGfF4JiMdYCTqJCWRUYaGnagJDZBF7wGWtHf5FGGXdLjNw==
+tree-sitter-rust@0.20.1:
+  version "0.20.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-rust/-/tree-sitter-rust-0.20.1.tgz#3ff85edc85293797f88e7bdb29022d57a6a1e30f"
+  integrity sha512-du8yLJBnjzjynQDPlt4IhbHgGHq2o/hdUGrHuedyAd5008i3ghB6trDB805B9qXNPFJGNy8gY0kxQPak2zOsFw==
   dependencies:
     nan "^2.14.0"
 
-tree-sitter@0.17.1:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter/-/tree-sitter-0.17.1.tgz#821c5a4ac1afdb623d63f5ffc7916663e732a95c"
-  integrity sha512-obIe804bwfAGFMhTjQz0NXF75GDupCVXo7Sv0NVVdA3s/Q4ZI4mdirIN8cpw6bVhz/K1qgUdEuI3SEoOE/q75A==
+tree-sitter-typescript@0.20.1:
+  version "0.20.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-typescript/-/tree-sitter-typescript-0.20.1.tgz#6b338a1414f5ed13cc39e60275ddeaa0f25870a9"
+  integrity sha512-wqpnhdVYX26ATNXeZtprib4+mF2GlYQB1cjRPibYGxDRiugx5OfjWwLE4qPPxEGdp2ZLSmZVesGUjLWzfKo6rA==
   dependencies:
     nan "^2.14.0"
-    prebuild-install "^5.0.0"
 
-"tree-view@https://www.atom.io/api/packages/tree-view/versions/0.229.1/tarball":
+tree-sitter@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter/-/tree-sitter-0.20.0.tgz#b24f4d0ce6b9fdd9e99101907c954c5d938cb82d"
+  integrity sha512-tqTdtD1T2cN4aEES0sZCjKTQrc9Ls8H/iYlzpskhGy8yCwNPKBIbK9YuuCg/AxACr8RAY4wMoeCigM1X/A79yg==
+  dependencies:
+    nan "^2.14.0"
+    prebuild-install "^6.0.1"
+
+"tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
   version "0.229.1"
-  resolved "https://www.atom.io/api/packages/tree-view/versions/0.229.1/tarball#f95938fe9aefbcdfed186d6285c3b014e435eee8"
+  resolved "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1#f95938fe9aefbcdfed186d6285c3b014e435eee8"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
@@ -7996,9 +7896,9 @@ which@^2.0.1, which@^2.0.2:
   dependencies:
     isexe "^2.0.0"
 
-"whitespace@https://www.atom.io/api/packages/whitespace/versions/0.37.8/tarball":
+"whitespace@https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8":
   version "0.37.8"
-  resolved "https://www.atom.io/api/packages/whitespace/versions/0.37.8/tarball#0c0510f8ead296d63a16105024700ec34b2b5d1b"
+  resolved "https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8#0c0510f8ead296d63a16105024700ec34b2b5d1b"
 
 wide-align@1.1.3:
   version "1.1.3"
@@ -8062,9 +7962,9 @@ wrap-ansi@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
 
-"wrap-guide@https://www.atom.io/api/packages/wrap-guide/versions/0.41.0/tarball":
+"wrap-guide@https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0":
   version "0.41.0"
-  resolved "https://www.atom.io/api/packages/wrap-guide/versions/0.41.0/tarball#bd23ce8c207d589c742bd324135de81b6eb7ec02"
+  resolved "https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0#bd23ce8c207d589c742bd324135de81b6eb7ec02"
 
 wrappy@1:
   version "1.0.2"
