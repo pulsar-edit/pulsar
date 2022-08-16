@@ -50,11 +50,11 @@ const getDefaultPath = () => {
   }
 };
 
-const getSocketSecretPath = atomVersion => {
+const getSocketSecretPath = applicationVersion => {
   const { username } = os.userInfo();
   const atomHome = path.resolve(process.env.ATOM_HOME);
 
-  return path.join(atomHome, `.atom-socket-secret-${username}-${atomVersion}`);
+  return path.join(atomHome, `.pulsar-socket-secret-${username}-${applicationVersion}`);
 };
 
 const getSocketPath = socketSecret => {
@@ -70,14 +70,14 @@ const getSocketPath = socketSecret => {
     .substr(0, 12);
 
   if (process.platform === 'win32') {
-    return `\\\\.\\pipe\\atom-${socketName}-sock`;
+    return `\\\\.\\pipe\\pulsar-${socketName}-sock`;
   } else {
-    return path.join(os.tmpdir(), `atom-${socketName}.sock`);
+    return path.join(os.tmpdir(), `pulsar-${socketName}.sock`);
   }
 };
 
-const getExistingSocketSecret = atomVersion => {
-  const socketSecretPath = getSocketSecretPath(atomVersion);
+const getExistingSocketSecret = applicationVersion => {
+  const socketSecretPath = getSocketSecretPath(applicationVersion);
 
   if (!fs.existsSync(socketSecretPath)) {
     return null;
@@ -89,10 +89,10 @@ const getExistingSocketSecret = atomVersion => {
 const getRandomBytes = promisify(crypto.randomBytes);
 const writeFile = promisify(fs.writeFile);
 
-const createSocketSecret = async atomVersion => {
+const createSocketSecret = async applicationVersion => {
   const socketSecret = (await getRandomBytes(16)).toString('hex');
 
-  await writeFile(getSocketSecretPath(atomVersion), socketSecret, {
+  await writeFile(getSocketSecretPath(applicationVersion), socketSecret, {
     encoding: 'utf8',
     mode: 0o600
   });
@@ -142,11 +142,11 @@ ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
 });
 // The application's singleton class.
 //
-// It's the entry point into the Atom application and maintains the global state
+// It's the entry point into the Pulsar application and maintains the global state
 // of the application.
 //
 module.exports = class AtomApplication extends EventEmitter {
-  // Public: The entry point into the Atom application.
+  // Public: The entry point into the Pulsar application.
   static open(options) {
     StartupTime.addMarker('main-process:atom-application:open');
 
@@ -413,7 +413,7 @@ module.exports = class AtomApplication extends EventEmitter {
         )
       );
     } else {
-      // Always open an editor window if this is the first instance of Atom.
+      // Always open an editor window if this is the first instance of Pulsar.
       return this.openPath({
         pathToOpen: null,
         pidToKillWhenClosed,
@@ -678,19 +678,19 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.openPathOnEvent('application:about', 'atom://about');
     this.openPathOnEvent('application:show-settings', 'atom://config');
-    this.openPathOnEvent('application:open-your-config', 'atom://.atom/config');
+    this.openPathOnEvent('application:open-your-config', 'atom://.pulsar/config');
     this.openPathOnEvent(
       'application:open-your-init-script',
-      'atom://.atom/init-script'
+      'atom://.pulsar/init-script'
     );
-    this.openPathOnEvent('application:open-your-keymap', 'atom://.atom/keymap');
+    this.openPathOnEvent('application:open-your-keymap', 'atom://.pulsar/keymap');
     this.openPathOnEvent(
       'application:open-your-snippets',
-      'atom://.atom/snippets'
+      'atom://.pulsar/snippets'
     );
     this.openPathOnEvent(
       'application:open-your-stylesheet',
-      'atom://.atom/stylesheet'
+      'atom://.pulsar/stylesheet'
     );
     this.openPathOnEvent(
       'application:open-license',
@@ -771,7 +771,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     // Triggered by the 'open-file' event from Electron:
     // https://electronjs.org/docs/api/app#event-open-file-macos
-    // For example, this is fired when a file is dragged and dropped onto the Atom application icon in the dock.
+    // For example, this is fired when a file is dragged and dropped onto the Pulsar application icon in the dock.
     this.disposable.add(
       ipcHelpers.on(app, 'open-file', (event, pathToOpen) => {
         event.preventDefault();
@@ -1077,7 +1077,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   initializeAtomHome(configDirPath) {
     if (!fs.existsSync(configDirPath)) {
-      const templateConfigDirPath = fs.resolve(this.resourcePath, 'dot-atom');
+      const templateConfigDirPath = fs.resolve(this.resourcePath, 'templates');
       fs.copySync(templateConfigDirPath, configDirPath);
     }
   }
@@ -1507,7 +1507,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     if (state.version === APPLICATION_STATE_VERSION) {
-      // Atom >=1.36.1
+      // Pulsar >=1.36.1
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
       return state.windows.map(each => ({
         foldersToOpen: each.projectRoots,
@@ -1516,7 +1516,7 @@ module.exports = class AtomApplication extends EventEmitter {
         newWindow: true
       }));
     } else if (state.version === undefined) {
-      // Atom <= 1.36.0
+      // Pulsar <= 1.36.0
       // Schema: [{initialPaths: ['<root-dir>', ...]}, ...]
       return Promise.all(
         state.map(async windowState => {
@@ -1544,7 +1544,7 @@ module.exports = class AtomApplication extends EventEmitter {
         })
       );
     } else {
-      // Unrecognized version (from a newer Atom?)
+      // Unrecognized version (from a newer Pulsar?)
       return [];
     }
   }
@@ -1696,8 +1696,8 @@ module.exports = class AtomApplication extends EventEmitter {
   //                   completion.
   //   :resourcePath - The path to include specs from.
   //   :specPath - The directory to load specs from.
-  //   :safeMode - A Boolean that, if true, won't run specs from ~/.atom/packages
-  //               and ~/.atom/dev/packages, defaults to false.
+  //   :safeMode - A Boolean that, if true, won't run specs from ~/.pulsar/packages
+  //               and ~/.pulsar/dev/packages, defaults to false.
   runTests({
     headless,
     resourcePath,
@@ -2038,8 +2038,8 @@ module.exports = class AtomApplication extends EventEmitter {
         type: 'warning',
         title: 'Restart required',
         message:
-          'You will need to restart Atom for this change to take effect.',
-        buttons: ['Restart Atom', 'Cancel']
+          'You will need to restart Pulsar for this change to take effect.',
+        buttons: ['Restart Pulsar', 'Cancel']
       }
     );
     if (result.response === 0) this.restart();

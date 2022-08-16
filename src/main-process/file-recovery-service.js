@@ -74,12 +74,12 @@ module.exports = class FileRecoveryService {
         recoveryFile
           .recover()
           .catch(error => {
-            const message = 'A file that Atom was saving could be corrupted';
+            const message = 'A file that Pulsar was saving could be corrupted';
             const detail =
               `Error ${error.code}. There was a crash while saving "${
                 recoveryFile.originalPath
               }", so this file might be blank or corrupted.\n` +
-              `Atom couldn't recover it automatically, but a recovery file has been saved at: "${
+              `Pulsar couldn't recover it automatically, but a recovery file has been saved at: "${
                 recoveryFile.recoveryPath
               }".`;
             console.log(detail);
