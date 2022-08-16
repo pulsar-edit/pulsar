@@ -133,8 +133,8 @@ let UpdateManager = class UpdateManager {
     }
 
     const releaseRepo =
-      appVersion.indexOf('nightly') > -1 ? 'atom-nightly-releases' : 'atom';
-    return `https://github.com/atom-ide-community/${releaseRepo}/releases/tag/${appVersion}`;
+      appVersion.indexOf('nightly') > -1 ? 'pulsar-nightly-releases' : 'pulsar';
+    return `https://github.com/pulsar-edit/${releaseRepo}/releases/tag/${appVersion}`;
   }
 };
 
