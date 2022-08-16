@@ -50,7 +50,7 @@ module.exports = class UpdateView extends EtchComponent {
               'about-updates-item is-shown about-default-update-message'
           },
           this.props.updateManager.getAutoUpdatesEnabled()
-            ? 'Atom will check for updates automatically'
+            ? 'Pulsar will check for updates automatically'
             : 'Automatic updates are disabled please check manually'
         );
         break;
@@ -96,7 +96,7 @@ module.exports = class UpdateView extends EtchComponent {
           $.span({ className: 'icon icon-check' }),
           $.span(
             { className: 'about-updates-label is-strong' },
-            'Atom is up to date!'
+            'Pulsar is up to date!'
           )
         );
         break;
