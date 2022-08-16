@@ -115,7 +115,7 @@ const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
 // a very good reason not to allow users to close your item. Items can be made
 // permanent *only* when they are contained in docks. Center pane items can
 // always be removed. Note that it is currently still possible to close dock
-// items via the `Close Pane` option in the context menu and via Atom APIs, so
+// items via the `Close Pane` option in the context menu and via Pulsar APIs, so
 // you should still be prepared to handle your dock items being destroyed by the
 // user even if you implement this method.
 //
@@ -171,7 +171,7 @@ const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
 //
 // #### `shouldPromptToSave()`
 //
-// This method indicates whether Atom should prompt the user to save this item
+// This method indicates whether Pulsar should prompt the user to save this item
 // when the user closes or reloads the window. Returns a boolean.
 module.exports = class Workspace extends Model {
   constructor(params) {
@@ -395,7 +395,7 @@ module.exports = class Workspace extends Model {
       deserializer: 'Workspace',
       packagesWithActiveGrammars: this.getPackageNamesWithActiveGrammars(),
       destroyedItemURIs: this.destroyedItemURIs.slice(),
-      // Ensure deserializing 1.17 state with pre 1.17 Atom does not error
+      // Ensure deserializing 1.17 state with pre 1.17 Pulsar does not error
       // TODO: Remove after 1.17 has been on stable for a while
       paneContainer: { version: 2 },
       paneContainers: {
@@ -1039,7 +1039,7 @@ module.exports = class Workspace extends Model {
   Section: Opening
   */
 
-  // Essential: Opens the given URI in Atom asynchronously.
+  // Essential: Opens the given URI in Pulsar asynchronously.
   // If the URI is already open, the existing item for that URI will be
   // activated. If no URI is given, or no registered opener can open
   // the URI, a new empty {TextEditor} will be created.
@@ -1068,7 +1068,7 @@ module.exports = class Workspace extends Model {
   //     an existing item for the same URI. Defaults to `false`.
   //   * `location` (optional) A {String} containing the name of the location
   //     in which this item should be opened (one of "left", "right", "bottom",
-  //     or "center"). If omitted, Atom will fall back to the last location in
+  //     or "center"). If omitted, Pulsar will fall back to the last location in
   //     which a user has placed an item with the same URI or, if this is a new
   //     URI, the default location specified by the item. NOTE: This option
   //     should almost always be omitted to honor user preference.
@@ -1299,7 +1299,7 @@ module.exports = class Workspace extends Model {
     }
   }
 
-  // Open Atom's license in the active pane.
+  // Open Pulsar's license in the active pane.
   openLicense() {
     return this.open(path.join(process.resourcesPath, 'LICENSE.md'));
   }
@@ -1423,7 +1423,7 @@ module.exports = class Workspace extends Model {
         this.applicationDelegate.confirm(
           {
             message:
-              'Atom will be unresponsive during the loading of very large files.',
+              'Pulsar will be unresponsive during the loading of very large files.',
             detail: 'Do you still want to load this file?',
             buttons: ['Proceed', 'Cancel']
           },
@@ -1490,7 +1490,7 @@ module.exports = class Workspace extends Model {
 
   // Public: Register an opener for a uri.
   //
-  // When a URI is opened via {Workspace::open}, Atom loops through its registered
+  // When a URI is opened via {Workspace::open}, Pulsar loops through its registered
   // opener functions until one returns a value for the given uri.
   // Openers are expected to return an object that inherits from HTMLElement or
   // a model which has an associated view in the {ViewRegistry}.
@@ -1989,9 +1989,9 @@ module.exports = class Workspace extends Model {
   //     (default: true)
   //   * `priority` (optional) {Number} Determines stacking order. Lower priority items are
   //     forced closer to the edges of the window. (default: 100)
-  //   * `autoFocus` (optional) {Boolean|Element} true if you want modal focus managed for you by Atom.
-  //     Atom will automatically focus on this element or your modal panel's first tabbable element when the modal
-  //     opens and will restore the previously selected element when the modal closes. Atom will
+  //   * `autoFocus` (optional) {Boolean|Element} true if you want modal focus managed for you by Pulsar.
+  //     Pulsar will automatically focus on this element or your modal panel's first tabbable element when the modal
+  //     opens and will restore the previously selected element when the modal closes. Pulsar will
   //     also automatically restrict user tab focus within your modal while it is open.
   //     (default: false)
   //
