@@ -282,6 +282,7 @@
     "build": "electron-rebuild",
     "build:apm": "cd apm; yarn install; ./node_modules/atom-package-manager/bin/npm rebuild",
     "start": "electron --enable-logging --preserve-symlinks --inspect=5858 . -f",
+    "clear:state": "electron --enable-logging --preserve-symlinks --inspect=5858 --clear-window-state . -f",
     "dist": "node script/electron-builder.js"
   },
   "standard-engine": "./script/node_modules/standard",
