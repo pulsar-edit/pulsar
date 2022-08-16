@@ -280,7 +280,8 @@
     "test": "node script/test",
     "build": "electron-rebuild",
     "build:apm": "cd apm; yarn install; ./node_modules/atom-package-manager/bin/npm rebuild",
-    "start": "electron --enable-logging . -f"
+    "start": "electron --enable-logging --preserve-symlinks --inspect=5858 . -f",
+    "dist": "node script/electron-builder.js"
   },
   "standard-engine": "./script/node_modules/standard",
   "standard": {
