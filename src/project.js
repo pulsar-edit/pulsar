@@ -10,7 +10,7 @@ const DefaultDirectoryProvider = require('./default-directory-provider');
 const Model = require('./model');
 const GitRepositoryProvider = require('./git-repository-provider');
 
-// Extended: Represents a project that's opened in Atom.
+// Extended: Represents a project that's opened in Pulsar.
 //
 // An instance of this class is always available as the `atom.project` global.
 module.exports = class Project extends Model {
@@ -354,7 +354,7 @@ module.exports = class Project extends Model {
       return this.rootDirectories.map(rootDirectory => rootDirectory.getPath());
     } catch (e) {
       atom.notifications.addError(
-        "Please clear Atom's window state with: atom --clear-window-state"
+        "Please clear Pulsar's window state with: pulsar --clear-window-state"
       );
     }
   }
