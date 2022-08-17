@@ -56,7 +56,7 @@ jobs:
             descr: others
       fail-fast: false
 
-    name: test
+    name: test-${{ matrix.descr }}-packages
     runs-on: ubuntu-20.04
     needs: setup
     steps:
