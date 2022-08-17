@@ -25,7 +25,7 @@ function isAtomRepoPath(repoPath) {
   if (fs.statSyncNoException(packageJsonPath)) {
     try {
       let packageJson = CSON.readFileSync(packageJsonPath);
-      return packageJson.name === 'atom';
+      return packageJson.name === 'pulsar';
     } catch (e) {
       return false;
     }
@@ -37,6 +37,16 @@ function isAtomRepoPath(repoPath) {
 let resourcePath;
 let devResourcePath;
 
+//Add hot reloader in dev to allow for hot swapping modules
+if (args.dev) {
+  try {
+    require('electron-reloader')(module, {
+        debug: true,
+        watchRenderer: true
+    });
+} catch (_) { console.log('Error'); }
+}
+
 if (args.resourcePath) {
   resourcePath = args.resourcePath;
   devResourcePath = resourcePath;
@@ -45,7 +55,7 @@ if (args.resourcePath) {
   const defaultRepositoryPath = path.join(
     app.getPath('home'),
     'github',
-    'atom'
+    'pulsar-edit'
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {
