@@ -1,0 +1,76 @@
+name: Package tests for Pulsar on Linux
+on:
+  - push
+  - pull_request
+jobs:
+  setup:
+    name: setup
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install windows-build-tools
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        npm i --global windows-build-tools@4.0.0
+        npm config set msvs_version 2019
+
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+
+    - name: Setup node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 16
+
+    - name: install dependencies
+      run: yarn install
+
+    - name: build dependencies
+      run: yarn build
+
+    - name: cache node module
+      id: cache-node
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: linux-modules-${{ hashFiles('package.json') }}
+
+  test:
+    strategy:
+      matrix:
+        include:
+          - filter: autocomplete|language
+            descr: syntax-related
+          - filter: dark|light
+            descr: themes
+          - filter: git-diff|go-to-line|grammar-selector|line-ending-selector|autoflow|autosave|symbols-view|spell-check|bracket-matcher|whitespace|wrap-guide|snippets|encoding-selector
+            descr: editor related
+          - filter: find|command
+            descr: Fuzzy finding/finders
+          - filter: github
+            descr: GitHub
+          - filter: deprecation-cop|dev-live-reload|dalek|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
+            descr: development helpers
+          - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|status-bar|settings-view|notifications
+            descr: UI elements
+          - filter: image-view|bookmarks|keybinding-resolver|link|timecop
+            descr: others
+      fail-fast: false
+
+    name: test
+    runs-on: ubuntu-20.04
+    needs: setup
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+
+    - name: restore node module
+      id: restore-node
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: linux-modules-${{ hashFiles('package.json') }}
+
+    - name: Run ${{ matrix.descr }} packages' tests
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: node -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
