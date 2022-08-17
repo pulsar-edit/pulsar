@@ -299,6 +299,7 @@
     "electron": "11.5.0",
     "electron-rebuild": "3.2.7",
     "random-seed": "^0.3.0",
-    "webdriverio": "^7.20.9"
+    "webdriverio": "^7.20.9",
+    "electron-rebuild": "3.2.7"
   }
 }
