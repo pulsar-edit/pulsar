@@ -1,4 +1,8 @@
 name: Editor tests
+
+env:
+  DEBUG = electron-rebuild
+
 on:
   - push
   - pull_request

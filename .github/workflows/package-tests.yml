@@ -1,4 +1,8 @@
 name: Package tests for Pulsar
+
+env:
+  DEBUG = electron-rebuild
+
 on:
   - push
   - pull_request
