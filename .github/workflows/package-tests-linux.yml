@@ -46,9 +46,7 @@ jobs:
             descr: editor related
           - filter: find|command
             descr: Fuzzy finding/finders
-          - filter: github
-            descr: GitHub
-          - filter: deprecation-cop|dev-live-reload|dalek|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
+          - filter: deprecation-cop|dev-live-reload|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
             descr: development helpers
           - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|status-bar|settings-view|notifications
             descr: UI elements
