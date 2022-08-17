@@ -60,7 +60,9 @@ module.exports = class AtomWindow extends EventEmitter {
         // TodoElectronIssue: remote module is deprecated https://www.electronjs.org/docs/breaking-changes#default-changed-enableremotemodule-defaults-to-false
         enableRemoteModule: true,
         // node support in threads
-        nodeIntegrationInWorker: true
+        nodeIntegrationInWorker: true,
+        //TODO_PULSAR: ContextIsolation should be removed as it's disabled state is more-or-less deprecated
+        contextIsolation: false
       },
       simpleFullscreen: this.getSimpleFullscreen()
     };
@@ -77,6 +79,8 @@ module.exports = class AtomWindow extends EventEmitter {
     const BrowserWindowConstructor =
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
+    //TODO_PULSAR: Remove
+    this.browserWindow.show();
 
     Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
       get: () =>
