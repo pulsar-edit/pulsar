@@ -1,6 +1,7 @@
 {
   "name": "atom",
   "productName": "Atom",
+  "author": "Pulsar Community <noreply@pulsar-edit.com>",
   "version": "1.63.0-dev",
   "description": "A hackable text editor for the 21st Century.",
   "branding": {
@@ -280,7 +281,8 @@
     "test": "node script/test",
     "build": "electron-rebuild",
     "build:apm": "cd apm; yarn install; ./node_modules/atom-package-manager/bin/npm rebuild",
-    "start": "electron --enable-logging . -f"
+    "start": "electron --enable-logging . -f",
+    "dist": "node script/electron-builder.js"
   },
   "standard-engine": "./script/node_modules/standard",
   "standard": {
@@ -297,9 +299,9 @@
   },
   "devDependencies": {
     "electron": "11.5.0",
+    "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
     "random-seed": "^0.3.0",
-    "webdriverio": "^7.20.9",
-    "electron-rebuild": "3.2.7"
+    "webdriverio": "^7.20.9"
   }
 }
