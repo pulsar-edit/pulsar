@@ -99,7 +99,7 @@ export default class WelcomeView {
             <ul>
               <li>
                 The{' '}
-                // TODO: Update to our docs or test {atom.branding.urlWeb}+"/docs"
+                {/* // TODO_PULSAR: Update to our docs or test {atom.branding.urlWeb}+"/docs" */}
                 <a
                   href="https://www.atom.io/docs"
                   dataset={{ event: 'atom-docs' }}
