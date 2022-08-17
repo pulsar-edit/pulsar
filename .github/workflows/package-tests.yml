@@ -3,14 +3,20 @@ on:
   - push
   - pull_request
 jobs:
-  tests:
-    name: tests
+  setup:
+    name: setup
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-latest, windows-2019]
+        os: [ubuntu-20.04, macos-latest, windows-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
+    - name: Install windows-build-tools
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        npm i --global windows-build-tools@4.0.0
+        npm config set msvs_version 2019
+
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
@@ -25,13 +31,34 @@ jobs:
     - name: build dependencies
       run: yarn build
 
-    - name: Run the tests on sane OSes
+    - name: cache node module
+      id: cache-node
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-modules-${{ hashFiles('package.json') }}
+
+  test:
+    name: test
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    needs: setup
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+
+    - name: restore node module
+      id: restore-node
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-modules-${{ hashFiles('package.json') }}
+
+    - name: Run languages' packages' tests
       uses: GabrielBB/xvfb-action@v1
       if: ${{ !contains(matrix.os, 'windows') }}
       with:
-        run: node script/run-package-tests.js
-
-    - name: Run the tests on Windows
-      if: ${{ contains(matrix.os, 'windows') }}
-      continue-on-error: true # due to https://github.com/atom/github/pull/2459#issuecomment-624725972
-      run: node script\run-package-tests.js
+        run: node -e "require('./script/run-package-tests')(/language|complete/)"
