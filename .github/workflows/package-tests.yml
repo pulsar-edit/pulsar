@@ -1,7 +1,7 @@
 name: Package tests for Pulsar
 
 env:
-  DEBUG = electron-rebuild
+  DEBUG: electron-rebuild
 
 on:
   - push
