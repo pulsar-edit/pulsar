@@ -5,13 +5,11 @@ const packJson = require('../package.json')
 let packagePath = []
 
 for(let pack in packJson.packageDependencies) {
-  if(pack.match(/complete|language/)) {
-    let basePath = path.join('node_modules', pack)
-    let testPath = path.join(basePath, 'test')
-    let specPath = path.join(basePath, 'spec')
-    if(fs.existsSync(testPath)) packagePath.push(testPath)
-    if(fs.existsSync(specPath)) packagePath.push(specPath)
-  }
+  let basePath = path.join('node_modules', pack)
+  let testPath = path.join(basePath, 'test')
+  let specPath = path.join(basePath, 'spec')
+  if(fs.existsSync(testPath)) packagePath.push(testPath)
+  if(fs.existsSync(specPath)) packagePath.push(specPath)
 }
 
 // console.log('yarn', 'start', '--test', ...packagePath)
