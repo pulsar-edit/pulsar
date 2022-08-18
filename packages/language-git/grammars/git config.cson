@@ -1,0 +1,99 @@
+'name': 'Git Config'
+'scopeName': 'source.git-config'
+'fileTypes': [
+  '.git/config'
+  'gitconfig'
+  'gitmodules'
+]
+'patterns': [
+  {
+    'include': '#section'
+  }
+  {
+    'include': '#comment'
+  }
+]
+'repository':
+  'boolean':
+    'match': '\\b(?i:yes|no|0|1|true|false)\\b'
+    'name': 'constant.language.boolean.git-config'
+  'comment':
+    'captures':
+      '1':
+        'name': 'comment.line.number-sign.git-config'
+      '2':
+        'name': 'punctuation.definition.comment.git-config'
+      '3':
+        'name': 'comment.line.semi-colon.git-config'
+      '4':
+        'name': 'punctuation.definition.comment.git-config'
+    'match': '((#).*$\\n?)|((;).*$\\n?)'
+  'section':
+    'begin': '\\[\\s*([\\w_-]+)(?:\\s+((")(?:[^"\\\\]|\\\\["\\\\])*("))|\\.([\\w_-]+))?\\s*\\]'
+    'captures':
+      '1':
+        'name': 'entity.name.section.git-config'
+      '2':
+        'name': 'entity.name.section.subsection.git-config'
+      '3':
+        'name': 'punctuation.definition.section.subsection.begin.git-config'
+      '4':
+        'name': 'punctuation.definition.section.subsection.end.git-config'
+      '5':
+        'name': 'entity.name.section.subsection.git-config'
+    'end': '(?=\\[)'
+    'name': 'meta.section.git-config'
+    'patterns': [
+      {
+        'include': '#value_pair'
+      }
+      {
+        'include': '#comment'
+      }
+    ]
+  'string':
+    'begin': '"'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.git-config'
+    'end': '"'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.git-config'
+    'name': 'string.quoted.double.git-config'
+    'patterns': [
+      {
+        'match': '\\\\[ntb"\\\\]'
+        'name': 'constant.character.escape.git-config'
+      }
+      {
+        'match': '\\\\.'
+        'name': 'invalid.illegal.unknown-escape.git-config'
+      }
+    ]
+  'escaped-string':
+    'match': '\\\\"'
+    'name': 'constant.character.escape.git-config'
+  'value_pair':
+    'begin': '([-\\w]+)\\s*(=)\\s*(?!$)'
+    'captures':
+      '1':
+        'name': 'support.constant.git-config'
+      '2':
+        'name': 'punctuation.separator.key-value.git-config'
+    'end': '$|(?=[#;])'
+    'name': 'meta.value-pair.section-item.git-config'
+    'patterns': [
+      {
+        'include': '#boolean'
+      }
+      {
+        'include': '#escaped-string'
+      }
+      {
+        'include': '#string'
+      }
+      {
+        'include': '#comment'
+      }
+    ]

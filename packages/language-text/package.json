@@ -1,0 +1,21 @@
+{
+  "name": "language-text",
+  "version": "0.7.4",
+  "description": "Plain text support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-text",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-text.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-text/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

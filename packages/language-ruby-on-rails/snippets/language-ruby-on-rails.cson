@@ -1,0 +1,558 @@
+'.meta.rails.migration.create_table, .meta.rails.migration.change_table':
+  'Table column binary':
+    'prefix': 'tcbi'
+    'body': 't.binary :${1:title}${2:, :limit => ${3:2}.megabytes}\n$0'
+  'Table column boolean':
+    'prefix': 'tcb'
+    'body': 't.boolean :${1:title}\n$0'
+  'Table column date':
+    'prefix': 'tcda'
+    'body': 't.date :${1:title}\n$0'
+  'Table column datetime':
+    'prefix': 'tcdt'
+    'body': 't.datetime :${1:title}\n$0'
+  'Table column decimal':
+    'prefix': 'tcd'
+    'body': 't.decimal :${1:title}${2:${3:, :precision => ${4:10}}${5:, :scale => ${6:2}}}\n$0'
+  'Table column float':
+    'prefix': 'tcf'
+    'body': 't.float :${1:title}\n$0'
+  'Table column integer':
+    'prefix': 'tci'
+    'body': 't.integer :${1:title}\n$0'
+  'Table column lock_version':
+    'prefix': 'tcl'
+    'body': 't.integer :lock_version, :null => false, :default => 0\n$0'
+  'Table column(s) references':
+    'prefix': 'tcr'
+    'body': 't.references :${1:taggable}${2:, :polymorphic => ${3:{ :default => \'${4:Photo}\' \\}}}\n$0'
+  'Table column string':
+    'prefix': 'tcs'
+    'body': 't.string :${1:title}\n$0'
+  'Table column text':
+    'prefix': 'tct'
+    'body': 't.text :${1:title}\n$0'
+  'Table column time':
+    'prefix': 'tcti'
+    'body': 't.time :${1:title}\n$0'
+  'Table column timestamp':
+    'prefix': 'tcts'
+    'body': 't.timestamp :${1:title}\n$0'
+  'Table column timestamps':
+    'prefix': 'tctss'
+    'body': 't.timestamps\n$0'
+  't.binary (tcbi)':
+    'prefix': 't.'
+    'body': 't.binary :${1:title}${2:, :limit => ${3:2}.megabytes}\nt.$0'
+  't.boolean (tcb)':
+    'prefix': 't.'
+    'body': 't.boolean :${1:title}\nt.$0'
+  't.date (tcda)':
+    'prefix': 't.'
+    'body': 't.date :${1:title}\nt.$0'
+  't.datetime (tcdt)':
+    'prefix': 't.'
+    'body': 't.datetime :${1:title}\nt.$0'
+  't.decimal (tcd)':
+    'prefix': 't.'
+    'body': 't.decimal :${1:title}${2:${3:, :precision => ${4:10}}${5:, :scale => ${6:2}}}\nt.$0'
+  't.float (tcf)':
+    'prefix': 't.'
+    'body': 't.float :${1:title}\nt.$0'
+  't.integer (tci)':
+    'prefix': 't.'
+    'body': 't.integer :${1:title}\nt.$0'
+  't.lock_version (tcl)':
+    'prefix': 't.'
+    'body': 't.integer :lock_version, :null => false, :default => 0\nt.$0'
+  't.references (tcr)':
+    'prefix': 't.'
+    'body': 't.references :${1:taggable}${2:, :polymorphic => ${3:{ :default => \'${4:Photo}\' \\}}}\nt.$0'
+  't.string (tcs)':
+    'prefix': 't.'
+    'body': 't.string :${1:title}\nt.$0'
+  't.text (tct)':
+    'prefix': 't.'
+    'body': 't.text :${1:title}\nt.$0'
+  't.time (tcti)':
+    'prefix': 't.'
+    'body': 't.time :${1:title}\nt.$0'
+  't.timestamp (tcts)':
+    'prefix': 't.'
+    'body': 't.timestamp :${1:title}\nt.$0'
+  't.timestamps (tctss)':
+    'prefix': 't.'
+    'body': 't.timestamps\nt.$0'
+'.source.ruby':
+  'assert(var = assigns(:var))':
+    'prefix': 'asg'
+    'body': 'assert(${1:var} = assigns(:${1}), "Cannot find @${1}")\n$0'
+  'assert_difference':
+    'prefix': 'asd'
+    'body': 'assert_difference "${1:Model}.${2:count}", ${3:+1} do\n  $0\nend'
+  'assert_no_difference':
+    'prefix': 'asnd'
+    'body': 'assert_no_difference "${1:Model}.${2:count}" do\n  $0\nend'
+'.meta.rails.migration.create_table':
+  'Create Column in Table':
+    'prefix': 'mcol'
+    'body': 't.column ${1:title}, :${2:string}\n$0'
+  'Create Several Columns in Table':
+    'prefix': 'mccc'
+    'body': 't.column ${1:title}, :${2:string}\nmccc$0'
+'.source.ruby.rails':
+  'Rails.logger.debug':
+    'prefix': 'deb'
+    'body': 'Rails.logger.debug "${1:message}"'
+  'assert_redirected_to':
+    'prefix': 'asrt'
+    'body': 'assert_redirected_to ${2::action => "${1:index}"}'
+  'assert_response':
+    'prefix': 'asre'
+    'body': 'assert_response :${1:success}${2:, @response.body}$0'
+  'accepts_nested_attributes_for':
+    'prefix': 'anaf'
+    'body': 'accepts_nested_attributes_for :${1:association_name}${2:${3:, :allow_destroy => true}${4:, :reject_if => proc { |obj| ${5:obj.blank?} \\}}}\n'
+  'after_create':
+    'prefix': 'aftc'
+    'body': 'after_create '
+  'after_destroy':
+    'prefix': 'aftd'
+    'body': 'after_destroy '
+  'after_save':
+    'prefix': 'afts'
+    'body': 'after_save '
+  'after_update':
+    'prefix': 'aftu'
+    'body': 'after_update '
+  'alias_attribute':
+    'prefix': 'alias'
+    'body': 'alias_attribute :${1:new_name}, :${2:old_name}'
+  'assert_redirected_to (nested path plural)':
+    'prefix': 'asrt'
+    'body': 'assert_redirected_to ${10:${2:parent}_${3:child}_path(${4:@}${5:${2}})}'
+  'assert_redirected_to (nested path)':
+    'prefix': 'asrt'
+    'body': 'assert_redirected_to ${2:${12:parent}_${13:child}_path(${14:@}${15:${12}}, ${16:@}${17:${13}})}'
+  'assert_redirected_to (path plural)':
+    'prefix': 'asrt'
+    'body': 'assert_redirected_to ${10:${2:model}s_path}'
+  'assert_redirected_to (path)':
+    'prefix': 'asrt'
+    'body': 'assert_redirected_to ${2:${12:model}_path(${13:@}${14:${12}})}'
+  'assert_rjs':
+    'prefix': 'asrj'
+    'body': 'assert_rjs :${1:replace}, ${2:"${3:dom id}"}'
+  'assert_select':
+    'prefix': 'ass'
+    'body': 'assert_select \'${1:path}\'${2:, :${3:text} => ${4:\'${5:inner_html}\'}}${6: do\n\t$0\nend}'
+  'assert_template':
+    'prefix': 'aste'
+    'body': 'assert_template \'${1:template}\''
+  'before_action':
+    'prefix': 'ba'
+    'body': 'before_action :${1:method}${2:${3:, :only => ${4:[:${5:action}, :${6:action}]}}${7:, :except => ${8:[:${9:action}, :${10:action}]}}}'
+  'before_create':
+    'prefix': 'befc'
+    'body': 'before_create '
+  'before_destroy':
+    'prefix': 'befd'
+    'body': 'before_destroy '
+  'before_filter':
+    'prefix': 'bf'
+    'body': 'before_filter :${1:method}${2:${3:, :only => ${4:[:${5:action}, :${6:action}]}}${7:, :except => ${8:[:${9:action}, :${10:action}]}}}'
+  'before_save':
+    'prefix': 'befs'
+    'body': 'before_save '
+  'before_update':
+    'prefix': 'befu'
+    'body': 'before_update '
+  'caches_action':
+    'prefix': 'cache'
+    'body': 'caches_action :${1:action}'
+  'cattr_accessor':
+    'prefix': 'crw'
+    'body': 'cattr_accessor :${0:attr_names}'
+  'classify { |e| .. }':
+    'prefix': 'cl'
+    'body': 'classify { |${1:e}| $0 }'
+  'find(:all)':
+    'prefix': 'fina'
+    'body': 'find(:all${1:, :conditions => [\'${2:${3:field} = ?}\', ${5:true}]})'
+  'find(:first)':
+    'prefix': 'finf'
+    'body': 'find(:first${1:, :conditions => [\'${2:${3:field} = ?}\', ${5:true}]})'
+  'find(:last)':
+    'prefix': 'finl'
+    'body': 'find(:last${1:, :conditions => [\'${2:${3:field} = ?}\', ${5:true}]})'
+  'find(id)':
+    'prefix': 'fini'
+    'body': 'find(${1:id})'
+  'find_each':
+    'prefix': 'fine'
+    'body': 'find_each(${1::conditions => {:${2:field} => ${3:true}\\}}) do |$1|\n\t$0\nend'
+  'find_in_batches':
+    'prefix': 'finb'
+    'body': 'find_in_batches(${1::conditions => {:${2:field} => ${3:true}\\}}) do |$1s|\n\t$4s.each do |$4|\n\t\t$0\n\tend\nend'
+  'gem :git':
+    'prefix': 'gemg'
+    'body': 'gem \'${1:paperclip}\', :git => "${2:git://github.com/thoughtbot/paperclip.git}"${3:, :branch => "${4:rails3}"}'
+  'gem':
+    'prefix': 'gem'
+    'body': 'gem \'${1:name}\'${2:${3:, "${4:1.0}"}${5:${6:, :require => ${7:"${8:$1}"}}${9:, :group => :${10:test}}}}'
+  'layout':
+    'prefix': 'layout'
+    'body': 'layout "${1:template_name}"${2:${3:, :only => ${4:[:${5:action}, :${6:action}]}}${7:, :except => ${8:[:${9:action}, :${10:action}]}}}'
+  'logger.debug':
+    'prefix': 'logd'
+    'body': '${1:Rails.}logger.debug { "${2:message}" }$0'
+  'logger.error':
+    'prefix': 'loge'
+    'body': 'logger.error { "${1:message}" }$0'
+  'logger.fatal':
+    'prefix': 'logf'
+    'body': 'logger.fatal { "${1:message}" }$0'
+  'logger.info':
+    'prefix': 'logi'
+    'body': 'logger.info { "${1:message}" }$0'
+  'logger.warn':
+    'prefix': 'logw'
+    'body': 'logger.warn { "${1:message}" }$0'
+  'map(&:sym_proc)':
+    'prefix': 'mp'
+    'body': 'map(&:${1:id})'
+  'mattr_accessor':
+    'prefix': 'mrw'
+    'body': 'mattr_accessor :${0:attr_names}'
+  'flash[…]':
+    'prefix': 'flash'
+    'body': 'flash[:${1:notice}] = "${2:Successfully created...}"$0'
+  'redirect_to (action)':
+    'prefix': 'rea'
+    'body': 'redirect_to :action => "${1:index}"'
+  'redirect_to (action, id)':
+    'prefix': 'reai'
+    'body': 'redirect_to :action => "${1:show}", :id => ${0:@item}'
+  'redirect_to (controller)':
+    'prefix': 'rec'
+    'body': 'redirect_to :controller => "${1:items}"'
+  'redirect_to (controller, action)':
+    'prefix': 'reca'
+    'body': 'redirect_to :controller => "${1:items}", :action => "${2:list}"'
+  'redirect_to (controller, action, id)':
+    'prefix': 'recai'
+    'body': 'redirect_to :controller => "${1:items}", :action => "${2:show}", :id => ${0:@item}'
+  'redirect_to (nested path plural)':
+    'prefix': 'renpp'
+    'body': 'redirect_to(${2:${10:parent}_${11:child}_path(${12:@}${13:${10}})})'
+  'redirect_to (nested path)':
+    'prefix': 'renp'
+    'body': 'redirect_to(${2:${12:parent}_${13:child}_path(${14:@}${15:${12}}, ${16:@}${17:${13}})})'
+  'redirect_to (path plural)':
+    'prefix': 'repp'
+    'body': 'redirect_to(${2:${10:model}s_path})'
+  'redirect_to (path)':
+    'prefix': 'rep'
+    'body': 'redirect_to(${2:${12:model}_path(${13:@}${14:${12}})})'
+  'redirect_to :back':
+    'prefix': 'reb'
+    'body': 'redirect_to :back'
+  'render (action)':
+    'prefix': 'ra'
+    'body': 'render :action => "${1:action}"'
+  'render (action, layout)':
+    'prefix': 'ral'
+    'body': 'render :action => "${1:action}", :layout => "${2:layoutname}"'
+  'render (file)':
+    'prefix': 'rf'
+    'body': 'render :file => "${1:filepath}"'
+  'render (file, use_full_path)':
+    'prefix': 'rfu'
+    'body': 'render :file => "${1:filepath}", :use_full_path => ${2:false}'
+  'render (inline)':
+    'prefix': 'ri'
+    'body': 'render :inline => "${1:<%= \'hello\' %>}"'
+  'render (inline, locals)':
+    'prefix': 'ril'
+    'body': 'render :inline => "${1:<%= \'hello\' %>}", :locals => { ${2::name} => "${3:value}"$4 }'
+  'render (inline, type)':
+    'prefix': 'rit'
+    'body': 'render :inline => "${1:<%= \'hello\' %>}", :type => ${2::rxml}'
+  'render (layout)':
+    'prefix': 'rl'
+    'body': 'render :layout => "${1:layoutname}"'
+  'render (nothing)':
+    'prefix': 'rn'
+    'body': 'render :nothing => ${1:true}'
+  'render (nothing, status)':
+    'prefix': 'rns'
+    'body': 'render :nothing => ${1:true}, :status => ${2:401}'
+  'render (text)':
+    'prefix': 'rt'
+    'body': 'render :text => "${1:text to render...}"'
+  'render (text, layout)':
+    'prefix': 'rtl'
+    'body': 'render :text => "${1:text to render...}", :layout => "${2:layoutname}"'
+  'render (text, layout => true)':
+    'prefix': 'rtlt'
+    'body': 'render :text => "${1:text to render...}", :layout => ${2:true}'
+  'render (text, status)':
+    'prefix': 'rts'
+    'body': 'render :text => "${1:text to render...}", :status => ${2:401}'
+  'render (update)':
+    'prefix': 'ru'
+    'body': 'render :update do |${2:page}|\n\t$2.$0\nend'
+  'scoped_by':
+    'prefix': 'sb'
+    'body': 'scoped_by_${1:attribute}(${2:id})'
+  'setup do..end':
+    'prefix': 'setup'
+    'body': 'setup do\n\t$0\nend'
+  'test do..end':
+    'prefix': 'test'
+    'body': 'test "${1:something interesting}" do\n\t$0\nend'
+  'validates_acceptance_of if':
+    'prefix': 'vaoif'
+    'body': 'validates_acceptance_of :${1:terms}${2:${3:, :accept => "${4:1}"}${5:, :message => "${6:You must accept the terms of service}"}}, :if => proc { |obj| ${7:obj.condition?} }}'
+  'validates_acceptance_of':
+    'prefix': 'vao'
+    'body': 'validates_acceptance_of :${1:terms}${2:${3:, :accept => "${4:1}"}${5:, :message => "${6:You must accept the terms of service}"}}'
+  'validates_associated':
+    'prefix': 'va'
+    'body': 'validates_associated :${1:attribute}${2:, :on => :${3:create}}'
+  'validates_associated if':
+    'prefix': 'vaif'
+    'body': 'validates_associated :${1:attribute}${2:, :on => :${3:create}, :if => proc { |obj| ${5:obj.condition?} }}'
+  'validates_confirmation_of':
+    'prefix': 'vc'
+    'body': 'validates_confirmation_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:should match confirmation}"}'
+  'validates_confirmation_of if':
+    'prefix': 'vcif'
+    'body': 'validates_confirmation_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:should match confirmation}", :if => proc { |obj| ${5:obj.condition?} }}'
+  'validates_exclusion_of':
+    'prefix': 've'
+    'body': 'validates_exclusion_of :${1:attribute}${2:, :in => ${3:%w( ${4:mov avi} )}, :on => :${5:create}, :message => "${6:extension %s is not allowed}"}'
+  'validates_exclusion_of if':
+    'prefix': 'veif'
+    'body': 'validates_exclusion_of :${1:attribute}${2:, :in => ${3:%w( ${4:mov avi} )}, :on => :${5:create}, :message => "${6:extension %s is not allowed}"}, :if => proc { |obj| ${7:obj.condition?} }}'
+  'validates_format_of if':
+    'prefix': 'vfif'
+    'body': 'validates_format_of :${1:attribute}, :with => /${2:^[${3:\\w\\d}]+\\$}/${4:, :on => :${5:create}, :message => "${6:is invalid}"}, :if => proc { |obj| ${7:obj.condition?} }}'
+  'validates_format_of':
+    'prefix': 'vf'
+    'body': 'validates_format_of :${1:attribute}, :with => /${2:^[${3:\\w\\d}]+\\$}/${4:, :on => :${5:create}, :message => "${6:is invalid}"}'
+  'validates_inclusion_of if':
+    'prefix': 'viif'
+    'body': 'validates_inclusion_of :${1:attribute}${2:, :in => ${3:%w( ${4:mov avi} )}, :on => :${5:create}, :message => "${6:extension %s is not included in the list}"}, :if => proc { |obj| ${7:obj.condition?} }}'
+  'validates_inclusion_of':
+    'prefix': 'vi'
+    'body': 'validates_inclusion_of :${1:attribute}${2:, :in => ${3:%w( ${4:mov avi} )}, :on => :${5:create}, :message => "${6:extension %s is not included in the list}"}'
+  'validates_length_of':
+    'prefix': 'vl'
+    'body': 'validates_length_of :${1:attribute}, :within => ${2:3..20}${3:, :on => :${4:create}, :message => "${5:must be present}"}'
+  'validates_length_of if':
+    'prefix': 'vlif'
+    'body': 'validates_length_of :${1:attribute}, :within => ${2:3..20}${3:, :on => :${4:create}, :message => "${5:must be present}"}, :if => proc { |obj| ${6:obj.condition?} }}'
+  'validates_numericality_of if':
+    'prefix': 'vnif'
+    'body': 'validates_numericality_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:is not a number}"}, :if => proc { |obj| ${5:obj.condition?} }}'
+  'validates_numericality_of':
+    'prefix': 'vn'
+    'body': 'validates_numericality_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:is not a number}"}'
+  'validates_presence_of':
+    'prefix': 'vp'
+    'body': 'validates_presence_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:can\'t be blank}"}'
+  'validates_presence_of if':
+    'prefix': 'vpif'
+    'body': 'validates_presence_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:can\'t be blank}"}, :if => proc { |obj| ${5:obj.condition?} }'
+  'validates_uniqueness_of':
+    'prefix': 'vu'
+    'body': 'validates_uniqueness_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:must be unique}"}'
+  'validates_uniqueness_of if':
+    'prefix': 'vuif'
+    'body': 'validates_uniqueness_of :${1:attribute}${2:, :on => :${3:create}, :message => "${4:must be unique}", :if => proc { |obj| ${6:obj.condition?} }}'
+  'verify — render':
+    'prefix': 'verify'
+    'body': 'verify :only => [:$1], :method => :post, :render => {:status => 500, :text => "use HTTP-POST"}\n'
+  'verify — redirect':
+    'prefix': 'verify'
+    'body': 'verify :only => [:$1], :session => :user, :params => :id, :redirect_to => {:action => \'${2:index}\'}\n'
+  'xhr delete':
+    'prefix': 'xdelete'
+    'body': 'xhr :delete, :${1:destroy}, :id => ${2:1}$0'
+  'xhr get':
+    'prefix': 'xget'
+    'body': 'xhr :get, :${1:show}${2:, :id => ${3:1}}$0'
+  'xhr post':
+    'prefix': 'xpost'
+    'body': 'xhr :post, :${1:create}, :${2:object} => { $3 }'
+  'xhr put':
+    'prefix': 'xput'
+    'body': 'xhr :put, :${1:update}, :id => ${2:1}, :${3:object} => { $4 }$0'
+'.meta.rails.migration.change_table':
+  'Table column(s) change':
+    'prefix': 'tch'
+    'body': 't.change :${1:name}${2:, :${3:string}${4:, :${5:limit} => ${6:80}}}\n$0'
+  'Table column(s) rename':
+    'prefix': 'tre'
+    'body': 't.rename :${1:old_column_name}, :${2:new_column_name}\n$0'
+  't.change (tch)':
+    'prefix': 't.'
+    'body': 't.change :${1:name}${2:, :${3:string}${4:, :${5:limit} => ${6:80}}}\nt.$0'
+  't.rename (tre)':
+    'prefix': 't.'
+    'body': 't.rename :${1:old_column_name}, :${2:new_column_name}\nt.$0'
+'.meta.rails.model':
+  'after_validation':
+    'prefix': 'aftv'
+    'body': 'after_validation :${1:field}${2:, :on => :${3:create|update}${4:${5:, :allow_blank => true}${6:, :allow_nil => true}}}$0'
+  'before_validation':
+    'prefix': 'befv'
+    'body': 'before_validation :${1:field}${2:, :on => :${3:create|update}${4:${5:, :allow_blank => true}${6:, :allow_nil => true}}}$0'
+  'belongs_to':
+    'prefix': 'bt'
+    'body': 'belongs_to :${1:object}${2:, :class_name => "${1}", :foreign_key => "${4:reference}_id"}'
+  'default_scope':
+    'prefix': 'dscope'
+    'body': 'default_scope ${1:order(${2:\'${3:created_at DESC}\'})}'
+  'has_and_belongs_to_many':
+    'prefix': 'habtm'
+    'body': 'has_and_belongs_to_many :${1:object}${2:, :join_table => "${3:table_name}", :foreign_key => "${4:${1}_id}"}'
+  'has_many':
+    'prefix': 'hm'
+    'body': 'has_many :${1:object}s${2:, :class_name => "${1}", :foreign_key => "${4:reference}_id"}'
+  'has_many (through)':
+    'prefix': 'hmt'
+    'body': 'has_many :${1:objects}, :through => :${2:join_association}${3:, :source => :${4:${2}_table_foreign_key_to_${1}_table}}'
+  'has_many :dependent => :destroy':
+    'prefix': 'hmd'
+    'body': 'has_many :${1:object}s${2:, :class_name => "${1}", :foreign_key => "${4:reference}_id"}, :dependent => :destroy$0'
+  'has_one':
+    'prefix': 'ho'
+    'body': 'has_one :${1:object}${2:, :class_name => "${1}", :dependent => :destroy}'
+  'has_one (through)':
+    'prefix': 'hot'
+    'body': 'has_one :${1:object}, :through => :${2:join_association}${3:, :source => :${4:${2}_table_foreign_key_to_${1}_table}}'
+  'scope lambda':
+    'prefix': 'scopel'
+    'body': 'scope :${1:name}, lambda { |${2:param}| ${3:where(${4::${5:field} => ${6:"${7:value}"}})} }'
+  'scope with extension':
+    'prefix': 'scopee'
+    'body': 'scope :${1:name}, ${2:where(${3::${4:field} => ${5:\'${6:value}\'}})} do\n  def ${7:method_name}\n    $0\n  end\nend'
+  'scope':
+    'prefix': 'scope'
+    'body': 'scope :${1:name}, ${2:joins(:${3:table}).}where(${4:\'${5:$3.${6:field}} = ?\', ${7:\'${8:value}\'}})'
+'.text.html.ruby':
+  'content_for':
+    'prefix': 'conf'
+    'body': '<% content_for :${1:yield_label_in_layout} do -%>\n\t$0\n<% end -%>'
+  'else (ERB)':
+    'prefix': 'else'
+    'body': '<% else %>\n  '
+  'end (ERB)':
+    'prefix': 'end'
+    'body': '<% end %>'
+  'for loop in rhtml':
+    'prefix': 'for'
+    'body': '<% if !${1:list}.blank? %>\n  <% for ${2:item} in ${1} %>\n    $3\n  <% end %>\n<% else %>\n  $4\n<% end %>\n'
+  'if (ERB)':
+    'prefix': 'if'
+    'body': '<% if ${1:condition} %>\n  $0\n<% end %>'
+'.meta.rails.controller':
+  'format (respond_with)':
+    'prefix': 'format'
+    'body': 'format.${1:html|xml|json|js|any} { $0 }'
+  'respond_to':
+    'prefix': 'rest'
+    'body': 'respond_to :${1:html}${2:, :${3:xml}${4:, :${5:json}}}$0'
+  'respond_with':
+    'prefix': 'resw'
+    'body': 'respond_with(${1:@${2:model}})${3: do |format|\n  format.${4:html} { $0 \\}\nend}'
+  'params':
+    'prefix': 'p'
+    'body': 'params[:${1:id}]$0'
+  'session':
+    'prefix': 'sess'
+    'body': 'session[:${1:user}]$0'
+'.meta.rails.routes':
+  'get :on => :member':
+    'prefix': 'get'
+    'body': 'get \'${1:recent}\'${2:, :on => :${3:member}}'
+  'get :on => :collection':
+    'prefix': 'get'
+    'body': 'get \'${1:recent}\'${2:, :on => :${3:collection}}'
+  'map.catch_all':
+    'prefix': 'mapca'
+    'body': '${1:map}.catch_all "*${2:anything}", :controller => "${3:default}", :action => "${4:error}"\n'
+  'map.named_route':
+    'prefix': 'map'
+    'body': '${1:map}.${2:connect} \'${3::controller/:action/:id}\''
+  'map.resource':
+    'prefix': 'mapr'
+    'body': '${1:map}.resource :${2:resource}${10: do |${11:$2}|\n  $0\nend}'
+  'map.resources':
+    'prefix': 'maprs'
+    'body': '${1:map}.resources :${2:resource}${10: do |${11:$2}|\n  $0\nend}'
+  'map.with_options':
+    'prefix': 'mapwo'
+    'body': '${1:map}.with_options :${2:controller} => \'${3:thing}\' do |${4:$3}|\n\t$0\nend\n'
+  'member routes':
+    'prefix': 'member'
+    'body': 'member do\n  ${1:get :${2:action}}\n  ${3:put :${4:action}}\n  ${5:post :${6:action}}\n  ${7:delete :${8:action}}\nend'
+  'collection routes':
+    'prefix': 'col'
+    'body': 'collection do\n  ${1:get :${2:action}}\n  ${3:put :${4:action}}\n  ${5:post :${6:action}}\n  ${7:delete :${8:action}}\nend'
+  'resources':
+    'prefix': 'res'
+    'body': 'resources :${1:posts}${2: do\n  $3\nend}'
+'.source.ruby.rails.rjs':
+  'page.hide (*ids)':
+    'prefix': 'hide'
+    'body': 'page.hide ${1:"${2:id(s)}"}'
+  'page.insert_html (position, id, partial)':
+    'prefix': 'ins'
+    'body': 'page.insert_html :${1:top}, ${2:"${3:id}"}, :${4:partial => "${5:template}"}'
+  'page.replace (id, partial)':
+    'prefix': 'rep'
+    'body': 'page.replace ${1:"${2:id}"}, :${3:partial => "${4:template}"}'
+  'page.replace_html (id, partial)':
+    'prefix': 'reph'
+    'body': 'page.replace_html ${1:"${2:id}"}, :${3:partial => "${4:template}"}'
+  'page.show (*ids)':
+    'prefix': 'show'
+    'body': 'page.show ${1:"${2:id(s)}"}'
+  'page.toggle (*ids)':
+    'prefix': 'tog'
+    'body': 'page.toggle ${1:"${2:id(s)}"}'
+  'page.visual_effect (effect, id)':
+    'prefix': 'vis'
+    'body': 'page.visual_effect :${1:toggle_slide}, ${2:"${3:DOM ID}"}'
+'.source.ruby.rails, .text.html.ruby, .text.haml, .source.js.rails':
+  'erb_render_block':
+    'prefix': '='
+    'body': '<%= $1 %>'
+'.source.ruby.rails, .text.html.ruby, .text.haml':
+  'erb_exec_block':
+    'prefix': '-'
+    'body': '<% $1 %>'
+  'erb_loop_block':
+    'prefix': '=loop'
+    'body': '<% $1.each do |$2| %>\n\t<%= $3 %>\n<% end %>\n$4'
+  'link_to':
+    'prefix': 'lt'
+    'body': '<%= link_to "${1:name}", ${2:path} %>'
+  'render (partial)':
+    'prefix': 'rp'
+    'body': 'render :partial => "${1:item}"'
+  'render (partial, collection)':
+    'prefix': 'rpc'
+    'body': 'render :partial => "${1:item}", :collection => ${2:@$1s}'
+  'render (partial, locals)':
+    'prefix': 'rpl'
+    'body': 'render :partial => "${1:item}", :locals => { :${2:$1} => ${3:@$1}$0 }'
+  'render (partial, object)':
+    'prefix': 'rpo'
+    'body': 'render :partial => "${1:item}", :object => ${2:@$1}'
+  'render (partial, status)':
+    'prefix': 'rps'
+    'body': 'render :partial => "${1:item}", :status => ${2:500}'

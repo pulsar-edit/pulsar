@@ -1,0 +1,141 @@
+'name': 'Git Commit Message'
+'scopeName': 'text.git-commit'
+'fileTypes': [
+  'COMMIT_EDITMSG'
+  'MERGE_MSG'
+]
+'foldingStartMarker': '^\\+\\+\\+'
+'foldingStopMarker': '^---'
+'patterns': [
+  {
+    'begin': '\\A(?!#)'
+    'end': '^(?<!\\A)(?=# Please enter the commit message)'
+    'name': 'meta.scope.message.git-commit'
+    'patterns': [
+      {
+        'match': '\\G((fixup|squash)!)'
+        'captures':
+          '1':
+            'name': 'keyword.other.$2.git-commit'
+      }
+      {
+        'match': '^#.*$'
+        'name': 'comment.line.number-sign.git-commit'
+      }
+      {
+        # Subject line 0-50 chars
+        'match': '\\A(?!#)(([a-z])|.).{0,48}((\\.)|.)$'
+        'captures':
+          '2':
+            'name': 'invalid.illegal.first-char-should-be-uppercase.git-commit'
+          '4':
+            'name': 'invalid.illegal.subject-no-trailing-period.git-commit'
+      }
+      {
+        # Subject line 51-72 chars
+        'match': '\\A(?!#)(([a-z])|.).{49}(.{0,21})((\\.)|(.))$'
+        'captures':
+          '2':
+            'name': 'invalid.illegal.first-char-should-be-uppercase.git-commit'
+          '3':
+            'name': 'invalid.deprecated.line-too-long.git-commit'
+          '5':
+            'name': 'invalid.illegal.subject-no-trailing-period.git-commit'
+          '6':
+            'name': 'invalid.deprecated.line-too-long.git-commit'
+      }
+      {
+        # Subject line 73 chars or longer
+        'match': '\\A(?!#)(([a-z])|.).{49}(.{0,22})(.*?)(\\.?)$'
+        'captures':
+          '2':
+            'name': 'invalid.illegal.first-char-should-be-uppercase.git-commit'
+          '3':
+            'name': 'invalid.deprecated.line-too-long.git-commit'
+          '4':
+            'name': 'invalid.illegal.line-too-long.git-commit'
+          '5':
+            'name': 'invalid.illegal.subject-no-trailing-period.git-commit'
+      }
+      {
+        # Body line 73 chars or longer
+        'match': '^(?!#).{72}(.+)'
+        'captures':
+          '1':
+            'name': 'invalid.illegal.line-too-long.git-commit'
+      }
+    ]
+  }
+  {
+    'begin': '(?<=^)(?=# Please enter the commit message)'
+    'end': '\\z'
+    'name': 'meta.scope.metadata.git-commit'
+    'patterns': [
+      {
+        'include': '#metadata'
+      }
+    ]
+  }
+]
+'repository':
+  'metadata':
+    'patterns': [
+      {
+        'begin': '(?=^# Changes to be committed:)'
+        'end': '(?!\\G)((?=^# \\w)|(?!^#))'
+        'patterns': [
+          {
+            'begin': '(^[ \\t]+)?(?=#)'
+            'beginCaptures':
+              '1':
+                'name': 'punctuation.whitespace.comment.leading.git-commit'
+            'contentName': 'comment.line.number-sign.git-commit'
+            'end': '(?!\\G)^'
+            'patterns': [
+              {
+                'match': '\\G#'
+                'name': 'punctuation.definition.comment.git-commit'
+              }
+              {
+                'match': '((modified|renamed):.*)$\\n?'
+                'name': 'markup.changed.git-commit'
+              }
+              {
+                'match': '(new file:.*)$\\n?'
+                'name': 'markup.inserted.git-commit'
+              }
+              {
+                'match': '(deleted:.*)$\\n?'
+                'name': 'markup.deleted.git-commit'
+              }
+            ]
+          }
+        ]
+      }
+      {
+        'begin': '^(?=#)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.whitespace.comment.leading.git-commit'
+        'contentName': 'comment.line.number-sign.git-commit'
+        'end': '(?!\\G)^'
+        'patterns': [
+          {
+            'match': '\\G#'
+            'name': 'punctuation.definition.comment.git-commit'
+          }
+        ]
+      }
+      {
+        'begin': '(?=diff\\ \\-\\-git)'
+        'comment': 'diff presented at the end of the commit message when using commit -v.'
+        'contentName': 'source.diff'
+        'end': '\\z'
+        'name': 'meta.embedded.diff.git-commit'
+        'patterns': [
+          {
+            'include': 'source.diff'
+          }
+        ]
+      }
+    ]
