@@ -11,7 +11,7 @@ const url = require('url');
 const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
-const ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'atom.png');
+const ICON_PATH = path.resolve(process.resourcesPath, 'atom.png');
 
 let includeShellLoadTime = true;
 let nextId = 0;
