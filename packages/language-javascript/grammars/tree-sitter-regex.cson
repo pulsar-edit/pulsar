@@ -1,0 +1,17 @@
+name: 'Javascript RegExp'
+scopeName: 'source.js.regexp'
+type: 'tree-sitter'
+parser: 'tree-sitter-regex'
+
+injectionRegex: 'regex'
+
+scopes:
+  'pattern': 'string.quoted',
+  'group_name': 'variable.other.object.property'
+  'identity_escape, control_letter_escape, control_escape, class_escape': 'constant.character.character-class.regexp'
+  'start_assertion, end_assertion, boundary_assertion, non_boundary_assertion': 'constant.character.character-class.regexp'
+  'count_quantifier, one_or_more, zero_or_more, optional': 'storage.modifier'
+  'character_class': 'string.regexp'
+  '"(", "(?", "(?:", "(?<"': 'punctuation.definition.parameters.begin.bracket.round'
+  '">", ")"': 'punctuation.definition.parameters.end.bracket.round'
+  '"=", "<=", "!", "<!"': 'punctuation.definition.parameters.begin.bracket.round'

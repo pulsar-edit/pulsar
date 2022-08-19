@@ -1682,9 +1682,9 @@
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
 "@types/node@^18.0.0":
-  version "18.7.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.4.tgz#95baa50846ae112a7376869d49fec23b2506c69d"
-  integrity sha512-RzRcw8c0B8LzryWOR4Wj7YOTFXvdYKwvrb6xQQyuDfnlTxwYXGCV5RZ/TEbq5L5kn+w3rliHAUyRcG1RtbmTFg==
+  version "18.7.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.5.tgz#f1c1d4b7d8231c0278962347163656f9c36f3e83"
+  integrity sha512-NcKK6Ts+9LqdHJaW6HQmgr7dT/i3GOHG+pt6BiWv++5SnjtRd4NXeiuN2kA153SjhXPR/AhHIPHPbrsbpUVOww==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -2222,9 +2222,9 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "0.17.5"
   resolved "https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5#a6b38bca90bdba18a2f40c366266cda93bf582c3"
 
-"autocomplete-html@https://codeload.github.com/atom/autocomplete-html/legacy.tar.gz/refs/tags/v0.8.8":
-  version "0.8.8"
-  resolved "https://codeload.github.com/atom/autocomplete-html/legacy.tar.gz/refs/tags/v0.8.8#2c07bb627e672d8dbc3aa1abc77d5bc1d211f4f1"
+"autocomplete-html@https://github.com/pulsar-edit/autocomplete-html.git#v0.8.9":
+  version "0.8.9"
+  resolved "https://github.com/pulsar-edit/autocomplete-html.git#4d0c180bade12e90ec3fce944ba3759723e64ba4"
 
 "autocomplete-plus@https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4":
   version "2.42.4"
@@ -5627,17 +5627,14 @@ ky@0.30.0:
     tree-sitter-c "^0.15.3"
     tree-sitter-cpp "^0.15.1"
 
-"language-clojure@https://codeload.github.com/atom/language-clojure/legacy.tar.gz/refs/tags/v0.22.8":
+"language-clojure@file:packages/language-clojure":
   version "0.22.8"
-  resolved "https://codeload.github.com/atom/language-clojure/legacy.tar.gz/refs/tags/v0.22.8#3887114cb34eadb0d974c785918d6c44550dd850"
 
-"language-coffee-script@https://codeload.github.com/atom/language-coffee-script/legacy.tar.gz/refs/tags/v0.50.0":
+"language-coffee-script@file:packages/language-coffee-script":
   version "0.50.0"
-  resolved "https://codeload.github.com/atom/language-coffee-script/legacy.tar.gz/refs/tags/v0.50.0#abced7a9e188335b085e789a3d2008b4a0e18d5b"
 
-"language-csharp@https://codeload.github.com/atom/language-csharp/legacy.tar.gz/refs/tags/v1.1.0":
+"language-csharp@file:packages/language-csharp":
   version "1.1.0"
-  resolved "https://codeload.github.com/atom/language-csharp/legacy.tar.gz/refs/tags/v1.1.0#a4a77c512bfd883ddc399c8631ef35a46dd62d29"
 
 "language-css@https://codeload.github.com/atom/language-css/legacy.tar.gz/refs/tags/v0.45.1":
   version "0.45.1"
@@ -5645,145 +5642,112 @@ ky@0.30.0:
   dependencies:
     tree-sitter-css "^0.19.0"
 
-"language-gfm@https://codeload.github.com/atom/language-gfm/legacy.tar.gz/refs/tags/v0.90.8":
+"language-gfm@file:packages/language-gfm":
   version "0.90.8"
-  resolved "https://codeload.github.com/atom/language-gfm/legacy.tar.gz/refs/tags/v0.90.8#47eebceaf4290da491abc68f6a12006ce6171ae7"
 
-"language-git@https://codeload.github.com/atom/language-git/legacy.tar.gz/refs/tags/v0.19.1":
+"language-git@file:packages/language-git":
   version "0.19.1"
-  resolved "https://codeload.github.com/atom/language-git/legacy.tar.gz/refs/tags/v0.19.1#4e42383312e9979f50968031d6e5e1dea9ffc98f"
 
-"language-go@https://codeload.github.com/atom/language-go/legacy.tar.gz/refs/tags/v0.47.2":
-  version "0.47.2"
-  resolved "https://codeload.github.com/atom/language-go/legacy.tar.gz/refs/tags/v0.47.2#726785ac72cb8e18f524835f27a7ef3834f705d5"
-  dependencies:
-    tree-sitter-go "^0.15.1"
-
-"language-html@https://codeload.github.com/atom/language-html/legacy.tar.gz/refs/tags/v0.53.1":
+"language-html@file:packages/language-html":
   version "0.53.1"
-  resolved "https://codeload.github.com/atom/language-html/legacy.tar.gz/refs/tags/v0.53.1#d1f031b457a4d476bf742a9103e11433850dbe88"
   dependencies:
     atom-grammar-test "^0.6.3"
-    tree-sitter-embedded-template "^0.15.2"
-    tree-sitter-html "^0.15.0"
+    tree-sitter-embedded-template "0.19.0"
+    tree-sitter-html "0.19.0"
 
-"language-hyperlink@https://codeload.github.com/atom/language-hyperlink/legacy.tar.gz/refs/tags/v0.17.1":
+"language-hyperlink@file:packages/language-hyperlink":
   version "0.17.1"
-  resolved "https://codeload.github.com/atom/language-hyperlink/legacy.tar.gz/refs/tags/v0.17.1#d43adf5639fcf426399496cf439f2b3270456f74"
 
-"language-java@https://codeload.github.com/atom/language-java/legacy.tar.gz/refs/tags/v0.32.1":
+"language-java@file:packages/language-java":
   version "0.32.1"
-  resolved "https://codeload.github.com/atom/language-java/legacy.tar.gz/refs/tags/v0.32.1#0b9604dc26b5df0e378cb43ef3637b8acf92b3cf"
   dependencies:
-    tree-sitter-java-dev "^0.16.0-dev2"
+    tree-sitter-java "0.19.1"
 
-"language-javascript@https://codeload.github.com/atom/language-javascript/legacy.tar.gz/refs/tags/v0.134.1":
-  version "0.134.1"
-  resolved "https://codeload.github.com/atom/language-javascript/legacy.tar.gz/refs/tags/v0.134.1#3d237c3c42f5f4d204e906d302175aa256dcc566"
+"language-javascript@file:packages/language-javascript":
+  version "0.134.2"
   dependencies:
-    tree-sitter-javascript "^0.15.2"
-    tree-sitter-jsdoc "^0.15.2"
-    tree-sitter-regex "^0.15.1"
+    tree-sitter-javascript "0.19.0"
+    tree-sitter-jsdoc "0.19.0"
+    tree-sitter-regex "0.19.0"
 
-"language-json@https://codeload.github.com/atom/language-json/legacy.tar.gz/refs/tags/v1.0.5":
+"language-json@file:packages/language-json":
   version "1.0.5"
-  resolved "https://codeload.github.com/atom/language-json/legacy.tar.gz/refs/tags/v1.0.5#2c1d86212f66606f0f2d63fe2ab1296c4208162a"
   dependencies:
-    tree-sitter-json "^0.15.1"
+    tree-sitter-json "0.20.0"
 
-"language-less@https://codeload.github.com/atom/language-less/legacy.tar.gz/refs/tags/v0.34.3":
+"language-less@file:packages/language-less":
   version "0.34.3"
-  resolved "https://codeload.github.com/atom/language-less/legacy.tar.gz/refs/tags/v0.34.3#aad0fb2660910e7e113a0751edb7c4820dadb06d"
 
-"language-make@https://codeload.github.com/atom/language-make/legacy.tar.gz/refs/tags/v0.23.0":
+"language-make@file:packages/language-make":
   version "0.23.0"
-  resolved "https://codeload.github.com/atom/language-make/legacy.tar.gz/refs/tags/v0.23.0#5ca4b570c56cc3aa09ade9337e7478fe640b9825"
 
-"language-mustache@https://codeload.github.com/atom/language-mustache/legacy.tar.gz/refs/tags/v0.14.5":
+"language-mustache@file:packages/language-mustache":
   version "0.14.5"
-  resolved "https://codeload.github.com/atom/language-mustache/legacy.tar.gz/refs/tags/v0.14.5#68c76cc0970eacf99fbe14667f80be164eb833dc"
 
-"language-objective-c@https://codeload.github.com/atom/language-objective-c/legacy.tar.gz/refs/tags/v0.16.0":
+"language-objective-c@file:packages/language-objective-c":
   version "0.16.0"
-  resolved "https://codeload.github.com/atom/language-objective-c/legacy.tar.gz/refs/tags/v0.16.0#38b9b5adbc1700e0f455fdf71d748a9837de2b40"
 
-"language-perl@https://codeload.github.com/atom/language-perl/legacy.tar.gz/refs/tags/v0.38.1":
+"language-perl@file:packages/language-perl":
   version "0.38.1"
-  resolved "https://codeload.github.com/atom/language-perl/legacy.tar.gz/refs/tags/v0.38.1#3fe16c1b24c5610082b9d0d1ad3ae838b06f7eb5"
 
-"language-php@https://codeload.github.com/atom/language-php/legacy.tar.gz/refs/tags/v0.48.1":
+"language-php@file:packages/language-php":
   version "0.48.1"
-  resolved "https://codeload.github.com/atom/language-php/legacy.tar.gz/refs/tags/v0.48.1#9606f7fd556f24d9fdf2aadfb8c59fd693cc0aac"
 
-"language-property-list@https://codeload.github.com/atom/language-property-list/legacy.tar.gz/refs/tags/v0.9.1":
+"language-property-list@file:packages/language-property-list":
   version "0.9.1"
-  resolved "https://codeload.github.com/atom/language-property-list/legacy.tar.gz/refs/tags/v0.9.1#d8686d95e1e656c894d1f0079963cc1deceefcbc"
 
-"language-python@https://codeload.github.com/atom/language-python/legacy.tar.gz/refs/tags/v0.53.6":
+"language-python@file:packages/language-python":
   version "0.53.6"
-  resolved "https://codeload.github.com/atom/language-python/legacy.tar.gz/refs/tags/v0.53.6#3b09b0afa634b2f8b638c2797e1da61d9614ebfa"
   dependencies:
     atom-grammar-test "^0.6.4"
-    tree-sitter-python "^0.17.0"
+    tree-sitter-python "0.19.0"
 
-"language-ruby-on-rails@https://codeload.github.com/atom/language-ruby-on-rails/legacy.tar.gz/refs/tags/v0.25.3":
+"language-ruby-on-rails@file:packages/language-ruby-on-rails":
   version "0.25.3"
-  resolved "https://codeload.github.com/atom/language-ruby-on-rails/legacy.tar.gz/refs/tags/v0.25.3#a6ad61c1d7b0697bf31605b5db85c1e14af9ba00"
 
-"language-ruby@https://codeload.github.com/atom/language-ruby/legacy.tar.gz/refs/tags/v0.73.0":
+"language-ruby@file:packages/language-ruby":
   version "0.73.0"
-  resolved "https://codeload.github.com/atom/language-ruby/legacy.tar.gz/refs/tags/v0.73.0#1beac72d0ed4f8523117c02480e1320af857b585"
   dependencies:
-    tree-sitter-ruby "^0.17.0"
+    tree-sitter-ruby "^0.19.0"
 
 "language-rust-bundled@file:packages/language-rust-bundled":
-  version "0.1.0"
+  version "0.1.1"
   dependencies:
-    tree-sitter-rust "^0.17.0"
+    tree-sitter-rust "0.20.1"
 
-"language-sass@https://codeload.github.com/atom/language-sass/legacy.tar.gz/refs/tags/v0.62.1":
-  version "0.62.1"
-  resolved "https://codeload.github.com/atom/language-sass/legacy.tar.gz/refs/tags/v0.62.1#a6cc2b197bc2e4c029c99f0737d5e79f148671f6"
+"language-sass@file:packages/language-sass":
+  version "0.62.2"
 
-"language-shellscript@https://codeload.github.com/atom/language-shellscript/legacy.tar.gz/refs/tags/v0.28.2":
+"language-shellscript@file:packages/language-shellscript":
   version "0.28.2"
-  resolved "https://codeload.github.com/atom/language-shellscript/legacy.tar.gz/refs/tags/v0.28.2#58b43b0d239953d157d79c0dccb2db4bb745e90c"
   dependencies:
-    tree-sitter-bash "^0.16.1"
+    tree-sitter-bash "0.19.0"
 
-"language-source@https://codeload.github.com/atom/language-source/legacy.tar.gz/refs/tags/v0.9.0":
+"language-source@file:packages/language-source":
   version "0.9.0"
-  resolved "https://codeload.github.com/atom/language-source/legacy.tar.gz/refs/tags/v0.9.0#e22e50ef026b8e703a0a9f09ff23ef90a97a04a8"
 
-"language-sql@https://codeload.github.com/atom/language-sql/legacy.tar.gz/refs/tags/v0.25.10":
+"language-sql@file:packages/language-sql":
   version "0.25.10"
-  resolved "https://codeload.github.com/atom/language-sql/legacy.tar.gz/refs/tags/v0.25.10#07061c5aeb21ebe079febf3e43740e681ef09b67"
 
-"language-text@https://codeload.github.com/atom/language-text/legacy.tar.gz/refs/tags/v0.7.4":
+"language-text@file:packages/language-text":
   version "0.7.4"
-  resolved "https://codeload.github.com/atom/language-text/legacy.tar.gz/refs/tags/v0.7.4#d97c38daa8200f004780380c90280e9143ba7d31"
 
-"language-todo@https://codeload.github.com/atom/language-todo/legacy.tar.gz/refs/tags/v0.29.4":
+"language-todo@file:packages/language-todo":
   version "0.29.4"
-  resolved "https://codeload.github.com/atom/language-todo/legacy.tar.gz/refs/tags/v0.29.4#7adf197762d779f225258adc692fbb15ded05a64"
 
-"language-toml@https://codeload.github.com/atom/language-toml/legacy.tar.gz/refs/tags/v0.20.0":
+"language-toml@file:packages/language-toml":
   version "0.20.0"
-  resolved "https://codeload.github.com/atom/language-toml/legacy.tar.gz/refs/tags/v0.20.0#2ed77c14e56e22b59dec29a2fc45fd8798eae339"
 
-"language-typescript@https://codeload.github.com/atom/language-typescript/legacy.tar.gz/refs/tags/v0.6.3":
-  version "0.6.3"
-  resolved "https://codeload.github.com/atom/language-typescript/legacy.tar.gz/refs/tags/v0.6.3#a315c84d29cdd1b29cded97ff13dd4e6ee0f4464"
+"language-typescript@file:packages/language-typescript":
+  version "0.6.4"
   dependencies:
-    tree-sitter-typescript "^0.16.1"
+    tree-sitter-typescript "0.20.1"
 
-"language-xml@https://codeload.github.com/atom/language-xml/legacy.tar.gz/refs/tags/v0.35.3":
+"language-xml@file:packages/language-xml":
   version "0.35.3"
-  resolved "https://codeload.github.com/atom/language-xml/legacy.tar.gz/refs/tags/v0.35.3#c408ff2dbbd623e51819e66ec8cae25f160c38c8"
 
-"language-yaml@https://codeload.github.com/atom/language-yaml/legacy.tar.gz/refs/tags/v0.32.0":
+"language-yaml@file:packages/language-yaml":
   version "0.32.0"
-  resolved "https://codeload.github.com/atom/language-yaml/legacy.tar.gz/refs/tags/v0.32.0#24155a81f19839889ff600303b6d22c1d242106c"
 
 latest-version@^5.1.0:
   version "5.1.0"
@@ -6469,7 +6433,7 @@ nan@2.14.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz#d7be34dfa3105b91494c3147089315eff8874b01"
   integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
 
-nan@^2.0.0, nan@^2.10.0, nan@^2.11.1, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2, nan@^2.8.0:
+nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.16.0.tgz#664f43e45460fb98faf00edca0bb0d7b8dce7916"
   integrity sha512-UdAqHyFngu7TfQKsCBgAA6pWDkT8MAO7d0jyOecVhN5354xbLqdn8mV9Tat9gepAupm0bt2DbeaSC8vS52MuFA==
@@ -7184,7 +7148,7 @@ prebuild-install@^5.0.0, prebuild-install@^5.3.3:
     tunnel-agent "^0.6.0"
     which-pm-runs "^1.0.0"
 
-prebuild-install@^6.0.0:
+prebuild-install@^6.0.0, prebuild-install@^6.0.1:
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-6.1.4.tgz#ae3c0142ad611d58570b89af4986088a4937e00f"
   integrity sha512-Z4vpywnK1lBg+zdPCVCsKq0xO66eEV9rWo2zrROGGiRS4JtueBOdlB1FnY8lcy7JsUud/Q3ijUxyWN26Ika0vQ==
@@ -8664,10 +8628,10 @@ tree-kill@1.2.2:
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
-tree-sitter-bash@^0.16.1:
-  version "0.16.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-bash/-/tree-sitter-bash-0.16.1.tgz#7d171dfe3a912f7210cee2142804cba1f553939d"
-  integrity sha512-knkl96EkBSns9NSUmFVboOlnMNxkhHp/e7l5rKCt9kk7qZlT9NdCJQHsXLcjk8L2ameRnQFJfuSzCNG3DQeF7Q==
+tree-sitter-bash@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-bash/-/tree-sitter-bash-0.19.0.tgz#756332e3c5494a0b5ccda04c182e7206d65cf350"
+  integrity sha512-i/0NUZHSrxmYtQWMX+Tvuk9PBvsB0S3h0vD17qHSGuvPYgvpekRy8do75CAXyH6FlycMhejM39gNRppyvDeiVQ==
   dependencies:
     nan "^2.14.0"
     prebuild-install "^5.3.3"
@@ -8693,97 +8657,91 @@ tree-sitter-css@^0.19.0:
   dependencies:
     nan "^2.14.1"
 
-tree-sitter-embedded-template@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-embedded-template/-/tree-sitter-embedded-template-0.15.2.tgz#6cc0e3e46c1c3d4ee3ea644c11307ebcb329dcf4"
-  integrity sha512-DHT4KAzFbtj/5XhSZWCkf7LP1SYIi4gSSOZHVH9SqEv1DIc9rSmgNO3rzIyMoRclusLoL2susmokL/hYkj56+A==
-  dependencies:
-    nan "^2.0.0"
-
-tree-sitter-go@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-go/-/tree-sitter-go-0.15.1.tgz#51ad116d7fab4519d73b6381f608ee00d1fefa43"
-  integrity sha512-TCwvh7kz+2iMUjZI7aPnpImv5PFcWdbo8hJysjwV7FUlCTGeCgca2ItdxA5cdACcykRVLzoUTZN70qFGwYVQVw==
-  dependencies:
-    nan "^2.10.0"
-
-tree-sitter-html@^0.15.0:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-html/-/tree-sitter-html-0.15.1.tgz#9e670cc1cb55cda5e9b821fc61006cc74bd936dd"
-  integrity sha512-hf1dTxB6OIlDk+mkxLaHC1boKUxmnp0qxt8nApZZ6zf3VWj5FeYlWv93GX5+gLL3NkLAjaUKGZGFXpR+wE97Jg==
-  dependencies:
-    nan "^2.10.0"
-
-tree-sitter-java-dev@^0.16.0-dev2:
-  version "0.16.0-dev2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-java-dev/-/tree-sitter-java-dev-0.16.0-dev2.tgz#4fba63da5648e4650364ac36c387fea16f3ff930"
-  integrity sha512-BilPJ2SwvRKMTeq2WZdvVX5HiMYTLSncJATkqWiPRGUl157FcBjY42mzm3M42/5QQybb1nDJjW0tAvVA5iEHmw==
-  dependencies:
-    nan "^2.12.1"
-
-tree-sitter-javascript@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-javascript/-/tree-sitter-javascript-0.15.2.tgz#3c2c2b7c20a183f9266c4abf531172913a14ba97"
-  integrity sha512-AwgnkVqxglpxWUH07CWq1CmZ1g3emFHCUlMT6hEwNrk5K62I3gmkqMFtzFqXos6U2sEkwBn7IWp753X13KiAdQ==
-  dependencies:
-    nan "^2.12.1"
-
-tree-sitter-jsdoc@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/tree-sitter-jsdoc/-/tree-sitter-jsdoc-0.15.2.tgz#510eac71f57998feff381333fd2ee6028f0819e8"
-  integrity sha512-ERhddQ4nj3i4ayi0L09ic/CLtwH/A82iauGWev15NGuWCyUG7qw9rz2ZNxpmy9R6KG8kXK1MsFQj/pab8lm5/w==
-  dependencies:
-    nan "^2.11.1"
-
-tree-sitter-json@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-json/-/tree-sitter-json-0.15.1.tgz#02bc1961b9de963d23e2fbeab7d360b1cbbcc50d"
-  integrity sha512-zSbxzlZlMuWEQ/WhyjR+AoECf/v9/dlE+6+0uxNgU5fb5m4kGc9Y0+HKWxLWZ4yhZNBdwCIrUQwo/oaBdmyXPg==
-  dependencies:
-    nan "^2.0.0"
-
-tree-sitter-python@^0.17.0:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-python/-/tree-sitter-python-0.17.1.tgz#69e19599478fdc4288102adf82d24dc214ca1479"
-  integrity sha512-T4vvjAzd7piW66zKbJ/+4YgGk5wOtqNI25FGVsr947+EeZqdSAfwPsgSD1/I2NAVe3mdpOh/EQbfvq+EOfAiJA==
+tree-sitter-embedded-template@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-embedded-template/-/tree-sitter-embedded-template-0.19.0.tgz#3234830a30b9b27de3b187d965005fe91e3e420d"
+  integrity sha512-J80/G0xRHlIxv0gNfvW8zHMZeD9nqnSKV4nMB5t0RAW/W/nM5io/gojk0ppWuWKMuyYNs3KKXIqP0i43jVkdkQ==
   dependencies:
     nan "^2.14.0"
 
-tree-sitter-regex@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-regex/-/tree-sitter-regex-0.15.1.tgz#36c53ea064812f689c6ed097fb2101870ecd0aa2"
-  integrity sha512-ORspHauiPTw3+mCKBAAZqYH4vQOT6T2B2RcYDrWmYfwxSjA7Wg3HPiqzkuMVvDwl5Z491EYIBTUvHEaBLoGI7w==
+tree-sitter-html@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-html/-/tree-sitter-html-0.19.0.tgz#abebe9950f5ce909b6e3e8da2e90246647a70a22"
+  integrity sha512-xH6XGSBWzb4oU/aG6gouMRQKsd96iKuy0zboUqo3wcIWrA++q9a7CmQTSeIINiSfOXjT2ZLJciXFDgAh6h04Bw==
   dependencies:
     nan "^2.14.0"
 
-tree-sitter-ruby@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/tree-sitter-ruby/-/tree-sitter-ruby-0.17.0.tgz#3da62b5cfdfe62ac2e0e2e04ca7220161e40cea6"
-  integrity sha512-Hpjnp7vfRjRsULeYWtDcwR6nb/lPeQfaY2jo9V3npUiaSlqYFJxlC5d45FfZ60aHxv74CI3ziocs9kMfjPS2oQ==
+tree-sitter-java@0.19.1:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-java/-/tree-sitter-java-0.19.1.tgz#c1bf59caaa81bf8a4a6dda99e7c97e51b3bd26d4"
+  integrity sha512-yVm+4q1D4niaHcEf2iqhOcIaiSp3wxHjeC4eoLAqSQNVxSrhThmT1FEfM4yDgHV4XaxH+62xpKHCwYG9NzRt6Q==
+  dependencies:
+    nan "^2.14.1"
+
+tree-sitter-javascript@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-javascript/-/tree-sitter-javascript-0.19.0.tgz#20fc0da277502dac2bb3bf9ff75372268e761558"
+  integrity sha512-SNykDdNgmlJZhX02ZIu0TQF9P7t847jV7769SxA9XrZ2QXjofQsVTMEi9+LpXZKsI0UoFYI25FnZm3fFm0z2yw==
   dependencies:
     nan "^2.12.1"
+
+tree-sitter-jsdoc@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-jsdoc/-/tree-sitter-jsdoc-0.19.0.tgz#3f7731c9df61db5666b4a41d5ff3810fceac9d81"
+  integrity sha512-E2DgqInWSw+1wv+7uyJu0oYhWns0xaOSccqe4crLNnxo9uAQBjySaum8mNAfTu8Rh6jAnDr2DxuzKUBhOQxOwg==
+  dependencies:
+    nan "^2.14.1"
+
+tree-sitter-json@0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-json/-/tree-sitter-json-0.20.0.tgz#e17bb4917e8d5fe9f2f0d5eaec603e2d3552b07c"
+  integrity sha512-PteOLH+Tx6Bz4ZA/d40/DbkiSXXRM/gKahhHI8hQ1lWNfFvdknnz9k3Mz84ol5srRyLboJ8wp8GSkhZ6ht9EGQ==
+  dependencies:
+    nan "^2.14.1"
+
+tree-sitter-python@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-python/-/tree-sitter-python-0.19.0.tgz#ad79a221fab7136559da0704f789173b81e0bdcd"
+  integrity sha512-UAJV73zCE+2b+X8XQOyL6C+MxVUV8BH0TxcOwhfgaDh6F6g4Ub0SqWGF19C1MDrGi25JNnZ8xlsH0aqrasyS3w==
+  dependencies:
+    nan "^2.14.0"
+
+tree-sitter-regex@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-regex/-/tree-sitter-regex-0.19.0.tgz#b4b3f44dc742684881a7c05635e075d90ff5414d"
+  integrity sha512-hKaGO6ect2MuGwY+PU89JJdkgwRRseDgVNiRaZTLXQyW8vAsZLOb/tkphY9NF9U+ZOeLATotKwG+rLykYYWXyA==
+  dependencies:
+    nan "^2.14.1"
+
+tree-sitter-ruby@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-ruby/-/tree-sitter-ruby-0.19.0.tgz#a5fd70c7653beaa89c7d643a9b04e0f71eb075bd"
+  integrity sha512-uzASkTuC6wXnnshfDgij/Q9FYWxODCyIKVb0eHVGX9G5Cu5iFPvgJQgWTKIft1zomTjKjD25YIwFUnXnzZf4Ew==
+  dependencies:
+    nan "^2.14.1"
     prebuild-install "^5.0.0"
 
-tree-sitter-rust@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/tree-sitter-rust/-/tree-sitter-rust-0.17.0.tgz#830cff49c43058df33570816cdb8443326411766"
-  integrity sha512-dWYKrX4JbuLbKagTeCSsMZuFDKTzzaEHECsjLzIqbO/IhNHHLOzEcbF2YcIAGKG5thiT/lnNAjeOXDsILteCpg==
-  dependencies:
-    nan "^2.8.0"
-
-tree-sitter-typescript@^0.16.1:
-  version "0.16.3"
-  resolved "https://registry.yarnpkg.com/tree-sitter-typescript/-/tree-sitter-typescript-0.16.3.tgz#920a0a41edca661221fa3b7fb4beedbbe76e3446"
-  integrity sha512-qdRydjlnFuxwlkE/+oqOywzcKL2l3G1xkhR9DxDySGfF4JiMdYCTqJCWRUYaGnagJDZBF7wGWtHf5FGGXdLjNw==
+tree-sitter-rust@0.20.1:
+  version "0.20.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-rust/-/tree-sitter-rust-0.20.1.tgz#3ff85edc85293797f88e7bdb29022d57a6a1e30f"
+  integrity sha512-du8yLJBnjzjynQDPlt4IhbHgGHq2o/hdUGrHuedyAd5008i3ghB6trDB805B9qXNPFJGNy8gY0kxQPak2zOsFw==
   dependencies:
     nan "^2.14.0"
 
-"tree-sitter@https://codeload.github.com/DeeDeeG/node-tree-sitter/legacy.tar.gz/b378c9f95b553a4d633b2d25aa8e8a814f2c9182":
-  version "0.17.1"
-  resolved "https://codeload.github.com/DeeDeeG/node-tree-sitter/legacy.tar.gz/b378c9f95b553a4d633b2d25aa8e8a814f2c9182#9e666f7fd30eb618a0c483a3ac8bddbed4b6a88f"
+tree-sitter-typescript@0.20.1:
+  version "0.20.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-typescript/-/tree-sitter-typescript-0.20.1.tgz#6b338a1414f5ed13cc39e60275ddeaa0f25870a9"
+  integrity sha512-wqpnhdVYX26ATNXeZtprib4+mF2GlYQB1cjRPibYGxDRiugx5OfjWwLE4qPPxEGdp2ZLSmZVesGUjLWzfKo6rA==
   dependencies:
     nan "^2.14.0"
-    prebuild-install "^5.0.0"
+
+tree-sitter@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter/-/tree-sitter-0.20.0.tgz#b24f4d0ce6b9fdd9e99101907c954c5d938cb82d"
+  integrity sha512-tqTdtD1T2cN4aEES0sZCjKTQrc9Ls8H/iYlzpskhGy8yCwNPKBIbK9YuuCg/AxACr8RAY4wMoeCigM1X/A79yg==
+  dependencies:
+    nan "^2.14.0"
+    prebuild-install "^6.0.1"
 
 "tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
   version "0.229.1"

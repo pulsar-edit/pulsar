@@ -1,0 +1,27 @@
+{
+  "name": "language-css",
+  "description": "CSS support in Atom",
+  "keywords": [
+    "tree-sitter"
+  ],
+  "version": "0.45.4",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-css.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-css/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  },
+  "dependencies": {
+    "tree-sitter-css": "^0.19.0"
+  }
+}

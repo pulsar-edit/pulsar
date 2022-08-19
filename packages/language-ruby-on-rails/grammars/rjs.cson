@@ -1,0 +1,10 @@
+'scopeName': 'source.ruby.rails.rjs'
+'name': 'Ruby on Rails (RJS)'
+'fileTypes': [
+  'rjs'
+]
+'patterns': [
+  {
+    'include': 'source.ruby'
+  }
+]

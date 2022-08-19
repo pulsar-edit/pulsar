@@ -1,0 +1,54 @@
+'.source.sass':
+  '!important':
+    'prefix': '!'
+    'body': '!important${1:;}$0'
+  '@import':
+    'prefix': 'import'
+    'body': '@import "$0"'
+  '@Include':
+    'prefix': 'include'
+    'body': '@include ${0}'
+    'description': 'Include a mixin.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#including_a_mixin'
+  '@extend':
+    'prefix': 'extend'
+    'body': '@extend $0'
+    'description': 'Extend another CSS class.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#extend'
+  '@if':
+    'prefix': 'if'
+    'body': '@if ${1:conditions}\n\t$0'
+    'description': 'Takes a SassScript expression and uses styles nested beneath if the expression returns true.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_9'
+  '@mixin':
+    'prefix': 'mixin'
+    'body': '@mixin ${1:name} {\n\t$0\n}'
+    'description': 'Mixins allow you to define styles that can be re-used throughout the stylesheet.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#defining_a_mixin'
+  '@function':
+    'prefix': 'func'
+    'body': '@function ${1:name}(${2:arguments}) {\n\t@return ${3:returnValue};\n}'
+    'description': 'Define your own functions.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#function_directives'
+'.source.css.scss':
+  '@Include':
+    'prefix': 'include'
+    'body': '@include ${0};'
+    'description': 'Include a mixin.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#including_a_mixin'
+  '@extend':
+    'prefix': 'extend'
+    'body': '@extend $0;'
+    'description': 'Extend another CSS class.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#extend'
+  '@if':
+    'prefix': 'if'
+    'body': '@if ${1:conditions} {\n\t$0\n}'
+    'description': 'Takes a SassScript expression and uses styles nested beneath if the expression returns true.'
+    'descriptionMoreURL': 'http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_9'
+  '@mixin':
+    'prefix': 'mixin'
+    'body': '@mixin ${1:name} {\n\t$0\n}'
+  '@function':
+    'prefix': 'func'
+    'body': '@function ${1:name}(${2:arguments}) {\n\t@return ${3:returnValue};\n}'

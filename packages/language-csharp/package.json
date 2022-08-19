@@ -1,0 +1,17 @@
+{
+  "name": "language-csharp",
+  "version": "1.1.0",
+  "private": true,
+  "description": "C# language support for Atom",
+  "repository": "https://github.com/atom/language-csharp",
+  "keywords": [
+    "C#",
+    "csharp",
+    ".Net"
+  ],
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {}
+}

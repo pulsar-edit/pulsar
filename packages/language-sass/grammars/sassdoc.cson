@@ -1,0 +1,409 @@
+'scopeName': 'source.sassdoc'
+'name': 'SassDoc'
+'patterns': [
+  {
+    # @access private|public
+    'match': '''(?x)
+      ((@)(?:access))
+      \\s+
+      (private|public)
+      \\b
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'constant.language.access-type.sassdoc'
+  }
+  {
+    # @author name [<email>]
+    'match': '''(?x)
+      ((@)author)
+      \\s+
+      (
+        [^@\\s<>*/]
+        (?:[^@<>*/]|\\*[^/])*
+      )
+      (?:
+        \\s*
+        (<)
+        ([^>\\s]+)
+        (>)
+      )?
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'entity.name.type.instance.sassdoc'
+      '4':
+        'name': 'punctuation.definition.bracket.angle.begin.sassdoc'
+      '5':
+        'name': 'constant.other.email.link.underline.sassdoc'
+      '6':
+        'name': 'punctuation.definition.bracket.angle.end.sassdoc'
+  }
+  {
+    # @example text();
+    'name': 'meta.example.css.scss.sassdoc'
+    'begin': '''(?x)
+      ((@)example)
+      \\s+
+      (css|scss)
+    '''
+    'end': '(?=@|///$)'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'variable.other.sassdoc'
+    'patterns': [
+      {
+        'match': '^///\\s+'
+      }
+      {
+        # Highlighted (S)CSS example
+        'match': '[^\\s@*](?:[^*]|\\*[^/])*'
+        'captures':
+          '0':
+            'name': 'source.embedded.css.scss'
+            'patterns': [
+              {
+                'include': 'source.css.scss'
+              }
+            ]
+      }
+    ]
+  }
+  {
+    # @example Markup
+    # There must be a better way to do this.
+    'name': 'meta.example.html.sassdoc'
+    'begin': '''(?x)
+      ((@)example)
+      \\s+
+      (markup)
+    '''
+    'end': '(?=@|///$)'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'variable.other.sassdoc'
+    'patterns': [
+      {
+        'match': '^///\\s+'
+      }
+      {
+        # Highlighted markup example
+        'match': '[^\\s@*](?:[^*]|\\*[^/])*'
+        'captures':
+          '0':
+            'name': 'source.embedded.html'
+            'patterns': [
+              {
+                'include': 'source.html'
+              }
+            ]
+      }
+    ]
+  }
+  {
+    # @example JavaScript
+    # Again, hopefully a better way can be found.
+    'name': 'meta.example.js.sassdoc'
+    'begin': '''(?x)
+      ((@)example)
+      \\s+
+      (javascript)
+    '''
+    'end': '(?=@|///$)'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'variable.other.sassdoc'
+    'patterns': [
+      {
+        'match': '^///\\s+'
+      }
+      {
+        # Highlighted JavaScript example
+        'match': '[^\\s@*](?:[^*]|\\*[^/])*'
+        'captures':
+          '0':
+            'name': 'source.embedded.js'
+            'patterns': [
+              {
+                'include': 'source.js'
+              }
+            ]
+      }
+    ]
+  }
+  {
+    # @link URL [Caption]
+    'match': '''(?x)
+      ((@)link)
+      \\s+
+      (?:
+        # URL
+        (
+          (?=https?://)
+          (?:[^\\s*]|\\*[^/])+
+        )
+      )
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'variable.other.link.underline.sassdoc'
+      '4':
+        'name': 'entity.name.type.instance.sassdoc'
+  }
+  {
+    # Tags followed by an identifier token
+    # - @<tag> identifier
+    'match': '''(?x)
+      (
+        (@)
+        (?:arg|argument|param|parameter|requires?|see|colors?|fonts?|ratios?|sizes?)
+      )
+      \\s+
+      (
+        [A-Za-z_$%]
+        [\\-\\w$.\\[\\]]*
+      )
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'variable.other.sassdoc'
+  }
+  {
+    # Tags followed by a type expression, then an identifier
+    # -  @<tag> {type} identifier
+    'begin': '((@)(?:arg|argument|param|parameter|prop|property|requires?|see|sizes?))\\s+(?={)'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+    'end': '(?=\\s|\\*/|[^{}\\[\\]A-Za-z_$])'
+    'patterns': [
+      {
+        'include': '#sassdoctype'
+      }
+      {
+        'match': '([A-Za-z_$%][\\-\\w$.\\[\\]]*)'
+        'name': 'variable.other.sassdoc'
+      }
+      {
+        # Optional value
+        'name': 'variable.other.sassdoc'
+        'match': '''(?x)
+          (\\[)\\s*
+          [\\w$]+
+          (?:
+            (?:\\[\\])?                                        # Foo[].bar properties within an array
+            \\.                                                # Foo.Bar namespaced parameter
+            [\\w$]+
+          )*
+          (?:
+            \\s*
+            (=)                                                # [foo=bar] Default parameter value
+            \\s*
+            (
+              # The inner regexes are to stop the match early at */ and to not stop at escaped quotes
+              (?>
+                "(?:(?:\\*(?!/))|(?:\\\\(?!"))|[^*\\\\])*?" |  # [foo="bar"] Double-quoted
+                '(?:(?:\\*(?!/))|(?:\\\\(?!'))|[^*\\\\])*?' |  # [foo='bar'] Single-quoted
+                \\[ (?:(?:\\*(?!/))|[^*])*? \\] |              # [foo=[1,2]] Array literal
+                (?:(?:\\*(?!/))|\\s(?!\\s*\\])|\\[.*?(?:\\]|(?=\\*/))|[^*\\s\\[\\]])* # Everything else (sorry)
+              )*
+            )
+          )?
+          \\s*(?:(\\])((?:[^*\\s]|\\*[^\\s/])+)?|(?=\\*/))
+        '''
+        'captures':
+          '1':
+            'name': 'punctuation.definition.optional-value.begin.bracket.square.sassdoc'
+          '2':
+            'name': 'keyword.operator.assignment.sassdoc'
+          '3':
+            'name': 'source.embedded.js'
+            'patterns': [
+              {
+                'include': 'source.js'
+              }
+            ]
+          '4':
+            'name': 'punctuation.definition.optional-value.end.bracket.square.sassdoc'
+          '5':
+            'name': 'invalid.illegal.syntax.sassdoc'
+      }
+    ]
+  }
+  {
+    # Tags followed by a type expression
+    # -  @<tag> {type}
+    'begin': '''(?x)
+      (
+        (@)
+        (?:returns?|throws?|exception|outputs?)
+      )
+      \\s+(?={)
+    '''
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+    'end': '(?=\\s|[^{}\\[\\]A-Za-z_$])'
+    'patterns': [
+      {
+        'include': '#sassdoctype'
+      }
+    ]
+  }
+  {
+    # Type annotation blocks
+    # -  @type type|othertype
+    'match': '''(?x)
+      (
+        (@)
+        (?:type)
+      )
+      \\s+
+      (
+        (?:
+          [A-Za-z |]+
+        )
+      )
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'entity.name.type.instance.sassdoc'
+        'patterns': [
+          {
+            'include': '#sassdoctypedelimiter'
+          }
+        ]
+  }
+  {
+    # Tags followed by a namepath
+    # -  @<tag> namepath
+    'match': '''(?x)
+      (
+        (@)
+        (?:alias|group|name|requires?|see|icons?)
+      )
+      \\s+
+      (
+        (?:
+          [^{}@\\s*] | \\*[^/]
+        )+
+      )
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.sassdoc'
+      '2':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+      '3':
+        'name': 'entity.name.type.instance.sassdoc'
+  }
+  {
+    'name': 'storage.type.class.sassdoc'
+    'match': '''(?x)
+      (@)
+      (?:access|alias|author|content|deprecated|example|exception|group
+      |ignore|name|prop|property|requires?|returns?|see|since|throws?|todo
+      |type|outputs?)
+      \\b
+    '''
+    'captures':
+      '1':
+        'name': 'punctuation.definition.block.tag.sassdoc'
+  }
+]
+
+'repository':
+  # Balanced brackets (square or curly)
+  'brackets':
+    'patterns': [
+      {
+        'begin': '{'
+        'end': '}|(?=$)'
+        'patterns': [
+          {
+            'include': '#brackets'
+          }
+        ]
+      }
+      {
+        'begin': '\\['
+        'end': '\\]|(?=$)'
+        'patterns': [
+          {
+            'include': '#brackets'
+          }
+        ]
+      }
+    ]
+
+  'sassdoctypedelimiter':
+    'match': '(\\|)'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.delimiter.sassdoc'
+
+  # {type}
+  'sassdoctype':
+    'patterns': [
+      {
+        # {unclosed
+        'name': 'invalid.illegal.type.sassdoc'
+        'match': '\\G{(?:[^}*]|\\*[^/}])+$'
+      }
+      {
+        'begin': '\\G({)'
+        'beginCaptures':
+          '0':
+            'name': 'entity.name.type.instance.sassdoc'
+          '1':
+            'name': 'punctuation.definition.bracket.curly.begin.sassdoc'
+        'contentName': 'entity.name.type.instance.sassdoc'
+        'end': '((}))\\s*|(?=$)'
+        'endCaptures':
+          '1':
+            'name': 'entity.name.type.instance.sassdoc'
+          '2':
+            'name': 'punctuation.definition.bracket.curly.end.sassdoc'
+        'patterns': [
+          {
+            'include': '#brackets'
+          }
+        ]
+      }
+    ]

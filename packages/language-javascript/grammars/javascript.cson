@@ -1,0 +1,2028 @@
+'scopeName': 'source.js'
+'fileTypes': [
+  'js'
+  '_js'
+  'cjs'
+  'es'
+  'es6'
+  'gs'
+  'htc'
+  'jscad'
+  'jscript'
+  'jse'
+  'jslib'
+  'jsm'
+  'json5'
+  'jspre'
+  'mjs'
+  'pac'
+  'pjs'
+  'sjs'
+  'snap'
+  'xsjs'
+  'xsjslib'
+]
+'firstLineMatch': '''(?x)
+  # Hashbang
+  ^\\#!.*(?:\\s|\\/|(?<=!)\\b)
+    (?:node|iojs|JavaScript)
+  (?:$|\\s)
+  |
+  # Modeline
+  (?i:
+    # Emacs
+    -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+      (?:js|javascript)
+    (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+    |
+    # Vim
+    (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+      javascript
+    (?=\\s|:|$)
+  )
+'''
+'name': 'JavaScript'
+'patterns': [
+  {
+    # ES6 import
+    'begin': '(?<!\\.)\\b(import)(?!\\s*[:(])\\b'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.control.js'
+    'end': '(?=;|$)'
+    'name': 'meta.import.js'
+    'patterns': [
+      {
+        # { member1 , member2 as alias2 , [...] }
+        'begin': '{'
+        'beginCaptures':
+          0:
+            'name': 'punctuation.definition.modules.begin.js'
+        'end': '}'
+        'endCaptures':
+          0:
+            'name': 'punctuation.definition.modules.end.js'
+        'patterns': [
+          {
+            # (default|name) as alias
+            'match': '''(?x)
+              (?: \\b(default)\\b | \\b([a-zA-Z_$][\\w$]*)\\b)
+              \\s*
+              (\\b as \\b)
+              \\s*
+              (?: (\\b default \\b | \\*) | \\b([a-zA-Z_$][\\w$]*)\\b)
+            '''
+            'captures':
+              '1':
+                'name': 'variable.language.default.js'
+              '2':
+                'name': 'variable.other.module.js'
+              '3':
+                'name': 'keyword.control.js'
+              '4':
+                'name': 'invalid.illegal.js'
+              '5':
+                'name': 'variable.other.module-alias.js'
+          }
+          {
+            'match': ','
+            'name': 'meta.delimiter.object.comma.js'
+          }
+          {
+            'include': '#comments'
+          }
+          {
+            'match': '\\b([a-zA-Z_$][\\w$]*)\\b'
+            'name': 'variable.other.module.js'
+          }
+        ]
+      }
+      {
+        # (default|*|name) as alias
+        'match': '''(?x)
+          (?: \\b(default)\\b | (\\*) | \\b([a-zA-Z_$][\\w$]*)\\b)
+          \\s*
+          (\\b as \\b)
+          \\s*
+          (?: (\\b default \\b | \\*) | \\b([a-zA-Z_$][\\w$]*)\\b)
+        '''
+        'captures':
+          '1':
+            'name': 'variable.language.default.js'
+          '2':
+            'name': 'variable.language.import-all.js'
+          '3':
+            'name': 'variable.other.module.js'
+          '4':
+            'name': 'keyword.control.js'
+          '5':
+            'name': 'invalid.illegal.js'
+          '6':
+            'name': 'variable.other.module-alias.js'
+      }
+      {
+        'match': '\\*'
+        'name': 'variable.language.import-all.js'
+      }
+      {
+        'match': '\\b(default)\\b'
+        'name': 'variable.language.default.js'
+      }
+      {
+        'include': '#strings'
+      }
+      {
+        'include': '#comments'
+      }
+      {
+        'match': '\\b(from)\\b'
+        'name': 'keyword.control.js'
+      }
+      {
+        'match': '\\b([a-zA-Z_$][\\w$]*)\\b(?=.*\\bfrom\\b)'
+        'name': 'variable.other.module.js'
+      }
+      {
+        'match': ','
+        'name': 'meta.delimiter.object.comma.js'
+      }
+    ]
+  }
+  {
+    # ES6 export: export default (variable|class|function, etc.)
+    'match': '''(?x)
+      \\b(export)\\b\\s*
+      \\b(default)\\b\\s*
+      \\b((?!\\b(?:function|class|let|var|const)\\b)[a-zA-Z_$][\\w$]*)?\\b
+    '''
+    'captures':
+      '0':
+        'name': 'meta.export.js'
+      '1':
+        'name': 'keyword.control.js'
+      '2':
+        'name': 'variable.language.default.js'
+      '3':
+        'name': 'variable.other.module.js'
+  }
+  {
+    # ES6 export, re-export: export {member as alias, [...]} [from ...]
+    'begin': '(?<!\\.)\\b(export)(?!\\s*[:(])\\b'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.control.js'
+    'end': '(?=;|\\bfunction\\b|\\bclass\\b|\\blet\\b|\\bvar\\b|\\bconst\\b|$)'
+    'name': 'meta.export.js'
+    'patterns': [
+      {
+        'include': '#numbers'
+      }
+      {
+        # { member1 , member2 as alias2 , [...] }
+        'begin': '(?![a-zA-Z_$0-9]){'
+        'beginCaptures':
+          0:
+            'name': 'punctuation.definition.modules.begin.js'
+        'end': '}'
+        'endCaptures':
+          0:
+            'name': 'punctuation.definition.modules.end.js'
+        'patterns': [
+          {
+            # name as (default|alias)
+            'captures':
+              '1':
+                'name': 'variable.language.default.js'
+              '2':
+                'name': 'variable.other.module.js'
+              '3':
+                'name': 'keyword.control.js'
+              '4':
+                'name': 'variable.language.default.js'
+              '5':
+                'name': 'invalid.illegal.js'
+              '6':
+                'name': 'variable.other.module-alias.js'
+            'match': '''(?x)
+              (?: \\b(default)\\b | \\b([a-zA-Z_$][\\w$]*)\\b)
+              \\s*
+              (\\b as \\b)
+              \\s*
+              (?: \\b(default)\\b | (\\*) | \\b([a-zA-Z_$][\\w$]*)\\b)
+            '''
+          }
+          {
+            'include': '#comments'
+          }
+          {
+            'match': ','
+            'name': 'meta.delimiter.object.comma.js'
+          }
+          {
+            'match': '\\b([a-zA-Z_$][\\w$]*)\\b'
+            'name': 'variable.other.module.js'
+          }
+        ]
+      }
+      {
+        'match': '\\*(?=.*\\bfrom\\b)'
+        'name': 'variable.language.import-all.js'
+      }
+      {
+        'match': '\\b(default)\\b'
+        'name': 'variable.language.default.js'
+      }
+      {
+        'include': '#strings'
+      }
+      {
+        'include': '#comments'
+      }
+      {
+        'match': '\\b(from)\\b'
+        'name': 'keyword.control.js'
+      }
+      {
+        'match': '\\b([a-zA-Z_$][\\w$]*)\\b'
+        'name': 'variable.other.module.js'
+      }
+      {
+        'match': ','
+        'name': 'meta.delimiter.object.comma.js'
+      }
+      {
+        'include': '#operators'
+      }
+    ]
+  }
+  {
+    'match': '(?:(?<=\\.{3})|(?<!\\.)\\b)(?<!\\$)(super|this|arguments)(?!\\s*:|\\$)\\b'
+    'name': 'variable.language.js'
+  }
+  {
+    # [async] function [name](params)
+    # function* name(params) – generator function declaration
+    'begin': '(?=(\\basync\\b\\s*)?\\bfunction\\b(?!\\s*:))'
+    'end': '(?<=})'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=\\))'
+        'name': 'meta.function.js'
+        'patterns': [
+          {
+            'include': '#function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # [.]foo = function...
+    'begin': '(?=(\\.)?[a-zA-Z_$][\\w$]*\\s*=\\s*(\\basync\\b\\s*)?\\bfunction\\b)'
+    'end': '(?<=})'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?!\\G)(?<=\\))'
+        'name': 'meta.function.js'
+        'patterns': [
+          {
+            'match': '(\\.)?([a-zA-Z_$][\\w$]*)\\s*(=)\\s*'
+            'captures':
+              '1':
+                'name': 'meta.delimiter.method.period.js'
+              '2':
+                'name': 'entity.name.function.js'
+              '3':
+                'name': 'keyword.operator.assignment.js'
+          }
+          {
+            'include': '#function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # foo: function...
+    'begin': '(?=\\b[a-zA-Z_$][\\w$]*\\s*:\\s*(\\basync\\b\\s*)?\\bfunction\\b)'
+    'end': '(?<=})'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=\\))'
+        'name': 'meta.function.json.js'
+        'patterns': [
+          {
+            'match': '\\b([a-zA-Z_$][\\w$]*)\\s*(:)\\s*'
+            'captures':
+              '1':
+                'name': 'entity.name.function.js'
+              '2':
+                'name': 'keyword.operator.assignment.js'
+          }
+          {
+            'include': '#function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # "foo": function...
+    'begin': '(?=((\'[^\']*?\')|("[^"]*?"))\\s*:\\s*(\\basync\\b\\s*)?\\bfunction\\b)'
+    'end': '(?<=})'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=\\))'
+        'name': 'meta.function.json.js'
+        'patterns': [
+          {
+            'match': '(?:((\')([^\']*?)(\'))|((")([^"]*?)(")))\\s*(:)'
+            'captures':
+              '1':
+                'name': 'string.quoted.single.js'
+              '2':
+                'name': 'punctuation.definition.string.begin.js'
+              '3':
+                'name': 'entity.name.function.js'
+              '4':
+                'name': 'punctuation.definition.string.end.js'
+              '5':
+                'name': 'string.quoted.double.js'
+              '6':
+                'name': 'punctuation.definition.string.begin.js'
+              '7':
+                'name': 'entity.name.function.js'
+              '8':
+                'name': 'punctuation.definition.string.end.js'
+              '9':
+                'name': 'keyword.operator.assignment.js'
+          }
+          {
+            'include': '#function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'begin': '(?=\\bconstructor\\b\\s*)'
+    'end': '(?<=})'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=\\))'
+        'name': 'meta.function.js'
+        'patterns': [
+          {
+            'match': '\\b(constructor)\\s*'
+            'name': 'entity.name.function.constructor.js'
+          }
+          {
+            'include': '#function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # ES6 method definitions: foo() {}
+    'begin': '''(?x)
+      (?=
+        (?!
+          (break|case|catch|continue|do|else|finally|for|function|if|
+          return|switch|throw|try|while|with)
+          [\\s\\(]
+        )
+        (
+          \\b(get|set)            # Property getter/setter: get foo(){}
+          (?:\\s+|(?=\\[))        # Followed by whitespace or square bracket
+        )?+
+        (                         # Method name
+          \\b[a-zA-Z_$][\\w$]*    # Fixed name
+          |
+          \\[                     # Computed property key
+            [^\\[\\]]++           # Contains at least one non-brace character
+          \\]
+        )
+        \\s*\\(\\s*               # Start of arguments list
+          (
+            "[^"]*"  |            # Double-quoted string
+            '[^']*'  |            # Single-quoted string
+             [^"()']              # Any non-bracket or non-quote
+          )*
+        \\)\\s*                   # End of arguments
+        {                         # Beginning of body
+      )
+    '''
+    'end': '(?<=})'
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=\\))'
+        'name': 'meta.function.method.definition.js'
+        'patterns': [
+          {
+            'match': '(\\[)(.+)(\\])(?=\\s*\\()'
+            'captures':
+              '1':
+                'name': 'punctuation.definition.computed-key.begin.bracket.square.js'
+              '2':
+                'patterns': [
+                  {
+                    'include': '$self'
+                  }
+                  {
+                    'match': '[a-zA-Z_$][\\w$]*'
+                    'name': 'variable.parameter.property.js'
+                  }
+                ]
+              '3':
+                'name': 'punctuation.definition.computed-key.end.bracket.square.js'
+            'name': 'meta.computed-key.js'
+          }
+          {
+            'match': '\\b(get|set)(?=\\s*\\[.+\\]\\s*\\(|\\s+[^\\s\\[(]+\\s*\\()'
+            'name': 'keyword.operator.$1ter.js'
+          }
+          {
+            'match': '\\b([a-zA-Z_$][\\w$]*)'
+            'name': 'entity.name.function.js'
+          }
+          {
+            'include': '#function_params'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # [param|(params)] => [expression|{statements}]
+    'begin': '''(?x)
+      (?=
+        (?<![A-Za-z0-9])
+        ((\\(([^\\(\\)]*)?\\))|[\\w$]+)
+        \\s*=>
+      )
+    '''
+    'end': '''(?x)
+      (?<=})|
+      ((?!
+        \\s*{|
+        \\G\\(|
+        \\G[\\w$]+|
+        \\s*/\\*|\\s*//
+      )(?=\\s*\\S))
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=(=>))'
+        'name': 'meta.function.arrow.js'
+        'patterns': [
+          {
+            'include': '#arrow_function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # [.]foo = ... => ...
+    'begin': '''(?x)
+      (?=
+        (\\.)?[a-zA-Z_$][\\w$]*
+        \\s*(=)\\s*
+        ((\\(([^\\(\\)]*)?\\))|[\\w$]+)
+        \\s*=>
+      )
+    '''
+    'end': '''(?x)
+      (?<=})|
+      ((?!
+        \\s*{|
+        \\G(\\.)?[a-zA-Z_$][\\w$]*\\s*(=)\\s*\\(|
+        \\G(\\.)?[a-zA-Z_$][\\w$]*\\s*(=)\\s*[\\w$]+|
+        \\s*/\\*|\\s*//
+      )(?=\\s*\\S))
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=(=>))'
+        'name': 'meta.function.arrow.js'
+        'patterns': [
+          {
+            'match': '\\G(\\.)?([a-zA-Z_$][\\w$]*)\\s*(=)'
+            'captures':
+              '1':
+                'name': 'meta.delimiter.method.period.js'
+              '2':
+                'name': 'entity.name.function.js'
+              '3':
+                'name': 'keyword.operator.assignment.js'
+          }
+          {
+            'include': '#arrow_function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # foo: ... => ...
+    'begin': '''(?x)
+      (?=
+        \\b[a-zA-Z_$][\\w$]*
+        \\s*:\\s*
+        ((\\(([^\\(\\)]*)?\\))|[\\w$]+)
+        \\s*=>
+      )
+    '''
+    'end': '''(?x)
+      (?<=})|
+      ((?!
+        \\s*{|
+        \\G[\\w$]+\\s*:|
+        \\s*/\\*|\\s*//
+      )(?=\\s*\\S))
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=(=>))'
+        'name': 'meta.function.arrow.json.js'
+        'patterns': [
+          {
+            'match': '\\b([a-zA-Z_$][\\w$]*)\\s*(:)\\s*'
+            'captures':
+              '1':
+                'name': 'entity.name.function.js'
+              '2':
+                'name': 'keyword.operator.assignment.js'
+          }
+          {
+            'include': '#arrow_function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # "foo": ... => ...
+    'begin': '''(?x)
+      (?=
+        ((\'[^\']*?\')|("[^"]*?"))
+        \\s*:\\s*
+        ((\\(([^\\(\\)]*)?\\))|[\\w$]+)
+        \\s*=>
+      )
+    '''
+    'end': '''(?x)
+      (?<=})|
+      ((?!
+        \\G((\'[^\']*?\')|("[^"]*?"))|
+        \\s*{|
+        \\s*/\\*|\\s*//
+      )(?=\\s*\\S))
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'include': '#function_body'
+      }
+      {
+        'begin': '\\G'
+        'end': '(?<=(=>))'
+        'name': 'meta.function.arrow.json.js'
+        'patterns': [
+          {
+            'match': '(?:((\')([^\']*?)(\'))|((")([^"]*?)(")))\\s*(:)'
+            'captures':
+              '1':
+                'name': 'string.quoted.single.js'
+              '2':
+                'name': 'punctuation.definition.string.begin.js'
+              '3':
+                'name': 'entity.name.function.js'
+              '4':
+                'name': 'punctuation.definition.string.end.js'
+              '5':
+                'name': 'string.quoted.double.js'
+              '6':
+                'name': 'punctuation.definition.string.begin.js'
+              '7':
+                'name': 'entity.name.function.js'
+              '8':
+                'name': 'punctuation.definition.string.end.js'
+              '9':
+                'name': 'keyword.operator.assignment.js'
+          }
+          {
+            'include': '#arrow_function_innards'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'match': '(=>)'
+    'captures':
+      '0':
+        'name': 'meta.function.arrow.js'
+      '1':
+        'name': 'storage.type.function.arrow.js'
+  }
+  {
+    'match': '''(?x)
+      \\b(class)
+      (?:
+        (?:\\s+(extends)\\s+([a-zA-Z_$][\\w$]*))
+        |
+        (?:
+          (?:\\s+([a-zA-Z_$][\\w$]*))
+          (?:\\s+(extends)\\s+([a-zA-Z_$][\\w$]*))?
+        )
+      )
+    '''
+    'captures':
+      '1':
+        'name': 'storage.type.class.js'
+      '2':
+        'name': 'storage.modifier.js'
+      '3':
+        'name': 'entity.other.inherited-class.js'
+      '4':
+        'name': 'entity.name.type.class.js'
+      '5':
+        'name': 'storage.modifier.js'
+      '6':
+        'name': 'entity.other.inherited-class.js'
+    'name': 'meta.class.js'
+  }
+  {
+    'match': '(new)\\s+([\\w$]+[\\w.$]*)'
+    'name': 'meta.class.instance.constructor.js'
+    'captures':
+      '1':
+        'name': 'keyword.operator.new.js'
+      '2':
+        'name': 'entity.name.type.instance.js'
+        'patterns': [
+          {
+            'match': '\\.'
+            'name': 'meta.delimiter.property.period.js'
+          }
+        ]
+  }
+  {
+    # console
+    # console.log(arg1, "arg2", [...])
+    'begin': '(?<![\\w$])console(?![\\w$]|\\s*:)'
+    'beginCaptures':
+      '0':
+        'name': 'entity.name.type.object.console.js'
+    'end': '''(?x)
+      (?<=\\)) | (?=
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\.)\\s*
+          (assert|clear|debug|error|info|log|profile|profileEnd|time|timeEnd|warn)
+          \\s*\\(
+        )) \\s*\\S
+      )
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'begin': '\\s*(\\.)\\s*(\\w+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.method.period.js'
+          '2':
+            'name': 'support.function.console.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # Math
+    'begin': '(?<![\\w$])Math(?![\\w$]|\\s*:)'
+    'beginCaptures':
+      '0':
+        'name': 'support.class.math.js'
+    'end': '''(?x)
+      (?<=E|LN10|LN2|LOG10E|LOG2E|PI|SQRT1_2|SQRT2|\\)
+      ) | (?=
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*\\.\\s* (
+          ((abs|acos|acosh|asin|asinh|atan|atan2|atanh|cbrt|ceil|clz32|cos|cosh|exp|
+          expm1|floor|fround|hypot|imul|log|log10|log1p|log2|max|min|pow|random|
+          round|sign|sin|sinh|sqrt|tan|tanh|trunc)\\s*\\(
+          ) | (E|LN10|LN2|LOG10E|LOG2E|PI|SQRT1_2|SQRT2)(?!\\s*[\\w$(]))
+        )) \\s*\\S
+      )
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        # Math.random()
+        'begin': '\\s*(\\.)\\s*(\\w+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.method.period.js'
+          '2':
+            'name': 'support.function.math.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+      {
+        # Math.PI
+        'match': '\\s*(\\.)\\s*(\\w+)\\b'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.property.period.js'
+          '2':
+            'name': 'support.constant.property.math.js'
+      }
+    ]
+  }
+  {
+    # Promise
+    'begin': '(?<![\\w$])Promise(?![\\w$]|\\s*:)'
+    'beginCaptures':
+      '0':
+        'name': 'support.class.promise.js'
+    'end': '''(?x)
+      (?<=\\)) | (?=
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*\\.\\s*(all|race|reject|resolve)\\s*\\() )\\s*\\S
+      )
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        # Promise.all()
+        'begin': '\\s*(\\.)\\s*(\\w+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.method.period.js'
+          '2':
+            'name': 'support.function.promise.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'include': '#strings'
+  }
+  {
+    'include': '#comments'
+  }
+  {
+    'match': '(<!--|-->)'
+    'captures':
+      '0':
+        'name': 'punctuation.definition.comment.html.js'
+      '2':
+        'name': 'punctuation.definition.comment.html.js'
+    'name': 'comment.block.html.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(class|enum|function|interface)(?!\\s*:)\\b'
+    'name': 'storage.type.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(async|export|extends|implements|private|protected|public|static)(?!\\s*:)\\b'
+    'name': 'storage.modifier.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(let|var)(?!\\s*:)\\b'
+    'name': 'storage.type.var.js'
+  }
+  {
+    'begin': '(?<!\\.)\\b(const)(?!\\s*:)\\b'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.const.js'
+    'end': '(\\bof\\b|\\bin\\b)|(;)|(=)|(?<![,{])\\n'
+    'endCaptures':
+      '1':
+        'name': 'keyword.operator.$1.js'
+      '2':
+        'name': 'punctuation.terminator.statement.js'
+      '3':
+        'name': 'keyword.operator.assignment.js'
+    'patterns': [
+      {
+        'match': '([$_a-zA-Z][$_a-zA-Z0-9]*)\\s*(:)\\s*([$_a-zA-Z][$_a-zA-Z0-9]*)?'
+        'captures':
+          '2':
+            'name': 'keyword.operator.assignment.js'
+          '3':
+            'name': 'constant.other.js'
+      }
+      {
+        'match': '([$_a-zA-Z][$_a-zA-Z0-9]*)'
+        'captures':
+          '1':
+            'name': 'constant.other.js'
+      }
+      {
+        'match': '\\.\\.\\.'
+        'name': 'keyword.operator.spread.js'
+      }
+      {
+        'match': ','
+        'name': 'meta.delimiter.object.comma.js'
+      }
+      {
+        'match': '\\(|\\)'
+        'name': 'meta.brace.round.js'
+      }
+      {
+        'match': '{|}'
+        'name': 'meta.brace.curly.js'
+      }
+      {
+        'match': '\\[|\\]'
+        'name': 'meta.brace.square.js'
+      }
+      {
+        'include': '#comments'
+      }
+    ]
+  }
+  {
+    'match': '(?<!\\.)\\b(yield)(?!\\s*:)\\b(?:\\s*(\\*))?',
+    'captures':
+      '1':
+        'name': 'keyword.control.js'
+      '2':
+        'name': 'storage.modifier.js'
+    'name': 'meta.control.yield.js'
+  }
+  {
+    'match': '(?:(?<=\\.{3})|(?<!\\.))\\b(await)(?!\\s*:)\\b'
+    'name': 'keyword.control.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(break|catch|continue|do|else|finally|for|if|import|package|return|throw|try|while|with)(?!\\s*:)\\b'
+    'name': 'keyword.control.js'
+  }
+  {
+    'include': '#switch_statement'
+  }
+  {
+    'match': '(?<!\\.)\\b(delete|in|of|instanceof|new|typeof|void)(?!\\s*:)\\b'
+    'name': 'keyword.operator.$1.js'
+  }
+  {
+    'match': '\\.\\.\\.'
+    'name': 'keyword.operator.spread.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(true|false)(?!\\s*:)\\b'
+    'name': 'constant.language.boolean.$1.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(null)(?!\\s*:)\\b'
+    'name': 'constant.language.null.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(debugger)(?!\\s*:)\\b'
+    'name': 'keyword.other.debugger.js'
+  }
+  {
+    'match': '''(?x) (?<!\\$) \\b
+      (AggregateError|Array|ArrayBuffer|Atomics|Boolean|DataView|Date|Error|EvalError|Float32Array|Float64Array
+      |Function|Generator|GeneratorFunction|Int16Array|Int32Array|Int8Array|InternalError|Intl|JSON|Map|Number
+      |Object|Proxy|RangeError|ReferenceError|Reflect|RegExp|Set|SharedArrayBuffer|SIMD|String|Symbol|SyntaxError
+      |TypeError|Uint16Array|Uint32Array|Uint8Array|Uint8ClampedArray|URIError|WeakMap|WeakSet)
+      \\b
+    '''
+    'name': 'support.class.js'
+  }
+  {
+    'match': '''(?x) (\\.) \\s* (?:
+        (constructor|length|prototype) |
+        (EPSILON|MAX_SAFE_INTEGER|MAX_VALUE|MIN_SAFE_INTEGER|MIN_VALUE|NEGATIVE_INFINITY|POSITIVE_INFINITY)
+      )\\b
+    '''
+    'captures':
+      '1':
+        'name': 'meta.delimiter.property.period.js'
+      '2':
+        'name': 'support.variable.property.js'
+      '3':
+        'name': 'support.constant.js'
+  }
+  {
+    'match': '''(?x) (?<!\\$) \\b (?:
+      (document|event|navigator|performance|screen|window|self|frames)
+      |
+      (AnalyserNode|ArrayBufferView|Attr|AudioBuffer|AudioBufferSourceNode|AudioContext|AudioDestinationNode|AudioListener
+      |AudioNode|AudioParam|BatteryManager|BeforeUnloadEvent|BiquadFilterNode|Blob|BufferSource|ByteString|CSS|CSSConditionRule
+      |CSSCounterStyleRule|CSSGroupingRule|CSSMatrix|CSSMediaRule|CSSPageRule|CSSPrimitiveValue|CSSRule|CSSRuleList|CSSStyleDeclaration
+      |CSSStyleRule|CSSStyleSheet|CSSSupportsRule|CSSValue|CSSValueList|CanvasGradient|CanvasImageSource|CanvasPattern
+      |CanvasRenderingContext2D|ChannelMergerNode|ChannelSplitterNode|CharacterData|ChromeWorker|CloseEvent|Comment|CompositionEvent
+      |Console|ConvolverNode|Coordinates|Credential|CredentialsContainer|Crypto|CryptoKey|CustomEvent|DOMError|DOMException
+      |DOMHighResTimeStamp|DOMImplementation|DOMString|DOMStringList|DOMStringMap|DOMTimeStamp|DOMTokenList|DataTransfer
+      |DataTransferItem|DataTransferItemList|DedicatedWorkerGlobalScope|DelayNode|DeviceProximityEvent|DirectoryEntry
+      |DirectoryEntrySync|DirectoryReader|DirectoryReaderSync|Document|DocumentFragment|DocumentTouch|DocumentType|DragEvent
+      |DynamicsCompressorNode|Element|Entry|EntrySync|ErrorEvent|Event|EventListener|EventSource|EventTarget|FederatedCredential
+      |FetchEvent|File|FileEntry|FileEntrySync|FileException|FileList|FileReader|FileReaderSync|FileSystem|FileSystemSync
+      |FontFace|FormData|GainNode|Gamepad|GamepadButton|GamepadEvent|Geolocation|GlobalEventHandlers|HTMLAnchorElement
+      |HTMLAreaElement|HTMLAudioElement|HTMLBRElement|HTMLBaseElement|HTMLBodyElement|HTMLButtonElement|HTMLCanvasElement
+      |HTMLCollection|HTMLContentElement|HTMLDListElement|HTMLDataElement|HTMLDataListElement|HTMLDialogElement|HTMLDivElement
+      |HTMLDocument|HTMLElement|HTMLEmbedElement|HTMLFieldSetElement|HTMLFontElement|HTMLFormControlsCollection|HTMLFormElement
+      |HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLIFrameElement|HTMLImageElement|HTMLInputElement
+      |HTMLKeygenElement|HTMLLIElement|HTMLLabelElement|HTMLLegendElement|HTMLLinkElement|HTMLMapElement|HTMLMediaElement
+      |HTMLMetaElement|HTMLMeterElement|HTMLModElement|HTMLOListElement|HTMLObjectElement|HTMLOptGroupElement|HTMLOptionElement
+      |HTMLOptionsCollection|HTMLOutputElement|HTMLParagraphElement|HTMLParamElement|HTMLPreElement|HTMLProgressElement
+      |HTMLQuoteElement|HTMLScriptElement|HTMLSelectElement|HTMLShadowElement|HTMLSourceElement|HTMLSpanElement|HTMLStyleElement
+      |HTMLTableCaptionElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableDataCellElement|HTMLTableElement|HTMLTableHeaderCellElement
+      |HTMLTableRowElement|HTMLTableSectionElement|HTMLTextAreaElement|HTMLTimeElement|HTMLTitleElement|HTMLTrackElement
+      |HTMLUListElement|HTMLUnknownElement|HTMLVideoElement|HashChangeEvent|History|IDBCursor|IDBCursorWithValue|IDBDatabase
+      |IDBEnvironment|IDBFactory|IDBIndex|IDBKeyRange|IDBMutableFile|IDBObjectStore|IDBOpenDBRequest|IDBRequest|IDBTransaction
+      |IDBVersionChangeEvent|IIRFilterNode|IdentityManager|ImageBitmap|ImageBitmapFactories|ImageData|Index|InputDeviceCapabilities
+      |InputEvent|InstallEvent|InstallTrigger|KeyboardEvent|LinkStyle|LocalFileSystem|LocalFileSystemSync|Location|MIDIAccess
+      |MIDIConnectionEvent|MIDIInput|MIDIInputMap|MIDIOutputMap|MediaElementAudioSourceNode|MediaError|MediaKeyMessageEvent
+      |MediaKeySession|MediaKeyStatusMap|MediaKeySystemAccess|MediaKeySystemConfiguration|MediaKeys|MediaRecorder|MediaStream
+      |MediaStreamAudioDestinationNode|MediaStreamAudioSourceNode|MessageChannel|MessageEvent|MessagePort|MouseEvent
+      |MutationObserver|MutationRecord|NamedNodeMap|Navigator|NavigatorConcurrentHardware|NavigatorGeolocation|NavigatorID
+      |NavigatorLanguage|NavigatorOnLine|Node|NodeFilter|NodeIterator|NodeList|NonDocumentTypeChildNode|Notification
+      |OfflineAudioCompletionEvent|OfflineAudioContext|OscillatorNode|PageTransitionEvent|PannerNode|ParentNode|PasswordCredential
+      |Path2D|PaymentAddress|PaymentRequest|PaymentResponse|Performance|PerformanceEntry|PerformanceFrameTiming|PerformanceMark
+      |PerformanceMeasure|PerformanceNavigation|PerformanceNavigationTiming|PerformanceObserver|PerformanceObserverEntryList
+      |PerformanceResourceTiming|PerformanceTiming|PeriodicSyncEvent|PeriodicWave|Plugin|Point|PointerEvent|PopStateEvent
+      |PortCollection|Position|PositionError|PositionOptions|PresentationConnectionClosedEvent|PresentationConnectionList
+      |PresentationReceiver|ProcessingInstruction|ProgressEvent|PromiseRejectionEvent|PushEvent|PushRegistrationManager
+      |RTCCertificate|RTCConfiguration|RTCPeerConnection|RTCSessionDescriptionCallback|RTCStatsReport|RadioNodeList|RandomSource
+      |Range|ReadableByteStream|RenderingContext|SVGAElement|SVGAngle|SVGAnimateColorElement|SVGAnimateElement|SVGAnimateMotionElement
+      |SVGAnimateTransformElement|SVGAnimatedAngle|SVGAnimatedBoolean|SVGAnimatedEnumeration|SVGAnimatedInteger|SVGAnimatedLength
+      |SVGAnimatedLengthList|SVGAnimatedNumber|SVGAnimatedNumberList|SVGAnimatedPoints|SVGAnimatedPreserveAspectRatio
+      |SVGAnimatedRect|SVGAnimatedString|SVGAnimatedTransformList|SVGAnimationElement|SVGCircleElement|SVGClipPathElement
+      |SVGCursorElement|SVGDefsElement|SVGDescElement|SVGElement|SVGEllipseElement|SVGEvent|SVGFilterElement|SVGFontElement
+      |SVGFontFaceElement|SVGFontFaceFormatElement|SVGFontFaceNameElement|SVGFontFaceSrcElement|SVGFontFaceUriElement
+      |SVGForeignObjectElement|SVGGElement|SVGGlyphElement|SVGGradientElement|SVGHKernElement|SVGImageElement|SVGLength
+      |SVGLengthList|SVGLineElement|SVGLinearGradientElement|SVGMPathElement|SVGMaskElement|SVGMatrix|SVGMissingGlyphElement
+      |SVGNumber|SVGNumberList|SVGPathElement|SVGPatternElement|SVGPoint|SVGPolygonElement|SVGPolylineElement|SVGPreserveAspectRatio
+      |SVGRadialGradientElement|SVGRect|SVGRectElement|SVGSVGElement|SVGScriptElement|SVGSetElement|SVGStopElement|SVGStringList
+      |SVGStylable|SVGStyleElement|SVGSwitchElement|SVGSymbolElement|SVGTRefElement|SVGTSpanElement|SVGTests|SVGTextElement
+      |SVGTextPositioningElement|SVGTitleElement|SVGTransform|SVGTransformList|SVGTransformable|SVGUseElement|SVGVKernElement
+      |SVGViewElement|ServiceWorker|ServiceWorkerContainer|ServiceWorkerGlobalScope|ServiceWorkerRegistration|ServiceWorkerState
+      |ShadowRoot|SharedWorker|SharedWorkerGlobalScope|SourceBufferList|StereoPannerNode|Storage|StorageEvent|StyleSheet
+      |StyleSheetList|SubtleCrypto|SyncEvent|Text|TextMetrics|TimeEvent|TimeRanges|Touch|TouchEvent|TouchList|Transferable
+      |TreeWalker|UIEvent|USVString|VRDisplayCapabilities|ValidityState|WaveShaperNode|WebGL|WebGLActiveInfo|WebGLBuffer
+      |WebGLContextEvent|WebGLFramebuffer|WebGLProgram|WebGLRenderbuffer|WebGLRenderingContext|WebGLShader|WebGLShaderPrecisionFormat
+      |WebGLTexture|WebGLTimerQueryEXT|WebGLTransformFeedback|WebGLUniformLocation|WebGLVertexArrayObject|WebGLVertexArrayObjectOES
+      |WebSocket|WebSockets|WebVTT|WheelEvent|Window|WindowBase64|WindowEventHandlers|WindowTimers|Worker|WorkerGlobalScope
+      |WorkerLocation|WorkerNavigator|XMLHttpRequest|XMLHttpRequestEventTarget|XMLSerializer|XPathExpression|XPathResult
+      |XSLTProcessor)
+    )\\b
+    '''
+    'captures':
+      '1':
+        'name': 'support.variable.dom.js'
+      '2':
+        'name': 'support.class.dom.js'
+  }
+  {
+    'match': '''(?x) (\\.) \\s*
+      (?:
+        (ATTRIBUTE_NODE|CDATA_SECTION_NODE|COMMENT_NODE|DOCUMENT_FRAGMENT_NODE|DOCUMENT_NODE|DOCUMENT_TYPE_NODE
+        |DOMSTRING_SIZE_ERR|ELEMENT_NODE|ENTITY_NODE|ENTITY_REFERENCE_NODE|HIERARCHY_REQUEST_ERR|INDEX_SIZE_ERR
+        |INUSE_ATTRIBUTE_ERR|INVALID_CHARACTER_ERR|NO_DATA_ALLOWED_ERR|NO_MODIFICATION_ALLOWED_ERR|NOT_FOUND_ERR
+        |NOT_SUPPORTED_ERR|NOTATION_NODE|PROCESSING_INSTRUCTION_NODE|TEXT_NODE|WRONG_DOCUMENT_ERR)
+        |
+        (_content|[xyz]|abbr|above|accept|acceptCharset|accessKey|action|align|[av]Link(?:color)?|all|alt|anchors|appCodeName
+        |appCore|applets|appMinorVersion|appName|appVersion|archive|areas|arguments|attributes|availHeight|availLeft|availTop
+        |availWidth|axis|background|backgroundColor|backgroundImage|below|bgColor|body|border|borderBottomWidth|borderColor
+        |borderLeftWidth|borderRightWidth|borderStyle|borderTopWidth|borderWidth|bottom|bufferDepth|callee|caller|caption
+        |cellPadding|cells|cellSpacing|ch|characterSet|charset|checked|childNodes|chOff|cite|classes|className|clear
+        |clientInformation|clip|clipBoardData|closed|code|codeBase|codeType|color|colorDepth|cols|colSpan|compact|complete
+        |components|content|controllers|cookie|cookieEnabled|cords|cpuClass|crypto|current|data|dateTime|declare|defaultCharset
+        |defaultChecked|defaultSelected|defaultStatus|defaultValue|defaultView|defer|description|dialogArguments|dialogHeight
+        |dialogLeft|dialogTop|dialogWidth|dir|directories|disabled|display|docmain|doctype|documentElement|elements|embeds
+        |enabledPlugin|encoding|enctype|entities|event|expando|external|face|fgColor|filename|firstChild|fontFamily|fontSize
+        |fontWeight|form|formName|forms|frame|frameBorder|frameElement|frames|hasFocus|hash|headers|height|history|host
+        |hostname|href|hreflang|hspace|htmlFor|httpEquiv|id|ids|ignoreCase|images|implementation|index|innerHeight|innerWidth
+        |input|isMap|label|lang|language|lastChild|lastIndex|lastMatch|lastModified|lastParen|layer[sXY]|left|leftContext
+        |lineHeight|link|linkColor|links|listStyleType|localName|location|locationbar|longDesc|lowsrc|lowSrc|marginBottom
+        |marginHeight|marginLeft|marginRight|marginTop|marginWidth|maxLength|media|menubar|method|mimeTypes|multiline|multiple
+        |name|nameProp|namespaces|namespaceURI|next|nextSibling|nodeName|nodeType|nodeValue|noHref|noResize|noShade|notationName
+        |notations|noWrap|object|offscreenBuffering|onLine|onreadystatechange|opener|opsProfile|options|oscpu|outerHeight
+        |outerWidth|ownerDocument|paddingBottom|paddingLeft|paddingRight|paddingTop|page[XY]|page[XY]Offset|parent|parentLayer
+        |parentNode|parentWindow|pathname|personalbar|pixelDepth|pkcs11|platform|plugins|port|prefix|previous|previousDibling
+        |product|productSub|profile|profileend|prompt|prompter|protocol|publicId|readOnly|readyState|referrer|rel|responseText
+        |responseXML|rev|right|rightContext|rowIndex|rows|rowSpan|rules|scheme|scope|screen[XY]|screenLeft|screenTop|scripts
+        |scrollbars|scrolling|sectionRowIndex|security|securityPolicy|selected|selectedIndex|selection|self|shape|siblingAbove
+        |siblingBelow|size|source|specified|standby|start|status|statusbar|statusText|style|styleSheets|suffixes|summary
+        |systemId|systemLanguage|tagName|tags|target|tBodies|text|textAlign|textDecoration|textIndent|textTransform|tFoot|tHead
+        |title|toolbar|top|type|undefined|uniqueID|updateInterval|URL|URLUnencoded|useMap|userAgent|userLanguage|userProfile
+        |vAlign|value|valueType|vendor|vendorSub|version|visibility|vspace|whiteSpace|width|X[MS]LDocument|zIndex)
+      )
+      \\b
+    '''
+    'captures':
+      '1':
+        'name': 'meta.delimiter.property.period.js'
+      '2':
+        'name': 'support.constant.dom.js'
+      '3':
+        'name': 'support.variable.property.dom.js'
+  }
+  {
+    'match': '(?<!\\.)\\b(module|exports|__filename|__dirname|global|globalThis|process)(?!\\s*:)\\b'
+    'name': 'support.variable.js'
+  }
+  {
+    'match': '\\b(Infinity|NaN|undefined)\\b'
+    'name': 'constant.language.js'
+  }
+  {
+    'begin': '(?<=[\\[{=(?:+*,!~-]|^|return|=>|&&|\\|\\|)\\s*(/)(?![/*+?])(?=.*/)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.string.begin.js'
+    'end': '(/)([gimsuy]*)'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.string.end.js'
+      '2':
+        'name': 'meta.flag.regexp'
+    'name': 'string.regexp.js'
+    'patterns': [
+      {
+        'include': 'source.js.regexp'
+      }
+    ]
+  }
+  {
+    'begin': '\\?'
+    'beginCaptures':
+      '0':
+        'name': 'keyword.operator.ternary.js'
+    'end': ':'
+    'endCaptures':
+      '0':
+        'name': 'keyword.operator.ternary.js'
+    'patterns': [
+      {
+        'include': '#prevent_object_keys_matching'
+      }
+      {
+        'include': '$self'
+      }
+    ]
+  }
+  {
+    'include': '#operators'
+  }
+  {
+    'include': '#method_calls'
+  }
+  {
+    'include': '#function_calls'
+  }
+  {
+    'include': '#numbers'
+  }
+  {
+    'include': '#objects'
+  }
+  {
+    'include': '#properties'
+  }
+  {
+    'match': '((?<!\\.|[\\w$])(?![_\\$]+[^A-Z0-9_$])\\$*\\b(?:[A-Z_$][A-Z0-9_$]*)\\b\\$*)'
+    'name': 'constant.other.js'
+  }
+  {
+    'match': '(?<!\\$)\\b[0-9]+[\\w$]*'
+    'name': 'invalid.illegal.identifier.js'
+  }
+  {
+    'match': '\\;'
+    'name': 'punctuation.terminator.statement.js'
+  }
+  {
+    'match': ','
+    'name': 'meta.delimiter.object.comma.js'
+  }
+  {
+    'match': '\\.'
+    'name': 'meta.delimiter.method.period.js'
+  }
+  {
+    # Allows the special return snippet to fire.
+    'match': '({)(})'
+    'captures':
+      '1':
+        'name': 'punctuation.section.scope.begin.js'
+      '2':
+        'name': 'punctuation.section.scope.end.js'
+  }
+  {
+    'begin': '{'
+    'beginCaptures':
+      '0':
+        'name': 'meta.brace.curly.js'
+    'end': '}'
+    'endCaptures':
+      '0':
+        'name': 'meta.brace.curly.js'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
+  }
+  {
+    'begin': '\\('
+    'beginCaptures':
+      '0':
+        'name': 'meta.brace.round.js'
+    'end': '\\)'
+    'endCaptures':
+      '0':
+        'name': 'meta.brace.round.js'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
+  }
+  {
+    'match': '\\[|\\]'
+    'name': 'meta.brace.square.js'
+  }
+  {
+    'match': '\\A#!.*$'
+    'name': 'comment.line.shebang.js'
+  }
+]
+'repository':
+  'numbers':
+    'patterns': [
+      {
+        'match': '\\b(?<!\\$)0(x|X)[0-9a-fA-F]+(?:_[0-9a-fA-F]+)*n?\\b(?!\\$)'
+        'name': 'constant.numeric.hex.js'
+        'captures':
+          '0':
+            'patterns': [
+              {
+                'include': '#numeric_separators'
+              }
+            ]
+      }
+      {
+        'match': '\\b(?<!\\$)0(b|B)[01]+(?:_[01]+)*n?\\b(?!\\$)'
+        'name': 'constant.numeric.binary.js'
+        'captures':
+          '0':
+            'patterns': [
+              {
+                'include': '#numeric_separators'
+              }
+            ]
+      }
+      {
+        'match': '\\b(?<!\\$)0(o|O)?[0-7]+(?:_[0-7]+)*n?\\b(?!\\$)'
+        'name': 'constant.numeric.octal.js'
+        'captures':
+          '0':
+            'patterns': [
+              {
+                'include': '#numeric_separators'
+              }
+            ]
+      }
+      {
+        'match': '''(?x)
+          (?<!\\$)(?:
+            (?:\\b[0-9]+(?:_[0-9]+)*\\.[0-9]+(?:_[0-9]+)*[eE][+-]?[0-9]+(?:_[0-9]+)*\\b)|   # 1.1E+3
+            (?:\\b[0-9]+(?:_[0-9]+)*\\.[eE][+-]?[0-9]+(?:_[0-9]+)*\\b)|                     # 1.E+3
+            (?:\\B\\.[0-9]+(?:_[0-9]+)*[eE][+-]?[0-9]+(?:_[0-9]+)*\\b)|                     # .1E+3
+            (?:\\b[0-9]+(?:_[0-9]+)*[eE][+-]?[0-9]+(?:_[0-9]+)*\\b)|                        # 1E+3
+            (?:\\b[0-9]+(?:_[0-9]+)*\\.[0-9]+(?:_[0-9]+)*\\b)|                              # 1.1
+            (?:\\b[0-9]+(?:_[0-9]+)*\\.\\B)|                                                # 1.
+            (?:\\B\\.[0-9]+(?:_[0-9]+)*\\b)|                                                # .1
+            (?:\\b[0-9]+(?:_[0-9]+)*n?\\b(?!\\.))                                           # 1n
+          )(?!\\$)
+        '''
+        'name': 'constant.numeric.decimal.js'
+        'captures':
+          '0':
+            'patterns': [
+              {
+                'include': '#numeric_separators'
+              }
+            ]
+      }
+    ]
+  'numeric_separators':
+    'patterns': [
+      {
+        'match': '(_)|(\\.)'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.numeric.separator.js'
+          '2':
+            'name': 'meta.delimiter.decimal.period.js'
+      }
+    ]
+  'operators':
+    'patterns': [
+      {
+        'match': '%=|\\+=|-=|\\*=|(?<!\\()/='
+        'name': 'keyword.operator.assignment.compound.js'
+      }
+      {
+        'match': '&=|\\^=|<<=|>>=|>>>=|\\|='
+        'name': 'keyword.operator.assignment.compound.bitwise.js'
+      }
+      {
+        'match': '<<|>>>|>>'
+        'name': 'keyword.operator.bitwise.shift.js'
+      }
+      {
+        'match': '!==|!=|<=|>=|===|==|<|>'
+        'name': 'keyword.operator.comparison.js'
+      }
+      {
+        'match': '&&|!!|!|\\|\\|'
+        'name': 'keyword.operator.logical.js'
+      }
+      {
+        'match': '&|\\||\\^|~'
+        'name': 'keyword.operator.bitwise.js'
+      }
+      {
+        'match': '=|:'
+        'name': 'keyword.operator.assignment.js'
+      }
+      {
+        'match': '--'
+        'name': 'keyword.operator.decrement.js'
+      }
+      {
+        'match': '\\+\\+'
+        'name': 'keyword.operator.increment.js'
+      }
+      {
+        'match': '%|\\*|/|-|\\+'
+        'name': 'keyword.operator.js'
+      }
+    ]
+  'strings':
+    'patterns': [
+      {
+        'begin': '\''
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.js'
+        'end': '\''
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'name': 'string.quoted.single.js'
+        'patterns': [
+          {
+            'include': '#string_escapes'
+          }
+        ]
+      }
+      {
+        'begin': '"'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.js'
+        'end': '"'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'name': 'string.quoted.double.js'
+        'patterns': [
+          {
+            'include': '#string_escapes'
+          }
+        ]
+      }
+      {
+        'begin': '((\\w+)?(html|HTML|Html))\\s*(`)'
+        'beginCaptures':
+          '1':
+            'name': 'entity.name.function.js'
+          '4':
+            'name': 'punctuation.definition.string.begin.js'
+        'end': '`'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'name': 'string.quoted.template.html.js'
+        'patterns': [
+          {
+            'include': '#string_escapes'
+          }
+          {
+            'include': '#interpolated_js'
+          }
+          {
+            'include': 'text.html.basic'
+          }
+        ]
+      }
+      {
+        'begin': '(?<=innerHTML)\\s*(\\+?=)\\s*(?=`)'
+        'beginCaptures':
+          '1':
+            'name': 'keyword.operator.assignment.js'
+        'end': '(?<=`)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'contentName': 'string.quoted.template.html.js'
+        'patterns': [
+          {
+            'begin': '`'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.string.begin.js'
+            'end': '`'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.string.end.js'
+            'patterns': [
+              {
+                'include': '#string_escapes'
+              }
+              {
+                'include': '#interpolated_js'
+              }
+              {
+                'include': 'text.html.basic'
+              }
+            ]
+          }
+        ]
+      }
+      {
+        'begin': '(Relay\\.QL|gql)\\s*(`)'
+        'beginCaptures':
+          '1':
+            'name': 'entity.name.function.js'
+          '2':
+            'name': 'punctuation.definition.string.begin.js'
+        'end': '`'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'name': 'string.quoted.template.graphql.js'
+        'patterns': [
+          {
+            'include': '#string_escapes'
+          }
+          {
+            'include': '#interpolated_js'
+          }
+          {
+            'include': 'source.graphql'
+          }
+        ]
+      }
+      {
+        'begin': '(sql|SQL|Sql)\\s*(`)'
+        'beginCaptures':
+          '1':
+            'name': 'entity.name.function.js'
+          '2':
+            'name': 'punctuation.definition.string.begin.js'
+        'end': '`'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'name': 'string.quoted.template.sql.js'
+        'patterns': [
+          {
+            'include': '#string_escapes'
+          }
+          {
+            'include': '#interpolated_js'
+          }
+          {
+            'include': 'source.sql'
+          }
+        ]
+      }
+      {
+        'begin': '`'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.js'
+        'end': '`'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.js'
+        'name': 'string.quoted.template.js'
+        'patterns': [
+          {
+            'include': '#string_escapes'
+          }
+          {
+            'include': '#interpolated_js'
+          }
+        ]
+      }
+    ]
+  'string_escapes':
+    'patterns': [
+      {
+        'match': '\\\\u(?![A-Fa-f0-9]{4}|{[A-Fa-f0-9]+})[^\'"]*'
+        'name': 'invalid.illegal.unicode-escape.js'
+      }
+      {
+        'match': '\\\\u(?:[A-Fa-f0-9]{4}|({)([A-Fa-f0-9]+)(}))'
+        'name': 'constant.character.escape.js'
+        'captures':
+          '1':
+            'name': 'punctuation.definition.unicode-escape.begin.bracket.curly.js'
+          '2':
+            'patterns': [
+              {
+                # Max codepoint: \u{10FFFF}
+                'match': '[A-Fa-f\\d]{7,}|(?!10)[A-Fa-f\\d]{6}'
+                'name': 'invalid.illegal.unicode-escape.js'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.unicode-escape.end.bracket.curly.js'
+      }
+      {
+        'match': '\\\\(x[0-9A-Fa-f]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.)'
+        'name': 'constant.character.escape.js'
+      }
+    ]
+  'function_params':
+    'patterns': [
+      {
+        'begin': '\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.parameters.begin.bracket.round.js'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.parameters.end.bracket.round.js'
+        'name': 'meta.parameters.js'
+        'patterns': [
+          {
+            'match': '(\\.\\.\\.)([a-zA-Z_$][\\w$]*)'
+            'captures':
+              '1':
+                'name': 'keyword.operator.spread.js'
+              '2':
+                'name': 'variable.parameter.rest.function.js'
+          }
+          {
+            'include': '$self'
+          }
+          {
+            'match': '[a-zA-Z_$][\\w$]*'
+            'name': 'variable.parameter.function.js'
+          }
+        ]
+      }
+    ]
+  'function_body':
+    'patterns': [
+      {
+        'begin': '{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.function.body.begin.bracket.curly.js'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.function.body.end.bracket.curly.js'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  'function_innards':
+    'patterns': [
+      {
+        'match': '(?:\\b(async)\\b\\s*)?\\b(function)\\b(?:\\s*(\\*))?'
+        'captures':
+          '1':
+            'name': 'storage.modifier.async.js'
+          '2':
+            'name': 'storage.type.function.js'
+          '3':
+            'name': 'storage.modifier.generator.js'
+      }
+      {
+        'match': '[a-zA-Z_$][\\w$]*(?=\\s*\\()'
+        'name': 'entity.name.function.js'
+      }
+      {
+        'include': '#function_params'
+      }
+      {
+        'include': '#comments'
+      }
+    ]
+  'arrow_function_innards':
+    'patterns': [
+      {
+        'match': '=>'
+        'name': 'storage.type.function.arrow.js'
+      }
+      {
+        'include': '#function_params'
+      }
+      {
+        'match': '([a-zA-Z_$][\\w$]*)(?=\\s*=>)'
+        'captures':
+          '0':
+            'name': 'meta.parameters.js'
+          '1':
+            'name': 'variable.parameter.function.js'
+      }
+      {
+        'match': '(\\d[\\w$]*)'
+        'captures':
+          '0':
+            'name': 'meta.parameters.js'
+          '1':
+            'name': 'invalid.illegal.identifier.js'
+      }
+    ]
+  'arguments':
+    'patterns': [
+      {
+        'begin': '\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.js'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.js'
+        'name': 'meta.arguments.js'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  'method_calls':
+    'patterns': [
+      {
+        # .methodCall(arg1, "arg2", [...])
+        'begin': '(\\.)\\s*([\\w$]+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.method.period.js'
+          '2':
+            'patterns': [
+              {
+                'match': '''(?x)
+                  \\bon(Rowsinserted|Rowsdelete|Rowenter|Rowexit|Resize|Resizestart|Resizeend|Reset|
+                  Readystatechange|Mouseout|Mouseover|Mousedown|Mouseup|Mousemove|
+                  Before(cut|deactivate|unload|update|paste|print|editfocus|activate)|
+                  Blur|Scrolltop|Submit|Select|Selectstart|Selectionchange|Hover|Help|
+                  Change|Contextmenu|Controlselect|Cut|Cellchange|Clock|Close|Deactivate|
+                  Datasetchanged|Datasetcomplete|Dataavailable|Drop|Drag|Dragstart|Dragover|
+                  Dragdrop|Dragenter|Dragend|Dragleave|Dblclick|Unload|Paste|Propertychange|Error|
+                  Errorupdate|Keydown|Keyup|Keypress|Focus|Load|Activate|Afterupdate|Afterprint|Abort)\\b
+                '''
+                'name': 'support.function.event-handler.js'
+              }
+              {
+                'match': '''(?x)
+                  \\b(catch|finally|then|shift|showModelessDialog|showModalDialog|showHelp|scroll|scrollX|scrollByPages|
+                  scrollByLines|scrollY|scrollTo|stop|strike|sizeToContent|sidebar|signText|sort|
+                  sup|sub|substr|substring|splice|split|send|set(Milliseconds|Seconds|Minutes|Hours|
+                  Month|Year|FullYear|Date|UTC(Milliseconds|Seconds|Minutes|Hours|Month|FullYear|Date)|
+                  Time|Hotkeys|Cursor|ZOptions|Active|Resizable|RequestHeader)|search|slice|
+                  savePreferences|small|home|handleEvent|navigate|char|charCodeAt|charAt|concat|
+                  contextual|confirm|compile|clear|captureEvents|call|createStyleSheet|createPopup|
+                  createEventObject|to(GMTString|UTCString|String|Source|UpperCase|LowerCase|LocaleString)|
+                  test|taint|taintEnabled|indexOf|italics|disableExternalCapture|dump|detachEvent|unshift|
+                  untaint|unwatch|updateCommands|join|javaEnabled|pop|push|plugins.refresh|paddings|parse|stringify|
+                  print|prompt|preference|enableExternalCapture|exec|execScript|valueOf|UTC|find|file|
+                  fileModifiedDate|fileSize|fileCreatedDate|fileUpdatedDate|fixed|fontsize|fontcolor|
+                  forward|fromCharCode|watch|link|load|lastIndexOf|anchor|attachEvent|atob|apply|alert|
+                  abort|routeEvents|resize|resizeBy|resizeTo|recalc|returnValue|replace|reverse|reload|
+                  releaseCapture|releaseEvents|go|get(Milliseconds|Seconds|Minutes|Hours|Month|Day|Year|FullYear|
+                  Time|Date|TimezoneOffset|UTC(Milliseconds|Seconds|Minutes|Hours|Day|Month|FullYear|Date)|
+                  Attention|Selection|ResponseHeader|AllResponseHeaders)|moveBy|moveBelow|moveTo|
+                  moveToAbsolute|moveAbove|mergeAttributes|match|margins|btoa|big|bold|borderWidths|blink|back)\\b
+                '''
+                'name': 'support.function.js'
+              }
+              {
+                'match': '''(?x)
+                  \\b(acceptNode|add|addEventListener|addTextTrack|adoptNode|after|animate|append|
+                  appendChild|appendData|before|blur|canPlayType|captureStream|
+                  caretPositionFromPoint|caretRangeFromPoint|checkValidity|clear|click|
+                  cloneContents|cloneNode|cloneRange|close|closest|collapse|
+                  compareBoundaryPoints|compareDocumentPosition|comparePoint|contains|
+                  convertPointFromNode|convertQuadFromNode|convertRectFromNode|createAttribute|
+                  createAttributeNS|createCaption|createCDATASection|createComment|
+                  createContextualFragment|createDocument|createDocumentFragment|
+                  createDocumentType|createElement|createElementNS|createEntityReference|
+                  createEvent|createExpression|createHTMLDocument|createNodeIterator|
+                  createNSResolver|createProcessingInstruction|createRange|createShadowRoot|
+                  createTBody|createTextNode|createTFoot|createTHead|createTreeWalker|delete|
+                  deleteCaption|deleteCell|deleteContents|deleteData|deleteRow|deleteTFoot|
+                  deleteTHead|detach|disconnect|dispatchEvent|elementFromPoint|elementsFromPoint|
+                  enableStyleSheetsForSet|entries|evaluate|execCommand|exitFullscreen|
+                  exitPointerLock|expand|extractContents|fastSeek|firstChild|focus|forEach|get|
+                  getAll|getAnimations|getAttribute|getAttributeNames|getAttributeNode|
+                  getAttributeNodeNS|getAttributeNS|getBoundingClientRect|getBoxQuads|
+                  getClientRects|getContext|getDestinationInsertionPoints|getElementById|
+                  getElementsByClassName|getElementsByName|getElementsByTagName|
+                  getElementsByTagNameNS|getItem|getNamedItem|getSelection|getStartDate|
+                  getVideoPlaybackQuality|has|hasAttribute|hasAttributeNS|hasAttributes|
+                  hasChildNodes|hasFeature|hasFocus|importNode|initEvent|insertAdjacentElement|
+                  insertAdjacentHTML|insertAdjacentText|insertBefore|insertCell|insertData|
+                  insertNode|insertRow|intersectsNode|isDefaultNamespace|isEqualNode|
+                  isPointInRange|isSameNode|item|key|keys|lastChild|load|lookupNamespaceURI|
+                  lookupPrefix|matches|move|moveAttribute|moveAttributeNode|moveChild|
+                  moveNamedItem|namedItem|nextNode|nextSibling|normalize|observe|open|
+                  parentNode|pause|play|postMessage|prepend|preventDefault|previousNode|
+                  previousSibling|probablySupportsContext|queryCommandEnabled|
+                  queryCommandIndeterm|queryCommandState|queryCommandSupported|queryCommandValue|
+                  querySelector|querySelectorAll|registerContentHandler|registerElement|
+                  registerProtocolHandler|releaseCapture|releaseEvents|remove|removeAttribute|
+                  removeAttributeNode|removeAttributeNS|removeChild|removeEventListener|
+                  removeItem|replace|replaceChild|replaceData|replaceWith|reportValidity|
+                  requestFullscreen|requestPointerLock|reset|scroll|scrollBy|scrollIntoView|
+                  scrollTo|seekToNextFrame|select|selectNode|selectNodeContents|set|setAttribute|
+                  setAttributeNode|setAttributeNodeNS|setAttributeNS|setCapture|
+                  setCustomValidity|setEnd|setEndAfter|setEndBefore|setItem|setNamedItem|
+                  setRangeText|setSelectionRange|setSinkId|setStart|setStartAfter|setStartBefore|
+                  slice|splitText|stepDown|stepUp|stopImmediatePropagation|stopPropagation|
+                  submit|substringData|supports|surroundContents|takeRecords|terminate|toBlob|
+                  toDataURL|toggle|toString|values|write|writeln)\\b
+                '''
+                'name': 'support.function.dom.js'
+              }
+              {
+                'match': "[a-zA-Z_$][\\w$]*"
+                'name': 'entity.name.function.js'
+              }
+              {
+                'match': '\\d[\\w$]*'
+                'name': 'invalid.illegal.identifier.js'
+              }
+            ]
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  'function_calls':
+    'patterns': [
+      {
+        # functionCall(arg1, "arg2", [...])
+        'begin': '([\\w$]+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'match': '''(?x)
+                  \\b(isNaN|isFinite|eval|uneval|parseInt|parseFloat|decodeURI|
+                  decodeURIComponent|encodeURI|encodeURIComponent|escape|unescape|
+                  require|set(Interval|Timeout)|clear(Interval|Timeout))\\b
+                '''
+                'name': 'support.function.js'
+              }
+              {
+                'match': "[a-zA-Z_$][\\w$]*"
+                'name': 'entity.name.function.js'
+              }
+              {
+                'match': '\\d[\\w$]*'
+                'name': 'invalid.illegal.identifier.js'
+              }
+            ]
+        'end': '(?<=\\))'
+        'name': 'meta.function-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  'objects':
+    'patterns': [
+      {
+        # OBJ in OBJ.prop, OBJ.methodCall()
+        'match': '[A-Z][A-Z0-9_$]*(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'name': 'constant.other.object.js'
+      }
+      {
+        # obj in obj.prop, obj.methodCall()
+        'match': '[a-zA-Z_$][\\w$]*(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'name': 'variable.other.object.js'
+      }
+    ]
+  'properties':
+    'patterns': [
+      {
+        # PROP1 in obj.PROP1.prop2, func().PROP1.prop2
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.property.period.js'
+          '2':
+            'name': 'constant.other.object.property.js'
+      }
+      {
+        # prop1 in obj.prop1.prop2, func().prop1.prop2
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.property.period.js'
+          '2':
+            'name': 'variable.other.object.property.js'
+      }
+      {
+        # PROP in obj.PROP, func().PROP
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.property.period.js'
+          '2':
+            'name': 'constant.other.property.js'
+      }
+      {
+        # prop in obj.prop, func().prop
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.property.period.js'
+          '2':
+            'name': 'variable.other.property.js'
+      }
+      {
+        # 123illegal in obj.123illegal, func().123illegal
+        'match': '(\\.)\\s*([0-9][\\w$]*)'
+        'captures':
+          '1':
+            'name': 'meta.delimiter.property.period.js'
+          '2':
+            'name': 'invalid.illegal.identifier.js'
+      }
+    ]
+  'interpolated_js':
+    'patterns': [
+      {
+        'begin': '\\${'
+        'captures':
+          '0':
+            'name': 'punctuation.section.embedded.js'
+        'end': '}'
+        'name': 'source.js.embedded.source'
+        'patterns': [
+          {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'meta.brace.curly.js'
+            'end': '}'
+            'endCaptures':
+              '0':
+                'name': 'meta.brace.curly.js'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  'comments':
+    'patterns': [
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.comment.begin.js'
+          '2':
+            'name': 'punctuation.definition.comment.end.js'
+        'match': '(/\\*)(\\*/)'
+        'name': 'comment.block.empty.js'
+      }
+      {
+        'begin': '/\\*\\*'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.begin.js'
+        'end': '\\*/'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.end.js'
+        'name': 'comment.block.documentation.js'
+        'patterns': [
+          {
+            'include': 'source.jsdoc'
+          }
+        ]
+      }
+      {
+        'begin': '/\\*'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.begin.js'
+        'end': '\\*/'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.end.js'
+        'name': 'comment.block.js'
+      }
+      {
+        'begin': '//'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.js'
+        'end': '$'
+        'name': 'comment.line.double-slash.js'
+      }
+    ]
+  'switch_statement':
+    'patterns': [
+      {
+        # switch(expression) {...}
+        'begin': '\\bswitch\\b'
+        'beginCaptures':
+          '0':
+            'name': 'keyword.control.switch.js'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.section.switch-block.end.bracket.curly.js'
+        'name': 'meta.switch-statement.js'
+        'patterns': [
+          {
+            'begin': '\\('
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.switch-expression.begin.bracket.round.js'
+            'end': '\\)'
+            'endCaptures':
+              '0':
+                'name': 'punctuation.definition.switch-expression.end.bracket.round.js'
+            'patterns': [
+              'include': '$self'
+            ]
+          }
+          {
+            'begin': '{'
+            'beginCaptures':
+              '0':
+                'name': 'punctuation.definition.section.switch-block.begin.bracket.curly.js'
+            'end': '(?=})'
+            'patterns': [
+              {
+                'begin': '\\bcase\\b'
+                'beginCaptures':
+                  '0':
+                    'name': 'keyword.control.case.js'
+                'end': ':'
+                'endCaptures':
+                  '0':
+                    'name': 'punctuation.definition.section.case-statement.js'
+                'patterns': [
+                  {
+                    'include': '#prevent_object_keys_matching'
+                  }
+                  {
+                    'include': '$self'
+                  }
+                ]
+              }
+              {
+                'match': '(?:^\\s*)?\\b(default)\\b\\s*(:)'
+                'captures':
+                  '1':
+                    'name': 'keyword.control.default.js'
+                  '2':
+                    'name': 'punctuation.definition.section.case-statement.js'
+              }
+              {
+                'include': '$self'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  'prevent_object_keys_matching':
+    'patterns': [
+      {
+        # e.g. don't treat null as an object key in
+        # ? null :
+        # case null:
+        'match': '(\\w+)(?=\\s*:)'
+        'captures':
+          '1':
+            'patterns': [
+              'include': '$self'
+            ]
+      }
+    ]

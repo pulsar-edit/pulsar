@@ -1,0 +1,2301 @@
+'scopeName': 'source.python'
+'name': 'Python'
+'fileTypes': [
+  'cpy'
+  'gyp'
+  'gypi'
+  'kv'
+  'py'
+  'pyw'
+  'pyi'
+  'rpy'
+  'SConscript'
+  'SConstruct'
+  'Sconstruct'
+  'sconstruct'
+  'Snakefile'  # Snakemake support
+  'smk'        # Snakemake support
+  'tac'
+  'wscript'
+  'wsgi'
+]
+'firstLineMatch': '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
+'injections':
+  'L:source.python meta.embedded.sql':
+    'patterns': [
+      {
+        'include': '#string_formatting'
+      }
+      {
+        'include': '#escaped_char'
+      }
+    ]
+'patterns': [
+  {
+    'include': '#line_comments'
+  }
+  {
+    'include': '#language_variables'
+  }
+  {
+    'match': '\\b(?i:(0x\\h*)L)'
+    'name': 'constant.numeric.integer.long.hexadecimal.python'
+  }
+  {
+    'match': '\\b(?i:(0x\\h*))'
+    'name': 'constant.numeric.integer.hexadecimal.python'
+  }
+  {
+    'match': '\\b(?i:(0o?[0-7]+)L)'
+    'name': 'constant.numeric.integer.long.octal.python'
+  }
+  {
+    'match': '\\b(?i:(0o?[0-7]+))'
+    'name': 'constant.numeric.integer.octal.python'
+  }
+  {
+    'match': '\\b(?i:(0b[01]+)L)',
+    'name': 'constant.numeric.integer.long.binary.python'
+  }
+  {
+    'match': '\\b(?i:(0b[01]+))',
+    'name': 'constant.numeric.integer.binary.python'
+  }
+  {
+    'match': '\\b(?i:(((\\d+(\\.(?=[^a-zA-Z_])\\d*)?|(?<=[^0-9a-zA-Z_])\\.\\d+)(e[\\-\\+]?\\d+)?))J)'
+    'name': 'constant.numeric.complex.python'
+  }
+  {
+    'match': '\\b(?i:(\\d+\\.\\d*(e[\\-\\+]?\\d+)?))(?=[^a-zA-Z_])'
+    'name': 'constant.numeric.float.python'
+  }
+  {
+    'match': '(?<=[^0-9a-zA-Z_])(?i:(\\.\\d+(e[\\-\\+]?\\d+)?))'
+    'name': 'constant.numeric.float.python'
+  }
+  {
+    'match': '\\b(?i:(\\d+e[\\-\\+]?\\d+))'
+    'name': 'constant.numeric.float.python'
+  }
+  {
+    'match': '\\b(?i:([1-9]+[0-9]*|0)L)'
+    'name': 'constant.numeric.integer.long.decimal.python'
+  }
+  {
+    'match': '\\b([1-9]+[0-9]*|0)'
+    'name': 'constant.numeric.integer.decimal.python'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'storage.modifier.global.python'
+    'match': '\\b(global)\\b'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'storage.modifier.nonlocal.python'
+    'match': '\\b(nonlocal)\\b'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.control.import.python'
+      '2':
+        'name': 'keyword.control.import.from.python'
+    'match': '\\b(?:(import)|(from))\\b'
+  }
+  {
+    'comment': 'keywords that delimit flow conditionals'
+    'name': 'keyword.control.conditional.python'
+    'match': '\\b(if|elif|else)\\b'
+  }
+  {
+    'comment': 'keywords that delimit an exception'
+    'name': 'keyword.control.exception.python'
+    'match': '\\b(except|finally|try|raise)\\b'
+  }
+  {
+    'comment': 'keywords that delimit loops'
+    'name': 'keyword.control.repeat.python'
+    'match': '\\b(for|while)\\b'
+  }
+  {
+    'comment': 'keywords that alter flow from within a block'
+    'name': 'keyword.control.statement.python'
+    'match': '\\b(with|break|continue|pass|return|yield(\\s+from)?|await)\\b'
+  }
+  {
+    'comment': 'keyword operators that evaluate to True or False'
+    'match': '\\b(and|in|is|not|or)\\b'
+    'name': 'keyword.operator.logical.python'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.other.python'
+    'comment': 'keywords that haven\'t fit into other groups (yet).'
+    'match': '\\b(as|assert|del|exec|print)\\b'
+  }
+  {
+    'match': '<>'
+    'name': 'invalid.deprecated.operator.python'
+  }
+  {
+    'match': '<\\=|>\\=|\\=\\=|<|>|\\!\\='
+    'name': 'keyword.operator.comparison.python'
+  }
+  {
+    'match': '\\+\\=|-\\=|\\*\\=|/\\=|//\\=|%\\=|&\\=|\\|\\=|\\^\\=|>>\\=|<<\\=|\\*\\*\\='
+    'name': 'keyword.operator.assignment.augmented.python'
+  }
+  {
+    'match': '\\+|\\-|\\*|\\*\\*|/|//|%|<<|>>|&|\\||\\^|~'
+    'name': 'keyword.operator.arithmetic.python'
+  }
+  {
+    'match': '\\='
+    'name': 'keyword.operator.assignment.python'
+  }
+  {
+    'begin': '^\\s*(class)\\s+(?=[a-zA-Z_][a-zA-Z_0-9]*\\s*\\:)'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.python'
+    'contentName': 'entity.name.type.class.python'
+    'end': '\\s*(:)'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.section.class.begin.python'
+    'name': 'meta.class.old-style.python'
+    'patterns': [
+      {
+        'include': '#entity_name_class'
+      }
+    ]
+  }
+  {
+    'begin': '^\\s*(class)\\s+(?=[a-zA-Z_][a-zA-Z_0-9]*\\s*\\()'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.python'
+    'end': '(\\))\\s*(?:(\\:)|(.*$\\n?))'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.inheritance.end.python'
+      '2':
+        'name': 'punctuation.section.class.begin.python'
+      '3':
+        'name': 'invalid.illegal.missing-section-begin.python'
+    'name': 'meta.class.python'
+    'patterns': [
+      {
+        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*)'
+        'contentName': 'entity.name.type.class.python'
+        'end': '(?![A-Za-z0-9_])'
+        'patterns': [
+          {
+            'include': '#entity_name_class'
+          }
+        ]
+      }
+      {
+        'begin': '(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.inheritance.begin.python'
+        'contentName': 'meta.class.inheritance.python'
+        'end': '(?=\\)|:)'
+        'patterns': [
+          {
+            'begin': '(?<=\\(|,)\\s*'
+            'contentName': 'entity.other.inherited-class.python'
+            'end': '\\s*(?:(,)|(?=\\)))'
+            'endCaptures':
+              '1':
+                'name': 'punctuation.separator.inheritance.python'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'begin': '^\\s*(class)\\s+(?=[a-zA-Z_][a-zA-Z_0-9])'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.class.python'
+    'end': '(\\()|(\\s*$\\n?|#.*$\\n?)'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.inheritance.begin.python'
+      '2':
+        'name': 'invalid.illegal.missing-inheritance.python'
+    'name': 'meta.class.python'
+    'patterns': [
+      {
+        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*)'
+        'contentName': 'entity.name.type.class.python'
+        'end': '(?![A-Za-z0-9_])'
+        'patterns': [
+          {
+            'include': '#entity_name_function'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'begin': '^\\s*(?:(async)\\s+)?(def)\\s+(?=[A-Za-z_][A-Za-z0-9_]*)'
+    'beginCaptures':
+      '1':
+        'name': 'storage.modifier.async.python'
+      '2':
+        'name': 'storage.type.function.python'
+    'end': ':'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.function.begin.python'
+    'name': 'meta.function.python'
+    'patterns': [
+      {
+        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*)'
+        'contentName': 'entity.name.function.python'
+        'end': '(?![A-Za-z0-9_])'
+        'patterns': [
+          {
+            'include': '#entity_name_function'
+          }
+        ]
+      }
+      {
+        'begin': '\\('
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.parameters.begin.python'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.parameters.end.python'
+        'contentName': 'meta.function.parameters.python'
+        'patterns': [
+          {
+            'include': '#line_comments'
+          }
+          {
+            # param = 3
+            # param: int = 3
+            'begin': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\s*(?:(:)\\s*([a-zA-Z_][\\w_]*))?\\s*(=)\\s*'
+            'beginCaptures':
+              '1':
+                'name': 'keyword.operator.unpacking.arguments.python'
+              '2':
+                'name': 'variable.parameter.function.python'
+              '3':
+                'name': 'punctuation.separator.python'
+              '4':
+                'name': 'storage.type.python'
+              '5':
+                'name': 'keyword.operator.assignment.python'
+            'end': '(?!\\G)'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+          {
+            # param
+            # param: int
+            'match': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\s*(?:(:)\\s*([a-zA-Z_][\\w_]*))?'
+            'captures':
+              '1':
+                'name': 'keyword.operator.unpacking.arguments.python'
+              '2':
+                'name': 'variable.parameter.function.python'
+              '3':
+                'name': 'punctuation.separator.python'
+              '4':
+                'name': 'storage.type.python'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.parameters.python'
+          }
+        ]
+      }
+      {
+        'match': '(->)\\s*([A-Za-z_][\\w_]*)(?=\\s*:)'
+        'captures':
+          '1':
+            'name': 'keyword.operator.function-annotation.python'
+          '2':
+            'name': 'storage.type.python'
+      }
+    ]
+  }
+  {
+    'begin': '\\b(lambda)\\b'
+    'beginCaptures':
+      '1':
+        'name': 'storage.type.function.inline.python'
+    'end': ':'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.function.begin.python'
+    'name': 'meta.function.inline.python'
+    'patterns': [
+      {
+        'begin': '\\G'
+        'end': '(?=\\:)'
+        'contentName': 'meta.function.inline.parameters.python'
+        'patterns': [
+          {
+            # param = 3
+            'begin': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\s*(=)\\s*'
+            'beginCaptures':
+              '1':
+                'name': 'keyword.operator.unpacking.arguments.python'
+              '2':
+                'name': 'variable.parameter.function.python'
+              '3':
+                'name': 'keyword.operator.assignment.python'
+            'end': '(?!\\G)'
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          }
+          {
+            # param
+            'match': '(?:(\\*{0,2})|\\b)([a-zA-Z_][\\w_]*)\\b'
+            'captures':
+              '1':
+                'name': 'keyword.operator.unpacking.arguments.python'
+              '2':
+                'name': 'variable.parameter.function.python'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.parameters.python'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'begin': '^\\s*(?=@\\s*[A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*\\s*\\()'
+    'comment': 'a decorator may be a function call which returns a decorator.'
+    'end': '(\\))'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.arguments.end.python'
+    'name': 'meta.function.decorator.python'
+    'patterns': [
+      {
+        'begin': '(?=(@)\\s*[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*\\s*\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.decorator.python'
+        'contentName': 'entity.name.function.decorator.python'
+        'end': '(?=\\s*\\()'
+        'patterns': [
+          {
+            'include': '#dotted_name'
+          }
+        ]
+      }
+      {
+        'begin': '(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.arguments.begin.python'
+        'contentName': 'meta.function.decorator.arguments.python'
+        'end': '(?=\\))'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'begin': '^\\s*(?=@\\s*[A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*)'
+    'contentName': 'entity.name.function.decorator.python'
+    'end': '(?=\\s|$\\n?|#)'
+    'name': 'meta.function.decorator.python'
+    'patterns': [
+      {
+        'begin': '(?=(@)\\s*[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.decorator.python'
+        'end': '(?=\\s|$\\n?|#)'
+        'patterns': [
+          {
+            'include': '#dotted_name'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'include': '#function_calls'
+  }
+  {
+    'include': '#method_calls'
+  }
+  {
+    'include': '#objects'
+  }
+  {
+    'include': '#properties'
+  }
+  {
+    'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z_0-9]*)*\\s*\\[)'
+    'end': '(\\])'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.arguments.end.python'
+    'name': 'meta.item-access.python'
+    'patterns': [
+      {
+        'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*\\s*\\[)'
+        'end': '(?=\\s*\\[)'
+        'patterns': [
+          {
+            'include': '#dotted_name'
+          }
+        ]
+      }
+      {
+        'begin': '(\\[)'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.arguments.begin.python'
+        'contentName': 'meta.item-access.arguments.python'
+        'end': '(?=\\])'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'begin': '(?<=\\)|\\])\\s+(\\[)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.arguments.begin.python'
+    'contentName': 'meta.item-access.arguments.python'
+    'end': '(\\])'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.arguments.end.python'
+    'name': 'meta.item-access.python'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
+  }
+  {
+    'captures':
+      '1':
+        'name': 'storage.type.class.python'
+    'match': '\\b(class)\\b'
+  }
+  {
+    'include': '#line_continuation'
+  }
+  {
+    'match': '\\b(None|True|False|Ellipsis|NotImplemented)\\b'
+    'name': 'constant.language.python'
+  }
+  {
+    'include': '#string_quoted_single'
+  }
+  {
+    'include': '#string_quoted_double'
+  }
+  {
+    'begin': '(\\()'
+    'end': '(\\))'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
+  }
+  {
+    'captures':
+      '1':
+        'name': 'punctuation.definition.list.begin.python'
+      '2':
+        'name': 'meta.empty-list.python'
+      '3':
+        'name': 'punctuation.definition.list.end.python'
+    'match': '(\\[)(\\s*(\\]))\\b'
+  }
+  {
+    'begin': '(\\[)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.list.begin.python'
+    'end': '(\\])'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.list.end.python'
+    'name': 'meta.structure.list.python'
+    'patterns': [
+      {
+        'begin': '(?<=\\[|\\,)\\s*(?![\\],])'
+        'contentName': 'meta.structure.list.item.python'
+        'end': '\\s*(?:(,)|(?=\\]))'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.separator.list.python'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    'captures':
+      '1':
+        'name': 'punctuation.definition.tuple.begin.python'
+      '2':
+        'name': 'meta.empty-tuple.python'
+      '3':
+        'name': 'punctuation.definition.tuple.end.python'
+    'match': '(\\()(\\s*(\\)))'
+    'name': 'meta.structure.tuple.python'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'punctuation.definition.dictionary.begin.python'
+      '2':
+        'name': 'meta.empty-dictionary.python'
+      '3':
+        'name': 'punctuation.definition.dictionary.end.python'
+    'match': '(\\{)(\\s*(\\}))'
+    'name': 'meta.structure.dictionary.python'
+  }
+  {
+    'begin': '(\\{)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.dictionary.begin.python'
+    'end': '(\\})'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.dictionary.end.python'
+    'name': 'meta.structure.dictionary.python'
+    'patterns': [
+      {
+        'begin': '(?<=\\{|\\,|^)\\s*(?![\\},])'
+        'contentName': 'meta.structure.dictionary.key.python'
+        'end': '\\s*(?:(?=\\})|(\\:))'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.separator.valuepair.dictionary.python'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+      {
+        'begin': '(?<=\\:|^)\\s*'
+        'contentName': 'meta.structure.dictionary.value.python'
+        'end': '\\s*(?:(?=\\})|(,))'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.separator.dictionary.python'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  }
+]
+'repository':
+  'builtin_exceptions':
+    'match': '(?x)\\b(\n\t\t\t\t(\n\t\t\t\t\tArithmetic|Assertion|Attribute|BlockingIO|BrokenPipe|Buffer|ChildProcess|\n\t\t\t\t\tConnection(Aborted|Refused|Reset)?|EOF|Environment|FileExists|\n\t\t\t\t\tFileNotFound|FloatingPoint|Interrupted|IO|IsADirectoryError|\n\t\t\t\t\tImport|Indentation|Index|Key|Lookup|Memory|Name|NotADirectory|\n\t\t\t\t\tNotImplemented|OS|Overflow|Permission|ProcessLookup|Recursion|Reference|\n\t\t\t\t\tRuntime|Standard|Syntax|System|Tab|Timeout|Type|UnboundLocal|\n\t\t\t\t\tUnicode(Encode|Decode|Translate)?|Value|VMS|Windows|ZeroDivision\n\t\t\t\t)Error|\n\t\t\t\t((Pending)?Deprecation|Runtime|Syntax|User|Future|Import|Unicode|Bytes)?Warning|\n\t\t\t\t(Base)?Exception|\n\t\t\t\tSystemExit|StopAsyncIteration|StopIteration|NotImplemented|KeyboardInterrupt|GeneratorExit\n\t\t\t)\\b'
+    'name': 'support.type.exception.python'
+  'builtin_functions':
+    'match': '(?x)\\b(__import__|abs|all|any|ascii|bin|bool|bytearray|bytes|callable|chr|classmethod|compile|complex|delattr|dict|dir|divmod|enumerate|eval|exec|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|isinstance|issubclass|iter|len|list|locals|map|max|memoryview|min|next|object|oct|open|ord|pow|print|property|range|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|vars|zip|file|long|raw_input|reduce|reload|unichr|unicode|xrange|apply|buffer|coerce|intern|execfile)\\b'
+    'name': 'support.function.builtin.python'
+  'builtin_types':
+    'match': '(?x)\\b(\n\t\t\t\tbasestring|bool|buffer|bytearray|bytes|complex|dict|float|frozenset|int|\n\t\t\t\tlist|long|memoryview|object|range|set|slice|str|tuple|unicode|xrange\n\t\t\t)\\b'
+    'name': 'support.type.python'
+  'docstrings':
+    'patterns': [
+      {
+        'begin': '^\\s*(?=[uU]?[rR]?""")'
+        'end': '(?<=""")'
+        'name': 'comment.block.python'
+        'patterns': [
+          {
+            'include': '#string_quoted_double'
+          }
+        ]
+      }
+      {
+        'begin': '^\\s*(?=[uU]?[rR]?\'\'\')'
+        'end': '(?<=\'\'\')'
+        'name': 'comment.block.python'
+        'patterns': [
+          {
+            'include': '#string_quoted_single'
+          }
+        ]
+      }
+    ]
+  'function_calls':
+    'patterns': [
+      {
+        'begin': '(?:([A-Za-z_][A-Za-z0-9_]*)|(?<=\\)|\\]))\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#builtin_functions'
+              }
+              {
+                'include': '#function_names'
+              }
+            ]
+          '2':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.python'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.python'
+        'name': 'meta.function-call.python'
+        'contentName': 'meta.function-call.arguments.python'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.arguments.python'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  'dotted_name':
+    'begin': '(?=[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)'
+    'end': '(?![A-Za-z0-9_\\.])'
+    'patterns': [
+      {
+        'begin': '(\\.)(?=[A-Za-z_][A-Za-z0-9_]*)'
+        'end': '(?![A-Za-z0-9_])'
+        'patterns': [
+          {
+            'include': '#magic_function_names'
+          }
+          {
+            'include': '#magic_variable_names'
+          }
+          {
+            'include': '#illegal_names'
+          }
+          {
+            'include': '#generic_names'
+          }
+        ]
+      }
+      {
+        'begin': '(?<!\\.)(?=[A-Za-z_][A-Za-z0-9_]*)'
+        'end': '(?![A-Za-z0-9_])'
+        'patterns': [
+          {
+            'include': '#builtin_functions'
+          }
+          {
+            'include': '#builtin_types'
+          }
+          {
+            'include': '#builtin_exceptions'
+          }
+          {
+            'include': '#illegal_names'
+          }
+          {
+            'include': '#magic_function_names'
+          }
+          {
+            'include': '#magic_variable_names'
+          }
+          {
+            'include': '#language_variables'
+          }
+          {
+            'include': '#generic_names'
+          }
+        ]
+      }
+    ]
+  'entity_name_class':
+    'patterns': [
+      {
+        'include': '#illegal_names'
+      }
+      {
+        'include': '#generic_names'
+      }
+    ]
+  'entity_name_function':
+    'patterns': [
+      {
+        'include': '#magic_function_names'
+      }
+      {
+        'include': '#illegal_names'
+      }
+      {
+        'include': '#generic_names'
+      }
+    ]
+  'escaped_char':
+    'match': '''(?x)
+      (\\\\x[0-9A-Fa-f]{2})|
+      (\\\\[0-7]{3})|(\\\\\\n)|
+      (\\\\\\\\)|
+      (\\\\\\")|
+      (\\\\\')|
+      (\\\\a)|
+      (\\\\b)|
+      (\\\\f)|
+      (\\\\n)|
+      (\\\\r)|
+      (\\\\t)|
+      (\\\\v)|
+      ({{|}})
+    '''
+    'captures':
+      '1':
+        'name': 'constant.character.escape.hex.python'
+      '2':
+        'name': 'constant.character.escape.octal.python'
+      '3':
+        'name': 'constant.character.escape.newline.python'
+      '4':
+        'name': 'constant.character.escape.backlash.python'
+      '5':
+        'name': 'constant.character.escape.double-quote.python'
+      '6':
+        'name': 'constant.character.escape.single-quote.python'
+      '7':
+        'name': 'constant.character.escape.bell.python'
+      '8':
+        'name': 'constant.character.escape.backspace.python'
+      '9':
+        'name': 'constant.character.escape.formfeed.python'
+      '10':
+        'name': 'constant.character.escape.linefeed.python'
+      '11':
+        'name': 'constant.character.escape.return.python'
+      '12':
+        'name': 'constant.character.escape.tab.python'
+      '13':
+        'name': 'constant.character.escape.vertical-tab.python'
+      '14':
+        'name': 'constant.character.escape.curly-bracket.python'
+  'escaped_unicode_char':
+    'captures':
+      '1':
+        'name': 'constant.character.escape.unicode.16-bit-hex.python'
+      '2':
+        'name': 'constant.character.escape.unicode.32-bit-hex.python'
+      '3':
+        'name': 'constant.character.escape.unicode.name.python'
+    'match': '(\\\\U[0-9A-Fa-f]{8})|(\\\\u[0-9A-Fa-f]{4})|(\\\\N\\{[a-zA-Z ]+\\})'
+  'function_names':
+    'patterns': [
+      {
+        'include': '#magic_function_names'
+      }
+      {
+        'include': '#illegal_names'
+      }
+      {
+        'match': '[a-zA-Z_][a-zA-Z0-9_]*'
+        'name': 'entity.name.function.python'
+      }
+    ]
+  'generic_names':
+    'match': '[A-Za-z_][A-Za-z0-9_]*'
+  'illegal_names':
+    'match': '\\b(and|as|assert|break|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|print|raise|return|try|while|with|yield|await|async)\\b'
+    'name': 'invalid.illegal.name.python'
+  'keyword_arguments':
+    'begin': '\\b([a-zA-Z_][a-zA-Z_0-9]*)\\s*(=)(?!=)'
+    'beginCaptures':
+      '1':
+        'name': 'variable.parameter.function.python'
+      '2':
+        'name': 'keyword.operator.assignment.python'
+    'end': '\\s*(?:(,)|(?=$\\n?|[\\)\\:]))'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.separator.parameters.python'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
+  'language_variables':
+    'match': '\\b(self|cls)\\b'
+    'name': 'variable.language.self.python'
+  'line_comments':
+    'begin': '(^[ \\t]+)?(?=#)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.whitespace.comment.leading.python'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '#'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.python'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.python'
+      }
+    ]
+  'line_continuation':
+    'captures':
+      '1':
+        'name': 'punctuation.separator.continuation.line.python'
+      '2':
+        'name': 'invalid.illegal.unexpected-text.python'
+    'match': '(\\\\)(.*)$\\n?'
+  'magic_function_names':
+    'comment': 'these methods have magic interpretation by python and are generally called indirectly through syntactic constructs'
+    'match': '(?x)\\b(__(?:abs|add|and|bool|bytes|call|cmp|coerce|complex|contains|del|delattr|delete|delitem|delslice|dir|div|divmod|enter|eq|exit|float|floordiv|format|ge|get|getattr|getattribute|getitem|getslice|gt|hash|hex|iadd|iand|idiv|ifloordiv|ilshift|imatmul|imod|imul|index|init|instancecheck|int|invert|ior|ipow|irshift|isub|iter|itruediv|ixor|le|len|length_hint|long|lshift|lt|matmul|missing|mod|mul|ne|neg|next|new|nonzero|oct|or|pos|pow|radd|rand|rdiv|rdivmod|repr|reversed|rfloordiv|rlshift|rmatmul|rmod|rmul|ror|round|rpow|rrshift|rshift|rsub|rtruediv|rxor|set|setattr|setitem|setslice|str|sub|subclasscheck|truediv|unicode|xor)__)\\b'
+    'name': 'support.function.magic.python'
+  'magic_variable_names':
+    'comment': 'magic variables which a class/module may have.'
+    'match': '\\b__(all|annotations|bases|class|closure|code|debug|dict|doc|file|func|globals|kwdefaults|members|metaclass|methods|module|name|qualname|self|slots|weakref)__\\b'
+    'name': 'support.variable.magic.python'
+  'method_calls':
+    'patterns': [
+      {
+        'begin': '(\\.)([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.separator.method.period.python'
+          '2':
+            'patterns': [
+              {
+                'include': '#function_names'
+              }
+            ]
+          '3':
+            'name': 'punctuation.definition.arguments.begin.bracket.round.python'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.arguments.end.bracket.round.python'
+        'name': 'meta.method-call.python'
+        'contentName': 'meta.method-call.arguments.python'
+        'patterns': [
+          {
+            'include': '#keyword_arguments'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.separator.arguments.python'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+    ]
+  'objects':
+    'patterns': [
+      {
+        # OBJ in OBJ.prop, OBJ.methodCall()
+        'match': '[A-Z][A-Z0-9_]*(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'name': 'constant.other.object.python'
+      }
+      {
+        # obj in obj.prop, obj.methodCall()
+        'match': '[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'name': 'variable.other.object.python'
+      }
+    ]
+  'properties':
+    'patterns': [
+      {
+        # PROP1 in obj.PROP1.prop2, func().PROP1.prop2
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_]*\\b\\$*)(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'constant.other.object.property.python'
+      }
+      {
+        # prop1 in obj.prop1.prop2, func().prop1.prop2
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\.\\s*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'variable.other.object.property.python'
+      }
+      {
+        # PROP in obj.PROP, func().PROP
+        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'constant.other.property.python'
+      }
+      {
+        # prop in obj.prop, func().prop
+        'match': '(\\.)\\s*(\\$*[a-zA-Z_][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'variable.other.property.python'
+      }
+      {
+        # 123illegal in obj.123illegal, func().123illegal
+        'match': '(\\.)\\s*([0-9][a-zA-Z0-9_]*)'
+        'captures':
+          '1':
+            'name': 'punctuation.separator.property.period.python'
+          '2':
+            'name': 'invalid.illegal.identifier.python'
+      }
+    ]
+  'nested_replacement_field':
+    'match': '''(?x)
+      {
+        (
+          (
+            \\d                       # integer
+            |
+            [a-zA-Z_]\\w*             # identifier
+          )
+          (
+            \\.[a-zA-Z_]\\w*          # attribute name
+            |
+            \\[[^\\]]+\\]             # element index
+          )*
+        )?
+        (![rsa])?                     # conversion
+        (
+          :
+          (.?[<>=^])?                 # fill followed by align
+          [+\\- ]?                    # sign (space at the end is intentional)
+          \\#?                        # alternate form
+          0?
+          \\d*                        # width
+          [_,]?                       # grouping option
+          (\\.\\d+)?                  # precision
+          [bcdeEfFgGnosxX%]?          # type
+        )?
+      }
+    '''
+    'name': 'constant.other.placeholder.python'
+  'regular_expressions':
+    'comment': 'Changed disabled to 1 to turn off syntax highlighting in “r” strings.'
+    'disabled': 0
+    'patterns': [
+      {
+        'include': 'source.regexp.python'
+      }
+    ]
+  'string_formatting':
+    'patterns': [
+      {
+        # https://docs.python.org/2/library/stdtypes.html#string-formatting (deprecated)
+        'match': '''(?x)
+          %
+          (\\([a-zA-Z_]+\\))?             # mapping key
+          [#0+\\- ]?                      # conversion flags (space at the end is intentional)
+          (\\d+|\\*)?                     # minimum field width
+          (\\.(\\d+|\\*))?                # precision
+          [hlL]?                          # length modifier
+          [diouxXeEfFgGcrs%]              # conversion type
+        '''
+        'name': 'constant.other.placeholder.python'
+      }
+      {
+        # https://docs.python.org/3/library/string.html#format-string-syntax
+        'match': '''(?x)
+          {
+            (?:
+              (?:
+                \\d                       # integer
+                |
+                [a-zA-Z_]\\w*             # identifier
+              )
+              (?:
+                \\.[a-zA-Z_]\\w*          # attribute name
+                |
+                \\[[^\\]]+\\]             # element index
+              )*
+            )?
+            (?:![rsa])?                   # conversion
+            (?:
+              # Yup, this is disgusting. But top-level format specifiers can have nested replacement fields.
+              :
+              (?:(?:.|({[^}]*}))?(?:[<>=^]|({[^}]*})))?    # fill followed by align
+              (?:[+\\- ]|({[^}]*}))?                       # sign (space at the end is intentional)
+              (?:\\#|({[^}]*}))?                           # alternate form
+              (?:0|({[^}]*}))?
+              (?:\\d+|({[^}]*}))?                          # width
+              (?:[_,]|({[^}]*}))?                          # grouping option
+              (?:\\.(?:\\d+|({[^}]*}))|({[^}]*}))?         # precision
+              (?:[bcdeEfFgGnosxX%]|({[^}]*}))?             # type
+            )?
+          }
+        '''
+        'name': 'constant.other.placeholder.python'
+        'captures':
+          '1': 'patterns': [{'include': '#nested_replacement_field'}]
+          '2': 'patterns': [{'include': '#nested_replacement_field'}]
+          '3': 'patterns': [{'include': '#nested_replacement_field'}]
+          '4': 'patterns': [{'include': '#nested_replacement_field'}]
+          '5': 'patterns': [{'include': '#nested_replacement_field'}]
+          '6': 'patterns': [{'include': '#nested_replacement_field'}]
+          '7': 'patterns': [{'include': '#nested_replacement_field'}]
+          '8': 'patterns': [{'include': '#nested_replacement_field'}]
+          '9': 'patterns': [{'include': '#nested_replacement_field'}]
+          '10': 'patterns': [{'include': '#nested_replacement_field'}]
+      }
+    ]
+  'string_interpolation':
+    # https://docs.python.org/3/reference/lexical_analysis.html#f-strings
+    # and https://www.python.org/dev/peps/pep-0498/
+    # Unlike string_formatting, string_interpolation can contain expressions
+    'begin': '{'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.interpolation.begin.bracket.curly.python'
+    'end': '''(?x)(?!\\G)
+      (
+        (?:![rsa])?                   # conversion
+        (?:
+          # Yup, this is disgusting. But top-level format specifiers can have nested replacement fields.
+          :
+          (?:(?:.|({[^}]*}))?(?:[<>=^]|({[^}]*})))?    # fill followed by align
+          (?:[+\\- ]|({[^}]*}))?                       # sign (space at the end is intentional)
+          (?:\\#|({[^}]*}))?                           # alternate form
+          (?:0|({[^}]*}))?
+          (?:\\d+|({[^}]*}))?                          # width
+          (?:[_,]|({[^}]*}))?                          # grouping option
+          (?:\\.(?:\\d+|({[^}]*}))|({[^}]*}))?         # precision
+          (?:[bcdeEfFgGnosxX%]|({[^}]*}))?             # type
+        )?
+      )
+      (})
+    '''
+    'endCaptures':
+      '1':
+        'name': 'constant.other.placeholder.python'
+      '2': 'patterns': [{'include': '#nested_replacement_field'}]
+      '3': 'patterns': [{'include': '#nested_replacement_field'}]
+      '4': 'patterns': [{'include': '#nested_replacement_field'}]
+      '5': 'patterns': [{'include': '#nested_replacement_field'}]
+      '6': 'patterns': [{'include': '#nested_replacement_field'}]
+      '7': 'patterns': [{'include': '#nested_replacement_field'}]
+      '8': 'patterns': [{'include': '#nested_replacement_field'}]
+      '9': 'patterns': [{'include': '#nested_replacement_field'}]
+      '10': 'patterns': [{'include': '#nested_replacement_field'}]
+      '11': 'patterns': [{'include': '#nested_replacement_field'}]
+      '12':
+        'name': 'punctuation.definition.interpolation.end.bracket.curly.python'
+    'name': 'meta.interpolation.python'
+    'contentName': 'meta.embedded.python'
+    'patterns': [
+      {
+        'match': '\\\\'
+        'name': 'invalid.illegal.backslash.python'
+      }
+      {
+        'include': '$self'
+      }
+    ]
+  'string_quoted_double':
+    'patterns': [
+      {
+        'begin': '([uU]r)(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode-raw string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.unicode-raw-regex.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#regular_expressions'
+          }
+        ]
+      }
+      {
+        'begin': '([uU]R)(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode-raw string without regular expression highlighting'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.unicode-raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '(r)(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted raw string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw-regex.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#regular_expressions'
+          }
+        ]
+      }
+      {
+        'begin': '(R)(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted raw string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([uU])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted unicode string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.unicode.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF]|[fF][rR])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw-format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(""")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'captures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+          '3':
+            'patterns': [
+              {'include': '#string_formatting'}
+              {'include': '#escaped_unicode_char'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
+            ]
+          '4':
+            'name': 'punctuation.definition.string.end.python'
+        'comment': 'double-quoted raw string'
+        'match': '([uU]r)(")((?:[^"\\\\]|\\\\.)*)(")'
+        'name': 'string.quoted.double.single-line.unicode-raw-regex.python'
+      }
+      {
+        'begin': '([uU]R)(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double-quoted raw string'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.unicode-raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'captures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+          '3':
+            'patterns': [
+              {'include': '#string_formatting'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
+            ]
+          '4':
+            'name': 'punctuation.definition.string.end.python'
+        'comment': 'double-quoted raw string'
+        'match': '(r)(")((?:[^"\\\\]|\\\\.)*)(")'
+        'name': 'string.quoted.double.single-line.raw-regex.python'
+      }
+      {
+        'begin': '(R)(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double-quoted raw string'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([uU])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted unicode string'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.unicode.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF]|[fF][rR])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.raw-format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(")'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '(""")'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.python'
+        'patterns': [
+          {
+             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE(?! \/)|CREATE|REPLACE|ALTER|WITH))'
+             'name': 'meta.embedded.sql'
+             'end': '(?=\\s*""")'
+             'patterns': [
+                {
+                  'include': 'source.sql'
+                }
+             ]
+          }
+        ]
+      }
+      {
+        'begin': '(")(?=\\s*(SELECT|INSERT|UPDATE|DELETE(?! \/)|CREATE|REPLACE|ALTER|WITH))'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted string'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.sql.python'
+        'contentName': 'meta.embedded.sql'
+        'patterns': [
+          {
+            'include': 'source.sql'
+          }
+        ]
+      }
+      {
+        'begin': '(""")'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted string'
+        'end': '((?<=""")(")""|""")'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+        'name': 'string.quoted.double.block.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '(")'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'double quoted string'
+        'end': '((?<=")(")|")|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.double.python'
+          '3':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.double.single-line.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+    ]
+  'string_quoted_single':
+    'patterns': [
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+          '2':
+            'name': 'punctuation.definition.string.end.python'
+          '3':
+            'name': 'meta.empty-string.single.python'
+        'match': '(?<!\')(\')((\'))(?!\')'
+        'name': 'string.quoted.single.single-line.python'
+      }
+      {
+        'begin': '([uU]r)(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode-raw string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.unicode-raw-regex.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#regular_expressions'
+          }
+        ]
+      }
+      {
+        'begin': '([uU]R)(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode-raw string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.unicode-raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '(r)(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted raw string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw-regex.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#regular_expressions'
+          }
+        ]
+      }
+      {
+        'begin': '(R)(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted raw string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([uU])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.unicode.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF]|[fF][rR])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw-format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'captures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+          '3':
+            'patterns': [
+              {'include': '#string_formatting'}
+              {'include': '#escaped_unicode_char'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
+            ]
+          '4':
+            'name': 'punctuation.definition.string.end.python'
+        'comment': 'single quoted raw string'
+        'match': '([uU]r)(\')((?:[^\'\\\\]|\\\\.)*)(\')'
+        'name': 'string.quoted.single.single-line.unicode-raw-regex.python'
+      }
+      {
+        'begin': '([uU]R)(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted raw string'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.unicode-raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'captures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+          '3':
+            'patterns': [
+              {'include': '#string_formatting'}
+              {'include': '#escaped_char'}
+              {'include': '#regular_expressions'}
+            ]
+          '4':
+            'name': 'punctuation.definition.string.end.python'
+        'comment': 'single quoted raw string'
+        'match': '(r)(\')((?:[^\'\\\\]|\\\\.)*)(\')'
+        'name': 'string.quoted.single.single-line.raw-regex.python'
+      }
+      {
+        'begin': '(R)(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted raw string'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.raw.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([uU])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted unicode string'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.unicode.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_unicode_char'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '([fF])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][fF]|[fF][rR])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.raw-format.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_interpolation'
+          }
+          {
+            'match': '}'
+            'name': 'invalid.illegal.closing-curly-bracket.python'
+          }
+        ]
+      }
+      {
+        'begin': '([bB])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '([rR][bB]|[bB][rR])(\')'
+        'beginCaptures':
+          '1':
+            'name': 'storage.type.string.python'
+          '2':
+            'name': 'punctuation.definition.string.begin.python'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.raw-binary.python'
+        'patterns': [
+          {
+            'include': '#escaped_char'
+          }
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'match': '[^\\x{01}-\\x{7f}]'
+            'name': 'invalid.illegal.character-out-of-range.python'
+          }
+        ]
+      }
+      {
+        'begin': '(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.python'
+        'patterns': [
+          {
+             'begin': '(?=\\s*(SELECT|INSERT|UPDATE|DELETE(?! \/)|CREATE|REPLACE|ALTER|WITH))'
+             'end': '(?=\\s*\'\'\')'
+             'name': 'meta.embedded.sql'
+             'patterns': [
+                {
+                  'include': 'source.sql'
+                }
+             ]
+          }
+        ]
+      }
+      {
+        'begin': '(\')(?=\\s*(SELECT|INSERT|UPDATE|DELETE(?! \/)|CREATE|REPLACE|ALTER|WITH))'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted string'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.sql.python'
+        'contentName': 'meta.embedded.sql'
+        'patterns': [
+          {
+            'include': 'source.sql'
+          }
+        ]
+      }
+      {
+        'begin': '(\'\'\')'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted string'
+        'end': '((?<=\'\'\')(\')\'\'|\'\'\')'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'meta.empty-string.single.python'
+        'name': 'string.quoted.single.block.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+      {
+        'begin': '(\')'
+        'beginCaptures':
+          '1':
+            'name': 'punctuation.definition.string.begin.python'
+        'comment': 'single quoted string'
+        'end': '(\')|(\\n)'
+        'endCaptures':
+          '1':
+            'name': 'punctuation.definition.string.end.python'
+          '2':
+            'name': 'invalid.illegal.unclosed-string.python'
+        'name': 'string.quoted.single.single-line.python'
+        'patterns': [
+          {
+            'include': '#string_formatting'
+          }
+          {
+            'include': '#escaped_char'
+          }
+        ]
+      }
+    ]
+  'strings':
+    'patterns': [
+      {
+        'include': '#string_quoted_double'
+      }
+      {
+        'include': '#string_quoted_single'
+      }
+    ]
