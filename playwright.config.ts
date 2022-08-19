@@ -1,5 +1,5 @@
 module.exports = {
-  testDir: 'tests',
+  testDir: 'integration',
   timeout: 60000,
   expect: {
     timeout: 25000,
