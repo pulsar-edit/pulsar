@@ -51,8 +51,6 @@ jobs:
             descr: themes
           - filter: git-diff|go-to-line|grammar-selector|line-ending-selector|autoflow|autosave|symbols-view|spell-check|bracket-matcher|whitespace|wrap-guide|snippets|encoding-selector
             descr: editor related
-          - filter: find|command
-            descr: Fuzzy finding/finders
           - filter: deprecation-cop|dev-live-reload|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
             descr: development helpers
           - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|status-bar|settings-view|notifications
