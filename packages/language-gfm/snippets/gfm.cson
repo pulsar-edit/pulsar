@@ -1,0 +1,42 @@
+'.source.gfm':
+  'bold text':
+    'prefix': 'b'
+    'body': '**$1**$0'
+  'code':
+    'prefix': 'code'
+    'body': """
+      ```$1
+      $2
+      ```$0
+    """
+  'italic text':
+    'prefix': 'i'
+    'body': '*$1*$0'
+  'embedded image':
+    'prefix': 'img'
+    'body': '![$1]($2)$0'
+  'link':
+    'prefix': 'l'
+    'body': '[$1]($2)$0'
+  'bullet point':
+    'prefix': 'p'
+    'body': '- $1'
+  'reference':
+    'prefix': 'ref'
+    'body': '[${1:id}]: ${2:url}${3: "${4:title}"}$0'
+  'reference image':
+    'prefix': 'rimg'
+    'body': '![$1][$2]$0'
+  'reference link':
+    'prefix': 'rl'
+    'body': '[$1][$2]$0'
+  'todo':
+    'prefix': 't'
+    'body': '- [ ] $1'
+  'table':
+    'prefix': 'table'
+    'body': """
+      | ${1:Header One    } | ${2:Header Two    } |
+      | :------------- | :------------- |
+      | ${3:Item One      } | ${4:Item Two      } |$0
+    """

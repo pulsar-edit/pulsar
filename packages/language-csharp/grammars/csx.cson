@@ -1,0 +1,14 @@
+scopeName: "source.csx"
+name: "C# Script File"
+fileTypes: [
+  "csx"
+]
+patterns: [
+  {
+    include: "source.cs"
+  }
+  {
+    match: "^#(load|r)"
+    name: "preprocessor.source.csx"
+  }
+]

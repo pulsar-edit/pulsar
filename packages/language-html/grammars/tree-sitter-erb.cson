@@ -1,0 +1,36 @@
+name: 'ERB'
+scopeName: 'text.html.erb'
+type: 'tree-sitter'
+parser: 'tree-sitter-embedded-template'
+
+fileTypes: [
+  'erb'
+  'html.erb'
+]
+
+injectionRegExp: '^(erb|ERB)$'
+
+folds: [
+  {
+    type: ['directive', 'output_directive'],
+    start: {index: 0},
+    end: {index: -1}
+  }
+]
+
+comments:
+  start: '<%#'
+  end: '%>'
+
+scopes:
+  'comment_directive': 'comment.block'
+  'comment_directive > "%>"': 'comment.block'
+
+  '"<%#"': 'keyword.control.directive'
+  '"<%"': 'keyword.control.directive'
+  '"<%="': 'keyword.control.directive'
+  '"<%_"': 'keyword.control.directive'
+  '"<%-"': 'keyword.control.directive'
+  '"%>"': 'keyword.control.directive'
+  '"-%>"': 'keyword.control.directive'
+  '"_%>"': 'keyword.control.directive'

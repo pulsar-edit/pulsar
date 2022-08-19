@@ -1,0 +1,5 @@
+'.source.cs':
+  'editor':
+    'commentStart': '// '
+    'increaseIndentPattern': '(?x)\n\t\t^ .* \\{ [^}"\']* $\n\t|   ^ \\s* \\{ \\} $\n\t'
+    'decreaseIndentPattern': '(?x)\n\t\t^ (.*\\*/)? \\s* \\} ( [^}{"\']* \\{ | \\s* while \\s* \\( .* )? [;\\s]* (//.*|/\\*.*\\*/\\s*)? $\n\t'

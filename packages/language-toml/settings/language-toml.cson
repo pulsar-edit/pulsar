@@ -1,0 +1,3 @@
+'.source.toml':
+  'editor':
+    'commentStart': '# '

@@ -1,0 +1,21 @@
+{
+  "name": "language-source",
+  "version": "0.9.0",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "description": "Source code support in Atom",
+  "homepage": "http://atom.github.io/language-source",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-source.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-source/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

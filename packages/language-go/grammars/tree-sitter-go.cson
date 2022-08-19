@@ -1,0 +1,130 @@
+name: 'Go'
+scopeName: 'source.go'
+type: 'tree-sitter'
+parser: 'tree-sitter-go'
+
+fileTypes: [
+  'go'
+]
+
+comments:
+  start: '// '
+
+folds: [
+  {
+    type: ['comment', 'raw_string_literal']
+  }
+  {
+    start: {index: 0, type: '{'}
+    end: {index: -1, type: '}'}
+  }
+  {
+    start: {index: 0, type: '['}
+    end: {index: -1, type: ']'}
+  }
+  {
+    start: {index: 0, type: '('}
+    end: {index: -1, type: ')'}
+  }
+  {
+    type: [
+      'type_switch_statement',
+      'type_case_clause',
+      'expression_switch_statement'
+      'expression_case_clause',
+      'select_statement',
+      'communication_clause'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+]
+
+scopes:
+  'source_file': 'source.go'
+
+  'comment': 'comment.block'
+
+  '"var"': 'keyword.import'
+  '"type"': 'keyword.type'
+  '"func"': 'keyword.function'
+  '"const"': 'keyword.const'
+  '"struct"': 'keyword.struct'
+  '"interface"': 'keyword.interface'
+  '"import"': 'keyword.import'
+  '"package"': 'keyword.package'
+  '"map"': 'keyword.map'
+  '"chan"': 'keyword.chan'
+
+  'type_identifier': 'support.storage.type'
+  'field_identifier': 'variable.other.object.property'
+  'package_identifier': 'entity.name.package'
+
+  '"if"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"break"': 'keyword.control'
+  '"switch"': 'keyword.control'
+  '"select"': 'keyword.control'
+  '"return"': 'keyword.control'
+  '"default"': 'keyword.control'
+  '"continue"': 'keyword.control'
+  '"goto"': 'keyword.control'
+  '"fallthrough"': 'keyword.control'
+  '"defer"': 'keyword.control'
+  '"range"': 'keyword.control'
+  '"go"': 'keyword.control'
+
+  'interpreted_string_literal': 'string.quoted.double'
+  'raw_string_literal': 'string.quoted.double'
+  'escape_sequence': 'constant.character.escape'
+  'rune_literal': 'constant.other.rune'
+  'int_literal': 'constant.numeric.integer'
+  'float_literal': 'constant.numeric.float'
+  'imaginary_literal': 'constant.numeric.integer'
+  'nil': 'constant.language.nil'
+  'false': 'constant.language.false'
+  'true': 'constant.language.true'
+
+  'call_expression > identifier': 'entity.name.function'
+  'function_declaration > identifier': 'entity.name.function'
+  'method_declaration > field_identifier': 'entity.name.function'
+  'call_expression > selector_expression > field_identifier': 'entity.name.function'
+
+  '"+"': 'keyword.operator'
+  '"-"': 'keyword.operator'
+  '"*"': 'keyword.operator'
+  '"/"': 'keyword.operator'
+  '"%"': 'keyword.operator'
+  '"++"': 'keyword.operator'
+  '"--"': 'keyword.operator'
+  '"=="': 'keyword.operator'
+  '"!="': 'keyword.operator'
+  '">"': 'keyword.operator'
+  '"<"': 'keyword.operator'
+  '">="': 'keyword.operator'
+  '"<="': 'keyword.operator'
+  '"!"': 'keyword.operator'
+  '"|"': 'keyword.operator'
+  '"^"': 'keyword.operator'
+  '"<<"': 'keyword.operator'
+  '">>"': 'keyword.operator'
+  '"="': 'keyword.operator'
+  '"+="': 'keyword.operator'
+  '"-="': 'keyword.operator'
+  '"*="': 'keyword.operator'
+  '"/="': 'keyword.operator'
+  '"%="': 'keyword.operator'
+  '"<<="': 'keyword.operator'
+  '">>="': 'keyword.operator'
+  '"&="': 'keyword.operator'
+  '"^="': 'keyword.operator'
+  '"|="': 'keyword.operator'
+  '":="': 'keyword.operator'
+  '"&"': 'keyword.operator'
+  '"*"': 'keyword.operator'
+  '"&&"': 'keyword.operator'
+  '"||"': 'keyword.operator'
+  '"..."': 'keyword.operator'
+  '"<-"': 'keyword.operator'

@@ -1,0 +1,14 @@
+scopeName: "source.cake"
+name: "C# Cake File"
+fileTypes: [
+  "cake"
+]
+patterns: [
+  {
+    include: "source.cs"
+  }
+  {
+    match: "^#(load|l)"
+    name: "preprocessor.source.cake"
+  }
+]
