@@ -19,7 +19,7 @@
     "url": "https://github.com/atom/atom/issues"
   },
   "license": "MIT",
-  "electronVersion": "11.5.0",
+  "electronVersion": "12.2.3",
   "dependencies": {
     "@atom/fuzzy-native": "^1.2.1",
     "@atom/source-map-support": "^0.3.4",
@@ -40,8 +40,8 @@
     "autocomplete-plus": "https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4",
     "autocomplete-snippets": "https://codeload.github.com/atom/autocomplete-snippets/legacy.tar.gz/refs/tags/v1.12.1",
     "autoflow": "file:packages/autoflow",
-    "babel-preset-atomic": "^5.0.0",
     "autosave": "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6",
+    "babel-preset-atomic": "^5.0.0",
     "background-tips": "https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
     "base16-tomorrow-light-theme": "file:packages/base16-tomorrow-light-theme",
@@ -298,7 +298,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "11.5.0",
+    "electron": "12.2.3",
     "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
     "random-seed": "^0.3.0",
