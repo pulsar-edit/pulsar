@@ -18,7 +18,7 @@ linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
-    - yarn install || sleep 1 && yarn install || sleep 2 && yarn install || sleep 2 && yarn install || sleep 2 && yarn install || sleep 2 && yarn install
+    - yarn install install --ignore-scripts; rm -R node_modules/electron; yarn install
     - yarn build
     - yarn run build:apm
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
