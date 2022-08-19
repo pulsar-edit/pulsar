@@ -18,6 +18,7 @@ linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install install --ignore-scripts; rm -R node_modules/electron; yarn install
     - yarn build
     - yarn run build:apm
@@ -30,20 +31,19 @@ linux_task:
       type: text/xml
       format: junit
   build_binary_script:
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn dist
   binary_artifacts:
     path: ./binaries/*
 
-mac_task:
+silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   test_script:
-    - echo A | softwareupdate --install-rosetta
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - brew install node@16 yarn git python
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn install || sleep 1 && yarn install || sleep 2 && yarn install || sleep 2 && yarn install || sleep 2 && yarn install || sleep 2 && yarn install
+    - yarn install install --ignore-scripts; rm -R node_modules/electron; yarn install
     - yarn build
     - yarn run build:apm
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
@@ -56,20 +56,37 @@ mac_task:
       format: junit
   build_arm_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn dist
   binary_artifacts:
     path: ./binaries/*
-  build_x86_binary_script:
+
+x86_mac_task:
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+  test_script:
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - sudo rm -rf /Library/Developer/CommandLineTools
+    - arch -x86_64 xcode-select --install
+    - echo A | softwareupdate --install-rosetta
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
+    - yarn install install --ignore-scripts; rm -R node_modules/electron; yarn install
     - ln -s /usr/local/opt/python3 /usr/local/bin/python
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
+    - arch -x86_64 yarn install install --ignore-scripts; rm -R node_modules/electron; arch -x86_64 yarn install
     - arch -x86_64 yarn build
     - arch -x86_64 yarn run build:apm
-    - sudo rm -rf /Library/Developer/CommandLineTools
-    - arch -x86_64 xcode-select --install
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
+  build_x86_binary_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - arch -x86_64 yarn dist || arch -x86_64 yarn dist
   binary_artifacts:
     path: ./binaries/*
