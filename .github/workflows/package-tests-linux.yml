@@ -36,10 +36,15 @@ jobs:
       id: cache-node
       uses: actions/cache@v3
       with:
-        path: |
-          node_modules
-          apm
+        path: node_modules
         key: linux-modules-${{ hashFiles('package.json') }}
+
+    - name: cache APM module
+      id: cache-apm
+      uses: actions/cache@v3
+      with:
+        path: apm
+        key: linux-apm-${{ hashFiles('apm/package.json') }}
 
   test:
     strategy:
@@ -72,6 +77,13 @@ jobs:
       with:
         path: node_modules
         key: linux-modules-${{ hashFiles('package.json') }}
+
+    - name: cache APM module
+      id: restore-apm
+      uses: actions/cache@v3
+      with:
+        path: apm
+        key: linux-apm-${{ hashFiles('apm/package.json') }}
 
     - name: Run ${{ matrix.descr }} packages' tests
       uses: GabrielBB/xvfb-action@v1
