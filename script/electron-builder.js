@@ -40,6 +40,8 @@ const Platform = builder.Platform
 
 const generate = require('./lib/generate-metadata.js')
 
+const pngIcon = 'resources/app-icons/nightly/png/1024.png'
+const icoIcon = 'resources/app-icons/nightly/atom.ico'
 let options = {
   "appId": "link.mauricioszabo.pulsar",
   "npmRebuild": false,
@@ -52,7 +54,7 @@ let options = {
   ],
   compression: "normal",
   "linux": {
-    "icon": "resources/app-icons/atom-community.png",
+    "icon": pngIcon,
     "category": "Development",
     "synopsis": "A hackable text editor for the 22nd century",
     "target": [
@@ -71,11 +73,11 @@ let options = {
     ]
   },
   "mac": {
-    "icon": "resources/app-icons/atom-community.png",
+    "icon": pngIcon,
     "category": "Development"
   },
   "win": {
-    "icon": "resources/app-icons/atom-community.ico",
+    "icon": icoIcon,
     "target": [
       { "target": "nsis" },
       { "target": "portable" }
