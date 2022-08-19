@@ -118,7 +118,7 @@ function getApmBinPath() {
   return path.join(
     apmRootPath,
     'node_modules',
-    'atom-package-manager',
+    'pulsar-package-manager',
     'bin',
     apmBinName
   );

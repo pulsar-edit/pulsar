@@ -86,7 +86,7 @@ windows_task:
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
     - cd apm; npx yarn install || sleep 1 && npx yarn install || sleep 2 && npx yarn cache clean; npx yarn install || sleep 2 && npx yarn install || sleep 2 && npx yarn cache clean; npx yarn install || sleep 2 && npx yarn install
-    - ./node_modules/atom-package-manager/bin/npm rebuild || sleep 1 && ./node_modules/atom-package-manager/bin/npm rebuild || sleep 2 && ./node_modules/atom-package-manager/bin/npm rebuild || sleep 4 && ./node_modules/atom-package-manager/bin/npm rebuild
+    - ./node_modules/pulsar-package-manager/bin/npm rebuild || sleep 1 && ./node_modules/pulsar-package-manager/bin/npm rebuild || sleep 2 && ./node_modules/pulsar-package-manager/bin/npm rebuild || sleep 4 && ./node_modules/pulsar-package-manager/bin/npm rebuild
   test_script:
     - npx yarn install --ignore-scripts || sleep 1 && npx yarn install --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-scripts || sleep 2 && npx yarn install --ignore-scripts || echo "Giving up"
     - rm -R node_modules/electron

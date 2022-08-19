@@ -7,7 +7,7 @@ const { expect } = require('@playwright/test')
 async function openAtom(profilePath, videoName) {
   const env = process.env
   env.ATOM_HOME = path.join("tmp", profilePath)
-  env.APM_PATH = path.join("apm", "node_modules", "atom-package-manager", "bin", "apm")
+  env.APM_PATH = path.join("apm", "node_modules", "pulsar-package-manager", "bin", "apm")
 
   const config = {
     args: ["--no-sandbox", "."],
