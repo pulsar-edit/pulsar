@@ -50,7 +50,10 @@ let options = {
     {
       "from": "apm",
       "to": "app/apm"
-    }
+    }, {
+      "from": pngIcon,
+      "to": "atom.png"
+    },
   ],
   compression: "normal",
   "linux": {
