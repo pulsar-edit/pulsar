@@ -20,7 +20,7 @@
     "node": "*"
   },
   "dependencies": {
-    "tree-sitter-c": "0.20.1",
+    "tree-sitter-c": "0.20.2",
     "tree-sitter-cpp": "0.20.0"
   },
   "devDependencies": {

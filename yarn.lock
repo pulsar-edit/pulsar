@@ -5628,12 +5628,11 @@ ky@0.30.0:
   resolved "https://registry.yarnpkg.com/ky/-/ky-0.30.0.tgz#a3d293e4f6c4604a9a4694eceb6ce30e73d27d64"
   integrity sha512-X/u76z4JtDVq10u1JA5UQfatPxgPaVDMYTrgHyiTpGN2z4TMEJkIHsoSBBSg9SWZEIXTKsi9kHgiQ9o3Y/4yog==
 
-"language-c@https://codeload.github.com/atom/language-c/legacy.tar.gz/refs/tags/v0.60.19":
-  version "0.60.19"
-  resolved "https://codeload.github.com/atom/language-c/legacy.tar.gz/refs/tags/v0.60.19#27e6c24739e0491111ee3cbd2c12283c07778ebc"
+"language-c@file:packages/language-c":
+  version "0.60.20"
   dependencies:
-    tree-sitter-c "^0.15.3"
-    tree-sitter-cpp "^0.15.1"
+    tree-sitter-c "0.20.2"
+    tree-sitter-cpp "0.20.0"
 
 "language-clojure@file:packages/language-clojure":
   version "0.22.8"
@@ -5644,9 +5643,8 @@ ky@0.30.0:
 "language-csharp@file:packages/language-csharp":
   version "1.1.0"
 
-"language-css@https://codeload.github.com/atom/language-css/legacy.tar.gz/refs/tags/v0.45.1":
-  version "0.45.1"
-  resolved "https://codeload.github.com/atom/language-css/legacy.tar.gz/refs/tags/v0.45.1#a1e5471edabe1c863a72e7a4bfc74bed6e0eb0e3"
+"language-css@file:packages/language-css":
+  version "0.45.4"
   dependencies:
     tree-sitter-css "^0.19.0"
 
@@ -5655,6 +5653,11 @@ ky@0.30.0:
 
 "language-git@file:packages/language-git":
   version "0.19.1"
+
+"language-go@file:packages/language-go":
+  version "0.47.3"
+  dependencies:
+    tree-sitter-go "0.19.1"
 
 "language-html@file:packages/language-html":
   version "0.53.1"
@@ -8656,19 +8659,19 @@ tree-sitter-bash@0.19.0:
     nan "^2.14.0"
     prebuild-install "^5.3.3"
 
-tree-sitter-c@^0.15.3:
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/tree-sitter-c/-/tree-sitter-c-0.15.3.tgz#f195ce6ddafc2332b9c14e0da34d761bf1752f34"
-  integrity sha512-wNtYDKaJWFp4H9C9b1II54ku50ENI3OjBNCeiFDRjRVOZZHdMlgvK9eAKnF70GNOkWQLG1WcZp6PJlZDlfy3aA==
+tree-sitter-c@0.20.2:
+  version "0.20.2"
+  resolved "https://registry.yarnpkg.com/tree-sitter-c/-/tree-sitter-c-0.20.2.tgz#6bc86898d0f55ee1ed796f625e448d9301a20543"
+  integrity sha512-ZHEtq23JaFPSOq5JPRoH+rGItsGvo3rMdOeodyCF8FaQ1JPcWS26KS1GWXTPfLPGdZFfzbY6Jw/W31+G2wxALQ==
   dependencies:
-    nan "^2.10.0"
+    nan "^2.14.0"
 
-tree-sitter-cpp@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-cpp/-/tree-sitter-cpp-0.15.1.tgz#c814e1178290e227bd746e5db4eda5975d0f9bff"
-  integrity sha512-Ki1X5AdnR9AC8EEjRvcIwJ8oNH6K6xJf19nKbu8vlCUwyupTco2YFKYrKY7Ow5dLTC7JNqjDLEZXy7EwHz/7xQ==
+tree-sitter-cpp@0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-cpp/-/tree-sitter-cpp-0.20.0.tgz#42499b1f2d3f61f74703cc9f13fcaf65173c96a4"
+  integrity sha512-ka1KoFfmLX9dmus8S+NrXxEN+k2PWJOZi60vO3hnR2lnRIr4FYBSXZKmTgQnCd8/w0UM7sNtgETvW1SM1qJ9og==
   dependencies:
-    nan "^2.10.0"
+    nan "^2.14.0"
 
 tree-sitter-css@^0.19.0:
   version "0.19.0"
@@ -8681,6 +8684,13 @@ tree-sitter-embedded-template@0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/tree-sitter-embedded-template/-/tree-sitter-embedded-template-0.19.0.tgz#3234830a30b9b27de3b187d965005fe91e3e420d"
   integrity sha512-J80/G0xRHlIxv0gNfvW8zHMZeD9nqnSKV4nMB5t0RAW/W/nM5io/gojk0ppWuWKMuyYNs3KKXIqP0i43jVkdkQ==
+  dependencies:
+    nan "^2.14.0"
+
+tree-sitter-go@0.19.1:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-go/-/tree-sitter-go-0.19.1.tgz#f23c84bff882eafa296ce2d307366e76f1f83e2d"
+  integrity sha512-qAHzfuddhbs3kPIW2vMBL5TqC5umhQ3NlDBPtdqlxE6tN2PKWHj0SZxXd/YrvqNUDrMmRpPBRg9W7JyCP/+n3A==
   dependencies:
     nan "^2.14.0"
 
