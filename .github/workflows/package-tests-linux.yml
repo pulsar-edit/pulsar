@@ -2,6 +2,8 @@ name: Package tests for Pulsar on Linux
 on:
   - push
   - pull_request
+env:
+  APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
 jobs:
   setup:
     name: setup
@@ -26,6 +28,9 @@ jobs:
 
     - name: build dependencies
       run: yarn build
+
+    - name: build dependencies
+      run: yarn build:apm
 
     - name: cache node module
       id: cache-node
