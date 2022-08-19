@@ -141,10 +141,6 @@
       : require('../src/module-cache');
     ModuleCache.register(getWindowLoadSettings());
 
-    const startCrashReporter = useSnapshot
-      ? snapshotResult.customRequire('../src/crash-reporter-start.js')
-      : require('../src/crash-reporter-start');
-
     useSnapshot
       ? snapshotResult.customRequire(
           '../node_modules/document-register-element/build/document-register-element.node.js'
@@ -170,11 +166,6 @@
       userSettings.core &&
       userSettings.core.telemetryConsent === 'limited';
     const releaseChannel = getReleaseChannel(appVersion);
-
-    startCrashReporter({
-      uploadToServer,
-      releaseChannel
-    });
 
     const CSON = useSnapshot
       ? snapshotResult.customRequire('../node_modules/season/lib/cson.js')
