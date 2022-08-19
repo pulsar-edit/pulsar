@@ -1499,13 +1499,13 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@playwright/test@^1.22.2":
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.25.0.tgz#e0de134651e78e45e986c5f16578188dd5937331"
-  integrity sha512-j4EZhTTQI3dBeWblE21EV//swwmBtOpIrLdOIJIRv4uqsLdHgBg1z+JtTg+AeC5o2bAXIE26kDNW5A0TimG8Bg==
+"@playwright/test@1.22.2":
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.22.2.tgz#b848f25f8918140c2d0bae8e9227a40198f2dd4a"
+  integrity sha512-cCl96BEBGPtptFz7C2FOSN3PrTnJ3rPpENe+gYCMx4GNNDlN4tmo2D89y13feGKTMMAIVrXfSQ/UmaQKLy1XLA==
   dependencies:
     "@types/node" "*"
-    playwright-core "1.25.0"
+    playwright-core "1.22.2"
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -7044,17 +7044,17 @@ pkg-dir@4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-playwright-core@1.25.0, playwright-core@^1.22.2:
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.25.0.tgz#54dc867c6c2cc5e4233905e249206a02914d14f1"
-  integrity sha512-kZ3Jwaf3wlu0GgU0nB8UMQ+mXFTqBIFz9h1svTlNduNKjnbPXFxw7mJanLVjqxHJRn62uBfmgBj93YHidk2N5Q==
+playwright-core@1.22.2:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.22.2.tgz#ed2963d79d71c2a18d5a6fd25b60b9f0a344661a"
+  integrity sha512-w/hc/Ld0RM4pmsNeE6aL/fPNWw8BWit2tg+TfqJ3+p59c6s3B6C8mXvXrIPmfQEobkcFDc+4KirNzOQ+uBSP1Q==
 
-playwright@^1.22.2:
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.25.0.tgz#a5e317c8c207b921e7da17507ef9ec2983367970"
-  integrity sha512-Z+pQNWI17Qx/tHhnmgMmPsptsisXpKgAnUvYv98kctlHUJaqMt2400P8kTw9vEPoC0xdxqu0JhxO7pDTmaaIKw==
+playwright@1.22.2:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.22.2.tgz#353a7c29f89ca9600edc7a9a30aed790823c797d"
+  integrity sha512-hUTpg7LytIl3/O4t0AQJS1V6hWsaSY5uZ7w1oCC8r3a1AQN5d6otIdCkiB3cbzgQkcMaRxisinjMFMVqZkybdQ==
   dependencies:
-    playwright-core "1.25.0"
+    playwright-core "1.22.2"
 
 plist@^3.0.1, plist@^3.0.4:
   version "3.0.6"
@@ -7347,17 +7347,17 @@ quick-lru@^5.1.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
-random-seed@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/random-seed/-/random-seed-0.2.0.tgz#4d1889b46dc84ef52316ceb7772b0ce0a544f38e"
-  integrity sha512-Nl6sw5Ge+u/oI/DKvAq8OpzADeBzUOKMUXzi2Q6WJiGyZEHfpi9KoL15BfjV7hoxN0BtKEtBi95fzfYX0IsIaQ==
-
-random-seed@^0.3.0:
+random-seed@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/random-seed/-/random-seed-0.3.0.tgz#d945f2e1f38f49e8d58913431b8bf6bb937556cd"
   integrity sha512-y13xtn3kcTlLub3HKWXxJNeC2qK4mB59evwZ5EkeRlolx+Bp2ztF7LbcZmyCnOqlHQrLnfuNbi1sVmm9lPDlDA==
   dependencies:
     json-stringify-safe "^5.0.1"
+
+random-seed@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/random-seed/-/random-seed-0.2.0.tgz#4d1889b46dc84ef52316ceb7772b0ce0a544f38e"
+  integrity sha512-Nl6sw5Ge+u/oI/DKvAq8OpzADeBzUOKMUXzi2Q6WJiGyZEHfpi9KoL15BfjV7hoxN0BtKEtBi95fzfYX0IsIaQ==
 
 rc@1.2.8, rc@^1.2.7, rc@^1.2.8:
   version "1.2.8"
@@ -9094,7 +9094,7 @@ webdriver@7.20.8:
     ky "0.30.0"
     lodash.merge "^4.6.1"
 
-webdriverio@^7.20.9:
+webdriverio@7.20.9:
   version "7.20.9"
   resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-7.20.9.tgz#11fe6614f2164cb098b6427ec560fc30a54218a5"
   integrity sha512-p/XNuIL1fSeF4oR9sKYDHKijDFZyay/J+EW5G8rTwKvAnve/psskLcS+59gGTcUrWRSrqZ/Rfhn3ybrccEGAuw==
