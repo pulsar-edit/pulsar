@@ -1,0 +1,72 @@
+'scopeName': 'source.java-properties'
+'name': 'Java Properties'
+'fileTypes': [
+  'properties'
+]
+'foldingStartMarker': '^[a-zA-Z0-9.-_]+=.*\\\n'
+'foldingStopMarker': '^(.*(?<!\\)\n)'
+'patterns': [
+  {
+    'begin': '(^[ \\t]+)?(?=#)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.whitespace.comment.leading.java-properties'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '#'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.java-properties'
+        'end': '\\n'
+        'name': 'comment.line.number-sign.java-properties'
+      }
+    ]
+  }
+  {
+    'begin': '(^[ \\t]+)?(?=!)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.whitespace.comment.leading.java-properties'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '!'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.java-properties'
+        'end': '\\n'
+        'name': 'comment.line.exclamation.java-properties'
+      }
+    ]
+  }
+  {
+    'begin': '^\\s*(([\\S&&[^:=\\\\]]|\\\\.)+)\\s*([:=])?'
+    'beginCaptures':
+      '1':
+        'name': 'support.constant.java-properties'
+        'patterns': [
+          {
+            'match': '\\\\([tnfr"\'\\\\ ]|u\\h{4})'
+            'name': 'constant.character.escape.java-properties'
+          }
+        ]
+      '3':
+        'name': 'punctuation.separator.key-value.java-properties'
+    'end': '\\n'
+    'name': 'meta.key-pair.java-properties'
+    'patterns': [
+      {
+        'begin': '(?=\\S)'
+        'end': '(?<!\\\\)(?=\\n)'
+        'name': 'string.unquoted.java-properties'
+        'patterns': [
+          {
+            'match': '\\\\([tnfr"\'\\\\]|u\\h{4}|)'
+            'name': 'constant.character.escape.java-properties'
+          }
+        ]
+      }
+    ]
+  }
+]

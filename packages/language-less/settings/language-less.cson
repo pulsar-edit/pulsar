@@ -1,0 +1,487 @@
+".source.css.less":
+  editor:
+    commentStart: "// "
+  autocomplete:
+    extraWordCharacters: '-'
+    symbols:
+      variable:
+        selector: ".variable"
+        typePriority: 2
+      selector:
+        selector: ".attribute-name.id, .attribute-name.class"
+        typePriority: 1
+".source.css.less .meta.property-value":
+  autocomplete:
+    symbols:
+      builtins:
+        suggestions: [
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "escape(${1:@string})${2:;}$0"
+            description: "URL encodes a string"
+            descriptionMoreURL: "http://lesscss.org/functions/#string-functions-escape"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "e(${1:@string})${2:;}$0"
+            description: "escape string content"
+            descriptionMoreURL: "http://lesscss.org/functions/#string-functions-e"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "%(${1:@string}, ${2:values...})${3:;}$0"
+            description: "formats a string"
+            descriptionMoreURL: "http://lesscss.org/functions/#string-functions-format"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "replace(${1:@string}, ${2:@pattern}, ${3:@replacement}, ${4:[@flags]})${5:;}$0"
+            description: "string replace"
+            descriptionMoreURL: "http://lesscss.org/functions/#string-functions-replace"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "unit(${1:@dimension}, ${2:[@unit: \"\"]})${3:;}$0"
+            description: "remove or change the unit of a dimension"
+            descriptionMoreURL: "http://lesscss.org/functions/#misc-functions-unit"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "color(${1:@string})${2:;}$0"
+            description: "parses a string to a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#misc-functions-color"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "convert(${1:@value}, ${2:unit})${3:;}$0"
+            description: "converts numbers from one type into another"
+            descriptionMoreURL: "http://lesscss.org/functions/#misc-functions-convert"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "data-uri(${1:[mimetype]}, ${2:url})${3:;}$0"
+            description: "inlines a resource and falls back to `url()`"
+            descriptionMoreURL: "http://lesscss.org/functions/#misc-functions-data-uri"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "length(${1:@list})${2:;}$0"
+            description: "returns the number of elements in a value list"
+            descriptionMoreURL: "http://lesscss.org/functions/#list-functions-length"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "extract(${1:@list}, ${2:index})${3:;}$0"
+            description: "returns a value at the specified position in the list"
+            descriptionMoreURL: "http://lesscss.org/functions/#list-functions-extract"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "unit(${1:number}, ${2:units})${3:;}$0"
+            description: "changes number units without converting it"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-unit"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "convert(${1:number}, ${2:units})${3:;}$0"
+            description: "converts between number types"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-convert"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "abs(${1:number})${2:;}$0"
+            description: "absolute value of a number"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-abs"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "acos(${1:number})${2:;}$0"
+            description: "arccosine - inverse of cosine function"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-acos"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "asin(${1:number})${2:;}$0"
+            description: "arcsine - inverse of sine function"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-asin"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "ceil(${1:@number})${2:;}$0"
+            description: "rounds up to an integer"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-ceil"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "cos(${1:number})${2:;}$0"
+            description: "cosine function"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-cos"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "floor(${1:@number})${2:;}$0"
+            description: "rounds down to an integer"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-floor"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "percentage(${1:@number})${2:;}$0"
+            description: "converts to a %, e.g. 0.5 > 50%"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-percentage"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "round(${1:number}, ${2:[places: 0]})${3:;}$0"
+            description: "rounds a number to a number of places"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-round"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "sqrt(${1:number})${2:;}$0"
+            description: "calculates square root of a number"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-sqrt"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "sin(${1:number})${2:;}$0"
+            description: "sine function"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-sin"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "tan(${1:number})${2:;}$0"
+            description: "tangent function"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-tan"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "atan(${1:number})${2:;}$0"
+            description: "arctangent - inverse of tangent function"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-atan"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "pi()$0"
+            description: "returns pi"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-pi"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "pow(${1:@base}, ${2:@exponent})${3:;}$0"
+            description: "first argument raised to the power of the second argument"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-pow"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "mod(${1:number}, ${2:number})${3:;}$0"
+            description: "first argument modulus second argument"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-mod"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "min(${1:@x}, ${2:@y})${3:;}$0"
+            description: "returns the lowest of one or more values"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-min"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "max(${1:@x}, ${2:@y})${3:;}$0"
+            description: "returns the lowest of one or more values"
+            descriptionMoreURL: "http://lesscss.org/functions/#math-functions-max"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "rgb(${1:@r}, ${2:@g}, ${3:@b})${4:;}$0"
+            description: "converts to a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-rgb"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "rgba(${1:@r}, ${2:@g}, ${3:@b}, ${4:@a})${5:;}$0"
+            description: "converts to a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-rgba"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "argb(${1:@color})${2:;}$0"
+            description: "creates a #AARRGGBB"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-argb"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsl(${1:@hue}, ${2:@saturation}, ${3:@lightness})${4:;}$0"
+            description: "creates a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-hsl"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsla(${1:@hue}, ${2:@saturation}, ${3:@lightness}, ${4:@alpha})${5:;}$0"
+            description: "creates a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-hsla"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsv(${1:@hue}, ${2:@saturation}, ${3:@value})${4:;}$0"
+            description: "creates a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-hsv"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsva(${1:@hue}, ${2:@saturation}, ${3:@value}, ${4:@alpha})${5:;}$0"
+            description: "creates a color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-definition-hsva"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hue(${1:@color})${2:;}$0"
+            description: "returns the `hue` channel of `@color` in the HSL space"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-hue"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "saturation(${1:@color})${2:;}$0"
+            description: "returns the `saturation` channel of `@color` in the HSL space"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-saturation"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "lightness(${1:@color})${2:;}$0"
+            description: "returns the `lightness` channel of `@color` in the HSL space"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-lightness"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsvhue(${1:@color})${2:;}$0"
+            description: "returns the `hue` channel of `@color` in the HSV space"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-hsvhue"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsvsaturation(${1:@color})${2:;}$0"
+            description: "returns the `saturation` channel of `@color` in the HSV space"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-hsvsaturation"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hsvvalue(${1:@color})${2:;}$0"
+            description: "returns the `value` channel of `@color` in the HSV space"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-hsvvalue"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "red(${1:@color})${2:;}$0"
+            description: "returns the `red` channel of `@color`"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-red"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "green(${1:@color})${2:;}$0"
+            description: "returns the `green` channel of `@color`"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-green"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "blue(${1:@color})${2:;}$0"
+            description: "returns the `blue` channel of `@color`"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-blue"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "alpha(${1:@color})${2:;}$0"
+            description: "returns the `alpha` channel of `@color`"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-alpha"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "luma(${1:@color})${2:;}$0"
+            description: "returns the `luma` value (perceptual brightness) of `@color`"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-channel-luma"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "saturate(${1:@color}, ${2:10%})${3:;}$0"
+            description: "return `@color` 10% points _more_ saturated"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-saturate"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "desaturate(${1:@color}, ${2:10%})${3:;}$0"
+            description: "return `@color` 10% points _less_ saturated"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-desaturate"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "lighten(${1:@color}, ${2:10%})${3:;}$0"
+            description: "return `@color` 10% points _lighter_"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-lighten"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "darken(${1:@color}, ${2:10%})${3:;}$0"
+            description: "return `@color` 10% points _darker_"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-darken"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "fadein(${1:@color}, ${2:10%})${3:;}$0"
+            description: "return `@color` 10% points _less_ transparent"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-fadein"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "fadeout(${1:@color}, ${2:10%})${3:;}$0"
+            description: "return `@color` 10% points _more_ transparent"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-fadeout"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "fade(${1:@color}, ${2:50%})${3:;}$0"
+            description: "return `@color` with 50% transparency"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-fade"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "spin(${1:@color}, ${2:10})${3:;}$0"
+            description: "return `@color` with a 10 degree larger in hue"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-spin"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "mix(${1:@color1}, ${2:@color2}, ${3:[@weight: 50%]})${4:;}$0"
+            description: "return a mix of `@color1` and `@color2`"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-mix"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "greyscale(${1:@color})${2:;}$0"
+            description: "returns a grey, 100% desaturated color"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-greyscale"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "contrast(${1:@color1}, ${2:[@darkcolor: black]}, ${3:[@lightcolor: white]}, ${4:[@threshold: 43%]})${5:;}$0"
+            description: "return `@darkcolor` if `@color1 is> 43% luma` otherwise return `@lightcolor`, see notes"
+            descriptionMoreURL: "http://lesscss.org/functions/#color-operations-contrast"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "multiply(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-multiply"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "screen(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-screen"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "overlay(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-overlay"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "softlight(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-softlight"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "hardlight(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-hardlight"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "difference(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-difference"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "exclusion(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-exclusion"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "average(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-average"
+          }
+          {
+            type: "function"
+            rightLabel: "Less Builtin"
+            snippet: "negation(${1:@color1}, ${2:@color2})${3:;}$0"
+            description: "description..."
+            descriptionMoreURL: "http://lesscss.org/functions/#color-blending-negation"
+          }
+        ]

@@ -1,0 +1,34 @@
+'.source.java':
+  'editor':
+    'commentStart': '// '
+    'foldEndPattern': '^\\s*(\\}|// \\}\\}\\}$)'
+    'increaseIndentPattern': '^.*\\{(\\}|[^}"\']*)$|^\\s*(public|private|protected):\\s*$'
+    'decreaseIndentPattern': '^(.*\\*/)?\\s*\\}|^\\s*(public|private|protected):\\s*$'
+'.text.html.jsp':
+  'editor':
+    'foldEndPattern': '\\*\\*/|^\\s*\\}'
+    'commentStart': '<%-- '
+    'commentEnd': ' --%>'
+    'increaseIndentPattern': '^\\s*<(([^!/?]|%)(?!.+?([/%]>|</.+?>))|[%!]--\\s*$)'
+    'decreaseIndentPattern': '^\\s*(</[^>]+>|-->|--%>)'
+'.text.junit-test-report':
+  'editor':
+    'foldEndPattern': '^\\s*(\\}|// \\}\\}\\}$)'
+'.source.java-properties':
+  'editor':
+    'commentStart': '# '
+'.keyword.other.documentation.javadoc.java':
+  'editor':
+    'completions': [
+      'author'
+      'deprecated'
+      'exception'
+      'link'
+      'param'
+      'return'
+      'see'
+      'serial'
+      'since'
+      'throws'
+      'version'
+    ]

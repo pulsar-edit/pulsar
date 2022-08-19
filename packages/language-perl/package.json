@@ -1,0 +1,21 @@
+{
+  "name": "language-perl",
+  "version": "0.38.1",
+  "description": "Perl language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-perl",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-perl.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-perl/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

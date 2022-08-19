@@ -1,0 +1,21 @@
+{
+  "name": "language-git",
+  "version": "0.19.1",
+  "description": "Git editing support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-git.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-git/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

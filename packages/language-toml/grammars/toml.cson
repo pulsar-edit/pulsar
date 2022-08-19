@@ -1,0 +1,295 @@
+'name': 'TOML'
+'scopeName': 'source.toml'
+'fileTypes': ['toml']
+'patterns': [
+  {
+    'include': '#comment'
+  }
+  {
+    'match': '(?:^\\s*)((\\[\\[)[^\\]]+(\\]\\]))'
+    'captures':
+      '1': 'name': 'entity.name.section.table.array.toml'
+      '2': 'name': 'punctuation.definition.table.array.begin.toml'
+      '3': 'name': 'punctuation.definition.table.array.end.toml'
+  }
+  {
+    'match': '(?:^\\s*)((\\[)[^\\]]+(\\]))'
+    'captures':
+      '1': 'name': 'entity.name.section.table.toml'
+      '2': 'name': 'punctuation.definition.table.begin.toml'
+      '3': 'name': 'punctuation.definition.table.end.toml'
+  }
+  {
+    'begin': '([A-Za-z0-9_-]+)\\s*(=)\\s*' # IMPORTANT: Do not replace with [\\w-]. \\w includes more than just a-z.
+    'beginCaptures':
+      '1':
+        'name': 'variable.other.key.toml'
+      '2':
+        'name': 'keyword.operator.assignment.toml'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'include': '#values'
+      }
+    ]
+  }
+  {
+    'begin': '((")(.*?)("))\\s*(=)\\s*' # This one is .* because " can be escaped
+    'beginCaptures':
+      '1':
+        'name': 'string.quoted.double.toml'
+      '2':
+        'name': 'punctuation.definition.string.begin.toml'
+      '3':
+        'name': 'variable.other.key.toml'
+        'patterns': [
+          {
+            'include': '#string-escapes'
+          }
+        ]
+      '4':
+        'name': 'punctuation.definition.string.end.toml'
+      '5':
+        'name': 'keyword.operator.assignment.toml'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'include': '#values'
+      }
+    ]
+  }
+  {
+    'begin': "((')([^']*)('))\\s*(=)\\s*"
+    'beginCaptures':
+      '1':
+        'name': 'string.quoted.single.toml'
+      '2':
+        'name': 'punctuation.definition.string.begin.toml'
+      '3':
+        'name': 'variable.other.key.toml'
+      '4':
+        'name': 'punctuation.definition.string.end.toml'
+      '5':
+        'name': 'keyword.operator.assignment.toml'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'include': '#values'
+      }
+    ]
+  }
+]
+'repository':
+  'comment':
+    'patterns': [
+      {
+        'match': '(#).*$'
+        'name': 'comment.line.number-sign.toml'
+        'captures':
+          '1': 'name': 'punctuation.definition.comment.toml'
+      }
+    ]
+  'string-escapes':
+    'match': '\\\\[btnfr"\\\\]|\\\\u[A-Fa-f0-9]{4}|\\\\U[A-Fa-f0-9]{8}'
+    'name': 'constant.character.escape.toml'
+  'values':
+    'patterns': [
+      {
+        'begin': '\\['
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.array.begin.toml'
+        'end': '\\]'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.array.end.toml'
+        'patterns': [
+          {
+            'include': '#comment'
+          }
+          {
+            'match': ','
+            'name': 'punctuation.definition.separator.comma.toml'
+          }
+          {
+            'include': '#values'
+          }
+        ]
+      }
+      {
+        'begin': '{'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.table.inline.begin.toml'
+        'end': '}'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.table.inline.end.toml'
+        'patterns': [
+          {
+            'match': ','
+            'name': 'punctuation.definition.separator.comma.toml'
+          }
+          {
+            'include': '$self'
+          }
+        ]
+      }
+      {
+        'begin': '"""'
+        'beginCaptures':
+          '0': 'name': 'punctuation.definition.string.begin.toml'
+        'end': '"""'
+        'endCaptures':
+          '0': 'name': 'punctuation.definition.string.end.toml'
+        'name': 'string.quoted.double.block.toml'
+        'patterns': [
+          {
+            'include': '#string-escapes'
+          }
+          {
+            # Line continuation with backslashes
+            'match': '\\\\(?=\\s*$)'
+            'name': 'constant.character.escape.toml'
+          }
+        ]
+      }
+      {
+        'begin': "'''"
+        'beginCaptures':
+          '0': 'name': 'punctuation.definition.string.begin.toml'
+        'end': "'''"
+        'endCaptures':
+          '0': 'name': 'punctuation.definition.string.end.toml'
+        'name': 'string.quoted.single.block.toml'
+      }
+      {
+        'begin': '"'
+        'beginCaptures':
+          '0': 'name': 'punctuation.definition.string.begin.toml'
+        'end': '"'
+        'endCaptures':
+          '0': 'name': 'punctuation.definition.string.end.toml'
+        'name': 'string.quoted.double.toml'
+        'patterns': [
+          {
+            'include': '#string-escapes'
+          }
+        ]
+      }
+      {
+        'begin': "'"
+        'beginCaptures':
+          '0': 'name': 'punctuation.definition.string.begin.toml'
+        'end': "'"
+        'endCaptures':
+          '0': 'name': 'punctuation.definition.string.end.toml'
+        'name': 'string.quoted.single.toml'
+      }
+      {
+        'match': 'true'
+        'name': 'constant.language.boolean.true.toml'
+      }
+      {
+        'match': 'false'
+        'name': 'constant.language.boolean.false.toml'
+      }
+      {
+        'include': '#date-time'
+      }
+      {
+        'include': '#numbers'
+      }
+      {
+        'match': '.+'
+        'name': 'invalid.illegal.toml'
+      }
+    ]
+  'date-time':
+    'patterns': [
+      {
+        # Offset date-time
+        # https://github.com/toml-lang/toml#offset-date-time
+        'match': '''(?x)
+          \\d{4}-\\d{2}-\\d{2}               # YYYY-MM-DD
+          (T|[ ])                            # T or space
+          \\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?   # HH:MM:SS.precision
+          (?:
+            (Z)
+            |
+            ([+-])\\d{2}:\\d{2}              # +/- HH:MM
+          )
+        '''
+        'name': 'constant.numeric.date.toml'
+        'captures':
+          '1':
+            'name': 'keyword.other.time.toml'
+          '2':
+            'name': 'keyword.other.offset.toml'
+          '3':
+            'name': 'keyword.other.offset.toml'
+      }
+      {
+        # Local date-time
+        # https://github.com/toml-lang/toml#local-date-time
+        'match': '''(?x)
+          \\d{4}-\\d{2}-\\d{2}               # YYYY-MM-DD
+          (T|[ ])                            # T or space
+          \\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?   # HH:MM:SS.precision
+        '''
+        'name': 'constant.numeric.date.toml'
+        'captures':
+          '1':
+            'name': 'keyword.other.time.toml'
+      }
+      {
+        # Local date
+        # https://github.com/toml-lang/toml#local-date
+        'match': '\\d{4}-\\d{2}-\\d{2}'
+        'name': 'constant.numeric.date.toml'
+      }
+      {
+        # Local time
+        # https://github.com/toml-lang/toml#local-time
+        'match': '\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?'
+        'name': 'constant.numeric.date.toml'
+      }
+    ]
+  'numbers':
+    # https://github.com/toml-lang/toml#integer
+    'patterns': [
+      {
+        # Handles decimal integers & floats
+        'match': '''(?x)
+          [+-]?                    # Optional +/-
+          (
+            0                      # Just a zero
+            |
+            [1-9](_?\\d)*          # Or a non-zero number (no leading zeros allowed)
+          )
+          (\\.\\d(_?\\d)*)?        # Optional fractional portion
+          ([eE][+-]?\\d(_?\\d)*)?  # Optional exponent
+          \\b
+        '''
+        'name': 'constant.numeric.toml'
+      }
+      {
+        'match': '[+-]?(inf|nan)\\b'
+        'name': 'constant.numeric.$1.toml'
+      }
+      {
+        # Hex
+        'match': '0x[0-9A-Fa-f](_?[0-9A-Fa-f])*\\b'
+        'name': 'constant.numeric.hex.toml'
+      }
+      {
+        # Octal
+        'match': '0o[0-7](_?[0-7])*\\b'
+        'name': 'constant.numeric.octal.toml'
+      }
+      {
+        # Binary
+        'match': '0b[01](_?[01])*\\b'
+        'name': 'constant.numeric.binary.toml'
+      }
+    ]

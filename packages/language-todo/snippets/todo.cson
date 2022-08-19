@@ -1,0 +1,397 @@
+'.source.ruby, .source.puppet, .source.coffee, .source.python':
+  'todo':
+    'prefix': 'todo'
+    'body': '# TODO: $0'
+  'fixme':
+    'prefix': 'fix'
+    'body': '# FIXME: $0'
+  'xxx':
+    'prefix': 'xxx'
+    'body': '# XXX: $0'
+  'idea':
+    'prefix': 'idea'
+    'body': '# IDEA: $0'
+  'hack':
+    'prefix': 'hack'
+    'body': '# HACK: $0'
+  'note':
+    'prefix': 'note'
+    'body': '# NOTE: $0'
+  'review':
+    'prefix': 'review'
+    'body': '# REVIEW: $0'
+  'bug':
+    'prefix': 'bug'
+    'body': '# BUG: $0'
+  'question':
+    'prefix': 'question'
+    'body': '# QUESTION: $0'
+  'combak':
+    'prefix': 'combak'
+    'body': '# COMBAK: $0'
+  'temp':
+    'prefix': 'temp'
+    'body': '# TEMP: $0'
+  'debug':
+    'prefix': 'debug'
+    'body': '# DEBUG: $0'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '# OPTIMIZE: $0'
+  'warning':
+    'prefix': 'warning'
+    'body': '# WARNING: $0'
+
+'.text.haml':
+  'todo':
+    'prefix': 'todo'
+    'body': '-# TODO: $0'
+  'fixme':
+    'prefix': 'fix'
+    'body': '-# FIXME: $0'
+  'xxx':
+    'prefix': 'xxx'
+    'body': '-# XXX: $0'
+  'idea':
+    'prefix': 'idea'
+    'body': '-# IDEA: $0'
+  'hack':
+    'prefix': 'hack'
+    'body': '-# HACK: $0'
+  'note':
+    'prefix': 'note'
+    'body': '-# NOTE: $0'
+  'review':
+    'prefix': 'review'
+    'body': '-# REVIEW: $0'
+  'bug':
+    'prefix': 'bug'
+    'body': '-# BUG: $0'
+  'question':
+    'prefix': 'question'
+    'body': '-# QUESTION: $0'
+  'combak':
+    'prefix': 'combak'
+    'body': '-# COMBAK: $0'
+  'temp':
+    'prefix': 'temp'
+    'body': '-# TEMP: $0'
+  'debug':
+    'prefix': 'debug'
+    'body': '-# DEBUG: $0'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '-# OPTIMIZE: $0'
+  'warning':
+    'prefix': 'warning'
+    'body': '-# WARNING: $0'
+
+'.text.html.ruby, .text.erb':
+  'todo':
+    'prefix': 'todo'
+    'body': '<%# TODO: $0 %>'
+  'fixme':
+    'prefix': 'fix'
+    'body': '<%# FIXME: $0 %>'
+  'xxx':
+    'prefix': 'xxx'
+    'body': '<%# XXX: $0 %>'
+  'idea':
+    'prefix': 'idea'
+    'body': '<%# IDEA: $0 %>'
+  'hack':
+    'prefix': 'hack'
+    'body': '<%# HACK: $0 %>'
+  'note':
+    'prefix': 'note'
+    'body': '<%# NOTE: $0 %>'
+  'review':
+    'prefix': 'review'
+    'body': '<%# REVIEW: $0 %>'
+  'bug':
+    'prefix': 'bug'
+    'body': '<%# BUG: $0 %>'
+  'question':
+    'prefix': 'question'
+    'body': '<%# QUESTION: $0 %>'
+  'combak':
+    'prefix': 'combak'
+    'body': '<%# COMBAK: $0 %>'
+  'temp':
+    'prefix': 'temp'
+    'body': '<%# TEMP: $0 %>'
+  'debug':
+    'prefix': 'debug'
+    'body': '<%# DEBUG: $0 %>'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '<%# OPTIMIZE: $0 %>'
+  'warning':
+    'prefix': 'warning'
+    'body': '<%# WARNING: $0 %>'
+
+'.text.html.ruby .meta.tag, .text.erb .meta.tag':
+  'todo':
+    'prefix': 'todo'
+  'fixme':
+    'prefix': 'fix'
+  'xxx':
+    'prefix': 'xxx'
+  'idea':
+    'prefix': 'idea'
+  'hack':
+    'prefix': 'hack'
+  'note':
+    'prefix': 'note'
+  'review':
+    'prefix': 'review'
+  'bug':
+    'prefix': 'bug'
+  'question':
+    'prefix': 'question'
+  'combak':
+    'prefix': 'combak'
+  'temp':
+    'prefix': 'temp'
+  'debug':
+    'prefix': 'debug'
+  'optimize':
+    'prefix': 'optimize'
+  'warning':
+    'prefix': 'warning'
+
+'.html.basic':
+  'todo':
+    'prefix': 'todo',
+    'body': '<!-- TODO: $0 -->'
+  'fixme':
+    'prefix': 'fix',
+    'body': '<!-- FIXME: $0 -->'
+  'xxx':
+    'prefix': 'xxx',
+    'body': '<!-- XXX: $0 -->'
+  'idea':
+    'prefix': 'idea',
+    'body': '<!-- IDEA: $0 -->'
+  'hack':
+    'prefix': 'hack',
+    'body': '<!-- HACK: $0 -->'
+  'note':
+    'prefix': 'note',
+    'body': '<!-- NOTE: $0 -->'
+  'review':
+    'prefix': 'review',
+    'body': '<!-- REVIEW: $0 -->'
+  'bug':
+    'prefix': 'bug'
+    'body': '<!-- BUG: $0 -->'
+  'question':
+    'prefix': 'question'
+    'body': '<!-- QUESTION: $0 -->'
+  'combak':
+    'prefix': 'combak'
+    'body': '<!-- COMBAK: $0 -->'
+  'temp':
+    'prefix': 'temp'
+    'body': '<!-- TEMP: $0 -->'
+  'debug':
+    'prefix': 'debug'
+    'body': '<!-- DEBUG: $0 -->'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '<!-- OPTIMIZE: $0 -->'
+  'warning':
+    'prefix': 'warning'
+    'body': '<!-- WARNING: $0 -->'
+
+'.html.basic .meta.tag':
+  'todo':
+    'prefix': 'todo',
+  'fixme':
+    'prefix': 'fix',
+  'xxx':
+    'prefix': 'xxx',
+  'idea':
+    'prefix': 'idea',
+  'hack':
+    'prefix': 'hack',
+  'note':
+    'prefix': 'note',
+  'review':
+    'prefix': 'review',
+  'bug':
+    'prefix': 'bug'
+  'question':
+    'prefix': 'question'
+  'combak':
+    'prefix': 'combak'
+  'temp':
+    'prefix': 'temp'
+  'debug':
+    'prefix': 'debug'
+  'optimize':
+    'prefix': 'optimize'
+  'warning':
+    'prefix': 'warning'
+
+'.source.scss, .source.sass, .source.css.scss, .source.css.sass, .source.css.less, .source.js, .source.go, .source.scala, .source.ts, .source.php, .source.java':
+  'todo':
+    'prefix': 'todo'
+    'body': '// TODO: $0'
+  'fixme':
+    'prefix': 'fix'
+    'body': '// FIXME: $0'
+  'xxx':
+    'prefix': 'xxx'
+    'body': '// XXX: $0'
+  'idea':
+    'prefix': 'idea'
+    'body': '// IDEA: $0'
+  'hack':
+    'prefix': 'hack'
+    'body': '// HACK: $0'
+  'note':
+    'prefix': 'note'
+    'body': '// NOTE: $0'
+  'review':
+    'prefix': 'review'
+    'body': '// REVIEW: $0'
+  'bug':
+    'prefix': 'bug'
+    'body': '// BUG: $0'
+  'question':
+    'prefix': 'question'
+    'body': '// QUESTION: $0'
+  'combak':
+    'prefix': 'combak'
+    'body': '// COMBAK: $0'
+  'temp':
+    'prefix': 'temp'
+    'body': '// TEMP: $0'
+  'debug':
+    'prefix': 'debug'
+    'body': '// DEBUG: $0'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '// OPTIMIZE: $0'
+  'warning':
+    'prefix': 'warning'
+    'body': '// WARNING: $0'
+
+'.source.css':
+  'todo':
+    'prefix': 'todo'
+    'body': '/* TODO: $0 */'
+  'fixme':
+    'prefix': 'fix'
+    'body': '/* FIXME: $0 */'
+  'xxx':
+    'prefix': 'xxx'
+    'body': '/* XXX: $0 */'
+  'idea':
+    'prefix': 'idea'
+    'body': '/* IDEA: $0 */'
+  'hack':
+    'prefix': 'hack'
+    'body': '/* HACK: $0 */'
+  'note':
+    'prefix': 'note'
+    'body': '/* NOTE: $0 */'
+  'review':
+    'prefix': 'review'
+    'body': '/* REVIEW: $0 */'
+  'bug':
+    'prefix': 'bug'
+    'body': '/* BUG: $0 */'
+  'question':
+    'prefix': 'question'
+    'body': '/* QUESTION: $0 */'
+  'combak':
+    'prefix': 'combak'
+    'body': '/* COMBAK: $0 */'
+  'temp':
+    'prefix': 'temp'
+    'body': '/* TEMP: $0 */'
+  'debug':
+    'prefix': 'debug'
+    'body': '/* DEBUG: $0 */'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '/* OPTIMIZE: $0 */'
+  'warning':
+    'prefix': 'warning'
+    'body': '/* WARNING: $0 */'
+
+'.source.css .meta.property-value':
+  'todo':
+    'prefix': 'todo'
+  'fixme':
+    'prefix': 'fix'
+  'xxx':
+    'prefix': 'xxx'
+  'idea':
+    'prefix': 'idea'
+  'hack':
+    'prefix': 'hack'
+  'note':
+    'prefix': 'note'
+  'review':
+    'prefix': 'review'
+  'bug':
+    'prefix': 'bug'
+  'question':
+    'prefix': 'question'
+  'combak':
+    'prefix': 'combak'
+  'temp':
+    'prefix': 'temp'
+  'debug':
+    'prefix': 'debug'
+  'optimize':
+    'prefix': 'optimize'
+  'warning':
+    'prefix': 'warning'
+
+'.text.html.php':
+  'todo':
+    'prefix': 'todo'
+    'body': '<?php // TODO: $1 ?>$0'
+  'fixme':
+    'prefix': 'fix'
+    'body': '<?php // FIXME: $1 ?>$0'
+  'xxx':
+    'prefix': 'xxx'
+    'body': '<?php // XXX: $1 ?>$0'
+  'idea':
+    'prefix': 'idea'
+    'body': '<?php // IDEA: $1 ?>$0'
+  'hack':
+    'prefix': 'hack'
+    'body': '<?php // HACK: $1 ?>$0'
+  'note':
+    'prefix': 'note'
+    'body': '<?php // NOTE: $1 ?>$0'
+  'review':
+    'prefix': 'review'
+    'body': '<?php // REVIEW: $1 ?>$0'
+  'bug':
+    'prefix': 'bug'
+    'body': '<?php // BUG: $1 ?>$0'
+  'question':
+    'prefix': 'question'
+    'body': '<?php // QUESTION: $1 ?>$0'
+  'combak':
+    'prefix': 'combak'
+    'body': '<?php // COMBAK: $1 ?>$0'
+  'temp':
+    'prefix': 'temp'
+    'body': '<?php // TEMP: $1 ?>$0'
+  'debug':
+    'prefix': 'debug'
+    'body': '<?php // DEBUG: $1 ?>$0'
+  'optimize':
+    'prefix': 'optimize'
+    'body': '<?php // OPTIMIZE: $1 ?>$0'
+  'warning':
+    'prefix': 'warning'
+    'body': '<?php // WARNING: $1 ?>$0'

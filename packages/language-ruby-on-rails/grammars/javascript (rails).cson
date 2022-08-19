@@ -1,0 +1,40 @@
+'scopeName': 'source.js.rails source.js.jquery'
+'name': 'JavaScript (Rails)'
+'fileTypes': [
+  'js.erb'
+]
+'foldingStartMarker': '/\\*\\*|\\{\\s*$'
+'foldingStopMarker': '\\*\\*/|^\\s*\\}'
+'patterns': [
+  {
+    'begin': '<%+#'
+    'captures':
+      '0':
+        'name': 'punctuation.definition.comment.erb'
+    'end': '%>'
+    'name': 'comment.block.erb'
+  }
+  {
+    'begin': '<%+(?!>)[-=]?'
+    'captures':
+      '0':
+        'name': 'punctuation.section.embedded.ruby'
+    'end': '-?%>'
+    'name': 'source.ruby.rails.embedded.html'
+    'patterns': [
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.comment.ruby'
+        'match': '(#).*?(?=-?%>)'
+        'name': 'comment.line.number-sign.ruby'
+      }
+      {
+        'include': 'source.ruby.rails'
+      }
+    ]
+  }
+  {
+    'include': 'source.js'
+  }
+]

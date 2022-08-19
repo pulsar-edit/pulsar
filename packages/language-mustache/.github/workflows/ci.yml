@@ -1,0 +1,23 @@
+name: CI
+
+on: [push]
+
+env:
+  CI: true
+
+jobs:
+  Test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        channel: [stable, beta]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v1
+    - uses: UziTech/action-setup-atom@v2
+      with:
+        version: ${{ matrix.channel }}
+    - name: Install dependencies
+      run: apm install
+    - name: Run tests
+      run: atom --test spec
