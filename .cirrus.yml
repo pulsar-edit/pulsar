@@ -69,9 +69,9 @@ x86_mac_task:
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
     - yarn install || yarn install
     - ln -s /usr/local/opt/python3 /usr/local/bin/python
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
     - arch -x86_64 npx yarn run build:apm
