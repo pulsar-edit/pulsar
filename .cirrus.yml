@@ -33,7 +33,7 @@ linux_task:
       format: junit
   build_binary_script:
     - yarn dist
-    - alien -r  -c -v binaries/atom*.deb
+    - alien -r  -c -v binaries/atom*.deb && mv *rpm binaries
   binary_artifacts:
     path: ./binaries/*
 
