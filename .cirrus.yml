@@ -43,7 +43,7 @@ silicon_mac_task:
     - brew install node@16 yarn git python
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn install --ignore-scripts; rm -R node_modules/electron; yarn install
+    - yarn install || yarn install
     - yarn build
     - yarn run build:apm
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
@@ -69,12 +69,12 @@ x86_mac_task:
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
-    - yarn install --ignore-scripts; rm -R node_modules/electron; yarn install
+    - yarn install || yarn install
     - ln -s /usr/local/opt/python3 /usr/local/bin/python
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
-    - arch -x86_64 yarn install --ignore-scripts; rm -R node_modules/electron; arch -x86_64 yarn install
-    - arch -x86_64 yarn build
-    - arch -x86_64 yarn run build:apm
+    - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
+    - arch -x86_64 npx yarn build
+    - arch -x86_64 npx yarn run build:apm
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -87,7 +87,7 @@ x86_mac_task:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
-    - arch -x86_64 yarn dist || arch -x86_64 yarn dist
+    - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
 
