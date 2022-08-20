@@ -66,8 +66,8 @@ x86_mac_task:
   test_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - sudo rm -rf /Library/Developer/CommandLineTools
-    - arch -x86_64 xcode-select --install
     - echo A | softwareupdate --install-rosetta
+    - arch -x86_64 xcode-select --install
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
