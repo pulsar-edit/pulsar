@@ -32,7 +32,7 @@ linux_task:
       type: text/xml
       format: junit
   build_binary_script:
-    - yarn dist
+    - yarn dist || rm dist && yarn dist
     - alien -r  -c -v binaries/atom*.deb && mv *rpm binaries
   binary_artifacts:
     path: ./binaries/*
@@ -58,7 +58,7 @@ silicon_mac_task:
       format: junit
   build_arm_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist
+    - yarn dist || rm dist && yarn dist
   binary_artifacts:
     path: ./binaries/*
 
@@ -72,6 +72,7 @@ x86_mac_task:
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
+    - export PYTHON=/usr/local/bin/python3
     - yarn install || yarn install
     - ln -s /usr/local/opt/python3 /usr/local/bin/python
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
@@ -89,7 +90,7 @@ x86_mac_task:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
-    - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
+    - arch -x86_64 npx yarn dist || rm dist && arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
 
