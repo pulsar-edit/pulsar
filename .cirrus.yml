@@ -65,9 +65,7 @@ x86_mac_task:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   test_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
-    - arch -x86_64 xcode-select --install
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
@@ -87,6 +85,8 @@ x86_mac_task:
       format: junit
   build_x86_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - sudo rm -rf /Library/Developer/CommandLineTools
+    - arch -x86_64 xcode-select --install
     - arch -x86_64 yarn dist || arch -x86_64 yarn dist
   binary_artifacts:
     path: ./binaries/*
