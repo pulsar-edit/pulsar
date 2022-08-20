@@ -19,7 +19,7 @@ linux_task:
                 libnss3
                 xvfb
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - yarn install --ignore-scripts; rm -R node_modules/electron; yarn install
+    - yarn install || yarn install
     - yarn build
     - yarn run build:apm
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
