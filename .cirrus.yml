@@ -61,32 +61,18 @@ silicon_mac_task:
     - yarn dist || rm dist && yarn dist
   binary_artifacts:
     path: ./binaries/*
-
-x86_mac_task:
-  macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
-  test_script:
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  build_x86_dependencies_script:
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
-    - export PYTHON=/usr/local/bin/python3
     - yarn install || yarn install
     - ln -s /usr/local/opt/python3 /usr/local/bin/python
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
     - arch -x86_64 npx yarn run build:apm
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
-  always:
-    videos_artifacts:
-      path: ./tests/videos/**
-    junit_artifacts:
-      path: report.xml
-      type: text/xml
-      format: junit
-  build_x86_binary_script:
+  dist_x86_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
@@ -101,7 +87,7 @@ windows_task:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   install_deps_script:
-    - choco install nodejs --version=16.15.1 -y
+    - choco install nodejs --version=16.16.0 -y
     - choco install python git visualstudio2019-workload-vctools -y
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
