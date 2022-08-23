@@ -1,0 +1,21 @@
+{
+  "name": "language-clojure",
+  "version": "0.22.8",
+  "description": "Clojure language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-clojure",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-clojure"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-clojure/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  }
+}

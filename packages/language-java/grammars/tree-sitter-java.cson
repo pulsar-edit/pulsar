@@ -1,0 +1,306 @@
+name: 'Java'
+scopeName: 'source.java'
+type: 'tree-sitter'
+parser: 'tree-sitter-java'
+
+fileTypes: [
+  'java'
+]
+
+folds: [
+  {
+    type: [
+      'comment',
+      'class_body',
+      'enum_body',
+      'interface_body'
+      'annotation_type_body',
+      'module_body',
+      'constructor_body',
+      'block',
+      'switch_block'
+    ]
+  }
+]
+
+comments:
+  start: '// '
+
+scopes:
+  'program': 'source.java'
+
+  'comment': 'comment.block'
+
+  '''
+  "assert",
+  "break",
+  "case",
+  "catch",
+  "continue",
+  "default",
+  "do",
+  "else",
+  "finally",
+  "for",
+  "if",
+  "new",
+  "return",
+  "switch",
+  "throw",
+  "try",
+  "while"
+  ''': 'keyword.control'
+
+  '''
+  "const",
+  "goto"
+  ''': 'keyword.reserved'
+
+  '''
+  ternary_expression > "?",
+  ternary_expression > ":"
+  ''': 'keyword.control.ternary'
+
+  '"instanceof"': 'keyword.operator.instanceof'
+  '"="': 'keyword.operator.assignment'
+
+  '''
+  "==",
+  "!=",
+  "<=",
+  ">=",
+  ">",
+  "<"
+  ''': 'keyword.operator.comparison'
+
+  '''
+  "!",
+  "&&",
+  "||"
+  ''': 'keyword.operator.logical'
+
+  '''
+  "-",
+  "+",
+  "*",
+  "/",
+  "%",
+  "-=",
+  "+=",
+  "*=",
+  "/=",
+  "%=",
+  "++",
+  "--"
+  ''': 'keyword.operator.arithmetic'
+
+  '''
+  "&",
+  "|",
+  "^",
+  "~",
+  "&=",
+  "|=",
+  "^=",
+  "<<",
+  ">>",
+  ">>>",
+  "<<=",
+  ">>=",
+  ">>>="
+  ''': 'keyword.operator.bitwise'
+
+  '"."': 'punctuation.separator.period'
+  '","': 'punctuation.separator.delimiter'
+  '";"': 'punctuation.terminator.statement'
+  '"["': 'punctuation.bracket.square'
+  '"]"': 'punctuation.bracket.square'
+  '"{"': 'punctuation.bracket.curly'
+  '"}"': 'punctuation.bracket.curly'
+  '"("': 'punctuation.bracket.round'
+  '")"': 'punctuation.bracket.round'
+
+  '''
+  this,
+  super
+  ''': 'variable.language'
+
+  # Literals and constants
+
+  'null_literal': 'constant.language.null'
+
+  '''
+  true,
+  false
+  ''': 'constant.boolean'
+
+  '''
+  decimal_integer_literal,
+  hex_integer_literal,
+  octal_integer_literal,
+  binary_integer_literal
+  ''': 'constant.numeric'
+
+  '''
+  decimal_floating_point_literal,
+  hex_floating_point_literal
+  ''': 'constant.numeric'
+
+  'character_literal': 'string.quoted.single'
+  'string_literal': 'string.quoted.double'
+
+  # Primitive and simple types
+
+  '''
+  void_type,
+  integral_type,
+  floating_point_type,
+  boolean_type,
+  type_identifier,
+  type_parameter > identifier
+  ''': 'storage.type'
+
+  # Generic types
+
+  '''
+  type_arguments > "<",
+  type_arguments > ">",
+  type_parameters > "<",
+  type_parameters > ">"
+  ''': 'punctuation.bracket.angle'
+
+  'type_arguments > wildcard > "?"': 'storage.type.generic.wildcard'
+  'type_arguments > wildcard > "extends"': "storage.modifier.extends"
+  'type_arguments > wildcard > super': "storage.modifier.super"
+  # generic bounds in classes
+  'type_bound > "extends"': "storage.modifier.extends"
+  'type_bound > "&"': 'punctuation.separator.types'
+
+  # Modifiers and keywords
+
+  '''
+  "public",
+  "protected",
+  "private",
+  "abstract",
+  "static",
+  "final",
+  "strictfp",
+  "default",
+  "synchronized",
+  "native",
+  "transient",
+  "volatile",
+  "threadsafe"
+  ''': 'storage.modifier'
+  # "extends" keyword for classes and enums
+  'superclass > "extends"': 'storage.modifier.extends'
+  # "extends" keyword for interfaces
+  'extends_interfaces > "extends"': 'storage.modifier.extends'
+  'super_interfaces > "implements"': 'storage.modifier.implements'
+  'static_initializer > "static"': 'storage.modifier'
+
+  # Package and imports
+
+  'package_declaration': 'meta.package'
+  'package_declaration > "package"': 'keyword.other.package'
+
+  'import_declaration': 'meta.import'
+  'import_declaration > "import"': 'keyword.other.import'
+  'import_declaration > "static"': 'keyword.other.static'
+  'import_declaration > asterisk > "*"': 'variable.language.wildcard'
+
+  # Expressions
+
+  'lambda_expression > "->"': 'storage.type.function.arrow'
+
+  # Statements
+
+  'catch_type > "|"': 'punctuation.catch.separator'
+
+  # Class declaration
+
+  'class_declaration > "class"': 'keyword.other.class'
+  'class_declaration > identifier': 'entity.name.type.class'
+
+  'class_declaration > class_body': 'meta.class.body'
+
+  # Enum declaration
+
+  'enum_declaration > "enum"': 'keyword.other.enum'
+  'enum_declaration > identifier': 'entity.name.type.enum'
+
+  'enum_declaration > enum_body': 'meta.enum.body'
+
+  'enum_constant > identifier': 'constant.other.enum'
+
+  # Interface declaration
+
+  'interface_declaration > "interface"': 'keyword.other.interface'
+  'interface_declaration > identifier': 'entity.name.type.interface'
+
+  'interface_declaration > interface_body': 'meta.interface.body'
+
+  # annotated interface
+  'annotation_type_declaration > "@interface"': 'keyword.other.interface.annotated'
+  'annotation_type_declaration > identifier': 'entity.name.type.interface.annotated'
+
+  'annotation_type_declaration > annotation_type_body': 'meta.interface.annotated.body'
+
+  'annotation_type_element_declaration > identifier': 'entity.name.function'
+
+  # Annotations
+
+  'marker_annotation': 'meta.declaration.annotation'
+  'marker_annotation > "@"': 'punctuation.definition.annotation'
+  '''
+  marker_annotation > identifier,
+  marker_annotation > scoped_identifier > identifier
+  ''': 'storage.type.annotation'
+
+  'annotation': 'meta.declaration.annotation'
+  'annotation > "@"': 'punctuation.definition.annotation'
+  '''
+  annotation > identifier,
+  annotation > scoped_identifier > identifier
+  ''': 'storage.type.annotation'
+
+  'element_value_pair > identifier': 'variable.other.annotation.element'
+
+  # Methods
+
+  'method_declaration': 'meta.method'
+  'method_declaration > identifier': 'entity.name.function'
+  'method_declaration > block': 'meta.method.body'
+
+  'constructor_declaration': 'meta.constructor'
+  'constructor_declaration > identifier': 'entity.name.function'
+  'constructor_body': 'meta.constructor.body'
+
+  'throws > "throws"': 'storage.modifier.throws'
+
+  'spread_parameter > "..."': 'punctuation.definition.parameters.varargs'
+
+  # Method access and reference
+
+  'method_invocation > identifier': 'entity.name.function'
+
+  # Method reference
+  'method_reference > "::"': 'keyword.control.method'
+
+  '''
+  method_reference > "new",
+  method_reference > identifier:nth-child(2)
+  ''': 'entity.name.function'
+
+  '''
+  field_access > identifier,
+  method_reference > identifier,
+  method_invocation > identifier
+  ''': [
+    {match: '^[A-Z][A-Z0-9_\\$]+$', scopes: 'constant.other'},
+    {match: '^[A-Z]', scopes: 'storage.type'}
+  ]
+  'identifier': [
+    {match: '^[A-Z][A-Z0-9_\\$]+$', scopes: 'constant.other'}
+  ]

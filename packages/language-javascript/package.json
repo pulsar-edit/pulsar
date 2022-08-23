@@ -1,0 +1,30 @@
+{
+  "name": "language-javascript",
+  "version": "0.134.2",
+  "description": "JavaScript language support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "main": "lib/main",
+  "homepage": "http://atom.github.io/language-javascript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-javascript.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/language-javascript/issues"
+  },
+  "keywords": [
+    "tree-sitter"
+  ],
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  },
+  "dependencies": {
+    "tree-sitter-javascript": "0.19.0",
+    "tree-sitter-jsdoc": "0.19.0",
+    "tree-sitter-regex": "0.19.0"
+  }
+}

@@ -1,0 +1,55 @@
+'scopeName': 'source.mod'
+'name': 'Go Module File'
+'fileTypes': [
+  'mod'
+]
+'patterns': [
+  {
+    'comment': 'Module keyword'
+    'match': '\\bmodule\\b'
+    'name': 'keyword.module.module'
+  }
+  {
+    'comment': 'Require keyword'
+    'match': '\\brequire\\b'
+    'name': 'keyword.module.require'
+  }
+  {
+    'comment': 'Replace keyword'
+    'match': '\\breplace\\b'
+    'name': 'keyword.module.replace'
+  }
+  {
+    'comment': 'Exclude keyword'
+    'match': '\\bexclude\\b'
+    'name': 'keyword.module.exclude'
+  }
+  {
+    'comment': 'Version string'
+    'match': 'v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:\\-(\\d{4}(?:0[1-9]|1[0-2])(?:0[1-9]|[1-2]\\d|3[0-1])(?:[0-1]\\d|2[0-3])(?:[0-5]\\d)(?:[0-5]\\d)))?(?:\\-([a-zA-Z\\d]{12}))?(?:\\+(incompatible))?'
+    'name': 'string.unquoted.version.go'
+  }
+  {
+    'begin': '\\('
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.begin.bracket.round.go'
+    'end': '\\)'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.end.bracket.round.go'
+    'patterns': [
+      {
+        'include': '$self'
+      }
+    ]
+  }
+  {
+    'begin': '//'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.comment.go'
+    'end': '$'
+    'name': 'comment.line.double-slash.go'
+  }
+]

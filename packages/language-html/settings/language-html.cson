@@ -1,0 +1,23 @@
+'.text.html':
+  'autocomplete':
+    'extraWordCharacters': '-'
+  'editor':
+    'commentStart': '<!-- '
+    'commentEnd': ' -->'
+    'foldEndPattern': '(?x)\n\t\t(</(?i:head|body|table|thead|tbody|tfoot|tr|div|select|fieldset|style|script|ul|ol|li|form|dl|section|article|header|footer|nav|aside)>\n\t\t|^(?!.*?<!--).*?--\\s*>\n\t\t|^<!--\\ end\\ tminclude\\ -->$\n\t\t|<\\?(?:php)?.*\\bend(if|for(each)?|while)\\b\n\t\t|\\{\\{?/(if|foreach|capture|literal|foreach|php|section|strip)\n\t\t|^[^{]*\\}\n\t\t|^\\s*\\)[,;]\n\t\t)'
+    'increaseIndentPattern': '''(?x)
+      <(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|link|meta|param)\\b|[^>]*/>)
+      ([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*</\\1>)
+      |<!--(?!.*-->)
+      |<\\?php.+?\\b(if|else(?:if)?|for(?:each)?|while)\\b.*:(?!.*end\\2)
+      |\\{[^}"\']*$
+    '''
+    'decreaseIndentPattern': '''(?x)
+      ^\\s*
+      (</(?!html)
+        [-_\\.A-Za-z0-9]+\\b[^>]*>
+        |-->
+        |<\\?(php)?\\s+(else(if)?|end(if|for(each)?|while)|\\})
+        |\\}
+      )
+    '''

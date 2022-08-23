@@ -1,0 +1,15 @@
+'scopeName': 'text.todo'
+'injectionSelector': 'comment, text.plain'
+'patterns': [
+  {
+    'match': '(?<!\\w)@?(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\\b'
+    'name': 'storage.type.class.${1:/downcase}'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'markup.underline.link.radar'
+    'match': '<(ra?dar:/(?:/problems?|)/(?:[&0-9]+))>'
+    'name': 'storage.type.class.radar'
+  }
+]

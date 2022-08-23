@@ -1,0 +1,37 @@
+'.source.objc, .source.objcpp':
+  'editor':
+    'completions': [
+      'retain'
+      'release'
+      'autorelease'
+      'description'
+      'stringWithFormat:'
+      'componentsSeparatedByString:'
+      'componentsJoinedByString:'
+      'isEqualToString:'
+      'UTF8String'
+      'lastPathComponent'
+      'pathExtension'
+      'stringByAbbreviatingWithTildeInPath'
+      'stringByAppendingPathComponent:'
+      'stringByAppendingPathExtension:'
+      'stringByDeletingLastPathComponent'
+      'stringByDeletingPathExtension'
+      'stringByExpandingTildeInPath'
+      'stringByResolvingSymlinksInPath'
+      'stringByStandardizingPath'
+      'valueForKey:'
+      'valueForKeyPath:'
+      'setValue:'
+      'forKey:'
+      'forKeyPath:'
+      'NSArray'
+      'NSDictionary'
+      'NSMutableArray'
+      'NSMutableDictionary'
+      'NSMutableString'
+      'NSString'
+    ]
+'.source.objcpp, .source.objc':
+  'editor':
+    'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}|^@end\\b'

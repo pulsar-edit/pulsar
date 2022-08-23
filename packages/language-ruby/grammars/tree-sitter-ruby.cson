@@ -1,0 +1,256 @@
+name: 'Ruby'
+scopeName: 'source.ruby'
+type: 'tree-sitter'
+parser: 'tree-sitter-ruby'
+
+injectionRegex: 'rb|ruby'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(\w*ruby|rake)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=ruby'
+]
+
+fileTypes: [
+  'rb',
+  'rake',
+  'Podfile',
+  'Brewfile',
+  'Rakefile',
+  'Gemfile'
+]
+
+comments:
+  start: '# '
+
+folds: [
+  {
+    type: ['block', 'do_block']
+    start: {type: 'block_parameters'}
+    end: {index: -1}
+  }
+  {
+    type: 'begin'
+    start: {index: 0}
+    end: {type: 'rescue'}
+  }
+  {
+    type: 'heredoc_body',
+    end: {type: 'heredoc_end'}
+  }
+  {
+    type: [
+      'hash'
+      'array'
+      'begin'
+      'block'
+      'do_block'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+  {
+    type: 'argument_list'
+    start: {index: 0, type: '('}
+    end: {index: -1}
+  }
+  {
+    type: 'class'
+    start: {type: 'superclass'}
+    end: {index: -1}
+  }
+  {
+    type: 'class'
+    start: {index: 1}
+    end: {index: -1}
+  }
+  {
+    type: ['method', 'singleton_method']
+    start: {type: 'method_parameters'}
+    end: {index: -1}
+  }
+  {
+    type: ['method', 'singleton_method']
+    start: {index: 1}
+    end: {index: -1}
+  }
+  {
+    type: 'then',
+    start: {index: 0, type: '"then"'}
+  }
+  {
+    type: 'then'
+  }
+  {
+    type: 'case',
+    end: {index: -1}
+  }
+  {
+    type: 'else'
+    start: {index: 0}
+  }
+]
+
+scopes:
+  'program': 'source.ruby'
+
+  '"if"': 'keyword.control'
+  '"unless"': 'keyword.control'
+  '"def"': 'keyword.control'
+  '"do"': 'keyword.control'
+  '"end"': 'keyword.control'
+  '"else"': 'keyword.control'
+  '"elsif"': 'keyword.control'
+  '"class"': 'keyword.control'
+  '"module"': 'keyword.control'
+  '"begin"': 'keyword.control'
+  '"rescue"': 'keyword.control'
+  '"ensure"': 'keyword.control'
+  '"return"': 'keyword.control'
+  '"yield"': 'keyword.control'
+  '"case"': 'keyword.control'
+  '"when"': 'keyword.control'
+  '"then"': 'keyword.control'
+  '"for"': 'keyword.control'
+  '"break"': 'keyword.control'
+  '"next"': 'keyword.control'
+  '"retry"': 'keyword.control'
+  '"while"': 'keyword.control'
+  '"in"': 'keyword.control'
+  '"until"': 'keyword.control'
+  '"defined?"': 'keyword.control'
+  '"alias"': 'keyword.control'
+  '"undef"': 'keyword.control'
+  'super': 'keyword.control'
+
+  'interpolation': 'embedded.source'
+  'interpolation > "#{"': 'punctuation.section.embedded'
+  'interpolation > "}"': 'punctuation.section.embedded'
+
+  'constant': [
+    {match: '^[A-Z_0-9]+$', scopes: 'variable.constant'}
+    'entity.name.type.class'
+  ]
+  'global_variable': 'variable.other.readwrite.global'
+  'superclass > constant': 'entity.other.inherited-class'
+
+  'identifier': [
+    {
+      match: '^__(FILE|LINE|ENCODING)__$',
+      scopes: 'support.variable'
+    }
+    {
+      match: '^(public|protected|private)$'
+      scopes: 'keyword.other.special-method'
+    }
+    {
+      match: '^(block_given\?|iterator\?|alias_method)'
+      scopes: 'keyword.control'
+    }
+  ]
+
+  'escape_sequence': 'constant.character.escape'
+
+  'self': 'variable.language'
+
+  '"%w("': 'punctuation.definition.parameters'
+  '"%i("': 'punctuation.definition.parameters'
+  '"("': 'punctuation.definition.parameters'
+  '")"': 'punctuation.definition.parameters'
+
+  'method > identifier': 'entity.name.function'
+  'assignment > identifier': 'variable'
+
+  'singleton_method > identifier:nth-child(3)': 'entity.name.function'
+  'setter > identifier': 'entity.name.function'
+  'call > identifier:nth-child(2)': 'entity.name.function'
+  'method_call > identifier:nth-child(0)': [
+    {exact: 'require', scopes: 'support.function'}
+    {match: '^(public|protected|private)$', scopes: 'keyword.other.special-method'}
+    {match: '^(block_given\?|iterator\?|alias_method)', scopes: 'keyword.control'}
+    'entity.name.function'
+  ]
+
+  'block_parameters > identifier': 'variable.other.block'
+  'method_parameters > identifier, optional_parameter > identifier': 'variable.parameter.function'
+  'keyword_parameter > identifier:nth-child(0)': 'constant.other.symbol'
+  'class_variable': 'variable.other.object.property'
+  'instance_variable': 'variable.other.object.property'
+  'symbol': 'constant.other.symbol'
+  'bare_symbol': 'constant.other.symbol'
+
+  'comment': 'comment'
+  'regex': 'string.regexp'
+  'float': 'constant.numeric'
+  'integer': 'constant.numeric'
+
+  'string': [
+    {match: '^"', scopes: 'string.quoted.double.interpolated'}
+    {match: "^'", scopes: 'string.quoted.single'}
+    'string'
+  ]
+
+  # Quote delimiters are the only two children of these kinds of strings. If
+  # this changes in the tree-sitter parser in the future, these selectors will
+  # need updating.
+  "string > '\"':nth-child(0)": 'punctuation.definition.string.begin'
+  "string > '\"':nth-child(1)": 'punctuation.definition.string.end'
+  'string > "\'":nth-child(0)': 'punctuation.definition.string.begin'
+  'string > "\'":nth-child(1)': 'punctuation.definition.string.end'
+
+  'heredoc_beginning, heredoc_body': 'string.unquoted.heredoc.interpolated'
+  'subshell': 'string.quoted.subshell.interpolated'
+  'bare_string': 'string.unquoted.other'
+
+  '"="': 'keyword.operator.assignment'
+
+  '"+="': 'keyword.operator.assignment.augmented'
+  '"-="': 'keyword.operator.assignment.augmented'
+  '"*="': 'keyword.operator.assignment.augmented'
+  '"/="': 'keyword.operator.assignment.augmented'
+  '"<<="': 'keyword.operator.assignment.augmented'
+  '"%="': 'keyword.operator.assignment.augmented'
+  '"&="': 'keyword.operator.assignment.augmented'
+  '"&&="': 'keyword.operator.assignment.augmented'
+  '"|="': 'keyword.operator.assignment.augmented'
+  '"||="': 'keyword.operator.assignment.augmented'
+  '"**="': 'keyword.operator.assignment.augmented'
+  '"^="': 'keyword.operator.assignment.augmented'
+
+  '"<=>"': 'keyword.operator.comparison'
+  '"<"': 'keyword.operator.comparison'
+  '">"': 'keyword.operator.comparison'
+  '"<="': 'keyword.operator.comparison'
+  '">="': 'keyword.operator.comparison'
+  '"==="': 'keyword.operator.comparison'
+  '"=="': 'keyword.operator.comparison'
+  '"=~"': 'keyword.operator.comparison'
+  '"!="': 'keyword.operator.comparison'
+  '"!~"': 'keyword.operator.comparison'
+
+  '"&&"': 'keyword.operator.logical'
+  '"!"': 'keyword.operator.logical'
+  '"||"': 'keyword.operator.logical'
+  '"and"': 'keyword.operator.logical'
+  '"not"': 'keyword.operator.logical'
+  '"or"': 'keyword.operator.logical'
+  '"^"': 'keyword.operator.logical'
+
+  '"+"': 'keyword.operator.arithmetic'
+  '"-"': 'keyword.operator.arithmetic'
+  '"*"': 'keyword.operator.arithmetic'
+  '"/"': 'keyword.operator.arithmetic'
+  '"**"': 'keyword.operator.arithmetic'
+  '"&"': 'keyword.operator.arithmetic'
+  '"%"': 'keyword.operator.arithmetic'
+
+  'call > ".", call > "&."': 'punctuation.separator.method'
+
+  '";"': 'punctuation.separator.statement'
+  '","': 'punctuation.separator.object'
+
+  'nil': 'constant.language.nil'
+  'true': 'constant.language.true'
+  'false': 'constant.language.false'

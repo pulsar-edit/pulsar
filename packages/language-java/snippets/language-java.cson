@@ -1,0 +1,134 @@
+'.source.java, .source.groovy':
+  'abstract':
+    'prefix': 'ab'
+    'body': 'abstract '
+  'case':
+    'prefix': 'cs'
+    'body': 'case $1:\n\t$2\n$0'
+  'catch':
+    'prefix': 'ca'
+    'body': 'catch (${1:Exception} ${2:e}) {\n\t$0\n}'
+  'class':
+    'prefix': 'cl'
+    'body': 'class ${1:MyClass} ${2:extends ${3:Parent} }${4:implements ${5:Interface} }{\n\t$6\n}'
+  'else if':
+    'prefix': 'elif'
+    'body': 'else if ($1) {\n\t$0\n}'
+  'do while':
+    'prefix': 'dow'
+    'body': 'do {\n\t$1\n} while ($2);$0'
+  'else':
+    'prefix': 'el'
+    'body': 'else {\n\t$0\n}'
+  'final':
+    'prefix': 'fi'
+    'body': 'final '
+  'finally':
+    'prefix': 'fy'
+    'body': 'finally {\n\t$0\n}'
+  'for':
+    'prefix': 'for'
+    'body': 'for ($1; $2; $3) {\n\t$0\n}'
+  'if':
+    'prefix': 'if'
+    'body': 'if ($1) {\n\t$0\n}'
+  'import':
+    'prefix': 'im'
+    'body': 'import '
+  'interface':
+    'prefix': 'in'
+    'body': 'interface ${1:MyInterface} ${2:extends ${3:Parent} }{\n\t$0\n}'
+  'private':
+    'prefix': 'pr'
+    'body': 'private '
+  'protected':
+    'prefix': 'po'
+    'body': 'protected '
+  'public':
+    'prefix': 'pu'
+    'body': 'public '
+  'return':
+    'prefix': 're'
+    'body': 'return '
+  'serialVersionUID':
+    'prefix': 'se'
+    'body': 'private static final long serialVersionUID = ${1:42}l;$0'
+  'static':
+    'prefix': 'st'
+    'body': 'static '
+  'switch':
+    'prefix': 'sw'
+    'body': 'switch ($1) {\n\t$0\n}'
+  'synchronized':
+    'prefix': 'sy'
+    'body': 'synchronized '
+  'throw new':
+    'prefix': 'tn'
+    'body': 'throw new $0'
+  'throw':
+    'prefix': 'th'
+    'body': 'throw $0'
+  'try':
+    'prefix': 'tr'
+    'body': 'try {\n\t$0\n}'
+  'try-catch':
+    'prefix':'trc'
+    'body': 'try {\n\t$1\n} catch(${2:Exception} ${3:e}) {\n\t$4\n}'
+  'variable':
+    'prefix': 'v'
+    'body': '${1:String} ${2:var}${3: = ${0:null}};'
+'.source.java':
+  'break':
+    'prefix': 'br'
+    'body': 'break;\n'
+  'constant string':
+    'prefix': 'cos'
+    'body': 'public static final String ${1:var} = "$2";$0'
+  'constant':
+    'prefix': 'co'
+    'body': 'public static final ${1:String} ${2:var} = $3;$0'
+  'default':
+    'prefix': 'de'
+    'body': 'default:\n\t$0'
+  'for (each)':
+    'prefix': 'fore'
+    'body': 'for ($1 : $2) {\n\t$0\n}'
+  'import junit.framework.TestCase;':
+    'prefix': 'imt'
+    'body': 'import junit.framework.TestCase;\n$0'
+  'java.beans.':
+    'prefix': 'j.b'
+    'body': 'java.beans.'
+  'java.io.':
+    'prefix': 'j.i'
+    'body': 'java.io.'
+  'java.math.':
+    'prefix': 'j.m'
+    'body': 'java.math.'
+  'java.net.':
+    'prefix': 'j.n'
+    'body': 'java.net.'
+  'java.util.':
+    'prefix': 'j.u'
+    'body': 'java.util.'
+  'method (main)':
+    'prefix': 'main'
+    'body': 'public static void main(String[] args) {\n\t$0\n}'
+  'method':
+    'prefix': 'm'
+    'body': '${1:void} ${2:method}($3) ${4:throws $5 }{\n\t$0\n}\n'
+  'print':
+    'prefix': 'p'
+    'body': 'System.out.print($1);$0'
+  'println':
+    'prefix': 'pl'
+    'body': 'System.out.println($1);$0'
+  'test case':
+    'prefix': 'tc'
+    'body': 'public class ${1:MyTest} extends ${2:TestCase} {\n\t$0\n}'
+  'test':
+    'prefix': 't'
+    'body': 'public void test${1:Name}() throws Exception {\n\t$0\n}'
+  'while':
+    'prefix': 'wh'
+    'body': 'while ($1) {\n\t$0\n}'

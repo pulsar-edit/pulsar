@@ -1,0 +1,6 @@
+# empty appveyor
+build: off
+
+branches:
+  only:
+  - non-existing
