@@ -153,7 +153,7 @@ module.exports = class Task {
   //
   // Returns a {Disposable} that can be used to stop listening for the event.
   on(eventName, callback) {
-    return this.emitter.on(eventName, (args) => callback(...args));
+    return this.emitter.on(eventName, (args) => callback(...(args || [])));
   }
 
   once(eventName, callback) {

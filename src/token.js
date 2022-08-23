@@ -6,7 +6,7 @@ module.exports = class Token {
 
   constructor(properties) {
     this.value = properties.value;
-    this.scopes = properties.copes;
+    this.scopes = properties.scopes;
   }
 
   isEqual(other) {

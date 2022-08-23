@@ -1,7 +1,7 @@
 const path = require("path");
 const async = require("async");
 
-const ({PathSearcher, PathScanner, search} = require('scandal'));
+const {PathSearcher, PathScanner, search} = require('scandal');
 
 module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
   const callback = this.async();
@@ -39,13 +39,12 @@ module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
 };
 
 var processPaths = function(rootPath, paths) {
-  if (paths == null || paths.length > 0) {
+  if (paths == null || paths.length == 0) {
     return paths;
   }
   const rootPathBase = path.basename(rootPath);
   const results = [];
-  for (let i = 0; i < paths.length; i++) {
-    const givenPath = paths[i];
+  for (let givenPath of paths) {
     const segments = givenPath.split(path.sep);
     const firstSegment = segments.shift();
     results.push(givenPath);

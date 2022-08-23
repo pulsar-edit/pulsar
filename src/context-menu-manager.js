@@ -152,7 +152,7 @@ module.exports = class ContextMenuManager {
       const currentTargetItems = [];
       const matchingItemSets = this.itemSets.filter((itemSet) => currentTarget.webkitMatchesSelector(itemSet.selector));
       for (let itemSet of matchingItemSets) {
-        for (let item of itemSet) {
+        for (let item of itemSet.items) {
           const itemForEvent = this.cloneItemForEvent(item, event);
           if (itemForEvent) {
             MenuHelpers.merge(currentTargetItems, itemForEvent, itemSet.specificity);
@@ -213,7 +213,7 @@ module.exports = class ContextMenuManager {
 
   sortTemplate(template) {
     template = sortMenuItems(template);
-    for (id in template) {
+    for (let id in template) {
       const item = template[id];
       if (Array.isArray(item.submenu)) {
         item.submenu = this.sortTemplate(item.submenu);
