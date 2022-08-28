@@ -1,1 +1,1 @@
-See https://flight-manual.atom.io/hacking-Pulsar/sections/contributing-to-official-Pulsar-packages/
+See https://flight-manual.atom.io/hacking-atom/sections/contributing-to-official-Pulsar-packages/
