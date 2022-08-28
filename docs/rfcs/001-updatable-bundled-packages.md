@@ -6,7 +6,7 @@ Proposed
 
 ## Summary
 
-This feature will enable an opt-in subset of bundled Pulsar packages to be updated with `apm` outside of the Pulsar release cycle.  This will enable users to receive new functionality and bug fixes for some bundled packages as regularly as needed without waiting for them to be included in a new Pulsar release.  This is especially important for packages like [GitHub](https://github.com/Pulsar/github/) and  [Teletype](https://github.com/Pulsar/teletype/) which provide essential Pulsar functionality and could be improved independently of Pulsar.
+This feature will enable an opt-in subset of bundled Pulsar packages to be updated with `apm` outside of the Pulsar release cycle.  This will enable users to receive new functionality and bug fixes for some bundled packages as regularly as needed without waiting for them to be included in a new Pulsar release.  This is especially important for packages like [GitHub](https://github.com/atom/github/) and  [Teletype](https://github.com/atom/teletype/) which provide essential Pulsar functionality and could be improved independently of Pulsar.
 
 ## Motivation
 
@@ -18,7 +18,7 @@ Bundled packages are treated differently than community packages that you can in
 
 - You are not prompted to update them when new versions are released on `apm`
 - `apm` will warn you at the command line when you try to install or update a bundled package
-- If a user intentionally installs a bundled package from `apm` the [dalek package](https://github.com/Pulsar/dalek/) will show a warning in the "deprecations" view asking the user to remove the offending package
+- If a user intentionally installs a bundled package from `apm` the [dalek package](https://github.com/atom/dalek/) will show a warning in the "deprecations" view asking the user to remove the offending package
 
 Despite all this, if the user *does* manually install an update to a bundled package using `apm`, it will be loaded into the editor and updated dutifully as new releases occur.  The only new functionality needed is to enable `apm` to check bundled packages for updates when those packages haven't yet been installed in the user's `~/.Pulsar/packages` folder.
 
@@ -70,7 +70,7 @@ Another major drawback is that the snapshotted code for the bundled package will
 
 There was no measurable effect on shell or window startup time, only package load time.  It seems that the transpilation phase of the first load of the package incurs a 100x increase in load time.  Pre-transpilation of the package code (either when shipped or when installed using `apm`) will be useful in mitigating this cost.  Further investigation into snapshotting package code will be needed to understand if the load time increase can be mitigated.
 
-There is a possibility that the GitHub package could load parts of its codebase on demand to mitigate the increased startup time when not loaded as part of Pulsar's snapshot.  This approach is discussed in more detail at [Pulsar/github#1522](https://github.com/Pulsar/github/issues/1522).
+There is a possibility that the GitHub package could load parts of its codebase on demand to mitigate the increased startup time when not loaded as part of Pulsar's snapshot.  This approach is discussed in more detail at [Pulsar/github#1522](https://github.com/atom/github/issues/1522).
 
 ### Incompatibility across Pulsar release channels
 

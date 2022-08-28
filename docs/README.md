@@ -2,7 +2,7 @@
 
 ![Pulsar](https://cloud.githubusercontent.com/assets/72919/2874231/3af1db48-d3dd-11e3-98dc-6066f8bc766f.png)
 
-Most of the Pulsar user and developer documentation is contained in the [Atom Flight Manual](https://github.com/Pulsar/flight-manual.atom.io).
+Most of the Pulsar user and developer documentation is contained in the [Atom Flight Manual](https://github.com/atom/flight-manual.atom.io).
 
 ## Build documentation
 

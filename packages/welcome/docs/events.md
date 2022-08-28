@@ -1,6 +1,6 @@
 # Events specification
 
-This document specifies all the data (along with the format) which gets sent from the Welcome package to the GitHub analytics pipeline. This document follows the same format and nomenclature as the [Pulsar Core Events spec](https://github.com/Pulsar/metrics/blob/master/docs/events.md).
+This document specifies all the data (along with the format) which gets sent from the Welcome package to the GitHub analytics pipeline. This document follows the same format and nomenclature as the [Pulsar Core Events spec](https://github.com/atom/metrics/blob/master/docs/events.md).
 
 ## Counters
 

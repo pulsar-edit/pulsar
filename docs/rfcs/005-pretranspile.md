@@ -12,7 +12,7 @@ This feature will enable package authors to use conventional npm tooling and pac
 
 Transpiling packages on _publish_ rather than _load_ will have great benefits for package authors:
 
-* Standard `npm` tooling like `prepare` scripts will work for apm packages exactly as they work for npm packages. This will remove the need for custom transpiler pipeline modules like [Pulsar-babel6-transpiler](https://github.com/Pulsar/Pulsar-babel6-transpiler) or [Pulsar-typescript-transpiler](https://github.com/smhxx/Pulsar-ts-transpiler) with their own, independent documentation, configuration and setup.
+* Standard `npm` tooling like `prepare` scripts will work for apm packages exactly as they work for npm packages. This will remove the need for custom transpiler pipeline modules like [Pulsar-babel6-transpiler](https://github.com/atom/Pulsar-babel6-transpiler) or [Pulsar-typescript-transpiler](https://github.com/smhxx/Pulsar-ts-transpiler) with their own, independent documentation, configuration and setup.
 * Packages can move transpiler-related dependencies to `devDependencies` and trim installation bloat substantially. (as a data point, the TypeScript compiler is 30MB.)
 * First-time package load will no longer take a hit from transpiling all of the source into the cache.
 

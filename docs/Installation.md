@@ -4,17 +4,17 @@
 
 ### macOS
 
-Download the latest [Pulsar release](https://github.com/Pulsar/Pulsar/releases/latest).
+Download the latest [Pulsar release](https://github.com/atom/Pulsar/releases/latest).
 
 Pulsar will automatically update when a new release is available.
 
 ### Windows
 
-Download the latest [Pulsar installer](https://github.com/Pulsar/Pulsar/releases/latest). `PulsarSetup.exe` is 32-bit. For 64-bit systems, download `PulsarSetup-x64.exe`.
+Download the latest [Pulsar installer](https://github.com/atom/Pulsar/releases/latest). `PulsarSetup.exe` is 32-bit. For 64-bit systems, download `PulsarSetup-x64.exe`.
 
 Pulsar will automatically update when a new release is available.
 
-You can also download `Pulsar-windows.zip` (32-bit) or `Pulsar-x64-windows.zip` (64-bit) from the [releases page](https://github.com/Pulsar/Pulsar/releases/latest).
+You can also download `Pulsar-windows.zip` (32-bit) or `Pulsar-x64-windows.zip` (64-bit) from the [releases page](https://github.com/atom/Pulsar/releases/latest).
 The `.zip` version will not automatically update.
 
 Using [Chocolatey](https://chocolatey.org)? Run `cinst Pulsar` to install the latest version of Pulsar.
@@ -36,7 +36,7 @@ but should be compatible with other Linux distributions.
 ```sh
 sudo apt install git libasound2 libcurl4 libgbm1 libgcrypt20 libgtk-3-0 libnotify4 libnss3 libglib2.0-bin xdg-utils libx11-xcb1 libxcb-dri3-0 libxss1 libxtst6 libxkbfile1
 ```
-2. Download `Pulsar-amd64.tar.gz` from the [Pulsar releases page](https://github.com/Pulsar/Pulsar/releases/latest).
+2. Download `Pulsar-amd64.tar.gz` from the [Pulsar releases page](https://github.com/atom/Pulsar/releases/latest).
 3. Run `tar xf Pulsar-amd64.tar.gz` in the directory where you want to extract the Pulsar folder.
 4. Launch Pulsar using the installed `Pulsar` command from the newly extracted directory.
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented in PR [#17538](https://github.com/Pulsar/Pulsar/pull/17538)
+Implemented in PR [#17538](https://github.com/atom/Pulsar/pull/17538)
 
 ## Summary
 
