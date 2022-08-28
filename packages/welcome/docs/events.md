@@ -31,6 +31,6 @@ Currently the Welcome package does not log any timing events.
   |-------|-------|
   | `ea` | link that was clicked
 
-(There are many potential values for the `ea` param, e.g: `clicked-welcome-Pulsar-docs-link`,`clicked-welcome-Pulsar-org-link`, `clicked-project-cta`, `clicked-init-script-cta`, ...).
+(There are many potential values for the `ea` param, e.g: `clicked-welcome-atom-docs-link`,`clicked-welcome-atom-org-link`, `clicked-project-cta`, `clicked-init-script-cta`, ...).
 
 
