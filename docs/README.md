@@ -8,7 +8,7 @@ Most of the Pulsar user and developer documentation is contained in the [Atom Fl
 
 Instructions for building Pulsar on various platforms from source.
 
-* Moved to [the Flight Manual](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-Pulsar-core/)
+* Moved to [the Flight Manual](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/)
     * Linux
     * macOS
     * Windows
