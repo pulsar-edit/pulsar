@@ -12,7 +12,7 @@ Order block decoration items in the DOM in a deterministic and controllable way.
 
 When multiple block decorations are created at the same screen line, they are inserted into the DOM in an order determined by the sequence of their creation; from oldest to newest when `position` is set to `"before"`, from newest to oldest when `position` is set to `"after"`. While this is deterministic, it is limited: it isn't possible to insert decorations within a sequence of existing ones, and it's difficult to control the order of decorations when creating and destroying and moving markers around an editor.
 
-We hit the need for this in [atom/github#1913](https://github.com/atom/github/pull/1913) when we have a block decoration for multiple consecutive collapsed file patches.
+We hit the need for this in [Pulsar/github#1913](https://github.com/Pulsar/github/pull/1913) when we have a block decoration for multiple consecutive collapsed file patches.
 
 ## Explanation
 
@@ -30,7 +30,7 @@ This adds another situational parameter to `TextEditor::decorationMarker()`, whi
 
 ## Rationale and alternatives
 
-Originally I wanted to address the package coordination problem with a similar approach to [the way context menu items are ordered](https://github.com/atom/atom/pull/16661), by allowing individual decorations to specify constraints: "before this block," "after this block," "next to this block" and so forth. I ultimately chose to write up the simpler proposal because:
+Originally I wanted to address the package coordination problem with a similar approach to [the way context menu items are ordered](https://github.com/Pulsar/Pulsar/pull/16661), by allowing individual decorations to specify constraints: "before this block," "after this block," "next to this block" and so forth. I ultimately chose to write up the simpler proposal because:
 
 * Block decoration collisions among packages seem much less likely than context menu collisions.
 * Constraint satisfaction problems are complex. There would be a relatively high chance of introducing bugs and performance regressions.

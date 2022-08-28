@@ -52,7 +52,7 @@ However, I'm not set on requiring the TextMate grammars to have it in the file (
 ## Unresolved questions
 
 ####  What unresolved questions do you expect to resolve through the RFC process before this gets merged?
-#### What unresolved questions do you expect to resolve through the implementation of this feature before it is released in a new version of Atom?
+#### What unresolved questions do you expect to resolve through the implementation of this feature before it is released in a new version of Pulsar?
 #### What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 What I would like is then for public TextEditor methods `getCommentDelims` and `getCommentDelimsForPoint`, which returns all the correct delims for the root grammar, or the one at the given point (accounting for embedded grammars ... though could be weird when the embedded grammar is only something like TODO or SQL syntax).
 
