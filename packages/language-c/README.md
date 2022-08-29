@@ -1,4 +1,4 @@
-# C/C++ language support in Atom
+# C/C++ language support in Pulsar
 ![CI Status](https://github.com/atom/language-c/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to C/C++ files in Atom.
