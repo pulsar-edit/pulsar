@@ -5,7 +5,7 @@
 
 Adds syntax highlighting to Git commit, merge, and rebase messages edited in Pulsar.
 
-You can configure Atom to be your Git editor with the following command:
+You can configure Pulsar to be your Git editor with the following command:
 
 ```sh
 git config --global core.editor "atom --wait"
