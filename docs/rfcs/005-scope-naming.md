@@ -36,7 +36,7 @@ Thus, here’s what I propose:
 
 If an issue or PR proposes adding a scope and can justify its presence somehow — including the goal of parity with its non-tree-sitter predecessor — an answer of “no, because the built-in syntax themes don’t want to highlight it that way” should become “OK, but only if someone does the associated work to ensure no visual regressions in the built-in syntax themes.” That someone could be the PR’s author or anyone else who has an interest in getting it landed.
 
-This is tricky, of course — not only the coordination of PRs across packages, but also the need to apply overrides to all six (is it six? I think it’s six) of the built-in syntax themes. If all built-in themes are going to share an austere philosophy ([and it seems like that’s the plan](https://github.com/atom/Pulsar/pull/18383#issuecomment-435460854)), then perhaps it makes sense for them to start sharing a core set of contextual rules. The only difference between them would be the specific color choices that they make.
+This is tricky, of course — not only the coordination of PRs across packages, but also the need to apply overrides to all six (is it six? I think it’s six) of the built-in syntax themes. If all built-in themes are going to share an austere philosophy ([and it seems like that’s the plan](https://github.com/atom/atom/pull/18383#issuecomment-435460854)), then perhaps it makes sense for them to start sharing a core set of contextual rules. The only difference between them would be the specific color choices that they make.
 
 ## Drawbacks
 
