@@ -14,7 +14,7 @@ Download the latest [Pulsar installer](https://github.com/pulsar-edit/pulsar/rel
 
 Pulsar will automatically update when a new release is available.
 
-You can also download `Pulsar-windows.zip` (32-bit) or `Pulsar-x64-windows.zip` (64-bit) from the [releases page](https://github.com/atom/Pulsar/releases/latest).
+You can also download `Pulsar-windows.zip` (32-bit) or `Pulsar-x64-windows.zip` (64-bit) from the [releases page](https://github.com/pulsar-edit/pulsar/releases/latest).
 The `.zip` version will not automatically update.
 
 Using [Chocolatey](https://chocolatey.org)? Run `cinst Pulsar` to install the latest version of Pulsar.
