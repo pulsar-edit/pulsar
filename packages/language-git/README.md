@@ -1,4 +1,4 @@
-# Git editing support in Atom
+# Git editing support in Pulsar
 [![macOS Build Status](https://travis-ci.org/atom/language-git.svg?branch=master)](https://travis-ci.org/atom/language-git)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/481319gyrr1feo8b/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-git/branch/master)
 [![Dependency Status](https://david-dm.org/atom/language-git.svg)](https://david-dm.org/atom/language-git)
