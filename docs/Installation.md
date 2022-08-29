@@ -10,7 +10,7 @@ Pulsar will automatically update when a new release is available.
 
 ### Windows
 
-Download the latest [Pulsar installer](https://github.com/atom/Pulsar/releases/latest). `PulsarSetup.exe` is 32-bit. For 64-bit systems, download `PulsarSetup-x64.exe`.
+Download the latest [Pulsar installer](https://github.com/pulsar-edit/pulsar/releases/latest). `PulsarSetup.exe` is 32-bit. For 64-bit systems, download `PulsarSetup-x64.exe`.
 
 Pulsar will automatically update when a new release is available.
 
