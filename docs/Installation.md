@@ -4,7 +4,7 @@
 
 ### macOS
 
-Download the latest [Pulsar release](https://github.com/atom/Pulsar/releases/latest).
+Download the latest [Pulsar release](https://github.com/pulsar-edit/pulsar/releases/latest).
 
 Pulsar will automatically update when a new release is available.
 
