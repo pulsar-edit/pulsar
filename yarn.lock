@@ -7822,15 +7822,6 @@ tar@^6.0.2, tar@^6.0.5, tar@^6.1.2:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-telemetry-github@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/telemetry-github/-/telemetry-github-0.1.1.tgz#ae3d159e914d124dc1debd042fc2e276ce847df4"
-  integrity sha512-UUtkNKKHpUthL4FsAJDqKg+TiW0DBI636XAOAA3qcu86m20DhLhn3qhxl12joGdPBtk0tbv/Dx47pj28ZhuF+g==
-  dependencies:
-    idb "^4.0.3"
-    lokijs "^1.5.4"
-    uuid "^3.2.1"
-
 temp@0.9.1:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/temp/-/temp-0.9.1.tgz#2d666114fafa26966cd4065996d7ceedd4dd4697"
