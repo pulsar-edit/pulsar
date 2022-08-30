@@ -77,7 +77,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **line-ending-selector** | [`./packages/line-ending-selector`](./line-ending-selector) | [#17847](https://github.com/atom/atom/issues/17847) |
 | **link** | [`./link`](./link) | [#17848](https://github.com/atom/atom/issues/17848) |
 | **markdown-preview** | [`atom/markdown-preview`][markdown-preview] |  |
-| **metrics** | [`atom/metrics`][metrics] | [#18276](https://github.com/atom/atom/issues/18276) |
 | **notifications** | [`atom/notifications`][notifications] | [#18277](https://github.com/atom/atom/issues/18277) |
 | **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | [#17853](https://github.com/atom/atom/issues/17853) |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | [#17854](https://github.com/atom/atom/issues/17854) |
@@ -152,7 +151,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 [language-xml]: https://github.com/atom/language-xml
 [language-yaml]: https://github.com/atom/language-yaml
 [markdown-preview]: https://github.com/atom/markdown-preview
-[metrics]: https://github.com/atom/metrics
 [notifications]: https://github.com/atom/notifications
 [open-on-github]: https://github.com/atom/open-on-github
 [package-generator]: https://github.com/atom/package-generator

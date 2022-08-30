@@ -339,29 +339,6 @@ const configSchema = {
         type: 'boolean',
         default: true
       },
-      telemetryConsent: {
-        description:
-          'Allow usage statistics and exception reports to be sent to the Atom team to help improve the product.',
-        title: 'Send Telemetry to the Atom Team',
-        type: 'string',
-        default: 'undecided',
-        enum: [
-          {
-            value: 'limited',
-            description:
-              'Allow limited anonymous usage stats, exception and crash reporting'
-          },
-          {
-            value: 'no',
-            description: 'Do not send any telemetry data'
-          },
-          {
-            value: 'undecided',
-            description:
-              'Undecided (Atom will ask again next time it is launched)'
-          }
-        ]
-      },
       warnOnLargeFileLimit: {
         description:
           'Warn before opening files larger than this number of megabytes.',

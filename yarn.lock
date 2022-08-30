@@ -5551,14 +5551,6 @@ md5@^2.1.0:
     crypt "0.0.2"
     is-buffer "~1.1.6"
 
-"metrics@https://codeload.github.com/atom/metrics/legacy.tar.gz/refs/tags/v1.8.1":
-  version "1.8.1"
-  resolved "https://codeload.github.com/atom/metrics/legacy.tar.gz/refs/tags/v1.8.1#fbf921b4c9212a11f83d1f580620c3d6b1fff974"
-  dependencies:
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    telemetry-github "0.1.1"
-
 mime-db@1.52.0:
   version "1.52.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.52.0.tgz#bbabcdc02859f4987301c856e3387ce5ec43bf70"
