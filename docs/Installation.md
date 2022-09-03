@@ -23,7 +23,7 @@ Using [Chocolatey](https://chocolatey.org)? Run `cinst Pulsar` to install the la
 
 Pulsar is only available for 64-bit Linux systems.
 
-Configure your distribution's package manager to install and update Pulsar by following the [Linux installation instructions](https://flight-manual.atom.io/getting-started/sections/installing-Pulsar/#platform-linux) in the Flight Manual.  You will also find instructions on how to install Pulsar's official Linux packages without using a package repository, though you will not get automatic updates after installing Pulsar this way.
+Configure your distribution's package manager to install and update Pulsar by following the [Linux installation instructions](https://flight-manual.atom.io/getting-started/sections/installing-atom/#platform-linux) in the Flight Manual.  You will also find instructions on how to install Pulsar's official Linux packages without using a package repository, though you will not get automatic updates after installing Pulsar this way.
 
 #### Archive extraction
 
