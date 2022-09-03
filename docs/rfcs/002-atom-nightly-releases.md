@@ -20,7 +20,7 @@ Today, a bleeding-edge user must manually pull Pulsar's `master` branch and comp
 
 A user who wants to use the latest improvements to Pulsar each day can go to atom.io, download the Pulsar Nightly release, and install it on their machine.  This release can be installed alongside Pulsar Stable and Pulsar Beta.
 
-Each night when there are new commits to Pulsar's `master` branch, a scheduled CI build creates a new Pulsar Nightly release with packages for Windows, macOS, and Linux.  These packages are automatically uploaded to a new GitHub release on the `Pulsar/Pulsar-nightly-releases` repository using a monotonically-increasing nightly version based off of the version in `master` (e.g. `v1.29.0-nightly1`).
+Each night when there are new commits to Pulsar's `master` branch, a scheduled CI build creates a new Pulsar Nightly release with packages for Windows, macOS, and Linux.  These packages are automatically uploaded to a new GitHub release on the `pulsar-edit/atom-nightly-releases` repository using a monotonically-increasing nightly version based off of the version in `master` (e.g. `v1.29.0-nightly1`).
 
 Every 4 hours, an Pulsar Nightly release installed on Windows or macOS checks for a new update by consulting Electron's [update.electronjs.org](update-electron) service.  If a new update is available, it is downloaded in the background and the user is notified to restart Pulsar once it's complete.  This update flow is the same as what users experience in Pulsar Stable or Beta releases but updates occur more frequently.
 
