@@ -24,7 +24,7 @@
 > - [line-ending-selector](https://github.com/atom/Pulsar/tree/master/packages/line-ending-selector)
 > - [link](https://github.com/pulsar-edit/pulsar/tree/master/packages/link)
 > - [ruby-on-rails](https://github.com/pulsar-edit/pulsar/tree/master/packages/ruby-on-rails)
-> - [update-package-dependencies](https://github.com/atom/Pulsar/tree/master/packages/update-package-dependencies)
+> - [update-package-dependencies](https://github.com/pulsar-edit/pulsar/tree/master/packages/update-package-dependencies)
 > - [welcome](https://github.com/atom/Pulsar/tree/master/packages/welcome)
 >
 > The dependency badges might be irrelevant, so take them with a grain of salt (e.g. not very seriously).
