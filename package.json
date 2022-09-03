@@ -276,6 +276,7 @@
   "private": true,
   "scripts": {
     "preinstall": "node -e 'process.exit(0)'",
+    "postinstall": "cd apm && yarn install",
     "test": "node script/test",
     "build": "electron-rebuild",
     "build:apm": "cd apm; yarn install; ./node_modules/atom-package-manager/bin/npm rebuild",

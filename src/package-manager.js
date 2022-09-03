@@ -206,7 +206,7 @@ module.exports = class PackageManager {
       
       this.apmPath = path.join(
         __dirname, 
-        "../apm/node_modules/atom-package-manager/bin",
+        "../apm/node_modules/ppm/bin",
         commandName
       );
     }
