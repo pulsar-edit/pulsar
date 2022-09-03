@@ -36,7 +36,7 @@ but should be compatible with other Linux distributions.
 ```sh
 sudo apt install git libasound2 libcurl4 libgbm1 libgcrypt20 libgtk-3-0 libnotify4 libnss3 libglib2.0-bin xdg-utils libx11-xcb1 libxcb-dri3-0 libxss1 libxtst6 libxkbfile1
 ```
-2. Download `Pulsar-amd64.tar.gz` from the [Pulsar releases page](https://github.com/atom/Pulsar/releases/latest).
+2. Download `Pulsar-amd64.tar.gz` from the [Pulsar releases page](https://github.com/pulsar-edit/pulsar/releases/latest).
 3. Run `tar xf Pulsar-amd64.tar.gz` in the directory where you want to extract the Pulsar folder.
 4. Launch Pulsar using the installed `Pulsar` command from the newly extracted directory.
 
