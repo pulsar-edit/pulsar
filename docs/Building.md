@@ -9,7 +9,7 @@ There are two ways of building and staring hacking on Pulsar's core. One is foll
 
 ### Alternative method
 
-First, install `yarn`. Pulsar currently does not work with `npm` (althought it will
+First, install `yarn`. Pulsar currently does not work with `npm` (although it will
 probably work in the future). Be sure you're using Node.JS versions between 10 and 16, and
 then run:
 
@@ -18,6 +18,8 @@ yarn install
 yarn build
 yarn build:apm
 ```
+
+> Now `yarn build:apm` is included as a `postinstall` script. So there is no need to run it.
 
 This will install the packages, rebuild them for Electron, and build the Atom Package
 Manager. Finally, you can run the editor with `yarn start`. This command will accept the
