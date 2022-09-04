@@ -1,0 +1,22 @@
+{
+  "name": "language-sass",
+  "version": "0.62.2",
+  "description": "Sass/SCSS language support in Atom",
+  "license": "MIT",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-sass",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/language-sass.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/language-sass/issues"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.10.1",
+    "dedent": "^0.7.0"
+  }
+}

@@ -1,0 +1,121 @@
+'.source.python':
+  '#!/usr/bin/env python':
+    'prefix': 'env'
+    'body': '#!/usr/bin/env python\n'
+  '#!/usr/bin/env python3':
+    'prefix': 'env3'
+    'body': '#!/usr/bin/env python3\n'
+  '# coding=utf-8':
+    'prefix': 'enc'
+    'body': '# -*- coding: utf-8 -*-\n'
+  'Import':
+    'prefix': 'im'
+    'body': 'import ${1:package/module}'
+  'From/Import':
+    'prefix': 'fim'
+    'body': 'from ${1:package/module} import ${2:names}'
+  'Assert Equal':
+    'prefix': 'ase'
+    'body': 'self.assertEqual(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
+  'Assert Not Equal':
+    'prefix': 'asne'
+    'body': 'self.assertNotEqual(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
+  'Assert Raises':
+    'prefix': 'asr'
+    'body': 'self.assertRaises(${1:exception}, ${2:callable})$0'
+  'Assert True':
+      'prefix': 'ast'
+      'body': 'self.assertTrue(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert False':
+     'prefix': 'asf'
+     'body': 'self.assertFalse(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert Is':
+     'prefix': 'asi'
+     'body': 'self.assertIs(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
+  'Assert Is Not':
+     'prefix': 'asint'
+     'body': 'self.assertIsNot(${1:expected}, ${2:actual}${3:, \'${4:message}\'})$0'
+  'Assert Is None':
+     'prefix': 'asino'
+     'body': 'self.assertIsNone(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert Is Not None':
+     'prefix': 'asinno'
+     'body': 'self.assertIsNotNone(${1:actual}${2:, \'${3:message}\'})$0'
+  'Assert In':
+     'prefix': 'asin'
+     'body': 'self.assertIn(${1:needle}, ${2:haystack}${3:, \'${4:message}\'})$0'
+  'Assert Not In':
+     'prefix': 'asni'
+     'body': 'self.assertNotIn(${1:needle}, ${2:haystack}${3:, \'${4:message}\'})$0'
+  'Assert':
+    'prefix': 'as'
+    'body': 'self.assert_(${1:boolean expression}${2:, \'${3:message}\'})$0'
+  'Fail (a test)':
+    'prefix': 'fail'
+    'body': 'self.fail(\'${1:message}\')$0'
+  'New Class':
+    'prefix': 'class'
+    'body': 'class ${1:ClassName}(${2:object}):\n\t"""${3:docstring for $1.}"""\n\n\tdef __init__(self, ${4:arg}):\n\t\t${5:super($1, self).__init__()}\n\t\tself.arg = arg\n\t\t$0'
+  'New Method':
+    'prefix': 'defs'
+    'body': 'def ${1:mname}(self, ${2:arg}):\n\t${3:pass}'
+  'New Function':
+    'prefix': 'def'
+    'body': 'def ${1:fname}(${2:arg}):\n\t${3:pass}'
+  'New Property':
+    'prefix': 'property'
+    'body': 'def ${1:foo}():\n    doc = "${2:The $1 property.}"\n    def fget(self):\n        ${3:return self._$1}\n    def fset(self, value):\n        ${4:self._$1 = value}\n    def fdel(self):\n        ${5:del self._$1}\n    return locals()\n$1 = property(**$1())$0'
+  'if':
+    'prefix': 'if'
+    'body': 'if ${1:condition}:\n\t${2:pass}'
+  'for':
+    'prefix': 'for'
+    'body': 'for ${1:value} in ${2:variable}:\n\t${3:pass}'
+  'while':
+    'prefix': 'while'
+    'body': 'while ${1:condition}:\n\t${2:pass}'
+  'with statement':
+    'prefix': 'with'
+    'body': 'with ${1:expression} as ${2:target}:\n\t${3:pass}'
+  'Try/Except/Else/Finally':
+    'prefix': 'tryef'
+    'body': 'try:\n\t${1:pass}\nexcept${2: ${3:Exception} as ${4:e}}:\n\t${5:raise}\nelse:\n\t${6:pass}\nfinally:\n\t${7:pass}'
+  'Try/Except/Else':
+    'prefix': 'trye'
+    'body': 'try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}\nelse:\n\t${5:pass}'
+  'Try/Except/Finally':
+    'prefix': 'tryf'
+    'body': 'try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}\nfinally:\n\t${5:pass}'
+  'Try/Except':
+    'prefix': 'try'
+    'body': 'try:\n\t${1:pass}\nexcept ${2:Exception} as ${3:e}:\n\t${4:raise $3}'
+  'List Comprehension':
+    'prefix': 'lc'
+    'body': '[${1:value} for ${2:value} in ${3:variable}]'
+  'List Comprehension If Else':
+    'prefix': 'lcie'
+    'body': '[${1:value} if ${2:condition} else ${3:value} for ${4:value} in ${5:variable}]'
+  'Dictionary Comprehension':
+    'prefix': 'dc'
+    'body': '{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:variable}}'
+  'Set Comprehension':
+    'prefix': 'sc'
+    'body': '{${1:value} for ${2:value} in ${3:variable}}'
+  'PDB set trace':
+    'prefix': 'pdb'
+    'body': 'import pdb; pdb.set_trace()'
+  'iPDB set trace':
+    'prefix': 'ipdb'
+    'body': 'import ipdb; ipdb.set_trace()'
+  'rPDB set trace':
+    'prefix': 'rpdb'
+    'body': 'import rpdb2; rpdb2.start_embedded_debugger(\'${1:debug_password}\')$0'
+  'PuDB set trace':
+    'prefix': 'pudb'
+    'body': 'import pudb; pudb.set_trace()'
+  '__magic__':
+    'prefix': '__'
+    'body': '__${1:init}__'
+  'if __name__ == \'__main__\'':
+    'prefix': 'ifmain'
+    'body': 'if __name__ == \'__main__\':\n\t${1:main()}$0'

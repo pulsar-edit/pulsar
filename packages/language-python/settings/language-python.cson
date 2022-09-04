@@ -1,0 +1,9 @@
+'.source.python':
+  'editor':
+    'autoIndentOnPaste': false
+    'softTabs': true
+    'tabLength': 4
+    'commentStart': '# '
+    'foldEndPattern': '^\\s*[}\\])]'
+    'increaseIndentPattern': '^\\s*(class|def|elif|else|except|finally|for|if|try|with|while|async\\s+(def|for|with))\\b.*:\\s*$'
+    'decreaseIndentPattern': '^\\s*(elif|else|except|finally)\\b.*:\\s*$'

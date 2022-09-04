@@ -1,0 +1,14 @@
+{
+  "name": "language-gfm",
+  "version": "0.90.8",
+  "description": "Syntax highlighting and snippets for GitHub Flavored Markdown (GFM).",
+  "repository": "https://github.com/atom/language-gfm",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "devDependencies": {
+    "coffee-script": "1.7.0",
+    "coffeelint": "^1.10.1"
+  }
+}

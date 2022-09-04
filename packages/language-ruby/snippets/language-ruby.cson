@@ -1,0 +1,351 @@
+'.source.ruby, .dyn.caret.begin.document':
+  '#!/usr/bin/env ruby -wKU':
+    'prefix': 'rb'
+    'body': '#!/usr/bin/env ruby -wKU\n'
+'.source.ruby':
+  '# encoding: UTF-8':
+    'prefix': 'utf8'
+    'body': '# encoding: ${1:UTF-8}\n'
+  'if … else … end':
+    'prefix': 'ife'
+    'body': 'if ${1:condition}\n\t$2\nelse\n\t$3\nend'
+  'if … end':
+    'prefix': 'if'
+    'body': 'if ${1:condition}\n\t$0\nend'
+  'it … end':
+    'prefix': 'it'
+    'body': 'it "${1:text}" do\n\t$0\nend'
+  'case … end':
+    'prefix': 'case'
+    'body': 'case ${1:object}\nwhen ${2:condition}\n\t$0\nend'
+  'begin … rescue … end':
+    'prefix': 'beg'
+    'body': 'begin\n\t$1\nrescue ${2:ExceptionName}\n\t$3\nend'
+  'refine … end':
+    'prefix': 'ref'
+    'body': 'refine ${1:ClassName} do\n\t$2\nend'
+  'using':
+    'prefix': 'usi'
+    'body': 'using ${1:ModuleName}'
+  'Add ‘# =>’ Marker':
+    'prefix': '#'
+    'body': '# => '
+  'Benchmark.bmbm do .. end':
+    'prefix': 'bm-'
+    'body': 'TESTS = ${1:10_000}\nBenchmark.bmbm do |results|\n  $0\nend'
+  'Dir.glob("..") { |file| .. }':
+    'prefix': 'Dirg'
+    'body': 'Dir.glob(${1:"${2:dir/glob/*}"}) { |${3:file}| $0 }'
+  'Dir[".."]':
+    'prefix': 'Dir'
+    'body': 'Dir[${1:"${2:glob/**/*.rb}"}]'
+  'File.foreach ("..") { |line| .. }':
+    'prefix': 'Filef'
+    'body': 'File.foreach(${1:"${2:path/to/file}"}) { |${3:line}| $0 }'
+  'File.read("..")':
+    'prefix': 'File'
+    'body': 'File.read(${1:"${2:path/to/file}"})'
+  'Hash.new { |hash, key| hash[key] = .. }':
+    'prefix': 'Hash'
+    'body': 'Hash.new { |${1:hash}, ${2:key}| ${1:hash}[${2:key}] = $0 }'
+  'Array.new( .. )':
+    'prefix': 'arr'
+    'body': 'Array.new(${1:len,val})\n$0'
+  'Array.new( .. ) { |index| .. }':
+    'prefix': 'arri'
+    'body': 'Array.new(${1:len}) { |${2:i}| $0 }'
+  'Marshal.dump(.., file)':
+    'prefix': 'Md'
+    'body': 'File.open(${1:"${2:path/to/file}.dump"}, "wb") { |${3:file}| Marshal.dump(${4:obj}, ${3:file}) }'
+  'Marshal.load(obj)':
+    'prefix': 'Ml'
+    'body': 'File.open(${1:"${2:path/to/file}.dump"}, "rb") { |${3:file}| Marshal.load(${3:file}) }'
+  'PStore.new( .. )':
+    'prefix': 'Pn-'
+    'body': 'PStore.new(${1:"${2:file_name.pstore}"})'
+  'YAML.dump(.., file)':
+    'prefix': 'Yd-'
+    'body': 'File.open(${1:"${2:path/to/file}.yaml"}, "w") { |${3:file}| YAML.dump(${4:obj}, ${3:file}) }'
+  'YAML.load(file)':
+    'prefix': 'Yl-'
+    'body': 'File.open(${1:"${2:path/to/file}.yaml"}) { |${3:file}| YAML.load(${3:file}) }'
+  'alias_method ..':
+    'prefix': 'am'
+    'body': 'alias_method :${1:new_name}, :${0:old_name}'
+  'all? { |e| .. }':
+    'prefix': 'all'
+    'body': 'all? { |${1:e}| $0 }'
+  'any? { |e| .. }':
+    'prefix': 'any'
+    'body': 'any? { |${1:e}| $0 }'
+  'application { .. }':
+    'prefix': 'app'
+    'body': 'if __FILE__ == \\$PROGRAM_NAME\n\t$0\nend'
+  'assert_nothing_raised(..) { .. }':
+    'prefix': 'asnr'
+    'body': 'assert_nothing_raised(${1:Exception}) { $0 }'
+  'assert_nothing_thrown { .. }':
+    'prefix': 'asnt'
+    'body': 'assert_nothing_thrown { $0 }'
+  'assert_raise(..) { .. }':
+    'prefix': 'asr'
+    'body': 'assert_raise(${1:Exception}) { $0 }'
+  'assert_throws(..) { .. }':
+    'prefix': 'ast'
+    'body': 'assert_throws(:${1:expected}) { $0 }'
+  'attr_accessor ..':
+    'prefix': 'rw'
+    'body': 'attr_accessor :${0:attr_names}'
+  'attr_reader ..':
+    'prefix': 'r'
+    'body': 'attr_reader :${0:attr_names}'
+  'attr_writer ..':
+    'prefix': 'w'
+    'body': 'attr_writer :${0:attr_names}'
+  'ClassName = Struct .. do .. end':
+    'prefix': 'clast'
+    'body': '$1 = Struct.new(:${2:attr_names}) do\n\tdef ${3:method_name}\n\t\t$0\n\tend\n\t\n\t\nend'
+  'class << self .. end':
+    'prefix': 'clase'
+    'body': 'class << ${1:self}\n\t$0\nend'
+  'class .. end':
+    'prefix': 'cla'
+    'body': 'class ${1:ClassName}\n\t$0\nend'
+  'class_from_name()':
+    'prefix': 'clafn'
+    'body': 'split("::").inject(Object) { |par, const| par.const_get(const) }'
+  'collect { |e| .. }':
+    'prefix': 'col'
+    'body': 'collect { |${1:e}| $0 }'
+  'deep_copy(..)':
+    'prefix': 'deec'
+    'body': 'Marshal.load(Marshal.dump(${0:obj_to_copy}))'
+  'def … end':
+    'prefix': 'def'
+    'body': 'def ${1:method_name}\n\t$0\nend'
+  'initialize':
+    'prefix': 'defi'
+    'body': 'def initialize${1:(${2:argument})}\n\t\@${2:argument} = ${2:argument}$0\nend'
+  'def method_missing .. end':
+    'prefix': 'defmm'
+    'body': 'def method_missing(meth, *args, &blk)\n\t$0\nend'
+  'def self .. end':
+    'prefix': 'defs'
+    'body': 'def self.${1:class_method_name}\n\t$0\nend'
+  'def test_ .. end':
+    'prefix': 'deft'
+    'body': 'def test_${1:case_name}\n\t$0\nend'
+  'def_delegator ..':
+    'prefix': 'defd'
+    'body': 'def_delegator :${1:@del_obj}, :${2:del_meth}, :${3:new_name}'
+  'def_delegators ..':
+    'prefix': 'defds'
+    'body': 'def_delegators :${1:@del_obj}, :${0:del_methods}'
+  'delete_if { |e| .. }':
+    'prefix': 'deli'
+    'body': 'delete_if { |${1:e}| $0 }'
+  'detect { |e| .. }':
+    'prefix': 'det'
+    'body': 'detect { |${1:e}| $0 }'
+  'directory()':
+    'prefix': 'dir'
+    'body': 'File.dirname(__FILE__)'
+  'Insert do … end':
+    'prefix': 'do'
+    'body': 'do\n\t$0\nend'
+  'Insert do |variable| … end':
+    'prefix': 'dop'
+    'body': 'do |${1:variable}|\n\t$0\nend'
+  'each { |e| .. }':
+    'prefix': 'ea'
+    'body': 'each { |${1:e}| $0 }'
+  'each_byte { |byte| .. }':
+    'prefix': 'eab'
+    'body': 'each_byte { |${1:byte}| $0 }'
+  'each_char { |chr| .. }':
+    'prefix': 'eacha'
+    'body': 'each_char { |${1:chr}| $0 }'
+  'each_cons(..) { |group| .. }':
+    'prefix': 'eacon'
+    'body': 'each_cons(${1:2}) { |${2:group}| $0 }'
+  'each_index { |i| .. }':
+    'prefix': 'eai'
+    'body': 'each_index { |${1:i}| $0 }'
+  'each_key { |key| .. }':
+    'prefix': 'eak'
+    'body': 'each_key { |${1:key}| $0 }'
+  'each_line { |line| .. }':
+    'prefix': 'eal'
+    'body': 'each_line$1 { |${2:line}| $0 }'
+  'each_pair { |name, val| .. }':
+    'prefix': 'eap'
+    'body': 'each_pair { |${1:name}, ${2:val}| $0 }'
+  'each_slice(..) { |group| .. }':
+    'prefix': 'eas-'
+    'body': 'each_slice(${1:2}) { |${2:group}| $0 }'
+  'each_value { |val| .. }':
+    'prefix': 'eav'
+    'body': 'each_value { |${1:val}| $0 }'
+  'each_with_index { |e, i| .. }':
+    'prefix': 'eawi'
+    'body': 'each_with_index { |${1:e}, ${2:i}| $0 }'
+  'elsif ...':
+    'prefix': 'elsif'
+    'body': 'elsif ${1:condition}\n\t$0'
+  'extend Forwardable':
+    'prefix': 'Forw'
+    'body': 'extend Forwardable'
+  'find { |e| .. }':
+    'prefix': 'fin'
+    'body': 'find { |${1:e}| $0 }'
+  'find_all { |e| .. }':
+    'prefix': 'fina'
+    'body': 'find_all { |${1:e}| $0 }'
+  'flatten_once()':
+    'prefix': 'flao'
+    'body': 'inject(Array.new) { |${1:arr}, ${2:a}| ${1:arr}.push(*${2:a}) }'
+  'grep(/pattern/) { |match| .. }':
+    'prefix': 'gre'
+    'body': 'grep(${1:/${2:pattern}/}) { |${3:match}| $0 }'
+  'Hash Pair — :key => "value"':
+    'prefix': 'hp'
+    'body': ':${1:key} => ${2:"${3:value}"}${4:, }'
+  'include Comparable ..':
+    'prefix': 'Comp'
+    'body': 'include Comparable\n\ndef <=>(other)\n\t$0\nend'
+  'include Enumerable ..':
+    'prefix': 'Enum'
+    'body': 'include Enumerable\n\ndef each(&block)\n\t$0\nend'
+  'loop { .. }':
+    'prefix': 'loo'
+    'body': 'loop { $0 }'
+  'map { |e| .. }':
+    'prefix': 'map'
+    'body': 'map { |${1:e}| $0 }'
+  'map_with_index { |e, i| .. }':
+    'prefix': 'mapwi-'
+    'body': 'enum_with_index.map { |${1:e}, ${2:i}| $0 }'
+  'max { |a, b| .. }':
+    'prefix': 'max'
+    'body': 'max { |a, b| $0 }'
+  'min { |a, b| .. }':
+    'prefix': 'min'
+    'body': 'min { |a, b| $0 }'
+  'module .. module_function .. end':
+    'prefix': 'modf'
+    'body': 'module $1\n\tmodule_function\n\t\n\t$0\nend'
+  'module .. end':
+    'prefix': 'mod'
+    'body': 'module ${1:ModuleName}\n\t$0\nend'
+  'namespace :.. do .. end':
+    'prefix': 'nam'
+    'body': 'namespace :$1 do\n\t$0\nend'
+  'partition { |e| .. }':
+    'prefix': 'par'
+    'body': 'partition { |${1:e}| $0 }'
+  'path_from_here( .. )':
+    'prefix': 'patfh'
+    'body': 'File.join(File.dirname(__FILE__), *%w[${1:rel path here}])'
+  'randomize()':
+    'prefix': 'ran'
+    'body': 'sort_by { rand }'
+  'reject { |e| .. }':
+    'prefix': 'rej'
+    'body': 'reject { |${1:e}| $0 }'
+  'require ".."':
+    'prefix': 'req'
+    'body': 'require "$0"'
+  'require "tc_.." ..':
+    'prefix': 'ts'
+    'body': 'require "test/unit"\n\nrequire "tc_${1:test_case_file}"\nrequire "tc_${2:test_case_file}"\n'
+  'require_gem ".."':
+    'prefix': 'reqg-'
+    'body': 'require "$0"'
+  'results.report(..) { .. }':
+    'prefix': 'rep'
+    'body': 'results.report("${1:name}:") { TESTS.times { $0 } }'
+  'reverse_each { |e| .. }':
+    'prefix': 'reve'
+    'body': 'reverse_each { |${1:e}| $0 }'
+  'scan(/../) { |match| .. }':
+    'prefix': 'sca'
+    'body': 'scan(/${1:pattern}/) { |${2:match}| $0 }'
+  'select { |e| .. }':
+    'prefix': 'sel'
+    'body': 'select { |${1:e}| $0 }'
+  'singleton_class()':
+    'prefix': 'sinc'
+    'body': 'class << self; self end'
+  'sort { |a, b| .. }':
+    'prefix': 'sor'
+    'body': 'sort { |a, b| $0 }'
+  'sort_by { |e| .. }':
+    'prefix': 'sorb'
+    'body': 'sort_by { |${1:e}| $0 }'
+  'task :task_name => [:dependent, :tasks] do .. end':
+    'prefix': 'tas'
+    'body': 'desc "${1:Task description}"\ntask :${2:${3:task_name} => ${4:[:${5:dependent, :tasks}]}} do\n\t$0\nend'
+  'unix_filter { .. }':
+    'prefix': 'unif'
+    'body': 'ARGF.each_line$1 do |${2:line}|\n\t$0\nend'
+  'unless … end':
+    'prefix': 'unless'
+    'body': 'unless ${1:condition}\n\t$0\nend'
+  'until ... end':
+    'prefix': 'until'
+    'body': 'until ${1:condition}\n\t$0\nend'
+  'usage_if()':
+    'prefix': 'usai'
+    'body': 'if ARGV.$1\n\tabort "Usage:  #\{\\$PROGRAM_NAME} ${2:ARGS_GO_HERE}"\nend' # '"#{var}"' makes a coffeelint issue. Use '"#\{var}"' instead.
+  'usage_unless()':
+    'prefix': 'usau'
+    'body': 'unless ARGV.$1\n\tabort "Usage:  #\{\\$PROGRAM_NAME} ${2:ARGS_GO_HERE}"\nend' # '"#{var}"' makes a coffeelint issue. Use '"#\{var}"' instead.
+  'when …':
+    'prefix': 'when'
+    'body': 'when ${1:condition}\n\t$0'
+  'while ... end':
+    'prefix': 'while'
+    'body': 'while ${1:condition}\n\t$0\nend'
+  'xmlread(..)':
+    'prefix': 'xml-'
+    'body': 'REXML::Document.new(File.read(${1:"${2:path/to/file}"}))'
+  'xpath(..) { .. }':
+    'prefix': 'xpa'
+    'body': 'elements.each(${1:"${2://XPath}"}) do |${3:node}|\n\t$0\nend'
+  'zip(enums) { |row| .. }':
+    'prefix': 'zip'
+    'body': 'zip(${1:enums}) { |${2:row}| $0 }'
+  'pry':
+    'prefix': 'pry'
+    'body': 'binding.pry'
+  'Insert curly braces block':
+    'prefix': '{'
+    'body': '{ ${1:|${2:variable}| }$0 '
+'.source.ruby .comment':
+  ':yields:':
+    'prefix': 'y'
+    'body': ' :yields: ${0:arguments}'
+'.text.html.erb':
+  'erb_render_block':
+    'prefix': '='
+    'body': '<%= $1 %>'
+  'erb_render_block_after_tag':
+    'prefix': '\>='
+    'body': '\><%= $1 %>'
+  'erb_render_block_after_quote':
+    'prefix': '\"='
+    'body': '\"<%= $1 %>'
+  'erb_exec_block':
+    'prefix': '-'
+    'body': '<% $1 %>'
+  'erb_exec_block_after_tag':
+    'prefix': '\>-'
+    'body': '\><% $1 %>'
+  'erb_exec_block_after_quote':
+    'prefix': '\"-'
+    'body': '\"<% $1 %>'
+
+'.string.quoted.double.ruby:not(.string .source), .string.quoted.double.ruby:not(.string .source)':
+  'Interpolated Code':
+    'prefix': '#'
+    'body': '#{$1}$2'

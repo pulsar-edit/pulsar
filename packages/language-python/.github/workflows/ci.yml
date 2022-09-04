@@ -1,0 +1,51 @@
+name: ci
+on:
+  - pull_request
+  - push
+
+jobs:
+  Test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        atom_channel:
+          - stable
+          - nightly
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            'node_modules'
+            'C:/Program Files (x86)/MSBuild/Microsoft.Cpp/v4.0/v140'
+          key: ${{ runner.os }}-${{ matrix.atom_channel }}-${{ hashFiles('package.json') }}
+
+      - uses: UziTech/action-setup-atom@v1
+        with:
+          channel: ${{ matrix.atom_channel }}
+
+      - name: Install Visual Studio 2015 on Windows
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          choco install visualcpp-build-tools --version=14.0.25420.1 --ignore-dependencies -y --params "'/IncludeRequired'"
+          echo ::set-env name=VCTargetsPath::'C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v140'
+
+      - name: Install dependencies
+        run: apm install
+
+      - name: Run tests
+        run: apm test
+
+  Skip:
+    if: contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip CI 🚫
+        run: echo skip ci

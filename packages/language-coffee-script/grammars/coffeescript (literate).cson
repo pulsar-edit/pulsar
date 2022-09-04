@@ -1,0 +1,724 @@
+'comment': 'CoffeeScript (Literate)'
+'fileTypes': [
+  'litcoffee'
+  'litcoffee.erb'
+  'coffee.md'
+]
+'name': 'CoffeeScript (Literate)'
+'scopeName': 'source.litcoffee'
+'firstLineMatch': '''(?x)
+  # Hashbang
+  ^\\#!.*(?:\\s|\\/)
+    coffee(?:\\s.+?)?\\s(?:-l|--literate)
+  (?:\\s|$)
+  |
+  # Modeline
+  (?i:
+    # Emacs
+    -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+      litcoffee
+    (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+    |
+    # Vim
+    (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+      litcoffee
+    (?=\\s|:|$)
+  )
+'''
+'patterns': [
+  {
+    'begin': '^(?=([ ]{4}|\\t)(?!$))'
+    'end': '^(?!([ ]{4}|\\t))'
+    'name': 'markup.raw.block.markdown'
+    'patterns': [
+      {
+        'include': '#block_raw'
+      }
+    ]
+  }
+  {
+    'begin': '''
+              (?x)^
+              (?=  [ ]{0,3}>.
+              |  [#]{1,6}\\s*+
+              |  [ ]{0,3}(?<marker>[-*_])([ ]{0,2}\\k<marker>){2,}[ \\t]*+$
+              )
+            '''
+    'comment': 'We could also use an empty end match and set applyEndPatternLast, but then we must be sure that the begin pattern will only match stuff matched by the sub-patterns.'
+    'end': '''
+            (?x)^
+            (?!  [ ]{0,3}>.
+            |  [#]{1,6}\\s*+
+            |  [ ]{0,3}(?<marker>[-*_])([ ]{0,2}\\k<marker>){2,}[ \\t]*+$
+            )
+          '''
+    'name': 'meta.block-level.markdown'
+    'patterns': [
+      {
+        'include': '#block_quote'
+      }
+      {
+        'include': '#heading'
+      }
+      {
+        'include': '#separator'
+      }
+    ]
+  }
+  {
+    'begin': '^[ ]{0,3}([*+-])(?=\\s)'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.list_item.markdown'
+    'end': '^(?=\\S|[ ]{4,})|(?!\\G)'
+    'name': 'markup.list.unnumbered.markdown'
+    'patterns': [
+      {
+        'include': '#list-paragraph'
+      }
+    ]
+  }
+  {
+    'begin': '^[ ]{0,3}([0-9]+\\.)(?=\\s)'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.list_item.markdown'
+    'end': '^(?=\\S|[ ]{4,})|(?!\\G)'
+    'name': 'markup.list.numbered.markdown'
+    'patterns': [
+      {
+        'include': '#list-paragraph'
+      }
+    ]
+  }
+  {
+    'begin': '^(?=<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del)\\b)(?!.*?</\\1>)'
+    'comment': 'Markdown formatting is disabled inside block-level tags.'
+    'end': '(?<=^</\\1>$\\n)'
+    'name': 'meta.disable-markdown'
+    'patterns': [
+      {
+        'include': 'text.html.basic'
+      }
+    ]
+  }
+  {
+    'begin': '^(?=<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del)\\b)'
+    'comment': 'Same rule but for one line disables.'
+    'end': '$\\n?'
+    'name': 'meta.disable-markdown'
+    'patterns': [
+      {
+        'include': 'text.html.basic'
+      }
+    ]
+  }
+  {
+    'captures':
+      '1':
+        'name': 'punctuation.definition.constant.markdown'
+      '2':
+        'name': 'constant.other.reference.link.markdown'
+      '3':
+        'name': 'punctuation.definition.constant.markdown'
+      '4':
+        'name': 'punctuation.separator.key-value.markdown'
+      '5':
+        'name': 'punctuation.definition.link.markdown'
+      '6':
+        'name': 'markup.underline.link.markdown'
+      '7':
+        'name': 'punctuation.definition.link.markdown'
+      '8':
+        'name': 'string.other.link.description.title.markdown'
+      '9':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '10':
+        'name': 'punctuation.definition.string.end.markdown'
+      '11':
+        'name': 'string.other.link.description.title.markdown'
+      '12':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '13':
+        'name': 'punctuation.definition.string.end.markdown'
+    'match': '''
+              (?x)
+              \\s*                    # Leading whitespace
+              (\\[)(.+?)(\\])(:)      # Reference name
+              [ \\t]*                 # Optional whitespace
+              (<?)(\\S+?)(>?)         # The url
+              [ \\t]*                 # Optional whitespace
+              (?:
+                ((\\().+?(\\)))       # Match title in quotes…
+                | ((").+?("))         # or in parens.
+              )?                      # Title is optional
+              \\s*                    # Optional whitespace
+              $
+            '''
+    'name': 'meta.link.reference.def.markdown'
+  }
+  {
+    'begin': '^(?=\\S)(?![=-]{3,}(?=$))'
+    'end': '^(?:\\s*$|(?=[ ]{0,3}>.))|(?=[ \\t]*\\n)(?<=^===|^====|=====|^---|^----|-----)[ \\t]*\\n|(?=^#)'
+    'name': 'meta.paragraph.markdown'
+    'patterns': [
+      {
+        'include': '#inline'
+      }
+      {
+        'include': 'text.html.basic'
+      }
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.heading.markdown'
+        'match': '^(={3,})(?=[ \\t]*$)'
+        'name': 'markup.heading.1.markdown'
+      }
+      {
+        'captures':
+          '1':
+            'name': 'punctuation.definition.heading.markdown'
+        'match': '^(-{3,})(?=[ \\t]*$)'
+        'name': 'markup.heading.2.markdown'
+      }
+    ]
+  }
+]
+'repository':
+  'ampersand':
+    'comment': 'Markdown will convert this for us. We match it so that the HTML grammar will not mark it up as invalid.'
+    'match': '&(?!([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+);)'
+    'name': 'meta.other.valid-ampersand.markdown'
+  'block_quote':
+    'begin': '\\G[ ]{0,3}(>)(?!$)[ ]?'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.blockquote.markdown'
+    'comment': ' We terminate the block quote when seeing an empty line, a separator or a line with leading > characters. The latter is to “reset” the quote level for quoted lines.'
+    'end': '''
+            (?x)^
+            (?=  \\s*$
+            |  [ ]{0,3}(?<marker>[-*_])([ ]{0,2}\\k<marker>){2,}[ \\t]*+$
+            |  [ ]{0,3}>.
+            )
+          '''
+    'name': 'markup.quote.markdown'
+    'patterns': [
+      {
+        'begin': '''
+                  (?x)\\G
+                  (?=  [ ]{0,3}>.
+                  )
+                '''
+        'end': '^'
+        'patterns': [
+          {
+            'include': '#block_quote'
+          }
+        ]
+      }
+      {
+        'applyEndPatternLast': 1
+        'begin': '''
+                  (?x)\\G
+                  (?=  ([ ]{4}|\\t)
+                  |  [#]{1,6}\\s*+
+                  |  [ ]{0,3}(?<marker>[-*_])([ ]{0,2}\\k<marker>){2,}[ \\t]*+$
+                  )
+                '''
+        'end': '^'
+        'patterns': [
+          {
+            'include': '#block_raw'
+          }
+          {
+            'include': '#heading'
+          }
+          {
+            'include': '#separator'
+          }
+        ]
+      }
+      {
+        'begin': '''
+                  (?x)\\G
+                  (?!  $
+                  |  [ ]{0,3}>.
+                  |  ([ ]{4}|\\t)
+                  |  [#]{1,6}\\s*+
+                  |  [ ]{0,3}(?<marker>[-*_])([ ]{0,2}\\k<marker>){2,}[ \\t]*+$
+                  )
+                '''
+        'end': '$|(?<=\\n)'
+        'patterns': [
+          {
+            'include': '#inline'
+          }
+        ]
+      }
+    ]
+  'block_raw':
+    'name': 'markup.raw.block.markdown'
+    'patterns': [
+      {
+        'include': '#coffee_script'
+      }
+    ]
+  'bold':
+    'begin': '''
+              (?x)
+              (\\*\\*|__)(?=\\S)                                          # Open
+              (?=
+                (
+                  <[^>]*+>                                                # HTML tags
+                  | (?<raw>`+)([^`]|(?!(?<!`)\\k<raw>(?!`))`)*+\\k<raw>   # Raw
+                  | \\\\[\\\\`*_{}\\[\\]()#.!+\\->]?+                     # Escapes
+                  | \\[
+                  (
+                    (?<square>                                            # Named group
+                      [^\\[\\]\\\\]                                       # Match most chars
+                      | \\\\.                                             # Escaped chars
+                      | \\[ \\g<square>*+ \\]                             # Nested brackets
+                    )*+
+                    \\]
+                    (
+                      (                                                   # Reference Link
+                        [ ]?                                              # Optional space
+                        \\[[^\\]]*+\\]                                    # Ref name
+                      )
+                      |
+                      (                                                   # Inline Link
+                        \\(                                               # Opening paren
+                        [ \\t]*+                                          # Optional whitespace
+                        <?(.*?)>?                                         # URL
+                        [ \\t]*+                                          # Optional whitespace
+                        (                                                 # Optional Title
+                          (?<title>[\'"])
+                          (.*?)
+                          \\k<title>
+                        )?
+                        \\)
+                      )
+                    )
+                  )
+                  | (?!(?<=\\S)\\1).                                      # Everything besides
+                )++
+                (?<=\\S)\\1                                               # Close
+              )
+            '''
+    'captures':
+      '1':
+        'name': 'punctuation.definition.bold.markdown'
+    'end': '(?<=\\S)(\\1)'
+    'name': 'markup.bold.markdown'
+    'patterns': [
+      {
+        'applyEndPatternLast': 1
+        'begin': '(?=<[^>]*?>)'
+        'end': '(?<=>)'
+        'patterns': [
+          {
+            'include': 'text.html.basic'
+          }
+        ]
+      }
+      {
+        'include': '#escape'
+      }
+      {
+        'include': '#ampersand'
+      }
+      {
+        'include': '#bracket'
+      }
+      {
+        'include': '#raw'
+      }
+      {
+        'include': '#italic'
+      }
+      {
+        'include': '#image-inline'
+      }
+      {
+        'include': '#link-inline'
+      }
+      {
+        'include': '#link-inet'
+      }
+      {
+        'include': '#link-email'
+      }
+      {
+        'include': '#image-ref'
+      }
+      {
+        'include': '#link-ref-literal'
+      }
+      {
+        'include': '#link-ref'
+      }
+    ]
+  'bracket':
+    'comment': 'Markdown will convert this for us. We match it so that the HTML grammar will not mark it up as invalid.'
+    'match': '<(?![a-z/?\\$!])'
+    'name': 'meta.other.valid-bracket.markdown'
+  'coffee_script':
+    'patterns': [
+      {
+        'include': 'source.coffee'
+      }
+    ]
+  'escape':
+    'match': '\\\\[-`*_#+.!(){}\\[\\]\\\\>]'
+    'name': 'constant.character.escape.markdown'
+  'heading':
+    'begin': '\\G(#{1,6})(?!#)\\s*(?=\\S)'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.heading.markdown'
+    'contentName': 'entity.name.section.markdown'
+    'end': '\\s*(#*)$\\n?'
+    'name': 'markup.heading.markdown'
+    'patterns': [
+      {
+        'include': '#inline'
+      }
+    ]
+  'image-inline':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '2':
+        'name': 'string.other.link.description.markdown'
+      '3':
+        'name': 'punctuation.definition.string.end.markdown'
+      '5':
+        'name': 'invalid.illegal.whitespace.markdown'
+      '6':
+        'name': 'punctuation.definition.metadata.markdown'
+      '7':
+        'name': 'punctuation.definition.link.markdown'
+      '8':
+        'name': 'markup.underline.link.image.markdown'
+      '9':
+        'name': 'punctuation.definition.link.markdown'
+      '10':
+        'name': 'string.other.link.description.title.markdown'
+      '11':
+        'name': 'punctuation.definition.string.markdown'
+      '12':
+        'name': 'punctuation.definition.string.markdown'
+      '13':
+        'name': 'string.other.link.description.title.markdown'
+      '14':
+        'name': 'punctuation.definition.string.markdown'
+      '15':
+        'name': 'punctuation.definition.string.markdown'
+      '16':
+        'name': 'punctuation.definition.metadata.markdown'
+    'match': '''
+              (?x)
+              \\!                       # Images start with !
+              (\\[)((?<square>[^\\[\\]\\\\]|\\\\.|\\[\\g<square>*+\\])*+)(\\]) # Match the link text
+              ([ ])?                    # Space not allowed
+              (\\()                     # Opening paren for url
+              (<?)(\\S+?)(>?)           # The url
+              [ \\t]*                   # Optional whitespace
+              (?:
+                ((\\().+?(\\)))         # Match title in parens…
+                | ((").+?("))           # or in quotes.
+              )?                        # Title is optional
+              \\s*                      # Optional whitespace
+              (\\))
+            '''
+    'name': 'meta.image.inline.markdown'
+  'image-ref':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '2':
+        'name': 'string.other.link.description.markdown'
+      '4':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '5':
+        'name': 'punctuation.definition.constant.markdown'
+      '6':
+        'name': 'constant.other.reference.link.markdown'
+      '7':
+        'name': 'punctuation.definition.constant.markdown'
+    'match': '\\!(\\[)((?<square>[^\\[\\]\\\\]|\\\\.|\\[\\g<square>*+\\])*+)(\\])[ ]?(\\[)(.*?)(\\])'
+    'name': 'meta.image.reference.markdown'
+  'inline':
+    'patterns': [
+      {
+        'include': '#escape'
+      }
+      {
+        'include': '#ampersand'
+      }
+      {
+        'include': '#bracket'
+      }
+      {
+        'include': '#raw'
+      }
+      {
+        'include': '#bold'
+      }
+      {
+        'include': '#italic'
+      }
+      {
+        'include': '#line-break'
+      }
+      {
+        'include': '#image-inline'
+      }
+      {
+        'include': '#link-inline'
+      }
+      {
+        'include': '#link-inet'
+      }
+      {
+        'include': '#link-email'
+      }
+      {
+        'include': '#image-ref'
+      }
+      {
+        'include': '#link-ref-literal'
+      }
+      {
+        'include': '#link-ref'
+      }
+    ]
+  'italic':
+    'begin': '''
+              (?x)
+              (\\*|_)(?=\\S)                                            # Open
+              (?=
+                (
+                  <[^>]*+>                                              # HTML tags
+                  | (?<raw>`+)([^`]|(?!(?<!`)\\k<raw>(?!`))`)*+\\k<raw> # Raw
+                  | \\\\[\\\\`*_{}\\[\\]()#.!+\\->]?+                   # Escapes
+                  | \\[
+                  (
+                    (?<square>                                          # Named group
+                      [^\\[\\]\\\\]                                     # Match most chars
+                      | \\\\.                                           # Escaped chars
+                      | \\[ \\g<square>*+ \\]                           # Nested brackets
+                    )*+
+                    \\]
+                    (
+                      (                                                 # Reference Link
+                        [ ]?                                            # Optional space
+                        \\[[^\\]]*+\\]                                  # Ref name
+                      )
+                      |
+                      (                                                 # Inline Link
+                        \\(                                             # Opening paren
+                        [ \\t]*+                                        # Optional whitespace
+                        <?(.*?)>?                                       # URL
+                        [ \\t]*+                                        # Optional whitespace
+                        (                                               # Optional Title
+                          (?<title>[\'"])
+                          (.*?)
+                          \\k<title>
+                        )?
+                        \\)
+                      )
+                    )
+                  )
+                  | \\1\\1                                               # Must be bold closer
+                  | (?!(?<=\\S)\\1).                                     # Everything besides
+                )++
+                (?<=\\S)\\1                                              # Close
+              )
+            '''
+    'captures':
+      '1':
+        'name': 'punctuation.definition.italic.markdown'
+    'end': '(?<=\\S)(\\1)((?!\\1)|(?=\\1\\1))'
+    'name': 'markup.italic.markdown'
+    'patterns': [
+      {
+        'applyEndPatternLast': 1
+        'begin': '(?=<[^>]*?>)'
+        'end': '(?<=>)'
+        'patterns': [
+          {
+            'include': 'text.html.basic'
+          }
+        ]
+      }
+      {
+        'include': '#escape'
+      }
+      {
+        'include': '#ampersand'
+      }
+      {
+        'include': '#bracket'
+      }
+      {
+        'include': '#raw'
+      }
+      {
+        'include': '#bold'
+      }
+      {
+        'include': '#image-inline'
+      }
+      {
+        'include': '#link-inline'
+      }
+      {
+        'include': '#link-inet'
+      }
+      {
+        'include': '#link-email'
+      }
+      {
+        'include': '#image-ref'
+      }
+      {
+        'include': '#link-ref-literal'
+      }
+      {
+        'include': '#link-ref'
+      }
+    ]
+  'line-break':
+    'match': ' {2,}$'
+    'name': 'meta.dummy.line-break'
+  'link-email':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.link.markdown'
+      '2':
+        'name': 'markup.underline.link.markdown'
+      '4':
+        'name': 'punctuation.definition.link.markdown'
+    'match': '(<)((?:mailto:)?[-.\\w]+@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)(>)'
+    'name': 'meta.link.email.lt-gt.markdown'
+  'link-inet':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.link.markdown'
+      '2':
+        'name': 'markup.underline.link.markdown'
+      '3':
+        'name': 'punctuation.definition.link.markdown'
+    'match': '(<)((?:https?|ftp)://.*?)(>)'
+    'name': 'meta.link.inet.markdown'
+  'link-inline':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '2':
+        'name': 'string.other.link.title.markdown'
+      '4':
+        'name': 'punctuation.definition.string.end.markdown'
+      '5':
+        'name': 'invalid.illegal.whitespace.markdown'
+      '6':
+        'name': 'punctuation.definition.metadata.markdown'
+      '7':
+        'name': 'punctuation.definition.link.markdown'
+      '8':
+        'name': 'markup.underline.link.markdown'
+      '9':
+        'name': 'punctuation.definition.link.markdown'
+      '10':
+        'name': 'string.other.link.description.title.markdown'
+      '11':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '12':
+        'name': 'punctuation.definition.string.end.markdown'
+      '13':
+        'name': 'string.other.link.description.title.markdown'
+      '14':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '15':
+        'name': 'punctuation.definition.string.end.markdown'
+      '16':
+        'name': 'punctuation.definition.metadata.markdown'
+    'match': '''
+              (?x)
+              (\\[)((?<square>[^\\[\\]\\\\]|\\\\.|\\[\\g<square>*+\\])*+)(\\]) # Match the link text.
+              ([ ])?            # Space not allowed
+              (\\()             # Opening paren for url
+              (<?)(.*?)(>?)     # The url
+              [ \\t]*           # Optional whitespace
+              (?:
+                ((\\().+?(\\))) # Match title in parens…
+                | ((").+?("))   # or in quotes.
+              )?                # Title is optional
+              \\s*              # Optional whitespace
+              (\\))
+            '''
+    'name': 'meta.link.inline.markdown'
+  'link-ref':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '2':
+        'name': 'string.other.link.title.markdown'
+      '4':
+        'name': 'punctuation.definition.string.end.markdown'
+      '5':
+        'name': 'punctuation.definition.constant.begin.markdown'
+      '6':
+        'name': 'constant.other.reference.link.markdown'
+      '7':
+        'name': 'punctuation.definition.constant.end.markdown'
+    'match': '(\\[)((?<square>[^\\[\\]\\\\]|\\\\.|\\[\\g<square>*+\\])*+)(\\])[ ]?(\\[)([^\\]]*+)(\\])'
+    'name': 'meta.link.reference.markdown'
+  'link-ref-literal':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.string.begin.markdown'
+      '2':
+        'name': 'string.other.link.title.markdown'
+      '4':
+        'name': 'punctuation.definition.string.end.markdown'
+      '5':
+        'name': 'punctuation.definition.constant.begin.markdown'
+      '6':
+        'name': 'punctuation.definition.constant.end.markdown'
+    'match': '(\\[)((?<square>[^\\[\\]\\\\]|\\\\.|\\[\\g<square>*+\\])*+)(\\])[ ]?(\\[)(\\])'
+    'name': 'meta.link.reference.literal.markdown'
+  'list-paragraph':
+    'patterns': [
+      {
+        'begin': '\\G\\s+(?=\\S)'
+        'end': '^\\s*$'
+        'name': 'meta.paragraph.list.markdown'
+        'patterns': [
+          {
+            'include': '#inline'
+          }
+          {
+            'captures':
+              '1':
+                'name': 'punctuation.definition.list_item.markdown'
+            'comment': 'Match the list punctuation'
+            'match': '^\\s*([*+-]|[0-9]+\\.)'
+          }
+        ]
+      }
+    ]
+  'raw':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.raw.markdown'
+      '3':
+        'name': 'punctuation.definition.raw.markdown'
+    'match': '(`+)([^`]|(?!(?<!`)\\1(?!`))`)*+(\\1)'
+    'name': 'markup.raw.inline.markdown'
+  'separator':
+    'match': '\\G[ ]{0,3}([-*_])([ ]{0,2}\\1){2,}[ \\t]*$\\n?'
+    'name': 'meta.separator.markdown'

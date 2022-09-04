@@ -1,0 +1,16 @@
+name: 'JSDoc'
+scopeName: 'source.jsdoc'
+type: 'tree-sitter'
+parser: 'tree-sitter-jsdoc'
+
+injectionRegex: '^jsdoc$'
+
+scopes:
+  'tag_name': 'keyword.control'
+  'identifier': 'variable.other.jsdoc'
+  'type': 'support.type'
+  'path_expression > identifier': 'string'
+  '"."': 'meta.delimiter.period'
+  '":"': 'meta.delimiter.colon'
+  '"/"': 'meta.delimiter.slash'
+  '"#", "~"': 'meta.delimiter'

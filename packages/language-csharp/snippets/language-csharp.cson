@@ -1,0 +1,142 @@
+'.source.cs':
+  'Abstract':
+    'prefix': 'ab'
+    'body': 'abstract '
+  'Array':
+    'prefix': 'arr'
+    'body': '${0:DataType}[] ${1:VariableName} = {};'
+  'Async Task':
+    'prefix': 'at'
+    'body': 'async Task<${0:T}> ${1:MethodName}($2) {\n\t$3\n}'
+  'Async Void':
+    'prefix': 'av'
+    'body': 'async void ${0:MethodName}($1) {\n\t$2\n}'
+  'Await':
+    'prefix': 'aw'
+    'body': 'await '
+  'Break':
+    'prefix': 'br'
+    'body': 'break;\n'
+  'Case':
+    'prefix': 'cs'
+    'body': 'case ${1:Condition}:\n\t$2\n$0'
+  'Catch':
+    'prefix': 'ca'
+    'body': 'catch (${1:Exception} ${2:e}) {\n\t$0\n}'
+  'Class':
+    'prefix': 'cl'
+    'body': 'class $1\n{\n\t$0\n}'
+  'Constant String':
+    'prefix': 'cos'
+    'body': 'public const string ${1:Var} = $2;$0'
+  'Constant':
+    'prefix': 'co'
+    'body': 'public const ${1:string} ${2:Var} = $3;$0'
+  'Default':
+    'prefix': 'de'
+    'body': 'default:\n\t$0'
+  'Do While':
+    'prefix': 'do'
+    'body': 'do {\n\t$0\n} while (${1:Condition});'
+  'Else If':
+    'prefix': 'elif'
+    'body': 'else if (${1:Condition}) {\n\t$0\n}'
+  'Else':
+    'prefix': 'el'
+    'body': 'else {\n\t$0\n}'
+  'Enumeration':
+    'prefix': 'enum'
+    'body': 'enum $1\n{\n\t$0\n}'
+  'Finally':
+    'prefix': 'fy'
+    'body': 'finally {\n\t$0\n}'
+  'Fixed':
+    'prefix': 'fi'
+    'body': 'fixed (${1:Expression}) {\n\t$0\n}'
+  'For':
+    'prefix': 'for'
+    'body': 'for (${1:Initializer}; ${2:Condition}; ${3:Update}) {\n\t$0\n}'
+  'For Each':
+    'prefix': 'fore'
+    'body': 'foreach (${1:Type} in ${2:Collection}) {\n\t$0\n}'
+  'If                             ':
+    'prefix': 'if'
+    'body': 'if (${1:Condition}) {\n\t$0\n}'
+  'Interface':
+    'prefix': 'in'
+    'body': 'interface $1\n{\n\t$0\n}'
+  'Method (Main)':
+    'prefix': 'main'
+    'body': '/// <summary>\n///   The main entry point for the application\n/// </summary>\n[STAThread]\npublic static void Main(string[] args)\n{\n\t$0\n}'
+  'Method':
+    'prefix': 'm'
+    'body': '${1:void} ${2:Method}($3)\n{\n\t$0\n}'
+  'Namespace                  ':
+    'prefix': 'ns'
+    'body': 'namespace ${1:NamespaceName}\n{\n\t$0\n}'
+  'Override':
+    'prefix': 'over'
+    'body': 'override '
+  'Parse':
+    'prefix': 'par'
+    'body': '${0:DataType}.Parse(${1:VariableName});'
+  'Private':
+    'prefix': 'pr'
+    'body': 'private '
+  'Property':
+    'prefix': 'prop'
+    'body': 'public ${1:string} ${2:PropertyName} { get; set; }'
+  'Protected':
+    'prefix': 'po'
+    'body': 'protected '
+  'Public                       ':
+    'prefix': 'pu'
+    'body': 'public '
+  'ReadLine':
+    'prefix': 'rl'
+    'body': 'Console.ReadLine();'
+  'Region':
+    'prefix': 'reg'
+    'body': '#region ${1:Region Name}\n\n$0\n\n#endregion\n'
+  'Return':
+    'prefix': 're'
+    'body': 'return '
+  'Sealed':
+    'prefix': 'se'
+    'body': 'sealed '
+  'Static':
+    'prefix': 'st'
+    'body': 'static '
+  'Struct':
+    'prefix': 'su'
+    'body': 'struct $1\n{\n\t$0\n}'
+  'Switch':
+    'prefix': 'sw'
+    'body': 'switch (${1:Expression}) {\n\t$0\n}'
+  'Throw New':
+    'prefix': 'tn'
+    'body': 'throw new $0'
+  'Throw':
+    'prefix': 'th'
+    'body': 'throw $0'
+  'Try':
+    'prefix': 'tr'
+    'body': 'try {\n\t$0\n}'
+  'Using':
+    'prefix': 'us'
+    'body': 'using ${1:System};$0'
+  'Variable':
+    'prefix': 'v'
+    'body': '${1:string} ${2:var}${3: = ${0:null}};'
+  'Virtual':
+    'prefix': 'virt'
+    'body': 'virtual '
+  'While':
+    'prefix': 'wh'
+    'body': 'while (${1:Condition}) {\n\t$0\n}'
+  'Write':
+    'prefix': 'w'
+    'body': 'Console.Write($1);$0'
+  'WriteLine':
+    'prefix': 'wl'
+    'body': 'Console.WriteLine($1);$0'
