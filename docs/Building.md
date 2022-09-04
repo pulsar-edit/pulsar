@@ -19,8 +19,6 @@ yarn build
 yarn build:apm
 ```
 
-> Now `yarn build:apm` is included as a `postinstall` script. So there is no need to run it.
-
 This will install the packages, rebuild them for Electron, and build the Atom Package
 Manager. Finally, you can run the editor with `yarn start`. This command will accept the
 same arguments as the final binary.

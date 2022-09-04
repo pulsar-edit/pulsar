@@ -276,7 +276,6 @@
   "private": true,
   "scripts": {
     "preinstall": "node -e 'process.exit(0)'",
-    "postinstall": "cd apm && yarn install && ./node_modules/ppm/bin/npm rebuild && cd ./node_modules/git-utils && npm run prepare && npm install",
     "test": "node script/test",
     "build": "electron-rebuild",
     "build:apm": "cd apm && yarn install && ./node_modules/ppm/bin/npm rebuild && cd ./node_modules/git-utils && npm run prepare && npm install",
