@@ -1869,11 +1869,11 @@ module.exports = class AtomApplication extends EventEmitter {
   resolveLegacyTestRunnerPath() {
     try {
       return require.resolve(
-        path.resolve(this.devResourcePath, 'spec', 'jasmine-test-runner')
+        path.resolve(this.devResourcePath, 'spec', 'jasmine-test-runner.js')
       );
     } catch (error) {
       return require.resolve(
-        path.resolve(__dirname, '..', '..', 'spec', 'jasmine-test-runner')
+        path.resolve(__dirname, '..', '..', 'spec', 'jasmine-test-runner.js')
       );
     }
   }
