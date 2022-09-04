@@ -9,7 +9,7 @@ There are two ways of building and staring hacking on Pulsar's core. One is foll
 
 ### Alternative method
 
-First, install `yarn`. Pulsar currently does not work with `npm` (althought it will
+First, install `yarn`. Pulsar currently does not work with `npm` (although it will
 probably work in the future). Be sure you're using Node.JS versions between 10 and 16, and
 then run:
 
