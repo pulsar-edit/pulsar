@@ -226,6 +226,7 @@ describe('PanelContainerElement', () => {
 
         panel.show();
         expect(document.activeElement).toBe(inputEl);
+        panel.destroy();
       });
 
       it('focuses the autoFocus element if available', () => {
@@ -240,6 +241,7 @@ describe('PanelContainerElement', () => {
 
         panel.show();
         expect(document.activeElement).toBe(inputEl2);
+        panel.destroy();
       });
 
       it('focuses the entire panel item when no tabbable item is available and the panel is focusable', () => {
@@ -249,6 +251,7 @@ describe('PanelContainerElement', () => {
         spyOn(panelEl, 'focus');
         panel.show();
         expect(panelEl.focus).toHaveBeenCalled();
+        panel.destroy()
       });
 
       it('returns focus to the original activeElement', () => {
