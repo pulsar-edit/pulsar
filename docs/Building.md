@@ -19,6 +19,8 @@ yarn build
 yarn build:apm
 ```
 
+_If a Windows user it is recommended to install Pulsar on a path with no Spaces_
+
 This will install the packages, rebuild them for Electron, and build the Atom Package
 Manager. Finally, you can run the editor with `yarn start`. This command will accept the
 same arguments as the final binary.
