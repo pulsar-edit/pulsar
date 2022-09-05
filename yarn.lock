@@ -5074,12 +5074,11 @@ ky@0.30.0:
   resolved "https://registry.yarnpkg.com/ky/-/ky-0.30.0.tgz#a3d293e4f6c4604a9a4694eceb6ce30e73d27d64"
   integrity sha512-X/u76z4JtDVq10u1JA5UQfatPxgPaVDMYTrgHyiTpGN2z4TMEJkIHsoSBBSg9SWZEIXTKsi9kHgiQ9o3Y/4yog==
 
-"language-c@https://codeload.github.com/atom/language-c/legacy.tar.gz/refs/tags/v0.60.19":
-  version "0.60.19"
-  resolved "https://codeload.github.com/atom/language-c/legacy.tar.gz/refs/tags/v0.60.19#27e6c24739e0491111ee3cbd2c12283c07778ebc"
+"language-c@file:packages/language-c":
+  version "0.60.20"
   dependencies:
-    tree-sitter-c "^0.15.3"
-    tree-sitter-cpp "^0.15.1"
+    tree-sitter-c "0.20.1"
+    tree-sitter-cpp "0.20.0"
 
 "language-clojure@file:packages/language-clojure":
   version "0.22.8"
@@ -7961,19 +7960,19 @@ tree-sitter-bash@0.19.0:
     nan "^2.14.0"
     prebuild-install "^5.3.3"
 
-tree-sitter-c@^0.15.3:
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/tree-sitter-c/-/tree-sitter-c-0.15.3.tgz#f195ce6ddafc2332b9c14e0da34d761bf1752f34"
-  integrity sha512-wNtYDKaJWFp4H9C9b1II54ku50ENI3OjBNCeiFDRjRVOZZHdMlgvK9eAKnF70GNOkWQLG1WcZp6PJlZDlfy3aA==
+tree-sitter-c@0.20.1:
+  version "0.20.1"
+  resolved "https://registry.yarnpkg.com/tree-sitter-c/-/tree-sitter-c-0.20.1.tgz#0f3b00f92ef8a67068e6a83fc066ca6dac029240"
+  integrity sha512-aKDkF8wj1dnAG4D4vSMYBF4Z2ALropFiVdbQbu8YpiQRFgc3wZtjGGowiwiBHaV+RqSF8x7JCek4+VqkBByW/Q==
   dependencies:
-    nan "^2.10.0"
+    nan "^2.14.0"
 
-tree-sitter-cpp@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/tree-sitter-cpp/-/tree-sitter-cpp-0.15.1.tgz#c814e1178290e227bd746e5db4eda5975d0f9bff"
-  integrity sha512-Ki1X5AdnR9AC8EEjRvcIwJ8oNH6K6xJf19nKbu8vlCUwyupTco2YFKYrKY7Ow5dLTC7JNqjDLEZXy7EwHz/7xQ==
+tree-sitter-cpp@0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/tree-sitter-cpp/-/tree-sitter-cpp-0.20.0.tgz#42499b1f2d3f61f74703cc9f13fcaf65173c96a4"
+  integrity sha512-ka1KoFfmLX9dmus8S+NrXxEN+k2PWJOZi60vO3hnR2lnRIr4FYBSXZKmTgQnCd8/w0UM7sNtgETvW1SM1qJ9og==
   dependencies:
-    nan "^2.10.0"
+    nan "^2.14.0"
 
 tree-sitter-css@^0.19.0:
   version "0.19.0"
@@ -8060,7 +8059,7 @@ tree-sitter-typescript@0.20.1:
   dependencies:
     nan "^2.14.0"
 
-tree-sitter@^0.20.0:
+tree-sitter@0.20.0:
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/tree-sitter/-/tree-sitter-0.20.0.tgz#b24f4d0ce6b9fdd9e99101907c954c5d938cb82d"
   integrity sha512-tqTdtD1T2cN4aEES0sZCjKTQrc9Ls8H/iYlzpskhGy8yCwNPKBIbK9YuuCg/AxACr8RAY4wMoeCigM1X/A79yg==

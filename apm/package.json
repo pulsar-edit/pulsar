@@ -1,11 +1,11 @@
 {
-  "name": "atom-bundled-apm",
-  "description": "Atom's bundled apm",
+  "name": "pulsar-bundled-apm",
+  "description": "Pulsar's bundled apm",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atom/atom.git"
+    "url": "https://github.com/pulsar-edit/pulsar.git"
   },
   "dependencies": {
-    "atom-package-manager": "npm:@atom-ide-community/atom-package-manager@2.6.5-atomic.1.0"
+    "ppm": "https://github.com/pulsar-edit/ppm.git"
   }
 }
