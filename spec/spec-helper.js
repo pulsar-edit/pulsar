@@ -24,6 +24,7 @@ const TextEditorElement = require('../src/text-editor-element');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
 const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
 const {clipboard} = require('electron');
+const {mockDebounce} = require("./spec-helper-functions.js");
 
 const jasmineStyle = document.createElement('style');
 jasmineStyle.textContent = atom.themes.loadStylesheet(atom.themes.resolveStylesheet('../static/jasmine'));
@@ -99,62 +100,7 @@ beforeEach(function() {
   spyOn(Date, 'now').andCallFake(() => window.now);
   spyOn(window, "setTimeout").andCallFake(window.fakeSetTimeout);
   spyOn(window, "clearTimeout").andCallFake(window.fakeClearTimeout);
-  spyOn(_, "debounce").andCallFake(function(func, wait, immediate) {
-    var timeout, previous, args, result, context;
-    
-    // Declaring Rest Arguments here, since its included in our debounce function 
-    var restArguments = function(func, startIndex) {
-      startIndex = startIndex == null ? func.length - 1 : +startIndex;
-      return function() {
-        var length = Math.max(arguments.length = startIndex, 0),
-          rest = Array(length),
-          index = 0;
-        for (; index < length; index++) {
-          rest[index] = arguments[index + startIndex];
-        }
-        switch (startIndex) {
-          case 0: return func.call(this, rest);
-          case 1: return func.call(this, arguments[0], rest);
-          case 2: return func.call(this, arguments[0], arguments[1], rest);
-        }
-        var args = Array(startIndex + 1);
-        for (index = 0; index < startIndex; index++) {
-          args[index] = arguments[index];
-        }
-        args[startIndex] = rest;
-        return func.apply(this, args);
-      };
-    };
-    
-    var later = function() {
-      var passed = Date.now() - previous;
-      if (wait > passed) {
-        timeout = setTimeout(later, wait - passed);
-      } else {
-        timeout = null;
-        if (!immediate) result = func.apply(context, args);
-        if (!timeout) args = context = null;
-      }
-    };
-    
-    var debounced = restArguments(function(_args) {
-      context = this;
-      args = _args;
-      previous = Date.now();
-      if (!timeout) {
-        timeout = setTimeout(later, wait);
-        if (immediate) result = func.apply(context, args);
-      }
-      return result;
-    });
-    
-    debounced.cancel = function() {
-      clearTimeout(timeout);
-      timeout = args = context = null;
-    };
-    
-    return debounced;
-  });
+  spyOn(_, "debounce").andCallFake(mockDebounce);
 
   const spy = spyOn(atom.packages, 'resolvePackagePath').andCallFake(function(packageName) {
     if (specPackageName && (packageName === specPackageName)) {
