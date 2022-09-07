@@ -220,7 +220,7 @@ class AtomEnvironment {
       commands: this.commands,
       stateStore: this.stateStore
     });
-    
+
     this.branding = {
       id: packagejson.branding.id,
       name: packagejson.branding.name,
