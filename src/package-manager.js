@@ -198,11 +198,15 @@ module.exports = class PackageManager {
     const apmRoot = path.join(process.resourcesPath, 'app', 'apm');
     this.apmPath = path.join(apmRoot, 'bin', commandName);
     if (!fs.isFileSync(this.apmPath)) {
+      // Here is where any test instance (as far as I can tell) will land 
+      // with previous attempts to declare the apmPath failing 
+      // But here this expects the bootstrap scripts to have been run 
+      // without them this path still fails.
+      // So we can change this path instead to our bundled APM 
+      
       this.apmPath = path.join(
-        apmRoot,
-        'node_modules',
-        'atom-package-manager',
-        'bin',
+        __dirname, 
+        "../apm/node_modules/ppm/bin",
         commandName
       );
     }

@@ -1301,7 +1301,12 @@ module.exports = class Workspace extends Model {
 
   // Open Atom's license in the active pane.
   openLicense() {
-    return this.open(path.join(process.resourcesPath, 'LICENSE.md'));
+    const resPath = path.join(process.resourcesPath, 'LICENSE.md')
+    if(fs.existsSync(resPath)) {
+      return this.open(resPath);
+    } else {
+      return this.open(path.join(__dirname, '..', 'LICENSE.md'))
+    }
   }
 
   // Synchronously open the given URI in the active pane. **Only use this method

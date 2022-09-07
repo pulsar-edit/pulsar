@@ -4059,7 +4059,7 @@ describe('TextEditorComponent', () => {
     describe('on the lines', () => {
       describe('when there is only one cursor', () => {
         it('positions the cursor on single-click or when middle-clicking', async () => {
-          atom.config.set('editor.selectionClipboard', true);
+          atom.config.set('editor.selectionClipboard', false);
           for (const button of [0, 1]) {
             const { component, editor } = buildComponent();
             const { lineHeight } = component.measurements;
