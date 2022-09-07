@@ -1,0 +1,3 @@
+[submodule "ppm"]
+	path = ppm
+	url = git@github.com:pulsar-edit/ppm

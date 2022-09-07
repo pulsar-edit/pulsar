@@ -48,7 +48,7 @@ let options = {
   "publish": null,
   "extraResources": [
     {
-      "from": "apm",
+      "from": "ppm",
       "to": "app/apm"
     }, {
       "from": pngIcon,

@@ -280,7 +280,7 @@
     "preinstall": "node -e 'process.exit(0)'",
     "test": "node script/test",
     "build": "electron-rebuild",
-    "build:apm": "cd apm && yarn install && ./node_modules/ppm/bin/npm rebuild && cd ./node_modules/git-utils && npm run prepare && npm install",
+    "build:apm": "cd ppm && yarn install",
     "start": "electron --enable-logging . -f",
     "dist": "node script/electron-builder.js"
   },

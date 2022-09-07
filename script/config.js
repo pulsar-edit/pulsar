@@ -7,7 +7,7 @@ const path = require('path');
 const spawnSync = require('./lib/spawn-sync');
 
 const repositoryRootPath = path.resolve(__dirname, '..');
-const apmRootPath = path.join(repositoryRootPath, 'apm');
+const apmRootPath = path.join(repositoryRootPath, 'ppm');
 const scriptRootPath = path.join(repositoryRootPath, 'script');
 const scriptRunnerRootPath = path.join(scriptRootPath, 'script-runner');
 const scriptRunnerModulesPath = path.join(scriptRunnerRootPath, 'node_modules');
