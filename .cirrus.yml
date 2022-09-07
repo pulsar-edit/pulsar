@@ -1,6 +1,7 @@
 linux_task:
   container:
     image: node:lts-slim
+    memory: 8G
   test_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
@@ -42,6 +43,7 @@ linux_task:
 silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    memory: 8G
   test_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - brew install node@16 yarn git python
