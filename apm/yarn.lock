@@ -2830,9 +2830,9 @@ pify@^3.0.0:
   resolved "https://registry.yarnpkg.com/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
   integrity sha512-C3FsVNH1udSEX48gGX1xfvwTWfsYWj5U+8/uK15BGzIGrKoUpghX8hWZwa/OFnakBiiVNmBvemTJR5mcy7iPcg==
 
-"ppm@https://github.com/pulsar-edit/ppm.git":
+"ppm@https://github.com/pulsar-edit/ppm.git#53d3a8f":
   version "2.7.0"
-  resolved "https://github.com/pulsar-edit/ppm.git#46d8338fb258d5265ab2248f3218b01f750d802f"
+  resolved "https://github.com/pulsar-edit/ppm.git#53d3a8ff7f4df0b5e8bd641a3f481d8cb1c42d34"
   dependencies:
     "@atom/plist" "0.4.4"
     asar-require "0.3.0"
