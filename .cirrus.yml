@@ -2,8 +2,6 @@ linux_task:
   container:
     image: node:lts-slim
   test_script:
-    - git submodule init
-    - git submodule update
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -21,6 +19,8 @@ linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
+    - git submodule init
+    - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
@@ -43,10 +43,10 @@ silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   test_script:
-    - git submodule init
-    - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - brew install node@16 yarn git python
+    - git submodule init
+    - git submodule update
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn install || yarn install
