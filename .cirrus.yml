@@ -2,6 +2,8 @@ linux_task:
   container:
     image: node:lts-slim
   test_script:
+    - git submodule init
+    - git submodule update
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -41,6 +43,8 @@ silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
   test_script:
+    - git submodule init
+    - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - brew install node@16 yarn git python
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
@@ -87,6 +91,8 @@ windows_task:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   install_deps_script:
+    - git submodule init
+    - git submodule update
     - choco install nodejs --version=16.16.0 -y
     - choco install python git visualstudio2019-workload-vctools -y
     - npm config set python 'C:\Python310\python.exe'
