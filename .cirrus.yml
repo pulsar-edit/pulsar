@@ -7,7 +7,6 @@ linux_task:
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
                 rpm
-                alien
                 build-essential
                 git
                 libsecret-1-dev
@@ -36,7 +35,6 @@ linux_task:
       format: junit
   build_binary_script:
     - yarn dist || rm dist && yarn dist
-    - alien -r  -c -v binaries/atom*.deb && mv *rpm binaries
   binary_artifacts:
     path: ./binaries/*
 
