@@ -58,7 +58,6 @@ describe('AtomWindow', function() {
           '*':
             core:
               automaticallyUpdate: false
-              telemetryConsent: "no"
             welcome:
               showOnStartup: false
         `;

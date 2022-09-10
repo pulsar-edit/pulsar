@@ -4534,11 +4534,6 @@ iconv-lite@^0.6.2:
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
-idb@^4.0.3:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/idb/-/idb-4.0.5.tgz#23b930fbb0abce391e939c35b7b31a669e74041f"
-  integrity sha512-P+Fk9HT2h1DhXoE1YNK183SY+CRh2GHNh28de94sGwhe0bUA75JJeVJWt3SenE5p0BXK7maflIq29dl6UZHrFw==
-
 ieee754@^1.1.13:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
@@ -5392,11 +5387,6 @@ loglevel@^1.6.0:
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.8.0.tgz#e7ec73a57e1e7b419cb6c6ac06bf050b67356114"
   integrity sha512-G6A/nJLRgWOuuwdNuA6koovfEV1YpqqAG4pRUlFaz3jj2QNZ8M4vBqnVA+HBTmU/AMNUtlOsMmSpF6NyOjztbA==
 
-lokijs@^1.5.4:
-  version "1.5.12"
-  resolved "https://registry.yarnpkg.com/lokijs/-/lokijs-1.5.12.tgz#cb55b37009bdf09ee7952a6adddd555b893653a0"
-  integrity sha512-Q5ALD6JiS6xAUWCwX3taQmgwxyveCtIIuL08+ml0nHwT3k0S/GIFJN+Hd38b1qYIMaE5X++iqsqWVksz7SYW+Q==
-
 loophole@^1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/loophole/-/loophole-1.1.0.tgz#37949fea453b6256acc725c320ce0c5a7f70a2bd"
@@ -5549,14 +5539,6 @@ md5@^2.1.0:
     charenc "0.0.2"
     crypt "0.0.2"
     is-buffer "~1.1.6"
-
-"metrics@https://codeload.github.com/atom/metrics/legacy.tar.gz/refs/tags/v1.8.1":
-  version "1.8.1"
-  resolved "https://codeload.github.com/atom/metrics/legacy.tar.gz/refs/tags/v1.8.1#fbf921b4c9212a11f83d1f580620c3d6b1fff974"
-  dependencies:
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    telemetry-github "0.1.1"
 
 mime-db@1.52.0:
   version "1.52.0"
@@ -7829,15 +7811,6 @@ tar@^6.0.2, tar@^6.0.5, tar@^6.1.2:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-telemetry-github@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/telemetry-github/-/telemetry-github-0.1.1.tgz#ae3d159e914d124dc1debd042fc2e276ce847df4"
-  integrity sha512-UUtkNKKHpUthL4FsAJDqKg+TiW0DBI636XAOAA3qcu86m20DhLhn3qhxl12joGdPBtk0tbv/Dx47pj28ZhuF+g==
-  dependencies:
-    idb "^4.0.3"
-    lokijs "^1.5.4"
-    uuid "^3.2.1"
-
 temp@0.9.1:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/temp/-/temp-0.9.1.tgz#2d666114fafa26966cd4065996d7ceedd4dd4697"
@@ -8263,7 +8236,7 @@ util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
 
-uuid@^3.0.0, uuid@^3.2.1, uuid@^3.3.2:
+uuid@^3.0.0, uuid@^3.3.2:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
