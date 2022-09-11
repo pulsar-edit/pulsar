@@ -264,36 +264,6 @@ All JavaScript code is linted with [Prettier](https://prettier.io/).
     * Instance methods and properties
 * [Avoid platform-dependent code](https://flight-manual.atom.io/hacking-atom/sections/cross-platform-compatibility/)
 
-### CoffeeScript Styleguide
-
-* Set parameter defaults without spaces around the equal sign
-    * `clear = (count=1) ->` instead of `clear = (count = 1) ->`
-* Use spaces around operators
-    * `count + 1` instead of `count+1`
-* Use spaces after commas (unless separated by newlines)
-* Use parentheses if it improves code clarity.
-* Prefer alphabetic keywords to symbolic keywords:
-    * `a is b` instead of `a == b`
-* Avoid spaces inside the curly-braces of hash literals:
-    * `{a: 1, b: 2}` instead of `{ a: 1, b: 2 }`
-* Include a single line of whitespace between methods.
-* Capitalize initialisms and acronyms in names, except for the first word, which
-  should be lower-case:
-  * `getURI` instead of `getUri`
-  * `uriToOpen` instead of `URIToOpen`
-* Use `slice()` to copy an array
-* Add an explicit `return` when your function ends with a `for`/`while` loop and
-  you don't want it to return a collected array.
-* Use `this` instead of a standalone `@`
-  * `return this` instead of `return @`
-* Place requires in the following order:
-    * Built in Node Modules (such as `path`)
-    * Built in Atom and Electron Modules (such as `atom`, `remote`)
-    * Local Modules (using relative paths)
-* Place class properties in the following order:
-    * Class methods and properties (methods starting with a `@`)
-    * Instance methods and properties
-* [Avoid platform-dependent code](https://flight-manual.atom.io/hacking-atom/sections/cross-platform-compatibility/)
 
 ### Specs Styleguide
 
