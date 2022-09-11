@@ -9,7 +9,7 @@ const MenuHelpers = require('./menu-helpers');
 const buildMetadata = require('../package.json');
 var platformMenu;
 if (buildMetadata) {
-  platformMenu = buildMetadata._atomMenu;
+  platformMenu = (buildMetadata._atomMenu && buildMetadata._atomMenu.menu);
 }
 
 // Extended: Provides a registry for menu items that you'd like to appear in the
