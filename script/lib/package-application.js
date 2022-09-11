@@ -22,7 +22,8 @@ module.exports = function() {
     } with app name "${appName}"`
   );
   return runPackager({
-    appBundleId: 'com.github.atom',
+    appBundleId: 'com.github.pulsar',
+    //TODO_PULSAR: Check to see if we should/need to migrate away from GitHub as a CompanyName
     appCopyright: `Copyright © 2014-${new Date().getFullYear()} GitHub, Inc. All rights reserved.`,
     appVersion: CONFIG.appMetadata.version,
     arch: process.platform === 'darwin' ? 'x64' : HOST_ARCH, // OS X is 64-bit only
@@ -36,25 +37,26 @@ module.exports = function() {
       CONFIG.repositoryRootPath,
       'resources',
       'mac',
-      'atom-Info.plist'
+      'pulsar-Info.plist'
     ),
-    helperBundleId: 'com.github.atom.helper',
+    helperBundleId: 'com.github.pulsar.helper',
     icon: path.join(
       CONFIG.repositoryRootPath,
       'resources',
       'app-icons',
       CONFIG.channel,
-      'atom'
+      'pulsar'
     ),
     name: appName,
     out: CONFIG.buildOutputPath,
     overwrite: true,
     platform: process.platform,
-    // Atom doesn't have devDependencies, but if prune is true, it will delete the non-standard packageDependencies.
+    // Pulsar doesn't have devDependencies, but if prune is true, it will delete the non-standard packageDependencies.
     prune: false,
     win32metadata: {
+      //TODO_PULSAR: Check to see if we should/need to migrate away from GitHub as a CompanyName
       CompanyName: 'GitHub, Inc.',
-      FileDescription: 'Atom',
+      FileDescription: 'Pulsar',
       ProductName: CONFIG.appName
     }
   }).then(packagedAppPath => {
@@ -109,8 +111,8 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
       )
     );
     fs.copySync(
-      path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-      path.join(bundledResourcesPath, 'app', 'atom.sh')
+      path.join(CONFIG.repositoryRootPath, 'pulsar.sh'),
+      path.join(bundledResourcesPath, 'app', 'pulsar.sh')
     );
   }
   if (process.platform === 'darwin') {
@@ -128,12 +130,12 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
         'png',
         '1024.png'
       ),
-      path.join(packagedAppPath, 'atom.png')
+      path.join(packagedAppPath, 'pulsar.png')
     );
   } else if (process.platform === 'win32') {
     [
-      'atom.sh',
-      'atom.js',
+      'pulsar.sh',
+      'pulsar.js',
       'apm.cmd',
       'apm.sh',
       'file.ico',
@@ -145,7 +147,7 @@ function copyNonASARResources(packagedAppPath, bundledResourcesPath) {
       )
     );
 
-    // Customize atom.cmd for the channel-specific atom.exe name (e.g. atom-beta.exe)
+    // Customize pulsar.cmd for the channel-specific pulsar.exe name (e.g. pulsar-beta.exe)
     generateAtomCmdForChannel(bundledResourcesPath);
   }
 
@@ -162,11 +164,11 @@ function setAtomHelperVersion(packagedAppPath) {
   const frameworksPath = path.join(packagedAppPath, 'Contents', 'Frameworks');
   const helperPListPath = path.join(
     frameworksPath,
-    'Atom Helper.app',
+    'Pulsar Helper.app',
     'Contents',
     'Info.plist'
   );
-  console.log(`Setting Atom Helper Version for ${helperPListPath}`);
+  console.log(`Setting Pulsar Helper Version for ${helperPListPath}`);
   spawnSync('/usr/libexec/PlistBuddy', [
     '-c',
     `Add CFBundleVersion string ${CONFIG.appMetadata.version}`,
@@ -197,7 +199,7 @@ function buildAsarUnpackGlobExpression() {
     path.join('**', 'node_modules', 'dugite', 'git', '**'),
     path.join('**', 'node_modules', 'github', 'bin', '**'),
     path.join('**', 'node_modules', 'vscode-ripgrep', 'bin', '**'),
-    path.join('**', 'resources', 'atom.png')
+    path.join('**', 'resources', 'pulsar.png')
   ];
 
   return `{${unpack.join(',')}}`;
@@ -207,9 +209,9 @@ function getAppName() {
   if (process.platform === 'darwin') {
     return CONFIG.appName;
   } else if (process.platform === 'win32') {
-    return CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
+    return CONFIG.channel === 'stable' ? 'pulsar' : `pulsar-${CONFIG.channel}`;
   } else {
-    return 'atom';
+    return 'pulsar';
   }
 }
 
@@ -236,7 +238,7 @@ function renamePackagedAppDir(packageOutputDirPath) {
     );
   } else if (process.platform === 'linux') {
     const appName =
-      CONFIG.channel !== 'stable' ? `atom-${CONFIG.channel}` : 'atom';
+      CONFIG.channel !== 'stable' ? `pulsar-${CONFIG.channel}` : 'pulsar';
     let architecture;
     if (HOST_ARCH === 'ia32') {
       architecture = 'i386';
@@ -264,13 +266,13 @@ function renamePackagedAppDir(packageOutputDirPath) {
 
 function generateAtomCmdForChannel(bundledResourcesPath) {
   const atomCmdTemplate = fs.readFileSync(
-    path.join(CONFIG.repositoryRootPath, 'resources', 'win', 'atom.cmd')
+    path.join(CONFIG.repositoryRootPath, 'resources', 'win', 'pulsar.cmd')
   );
   const atomCmdContents = template(atomCmdTemplate)({
     atomExeName: CONFIG.executableName
   });
   fs.writeFileSync(
-    path.join(bundledResourcesPath, 'cli', 'atom.cmd'),
+    path.join(bundledResourcesPath, 'cli', 'pulsar.cmd'),
     atomCmdContents
   );
 }

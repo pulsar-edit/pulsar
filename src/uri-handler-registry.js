@@ -5,7 +5,7 @@ const { Emitter, Disposable } = require('event-kit');
 //
 // The global URI handler registry maps URIs to listener functions. URIs are mapped
 // based on the hostname of the URI; the format is atom://package/command?args.
-// The "core" package name is reserved for URIs handled by Atom core (it is not possible
+// The "core" package name is reserved for URIs handled by Pulsar Core (it is not possible
 // to register a package with the name "core").
 //
 // Because URI handling can be triggered from outside the application (e.g. from
@@ -18,15 +18,15 @@ const { Emitter, Disposable } = require('event-kit');
 // Packages can register their desire to handle URIs via a special key in their
 // `package.json` called "uriHandler". The value of this key should be an object
 // that contains, at minimum, a key named "method". This is the name of the method
-// on your package object that Atom will call when it receives a URI your package
+// on your package object that Pulsar will call when it receives a URI your package
 // is responsible for handling. It will pass the parsed URI as the first argument (by using
 // [Node's `url.parse(uri, true)`](https://nodejs.org/docs/latest/api/url.html#url_url_parse_urlstring_parsequerystring_slashesdenotehost))
 // and the raw URI string as the second argument.
 //
-// By default, Atom will defer activation of your package until a URI it needs to handle
+// By default, Pulsar will defer activation of your package until a URI it needs to handle
 // is triggered. If you need your package to activate right away, you can add
 // `"deferActivation": false` to your "uriHandler" configuration object. When activation
-// is deferred, once Atom receives a request for a URI in your package's namespace, it will
+// is deferred, once Pulsar receives a request for a URI in your package's namespace, it will
 // activate your package and then call `methodName` on it as before.
 //
 // If your package specifies a deprecated `urlMain` property, you cannot register URI handlers

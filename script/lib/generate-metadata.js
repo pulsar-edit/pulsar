@@ -13,7 +13,7 @@ let appName = CONFIG.appMetadata.name;
 if (process.platform === 'win32') {
   // Use the channel name in the app name on Windows so that the installer will
   // place it in a different folder in AppData\Local
-  appName = CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
+  appName = CONFIG.channel === 'stable' ? 'pulsar' : `pulsar-${CONFIG.channel}`;
 }
 
 module.exports = function() {

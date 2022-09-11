@@ -44,7 +44,7 @@ describe('Reporter', () => {
   });
 
   describe('.reportUncaughtException(error)', () => {
-    it('posts errors originated inside Atom Core to BugSnag', () => {
+    it('posts errors originated inside Pulsar Core to BugSnag', () => {
       const repositoryRootPath = path.join(__dirname, '..');
       reporter = new Reporter({
         request: (url, options) =>
@@ -68,7 +68,7 @@ describe('Reporter', () => {
       expect(request.url).toBe('https://notify.bugsnag.com');
       expect(request.headers.get('Content-Type')).toBe('application/json');
       let body = JSON.parse(request.body);
-      // Delete `inProject` field because tests may fail when run as part of Atom core
+      // Delete `inProject` field because tests may fail when run as part of Pulsar Core
       // (i.e. when this test file will be located under `node_modules/exception-reporting/spec`)
       delete body.events[0].exceptions[0].stacktrace[0].inProject;
 
@@ -112,7 +112,7 @@ describe('Reporter', () => {
       });
     });
 
-    it('posts errors originated outside Atom Core to BugSnag', () => {
+    it('posts errors originated outside Pulsar Core to BugSnag', () => {
       fs.getHomeDirectory = () => path.join(__dirname, '..', '..');
 
       let error = new Error();
@@ -129,7 +129,7 @@ describe('Reporter', () => {
       expect(request.url).toBe('https://notify.bugsnag.com');
       expect(request.headers.get('Content-Type')).toBe('application/json');
       let body = JSON.parse(request.body);
-      // Delete `inProject` field because tests may fail when run as part of Atom core
+      // Delete `inProject` field because tests may fail when run as part of Pulsar Core
       // (i.e. when this test file will be located under `node_modules/exception-reporting/spec`)
       delete body.events[0].exceptions[0].stacktrace[0].inProject;
 
@@ -335,7 +335,7 @@ describe('Reporter', () => {
       expect(request.url).toBe('https://notify.bugsnag.com');
       expect(request.headers.get('Content-Type')).toBe('application/json');
       let body = JSON.parse(request.body);
-      // Delete `inProject` field because tests may fail when run as part of Atom core
+      // Delete `inProject` field because tests may fail when run as part of Pulsar Core
       // (i.e. when this test file will be located under `node_modules/exception-reporting/spec`)
       delete body.events[0].exceptions[0].stacktrace[0].inProject;
 

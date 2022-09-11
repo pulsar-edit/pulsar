@@ -1,7 +1,7 @@
 const notarize = require('electron-notarize').notarize;
 
 module.exports = async function(packagedAppPath) {
-  const appBundleId = 'com.github.atom';
+  const appBundleId = 'com.github.pulsar';
   const appleId = process.env.AC_USER;
   const appleIdPassword = process.env.AC_PASSWORD;
   console.log(`Notarizing application at ${packagedAppPath}`);

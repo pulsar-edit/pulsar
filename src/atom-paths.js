@@ -27,15 +27,15 @@ const getAppDirectory = () => {
 
 module.exports = {
   setAtomHome: homePath => {
-    // When a read-writeable .atom folder exists above app use that
-    const portableHomePath = path.join(getAppDirectory(), '..', '.atom');
+    // When a read-writeable .pulsar folder exists above app use that
+    const portableHomePath = path.join(getAppDirectory(), '..', '.pulsar');
     if (fs.existsSync(portableHomePath)) {
       if (hasWriteAccess(portableHomePath)) {
         process.env.ATOM_HOME = portableHomePath;
       } else {
         // A path exists so it was intended to be used but we didn't have rights, so warn.
         console.log(
-          `Insufficient permission to portable Atom home "${portableHomePath}".`
+          `Insufficient permission to portable Pulsar home "${portableHomePath}".`
         );
       }
     }
@@ -46,7 +46,7 @@ module.exports = {
     }
 
     // Fall back to default .atom folder in users home folder
-    process.env.ATOM_HOME = path.join(homePath, '.atom');
+    process.env.ATOM_HOME = path.join(homePath, '.pulsar');
   },
 
   setUserData: app => {

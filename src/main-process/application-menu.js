@@ -164,8 +164,8 @@ module.exports = class ApplicationMenu {
   getDefaultTemplate() {
     return [
       {
-        label: 'Atom',
-        id: 'Atom',
+        label: 'Pulsar',
+        id: 'Pulsar',
         submenu: [
           {
             label: 'Check for Update',

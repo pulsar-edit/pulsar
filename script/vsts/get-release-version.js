@@ -15,12 +15,12 @@ const argv = yargs
 function getAppName(version) {
   const match = version.match(/\d+\.\d+\.\d+(-([a-z]+)(\d+|-\w{4,})?)?$/);
   if (!match) {
-    throw new Error(`Found incorrectly formatted Atom version ${version}`);
+    throw new Error(`Found incorrectly formatted Pulsar version ${version}`);
   } else if (match[2]) {
-    return `atom-${match[2]}`;
+    return `pulsar-${match[2]}`;
   }
 
-  return 'atom';
+  return 'pulsar';
 }
 
 async function getReleaseVersion() {
@@ -30,7 +30,7 @@ async function getReleaseVersion() {
       url: `https://api.github.com/repos/${REPO_OWNER}/${NIGHTLY_RELEASE_REPO}/releases`,
       headers: {
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'Atom Release Build'
+        'User-Agent': 'Pulsar Release Build'
       },
       json: true
     });

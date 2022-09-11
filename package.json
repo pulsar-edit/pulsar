@@ -1,6 +1,7 @@
 {
-  "name": "atom",
-  "productName": "Atom",
+  "name": "pulsar",
+  "author": "Pulsar-Edit",
+  "productName": "Pulsar",
   "author": "Pulsar Community <noreply@pulsar-edit.com>",
   "version": "1.63.0-dev",
   "description": "A hackable text editor for the 21st Century.",
@@ -13,10 +14,10 @@
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atom/atom.git"
+    "url": "https://github.com/pulsar-edit/pulsar.git"
   },
   "bugs": {
-    "url": "https://github.com/atom/atom/issues"
+    "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
   "license": "MIT",
   "electronVersion": "12.2.3",

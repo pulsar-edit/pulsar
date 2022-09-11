@@ -48,7 +48,7 @@ const runApmInstall = require('./lib/run-apm-install');
 function assertExecutablePaths(executablePaths) {
   assert(
     executablePaths.length !== 0,
-    `No atom build found. Please run "script/build" and try again.`
+    `No Pulsar build found. Please run "script/build" and try again.`
   );
   assert(
     executablePaths.length === 1,
@@ -71,13 +71,13 @@ if (process.platform === 'darwin') {
   );
 } else if (process.platform === 'linux') {
   const executablePaths = glob.sync(
-    path.join(CONFIG.buildOutputPath, 'atom-*', 'atom')
+    path.join(CONFIG.buildOutputPath, 'pulsar-*', 'pulsar')
   );
   assertExecutablePaths(executablePaths);
   executablePath = executablePaths[0];
 } else if (process.platform === 'win32') {
   const executablePaths = glob.sync(
-    path.join(CONFIG.buildOutputPath, '**', 'atom*.exe')
+    path.join(CONFIG.buildOutputPath, '**', 'pulsar*.exe')
   );
   assertExecutablePaths(executablePaths);
   executablePath = executablePaths[0];

@@ -2,7 +2,7 @@
   "name": "one-light-ui",
   "theme": "ui",
   "version": "1.12.5",
-  "description": "Pulsar One light UI theme",
+  "description": "One light UI theme developed for Atom, repurposed for Pulsar",
   "keywords": [
     "light",
     "adaptive",

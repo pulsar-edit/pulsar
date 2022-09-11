@@ -10,16 +10,16 @@ const CONFIG = require('../config');
 
 module.exports = function(packagedAppPath) {
   console.log(`Creating rpm package for "${packagedAppPath}"`);
-  const atomExecutableName =
-    CONFIG.channel === 'stable' ? 'atom' : `atom-${CONFIG.channel}`;
-  const apmExecutableName =
+  const editorExecutableName =
+    CONFIG.channel === 'stable' ? 'pulsar' : `pulsar-${CONFIG.channel}`;
+  const pkgMgrExecutableName =
     CONFIG.channel === 'stable' ? 'apm' : `apm-${CONFIG.channel}`;
   const appName = CONFIG.appName;
   const appDescription = CONFIG.appMetadata.description;
   // RPM versions can't have dashes or tildes in them.
   // (Ref.: https://twiki.cern.ch/twiki/bin/view/Main/RPMAndDebVersioning)
   const appVersion = CONFIG.appMetadata.version.replace(/-/g, '.');
-  const policyFileName = `atom-${CONFIG.channel}.policy`;
+  const policyFileName = `pulsar-${CONFIG.channel}.policy`;
 
   const rpmPackageDirPath = path.join(CONFIG.homeDirPath, 'rpmbuild');
   const rpmPackageBuildDirPath = path.join(rpmPackageDirPath, 'BUILD');
@@ -65,20 +65,20 @@ module.exports = function(packagedAppPath) {
   );
 
   console.log(`Writing rpm package spec file into "${rpmPackageSpecsDirPath}"`);
-  const rpmPackageSpecFilePath = path.join(rpmPackageSpecsDirPath, 'atom.spec');
+  const rpmPackageSpecFilePath = path.join(rpmPackageSpecsDirPath, 'pulsar.spec');
   const rpmPackageSpecsTemplate = fs.readFileSync(
     path.join(
       CONFIG.repositoryRootPath,
       'resources',
       'linux',
       'redhat',
-      'atom.spec.in'
+      'pulsar.spec.in'
     )
   );
   const rpmPackageSpecsContents = template(rpmPackageSpecsTemplate)({
     appName: appName,
-    appFileName: atomExecutableName,
-    apmFileName: apmExecutableName,
+    appFileName: editorExecutableName,
+    apmFileName: pkgMgrExecutableName,
     description: appDescription,
     installDir: '/usr',
     version: appVersion,
@@ -92,30 +92,30 @@ module.exports = function(packagedAppPath) {
       CONFIG.repositoryRootPath,
       'resources',
       'linux',
-      'atom.desktop.in'
+      'pulsar.desktop.in'
     )
   );
   const desktopEntryContents = template(desktopEntryTemplate)({
     appName: appName,
-    appFileName: atomExecutableName,
+    appFileName: editorExecutableName,
     description: appDescription,
     installDir: '/usr',
-    iconPath: atomExecutableName
+    iconPath: editorExecutableName
   });
   fs.writeFileSync(
-    path.join(rpmPackageBuildDirPath, `${atomExecutableName}.desktop`),
+    path.join(rpmPackageBuildDirPath, `${editorExecutableName}.desktop`),
     desktopEntryContents
   );
 
-  console.log(`Copying atom.sh into "${rpmPackageBuildDirPath}"`);
+  console.log(`Copying pulsar.sh into "${rpmPackageBuildDirPath}"`);
   fs.copySync(
-    path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-    path.join(rpmPackageBuildDirPath, 'atom.sh')
+    path.join(CONFIG.repositoryRootPath, 'pulsar.sh'),
+    path.join(rpmPackageBuildDirPath, 'pulsar.sh')
   );
 
-  console.log(`Copying atom.policy into "${rpmPackageBuildDirPath}"`);
+  console.log(`Copying pulsar.policy into "${rpmPackageBuildDirPath}"`);
   fs.copySync(
-    path.join(CONFIG.repositoryRootPath, 'resources', 'linux', 'atom.policy'),
+    path.join(CONFIG.repositoryRootPath, 'resources', 'linux', 'pulsar.policy'),
     path.join(rpmPackageBuildDirPath, policyFileName)
   );
 
@@ -137,7 +137,7 @@ module.exports = function(packagedAppPath) {
     );
     const outputRpmPackageFilePath = path.join(
       CONFIG.buildOutputPath,
-      `atom.${generatedArch}.rpm`
+      `pulsar.${generatedArch}.rpm`
     );
     console.log(
       `Copying "${generatedPackageFilePath}" into "${outputRpmPackageFilePath}"`

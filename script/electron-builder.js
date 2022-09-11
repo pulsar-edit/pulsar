@@ -41,7 +41,8 @@ const Platform = builder.Platform
 const generate = require('./lib/generate-metadata.js')
 
 const pngIcon = 'resources/app-icons/nightly/png/1024.png'
-const icoIcon = 'resources/app-icons/nightly/atom.ico'
+const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
+
 let options = {
   "appId": "link.mauricioszabo.pulsar",
   "npmRebuild": false,
@@ -76,7 +77,7 @@ let options = {
       "to": "app/apm"
     }, {
       "from": pngIcon,
-      "to": "atom.png"
+      "to": "pulsar.png"
     },
   ],
   compression: "normal",
