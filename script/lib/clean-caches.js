@@ -15,10 +15,10 @@ module.exports = function() {
     path.join(CONFIG.atomHomeDirPath, '.npm'),
     path.join(CONFIG.atomHomeDirPath, 'compile-cache'),
     path.join(CONFIG.atomHomeDirPath, 'snapshot-cache'),
-    path.join(CONFIG.atomHomeDirPath, 'atom-shell'),
+    path.join(CONFIG.atomHomeDirPath, 'pulsar-shell'),
     path.join(CONFIG.atomHomeDirPath, 'electron'),
-    path.join(os.tmpdir(), 'atom-build'),
-    path.join(os.tmpdir(), 'atom-cached-atom-shells')
+    path.join(os.tmpdir(), 'pulsar-build'),
+    path.join(os.tmpdir(), 'pulsar-cached-pulsar-shells')
   ];
   const rmPromises = [];
   for (let path of cachePaths) {

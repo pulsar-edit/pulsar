@@ -20,14 +20,14 @@ describe('dalek', function() {
         'an-unduplicated-installed-package': path.join(
           'Users',
           'username',
-          '.atom',
+          '.pulsar',
           'packages',
           'an-unduplicated-installed-package'
         ),
         'duplicated-package': path.join(
           'Users',
           'username',
-          '.atom',
+          '.pulsar',
           'packages',
           'duplicated-package'
         ),
@@ -40,7 +40,7 @@ describe('dalek', function() {
 
       atom.devMode = false;
       bundledPackages = ['duplicated-package', 'unduplicated-package'];
-      packageDirPaths = [path.join('Users', 'username', '.atom', 'packages')];
+      packageDirPaths = [path.join('Users', 'username', '.pulsar', 'packages')];
       sandbox = sinon.createSandbox();
       sandbox
         .stub(dalek, 'realpath')
@@ -88,7 +88,7 @@ describe('dalek', function() {
         const packagePath = path.join(
           'Users',
           'username',
-          '.atom',
+          '.pulsar',
           'packages',
           'duplicated-package'
         );

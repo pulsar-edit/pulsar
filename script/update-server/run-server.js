@@ -7,12 +7,12 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3456;
 
-// Load the metadata for the local build of Atom
+// Load the metadata for the local build of Pulsar
 const buildPath = path.resolve(__dirname, '..', '..', 'out');
 const packageJsonPath = path.join(buildPath, 'app', 'package.json');
 if (!fs.existsSync(buildPath) || !fs.existsSync(packageJsonPath)) {
   console.log(
-    `This script requires a full Atom build with release packages for the current platform in the following path:\n    ${buildPath}\n`
+    `This script requires a full Pulsar build with release packages for the current platform in the following path:\n    ${buildPath}\n`
   );
   if (process.platform === 'darwin') {
     console.log(
@@ -37,8 +37,8 @@ console.log(
 );
 
 function getMacZip(req, res) {
-  console.log(`Received request for atom-mac.zip, sending it`);
-  res.sendFile(path.join(buildPath, 'atom-mac.zip'));
+  console.log(`Received request for pulsar-mac.zip, sending it`);
+  res.sendFile(path.join(buildPath, 'pulsar-mac.zip'));
 }
 
 function getMacUpdates(req, res) {
@@ -46,7 +46,7 @@ function getMacUpdates(req, res) {
     const updateInfo = {
       name: appMetadata.version,
       pub_date: new Date().toISOString(),
-      url: `http://localhost:${port}/mac/atom-mac.zip`,
+      url: `http://localhost:${port}/mac/pulsar-mac.zip`,
       notes: '<p>No Details</p>'
     };
 
@@ -59,7 +59,7 @@ function getMacUpdates(req, res) {
     res.json(updateInfo);
   } else {
     console.log(
-      `Received request for macOS updates, sending 204 as Atom is up to date (version = ${
+      `Received request for macOS updates, sending 204 as Pulsar is up to date (version = ${
         req.query.version
       })`
     );
@@ -79,7 +79,7 @@ function getReleasesFile(fileName) {
       const versionChannel = (versionMatch && versionMatch[1]) || 'stable';
       if (releaseChannel !== versionChannel) {
         console.log(
-          `Atom requested an update for version ${
+          `Pulsar requested an update for version ${
             req.query.version
           } but the current release channel is ${releaseChannel}`
         );
@@ -96,9 +96,9 @@ function getNupkgFile(is64bit) {
   return function(req, res) {
     let nupkgFile = req.params.nupkg;
     if (is64bit) {
-      const nupkgMatch = nupkgFile.match(/atom-(.+)-(delta|full)\.nupkg/);
+      const nupkgMatch = nupkgFile.match(/pulsar-(.+)-(delta|full)\.nupkg/);
       if (nupkgMatch) {
-        nupkgFile = `atom-x64-${nupkgMatch[1]}-${nupkgMatch[2]}.nupkg`;
+        nupkgFile = `pulsar-x64-${nupkgMatch[1]}-${nupkgMatch[2]}.nupkg`;
       }
     }
 
@@ -110,7 +110,7 @@ function getNupkgFile(is64bit) {
 }
 
 if (process.platform === 'darwin') {
-  app.get('/mac/atom-mac.zip', getMacZip);
+  app.get('/mac/pulsar-mac.zip', getMacZip);
   app.get('/api/updates', getMacUpdates);
 } else if (process.platform === 'win32') {
   app.get('/api/updates/RELEASES', getReleasesFile('RELEASES'));
@@ -128,7 +128,7 @@ if (process.platform === 'darwin') {
 
 app.listen(port, () => {
   console.log(
-    `Run Atom with ATOM_UPDATE_URL_PREFIX="http://localhost:${port}" set to test updates!\n`
+    `Run Pulsar with ATOM_UPDATE_URL_PREFIX="http://localhost:${port}" set to test updates!\n`
       .yellow
   );
 });

@@ -76,19 +76,19 @@ module.exports = function(packagedAppPath, installDir) {
       });
     }
   } else {
-    const atomExecutableName =
-      CONFIG.channel === 'stable' ? 'atom' : 'atom-' + CONFIG.channel;
-    const apmExecutableName =
+    const editorExecutableName =
+      CONFIG.channel === 'stable' ? 'pulsar' : 'pulsar-' + CONFIG.channel;
+    const pkgMgrExecutableName =
       CONFIG.channel === 'stable' ? 'apm' : 'apm-' + CONFIG.channel;
     const appName =
       CONFIG.channel === 'stable'
-        ? 'Atom'
-        : startCase('Atom ' + CONFIG.channel);
+        ? 'Pulsar'
+        : startCase('Pulsar ' + CONFIG.channel);
     const appDescription = CONFIG.appMetadata.description;
     const prefixDirPath =
       installDir !== '' ? handleTilde(installDir) : path.join('/usr', 'local');
     const shareDirPath = path.join(prefixDirPath, 'share');
-    const installationDirPath = path.join(shareDirPath, atomExecutableName);
+    const installationDirPath = path.join(shareDirPath, editorExecutableName);
     const applicationsDirPath = path.join(shareDirPath, 'applications');
 
     const binDirPath = path.join(prefixDirPath, 'bin');
@@ -101,7 +101,7 @@ module.exports = function(packagedAppPath, installDir) {
     {
       // Install icons
       const baseIconThemeDirPath = findBaseIconThemeDirPath();
-      const fullIconName = atomExecutableName + '.png';
+      const fullIconName = editorExecutableName + '.png';
 
       let existingIconsFound = false;
       fs.readdirSync(baseIconThemeDirPath).forEach(size => {
@@ -156,7 +156,7 @@ module.exports = function(packagedAppPath, installDir) {
       // Install xdg desktop file
       const desktopEntryPath = path.join(
         applicationsDirPath,
-        `${atomExecutableName}.desktop`
+        `${editorExecutableName}.desktop`
       );
       if (fs.existsSync(desktopEntryPath)) {
         console.log(
@@ -170,51 +170,51 @@ module.exports = function(packagedAppPath, installDir) {
           CONFIG.repositoryRootPath,
           'resources',
           'linux',
-          'atom.desktop.in'
+          'pulsar.desktop.in'
         )
       );
       const desktopEntryContents = template(desktopEntryTemplate)({
         appName,
-        appFileName: atomExecutableName,
+        appFileName: editorExecutableName,
         description: appDescription,
         installDir: prefixDirPath,
-        iconPath: atomExecutableName
+        iconPath: editorExecutableName
       });
       fs.writeFileSync(desktopEntryPath, desktopEntryContents);
     }
 
     {
-      // Add atom executable to the PATH
-      const atomBinDestinationPath = path.join(binDirPath, atomExecutableName);
-      if (fs.existsSync(atomBinDestinationPath)) {
+      // Add pulsar executable to the PATH
+      const editorBinDestinationPath = path.join(binDirPath, editorExecutableName);
+      if (fs.existsSync(editorBinDestinationPath)) {
         console.log(
-          `Removing existing executable at "${atomBinDestinationPath}"`
+          `Removing existing executable at "${editorBinDestinationPath}"`
         );
-        fs.removeSync(atomBinDestinationPath);
+        fs.removeSync(editorBinDestinationPath);
       }
-      console.log(`Copying atom.sh to "${atomBinDestinationPath}"`);
+      console.log(`Copying pulsar.sh to "${editorBinDestinationPath}"`);
       fs.copySync(
-        path.join(CONFIG.repositoryRootPath, 'atom.sh'),
-        atomBinDestinationPath
+        path.join(CONFIG.repositoryRootPath, 'pulsar.sh'),
+        editorBinDestinationPath
       );
     }
 
     {
       // Link apm executable to the PATH
-      const apmBinDestinationPath = path.join(binDirPath, apmExecutableName);
+      const pkgMgrBinDestinationPath = path.join(binDirPath, pkgMgrExecutableName);
       try {
-        fs.lstatSync(apmBinDestinationPath);
+        fs.lstatSync(pkgMgrBinDestinationPath);
         console.log(
-          `Removing existing executable at "${apmBinDestinationPath}"`
+          `Removing existing executable at "${pkgMgrBinDestinationPath}"`
         );
-        fs.removeSync(apmBinDestinationPath);
+        fs.removeSync(pkgMgrBinDestinationPath);
       } catch (e) {}
-      console.log(`Symlinking apm to "${apmBinDestinationPath}"`);
+      console.log(`Symlinking apm to "${pkgMgrBinDestinationPath}"`);
       fs.symlinkSync(
         path.join(
           '..',
           'share',
-          atomExecutableName,
+          editorExecutableName,
           'resources',
           'app',
           'apm',
@@ -222,7 +222,7 @@ module.exports = function(packagedAppPath, installDir) {
           '.bin',
           'apm'
         ),
-        apmBinDestinationPath
+        pkgMgrBinDestinationPath
       );
     }
 

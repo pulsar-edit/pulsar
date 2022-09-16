@@ -12,7 +12,7 @@ let SequenceCount = 0;
 // presented in the command palette.
 //
 // The global command registry facilitates a style of event handling known as
-// *event delegation* that was popularized by jQuery. Atom commands are expressed
+// *event delegation* that was popularized by jQuery. Pulsar commands are expressed
 // as custom DOM events that can be invoked on the currently focused element via
 // a key binding or manually via the command palette. Rather than binding
 // listeners for command events directly to DOM nodes, you instead register

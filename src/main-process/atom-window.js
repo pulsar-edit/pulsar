@@ -11,7 +11,7 @@ const url = require('url');
 const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
-const ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'atom.png');
+const ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
 
 let includeShellLoadTime = true;
 let nextId = 0;
@@ -55,6 +55,8 @@ module.exports = class AtomWindow extends EventEmitter {
         // (Ref: https://github.com/atom/atom/pull/12696#issuecomment-290496960)
         disableBlinkFeatures: 'Auxclick',
         nodeIntegration: true,
+        contextIsolation: false,
+        enableRemoteModule: true,
         webviewTag: true,
 
         // TodoElectronIssue: remote module is deprecated https://www.electronjs.org/docs/breaking-changes#default-changed-enableremotemodule-defaults-to-false

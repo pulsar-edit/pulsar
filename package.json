@@ -1,6 +1,8 @@
 {
-  "name": "atom",
-  "productName": "Atom",
+  "name": "pulsar",
+  "author": "Pulsar-Edit",
+  "productName": "Pulsar",
+  "author": "Pulsar Community <noreply@pulsar-edit.com>",
   "version": "1.63.0-dev",
   "description": "A hackable text editor for the 21st Century.",
   "branding": {
@@ -12,13 +14,13 @@
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atom/atom.git"
+    "url": "https://github.com/pulsar-edit/pulsar.git"
   },
   "bugs": {
-    "url": "https://github.com/atom/atom/issues"
+    "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
   "license": "MIT",
-  "electronVersion": "11.5.0",
+  "electronVersion": "12.2.3",
   "dependencies": {
     "@atom/fuzzy-native": "^1.2.1",
     "@atom/source-map-support": "^0.3.4",
@@ -39,8 +41,8 @@
     "autocomplete-plus": "https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4",
     "autocomplete-snippets": "https://codeload.github.com/atom/autocomplete-snippets/legacy.tar.gz/refs/tags/v1.12.1",
     "autoflow": "file:packages/autoflow",
-    "babel-preset-atomic": "^5.0.0",
     "autosave": "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6",
+    "babel-preset-atomic": "^5.0.0",
     "background-tips": "https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
     "base16-tomorrow-light-theme": "file:packages/base16-tomorrow-light-theme",
@@ -91,6 +93,7 @@
     "language-csharp": "file:packages/language-csharp",
     "language-gfm": "file:packages/language-gfm",
     "language-git": "file:packages/language-git",
+    "language-go": "file:packages/language-go",
     "language-html": "file:packages/language-html",
     "language-hyperlink": "file:packages/language-hyperlink",
     "language-java": "file:packages/language-java",
@@ -119,7 +122,7 @@
     "language-yaml": "file:packages/language-yaml",
     "keybinding-resolver": "https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1",
     "language-c": "file:packages/language-c",
-    "language-css": "https://codeload.github.com/atom/language-css/legacy.tar.gz/refs/tags/v0.45.1",
+    "language-css": "file:packages/language-css",
     "less-cache": "1.1.0",
     "line-ending-selector": "file:packages/line-ending-selector",
     "line-top-index": "0.3.1",
@@ -240,10 +243,10 @@
     "language-clojure": "file:./packages/language-clojure",
     "language-coffee-script": "file:./packages/language-coffee-script",
     "language-csharp": "file:./packages/language-csharp",
-    "language-css": "0.45.1",
+    "language-css": "file:./packages/language-css",
     "language-gfm": "file:./packages/language-gfm",
     "language-git": "file:./packages/language-git",
-    "language-go": "0.47.2",
+    "language-go": "file:./packages/language-go",
     "language-html": "file:./packages/language-html",
     "language-hyperlink": "file:./packages/language-hyperlink",
     "language-java": "file:./packages/language-java",
@@ -276,8 +279,9 @@
     "preinstall": "node -e 'process.exit(0)'",
     "test": "node script/test",
     "build": "electron-rebuild",
-    "build:apm": "cd apm && yarn install && ./node_modules/ppm/bin/npm rebuild && cd ./node_modules/git-utils && npm run prepare && npm install",
-    "start": "electron --enable-logging . -f"
+    "build:apm": "cd ppm && yarn install",
+    "start": "electron --enable-logging . -f",
+    "dist": "node script/electron-builder.js"
   },
   "standard-engine": "./script/node_modules/standard",
   "standard": {
@@ -293,9 +297,13 @@
     ]
   },
   "devDependencies": {
-    "electron": "11.5.0",
+    "@playwright/test": "1.22.2",
+    "electron": "12.2.3",
+    "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
-    "random-seed": "^0.3.0",
-    "webdriverio": "^7.20.9"
+    "random-seed": "0.3.0",
+    "webdriverio": "7.20.9",
+    "playwright": "1.22.2",
+    "playwright-core": "1.22.2"
   }
 }

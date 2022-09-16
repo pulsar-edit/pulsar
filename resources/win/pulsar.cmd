@@ -47,5 +47,5 @@ IF "%EXPECT_OUTPUT%"=="YES" (
     "%~dp0\..\..\<%= atomExeName %>" %*
   )
 ) ELSE (
-  "%~dp0\..\app\apm\bin\node.exe" "%~dp0\atom.js" "<%= atomExeName %>" %*
+  "%~dp0\..\app\apm\bin\node.exe" "%~dp0\pulsar.js" "<%= atomExeName %>" %*
 )

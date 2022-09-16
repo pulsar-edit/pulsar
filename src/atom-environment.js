@@ -52,7 +52,7 @@ const stat = util.promisify(fs.stat);
 
 let nextId = 0;
 
-// Essential: Atom global for dealing with packages, themes, menus, and the window.
+// Essential: Pulsar global for dealing with packages, themes, menus, and the window.
 //
 // An instance of this class is always available as the `atom` global.
 class AtomEnvironment {
@@ -220,7 +220,7 @@ class AtomEnvironment {
       commands: this.commands,
       stateStore: this.stateStore
     });
-    
+
     this.branding = {
       id: packagejson.branding.id,
       name: packagejson.branding.name,
@@ -387,15 +387,15 @@ class AtomEnvironment {
   registerDefaultOpeners() {
     this.workspace.addOpener(uri => {
       switch (uri) {
-        case 'atom://.atom/stylesheet':
+        case 'atom://.pulsar/stylesheet':
           return this.workspace.openTextFile(
             this.styles.getUserStyleSheetPath()
           );
-        case 'atom://.atom/keymap':
+        case 'atom://.pulsar/keymap':
           return this.workspace.openTextFile(this.keymaps.getUserKeymapPath());
-        case 'atom://.atom/config':
+        case 'atom://.pulsar/config':
           return this.workspace.openTextFile(this.config.getUserConfigPath());
-        case 'atom://.atom/init-script':
+        case 'atom://.pulsar/init-script':
           return this.workspace.openTextFile(this.getUserInitScriptPath());
       }
     });
@@ -534,7 +534,7 @@ class AtomEnvironment {
   }
 
   /*
-  Section: Atom Details
+  Section: Pulsar Details
   */
 
   // Public: Returns a {Boolean} that is `true` if the current window is in development mode.
@@ -563,7 +563,7 @@ class AtomEnvironment {
     return this.firstLoad;
   }
 
-  // Public: Get the full name of this Atom release (e.g. "Atom", "Atom Beta")
+  // Public: Get the full name of this Pulsar release (e.g. "Pulsar", "Pulsar Beta")
   //
   // Returns the app name {String}.
   getAppName() {
@@ -571,7 +571,7 @@ class AtomEnvironment {
     return this.appName;
   }
 
-  // Public: Get the version of the Atom application.
+  // Public: Get the version of the Pulsar application.
   //
   // Returns the version text {String}.
   getVersion() {
@@ -580,10 +580,10 @@ class AtomEnvironment {
     return this.appVersion;
   }
 
-  // Public: Gets the release channel of the Atom application.
+  // Public: Gets the release channel of the Pulsar application.
   //
   // Returns the release channel as a {String}. Will return a specific release channel
-  // name like 'beta' or 'nightly' if one is found in the Atom version or 'stable'
+  // name like 'beta' or 'nightly' if one is found in the Pulsar version or 'stable'
   // otherwise.
   getReleaseChannel() {
     return getReleaseChannel(this.getVersion());
@@ -625,10 +625,10 @@ class AtomEnvironment {
   }
 
   /*
-  Section: Managing The Atom Window
+  Section: Managing The Pulsar Window
   */
 
-  // Essential: Open a new Atom window using the given options.
+  // Essential: Open a new Pulsar window using the given options.
   //
   // Calling this method without an options parameter will open a prompt to pick
   // a file/folder to open in the new window.
@@ -638,10 +638,10 @@ class AtomEnvironment {
   //   * `newWindow` A {Boolean}, true to always open a new window instead of
   //     reusing existing windows depending on the paths to open.
   //   * `devMode` A {Boolean}, true to open the window in development mode.
-  //     Development mode loads the Atom source from the locally cloned
-  //     repository and also loads all the packages in ~/.atom/dev/packages
+  //     Development mode loads the Pulsar source from the locally cloned
+  //     repository and also loads all the packages in ~/.pulsar/dev/packages
   //   * `safeMode` A {Boolean}, true to open the window in safe mode. Safe
-  //     mode prevents all packages installed to ~/.atom/packages from loading.
+  //     mode prevents all packages installed to ~/.pulsar/packages from loading.
   open(params) {
     return this.applicationDelegate.open(params);
   }
@@ -1773,7 +1773,7 @@ module.exports = AtomEnvironment;
 
 // Preserve this deprecation until 2.0. Sorry. Should have removed Q sooner.
 Promise.prototype.done = function (callback) {
-  deprecate('Atom now uses ES6 Promises instead of Q. Call promise.then instead of promise.done')
+  deprecate('Pulsar now uses ES6 Promises instead of Q. Call promise.then instead of promise.done')
   return this.then(callback)
 }
 

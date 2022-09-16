@@ -21,8 +21,8 @@ RUN apt-get update && \
         npm && \
     rm -rf /var/lib/apt/lists/*
 
-# Update npm and dependencies
-RUN npm install -g npm --loglevel error
+COPY . /pulsar
+WORKDIR /pulsar
 
 # Use python2 by default
 RUN npm config set python /usr/bin/python2 -g

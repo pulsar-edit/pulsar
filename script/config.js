@@ -7,7 +7,7 @@ const path = require('path');
 const spawnSync = require('./lib/spawn-sync');
 
 const repositoryRootPath = path.resolve(__dirname, '..');
-const apmRootPath = path.join(repositoryRootPath, 'apm');
+const apmRootPath = path.join(repositoryRootPath, 'ppm');
 const scriptRootPath = path.join(repositoryRootPath, 'script');
 const scriptRunnerRootPath = path.join(scriptRootPath, 'script-runner');
 const scriptRunnerModulesPath = path.join(scriptRunnerRootPath, 'node_modules');
@@ -18,7 +18,7 @@ const symbolsPath = path.join(buildOutputPath, 'symbols');
 const electronDownloadPath = path.join(repositoryRootPath, 'electron');
 const homeDirPath = process.env.HOME || process.env.USERPROFILE;
 const atomHomeDirPath =
-  process.env.ATOM_HOME || path.join(homeDirPath, '.atom');
+  process.env.ATOM_HOME || path.join(homeDirPath, '.pulsar');
 
 const appMetadata = require(path.join(repositoryRootPath, 'package.json'));
 const apmMetadata = require(path.join(apmRootPath, 'package.json'));
@@ -36,10 +36,10 @@ if (process.env.npm_config_jobs === undefined) {
   process.env.npm_config_jobs = 'max';
 }
 
-const REPO_OWNER = process.env.REPO_OWNER || 'atom';
-const MAIN_REPO = process.env.MAIN_REPO || 'atom';
+const REPO_OWNER = process.env.REPO_OWNER || 'pulsar-edit';
+const MAIN_REPO = process.env.MAIN_REPO || 'pulsar';
 const NIGHTLY_RELEASE_REPO =
-  process.env.NIGHTLY_RELEASE_REPO || 'atom-nightly-releases';
+  process.env.NIGHTLY_RELEASE_REPO || 'pulsar-nightly-releases';
 
 module.exports = {
   appMetadata,
@@ -71,13 +71,13 @@ module.exports = {
 };
 
 function getChannelName(channel) {
-  return channel === 'stable' ? 'atom' : `atom-${channel}`;
+  return channel === 'stable' ? 'pulsar' : `pulsar-${channel}`;
 }
 
 function getChannel(version) {
   const match = version.match(/\d+\.\d+\.\d+(-([a-z]+)(\d+|-\w{4,})?)?$/);
   if (!match) {
-    throw new Error(`Found incorrectly formatted Atom version ${version}`);
+    throw new Error(`Found incorrectly formatted Pulsar version ${version}`);
   } else if (match[2]) {
     return match[2];
   }
@@ -87,8 +87,8 @@ function getChannel(version) {
 
 function getAppName(channel) {
   return channel === 'stable'
-    ? 'Atom'
-    : `Atom ${process.env.ATOM_CHANNEL_DISPLAY_NAME ||
+    ? 'Pulsar'
+    : `Pulsar ${process.env.ATOM_CHANNEL_DISPLAY_NAME ||
         channel.charAt(0).toUpperCase() + channel.slice(1)}`;
 }
 
@@ -96,9 +96,9 @@ function getExecutableName(channel, appName) {
   if (process.platform === 'darwin') {
     return appName;
   } else if (process.platform === 'win32') {
-    return channel === 'stable' ? 'atom.exe' : `atom-${channel}.exe`;
+    return channel === 'stable' ? 'pulsar.exe' : `pulsar-${channel}.exe`;
   } else {
-    return 'atom';
+    return 'pulsar';
   }
 }
 
@@ -118,7 +118,7 @@ function getApmBinPath() {
   return path.join(
     apmRootPath,
     'node_modules',
-    'atom-package-manager',
+    'pulsar-package-manager',
     'bin',
     apmBinName
   );

@@ -6,7 +6,7 @@ const GitUtils = require('git-utils');
 
 let nextId = 0;
 
-// Extended: Represents the underlying git operations performed by Atom.
+// Extended: Represents the underlying git operations performed by Pulsar.
 //
 // This class shouldn't be instantiated directly but instead by accessing the
 // `atom.project` global and calling `getRepositories()`. Note that this will

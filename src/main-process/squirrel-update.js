@@ -28,29 +28,29 @@ const spawnSetx = (args, callback) => Spawner.spawn(setxPath, args, callback);
 const spawnUpdate = (args, callback) =>
   Spawner.spawn(updateDotExe, args, callback);
 
-// Add atom and apm to the PATH
+// Add pulsar and apm to the PATH
 //
-// This is done by adding .cmd shims to the root bin folder in the Atom
+// This is done by adding .cmd shims to the root bin folder in the Pulsar
 // install directory that point to the newly installed versions inside
 // the versioned app directories.
 const addCommandsToPath = callback => {
   const atomCmdName = execName.replace('.exe', '.cmd');
-  const apmCmdName = atomCmdName.replace('atom', 'apm');
+  const apmCmdName = atomCmdName.replace('pulsar', 'apm');
   const atomShName = execName.replace('.exe', '');
-  const apmShName = atomShName.replace('atom', 'apm');
+  const apmShName = atomShName.replace('pulsar', 'apm');
 
   const installCommands = callback => {
     const atomCommandPath = path.join(binFolder, atomCmdName);
     const relativeAtomPath = path.relative(
       binFolder,
-      path.join(appFolder, 'resources', 'cli', 'atom.cmd')
+      path.join(appFolder, 'resources', 'cli', 'pulsar.cmd')
     );
     const atomCommand = `@echo off\r\n"%~dp0\\${relativeAtomPath}" %*`;
 
     const atomShCommandPath = path.join(binFolder, atomShName);
     const relativeAtomShPath = path.relative(
       binFolder,
-      path.join(appFolder, 'resources', 'cli', 'atom.sh')
+      path.join(appFolder, 'resources', 'cli', 'pulsar.sh')
     );
     const atomShCommand = `#!/bin/sh\r\n"$(dirname "$0")/${relativeAtomShPath.replace(
       /\\/g,
@@ -107,7 +107,7 @@ const addCommandsToPath = callback => {
   });
 };
 
-// Remove atom and apm from the PATH
+// Remove pulsar and apm from the PATH
 const removeCommandsFromPath = callback =>
   WinPowerShell.getPath((error, pathEnv) => {
     if (error != null) {
@@ -166,10 +166,10 @@ const removeShortcuts = callback =>
 
 exports.spawn = spawnUpdate;
 
-// Is the Update.exe installed with Atom?
+// Is the Update.exe installed with Pulsar?
 exports.existsSync = () => fs.existsSync(updateDotExe);
 
-// Restart Atom using the version pointed to by the atom.cmd shim
+// Restart Pulsar using the version pointed to by the pulsar.cmd shim
 exports.restartAtom = () => {
   let args;
   const atomCmdName = execName.replace('.exe', '.cmd');

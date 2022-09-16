@@ -34,7 +34,7 @@ module.exports = {
       /\.\d+$/,
       ''
     );
-    const apmVersion = CONFIG.apmMetadata.dependencies['atom-package-manager'];
+    const apmVersion = CONFIG.apmMetadata.dependencies['pulsar-package-manager'];
     const body =
       electronVersion +
       apmVersion +

@@ -62,7 +62,7 @@ module.exports = class ReopenProjectMenuManager {
       .join(' ');
   }
 
-  // Windows users can right-click Atom taskbar and remove project from the jump list.
+  // Windows users can right-click Pulsar taskbar and remove project from the jump list.
   // We have to honor that or the group stops working. As we only get a partial list
   // each time we remove them from history entirely.
   async applyWindowsJumpListRemovals() {
@@ -121,7 +121,7 @@ module.exports = class ReopenProjectMenuManager {
             title: 'New Window',
             program: process.execPath,
             args: '--new-window',
-            description: 'Opens a new Atom window'
+            description: 'Opens a new Pulsar window'
           }
         ]
       }

@@ -566,7 +566,7 @@ module.exports = class Package {
             if (atomEnvironment.packages.hasActivatedInitialPackages()) {
               // Only explicitly activate the package if initial packages
               // have finished activating. This is because deserialization
-              // generally occurs at Atom startup, which happens before the
+              // generally occurs at Pulsar startup, which happens before the
               // workspace element is added to the DOM and is inconsistent with
               // with when initial package activation occurs. Triggering activation
               // immediately may cause problems with packages that expect to
@@ -897,7 +897,7 @@ module.exports = class Package {
         Failed to require the main module of '${
           this.name
         }' because it requires one or more incompatible native modules (${nativeModuleNames}).
-        Run \`apm rebuild\` in the package directory and restart Atom to resolve.\
+        Run \`apm rebuild\` in the package directory and restart Pulsar to resolve.\
       `);
     } else {
       const mainModulePath = this.getMainModulePath();
@@ -1226,7 +1226,7 @@ module.exports = class Package {
   */
 
   // Extended: Are all native modules depended on by this package correctly
-  // compiled against the current version of Atom?
+  // compiled against the current version of Pulsar?
   //
   // Incompatible packages cannot be activated.
   //
@@ -1248,7 +1248,7 @@ module.exports = class Package {
   }
 
   // Extended: Rebuild native modules in this package's dependencies for the
-  // current version of Atom.
+  // current version of Pulsar.
   //
   // Returns a {Promise} that resolves with an object containing `code`,
   // `stdout`, and `stderr` properties based on the results of running

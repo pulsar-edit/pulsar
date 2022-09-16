@@ -380,7 +380,7 @@ export default class GuideView {
 
   getApplicationMenuName() {
     if (process.platform === 'darwin') {
-      return 'Atom';
+      return 'Pulsar';
     } else if (process.platform === 'linux') {
       return 'Edit';
     } else {
@@ -450,17 +450,17 @@ export default class GuideView {
 
   didClickStylingButton() {
     this.props.reporterProxy.sendEvent('clicked-styling-cta');
-    atom.workspace.open('atom://.atom/stylesheet', { split: 'left' });
+    atom.workspace.open('atom://.pulsar/stylesheet', { split: 'left' });
   }
 
   didClickInitScriptButton() {
     this.props.reporterProxy.sendEvent('clicked-init-script-cta');
-    atom.workspace.open('atom://.atom/init-script', { split: 'left' });
+    atom.workspace.open('atom://.pulsar/init-script', { split: 'left' });
   }
 
   didClickSnippetsButton() {
     this.props.reporterProxy.sendEvent('clicked-snippets-cta');
-    atom.workspace.open('atom://.atom/snippets', { split: 'left' });
+    atom.workspace.open('atom://.pulsar/snippets', { split: 'left' });
   }
 
   didClickTeletypeButton() {

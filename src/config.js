@@ -13,7 +13,7 @@ const ScopeDescriptor = require('./scope-descriptor');
 
 const schemaEnforcers = {};
 
-// Essential: Used to access all of Atom's configuration details.
+// Essential: Used to access all of Pulsar's configuration details.
 //
 // An instance of this class is always available as the `atom.config` global.
 //
@@ -616,7 +616,7 @@ class Config {
   //     See [the scopes docs](http://flight-manual.atom.io/behind-atom/sections/scoped-settings-scopes-and-scope-descriptors/)
   //     for more information.
   //
-  // Returns the value from Atom's default settings, the user's configuration
+  // Returns the value from Pulsar's default settings, the user's configuration
   // file in the type specified by the configuration schema.
   get(...args) {
     let keyPath, options, scope;
@@ -688,7 +688,7 @@ class Config {
 
   // Essential: Sets the value for a configuration setting.
   //
-  // This value is stored in Atom's internal configuration file.
+  // This value is stored in Pulsar's internal configuration file.
   //
   // ### Examples
   //

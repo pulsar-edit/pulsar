@@ -51,7 +51,7 @@ const configSchema = {
         default: 'native',
         enum: ['native', 'hidden'],
         description:
-          'Experimental:  The title bar can  be completely `hidden`.<br>This setting will require a relaunch of Atom to take effect.'
+          'Experimental:  The title bar can  be completely `hidden`.<br>This setting will require a relaunch of Pulsar to take effect.'
       },
       versionPinnedPackages: {
         type: 'array',
@@ -80,12 +80,12 @@ const configSchema = {
         type: 'string',
         default: 'prompt',
         description:
-          'When should Atom register itself as the default handler for atom:// URIs',
+          'When should Pulsar register itself as the default handler for atom:// URIs',
         enum: [
           {
             value: 'prompt',
             description:
-              'Prompt to register Atom as the default atom:// URI handler'
+              'Prompt to register Pulsar as the default atom:// URI handler'
           },
           {
             value: 'always',
@@ -105,7 +105,7 @@ const configSchema = {
           type: 'string'
         },
         description:
-          'Names of UI and syntax themes which will be used when Atom starts.'
+          'Names of UI and syntax themes which will be used when Pulsar starts.'
       },
       audioBeep: {
         type: 'boolean',
@@ -118,7 +118,7 @@ const configSchema = {
         default: false,
         title: 'Close Deleted File Tabs',
         description:
-          'Close corresponding editors when a file is deleted outside Atom.'
+          'Close corresponding editors when a file is deleted outside Pulsar.'
       },
       destroyEmptyPanes: {
         type: 'boolean',
@@ -312,7 +312,7 @@ const configSchema = {
         enum: ['no', 'yes', 'always'],
         default: 'yes',
         description:
-          "When selected 'no', a blank environment is loaded. When selected 'yes' and Atom is started from the icon or `atom` by itself from the command line, restores the last state of all Atom windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Atom windows always, no matter how Atom is started."
+          "When selected 'no', a blank environment is loaded. When selected 'yes' and Pulsar is started from the icon or `atom` by itself from the command line, restores the last state of all Pulsar windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Pulsar windows always, no matter how Pulsar is started."
       },
       reopenProjectMenuCount: {
         description:
@@ -322,7 +322,7 @@ const configSchema = {
       },
       automaticallyUpdate: {
         description:
-          'Automatically update Atom when a new release is available.',
+          'Automatically update Pulsar when a new release is available.',
         type: 'boolean',
         default: true
       },
@@ -347,7 +347,7 @@ const configSchema = {
       },
       fileSystemWatcher: {
         description:
-          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Atom, but may help prevent crashes or freezes.',
+          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
         type: 'string',
         default: 'native',
         enum: [
@@ -365,7 +365,7 @@ const configSchema = {
           },
           {
             value: 'atom',
-            description: 'Emulated with Atom events'
+            description: 'Emulated with Pulsar events'
           }
         ]
       },
@@ -376,7 +376,7 @@ const configSchema = {
       },
       colorProfile: {
         description:
-          "Specify whether Atom should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Atom to take effect.",
+          "Specify whether Pulsar should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Pulsar to take effect.",
         type: 'string',
         default: 'default',
         enum: [
@@ -564,7 +564,7 @@ const configSchema = {
       invisibles: {
         type: 'object',
         description:
-          'A hash of characters Atom will use to render whitespace characters. Keys are whitespace character types, values are rendered characters (use value false to turn off individual whitespace character types).',
+          'A hash of characters Pulsar will use to render whitespace characters. Keys are whitespace character types, values are rendered characters (use value false to turn off individual whitespace character types).',
         properties: {
           eol: {
             type: ['boolean', 'string'],
@@ -627,7 +627,7 @@ if (process.platform === 'darwin') {
     default: 'native',
     enum: ['native', 'custom', 'custom-inset', 'hidden'],
     description:
-      'Experimental: A `custom` title bar adapts to theme colors. Choosing `custom-inset` adds a bit more padding. The title bar can also be completely `hidden`.<br>Note: Switching to a custom or hidden title bar will compromise some functionality.<br>This setting will require a relaunch of Atom to take effect.'
+      'Experimental: A `custom` title bar adapts to theme colors. Choosing `custom-inset` adds a bit more padding. The title bar can also be completely `hidden`.<br>Note: Switching to a custom or hidden title bar will compromise some functionality.<br>This setting will require a relaunch of Pulsar to take effect.'
   };
   configSchema.core.properties.simpleFullScreenWindows = {
     type: 'boolean',
