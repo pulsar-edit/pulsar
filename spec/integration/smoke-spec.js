@@ -18,7 +18,6 @@ describe('Smoke Test', () => {
       '*': {
         welcome: { showOnStartup: false },
         core: {
-          telemetryConsent: 'no',
           disabledPackages: ['github']
         }
       }

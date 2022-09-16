@@ -120,16 +120,10 @@ export default class Reporter {
   }
 
   shouldReport(error) {
-    if (this.alwaysReport) return true; // Used in specs
-    if (atom.config.get('core.telemetryConsent') !== 'limited') return false;
-    if (atom.inDevMode()) return false;
-
-    const topFrame = this.parseStackTrace(error)[0];
-    const fileName = topFrame ? topFrame.getFileName() : null;
-    return (
-      fileName &&
-      (this.isBundledFile(fileName) || this.isTeletypeFile(fileName))
-    );
+    // Since the `core.telemetryConsent` variable has been removed, this has no good way 
+    // to check if should report to the remote. So we will just always return false 
+    // to report to remote. But still allow reporting locally.
+    return false;
   }
 
   parseStackTrace(error) {

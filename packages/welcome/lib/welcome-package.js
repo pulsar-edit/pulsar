@@ -3,11 +3,10 @@
 import { CompositeDisposable } from 'atom';
 import ReporterProxy from './reporter-proxy';
 
-let WelcomeView, GuideView, ConsentView;
+let WelcomeView, GuideView;
 
 const WELCOME_URI = 'atom://welcome/welcome';
 const GUIDE_URI = 'atom://welcome/guide';
-const CONSENT_URI = 'atom://welcome/consent';
 
 export default class WelcomePackage {
   constructor() {
@@ -34,20 +33,8 @@ export default class WelcomePackage {
     );
 
     this.subscriptions.add(
-      atom.workspace.addOpener(filePath => {
-        if (filePath === CONSENT_URI) {
-          return this.createConsentView({ uri: CONSENT_URI });
-        }
-      })
-    );
-
-    this.subscriptions.add(
       atom.commands.add('atom-workspace', 'welcome:show', () => this.show())
     );
-
-    if (atom.config.get('core.telemetryConsent') === 'undecided') {
-      await atom.workspace.open(CONSENT_URI);
-    }
 
     if (atom.config.get('welcome.showOnStartup')) {
       await this.show();
@@ -78,10 +65,5 @@ export default class WelcomePackage {
   createGuideView(state) {
     if (GuideView == null) GuideView = require('./guide-view');
     return new GuideView({ reporterProxy: this.reporterProxy, ...state });
-  }
-
-  createConsentView(state) {
-    if (ConsentView == null) ConsentView = require('./consent-view');
-    return new ConsentView({ reporterProxy: this.reporterProxy, ...state });
   }
 }

@@ -17,24 +17,21 @@ describe('Welcome', () => {
     atom.reset();
   });
 
-  describe("when `core.telemetryConsent` is 'undecided'", () => {
+  describe("when welcomePackage.activate is called", () => {
     beforeEach(async () => {
-      atom.config.set('core.telemetryConsent', 'undecided');
       await welcomePackage.activate();
     });
 
-    it('opens the telemetry consent pane and the welcome panes', () => {
+    it('opens the welcome panes', () => {
       const panes = atom.workspace.getCenter().getPanes();
       assert.equal(panes.length, 2);
-      assert.equal(panes[0].getItems()[0].getTitle(), 'Telemetry Consent');
-      assert.equal(panes[0].getItems()[1].getTitle(), 'Welcome');
+      assert.equal(panes[0].getItems()[0].getTitle(), 'Welcome');
       assert.equal(panes[1].getItems()[0].getTitle(), 'Welcome Guide');
     });
   });
 
-  describe('when `core.telemetryConsent` is not `undecided`', () => {
+  describe('when welcomePackage.activate is called. (previously variation of telemetryConsent change)', () => {
     beforeEach(async () => {
-      atom.config.set('core.telemetryConsent', 'no');
       await welcomePackage.activate();
     });
 

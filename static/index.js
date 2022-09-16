@@ -161,11 +161,6 @@
     };
 
     const { userSettings, appVersion } = getWindowLoadSettings();
-    const uploadToServer =
-      userSettings &&
-      userSettings.core &&
-      userSettings.core.telemetryConsent === 'limited';
-    const releaseChannel = getReleaseChannel(appVersion);
 
     const CSON = useSnapshot
       ? snapshotResult.customRequire('../node_modules/season/lib/cson.js')
