@@ -13,6 +13,7 @@
 
 [![Badge License]][License]    
 [![Badge Guidelines]][Guidelines]    
+[![Badge Status]][Status]    
 [![Badge Sunset]][Retired]    
 [![Badge Discord]][Discord]
 
@@ -27,25 +28,18 @@
 <br>
 <br>
 
-[![Badge Status]][Status]
-
-<br>
-<br>
-
 ![Preview]
 
 </div>
 
-
-<!---------------------------------------------------------------->
+<!---------------------------{ Links }--------------------------->
 
 [Guidelines]: https://github.com/logos 'Branding Guidelines'
 [Electron]: https://github.com/electron/electron
 [Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
-[Status]: https://dev.azure.com/atomcommunity/atomcommunity/_build/latest?definitionId=10&branchName=master
+[Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar
 
 [#]: #
-
 
 <!---------------------------{ Files }--------------------------->
 
@@ -69,7 +63,7 @@
 [Badge Sunset]: https://img.shields.io/badge/Sunset-orange.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
 [Badge Discord]: https://img.shields.io/badge/Discord-6399c4.svg?style=for-the-badge&labelColor=323232&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-e5ab42.svg?style=for-the-badge&labelColor=323232
-[Badge Status]: https://dev.azure.com/atomcommunity/atomcommunity/_apis/build/status/atom-community/Release%20Branch%20Build?branchName=master
+[Badge Status]: https://img.shields.io/cirrus/github/pulsar-edit/pulsar?style=for-the-badge&labelColor=323232&label=Build%20Status
 
 
 <!--------------------------{ Buttons }--------------------------->
