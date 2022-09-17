@@ -7,14 +7,14 @@
 
 # Pulsar
 
-[![Button Install]][Install]   
-[![Button Documentation]][Documentation]   
+[![Button Install]][Install] 
+[![Button Documentation]][Documentation] 
 [![Button Build]][Build] 
 
-[![Badge License]][License]    
-[![Badge Guidelines]][Guidelines]    
-[![Badge Status]][Status]    
-[![Badge Sunset]][Retired]    
+[![Badge License]][License] 
+[![Badge Guidelines]][Guidelines] 
+[![Badge Status]][Status] 
+[![Badge Sunset]][Retired] 
 [![Badge Discord]][Discord]
 
 <br>
