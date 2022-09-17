@@ -27,7 +27,7 @@
     "@babel/core": "7.18.6",
     "about": "file:packages/about",
     "archive-view": "https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0",
-    "async": "^3.2.4",
+    "async": "3.2.4",
     "atom-dark-syntax": "file:packages/atom-dark-syntax",
     "atom-dark-ui": "file:packages/atom-dark-ui",
     "atom-keymap": "8.2.15",
