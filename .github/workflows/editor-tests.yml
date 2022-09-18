@@ -20,7 +20,7 @@ jobs:
         node-version: 16
         
     - name: install dependencies
-      run: yarn install
+      run: yarn install --verbose --ignore-engines
 
     - name: build dependencies
       run: yarn build
