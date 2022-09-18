@@ -19,6 +19,10 @@ jobs:
       with:
         node-version: 16
 
+    - name: Clean Cache 
+      shell: pwsh
+      run: Remove-Item %LocalAppData%\node-gyp\Cache\*.* 
+        
     - name: install dependencies
       run: yarn install
 
