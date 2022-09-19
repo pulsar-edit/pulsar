@@ -34,7 +34,7 @@ linux_task:
       type: text/xml
       format: junit
   build_binary_script:
-    - yarn dist || rm dist && yarn dist
+    - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
 
@@ -62,7 +62,7 @@ silicon_mac_task:
       format: junit
   build_arm_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist || rm dist && yarn dist
+    - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
   build_x86_dependencies_script:
@@ -80,7 +80,7 @@ silicon_mac_task:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
-    - arch -x86_64 npx yarn dist || rm dist && arch -x86_64 npx yarn dist
+    - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
 
