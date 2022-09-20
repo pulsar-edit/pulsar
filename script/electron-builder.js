@@ -44,7 +44,7 @@ const pngIcon = 'resources/app-icons/nightly/png/1024.png'
 const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
 
 let options = {
-  "appId": "link.mauricioszabo.pulsar",
+  "appId": "com.pulsar-edit.pulsar",
   "npmRebuild": false,
   "publish": null,
   files: [
