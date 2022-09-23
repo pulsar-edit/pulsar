@@ -1,7 +1,7 @@
 
 <div align = center>
 
-![Banner]
+<!-- ![Banner] -->
 <br>
 <br>
 
