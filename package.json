@@ -24,7 +24,6 @@
   "dependencies": {
     "@atom/fuzzy-native": "^1.2.1",
     "@atom/source-map-support": "^0.3.4",
-    "@atom/watcher": "^1.3.5",
     "@babel/core": "7.18.6",
     "about": "file:packages/about",
     "archive-view": "https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0",
