@@ -34,7 +34,7 @@ linux_task:
       type: text/xml
       format: junit
   build_binary_script:
-    - yarn dist || rm dist && yarn dist
+    - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
 
@@ -62,7 +62,7 @@ silicon_mac_task:
       format: junit
   build_arm_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist || rm dist && yarn dist
+    - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
   build_x86_dependencies_script:
@@ -80,30 +80,31 @@ silicon_mac_task:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
-    - arch -x86_64 npx yarn dist || rm dist && arch -x86_64 npx yarn dist
+    - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
 
 windows_task:
   windows_container:
-    image: cirrusci/windowsservercore:visualstudio2019-2021.12.07
+    image: cirrusci/windowsservercore:visualstudio2022-2022.06.23
   env:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   install_deps_script:
+    - choco install nodejs --version=14.15.0 -y
+    - choco install python git visualstudio2019-workload-vctools -y
     - git submodule init
     - git submodule update
-    - choco install nodejs --version=16.16.0 -y
-    - choco install python git visualstudio2019-workload-vctools -y
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
-    - cd apm; npx yarn install || sleep 1 && npx yarn install || sleep 2 && npx yarn cache clean; npx yarn install || sleep 2 && npx yarn install || sleep 2 && npx yarn cache clean; npx yarn install || sleep 2 && npx yarn install
-    - ./node_modules/pulsar-package-manager/bin/npm rebuild || sleep 1 && ./node_modules/pulsar-package-manager/bin/npm rebuild || sleep 2 && ./node_modules/pulsar-package-manager/bin/npm rebuild || sleep 4 && ./node_modules/pulsar-package-manager/bin/npm rebuild
-  test_script:
-    - npx yarn install --ignore-scripts || sleep 1 && npx yarn install --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-scripts || sleep 2 && npx yarn install --ignore-scripts || echo "Giving up"
-    - rm -R node_modules/electron
-    - npx yarn install || sleep 1 && npx yarn install || sleep 2 && npx yarn cache clean; npx yarn install || sleep 2 && npx yarn install || echo "Giving up"
-    - npx yarn build
+    - cd ppm; npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
+  install_without_scripts_script:
+    - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
+  rebuild_for_electron_script:
+    - npx yarn build || npx yarn build || npx yarn build
+  # install_only_electron_script:
+  #   - rm -R node_modules/electron
+  #   - npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
     # - npx playwright test --reporter=list
   videos_artifacts:
     path: tests\videos\**
