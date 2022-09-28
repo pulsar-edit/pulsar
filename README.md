@@ -2,9 +2,6 @@
 <div align = center>
 
 <!-- ![Banner] -->
-<br>
-<br>
-
 # Pulsar
 
 [![Button Install]][Install]   
