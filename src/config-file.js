@@ -2,12 +2,14 @@ const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const dedent = require('dedent');
 const { Disposable, Emitter } = require('event-kit');
-const { watchPath } = require('./path-watcher');
 const CSON = require('season');
 const Path = require('path');
 const asyncQueue = require('async/queue');
 
-const EVENT_TYPES = new Set(['created', 'modified', 'renamed']);
+// TODO: if we ever decide to change path watchers on the future, this is kinda
+// duplicated because of https://github.com/pulsar-edit/pulsar/issues/76
+const nsfw = require('nsfw');
+const EVENT_TYPES = new Set([nsfw.actions.CREATED, nsfw.actions.MODIFIED, nsfw.actions.RENAMED]);
 
 module.exports = class ConfigFile {
   static at(path) {
@@ -63,7 +65,7 @@ module.exports = class ConfigFile {
     });
   }
 
-  async watch(callback) {
+  async watch() {
     if (!fs.existsSync(this.path)) {
       fs.makeTreeSync(Path.dirname(this.path));
       CSON.writeFileSync(this.path, {}, { flag: 'wx' });
@@ -72,10 +74,13 @@ module.exports = class ConfigFile {
     await this.reload();
 
     try {
-      return await watchPath(this.path, {}, events => {
-        if (events.some(event => EVENT_TYPES.has(event.action)))
+      const watcher = await nsfw(this.path, events => {
+        if (events.some(event => EVENT_TYPES.has(event.action))) {
           this.requestLoad();
-      });
+        }
+      })
+      watcher.start();
+      return { dispose: () => watcher.stop() };
     } catch (error) {
       //TODO_PULSAR: Find out why the atom global variable isn't available at this point
       this.emitter.emit(
