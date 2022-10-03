@@ -73,6 +73,9 @@ let options = {
   ],
   "extraResources": [
     {
+      "from": "pulsar.sh",
+      "to": "pulsar.sh"
+    }, {
       "from": "ppm",
       "to": "app/apm"
     }, {
@@ -81,6 +84,8 @@ let options = {
     },
   ],
   compression: "normal",
+  deb: { afterInstall: "script/post-install.sh" },
+  rpm: { afterInstall: "script/post-install.sh" },
   "linux": {
     "icon": pngIcon,
     "category": "Development",
