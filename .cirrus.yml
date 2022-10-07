@@ -36,8 +36,13 @@ linux_task:
       format: junit
   build_binary_script:
     - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
+  deb_artifacts:
+    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit-dev.deb
+  rpm_artifacts:
+    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit-dev.rpm
+  appImage_artifacts:
+    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit-dev.appImage
+  
 
 silicon_mac_task:
   alias: mac
