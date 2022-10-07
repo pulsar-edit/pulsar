@@ -37,11 +37,11 @@ linux_task:
   build_binary_script:
     - yarn dist || yarn dist
   deb_artifacts:
-    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit(sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json).deb
+    path: ./binaries/pulsar/pulsar-edit-dev.deb
   rpm_artifacts:
-    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit(sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json).rpm
+    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit-dev.rpm
   appImage_artifacts:
-    path: ./binaries/pulsar-dev/`date -u +%Y%m%d%H`/pulsar-edit(sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json).appImage
+    path: ./binaries/pulsar-dev/pulsar-edit-dev.appImage
   
 
 silicon_mac_task:
