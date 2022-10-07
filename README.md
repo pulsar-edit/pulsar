@@ -41,7 +41,7 @@
 
 [#]: #
 
-<!---------------------------{ Files }--------------------------->
+<!---------------------------{ Documents }--------------------------->
 
 [Documentation]: https://pulsar-edit.dev/docs/ 'Information how to use & work with Pulsar.'
 [Install]: https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar 'How to install Pulsar on your system.'
