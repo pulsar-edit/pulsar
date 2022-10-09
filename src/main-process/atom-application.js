@@ -625,13 +625,6 @@ module.exports = class AtomApplication extends EventEmitter {
         this.openPaths({ pathsToOpen: paths });
       });
 
-      this.on('application:open', () => {
-        this.promptForPathToOpen(
-          'all',
-          createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
-        );
-      });
       this.on('application:open-file', () => {
         this.promptForPathToOpen(
           'file',
