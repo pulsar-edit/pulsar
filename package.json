@@ -276,7 +276,7 @@
   "scripts": {
     "preinstall": "node -e 'process.exit(0)'",
     "test": "node script/test",
-    "build": "electron-rebuild",
+    "build": "electron-builder install-app-deps",
     "build:apm": "cd ppm && yarn install",
     "start": "electron --enable-logging . -f",
     "dist": "node script/electron-builder.js"
@@ -298,7 +298,6 @@
     "@playwright/test": "1.22.2",
     "electron": "12.2.3",
     "electron-builder": "23.3.1",
-    "electron-rebuild": "3.2.7",
     "playwright": "1.22.2",
     "playwright-core": "1.22.2",
     "random-seed": "0.3.0",
