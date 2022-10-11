@@ -16,35 +16,40 @@ jobs:
         npm config set msvs_version 2019
 
     - name: Checkout the latest code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup node
-      uses: actions/setup-node@v2-beta
+      uses: actions/setup-node@v3
       with:
         node-version: 16
 
-    - name: install dependencies
-      run: yarn install
-
-    - name: build dependencies
-      run: yarn build
-
-    - name: build dependencies
-      run: yarn build:apm
-
-    - name: cache node module
-      id: cache-node
-      uses: actions/cache@v3
+    - uses: pnpm/action-setup@v2.2.2
+      name: Install pnpm
+      id: pnpm-install
       with:
-        path: node_modules
-        key: linux-modules-${{ hashFiles('package.json') }}
+        version: 7
+        run_install: |
+          - recursive: true
+            args: [--frozen-lockfile, --strict-peer-dependencies]
+          - args: [--global, prettier, gulp]
 
-    - name: cache APM module
-      id: cache-apm
-      uses: actions/cache@v3
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      run: |
+        echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
       with:
-        path: apm
-        key: linux-apm-${{ hashFiles('apm/package.json') }}
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install
+    - name: Build VuePress Site
+      run: pnpm build
 
   test:
     strategy:
@@ -69,8 +74,7 @@ jobs:
     needs: setup
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v2
-
+      uses: actions/checkout@v3
     - name: restore node module
       id: restore-node
       uses: actions/cache@v3
@@ -88,4 +92,4 @@ jobs:
     - name: Run ${{ matrix.descr }} packages' tests
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: node -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
+        run: pnpm -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
