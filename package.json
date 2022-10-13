@@ -35,7 +35,7 @@
     "autocomplete-atom-api": "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7",
     "autocomplete-css": "https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5",
     "autocomplete-html": "https://github.com/pulsar-edit/autocomplete-html.git#v0.8.9",
-    "autocomplete-plus": "file:../autocomplete-plus",
+    "autocomplete-plus": "https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.5",
     "autocomplete-snippets": "https://codeload.github.com/atom/autocomplete-snippets/legacy.tar.gz/refs/tags/v1.12.1",
     "autoflow": "file:packages/autoflow",
     "autosave": "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6",
