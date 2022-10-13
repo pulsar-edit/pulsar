@@ -1,5 +1,4 @@
 const { app } = require('electron');
-const nslog = require('nslog');
 const path = require('path');
 const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
@@ -45,9 +44,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   // This must happen after parseCommandLine() because yargs uses console.log
   // to display the usage message.
-  const previousConsoleLog = console.log;
-  console.log = nslog;
-
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
