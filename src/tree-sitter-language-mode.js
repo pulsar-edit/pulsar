@@ -1,6 +1,7 @@
 const Parser = require('tree-sitter');
 const { Point, Range, spliceArray } = require('text-buffer');
-const { Patch } = require('superstring');
+let Patch;
+require('superstring').superstring.then(r => Patch = r.Patch);
 const { Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const Token = require('./token');
@@ -115,7 +116,7 @@ class TreeSitterLanguageMode {
   parse(language, oldTree, ranges) {
     const parser = PARSER_POOL.pop() || new Parser();
     parser.setLanguage(language);
-    const result = parser.parseTextBuffer(this.buffer.buffer, oldTree, {
+    const result = parser.parse(this.buffer.getText(), oldTree, {
       syncTimeoutMicros: this.syncTimeoutMicros,
       includedRanges: ranges
     });
