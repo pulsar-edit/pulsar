@@ -3,7 +3,7 @@ linux_task:
   container:
     image: node:lts-slim
     memory: 8G
-  test_script:
+  install_deps_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -26,6 +26,11 @@ linux_task:
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
+  build_binary_script:
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -34,12 +39,8 @@ linux_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_binary_script:
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
-silicon_mac_task:
+macos_task:
   alias: mac
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
