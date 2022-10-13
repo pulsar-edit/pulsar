@@ -4,7 +4,7 @@
 
 const path = require('path');
 const fs = require('fs-plus');
-const sourceMapSupport = require('@atom/source-map-support');
+const sourceMapSupport = require('source-map-support');
 
 const PackageTranspilationRegistry = require('./package-transpilation-registry');
 let CSON = null;
