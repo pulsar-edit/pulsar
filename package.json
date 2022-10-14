@@ -165,7 +165,6 @@
     "temp": "0.9.2",
     "text-buffer": "https://github.com/pulsar-edit/text-buffer.git#56fcfc6c7",
     "timecop": "https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2",
-    "tree-sitter": "https://github.com/pulsar-edit/node-tree-sitter.git#b920ec0",
     "tree-view": "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1",
     "typescript-simple": "8.0.6",
     "update-package-dependencies": "file:./packages/update-package-dependencies",

@@ -1,4 +1,4 @@
-const Parser = require('tree-sitter');
+// const Parser = require('tree-sitter');
 const { Point, Range, spliceArray } = require('text-buffer');
 let Patch;
 require('superstring').superstring.then(r => Patch = r.Patch);
