@@ -3,6 +3,9 @@
   // window:start marker.
   const startWindowTime = Date.now();
 
+  // "Warm up" superstring so it's available when things load.
+  // FIXME: better to actually "await" for superstring, but this
+  // locks the editor for some reason...
   const {superstring} = require('superstring');
   const electron = require('electron');
   const path = require('path');
