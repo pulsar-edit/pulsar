@@ -1,8 +1,9 @@
-(function() {
+(async function() {
   // Define the window start time before the requires so we get a more accurate
   // window:start marker.
   const startWindowTime = Date.now();
 
+  const {superstring} = require('superstring');
   const electron = require('electron');
   const path = require('path');
   const Module = require('module');
