@@ -80,7 +80,7 @@ module.exports = class AtomWindow extends EventEmitter {
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
     this.browserWindow.show()
-    this.browserWindow.openDevTools()
+    //this.browserWindow.openDevTools()
 
     Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
       get: () =>
