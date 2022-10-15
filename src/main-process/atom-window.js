@@ -1,3 +1,5 @@
+const electronRemote = require('@electron/remote/main')
+electronRemote.initialize()
 const {
   BrowserWindow,
   app,
@@ -80,7 +82,9 @@ module.exports = class AtomWindow extends EventEmitter {
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
     this.browserWindow.show()
-    //this.browserWindow.openDevTools()
+    this.browserWindow.openDevTools()
+
+    electronRemote.enable(this.browserWindow.webContents)
 
     Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
       get: () =>
