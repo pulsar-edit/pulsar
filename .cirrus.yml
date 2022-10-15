@@ -45,7 +45,7 @@ macos_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  test_script:
+  install_deps_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - brew install node@16 yarn git python
     - git submodule init
@@ -55,6 +55,12 @@ macos_task:
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
+  build_arm_binary_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -63,11 +69,6 @@ macos_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_arm_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
   build_x86_dependencies_script:
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
