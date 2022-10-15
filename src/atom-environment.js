@@ -1,3 +1,4 @@
+const {superstring} = require('superstring');
 const crypto = require('crypto');
 const path = require('path');
 const util = require('util');
@@ -886,6 +887,8 @@ class AtomEnvironment {
   // Call this method when establishing a real application window.
   async startEditorWindow() {
     StartupTime.addMarker('window:environment:start-editor-window:start');
+    // Await for superstring to activate, before opening the window
+    await superstring;
 
     if (this.getLoadSettings().clearWindowState) {
       await this.stateStore.clear();
