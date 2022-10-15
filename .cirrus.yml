@@ -58,7 +58,7 @@ macos_task:
   build_arm_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
-  binary_artifacts:
+  arm_binary_artifacts:
     path: ./binaries/*
   test_script:
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
@@ -85,7 +85,7 @@ macos_task:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
-  binary_artifacts:
+  x86_binary_artifacts:
     path: ./binaries/*
 
 windows_task:
