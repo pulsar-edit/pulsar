@@ -587,21 +587,21 @@ module.exports = class AtomApplication extends EventEmitter {
       shell.openExternal('http://flight-manual.atom.io')
     );
     this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/atom/atom/discussions')
+      shell.openExternal('https://github.com/atom/atom/discussions')//preland: this may break
     );
     this.on('application:open-faq', () =>
-      shell.openExternal('https://atom.io/faq')
+      shell.openExternal('https://atom.io/faq')//preland: this may break
     );
-    this.on('application:open-terms-of-use', () =>
+    this.on('application:open-terms-of-use', () =>//preland: this may break
       shell.openExternal('https://atom.io/terms')
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
-        'https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs'
+        'https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs'//preland: this may break
       )
     );
     this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/search?q=+is%3Aissue+user%3Aatom')
+      shell.openExternal('https://github.com/search?q=+is%3Aissue+user%3Aatom')//preland: this may break
     );
 
     this.on('application:install-update', () => {

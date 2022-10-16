@@ -88,7 +88,7 @@ module.exports = class ProtocolHandlerInstaller {
         icon: 'link',
         description:
           'Pulsar is not currently set as the default handler for atom:// URIs. Would you like Pulsar to handle ' +
-          'atom:// URIs?',
+          'atom:// URIs?', //preland: Pulsar should have its own URI to avoid confusion like this; maybe plsr?
         buttons: [
           {
             text: 'Yes',

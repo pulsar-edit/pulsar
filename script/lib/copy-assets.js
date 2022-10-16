@@ -39,7 +39,7 @@ module.exports = function() {
   // We do this to ensure that symlinked repo-local bundled packages get
   // copied to the output folder correctly.  We dereference only the top-level
   // symlinks and not nested symlinks to avoid issues where symlinked binaries
-  // are duplicated in Pulsar's installation packages (see atom/atom#18490).
+  // are duplicated in Pulsar's installation packages (see atom/atom#18490). <-- preland: this may disappear
   const nodeModulesPath = path.join(CONFIG.repositoryRootPath, 'node_modules');
   glob
     .sync(path.join(nodeModulesPath, '*'))

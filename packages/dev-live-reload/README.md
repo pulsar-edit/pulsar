@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Dev Live Reload package
 
 This live reloads the Atom `.less` files. You edit styles and they are magically reflected in any running Atom windows. Magic! :tophat: :sparkles: :rabbit2:

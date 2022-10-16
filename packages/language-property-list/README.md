@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Property list support in Atom
 
 Adds syntax highlighting and snippets to [plist](https://en.wikipedia.org/wiki/Property_list)

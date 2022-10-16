@@ -11,7 +11,7 @@ const { REPO_OWNER, MAIN_REPO } = CONFIG;
 module.exports = packagedAppPath => {
   const archSuffix = process.arch === 'ia32' ? '' : '-' + process.arch;
   const updateUrlPrefix =
-    process.env.ATOM_UPDATE_URL_PREFIX || 'https://atom.io';
+    process.env.ATOM_UPDATE_URL_PREFIX || 'https://atom.io'; //preland: this may need to be changed.
   const options = {
     name: CONFIG.channelName,
     title: CONFIG.appName,

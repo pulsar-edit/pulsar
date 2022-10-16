@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # dalek
 
 **EXTERMINATEs** core packages installed in `~/.atom/packages`.

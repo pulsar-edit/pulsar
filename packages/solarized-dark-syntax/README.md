@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Solarized Dark Syntax theme
 
 Atom theme using the ever popular dark [solarized](http://ethanschoonover.com/solarized) colors.

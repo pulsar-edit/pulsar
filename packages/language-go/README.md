@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Go language support in Atom
 ![CI Status](https://github.com/atom/language-go/actions/workflows/main.yml/badge.svg)
 

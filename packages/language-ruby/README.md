@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Ruby language support in Atom
 ![ci](https://github.com/atom/language-ruby/workflows/ci/badge.svg)
 [![Dependency Status](https://david-dm.org/atom/language-ruby.svg)](https://david-dm.org/atom/language-ruby)

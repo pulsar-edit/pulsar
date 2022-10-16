@@ -13,6 +13,7 @@ if (true) {
 }
 
 // https://github.com/atom/atom/issues/6691
+// preland: above may break
 if (true)
 {
   foo();

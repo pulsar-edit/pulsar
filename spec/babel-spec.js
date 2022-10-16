@@ -1,6 +1,6 @@
 // Users may have this environment variable set. Currently, it causes babel to
 // log to stderr, which causes errors on Windows.
-// See https://github.com/atom/electron/issues/2033
+// See https://github.com/atom/electron/issues/2033 <--preland: this may break
 process.env.DEBUG = '*';
 
 const path = require('path');

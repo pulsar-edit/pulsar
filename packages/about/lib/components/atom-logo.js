@@ -3,6 +3,8 @@ const EtchComponent = require('../etch-component');
 
 const $ = etch.dom;
 
+//preland: I know this code probably does something really cool.... but I'm pretty sure Pulsar really shouldn't be using anything remotely called "AtomLogo"....
+
 module.exports = class AtomLogo extends EtchComponent {
   render() {
     return $.svg(

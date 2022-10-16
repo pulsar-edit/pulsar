@@ -214,7 +214,7 @@
 
     // Ensure ATOM_HOME is always set before anything else is required
     // This is because of a difference in Linux not inherited between browser and render processes
-    // https://github.com/atom/atom/issues/5412
+    // https://github.com/atom/atom/issues/5412 <--preland: this may break
     if (getWindowLoadSettings() && getWindowLoadSettings().atomHome) {
       process.env.ATOM_HOME = getWindowLoadSettings().atomHome;
     }

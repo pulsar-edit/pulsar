@@ -57,7 +57,7 @@ class NativeCompileCache {
   overrideModuleCompile() {
     let self = this;
     // Here we override Node's module.js
-    // (https://github.com/atom/node/blob/atom/lib/module.js#L378), changing
+    // (https://github.com/atom/node/blob/atom/lib/module.js#L378), changing <--preland: this link may break
     // only the bits that affect compilation in order to use the cached one.
     Module.prototype._compile = function(content, filename) {
       let moduleSelf = this;

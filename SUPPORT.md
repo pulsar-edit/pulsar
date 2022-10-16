@@ -1,5 +1,7 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Atom Community Support
- 
+
 If you're looking for support for Atom Community, there are a lot of options to check out:
 * User Documentation &mdash; [The Atom Flight Manual](https://flight-manual.atom.io)
 * Developer Documentation &mdash; [Atom API Documentation](https://atom.io/docs/api/latest)

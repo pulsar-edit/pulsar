@@ -1,6 +1,8 @@
 const url = require('url');
 const { Emitter, Disposable } = require('event-kit');
 
+//preland: reminder that changing the URI would be a good idea
+
 // Private: Associates listener functions with URIs from outside the application.
 //
 // The global URI handler registry maps URIs to listener functions. URIs are mapped

@@ -1104,7 +1104,7 @@ module.exports = class Workspace extends Model {
       }
 
       // Avoid adding URLs as recent documents to work-around this Spotlight crash:
-      // https://github.com/atom/atom/issues/10071
+      // https://github.com/atom/atom/issues/10071 <--preland: this link may break
       if (uri && (!url.parse(uri).protocol || process.platform === 'win32')) {
         this.applicationDelegate.addRecentDocument(uri);
       }
@@ -1850,7 +1850,7 @@ module.exports = class Workspace extends Model {
   *Note:* If your panel changes its size throughout its lifetime, consider giving it a higher
   priority, allowing fixed size panels to be closer to the edge. This allows control targets to
   remain more static for easier targeting by users that employ mice or trackpads. (See
-  [atom/atom#4834](https://github.com/atom/atom/issues/4834) for discussion.)
+  [atom/atom#4834](https://github.com/atom/atom/issues/4834) for discussion.) <--preland: this link may break
   */
 
   // Essential: Get an {Array} of all the panel items at the bottom of the editor window.

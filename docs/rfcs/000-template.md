@@ -14,7 +14,7 @@ Why are we doing this? What use cases does it support? What is the expected outc
 
 ## Explanation
 
-Explain the proposal as if it was already implemented and you were describing it to an Atom user. That generally means:
+Explain the proposal as if it was already implemented and you were describing it to a Pulsar user. That generally means:
 
 - Introducing new named concepts.
 - Explaining the feature largely in terms of examples.
@@ -33,5 +33,5 @@ Why should we *not* do this?
 ## Unresolved questions
 
 - What unresolved questions do you expect to resolve through the RFC process before this gets merged?
-- What unresolved questions do you expect to resolve through the implementation of this feature before it is released in a new version of Atom?
+- What unresolved questions do you expect to resolve through the implementation of this feature before it is released in a new version of Pulsar?
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?

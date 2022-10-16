@@ -83,7 +83,7 @@ class AutoUpdater extends EventEmitter {
           update.releaseNotes,
           update.version,
           new Date(),
-          'https://atom.io',
+          'https://atom.io', //preland: this may (?) need to be changed
           () => this.quitAndInstall()
         );
       });

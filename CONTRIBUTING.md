@@ -32,7 +32,7 @@ The following is a set of guidelines for contributing to Pulsar and its packages
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Atom Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [atom@github.com](mailto:atom@github.com).
+This project and everyone participating in it is governed by the [Atom Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to <!--[atom@github.com](mailto:atom@github.com)-->```Needs to be updated.```.
 
 ## I don't want to read this whole thing I just have a question!!!
 
@@ -40,8 +40,8 @@ This project and everyone participating in it is governed by the [Atom Code of C
 
 We have an official message board with a detailed FAQ and where the community chimes in with helpful advice if you have questions.
 
-* [Github Discussions, the official Atom message board](https://github.com/atom/atom/discussions)
-* [Atom FAQ](https://flight-manual.atom.io/faq/)
+* [Github Discussions, the official Atom message board]<!--(https://github.com/atom/atom/discussions)
+* [Atom FAQ](https://flight-manual.atom.io/faq/)-->```Needs to be updated.```
 
 ## What should I know before I get started?
 
@@ -54,7 +54,8 @@ Pulsar is intentionally very modular. Nearly every non-editor UI element you int
 <a id="atom-packages-image"/>
 
 ![atom-packages](https://cloud.githubusercontent.com/assets/69169/10472281/84fc9792-71d3-11e5-9fd1-19da717df079.png)
-
+``` The below statement may become obsolete in the future; this statement will be removed if deemed otherwise.
+```
 To get a sense for the packages that are bundled with Atom, you can go to `Settings` > `Packages` within Atom and take a look at the Core Packages section.
 
 Here's a list of the big ones:
@@ -73,11 +74,11 @@ Here's a list of the big ones:
 * [one-dark-ui](https://github.com/pulsar-edit/one-dark-ui) - the default UI styling for anything but the text editor. UI theme packages (i.e. packages with a `-ui` suffix) provide only styling and it's possible that a bundled package is responsible for a UI issue. There are other bundled UI themes, such as [one-light-ui](https://github.com/pulsar-edit/one-light-ui).
 * [one-dark-syntax](https://github.com/pulsar-edit/one-dark-syntax) - the default syntax highlighting styles applied for all languages. There are other bundled syntax themes, such as [solarized-dark-syntax](https://github.com/pulsar-edit/solarized-dark-syntax). You should use these packages for reporting issues that appear in many languages, but disappear if you change to another syntax theme.
 * [apm](https://github.com/pulsar-edit/apm) - the `apm` command line tool (Atom Package Manager). You should use this repository for any contributions related to the `apm` tool and for publishing packages.
-* [atom.io](https://github.com/pulsar-edit/atom.io) - the repository for feedback on the [Atom.io website](https://atom.io) and the [Atom.io package API](https://github.com/atom/atom/blob/master/docs/apm-rest-api.md) used by [ppm](https://github.com/pulsar-edit/ppm).
+* [atom.io](https://github.com/pulsar-edit/atom.io) - the repository for feedback on the [Atom.io website](https://atom.io) and the [Atom.io package API](https://github.com/atom/atom/blob/master/docs/apm-rest-api.md) used by [ppm](https://github.com/pulsar-edit/ppm). ```This information may become obsolete.```
 
 There are many more, but this list should be a good starting point. For more information on how to work with Atom's official packages, see [Contributing to Atom Packages][contributing-to-official-atom-packages].
 
-Also, because Atom is so extensible, it's possible that a feature you've become accustomed to in Atom or an issue you're encountering isn't coming from a bundled package at all, but rather a [community package](https://atom.io/packages) you've installed. Each community package has its own repository too.
+Also, because Atom is so extensible, it's possible that a feature you've become accustomed to in Atom or an issue you're encountering isn't coming from a bundled package at all, but rather a [community package](https://atom.io/packages) you've installed. Each community package has its own repository too. ```Link may become obsolete.```
 
 #### Package Conventions
 
@@ -91,16 +92,17 @@ There are a few conventions that have developed over time around packages:
     * Often themes that are designed to work together are given the same root name, for example: `one-dark-ui` and `one-dark-syntax`
     * UI themes style everything outside of the editor pane &mdash; all of the green areas in the [packages image above](#atom-packages-image)
     * Syntax themes style just the items inside the editor pane, mostly syntax highlighting
-* Packages that add [autocomplete providers](https://github.com/atom/autocomplete-plus/wiki/Autocomplete-Providers) are named `autocomplete-[what-they-autocomplete]` &mdash; ex: [autocomplete-css](https://github.com/atom/autocomplete-css)
-
+* Packages that add [autocomplete providers](https://github.com/atom/autocomplete-plus/wiki/Autocomplete-Providers) are named `autocomplete-[what-they-autocomplete]` &mdash; ex: [autocomplete-css](https://github.com/atom/autocomplete-css) ```Examples will become obsolete after sunset.```
 ### Design Decisions
 
 When we make a significant decision in how we maintain the project and what we can or cannot support, we will document it in the [atom/design-decisions repository](https://github.com/atom/design-decisions). If you have a question around how we do things, check to see if it is documented there. If it is *not* documented there, please open a new topic on [Github Discussions, the official Atom message board](https://github.com/atom/atom/discussions) and ask your question.
-
+```Links will become obsolete after sunset.
+```
 ## How Can I Contribute?
 
 ### Reporting Bugs
 
+#### This section is currently unrelated to Pulsar, and needs to be updated and/or removed.
 This section guides you through submitting a bug report for Atom. Following these guidelines helps maintainers and the community understand your report :pencil:, reproduce the behavior :computer: :computer:, and find related reports :mag_right:.
 
 Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](https://github.com/atom/.github/blob/master/.github/ISSUE_TEMPLATE/bug_report.md), the information it asks for helps us resolve issues faster.
@@ -150,7 +152,7 @@ Include details about your configuration and environment:
 * **Which keyboard layout are you using?** Are you using a US layout or some other layout?
 
 ### Suggesting Enhancements
-
+#### This section is currently unrelated to Pulsar, and needs to be updated and/or removed.
 This section guides you through submitting an enhancement suggestion for Atom, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion :pencil: and find related suggestions :mag_right:.
 
 Before creating enhancement suggestions, please check [this list](#before-submitting-an-enhancement-suggestion) as you might find out that you don't need to create one. When you are creating an enhancement suggestion, please [include as many details as possible](#how-do-i-submit-a-good-enhancement-suggestion). Fill in [the template](https://github.com/atom/.github/blob/master/.github/ISSUE_TEMPLATE/feature_request.md), including the steps that you imagine you would take if the feature you're requesting existed.
@@ -177,7 +179,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 * **Specify the name and version of the OS you're using.**
 
 ### Your First Code Contribution
-
+#### This section is unrelated to Pulsar, and needs to be updated and/or removed.
 Unsure where to begin contributing to Atom? You can start by looking through these `beginner` and `help-wanted` issues:
 
 * [Beginner issues][beginner] - issues which should only require a few lines of code, and a test or two.
@@ -195,7 +197,7 @@ Atom Core and all packages can be developed locally. For instructions on how to 
 * [Contributing to Official Atom Packages][contributing-to-official-atom-packages]
 
 ### Pull Requests
-
+#### This section is unrelated to Pulsar, and needs to be updated and/or removed.
 The process described here has several goals:
 
 - Maintain Atom's quality
@@ -212,6 +214,8 @@ Please follow these steps to have your contribution considered by the maintainer
 While the prerequisites above must be satisfied prior to having your pull request reviewed, the reviewer(s) may ask you to complete additional design work, tests, or other changes before your pull request can be ultimately accepted.
 
 ## Styleguides
+
+### Note: This section may not be entirely relevant to Pulsar. This note will be removed when the below section is confirmed to be correct.
 
 ### Git Commit Messages
 
@@ -338,7 +342,11 @@ disablePackage: (name, options, callback) ->
 
 ## Additional Notes
 
+This document currently contains many mentions of Atom, the original project that Pulsar is based upon. This message will be removed when this document is fully updated.
+
 ### Issue and Pull Request Labels
+
+#### This section may contain inaccuracies.
 
 This section lists the labels we use to help us track and manage issues and pull requests. Most labels are used across all Atom repositories, but some are specific to `atom/atom`.
 

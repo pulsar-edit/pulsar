@@ -1,5 +1,7 @@
 # Atom build status
 
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 > **Note**: Since Atom's electron version is outdated, the electron badges are from old versions.
 
 | System | Azure Pipelines | CircleCI | AppVeyor/Win | Dependencies |

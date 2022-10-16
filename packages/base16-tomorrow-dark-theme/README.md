@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Base16 Tomorrow Dark Syntax theme
 
 Atom theme using the ever popular [Base16 Tomorrow](http://chriskempson.com/projects/base16/) dark colors.

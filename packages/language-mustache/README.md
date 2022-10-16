@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Mustache/Handlebars support in Atom
 [![OS X Build Status](https://travis-ci.org/atom/language-mustache.svg?branch=master)](https://travis-ci.org/atom/language-mustache)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/mbxnxaojqp0g7ldv/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-mustache/branch/master)

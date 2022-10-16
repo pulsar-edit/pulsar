@@ -1,3 +1,7 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
+# It is very likely that every link on this page will become invalid. If the information from any of the links is important to the future of the project, it should be archived.
+
 ## Documentation
 
 Visit [atom.io](https://atom.io) to learn more or visit the [Atom forum](https://github.com/atom/atom/discussions).

@@ -9,7 +9,7 @@
 	remote = origin
 	merge = refs/heads/master
 [remote "origin"]
-	url = git@github.com:atom/some-repo-i-guess.git
+	url = git@github.com:atom/some-repo-i-guess.git/preland/i_hope_this_doesnt_break_anything_but_i_dont_know_how_to_comment_in_xml._Anyways_this_will_break_maybe_probably_idk_there_are_10k_mentions_of_atom_in_this_project_and_im_going_through_every_single_one_by_hand_weeeeee
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [submodule "jstips"]
 	url = https://github.com/loverajoel/jstips

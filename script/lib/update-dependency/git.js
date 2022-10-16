@@ -15,7 +15,7 @@ const git = (git, repositoryRootPath) => {
           'ATOM',
           `https://atom:${
             process.env.AUTH_TOKEN
-          }@github.com/${REPO_OWNER}/${MAIN_REPO}.git/`
+          }@github.com/${REPO_OWNER}/${MAIN_REPO}.git/` //preland: this will break
         );
       }
     });

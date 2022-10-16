@@ -44,6 +44,7 @@ describe('link package', () => {
 
     // only works in Atom >= 1.33.0
     // https://github.com/atom/link/pull/33#issuecomment-419643655
+    //preland: above will break at some point
     const atomVersion = atom.getVersion().split('.');
     console.error('atomVersion', atomVersion);
     if (+atomVersion[0] > 1 || +atomVersion[1] >= 33) {

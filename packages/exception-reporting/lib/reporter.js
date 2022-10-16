@@ -31,7 +31,7 @@ export default class Reporter {
       notifier: {
         name: 'Pulsar',
         version: LIB_VERSION,
-        url: 'https://www.atom.io'
+        url: 'https://www.atom.io' //preland: i considered editing this, but i dont want to accidentally break the code
       },
       events: [
         {
@@ -120,8 +120,8 @@ export default class Reporter {
   }
 
   shouldReport(error) {
-    // Since the `core.telemetryConsent` variable has been removed, this has no good way 
-    // to check if should report to the remote. So we will just always return false 
+    // Since the `core.telemetryConsent` variable has been removed, this has no good way
+    // to check if should report to the remote. So we will just always return false
     // to report to remote. But still allow reporting locally.
     return false;
   }

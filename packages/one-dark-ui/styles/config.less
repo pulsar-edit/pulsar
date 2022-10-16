@@ -135,6 +135,7 @@
 
     // Fix sticky header from covering auto-revealed directories when using up/down keys
     // for directories, scroll test moves to .header, see https://github.com/atom/tree-view/blob/d2857ad4d7eeb7dad5cf94b33257a8740211480e/lib/tree-view.coffee#L839
+    //preland: above link will break at some point
     .entry.directory.selected:not(.project-root) {
       & > .header {
         padding-top: @ui-tab-height;

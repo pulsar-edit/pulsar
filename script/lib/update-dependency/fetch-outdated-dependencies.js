@@ -11,7 +11,7 @@ const apm = async function({ dependencies, packageDependencies }) {
     });
 
     const promises = coreDependencies.map(async dependency => {
-      return fetch(`https://atom.io/api/packages/${dependency}`)
+      return fetch(`https://atom.io/api/packages/${dependency}`) //preland: this will break.
         .then(res => res.json())
         .then(res => res)
         .catch(ex => console.log(ex.message));

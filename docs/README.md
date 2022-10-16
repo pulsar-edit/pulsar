@@ -1,3 +1,7 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
+#It is likely that every link here will become obsolete.
+
 # Atom Docs
 
 ![Atom](https://cloud.githubusercontent.com/assets/72919/2874231/3af1db48-d3dd-11e3-98dc-6066f8bc766f.png)

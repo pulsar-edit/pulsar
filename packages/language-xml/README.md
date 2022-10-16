@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # XML language support in Atom
 [![CI](https://github.com/atom/language-xml/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-xml/actions/workflows/ci.yml)
 

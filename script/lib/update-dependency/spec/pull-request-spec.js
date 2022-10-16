@@ -34,7 +34,7 @@ describe('Pull Request', () => {
         q:
           'octocat type:pr octocat@2.0.0 in:title repo:atom/atom head:octocat-2.0.0 state:open',
         owner: 'atom',
-        repo: 'atom'
+        repo: 'atom' //preland: this will break.
       })
       .reply(200, searchResponse);
 

@@ -115,6 +115,7 @@ export default class DeprecationCopView {
       return <li className="list-item">No deprecated calls</li>;
     } else {
       //TODO_PULSAR: Validate 'atom core'
+      //additional note by preland(if this annoys you, remove it ;) : rename every instance of 'atom' to 'pulsar', to improve future development.
       return packageNames.sort().map(packageName => (
         <li className="deprecation list-nested-item collapsed">
           <div

@@ -810,7 +810,7 @@ class AtomEnvironment {
   }
 
   // Returns true if the dimensions are useable, false if they should be ignored.
-  // Work around for https://github.com/atom/atom-shell/issues/473
+  // Work around for https://github.com/atom/atom-shell/issues/473 <--preland: this may break
   isValidDimensions({ x, y, width, height } = {}) {
     return width > 0 && height > 0 && x + width > 0 && y + height > 0;
   }

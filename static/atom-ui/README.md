@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # :sparkles: Atom UI :sparkles:
 
 This is Atom's UI library. Originally forked from Bootstrap `3.3.6`, then merged with some core styles and now tweaked to Atom's needy needs.

@@ -1,7 +1,7 @@
 const { Disposable } = require('atom');
 const etch = require('etch');
 const { shell } = require('electron');
-const AtomLogo = require('./atom-logo');
+const AtomLogo = require('./atom-logo'); //preland: this *really* shouldn't be here...
 const EtchComponent = require('../etch-component');
 const UpdateView = require('./update-view');
 
@@ -45,13 +45,13 @@ module.exports = class AboutView extends EtchComponent {
 
   handleTermsOfUseClick(e) {
     e.preventDefault();
-    shell.openExternal('https://atom.io/terms');
+    shell.openExternal('https://atom.io/terms'); //preland: this may also need to be changed....
   }
 
   handleHowToUpdateClick(e) {
     e.preventDefault();
     shell.openExternal(
-      'https://flight-manual.atom.io/getting-started/sections/installing-atom/'
+      'https://flight-manual.atom.io/getting-started/sections/installing-atom/' //preland: as well as this....
     );
   }
 

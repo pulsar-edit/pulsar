@@ -83,6 +83,8 @@ module.exports = class ConfigFile {
       return { dispose: () => watcher.stop() };
     } catch (error) {
       //TODO_PULSAR: Find out why the atom global variable isn't available at this point
+
+      //preland: also, below link may break
       this.emitter.emit(
         'did-error',
         dedent`

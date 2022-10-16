@@ -130,7 +130,7 @@ module.exports = class ApplicationDelegate {
   async openWindowDevTools() {
     // Defer DevTools interaction to the next tick, because using them during
     // event handling causes some wrong input events to be triggered on
-    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
+    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697). <--preland: this may break
     await new Promise(process.nextTick);
     return ipcHelpers.call('window-method', 'openDevTools');
   }
@@ -138,7 +138,7 @@ module.exports = class ApplicationDelegate {
   async closeWindowDevTools() {
     // Defer DevTools interaction to the next tick, because using them during
     // event handling causes some wrong input events to be triggered on
-    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
+    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697). <--preland: this may break
     await new Promise(process.nextTick);
     return ipcHelpers.call('window-method', 'closeDevTools');
   }
@@ -146,7 +146,7 @@ module.exports = class ApplicationDelegate {
   async toggleWindowDevTools() {
     // Defer DevTools interaction to the next tick, because using them during
     // event handling causes some wrong input events to be triggered on
-    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
+    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697). <--preland: this may break
     await new Promise(process.nextTick);
     return ipcHelpers.call('window-method', 'toggleDevTools');
   }

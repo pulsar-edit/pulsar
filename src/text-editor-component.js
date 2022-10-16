@@ -1797,6 +1797,7 @@ module.exports = class TextEditorComponent {
     // the paste event. And since we don't use the `paste` event for any
     // behavior in Pulsar, we can no-op the event to eliminate this issue.
     // See https://github.com/atom/atom/pull/15183#issue-248432413.
+    //preland: above link may break.
     if (this.getPlatform() === 'linux') event.preventDefault();
   }
 
@@ -1815,7 +1816,7 @@ module.exports = class TextEditorComponent {
       // editors. This means typing space will actually change the contents
       // of the hidden input, which will cause the browser to autoscroll the
       // scroll container to reveal the input if it is off screen (See
-      // https://github.com/atom/atom/issues/16046). To correct for this
+      // https://github.com/atom/atom/issues/16046). To correct for this        <--preland: this link may break
       // situation, we automatically reset the scroll position to 0,0 after
       // typing a space. None of this can really be tested.
       if (event.data === ' ') {

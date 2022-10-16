@@ -5669,7 +5669,7 @@ module.exports = class TextEditor {
           );
 
           // Prevent the cursor from selecting / passing the delimiters
-          // See https://github.com/atom/atom/pull/17519
+          // See https://github.com/atom/atom/pull/17519 <--preland: this link may break
           if (options.correctSelection && options.selection) {
             const endLineLength = this.buffer.lineLengthForRow(end);
             const oldRange = options.selection.getBufferRange();

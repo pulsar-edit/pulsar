@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Objective-C language support in Atom
 [![macOS Build Status](https://travis-ci.org/atom/language-objective-c.svg?branch=master)](https://travis-ci.org/atom/language-objective-c)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/27j8vfv5u95fjhkw/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-objective-c/branch/master)

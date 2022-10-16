@@ -839,6 +839,7 @@ describe "JavaScript grammar", ->
 
   describe "HTML template strings", ->
     # TODO: Remove after Atom 1.21 is released
+    # TODO: Fix whatever the above comment is saying, and then remove it because it mentions Atom
     [tagScope, entityScope] = []
     if parseFloat(atom.getVersion()) <= 1.21
       tagScope = 'meta.tag.inline.any.html'

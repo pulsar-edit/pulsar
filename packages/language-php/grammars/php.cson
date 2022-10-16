@@ -6,6 +6,8 @@
 # and PHP recognizes it as a valid identifier. To handle this behavior in Atom, we use the modified regex
 # [a-z_\x{7f}-\x{10ffff}][a-z0-9_\x{7f}-\x{10ffff}]*.
 # See https://github.com/atom/language-php/issues/301.
+
+# preland: above link may be broken in the future.
 'scopeName': 'source.php'
 'patterns': [
   {

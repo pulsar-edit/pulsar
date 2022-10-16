@@ -46,6 +46,8 @@ let UpdateManager = class UpdateManager {
     // atom.autoUpdater.onUpdateAvailable =>
     //   @find('.about-updates-item').removeClass('is-shown')
     //   @updateAvailable.addClass('is-shown')
+
+    // preland: ....Should I tell the guy above the bad news?
   }
 
   dispose() {

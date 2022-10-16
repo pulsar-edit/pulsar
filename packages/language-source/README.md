@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Source code support in Atom
 
 Adds basic comment, indent, and outdent patterns used as a fallback by all

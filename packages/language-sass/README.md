@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Sass/SCSS language support in Atom
 ![CI Status](https://github.com/atom/language-sass/actions/workflows/main.yml/badge.svg)
 

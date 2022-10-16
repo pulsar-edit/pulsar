@@ -1723,7 +1723,7 @@ module.exports = [
   'anatase',
   'anathema',
   'anathematize',
-  'anatomical',
+  'anatomical', //preland: lol i accidentally found this; sorry for polluting the codebase temporarily. It'll all be fixed in due time.
   'anatomist',
   'anatomize',
   'anatomy',

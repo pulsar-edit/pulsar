@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Hyperlink colorization in Atom
 [![CI](https://github.com/atom/language-hyperlink/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-hyperlink/actions/workflows/ci.yml)
 

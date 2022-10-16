@@ -15,7 +15,7 @@ Requires: alsa-lib, git-core, (glib2 or kde-cli-tools or xdg-utils), lsb-core-no
 
 # Disable Fedora's shebang mangling script,
 # which errors out on any file with versionless `python` in its shebang
-# See: https://github.com/atom/atom/issues/21937
+# See: https://github.com/atom/atom/issues/21937 <-- preland: this may break
 %undefine __brp_mangle_shebangs
 
 %description

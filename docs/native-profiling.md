@@ -1,4 +1,7 @@
-# Profiling the Atom Render Process on macOS with Instruments
+# This document has nothing to do with Pulsar(probably), and should be removed. If this is not the case, this message should be removed.
+
+
+## Profiling the Atom Render Process on macOS with Instruments
 
 ![Instruments](https://cloud.githubusercontent.com/assets/1789/14193295/d503db7a-f760-11e5-88bf-fe417c0cd913.png)
 

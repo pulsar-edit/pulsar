@@ -3,9 +3,12 @@
 
 There are two ways of building and staring hacking on Pulsar's core. One is following the documentation of the flight manual:
 
+ ```Note: the links may become obsolete in the future.
+ ```
 * [Linux](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-linux)
 * [macOS](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-mac)
 * [Windows](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-windows)
+
 
 ### Alternative method
 

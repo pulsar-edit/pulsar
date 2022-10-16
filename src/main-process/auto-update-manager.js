@@ -29,7 +29,7 @@ module.exports = class AutoUpdateManager extends EventEmitter {
       'pulsar.png'
     );
     this.updateUrlPrefix =
-      process.env.ATOM_UPDATE_URL_PREFIX || 'https://atom.io';
+      process.env.ATOM_UPDATE_URL_PREFIX || 'https://atom.io';//preland: this should probably be changed
   }
 
   initialize() {

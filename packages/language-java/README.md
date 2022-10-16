@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # Java language support in Atom
 ![build](https://github.com/atom/language-java/workflows/build/badge.svg)
 [![Dependency Status](https://david-dm.org/atom/language-java.svg)](https://david-dm.org/atom/language-java)

@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 # JavaScript language support in Atom
 
 ![ci](https://github.com/atom/language-javascript/workflows/ci/badge.svg)

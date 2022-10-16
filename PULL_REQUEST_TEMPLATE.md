@@ -1,3 +1,5 @@
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+
 ⚛👋 Hello there! Welcome. Please follow the steps below to tell us about your contribution.
 
 1. Copy the correct template for your contribution

@@ -552,7 +552,7 @@ class TreeSitterLanguageMode {
     point = this.buffer.clipPosition(Point.fromObject(point));
 
     // If the position is the end of a line, get node of left character instead of newline
-    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463 <--preland: this may break
     if (
       point.column > 0 &&
       point.column === this.buffer.lineLengthForRow(point.row)
@@ -586,7 +586,7 @@ class TreeSitterLanguageMode {
     point = this.buffer.clipPosition(Point.fromObject(point));
 
     // If the position is the end of a line, get scope of left character instead of newline
-    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463 <--preland: this may break
     if (
       point.column > 0 &&
       point.column === this.buffer.lineLengthForRow(point.row)

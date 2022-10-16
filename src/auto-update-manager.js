@@ -72,6 +72,8 @@ module.exports = class AutoUpdateManager {
   //   return this.emitter.on('update-available', callback)
   // }
 
+  //preland: above statement should be looked at
+
   onUpdateNotAvailable(callback) {
     return this.emitter.on('update-not-available', callback);
   }

@@ -7,6 +7,7 @@ const { Emitter } = require('event-kit');
 // Examples: [status-bar](https://github.com/atom/status-bar)
 // and [find-and-replace](https://github.com/atom/find-and-replace) both use
 // panels.
+//preland: the example links above may break.
 module.exports = class Panel {
   /*
   Section: Construction and Destruction
