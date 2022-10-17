@@ -38,7 +38,8 @@ module.exports = class OverlayManager {
       cacheLeft = cachedOverlay.pixelPosition.left;
     }
     if (overlay.pixelPosition == null) {
-      {top, left} = overlay.pixelPosition;
+      top = overlay.pixelPosition.top;
+      left = overlay.pixelPosition.left;
     }
     return cacheTop != top || cacheLeft != left;
   }
