@@ -32,7 +32,7 @@ module.exports = function parseCommandLine(processArgs) {
 
     Environment Variables:
 
-      ATOM_DEV_RESOURCE_PATH  The path from which Pulsar loads source code in dev mode.
+      PULSAR_DEV_RESOURCE_PATH  The path from which Pulsar loads source code in dev mode.
                               Defaults to \`~/github/atom\`.
 
       ATOM_HOME               The root path for all configuration files and folders.

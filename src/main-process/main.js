@@ -48,8 +48,8 @@ if (args.resourcePath) {
     'atom'
   );
 
-  if (process.env.ATOM_DEV_RESOURCE_PATH) {
-    devResourcePath = process.env.ATOM_DEV_RESOURCE_PATH;
+  if (process.env.PULSAR_DEV_RESOURCE_PATH) {
+    devResourcePath = process.env.PULSAR_DEV_RESOURCE_PATH;
   } else if (isAtomRepoPath(process.cwd())) {
     devResourcePath = process.cwd();
   } else if (fs.statSyncNoException(defaultRepositoryPath)) {
