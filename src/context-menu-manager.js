@@ -9,7 +9,7 @@ const {sortMenuItems} = require('./menu-sort-helpers');
 const _ = require('underscore-plus');
 
 const buildMetadata = require('../package.json');
-var platformContextMenu;
+let platformContextMenu;
 if (buildMetadata != null && buildMetadata._atomMenu != null && buildMetadata._atomMenu['context-menu']) {
   platformContextMenu = buildMetadata._atomMenu['context-menu'];
 }
@@ -272,7 +272,7 @@ module.exports = class ContextMenuManager {
 
 };
 
-var ContextMenuItemSet = class ContextMenuItemSet {
+class ContextMenuItemSet {
   constructor(selector1, items1) {
     this.selector = selector1;
     this.items = items1;

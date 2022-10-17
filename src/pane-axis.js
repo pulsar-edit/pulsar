@@ -23,7 +23,7 @@ class PaneAxis extends Model {
     this.flexScale = flexScale != null ? flexScale : 1;
     this.children = [];
     if (children) {
-      for (let child of children) {
+      for (const child of children) {
         this.addChild(child);
       }
     }
@@ -130,13 +130,13 @@ class PaneAxis extends Model {
   adjustFlexScale() {
     // get current total flex scale of children
     let total = 0;
-    for (var child of this.children) {
+    for (const child of this.children) {
       total += child.getFlexScale();
     }
 
     const needTotal = this.children.length;
     // set every child's flex scale by the ratio
-    for (child of this.children) {
+    for (const child of this.children) {
       child.setFlexScale((needTotal * child.getFlexScale()) / total);
     }
   }

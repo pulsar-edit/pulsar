@@ -57,8 +57,8 @@ module.exports = class AboutView extends EtchComponent {
 
   handleShowMoreClick(e) {
     e.preventDefault();
-    var showMoreDiv = document.querySelector('.show-more');
-    var showMoreText = document.querySelector('.about-more-expand');
+    const showMoreDiv = document.querySelector('.show-more');
+    const showMoreText = document.querySelector('.about-more-expand');
     switch (showMoreText.textContent) {
       case 'Show more':
         showMoreDiv.classList.toggle('hidden');

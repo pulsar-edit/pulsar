@@ -418,7 +418,7 @@ module.exports = class Package {
 
   activateServices() {
     let methodName, version, versions;
-    for (var name in this.metadata.providedServices) {
+    for (const name in this.metadata.providedServices) {
       ({ versions } = this.metadata.providedServices[name]);
       const servicesByVersion = {};
       for (version in versions) {

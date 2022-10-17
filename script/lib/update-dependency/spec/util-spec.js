@@ -9,7 +9,7 @@ describe('Update-dependency', function() {
   const oldPackageJson = JSON.parse(
     JSON.stringify(require(packageJsonFilePath))
   );
-  var packageJson;
+  let packageJson;
 
   it('bumps package.json properly', async function() {
     const dependencies = [...coreDependencies, ...nativeDependencies];

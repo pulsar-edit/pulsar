@@ -1,4 +1,4 @@
-var nextInstanceId = 1;
+let nextInstanceId = 1;
 
 module.exports = class Model {
 

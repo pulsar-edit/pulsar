@@ -306,8 +306,7 @@ module.exports = class TextEditorComponent {
       this.remeasureAllBlockDecorations = false;
 
       const decorations = this.props.model.getDecorations();
-      for (let i = 0; i < decorations.length; i++) {
-        const decoration = decorations[i];
+      for (const decoration of decorations) {
         const marker = decoration.getMarker();
         if (marker.isValid() && decoration.getProperties().type === 'block') {
           this.blockDecorationsToMeasure.add(decoration);
@@ -653,8 +652,7 @@ module.exports = class TextEditorComponent {
       const rowsPerTile = this.getRowsPerTile();
       const tileWidth = this.getScrollWidth();
 
-      for (let i = 0; i < this.renderedTileStartRows.length; i++) {
-        const tileStartRow = this.renderedTileStartRows[i];
+      for (const tileStartRow of this.renderedTileStartRows) {
         const tileEndRow = Math.min(endRow, tileStartRow + rowsPerTile);
         const tileHeight =
           this.pixelPositionBeforeBlocksForRow(tileEndRow) -
@@ -878,24 +876,23 @@ module.exports = class TextEditorComponent {
     const newClassList = ['editor'];
     if (this.focused) newClassList.push('is-focused');
     if (model.isMini()) newClassList.push('mini');
-    for (var i = 0; i < model.selections.length; i++) {
-      if (!model.selections[i].isEmpty()) {
+    for (const selection of model.selections) {
+      if (!selection.isEmpty()) {
         newClassList.push('has-selection');
         break;
       }
     }
 
     if (oldClassList) {
-      for (let i = 0; i < oldClassList.length; i++) {
-        const className = oldClassList[i];
+      for (const className of oldClassList) {
         if (!newClassList.includes(className)) {
           this.element.classList.remove(className);
         }
       }
     }
 
-    for (let i = 0; i < newClassList.length; i++) {
-      this.element.classList.add(newClassList[i]);
+    for (const className of newClassList) {
+        this.element.classList.add(className);
     }
 
     this.classList = newClassList;
@@ -1053,8 +1050,7 @@ module.exports = class TextEditorComponent {
     decorationsByMarker.forEach((decorations, marker) => {
       const screenRange = marker.getScreenRange();
       const reversed = marker.isReversed();
-      for (let i = 0; i < decorations.length; i++) {
-        const decoration = decorations[i];
+      for (const decoration of decorations) {
         this.addDecorationToRender(
           decoration.type,
           decoration,
@@ -1070,9 +1066,9 @@ module.exports = class TextEditorComponent {
 
   addDecorationToRender(type, decoration, marker, screenRange, reversed) {
     if (Array.isArray(type)) {
-      for (let i = 0, length = type.length; i < length; i++) {
+      for (subType of type) {
         this.addDecorationToRender(
-          type[i],
+          subType,
           decoration,
           marker,
           screenRange,
@@ -1383,9 +1379,7 @@ module.exports = class TextEditorComponent {
     const containingMarkers = [];
 
     // Iterate over boundaries to build up text decorations.
-    for (let i = 0; i < this.textDecorationBoundaries.length; i++) {
-      const boundary = this.textDecorationBoundaries[i];
-
+    for (const boundary of this.textDecorationBoundaries) {
       // If multiple markers start here, sort them by order of nesting (markers ending later come first)
       if (boundary.starting && boundary.starting.length > 1) {
         boundary.starting.sort((a, b) => a.compare(b));
@@ -1398,11 +1392,11 @@ module.exports = class TextEditorComponent {
 
       // Remove markers ending here from containing markers array
       if (boundary.ending) {
-        for (let j = boundary.ending.length - 1; j >= 0; j--) {
-          containingMarkers.splice(
-            containingMarkers.lastIndexOf(boundary.ending[j]),
-            1
-          );
+        for (const ending of boundary.ending) {
+            containingMarkers.splice(
+              containingMarkers.lastIndexOf(ending),
+              1
+            );
         }
       }
       // Add markers starting here to containing markers array
@@ -1410,11 +1404,9 @@ module.exports = class TextEditorComponent {
 
       // Determine desired className and style based on containing markers
       let className, style;
-      for (let j = 0; j < containingMarkers.length; j++) {
-        const marker = containingMarkers[j];
+      for (const marker of containingMarkers) {
         const decorations = this.textDecorationsByMarker.get(marker);
-        for (let k = 0; k < decorations.length; k++) {
-          const decoration = decorations[k];
+        for (const decoration of decorations){
           if (decoration.class) {
             if (className) {
               className += ' ' + decoration.class;
@@ -1480,8 +1472,7 @@ module.exports = class TextEditorComponent {
 
   updateHighlightsToRender() {
     this.decorationsToRender.highlights.length = 0;
-    for (let i = 0; i < this.decorationsToMeasure.highlights.length; i++) {
-      const highlight = this.decorationsToMeasure.highlights[i];
+    for (const highlight of this.decorationsToMeasure.highlights) {
       const { start, end } = highlight.screenRange;
       highlight.startPixelTop = this.pixelPositionAfterBlocksForRow(start.row);
       highlight.startPixelLeft = this.pixelLeftForRowAndColumn(
@@ -2859,8 +2850,8 @@ module.exports = class TextEditorComponent {
   observeBlockDecorations() {
     const { model } = this.props;
     const decorations = model.getDecorations({ type: 'block' });
-    for (let i = 0; i < decorations.length; i++) {
-      this.addBlockDecoration(decorations[i]);
+    for (const decoration of decorations) {
+      this.addBlockDecoration(decoration);
     }
   }
 
@@ -2926,8 +2917,7 @@ module.exports = class TextEditorComponent {
   didResizeBlockDecorations(entries) {
     if (!this.visible) return;
 
-    for (let i = 0; i < entries.length; i++) {
-      const { target, contentRect } = entries[i];
+    for (const { target, contentRect } of entries) {
       const decoration = this.blockDecorationsByElement.get(target);
       const previousHeight = this.heightsByBlockDecoration.get(decoration);
       if (
@@ -3334,8 +3324,7 @@ module.exports = class TextEditorComponent {
     const startRow = this.getRenderedStartRow();
     const endRow = this.getRenderedEndRow();
     const freeTileIds = [];
-    for (let i = 0; i < this.renderedTileStartRows.length; i++) {
-      const tileStartRow = this.renderedTileStartRows[i];
+    for (const tileStartRow of this.renderedTileStartRows) {
       if (tileStartRow < startRow || tileStartRow >= endRow) {
         const tileId = this.idsByTileStartRow.get(tileStartRow);
         freeTileIds.push(tileId);
@@ -4103,14 +4092,13 @@ class CursorsAndInputComponent {
     const cursorHeight = lineHeight + 'px';
 
     const children = [this.renderHiddenInput()];
-    for (let i = 0; i < decorationsToRender.cursors.length; i++) {
-      const {
-        pixelLeft,
-        pixelTop,
-        pixelWidth,
-        className: extraCursorClassName,
-        style: extraCursorStyle
-      } = decorationsToRender.cursors[i];
+    for (const {
+      pixelLeft,
+      pixelTop,
+      pixelWidth,
+      className: extraCursorClassName,
+      style: extraCursorStyle
+  } of decorationsToRender.cursors) {
       let cursorClassName = 'cursor';
       if (extraCursorClassName) cursorClassName += ' ' + extraCursorClassName;
 
@@ -4230,8 +4218,8 @@ class LinesTileComponent {
   }
 
   destroy() {
-    for (let i = 0; i < this.lineComponents.length; i++) {
-      this.lineComponents[i].destroy();
+    for (const lineComponent of this.lineComponents) {
+      lineComponent.destroy();
     }
     this.lineComponents.length = 0;
 
@@ -4309,7 +4297,7 @@ class LinesTileComponent {
       const newScreenLine = newScreenLines[newScreenLineIndex];
 
       if (oldScreenLineIndex >= oldScreenLinesEndIndex) {
-        var newScreenLineComponent = new LineComponent({
+        const newScreenLineComponent = new LineComponent({
           screenLine: newScreenLine,
           screenRow: tileStartRow + newScreenLineIndex,
           lineDecoration: lineDecorations[newScreenLineIndex],
@@ -4353,7 +4341,7 @@ class LinesTileComponent {
           const newScreenLineComponents = [];
           while (newScreenLineIndex < oldScreenLineIndexInNewScreenLines) {
             // eslint-disable-next-line no-redeclare
-            var newScreenLineComponent = new LineComponent({
+            const newScreenLineComponent = new LineComponent({
               screenLine: newScreenLines[newScreenLineIndex],
               screenRow: tileStartRow + newScreenLineIndex,
               lineDecoration: lineDecorations[newScreenLineIndex],
@@ -4393,7 +4381,7 @@ class LinesTileComponent {
             lineComponentIndex
           ];
           // eslint-disable-next-line no-redeclare
-          var newScreenLineComponent = new LineComponent({
+          const newScreenLineComponent = new LineComponent({
             screenLine: newScreenLines[newScreenLineIndex],
             screenRow: tileStartRow + newScreenLineIndex,
             lineDecoration: lineDecorations[newScreenLineIndex],
@@ -4423,8 +4411,7 @@ class LinesTileComponent {
       : null;
     if (blockDecorations) {
       const blockDecorationElementsBeforeOldScreenLine = [];
-      for (let i = 0; i < blockDecorations.length; i++) {
-        const decoration = blockDecorations[i];
+      for (const decoration of blockDecorations) {
         if (decoration.position !== 'after') {
           blockDecorationElementsBeforeOldScreenLine.push(
             TextEditor.viewForItem(decoration.item)
@@ -4432,13 +4419,7 @@ class LinesTileComponent {
         }
       }
 
-      for (
-        let i = 0;
-        i < blockDecorationElementsBeforeOldScreenLine.length;
-        i++
-      ) {
-        const blockDecorationElement =
-          blockDecorationElementsBeforeOldScreenLine[i];
+      for (const blockDecorationElement of blockDecorationElementsBeforeOldScreenLine) {
         if (
           !blockDecorationElementsBeforeOldScreenLine.includes(
             blockDecorationElement.previousSibling
@@ -4460,8 +4441,8 @@ class LinesTileComponent {
         const newDecorations = newProps.blockDecorations
           ? newProps.blockDecorations.get(screenLineId)
           : null;
-        for (let i = 0; i < oldDecorations.length; i++) {
-          const oldDecoration = oldDecorations[i];
+
+        for (const oldDecoration of oldDecorations) {
           if (newDecorations && newDecorations.includes(oldDecoration))
             continue;
 
@@ -4481,8 +4462,7 @@ class LinesTileComponent {
         const lineNode = lineComponentsByScreenLineId.get(screenLineId).element;
         let lastAfter = lineNode;
 
-        for (let i = 0; i < newDecorations.length; i++) {
-          const newDecoration = newDecorations[i];
+        for (const newDecoration of newDecorations) {
           const element = TextEditor.viewForItem(newDecoration.item);
 
           if (oldDecorations && oldDecorations.includes(newDecoration)) {
@@ -4641,8 +4621,7 @@ class LineComponent {
       nextDecoration = textDecorations[++decorationIndex];
     }
 
-    for (let i = 0; i < tags.length; i++) {
-      const tag = tags[i];
+    for (const tag of tags) {
       if (tag !== 0) {
         if (displayLayer.isCloseTag(tag)) {
           openScopeNode = openScopeNode.parentElement;
@@ -4756,11 +4735,10 @@ class HighlightsComponent {
 
       const visibleHighlightDecorations = new Set();
       if (highlightDecorations) {
-        for (let i = 0; i < highlightDecorations.length; i++) {
-          const highlightDecoration = highlightDecorations[i];
+        for (const highlightDecoration of highlightDecorations) {
           const highlightProps = Object.assign(
             { lineHeight },
-            highlightDecorations[i]
+            highlightDecoration
           );
 
           let highlightComponent = this.highlightComponentsByKey.get(
@@ -4777,7 +4755,7 @@ class HighlightsComponent {
             );
           }
 
-          highlightDecorations[i].flashRequested = false;
+          highlightDecoration.flashRequested = false;
           visibleHighlightDecorations.add(highlightDecoration.key);
         }
       }
@@ -5053,11 +5031,11 @@ function textDecorationsEqual(oldDecorations, newDecorations) {
   if (oldDecorations && !newDecorations) return false;
   if (oldDecorations && newDecorations) {
     if (oldDecorations.length !== newDecorations.length) return false;
-    for (let j = 0; j < oldDecorations.length; j++) {
-      if (oldDecorations[j].column !== newDecorations[j].column) return false;
-      if (oldDecorations[j].className !== newDecorations[j].className)
+    for (const oldDecorations of oldDecorations) {
+      if (oldDecoration.column !== newDecoration.column) return false;
+      if (oldDecoration.className !== newDecoration.className)
         return false;
-      if (!objectsEqual(oldDecorations[j].style, newDecorations[j].style))
+      if (!objectsEqual(oldDecoration.style, newDecoration.style))
         return false;
     }
   }
@@ -5187,8 +5165,8 @@ class NodePool {
       }
 
       elements.push(node);
-      for (let i = 0; i < node.childNodes.length; i++) {
-        this.release(node.childNodes[i], depth + 1);
+      for (const childNode of node.childNodes) {
+        this.release(childNode, depth + 1);
       }
     }
   }

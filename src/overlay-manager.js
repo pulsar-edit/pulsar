@@ -1,6 +1,6 @@
 const ElementResizeDetector = require('element-resize-detector');
 
-var elementResizeDetector = null;
+let elementResizeDetector = null;
 
 module.exports = class OverlayManager {
 

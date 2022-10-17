@@ -7,7 +7,7 @@ const {Disposable} = require('event-kit');
 const MenuHelpers = require('./menu-helpers');
 
 const buildMetadata = require('../package.json');
-var platformMenu;
+let platformMenu;
 if (buildMetadata) {
   platformMenu = (buildMetadata._atomMenu && buildMetadata._atomMenu.menu);
 }
@@ -233,7 +233,6 @@ module.exports = MenuManager = class MenuManager {
 
   // Get an {Array} of {String} classes for the given element.
   classesForElement(element) {
-    var classList;
     if (element && element.classList) {
       return Array.prototype.slice.apply(element.classList);
     } else {

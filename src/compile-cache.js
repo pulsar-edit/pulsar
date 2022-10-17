@@ -156,8 +156,9 @@ exports.install = function(resourcesPath, nodeRequire) {
         return null;
       }
 
+      let sourceCode;
       try {
-        var sourceCode = fs.readFileSync(filePath, 'utf8');
+        sourceCode = fs.readFileSync(filePath, 'utf8');
       } catch (error) {
         console.warn('Error reading source file', error.stack);
         return null;
@@ -166,8 +167,9 @@ exports.install = function(resourcesPath, nodeRequire) {
       let compiler = COMPILERS[path.extname(filePath)];
       if (!compiler) compiler = COMPILERS['.js'];
 
+      let fileData;
       try {
-        var fileData = readCachedJavaScript(
+        fileData = readCachedJavaScript(
           compiler.getCachePath(sourceCode, filePath)
         );
       } catch (error) {
@@ -191,8 +193,9 @@ exports.install = function(resourcesPath, nodeRequire) {
       const sourceMappingURL = lastMatch[1];
       const rawData = sourceMappingURL.slice(sourceMappingURL.indexOf(',') + 1);
 
+      let sourceMap;
       try {
-        var sourceMap = JSON.parse(Buffer.from(rawData, 'base64'));
+        sourceMap = JSON.parse(Buffer.from(rawData, 'base64'));
       } catch (error) {
         console.warn('Error parsing source map', error.stack);
         return null;
@@ -206,7 +209,7 @@ exports.install = function(resourcesPath, nodeRequire) {
   });
 
   const prepareStackTraceWithSourceMapping = Error.prepareStackTrace;
-  var prepareStackTrace = prepareStackTraceWithSourceMapping;
+  let prepareStackTrace = prepareStackTraceWithSourceMapping;
 
   function prepareStackTraceWithRawStackAssignment(error, frames) {
     if (error.rawStack) {

@@ -3,7 +3,7 @@ const EventKit = require('event-kit');
 module.exports = function listen(element, eventName, selector, handler) {
   const innerHandler = function(event) {
     if (selector) {
-      var currentTarget = event.target;
+      let currentTarget = event.target;
       while (currentTarget) {
         if (currentTarget.matches && currentTarget.matches(selector)) {
           handler({

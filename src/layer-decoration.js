@@ -1,6 +1,6 @@
-var idCounter = 0;
+let idCounter = 0;
 
-var nextId = function() {
+function nextId() {
   return idCounter++;
 };
 

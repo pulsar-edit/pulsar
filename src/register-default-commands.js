@@ -3,9 +3,7 @@ const Grim = require('grim');
 
 module.exports = function({commandRegistry, commandInstaller, config, notificationManager, project, clipboard}) {
   commandRegistry.add('atom-workspace', {
-    'pane:show-next-recently-used-item': function() {
-      return this.getModel().getActivePane().activateNextRecentlyUsedItem();
-    },
+    'pane:show-next-recently-used-item': () => this.getModel().getActivePane().activateNextRecentlyUsedItem(),
     'pane:show-previous-recently-used-item': function() {
       return this.getModel().getActivePane().activatePreviousRecentlyUsedItem();
     },
@@ -91,18 +89,57 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
       return ipcRenderer.send('command', 'application:new-file');
     },
     'application:open': function() {
-      var defaultPath, ref, ref1, ref2;
-      defaultPath = (ref = (ref1 = atom.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = atom.project.getPaths()) != null ? ref2[0] : void 0;
+      const ref1 = atom.workspace.getActiveTextEditor();
+
+      let ref;
+      if (ref1 != null) {
+        ref = ref1.getPath();
+      }
+
+      const ref2 = atom.project.getPaths();
+      let defaultPath;
+      if (ref != null) {
+        defaultPath = ref;
+      } else if (ref2 != null) {
+        defaultPath = ref2[0];
+      }
+
       return ipcRenderer.send('open-chosen-any', defaultPath);
     },
     'application:open-file': function() {
-      var defaultPath, ref, ref1, ref2;
-      defaultPath = (ref = (ref1 = atom.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = atom.project.getPaths()) != null ? ref2[0] : void 0;
+      const ref1 = atom.workspace.getActiveTextEditor();
+
+      let ref;
+      if (ref1 != null) {
+        ref = ref1.getPath();
+      }
+
+      const ref2 = atom.project.getPaths();
+      let defaultPath;
+      if (ref != null) {
+        defaultPath = ref;
+      } else if (ref2 != null) {
+        defaultPath = ref2[0];
+      }
+
       return ipcRenderer.send('open-chosen-file', defaultPath);
     },
     'application:open-folder': function() {
-      var defaultPath, ref, ref1, ref2;
-      defaultPath = (ref = (ref1 = atom.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = atom.project.getPaths()) != null ? ref2[0] : void 0;
+      const ref1 = atom.workspace.getActiveTextEditor();
+
+      let ref;
+      if (ref1 != null) {
+        ref = ref1.getPath();
+      }
+
+      const ref2 = atom.project.getPaths();
+      let defaultPath;
+      if (ref != null) {
+        defaultPath = ref;
+      } else if (ref2 != null) {
+        defaultPath = ref2[0];
+      }
+
       return ipcRenderer.send('open-chosen-folder', defaultPath);
     },
     'application:open-dev': function() {
@@ -672,7 +709,7 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
   }), false);
 };
 
-var stopEventPropagation = function(commandListeners) {
+function stopEventPropagation(commandListeners) {
   const newCommandListeners = {};
   for (let commandName in commandListeners) {
     let commandListener = commandListeners[commandName];
@@ -684,7 +721,7 @@ var stopEventPropagation = function(commandListeners) {
   return newCommandListeners;
 };
 
-var stopEventPropagationAndGroupUndo = function(config, commandListeners) {
+function stopEventPropagationAndGroupUndo(config, commandListeners) {
   const newCommandListeners = {};
   for (let commandName in commandListeners) {
     let commandListener = commandListeners[commandName];
@@ -697,21 +734,21 @@ var stopEventPropagationAndGroupUndo = function(config, commandListeners) {
   return newCommandListeners;
 };
 
-var showCursorScope = function(descriptor, notificationManager) {
+function showCursorScope(descriptor, notificationManager) {
   let list = descriptor.scopes.toString().split(',');
   list = list.map((item) => `* ${item}`);
   const content = `Scopes at Cursor\n${list.join('\n')}`;
   return notificationManager.addInfo(content, {dismissable: true});
 };
 
-var showSyntaxTree = function(descriptor, notificationManager) {
+function showSyntaxTree(descriptor, notificationManager) {
   let list = descriptor.scopes.toString().split(',');
   list = list.map((item) => `* ${item}`);
   const content = `Syntax tree at Cursor\n${list.join('\n')}`;
   return notificationManager.addInfo(content, {dismissable: true});
 };
 
-var copyPathToClipboard = function(editor, project, clipboard, relative) {
+function copyPathToClipboard(editor, project, clipboard, relative) {
   let filePath;
   if (filePath = editor.getPath()) {
     if (relative) {

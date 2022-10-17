@@ -6,8 +6,8 @@ const {PathSearcher, PathScanner, search} = require('scandal');
 module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
   const callback = this.async();
   const PATHS_COUNTER_SEARCHED_CHUNK = 50;
-  var pathsSearched = 0;
-  var searcher = new PathSearcher(searchOptions);
+  let pathsSearched = 0;
+  const searcher = new PathSearcher(searchOptions);
   searcher.on('file-error', function({code, path, message}) {
     return emit('scan:file-error', {code, path, message});
   });
@@ -18,7 +18,7 @@ module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
   if (options.ignoreCase) {
     flags += "i";
   }
-  var regex = new RegExp(regexSource, flags);
+  const regex = new RegExp(regexSource, flags);
   return async.each(rootPaths, function(rootPath, next) {
     const options2 = Object.assign({}, options, {
       inclusions: processPaths(rootPath, options.inclusions),
@@ -38,13 +38,13 @@ module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
   }, callback);
 };
 
-var processPaths = function(rootPath, paths) {
+unction processPaths(rootPath, paths) {
   if (paths == null || paths.length == 0) {
     return paths;
   }
   const rootPathBase = path.basename(rootPath);
   const results = [];
-  for (let givenPath of paths) {
+  for (const givenPath of paths) {
     const segments = givenPath.split(path.sep);
     const firstSegment = segments.shift();
     results.push(givenPath);

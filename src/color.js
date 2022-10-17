@@ -28,8 +28,9 @@ module.exports = class Color {
       ParsedColor = require('color');
     }
 
+    let parsedColor;
     try {
-      var parsedColor = ParsedColor(value);
+      parsedColor = ParsedColor(value);
     } catch (error) {
       return null;
     }
