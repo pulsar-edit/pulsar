@@ -40,7 +40,6 @@ This project and everyone participating in it is governed by the [Atom Code of C
 
 We have an official message board with a detailed FAQ and where the community chimes in with helpful advice if you have questions.
 
-* [Github Discussions, the official Atom message board](https://github.com/atom/atom/discussions)
 * [Atom FAQ](https://flight-manual.atom.io/faq/)
 
 ## What should I know before I get started?
