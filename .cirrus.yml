@@ -39,6 +39,47 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
 
+arm_linux_task:
+  alias: linux
+  arm_container:
+    image: node:lts-slim
+    memory: 8G
+  test_script:
+    - apt-get update
+    - export DEBIAN_FRONTEND="noninteractive"
+    - apt-get install -y
+                rpm
+                build-essential
+                git
+                libsecret-1-dev
+                fakeroot
+                libx11-dev
+                libxkbfile-dev
+                libgdk-pixbuf2.0-dev
+                libgtk-3-dev
+                libxss-dev
+                libasound2-dev
+                libnss3
+                xvfb
+    - git submodule init
+    - git submodule update
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - yarn install || yarn install
+    - yarn build
+    - yarn run build:apm
+    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
+  build_binary_script:
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+
 silicon_mac_task:
   alias: mac
   macos_instance:
