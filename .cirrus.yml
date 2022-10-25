@@ -44,7 +44,7 @@ arm_linux_task:
   arm_container:
     image: node:lts-slim
     memory: 8G
-  test_script:
+  prepare_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -67,6 +67,11 @@ arm_linux_task:
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
+  build_binary_script:
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -75,10 +80,6 @@ arm_linux_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_binary_script:
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
 silicon_mac_task:
   alias: mac
@@ -114,7 +115,7 @@ intel_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  test_script:
+  prepare_script:
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/bin:$PATH"
@@ -125,6 +126,12 @@ intel_mac_task:
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
+  dist_x86_binary_script:
+    - arch -x86_64 xcode-select --install
+    - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -133,11 +140,6 @@ intel_mac_task:
       path: report.xml
       type: text/xml
       format: junit
-  dist_x86_binary_script:
-    - arch -x86_64 xcode-select --install
-    - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
 windows_task:
   alias: windows
