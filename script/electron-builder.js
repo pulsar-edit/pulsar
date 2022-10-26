@@ -91,18 +91,9 @@ let options = {
     "category": "Development",
     "synopsis": "A hackable text editor for the 22nd century",
     "target": [
-      {
-        "target": "appimage",
-        "arch": "x64"
-      },
-      {
-        "target": "deb",
-        "arch": "x64"
-      },
-      {
-        "target": "rpm",
-        "arch": "x64"
-      }
+      { "target": "appimage" },
+      { "target": "deb" },
+      { "target": "rpm" }
     ]
   },
   "mac": {
