@@ -78,6 +78,7 @@ arm_linux_task:
     - yarn build
     - yarn run build:apm
   build_binary_script:
+    - source /etc/profile.d/rvm.sh
     - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
@@ -145,6 +146,9 @@ intel_mac_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - export PATH="/usr/local/bin:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
