@@ -85,7 +85,10 @@ let options = {
   ],
   compression: "normal",
   deb: { afterInstall: "script/post-install.sh" },
-  rpm: { afterInstall: "script/post-install.sh" },
+  rpm: {
+    afterInstall: "script/post-install.sh",
+    compression: 'xz'
+  },
   "linux": {
     "icon": pngIcon,
     "category": "Development",
@@ -95,7 +98,6 @@ let options = {
       { target: "deb" },
       { target: "rpm" }
     ],
-    rpm: { compression: 'xz' }
   },
   "mac": {
     "icon": pngIcon,
