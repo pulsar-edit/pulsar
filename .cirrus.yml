@@ -51,6 +51,7 @@ arm_linux_task:
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
                 gnupg2
+                procps
                 curl
                 rpm
                 build-essential
@@ -66,7 +67,9 @@ arm_linux_task:
                 libnss3
                 xvfb
     - gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-    - \curl -sSL https://get.rvm.io | bash -s stable --ruby
+    - \curl -sSL https://get.rvm.io | bash -s stable
+    - source /etc/profile.d/rvm.sh
+    - rvm install ruby
     - gem install fpm
     - git submodule init
     - git submodule update
