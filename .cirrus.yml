@@ -44,10 +44,13 @@ arm_linux_task:
   arm_container:
     image: node:lts-slim
     memory: 8G
+  env:
+    USE_SYSTEM_FPM: 'true'
   prepare_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
+                ruby-full
                 rpm
                 build-essential
                 git
@@ -61,6 +64,7 @@ arm_linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
+    - gem install fpm -v=1.9.3
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
