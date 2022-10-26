@@ -91,13 +91,11 @@ let options = {
     "category": "Development",
     "synopsis": "A hackable text editor for the 22nd century",
     "target": [
-      { "target": "appimage" },
-      { "target": "deb" },
-      {
-        target: "rpm",
-        compression: 'xz'
-      }
-    ]
+      { target: "appimage" },
+      { target: "deb" },
+      { target: "rpm" }
+    ],
+    rpm: { compression: 'xz' }
   },
   "mac": {
     "icon": pngIcon,
