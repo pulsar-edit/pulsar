@@ -133,6 +133,7 @@ intel_mac_task:
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
   dist_x86_binary_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
