@@ -119,7 +119,7 @@ intel_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  prepare_script:
+  dist_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 xcode-select --install
@@ -132,7 +132,6 @@ intel_mac_task:
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
-  dist_x86_binary_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
