@@ -127,6 +127,7 @@ intel_mac_task:
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
   dist_x86_binary_script:
+    - sudo rm -rf /Library/Developer/CommandLineTools
     - arch -x86_64 xcode-select --install
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
