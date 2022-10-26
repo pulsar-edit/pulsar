@@ -93,7 +93,10 @@ let options = {
     "target": [
       { "target": "appimage" },
       { "target": "deb" },
-      { "target": "rpm" }
+      {
+        target: "rpm",
+        compression: 'xz'
+      }
     ]
   },
   "mac": {
