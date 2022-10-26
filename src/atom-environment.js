@@ -45,6 +45,7 @@ const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const AutoUpdateManager = require('./auto-update-manager');
 const StartupTime = require('./startup-time');
+const ppm = require('./ppm');
 const getReleaseChannel = require('./get-release-channel');
 const packagejson = require("../package.json");
 
@@ -220,6 +221,10 @@ class AtomEnvironment {
       commands: this.commands,
       stateStore: this.stateStore
     });
+
+    // Exposes the Integrated PPM Functions
+
+    this.ppm = ppm;
 
     this.branding = {
       id: packagejson.branding.id,
