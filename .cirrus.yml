@@ -1,7 +1,7 @@
 linux_task:
   alias: linux
   container:
-    image: node:lts-slim
+    image: node:16-slim
     memory: 8G
   test_script:
     - apt-get update
@@ -43,7 +43,7 @@ linux_task:
 arm_linux_task:
   alias: linux
   arm_container:
-    image: node:lts-slim
+    image: node:16-slim
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
@@ -144,7 +144,7 @@ intel_mac_task:
     - arch -x86_64 npx yarn install --ignore-scripts || arch -x86_64 npx yarn install --ignore-scripts
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
-    - rm -Rf node-modules/electron && yarn install --check-files
+    - rm -rf node-modules/electron && yarn install --check-files
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
