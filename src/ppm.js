@@ -17,9 +17,13 @@ async function search(args) {
     direction: args.direction ? args.direction : "desc"
   };
 
+  if (args.qs == "") {
+    return "Missing equired Search String";
+  }
+
   if (args.packages || !args.themes) {
     // default handling for search, and packages specific filtered search
-    let res = await superagent
+    superagent
       .get(`${apiUrl}/packages/search`)
       .query({ sort: args.sort, page: args.page, direction: args.direction, q: args.qs })
       .then(res => {
@@ -28,7 +32,7 @@ async function search(args) {
       })
       .catch(err => {
         console.log(err);
-        return [];
+        return err;
       });
   } else if (args.themes) {
     let res = await superagent
@@ -39,11 +43,29 @@ async function search(args) {
       })
       .catch(err => {
         console.log(err);
-        return [];
+        return err;
       });
   }
 }
 
+async function view(packageName) {
+  if (!packageName || packageName == "") {
+    return "Missing required package name";
+  }
+
+  superagent
+    .get(`${apiUrl}/packages/${packageName}`)
+    .then(res => {
+      console.log(res.body);
+      return res.body;
+    })
+    .catch(err => {
+      console.log(err);
+      return err;
+    });
+}
+
 module.exports = {
   search,
+  view,
 };
