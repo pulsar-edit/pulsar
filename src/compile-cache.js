@@ -16,7 +16,7 @@ const COMPILERS = {
   '.ts': packageTranspilationRegistry.wrapTranspiler(require('./typescript')),
   '.tsx': packageTranspilationRegistry.wrapTranspiler(require('./typescript')),
   '.coffee': packageTranspilationRegistry.wrapTranspiler(
-    require('./coffee-script')
+    require('./coffeescript')
   )
 };
 
