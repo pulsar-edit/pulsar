@@ -6,24 +6,34 @@ const apiUrl = "https://api.pulsar-edit.dev/api";
 
 // Operates on the API Search Endpoint.
 // Takes optional values of `packages` and `themes` to act as a filter for either, similar to the original APM.
-// Takes additional optional values to expose all API parameters compatible with the api server. Taking their same defaults.
-async function search(qs, packages = false, themes = false, page = 0, sort = "relevance", direction = "desc") {
-  if (packages || !themes) {
+// Takes an object, with a required `qs` object as the query, with additional optional arguments.
+async function search(args) {
+  args = {
+    qs: args.qs ? args.qs : "",
+    packages: args.packages ? args.packages : false,
+    themes: args.themes ? args.themes : false,
+    page: args.page ? args.page : 0,
+    sort: args.sort ? args.sort : "relevance",
+    direction: args.direction ? args.direction : "desc"
+  };
+
+  if (args.packages || !args.themes) {
     // default handling for search, and packages specific filtered search
     let res = await superagent
       .get(`${apiUrl}/packages/search`)
-      .query({ sort: sort, page: page, direction: direction, q: qs })
+      .query({ sort: args.sort, page: args.page, direction: args.direction, q: args.qs })
       .then(res => {
+        console.log(res.body);
         return res.body;
       })
       .catch(err => {
         console.log(err);
         return [];
       });
-  } else if (themes) {
+  } else if (args.themes) {
     let res = await superagent
       .get(`${apiUrl}/themes/search`)
-      .query({ sort: sort, page: page, direction: direction, q: qs })
+      .query({ sort: args.sort, page: args.page, direction: args.direction, q: args.qs })
       .then(res => {
         return res.body;
       })
