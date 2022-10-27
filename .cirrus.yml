@@ -23,9 +23,10 @@ linux_task:
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - yarn install || yarn install
+    - yarn install --ignore-scripts || yarn install --ignore-scripts
     - yarn build
     - yarn run build:apm
+    - rm -Rf node-modules/electron && yarn install
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -74,9 +75,10 @@ arm_linux_task:
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - yarn install || yarn install
+    - yarn install --ignore-scripts || yarn install --ignore-scripts
     - yarn build
     - yarn run build:apm
+    - rm -Rf node-modules/electron && yarn install
   build_binary_script:
     - source /etc/profile.d/rvm.sh
     - yarn dist || yarn dist
@@ -104,9 +106,10 @@ silicon_mac_task:
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - yarn install || yarn install
+    - yarn install --ignore-scripts || yarn install --ignore-scripts
     - yarn build
     - yarn run build:apm
+    - rm -Rf node-modules/electron && yarn install
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -138,9 +141,10 @@ intel_mac_task:
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - ln -s /usr/local/opt/python3 /usr/local/bin/python
-    - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
+    - arch -x86_64 npx yarn install --ignore-scripts || arch -x86_64 npx yarn install --ignore-scripts
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
+    - rm -Rf node-modules/electron && yarn install
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
