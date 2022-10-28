@@ -692,7 +692,7 @@ module.exports = class Dock {
   // {TextEditor}.
   getActiveTextEditor() {
     Grim.deprecate(
-      'Text editors are not allowed in docks. Use atom.workspace.getActiveTextEditor() instead.'
+      'Text editors are not allowed in docks. Use core.workspace.getActiveTextEditor() instead.'
     );
 
     const activeItem = this.getActivePaneItem();

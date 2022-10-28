@@ -116,7 +116,7 @@ module.exports = async function({ blobStore }) {
 
     const clipboard = new Clipboard();
     TextEditor.setClipboard(clipboard);
-    TextEditor.viewForItem = item => atom.views.getView(item);
+    TextEditor.viewForItem = item => core.views.getView(item);
 
     const testRunner = requireModule(testRunnerPath);
     const legacyTestRunner = require(legacyTestRunnerPath);

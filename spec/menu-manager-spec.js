@@ -173,7 +173,7 @@ describe('MenuManager', function() {
         }
       ]);
 
-      atom.keymaps.add('test', {
+      core.keymaps.add('test', {
         'atom-workspace': {
           'ctrl-alt-b': 'b',
           'ctrl-alt-shift-C': 'c',

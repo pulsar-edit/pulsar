@@ -7,7 +7,7 @@ const selectorParser = require('postcss-selector-parser');
 const { createStylesElement } = require('./styles-element');
 const DEPRECATED_SYNTAX_SELECTORS = require('./deprecated-syntax-selectors');
 
-// Extended: A singleton instance of this class available via `atom.styles`,
+// Extended: A singleton instance of this class available via `core.styles`,
 // which you can use to globally query and observe the set of active style
 // sheets. The `StyleManager` doesn't add any style elements to the DOM on its
 // own, but is instead subscribed to by individual `<atom-styles>` elements,

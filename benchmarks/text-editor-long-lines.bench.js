@@ -16,15 +16,15 @@ const TEXT = REPEATED_TEXT.repeat(
 module.exports = async ({ test }) => {
   const data = [];
 
-  const workspaceElement = atom.workspace.getElement();
+  const workspaceElement = core.workspace.getElement();
   document.body.appendChild(workspaceElement);
 
-  atom.packages.loadPackages();
-  await atom.packages.activate();
+  core.packages.loadPackages();
+  await core.packages.activate();
 
-  console.log(atom.getLoadSettings().resourcePath);
+  console.log(core.getLoadSettings().resourcePath);
 
-  for (let pane of atom.workspace.getPanes()) {
+  for (let pane of core.workspace.getPanes()) {
     pane.destroy();
   }
 
@@ -39,8 +39,8 @@ module.exports = async ({ test }) => {
       autoHeight: false,
       largeFileMode: true
     });
-    atom.grammars.assignLanguageMode(buffer, 'source.js');
-    atom.workspace.getActivePane().activateItem(editor);
+    core.grammars.assignLanguageMode(buffer, 'source.js');
+    core.workspace.getActivePane().activateItem(editor);
     let t1 = window.performance.now();
 
     data.push({

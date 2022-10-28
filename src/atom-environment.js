@@ -54,7 +54,7 @@ let nextId = 0;
 
 // Essential: Pulsar global for dealing with packages, themes, menus, and the window.
 //
-// An instance of this class is always available as the `atom` global.
+// An instance of this class is always available as the `core` global and the legacy variant `atom`.
 class AtomEnvironment {
   /*
   Section: Properties
@@ -1211,7 +1211,7 @@ class AtomEnvironment {
   //
   // ```js
   // // Async version (recommended)
-  // atom.confirm({
+  // core.confirm({
   //   message: 'How you feeling?',
   //   detail: 'Be honest.',
   //   buttons: ['Good', 'Bad']
@@ -1226,7 +1226,7 @@ class AtomEnvironment {
   //
   // ```js
   // // Legacy sync version
-  // const chosen = atom.confirm({
+  // const chosen = core.confirm({
   //   message: 'How you feeling?',
   //   detailedMessage: 'Be honest.',
   //   buttons: {
@@ -1417,7 +1417,7 @@ class AtomEnvironment {
   }
 
   showSaveDialogSync(options = {}) {
-    deprecate(`atom.showSaveDialogSync is deprecated and will be removed soon.
+    deprecate(`core.showSaveDialogSync is deprecated and will be removed soon.
 Please, implement ::saveAs and ::getSaveDialogOptions instead for pane items
 or use Pane::saveItemAs for programmatic saving.`);
     return this.applicationDelegate.showSaveDialog(options);
@@ -1560,7 +1560,7 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  // TODO: We should deprecate the update events here, and use `atom.autoUpdater` instead
+  // TODO: We should deprecate the update events here, and use `core.autoUpdater` instead
   onUpdateAvailable(callback) {
     return this.emitter.on('update-available', callback);
   }

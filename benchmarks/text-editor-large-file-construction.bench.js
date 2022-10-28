@@ -11,12 +11,12 @@ const TEXT = LINE_TEXT.repeat(
 module.exports = async ({ test }) => {
   const data = [];
 
-  document.body.appendChild(atom.workspace.getElement());
+  document.body.appendChild(core.workspace.getElement());
 
-  atom.packages.loadPackages();
-  await atom.packages.activate();
+  core.packages.loadPackages();
+  await core.packages.activate();
 
-  for (let pane of atom.workspace.getPanes()) {
+  for (let pane of core.workspace.getPanes()) {
     pane.destroy();
   }
 
@@ -35,8 +35,8 @@ module.exports = async ({ test }) => {
       autoHeight: false,
       largeFileMode: true
     });
-    atom.grammars.autoAssignLanguageMode(buffer);
-    atom.workspace.getActivePane().activateItem(editor);
+    core.grammars.autoAssignLanguageMode(buffer);
+    core.workspace.getActivePane().activateItem(editor);
     let t1 = window.performance.now();
 
     data.push({
@@ -90,7 +90,7 @@ module.exports = async ({ test }) => {
     await timeout(10000);
   }
 
-  atom.workspace.getElement().remove();
+  core.workspace.getElement().remove();
 
   return data;
 };

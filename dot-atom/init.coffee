@@ -6,6 +6,6 @@
 #
 # An example hack to log to the console when each text editor is saved.
 #
-# atom.workspace.observeTextEditors (editor) ->
+# core.workspace.observeTextEditors (editor) ->
 #   editor.onDidSave ->
 #     console.log "Saved! #{editor.getPath()}"

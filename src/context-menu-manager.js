@@ -17,7 +17,7 @@ if (buildMetadata != null && buildMetadata._atomMenu != null && buildMetadata._a
 // Extended: Provides a registry for commands that you'd like to appear in the
 // context menu.
 //
-// An instance of this class is always available as the `atom.contextMenu`
+// An instance of this class is always available as the `core.contextMenu`
 // global.
 //
 // ## Context Menu CSON Format
@@ -81,7 +81,7 @@ module.exports = class ContextMenuManager {
   // purposes and not the way the menu is actually configured in Atom by default.
   //
   // ```javascript
-  // atom.contextMenu.add({
+  // core.contextMenu.add({
   //   'atom-workspace': [{label: 'Help', command: 'application:open-documentation'}]
   //   'atom-text-editor': [{
   //     label: 'History',

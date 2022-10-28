@@ -14,7 +14,7 @@ const packageJSON = require('../package.json');
 
 // Extended: Package manager for coordinating the lifecycle of Pulsar packages.
 //
-// An instance of this class is always available as the `atom.packages` global.
+// An instance of this class is always available as the `core.packages` global.
 //
 // Packages can be loaded, activated, and deactivated, and unloaded:
 //  * Loading a package reads and parses the package's metadata and resources

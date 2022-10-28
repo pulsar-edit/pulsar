@@ -7,7 +7,7 @@ describe('NotificationManager', () => {
     manager = new NotificationManager();
   });
 
-  describe('the atom global', () =>
+  describe('the core global', () =>
     it('has a notifications instance', () => {
       expect(core.notifications instanceof NotificationManager).toBe(true);
     }));

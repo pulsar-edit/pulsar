@@ -67,7 +67,7 @@ module.exports = async ({ test, benchmarkPaths }) => {
         console.log(textualOutput);
       }
 
-      await global.atom.reset();
+      await global.core.reset();
     }
   }
 

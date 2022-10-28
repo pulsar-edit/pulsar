@@ -218,7 +218,7 @@ module.exports = class Project extends Model {
   // project path.
   //
   // ```js
-  // const disposable = atom.project.onDidChangeFiles(events => {
+  // const disposable = core.project.onDidChangeFiles(events => {
   //   for (const event of events) {
   //     // "created", "modified", "deleted", or "renamed"
   //     console.log(`Event action: ${event.action}`)
