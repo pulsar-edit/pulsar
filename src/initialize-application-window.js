@@ -68,11 +68,12 @@ const clipboard = new Clipboard();
 TextEditor.setClipboard(clipboard);
 TextEditor.viewForItem = item => atom.views.getView(item);
 
-global.atom = new AtomEnvironment({
+global.core = new AtomEnvironment({
   clipboard,
   applicationDelegate: new ApplicationDelegate(),
   enablePersistence: true
 });
+global.atom = global.core;
 
 TextEditor.setScheduler(global.atom.views);
 global.atom.preloadPackages();
