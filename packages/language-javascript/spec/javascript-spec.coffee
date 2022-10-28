@@ -2,8 +2,8 @@ fs = require 'fs'
 path = require 'path'
 TextEditor = null
 buildTextEditor = (params) ->
-  if atom.workspace.buildTextEditor?
-    atom.workspace.buildTextEditor(params)
+  if core.workspace.buildTextEditor?
+    core.workspace.buildTextEditor(params)
   else
     TextEditor ?= require('atom').TextEditor
     new TextEditor(params)
@@ -12,13 +12,13 @@ describe "JavaScript grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-javascript")
+      core.packages.activatePackage("language-javascript")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.js")
+      grammar = core.grammars.grammarForScopeName("source.js")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()
@@ -840,7 +840,7 @@ describe "JavaScript grammar", ->
   describe "HTML template strings", ->
     # TODO: Remove after Atom 1.21 is released
     [tagScope, entityScope] = []
-    if parseFloat(atom.getVersion()) <= 1.21
+    if parseFloat(core.getVersion()) <= 1.21
       tagScope = 'meta.tag.inline.any.html'
       entityScope = 'entity.name.tag.inline.any.html'
     else
@@ -849,7 +849,7 @@ describe "JavaScript grammar", ->
 
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage("language-html")
+        core.packages.activatePackage("language-html")
 
     it "tokenizes ES6 tagged HTML string templates", ->
       {tokens} = grammar.tokenizeLine('html`hey <b>${name}</b>`')

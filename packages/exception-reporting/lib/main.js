@@ -16,12 +16,12 @@ export default {
   activate() {
     this.subscriptions = new CompositeDisposable();
 
-    if (!atom.config.get('exception-reporting.userId')) {
-      atom.config.set('exception-reporting.userId', require('node-uuid').v4());
+    if (!core.config.get('exception-reporting.userId')) {
+      core.config.set('exception-reporting.userId', require('node-uuid').v4());
     }
 
     this.subscriptions.add(
-      atom.onDidThrowError(({ message, url, line, column, originalError }) => {
+      core.onDidThrowError(({ message, url, line, column, originalError }) => {
         try {
           getReporter().reportUncaughtException(originalError);
         } catch (secondaryException) {
@@ -36,9 +36,9 @@ export default {
       })
     );
 
-    if (atom.onDidFailAssertion != null) {
+    if (core.onDidFailAssertion != null) {
       this.subscriptions.add(
-        atom.onDidFailAssertion(error => {
+        core.onDidFailAssertion(error => {
           try {
             getReporter().reportFailedAssertion(error);
           } catch (secondaryException) {

@@ -7,27 +7,27 @@ describe "Autoflow package", ->
       activationPromise = null
 
       waitsForPromise ->
-        atom.workspace.open()
+        core.workspace.open()
 
       runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editorElement = atom.views.getView(editor)
+        editor = core.workspace.getActiveTextEditor()
+        editorElement = core.views.getView(editor)
 
-        atom.config.set('editor.preferredLineLength', 30)
-        atom.config.set('editor.tabLength', tabLength)
+        core.config.set('editor.preferredLineLength', 30)
+        core.config.set('editor.tabLength', tabLength)
 
-        activationPromise = atom.packages.activatePackage('autoflow')
+        activationPromise = core.packages.activatePackage('autoflow')
 
-        atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+        core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       waitsForPromise ->
         activationPromise
 
     it "uses the preferred line length based on the editor's scope", ->
-      atom.config.set('editor.preferredLineLength', 4, scopeSelector: '.text.plain.null-grammar')
+      core.config.set('editor.preferredLineLength', 4, scopeSelector: '.text.plain.null-grammar')
       editor.setText("foo bar")
       editor.selectAll()
-      atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+      core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       expect(editor.getText()).toBe """
         foo
@@ -38,7 +38,7 @@ describe "Autoflow package", ->
       editor.setText "\t\tThis is the first paragraph and it is longer than the preferred line length so it should be reflowed.\n\n\t\tThis is a short paragraph.\n\n\t\tAnother long paragraph, it should also be reflowed with the use of this single command."
 
       editor.selectAll()
-      atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+      core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       exedOut = editor.getText().replace(/\t/g, Array(tabLength+1).join 'X')
       expect(exedOut).toBe "XXXXXXXXThis is the first\nXXXXXXXXparagraph and it is\nXXXXXXXXlonger than the\nXXXXXXXXpreferred line length\nXXXXXXXXso it should be\nXXXXXXXXreflowed.\n\nXXXXXXXXThis is a short\nXXXXXXXXparagraph.\n\nXXXXXXXXAnother long\nXXXXXXXXparagraph, it should\nXXXXXXXXalso be reflowed with\nXXXXXXXXthe use of this single\nXXXXXXXXcommand."
@@ -53,7 +53,7 @@ describe "Autoflow package", ->
       """
 
       editor.selectAll()
-      atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+      core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       expect(editor.getText()).toBe """
         This is the first paragraph
@@ -83,7 +83,7 @@ describe "Autoflow package", ->
 
       editor.setCursorBufferPosition([1, 0])
       editor.selectToBufferPosition([6, 0])
-      atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+      core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       expect(editor.getText()).toBe """
         v--- SELECTION STARTS AT THE BEGINNING OF THE NEXT LINE (pos 1,0)
@@ -114,7 +114,7 @@ describe "Autoflow package", ->
       """
 
       editor.setCursorBufferPosition([3, 5])
-      atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+      core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       expect(editor.getText()).toBe """
         This is a preceding paragraph, which shouldn't be modified by a reflow of the following paragraph.
@@ -134,7 +134,7 @@ describe "Autoflow package", ->
       editor.setText("this-is-a-super-long-word-that-shouldn't-break-autoflow and these are some smaller words")
 
       editor.selectAll()
-      atom.commands.dispatch editorElement, 'autoflow:reflow-selection'
+      core.commands.dispatch editorElement, 'autoflow:reflow-selection'
 
       expect(editor.getText()).toBe """
         this-is-a-super-long-word-that-shouldn't-break-autoflow

@@ -23,7 +23,7 @@ export function activate() {
   let selector;
 
   disposables.add(
-    atom.commands.add('atom-text-editor', {
+    core.commands.add('atom-text-editor', {
       'line-ending-selector:show': () => {
         // Initiating Selector object - called only once when `line-ending-selector:show` is called
         if (!selectorDisposable) {
@@ -74,7 +74,7 @@ export function consumeStatusBar(statusBar) {
   }, 0);
 
   disposables.add(
-    atom.workspace.observeActiveTextEditor(editor => {
+    core.workspace.observeActiveTextEditor(editor => {
       if (currentBufferDisposable) currentBufferDisposable.dispose();
 
       if (editor && editor.getBuffer) {
@@ -102,7 +102,7 @@ export function consumeStatusBar(statusBar) {
         disposables.remove(tooltipDisposable);
         tooltipDisposable.dispose();
       }
-      tooltipDisposable = atom.tooltips.add(statusBarItem.element, {
+      tooltipDisposable = core.tooltips.add(statusBarItem.element, {
         title() {
           return `File uses ${statusBarItem.description()} line endings`;
         }
@@ -118,9 +118,9 @@ export function consumeStatusBar(statusBar) {
   );
 
   statusBarItem.onClick(() => {
-    const editor = atom.workspace.getActiveTextEditor();
-    atom.commands.dispatch(
-      atom.views.getView(editor),
+    const editor = core.workspace.getActiveTextEditor();
+    core.commands.dispatch(
+      core.views.getView(editor),
       'line-ending-selector:show'
     );
   });
@@ -130,7 +130,7 @@ export function consumeStatusBar(statusBar) {
 }
 
 function getDefaultLineEnding() {
-  switch (atom.config.get('line-ending-selector.defaultLineEnding')) {
+  switch (core.config.get('line-ending-selector.defaultLineEnding')) {
     case 'LF':
       return '\n';
     case 'CRLF':

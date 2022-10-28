@@ -28,7 +28,7 @@ describe('Reporter', () => {
     });
     requests = [];
     mockActivePackages = [];
-    spyOn(atom.packages, 'getActivePackages').andCallFake(
+    spyOn(core.packages, 'getActivePackages').andCallFake(
       () => mockActivePackages
     );
 
@@ -101,8 +101,8 @@ describe('Reporter', () => {
             severity: 'error',
             user: {},
             app: {
-              version: atom.getVersion(),
-              releaseStage: getReleaseChannel(atom.getVersion())
+              version: core.getVersion(),
+              releaseStage: getReleaseChannel(core.getVersion())
             },
             device: {
               osVersion: osVersion
@@ -162,8 +162,8 @@ describe('Reporter', () => {
             severity: 'error',
             user: {},
             app: {
-              version: atom.getVersion(),
-              releaseStage: getReleaseChannel(atom.getVersion())
+              version: core.getVersion(),
+              releaseStage: getReleaseChannel(core.getVersion())
             },
             device: {
               osVersion: osVersion
@@ -177,8 +177,8 @@ describe('Reporter', () => {
       let [error, notification] = [];
 
       beforeEach(() => {
-        atom.notifications.clear();
-        spyOn(atom.notifications, 'addInfo').andCallThrough();
+        core.notifications.clear();
+        spyOn(core.notifications, 'addInfo').andCallThrough();
 
         error = new Error();
         Error.captureStackTrace(error);
@@ -190,7 +190,7 @@ describe('Reporter', () => {
 
       it('posts a notification asking for consent', () => {
         reporter.reportUncaughtException(error);
-        expect(atom.notifications.addInfo).toHaveBeenCalled();
+        expect(core.notifications.addInfo).toHaveBeenCalled();
       });
 
       it('submits the error with the private metadata if the user consents', () => {
@@ -198,9 +198,9 @@ describe('Reporter', () => {
         reporter.reportUncaughtException(error);
         reporter.reportUncaughtException.reset();
 
-        notification = atom.notifications.getNotifications()[0];
+        notification = core.notifications.getNotifications()[0];
 
-        let notificationOptions = atom.notifications.addInfo.argsForCall[0][1];
+        let notificationOptions = core.notifications.addInfo.argsForCall[0][1];
         expect(notificationOptions.buttons[1].text).toMatch(/Yes/);
 
         notificationOptions.buttons[1].onDidClick();
@@ -218,9 +218,9 @@ describe('Reporter', () => {
         reporter.reportUncaughtException(error);
         reporter.reportUncaughtException.reset();
 
-        notification = atom.notifications.getNotifications()[0];
+        notification = core.notifications.getNotifications()[0];
 
-        let notificationOptions = atom.notifications.addInfo.argsForCall[0][1];
+        let notificationOptions = core.notifications.addInfo.argsForCall[0][1];
         expect(notificationOptions.buttons[0].text).toMatch(/No/);
 
         notificationOptions.buttons[0].onDidClick();
@@ -238,7 +238,7 @@ describe('Reporter', () => {
         reporter.reportUncaughtException(error);
         reporter.reportUncaughtException.reset();
 
-        notification = atom.notifications.getNotifications()[0];
+        notification = core.notifications.getNotifications()[0];
         notification.dismiss();
 
         expect(reporter.reportUncaughtException).toHaveBeenCalledWith(error);
@@ -249,7 +249,7 @@ describe('Reporter', () => {
       });
     });
 
-    it('treats packages located in atom.packages.getPackageDirPaths as user packages', () => {
+    it('treats packages located in core.packages.getPackageDirPaths as user packages', () => {
       mockActivePackages = [
         {
           name: 'user-1',
@@ -277,7 +277,7 @@ describe('Reporter', () => {
 
       const packageDirPaths = ['/Users/user/.atom/packages'];
 
-      spyOn(atom.packages, 'getPackageDirPaths').andReturn(packageDirPaths);
+      spyOn(core.packages, 'getPackageDirPaths').andReturn(packageDirPaths);
 
       let error = new Error();
       Error.captureStackTrace(error);
@@ -368,8 +368,8 @@ describe('Reporter', () => {
             severity: 'warning',
             user: {},
             app: {
-              version: atom.getVersion(),
-              releaseStage: getReleaseChannel(atom.getVersion())
+              version: core.getVersion(),
+              releaseStage: getReleaseChannel(core.getVersion())
             },
             device: {
               osVersion: osVersion
@@ -383,8 +383,8 @@ describe('Reporter', () => {
       let [error, notification] = [];
 
       beforeEach(() => {
-        atom.notifications.clear();
-        spyOn(atom.notifications, 'addInfo').andCallThrough();
+        core.notifications.clear();
+        spyOn(core.notifications, 'addInfo').andCallThrough();
 
         error = new Error();
         Error.captureStackTrace(error);
@@ -396,7 +396,7 @@ describe('Reporter', () => {
 
       it('posts a notification asking for consent', () => {
         reporter.reportFailedAssertion(error);
-        expect(atom.notifications.addInfo).toHaveBeenCalled();
+        expect(core.notifications.addInfo).toHaveBeenCalled();
       });
 
       it('submits the error with the private metadata if the user consents', () => {
@@ -404,9 +404,9 @@ describe('Reporter', () => {
         reporter.reportFailedAssertion(error);
         reporter.reportFailedAssertion.reset();
 
-        notification = atom.notifications.getNotifications()[0];
+        notification = core.notifications.getNotifications()[0];
 
-        let notificationOptions = atom.notifications.addInfo.argsForCall[0][1];
+        let notificationOptions = core.notifications.addInfo.argsForCall[0][1];
         expect(notificationOptions.buttons[1].text).toMatch(/Yes/);
 
         notificationOptions.buttons[1].onDidClick();
@@ -424,9 +424,9 @@ describe('Reporter', () => {
         reporter.reportFailedAssertion(error);
         reporter.reportFailedAssertion.reset();
 
-        notification = atom.notifications.getNotifications()[0];
+        notification = core.notifications.getNotifications()[0];
 
-        let notificationOptions = atom.notifications.addInfo.argsForCall[0][1];
+        let notificationOptions = core.notifications.addInfo.argsForCall[0][1];
         expect(notificationOptions.buttons[0].text).toMatch(/No/);
 
         notificationOptions.buttons[0].onDidClick();
@@ -444,7 +444,7 @@ describe('Reporter', () => {
         reporter.reportFailedAssertion(error);
         reporter.reportFailedAssertion.reset();
 
-        notification = atom.notifications.getNotifications()[0];
+        notification = core.notifications.getNotifications()[0];
         notification.dismiss();
 
         expect(reporter.reportFailedAssertion).toHaveBeenCalledWith(error);
@@ -466,11 +466,11 @@ describe('Reporter', () => {
         error.privateMetadataRequestName = 'foo';
 
         reporter.reportFailedAssertion(error);
-        expect(atom.notifications.addInfo).toHaveBeenCalled();
-        atom.notifications.addInfo.reset();
+        expect(core.notifications.addInfo).toHaveBeenCalled();
+        core.notifications.addInfo.reset();
 
         reporter.reportFailedAssertion(error);
-        expect(atom.notifications.addInfo).not.toHaveBeenCalled();
+        expect(core.notifications.addInfo).not.toHaveBeenCalled();
 
         let error2 = new Error();
         Error.captureStackTrace(error2);
@@ -479,11 +479,11 @@ describe('Reporter', () => {
         error2.privateMetadataRequestName = 'bar';
 
         reporter.reportFailedAssertion(error2);
-        expect(atom.notifications.addInfo).toHaveBeenCalled();
+        expect(core.notifications.addInfo).toHaveBeenCalled();
       });
     });
 
-    it('treats packages located in atom.packages.getPackageDirPaths as user packages', () => {
+    it('treats packages located in core.packages.getPackageDirPaths as user packages', () => {
       mockActivePackages = [
         {
           name: 'user-1',
@@ -511,7 +511,7 @@ describe('Reporter', () => {
 
       const packageDirPaths = ['/Users/user/.atom/packages'];
 
-      spyOn(atom.packages, 'getPackageDirPaths').andReturn(packageDirPaths);
+      spyOn(core.packages, 'getPackageDirPaths').andReturn(packageDirPaths);
 
       let error = new Error();
       Error.captureStackTrace(error);

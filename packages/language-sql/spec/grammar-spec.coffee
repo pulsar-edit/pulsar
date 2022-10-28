@@ -3,10 +3,10 @@ describe "SQL grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-sql")
+      core.packages.activatePackage("language-sql")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.sql")
+      grammar = core.grammars.grammarForScopeName("source.sql")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

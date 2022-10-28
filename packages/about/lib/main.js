@@ -17,8 +17,8 @@ module.exports = {
 
     let availableVersion = window.localStorage.getItem(AvailableUpdateVersion);
     if (
-      atom.getReleaseChannel() === 'dev' ||
-      (availableVersion && semver.lte(availableVersion, atom.getVersion()))
+      core.getReleaseChannel() === 'dev' ||
+      (availableVersion && semver.lte(availableVersion, core.getVersion()))
     ) {
       this.clearUpdateState();
     }
@@ -39,7 +39,7 @@ module.exports = {
     );
 
     this.subscriptions.add(
-      atom.commands.add('atom-workspace', 'about:clear-update-state', () => {
+      core.commands.add('atom-workspace', 'about:clear-update-state', () => {
         this.clearUpdateState();
       })
     );
@@ -77,7 +77,7 @@ module.exports = {
 
     this.model = new About({
       uri: AboutURI,
-      currentAtomVersion: atom.getVersion(),
+      currentAtomVersion: core.getVersion(),
       currentElectronVersion: process.versions.electron,
       currentChromeVersion: process.versions.chrome,
       currentNodeVersion: process.version,
@@ -87,7 +87,7 @@ module.exports = {
 
   isUpdateAvailable() {
     let availableVersion = window.localStorage.getItem(AvailableUpdateVersion);
-    return availableVersion && semver.gt(availableVersion, atom.getVersion());
+    return availableVersion && semver.gt(availableVersion, core.getVersion());
   },
 
   showStatusBarIfNeeded() {

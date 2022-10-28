@@ -8,7 +8,7 @@ CharacterPattern = ///
 
 module.exports =
   activate: ->
-    @commandDisposable = atom.commands.add 'atom-text-editor',
+    @commandDisposable = core.commands.add 'atom-text-editor',
       'autoflow:reflow-selection': (event) =>
         @reflowSelection(event.currentTarget.getModel())
 
@@ -125,10 +125,10 @@ module.exports =
     return leadingVerticalSpace + paragraphs.join('\n\n') + trailingVerticalSpace
 
   getTabLength: (editor) ->
-    atom.config.get('editor.tabLength', scope: editor.getRootScopeDescriptor()) ? 2
+    core.config.get('editor.tabLength', scope: editor.getRootScopeDescriptor()) ? 2
 
   getPreferredLineLength: (editor) ->
-    atom.config.get('editor.preferredLineLength', scope: editor.getRootScopeDescriptor())
+    core.config.get('editor.preferredLineLength', scope: editor.getRootScopeDescriptor())
 
   wrapSegment: (segment, currentLineLength, wrapColumn) ->
     CharacterPattern.test(segment) and

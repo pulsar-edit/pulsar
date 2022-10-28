@@ -5,13 +5,13 @@ describe "Python grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-python")
+      core.packages.activatePackage("language-python")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.python")
+      grammar = core.grammars.grammarForScopeName("source.python")
 
   it "recognises shebang on firstline", ->
     expect(grammar.firstLineRegex.scanner.findNextMatchSync("#!/usr/bin/env python")).not.toBeNull()
@@ -654,7 +654,7 @@ describe "Python grammar", ->
   describe "SQL highlighting", ->
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage('language-sql')
+        core.packages.activatePackage('language-sql')
 
     it "tokenizes SQL inline highlighting on blocks", ->
       delimsByScope =

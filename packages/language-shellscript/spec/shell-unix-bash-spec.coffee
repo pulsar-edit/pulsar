@@ -1,7 +1,7 @@
 TextEditor = null
 buildTextEditor = (params) ->
-  if atom.workspace.buildTextEditor?
-    atom.workspace.buildTextEditor(params)
+  if core.workspace.buildTextEditor?
+    core.workspace.buildTextEditor(params)
   else
     TextEditor ?= require('atom').TextEditor
     new TextEditor(params)
@@ -10,13 +10,13 @@ describe "Shell script grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.shell")
+      grammar = core.grammars.grammarForScopeName("source.shell")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

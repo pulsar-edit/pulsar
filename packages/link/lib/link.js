@@ -6,7 +6,7 @@ const LINK_SCOPE_REGEX = /markup\.underline\.link/;
 
 module.exports = {
   activate() {
-    this.commandDisposable = atom.commands.add(
+    this.commandDisposable = core.commands.add(
       'atom-text-editor',
       'link:open',
       () => this.openLink()
@@ -18,7 +18,7 @@ module.exports = {
   },
 
   openLink() {
-    const editor = atom.workspace.getActiveTextEditor();
+    const editor = core.workspace.getActiveTextEditor();
     if (editor == null) return;
 
     let link = this.linkUnderCursor(editor);

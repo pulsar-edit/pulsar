@@ -3,10 +3,10 @@ describe "Plain Text grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-text")
+      core.packages.activatePackage("language-text")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("text.plain")
+      grammar = core.grammars.grammarForScopeName("text.plain")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()

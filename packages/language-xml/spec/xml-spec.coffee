@@ -3,10 +3,10 @@ describe "XML grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-xml")
+      core.packages.activatePackage("language-xml")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("text.xml")
+      grammar = core.grammars.grammarForScopeName("text.xml")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()

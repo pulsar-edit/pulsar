@@ -2,12 +2,12 @@ const dedent = require('dedent');
 
 describe('Tree-sitter Ruby grammar', () => {
   beforeEach(async () => {
-    atom.config.set('core.useTreeSitterParsers', true);
-    await atom.packages.activatePackage('language-ruby');
+    core.config.set('core.useTreeSitterParsers', true);
+    await core.packages.activatePackage('language-ruby');
   });
 
   it('tokenizes symbols', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
 
     editor.setText(dedent`
       :foo
@@ -24,7 +24,7 @@ describe('Tree-sitter Ruby grammar', () => {
   });
 
   it('tokenizes visibility modifiers', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
 
     editor.setText(dedent`
       public
@@ -57,7 +57,7 @@ describe('Tree-sitter Ruby grammar', () => {
   });
 
   it('tokenizes keyword predicates', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
 
     editor.setText(dedent`
       defined?(:thing)
@@ -77,7 +77,7 @@ describe('Tree-sitter Ruby grammar', () => {
   });
 
   it('tokenizes alias definitions', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
 
     editor.setText(dedent`
       alias_method :name, :full_name
@@ -93,7 +93,7 @@ describe('Tree-sitter Ruby grammar', () => {
   });
 
   it('tokenizes keywords', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
 
     editor.setText(dedent`
       super
@@ -110,7 +110,7 @@ describe('Tree-sitter Ruby grammar', () => {
   });
 
   it('tokenizes variable in assignment expressions', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
     editor.setText(dedent`
       a = 10
     `);
@@ -121,7 +121,7 @@ describe('Tree-sitter Ruby grammar', () => {
   });
 
   it('does not tokenizes method call in assignment expressions', async () => {
-    const editor = await atom.workspace.open('foo.rb');
+    const editor = await core.workspace.open('foo.rb');
     editor.setText(dedent`
       foo() = 10
     `);

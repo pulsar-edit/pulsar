@@ -11,8 +11,8 @@ const ErrorState = 'error';
 let UpdateManager = class UpdateManager {
   constructor() {
     this.emitter = new Emitter();
-    this.currentVersion = atom.getVersion();
-    this.availableVersion = atom.getVersion();
+    this.currentVersion = core.getVersion();
+    this.availableVersion = core.getVersion();
     this.resetState();
     this.listenForAtomEvents();
   }
@@ -21,29 +21,29 @@ let UpdateManager = class UpdateManager {
     this.subscriptions = new CompositeDisposable();
 
     this.subscriptions.add(
-      atom.autoUpdater.onDidBeginCheckingForUpdate(() => {
+      core.autoUpdater.onDidBeginCheckingForUpdate(() => {
         this.setState(CheckingForUpdate);
       }),
-      atom.autoUpdater.onDidBeginDownloadingUpdate(() => {
+      core.autoUpdater.onDidBeginDownloadingUpdate(() => {
         this.setState(DownloadingUpdate);
       }),
-      atom.autoUpdater.onDidCompleteDownloadingUpdate(({ releaseVersion }) => {
+      core.autoUpdater.onDidCompleteDownloadingUpdate(({ releaseVersion }) => {
         this.setAvailableVersion(releaseVersion);
       }),
-      atom.autoUpdater.onUpdateNotAvailable(() => {
+      core.autoUpdater.onUpdateNotAvailable(() => {
         this.setState(UpToDate);
       }),
-      atom.autoUpdater.onUpdateError(() => {
+      core.autoUpdater.onUpdateError(() => {
         this.setState(ErrorState);
       }),
-      atom.config.observe('core.automaticallyUpdate', value => {
+      core.config.observe('core.automaticallyUpdate', value => {
         this.autoUpdatesEnabled = value;
         this.emitDidChange();
       })
     );
 
     // TODO: When https://github.com/atom/electron/issues/4587 is closed we can add this support.
-    // atom.autoUpdater.onUpdateAvailable =>
+    // core.autoUpdater.onUpdateAvailable =>
     //   @find('.about-updates-item').removeClass('is-shown')
     //   @updateAvailable.addClass('is-shown')
   }
@@ -67,11 +67,11 @@ let UpdateManager = class UpdateManager {
   }
 
   setAutoUpdatesEnabled(enabled) {
-    return atom.config.set('core.automaticallyUpdate', enabled);
+    return core.config.set('core.automaticallyUpdate', enabled);
   }
 
   getErrorMessage() {
-    return atom.autoUpdater.getErrorMessage();
+    return core.autoUpdater.getErrorMessage();
   }
 
   getState() {
@@ -84,8 +84,8 @@ let UpdateManager = class UpdateManager {
   }
 
   resetState() {
-    this.state = atom.autoUpdater.platformSupportsUpdates()
-      ? atom.autoUpdater.getState()
+    this.state = core.autoUpdater.platformSupportsUpdates()
+      ? core.autoUpdater.getState()
       : Unsupported;
     this.emitDidChange();
   }
@@ -107,11 +107,11 @@ let UpdateManager = class UpdateManager {
   }
 
   checkForUpdate() {
-    atom.autoUpdater.checkForUpdate();
+    core.autoUpdater.checkForUpdate();
   }
 
   restartAndInstallUpdate() {
-    atom.autoUpdater.restartAndInstallUpdate();
+    core.autoUpdater.restartAndInstallUpdate();
   }
 
   getReleaseNotesURLForCurrentVersion() {

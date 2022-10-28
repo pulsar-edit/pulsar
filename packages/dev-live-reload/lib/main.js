@@ -1,11 +1,11 @@
 module.exports = {
   activate(state) {
-    if (!atom.inDevMode() || atom.inSpecMode()) return;
+    if (!core.inDevMode() || core.inSpecMode()) return;
 
-    if (atom.packages.hasActivatedInitialPackages()) {
+    if (core.packages.hasActivatedInitialPackages()) {
       this.startWatching();
     } else {
-      this.activatedDisposable = atom.packages.onDidActivateInitialPackages(
+      this.activatedDisposable = core.packages.onDidActivateInitialPackages(
         () => this.startWatching()
       );
     }
@@ -19,8 +19,8 @@ module.exports = {
 
   startWatching() {
     const UIWatcher = require('./ui-watcher');
-    this.uiWatcher = new UIWatcher({ themeManager: atom.themes });
-    this.commandDisposable = atom.commands.add(
+    this.uiWatcher = new UIWatcher({ themeManager: core.themes });
+    this.commandDisposable = core.commands.add(
       'atom-workspace',
       'dev-live-reload:reload-all',
       () => this.uiWatcher.reloadAll()

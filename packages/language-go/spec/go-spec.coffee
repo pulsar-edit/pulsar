@@ -2,13 +2,13 @@ describe 'Go grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-go')
+      core.packages.activatePackage('language-go')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.go')
+      grammar = core.grammars.grammarForScopeName('source.go')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()

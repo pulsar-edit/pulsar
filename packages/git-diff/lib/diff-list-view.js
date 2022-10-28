@@ -40,7 +40,7 @@ export default class DiffListView {
       }
     });
     this.selectListView.element.classList.add('diff-list-view');
-    this.panel = atom.workspace.addModalPanel({
+    this.panel = core.workspace.addModalPanel({
       item: this.selectListView,
       visible: false
     });
@@ -68,7 +68,7 @@ export default class DiffListView {
   }
 
   async toggle() {
-    const editor = atom.workspace.getActiveTextEditor();
+    const editor = core.workspace.getActiveTextEditor();
     if (this.panel.isVisible()) {
       this.cancel();
     } else if (editor) {

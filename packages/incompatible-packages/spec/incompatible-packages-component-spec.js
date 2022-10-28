@@ -248,11 +248,11 @@ describe('IncompatiblePackagesComponent', () => {
           expect(component.refs.reloadButton).toBeDefined();
           expect(element.querySelector('.alert').textContent).toMatch(/2 of 2/);
 
-          spyOn(atom, 'reload');
+          spyOn(core, 'reload');
           component.refs.reloadButton.dispatchEvent(
             new CustomEvent('click', { bubbles: true })
           );
-          expect(atom.reload).toHaveBeenCalled();
+          expect(core.reload).toHaveBeenCalled();
         });
       });
     });
@@ -269,11 +269,11 @@ describe('IncompatiblePackagesComponent', () => {
 
           await etchScheduler.getNextUpdatePromise();
 
-          spyOn(atom.workspace, 'open');
+          spyOn(core.workspace, 'open');
           element
             .querySelector('.incompatible-package:nth-child(2) button')
             .dispatchEvent(new CustomEvent('click', { bubbles: true }));
-          expect(atom.workspace.open).toHaveBeenCalledWith(
+          expect(core.workspace.open).toHaveBeenCalledWith(
             'atom://config/packages/incompatible-2'
           );
         });

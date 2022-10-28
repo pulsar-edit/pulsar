@@ -1,7 +1,7 @@
 exports.activate = function() {
-  if (!atom.grammars.addInjectionPoint) return;
+  if (!core.grammars.addInjectionPoint) return;
 
-  atom.grammars.addInjectionPoint('source.ruby', {
+  core.grammars.addInjectionPoint('source.ruby', {
     type: 'heredoc_body',
     language(node) {
       return node.lastChild.text;
@@ -11,7 +11,7 @@ exports.activate = function() {
     }
   });
 
-  atom.grammars.addInjectionPoint('source.ruby', {
+  core.grammars.addInjectionPoint('source.ruby', {
     type: 'regex',
     language() {
       return 'regex';

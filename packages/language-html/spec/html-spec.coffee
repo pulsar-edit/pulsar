@@ -5,13 +5,13 @@ describe 'TextMate HTML grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-html')
+      core.packages.activatePackage('language-html')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('text.html.basic')
+      grammar = core.grammars.grammarForScopeName('text.html.basic')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()
@@ -20,7 +20,7 @@ describe 'TextMate HTML grammar', ->
   describe 'style tags', ->
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage('language-css')
+        core.packages.activatePackage('language-css')
 
     it 'tokenizes the tag attributes', ->
       lines = grammar.tokenizeLines '''
@@ -170,7 +170,7 @@ describe 'TextMate HTML grammar', ->
   describe 'CoffeeScript script tags', ->
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage('language-coffee-script')
+        core.packages.activatePackage('language-coffee-script')
 
     it 'tokenizes the content inside the tag as CoffeeScript', ->
       lines = grammar.tokenizeLines '''
@@ -182,7 +182,7 @@ describe 'TextMate HTML grammar', ->
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html']
       # TODO: Remove when Atom 1.21 reaches stable
-      if parseFloat(atom.getVersion()) <= 1.20
+      if parseFloat(core.getVersion()) <= 1.20
         expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
       else
         expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
@@ -198,7 +198,7 @@ describe 'TextMate HTML grammar', ->
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
       # TODO: Remove when Atom 1.21 reaches stable
-      if parseFloat(atom.getVersion()) <= 1.20
+      if parseFloat(core.getVersion()) <= 1.20
         expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
       else
         expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
@@ -226,7 +226,7 @@ describe 'TextMate HTML grammar', ->
 
   describe 'JavaScript script tags', ->
     beforeEach ->
-      waitsForPromise -> atom.packages.activatePackage('language-javascript')
+      waitsForPromise -> core.packages.activatePackage('language-javascript')
 
     it 'tokenizes the content inside the tag as JavaScript', ->
       lines = grammar.tokenizeLines '''
@@ -401,7 +401,7 @@ describe 'TextMate HTML grammar', ->
     describe "the 'style' attribute", ->
       beforeEach ->
         waitsForPromise ->
-          atom.packages.activatePackage('language-css')
+          core.packages.activatePackage('language-css')
 
       quotes =
         '"': 'double'
@@ -811,12 +811,12 @@ describe 'TextMate HTML grammar', ->
     snippetsModule = null
 
     beforeEach ->
-      # FIXME: This should just be atom.packages.loadPackage('snippets'),
+      # FIXME: This should just be core.packages.loadPackage('snippets'),
       # but a bug in PackageManager::resolvePackagePath where it finds language-html's
       # `snippets` directory before the actual package necessitates passing an absolute path
       # See https://github.com/atom/atom/issues/15953
-      snippetsPath = path.join(atom.packages.resourcePath, 'node_modules', 'snippets')
-      snippetsModule = require(atom.packages.loadPackage(snippetsPath).getMainModulePath())
+      snippetsPath = path.join(core.packages.resourcePath, 'node_modules', 'snippets')
+      snippetsModule = require(core.packages.loadPackage(snippetsPath).getMainModulePath())
 
       # Disable loading of user snippets before the package is activated
       spyOn(snippetsModule, 'loadUserSnippets').andCallFake (callback) -> callback({})

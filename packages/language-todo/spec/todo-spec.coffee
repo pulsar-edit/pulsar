@@ -3,10 +3,10 @@ describe "TODO grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-todo")
+      core.packages.activatePackage("language-todo")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("text.todo")
+      grammar = core.grammars.grammarForScopeName("text.todo")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()

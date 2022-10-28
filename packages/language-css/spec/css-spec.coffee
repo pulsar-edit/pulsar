@@ -2,13 +2,13 @@ describe 'CSS grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-css')
+      core.packages.activatePackage('language-css')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.css')
+      grammar = core.grammars.grammarForScopeName('source.css')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()
@@ -3476,7 +3476,7 @@ describe 'CSS grammar', ->
 
   describe "performance regressions", ->
     it "does not hang when tokenizing invalid input preceding an equals sign", ->
-      grammar = atom.grammars.grammarForScopeName('source.css')
+      grammar = core.grammars.grammarForScopeName('source.css')
       start = Date.now()
       grammar.tokenizeLine('<![CDATA[啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"=')
       expect(Date.now() - start).toBeLessThan(5000)

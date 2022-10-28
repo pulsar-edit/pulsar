@@ -15,7 +15,7 @@ module.exports = class About {
     };
 
     this.subscriptions.add(
-      atom.workspace.addOpener(uriToOpen => {
+      core.workspace.addOpener(uriToOpen => {
         if (uriToOpen === this.state.uri) {
           return this.deserialize();
         }
@@ -23,7 +23,7 @@ module.exports = class About {
     );
 
     this.subscriptions.add(
-      atom.commands.add('atom-workspace', 'about:view-release-notes', () => {
+      core.commands.add('atom-workspace', 'about:view-release-notes', () => {
         shell = shell || require('electron').shell;
         shell.openExternal(
           this.state.updateManager.getReleaseNotesURLForCurrentVersion()

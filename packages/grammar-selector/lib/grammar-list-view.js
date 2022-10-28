@@ -47,9 +47,9 @@ module.exports = class GrammarListView {
       didConfirmSelection: grammar => {
         this.cancel();
         if (grammar === this.autoDetect) {
-          atom.textEditors.clearGrammarOverride(this.editor);
+          core.textEditors.clearGrammarOverride(this.editor);
         } else {
-          atom.grammars.assignGrammar(this.editor, grammar);
+          core.grammars.assignGrammar(this.editor, grammar);
         }
       },
       didCancelSelection: () => {
@@ -79,7 +79,7 @@ module.exports = class GrammarListView {
   attach() {
     this.previouslyFocusedElement = document.activeElement;
     if (this.panel == null) {
-      this.panel = atom.workspace.addModalPanel({ item: this.selectListView });
+      this.panel = core.workspace.addModalPanel({ item: this.selectListView });
     }
     this.selectListView.focus();
     this.selectListView.reset();
@@ -91,21 +91,21 @@ module.exports = class GrammarListView {
       return;
     }
 
-    const editor = atom.workspace.getActiveTextEditor();
+    const editor = core.workspace.getActiveTextEditor();
     if (editor) {
       this.editor = editor;
       this.currentGrammar = this.editor.getGrammar();
-      if (this.currentGrammar === atom.grammars.nullGrammar) {
+      if (this.currentGrammar === core.grammars.nullGrammar) {
         this.currentGrammar = this.autoDetect;
       }
 
-      let grammars = atom.grammars
+      let grammars = core.grammars
         .getGrammars({ includeTreeSitter: true })
         .filter(grammar => {
-          return grammar !== atom.grammars.nullGrammar && grammar.name;
+          return grammar !== core.grammars.nullGrammar && grammar.name;
         });
 
-      if (atom.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
+      if (core.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
         const blacklist = new Set();
         grammars.forEach(grammar => {
           if (isTreeSitter(grammar)) {

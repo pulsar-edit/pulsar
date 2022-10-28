@@ -12,19 +12,19 @@ describe('git-diff:toggle-diff-list', () => {
       path.join(projectPath, 'git.git'),
       path.join(projectPath, '.git')
     );
-    atom.project.setPaths([projectPath]);
+    core.project.setPaths([projectPath]);
 
-    jasmine.attachToDOM(atom.workspace.getElement());
+    jasmine.attachToDOM(core.workspace.getElement());
 
-    waitsForPromise(() => atom.packages.activatePackage('git-diff'));
+    waitsForPromise(() => core.packages.activatePackage('git-diff'));
 
-    waitsForPromise(() => atom.workspace.open('sample.js'));
+    waitsForPromise(() => core.workspace.open('sample.js'));
 
     runs(() => {
-      editor = atom.workspace.getActiveTextEditor();
+      editor = core.workspace.getActiveTextEditor();
       editor.setCursorBufferPosition([8, 30]);
       editor.insertText('a');
-      atom.commands.dispatch(editor.getElement(), 'git-diff:toggle-diff-list');
+      core.commands.dispatch(editor.getElement(), 'git-diff:toggle-diff-list');
     });
 
     waitsFor(() => {
@@ -42,7 +42,7 @@ describe('git-diff:toggle-diff-list', () => {
 
   it('moves the cursor to the selected hunk', () => {
     editor.setCursorBufferPosition([0, 0]);
-    atom.commands.dispatch(
+    core.commands.dispatch(
       document.querySelector('.diff-list-view'),
       'core:confirm'
     );

@@ -1,7 +1,7 @@
 TextEditor = null
 buildTextEditor = (params) ->
-  if atom.workspace.buildTextEditor?
-    atom.workspace.buildTextEditor(params)
+  if core.workspace.buildTextEditor?
+    core.workspace.buildTextEditor(params)
   else
     TextEditor ?= require('atom').TextEditor
     new TextEditor(params)
@@ -10,14 +10,14 @@ describe "Language-C", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-c')
+      core.packages.activatePackage('language-c')
 
   describe "C", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName('source.c')
+      grammar = core.grammars.grammarForScopeName('source.c')
 
     it "parses the grammar", ->
       expect(grammar).toBeTruthy()
@@ -939,7 +939,7 @@ describe "Language-C", ->
 
   describe "C++", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName('source.cpp')
+      grammar = core.grammars.grammarForScopeName('source.cpp')
 
     it "parses the grammar", ->
       expect(grammar).toBeTruthy()

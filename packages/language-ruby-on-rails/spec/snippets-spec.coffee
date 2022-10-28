@@ -3,10 +3,10 @@ describe "Ruby on Rails snippets", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-ruby-on-rails")
+      core.packages.activatePackage("language-ruby-on-rails")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.ruby.rails")
+      grammar = core.grammars.grammarForScopeName("source.ruby.rails")
 
   it "tokenizes ActionMailer::Base", ->
     railsMailer = 'class RailsMailer < ActionMailer::Base'

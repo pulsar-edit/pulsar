@@ -2,13 +2,13 @@ describe 'Python regular expression grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-python')
+      core.packages.activatePackage('language-python')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.regexp.python')
+      grammar = core.grammars.grammarForScopeName('source.regexp.python')
 
   describe 'character classes', ->
     it 'does not recursively match character classes', ->

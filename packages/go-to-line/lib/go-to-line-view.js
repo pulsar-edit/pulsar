@@ -15,18 +15,18 @@ class GoToLineView {
     this.element.appendChild(this.miniEditor.element);
     this.element.appendChild(this.message);
 
-    this.panel = atom.workspace.addModalPanel({
+    this.panel = core.workspace.addModalPanel({
       item: this,
       visible: false
     });
-    atom.commands.add('atom-text-editor', 'go-to-line:toggle', () => {
+    core.commands.add('atom-text-editor', 'go-to-line:toggle', () => {
       this.toggle();
       return false;
     });
-    atom.commands.add(this.miniEditor.element, 'core:confirm', () => {
+    core.commands.add(this.miniEditor.element, 'core:confirm', () => {
       this.navigate();
     });
-    atom.commands.add(this.miniEditor.element, 'core:cancel', () => {
+    core.commands.add(this.miniEditor.element, 'core:cancel', () => {
       this.close();
     });
     this.miniEditor.onWillInsertText(arg => {
@@ -54,7 +54,7 @@ class GoToLineView {
 
   navigate(options = {}) {
     const lineNumber = this.miniEditor.getText();
-    const editor = atom.workspace.getActiveTextEditor();
+    const editor = core.workspace.getActiveTextEditor();
     if (!options.keepOpen) {
       this.close();
     }
@@ -91,11 +91,11 @@ class GoToLineView {
     ) {
       return this.previouslyFocusedElement.focus();
     }
-    atom.views.getView(atom.workspace).focus();
+    core.views.getView(core.workspace).focus();
   }
 
   open() {
-    if (this.panel.isVisible() || !atom.workspace.getActiveTextEditor()) return;
+    if (this.panel.isVisible() || !core.workspace.getActiveTextEditor()) return;
     this.storeFocusedElement();
     this.panel.show();
     this.message.textContent =

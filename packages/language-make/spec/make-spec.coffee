@@ -7,17 +7,17 @@ describe "Makefile grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-make")
+      core.packages.activatePackage("language-make")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.makefile")
+      grammar = core.grammars.grammarForScopeName("source.makefile")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()
     expect(grammar.scopeName).toBe "source.makefile"
 
   it "selects the Makefile grammar for files that start with a hashbang make -f command", ->
-    expect(atom.grammars.selectGrammar('', '#!/usr/bin/make -f')).toBe grammar
+    expect(core.grammars.selectGrammar('', '#!/usr/bin/make -f')).toBe grammar
 
   it "parses comments correctly", ->
     lines = grammar.tokenizeLines '#foo\n\t#bar\n#foo\\\nbar'
@@ -41,7 +41,7 @@ describe "Makefile grammar", ->
 
   it "parses recipes", ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
       lines = grammar.tokenizeLines 'all: foo.bar\n\ttest\n\nclean: foo\n\trm -fr foo.bar'
@@ -168,7 +168,7 @@ describe "Makefile grammar", ->
 
   it "continues matching prerequisites after reaching a line continuation character", ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
       lines = grammar.tokenizeLines 'hello: a b c \\\n d e f\n\techo "test"'
@@ -179,7 +179,7 @@ describe "Makefile grammar", ->
 
   it "parses nested interpolated strings and function calls correctly", ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
       lines = grammar.tokenizeLines 'default:\n\t$(eval MESSAGE=$(shell node -pe "decodeURIComponent(process.argv.pop())" "${MSG}"))'
@@ -203,7 +203,7 @@ describe "Makefile grammar", ->
 
   it "parses `origin` correctly", ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
       lines = grammar.tokenizeLines 'default:\n\t$(origin 1)'
@@ -215,7 +215,7 @@ describe "Makefile grammar", ->
 
   it "parses `flavor` correctly", ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
       lines = grammar.tokenizeLines 'default:\n\t$(flavor 1)'

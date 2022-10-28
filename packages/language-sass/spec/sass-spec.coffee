@@ -3,13 +3,13 @@ describe 'Sass grammar', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-css')
+      core.packages.activatePackage('language-css')
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-sass')
+      core.packages.activatePackage('language-sass')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.sass')
+      grammar = core.grammars.grammarForScopeName('source.sass')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()

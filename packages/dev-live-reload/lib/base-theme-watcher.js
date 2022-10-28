@@ -6,7 +6,7 @@ module.exports = class BaseThemeWatcher extends Watcher {
   constructor() {
     super();
     this.stylesheetsPath = path.dirname(
-      atom.themes.resolveStylesheet('../static/atom.less')
+      core.themes.resolveStylesheet('../static/atom.less')
     );
     this.watch();
   }
@@ -26,6 +26,6 @@ module.exports = class BaseThemeWatcher extends Watcher {
   }
 
   loadAllStylesheets() {
-    atom.themes.reloadBaseStylesheets();
+    core.themes.reloadBaseStylesheets();
   }
 };

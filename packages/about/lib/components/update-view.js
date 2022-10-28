@@ -17,7 +17,7 @@ module.exports = class UpdateView extends EtchComponent {
   }
 
   handleAutoUpdateCheckbox(e) {
-    atom.config.set('core.automaticallyUpdate', e.target.checked);
+    core.config.set('core.automaticallyUpdate', e.target.checked);
   }
 
   shouldUpdateActionButtonBeDisabled() {

@@ -2,13 +2,13 @@ describe "Shell session grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      core.packages.activatePackage("language-shellscript")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("text.shell-session")
+      grammar = core.grammars.grammarForScopeName("text.shell-session")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

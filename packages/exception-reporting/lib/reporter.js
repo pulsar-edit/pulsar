@@ -95,10 +95,10 @@ export default class Reporter {
 
   getDefaultNotificationParams() {
     return {
-      userId: atom.config.get('exception-reporting.userId'),
-      appVersion: atom.getVersion(),
-      releaseStage: this.getReleaseChannel(atom.getVersion()),
-      projectRoot: atom.getLoadSettings().resourcePath,
+      userId: core.config.get('exception-reporting.userId'),
+      appVersion: core.getVersion(),
+      releaseStage: this.getReleaseChannel(core.getVersion()),
+      projectRoot: core.getLoadSettings().resourcePath,
       osVersion: `${os.platform()}-${os.arch()}-${os.release()}`
     };
   }
@@ -172,7 +172,7 @@ export default class Reporter {
       }
     }
 
-    notification = atom.notifications.addInfo(message, {
+    notification = core.notifications.addInfo(message, {
       detail: error.privateMetadataDescription,
       description:
         'Are you willing to submit this information to a private server for debugging purposes?',
@@ -195,12 +195,12 @@ export default class Reporter {
   }
 
   addPackageMetadata(error) {
-    let activePackages = atom.packages.getActivePackages();
-    const availablePackagePaths = atom.packages.getPackageDirPaths();
+    let activePackages = core.packages.getActivePackages();
+    const availablePackagePaths = core.packages.getPackageDirPaths();
     if (activePackages.length > 0) {
       let userPackages = {};
       let bundledPackages = {};
-      for (let pack of atom.packages.getActivePackages()) {
+      for (let pack of core.packages.getActivePackages()) {
         if (availablePackagePaths.includes(path.dirname(pack.path))) {
           userPackages[pack.name] = pack.metadata.version;
         } else {
@@ -285,7 +285,7 @@ export default class Reporter {
   }
 
   isTeletypeFile(fileName) {
-    const teletypePath = atom.packages.resolvePackagePath('teletype');
+    const teletypePath = core.packages.resolvePackagePath('teletype');
     return (
       teletypePath && this.normalizePath(fileName).indexOf(teletypePath) === 0
     );

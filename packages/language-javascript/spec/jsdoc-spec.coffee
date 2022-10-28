@@ -2,13 +2,13 @@ describe "JSDoc grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-javascript")
+      core.packages.activatePackage("language-javascript")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.js")
+      grammar = core.grammars.grammarForScopeName("source.js")
 
   describe "inline tags", ->
     it "tokenises tags without descriptions", ->

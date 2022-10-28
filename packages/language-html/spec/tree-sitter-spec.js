@@ -2,12 +2,12 @@ const dedent = require('dedent');
 
 describe('Tree-sitter HTML grammar', () => {
   beforeEach(async () => {
-    atom.config.set('core.useTreeSitterParsers', true);
-    await atom.packages.activatePackage('language-html');
+    core.config.set('core.useTreeSitterParsers', true);
+    await core.packages.activatePackage('language-html');
   });
 
   it('tokenizes punctuation in HTML tags and attributes', async () => {
-    const editor = await atom.workspace.open(`test.html`);
+    const editor = await core.workspace.open(`test.html`);
 
     editor.setText(dedent`
       <html lang="en">

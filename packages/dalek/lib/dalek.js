@@ -5,14 +5,14 @@ const path = require('path');
 
 module.exports = {
   async enumerate() {
-    if (atom.inDevMode()) {
+    if (core.inDevMode()) {
       return [];
     }
 
     const duplicatePackages = [];
-    const names = atom.packages.getAvailablePackageNames();
+    const names = core.packages.getAvailablePackageNames();
     for (let name of names) {
-      if (atom.packages.isBundledPackage(name)) {
+      if (core.packages.isBundledPackage(name)) {
         const isDuplicatedPackage = await this.isInstalledAsCommunityPackage(
           name
         );
@@ -26,7 +26,7 @@ module.exports = {
   },
 
   async isInstalledAsCommunityPackage(name) {
-    const availablePackagePaths = atom.packages.getPackageDirPaths();
+    const availablePackagePaths = core.packages.getPackageDirPaths();
 
     for (let packagePath of availablePackagePaths) {
       const candidate = path.join(packagePath, name);

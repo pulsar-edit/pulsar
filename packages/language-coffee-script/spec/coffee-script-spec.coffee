@@ -6,10 +6,10 @@ describe "CoffeeScript grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-coffee-script")
+      core.packages.activatePackage("language-coffee-script")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.coffee")
+      grammar = core.grammars.grammarForScopeName("source.coffee")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()
@@ -591,7 +591,7 @@ describe "CoffeeScript grammar", ->
 
   it "tokenizes embedded JavaScript", ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-javascript")
+      core.packages.activatePackage("language-javascript")
 
     runs ->
       {tokens} = grammar.tokenizeLine("`;`")
@@ -1124,7 +1124,7 @@ describe "CoffeeScript grammar", ->
   describe "regular expressions", ->
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage("language-javascript") # Provides the regexp subgrammar
+        core.packages.activatePackage("language-javascript") # Provides the regexp subgrammar
 
     it "tokenizes regular expressions", ->
       {tokens} = grammar.tokenizeLine("/test/")

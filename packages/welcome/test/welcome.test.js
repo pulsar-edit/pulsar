@@ -10,11 +10,11 @@ describe('Welcome', () => {
 
   beforeEach(() => {
     welcomePackage = new WelcomePackage();
-    atom.config.set('welcome.showOnStartup', true);
+    core.config.set('welcome.showOnStartup', true);
   });
 
   afterEach(() => {
-    atom.reset();
+    core.reset();
   });
 
   describe("when welcomePackage.activate is called", () => {
@@ -23,7 +23,7 @@ describe('Welcome', () => {
     });
 
     it('opens the welcome panes', () => {
-      const panes = atom.workspace.getCenter().getPanes();
+      const panes = core.workspace.getCenter().getPanes();
       assert.equal(panes.length, 2);
       assert.equal(panes[0].getItems()[0].getTitle(), 'Welcome');
       assert.equal(panes[1].getItems()[0].getTitle(), 'Welcome Guide');
@@ -37,7 +37,7 @@ describe('Welcome', () => {
 
     describe('when activated for the first time', () =>
       it('shows the welcome panes', () => {
-        const panes = atom.workspace.getCenter().getPanes();
+        const panes = core.workspace.getCenter().getPanes();
         assert.equal(panes.length, 2);
         assert.equal(panes[0].getItems()[0].getTitle(), 'Welcome');
         assert.equal(panes[1].getItems()[0].getTitle(), 'Welcome Guide');
@@ -45,18 +45,18 @@ describe('Welcome', () => {
 
     describe('the welcome:show command', () => {
       it('shows the welcome buffer', async () => {
-        atom.workspace
+        core.workspace
           .getCenter()
           .getPanes()
           .map(pane => pane.destroy());
-        assert(!atom.workspace.getActivePaneItem());
+        assert(!core.workspace.getActivePaneItem());
 
-        const workspaceElement = atom.views.getView(atom.workspace);
-        atom.commands.dispatch(workspaceElement, 'welcome:show');
+        const workspaceElement = core.views.getView(core.workspace);
+        core.commands.dispatch(workspaceElement, 'welcome:show');
 
-        await conditionPromise(() => atom.workspace.getActivePaneItem());
+        await conditionPromise(() => core.workspace.getActivePaneItem());
 
-        const panes = atom.workspace.getCenter().getPanes();
+        const panes = core.workspace.getCenter().getPanes();
         assert.equal(panes.length, 2);
         assert.equal(panes[0].getItems()[0].getTitle(), 'Welcome');
       });
@@ -65,7 +65,7 @@ describe('Welcome', () => {
     describe('deserializing the pane items', () => {
       describe('when GuideView is deserialized', () => {
         it('remembers open sections', () => {
-          const panes = atom.workspace.getCenter().getPanes();
+          const panes = core.workspace.getCenter().getPanes();
           const guideView = panes[1].getItems()[0];
 
           guideView.element
@@ -102,7 +102,7 @@ describe('Welcome', () => {
     describe('reporting events', () => {
       let panes, guideView, reportedEvents;
       beforeEach(() => {
-        panes = atom.workspace.getCenter().getPanes();
+        panes = core.workspace.getCenter().getPanes();
         guideView = panes[1].getItems()[0];
         reportedEvents = [];
 

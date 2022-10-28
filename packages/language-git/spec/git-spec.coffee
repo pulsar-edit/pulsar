@@ -3,11 +3,11 @@ describe "Git grammars", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-git")
+      core.packages.activatePackage("language-git")
 
   describe "Git configs", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName("source.git-config")
+      grammar = core.grammars.grammarForScopeName("source.git-config")
 
     it "parses the Git config grammar", ->
       expect(grammar).toBeTruthy()
@@ -27,7 +27,7 @@ describe "Git grammars", ->
     scopeLineOver72 = ['text.git-commit', 'meta.scope.message.git-commit', 'invalid.illegal.line-too-long.git-commit']
 
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName("text.git-commit")
+      grammar = core.grammars.grammarForScopeName("text.git-commit")
 
     it "parses the Git commit message grammar", ->
       expect(grammar).toBeTruthy()
@@ -159,7 +159,7 @@ describe "Git grammars", ->
 
   describe "Git rebases", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName("text.git-rebase")
+      grammar = core.grammars.grammarForScopeName("text.git-rebase")
 
     it "parses the Git rebase message grammar", ->
       expect(grammar).toBeTruthy()
@@ -186,7 +186,7 @@ describe "Git grammars", ->
 
     it "includes language-shellscript highlighting when using the exec command", ->
       waitsForPromise ->
-        atom.packages.activatePackage("language-shellscript")
+        core.packages.activatePackage("language-shellscript")
 
       runs ->
         {tokens} = grammar.tokenizeLine "exec echo 'Hello World'"

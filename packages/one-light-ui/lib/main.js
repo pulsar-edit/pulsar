@@ -3,11 +3,11 @@ const themeName = 'one-light-ui';
 
 module.exports = {
   activate(state) {
-    atom.config.observe(`${themeName}.fontSize`, setFontSize);
-    atom.config.observe(`${themeName}.tabSizing`, setTabSizing);
-    atom.config.observe(`${themeName}.tabCloseButton`, setTabCloseButton);
-    atom.config.observe(`${themeName}.hideDockButtons`, setHideDockButtons);
-    atom.config.observe(`${themeName}.stickyHeaders`, setStickyHeaders);
+    core.config.observe(`${themeName}.fontSize`, setFontSize);
+    core.config.observe(`${themeName}.tabSizing`, setTabSizing);
+    core.config.observe(`${themeName}.tabCloseButton`, setTabCloseButton);
+    core.config.observe(`${themeName}.hideDockButtons`, setHideDockButtons);
+    core.config.observe(`${themeName}.stickyHeaders`, setStickyHeaders);
   },
 
   deactivate() {

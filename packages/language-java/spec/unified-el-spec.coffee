@@ -2,12 +2,12 @@ describe 'Unified expression language grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
     waitsForPromise ->
-      atom.packages.activatePackage('language-java')
+      core.packages.activatePackage('language-java')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.java.el')
+      grammar = core.grammars.grammarForScopeName('source.java.el')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()

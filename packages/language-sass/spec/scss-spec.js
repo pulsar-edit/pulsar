@@ -2,12 +2,12 @@ const dedent = require('dedent');
 
 describe('Language sass', () => {
   beforeEach(async () => {
-    atom.config.set('core.useTreeSitterParsers', false);
-    await atom.packages.activatePackage('language-sass');
+    core.config.set('core.useTreeSitterParsers', false);
+    await core.packages.activatePackage('language-sass');
   });
 
   it('Should tokenize - as selector', async () => {
-    const editor = await atom.workspace.open('foo.scss');
+    const editor = await core.workspace.open('foo.scss');
 
     editor.setText(dedent`
       .foo {

@@ -3,7 +3,7 @@ const UpdatePackageDependenciesStatusView = require('./update-package-dependenci
 
 module.exports = {
   activate() {
-    this.subscription = atom.commands.add(
+    this.subscription = core.commands.add(
       'atom-workspace',
       'update-package-dependencies:update',
       () => this.update()
@@ -31,7 +31,7 @@ module.exports = {
 
     let errorOutput = '';
 
-    const command = atom.packages.getApmPath();
+    const command = core.packages.getApmPath();
     const args = ['install', '--no-color'];
     const stderr = output => {
       errorOutput += output;
@@ -47,9 +47,9 @@ module.exports = {
         this.updatePackageDependenciesStatusView.detach();
 
       if (code === 0) {
-        atom.notifications.addSuccess('Package dependencies updated');
+        core.notifications.addSuccess('Package dependencies updated');
       } else {
-        atom.notifications.addError('Failed to update package dependencies', {
+        core.notifications.addError('Failed to update package dependencies', {
           detail: errorOutput,
           dismissable: true
         });
@@ -71,11 +71,11 @@ module.exports = {
   },
 
   getActiveProjectPath() {
-    const activeItem = atom.workspace.getActivePaneItem();
+    const activeItem = core.workspace.getActivePaneItem();
     if (activeItem && typeof activeItem.getPath === 'function') {
-      return atom.project.relativizePath(activeItem.getPath())[0];
+      return core.project.relativizePath(activeItem.getPath())[0];
     } else {
-      return atom.project.getPaths()[0];
+      return core.project.getPaths()[0];
     }
   }
 };

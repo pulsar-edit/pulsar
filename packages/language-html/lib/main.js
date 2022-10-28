@@ -1,5 +1,5 @@
 exports.activate = function() {
-  atom.grammars.addInjectionPoint('text.html.basic', {
+  core.grammars.addInjectionPoint('text.html.basic', {
     type: 'script_element',
     language() {
       return 'javascript';
@@ -9,7 +9,7 @@ exports.activate = function() {
     }
   });
 
-  atom.grammars.addInjectionPoint('text.html.basic', {
+  core.grammars.addInjectionPoint('text.html.basic', {
     type: 'style_element',
     language() {
       return 'css';
@@ -19,7 +19,7 @@ exports.activate = function() {
     }
   });
 
-  atom.grammars.addInjectionPoint('text.html.ejs', {
+  core.grammars.addInjectionPoint('text.html.ejs', {
     type: 'template',
     language(node) {
       return 'javascript';
@@ -30,7 +30,7 @@ exports.activate = function() {
     newlinesBetween: true
   });
 
-  atom.grammars.addInjectionPoint('text.html.ejs', {
+  core.grammars.addInjectionPoint('text.html.ejs', {
     type: 'template',
     language(node) {
       return 'html';
@@ -40,7 +40,7 @@ exports.activate = function() {
     }
   });
 
-  atom.grammars.addInjectionPoint('text.html.erb', {
+  core.grammars.addInjectionPoint('text.html.erb', {
     type: 'template',
     language(node) {
       return 'ruby';
@@ -51,7 +51,7 @@ exports.activate = function() {
     newlinesBetween: true
   });
 
-  atom.grammars.addInjectionPoint('text.html.erb', {
+  core.grammars.addInjectionPoint('text.html.erb', {
     type: 'template',
     language(node) {
       return 'html';

@@ -3,10 +3,10 @@ describe 'SassDoc grammar', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-sass')
+      core.packages.activatePackage('language-sass')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.css.scss')
+      grammar = core.grammars.grammarForScopeName('source.css.scss')
 
   describe 'block tags', ->
     it 'tokenises simple tags', ->

@@ -20,16 +20,16 @@ export default class DeprecationCopView {
       })
     );
     // TODO: Remove conditional when the new StyleManager deprecation APIs reach stable.
-    if (atom.styles.onDidUpdateDeprecations) {
+    if (core.styles.onDidUpdateDeprecations) {
       this.subscriptions.add(
-        atom.styles.onDidUpdateDeprecations(() => {
+        core.styles.onDidUpdateDeprecations(() => {
           etch.update(this);
         })
       );
     }
     etch.initialize(this);
     this.subscriptions.add(
-      atom.commands.add(this.element, {
+      core.commands.add(this.element, {
         'core:move-up': () => {
           this.scrollUp();
         },
@@ -238,7 +238,7 @@ export default class DeprecationCopView {
   }
 
   renderPackageActionsIfNeeded(packageName) {
-    if (packageName && atom.packages.getLoadedPackage(packageName)) {
+    if (packageName && core.packages.getLoadedPackage(packageName)) {
       return (
         <div className="padded">
           <div className="btn-group">
@@ -407,7 +407,7 @@ export default class DeprecationCopView {
   }
 
   getRepoURL(packageName) {
-    const loadedPackage = atom.packages.getLoadedPackage(packageName);
+    const loadedPackage = core.packages.getLoadedPackage(packageName);
     if (
       loadedPackage &&
       loadedPackage.metadata &&
@@ -447,8 +447,8 @@ export default class DeprecationCopView {
 
   getDeprecatedSelectorsByPackageName() {
     const deprecatedSelectorsByPackageName = {};
-    if (atom.styles.getDeprecations) {
-      const deprecatedSelectorsBySourcePath = atom.styles.getDeprecations();
+    if (core.styles.getDeprecations) {
+      const deprecatedSelectorsBySourcePath = core.styles.getDeprecations();
       for (const sourcePath of Object.keys(deprecatedSelectorsBySourcePath)) {
         const deprecation = deprecatedSelectorsBySourcePath[sourcePath];
         const components = sourcePath.split(path.sep);
@@ -509,7 +509,7 @@ export default class DeprecationCopView {
         }
       }
 
-      if (atom.getUserInitScriptPath() === fileName) {
+      if (core.getUserInitScriptPath() === fileName) {
         return `Your local ${path.basename(fileName)} file`;
       }
     }
@@ -522,7 +522,7 @@ export default class DeprecationCopView {
       return this.packagePathsByPackageName;
     } else {
       this.packagePathsByPackageName = new Map();
-      for (const pack of atom.packages.getLoadedPackages()) {
+      for (const pack of core.packages.getLoadedPackages()) {
         this.packagePathsByPackageName.set(pack.name, pack.path);
       }
       return this.packagePathsByPackageName;
@@ -530,12 +530,12 @@ export default class DeprecationCopView {
   }
 
   checkForUpdates() {
-    atom.workspace.open('atom://config/updates');
+    core.workspace.open('atom://config/updates');
   }
 
   disablePackage(packageName) {
     if (packageName) {
-      atom.packages.disablePackage(packageName);
+      core.packages.disablePackage(packageName);
     }
   }
 
@@ -544,7 +544,7 @@ export default class DeprecationCopView {
     if (process.platform === 'win32') {
       pathToOpen = pathToOpen.replace(/^\//, '');
     }
-    atom.open({ pathsToOpen: [pathToOpen] });
+    core.open({ pathsToOpen: [pathToOpen] });
   }
 
   getURI() {

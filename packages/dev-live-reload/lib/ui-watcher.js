@@ -15,10 +15,10 @@ module.exports = class UIWatcher {
   watchPackages() {
     this.watchedThemes = new Map();
     this.watchedPackages = new Map();
-    for (const theme of atom.themes.getActiveThemes()) {
+    for (const theme of core.themes.getActiveThemes()) {
       this.watchTheme(theme);
     }
-    for (const pack of atom.packages.getActivePackages()) {
+    for (const pack of core.packages.getActivePackages()) {
       this.watchPackage(pack);
     }
     this.watchForPackageChanges();
@@ -26,7 +26,7 @@ module.exports = class UIWatcher {
 
   watchForPackageChanges() {
     this.subscriptions.add(
-      atom.themes.onDidChangeActiveThemes(() => {
+      core.themes.onDidChangeActiveThemes(() => {
         // We need to destroy all theme watchers as all theme packages are destroyed
         // when a theme changes.
         for (const theme of this.watchedThemes.values()) {
@@ -36,18 +36,18 @@ module.exports = class UIWatcher {
         this.watchedThemes.clear();
 
         // Rewatch everything!
-        for (const theme of atom.themes.getActiveThemes()) {
+        for (const theme of core.themes.getActiveThemes()) {
           this.watchTheme(theme);
         }
       })
     );
 
     this.subscriptions.add(
-      atom.packages.onDidActivatePackage(pack => this.watchPackage(pack))
+      core.packages.onDidActivatePackage(pack => this.watchPackage(pack))
     );
 
     this.subscriptions.add(
-      atom.packages.onDidDeactivatePackage(pack => {
+      core.packages.onDidDeactivatePackage(pack => {
         // This only handles packages - onDidChangeActiveThemes handles themes
         const watcher = this.watchedPackages.get(pack.name);
         if (watcher) watcher.destroy();
@@ -88,13 +88,13 @@ module.exports = class UIWatcher {
 
   reloadAll() {
     this.baseTheme.loadAllStylesheets();
-    for (const pack of atom.packages.getActivePackages()) {
+    for (const pack of core.packages.getActivePackages()) {
       if (PackageWatcher.supportsPackage(pack, 'atom')) {
         pack.reloadStylesheets();
       }
     }
 
-    for (const theme of atom.themes.getActiveThemes()) {
+    for (const theme of core.themes.getActiveThemes()) {
       if (PackageWatcher.supportsPackage(theme, 'theme')) {
         theme.reloadStylesheets();
       }

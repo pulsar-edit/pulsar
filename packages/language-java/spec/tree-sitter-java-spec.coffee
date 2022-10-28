@@ -6,14 +6,14 @@ describe 'Tree-sitter based Java grammar', ->
   buffer = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', true)
+    core.config.set('core.useTreeSitterParsers', true)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-java')
+      core.packages.activatePackage('language-java')
 
     runs ->
       editor = new TextEditor()
-      grammar = atom.grammars.grammarForScopeName('source.java')
+      grammar = core.grammars.grammarForScopeName('source.java')
       editor.setGrammar(grammar)
       buffer = editor.getBuffer()
 

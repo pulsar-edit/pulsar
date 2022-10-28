@@ -5,7 +5,7 @@ const Grim = require('grim');
 
 module.exports = {
   activate() {
-    atom.packages.onDidActivateInitialPackages(async () => {
+    core.packages.onDidActivateInitialPackages(async () => {
       const duplicates = await dalek.enumerate();
       for (let i = 0; i < duplicates.length; i++) {
         const duplicate = duplicates[i];

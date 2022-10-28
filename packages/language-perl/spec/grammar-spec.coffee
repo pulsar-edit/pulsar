@@ -3,10 +3,10 @@ describe "Perl grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-perl")
+      core.packages.activatePackage("language-perl")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.perl")
+      grammar = core.grammars.grammarForScopeName("source.perl")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

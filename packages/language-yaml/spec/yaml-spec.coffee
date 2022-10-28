@@ -3,10 +3,10 @@ describe "YAML grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-yaml")
+      core.packages.activatePackage("language-yaml")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.yaml')
+      grammar = core.grammars.grammarForScopeName('source.yaml')
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()
@@ -14,10 +14,10 @@ describe "YAML grammar", ->
 
   it "selects the grammar for cloud config files", ->
     waitsForPromise ->
-      atom.workspace.open('cloud.config')
+      core.workspace.open('cloud.config')
 
     runs ->
-      expect(atom.workspace.getActiveTextEditor().getGrammar()).toBe grammar
+      expect(core.workspace.getActiveTextEditor().getGrammar()).toBe grammar
 
   describe "strings", ->
     describe "double quoted", ->

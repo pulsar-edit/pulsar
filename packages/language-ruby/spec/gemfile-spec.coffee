@@ -2,13 +2,13 @@ describe "TextMate Gemfile grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-ruby")
+      core.packages.activatePackage("language-ruby")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.ruby.gemfile")
+      grammar = core.grammars.grammarForScopeName("source.ruby.gemfile")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()

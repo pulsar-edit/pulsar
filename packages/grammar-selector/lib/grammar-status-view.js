@@ -9,18 +9,18 @@ module.exports = class GrammarStatusView {
     this.grammarLink.classList.add('inline-block');
     this.element.appendChild(this.grammarLink);
 
-    this.activeItemSubscription = atom.workspace.observeActiveTextEditor(
+    this.activeItemSubscription = core.workspace.observeActiveTextEditor(
       this.subscribeToActiveTextEditor.bind(this)
     );
 
-    this.configSubscription = atom.config.observe(
+    this.configSubscription = core.config.observe(
       'grammar-selector.showOnRightSideOfStatusBar',
       this.attach.bind(this)
     );
     const clickHandler = event => {
       event.preventDefault();
-      atom.commands.dispatch(
-        atom.views.getView(atom.workspace.getActiveTextEditor()),
+      core.commands.dispatch(
+        core.views.getView(core.workspace.getActiveTextEditor()),
         'grammar-selector:show'
       );
     };
@@ -35,7 +35,7 @@ module.exports = class GrammarStatusView {
       this.tile.destroy();
     }
 
-    this.tile = atom.config.get('grammar-selector.showOnRightSideOfStatusBar')
+    this.tile = core.config.get('grammar-selector.showOnRightSideOfStatusBar')
       ? this.statusBar.addRightTile({ item: this.element, priority: 10 })
       : this.statusBar.addLeftTile({ item: this.element, priority: 10 });
   }
@@ -72,7 +72,7 @@ module.exports = class GrammarStatusView {
       this.grammarSubscription = null;
     }
 
-    const editor = atom.workspace.getActiveTextEditor();
+    const editor = core.workspace.getActiveTextEditor();
     if (editor) {
       this.grammarSubscription = editor.onDidChangeGrammar(
         this.updateGrammarText.bind(this)
@@ -82,8 +82,8 @@ module.exports = class GrammarStatusView {
   }
 
   updateGrammarText() {
-    atom.views.updateDocument(() => {
-      const editor = atom.workspace.getActiveTextEditor();
+    core.views.updateDocument(() => {
+      const editor = core.workspace.getActiveTextEditor();
       const grammar = editor ? editor.getGrammar() : null;
 
       if (this.tooltip) {
@@ -93,7 +93,7 @@ module.exports = class GrammarStatusView {
 
       if (grammar) {
         let grammarName = null;
-        if (grammar === atom.grammars.nullGrammar) {
+        if (grammar === core.grammars.nullGrammar) {
           grammarName = 'Plain Text';
         } else {
           grammarName = grammar.name || grammar.scopeName;
@@ -103,7 +103,7 @@ module.exports = class GrammarStatusView {
         this.grammarLink.dataset.grammar = grammarName;
         this.element.style.display = '';
 
-        this.tooltip = atom.tooltips.add(this.element, {
+        this.tooltip = core.tooltips.add(this.element, {
           title: `File uses the ${grammarName} grammar`
         });
       } else {

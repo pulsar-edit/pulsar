@@ -31,7 +31,7 @@ export default class GitDiffView {
     subscribeToRepository();
 
     this.subscriptions.add(
-      atom.project.onDidChangePaths(subscribeToRepository)
+      core.project.onDidChangePaths(subscribeToRepository)
     );
   }
 
@@ -108,21 +108,21 @@ export default class GitDiffView {
           this.buffer = this.editor.getBuffer();
           scheduleUpdate();
         }),
-        atom.commands.add(
+        core.commands.add(
           this.editorElement,
           'git-diff:move-to-next-diff',
           this.moveToNextDiff.bind(this)
         ),
-        atom.commands.add(
+        core.commands.add(
           this.editorElement,
           'git-diff:move-to-previous-diff',
           this.moveToPreviousDiff.bind(this)
         ),
-        atom.config.onDidChange(
+        core.config.onDidChange(
           'git-diff.showIconsInEditorGutter',
           updateIconDecoration
         ),
-        atom.config.onDidChange('editor.showLineNumbers', updateIconDecoration),
+        core.config.onDidChange('editor.showLineNumbers', updateIconDecoration),
         this.editorElement.onDidAttach(updateIconDecoration)
       );
 
@@ -156,7 +156,7 @@ export default class GitDiffView {
 
     // Wrap around to the first diff in the file
     if (
-      atom.config.get('git-diff.wrapAroundOnMoveToDiff') &&
+      core.config.get('git-diff.wrapAroundOnMoveToDiff') &&
       nextDiffLineNumber == null
     ) {
       nextDiffLineNumber = firstDiffLineNumber;
@@ -178,7 +178,7 @@ export default class GitDiffView {
 
     // Wrap around to the last diff in the file
     if (
-      atom.config.get('git-diff.wrapAroundOnMoveToDiff') &&
+      core.config.get('git-diff.wrapAroundOnMoveToDiff') &&
       previousDiffLineNumber === null
     ) {
       previousDiffLineNumber = lastDiffLineNumber;
@@ -191,8 +191,8 @@ export default class GitDiffView {
     const gutter = this.editorElement.querySelector('.gutter');
     if (gutter) {
       if (
-        atom.config.get('editor.showLineNumbers') &&
-        atom.config.get('git-diff.showIconsInEditorGutter')
+        core.config.get('editor.showLineNumbers') &&
+        core.config.get('git-diff.showIconsInEditorGutter')
       ) {
         gutter.classList.add('git-diff-icon');
       } else {

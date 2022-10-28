@@ -7,7 +7,7 @@ let grammarStatusView = null;
 
 module.exports = {
   activate() {
-    commandDisposable = atom.commands.add(
+    commandDisposable = core.commands.add(
       'atom-text-editor',
       'grammar-selector:show',
       () => {

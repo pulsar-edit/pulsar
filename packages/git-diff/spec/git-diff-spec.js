@@ -21,18 +21,18 @@ describe('GitDiff package', () => {
       path.join(projectPath, 'git.git'),
       path.join(projectPath, '.git')
     );
-    atom.project.setPaths([otherPath, projectPath]);
+    core.project.setPaths([otherPath, projectPath]);
 
-    jasmine.attachToDOM(atom.workspace.getElement());
+    jasmine.attachToDOM(core.workspace.getElement());
 
     waitsForPromise(async () => {
-      await atom.workspace.open(path.join(projectPath, 'sample.js'));
-      await atom.packages.activatePackage('git-diff');
+      await core.workspace.open(path.join(projectPath, 'sample.js'));
+      await core.packages.activatePackage('git-diff');
     });
 
     runs(() => {
-      editor = atom.workspace.getActiveTextEditor();
-      editorElement = atom.views.getView(editor);
+      editor = core.workspace.getActiveTextEditor();
+      editorElement = core.views.getView(editor);
     });
   });
 
@@ -161,11 +161,11 @@ describe('GitDiff package', () => {
       );
 
       waitsForPromise(() =>
-        atom.workspace.open(path.join(projectPath, 'sample.txt'))
+        core.workspace.open(path.join(projectPath, 'sample.txt'))
       );
 
       runs(() => {
-        editor = atom.workspace.getActiveTextEditor();
+        editor = core.workspace.getActiveTextEditor();
         editorElement = editor.getElement();
       });
 
@@ -186,7 +186,7 @@ describe('GitDiff package', () => {
   describe('when the project paths change', () => {
     it("doesn't try to use the destroyed git repository", () => {
       editor.deleteLine();
-      atom.project.setPaths([temp.mkdirSync('no-repository')]);
+      core.project.setPaths([temp.mkdirSync('no-repository')]);
       advanceClock(editor.getBuffer().stoppedChangingDelay);
       waitsFor(() => editor.getMarkers().length === 0);
       runs(() => {
@@ -205,10 +205,10 @@ describe('GitDiff package', () => {
         advanceClock(editor.getBuffer().stoppedChangingDelay);
 
         editor.setCursorBufferPosition([0]);
-        atom.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
+        core.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
         expect(editor.getCursorBufferPosition()).toEqual([4, 4]);
 
-        atom.commands.dispatch(editorElement, 'git-diff:move-to-previous-diff');
+        core.commands.dispatch(editorElement, 'git-diff:move-to-previous-diff');
         expect(editor.getCursorBufferPosition()).toEqual([0, 0]);
       });
     });
@@ -222,20 +222,20 @@ describe('GitDiff package', () => {
         advanceClock(editor.getBuffer().stoppedChangingDelay);
 
         editor.setCursorBufferPosition([0]);
-        atom.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
+        core.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
         expect(editor.getCursorBufferPosition().toArray()).toEqual([4, 4]);
 
-        atom.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
+        core.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
         expect(editor.getCursorBufferPosition().toArray()).toEqual([0, 0]);
 
-        atom.commands.dispatch(editorElement, 'git-diff:move-to-previous-diff');
+        core.commands.dispatch(editorElement, 'git-diff:move-to-previous-diff');
         expect(editor.getCursorBufferPosition().toArray()).toEqual([4, 4]);
       });
     });
 
     describe('when the wrapAroundOnMoveToDiff config option is false', () => {
       beforeEach(() =>
-        atom.config.set('git-diff.wrapAroundOnMoveToDiff', false)
+        core.config.set('git-diff.wrapAroundOnMoveToDiff', false)
       );
 
       it('does not wraps around to the first/last diff in the file', () => {
@@ -247,19 +247,19 @@ describe('GitDiff package', () => {
 
         runs(() => {
           editor.setCursorBufferPosition([0]);
-          atom.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
+          core.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
           expect(editor.getCursorBufferPosition()).toEqual([4, 4]);
 
-          atom.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
+          core.commands.dispatch(editorElement, 'git-diff:move-to-next-diff');
           expect(editor.getCursorBufferPosition()).toEqual([4, 4]);
 
-          atom.commands.dispatch(
+          core.commands.dispatch(
             editorElement,
             'git-diff:move-to-previous-diff'
           );
           expect(editor.getCursorBufferPosition()).toEqual([0, 0]);
 
-          atom.commands.dispatch(
+          core.commands.dispatch(
             editorElement,
             'git-diff:move-to-previous-diff'
           );
@@ -271,7 +271,7 @@ describe('GitDiff package', () => {
 
   describe('when the showIconsInEditorGutter config option is true', () => {
     beforeEach(() => {
-      atom.config.set('git-diff.showIconsInEditorGutter', true);
+      core.config.set('git-diff.showIconsInEditorGutter', true);
     });
 
     it('the gutter has a git-diff-icon class', () => {
@@ -287,12 +287,12 @@ describe('GitDiff package', () => {
       waitsFor(() => screenUpdates > 0);
 
       runs(() => {
-        atom.config.set('editor.showLineNumbers', false);
+        core.config.set('editor.showLineNumbers', false);
         expect(editorElement.querySelector('.gutter')).not.toHaveClass(
           'git-diff-icon'
         );
 
-        atom.config.set('editor.showLineNumbers', true);
+        core.config.set('editor.showLineNumbers', true);
         expect(editorElement.querySelector('.gutter')).toHaveClass(
           'git-diff-icon'
         );
@@ -303,7 +303,7 @@ describe('GitDiff package', () => {
       waitsFor(() => screenUpdates > 0);
 
       runs(() => {
-        atom.config.set('git-diff.showIconsInEditorGutter', false);
+        core.config.set('git-diff.showIconsInEditorGutter', false);
         expect(editorElement.querySelector('.gutter')).not.toHaveClass(
           'git-diff-icon'
         );

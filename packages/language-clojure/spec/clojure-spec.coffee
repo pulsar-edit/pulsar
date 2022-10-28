@@ -3,10 +3,10 @@ describe "Clojure grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-clojure")
+      core.packages.activatePackage("language-clojure")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("source.clojure")
+      grammar = core.grammars.grammarForScopeName("source.clojure")
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

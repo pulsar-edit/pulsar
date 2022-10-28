@@ -2,13 +2,13 @@ describe "JSON grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-json')
+      core.packages.activatePackage('language-json')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.json')
+      grammar = core.grammars.grammarForScopeName('source.json')
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

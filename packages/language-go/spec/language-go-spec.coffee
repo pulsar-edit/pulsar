@@ -5,15 +5,15 @@ describe 'Go settings', ->
     editor.destroy()
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.workspace.open().then (o) ->
+      core.workspace.open().then (o) ->
         editor = o
         languageMode = editor.languageMode
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-go')
+      core.packages.activatePackage('language-go')
 
   it 'matches lines correctly using the increaseIndentPattern', ->
     increaseIndentRegex = languageMode.increaseIndentRegexForScopeDescriptor(['source.go'])

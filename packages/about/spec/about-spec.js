@@ -11,12 +11,12 @@ describe('About', () => {
       return storage[key];
     });
 
-    workspaceElement = atom.views.getView(atom.workspace);
-    await atom.packages.activatePackage('about');
+    workspaceElement = core.views.getView(core.workspace);
+    await core.packages.activatePackage('about');
   });
 
   it('deserializes correctly', () => {
-    let deserializedAboutView = atom.deserializers.deserialize({
+    let deserializedAboutView = core.deserializers.deserialize({
       deserializer: 'AboutView',
       uri: 'atom://about'
     });
@@ -33,7 +33,7 @@ describe('About', () => {
       jasmine.attachToDOM(workspaceElement);
 
       expect(workspaceElement.querySelector('.about')).not.toExist();
-      await atom.workspace.open('atom://about');
+      await core.workspace.open('atom://about');
 
       let aboutElement = workspaceElement.querySelector('.about');
       expect(aboutElement).toBeVisible();
@@ -42,19 +42,19 @@ describe('About', () => {
 
   describe('when the Atom version number is clicked', () => {
     it('copies the version number to the clipboard', async () => {
-      await atom.workspace.open('atom://about');
+      await core.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
 
       let aboutElement = workspaceElement.querySelector('.about');
       let versionContainer = aboutElement.querySelector('.atom');
       versionContainer.click();
-      expect(atom.clipboard.read()).toBe(atom.getVersion());
+      expect(core.clipboard.read()).toBe(core.getVersion());
     });
   });
 
   describe('when the show more link is clicked', () => {
     it('expands to show additional version numbers', async () => {
-      await atom.workspace.open('atom://about');
+      await core.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
 
       let aboutElement = workspaceElement.querySelector('.about');
@@ -67,37 +67,37 @@ describe('About', () => {
 
   describe('when the Electron version number is clicked', () => {
     it('copies the version number to the clipboard', async () => {
-      await atom.workspace.open('atom://about');
+      await core.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
 
       let aboutElement = workspaceElement.querySelector('.about');
       let versionContainer = aboutElement.querySelector('.electron');
       versionContainer.click();
-      expect(atom.clipboard.read()).toBe(process.versions.electron);
+      expect(core.clipboard.read()).toBe(process.versions.electron);
     });
   });
 
   describe('when the Chrome version number is clicked', () => {
     it('copies the version number to the clipboard', async () => {
-      await atom.workspace.open('atom://about');
+      await core.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
 
       let aboutElement = workspaceElement.querySelector('.about');
       let versionContainer = aboutElement.querySelector('.chrome');
       versionContainer.click();
-      expect(atom.clipboard.read()).toBe(process.versions.chrome);
+      expect(core.clipboard.read()).toBe(process.versions.chrome);
     });
   });
 
   describe('when the Node version number is clicked', () => {
     it('copies the version number to the clipboard', async () => {
-      await atom.workspace.open('atom://about');
+      await core.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
 
       let aboutElement = workspaceElement.querySelector('.about');
       let versionContainer = aboutElement.querySelector('.node');
       versionContainer.click();
-      expect(atom.clipboard.read()).toBe(process.version);
+      expect(core.clipboard.read()).toBe(process.version);
     });
   });
 });

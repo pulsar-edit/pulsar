@@ -10,22 +10,22 @@ const $ = etch.dom;
 module.exports = class AboutView extends EtchComponent {
   handleAtomVersionClick(e) {
     e.preventDefault();
-    atom.clipboard.write(this.props.currentAtomVersion);
+    core.clipboard.write(this.props.currentAtomVersion);
   }
 
   handleElectronVersionClick(e) {
     e.preventDefault();
-    atom.clipboard.write(this.props.currentElectronVersion);
+    core.clipboard.write(this.props.currentElectronVersion);
   }
 
   handleChromeVersionClick(e) {
     e.preventDefault();
-    atom.clipboard.write(this.props.currentChromeVersion);
+    core.clipboard.write(this.props.currentChromeVersion);
   }
 
   handleNodeVersionClick(e) {
     e.preventDefault();
-    atom.clipboard.write(this.props.currentNodeVersion);
+    core.clipboard.write(this.props.currentNodeVersion);
   }
 
   handleReleaseNotesClick(e) {
@@ -37,8 +37,8 @@ module.exports = class AboutView extends EtchComponent {
 
   handleLicenseClick(e) {
     e.preventDefault();
-    atom.commands.dispatch(
-      atom.views.getView(atom.workspace),
+    core.commands.dispatch(
+      core.views.getView(core.workspace),
       'application:open-license'
     );
   }

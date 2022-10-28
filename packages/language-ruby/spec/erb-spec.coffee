@@ -2,13 +2,13 @@ describe "TextMate HTML (Ruby - ERB) grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    core.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-ruby")
+      core.packages.activatePackage("language-ruby")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName("text.html.erb")
+      grammar = core.grammars.grammarForScopeName("text.html.erb")
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()

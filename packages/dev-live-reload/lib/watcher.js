@@ -65,7 +65,7 @@ module.exports = class Watcher {
   }
 
   isInAsarArchive(pathToCheck) {
-    const { resourcePath } = atom.getLoadSettings();
+    const { resourcePath } = core.getLoadSettings();
     return (
       pathToCheck.startsWith(`${resourcePath}${path.sep}`) &&
       path.extname(resourcePath) === '.asar'

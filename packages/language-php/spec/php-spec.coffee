@@ -3,10 +3,10 @@ describe 'PHP grammar', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage 'language-php'
+      core.packages.activatePackage 'language-php'
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName 'source.php'
+      grammar = core.grammars.grammarForScopeName 'source.php'
       @addMatchers
         toContainAll: (arr) ->
           arr.every (el) =>
@@ -3119,7 +3119,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize embedded SQL in a string', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-sql')
+      core.packages.activatePackage('language-sql')
 
     runs ->
       delimsByScope =
@@ -3410,7 +3410,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded HTML and interpolation correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-html')
+      core.packages.activatePackage('language-html')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3456,7 +3456,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded HTML and interpolation correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-html')
+      core.packages.activatePackage('language-html')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3514,7 +3514,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded XML correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-xml')
+      core.packages.activatePackage('language-xml')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3541,7 +3541,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded XML correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-xml')
+      core.packages.activatePackage('language-xml')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3570,7 +3570,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded SQL correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-sql')
+      core.packages.activatePackage('language-sql')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3603,7 +3603,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded SQL correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-sql')
+      core.packages.activatePackage('language-sql')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3638,7 +3638,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded DQL correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-sql')
+      core.packages.activatePackage('language-sql')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3671,7 +3671,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded DQL correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-sql')
+      core.packages.activatePackage('language-sql')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3706,7 +3706,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded javascript correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-javascript')
+      core.packages.activatePackage('language-javascript')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3765,7 +3765,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded javascript correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-javascript')
+      core.packages.activatePackage('language-javascript')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3828,7 +3828,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded json correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-json')
+      core.packages.activatePackage('language-json')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3867,7 +3867,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded json correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-json')
+      core.packages.activatePackage('language-json')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3908,7 +3908,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a heredoc with embedded css correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-css')
+      core.packages.activatePackage('language-css')
 
     runs ->
       lines = grammar.tokenizeLines '''
@@ -3935,7 +3935,7 @@ describe 'PHP grammar', ->
 
   it 'should tokenize a nowdoc with embedded css correctly', ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-css')
+      core.packages.activatePackage('language-css')
 
     runs ->
       lines = grammar.tokenizeLines '''

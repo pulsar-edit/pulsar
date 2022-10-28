@@ -32,13 +32,13 @@ describe('dalek', function() {
           'duplicated-package'
         ),
         'unduplicated-package': path.join(
-          `${atom.getLoadSettings().resourcePath}`,
+          `${core.getLoadSettings().resourcePath}`,
           'node_modules',
           'unduplicated-package'
         )
       };
 
-      atom.devMode = false;
+      core.devMode = false;
       bundledPackages = ['duplicated-package', 'unduplicated-package'];
       packageDirPaths = [path.join('Users', 'username', '.pulsar', 'packages')];
       sandbox = sinon.createSandbox();
@@ -47,19 +47,19 @@ describe('dalek', function() {
         .callsFake(filePath =>
           Promise.resolve(realPaths[filePath] || filePath)
         );
-      sandbox.stub(atom.packages, 'isBundledPackage').callsFake(packageName => {
+      sandbox.stub(core.packages, 'isBundledPackage').callsFake(packageName => {
         return bundledPackages.includes(packageName);
       });
       sandbox
-        .stub(atom.packages, 'getAvailablePackageNames')
+        .stub(core.packages, 'getAvailablePackageNames')
         .callsFake(() => Object.keys(availablePackages));
-      sandbox.stub(atom.packages, 'getPackageDirPaths').callsFake(() => {
+      sandbox.stub(core.packages, 'getPackageDirPaths').callsFake(() => {
         return packageDirPaths;
       });
       sandbox.stub(fs, 'existsSync').callsFake(candidate => {
         return (
           Object.values(availablePackages).includes(candidate) &&
-          !candidate.includes(atom.getLoadSettings().resourcePath)
+          !candidate.includes(core.getLoadSettings().resourcePath)
         );
       });
     });
@@ -74,7 +74,7 @@ describe('dalek', function() {
 
     describe('when in dev mode', function() {
       beforeEach(function() {
-        atom.devMode = true;
+        core.devMode = true;
       });
 
       it('always returns an empty list', async function() {

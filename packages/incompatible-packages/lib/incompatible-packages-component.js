@@ -28,9 +28,9 @@ export default class IncompatiblePackagesComponent {
       if (event.target === this.refs.rebuildButton) {
         this.rebuildIncompatiblePackages();
       } else if (event.target === this.refs.reloadButton) {
-        atom.reload();
+        core.reload();
       } else if (event.target.classList.contains('view-settings')) {
-        atom.workspace.open(
+        core.workspace.open(
           `atom://config/packages/${event.target.package.name}`
         );
       }

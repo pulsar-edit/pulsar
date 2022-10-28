@@ -1,6 +1,6 @@
 exports.activate = function() {
   for (const scopeName of ['source.ts', 'source.flow']) {
-    atom.grammars.addInjectionPoint(scopeName, {
+    core.grammars.addInjectionPoint(scopeName, {
       type: 'call_expression',
 
       language(callExpression) {
@@ -23,7 +23,7 @@ exports.activate = function() {
       }
     });
 
-    atom.grammars.addInjectionPoint(scopeName, {
+    core.grammars.addInjectionPoint(scopeName, {
       type: 'assignment_expression',
 
       language(callExpression) {
@@ -43,7 +43,7 @@ exports.activate = function() {
       }
     });
 
-    atom.grammars.addInjectionPoint(scopeName, {
+    core.grammars.addInjectionPoint(scopeName, {
       type: 'regex_pattern',
       language(regex) {
         return 'regex';

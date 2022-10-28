@@ -6,7 +6,7 @@ import etch from 'etch';
 export default class GuideView {
   constructor(props) {
     this.props = props;
-    this.brand = atom.branding.name;
+    this.brand = core.branding.name;
     this.didClickProjectButton = this.didClickProjectButton.bind(this);
     this.didClickGitButton = this.didClickGitButton.bind(this);
     this.didClickGitHubButton = this.didClickGitHubButton.bind(this);
@@ -416,56 +416,56 @@ export default class GuideView {
 
   didClickProjectButton() {
     this.props.reporterProxy.sendEvent('clicked-project-cta');
-    atom.commands.dispatch(
-      atom.views.getView(atom.workspace),
+    core.commands.dispatch(
+      core.views.getView(core.workspace),
       'application:open'
     );
   }
 
   didClickGitButton() {
     this.props.reporterProxy.sendEvent('clicked-git-cta');
-    atom.commands.dispatch(
-      atom.views.getView(atom.workspace),
+    core.commands.dispatch(
+      core.views.getView(core.workspace),
       'github:toggle-git-tab'
     );
   }
 
   didClickGitHubButton() {
     this.props.reporterProxy.sendEvent('clicked-github-cta');
-    atom.commands.dispatch(
-      atom.views.getView(atom.workspace),
+    core.commands.dispatch(
+      core.views.getView(core.workspace),
       'github:toggle-github-tab'
     );
   }
 
   didClickPackagesButton() {
     this.props.reporterProxy.sendEvent('clicked-packages-cta');
-    atom.workspace.open('atom://config/install', { split: 'left' });
+    core.workspace.open('atom://config/install', { split: 'left' });
   }
 
   didClickThemesButton() {
     this.props.reporterProxy.sendEvent('clicked-themes-cta');
-    atom.workspace.open('atom://config/themes', { split: 'left' });
+    core.workspace.open('atom://config/themes', { split: 'left' });
   }
 
   didClickStylingButton() {
     this.props.reporterProxy.sendEvent('clicked-styling-cta');
-    atom.workspace.open('atom://.pulsar/stylesheet', { split: 'left' });
+    core.workspace.open('atom://.pulsar/stylesheet', { split: 'left' });
   }
 
   didClickInitScriptButton() {
     this.props.reporterProxy.sendEvent('clicked-init-script-cta');
-    atom.workspace.open('atom://.pulsar/init-script', { split: 'left' });
+    core.workspace.open('atom://.pulsar/init-script', { split: 'left' });
   }
 
   didClickSnippetsButton() {
     this.props.reporterProxy.sendEvent('clicked-snippets-cta');
-    atom.workspace.open('atom://.pulsar/snippets', { split: 'left' });
+    core.workspace.open('atom://.pulsar/snippets', { split: 'left' });
   }
 
   didClickTeletypeButton() {
     this.props.reporterProxy.sendEvent('clicked-teletype-cta');
-    atom.workspace.open('atom://config/packages/teletype', { split: 'left' });
+    core.workspace.open('atom://config/packages/teletype', { split: 'left' });
   }
 
   didExpandOrCollapseSection(event) {

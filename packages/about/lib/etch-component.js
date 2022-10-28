@@ -9,7 +9,7 @@ module.exports = class EtchComponent {
     this.props = props;
 
     etch.initialize(this);
-    EtchComponent.setScheduler(atom.views);
+    EtchComponent.setScheduler(core.views);
   }
 
   /*

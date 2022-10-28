@@ -7,7 +7,7 @@ describe('Update Package Dependencies', () => {
 
   beforeEach(() => {
     projectPath = __dirname;
-    atom.project.setPaths([projectPath]);
+    core.project.setPaths([projectPath]);
   });
 
   describe('updating package dependencies', () => {
@@ -58,13 +58,13 @@ describe('Update Package Dependencies', () => {
     });
 
     it('adds a status bar tile', async () => {
-      const statusBar = await atom.packages.activatePackage('status-bar');
+      const statusBar = await core.packages.activatePackage('status-bar');
 
-      const activationPromise = atom.packages.activatePackage(
+      const activationPromise = core.packages.activatePackage(
         'update-package-dependencies'
       );
-      atom.commands.dispatch(
-        atom.views.getView(atom.workspace),
+      core.commands.dispatch(
+        core.views.getView(core.workspace),
         'update-package-dependencies:update'
       );
       const { mainModule } = await activationPromise;
@@ -88,10 +88,10 @@ describe('Update Package Dependencies', () => {
     });
 
     describe('when there are multiple project paths', () => {
-      beforeEach(() => atom.project.setPaths([os.tmpdir(), projectPath]));
+      beforeEach(() => core.project.setPaths([os.tmpdir(), projectPath]));
 
       it('uses the currently active one', async () => {
-        await atom.workspace.open(path.join(projectPath, 'package.json'));
+        await core.workspace.open(path.join(projectPath, 'package.json'));
 
         updatePackageDependencies.update();
         expect(options.cwd).toEqual(projectPath);
@@ -105,7 +105,7 @@ describe('Update Package Dependencies', () => {
       });
 
       it('shows a success notification message', () => {
-        const notification = atom.notifications.getNotifications()[0];
+        const notification = core.notifications.getNotifications()[0];
         expect(notification.getType()).toEqual('success');
         expect(notification.getMessage()).toEqual(
           'Package dependencies updated'
@@ -121,7 +121,7 @@ describe('Update Package Dependencies', () => {
       });
 
       it('shows a failure notification', () => {
-        const notification = atom.notifications.getNotifications()[0];
+        const notification = core.notifications.getNotifications()[0];
         expect(notification.getType()).toEqual('error');
         expect(notification.getMessage()).toEqual(
           'Failed to update package dependencies'
@@ -136,11 +136,11 @@ describe('Update Package Dependencies', () => {
     beforeEach(() => spyOn(updatePackageDependencies, 'update'));
 
     it('activates the package and updates package dependencies', async () => {
-      const activationPromise = atom.packages.activatePackage(
+      const activationPromise = core.packages.activatePackage(
         'update-package-dependencies'
       );
-      atom.commands.dispatch(
-        atom.views.getView(atom.workspace),
+      core.commands.dispatch(
+        core.views.getView(core.workspace),
         'update-package-dependencies:update'
       );
       const { mainModule } = await activationPromise;

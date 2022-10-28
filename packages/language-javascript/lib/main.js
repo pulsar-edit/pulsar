@@ -1,7 +1,7 @@
 exports.activate = function() {
-  if (!atom.grammars.addInjectionPoint) return;
+  if (!core.grammars.addInjectionPoint) return;
 
-  atom.grammars.addInjectionPoint('source.js', {
+  core.grammars.addInjectionPoint('source.js', {
     type: 'call_expression',
 
     language(callExpression) {
@@ -26,7 +26,7 @@ exports.activate = function() {
     }
   });
 
-  atom.grammars.addInjectionPoint('source.js', {
+  core.grammars.addInjectionPoint('source.js', {
     type: 'assignment_expression',
 
     language(callExpression) {
@@ -46,7 +46,7 @@ exports.activate = function() {
     }
   });
 
-  atom.grammars.addInjectionPoint('source.js', {
+  core.grammars.addInjectionPoint('source.js', {
     type: 'regex_pattern',
     language(regex) {
       return 'regex';
@@ -57,7 +57,7 @@ exports.activate = function() {
   });
 
   for (const scopeName of ['source.js', 'source.flow', 'source.ts']) {
-    atom.grammars.addInjectionPoint(scopeName, {
+    core.grammars.addInjectionPoint(scopeName, {
       type: 'comment',
       language(comment) {
         if (comment.text.startsWith('/**')) return 'jsdoc';

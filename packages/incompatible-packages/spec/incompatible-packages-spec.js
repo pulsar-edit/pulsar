@@ -6,23 +6,23 @@ import StatusIconComponent from '../lib/status-icon-component';
 
 // This exists only so that CI passes on both Atom 1.6 and Atom 1.8+.
 function findStatusBar() {
-  if (typeof atom.workspace.getFooterPanels === 'function') {
-    const footerPanels = atom.workspace.getFooterPanels();
+  if (typeof core.workspace.getFooterPanels === 'function') {
+    const footerPanels = core.workspace.getFooterPanels();
     if (footerPanels.length > 0) {
       return footerPanels[0].getItem();
     }
   }
 
-  return atom.workspace.getBottomPanels()[0].getItem();
+  return core.workspace.getBottomPanels()[0].getItem();
 }
 
 describe('Incompatible packages', () => {
   let statusBar;
 
   beforeEach(() => {
-    atom.views.getView(atom.workspace);
+    core.views.getView(core.workspace);
 
-    waitsForPromise(() => atom.packages.activatePackage('status-bar'));
+    waitsForPromise(() => core.packages.activatePackage('status-bar'));
 
     runs(() => {
       statusBar = findStatusBar();
@@ -31,13 +31,13 @@ describe('Incompatible packages', () => {
 
   describe('when there are packages with incompatible native modules', () => {
     beforeEach(() => {
-      let incompatiblePackage = atom.packages.loadPackage(
+      let incompatiblePackage = core.packages.loadPackage(
         path.join(__dirname, 'fixtures', 'incompatible-package')
       );
       spyOn(incompatiblePackage, 'isCompatible').andReturn(false);
       incompatiblePackage.incompatibleModules = [];
       waitsForPromise(() =>
-        atom.packages.activatePackage('incompatible-packages')
+        core.packages.activatePackage('incompatible-packages')
       );
 
       waits(1);
@@ -54,7 +54,7 @@ describe('Incompatible packages', () => {
         statusBarIcon.element.dispatchEvent(new MouseEvent('click'));
 
         let activePaneItem;
-        waitsFor(() => (activePaneItem = atom.workspace.getActivePaneItem()));
+        waitsFor(() => (activePaneItem = core.workspace.getActivePaneItem()));
 
         runs(() => {
           expect(activePaneItem.constructor).toBe(
@@ -68,7 +68,7 @@ describe('Incompatible packages', () => {
   describe('when there are no packages with incompatible native modules', () => {
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.packages.activatePackage('incompatible-packages')
+        core.packages.activatePackage('incompatible-packages')
       );
     });
 

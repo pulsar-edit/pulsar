@@ -3,10 +3,10 @@ describe "TOML grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-toml")
+      core.packages.activatePackage("language-toml")
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('source.toml')
+      grammar = core.grammars.grammarForScopeName('source.toml')
 
   it "parses the grammar", ->
     expect(grammar).toBeTruthy()

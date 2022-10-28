@@ -9,7 +9,7 @@ export function activate() {
   disposables = new CompositeDisposable();
 
   disposables.add(
-    atom.workspace.addOpener(uri => {
+    core.workspace.addOpener(uri => {
       if (uri === VIEW_URI) {
         return deserializeIncompatiblePackagesComponent();
       }
@@ -17,9 +17,9 @@ export function activate() {
   );
 
   disposables.add(
-    atom.commands.add('atom-workspace', {
+    core.commands.add('atom-workspace', {
       'incompatible-packages:view': () => {
-        atom.workspace.open(VIEW_URI);
+        core.workspace.open(VIEW_URI);
       }
     })
   );
@@ -31,7 +31,7 @@ export function deactivate() {
 
 export function consumeStatusBar(statusBar) {
   let incompatibleCount = 0;
-  for (let pack of atom.packages.getLoadedPackages()) {
+  for (let pack of core.packages.getLoadedPackages()) {
     if (!pack.isCompatible()) incompatibleCount++;
   }
 
@@ -39,7 +39,7 @@ export function consumeStatusBar(statusBar) {
     let icon = createIcon(incompatibleCount);
     let tile = statusBar.addRightTile({ item: icon, priority: 200 });
     icon.element.addEventListener('click', () => {
-      atom.commands.dispatch(icon.element, 'incompatible-packages:view');
+      core.commands.dispatch(icon.element, 'incompatible-packages:view');
     });
     disposables.add(new Disposable(() => tile.destroy()));
   }
@@ -47,7 +47,7 @@ export function consumeStatusBar(statusBar) {
 
 export function deserializeIncompatiblePackagesComponent() {
   const IncompatiblePackagesComponent = require('./incompatible-packages-component');
-  return new IncompatiblePackagesComponent(atom.packages);
+  return new IncompatiblePackagesComponent(core.packages);
 }
 
 function createIcon(count) {

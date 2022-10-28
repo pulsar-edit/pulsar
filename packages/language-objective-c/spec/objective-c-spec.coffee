@@ -3,14 +3,14 @@ describe 'Language-Objective-C', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-objective-c')
+      core.packages.activatePackage('language-objective-c')
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-c')
+      core.packages.activatePackage('language-c')
 
   describe "Objective-C", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName('source.objc')
+      grammar = core.grammars.grammarForScopeName('source.objc')
 
     it 'parses the grammar', ->
       expect(grammar).toBeTruthy()
@@ -28,7 +28,7 @@ describe 'Language-Objective-C', ->
 
   describe "Objective-C++", ->
     beforeEach ->
-      grammar = atom.grammars.grammarForScopeName('source.objcpp')
+      grammar = core.grammars.grammarForScopeName('source.objcpp')
 
     it 'parses the grammar', ->
       expect(grammar).toBeTruthy()

@@ -13,15 +13,15 @@ export default {
     subscriptions = new CompositeDisposable();
 
     subscriptions.add(
-      atom.workspace.observeTextEditors(editor => {
-        const editorElement = atom.views.getView(editor);
+      core.workspace.observeTextEditors(editor => {
+        const editorElement = core.views.getView(editor);
         const diffView = new GitDiffView(editor, editorElement);
 
         diffViews.add(diffView);
 
         const listViewCommand = 'git-diff:toggle-diff-list';
         const editorSubs = new CompositeDisposable(
-          atom.commands.add(editorElement, listViewCommand, () => {
+          core.commands.add(editorElement, listViewCommand, () => {
             if (diffListView == null) diffListView = new DiffListView();
 
             diffListView.toggle();

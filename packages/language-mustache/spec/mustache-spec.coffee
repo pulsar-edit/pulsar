@@ -3,13 +3,13 @@ describe 'Mustache grammar', ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage('language-html')
+      core.packages.activatePackage('language-html')
 
     waitsForPromise ->
-      atom.packages.activatePackage('language-mustache')
+      core.packages.activatePackage('language-mustache')
 
     runs ->
-      grammar = atom.grammars.grammarForScopeName('text.html.mustache')
+      grammar = core.grammars.grammarForScopeName('text.html.mustache')
 
   it 'parses the grammar', ->
     expect(grammar).toBeTruthy()

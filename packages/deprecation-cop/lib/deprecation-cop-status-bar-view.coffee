@@ -24,8 +24,8 @@ class DeprecationCopStatusBarView
     @element.appendChild(@deprecationNumber)
 
     clickHandler = ->
-      workspaceElement = atom.views.getView(atom.workspace)
-      atom.commands.dispatch workspaceElement, 'deprecation-cop:view'
+      workspaceElement = core.views.getView(core.workspace)
+      core.commands.dispatch workspaceElement, 'deprecation-cop:view'
     @element.addEventListener('click', clickHandler)
     @subscriptions.add(new Disposable(=> @element.removeEventListener('click', clickHandler)))
 
@@ -35,8 +35,8 @@ class DeprecationCopStatusBarView
 
     @subscriptions.add Grim.on 'updated', @update
     # TODO: Remove conditional when the new StyleManager deprecation APIs reach stable.
-    if atom.styles.onDidUpdateDeprecations?
-      @subscriptions.add(atom.styles.onDidUpdateDeprecations(debouncedUpdateDeprecatedSelectorCount))
+    if core.styles.onDidUpdateDeprecations?
+      @subscriptions.add(core.styles.onDidUpdateDeprecations(debouncedUpdateDeprecatedSelectorCount))
 
   destroy: ->
     @subscriptions.dispose()
@@ -47,8 +47,8 @@ class DeprecationCopStatusBarView
 
   getDeprecatedStyleSheetsCount: ->
     # TODO: Remove conditional when the new StyleManager deprecation APIs reach stable.
-    if atom.styles.getDeprecations?
-      Object.keys(atom.styles.getDeprecations()).length
+    if core.styles.getDeprecations?
+      Object.keys(core.styles.getDeprecations()).length
     else
       0
 
@@ -60,7 +60,7 @@ class DeprecationCopStatusBarView
     @lastLength = length
     @deprecationNumber.textContent = "#{_.pluralize(length, 'deprecation')}"
     @toolTipDisposable?.dispose()
-    @toolTipDisposable = atom.tooltips.add @element, title: "#{_.pluralize(length, 'call')} to deprecated methods"
+    @toolTipDisposable = core.tooltips.add @element, title: "#{_.pluralize(length, 'call')} to deprecated methods"
 
     if length is 0
       @element.style.display = 'none'

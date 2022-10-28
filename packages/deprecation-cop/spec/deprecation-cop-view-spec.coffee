@@ -10,7 +10,7 @@ describe "DeprecationCopView", ->
     spyOn(_, 'debounce').andCallFake (func) ->
       -> func.apply(this, arguments)
 
-    workspaceElement = atom.views.getView(atom.workspace)
+    workspaceElement = core.views.getView(core.workspace)
     jasmine.attachToDOM(workspaceElement)
 
     jasmine.snapshotDeprecations()
@@ -19,14 +19,14 @@ describe "DeprecationCopView", ->
     deprecatedMethod()
 
     spyOn(Grim, 'deprecate') # Don't fail tests if when using deprecated APIs in deprecation cop's activation
-    activationPromise = atom.packages.activatePackage('deprecation-cop')
+    activationPromise = core.packages.activatePackage('deprecation-cop')
 
-    atom.commands.dispatch workspaceElement, 'deprecation-cop:view'
+    core.commands.dispatch workspaceElement, 'deprecation-cop:view'
 
     waitsForPromise ->
       activationPromise
 
-    waitsFor -> deprecationCopView = atom.workspace.getActivePane().getActiveItem()
+    waitsFor -> deprecationCopView = core.workspace.getActivePane().getActiveItem()
 
     runs ->
       jasmine.unspy(Grim, 'deprecate')
@@ -39,12 +39,12 @@ describe "DeprecationCopView", ->
     expect(deprecationCopView.element.textContent).toMatch /This isn't used/
 
   # TODO: Remove conditional when the new StyleManager deprecation APIs reach stable.
-  if atom.styles.getDeprecations?
+  if core.styles.getDeprecations?
     it "displays deprecated selectors", ->
-      atom.styles.addStyleSheet("atom-text-editor::shadow { color: red }", sourcePath: path.join('some-dir', 'packages', 'package-1', 'file-1.css'))
-      atom.styles.addStyleSheet("atom-text-editor::shadow { color: yellow }", context: 'atom-text-editor', sourcePath: path.join('some-dir', 'packages', 'package-1', 'file-2.css'))
-      atom.styles.addStyleSheet('atom-text-editor::shadow { color: blue }', sourcePath: path.join('another-dir', 'packages', 'package-2', 'file-3.css'))
-      atom.styles.addStyleSheet('atom-text-editor::shadow { color: gray }', sourcePath: path.join('another-dir', 'node_modules', 'package-3', 'file-4.css'))
+      core.styles.addStyleSheet("atom-text-editor::shadow { color: red }", sourcePath: path.join('some-dir', 'packages', 'package-1', 'file-1.css'))
+      core.styles.addStyleSheet("atom-text-editor::shadow { color: yellow }", context: 'atom-text-editor', sourcePath: path.join('some-dir', 'packages', 'package-1', 'file-2.css'))
+      core.styles.addStyleSheet('atom-text-editor::shadow { color: blue }', sourcePath: path.join('another-dir', 'packages', 'package-2', 'file-3.css'))
+      core.styles.addStyleSheet('atom-text-editor::shadow { color: gray }', sourcePath: path.join('another-dir', 'node_modules', 'package-3', 'file-4.css'))
 
       promise = etch.getScheduler().getNextUpdatePromise()
       waitsForPromise -> promise
