@@ -1113,11 +1113,11 @@ module.exports = class Package {
     this.workspaceOpenerSubscriptions = new CompositeDisposable();
     for (let opener of this.getWorkspaceOpeners()) {
       this.workspaceOpenerSubscriptions.add(
-        atom.workspace.addOpener(filePath => {
+        core.workspace.addOpener(filePath => {
           if (filePath === opener) {
             this.activateNow();
             this.workspaceOpenerSubscriptions.dispose();
-            return atom.workspace.createItemForURI(opener);
+            return core.workspace.createItemForURI(opener);
           }
         })
       );
@@ -1367,7 +1367,7 @@ module.exports = class Package {
   }
 
   handleError(message, error) {
-    if (atom.inSpecMode()) throw error;
+    if (core.inSpecMode()) throw error;
 
     let detail, location, stack;
     if (error.filename && error.location && error instanceof SyntaxError) {

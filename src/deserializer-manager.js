@@ -2,14 +2,14 @@ const { Disposable } = require('event-kit');
 
 // Extended: Manages the deserializers used for serialized state
 //
-// An instance of this class is always available as the `atom.deserializers`
+// An instance of this class is always available as the `core.deserializers`
 // global.
 //
 // ## Examples
 //
 // ```coffee
 // class MyPackageView extends View
-//   atom.deserializers.add(this)
+//   core.deserializers.add(this)
 //
 //   @deserialize: (state) ->
 //     new MyPackageView(state)
@@ -33,7 +33,7 @@ module.exports = class DeserializerManager {
   //   instances by adding a `.deserialize()` class method. When your method is
   //   called, it will be passed serialized state as the first argument and the
   //   {AtomEnvironment} object as the second argument, which is useful if you
-  //   wish to avoid referencing the `atom` global.
+  //   wish to avoid referencing the `core` global.
   add(...deserializers) {
     for (let i = 0; i < deserializers.length; i++) {
       let deserializer = deserializers[i];

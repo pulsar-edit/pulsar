@@ -2,7 +2,7 @@ const { Emitter, CompositeDisposable } = require('event-kit');
 
 // Extended: History manager for remembering which projects have been opened.
 //
-// An instance of this class is always available as the `atom.history` global.
+// An instance of this class is always available as the `core.history` global.
 //
 // The project history is used to enable the 'Reopen Project' menu.
 class HistoryManager {

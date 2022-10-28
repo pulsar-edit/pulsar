@@ -9,7 +9,7 @@ const LessCompileCache = require('./less-compile-cache');
 
 // Extended: Handles loading and activating available themes.
 //
-// An instance of this class is always available as the `atom.themes` global.
+// An instance of this class is always available as the `core.themes` global.
 module.exports = class ThemeManager {
   constructor({
     packageManager,

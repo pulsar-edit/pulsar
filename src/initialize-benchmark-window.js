@@ -68,7 +68,7 @@ module.exports = async function() {
 
     const clipboard = new Clipboard();
     TextEditor.setClipboard(clipboard);
-    TextEditor.viewForItem = item => atom.views.getView(item);
+    TextEditor.viewForItem = item => core.views.getView(item);
 
     const applicationDelegate = new ApplicationDelegate();
     const environmentParams = {
@@ -79,11 +79,12 @@ module.exports = async function() {
       configDirPath: process.env.ATOM_HOME,
       enablePersistence: false
     };
-    global.atom = new AtomEnvironment(environmentParams);
-    global.atom.initialize(environmentParams);
+    global.core = new AtomEnvironment(environmentParams);
+    global.atom = global.core;
+    global.core.initialize(environmentParams);
 
     // Prevent benchmarks from modifying application menus
-    global.atom.menu.sendToBrowserProcess = function() {};
+    global.core.menu.sendToBrowserProcess = function() {};
 
     if (headless) {
       Object.defineProperties(process, {

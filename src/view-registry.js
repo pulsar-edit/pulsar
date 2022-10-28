@@ -21,7 +21,7 @@ const AnyConstructor = Symbol('any-constructor');
 // makes [HTML 5 custom elements](http://www.html5rocks.com/en/tutorials/webcomponents/customelements/)
 // an ideal tool for implementing views in Pulsar.
 //
-// You can access the `ViewRegistry` object via `atom.views`.
+// You can access the `ViewRegistry` object via `core.views`.
 module.exports = class ViewRegistry {
   constructor(atomEnvironment) {
     this.animationFrameRequest = null;
@@ -43,12 +43,12 @@ module.exports = class ViewRegistry {
   // ## Examples
   //
   // Text editors are divided into a model and a view layer, so when you interact
-  // with methods like `atom.workspace.getActiveTextEditor()` you're only going
+  // with methods like `core.workspace.getActiveTextEditor()` you're only going
   // to get the model object. We display text editors on screen by teaching the
   // workspace what view constructor it should use to represent them:
   //
   // ```coffee
-  // atom.views.addViewProvider TextEditor, (textEditor) ->
+  // core.views.addViewProvider TextEditor, (textEditor) ->
   //   textEditorElement = new TextEditorElement
   //   textEditorElement.initialize(textEditor)
   //   textEditorElement
@@ -77,7 +77,7 @@ module.exports = class ViewRegistry {
           break;
         case 'object':
           Grim.deprecate(
-            'atom.views.addViewProvider now takes 2 arguments: a model constructor and a createView function. See docs for details.'
+            'core.views.addViewProvider now takes 2 arguments: a model constructor and a createView function. See docs for details.'
           );
           provider = modelConstructor;
           break;

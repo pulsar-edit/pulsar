@@ -9,7 +9,7 @@ let nextId = 0;
 // Extended: Represents the underlying git operations performed by Pulsar.
 //
 // This class shouldn't be instantiated directly but instead by accessing the
-// `atom.project` global and calling `getRepositories()`. Note that this will
+// `core.project` global and calling `getRepositories()`. Note that this will
 // only be available when the project is backed by a Git repository.
 //
 // This class handles submodules automatically by taking a `path` argument to many
@@ -19,7 +19,7 @@ let nextId = 0;
 // For a repository with submodules this would have the following outcome:
 //
 // ```coffee
-// repo = atom.project.getRepositories()[0]
+// repo = core.project.getRepositories()[0]
 // repo.getShortHead() # 'master'
 // repo.getShortHead('vendor/path/to/a/submodule') # 'dead1234'
 // ```
@@ -29,7 +29,7 @@ let nextId = 0;
 // ### Logging the URL of the origin remote
 //
 // ```coffee
-// git = atom.project.getRepositories()[0]
+// git = core.project.getRepositories()[0]
 // console.log git.getOriginURL()
 // ```
 //

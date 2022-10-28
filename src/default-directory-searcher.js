@@ -45,7 +45,7 @@ class DirectorySearch {
   }
 }
 
-// Default provider for the `atom.directory-searcher` service.
+// Default provider for the `core.directory-searcher` service.
 module.exports = class DefaultDirectorySearcher {
   // Determines whether this object supports search for a `Directory`.
   //

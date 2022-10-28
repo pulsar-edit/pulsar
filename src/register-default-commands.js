@@ -92,17 +92,17 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     },
     'application:open': function() {
       var defaultPath, ref, ref1, ref2;
-      defaultPath = (ref = (ref1 = atom.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = atom.project.getPaths()) != null ? ref2[0] : void 0;
+      defaultPath = (ref = (ref1 = core.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = core.project.getPaths()) != null ? ref2[0] : void 0;
       return ipcRenderer.send('open-chosen-any', defaultPath);
     },
     'application:open-file': function() {
       var defaultPath, ref, ref1, ref2;
-      defaultPath = (ref = (ref1 = atom.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = atom.project.getPaths()) != null ? ref2[0] : void 0;
+      defaultPath = (ref = (ref1 = core.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = core.project.getPaths()) != null ? ref2[0] : void 0;
       return ipcRenderer.send('open-chosen-file', defaultPath);
     },
     'application:open-folder': function() {
       var defaultPath, ref, ref1, ref2;
-      defaultPath = (ref = (ref1 = atom.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = atom.project.getPaths()) != null ? ref2[0] : void 0;
+      defaultPath = (ref = (ref1 = core.workspace.getActiveTextEditor()) != null ? ref1.getPath() : void 0) != null ? ref : (ref2 = core.project.getPaths()) != null ? ref2[0] : void 0;
       return ipcRenderer.send('open-chosen-folder', defaultPath);
     },
     'application:open-dev': function() {
@@ -112,7 +112,7 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
       return ipcRenderer.send('command', 'application:open-safe');
     },
     'application:add-project-folder': function() {
-      return atom.addProjectFolder();
+      return core.addProjectFolder();
     },
     'application:minimize': function() {
       return ipcRenderer.send('command', 'application:minimize');
@@ -649,7 +649,7 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
       return this.toggleLineCommentsInSelection();
     },
     'editor:checkout-head-revision': function() {
-      return atom.workspace.checkoutHeadRevision(this);
+      return core.workspace.checkoutHeadRevision(this);
     },
     'editor:move-line-up': function() {
       return this.moveLineUp();

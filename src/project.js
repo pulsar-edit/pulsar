@@ -12,7 +12,7 @@ const GitRepositoryProvider = require('./git-repository-provider');
 
 // Extended: Represents a project that's opened in Pulsar.
 //
-// An instance of this class is always available as the `atom.project` global.
+// An instance of this class is always available as the `core.project` global.
 module.exports = class Project extends Model {
   /*
   Section: Construction and Destruction
@@ -90,7 +90,7 @@ module.exports = class Project extends Model {
   // on top of the current global config.
   replace(projectSpecification) {
     if (projectSpecification == null) {
-      atom.config.clearProjectSettings();
+      core.config.clearProjectSettings();
       this.setPaths([]);
     } else {
       if (projectSpecification.originPath == null) {
@@ -103,7 +103,7 @@ module.exports = class Project extends Model {
           path.dirname(projectSpecification.originPath)
         ];
       }
-      atom.config.resetProjectSettings(
+      core.config.resetProjectSettings(
         projectSpecification.config,
         projectSpecification.originPath
       );
@@ -127,7 +127,7 @@ module.exports = class Project extends Model {
     const handleBufferState = bufferState => {
       if (bufferState.shouldDestroyOnFileDelete == null) {
         bufferState.shouldDestroyOnFileDelete = () =>
-          atom.config.get('core.closeDeletedFileTabs');
+          core.config.get('core.closeDeletedFileTabs');
       }
 
       // Use a little guilty knowledge of the way TextBuffers are serialized.
@@ -299,8 +299,8 @@ module.exports = class Project extends Model {
   // Prefer the following, which evaluates to a {Promise} that resolves to an
   // {Array} of {GitRepository} objects:
   // ```
-  // Promise.all(atom.project.getDirectories().map(
-  //     atom.project.repositoryForDirectory.bind(atom.project)))
+  // Promise.all(core.project.getDirectories().map(
+  //     core.project.repositoryForDirectory.bind(core.project)))
   // ```
   getRepositories() {
     return this.repositories;
@@ -353,7 +353,7 @@ module.exports = class Project extends Model {
     try {
       return this.rootDirectories.map(rootDirectory => rootDirectory.getPath());
     } catch (e) {
-      atom.notifications.addError(
+      core.notifications.addError(
         "Please clear Pulsar's window state with: pulsar --clear-window-state"
       );
     }
@@ -750,7 +750,7 @@ module.exports = class Project extends Model {
   }
 
   shouldDestroyBufferOnFileDelete() {
-    return atom.config.get('core.closeDeletedFileTabs');
+    return core.config.get('core.closeDeletedFileTabs');
   }
 
   // Still needed when deserializing a tokenized buffer

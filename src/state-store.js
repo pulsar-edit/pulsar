@@ -14,7 +14,7 @@ module.exports = class StateStore {
         dbOpenRequest.onupgradeneeded = event => {
           let db = event.target.result;
           db.onerror = error => {
-            atom.notifications.addFatalError('Error loading database', {
+            core.notifications.addFatalError('Error loading database', {
               stack: new Error('Error loading database').stack,
               dismissable: true
             });
@@ -27,7 +27,7 @@ module.exports = class StateStore {
           resolve(dbOpenRequest.result);
         };
         dbOpenRequest.onerror = error => {
-          atom.notifications.addFatalError('Could not connect to indexedDB', {
+          core.notifications.addFatalError('Could not connect to indexedDB', {
             stack: new Error('Could not connect to indexedDB').stack,
             dismissable: true
           });

@@ -15,7 +15,7 @@ if (buildMetadata) {
 // Extended: Provides a registry for menu items that you'd like to appear in the
 // application menu.
 //
-// An instance of this class is always available as the `atom.menu` global.
+// An instance of this class is always available as the `core.menu` global.
 //
 // ## Menu CSON Format
 //
@@ -82,7 +82,7 @@ module.exports = MenuManager = class MenuManager {
   //
   // ## Examples
   // ```javascript
-  //   atom.menu.add([
+  //   core.menu.add([
   //     {
   //       label: 'Hello'
   //       submenu : [{label: 'World!', id: 'World!', command: 'hello:world'}]

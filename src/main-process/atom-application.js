@@ -40,11 +40,11 @@ const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
 const APPLICATION_STATE_VERSION = '1';
 
 const getDefaultPath = () => {
-  const editor = atom.workspace.getActiveTextEditor();
+  const editor = core.workspace.getActiveTextEditor();
   if (!editor || !editor.getPath()) {
     return;
   }
-  const paths = atom.project.getPaths();
+  const paths = core.project.getPaths();
   if (paths) {
     return paths[0];
   }

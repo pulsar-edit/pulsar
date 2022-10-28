@@ -21,7 +21,7 @@ const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
 const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
 
 // Essential: Represents the state of the user interface for the entire window.
-// An instance of this class is available via the `atom.workspace` global.
+// An instance of this class is available via the `core.workspace` global.
 //
 // Interact with this object to open files, be notified of current and future
 // editors, and manipulate panes. To add panels, use {Workspace::addTopPanel}
@@ -260,7 +260,7 @@ module.exports = class Workspace extends Model {
 
   get paneContainer() {
     Grim.deprecate(
-      '`atom.workspace.paneContainer` has always been private, but it is now gone. Please use `atom.workspace.getCenter()` instead and consult the workspace API docs for public methods.'
+      '`core.workspace.paneContainer` has always been private, but it is now gone. Please use `core.workspace.getCenter()` instead and consult the workspace API docs for public methods.'
     );
     return this.paneContainers.center.paneContainer;
   }
@@ -679,7 +679,7 @@ module.exports = class Workspace extends Model {
   // open.
   updateWindowTitle() {
     let itemPath, itemTitle, projectPath, representedPath;
-    const appName = atom.getAppName();
+    const appName = core.getAppName();
     const left = this.project.getPaths();
     const projectPaths = left != null ? left : [];
     const item = this.getActivePaneItem();
@@ -1099,7 +1099,7 @@ module.exports = class Workspace extends Model {
     }
 
     try {
-      if (!atom.config.get('core.allowPendingPaneItems')) {
+      if (!core.config.get('core.allowPendingPaneItems')) {
         options.pending = false;
       }
 
@@ -1504,7 +1504,7 @@ module.exports = class Workspace extends Model {
   // ## Examples
   //
   // ```coffee
-  // atom.workspace.addOpener (uri) ->
+  // core.workspace.addOpener (uri) ->
   //   if path.extname(uri) is '.toml'
   //     return new TomlEditor(uri)
   // ```
@@ -1733,7 +1733,7 @@ module.exports = class Workspace extends Model {
     } else if (this.getCenter().getPanes().length > 1) {
       this.getCenter().destroyActivePane();
     } else if (this.config.get('core.closeEmptyWindows')) {
-      atom.close();
+      core.close();
     }
   }
 
@@ -1834,7 +1834,7 @@ module.exports = class Workspace extends Model {
 
   getVisiblePaneContainers() {
     const center = this.getCenter();
-    return atom.workspace
+    return core.workspace
       .getPaneContainers()
       .filter(container => container === center || container.isVisible());
   }

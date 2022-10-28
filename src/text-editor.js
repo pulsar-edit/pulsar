@@ -43,12 +43,12 @@ const DEFAULT_NON_WORD_CHARACTERS = '/\\()"\':,.;<>~!@#$%^&*|+=[]{}`?-…';
 // ## Accessing TextEditor Instances
 //
 // The easiest way to get hold of `TextEditor` objects is by registering a callback
-// with `::observeTextEditors` on the `atom.workspace` global. Your callback will
+// with `::observeTextEditors` on the `core.workspace` global. Your callback will
 // then be called with all current editor instances and also when any editor is
 // created in the future.
 //
 // ```js
-// atom.workspace.observeTextEditors(editor => {
+// core.workspace.observeTextEditors(editor => {
 //   editor.insertText('Hello World')
 // })
 // ```
@@ -221,11 +221,11 @@ module.exports = class TextEditor {
     } else {
       this.buffer = new TextBuffer({
         shouldDestroyOnFileDelete() {
-          return atom.config.get('core.closeDeletedFileTabs');
+          return core.config.get('core.closeDeletedFileTabs');
         }
       });
       this.buffer.setLanguageMode(
-        new TextMateLanguageMode({ buffer: this.buffer, config: atom.config })
+        new TextMateLanguageMode({ buffer: this.buffer, config: core.config })
       );
     }
 
@@ -1395,7 +1395,7 @@ module.exports = class TextEditor {
 
       let myPathSegments;
       const openEditorPathSegmentsWithSameFilename = [];
-      for (const textEditor of atom.workspace.getTextEditors()) {
+      for (const textEditor of core.workspace.getTextEditors()) {
         if (textEditor.getFileName() === fileName) {
           const pathSegments = fs
             .tildify(textEditor.getDirectoryPath())
@@ -1498,7 +1498,7 @@ module.exports = class TextEditor {
     if (
       windowCloseRequested &&
       projectHasPaths &&
-      atom.stateStore.isConnected()
+      core.stateStore.isConnected()
     ) {
       return this.buffer.isInConflict();
     } else {
@@ -2390,7 +2390,7 @@ module.exports = class TextEditor {
   // the editor is read-only, require an explicit opt-in option to proceed (`bypassReadOnly`) or throw an Error.
   ensureWritable(methodName, opts) {
     if (!opts.bypassReadOnly && this.isReadOnly()) {
-      if (atom.inDevMode() || atom.inSpecMode()) {
+      if (core.inDevMode() || core.inSpecMode()) {
         const e = new Error('Attempt to mutate a read-only TextEditor');
         e.detail =
           `Your package is attempting to call ${methodName} on an editor that has been marked read-only. ` +
@@ -4502,7 +4502,7 @@ module.exports = class TextEditor {
   setGrammar(grammar) {
     const buffer = this.getBuffer();
     buffer.setLanguageMode(
-      atom.grammars.languageModeForGrammarAndBuffer(grammar, buffer)
+      core.grammars.languageModeForGrammarAndBuffer(grammar, buffer)
     );
   }
 

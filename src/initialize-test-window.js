@@ -81,7 +81,7 @@ module.exports = async function({ blobStore }) {
 
       // Copy: cmd-c / ctrl-c
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 67) {
-        atom.clipboard.write(window.getSelection().toString());
+        core.clipboard.write(window.getSelection().toString());
       }
     };
 

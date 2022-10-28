@@ -15,7 +15,7 @@ const PATH_SPLIT_REGEX = new RegExp('[/.]');
 
 // Extended: This class holds the grammars used for tokenizing.
 //
-// An instance of this class is always available as the `atom.grammars` global.
+// An instance of this class is always available as the `core.grammars` global.
 module.exports = class GrammarRegistry {
   constructor({ config } = {}) {
     this.config = config;
@@ -375,7 +375,7 @@ module.exports = class GrammarRegistry {
   // Returns a {String} such as `"source.js"`.
   grammarOverrideForPath(filePath) {
     Grim.deprecate('Use buffer.getLanguageMode().getLanguageId() instead');
-    const buffer = atom.project.findBufferForPath(filePath);
+    const buffer = core.project.findBufferForPath(filePath);
     if (buffer) return this.getAssignedLanguageId(buffer);
   }
 
@@ -387,9 +387,9 @@ module.exports = class GrammarRegistry {
   // Returns undefined.
   setGrammarOverrideForPath(filePath, languageId) {
     Grim.deprecate(
-      'Use atom.grammars.assignLanguageMode(buffer, languageId) instead'
+      'Use core.grammars.assignLanguageMode(buffer, languageId) instead'
     );
-    const buffer = atom.project.findBufferForPath(filePath);
+    const buffer = core.project.findBufferForPath(filePath);
     if (buffer) {
       const grammar = this.grammarForScopeName(languageId);
       if (grammar)
@@ -403,8 +403,8 @@ module.exports = class GrammarRegistry {
   //
   // Returns undefined.
   clearGrammarOverrideForPath(filePath) {
-    Grim.deprecate('Use atom.grammars.autoAssignLanguageMode(buffer) instead');
-    const buffer = atom.project.findBufferForPath(filePath);
+    Grim.deprecate('Use core.grammars.autoAssignLanguageMode(buffer) instead');
+    const buffer = core.project.findBufferForPath(filePath);
     if (buffer) this.languageOverridesByBufferId.delete(buffer.id);
   }
 

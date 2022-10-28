@@ -27,12 +27,12 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
 // Experimental: This global registry tracks registered `TextEditors`.
 //
 // If you want to add functionality to a wider set of text editors than just
-// those appearing within workspace panes, use `atom.textEditors.observe` to
+// those appearing within workspace panes, use `core.textEditors.observe` to
 // invoke a callback for all current and future registered text editors.
 //
 // If you want packages to be able to add functionality to your non-pane text
 // editors (such as a search field in a custom user interface element), register
-// them for observation via `atom.textEditors.add`. **Important:** When you're
+// them for observation via `core.textEditors.add`. **Important:** When you're
 // done using your editor, be sure to call `dispose` on the returned disposable
 // to avoid leaking editors.
 module.exports = class TextEditorRegistry {
@@ -201,7 +201,7 @@ module.exports = class TextEditorRegistry {
   // Returns a {Disposable} that can be used to stop updating the editor's
   // grammar.
   maintainGrammar(editor) {
-    atom.grammars.maintainLanguageMode(editor.getBuffer());
+    core.grammars.maintainLanguageMode(editor.getBuffer());
   }
 
   // Deprecated: Force a {TextEditor} to use a different grammar than the
@@ -210,7 +210,7 @@ module.exports = class TextEditorRegistry {
   // * `editor` The editor whose gramamr will be set.
   // * `languageId` The {String} language ID for the desired {Grammar}.
   setGrammarOverride(editor, languageId) {
-    atom.grammars.assignLanguageMode(editor.getBuffer(), languageId);
+    core.grammars.assignLanguageMode(editor.getBuffer(), languageId);
   }
 
   // Deprecated: Retrieve the grammar scope name that has been set as a
@@ -221,14 +221,14 @@ module.exports = class TextEditorRegistry {
   // Returns a {String} scope name, or `null` if no override has been set
   // for the given editor.
   getGrammarOverride(editor) {
-    return atom.grammars.getAssignedLanguageId(editor.getBuffer());
+    return core.grammars.getAssignedLanguageId(editor.getBuffer());
   }
 
   // Deprecated: Remove any grammar override that has been set for the given {TextEditor}.
   //
   // * `editor` The editor.
   clearGrammarOverride(editor) {
-    atom.grammars.autoAssignLanguageMode(editor.getBuffer());
+    core.grammars.autoAssignLanguageMode(editor.getBuffer());
   }
 
   async updateAndMonitorEditorSettings(editor, oldLanguageMode) {

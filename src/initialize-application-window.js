@@ -66,7 +66,7 @@ if (global.isGeneratingSnapshot) {
 
 const clipboard = new Clipboard();
 TextEditor.setClipboard(clipboard);
-TextEditor.viewForItem = item => atom.views.getView(item);
+TextEditor.viewForItem = item => core.views.getView(item);
 
 global.core = new AtomEnvironment({
   clipboard,
@@ -75,8 +75,8 @@ global.core = new AtomEnvironment({
 });
 global.atom = global.core;
 
-TextEditor.setScheduler(global.atom.views);
-global.atom.preloadPackages();
+TextEditor.setScheduler(global.core.views);
+global.core.preloadPackages();
 
 // Like sands through the hourglass, so are the days of our lives.
 module.exports = function({ blobStore }) {
@@ -98,7 +98,7 @@ module.exports = function({ blobStore }) {
     process.env.NODE_ENV = 'production';
   }
 
-  global.atom.initialize({
+  global.core.initialize({
     window,
     document,
     blobStore,
@@ -106,7 +106,7 @@ module.exports = function({ blobStore }) {
     env: process.env
   });
 
-  return global.atom.startEditorWindow().then(function() {
+  return global.core.startEditorWindow().then(function() {
     // Workaround for focus getting cleared upon window creation
     const windowFocused = function() {
       window.removeEventListener('focus', windowFocused);

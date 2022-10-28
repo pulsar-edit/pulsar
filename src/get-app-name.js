@@ -3,7 +3,7 @@ const getReleaseChannel = require('./get-release-channel');
 
 module.exports = function getAppName() {
   if (process.type === 'renderer') {
-    return atom.getAppName();
+    return core.getAppName();
   }
 
   const releaseChannel = getReleaseChannel(app.getVersion());

@@ -189,7 +189,7 @@ module.exports = class PackageManager {
   //
   // Return a {String} file path to apm.
   getApmPath() {
-    const configPath = atom.config.get('core.apmPath');
+    const configPath = core.config.get('core.apmPath');
     if (process.env.APM_PATH || configPath || this.apmPath) {
       return process.env.APM_PATH || configPath || this.apmPath;
     }

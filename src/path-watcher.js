@@ -480,9 +480,9 @@ class PathWatcherManager {
   static active() {
     if (!this.activeManager) {
       this.activeManager = new PathWatcherManager(
-        atom.config.get('core.fileSystemWatcher')
+        core.config.get('core.fileSystemWatcher')
       );
-      this.sub = atom.config.onDidChange(
+      this.sub = core.config.onDidChange(
         'core.fileSystemWatcher',
         ({ newValue }) => {
           this.transitionTo(newValue);

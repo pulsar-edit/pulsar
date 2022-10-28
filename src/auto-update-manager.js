@@ -50,7 +50,7 @@ module.exports = class AutoUpdateManager {
 
   platformSupportsUpdates() {
     return (
-      atom.getReleaseChannel() !== 'dev' && this.getState() !== 'unsupported'
+      core.getReleaseChannel() !== 'dev' && this.getState() !== 'unsupported'
     );
   }
 

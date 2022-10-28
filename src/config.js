@@ -15,23 +15,23 @@ const schemaEnforcers = {};
 
 // Essential: Used to access all of Pulsar's configuration details.
 //
-// An instance of this class is always available as the `atom.config` global.
+// An instance of this class is always available as the `core.config` global.
 //
 // ## Getting and setting config settings.
 //
 // ```coffee
 // # Note that with no value set, ::get returns the setting's default value.
-// atom.config.get('my-package.myKey') # -> 'defaultValue'
+// core.config.get('my-package.myKey') # -> 'defaultValue'
 //
-// atom.config.set('my-package.myKey', 'value')
-// atom.config.get('my-package.myKey') # -> 'value'
+// core.config.set('my-package.myKey', 'value')
+// core.config.get('my-package.myKey') # -> 'value'
 // ```
 //
 // You may want to watch for changes. Use {::observe} to catch changes to the setting.
 //
 // ```coffee
-// atom.config.set('my-package.myKey', 'value')
-// atom.config.observe 'my-package.myKey', (newValue) ->
+// core.config.set('my-package.myKey', 'value')
+// core.config.observe 'my-package.myKey', (newValue) ->
 //   # `observe` calls immediately and every time the value is changed
 //   console.log 'My configuration changed:', newValue
 // ```
@@ -39,7 +39,7 @@ const schemaEnforcers = {};
 // If you want a notification only when the value changes, use {::onDidChange}.
 //
 // ```coffee
-// atom.config.onDidChange 'my-package.myKey', ({newValue, oldValue}) ->
+// core.config.onDidChange 'my-package.myKey', ({newValue, oldValue}) ->
 //   console.log 'My configuration changed:', newValue, oldValue
 // ```
 //
@@ -51,15 +51,15 @@ const schemaEnforcers = {};
 //
 // ```coffee
 // # When no value has been set, `::get` returns the setting's default value
-// atom.config.get('my-package.anInt') # -> 12
+// core.config.get('my-package.anInt') # -> 12
 //
 // # The string will be coerced to the integer 123
-// atom.config.set('my-package.anInt', '123')
-// atom.config.get('my-package.anInt') # -> 123
+// core.config.set('my-package.anInt', '123')
+// core.config.get('my-package.anInt') # -> 123
 //
 // # The string will be coerced to an integer, but it must be greater than 0, so is set to 1
-// atom.config.set('my-package.anInt', '-20')
-// atom.config.get('my-package.anInt') # -> 1
+// core.config.set('my-package.anInt', '-20')
+// core.config.get('my-package.anInt') # -> 1
 // ```
 //
 // ## Defining settings for your package
@@ -104,16 +104,16 @@ const schemaEnforcers = {};
 // set to a string `'10'`, it will be coerced into an integer.
 //
 // ```coffee
-// atom.config.set('my-package.thingVolume', '10')
-// atom.config.get('my-package.thingVolume') # -> 10
+// core.config.set('my-package.thingVolume', '10')
+// core.config.get('my-package.thingVolume') # -> 10
 //
 // # It respects the min / max
-// atom.config.set('my-package.thingVolume', '400')
-// atom.config.get('my-package.thingVolume') # -> 11
+// core.config.set('my-package.thingVolume', '400')
+// core.config.get('my-package.thingVolume') # -> 11
 //
 // # If it cannot be coerced, the value will not be set
-// atom.config.set('my-package.thingVolume', 'cats')
-// atom.config.get('my-package.thingVolume') # -> 11
+// core.config.set('my-package.thingVolume', 'cats')
+// core.config.get('my-package.thingVolume') # -> 11
 // ```
 //
 // ### Supported Types
@@ -128,11 +128,11 @@ const schemaEnforcers = {};
 //     default: 5
 //
 // # Then
-// atom.config.set('my-package.someSetting', 'true')
-// atom.config.get('my-package.someSetting') # -> true
+// core.config.set('my-package.someSetting', 'true')
+// core.config.get('my-package.someSetting') # -> true
 //
-// atom.config.set('my-package.someSetting', '12')
-// atom.config.get('my-package.someSetting') # -> 12
+// core.config.set('my-package.someSetting', '12')
+// core.config.get('my-package.someSetting') # -> 12
 // ```
 //
 // #### string
@@ -287,16 +287,16 @@ const schemaEnforcers = {};
 // Usage:
 //
 // ```coffee
-// atom.config.set('my-package.someSetting', '2')
-// atom.config.get('my-package.someSetting') # -> 2
+// core.config.set('my-package.someSetting', '2')
+// core.config.get('my-package.someSetting') # -> 2
 //
 // # will not set values outside of the enum values
-// atom.config.set('my-package.someSetting', '3')
-// atom.config.get('my-package.someSetting') # -> 2
+// core.config.set('my-package.someSetting', '3')
+// core.config.get('my-package.someSetting') # -> 2
 //
 // # If it cannot be coerced, the value will not be set
-// atom.config.set('my-package.someSetting', '4')
-// atom.config.get('my-package.someSetting') # -> 4
+// core.config.set('my-package.someSetting', '4')
+// core.config.get('my-package.someSetting') # -> 4
 // ```
 //
 // #### title and description
@@ -367,8 +367,8 @@ const schemaEnforcers = {};
 // You can still do the following
 //
 // ```coffee
-// let otherSetting  = atom.config.get('some-package.otherSetting')
-// atom.config.set('some-package.stillAnotherSetting', otherSetting * 5)
+// let otherSetting  = core.config.get('some-package.otherSetting')
+// core.config.set('some-package.stillAnotherSetting', otherSetting * 5)
 // ```
 //
 // In other words, if a function asks for a `key-path`, that path doesn't have to
@@ -426,7 +426,7 @@ class Config {
     return value;
   }
 
-  // Created during initialization, available as `atom.config`
+  // Created during initialization, available as `core.config`
   constructor(params = {}) {
     this.clear();
     this.initialize(params);
@@ -478,7 +478,7 @@ class Config {
   // `core.themes` for changes
   //
   // ```coffee
-  // atom.config.observe 'core.themes', (value) ->
+  // core.config.observe 'core.themes', (value) ->
   //   # do stuff with value
   // ```
   //
@@ -570,7 +570,7 @@ class Config {
   // You might want to know what themes are enabled, so check `core.themes`
   //
   // ```coffee
-  // atom.config.get('core.themes')
+  // core.config.get('core.themes')
   // ```
   //
   // With scope descriptors you can get settings within a specific editor
@@ -578,14 +578,14 @@ class Config {
   // files.
   //
   // ```coffee
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
+  // core.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
   // ```
   //
   // This setting in ruby files might be different than the global tabLength setting
   //
   // ```coffee
-  // atom.config.get('editor.tabLength') # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
+  // core.config.get('editor.tabLength') # => 4
+  // core.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
   // ```
   //
   // You can get the language scope descriptor via
@@ -593,14 +593,14 @@ class Config {
   // for the editor's language.
   //
   // ```coffee
-  // atom.config.get('editor.tabLength', scope: @editor.getRootScopeDescriptor()) # => 2
+  // core.config.get('editor.tabLength', scope: @editor.getRootScopeDescriptor()) # => 2
   // ```
   //
   // Additionally, you can get the setting at the specific cursor position.
   //
   // ```coffee
   // scopeDescriptor = @editor.getLastCursor().getScopeDescriptor()
-  // atom.config.get('editor.tabLength', scope: scopeDescriptor) # => 2
+  // core.config.get('editor.tabLength', scope: scopeDescriptor) # => 2
   // ```
   //
   // * `keyPath` The {String} name of the key to retrieve.
@@ -695,24 +695,24 @@ class Config {
   // You might want to change the themes programmatically:
   //
   // ```coffee
-  // atom.config.set('core.themes', ['atom-light-ui', 'atom-light-syntax'])
+  // core.config.set('core.themes', ['atom-light-ui', 'atom-light-syntax'])
   // ```
   //
   // You can also set scoped settings. For example, you might want change the
   // `editor.tabLength` only for ruby files.
   //
   // ```coffee
-  // atom.config.get('editor.tabLength') # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.js']) # => 4
+  // core.config.get('editor.tabLength') # => 4
+  // core.config.get('editor.tabLength', scope: ['source.ruby']) # => 4
+  // core.config.get('editor.tabLength', scope: ['source.js']) # => 4
   //
   // # Set ruby to 2
-  // atom.config.set('editor.tabLength', 2, scopeSelector: '.source.ruby') # => true
+  // core.config.set('editor.tabLength', 2, scopeSelector: '.source.ruby') # => true
   //
   // # Notice it's only set to 2 in the case of ruby
-  // atom.config.get('editor.tabLength') # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
-  // atom.config.get('editor.tabLength', scope: ['source.js']) # => 4
+  // core.config.get('editor.tabLength') # => 4
+  // core.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
+  // core.config.get('editor.tabLength', scope: ['source.js']) # => 4
   // ```
   //
   // * `keyPath` The {String} name of the key.

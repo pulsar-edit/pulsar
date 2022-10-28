@@ -4,7 +4,7 @@ let Tooltip = null;
 
 // Essential: Associates tooltips with HTML elements.
 //
-// You can get the `TooltipManager` via `atom.tooltips`.
+// You can get the `TooltipManager` via `core.tooltips`.
 //
 // ## Examples
 //
@@ -12,7 +12,7 @@ let Tooltip = null;
 //
 // ```js
 // // display it
-// const disposable = atom.tooltips.add(div, {title: 'This is a tooltip'})
+// const disposable = core.tooltips.add(div, {title: 'This is a tooltip'})
 //
 // // remove it
 // disposable.dispose()
@@ -27,8 +27,8 @@ let Tooltip = null;
 //
 // const div1 = document.createElement('div')
 // const div2 = document.createElement('div')
-// subscriptions.add(atom.tooltips.add(div1, {title: 'This is a tooltip'}))
-// subscriptions.add(atom.tooltips.add(div2, {title: 'Another tooltip'}))
+// subscriptions.add(core.tooltips.add(div1, {title: 'This is a tooltip'}))
+// subscriptions.add(core.tooltips.add(div2, {title: 'Another tooltip'}))
 //
 // // remove them all
 // subscriptions.dispose()
@@ -38,7 +38,7 @@ let Tooltip = null;
 // `keyBindingCommand` option.
 //
 // ```js
-// disposable = atom.tooltips.add(this.caseOptionButton, {
+// disposable = core.tooltips.add(this.caseOptionButton, {
 //   title: 'Match Case',
 //   keyBindingCommand: 'find-and-replace:toggle-case-option',
 //   keyBindingTarget: this.findEditor.element
