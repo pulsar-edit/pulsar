@@ -50,11 +50,11 @@ describe('TreeIndenter', () => {
   let languageMode, treeIndenter;
 
   beforeEach(async () => {
-    editor = await atom.workspace.open('');
+    editor = await core.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
 
-    grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
+    grammar = new TreeSitterGrammar(core.grammars, jsGrammarPath, {
       parser: 'tree-sitter-javascript'
     });
   });

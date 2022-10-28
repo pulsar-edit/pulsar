@@ -38,7 +38,7 @@ describe('Smoke Test', () => {
       const roots = await client.treeViewRootDirectories();
       expect(roots).toEqual([tempDirPath]);
 
-      await client.execute(filePath => atom.workspace.open(filePath), filePath);
+      await client.execute(filePath => core.workspace.open(filePath), filePath);
 
       const textEditorElement = await client.$('atom-text-editor');
       await textEditorElement.waitForExist(5000);
@@ -55,7 +55,7 @@ describe('Smoke Test', () => {
       await client.keys('Hello!');
 
       const text = await client.execute(() =>
-        atom.workspace.getActiveTextEditor().getText()
+        core.workspace.getActiveTextEditor().getText()
       );
       expect(text).toBe('Hello!');
 

@@ -796,7 +796,8 @@ describe('AtomApplication', function() {
         app = scenario.getApplication(0);
         app.removeWindow(w);
         sinon.stub(app, 'promptForPathToOpen');
-        global.atom = { workspace: { getActiveTextEditor() {} } };
+        global.core = { workspace: { getActiveTextEditor() {} } };
+        global.atom = global.core;
       });
 
       it('opens a new file', function() {
@@ -920,7 +921,7 @@ describe('AtomApplication', function() {
     // * choosing "open in new window" when adding a folder that has previously saved state
     // * drag and drop
     // * deprecated call links in deprecation-cop
-    // * other direct callers of `atom.open()`
+    // * other direct callers of `core.open()`
     it('"open" opens a fixed path by the standard opening rules', async function() {
       sinon.stub(app, 'atomWindowForEvent').callsFake(() => w1);
 

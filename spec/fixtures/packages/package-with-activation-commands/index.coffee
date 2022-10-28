@@ -5,5 +5,5 @@ module.exports =
   activate: ->
     @activateCallCount++
 
-    atom.commands.add 'atom-workspace', 'activation-command', =>
+    core.commands.add 'atom-workspace', 'activation-command', =>
       @activationCommandCallCount++

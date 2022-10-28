@@ -12,9 +12,9 @@ describe('TextEditorRegistry', function() {
     initialPackageActivation = Promise.resolve();
 
     registry = new TextEditorRegistry({
-      assert: atom.assert,
-      config: atom.config,
-      grammarRegistry: atom.grammars,
+      assert: core.assert,
+      config: core.config,
+      grammarRegistry: core.grammars,
       packageManager: {
         getActivatePromise() {
           return initialPackageActivation;
@@ -24,7 +24,7 @@ describe('TextEditorRegistry', function() {
 
     editor = new TextEditor({ autoHeight: false });
     expect(
-      atom.grammars.assignLanguageMode(editor, 'text.plain.null-grammar')
+      core.grammars.assignLanguageMode(editor, 'text.plain.null-grammar')
     ).toBe(true);
   });
 
@@ -71,7 +71,7 @@ describe('TextEditorRegistry', function() {
 
   describe('.build', function() {
     it('constructs a TextEditor with the right parameters based on its path and text', function() {
-      atom.config.set('editor.tabLength', 8, { scope: '.source.js' });
+      core.config.set('editor.tabLength', 8, { scope: '.source.js' });
 
       const languageMode = {
         grammar: NullGrammar,
@@ -104,11 +104,11 @@ describe('TextEditorRegistry', function() {
 
   describe('.maintainConfig(editor)', function() {
     it('does not update the editor when config settings change for unrelated scope selectors', async function() {
-      await atom.packages.activatePackage('language-javascript');
+      await core.packages.activatePackage('language-javascript');
 
       const editor2 = new TextEditor();
 
-      atom.grammars.assignLanguageMode(editor2, 'source.js');
+      core.grammars.assignLanguageMode(editor2, 'source.js');
 
       registry.maintainConfig(editor);
       registry.maintainConfig(editor2);
@@ -124,10 +124,10 @@ describe('TextEditorRegistry', function() {
       expect(editor.getEncoding()).toBe('utf8');
       expect(editor2.getEncoding()).toBe('utf8');
 
-      atom.config.set('core.fileEncoding', 'utf16le', {
+      core.config.set('core.fileEncoding', 'utf16le', {
         scopeSelector: '.text.plain.null-grammar'
       });
-      atom.config.set('core.fileEncoding', 'utf16be', {
+      core.config.set('core.fileEncoding', 'utf16be', {
         scopeSelector: '.source.js'
       });
 
@@ -141,13 +141,13 @@ describe('TextEditorRegistry', function() {
         resolveActivatePromise = resolve;
       });
 
-      atom.config.set('core.fileEncoding', 'utf16le');
+      core.config.set('core.fileEncoding', 'utf16le');
 
       registry.maintainConfig(editor);
       await Promise.resolve();
       expect(editor.getEncoding()).toBe('utf8');
 
-      atom.config.set('core.fileEncoding', 'utf16be');
+      core.config.set('core.fileEncoding', 'utf16be');
       await Promise.resolve();
       expect(editor.getEncoding()).toBe('utf8');
 
@@ -157,37 +157,37 @@ describe('TextEditorRegistry', function() {
     });
 
     it("updates the editor's settings when its grammar changes", async function() {
-      await atom.packages.activatePackage('language-javascript');
+      await core.packages.activatePackage('language-javascript');
 
       registry.maintainConfig(editor);
       await initialPackageActivation;
 
-      atom.config.set('core.fileEncoding', 'utf16be', {
+      core.config.set('core.fileEncoding', 'utf16be', {
         scopeSelector: '.source.js'
       });
       expect(editor.getEncoding()).toBe('utf8');
 
-      atom.config.set('core.fileEncoding', 'utf16le', {
+      core.config.set('core.fileEncoding', 'utf16le', {
         scopeSelector: '.source.js'
       });
       expect(editor.getEncoding()).toBe('utf8');
 
-      atom.grammars.assignLanguageMode(editor, 'source.js');
+      core.grammars.assignLanguageMode(editor, 'source.js');
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe('utf16le');
 
-      atom.config.set('core.fileEncoding', 'utf16be', {
+      core.config.set('core.fileEncoding', 'utf16be', {
         scopeSelector: '.source.js'
       });
       expect(editor.getEncoding()).toBe('utf16be');
 
-      atom.grammars.assignLanguageMode(editor, 'text.plain.null-grammar');
+      core.grammars.assignLanguageMode(editor, 'text.plain.null-grammar');
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe('utf8');
     });
 
     it("preserves editor settings that haven't changed between previous and current language modes", async function() {
-      await atom.packages.activatePackage('language-javascript');
+      await core.packages.activatePackage('language-javascript');
 
       registry.maintainConfig(editor);
       await initialPackageActivation;
@@ -200,23 +200,23 @@ describe('TextEditorRegistry', function() {
       editor.setSoftWrapped(true);
       expect(editor.isSoftWrapped()).toBe(true);
 
-      atom.grammars.assignLanguageMode(editor, 'source.js');
+      core.grammars.assignLanguageMode(editor, 'source.js');
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe('utf16le');
       expect(editor.isSoftWrapped()).toBe(true);
     });
 
     it('updates editor settings that have changed between previous and current language modes', async function() {
-      await atom.packages.activatePackage('language-javascript');
+      await core.packages.activatePackage('language-javascript');
 
       registry.maintainConfig(editor);
       await initialPackageActivation;
 
       expect(editor.getEncoding()).toBe('utf8');
-      atom.config.set('core.fileEncoding', 'utf16be', {
+      core.config.set('core.fileEncoding', 'utf16be', {
         scopeSelector: '.text.plain.null-grammar'
       });
-      atom.config.set('core.fileEncoding', 'utf16le', {
+      core.config.set('core.fileEncoding', 'utf16le', {
         scopeSelector: '.source.js'
       });
       expect(editor.getEncoding()).toBe('utf16be');
@@ -224,13 +224,13 @@ describe('TextEditorRegistry', function() {
       editor.setEncoding('utf8');
       expect(editor.getEncoding()).toBe('utf8');
 
-      atom.grammars.assignLanguageMode(editor, 'source.js');
+      core.grammars.assignLanguageMode(editor, 'source.js');
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe('utf16le');
     });
 
     it("returns a disposable that can be used to stop the registry from updating the editor's config", async function() {
-      await atom.packages.activatePackage('language-javascript');
+      await core.packages.activatePackage('language-javascript');
 
       const previousSubscriptionCount = getSubscriptionCount(editor);
       const disposable = registry.maintainConfig(editor);
@@ -240,14 +240,14 @@ describe('TextEditorRegistry', function() {
       );
       expect(registry.editorsWithMaintainedConfig.size).toBe(1);
 
-      atom.config.set('core.fileEncoding', 'utf16be');
+      core.config.set('core.fileEncoding', 'utf16be');
       expect(editor.getEncoding()).toBe('utf16be');
-      atom.config.set('core.fileEncoding', 'utf8');
+      core.config.set('core.fileEncoding', 'utf8');
       expect(editor.getEncoding()).toBe('utf8');
 
       disposable.dispose();
 
-      atom.config.set('core.fileEncoding', 'utf16be');
+      core.config.set('core.fileEncoding', 'utf16be');
       expect(editor.getEncoding()).toBe('utf8');
       expect(getSubscriptionCount(editor)).toBe(previousSubscriptionCount);
       expect(retainedEditorCount(registry)).toBe(0);
@@ -257,12 +257,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ encoding: 'utf8' });
       expect(editor.getEncoding()).toBe('utf8');
 
-      atom.config.set('core.fileEncoding', 'utf16le');
+      core.config.set('core.fileEncoding', 'utf16le');
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe('utf16le');
 
-      atom.config.set('core.fileEncoding', 'utf8');
+      core.config.set('core.fileEncoding', 'utf8');
       expect(editor.getEncoding()).toBe('utf8');
     });
 
@@ -270,24 +270,24 @@ describe('TextEditorRegistry', function() {
       editor.update({ tabLength: 4 });
       expect(editor.getTabLength()).toBe(4);
 
-      atom.config.set('editor.tabLength', 8);
+      core.config.set('editor.tabLength', 8);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getTabLength()).toBe(8);
 
-      atom.config.set('editor.tabLength', 4);
+      core.config.set('editor.tabLength', 4);
       expect(editor.getTabLength()).toBe(4);
     });
 
     it('enables soft tabs when the tabType config setting is "soft"', async function() {
-      atom.config.set('editor.tabType', 'soft');
+      core.config.set('editor.tabType', 'soft');
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftTabs()).toBe(true);
     });
 
     it('disables soft tabs when the tabType config setting is "hard"', async function() {
-      atom.config.set('editor.tabType', 'hard');
+      core.config.set('editor.tabType', 'hard');
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftTabs()).toBe(false);
@@ -296,9 +296,9 @@ describe('TextEditorRegistry', function() {
     describe('when the "tabType" config setting is "auto"', function() {
       it("enables or disables soft tabs based on the editor's content", async function() {
         await initialPackageActivation;
-        await atom.packages.activatePackage('language-javascript');
-        atom.grammars.assignLanguageMode(editor, 'source.js');
-        atom.config.set('editor.tabType', 'auto');
+        await core.packages.activatePackage('language-javascript');
+        core.grammars.assignLanguageMode(editor, 'source.js');
+        core.config.set('editor.tabType', 'auto');
         await initialPackageActivation;
 
         editor.setText(dedent`
@@ -368,11 +368,11 @@ describe('TextEditorRegistry', function() {
         await initialPackageActivation;
 
         editor.setText('abc\ndef');
-        atom.config.set('editor.softTabs', true);
-        atom.config.set('editor.tabType', 'auto');
+        core.config.set('editor.softTabs', true);
+        core.config.set('editor.tabType', 'auto');
         expect(editor.getSoftTabs()).toBe(true);
 
-        atom.config.set('editor.softTabs', false);
+        core.config.set('editor.softTabs', false);
         expect(editor.getSoftTabs()).toBe(false);
       });
     });
@@ -381,16 +381,16 @@ describe('TextEditorRegistry', function() {
       editor.update({ softTabs: true });
       expect(editor.getSoftTabs()).toBe(true);
 
-      atom.config.set('editor.tabType', 'hard');
+      core.config.set('editor.tabType', 'hard');
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftTabs()).toBe(false);
 
-      atom.config.set('editor.tabType', 'soft');
+      core.config.set('editor.tabType', 'soft');
       expect(editor.getSoftTabs()).toBe(true);
 
-      atom.config.set('editor.tabType', 'auto');
-      atom.config.set('editor.softTabs', true);
+      core.config.set('editor.tabType', 'auto');
+      core.config.set('editor.softTabs', true);
       expect(editor.getSoftTabs()).toBe(true);
     });
 
@@ -398,12 +398,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ atomicSoftTabs: true });
       expect(editor.hasAtomicSoftTabs()).toBe(true);
 
-      atom.config.set('editor.atomicSoftTabs', false);
+      core.config.set('editor.atomicSoftTabs', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.hasAtomicSoftTabs()).toBe(false);
 
-      atom.config.set('editor.atomicSoftTabs', true);
+      core.config.set('editor.atomicSoftTabs', true);
       expect(editor.hasAtomicSoftTabs()).toBe(true);
     });
 
@@ -411,12 +411,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ showCursorOnSelection: true });
       expect(editor.getShowCursorOnSelection()).toBe(true);
 
-      atom.config.set('editor.showCursorOnSelection', false);
+      core.config.set('editor.showCursorOnSelection', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getShowCursorOnSelection()).toBe(false);
 
-      atom.config.set('editor.showCursorOnSelection', true);
+      core.config.set('editor.showCursorOnSelection', true);
       expect(editor.getShowCursorOnSelection()).toBe(true);
     });
 
@@ -424,12 +424,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ showLineNumbers: true });
       expect(editor.showLineNumbers).toBe(true);
 
-      atom.config.set('editor.showLineNumbers', false);
+      core.config.set('editor.showLineNumbers', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.showLineNumbers).toBe(false);
 
-      atom.config.set('editor.showLineNumbers', true);
+      core.config.set('editor.showLineNumbers', true);
       expect(editor.showLineNumbers).toBe(true);
     });
 
@@ -443,16 +443,16 @@ describe('TextEditorRegistry', function() {
       });
       expect(editor.getInvisibles()).toEqual(invisibles1);
 
-      atom.config.set('editor.showInvisibles', true);
-      atom.config.set('editor.invisibles', invisibles2);
+      core.config.set('editor.showInvisibles', true);
+      core.config.set('editor.invisibles', invisibles2);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getInvisibles()).toEqual(invisibles2);
 
-      atom.config.set('editor.invisibles', invisibles1);
+      core.config.set('editor.invisibles', invisibles1);
       expect(editor.getInvisibles()).toEqual(invisibles1);
 
-      atom.config.set('editor.showInvisibles', false);
+      core.config.set('editor.showInvisibles', false);
       expect(editor.getInvisibles()).toEqual({});
     });
 
@@ -460,12 +460,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ showIndentGuide: true });
       expect(editor.doesShowIndentGuide()).toBe(true);
 
-      atom.config.set('editor.showIndentGuide', false);
+      core.config.set('editor.showIndentGuide', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.doesShowIndentGuide()).toBe(false);
 
-      atom.config.set('editor.showIndentGuide', true);
+      core.config.set('editor.showIndentGuide', true);
       expect(editor.doesShowIndentGuide()).toBe(true);
     });
 
@@ -473,12 +473,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ softWrapped: true });
       expect(editor.isSoftWrapped()).toBe(true);
 
-      atom.config.set('editor.softWrap', false);
+      core.config.set('editor.softWrap', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.isSoftWrapped()).toBe(false);
 
-      atom.config.set('editor.softWrap', true);
+      core.config.set('editor.softWrap', true);
       expect(editor.isSoftWrapped()).toBe(true);
     });
 
@@ -486,12 +486,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ softWrapHangingIndentLength: 4 });
       expect(editor.getSoftWrapHangingIndentLength()).toBe(4);
 
-      atom.config.set('editor.softWrapHangingIndent', 2);
+      core.config.set('editor.softWrapHangingIndent', 2);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftWrapHangingIndentLength()).toBe(2);
 
-      atom.config.set('editor.softWrapHangingIndent', 4);
+      core.config.set('editor.softWrapHangingIndent', 4);
       expect(editor.getSoftWrapHangingIndentLength()).toBe(4);
     });
 
@@ -505,13 +505,13 @@ describe('TextEditorRegistry', function() {
 
       expect(editor.getSoftWrapColumn()).toBe(80);
 
-      atom.config.set('editor.softWrap', true);
-      atom.config.set('editor.softWrapAtPreferredLineLength', false);
+      core.config.set('editor.softWrap', true);
+      core.config.set('editor.softWrapAtPreferredLineLength', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftWrapColumn()).toBe(120);
 
-      atom.config.set('editor.softWrapAtPreferredLineLength', true);
+      core.config.set('editor.softWrapAtPreferredLineLength', true);
       expect(editor.getSoftWrapColumn()).toBe(80);
     });
 
@@ -523,8 +523,8 @@ describe('TextEditorRegistry', function() {
 
       expect(editor.getSoftWrapColumn()).toBe(1500);
 
-      atom.config.set('editor.softWrap', false);
-      atom.config.set('editor.maxScreenLineLength', 500);
+      core.config.set('editor.softWrap', false);
+      core.config.set('editor.maxScreenLineLength', 500);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftWrapColumn()).toBe(500);
@@ -534,12 +534,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ preferredLineLength: 80 });
       expect(editor.getPreferredLineLength()).toBe(80);
 
-      atom.config.set('editor.preferredLineLength', 110);
+      core.config.set('editor.preferredLineLength', 110);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getPreferredLineLength()).toBe(110);
 
-      atom.config.set('editor.preferredLineLength', 80);
+      core.config.set('editor.preferredLineLength', 80);
       expect(editor.getPreferredLineLength()).toBe(80);
     });
 
@@ -547,12 +547,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ autoIndent: true });
       expect(editor.shouldAutoIndent()).toBe(true);
 
-      atom.config.set('editor.autoIndent', false);
+      core.config.set('editor.autoIndent', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.shouldAutoIndent()).toBe(false);
 
-      atom.config.set('editor.autoIndent', true);
+      core.config.set('editor.autoIndent', true);
       expect(editor.shouldAutoIndent()).toBe(true);
     });
 
@@ -560,12 +560,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ autoIndentOnPaste: true });
       expect(editor.shouldAutoIndentOnPaste()).toBe(true);
 
-      atom.config.set('editor.autoIndentOnPaste', false);
+      core.config.set('editor.autoIndentOnPaste', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.shouldAutoIndentOnPaste()).toBe(false);
 
-      atom.config.set('editor.autoIndentOnPaste', true);
+      core.config.set('editor.autoIndentOnPaste', true);
       expect(editor.shouldAutoIndentOnPaste()).toBe(true);
     });
 
@@ -573,12 +573,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ scrollPastEnd: true });
       expect(editor.getScrollPastEnd()).toBe(true);
 
-      atom.config.set('editor.scrollPastEnd', false);
+      core.config.set('editor.scrollPastEnd', false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getScrollPastEnd()).toBe(false);
 
-      atom.config.set('editor.scrollPastEnd', true);
+      core.config.set('editor.scrollPastEnd', true);
       expect(editor.getScrollPastEnd()).toBe(true);
     });
 
@@ -586,12 +586,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ undoGroupingInterval: 300 });
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      atom.config.set('editor.undoGroupingInterval', 600);
+      core.config.set('editor.undoGroupingInterval', 600);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getUndoGroupingInterval()).toBe(600);
 
-      atom.config.set('editor.undoGroupingInterval', 300);
+      core.config.set('editor.undoGroupingInterval', 300);
       expect(editor.getUndoGroupingInterval()).toBe(300);
     });
 
@@ -599,12 +599,12 @@ describe('TextEditorRegistry', function() {
       editor.update({ scrollSensitivity: 50 });
       expect(editor.getScrollSensitivity()).toBe(50);
 
-      atom.config.set('editor.scrollSensitivity', 60);
+      core.config.set('editor.scrollSensitivity', 60);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getScrollSensitivity()).toBe(60);
 
-      atom.config.set('editor.scrollSensitivity', 70);
+      core.config.set('editor.scrollSensitivity', 70);
       expect(editor.getScrollSensitivity()).toBe(70);
     });
 
@@ -616,15 +616,15 @@ describe('TextEditorRegistry', function() {
         const disposable2 = registry.maintainConfig(editor);
         await initialPackageActivation;
 
-        atom.config.set('editor.scrollSensitivity', 60);
+        core.config.set('editor.scrollSensitivity', 60);
         expect(editor.getScrollSensitivity()).toBe(60);
 
         disposable2.dispose();
-        atom.config.set('editor.scrollSensitivity', 70);
+        core.config.set('editor.scrollSensitivity', 70);
         expect(editor.getScrollSensitivity()).toBe(70);
 
         disposable1.dispose();
-        atom.config.set('editor.scrollSensitivity', 80);
+        core.config.set('editor.scrollSensitivity', 80);
         expect(editor.getScrollSensitivity()).toBe(70);
       });
     });

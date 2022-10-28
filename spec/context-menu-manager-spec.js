@@ -4,8 +4,8 @@ describe('ContextMenuManager', function() {
   let [contextMenu, parent, child, grandchild] = [];
 
   beforeEach(function() {
-    const { resourcePath } = atom.getLoadSettings();
-    contextMenu = new ContextMenuManager({ keymapManager: atom.keymaps });
+    const { resourcePath } = core.getLoadSettings();
+    contextMenu = new ContextMenuManager({ keymapManager: core.keymaps });
     contextMenu.initialize({ resourcePath });
 
     parent = document.createElement('div');
@@ -315,7 +315,7 @@ describe('ContextMenuManager', function() {
     let [keymaps, item] = [];
 
     beforeEach(function() {
-      keymaps = atom.keymaps.add('source', {
+      keymaps = core.keymaps.add('source', {
         '.child': {
           'ctrl-a': 'test:my-command',
           'shift-b': 'test:my-other-command'
@@ -419,7 +419,7 @@ describe('ContextMenuManager', function() {
     });
 
     it('does not add accelerators for multi-keystroke key bindings', function() {
-      atom.keymaps.add('source', {
+      core.keymaps.add('source', {
         '.child': {
           'ctrl-a ctrl-b': 'test:multi-keystroke-command'
         }

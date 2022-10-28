@@ -60,11 +60,12 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
   const applicationDelegate = new ApplicationDelegate();
   applicationDelegate.setRepresentedFilename = function() {};
   applicationDelegate.setWindowDocumentEdited = function() {};
-  window.atom = buildAtomEnvironment({
+  window.core = buildAtomEnvironment({
     applicationDelegate, window, document,
     configDirPath: atomHome,
     enablePersistence: false
   });
+  window.atom = window.core;
 
   require('./spec-helper');
   if (process.env.JANKY_SHA1 || process.env.CI) { disableFocusMethods(); }

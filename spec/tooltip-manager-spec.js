@@ -19,8 +19,8 @@ describe('TooltipManager', () => {
 
   beforeEach(function() {
     manager = new TooltipManager({
-      keymapManager: atom.keymaps,
-      viewRegistry: atom.views
+      keymapManager: core.keymaps,
+      viewRegistry: core.views
     });
     element = createElement('foo');
   });
@@ -184,7 +184,7 @@ describe('TooltipManager', () => {
     describe('when a keyBindingCommand is specified', () => {
       describe('when a title is specified', () =>
         it('appends the key binding corresponding to the command to the title', () => {
-          atom.keymaps.add('test', {
+          core.keymaps.add('test', {
             '.foo': { 'ctrl-x ctrl-y': 'test-command' },
             '.bar': { 'ctrl-x ctrl-z': 'test-command' }
           });
@@ -202,7 +202,7 @@ describe('TooltipManager', () => {
 
       describe('when no title is specified', () =>
         it('shows the key binding corresponding to the command alone', () => {
-          atom.keymaps.add('test', {
+          core.keymaps.add('test', {
             '.foo': { 'ctrl-x ctrl-y': 'test-command' }
           });
 
@@ -216,7 +216,7 @@ describe('TooltipManager', () => {
 
       describe('when a keyBindingTarget is specified', () => {
         it('looks up the key binding relative to the target', () => {
-          atom.keymaps.add('test', {
+          core.keymaps.add('test', {
             '.bar': { 'ctrl-x ctrl-z': 'test-command' },
             '.foo': { 'ctrl-x ctrl-y': 'test-command' }
           });

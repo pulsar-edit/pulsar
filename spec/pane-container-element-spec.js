@@ -3,10 +3,10 @@ const PaneAxis = require('../src/pane-axis');
 
 const params = {
   location: 'center',
-  config: atom.config,
-  confirm: atom.confirm.bind(atom),
-  viewRegistry: atom.views,
-  applicationDelegate: atom.applicationDelegate
+  config: core.config,
+  confirm: core.confirm.bind(core),
+  viewRegistry: core.views,
+  applicationDelegate: core.applicationDelegate
 };
 
 describe('PaneContainerElement', function() {
@@ -17,22 +17,22 @@ describe('PaneContainerElement', function() {
           child.nodeName.toLowerCase()
         );
 
-      const paneAxis = new PaneAxis({}, atom.views);
+      const paneAxis = new PaneAxis({}, core.views);
       var paneAxisElement = paneAxis.getElement();
 
       expect(childTagNames()).toEqual([]);
 
-      paneAxis.addChild(new PaneAxis({}, atom.views));
+      paneAxis.addChild(new PaneAxis({}, core.views));
       expect(childTagNames()).toEqual(['atom-pane-axis']);
 
-      paneAxis.addChild(new PaneAxis({}, atom.views));
+      paneAxis.addChild(new PaneAxis({}, core.views));
       expect(childTagNames()).toEqual([
         'atom-pane-axis',
         'atom-pane-resize-handle',
         'atom-pane-axis'
       ]);
 
-      paneAxis.addChild(new PaneAxis({}, atom.views));
+      paneAxis.addChild(new PaneAxis({}, core.views));
       expect(childTagNames()).toEqual([
         'atom-pane-axis',
         'atom-pane-resize-handle',
@@ -255,11 +255,11 @@ describe('PaneContainerElement', function() {
         expect(leftPane.getFlexScale()).toBe(1);
         expect(rightPane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(leftPane.getElement(), 'pane:increase-size');
+        core.commands.dispatch(leftPane.getElement(), 'pane:increase-size');
         expect(leftPane.getFlexScale()).toBe(1.1);
         expect(rightPane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(rightPane.getElement(), 'pane:increase-size');
+        core.commands.dispatch(rightPane.getElement(), 'pane:increase-size');
         expect(leftPane.getFlexScale()).toBe(1.1);
         expect(rightPane.getFlexScale()).toBe(1.1);
       }));
@@ -269,11 +269,11 @@ describe('PaneContainerElement', function() {
         expect(leftPane.getFlexScale()).toBe(1);
         expect(rightPane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(leftPane.getElement(), 'pane:decrease-size');
+        core.commands.dispatch(leftPane.getElement(), 'pane:decrease-size');
         expect(leftPane.getFlexScale()).toBe(1 / 1.1);
         expect(rightPane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(rightPane.getElement(), 'pane:decrease-size');
+        core.commands.dispatch(rightPane.getElement(), 'pane:decrease-size');
         expect(leftPane.getFlexScale()).toBe(1 / 1.1);
         expect(rightPane.getFlexScale()).toBe(1 / 1.1);
       }));
@@ -291,10 +291,10 @@ describe('PaneContainerElement', function() {
       it('does not increases the size of the pane', function() {
         expect(singlePane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(singlePane.getElement(), 'pane:increase-size');
+        core.commands.dispatch(singlePane.getElement(), 'pane:increase-size');
         expect(singlePane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(singlePane.getElement(), 'pane:increase-size');
+        core.commands.dispatch(singlePane.getElement(), 'pane:increase-size');
         expect(singlePane.getFlexScale()).toBe(1);
       }));
 
@@ -302,10 +302,10 @@ describe('PaneContainerElement', function() {
       it('does not decreases the size of the pane', function() {
         expect(singlePane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(singlePane.getElement(), 'pane:decrease-size');
+        core.commands.dispatch(singlePane.getElement(), 'pane:decrease-size');
         expect(singlePane.getFlexScale()).toBe(1);
 
-        atom.commands.dispatch(singlePane.getElement(), 'pane:decrease-size');
+        core.commands.dispatch(singlePane.getElement(), 'pane:decrease-size');
         expect(singlePane.getFlexScale()).toBe(1);
       }));
   });

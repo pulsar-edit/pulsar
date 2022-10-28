@@ -4,16 +4,16 @@ const temp = require('temp').track();
 describe('TitleBar', () => {
   it('updates its title when document.title changes', () => {
     const titleBar = new TitleBar({
-      workspace: atom.workspace,
-      themes: atom.themes,
-      applicationDelegate: atom.applicationDelegate
+      workspace: core.workspace,
+      themes: core.themes,
+      applicationDelegate: core.applicationDelegate
     });
     expect(titleBar.element.querySelector('.title').textContent).toBe(
       document.title
     );
 
     const paneItem = new FakePaneItem('Title 1');
-    atom.workspace.getActivePane().activateItem(paneItem);
+    core.workspace.getActivePane().activateItem(paneItem);
     expect(document.title).toMatch('Title 1');
     expect(titleBar.element.querySelector('.title').textContent).toBe(
       document.title
@@ -25,7 +25,7 @@ describe('TitleBar', () => {
       document.title
     );
 
-    atom.project.setPaths([temp.mkdirSync('project-1')]);
+    core.project.setPaths([temp.mkdirSync('project-1')]);
     expect(document.title).toMatch('project-1');
     expect(titleBar.element.querySelector('.title').textContent).toBe(
       document.title
@@ -34,9 +34,9 @@ describe('TitleBar', () => {
 
   it('can update the sheet offset for the current window based on its height', () => {
     const titleBar = new TitleBar({
-      workspace: atom.workspace,
-      themes: atom.themes,
-      applicationDelegate: atom.applicationDelegate
+      workspace: core.workspace,
+      themes: core.themes,
+      applicationDelegate: core.applicationDelegate
     });
     expect(() => titleBar.updateWindowSheetOffset()).not.toThrow();
   });

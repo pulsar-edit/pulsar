@@ -4,7 +4,7 @@ describe('Selection', () => {
   let buffer, editor, selection;
 
   beforeEach(() => {
-    buffer = atom.project.bufferForPathSync('sample.js');
+    buffer = core.project.bufferForPathSync('sample.js');
     editor = new TextEditor({ buffer, tabLength: 2 });
     selection = editor.getLastSelection();
   });

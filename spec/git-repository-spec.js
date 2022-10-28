@@ -163,26 +163,26 @@ describe('GitRepository', () => {
     let filePath, editor;
 
     beforeEach(async () => {
-      spyOn(atom, 'confirm');
+      spyOn(core, 'confirm');
 
       const workingDirPath = copyRepository();
       repo = new GitRepository(workingDirPath, {
-        project: atom.project,
-        config: atom.config,
-        confirm: atom.confirm
+        project: core.project,
+        config: core.config,
+        confirm: core.confirm
       });
       filePath = path.join(workingDirPath, 'a.txt');
       fs.writeFileSync(filePath, 'ch ch changes');
 
-      editor = await atom.workspace.open(filePath);
+      editor = await core.workspace.open(filePath);
     });
 
     it('displays a confirmation dialog by default', () => {
       // Permissions issues with this test on Windows
       if (process.platform === 'win32') return;
 
-      atom.confirm.andCallFake(({ buttons }) => buttons.OK());
-      atom.config.set('editor.confirmCheckoutHeadRevision', true);
+      core.confirm.andCallFake(({ buttons }) => buttons.OK());
+      core.config.set('editor.confirmCheckoutHeadRevision', true);
 
       repo.checkoutHeadForEditor(editor);
 
@@ -192,12 +192,12 @@ describe('GitRepository', () => {
     it('does not display a dialog when confirmation is disabled', () => {
       // Flakey EPERM opening a.txt on Win32
       if (process.platform === 'win32') return;
-      atom.config.set('editor.confirmCheckoutHeadRevision', false);
+      core.config.set('editor.confirmCheckoutHeadRevision', false);
 
       repo.checkoutHeadForEditor(editor);
 
       expect(fs.readFileSync(filePath, 'utf8')).toBe('');
-      expect(atom.confirm).not.toHaveBeenCalled();
+      expect(core.confirm).not.toHaveBeenCalled();
     });
   });
 
@@ -265,8 +265,8 @@ describe('GitRepository', () => {
     beforeEach(() => {
       workingDirectory = copyRepository();
       repo = new GitRepository(workingDirectory, {
-        project: atom.project,
-        config: atom.config
+        project: core.project,
+        config: core.config
       });
       modifiedPath = path.join(workingDirectory, 'file.txt');
       newPath = path.join(workingDirectory, 'untracked.txt');
@@ -295,9 +295,9 @@ describe('GitRepository', () => {
       fs.mkdirSync(subDir);
       const filePath = path.join(subDir, 'b.txt');
       fs.writeFileSync(filePath, '');
-      atom.project.setPaths([subDir]);
-      await atom.workspace.open('b.txt');
-      repo = atom.project.getRepositories()[0];
+      core.project.setPaths([subDir]);
+      await core.workspace.open('b.txt');
+      repo = core.project.getRepositories()[0];
 
       await repo.refreshStatus();
       const status = repo.getCachedPathStatus(filePath);
@@ -306,8 +306,8 @@ describe('GitRepository', () => {
     });
 
     it('works correctly when the project has multiple folders (regression)', async () => {
-      atom.project.addPath(workingDirectory);
-      atom.project.addPath(path.join(__dirname, 'fixtures', 'dir'));
+      core.project.addPath(workingDirectory);
+      core.project.addPath(path.join(__dirname, 'fixtures', 'dir'));
 
       await repo.refreshStatus();
       expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
@@ -334,11 +334,11 @@ describe('GitRepository', () => {
     let editor;
 
     beforeEach(async () => {
-      atom.project.setPaths([copyRepository()]);
+      core.project.setPaths([copyRepository()]);
       const refreshPromise = new Promise(resolve =>
-        atom.project.getRepositories()[0].onDidChangeStatuses(resolve)
+        core.project.getRepositories()[0].onDidChangeStatuses(resolve)
       );
-      editor = await atom.workspace.open('other.txt');
+      editor = await core.workspace.open('other.txt');
       await refreshPromise;
     });
 
@@ -346,7 +346,7 @@ describe('GitRepository', () => {
       editor.insertNewline();
 
       const statusHandler = jasmine.createSpy('statusHandler');
-      atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
+      core.project.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.save();
       expect(statusHandler.callCount).toBe(1);
@@ -360,7 +360,7 @@ describe('GitRepository', () => {
       fs.writeFileSync(editor.getPath(), 'changed');
 
       const statusHandler = jasmine.createSpy('statusHandler');
-      atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
+      core.project.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.getBuffer().reload();
       expect(statusHandler.callCount).toBe(1);
@@ -377,7 +377,7 @@ describe('GitRepository', () => {
       fs.writeFileSync(editor.getPath(), 'changed');
 
       const statusHandler = jasmine.createSpy('statusHandler');
-      atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
+      core.project.getRepositories()[0].onDidChangeStatus(statusHandler);
       editor.getBuffer().emitter.emit('did-change-path');
       expect(statusHandler.callCount).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
@@ -389,7 +389,7 @@ describe('GitRepository', () => {
     });
 
     it('stops listening to the buffer when the repository is destroyed (regression)', () => {
-      atom.project.getRepositories()[0].destroy();
+      core.project.getRepositories()[0].destroy();
       expect(() => editor.save()).not.toThrow();
     });
   });
@@ -402,19 +402,19 @@ describe('GitRepository', () => {
     });
 
     it('subscribes to all the serialized buffers in the project', async () => {
-      atom.project.setPaths([copyRepository()]);
+      core.project.setPaths([copyRepository()]);
 
-      await atom.workspace.open('file.txt');
+      await core.workspace.open('file.txt');
 
       project2 = new Project({
-        notificationManager: atom.notifications,
-        packageManager: atom.packages,
-        confirm: atom.confirm,
-        grammarRegistry: atom.grammars,
-        applicationDelegate: atom.applicationDelegate
+        notificationManager: core.notifications,
+        packageManager: core.packages,
+        confirm: core.confirm,
+        grammarRegistry: core.grammars,
+        applicationDelegate: core.applicationDelegate
       });
       await project2.deserialize(
-        atom.project.serialize({ isUnloading: false })
+        core.project.serialize({ isUnloading: false })
       );
 
       buffer = project2.getBuffers()[0];

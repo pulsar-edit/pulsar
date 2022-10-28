@@ -2,14 +2,14 @@ const path = require('path');
 const fs = require('fs-plus');
 const temp = require('temp').track();
 
-describe('atom.themes', function() {
+describe('core.themes', function() {
   beforeEach(function() {
-    spyOn(atom, 'inSpecMode').andReturn(false);
+    spyOn(core, 'inSpecMode').andReturn(false);
     spyOn(console, 'warn');
   });
 
   afterEach(function() {
-    waitsForPromise(() => atom.themes.deactivateThemes());
+    waitsForPromise(() => core.themes.deactivateThemes());
     runs(function() {
       try {
         temp.cleanupSync();
@@ -20,25 +20,25 @@ describe('atom.themes', function() {
   describe('theme getters and setters', function() {
     beforeEach(function() {
       jasmine.snapshotDeprecations();
-      atom.packages.loadPackages();
+      core.packages.loadPackages();
     });
 
     afterEach(() => jasmine.restoreDeprecationsSnapshot());
 
     describe('getLoadedThemes', () =>
       it('gets all the loaded themes', function() {
-        const themes = atom.themes.getLoadedThemes();
+        const themes = core.themes.getLoadedThemes();
         expect(themes.length).toBeGreaterThan(2);
       }));
 
     describe('getActiveThemes', () =>
       it('gets all the active themes', function() {
-        waitsForPromise(() => atom.themes.activateThemes());
+        waitsForPromise(() => core.themes.activateThemes());
 
         runs(function() {
-          const names = atom.config.get('core.themes');
+          const names = core.config.get('core.themes');
           expect(names.length).toBeGreaterThan(0);
-          const themes = atom.themes.getActiveThemes();
+          const themes = core.themes.getActiveThemes();
           expect(themes).toHaveLength(names.length);
         });
       }));
@@ -46,7 +46,7 @@ describe('atom.themes', function() {
 
   describe('when the core.themes config value contains invalid entry', () =>
     it('ignores theme', function() {
-      atom.config.set('core.themes', [
+      core.config.set('core.themes', [
         'atom-light-ui',
         null,
         undefined,
@@ -58,7 +58,7 @@ describe('atom.themes', function() {
         'atom-dark-ui'
       ]);
 
-      expect(atom.themes.getEnabledThemeNames()).toEqual([
+      expect(core.themes.getEnabledThemeNames()).toEqual([
         'atom-dark-ui',
         'atom-light-ui'
       ]);
@@ -66,13 +66,13 @@ describe('atom.themes', function() {
 
   describe('::getImportPaths()', function() {
     it('returns the theme directories before the themes are loaded', function() {
-      atom.config.set('core.themes', [
+      core.config.set('core.themes', [
         'theme-with-index-less',
         'atom-dark-ui',
         'atom-light-ui'
       ]);
 
-      const paths = atom.themes.getImportPaths();
+      const paths = core.themes.getImportPaths();
 
       // syntax theme is not a dir at this time, so only two.
       expect(paths.length).toBe(2);
@@ -81,24 +81,24 @@ describe('atom.themes', function() {
     });
 
     it('ignores themes that cannot be resolved to a directory', function() {
-      atom.config.set('core.themes', ['definitely-not-a-theme']);
-      expect(() => atom.themes.getImportPaths()).not.toThrow();
+      core.config.set('core.themes', ['definitely-not-a-theme']);
+      expect(() => core.themes.getImportPaths()).not.toThrow();
     });
   });
 
   describe('when the core.themes config value changes', function() {
     it('add/removes stylesheets to reflect the new config value', function() {
       let didChangeActiveThemesHandler;
-      atom.themes.onDidChangeActiveThemes(
+      core.themes.onDidChangeActiveThemes(
         (didChangeActiveThemesHandler = jasmine.createSpy())
       );
-      spyOn(atom.styles, 'getUserStyleSheetPath').andCallFake(() => null);
+      spyOn(core.styles, 'getUserStyleSheetPath').andCallFake(() => null);
 
-      waitsForPromise(() => atom.themes.activateThemes());
+      waitsForPromise(() => core.themes.activateThemes());
 
       runs(function() {
         didChangeActiveThemesHandler.reset();
-        atom.config.set('core.themes', []);
+        core.config.set('core.themes', []);
       });
 
       waitsFor('a', () => didChangeActiveThemesHandler.callCount === 1);
@@ -106,7 +106,7 @@ describe('atom.themes', function() {
       runs(function() {
         didChangeActiveThemesHandler.reset();
         expect(document.querySelectorAll('style.theme')).toHaveLength(0);
-        atom.config.set('core.themes', ['atom-dark-ui']);
+        core.config.set('core.themes', ['atom-dark-ui']);
       });
 
       waitsFor('b', () => didChangeActiveThemesHandler.callCount === 1);
@@ -121,7 +121,7 @@ describe('atom.themes', function() {
             .querySelector('style[priority="1"]')
             .getAttribute('source-path')
         ).toMatch(/atom-dark-ui/);
-        atom.config.set('core.themes', ['atom-light-ui', 'atom-dark-ui']);
+        core.config.set('core.themes', ['atom-light-ui', 'atom-dark-ui']);
       });
 
       waitsFor('c', () => didChangeActiveThemesHandler.callCount === 1);
@@ -141,7 +141,7 @@ describe('atom.themes', function() {
             .querySelectorAll('style[priority="1"]')[1]
             .getAttribute('source-path')
         ).toMatch(/atom-light-ui/);
-        atom.config.set('core.themes', []);
+        core.config.set('core.themes', []);
       });
 
       waitsFor(() => didChangeActiveThemesHandler.callCount === 1);
@@ -152,7 +152,7 @@ describe('atom.themes', function() {
           2
         );
         // atom-dark-ui has a directory path, the syntax one doesn't
-        atom.config.set('core.themes', [
+        core.config.set('core.themes', [
           'theme-with-index-less',
           'atom-dark-ui'
         ]);
@@ -164,29 +164,29 @@ describe('atom.themes', function() {
         expect(document.querySelectorAll('style[priority="1"]')).toHaveLength(
           2
         );
-        const importPaths = atom.themes.getImportPaths();
+        const importPaths = core.themes.getImportPaths();
         expect(importPaths.length).toBe(1);
         expect(importPaths[0]).toContain('atom-dark-ui');
       });
     });
 
     it('adds theme-* classes to the workspace for each active theme', function() {
-      atom.config.set('core.themes', ['atom-dark-ui', 'atom-dark-syntax']);
+      core.config.set('core.themes', ['atom-dark-ui', 'atom-dark-syntax']);
 
       let didChangeActiveThemesHandler;
-      atom.themes.onDidChangeActiveThemes(
+      core.themes.onDidChangeActiveThemes(
         (didChangeActiveThemesHandler = jasmine.createSpy())
       );
-      waitsForPromise(() => atom.themes.activateThemes());
+      waitsForPromise(() => core.themes.activateThemes());
 
-      const workspaceElement = atom.workspace.getElement();
+      const workspaceElement = core.workspace.getElement();
       runs(function() {
         expect(workspaceElement).toHaveClass('theme-atom-dark-ui');
 
-        atom.themes.onDidChangeActiveThemes(
+        core.themes.onDidChangeActiveThemes(
           (didChangeActiveThemesHandler = jasmine.createSpy())
         );
-        atom.config.set('core.themes', [
+        core.config.set('core.themes', [
           'theme-with-ui-variables',
           'theme-with-syntax-variables'
         ]);
@@ -209,7 +209,7 @@ describe('atom.themes', function() {
   describe('when a theme fails to load', () =>
     it('logs a warning', function() {
       console.warn.reset();
-      atom.packages
+      core.packages
         .activatePackage('a-theme-that-will-not-be-found')
         .then(function() {}, function() {});
       expect(console.warn.callCount).toBe(1);
@@ -225,19 +225,19 @@ describe('atom.themes', function() {
 
     it('synchronously loads css at the given path and installs a style tag for it in the head', function() {
       let styleElementAddedHandler;
-      atom.styles.onDidAddStyleElement(
+      core.styles.onDidAddStyleElement(
         (styleElementAddedHandler = jasmine.createSpy(
           'styleElementAddedHandler'
         ))
       );
 
       const cssPath = getAbsolutePath(
-        atom.project.getDirectories()[0],
+        core.project.getDirectories()[0],
         'css.css'
       );
       const lengthBefore = document.querySelectorAll('head style').length;
 
-      atom.themes.requireStylesheet(cssPath);
+      core.themes.requireStylesheet(cssPath);
       expect(document.querySelectorAll('head style').length).toBe(
         lengthBefore + 1
       );
@@ -252,7 +252,7 @@ describe('atom.themes', function() {
 
       // doesn't append twice
       styleElementAddedHandler.reset();
-      atom.themes.requireStylesheet(cssPath);
+      core.themes.requireStylesheet(cssPath);
       expect(document.querySelectorAll('head style').length).toBe(
         lengthBefore + 1
       );
@@ -267,11 +267,11 @@ describe('atom.themes', function() {
 
     it('synchronously loads and parses less files at the given path and installs a style tag for it in the head', function() {
       const lessPath = getAbsolutePath(
-        atom.project.getDirectories()[0],
+        core.project.getDirectories()[0],
         'sample.less'
       );
       const lengthBefore = document.querySelectorAll('head style').length;
-      atom.themes.requireStylesheet(lessPath);
+      core.themes.requireStylesheet(lessPath);
       expect(document.querySelectorAll('head style').length).toBe(
         lengthBefore + 1
       );
@@ -291,7 +291,7 @@ h2 {
 `);
 
       // doesn't append twice
-      atom.themes.requireStylesheet(lessPath);
+      core.themes.requireStylesheet(lessPath);
       expect(document.querySelectorAll('head style').length).toBe(
         lengthBefore + 1
       );
@@ -303,21 +303,21 @@ h2 {
     });
 
     it('supports requiring css and less stylesheets without an explicit extension', function() {
-      atom.themes.requireStylesheet(path.join(__dirname, 'fixtures', 'css'));
+      core.themes.requireStylesheet(path.join(__dirname, 'fixtures', 'css'));
       expect(
         document
           .querySelector('head style[source-path*="css.css"]')
           .getAttribute('source-path')
       ).toEqualPath(
-        getAbsolutePath(atom.project.getDirectories()[0], 'css.css')
+        getAbsolutePath(core.project.getDirectories()[0], 'css.css')
       );
-      atom.themes.requireStylesheet(path.join(__dirname, 'fixtures', 'sample'));
+      core.themes.requireStylesheet(path.join(__dirname, 'fixtures', 'sample'));
       expect(
         document
           .querySelector('head style[source-path*="sample.less"]')
           .getAttribute('source-path')
       ).toEqualPath(
-        getAbsolutePath(atom.project.getDirectories()[0], 'sample.less')
+        getAbsolutePath(core.project.getDirectories()[0], 'sample.less')
       );
 
       document.querySelector('head style[source-path*="css.css"]').remove();
@@ -328,11 +328,11 @@ h2 {
       const cssPath = require.resolve('./fixtures/css.css');
 
       expect(getComputedStyle(document.body).fontWeight).not.toBe('700');
-      const disposable = atom.themes.requireStylesheet(cssPath);
+      const disposable = core.themes.requireStylesheet(cssPath);
       expect(getComputedStyle(document.body).fontWeight).toBe('700');
 
       let styleElementRemovedHandler;
-      atom.styles.onDidRemoveStyleElement(
+      core.styles.onDidRemoveStyleElement(
         (styleElementRemovedHandler = jasmine.createSpy(
           'styleElementRemovedHandler'
         ))
@@ -348,19 +348,19 @@ h2 {
 
   describe('base style sheet loading', function() {
     beforeEach(function() {
-      const workspaceElement = atom.workspace.getElement();
-      jasmine.attachToDOM(atom.workspace.getElement());
+      const workspaceElement = core.workspace.getElement();
+      jasmine.attachToDOM(core.workspace.getElement());
       workspaceElement.appendChild(document.createElement('atom-text-editor'));
 
-      waitsForPromise(() => atom.themes.activateThemes());
+      waitsForPromise(() => core.themes.activateThemes());
     });
 
     it("loads the correct values from the theme's ui-variables file", function() {
       let didChangeActiveThemesHandler;
-      atom.themes.onDidChangeActiveThemes(
+      core.themes.onDidChangeActiveThemes(
         (didChangeActiveThemesHandler = jasmine.createSpy())
       );
-      atom.config.set('core.themes', [
+      core.config.set('core.themes', [
         'theme-with-ui-variables',
         'theme-with-syntax-variables'
       ]);
@@ -370,7 +370,7 @@ h2 {
       runs(function() {
         // an override loaded in the base css
         expect(
-          getComputedStyle(atom.workspace.getElement())['background-color']
+          getComputedStyle(core.workspace.getElement())['background-color']
         ).toBe('rgb(0, 0, 255)');
 
         // from within the theme itself
@@ -392,10 +392,10 @@ h2 {
     describe('when there is a theme with incomplete variables', () =>
       it('loads the correct values from the fallback ui-variables', function() {
         let didChangeActiveThemesHandler;
-        atom.themes.onDidChangeActiveThemes(
+        core.themes.onDidChangeActiveThemes(
           (didChangeActiveThemesHandler = jasmine.createSpy())
         );
-        atom.config.set('core.themes', [
+        core.config.set('core.themes', [
           'theme-with-incomplete-ui-variables',
           'theme-with-syntax-variables'
         ]);
@@ -405,7 +405,7 @@ h2 {
         runs(function() {
           // an override loaded in the base css
           expect(
-            getComputedStyle(atom.workspace.getElement())['background-color']
+            getComputedStyle(core.workspace.getElement())['background-color']
           ).toBe('rgb(0, 0, 255)');
 
           // from within the theme itself
@@ -425,7 +425,7 @@ h2 {
         userStylesheetPath,
         'body {border-style: dotted !important;}'
       );
-      spyOn(atom.styles, 'getUserStyleSheetPath').andReturn(userStylesheetPath);
+      spyOn(core.styles, 'getUserStyleSheetPath').andReturn(userStylesheetPath);
     });
 
     describe('when the user stylesheet changes', function() {
@@ -436,27 +436,27 @@ h2 {
       it('reloads it', function() {
         let styleElementAddedHandler, styleElementRemovedHandler;
 
-        waitsForPromise(() => atom.themes.activateThemes());
+        waitsForPromise(() => core.themes.activateThemes());
 
         runs(function() {
-          atom.styles.onDidRemoveStyleElement(
+          core.styles.onDidRemoveStyleElement(
             (styleElementRemovedHandler = jasmine.createSpy(
               'styleElementRemovedHandler'
             ))
           );
-          atom.styles.onDidAddStyleElement(
+          core.styles.onDidAddStyleElement(
             (styleElementAddedHandler = jasmine.createSpy(
               'styleElementAddedHandler'
             ))
           );
 
-          spyOn(atom.themes, 'loadUserStylesheet').andCallThrough();
+          spyOn(core.themes, 'loadUserStylesheet').andCallThrough();
 
           expect(getComputedStyle(document.body).borderStyle).toBe('dotted');
           fs.writeFileSync(userStylesheetPath, 'body {border-style: dashed}');
         });
 
-        waitsFor(() => atom.themes.loadUserStylesheet.callCount === 1);
+        waitsFor(() => core.themes.loadUserStylesheet.callCount === 1);
 
         runs(function() {
           expect(getComputedStyle(document.body).borderStyle).toBe('dashed');
@@ -475,7 +475,7 @@ h2 {
           fs.removeSync(userStylesheetPath);
         });
 
-        waitsFor(() => atom.themes.loadUserStylesheet.callCount === 2);
+        waitsFor(() => core.themes.loadUserStylesheet.callCount === 2);
 
         runs(function() {
           expect(styleElementRemovedHandler).toHaveBeenCalled();
@@ -490,24 +490,24 @@ h2 {
     describe('when there is an error reading the stylesheet', function() {
       let addErrorHandler = null;
       beforeEach(function() {
-        atom.themes.loadUserStylesheet();
-        spyOn(atom.themes.lessCache, 'cssForFile').andCallFake(function() {
+        core.themes.loadUserStylesheet();
+        spyOn(core.themes.lessCache, 'cssForFile').andCallFake(function() {
           throw new Error('EACCES permission denied "styles.less"');
         });
-        atom.notifications.onDidAddNotification(
+        core.notifications.onDidAddNotification(
           (addErrorHandler = jasmine.createSpy())
         );
       });
 
       it('creates an error notification and does not add the stylesheet', function() {
-        atom.themes.loadUserStylesheet();
+        core.themes.loadUserStylesheet();
         expect(addErrorHandler).toHaveBeenCalled();
         const note = addErrorHandler.mostRecentCall.args[0];
         expect(note.getType()).toBe('error');
         expect(note.getMessage()).toContain('Error loading');
         expect(
-          atom.styles.styleElementsBySourcePath[
-            atom.styles.getUserStyleSheetPath()
+          core.styles.styleElementsBySourcePath[
+            core.styles.getUserStyleSheetPath()
           ]
         ).toBeUndefined();
       });
@@ -522,14 +522,14 @@ h2 {
             throw new Error('Unable to watch path');
           }
         });
-        spyOn(atom.themes, 'loadStylesheet').andReturn('');
-        atom.notifications.onDidAddNotification(
+        spyOn(core.themes, 'loadStylesheet').andReturn('');
+        core.notifications.onDidAddNotification(
           (addErrorHandler = jasmine.createSpy())
         );
       });
 
       it('creates an error notification', function() {
-        atom.themes.loadUserStylesheet();
+        core.themes.loadUserStylesheet();
         expect(addErrorHandler).toHaveBeenCalled();
         const note = addErrorHandler.mostRecentCall.args[0];
         expect(note.getType()).toBe('error');
@@ -539,9 +539,9 @@ h2 {
 
     it("adds a notification when a theme's stylesheet is invalid", function() {
       const addErrorHandler = jasmine.createSpy();
-      atom.notifications.onDidAddNotification(addErrorHandler);
+      core.notifications.onDidAddNotification(addErrorHandler);
       expect(() =>
-        atom.packages
+        core.packages
           .activatePackage('theme-with-invalid-styles')
           .then(function() {}, function() {})
       ).not.toThrow();
@@ -555,16 +555,16 @@ h2 {
   describe('when a non-existent theme is present in the config', function() {
     beforeEach(function() {
       console.warn.reset();
-      atom.config.set('core.themes', [
+      core.config.set('core.themes', [
         'non-existent-dark-ui',
         'non-existent-dark-syntax'
       ]);
 
-      waitsForPromise(() => atom.themes.activateThemes());
+      waitsForPromise(() => core.themes.activateThemes());
     });
 
     it('uses the default one-dark UI and syntax themes and logs a warning', function() {
-      const activeThemeNames = atom.themes.getActiveThemeNames();
+      const activeThemeNames = core.themes.getActiveThemeNames();
       expect(console.warn.callCount).toBe(2);
       expect(activeThemeNames.length).toBe(2);
       expect(activeThemeNames).toContain('one-dark-ui');
@@ -575,13 +575,13 @@ h2 {
   describe('when in safe mode', function() {
     describe('when the enabled UI and syntax themes are bundled with Atom', function() {
       beforeEach(function() {
-        atom.config.set('core.themes', ['atom-light-ui', 'atom-dark-syntax']);
+        core.config.set('core.themes', ['atom-light-ui', 'atom-dark-syntax']);
 
-        waitsForPromise(() => atom.themes.activateThemes());
+        waitsForPromise(() => core.themes.activateThemes());
       });
 
       it('uses the enabled themes', function() {
-        const activeThemeNames = atom.themes.getActiveThemeNames();
+        const activeThemeNames = core.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
         expect(activeThemeNames).toContain('atom-light-ui');
         expect(activeThemeNames).toContain('atom-dark-syntax');
@@ -590,16 +590,16 @@ h2 {
 
     describe('when the enabled UI and syntax themes are not bundled with Atom', function() {
       beforeEach(function() {
-        atom.config.set('core.themes', [
+        core.config.set('core.themes', [
           'installed-dark-ui',
           'installed-dark-syntax'
         ]);
 
-        waitsForPromise(() => atom.themes.activateThemes());
+        waitsForPromise(() => core.themes.activateThemes());
       });
 
       it('uses the default dark UI and syntax themes', function() {
-        const activeThemeNames = atom.themes.getActiveThemeNames();
+        const activeThemeNames = core.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
         expect(activeThemeNames).toContain('one-dark-ui');
         expect(activeThemeNames).toContain('one-dark-syntax');
@@ -608,16 +608,16 @@ h2 {
 
     describe('when the enabled UI theme is not bundled with Atom', function() {
       beforeEach(function() {
-        atom.config.set('core.themes', [
+        core.config.set('core.themes', [
           'installed-dark-ui',
           'atom-light-syntax'
         ]);
 
-        waitsForPromise(() => atom.themes.activateThemes());
+        waitsForPromise(() => core.themes.activateThemes());
       });
 
       it('uses the default one-dark UI theme', function() {
-        const activeThemeNames = atom.themes.getActiveThemeNames();
+        const activeThemeNames = core.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
         expect(activeThemeNames).toContain('one-dark-ui');
         expect(activeThemeNames).toContain('atom-light-syntax');
@@ -626,16 +626,16 @@ h2 {
 
     describe('when the enabled syntax theme is not bundled with Atom', function() {
       beforeEach(function() {
-        atom.config.set('core.themes', [
+        core.config.set('core.themes', [
           'atom-light-ui',
           'installed-dark-syntax'
         ]);
 
-        waitsForPromise(() => atom.themes.activateThemes());
+        waitsForPromise(() => core.themes.activateThemes());
       });
 
       it('uses the default one-dark syntax theme', function() {
-        const activeThemeNames = atom.themes.getActiveThemeNames();
+        const activeThemeNames = core.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
         expect(activeThemeNames).toContain('atom-light-ui');
         expect(activeThemeNames).toContain('one-dark-syntax');

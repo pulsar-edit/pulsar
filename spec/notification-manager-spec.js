@@ -9,7 +9,7 @@ describe('NotificationManager', () => {
 
   describe('the atom global', () =>
     it('has a notifications instance', () => {
-      expect(atom.notifications instanceof NotificationManager).toBe(true);
+      expect(core.notifications instanceof NotificationManager).toBe(true);
     }));
 
   describe('adding events', () => {

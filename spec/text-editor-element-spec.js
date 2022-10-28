@@ -109,7 +109,7 @@ describe('TextEditorElement', () => {
     it("adds the 'mini' attribute if .isMini() returns true on the model", async () => {
       const element = buildTextEditorElement();
       element.getModel().update({ mini: true });
-      await atom.views.getNextUpdatePromise();
+      await core.views.getNextUpdatePromise();
       expect(element.hasAttribute('mini')).toBe(true);
     }));
 

@@ -4,14 +4,14 @@ describe('PaneElement', function() {
   let [paneElement, container, containerElement, pane] = [];
 
   beforeEach(function() {
-    spyOn(atom.applicationDelegate, 'open');
+    spyOn(core.applicationDelegate, 'open');
 
     container = new PaneContainer({
       location: 'center',
-      config: atom.config,
-      confirm: atom.confirm.bind(atom),
-      viewRegistry: atom.views,
-      applicationDelegate: atom.applicationDelegate
+      config: core.config,
+      confirm: core.confirm.bind(core),
+      viewRegistry: core.views,
+      applicationDelegate: core.applicationDelegate
     });
     containerElement = container.getElement();
     pane = container.getActivePane();
@@ -74,10 +74,10 @@ describe('PaneElement', function() {
     });
 
     describe('if the active item is a model object', () =>
-      it('retrieves the associated view from atom.views and appends it to the itemViews div', function() {
+      it('retrieves the associated view from core.views and appends it to the itemViews div', function() {
         class TestModel {}
 
-        atom.views.addViewProvider(TestModel, function(model) {
+        core.views.addViewProvider(TestModel, function(model) {
           const view = document.createElement('div');
           view.model = model;
           return view;
@@ -203,7 +203,7 @@ describe('PaneElement', function() {
       it("removes the model's associated view", function() {
         class TestModel {}
 
-        atom.views.addViewProvider(TestModel, function(model) {
+        core.views.addViewProvider(TestModel, function(model) {
           const view = document.createElement('div');
           model.element = view;
           view.model = model;
@@ -301,8 +301,8 @@ describe('PaneElement', function() {
           { path: '/fake2' }
         ]);
         paneElement.dispatchEvent(event);
-        expect(atom.applicationDelegate.open.callCount).toBe(1);
-        expect(atom.applicationDelegate.open.argsForCall[0][0]).toEqual({
+        expect(core.applicationDelegate.open.callCount).toBe(1);
+        expect(core.applicationDelegate.open.argsForCall[0][0]).toEqual({
           pathsToOpen: ['/fake1', '/fake2'],
           here: true
         });
@@ -312,7 +312,7 @@ describe('PaneElement', function() {
       it('does nothing', function() {
         const event = buildDragEvent('drop', []);
         paneElement.dispatchEvent(event);
-        expect(atom.applicationDelegate.open).not.toHaveBeenCalled();
+        expect(core.applicationDelegate.open).not.toHaveBeenCalled();
       }));
   });
 

@@ -78,7 +78,7 @@ const buildAtomClient = async (args, env) => {
   client.addCommand('waitForPaneItemCount', async function(count, timeout) {
     await this.waitUntil(
       () =>
-        this.execute(() => atom.workspace.getActivePane().getItems().length),
+        this.execute(() => core.workspace.getActivePane().getItems().length),
       timeout
     );
   });
@@ -93,7 +93,7 @@ const buildAtomClient = async (args, env) => {
   });
   client.addCommand('dispatchCommand', async function(command) {
     return this.execute(
-      command => atom.commands.dispatch(document.activeElement, command),
+      command => core.commands.dispatch(document.activeElement, command),
       command
     );
   });

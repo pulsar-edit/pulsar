@@ -4,6 +4,6 @@ module.exports =
 
   activate: ->
     @activateCallCount++
-    atom.workspace.addOpener (filePath) =>
+    core.workspace.addOpener (filePath) =>
       if filePath is 'atom://fictitious'
         @openerCount++

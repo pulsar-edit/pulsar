@@ -9,7 +9,7 @@ describe('AutoUpdateManager (renderer)', () => {
 
   beforeEach(() => {
     autoUpdateManager = new AutoUpdateManager({
-      applicationDelegate: atom.applicationDelegate
+      applicationDelegate: core.applicationDelegate
     });
     autoUpdateManager.initialize();
   });
@@ -81,7 +81,7 @@ describe('AutoUpdateManager (renderer)', () => {
     let state, releaseChannel;
     it('returns true on macOS and Windows when in stable', () => {
       spyOn(autoUpdateManager, 'getState').andCallFake(() => state);
-      spyOn(atom, 'getReleaseChannel').andCallFake(() => releaseChannel);
+      spyOn(core, 'getReleaseChannel').andCallFake(() => releaseChannel);
 
       state = 'idle';
       releaseChannel = 'stable';
@@ -105,7 +105,7 @@ describe('AutoUpdateManager (renderer)', () => {
     it('unsubscribes from all events', () => {
       const spy = jasmine.createSpy('spy');
       const doneIndicator = jasmine.createSpy('spy');
-      atom.applicationDelegate.onUpdateNotAvailable(doneIndicator);
+      core.applicationDelegate.onUpdateNotAvailable(doneIndicator);
       autoUpdateManager.onDidBeginCheckingForUpdate(spy);
       autoUpdateManager.onDidBeginDownloadingUpdate(spy);
       autoUpdateManager.onDidCompleteDownloadingUpdate(spy);

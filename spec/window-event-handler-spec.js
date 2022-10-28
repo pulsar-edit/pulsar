@@ -6,25 +6,25 @@ describe('WindowEventHandler', () => {
   let windowEventHandler;
 
   beforeEach(() => {
-    atom.uninstallWindowEventHandler();
-    spyOn(atom, 'hide');
-    const initialPath = atom.project.getPaths()[0];
-    spyOn(atom, 'getLoadSettings').andCallFake(() => {
-      const loadSettings = atom.getLoadSettings.originalValue.call(atom);
+    core.uninstallWindowEventHandler();
+    spyOn(core, 'hide');
+    const initialPath = core.project.getPaths()[0];
+    spyOn(core, 'getLoadSettings').andCallFake(() => {
+      const loadSettings = core.getLoadSettings.originalValue.call(core);
       loadSettings.initialPath = initialPath;
       return loadSettings;
     });
-    atom.project.destroy();
+    core.project.destroy();
     windowEventHandler = new WindowEventHandler({
-      atomEnvironment: atom,
-      applicationDelegate: atom.applicationDelegate
+      coreEnvironment: core,
+      applicationDelegate: core.applicationDelegate
     });
     windowEventHandler.initialize(window, document);
   });
 
   afterEach(() => {
     windowEventHandler.unsubscribe();
-    atom.installWindowEventHandler();
+    core.installWindowEventHandler();
   });
 
   describe('when the window is loaded', () =>
@@ -54,17 +54,17 @@ describe('WindowEventHandler', () => {
     it('calls storeWindowDimensions', async () => {
       jasmine.useRealClock();
 
-      spyOn(atom, 'storeWindowDimensions');
+      spyOn(core, 'storeWindowDimensions');
       window.dispatchEvent(new CustomEvent('resize'));
 
-      await conditionPromise(() => atom.storeWindowDimensions.callCount > 0);
+      await conditionPromise(() => core.storeWindowDimensions.callCount > 0);
     }));
 
   describe('window:close event', () =>
     it('closes the window', () => {
-      spyOn(atom, 'close');
+      spyOn(core, 'close');
       window.dispatchEvent(new CustomEvent('window:close'));
-      expect(atom.close).toHaveBeenCalled();
+      expect(core.close).toHaveBeenCalled();
     }));
 
   describe('when a link is clicked', () => {
@@ -244,9 +244,9 @@ describe('WindowEventHandler', () => {
   describe('when keydown events occur on the document', () =>
     it('dispatches the event via the KeymapManager and CommandRegistry', () => {
       const dispatchedCommands = [];
-      atom.commands.onWillDispatch(command => dispatchedCommands.push(command));
-      atom.commands.add('*', { 'foo-command': () => {} });
-      atom.keymaps.add('source-name', { '*': { x: 'foo-command' } });
+      core.commands.onWillDispatch(command => dispatchedCommands.push(command));
+      core.commands.add('*', { 'foo-command': () => {} });
+      core.keymaps.add('source-name', { '*': { x: 'foo-command' } });
 
       const event = KeymapManager.buildKeydownEvent('x', {
         target: document.createElement('div')
@@ -263,7 +263,7 @@ describe('WindowEventHandler', () => {
         'copy',
         'paste'
       ]);
-      spyOn(atom.applicationDelegate, 'getCurrentWindow').andReturn({
+      spyOn(core.applicationDelegate, 'getCurrentWindow').andReturn({
         webContents: webContentsSpy,
         on: () => {}
       });
@@ -273,8 +273,8 @@ describe('WindowEventHandler', () => {
       jasmine.attachToDOM(nativeKeyBindingsInput);
       nativeKeyBindingsInput.focus();
 
-      atom.dispatchApplicationMenuCommand('core:copy');
-      atom.dispatchApplicationMenuCommand('core:paste');
+      core.dispatchApplicationMenuCommand('core:copy');
+      core.dispatchApplicationMenuCommand('core:paste');
 
       expect(webContentsSpy.copy).toHaveBeenCalled();
       expect(webContentsSpy.paste).toHaveBeenCalled();
@@ -286,8 +286,8 @@ describe('WindowEventHandler', () => {
       jasmine.attachToDOM(normalInput);
       normalInput.focus();
 
-      atom.dispatchApplicationMenuCommand('core:copy');
-      atom.dispatchApplicationMenuCommand('core:paste');
+      core.dispatchApplicationMenuCommand('core:copy');
+      core.dispatchApplicationMenuCommand('core:paste');
 
       expect(webContentsSpy.copy).not.toHaveBeenCalled();
       expect(webContentsSpy.paste).not.toHaveBeenCalled();

@@ -10,9 +10,9 @@ describe('GitRepositoryProvider', () => {
 
   beforeEach(() => {
     provider = new GitRepositoryProvider(
-      atom.project,
-      atom.config,
-      atom.confirm
+      core.project,
+      core.config,
+      core.confirm
     );
   });
 

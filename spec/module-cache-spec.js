@@ -27,7 +27,7 @@ describe('ModuleCache', function() {
   });
 
   it('resolves relative core paths without hitting the filesystem', function() {
-    ModuleCache.add(atom.getLoadSettings().resourcePath, {
+    ModuleCache.add(core.getLoadSettings().resourcePath, {
       _atomModuleCache: {
         extensions: {
           '.json': [path.join('spec', 'fixtures', 'module-cache', 'file.json')]
@@ -52,7 +52,7 @@ describe('ModuleCache', function() {
         ]
       }
     });
-    ModuleCache.add(atom.getLoadSettings().resourcePath, {
+    ModuleCache.add(core.getLoadSettings().resourcePath, {
       _atomModuleCache: {
         dependencies: [
           {
@@ -97,7 +97,7 @@ exports.load = function() { require('underscore-plus'); };\
         ]
       }
     });
-    ModuleCache.add(atom.getLoadSettings().resourcePath, {
+    ModuleCache.add(core.getLoadSettings().resourcePath, {
       _atomModuleCache: {
         dependencies: [
           {

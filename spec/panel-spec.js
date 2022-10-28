@@ -13,7 +13,7 @@ describe('Panel', () => {
   }
 
   it("adds the item's element as a child of the panel", () => {
-    const panel = new Panel({ item: new TestPanelItem() }, atom.views);
+    const panel = new Panel({ item: new TestPanelItem() }, core.views);
     const element = panel.getElement();
     expect(element.tagName.toLowerCase()).toBe('atom-panel');
     expect(element.firstChild).toBe(panel.getItem().getElement());
@@ -21,7 +21,7 @@ describe('Panel', () => {
 
   describe('destroying the panel', () => {
     it('removes the element when the panel is destroyed', () => {
-      const panel = new Panel({ item: new TestPanelItem() }, atom.views);
+      const panel = new Panel({ item: new TestPanelItem() }, core.views);
       const element = panel.getElement();
       const jasmineContent = document.getElementById('jasmine-content');
       jasmineContent.appendChild(element);
@@ -33,7 +33,7 @@ describe('Panel', () => {
 
     it('does not try to remove the element twice', () => {
       const item = new TestPanelItem();
-      const panel = new Panel({ item }, atom.views);
+      const panel = new Panel({ item }, core.views);
       const element = panel.getElement();
       const jasmineContent = document.getElementById('jasmine-content');
       jasmineContent.appendChild(element);
@@ -52,7 +52,7 @@ describe('Panel', () => {
 
   describe('changing panel visibility', () => {
     it('notifies observers added with onDidChangeVisible', () => {
-      const panel = new Panel({ item: new TestPanelItem() }, atom.views);
+      const panel = new Panel({ item: new TestPanelItem() }, core.views);
 
       const spy = jasmine.createSpy();
       panel.onDidChangeVisible(spy);
@@ -74,14 +74,14 @@ describe('Panel', () => {
     it('initially renders panel created with visible: false', () => {
       const panel = new Panel(
         { visible: false, item: new TestPanelItem() },
-        atom.views
+        core.views
       );
       const element = panel.getElement();
       expect(element.style.display).toBe('none');
     });
 
     it('hides and shows the panel element when Panel::hide() and Panel::show() are called', () => {
-      const panel = new Panel({ item: new TestPanelItem() }, atom.views);
+      const panel = new Panel({ item: new TestPanelItem() }, core.views);
       const element = panel.getElement();
       expect(element.style.display).not.toBe('none');
 
@@ -97,7 +97,7 @@ describe('Panel', () => {
     it('initially renders panel created with visible: false', () => {
       const panel = new Panel(
         { className: 'some classes', item: new TestPanelItem() },
-        atom.views
+        core.views
       );
       const element = panel.getElement();
 

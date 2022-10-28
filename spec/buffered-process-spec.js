@@ -103,7 +103,7 @@ describe('BufferedProcess', function() {
       const exitCallback = jasmine.createSpy('exit callback');
       const apmProcess = new BufferedProcess({
         autoStart: false,
-        command: atom.packages.getApmPath(),
+        command: core.packages.getApmPath(),
         args: ['-h'],
         options: {},
         stdout(lines) {
@@ -134,7 +134,7 @@ describe('BufferedProcess', function() {
     let stderr = '';
     const exitCallback = jasmine.createSpy('exit callback');
     new BufferedProcess({
-      command: atom.packages.getApmPath(),
+      command: core.packages.getApmPath(),
       args: ['-h'],
       options: {},
       stdout(lines) {

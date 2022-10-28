@@ -17,7 +17,7 @@ describe('CompileCache', () => {
   let [atomHome, fixtures] = Array.from([]);
 
   beforeEach(() => {
-    fixtures = atom.project.getPaths()[0];
+    fixtures = core.project.getPaths()[0];
     atomHome = temp.mkdirSync('fake-atom-home');
 
     CSON.setCacheDir(null);
