@@ -16,7 +16,7 @@ describe('WindowEventHandler', () => {
     });
     core.project.destroy();
     windowEventHandler = new WindowEventHandler({
-      coreEnvironment: core,
+      atomEnvironment: core,
       applicationDelegate: core.applicationDelegate
     });
     windowEventHandler.initialize(window, document);

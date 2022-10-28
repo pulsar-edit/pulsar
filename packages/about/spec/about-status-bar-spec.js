@@ -15,7 +15,7 @@ describe('the status bar', () => {
       return storage[key];
     });
     spyOn(core, 'getVersion').andCallFake(() => {
-      return coreVersion;
+      return atomVersion;
     });
 
     workspaceElement = core.views.getView(core.workspace);
