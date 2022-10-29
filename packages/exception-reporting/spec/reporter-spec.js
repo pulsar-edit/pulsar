@@ -2,7 +2,6 @@ const Reporter = require('../lib/reporter');
 const semver = require('semver');
 const os = require('os');
 const path = require('path');
-const fs = require('fs-plus');
 let osVersion = `${os.platform()}-${os.arch()}-${os.release()}`;
 
 let getReleaseChannel = version => {
@@ -35,11 +34,11 @@ describe('Reporter', () => {
     initialStackTraceLimit = Error.stackTraceLimit;
     Error.stackTraceLimit = 1;
 
-    initialFsGetHomeDirectory = fs.getHomeDirectory;
+    initialFsGetHomeDirectory = os.homedir;
   });
 
   afterEach(() => {
-    fs.getHomeDirectory = initialFsGetHomeDirectory;
+    os.homedir = initialFsGetHomeDirectory;
     Error.stackTraceLimit = initialStackTraceLimit;
   });
 
@@ -113,7 +112,7 @@ describe('Reporter', () => {
     });
 
     it('posts errors originated outside Pulsar Core to BugSnag', () => {
-      fs.getHomeDirectory = () => path.join(__dirname, '..', '..');
+      os.homedir = () => path.join(__dirname, '..', '..');
 
       let error = new Error();
       Error.captureStackTrace(error);
@@ -319,7 +318,7 @@ describe('Reporter', () => {
 
   describe('.reportFailedAssertion(error)', () => {
     it('posts warnings to bugsnag', () => {
-      fs.getHomeDirectory = () => path.join(__dirname, '..', '..');
+      os.homedir = () => path.join(__dirname, '..', '..');
 
       let error = new Error();
       Error.captureStackTrace(error);

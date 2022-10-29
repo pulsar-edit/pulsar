@@ -7,6 +7,7 @@ const _ = require('underscore-plus');
 const { deprecate } = require('grim');
 const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
 const fs = require('fs-plus');
+const os = require('os');
 const { mapSourcePosition } = require('@atom/source-map-support');
 const WindowEventHandler = require('./window-event-handler');
 const StateStore = require('./state-store');
@@ -257,7 +258,7 @@ class AtomEnvironment {
 
     ConfigSchema.projectHome = {
       type: 'string',
-      default: path.join(fs.getHomeDirectory(), 'github'),
+      default: path.join(os.homedir(), 'github'),
       description:
         'The directory where projects are assumed to be located. Packages created using the Package Generator will be stored here by default.'
     };

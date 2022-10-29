@@ -1,6 +1,7 @@
 let setxPath;
 const { app } = require('electron');
 const fs = require('fs-plus');
+const os = require('os');
 const getAppName = require('../get-app-name');
 const path = require('path');
 const Spawner = require('./spawner');
@@ -137,7 +138,7 @@ const createShortcuts = (locations, callback) =>
 // Update the desktop and start menu shortcuts by using the command line API
 // provided by Squirrel's Update.exe
 const updateShortcuts = callback => {
-  const homeDirectory = fs.getHomeDirectory();
+  const homeDirectory = os.homedir();
   if (homeDirectory) {
     const desktopShortcutPath = path.join(
       homeDirectory,

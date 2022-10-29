@@ -9,6 +9,7 @@
  */
 const Grim = require('grim');
 const fs = require('fs-plus');
+const os = require('os');
 const temp = require('temp');
 const path = require('path');
 const {ipcRenderer} = require('electron');
@@ -39,7 +40,7 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
   }
   );
 
-  const userHome = process.env.ATOM_HOME || path.join(fs.getHomeDirectory(), '.atom');
+  const userHome = process.env.ATOM_HOME || path.join(os.homedir(), '.atom');
   const atomHome = temp.mkdirSync({prefix: 'atom-test-home-'});
   if (process.env.APM_TEST_PACKAGES) {
     const testPackages = process.env.APM_TEST_PACKAGES.split(/\s+/);

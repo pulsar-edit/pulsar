@@ -2,7 +2,6 @@
 
 import os from 'os';
 import stackTrace from 'stack-trace';
-import fs from 'fs-plus';
 import path from 'path';
 
 const API_KEY = '7ddca14cb60cbd1cd12d1b252473b076';
@@ -88,7 +87,7 @@ export default class Reporter {
       return this.normalizePath(path.relative(this.resourcePath, absolutePath));
     } else {
       return absolutePath
-        .replace(this.normalizePath(fs.getHomeDirectory()), '~') // Remove users home dir
+        .replace(this.normalizePath(os.homedir()), '~') // Remove users home dir
         .replace(/.*(\/packages\/.*)/, '$1'); // Remove everything before app.asar or packages
     }
   }
@@ -120,8 +119,8 @@ export default class Reporter {
   }
 
   shouldReport(error) {
-    // Since the `core.telemetryConsent` variable has been removed, this has no good way 
-    // to check if should report to the remote. So we will just always return false 
+    // Since the `core.telemetryConsent` variable has been removed, this has no good way
+    // to check if should report to the remote. So we will just always return false
     // to report to remote. But still allow reporting locally.
     return false;
   }
