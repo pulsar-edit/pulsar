@@ -13,7 +13,7 @@ async function openAtom(profilePath, videoName) {
     args: ["--no-sandbox", "."],
     cwd: ".",
     env: env,
-    timeout: 10000
+    timeout: 50000
   }
   if(process.env.CI) {
     config.recordVideo = {
