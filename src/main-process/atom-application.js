@@ -378,11 +378,10 @@ module.exports = class AtomApplication extends EventEmitter {
         env
       });
     } else if (benchmark || benchmarkTest) {
-      // We won't remove the Benchmark options from startup,
-      // Allowing benchmarks to still be a startup option, then
-      // having a message saying they are removed will help avoid confusion
-      // about the editor failing to launch in this mode.
-      console.log("Editor Benchmark Startup has been removed and is no longer accessible.");
+      // We are keeping these startup options so we can print a removal message.
+      // Printing a message saying benchmarks are removed will help avoid
+      // confusion about the editor failing to launch in this mode.
+      console.log("The benchmarking feature has been removed.");
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -903,11 +902,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'run-benchmarks', (event, benchmarksPath) => {
-        // We won't remove the Benchmark options from startup,
-        // Allowing benchmarks to still be a startup option, then
-        // having a message saying they are removed will help avoid confusion
-        // about the editor failing to launch in this mode.
-        console.log("Editor Benchmark Startup has been removed and is no longer accessible.");
+        // Printing a message saying benchmarks are removed will help avoid
+        // confusion about the benchmarking feature not working.
+        console.log("The benchmarking feature has been removed.");
       })
     );
 
