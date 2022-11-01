@@ -1195,7 +1195,7 @@
     ajv "^6.12.0"
     ajv-keywords "^3.4.1"
 
-"@electron/get@^1.14.1":
+"@electron/get@^1.0.1":
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/@electron/get/-/get-1.14.1.tgz#16ba75f02dffb74c23965e72d617adc721d27f40"
   integrity sha512-BrZYyL/6m0ZXz/lDxy/nlVhQz+WF+iPS6qXolEU8atw7h6v1aYkjwJZ63m+bJMBTxDE66X+r2tPS4a/8C82sZw==
@@ -1499,10 +1499,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.2.tgz#17d42c6322d917764dd3d2d3a10d7884925de067"
   integrity sha512-cRMwIgdDN43GO4xMWAfJAecYn8wV4JbsOGHNfNUIDiuYkUYAR5ec4Rj7IO2SAhFPEfpPtLtUTbbny/TCT7aDwA==
 
-"@types/node@^16.11.26":
-  version "16.11.66"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.66.tgz#97f6891c3b8770e21163b93918d57fd1b799e235"
-  integrity sha512-+xvMrGl3eAygKcf5jm+4zA4tbfEgmKM9o6/glTmN0RFVdu2VuFXMYYtRmuv3zTGCgAYMnEZLde3B7BTp+Yxcig==
+"@types/node@^14.6.2":
+  version "14.18.33"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.33.tgz#8c29a0036771569662e4635790ffa9e057db379b"
+  integrity sha512-qelS/Ra6sacc4loe/3MSjXNL1dNQ/GjxNHVzuChwMfmk7HuycRLVQN2qNY3XahK+fZc5E2szqQSKUyAF0E+2bg==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -1998,16 +1998,16 @@ atom-grammar-test@^0.6.3, atom-grammar-test@^0.6.4:
     chevrotain "^0.18.0"
     escape-string-regexp "^1.0.5"
 
-"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#a658c5d":
+"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#b773e5e":
   version "8.2.15"
-  resolved "https://github.com/pulsar-edit/atom-keymap.git#a658c5d84a1d73ba778e6782c3db238cf3b3c9f2"
+  resolved "https://github.com/pulsar-edit/atom-keymap.git#b773e5e3ef6cd2ee3659bb491ea695499e89c2d9"
   dependencies:
     clear-cut "^2"
     event-kit "^1.0.0"
     fs-plus "^3.0.0"
     grim "^1.2.1"
     keyboard-layout "2.0.17"
-    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git"
+    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git#de91ac16e20f12cc04779cc256c6f55087b91a92"
     property-accessors "^1"
     season "^6.0.2"
 
@@ -3698,13 +3698,13 @@ electron-to-chromium@^1.4.251:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.272.tgz#cedebaeec5d9879da85b127e65a55c6b4c58344e"
   integrity sha512-KS6gPPGNrzpVv9HzFVq+Etd0AjZEPr5pvaTBn2yD6KV4+cKW4I0CJoJNgmTG6gUQPAMZ4wIPtcOuoou3qFAZCA==
 
-electron@19.1.3:
-  version "19.1.3"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-19.1.3.tgz#90a2b6c3d738789d657477d87d1539f008be6536"
-  integrity sha512-P2kfFc8UqVvPHE1w9qTZSPNpfOqd+CK34K3wBqJwokzYdVBLsVkbIoLxyByjJ/cU35WaeCL5bsI8kXALfPvebw==
+electron@12.2.3:
+  version "12.2.3"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-12.2.3.tgz#d426a7861e3c722f92c32153f11f7bbedf65b000"
+  integrity sha512-B27c7eqx1bC5kea6An8oVhk1pShNC4VGqWarHMhD47MDtmg54KepHO5AbAvmKKZK/jWN7NTC7wyCYTDElJNtQA==
   dependencies:
-    "@electron/get" "^1.14.1"
-    "@types/node" "^16.11.26"
+    "@electron/get" "^1.0.1"
+    "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
 elliptic@^6.5.3:
@@ -6802,9 +6802,9 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-"pathwatcher@https://github.com/pulsar-edit/pulsar-pathwatcher.git":
+"pathwatcher@https://github.com/pulsar-edit/pulsar-pathwatcher.git#de91ac16e20f12cc04779cc256c6f55087b91a92":
   version "0.0.1"
-  resolved "https://github.com/pulsar-edit/pulsar-pathwatcher.git#47bcd4dae6e33b47cbf005511e9ded3ec0d2114d"
+  resolved "https://github.com/pulsar-edit/pulsar-pathwatcher.git#de91ac16e20f12cc04779cc256c6f55087b91a92"
   dependencies:
     async "~0.2.10"
     event-kit "^2.1.0"
@@ -8297,9 +8297,9 @@ temp@^0.9.0, temp@~0.9.0:
     mkdirp "^0.5.1"
     rimraf "~2.6.2"
 
-"text-buffer@https://github.com/pulsar-edit/text-buffer.git#c7e6b80fe":
+"text-buffer@https://github.com/pulsar-edit/text-buffer.git#18fb41075":
   version "13.18.6"
-  resolved "https://github.com/pulsar-edit/text-buffer.git#c7e6b80feb44db449180e919e61ffe00f190a8e1"
+  resolved "https://github.com/pulsar-edit/text-buffer.git#18fb410751032c5ed312ce224db0fdc7b07969dc"
   dependencies:
     delegato "^1.0.0"
     diff "^2.2.1"
@@ -8309,7 +8309,7 @@ temp@^0.9.0, temp@~0.9.0:
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git"
+    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git#de91ac16e20f12cc04779cc256c6f55087b91a92"
     serializable "^1.0.3"
     superstring "https://github.com/pulsar-edit/superstring.git#708924046f8db9d05901a5372337f249ff5c47bb"
     underscore-plus "^1.0.0"
@@ -8513,13 +8513,13 @@ tree-sitter-typescript@0.20.1:
     node-addon-api "git+https://github.com/nodejs/node-addon-api.git"
     prebuild-install "^5.0.0"
 
-"tree-view@https://github.com/pulsar-edit/tree-view.git#3c88467":
+"tree-view@https://github.com/pulsar-edit/tree-view.git#5ca6522":
   version "0.229.1"
-  resolved "https://github.com/pulsar-edit/tree-view.git#3c884670401433fb9b3c5130293c909643e25404"
+  resolved "https://github.com/pulsar-edit/tree-view.git#5ca652221c67faf55d7141bcea4314f2af840aa7"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
-    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git"
+    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git#de91ac16e20f12cc04779cc256c6f55087b91a92"
     temp "~0.9.0"
     underscore-plus "^1.0.0"
 
