@@ -7910,9 +7910,9 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@https://github.com/atom-community/snippets/archive/cdde11928c19d4969aba9a8dc5b1030ab68c4be2.tar.gz":
-  version "1.6.0"
-  resolved "https://github.com/atom-community/snippets/archive/cdde11928c19d4969aba9a8dc5b1030ab68c4be2.tar.gz#984b457026c12f885abfdd21d9158968389cf988"
+"snippets@https://codeload.github.com/pulsar-edit/snippets/legacy.tar.gz/refs/tags/v1.6.1":
+  version "1.6.1"
+  resolved "https://codeload.github.com/pulsar-edit/snippets/legacy.tar.gz/refs/tags/v1.6.1#dc5e28086e77beeec63b35b3d52f6b32dc5994ab"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
