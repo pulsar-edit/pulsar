@@ -89,13 +89,13 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('benchmark')
     .describe(
       'benchmark',
-      'Open a new window that runs the specified benchmarks.'
+      'This option is no longer supported.'
     );
   options
     .boolean('benchmark-test')
     .describe(
       'benchmark-test',
-      'Run a faster version of the benchmarks in headless mode.'
+      'This option is no longer supported.'
     );
   options
     .alias('t', 'test')
