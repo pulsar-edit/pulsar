@@ -82,8 +82,8 @@ module.exports = class AtomWindow extends EventEmitter {
     const BrowserWindowConstructor =
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
-    this.browserWindow.show()
-    this.browserWindow.openDevTools()
+    // this.browserWindow.show()
+    // this.browserWindow.openDevTools()
 
     electronRemote.enable(this.browserWindow.webContents)
 
