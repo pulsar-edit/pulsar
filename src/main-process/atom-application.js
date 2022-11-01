@@ -167,8 +167,6 @@ module.exports = class AtomApplication extends EventEmitter {
     if (
       !socketPath ||
       options.test ||
-      options.benchmark ||
-      options.benchmarkTest ||
       (process.platform !== 'win32' && !fs.existsSync(socketPath))
     ) {
       return createApplication(options);
@@ -237,7 +235,7 @@ module.exports = class AtomApplication extends EventEmitter {
     this.storageFolder = new StorageFolder(process.env.ATOM_HOME);
     this.autoUpdateManager = new AutoUpdateManager(
       this.version,
-      options.test || options.benchmark || options.benchmarkTest,
+      options.test,
       this.config
     );
 
@@ -266,7 +264,7 @@ module.exports = class AtomApplication extends EventEmitter {
     );
 
     let socketServerPromise;
-    if (options.test || options.benchmark || options.benchmarkTest) {
+    if (options.test) {
       socketServerPromise = Promise.resolve();
     } else {
       socketServerPromise = this.listenForArgumentsFromNewProcess();
@@ -307,7 +305,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let optionsForWindowsToOpen = [];
     let shouldReopenPreviousWindows = false;
 
-    if (options.test || options.benchmark || options.benchmarkTest) {
+    if (options.test) {
       optionsForWindowsToOpen.push(options);
     } else if (options.newWindow) {
       shouldReopenPreviousWindows = false;
