@@ -1,4 +1,4 @@
-# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed
 
 # Git Diff package
 [![OS X Build Status](https://travis-ci.org/atom/git-diff.svg?branch=master)](https://travis-ci.org/atom/git-diff) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/9auj52cs0vso66nv/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/git-diff/branch/master) [![Dependency Status](https://david-dm.org/atom/git-diff.svg)](https://david-dm.org/atom/git-diff)

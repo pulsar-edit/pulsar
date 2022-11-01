@@ -13,7 +13,7 @@
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pulsar-edit/pulsar.git"
+    "url": "git+https://github.com/pulsar-edit/pulsar.git"
   },
   "bugs": {
     "url": "https://github.com/pulsar-edit/pulsar/issues"
@@ -35,7 +35,7 @@
     "atom-select-list": "^0.8.1",
     "autocomplete-atom-api": "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7",
     "autocomplete-css": "https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5",
-    "autocomplete-html": "https://github.com/pulsar-edit/autocomplete-html.git#v0.8.9",
+    "autocomplete-html": "git+https://github.com/pulsar-edit/autocomplete-html.git#v0.8.9",
     "autocomplete-plus": "https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4",
     "autocomplete-snippets": "https://codeload.github.com/atom/autocomplete-snippets/legacy.tar.gz/refs/tags/v1.12.1",
     "autoflow": "file:packages/autoflow",
@@ -75,7 +75,7 @@
     "fuzzy-finder": "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3",
     "git-diff": "file:packages/git-diff",
     "git-utils": "5.7.1",
-    "github": "https://github.com/pulsar-edit/github.git#v0.36.11",
+    "github": "git+https://github.com/pulsar-edit/github.git#v0.36.11",
     "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
@@ -153,7 +153,7 @@
     "season": "^6.0.2",
     "semver": "7.3.2",
     "service-hub": "^0.7.4",
-    "settings-view": "https://github.com/pulsar-edit/settings-view.git#v0.261.9",
+    "settings-view": "git+https://github.com/pulsar-edit/settings-view.git#v0.261.9",
     "sinon": "9.2.1",
     "snippets": "https://github.com/atom-community/snippets/archive/cdde11928c19d4969aba9a8dc5b1030ab68c4be2.tar.gz",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
@@ -303,5 +303,9 @@
     "playwright-core": "1.22.2",
     "random-seed": "0.3.0",
     "webdriverio": "7.20.9"
+  },
+  "homepage": "https://github.com/pulsar-edit/pulsar#readme",
+  "directories": {
+    "doc": "docs"
   }
 }

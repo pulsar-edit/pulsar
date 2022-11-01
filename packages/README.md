@@ -1,4 +1,4 @@
-# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed.
+# This document has nothing to do with Pulsar, and should be removed. If this is not the case, this message should be removed
 
 Side note: if someone hasn't went ahead and made sure to preserve all of the packages here..... someone should
 

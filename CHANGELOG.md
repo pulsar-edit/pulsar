@@ -1,2 +1,2 @@
 <!--See https://atom.io/releases-->
-## Document needs to be updated further.
+## Document needs to be updated further
