@@ -1998,16 +1998,16 @@ atom-grammar-test@^0.6.3, atom-grammar-test@^0.6.4:
     chevrotain "^0.18.0"
     escape-string-regexp "^1.0.5"
 
-"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#a658c5d":
+"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#449b401":
   version "8.2.15"
-  resolved "https://github.com/pulsar-edit/atom-keymap.git#a658c5d84a1d73ba778e6782c3db238cf3b3c9f2"
+  resolved "https://github.com/pulsar-edit/atom-keymap.git#449b401a8da83a1b1b316b95ad7e7ff8a0a39412"
   dependencies:
     clear-cut "^2"
     event-kit "^1.0.0"
     fs-plus "^3.0.0"
     grim "^1.2.1"
     keyboard-layout "2.0.17"
-    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
     property-accessors "^1"
     season "^6.0.2"
 
@@ -3720,7 +3720,7 @@ elliptic@^6.5.3:
     minimalistic-assert "^1.0.1"
     minimalistic-crypto-utils "^1.0.1"
 
-emissary@^1, emissary@^1.0.0, emissary@^1.2.0:
+emissary@^1, emissary@^1.0.0, emissary@^1.2.0, emissary@^1.3.2:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -6230,15 +6230,15 @@ multi-integer-range@^2.0.0:
   resolved "https://registry.yarnpkg.com/multi-integer-range/-/multi-integer-range-2.1.0.tgz#73675519ba2146dba22cd35960e9c5e804ffe2fc"
   integrity sha512-hhxJJyEXhLlsCgzMsX10NlPL35yM/v/ThBNlHgLP/84/Wkf6VugIMIVqEH1m0bvOwGYSmz92yhPLKdoPV87BBg==
 
+nan@^2.10.0, nan@^2.14.2:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
+  integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
+
 nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.16.0.tgz#664f43e45460fb98faf00edca0bb0d7b8dce7916"
   integrity sha512-UdAqHyFngu7TfQKsCBgAA6pWDkT8MAO7d0jyOecVhN5354xbLqdn8mV9Tat9gepAupm0bt2DbeaSC8vS52MuFA==
-
-nan@^2.14.2:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
-  integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
 
 nanoid@^3.1.22:
   version "3.3.4"
@@ -6802,15 +6802,18 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-"pathwatcher@https://github.com/pulsar-edit/pulsar-pathwatcher.git":
-  version "0.0.1"
-  resolved "https://github.com/pulsar-edit/pulsar-pathwatcher.git#47bcd4dae6e33b47cbf005511e9ded3ec0d2114d"
+"pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f":
+  version "8.1.2"
+  resolved "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1"
   dependencies:
     async "~0.2.10"
+    emissary "^1.3.2"
     event-kit "^2.1.0"
     fs-plus "^3.0.0"
     grim "^2.0.1"
     iconv-lite "~0.4.4"
+    nan "^2.10.0"
+    underscore-plus "~1.x"
 
 pause-stream@0.0.11:
   version "0.0.11"
@@ -8297,9 +8300,9 @@ temp@^0.9.0, temp@~0.9.0:
     mkdirp "^0.5.1"
     rimraf "~2.6.2"
 
-"text-buffer@https://github.com/pulsar-edit/text-buffer.git#c7e6b80fe":
+"text-buffer@https://github.com/pulsar-edit/text-buffer.git#c62430d7e":
   version "13.18.6"
-  resolved "https://github.com/pulsar-edit/text-buffer.git#c7e6b80feb44db449180e919e61ffe00f190a8e1"
+  resolved "https://github.com/pulsar-edit/text-buffer.git#c62430d7ea0ba03d0f81ad9e0de8fc04f0caeb42"
   dependencies:
     delegato "^1.0.0"
     diff "^2.2.1"
@@ -8309,7 +8312,7 @@ temp@^0.9.0, temp@~0.9.0:
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
     serializable "^1.0.3"
     superstring "https://github.com/pulsar-edit/superstring.git#708924046f8db9d05901a5372337f249ff5c47bb"
     underscore-plus "^1.0.0"
@@ -8513,13 +8516,13 @@ tree-sitter-typescript@0.20.1:
     node-addon-api "git+https://github.com/nodejs/node-addon-api.git"
     prebuild-install "^5.0.0"
 
-"tree-view@https://github.com/pulsar-edit/tree-view.git#3c88467":
+"tree-view@https://github.com/pulsar-edit/tree-view.git#4274c7a":
   version "0.229.1"
-  resolved "https://github.com/pulsar-edit/tree-view.git#3c884670401433fb9b3c5130293c909643e25404"
+  resolved "https://github.com/pulsar-edit/tree-view.git#4274c7a9ccae7ba3fe8ec568771148f8616a65d2"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
-    pathwatcher "https://github.com/pulsar-edit/pulsar-pathwatcher.git"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
     temp "~0.9.0"
     underscore-plus "^1.0.0"
 
@@ -8629,7 +8632,7 @@ unbzip2-stream@1.4.3:
     buffer "^5.2.1"
     through "^2.3.8"
 
-underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.6.6, underscore-plus@^1.7.0:
+underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.6.6, underscore-plus@^1.7.0, underscore-plus@~1.x:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/underscore-plus/-/underscore-plus-1.7.0.tgz#107f1900c520ac1fefe4edec6580a7ff08a99d0f"
   integrity sha512-A3BEzkeicFLnr+U/Q3EyWwJAQPbA19mtZZ4h+lLq3ttm9kn8WC4R3YpuJZEXmWdLjYP47Zc8aLZm9kwdv+zzvA==
