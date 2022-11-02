@@ -5,7 +5,9 @@ on:
 jobs:
   tests:
     name: tests
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
+    if:
+      ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
+      ${{ !contains(github.event.head_commit.message, '[skip-editor-ci]') }}
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-latest, windows-2019]
