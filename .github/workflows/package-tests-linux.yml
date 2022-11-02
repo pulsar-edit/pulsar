@@ -7,6 +7,7 @@ env:
 jobs:
   setup:
     name: setup
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
     runs-on: ubuntu-20.04
     steps:
     - name: Install windows-build-tools
@@ -47,6 +48,7 @@ jobs:
         key: linux-apm-${{ hashFiles('apm/package.json') }}
 
   test:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
     strategy:
       matrix:
         include:
