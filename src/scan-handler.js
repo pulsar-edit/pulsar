@@ -38,7 +38,7 @@ module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
   }, callback);
 };
 
-unction processPaths(rootPath, paths) {
+function processPaths(rootPath, paths) {
   if (paths == null || paths.length == 0) {
     return paths;
   }
