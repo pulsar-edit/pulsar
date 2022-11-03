@@ -6,7 +6,10 @@ env:
   APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
 jobs:
   setup:
-    name: setup
+    name: Build Editor
+    if: |
+      !startsWith(github.event.pull_request.title, '[skip-ci]') &&
+      !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-20.04
     steps:
     - name: Install windows-build-tools
@@ -23,23 +26,23 @@ jobs:
       with:
         node-version: 16
 
-    - name: install dependencies
+    - name: Install Dependencies
       run: yarn install
 
-    - name: build dependencies
+    - name: Build Dependencies
       run: yarn build
 
     - name: build dependencies
       run: yarn build:apm
 
-    - name: cache node module
+    - name: Cache node_modules
       id: cache-node
       uses: actions/cache@v3
       with:
         path: node_modules
         key: linux-modules-${{ hashFiles('package.json') }}
 
-    - name: cache APM module
+    - name: Cache apm 
       id: cache-apm
       uses: actions/cache@v3
       with:
@@ -47,7 +50,11 @@ jobs:
         key: linux-apm-${{ hashFiles('apm/package.json') }}
 
   test:
+    name: Test Packages
+    needs: setup
+    runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - filter: autocomplete|language
@@ -62,30 +69,26 @@ jobs:
             descr: UI elements
           - filter: image-view|bookmarks|keybinding-resolver|link|timecop
             descr: others
-      fail-fast: false
 
-    name: test ${{ matrix.descr }} packages
-    runs-on: ubuntu-20.04
-    needs: setup
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
-    - name: restore node module
+    - name: Restore node_modules from Cache
       id: restore-node
       uses: actions/cache@v3
       with:
         path: node_modules
         key: linux-modules-${{ hashFiles('package.json') }}
 
-    - name: cache APM module
+    - name: Restore apm from Cache
       id: restore-apm
       uses: actions/cache@v3
       with:
         path: apm
         key: linux-apm-${{ hashFiles('apm/package.json') }}
 
-    - name: Run ${{ matrix.descr }} packages' tests
+    - name: Run Package Tests for ${{ matrix.descr }}
       uses: GabrielBB/xvfb-action@v1
       with:
         run: node -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
