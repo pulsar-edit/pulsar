@@ -45,7 +45,7 @@
 
 [Documentation]: https://pulsar-edit.dev/docs/ 'Information how to use & work with Pulsar.'
 [Install]: https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar 'How to install Pulsar on your system.'
-[Retired]: docs/Retirement.md 'Check out what happened to the original Atom project.'
+[Retired]: https://github.blog/2022-06-08-sunsetting-atom/ 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
 [Build]: https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#building-pulsar 'Instructions on how to build Pulsar by yourself.'
 
