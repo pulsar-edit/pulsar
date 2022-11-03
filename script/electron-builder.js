@@ -114,8 +114,23 @@ let options = {
   }
 }
 
+function whatToBuild() {
+  const argvStartingWith = process.argv.findIndex(e => e.match('electron-builder.js'))
+  const what = process.argv[argvStartingWith + 1]
+  if(what) {
+    const filter = e => e.target === what
+    options.linux.target = options.linux.target.filter(filter)
+    options.win.target = options.win.target.filter(filter)
+    // options.mac.target = options.mac.target.filter(filter)
+    return options
+  } else {
+    return options
+  }
+}
+
 async function main() {
   const package = await fs.readFile('package.json', "utf-8")
+  let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
     //targets: Platform.LINUX.createTarget(),
