@@ -6,7 +6,7 @@ env:
   APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
 jobs:
   setup:
-    name: setup
+    name: Build Editor
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
@@ -50,9 +50,9 @@ jobs:
         key: linux-apm-${{ hashFiles('apm/package.json') }}
 
   test:
-    if:
-      ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
-      ${{ !contains(github.event.head_commit.message, '[skip-package-ci]') }}
+    name: Test packages
+    if: 
+      jobs.setup.result == 'success'
     strategy:
       matrix:
         include:
