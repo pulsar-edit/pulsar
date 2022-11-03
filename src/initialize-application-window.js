@@ -68,7 +68,7 @@ const clipboard = new Clipboard();
 TextEditor.setClipboard(clipboard);
 TextEditor.viewForItem = item => atom.views.getView(item);
 
-global.atom = new AtomEnvironment({
+global.core = global.atom = new AtomEnvironment({
   clipboard,
   applicationDelegate: new ApplicationDelegate(),
   enablePersistence: true

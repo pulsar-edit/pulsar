@@ -60,7 +60,7 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
   const applicationDelegate = new ApplicationDelegate();
   applicationDelegate.setRepresentedFilename = function() {};
   applicationDelegate.setWindowDocumentEdited = function() {};
-  window.atom = buildAtomEnvironment({
+  window.core = window.atom = buildAtomEnvironment({
     applicationDelegate, window, document,
     configDirPath: atomHome,
     enablePersistence: false
