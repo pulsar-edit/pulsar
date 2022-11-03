@@ -892,7 +892,7 @@ module.exports = class TextEditorComponent {
     }
 
     for (const className of newClassList) {
-        this.element.classList.add(className);
+      this.element.classList.add(className);
     }
 
     this.classList = newClassList;
@@ -1393,10 +1393,10 @@ module.exports = class TextEditorComponent {
       // Remove markers ending here from containing markers array
       if (boundary.ending) {
         for (const ending of boundary.ending) {
-            containingMarkers.splice(
-              containingMarkers.lastIndexOf(ending),
-              1
-            );
+          containingMarkers.splice(
+            containingMarkers.lastIndexOf(ending),
+            1
+          );
         }
       }
       // Add markers starting here to containing markers array
@@ -4098,7 +4098,7 @@ class CursorsAndInputComponent {
       pixelWidth,
       className: extraCursorClassName,
       style: extraCursorStyle
-  } of decorationsToRender.cursors) {
+    } of decorationsToRender.cursors) {
       let cursorClassName = 'cursor';
       if (extraCursorClassName) cursorClassName += ' ' + extraCursorClassName;
 
