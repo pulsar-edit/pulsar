@@ -58,7 +58,7 @@ if (args.resourcePath) {
     devResourcePath = stableResourcePath;
   }
 
-  if (args.dev || args.test || args.benchmark || args.benchmarkTest) {
+  if (args.dev || args.test) {
     resourcePath = devResourcePath;
   } else {
     resourcePath = stableResourcePath;

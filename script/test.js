@@ -21,11 +21,6 @@ const argv = require('yargs')
     boolean: true,
     default: false
   })
-  .option('core-benchmark', {
-    describe: 'Run core benchmarks',
-    boolean: true,
-    default: false
-  })
   .option('package', {
     describe: 'Run bundled package specs',
     boolean: true,
@@ -362,21 +357,6 @@ function getPackageTestSuites() {
   return packageTestSuites;
 }
 
-function runBenchmarkTests(callback) {
-  const benchmarksPath = path.join(CONFIG.repositoryRootPath, 'benchmarks');
-  const testArguments = ['--benchmark-test', benchmarksPath];
-  const testEnv = prepareEnv('benchmark');
-
-  console.log('##[command] Executing benchmark tests'.bold.green);
-  spawnTest(
-    executablePath,
-    testArguments,
-    { stdio: 'inherit', env: testEnv },
-    callback,
-    `core-benchmarks`
-  );
-}
-
 let testSuitesToRun = requestedTestSuites(process.platform);
 
 function requestedTestSuites(platform) {
@@ -392,7 +372,6 @@ function requestedTestSuites(platform) {
     argv.package || process.env.ATOM_RUN_PACKAGE_TESTS === 'true';
   let packages1 = process.env.ATOM_RUN_PACKAGE_TESTS === '1';
   let packages2 = process.env.ATOM_RUN_PACKAGE_TESTS === '2';
-  let benchmark = argv.coreBenchmark;
 
   // Operating system overrides:
   coreMain =
@@ -455,11 +434,6 @@ function requestedTestSuites(platform) {
         ...getPackageTestSuites().slice(PACKAGES_TO_TEST_IN_PARALLEL)
       );
     }
-  }
-
-  // Benchmark tests
-  if (benchmark) {
-    suites.push(runBenchmarkTests);
   }
 
   if (argv.skipMainProcessTests) {

@@ -37,7 +37,7 @@
 [Guidelines]: https://github.com/logos 'Branding Guidelines'
 [Electron]: https://github.com/electron/electron
 [Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
-[Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar
+[Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar/master
 
 [#]: #
 

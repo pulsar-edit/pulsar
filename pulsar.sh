@@ -100,7 +100,7 @@ if [ $OS == 'Mac' ]; then
   if [ "$ATOM_APP" == . ]; then
     unset ATOM_APP
   else
-    ATOM_PATH="$(dirname "$ATOM_APP")"
+    PULSAR_PATH="$(dirname "$ATOM_APP")"
     ATOM_APP_NAME="$(basename "$ATOM_APP")"
   fi
 
@@ -120,26 +120,26 @@ if [ $OS == 'Mac' ]; then
     fi
   fi
 
-  if [ -z "${ATOM_PATH}" ]; then
-    # If ATOM_PATH isn't set, check /Applications and then ~/Applications for Atom.app
+  if [ -z "${PULSAR_PATH}" ]; then
+    # If PULSAR_PATH isn't set, check /Applications and then ~/Applications for Atom.app
     if [ -x "/Applications/$ATOM_APP_NAME" ]; then
-      ATOM_PATH="/Applications"
+      PULSAR_PATH="/Applications"
     elif [ -x "$HOME/Applications/$ATOM_APP_NAME" ]; then
-      ATOM_PATH="$HOME/Applications"
+      PULSAR_PATH="$HOME/Applications"
     else
       # We haven't found an Pulsar.app, use spotlight to search for Pulsar
-      ATOM_PATH="$(mdfind "kMDItemCFBundleIdentifier == 'com.github.pulsar'" | grep -v ShipIt | head -1 | xargs -0 dirname)"
+      PULSAR_PATH="$(mdfind "kMDItemCFBundleIdentifier == 'com.github.pulsar'" | grep -v ShipIt | head -1 | xargs -0 dirname)"
 
       # Exit if Pulsar can't be found
-      if [ ! -x "$ATOM_PATH/$ATOM_APP_NAME" ]; then
-        echo "Cannot locate ${ATOM_APP_NAME}, it is usually located in /Applications. Set the ATOM_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
+      if [ ! -x "$PULSAR_PATH/$ATOM_APP_NAME" ]; then
+        echo "Cannot locate ${ATOM_APP_NAME}, it is usually located in /Applications. Set the PULSAR_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
         exit 1
       fi
     fi
   fi
 
   if [ $EXPECT_OUTPUT ]; then
-    "$ATOM_PATH/$ATOM_APP_NAME/Contents/MacOS/$ATOM_EXECUTABLE_NAME" --executed-from="$(pwd)" --pid=$$ "$@"
+    "$PULSAR_PATH/$ATOM_APP_NAME/Contents/MacOS/$ATOM_EXECUTABLE_NAME" --executed-from="$(pwd)" --pid=$$ "$@"
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -147,24 +147,23 @@ if [ $OS == 'Mac' ]; then
       exit ${ATOM_EXIT}
     fi
   else
-    open -a "$ATOM_PATH/$ATOM_APP_NAME" -n --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
+    open -a "$PULSAR_PATH/$ATOM_APP_NAME" -n --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
   fi
 elif [ $OS == 'Linux' ]; then
   SCRIPT=$(readlink -f "$0")
-  USR_DIRECTORY=$(readlink -f $(dirname $SCRIPT)/..)
 
   case $CHANNEL in
     beta)
-      ATOM_PATH="$USR_DIRECTORY/share/pulsar-beta/pulsar"
+      PULSAR_PATH="/opt/Pulsar-beta/pulsar"
       ;;
     nightly)
-      ATOM_PATH="$USR_DIRECTORY/share/pulsar-nightly/pulsar"
+      PULSAR_PATH="/opt/Pulsar-nightly/pulsar"
       ;;
     dev)
-      ATOM_PATH="$USR_DIRECTORY/share/pulsar-dev/pulsar"
+      PULSAR_PATH="/opt/Pulsar-dev/pulsar"
       ;;
     *)
-      ATOM_PATH="$USR_DIRECTORY/share/pulsar/pulsar"
+      PULSAR_PATH="/opt/Pulsar/pulsar"
       ;;
   esac
 
@@ -175,10 +174,10 @@ elif [ $OS == 'Linux' ]; then
 
   : ${TMPDIR:=/tmp}
 
-  [ -x "$ATOM_PATH" ] || ATOM_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
+  [ -x "$PULSAR_PATH" ] || PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
 
   if [ $EXPECT_OUTPUT ]; then
-    "$ATOM_PATH" --executed-from="$(pwd)" --pid=$$ "$@"
+    "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@"
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -187,7 +186,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   else
     (
-    nohup "$ATOM_PATH" --executed-from="$(pwd)" --pid=$$ "$@" > "$ATOM_HOME/nohup.out" 2>&1
+    nohup "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@" > "$ATOM_HOME/nohup.out" 2>&1
     if [ $? -ne 0 ]; then
       cat "$ATOM_HOME/nohup.out"
       exit $?
