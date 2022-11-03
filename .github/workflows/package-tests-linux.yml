@@ -7,9 +7,9 @@ env:
 jobs:
   setup:
     name: setup
-    if:
-      ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
-      ${{ !contains(github.event.head_commit.message, '[skip-package-ci]') }}
+    if: |
+      !startsWith(github.event.pull_request.title, '[skip-ci]') &&
+      !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-20.04
     steps:
     - name: Install windows-build-tools
