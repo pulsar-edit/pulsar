@@ -305,7 +305,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let optionsForWindowsToOpen = [];
     let shouldReopenPreviousWindows = false;
 
-    if (options.test) {
+    if (options.test || options.benchmark || options.benchmarkTest) {
       optionsForWindowsToOpen.push(options);
     } else if (options.newWindow) {
       shouldReopenPreviousWindows = false;
