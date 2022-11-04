@@ -19,8 +19,7 @@
     }
   },
   "globals": {
-    "atom": true,
-    "snapshotResult": true
+    "atom": true
   },
   "rules": {
     "standard/no-callback-literal": ["off"],
