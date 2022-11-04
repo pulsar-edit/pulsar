@@ -1,7 +1,4 @@
 # TypeScript language support in Atom
-[![CI](https://github.com/atom/language-typescript/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-typescript/actions/workflows/ci.yml)
-
-[![Dependency Status](https://david-dm.org/atom/language-typescript.svg)](https://david-dm.org/atom/language-typescript)
 
 Adds syntax highlighting and snippets for TypeScript in Atom.
 

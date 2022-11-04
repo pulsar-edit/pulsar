@@ -22,6 +22,7 @@ function buildBundledPackagesMetadata(packageJSON) {
     const packageMetadata = JSON.parse(fs.readFileSync(packageMetadataPath, 'utf8'));
     const packageReadmePath = path.join(packagePath, 'README.md');
     packageMetadata.readme = fs.readFileSync(packageReadmePath, 'utf8').toString();
+    packageMetadata.repository = "https://github.com/pulsar-edit/pulsar";
     normalizePackageData(
       packageMetadata,
       msg => {

@@ -1,5 +1,4 @@
 # ShellScript language support in Atom
-![CI Status](https://github.com/atom/language-shellscript/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to shell scripts in Atom.
 
