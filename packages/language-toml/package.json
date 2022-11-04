@@ -1,8 +1,8 @@
 {
   "name": "language-toml",
   "version": "0.20.0",
-  "repository": "https://github.com/atom/language-toml",
   "description": "TOML language support",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": "*"

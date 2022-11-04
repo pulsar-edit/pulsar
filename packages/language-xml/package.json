@@ -6,15 +6,8 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-xml",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-xml.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-xml/issues"
-  },
   "devDependencies": {
     "coffeelint": "^1.10.1"
   }

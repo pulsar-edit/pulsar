@@ -2,8 +2,8 @@
   "name": "language-csharp",
   "version": "1.1.0",
   "private": true,
-  "repository": "https://github.com/atom/language-csharp",
   "description": "C# language support",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "keywords": [
     "C#",
     "csharp",
