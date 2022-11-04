@@ -46,7 +46,7 @@
 [Crowdin]: https://crowdin.pulsar-edit.dev
 [Reddit]: https://www.reddit.com/r/pulsaredit/
 [OpenCollective]: https://opencollective.com/pulsar-edit
-
+[Discussions]: https://github.com/orgs/pulsar-edit/discussions
 [#]: #
 
 <!---------------------------{ Documents }--------------------------->
