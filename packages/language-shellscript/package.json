@@ -1,7 +1,7 @@
 {
   "name": "language-shellscript",
   "version": "0.28.2",
-  "description": "ShellScript language support in Atom",
+  "description": "ShellScript language support",
   "keywords": [
     "tree-sitter"
   ],

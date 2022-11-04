@@ -1,6 +1,6 @@
 # Base16 Tomorrow Light Syntax theme
 
-Atom theme using the ever popular [Base16 Tomorrow](http://chriskempson.github.io/base16/#tomorrow) light colors.
+A theme using the ever popular [Base16 Tomorrow](http://chriskempson.github.io/base16/#tomorrow) light colors.
 
 ![Base16 Tomorrow light](https://cloud.githubusercontent.com/assets/378023/10118588/f1002474-64b6-11e5-9107-b6bedee9777a.png)
 

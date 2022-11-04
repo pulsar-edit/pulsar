@@ -1,7 +1,7 @@
 {
   "name": "language-objective-c",
   "version": "0.16.0",
-  "description": "Objective-C language support in Atom",
+  "description": "Objective-C language support",
   "engines": {
     "atom": "*",
     "node": "*"

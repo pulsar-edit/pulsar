@@ -1,7 +1,7 @@
 {
   "name": "welcome",
   "version": "0.36.9",
-  "description": "Welcome users to Pulsar with useful information",
+  "description": "Welcome users with useful information",
   "main": "./lib/main",
   "atomTestRunner": "atom-mocha-test-runner",
   "repository": "https://github.com/pulsar-edit/pulsar",

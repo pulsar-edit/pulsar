@@ -1,6 +1,6 @@
 # About package
 
-View useful information about your Atom installation.
+View useful information about your current installation.
 
 ![About Atom](https://cloud.githubusercontent.com/assets/16760489/19395499/69bbb780-922d-11e6-9779-2b8327027ea5.png)
 

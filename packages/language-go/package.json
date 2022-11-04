@@ -1,6 +1,6 @@
 {
   "name": "language-go",
-  "description": "Go language support in Atom",
+  "description": "Go language support",
   "keywords": [
     "tree-sitter"
   ],

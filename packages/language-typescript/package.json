@@ -1,7 +1,7 @@
 {
   "name": "language-typescript",
   "version": "0.6.4",
-  "description": "TypeScript language support in Atom",
+  "description": "TypeScript language support",
   "keywords": [
     "tree-sitter"
   ],

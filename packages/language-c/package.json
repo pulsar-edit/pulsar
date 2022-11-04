@@ -1,7 +1,7 @@
 {
   "version": "0.60.20",
   "name": "language-c",
-  "description": "Atom language support for C/C++",
+  "description": "C/C++ language support",
   "keywords": [
     "tree-sitter"
   ],

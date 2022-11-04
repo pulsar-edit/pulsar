@@ -1,6 +1,6 @@
 {
   "name": "language-css",
-  "description": "CSS support in Atom",
+  "description": "CSS language support",
   "keywords": [
     "tree-sitter"
   ],

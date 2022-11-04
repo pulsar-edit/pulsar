@@ -5,7 +5,7 @@
     "atom": "*",
     "node": "*"
   },
-  "description": "Python language support in Atom",
+  "description": "Python language support",
   "keywords": [
     "tree-sitter"
   ],

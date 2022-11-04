@@ -5,12 +5,12 @@
     "atom": "*",
     "node": "*"
   },
-  "description": "Source code support in Atom",
   "homepage": "http://atom.github.io/language-source",
   "repository": {
     "type": "git",
     "url": "https://github.com/atom/language-source.git"
   },
+  "description": "Source code support",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/atom/language-source/issues"
