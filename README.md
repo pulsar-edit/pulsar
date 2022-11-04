@@ -41,13 +41,13 @@
 
 [#]: #
 
-<!---------------------------{ Files }--------------------------->
+<!---------------------------{ Documents }--------------------------->
 
-[Documentation]: docs/Documentation.md 'Information how to use & work with Pulsar.'
-[Install]: docs/Installation.md 'How to install Pulsar on your system.'
-[Retired]: docs/Retirement.md 'Check out what happened to the original Atom project.'
+[Documentation]: https://pulsar-edit.dev/docs/ 'Information how to use & work with Pulsar.'
+[Install]: https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar 'How to install Pulsar on your system.'
+[Retired]: https://github.blog/2022-06-08-sunsetting-atom/ 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
-[Build]: docs/Building.md 'Instructions on how to build Pulsar by yourself.'
+[Build]: https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#building-pulsar 'Instructions on how to build Pulsar by yourself.'
 
 
 <!---------------------------{ Images }--------------------------->
