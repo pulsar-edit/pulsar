@@ -382,6 +382,10 @@ module.exports = class AtomApplication extends EventEmitter {
       // Printing a message saying benchmarks are removed will help avoid
       // confusion about the editor failing to launch in this mode.
       console.log("The benchmarking feature has been removed.");
+      if (this.getAllWindows().length === 0) {
+        console.log("Quitting.");
+        app.quit();
+      };
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
