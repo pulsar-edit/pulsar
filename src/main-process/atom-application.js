@@ -172,6 +172,15 @@ module.exports = class AtomApplication extends EventEmitter {
       return createApplication(options);
     }
 
+    // We haven't returned yet, so another editor main process must be running.
+    if (options.benchmark || options.benchmarkTest) {
+      // We have to log this quite early -- here is the latest we can log this
+      // and have it show in the same terminal where the second instance of the
+      // editor is being launched. The Promise below hands things off
+      // to the existing, older editor main process that is already running.
+      console.log('The benchmarking feature has been removed.');
+    }
+
     return new Promise(resolve => {
       const client = net.connect({ path: socketPath }, () => {
         client.write(encryptOptions(options, socketSecret), () => {
