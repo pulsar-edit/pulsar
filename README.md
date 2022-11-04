@@ -11,8 +11,7 @@
 [![Button Documentation]][Documentation]   
 [![Button Build]][Build] 
 
-[![Badge License]][License]    
-[![Badge Guidelines]][Guidelines]    
+[![Badge License]][License] 
 [![Badge Status]][Status]    
 [![Badge Sunset]][Retired]    
 
@@ -40,7 +39,6 @@
 
 <!---------------------------{ Links }--------------------------->
 
-[Guidelines]: https://github.com/logos 'Branding Guidelines'
 [Electron]: https://github.com/electron/electron
 [Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
 [Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar/master
@@ -68,7 +66,6 @@
 
 <!---------------------------{ Badges }--------------------------->
 
-[Badge Guidelines]: https://img.shields.io/badge/Logo-Guidelines-d36e2d.svg?style=for-the-badge&labelColor=323232
 [Badge Retired]: https://img.shields.io/badge/Retired-bb3c1f.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
 [Badge Sunset]: https://img.shields.io/badge/Sunset-orange.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
 [Badge Discord]: https://img.shields.io/badge/Discord-6399c4.svg?style=for-the-badge&labelColor=323232&logoColor=white&logo=Discord
