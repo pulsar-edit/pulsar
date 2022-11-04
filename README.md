@@ -19,6 +19,7 @@
 [![Badge Crowdin]][Crowdin]
 [![Badge OpenCollective]][OpenCollective]
 
+[![Badge Discussions]][Discussions]
 [![Badge Discord]][Discord]
 [![Badge Reddit]][Reddit]
 
