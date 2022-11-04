@@ -4,7 +4,6 @@
   "main": "./lib/main",
   "version": "1.9.1",
   "description": "View useful information about your current installation.",
-  "keywords": [],
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "scripts": {
