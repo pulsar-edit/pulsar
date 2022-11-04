@@ -41,7 +41,7 @@
     "autoflow": "file:packages/autoflow",
     "autosave": "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6",
     "babel-preset-atomic": "^5.0.0",
-    "background-tips": "https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0",
+    "background-tips": "https://codeload.github.com/pulsar-edit/background-tips/legacy.tar.gz/refs/tags/v0.28.1",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
     "base16-tomorrow-light-theme": "file:packages/base16-tomorrow-light-theme",
     "bookmarks": "https://codeload.github.com/atom/bookmarks/legacy.tar.gz/refs/tags/v0.46.0",
