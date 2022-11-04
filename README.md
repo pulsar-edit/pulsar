@@ -15,10 +15,16 @@
 [![Badge Guidelines]][Guidelines]    
 [![Badge Status]][Status]    
 [![Badge Sunset]][Retired]    
+
+[![Badge Codacy]][Codacy]
+[![Badge Crowdin]][Crowdin]
+[![Badge OpenCollective]][OpenCollective]
+
 [![Badge Discord]][Discord]
+[![Badge Reddit]][Reddit]
 
 <br>
- 
+
 *A hackable text editor for the 21st century, built on **[Electron]**,* <br>
 *and based on everything we love about our favorite editors.*
 
@@ -38,6 +44,10 @@
 [Electron]: https://github.com/electron/electron
 [Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
 [Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar/master
+[Codacy]: https://app.codacy.com/gh/pulsar-edit/pulsar
+[Crowdin]: https://crowdin.pulsar-edit.dev
+[Reddit]: https://www.reddit.com/r/pulsaredit/
+[OpenCollective]: https://opencollective.com/pulsar-edit
 
 [#]: #
 
@@ -64,6 +74,10 @@
 [Badge Discord]: https://img.shields.io/badge/Discord-6399c4.svg?style=for-the-badge&labelColor=323232&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-e5ab42.svg?style=for-the-badge&labelColor=323232
 [Badge Status]: https://img.shields.io/cirrus/github/pulsar-edit/pulsar?style=for-the-badge&labelColor=323232&label=Build%20Status
+[Badge Codacy]: https://app.codacy.com/project/badge/Grade/24873ecb93dc4c1d865202ce5b24efc1
+[Badge Crowdin]: https://badges.crowdin.net/pulsar-edit/localized.svg
+[Badge Reddit]: https://img.shields.io/reddit/subreddit-subscribers/pulsaredit?style=for-the-badge
+[Badge OpenCollective]: https://opencollective.com/pulsar-edit/tiers/badge.svg
 
 
 <!--------------------------{ Buttons }--------------------------->
@@ -71,4 +85,3 @@
 [Button Documentation]: https://img.shields.io/badge/Documentation-6399c4?style=for-the-badge&logoColor=white&logo=GitBook
 [Button Install]: https://img.shields.io/badge/Install-78af9f?style=for-the-badge&logoColor=white&logo=DocuSign
 [Button Build]: https://img.shields.io/badge/Building-e5ab42?style=for-the-badge&logoColor=white&logo=GNUBash
-
