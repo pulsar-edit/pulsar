@@ -75,7 +75,7 @@
 [Badge Crowdin]: https://badges.crowdin.net/pulsar-edit/localized.svg
 [Badge Reddit]: https://img.shields.io/reddit/subreddit-subscribers/pulsaredit?style=for-the-badge
 [Badge OpenCollective]: https://opencollective.com/pulsar-edit/tiers/badge.svg
-
+[Badge Discussions]: https://img.shields.io/github/discussions/pulsar-edit/.github?style=for-the-badge
 
 <!--------------------------{ Buttons }--------------------------->
 
