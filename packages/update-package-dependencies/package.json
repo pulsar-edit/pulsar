@@ -21,7 +21,6 @@
       }
     }
   },
-  "dependencies": {},
   "devDependencies": {
     "standard": "^10.0.3"
   },
