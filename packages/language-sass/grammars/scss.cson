@@ -1251,7 +1251,7 @@
         (?:
           [-a-zA-Z_0-9]|[^\\x00-\\x7F]       # Valid identifier characters
           | \\\\(?:[0-9a-fA-F]{1,6}|.)       # Escape sequence
-          | \\#\\{                           # Interpolation (escaped to avoid Coffeelint errors)
+          | \\#\\{                           # Interpolation
           | \\.?\\$                          # Possible start of interpolation variable
           | }                                # Possible end of interpolation
         )+?
@@ -1263,7 +1263,7 @@
             (?:
               [-a-zA-Z_0-9]|[^\\x00-\\x7F]       # Valid identifier characters
               | \\\\(?:[0-9a-fA-F]{1,6}|.)       # Escape sequence
-              | \\#\\{                           # Interpolation (escaped to avoid Coffeelint errors)
+              | \\#\\{                           # Interpolation
               | \\.?\\$                          # Possible start of interpolation variable
               | }                                # Possible end of interpolation
             )+
@@ -1365,7 +1365,7 @@
       (
         (?: [-a-zA-Z_0-9]|[^\\x00-\\x7F]     # Valid identifier characters
           | \\\\(?:[0-9a-fA-F]{1,6}|.)       # Escape sequence
-          | \\#\\{                           # Interpolation (escaped to avoid Coffeelint errors)
+          | \\#\\{                           # Interpolation
           | \\.?\\$                          # Possible start of interpolation variable
           | }                                # Possible end of interpolation
         )+
@@ -1405,7 +1405,7 @@
       (
         (?: [-a-zA-Z_0-9]|[^\\x00-\\x7F]     # Valid identifier characters
           | \\\\(?:[0-9a-fA-F]{1,6}|.)       # Escape sequence
-          | \\#\\{                           # Interpolation (escaped to avoid Coffeelint errors)
+          | \\#\\{                           # Interpolation
           | \\.?\\$                          # Possible start of interpolation variable
           | }                                # Possible end of interpolation
         )+
@@ -1441,7 +1441,7 @@
       (
         (?: [-a-zA-Z_0-9]|[^\\x00-\\x7F]     # Valid identifier characters
           | \\\\(?:[0-9a-fA-F]{1,6}|.)       # Escape sequence
-          | \\#\\{                           # Interpolation (escaped to avoid Coffeelint errors)
+          | \\#\\{                           # Interpolation
           | \\.\\$                           # Possible start of interpolation module scope variable
           | \\$                              # Possible start of interpolation variable
           | }                                # Possible end of interpolation
@@ -1479,7 +1479,7 @@
       (
         (?: [-a-zA-Z_0-9]|[^\\x00-\\x7F]     # Valid identifier characters
           | \\\\(?:[0-9a-fA-F]{1,6}|.)       # Escape sequence
-          | \\#\\{                           # Interpolation (escaped to avoid Coffeelint errors)
+          | \\#\\{                           # Interpolation
           | \\$                              # Possible start of interpolation variable
           | }                                # Possible end of interpolation
         )+

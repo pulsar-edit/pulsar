@@ -10,8 +10,5 @@
   "license": "MIT",
   "dependencies": {
     "tree-sitter-java": "0.19.1"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
   }
 }
