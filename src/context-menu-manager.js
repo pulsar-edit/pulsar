@@ -9,10 +9,7 @@ const {sortMenuItems} = require('./menu-sort-helpers');
 const _ = require('underscore-plus');
 
 const buildMetadata = require('../package.json');
-var platformContextMenu;
-if (buildMetadata != null && buildMetadata._atomMenu != null && buildMetadata._atomMenu['context-menu']) {
-  platformContextMenu = buildMetadata._atomMenu['context-menu'];
-}
+const platformContextMenu = buildMetadata?._atomMenu?.['context-menu'];
 
 // Extended: Provides a registry for commands that you'd like to appear in the
 // context menu.

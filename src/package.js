@@ -35,16 +35,9 @@ module.exports = class Package {
     this.mainModule = null;
     this.path = params.path;
     this.preloadedPackage = params.preloadedPackage;
-    this.metadata =
-      params.metadata || this.packageManager.loadPackageMetadata(this.path);
-    this.bundledPackage =
-      params.bundledPackage != null
-        ? params.bundledPackage
-        : this.packageManager.isBundledPackagePath(this.path);
-    this.name =
-      (this.metadata && this.metadata.name) ||
-      params.name ||
-      path.basename(this.path);
+    this.metadata = params.metadata || this.packageManager.loadPackageMetadata(this.path);
+    this.bundledPackage = params.bundledPackage ?? this.packageManager.isBundledPackagePath(this.path);
+    this.name = this.metadata?.name || params.name || path.basename(this.path);
     this.reset();
   }
 

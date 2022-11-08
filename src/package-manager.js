@@ -12,6 +12,8 @@ const ThemePackage = require('./theme-package');
 const ModuleCache = require('./module-cache');
 const packageJSON = require('../package.json');
 
+const initialPackagesCache = packageJSON._atomPackages ?? {};
+
 // Extended: Package manager for coordinating the lifecycle of Pulsar packages.
 //
 // An instance of this class is always available as the `atom.packages` global.
@@ -46,12 +48,8 @@ module.exports = class PackageManager {
     this.packageDirPaths = [];
     this.deferredActivationHooks = [];
     this.triggeredActivationHooks = new Set();
-    this.packagesCache =
-      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
-    this.packageDependencies =
-      packageJSON.packageDependencies != null
-        ? packageJSON.packageDependencies
-        : {};
+    this.packagesCache = initialPackagesCache;
+    this.packageDependencies = packageJSON.packageDependencies ?? {};
     this.deprecatedPackages = packageJSON._deprecatedPackages || {};
     this.deprecatedPackageRanges = {};
     this.initialPackagesLoaded = false;
@@ -99,12 +97,8 @@ module.exports = class PackageManager {
     this.loadedPackages = {};
     this.preloadedPackages = {};
     this.packageStates = {};
-    this.packagesCache =
-      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
-    this.packageDependencies =
-      packageJSON.packageDependencies != null
-        ? packageJSON.packageDependencies
-        : {};
+    this.packagesCache = initialPackagesCache;
+    this.packageDependencies = packageJSON.packageDependencies ?? {};
     this.triggeredActivationHooks.clear();
     this.activatePromise = null;
   }
@@ -303,9 +297,7 @@ module.exports = class PackageManager {
   // Returns the {Package} that was disabled or null if it isn't loaded.
   disablePackage(name) {
     const pack = this.loadPackage(name);
-    if (!this.isPackageDisabled(name) && pack != null) {
-      pack.disable();
-    }
+    if (!this.isPackageDisabled(name)) pack?.disable();
     return pack;
   }
 
@@ -456,8 +448,7 @@ module.exports = class PackageManager {
       if (!packagesByName.has(packageName)) {
         packages.push({
           name: packageName,
-          path: path.join(this.resourcePath, 'node_modules', packageName),
-          isBundled: true
+          path: path.join(this.resourcePath, 'node_modules', packageName)
         });
       }
     }
@@ -568,13 +559,7 @@ module.exports = class PackageManager {
   }
 
   preloadPackages() {
-    const result = [];
-    for (const packageName in this.packagesCache) {
-      result.push(
-        this.preloadPackage(packageName, this.packagesCache[packageName])
-      );
-    }
-    return result;
+    return Object.entry(this.packagesCache).map( ([packageName,package]) => this.preloadPackage(packageName, package) );
   }
 
   preloadPackage(packageName, pack) {
@@ -638,23 +623,17 @@ module.exports = class PackageManager {
   }
 
   loadPackage(nameOrPath) {
-    if (path.basename(nameOrPath)[0].match(/^\./)) {
-      // primarily to skip .git folder
-      return null;
-    }
+    if (path.basename(nameOrPath)[0].match(/^\./)) return null; // primarily to skip .git folder
 
     const pack = this.getLoadedPackage(nameOrPath);
-    if (pack) {
-      return pack;
-    }
+    if (pack) return pack;
 
     const packagePath = this.resolvePackagePath(nameOrPath);
     if (packagePath) {
-      const name = path.basename(nameOrPath);
       return this.loadAvailablePackage({
-        name,
         path: packagePath,
         isBundled: this.isBundledPackagePath(packagePath)
+        name: path.basename(nameOrPath),
       });
     }
 
@@ -677,9 +656,7 @@ module.exports = class PackageManager {
     }
 
     const loadedPackage = this.getLoadedPackage(availablePackage.name);
-    if (loadedPackage != null) {
-      return loadedPackage;
-    }
+    if (loadedPackage) return loadedPackage;
 
     if (preloadedPackage != null) {
       if (availablePackage.isBundled) {
@@ -934,7 +911,7 @@ module.exports = class PackageManager {
     return Promise.all([symlinkPromise, dirPromise]).then(values => {
       const [isSymLink, isDir] = values;
       if (!isSymLink && isDir) {
-        return fs.remove(directory, function() {});
+        return fs.remove(directory, () => {});
       }
     });
   }
@@ -1000,9 +977,7 @@ module.exports = class PackageManager {
       }
     }
 
-    if (metadata == null) {
-      metadata = {};
-    }
+    if (!metadata) metadata = {};
 
     if (typeof metadata.name !== 'string' || metadata.name.length <= 0) {
       metadata.name = packageName;
