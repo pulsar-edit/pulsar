@@ -632,7 +632,6 @@ module.exports = class PackageManager {
     if (packagePath) {
       return this.loadAvailablePackage({
         path: packagePath,
-        isBundled: this.isBundledPackagePath(packagePath)
         name: path.basename(nameOrPath),
       });
     }
@@ -677,17 +676,7 @@ module.exports = class PackageManager {
       return null;
     }
 
-    if (
-      !availablePackage.isBundled &&
-      this.isDeprecatedPackage(metadata.name, metadata.version)
-    ) {
-      console.warn(
-        `Could not load ${metadata.name}@${
-          metadata.version
-        } because it uses deprecated APIs that have been removed.`
-      );
-      return null;
-    }
+    if ( !availablePackage.isBundled && this.isDeprecatedPackage(metadata.name, metadata.version) ) return console.warn(`Could not load ${metadata.name}@${metadata.version} because it uses deprecated APIs that have been removed.`);
 
     const options = {
       path: availablePackage.path,
@@ -946,34 +935,24 @@ module.exports = class PackageManager {
   }
 
   loadPackageMetadata(packagePathOrAvailablePackage, ignoreErrors = false) {
-    let isBundled, packageName, packagePath;
+    let packageName, packagePath;
     if (typeof packagePathOrAvailablePackage === 'object') {
       const availablePackage = packagePathOrAvailablePackage;
       packageName = availablePackage.name;
       packagePath = availablePackage.path;
-      isBundled = availablePackage.isBundled;
     } else {
       packagePath = packagePathOrAvailablePackage;
       packageName = path.basename(packagePath);
-      isBundled = this.isBundledPackagePath(packagePath);
     }
 
     let metadata;
-    if (isBundled && this.packagesCache[packageName] != null) {
-      metadata = this.packagesCache[packageName].metadata;
-    }
-
-    if (metadata == null) {
-      const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
-      if (metadataPath) {
-        try {
-          metadata = CSON.readFileSync(metadataPath);
-          this.normalizePackageMetadata(metadata);
-        } catch (error) {
-          if (!ignoreErrors) {
-            throw error;
-          }
-        }
+    const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
+    if (metadataPath) {
+      try {
+        metadata = CSON.readFileSync(metadataPath);
+        this.normalizePackageMetadata(metadata);
+      } catch (error) {
+        if (!ignoreErrors) throw error;
       }
     }
 
