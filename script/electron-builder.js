@@ -92,7 +92,7 @@ let options = {
   "linux": {
     "icon": pngIcon,
     "category": "Development",
-    "synopsis": "A hackable text editor for the 22nd century",
+    "synopsis": "A hackable text editor for the 21st century",
     "target": [
       { target: "appimage" },
       { target: "deb" },
