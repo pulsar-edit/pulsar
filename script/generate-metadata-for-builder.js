@@ -20,8 +20,6 @@ function buildBundledPackagesMetadata(packageJSON) {
     const packagePath = path.join('node_modules', packageName);
     const packageMetadataPath = path.join(packagePath, 'package.json');
     const packageMetadata = JSON.parse(fs.readFileSync(packageMetadataPath, 'utf8'));
-    const packageReadmePath = path.join(packagePath, 'README.md');
-    packageMetadata.readme = fs.readFileSync(packageReadmePath, 'utf8').toString();
     normalizePackageData(
       packageMetadata,
       msg => {
@@ -40,6 +38,7 @@ function buildBundledPackagesMetadata(packageJSON) {
     delete packageMetadata['_from'];
     delete packageMetadata['_id'];
     delete packageMetadata['dist'];
+    delete packageMetadata['readme'];
     delete packageMetadata['readmeFilename'];
 
     const packageModuleCache = packageMetadata._atomModuleCache || {};
@@ -56,6 +55,7 @@ function buildBundledPackagesMetadata(packageJSON) {
       menus: {},
       grammarPaths: [],
       settings: {},
+      styleSheetPaths: [],
       rootDirPath: packagePath,
     };
 
@@ -73,78 +73,6 @@ function buildBundledPackagesMetadata(packageJSON) {
       // them here as well.
       packageNewMetadata.main = packageNewMetadata.main.replace(/\\/g, '/');
     }
-
-    const packageKeymapsPath = path.join(packagePath, 'keymaps');
-    if (fs.existsSync(packageKeymapsPath)) {
-      for (let packageKeymapName of fs.readdirSync(packageKeymapsPath)) {
-        const packageKeymapPath = path.join(
-          packageKeymapsPath,
-          packageKeymapName
-        );
-        if (
-          packageKeymapPath.endsWith('.cson') ||
-          packageKeymapPath.endsWith('.json')
-        ) {
-          packageNewMetadata.keymaps[packageKeymapPath] = CSON.readFileSync(
-            packageKeymapPath
-          );
-        }
-      }
-    }
-
-    const packageMenusPath = path.join(packagePath, 'menus');
-    if (fs.existsSync(packageMenusPath)) {
-      for (let packageMenuName of fs.readdirSync(packageMenusPath)) {
-        const packageMenuPath = path.join(packageMenusPath, packageMenuName);
-        if (
-          packageMenuPath.endsWith('.cson') ||
-          packageMenuPath.endsWith('.json')
-        ) {
-          packageNewMetadata.menus[packageMenuPath] = CSON.readFileSync(
-            packageMenuPath
-          );
-        }
-      }
-    }
-
-    const packageGrammarsPath = path.join(packagePath, 'grammars');
-    for (let packageGrammarPath of fs.listSync(packageGrammarsPath, [
-      'json',
-      'cson'
-    ])) {
-      packageNewMetadata.grammarPaths.push(packageGrammarPath);
-    }
-
-    const packageSettingsPath = path.join(packagePath, 'settings');
-    for (let packageSettingPath of fs.listSync(packageSettingsPath, [
-      'json',
-      'cson'
-    ])) {
-      packageNewMetadata.settings[packageSettingPath] = CSON.readFileSync(
-        packageSettingPath
-      );
-    }
-
-    const packageStyleSheetsPath = path.join(packagePath, 'styles');
-    let styleSheets = null;
-    if (packageMetadata.mainStyleSheet) {
-      styleSheets = [fs.resolve(packagePath, packageMetadata.mainStyleSheet)];
-    } else if (packageMetadata.styleSheets) {
-      styleSheets = packageMetadata.styleSheets.map(name =>
-        fs.resolve(packageStyleSheetsPath, name, ['css', 'less', ''])
-      );
-    } else {
-      const indexStylesheet = fs.resolve(packagePath, 'index', ['css', 'less']);
-      if (indexStylesheet) {
-        styleSheets = [indexStylesheet];
-      } else {
-        styleSheets = fs.listSync(packageStyleSheetsPath, ['css', 'less']);
-      }
-    }
-
-    packageNewMetadata.styleSheetPaths = styleSheets.map(styleSheetPath =>
-      path.relative(packagePath, styleSheetPath)
-    );
 
     packages[packageMetadata.name] = packageNewMetadata;
     if (packageModuleCache.extensions) {
