@@ -12,8 +12,6 @@ const ThemePackage = require('./theme-package');
 const ModuleCache = require('./module-cache');
 const packageJSON = require('../package.json');
 
-const initialPackagesCache = packageJSON._atomPackages ?? {};
-
 // Extended: Package manager for coordinating the lifecycle of Pulsar packages.
 //
 // An instance of this class is always available as the `atom.packages` global.
@@ -48,7 +46,6 @@ module.exports = class PackageManager {
     this.packageDirPaths = [];
     this.deferredActivationHooks = [];
     this.triggeredActivationHooks = new Set();
-    this.packagesCache = initialPackagesCache;
     this.packageDependencies = packageJSON.packageDependencies ?? {};
     this.deprecatedPackages = packageJSON._deprecatedPackages || {};
     this.deprecatedPackageRanges = {};
@@ -95,7 +92,6 @@ module.exports = class PackageManager {
     await this.deactivatePackages();
     this.loadedPackages = {};
     this.packageStates = {};
-    this.packagesCache = initialPackagesCache;
     this.packageDependencies = packageJSON.packageDependencies ?? {};
     this.triggeredActivationHooks.clear();
     this.activatePromise = null;

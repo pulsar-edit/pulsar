@@ -776,14 +776,7 @@ module.exports = class Package {
   }
 
   requireMainModule() {
-    if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
-      if (this.packageManager.packagesCache[this.name].main) {
-        this.mainModule = requireModule(
-          this.packageManager.packagesCache[this.name].main
-        );
-        return this.mainModule;
-      }
-    } else if (this.mainModuleRequired) {
+    if (this.mainModuleRequired) {
       return this.mainModule;
     } else if (!this.isCompatible()) {
       const nativeModuleNames = this.incompatibleModules
@@ -848,25 +841,13 @@ module.exports = class Package {
     if (this.resolvedMainModulePath) return this.mainModulePath;
     this.resolvedMainModulePath = true;
 
-    if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
-      if (this.packageManager.packagesCache[this.name].main) {
-        this.mainModulePath = path.resolve(
-          this.packageManager.resourcePath,
-          'static',
-          this.packageManager.packagesCache[this.name].main
-        );
-      } else {
-        this.mainModulePath = null;
-      }
-    } else {
-      const mainModulePath = this.metadata.main
-        ? path.join(this.path, this.metadata.main)
-        : path.join(this.path, 'index');
-      this.mainModulePath = fs.resolveExtension(mainModulePath, [
-        '',
-        ...CompileCache.supportedExtensions
-      ]);
-    }
+    const mainModulePath = this.metadata.main
+    ? path.join(this.path, this.metadata.main)
+    : path.join(this.path, 'index');
+    this.mainModulePath = fs.resolveExtension(mainModulePath, [
+      '',
+      ...CompileCache.supportedExtensions
+    ]);
     return this.mainModulePath;
   }
 
