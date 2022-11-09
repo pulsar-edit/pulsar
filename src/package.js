@@ -483,38 +483,17 @@ module.exports = class Package {
   }
 
   loadKeymaps() {
-    if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
-      this.keymaps = [];
-      for (const keymapPath in this.packageManager.packagesCache[this.name]
-        .keymaps) {
-        const keymapObject = this.packageManager.packagesCache[this.name]
-          .keymaps[keymapPath];
-        this.keymaps.push([`core:${keymapPath}`, keymapObject]);
-      }
-    } else {
-      this.keymaps = this.getKeymapPaths().map(keymapPath => [
-        keymapPath,
-        CSON.readFileSync(keymapPath, { allowDuplicateKeys: false }) || {}
-      ]);
-    }
+    this.keymaps = this.getKeymapPaths().map(keymapPath => [
+      keymapPath,
+      CSON.readFileSync(keymapPath, { allowDuplicateKeys: false }) || {}
+    ]);
   }
 
   loadMenus() {
-    if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
-      this.menus = [];
-      for (const menuPath in this.packageManager.packagesCache[this.name]
-        .menus) {
-        const menuObject = this.packageManager.packagesCache[this.name].menus[
-          menuPath
-        ];
-        this.menus.push([`core:${menuPath}`, menuObject]);
-      }
-    } else {
-      this.menus = this.getMenuPaths().map(menuPath => [
-        menuPath,
-        CSON.readFileSync(menuPath) || {}
-      ]);
-    }
+    this.menus = this.getMenuPaths().map(menuPath => [
+      menuPath,
+      CSON.readFileSync(menuPath) || {}
+    ]);
   }
 
   getKeymapPaths() {
@@ -614,46 +593,30 @@ module.exports = class Package {
   }
 
   getStylesheetPaths() {
-    if (
-      this.bundledPackage &&
-      this.packageManager.packagesCache[this.name] &&
-      this.packageManager.packagesCache[this.name].styleSheetPaths
-    ) {
-      const { styleSheetPaths } = this.packageManager.packagesCache[this.name];
-      return styleSheetPaths.map(styleSheetPath =>
-        path.join(this.path, styleSheetPath)
+    let indexStylesheet;
+    const stylesheetDirPath = this.getStylesheetsPath();
+    if (this.metadata.mainStyleSheet) {
+      return [fs.resolve(this.path, this.metadata.mainStyleSheet)];
+    } else if (this.metadata.styleSheets) {
+      return this.metadata.styleSheets.map(name =>
+        fs.resolve(stylesheetDirPath, name, ['css', 'less', ''])
       );
+    } else if (
+      (indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']))
+    ) {
+      return [indexStylesheet];
     } else {
-      let indexStylesheet;
-      const stylesheetDirPath = this.getStylesheetsPath();
-      if (this.metadata.mainStyleSheet) {
-        return [fs.resolve(this.path, this.metadata.mainStyleSheet)];
-      } else if (this.metadata.styleSheets) {
-        return this.metadata.styleSheets.map(name =>
-          fs.resolve(stylesheetDirPath, name, ['css', 'less', ''])
-        );
-      } else if (
-        (indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']))
-      ) {
-        return [indexStylesheet];
-      } else {
-        return fs.listSync(stylesheetDirPath, ['css', 'less']);
-      }
+      return fs.listSync(stylesheetDirPath, ['css', 'less']);
     }
   }
 
   loadGrammarsSync() {
     if (this.grammarsLoaded) return;
 
-    let grammarPaths;
-    if (this.preloadedPackage && this.packageManager.packagesCache[this.name]) {
-      ({ grammarPaths } = this.packageManager.packagesCache[this.name]);
-    } else {
-      grammarPaths = fs.listSync(path.join(this.path, 'grammars'), [
-        'json',
-        'cson'
-      ]);
-    }
+    const grammarPaths = fs.listSync(path.join(this.path, 'grammars'), [
+      'json',
+      'cson'
+    ]);
 
     for (let grammarPath of grammarPaths) {
       if (
@@ -714,22 +677,14 @@ module.exports = class Package {
     };
 
     return new Promise(resolve => {
-      if (
-        this.preloadedPackage &&
-        this.packageManager.packagesCache[this.name]
-      ) {
-        const { grammarPaths } = this.packageManager.packagesCache[this.name];
-        return asyncEach(grammarPaths, loadGrammar, () => resolve());
-      } else {
-        const grammarsDirPath = path.join(this.path, 'grammars');
-        fs.exists(grammarsDirPath, grammarsDirExists => {
-          if (!grammarsDirExists) return resolve();
-          fs.list(grammarsDirPath, ['json', 'cson'], (error, grammarPaths) => {
-            if (error || !grammarPaths) return resolve();
-            asyncEach(grammarPaths, loadGrammar, () => resolve());
-          });
+      const grammarsDirPath = path.join(this.path, 'grammars');
+      fs.exists(grammarsDirPath, grammarsDirExists => {
+        if (!grammarsDirExists) return resolve();
+        fs.list(grammarsDirPath, ['json', 'cson'], (error, grammarPaths) => {
+          if (error || !grammarPaths) return resolve();
+          asyncEach(grammarPaths, loadGrammar, () => resolve());
         });
-      }
+      });
     });
   }
 
