@@ -47,8 +47,6 @@ module.exports = class PackageManager {
     this.deferredActivationHooks = [];
     this.triggeredActivationHooks = new Set();
     this.packageDependencies = packageJSON.packageDependencies ?? {};
-    this.deprecatedPackages = packageJSON._deprecatedPackages || {};
-    this.deprecatedPackageRanges = {};
     this.initialPackagesLoaded = false;
     this.initialPackagesActivated = false;
     this.loadedPackages = {};
@@ -242,29 +240,6 @@ module.exports = class PackageManager {
   // Returns a {Boolean}.
   isBundledPackage(name) {
     return this.getPackageDependencies().hasOwnProperty(name);
-  }
-
-  isDeprecatedPackage(name, version) {
-    const metadata = this.deprecatedPackages[name];
-    if (!metadata) return false;
-    if (!metadata.version) return true;
-
-    let range = this.deprecatedPackageRanges[metadata.version];
-    if (!range) {
-      try {
-        range = new ModuleCache.Range(metadata.version);
-      } catch (error) {
-        range = NullVersionRange;
-      }
-      this.deprecatedPackageRanges[metadata.version] = range;
-    }
-    return range.test(version);
-  }
-
-  getDeprecatedPackageMetadata(name) {
-    const metadata = this.deprecatedPackages[name];
-    if (metadata) Object.freeze(metadata);
-    return metadata;
   }
 
   /*
@@ -599,8 +574,6 @@ module.exports = class PackageManager {
     } catch (error) {
       return this.handleMetadataError(error, availablePackage.path);
     }
-
-    if ( !availablePackage.isBundled && this.isDeprecatedPackage(metadata.name, metadata.version) ) return console.warn(`Could not load ${metadata.name}@${metadata.version} because it uses deprecated APIs that have been removed.`);
 
     const options = {
       path: availablePackage.path,
