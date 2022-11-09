@@ -34,18 +34,11 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 }
 /// END Monkey-Patch
 
-// Monkey-patch disables default top level node module excluded files.
+// Monkey-patch disables default top level node module excluded files
 // files: https://github.com/electron-userland/electron-builder/blob/28cb86bdcb6dd0b10e75a69ccd34ece6cca1d204/packages/app-builder-lib/src/util/NodeModuleCopyHelper.ts#L15-L33
 const {NodeModuleCopyHelper} = require('app-builder-lib/out/util/NodeModuleCopyHelper');
-// const fsExtra = require("fs-extra");
-// const path = require("path");
-const MOCK_BASE_DIR_SPECIAL_PREFIX = "\0\b"; // 
+const MOCK_BASE_DIR_SPECIAL_PREFIX = "\0\b"; // used to identify mocked string
 const mockDepPathSymbol = Symbol();
-
-// fsExtra.readdir = ( oldReadDir => function(...args) {
-//     if (args[0]?.[mockDepPathSymbol]) args[0] = args[0].toString();
-//     return oldReadDir.apply(this,args);
-// })(fsExtra.readdir);
 
 path.normalize = ( oldPathNormalize => function(...args) {
     if (!args[0]?.startsWith(MOCK_BASE_DIR_SPECIAL_PREFIX)) return oldPathNormalize.apply(this,args);
@@ -66,11 +59,6 @@ NodeModuleCopyHelper.prototype.collectNodeModules = (oldCollectNodeModules => fu
     args[0] = MOCK_BASE_DIR_SPECIAL_PREFIX + args[0];
     return oldCollectNodeModules.apply(this,args);
 })(NodeModuleCopyHelper.prototype.collectNodeModules);
-
-// NodeModuleCopyHelper.prototype.handleFile = (oldHandleFile => function(...args) {
-//     if (args[1]?.[mockDepPathSymbol]) args[1] = args[1].toString();
-//     return oldHandleFile.apply(this,args);
-// })(NodeModuleCopyHelper.prototype.handleFile);
 /// END Monkey-Patch
 
 const builder = require("electron-builder")
