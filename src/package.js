@@ -679,7 +679,7 @@ module.exports = class Package {
           asyncEach(settingsPaths, loadSettingsFile, () => resolve());
         });
       });
-    }
+    });
   }
 
   serialize() {
