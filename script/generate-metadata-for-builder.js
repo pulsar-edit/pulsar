@@ -25,11 +25,8 @@ function buildBundledPackagesMetadata(packageJSON) {
     normalizePackageData(
       packageMetadata,
       msg => {
-        if (!msg.match(/No README data$/)) {
-          console.warn(
-            `Invalid package metadata. ${packageMetadata.name}: ${msg}`
-          );
-        }
+        if (msg.match(/No README data$/)) return;
+        console.warn(`Invalid package metadata. ${packageMetadata.name}: ${msg}`);
       },
       true
     );
