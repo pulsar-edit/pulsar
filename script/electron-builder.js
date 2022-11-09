@@ -38,7 +38,6 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 const builder = require("electron-builder")
 const Platform = builder.Platform
 
-const generate = require('./lib/generate-metadata.js')
 
 const pngIcon = 'resources/app-icons/nightly/png/1024.png'
 const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
