@@ -33,9 +33,7 @@ function buildBundledPackagesMetadata(packageJSON) {
       },
       true
     );
-    if (
-      packageMetadata.repository &&
-      packageMetadata.repository.url &&
+    if ( packageMetadata.repository?.url &&
       packageMetadata.repository.type === 'git'
     ) {
       packageMetadata.repository.url = packageMetadata.repository.url.replace(

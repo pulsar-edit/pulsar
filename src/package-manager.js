@@ -559,7 +559,7 @@ module.exports = class PackageManager {
   }
 
   preloadPackages() {
-    return Object.entry(this.packagesCache).map( ([packageName,package]) => this.preloadPackage(packageName, package) );
+    return Object.entries(this.packagesCache).map( ([packageName,packageData]) => this.preloadPackage(packageName, packageData) );
   }
 
   preloadPackage(packageName, pack) {
@@ -643,11 +643,8 @@ module.exports = class PackageManager {
   loadAvailablePackage(availablePackage, disabledPackageNames) {
     const preloadedPackage = this.preloadedPackages[availablePackage.name];
 
-    if (
-      disabledPackageNames != null &&
-      disabledPackageNames.has(availablePackage.name)
-    ) {
-      if (preloadedPackage != null) {
+    if (disabledPackageNames?.has(availablePackage.name)) {
+      if (preloadedPackage) {
         preloadedPackage.deactivate();
         delete preloadedPackage[availablePackage.name];
       }
@@ -657,7 +654,7 @@ module.exports = class PackageManager {
     const loadedPackage = this.getLoadedPackage(availablePackage.name);
     if (loadedPackage) return loadedPackage;
 
-    if (preloadedPackage != null) {
+    if (preloadedPackage) {
       if (availablePackage.isBundled) {
         preloadedPackage.finishLoading();
         this.loadedPackages[availablePackage.name] = preloadedPackage;
@@ -672,8 +669,7 @@ module.exports = class PackageManager {
     try {
       metadata = this.loadPackageMetadata(availablePackage) || {};
     } catch (error) {
-      this.handleMetadataError(error, availablePackage.path);
-      return null;
+      return this.handleMetadataError(error, availablePackage.path);
     }
 
     if ( !availablePackage.isBundled && this.isDeprecatedPackage(metadata.name, metadata.version) ) return console.warn(`Could not load ${metadata.name}@${metadata.version} because it uses deprecated APIs that have been removed.`);
@@ -697,9 +693,7 @@ module.exports = class PackageManager {
       viewRegistry: this.viewRegistry
     };
 
-    const pack = metadata.theme
-      ? new ThemePackage(options)
-      : new Package(options);
+    const pack = metadata.theme ? new ThemePackage(options) : new Package(options);
     pack.load();
     this.loadedPackages[pack.name] = pack;
     this.emitter.emit('did-load-package', pack);
@@ -977,11 +971,9 @@ module.exports = class PackageManager {
   }
 
   normalizePackageMetadata(metadata) {
-    if (metadata != null) {
-      normalizePackageData =
-        normalizePackageData || require('normalize-package-data');
-      normalizePackageData(metadata);
-    }
+    if (!metadata) return;
+    normalizePackageData = normalizePackageData || require('normalize-package-data');
+    normalizePackageData(metadata);
   }
 };
 

@@ -19,8 +19,7 @@ transformer.createTransformer = function(srcDir, configuration, extraMetadata, e
         }
         if (extraTransformer != null) {
             return extraTransformer(file);
-        }
-        else {
+        } else {
             return null;
         }
     };
