@@ -338,10 +338,6 @@ class AtomEnvironment {
     );
   }
 
-  preloadPackages() {
-    return this.packages.preloadPackages();
-  }
-
   attachSaveStateListeners() {
     const saveState = _.debounce(() => {
       this.window.requestIdleCallback(() => {

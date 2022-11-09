@@ -54,7 +54,6 @@ module.exports = class PackageManager {
     this.deprecatedPackageRanges = {};
     this.initialPackagesLoaded = false;
     this.initialPackagesActivated = false;
-    this.preloadedPackages = {};
     this.loadedPackages = {};
     this.activePackages = {};
     this.activatingPackages = {};
@@ -95,7 +94,6 @@ module.exports = class PackageManager {
     this.serviceHub.clear();
     await this.deactivatePackages();
     this.loadedPackages = {};
-    this.preloadedPackages = {};
     this.packageStates = {};
     this.packagesCache = initialPackagesCache;
     this.packageDependencies = packageJSON.packageDependencies ?? {};
@@ -558,53 +556,6 @@ module.exports = class PackageManager {
     );
   }
 
-  preloadPackages() {
-    return Object.entries(this.packagesCache).map( ([packageName,packageData]) => this.preloadPackage(packageName, packageData) );
-  }
-
-  preloadPackage(packageName, pack) {
-    const metadata = pack.metadata || {};
-    if (typeof metadata.name !== 'string' || metadata.name.length < 1) {
-      metadata.name = packageName;
-    }
-
-    if (
-      metadata.repository != null &&
-      metadata.repository.type === 'git' &&
-      typeof metadata.repository.url === 'string'
-    ) {
-      metadata.repository.url = metadata.repository.url.replace(
-        /(^git\+)|(\.git$)/g,
-        ''
-      );
-    }
-
-    const options = {
-      path: pack.rootDirPath,
-      name: packageName,
-      preloadedPackage: true,
-      bundledPackage: true,
-      metadata,
-      packageManager: this,
-      config: this.config,
-      styleManager: this.styleManager,
-      commandRegistry: this.commandRegistry,
-      keymapManager: this.keymapManager,
-      notificationManager: this.notificationManager,
-      grammarRegistry: this.grammarRegistry,
-      themeManager: this.themeManager,
-      menuManager: this.menuManager,
-      contextMenuManager: this.contextMenuManager,
-      deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry
-    };
-
-    pack = metadata.theme ? new ThemePackage(options) : new Package(options);
-    pack.preload();
-    this.preloadedPackages[packageName] = pack;
-    return pack;
-  }
-
   loadPackages() {
     // Ensure atom exports is already in the require cache so the load time
     // of the first package isn't skewed by being the first to require atom
@@ -641,29 +592,10 @@ module.exports = class PackageManager {
   }
 
   loadAvailablePackage(availablePackage, disabledPackageNames) {
-    const preloadedPackage = this.preloadedPackages[availablePackage.name];
-
-    if (disabledPackageNames?.has(availablePackage.name)) {
-      if (preloadedPackage) {
-        preloadedPackage.deactivate();
-        delete preloadedPackage[availablePackage.name];
-      }
-      return null;
-    }
+    if (disabledPackageNames?.has(availablePackage.name)) return;
 
     const loadedPackage = this.getLoadedPackage(availablePackage.name);
     if (loadedPackage) return loadedPackage;
-
-    if (preloadedPackage) {
-      if (availablePackage.isBundled) {
-        preloadedPackage.finishLoading();
-        this.loadedPackages[availablePackage.name] = preloadedPackage;
-        return preloadedPackage;
-      } else {
-        preloadedPackage.deactivate();
-        delete preloadedPackage[availablePackage.name];
-      }
-    }
 
     let metadata;
     try {
