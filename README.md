@@ -78,7 +78,7 @@
 [Badge Crowdin]: https://badges.crowdin.net/pulsar-edit/localized.svg
 [Badge Codacy]: https://app.codacy.com/project/badge/Grade/24873ecb93dc4c1d865202ce5b24efc1
 [Badge Reddit]: https://img.shields.io/reddit/subreddit-subscribers/pulsaredit?style=for-the-badge&label=Reddit&logoColor=white&logo=Reddit&labelColor=e05d44&color=b14835
-[Badge Status]: https://img.shields.io/cirrus/github/pulsar-edit/pulsar?style=for-the-badge&labelColor=c77b7f&label=Build%20Status&color=8d575a
+[Badge Status]: https://img.shields.io/cirrus/github/pulsar-edit/pulsar?style=for-the-badge&labelColor=c25757&label=Build%20Status&color=914141
 
 
 <!--------------------------{ Buttons }--------------------------->
