@@ -179,6 +179,22 @@ module.exports = class PackageManager {
     return this.emitter.on('did-unload-package', callback);
   }
 
+  static possibleApmPaths(configPath) {
+    if (process.env.APM_PATH || configPath) {
+      return process.env.APM_PATH || configPath;
+    }
+
+    const commandName = process.platform === 'win32' ? 'apm.cmd' : 'apm';
+    const bundledPPMRoot = path.join(process.resourcesPath, 'app', 'ppm', 'bin', commandName);
+    const unbundledPPMRoot = path.join(__dirname, '..', 'ppm', 'bin', commandName);
+
+    if (fs.isFileSync(bundledPPMRoot)) {
+      return bundledPPMRoot;
+    } else {
+      return unbundledPPMRoot;
+    }
+  }
+
   /*
   Section: Package system data
   */
@@ -190,27 +206,12 @@ module.exports = class PackageManager {
   // Return a {String} file path to apm.
   getApmPath() {
     const configPath = atom.config.get('core.apmPath');
-    if (process.env.APM_PATH || configPath || this.apmPath) {
-      return process.env.APM_PATH || configPath || this.apmPath;
+    if (configPath || this.apmPath) {
+      return configPath || this.apmPath;
+    } else {
+       this.apmPath = PackageManager.possibleApmPaths();
+       return this.apmPath
     }
-
-    const commandName = process.platform === 'win32' ? 'apm.cmd' : 'apm';
-    const apmRoot = path.join(process.resourcesPath, 'app', 'apm');
-    this.apmPath = path.join(apmRoot, 'bin', commandName);
-    if (!fs.isFileSync(this.apmPath)) {
-      // Here is where any test instance (as far as I can tell) will land
-      // with previous attempts to declare the apmPath failing
-      // But here this expects the bootstrap scripts to have been run
-      // without them this path still fails.
-      // So we can change this path instead to our bundled APM
-
-      this.apmPath = path.join(
-        __dirname,
-        "../apm/node_modules/ppm/bin",
-        commandName
-      );
-    }
-    return this.apmPath;
   }
 
   // Public: Get the paths being used to look for packages.
