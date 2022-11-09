@@ -60,13 +60,9 @@ function buildBundledPackagesMetadata(packageJSON) {
     };
 
     if (packageMetadata.main) {
-      const mainPath = require.resolve(
-        path.resolve(packagePath, packageMetadata.main)
-      );
-      packageNewMetadata.main = path.relative(
-        'static',
-        mainPath
-      );
+      // const mainPath = require.resolve(path.resolve(packagePath, packageMetadata.main));
+      const mainPath = path.resolve(packagePath, packageMetadata.main);
+      packageNewMetadata.main = path.relative('static',mainPath);
       // Convert backward slashes to forward slashes in order to allow package
       // main modules to be required from the snapshot. This is because we use
       // forward slashes to cache the sources in the snapshot, so we need to use
