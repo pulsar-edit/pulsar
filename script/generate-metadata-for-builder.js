@@ -33,13 +33,11 @@ function buildBundledPackagesMetadata(packageJSON) {
       },
       true
     );
-    if ( packageMetadata.repository?.url &&
+    if (
+      packageMetadata.repository?.url &&
       packageMetadata.repository.type === 'git'
     ) {
-      packageMetadata.repository.url = packageMetadata.repository.url.replace(
-        /^git\+/,
-        ''
-      );
+      packageMetadata.repository.url = packageMetadata.repository.url.replace(/^git\+/,'');
     }
 
     delete packageMetadata['_from'];
@@ -48,13 +46,8 @@ function buildBundledPackagesMetadata(packageJSON) {
     delete packageMetadata['readmeFilename'];
 
     const packageModuleCache = packageMetadata._atomModuleCache || {};
-    if (
-      packageModuleCache.extensions &&
-      packageModuleCache.extensions['.json']
-    ) {
-      const index = packageModuleCache.extensions['.json'].indexOf(
-        'package.json'
-      );
+    if ( packageModuleCache.extensions?.['.json'] ) {
+      const index = packageModuleCache.extensions['.json'].indexOf('package.json');
       if (index !== -1) {
         packageModuleCache.extensions['.json'].splice(index, 1);
       }
@@ -65,10 +58,9 @@ function buildBundledPackagesMetadata(packageJSON) {
       keymaps: {},
       menus: {},
       grammarPaths: [],
-      settings: {}
+      settings: {},
+      rootDirPath: packagePath,
     };
-
-    packageNewMetadata.rootDirPath = packagePath;
 
     if (packageMetadata.main) {
       const mainPath = require.resolve(
@@ -195,10 +187,7 @@ function buildPlatformKeymapsMetadata(packageJSON) {
   for (let keymapName of fs.readdirSync(keymapsPath)) {
     const keymapPath = path.join(keymapsPath, keymapName);
     if (keymapPath.endsWith('.cson') || keymapPath.endsWith('.json')) {
-      const keymapPlatform = path.basename(
-        keymapPath,
-        path.extname(keymapPath)
-      );
+      const keymapPlatform = path.basename(keymapPath,path.extname(keymapPath));
       if (invalidPlatforms.indexOf(keymapPlatform) === -1) {
         keymaps[path.basename(keymapPath)] = CSON.readFileSync(keymapPath);
       }
