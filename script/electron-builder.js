@@ -34,6 +34,45 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 }
 /// END Monkey-Patch
 
+// Monkey-patch disables default top level node module excluded files.
+// files: https://github.com/electron-userland/electron-builder/blob/28cb86bdcb6dd0b10e75a69ccd34ece6cca1d204/packages/app-builder-lib/src/util/NodeModuleCopyHelper.ts#L15-L33
+const {NodeModuleCopyHelper} = require('app-builder-lib/out/util/NodeModuleCopyHelper');
+// const fsExtra = require("fs-extra");
+// const path = require("path");
+const MOCK_BASE_DIR_SPECIAL_PREFIX = "\0\b"; // 
+const mockDepPathSymbol = Symbol();
+
+// fsExtra.readdir = ( oldReadDir => function(...args) {
+//     if (args[0]?.[mockDepPathSymbol]) args[0] = args[0].toString();
+//     return oldReadDir.apply(this,args);
+// })(fsExtra.readdir);
+
+path.normalize = ( oldPathNormalize => function(...args) {
+    if (!args[0]?.startsWith(MOCK_BASE_DIR_SPECIAL_PREFIX)) return oldPathNormalize.apply(this,args);
+    args[0] = args[0].substring(MOCK_BASE_DIR_SPECIAL_PREFIX.length);
+    const ret = oldPathNormalize.apply(this,args);
+    const mockDepPath = new String(MOCK_BASE_DIR_SPECIAL_PREFIX + ret);
+    mockDepPath[mockDepPathSymbol] = true;
+    return mockDepPath;
+})(path.normalize);
+
+Array.prototype.pop = ( oldArrayPop => function(...args) {
+    const ret = oldArrayPop.apply(this,args);
+    if (!ret?.[mockDepPathSymbol]) return ret;
+    return ret.substring(MOCK_BASE_DIR_SPECIAL_PREFIX.length);
+})(Array.prototype.pop);
+
+NodeModuleCopyHelper.prototype.collectNodeModules = (oldCollectNodeModules => function(...args) {
+    args[0] = MOCK_BASE_DIR_SPECIAL_PREFIX + args[0];
+    return oldCollectNodeModules.apply(this,args);
+})(NodeModuleCopyHelper.prototype.collectNodeModules);
+
+// NodeModuleCopyHelper.prototype.handleFile = (oldHandleFile => function(...args) {
+//     if (args[1]?.[mockDepPathSymbol]) args[1] = args[1].toString();
+//     return oldHandleFile.apply(this,args);
+// })(NodeModuleCopyHelper.prototype.handleFile);
+/// END Monkey-Patch
+
 const builder = require("electron-builder")
 const Platform = builder.Platform
 
@@ -61,6 +100,7 @@ let options = {
     "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
     "!**/node_modules/*.d.ts",
     "!**/node_modules/.bin",
+    "!**/node_modules/{.coveralls.yml,karma.conf.js,test.js}",
     "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
     "!.editorconfig",
     "!**/._*",
