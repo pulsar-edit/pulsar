@@ -7,7 +7,6 @@ const {Disposable} = require('event-kit');
 const MenuHelpers = require('./menu-helpers');
 
 const buildMetadata = require('../package.json');
-const platformMenu = buildMetadata?._atomMenu?.menu;
 
 // Extended: Provides a registry for menu items that you'd like to appear in the
 // application menu.
@@ -204,14 +203,10 @@ module.exports = MenuManager = class MenuManager {
   }
 
   loadPlatformItems() {
-    if (platformMenu != null) {
-      return this.add(platformMenu);
-    } else {
-      const menusDirPath = path.join(this.resourcePath, 'menus');
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
-      const {menu} = CSON.readFileSync(platformMenuPath);
-      return this.add(menu);
-    }
+    const menusDirPath = path.join(this.resourcePath, 'menus');
+    const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
+    const {menu} = CSON.readFileSync(platformMenuPath);
+    return this.add(menu);
   }
 
   // Merges an item in a submenu aware way such that new items are always

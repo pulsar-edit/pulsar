@@ -9,7 +9,6 @@ const {sortMenuItems} = require('./menu-sort-helpers');
 const _ = require('underscore-plus');
 
 const buildMetadata = require('../package.json');
-const platformContextMenu = buildMetadata?._atomMenu?.['context-menu'];
 
 // Extended: Provides a registry for commands that you'd like to appear in the
 // context menu.
@@ -57,14 +56,10 @@ module.exports = class ContextMenuManager {
   }
 
   loadPlatformItems() {
-    if (platformContextMenu != null) {
-      return this.add(platformContextMenu, this.devMode || false);
-    } else {
-      const menusDirPath = path.join(this.resourcePath, 'menus');
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
-      const map = CSON.readFileSync(platformMenuPath);
-      return this.add(map['context-menu']);
-    }
+    const menusDirPath = path.join(this.resourcePath, 'menus');
+    const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
+    const map = CSON.readFileSync(platformMenuPath);
+    return this.add(map['context-menu']);
   }
 
   // Public: Add context menu items scoped by CSS selectors.
