@@ -1,38 +1,5 @@
 const path = require('path')
-const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
-
-// Monkey-patch to not remove things I explicitly didn't say so
-// See: https://github.com/electron-userland/electron-builder/issues/6957
-let transformer = require('app-builder-lib/out/fileTransformer')
-const builder_util_1 = require("builder-util");
-
-transformer.createTransformer = function(srcDir, configuration, extraMetadata, extraTransformer) {
-    const mainPackageJson = path.join(srcDir, "package.json");
-    const isRemovePackageScripts = configuration.removePackageScripts !== false;
-    const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
-    const packageJson = path.sep + "package.json";
-    return file => {
-        if (file === mainPackageJson) {
-            return modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords);
-        }
-        if (extraTransformer != null) {
-            return extraTransformer(file);
-        }
-        else {
-            return null;
-        }
-    };
-}
-async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords) {
-    const mainPackageData = JSON.parse(await fs.readFile(file, "utf-8"));
-    if (extraMetadata != null) {
-        builder_util_1.deepAssign(mainPackageData, extraMetadata);
-        return JSON.stringify(mainPackageData, null, 2);
-    }
-    return null;
-}
-/// END Monkey-Patch
 
 // Monkey-patch disables default top level node module excluded files
 // files: https://github.com/electron-userland/electron-builder/blob/28cb86bdcb6dd0b10e75a69ccd34ece6cca1d204/packages/app-builder-lib/src/util/NodeModuleCopyHelper.ts#L15-L33
