@@ -3,12 +3,6 @@ const path = require('path');
 const KeymapManager = require('atom-keymap');
 const CSON = require('season');
 
-const buildMetadata = require('../package.json');
-var bundledKeymaps;
-if (buildMetadata != null) {
-  bundledKeymaps = buildMetadata._atomKeymaps;
-}
-
 KeymapManager.prototype.onDidLoadBundledKeymaps = function(callback) {
   return this.emitter.on('did-load-bundled-keymaps', callback);
 };
@@ -17,22 +11,10 @@ KeymapManager.prototype.onDidLoadUserKeymap = function(callback) {
   return this.emitter.on('did-load-user-keymap', callback);
 };
 
-KeymapManager.prototype.canLoadBundledKeymapsFromMemory = function() {
-  return bundledKeymaps != null;
-};
-
 KeymapManager.prototype.loadBundledKeymaps = function() {
-  if (bundledKeymaps != null) {
-    for (let keymapName in bundledKeymaps) {
-      const keymap = bundledKeymaps[keymapName];
-      const keymapPath = `core:${keymapName}`;
-      this.add(keymapPath, keymap, 0, this.devMode != null ? this.devMode : false);
-    }
-  } else {
-    const keymapsPath = path.join(this.resourcePath, 'keymaps');
-    this.loadKeymap(keymapsPath);
-  }
-  return this.emitter.emit('did-load-bundled-keymaps');
+  const keymapsPath = path.join(this.resourcePath, 'keymaps');
+  this.loadKeymap(keymapsPath);
+  this.emitter.emit('did-load-bundled-keymaps');
 };
 
 KeymapManager.prototype.getUserKeymapPath = function() {
