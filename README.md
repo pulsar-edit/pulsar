@@ -12,8 +12,7 @@
 [![Button Build]][Build] 
 
 [![Badge License]][License] 
-[![Badge Status]][Status]    
-[![Badge Sunset]][Retired]    
+[![Badge Status]][Status]      
 
 [![Badge Codacy]][Codacy]
 [![Badge Crowdin]][Crowdin]
@@ -54,7 +53,6 @@
 
 [Documentation]: https://pulsar-edit.dev/docs/ 'Information how to use & work with Pulsar.'
 [Install]: https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar 'How to install Pulsar on your system.'
-[Retired]: https://github.blog/2022-06-08-sunsetting-atom/ 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
 [Build]: https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#building-pulsar 'Instructions on how to build Pulsar by yourself.'
 
@@ -68,7 +66,6 @@
 <!---------------------------{ Badges }--------------------------->
 
 [Badge Retired]: https://img.shields.io/badge/Retired-bb3c1f.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
-[Badge Sunset]: https://img.shields.io/badge/Sunset-orange.svg?style=for-the-badge&labelColor=323232&label=Upstream%20Status
 [Badge Discord]: https://img.shields.io/badge/Discord-6399c4.svg?style=for-the-badge&labelColor=323232&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-e5ab42.svg?style=for-the-badge&labelColor=323232
 [Badge Status]: https://img.shields.io/cirrus/github/pulsar-edit/pulsar?style=for-the-badge&labelColor=323232&label=Build%20Status
