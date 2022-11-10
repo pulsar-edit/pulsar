@@ -75,7 +75,6 @@ global.atom = new AtomEnvironment({
 });
 
 TextEditor.setScheduler(global.atom.views);
-global.atom.preloadPackages();
 
 // Like sands through the hourglass, so are the days of our lives.
 module.exports = function({ blobStore }) {
