@@ -91,25 +91,6 @@ module.exports = class Package {
     return 0;
   }
 
-  preload() {
-    this.loadKeymaps();
-    this.loadMenus();
-    this.registerDeserializerMethods();
-    this.activateCoreStartupServices();
-    this.registerURIHandler();
-    this.configSchemaRegisteredOnLoad = this.registerConfigSchemaFromMetadata();
-    this.requireMainModule();
-    this.settingsPromise = this.loadSettings();
-
-    this.activationDisposables = new CompositeDisposable();
-    this.activateKeymaps();
-    this.activateMenus();
-    for (let settings of this.settings) {
-      settings.activate(this.config);
-    }
-    this.settingsActivated = true;
-  }
-
   finishLoading() {
     this.measure('loadTime', () => {
       this.path = path.join(this.packageManager.resourcePath, this.path);
