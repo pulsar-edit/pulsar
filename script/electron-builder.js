@@ -76,7 +76,7 @@ let options = {
       "to": "pulsar.sh"
     }, {
       "from": "ppm",
-      "to": "app/apm"
+      "to": "app/ppm"
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
