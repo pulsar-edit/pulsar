@@ -1,4 +1,0 @@
-#!/usr/bin/env node
-
-console.warn('`script/lint` is deprecated. Use `node script/lint.js` instead');
-require('./lint.js');

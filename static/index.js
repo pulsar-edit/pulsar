@@ -44,19 +44,7 @@
         );
       useSnapshot = !devMode && typeof snapshotResult !== 'undefined';
 
-      if (devMode) {
-        const metadata = require('../package.json');
-        if (!metadata._deprecatedPackages) {
-          try {
-            metadata._deprecatedPackages = require('../script/deprecated-packages.json');
-          } catch (requireError) {
-            console.error(
-              'Failed to setup deprecated packages list',
-              requireError.stack
-            );
-          }
-        }
-      } else if (useSnapshot) {
+      if (useSnapshot) {
         Module.prototype.require = function(module) {
           const absoluteFilePath = Module._resolveFilename(module, this, false);
           let relativeFilePath = path.relative(

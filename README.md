@@ -18,8 +18,7 @@
 [![Badge Discord]][Discord]
 
 <br>
- 
-*A community-led hyper-hackable text editor, built on **[Electron]**,* <br>
+*A Community-led Hyper-Hackable Text Editor, built on **[Electron]**,* <br>
 *and based on everything we love about our favorite editors.*
 
 *We designed it to be deeply customizable, but still* <br>
@@ -71,4 +70,3 @@
 [Button Documentation]: https://img.shields.io/badge/Documentation-6399c4?style=for-the-badge&logoColor=white&logo=GitBook
 [Button Install]: https://img.shields.io/badge/Install-78af9f?style=for-the-badge&logoColor=white&logo=DocuSign
 [Button Build]: https://img.shields.io/badge/Building-e5ab42?style=for-the-badge&logoColor=white&logo=GNUBash
-
