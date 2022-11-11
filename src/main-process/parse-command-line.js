@@ -38,17 +38,6 @@ module.exports = function parseCommandLine(processArgs) {
       ATOM_HOME               The root path for all configuration files and folders.
                               Defaults to \`~/.pulsar\`.`
   );
-  // Deprecated 1.0 API preview flag
-  options
-    .alias('1', 'one')
-    .boolean('1')
-    .describe('1', 'This option is no longer supported.');
-  options
-    .boolean('include-deprecated-apis')
-    .describe(
-      'include-deprecated-apis',
-      'This option is not currently supported.'
-    );
   options
     .alias('d', 'dev')
     .boolean('d')
@@ -132,6 +121,13 @@ module.exports = function parseCommandLine(processArgs) {
       'enable-electron-logging',
       'Enable low-level logging messages from Electron.'
     );
+  options
+    .alias('p', 'package')
+    .boolean('p')
+    .describe(
+      'package',
+      'Delegate all commands to Pulsar\'s package management. Run with --package for more details'
+    );
   options.boolean('uri-handler');
   options
     .version(
@@ -188,6 +184,7 @@ module.exports = function parseCommandLine(processArgs) {
   const userDataDir = args['user-data-dir'];
   const profileStartup = args['profile-startup'];
   const clearWindowState = args['clear-window-state'];
+  const packageCmd = args['package'];
   let pathsToOpen = [];
   let urlsToOpen = [];
   let devMode = args['dev'];
@@ -230,6 +227,7 @@ module.exports = function parseCommandLine(processArgs) {
     profileStartup,
     timeout,
     clearWindowState,
+    packageCmd,
     addToLastWindow,
     mainProcess,
     benchmark,

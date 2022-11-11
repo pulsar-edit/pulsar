@@ -1,7 +1,3 @@
-if (typeof snapshotResult !== 'undefined') {
-  snapshotResult.setGlobals(global, process, global, {}, console, require);
-}
-
 const startTime = Date.now();
 const StartupTime = require('../startup-time');
 StartupTime.setStartTime();

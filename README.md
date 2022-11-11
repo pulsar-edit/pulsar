@@ -24,7 +24,8 @@
 
 <br>
 
-*A hackable text editor for the 21st century, built on **[Electron]**,* <br>
+
+*A Community-led Hyper-Hackable Text Editor, built on **[Electron]**,* <br>
 *and based on everything we love about our favorite editors.*
 
 *We designed it to be deeply customizable, but still* <br>
