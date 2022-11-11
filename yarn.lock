@@ -4492,9 +4492,9 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
-github@benonymus/github#416d71209603bab26771e2552ff94ccfcbb1de69:
+github@benonymus/github#dc96327982592d1018a4e83f775e5259bdb105cf:
   version "0.36.11"
-  resolved "https://codeload.github.com/benonymus/github/tar.gz/416d71209603bab26771e2552ff94ccfcbb1de69"
+  resolved "https://codeload.github.com/benonymus/github/tar.gz/dc96327982592d1018a4e83f775e5259bdb105cf"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
