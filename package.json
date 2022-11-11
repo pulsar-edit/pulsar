@@ -210,7 +210,7 @@
     "exception-reporting": "file:./packages/exception-reporting",
     "find-and-replace": "0.220.1",
     "fuzzy-finder": "1.14.3",
-    "github": "0.36.11",
+    "github": "benonymus/github#dc96327982592d1018a4e83f775e5259bdb105cf",
     "git-diff": "file:./packages/git-diff",
     "go-to-line": "file:./packages/go-to-line",
     "grammar-selector": "file:./packages/grammar-selector",
