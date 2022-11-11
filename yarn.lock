@@ -2522,9 +2522,8 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0":
+"bracket-matcher@file:packages/bracket-matcher":
   version "0.92.0"
-  resolved "https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0#fe75cb7dd3f286d9f20b1d1edd7fec085730a866"
   dependencies:
     first-mate "^7.4.1"
     underscore-plus "1.x"
