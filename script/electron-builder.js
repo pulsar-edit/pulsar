@@ -1,51 +1,64 @@
-const path = require('path')
-const normalizePackageData = require('normalize-package-data');
+const path = require("path");
+const normalizePackageData = require("normalize-package-data");
 const fs = require("fs/promises");
-const generateMetadata = require('./generate-metadata-for-builder')
+const generateMetadata = require("./generate-metadata-for-builder");
 
 // Monkey-patch to not remove things I explicitly didn't say so
 // See: https://github.com/electron-userland/electron-builder/issues/6957
-let transformer = require('app-builder-lib/out/fileTransformer')
+let transformer = require("app-builder-lib/out/fileTransformer");
 const builder_util_1 = require("builder-util");
 
-transformer.createTransformer = function(srcDir, configuration, extraMetadata, extraTransformer) {
-    const mainPackageJson = path.join(srcDir, "package.json");
-    const isRemovePackageScripts = configuration.removePackageScripts !== false;
-    const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
-    const packageJson = path.sep + "package.json";
-    return file => {
-        if (file === mainPackageJson) {
-            return modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords);
-        }
-        if (extraTransformer != null) {
-            return extraTransformer(file);
-        }
-        else {
-            return null;
-        }
-    };
-}
-async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords) {
-    const mainPackageData = JSON.parse(await fs.readFile(file, "utf-8"));
-    if (extraMetadata != null) {
-        builder_util_1.deepAssign(mainPackageData, extraMetadata);
-        return JSON.stringify(mainPackageData, null, 2);
+transformer.createTransformer = function (
+  srcDir,
+  configuration,
+  extraMetadata,
+  extraTransformer
+) {
+  const mainPackageJson = path.join(srcDir, "package.json");
+  const isRemovePackageScripts = configuration.removePackageScripts !== false;
+  const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
+  const packageJson = path.sep + "package.json";
+  return (file) => {
+    if (file === mainPackageJson) {
+      return modifyMainPackageJson(
+        file,
+        extraMetadata,
+        isRemovePackageScripts,
+        isRemovePackageKeywords
+      );
     }
-    return null;
+    if (extraTransformer != null) {
+      return extraTransformer(file);
+    } else {
+      return null;
+    }
+  };
+};
+async function modifyMainPackageJson(
+  file,
+  extraMetadata,
+  isRemovePackageScripts,
+  isRemovePackageKeywords
+) {
+  const mainPackageData = JSON.parse(await fs.readFile(file, "utf-8"));
+  if (extraMetadata != null) {
+    builder_util_1.deepAssign(mainPackageData, extraMetadata);
+    return JSON.stringify(mainPackageData, null, 2);
+  }
+  return null;
 }
 /// END Monkey-Patch
 
-const builder = require("electron-builder")
-const Platform = builder.Platform
+const builder = require("electron-builder");
+const Platform = builder.Platform;
 
-
-const pngIcon = 'resources/app-icons/nightly/png/1024.png'
-const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
+const pngIcon = "resources/app-icons/nightly/png/1024.png";
+const icoIcon = "resources/app-icons/nightly/pulsar.ico";
 
 let options = {
-  "appId": "com.pulsar-edit.pulsar",
-  "npmRebuild": false,
-  "publish": null,
+  appId: "com.pulsar-edit.pulsar",
+  npmRebuild: false,
+  publish: null,
   files: [
     "package.json",
     "docs/**/*",
@@ -68,81 +81,85 @@ let options = {
     "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
     "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
     "!**/{appveyor.yml,.travis.yml,circle.yml}",
-    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
   ],
-  "extraResources": [
+  extraResources: [
     {
-      "from": "pulsar.sh",
-      "to": "pulsar.sh"
-    }, {
-      "from": "ppm",
-      "to": "app/ppm"
-    }, {
-      "from": pngIcon,
-      "to": "pulsar.png"
+      from: "pulsar.sh",
+      to: "pulsar.sh",
+    },
+    {
+      from: "ppm",
+      to: "app/ppm",
+    },
+    {
+      from: pngIcon,
+      to: "pulsar.png",
     },
   ],
   compression: "normal",
   deb: { afterInstall: "script/post-install.sh" },
   rpm: {
     afterInstall: "script/post-install.sh",
-    compression: 'xz'
+    compression: "xz",
   },
-  "linux": {
-    "icon": pngIcon,
-    "category": "Development",
-    "synopsis": "A hackable text editor for the 22nd century",
-    "target": [
-      { target: "appimage" },
-      { target: "deb" },
-      { target: "rpm" }
-    ],
+  linux: {
+    icon: pngIcon,
+    category: "Development",
+    synopsis: "A hackable text editor for the 22nd century",
+    target: [{ target: "appimage" }, { target: "deb" }, { target: "rpm" }],
   },
-  "mac": {
-    "icon": pngIcon,
-    "category": "Development"
+  mac: {
+    icon: pngIcon,
+    category: "Development",
   },
-  "win": {
-    "icon": icoIcon,
-    "target": [
-      { "target": "nsis" },
-      { "target": "portable" }
-    ]
+  win: {
+    icon: icoIcon,
+    target: [{ target: "nsis" }, { target: "portable" }],
   },
-  "extraMetadata": {
-  }
-}
+  extraMetadata: {},
+  asarUnpack: ["node_modules/github/bin/*"],
+};
 
 function whatToBuild() {
-  const argvStartingWith = process.argv.findIndex(e => e.match('electron-builder.js'))
-  const what = process.argv[argvStartingWith + 1]
-  if(what) {
-    const filter = e => e.target === what
-    options.linux.target = options.linux.target.filter(filter)
-    options.win.target = options.win.target.filter(filter)
+  const argvStartingWith = process.argv.findIndex((e) =>
+    e.match("electron-builder.js")
+  );
+  const what = process.argv[argvStartingWith + 1];
+  if (what) {
+    const filter = (e) => e.target === what;
+    options.linux.target = options.linux.target.filter(filter);
+    options.win.target = options.win.target.filter(filter);
     // options.mac.target = options.mac.target.filter(filter)
-    return options
+    return options;
   } else {
-    return options
+    return options;
   }
 }
 
 async function main() {
-  const package = await fs.readFile('package.json', "utf-8")
-  let options = whatToBuild()
-  options.extraMetadata = generateMetadata(JSON.parse(package))
-  builder.build({
-    //targets: Platform.LINUX.createTarget(),
-    config: options
-  }).then((result) => {
-    console.log("Built binaries")
-    fs.mkdir('binaries').catch(() => "")
-    Promise.all(result.map(r => fs.copyFile(r, path.join('binaries', path.basename(r)))))
-  }).catch((error) => {
-    console.error("Error building binaries")
-    console.error(error)
-    process.exit(1)
-  })
+  const package = await fs.readFile("package.json", "utf-8");
+  let options = whatToBuild();
+  options.extraMetadata = generateMetadata(JSON.parse(package));
+  builder
+    .build({
+      //targets: Platform.LINUX.createTarget(),
+      config: options,
+    })
+    .then((result) => {
+      console.log("Built binaries");
+      fs.mkdir("binaries").catch(() => "");
+      Promise.all(
+        result.map((r) =>
+          fs.copyFile(r, path.join("binaries", path.basename(r)))
+        )
+      );
+    })
+    .catch((error) => {
+      console.error("Error building binaries");
+      console.error(error);
+      process.exit(1);
+    });
 }
 
-main()
+main();
