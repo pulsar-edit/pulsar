@@ -105,7 +105,7 @@ module.exports = class Task {
     }
     if (this.childProcess.stderr != null) {
       this.childProcess.stderr.removeAllListeners();
-      this.childProcess.stderr.on('data', (data) => nsole.error(data.toString()));
+      this.childProcess.stderr.on('data', (data) => console.error(data.toString()));
     }
   }
 
