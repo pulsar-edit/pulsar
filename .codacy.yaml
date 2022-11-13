@@ -4,7 +4,7 @@ engines:
     minTokenMatch: 80
 exclude_paths:
   - "./specs/fixtures"
-  - "./packages/**/spec/fixtures/*"
+  - "./packages/*/spec/fixtures/*"
 
 # Since Codacy exposes significantly little on the config.
 # We can use the rest of this document to solidify our settings.
