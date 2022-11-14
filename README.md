@@ -24,7 +24,6 @@
 
 <br>
 
-
 *A Community-led Hyper-Hackable Text Editor, built on **[Electron]**,* <br>
 *and based on everything we love about our favorite editors.*
 
