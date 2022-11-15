@@ -4334,15 +4334,6 @@ fs-plus@^3.0.0, fs-plus@^3.0.1, fs-plus@^3.1.1:
     rimraf "^2.5.2"
     underscore-plus "1.x"
 
-"fs-plus@https://codeload.github.com/pulsar-edit/fs-plus/legacy.tar.gz/refs/tags/v3.1.1":
-  version "3.1.1"
-  resolved "https://codeload.github.com/pulsar-edit/fs-plus/legacy.tar.gz/refs/tags/v3.1.1#1cdbfa371c3d446957b678705fcba7563b84767a"
-  dependencies:
-    async "^1.5.2"
-    mkdirp "^0.5.1"
-    rimraf "^2.5.2"
-    underscore-plus "1.x"
-
 fs-readdir-recursive@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fs-readdir-recursive/-/fs-readdir-recursive-1.1.0.tgz#e32fc030a2ccee44a6b5371308da54be0b397d27"
@@ -6633,9 +6624,10 @@ nsfw@2.2.2:
   dependencies:
     node-addon-api "*"
 
-"nslog@https://codeload.github.com/pulsar-edit/node-nslog/legacy.tar.gz/refs/tags/v3.2.0":
+nslog@^3.0.0:
   version "3.2.0"
-  resolved "https://codeload.github.com/pulsar-edit/node-nslog/legacy.tar.gz/refs/tags/v3.2.0#964cda08259a734780a5543e9d58c9c83d2067c5"
+  resolved "https://registry.yarnpkg.com/nslog/-/nslog-3.2.0.tgz#508c3b8c953b57432af061bf951a8bc01e13fc43"
+  integrity sha512-3J5XPvodzhRpy0S7DIuxzQ16e70XZ8gS7MTvA70PiEFG9iZBv8XFABsyZDphO/62b/kEPkgPpoAbQvZprqLhOQ==
   dependencies:
     nan "^2.14.0"
 
@@ -7723,9 +7715,10 @@ scheduler@^0.18.0:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-scoped-property-store@^0.17.0, "scoped-property-store@https://codeload.github.com/pulsar-edit/scoped-property-store/legacy.tar.gz/refs/tags/v0.17.0":
+scoped-property-store@^0.17.0:
   version "0.17.0"
-  resolved "https://codeload.github.com/pulsar-edit/scoped-property-store/legacy.tar.gz/refs/tags/v0.17.0#eed86a3445029b18afd4959e01cd7e4c0e9abe9d"
+  resolved "https://registry.yarnpkg.com/scoped-property-store/-/scoped-property-store-0.17.0.tgz#ada02c00d602fd2050961e2717dd9d02ba331831"
+  integrity sha512-QuvS5/Gggx7hah1cStD4FpQc3PhRlV2jr4/Npgw9ikg2IXgYicMSw0NiEH7TplmcfDcVmb7FhgakEBr801/IMw==
   dependencies:
     atom-slick "^2"
     event-kit "^1.0.0"
