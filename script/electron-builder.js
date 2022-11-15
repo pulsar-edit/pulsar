@@ -110,7 +110,9 @@ let options = {
     ]
   },
   "extraMetadata": {
-  }
+  },
+  "asarUnpack": ["node_modules/github/bin/*"]
+
 }
 
 function whatToBuild() {
