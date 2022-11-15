@@ -2383,9 +2383,9 @@ babel-preset-atomic@^5.0.0:
     "@types/babel__core" "^7.1.19"
     "@types/babel__preset-env" "7.9.2"
 
-"background-tips@https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0":
-  version "0.28.0"
-  resolved "https://codeload.github.com/atom/background-tips/legacy.tar.gz/refs/tags/v0.28.0#efe8011deb2f17852a1dd68d80890105a80f0a05"
+"background-tips@https://codeload.github.com/pulsar-edit/background-tips/legacy.tar.gz/refs/tags/v0.28.1":
+  version "0.28.1"
+  resolved "https://codeload.github.com/pulsar-edit/background-tips/legacy.tar.gz/refs/tags/v0.28.1#acf57779caaf199e80368fb7b6d08cbe44f4f826"
   dependencies:
     underscore-plus "1.x"
 
@@ -7800,9 +7800,9 @@ setimmediate@^1.0.5:
   resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
   integrity sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==
 
-"settings-view@https://github.com/pulsar-edit/settings-view.git#v0.261.9":
-  version "0.261.9"
-  resolved "https://github.com/pulsar-edit/settings-view.git#a1d29a597b1eb0d6412adc9c7dc5d0ade52895f5"
+"settings-view@https://github.com/pulsar-edit/settings-view.git#v0.261.11":
+  version "0.261.11"
+  resolved "https://github.com/pulsar-edit/settings-view.git#dd5ec14a793fb18e8979fc24d89ea768b6d9004b"
   dependencies:
     async "^3.2.0"
     dompurify "^2.0.17"
