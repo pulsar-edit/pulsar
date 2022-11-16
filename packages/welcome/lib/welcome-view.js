@@ -124,7 +124,7 @@ export default class WelcomeView {
                 >
                   {this.brand} org
                 </a>
-                . This is where all GitHub-created {this.brand} packages can be found.
+                . This is where all {this.brand} org packages can be found.
               </li>
             </ul>
           </section>
