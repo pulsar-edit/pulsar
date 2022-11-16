@@ -99,9 +99,8 @@ export default class WelcomeView {
             <ul>
               <li>
                 The{' '}
-                {/* // TODO_PULSAR: Update to our docs or test {atom.branding.urlWeb}+"/docs" */}
                 <a
-                  href="https://www.atom.io/docs"
+                  href="https://pulsar-edit.dev/docs/"
                   dataset={{ event: 'atom-docs' }}
                 >
                   {this.brand} docs
@@ -111,7 +110,7 @@ export default class WelcomeView {
               <li>
                 The {this.brand} forum at{' '}
                 <a
-                  href="https://github.com/pulsar-edit/pulsar/discussions"
+                  href="https://github.com/orgs/pulsar-edit/discussions"
                   dataset={{ event: 'discussions' }}
                 >
                   Github Discussions
@@ -144,12 +143,12 @@ export default class WelcomeView {
 
           <footer className="welcome-footer">
             <a href={atom.branding.urlWeb} dataset={{ event: 'footer-atom-io' }}>
-              atom.io
+              pulsar-edit.dev
             </a>{' '}
             <span className="text-subtle">×</span>{' '}
             <a
-              className="icon icon-octoface"
-              href="https://github.com/"
+              className="icon icon-heart"
+              href="https://pulsar-edit.dev/community.html"
               dataset={{ event: 'footer-octocat' }}
             />
           </footer>
