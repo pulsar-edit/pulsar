@@ -55,10 +55,9 @@ export default class WelcomePackage {
       let curVersion = atom.getVersion().split(".");
       // Usually getVersion Returns something along MAJOR.MINOR.PATCH ARCH
       // So we will account for that when checking what version they have.
-      await atom.workspace.open(CHANGELOG_URI);
-      //if (lastViewedVersion[0] < curVersion[0] && lastViewedVersion[1] < curVersion[1] && lastViewedVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
-      //  await atom.workspace.open(CHANGELOG_URI);
-      //}
+      if (lastViewedVersion[0] < curVersion[0] && lastViewedVersion[1] < curVersion[1] && lastViewedVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
+        await atom.workspace.open(CHANGELOG_URI);
+      }
     }
   }
 
