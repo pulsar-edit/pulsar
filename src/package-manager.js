@@ -89,7 +89,6 @@ module.exports = class PackageManager {
     await this.deactivatePackages();
     this.loadedPackages = {};
     this.packageStates = {};
-    this.packageDependencies = packageJSON.packageDependencies ?? {};
     this.triggeredActivationHooks.clear();
     this.activatePromise = null;
   }
@@ -231,15 +230,6 @@ module.exports = class PackageManager {
     }
 
     return null;
-  }
-
-  // Public: Is the package with the given name bundled with Pulsar?
-  //
-  // * `name` - The {String} package name.
-  //
-  // Returns a {Boolean}.
-  isBundledPackage(name) {
-    return this.getPackageDependencies().hasOwnProperty(name);
   }
 
   /*
@@ -406,22 +396,11 @@ module.exports = class PackageManager {
             const packagePath = path.join(packageDirPath, packageName);
             packages.push({
               name: packageName,
-              path: packagePath,
-              isBundled: false
+              path: packagePath
             });
             packagesByName.add(packageName);
           }
         }
-      }
-    }
-
-    for (const packageName in this.packageDependencies) {
-      if (!packagesByName.has(packageName)) {
-        packages.push({
-          name: packageName,
-          path: path.join(this.resourcePath, 'node_modules', packageName),
-          isBundled: true
-        });
       }
     }
 
@@ -438,10 +417,6 @@ module.exports = class PackageManager {
 
   setPackageState(name, state) {
     this.packageStates[name] = state;
-  }
-
-  getPackageDependencies() {
-    return this.packageDependencies;
   }
 
   hasAtomEngine(packagePath) {
@@ -563,8 +538,7 @@ module.exports = class PackageManager {
       const name = path.basename(nameOrPath);
       return this.loadAvailablePackage({
         name,
-        path: packagePath,
-        isBundled: this.isBundledPackagePath(packagePath)
+        path: packagePath
       });
     }
 
@@ -592,7 +566,6 @@ module.exports = class PackageManager {
       path: availablePackage.path,
       name: availablePackage.name,
       metadata,
-      bundledPackage: availablePackage.isBundled,
       packageManager: this,
       config: this.config,
       styleManager: this.styleManager,
@@ -824,24 +797,6 @@ module.exports = class PackageManager {
         pack.reloadStylesheets();
       }
     }
-  }
-
-  isBundledPackagePath(packagePath) {
-    if (
-      this.devMode &&
-      !this.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)
-    ) {
-      return false;
-    }
-
-    if (this.resourcePathWithTrailingSlash == null) {
-      this.resourcePathWithTrailingSlash = `${this.resourcePath}${path.sep}`;
-    }
-
-    return (
-      packagePath != null &&
-      packagePath.startsWith(this.resourcePathWithTrailingSlash)
-    );
   }
 
   loadPackageMetadata(packagePathOrAvailablePackage, ignoreErrors = false) {

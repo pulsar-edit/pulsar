@@ -35,7 +35,6 @@ module.exports = class Package {
     this.mainModule = null;
     this.path = params.path;
     this.metadata = params.metadata || this.packageManager.loadPackageMetadata(this.path);
-    this.bundledPackage = params.bundledPackage ?? this.packageManager.isBundledPackagePath(this.path);
     this.name = this.metadata?.name || params.name || path.basename(this.path);
     this.reset();
   }
@@ -286,8 +285,7 @@ module.exports = class Package {
         this.styleManager.addStyleSheet(source, {
           sourcePath,
           priority,
-          context,
-          skipDeprecatedSelectorsTransformation: this.bundledPackage
+          context
         })
       );
     }
@@ -600,7 +598,6 @@ module.exports = class Package {
       try {
         const grammar = this.grammarRegistry.readGrammarSync(grammarPath);
         grammar.packageName = this.name;
-        grammar.bundledPackage = this.bundledPackage;
         this.grammars.push(grammar);
         grammar.activate();
       } catch (error) {
@@ -630,7 +627,6 @@ module.exports = class Package {
           );
         } else {
           grammar.packageName = this.name;
-          grammar.bundledPackage = this.bundledPackage;
           this.grammars.push(grammar);
           if (this.grammarsActivated) grammar.activate();
         }

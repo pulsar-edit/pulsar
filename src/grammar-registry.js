@@ -271,9 +271,6 @@ module.exports = class GrammarRegistry {
           score -= 0.05;
         }
       }
-
-      // Prefer grammars that the user has manually installed over bundled grammars.
-      if (!grammar.bundledPackage) score += 0.01;
     }
 
     return score;
