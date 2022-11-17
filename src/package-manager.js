@@ -46,9 +46,15 @@ module.exports = class PackageManager {
     this.packageDirPaths = [];
     this.deferredActivationHooks = [];
     this.triggeredActivationHooks = new Set();
-    this.packageDependencies = packageJSON.packageDependencies ?? {};
+    this.packagesCache =
+      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
+    this.packageDependencies =
+      packageJSON.packageDependencies != null
+        ? packageJSON.packageDependencies
+        : {};
     this.initialPackagesLoaded = false;
     this.initialPackagesActivated = false;
+    this.preloadedPackages = {};
     this.loadedPackages = {};
     this.activePackages = {};
     this.activatingPackages = {};
@@ -89,8 +95,14 @@ module.exports = class PackageManager {
     this.serviceHub.clear();
     await this.deactivatePackages();
     this.loadedPackages = {};
+    this.preloadedPackages = {};
     this.packageStates = {};
-    this.packageDependencies = packageJSON.packageDependencies ?? {};
+    this.packagesCache =
+      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
+    this.packageDependencies =
+      packageJSON.packageDependencies != null
+        ? packageJSON.packageDependencies
+        : {};
     this.triggeredActivationHooks.clear();
     this.activatePromise = null;
   }
@@ -165,6 +177,22 @@ module.exports = class PackageManager {
     return this.emitter.on('did-unload-package', callback);
   }
 
+  static possibleApmPaths(configPath) {
+    if (process.env.APM_PATH || configPath) {
+      return process.env.APM_PATH || configPath;
+    }
+
+    const commandName = process.platform === 'win32' ? 'apm.cmd' : 'apm';
+    const bundledPPMRoot = path.join(process.resourcesPath, 'app', 'ppm', 'bin', commandName);
+    const unbundledPPMRoot = path.join(__dirname, '..', 'ppm', 'bin', commandName);
+
+    if (fs.isFileSync(bundledPPMRoot)) {
+      return bundledPPMRoot;
+    } else {
+      return unbundledPPMRoot;
+    }
+  }
+
   /*
   Section: Package system data
   */
@@ -176,27 +204,12 @@ module.exports = class PackageManager {
   // Return a {String} file path to apm.
   getApmPath() {
     const configPath = atom.config.get('core.apmPath');
-    if (process.env.APM_PATH || configPath || this.apmPath) {
-      return process.env.APM_PATH || configPath || this.apmPath;
+    if (configPath || this.apmPath) {
+      return configPath || this.apmPath;
+    } else {
+       this.apmPath = PackageManager.possibleApmPaths();
+       return this.apmPath
     }
-
-    const commandName = process.platform === 'win32' ? 'apm.cmd' : 'apm';
-    const apmRoot = path.join(process.resourcesPath, 'app', 'apm');
-    this.apmPath = path.join(apmRoot, 'bin', commandName);
-    if (!fs.isFileSync(this.apmPath)) {
-      // Here is where any test instance (as far as I can tell) will land
-      // with previous attempts to declare the apmPath failing
-      // But here this expects the bootstrap scripts to have been run
-      // without them this path still fails.
-      // So we can change this path instead to our bundled APM
-
-      this.apmPath = path.join(
-        __dirname,
-        "../apm/node_modules/ppm/bin",
-        commandName
-      );
-    }
-    return this.apmPath;
   }
 
   // Public: Get the paths being used to look for packages.
@@ -266,7 +279,9 @@ module.exports = class PackageManager {
   // Returns the {Package} that was disabled or null if it isn't loaded.
   disablePackage(name) {
     const pack = this.loadPackage(name);
-    if (!this.isPackageDisabled(name)) pack?.disable();
+    if (!this.isPackageDisabled(name) && pack != null) {
+      pack.disable();
+    }
     return pack;
   }
 
@@ -417,7 +432,8 @@ module.exports = class PackageManager {
       if (!packagesByName.has(packageName)) {
         packages.push({
           name: packageName,
-          path: path.join(this.resourcePath, 'node_modules', packageName)
+          path: path.join(this.resourcePath, 'node_modules', packageName),
+          isBundled: true
         });
       }
     }
@@ -527,6 +543,59 @@ module.exports = class PackageManager {
     );
   }
 
+  preloadPackages() {
+    const result = [];
+    for (const packageName in this.packagesCache) {
+      result.push(
+        this.preloadPackage(packageName, this.packagesCache[packageName])
+      );
+    }
+    return result;
+  }
+
+  preloadPackage(packageName, pack) {
+    const metadata = pack.metadata || {};
+    if (typeof metadata.name !== 'string' || metadata.name.length < 1) {
+      metadata.name = packageName;
+    }
+
+    if (
+      metadata.repository != null &&
+      metadata.repository.type === 'git' &&
+      typeof metadata.repository.url === 'string'
+    ) {
+      metadata.repository.url = metadata.repository.url.replace(
+        /(^git\+)|(\.git$)/g,
+        ''
+      );
+    }
+
+    const options = {
+      path: pack.rootDirPath,
+      name: packageName,
+      preloadedPackage: true,
+      bundledPackage: true,
+      metadata,
+      packageManager: this,
+      config: this.config,
+      styleManager: this.styleManager,
+      commandRegistry: this.commandRegistry,
+      keymapManager: this.keymapManager,
+      notificationManager: this.notificationManager,
+      grammarRegistry: this.grammarRegistry,
+      themeManager: this.themeManager,
+      menuManager: this.menuManager,
+      contextMenuManager: this.contextMenuManager,
+      deserializerManager: this.deserializerManager,
+      viewRegistry: this.viewRegistry
+    };
+
+    pack = metadata.theme ? new ThemePackage(options) : new Package(options);
+    pack.preload();
+    this.preloadedPackages[packageName] = pack;
+    return pack;
+  }
+
   loadPackages() {
     // Ensure atom exports is already in the require cache so the load time
     // of the first package isn't skewed by being the first to require atom
@@ -545,16 +614,23 @@ module.exports = class PackageManager {
   }
 
   loadPackage(nameOrPath) {
-    if (path.basename(nameOrPath)[0].match(/^\./)) return null; // primarily to skip .git folder
+    if (path.basename(nameOrPath)[0].match(/^\./)) {
+      // primarily to skip .git folder
+      return null;
+    }
 
     const pack = this.getLoadedPackage(nameOrPath);
-    if (pack) return pack;
+    if (pack) {
+      return pack;
+    }
 
     const packagePath = this.resolvePackagePath(nameOrPath);
     if (packagePath) {
+      const name = path.basename(nameOrPath);
       return this.loadAvailablePackage({
+        name,
         path: packagePath,
-        name: path.basename(nameOrPath),
+        isBundled: this.isBundledPackagePath(packagePath)
       });
     }
 
@@ -563,16 +639,41 @@ module.exports = class PackageManager {
   }
 
   loadAvailablePackage(availablePackage, disabledPackageNames) {
-    if (disabledPackageNames?.has(availablePackage.name)) return;
+    const preloadedPackage = this.preloadedPackages[availablePackage.name];
+
+    if (
+      disabledPackageNames != null &&
+      disabledPackageNames.has(availablePackage.name)
+    ) {
+      if (preloadedPackage != null) {
+        preloadedPackage.deactivate();
+        delete preloadedPackage[availablePackage.name];
+      }
+      return null;
+    }
 
     const loadedPackage = this.getLoadedPackage(availablePackage.name);
-    if (loadedPackage) return loadedPackage;
+    if (loadedPackage != null) {
+      return loadedPackage;
+    }
+
+    if (preloadedPackage != null) {
+      if (availablePackage.isBundled) {
+        preloadedPackage.finishLoading();
+        this.loadedPackages[availablePackage.name] = preloadedPackage;
+        return preloadedPackage;
+      } else {
+        preloadedPackage.deactivate();
+        delete preloadedPackage[availablePackage.name];
+      }
+    }
 
     let metadata;
     try {
       metadata = this.loadPackageMetadata(availablePackage) || {};
     } catch (error) {
-      return this.handleMetadataError(error, availablePackage.path);
+      this.handleMetadataError(error, availablePackage.path);
+      return null;
     }
 
     const options = {
@@ -594,7 +695,9 @@ module.exports = class PackageManager {
       viewRegistry: this.viewRegistry
     };
 
-    const pack = metadata.theme ? new ThemePackage(options) : new Package(options);
+    const pack = metadata.theme
+      ? new ThemePackage(options)
+      : new Package(options);
     pack.load();
     this.loadedPackages[pack.name] = pack;
     this.emitter.emit('did-load-package', pack);
@@ -795,7 +898,7 @@ module.exports = class PackageManager {
     return Promise.all([symlinkPromise, dirPromise]).then(values => {
       const [isSymLink, isDir] = values;
       if (!isSymLink && isDir) {
-        return fs.remove(directory, () => {});
+        return fs.remove(directory, function() {});
       }
     });
   }
@@ -830,28 +933,40 @@ module.exports = class PackageManager {
   }
 
   loadPackageMetadata(packagePathOrAvailablePackage, ignoreErrors = false) {
-    let packageName, packagePath;
+    let isBundled, packageName, packagePath;
     if (typeof packagePathOrAvailablePackage === 'object') {
       const availablePackage = packagePathOrAvailablePackage;
       packageName = availablePackage.name;
       packagePath = availablePackage.path;
+      isBundled = availablePackage.isBundled;
     } else {
       packagePath = packagePathOrAvailablePackage;
       packageName = path.basename(packagePath);
+      isBundled = this.isBundledPackagePath(packagePath);
     }
 
     let metadata;
-    const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
-    if (metadataPath) {
-      try {
-        metadata = CSON.readFileSync(metadataPath);
-        this.normalizePackageMetadata(metadata);
-      } catch (error) {
-        if (!ignoreErrors) throw error;
+    if (isBundled && this.packagesCache[packageName] != null) {
+      metadata = this.packagesCache[packageName].metadata;
+    }
+
+    if (metadata == null) {
+      const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
+      if (metadataPath) {
+        try {
+          metadata = CSON.readFileSync(metadataPath);
+          this.normalizePackageMetadata(metadata);
+        } catch (error) {
+          if (!ignoreErrors) {
+            throw error;
+          }
+        }
       }
     }
 
-    if (!metadata) metadata = {};
+    if (metadata == null) {
+      metadata = {};
+    }
 
     if (typeof metadata.name !== 'string' || metadata.name.length <= 0) {
       metadata.name = packageName;
@@ -872,9 +987,11 @@ module.exports = class PackageManager {
   }
 
   normalizePackageMetadata(metadata) {
-    if (!metadata) return;
-    normalizePackageData = normalizePackageData || require('normalize-package-data');
-    normalizePackageData(metadata);
+    if (metadata != null) {
+      normalizePackageData =
+        normalizePackageData || require('normalize-package-data');
+      normalizePackageData(metadata);
+    }
   }
 };
 

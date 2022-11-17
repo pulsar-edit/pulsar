@@ -52,7 +52,7 @@ test.describe('Opening Atom for the first time', () => {
 
   test('the editor opens at the welcome page', async () => {
     const workspace = editor.page.locator('atom-workspace')
-    await expect(workspace).toHaveText(/A hackable text editor/, {
+    await expect(workspace).toHaveText(/A Community-led Hyper-Hackable Text Editor/, {
       useInnerText: true,
     })
   })
@@ -69,7 +69,7 @@ test.describe('Opening Atom for the first time', () => {
   test.describe('the editor have syntax highlight', async () => {
     test.beforeAll(async () => {
       const workspace = editor.page.locator('atom-workspace')
-      await expect(workspace).toHaveText(/A hackable text editor/, {
+      await expect(workspace).toHaveText(/A Community-led Hyper-Hackable Text Editor/, {
         useInnerText: true,
       })
       await runCommand(editor, 'Tabs: Close All Tabs')

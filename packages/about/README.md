@@ -4,7 +4,7 @@ View useful information about your Atom installation.
 
 ![About Atom](https://cloud.githubusercontent.com/assets/16760489/19395499/69bbb780-922d-11e6-9779-2b8327027ea5.png)
 
-This is a package for [Atom](https://atom.io), a hackable text editor for the 21st Century.
+This is a package for [Atom](https://atom.io), a community-led hyper-hackable text editor
 
 ## Usage
 

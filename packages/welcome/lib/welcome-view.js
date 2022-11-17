@@ -89,7 +89,7 @@ export default class WelcomeView {
                 </g>
               </svg>
               <h1 className="welcome-title">
-                A hackable text editor for the 21<sup>st</sup> Century
+                A Community-led Hyper-Hackable Text Editor
               </h1>
             </a>
           </header>

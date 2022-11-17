@@ -102,7 +102,7 @@ let options = {
       "to": "pulsar.sh"
     }, {
       "from": "ppm",
-      "to": "app/apm"
+      "to": "app/ppm"
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
@@ -117,7 +117,7 @@ let options = {
   "linux": {
     "icon": pngIcon,
     "category": "Development",
-    "synopsis": "A hackable text editor for the 22nd century",
+    "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
       { target: "appimage" },
       { target: "deb" },
@@ -136,7 +136,9 @@ let options = {
     ]
   },
   "extraMetadata": {
-  }
+  },
+  "asarUnpack": ["node_modules/github/bin/*"]
+
 }
 
 function whatToBuild() {

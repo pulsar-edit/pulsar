@@ -1532,7 +1532,7 @@ or use Pane::saveItemAs for programmatic saving.`);
       'js',
       'coffee'
     ]);
-    return initScriptPath || path.join(this.getConfigDirPath(), 'init.coffee');
+    return initScriptPath || path.join(this.getConfigDirPath(), 'init.js');
   }
 
   requireUserInitScript() {
