@@ -14,13 +14,23 @@
     "test": "atom --test test/*.test.js"
   },
   "consumedServices": {
-    
+
   },
   "configSchema": {
     "showOnStartup": {
       "type": "boolean",
       "default": true,
       "description": "Show welcome panes with useful information when opening a new Pulsar window."
+    },
+    "showChangeLog": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show a Change Log after an update. (Requires Show On Startup to be Enabled)"
+    },
+    "lastViewedChangeLog": {
+      "type": "string",
+      "default": "0.0.0",
+      "description": "This is used to keep track of what Change Logs you've dismissed. Change this value to see one again."
     }
   },
   "deserializers": {
