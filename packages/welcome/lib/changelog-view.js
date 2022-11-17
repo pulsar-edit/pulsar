@@ -22,6 +22,10 @@ export default class ChangeLogView {
     atom.config.set('welcome.showChangeLog', this.checked);
   }
 
+  dismissVersion() {
+    atom.config.set('welcome.lastViewedChangeLog', atom.getVersion().split(" ")[0]);
+  }
+
   update() {}
 
   serialize() {
@@ -108,6 +112,27 @@ export default class ChangeLogView {
               </li>
 
             </ul>
+
+            <section className="welcome-panel">
+              <label>
+                <input className="input-checkbox"
+                  type="checkbox"
+                  checked={atom.config.get('welcome.showChangeLog')}
+                  onchange={this.didChangeShowChangeLog}
+                />
+                Show the Change Log after an update.
+              </label>
+            </section>
+            <section className="welcome-panel">
+              <label>
+                <input className="input-checkbox"
+                  type="checkbox"
+                  checked="false"
+                  onchange={this.dismissVersion}
+                />
+                Dismiss this Change Log
+              </label>
+            </section>
           </div>
         </div>
       </div>

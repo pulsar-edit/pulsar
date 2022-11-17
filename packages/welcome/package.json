@@ -25,7 +25,7 @@
     "showChangeLog": {
       "type": "boolean",
       "default": true,
-      "description": "Show a Change Log after an update. (Requires Show On Startup to be Enabled)"
+      "description": "Show a Change Log after an update."
     },
     "lastViewedChangeLog": {
       "type": "string",
