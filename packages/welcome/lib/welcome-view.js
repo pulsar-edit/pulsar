@@ -100,7 +100,7 @@ export default class WelcomeView {
               <li>
                 The{' '}
                 <a
-                  href={atom.branding.urlWeb + "\docs"}
+                  href={atom.branding.urlWeb + "docs"}
                   dataset={{ event: 'atom-docs' }}
                 >
                   {this.brand} docs
@@ -148,7 +148,7 @@ export default class WelcomeView {
             <span className="text-subtle">×</span>{' '}
             <a
               className="icon icon-heart"
-              href={atom.branding.urlWeb + "\community"}
+              href={atom.branding.urlWeb + "community"}
               dataset={{ event: 'footer-octocat' }}
             />
           </footer>
