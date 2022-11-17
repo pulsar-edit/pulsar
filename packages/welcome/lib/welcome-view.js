@@ -110,7 +110,7 @@ export default class WelcomeView {
               <li>
                 The {this.brand} forum at{' '}
                 <a
-                  href="https://github.com/orgs/pulsar-edit/discussions"
+                  href={atom.branding.urlForum}
                   dataset={{ event: 'discussions' }}
                 >
                   Github Discussions
