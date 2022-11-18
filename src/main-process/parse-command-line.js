@@ -46,7 +46,11 @@ module.exports = function parseCommandLine(processArgs) {
     .alias('f', 'foreground')
     .boolean('f')
     .describe('f', 'Keep the main process in the foreground.');
-  options.help('help', 'Print this usage message.').alias('h', 'help');
+  options.help(false)
+  options
+    .alias('h', 'help')
+    .boolean('h')
+    .describe('h', 'Print this usage message.')
   options
     .alias('l', 'log-file')
     .string('l')
@@ -141,6 +145,22 @@ module.exports = function parseCommandLine(processArgs) {
   // NB: if --help or --version are given, this also displays the relevant message and exits
   let args = options.argv;
 
+  if (args['package']) {
+    const PackageManager = require('../package-manager');
+    const cp = require('child_process');
+    const ppmPath = PackageManager.possibleApmPaths();
+    const ppmArgs = args['_'];
+    const exitCode = cp.spawnSync(ppmPath, ppmArgs, {stdio: 'inherit'}).status;
+    process.exit(exitCode);
+    return;
+  }
+
+  if (args['help']) {
+    options.showHelp();
+    process.exit(0);
+    return;
+  }
+
   // If --uri-handler is set, then we parse NOTHING else
   if (args.uriHandler) {
     args = {
@@ -184,7 +204,6 @@ module.exports = function parseCommandLine(processArgs) {
   const userDataDir = args['user-data-dir'];
   const profileStartup = args['profile-startup'];
   const clearWindowState = args['clear-window-state'];
-  const packageCmd = args['package'];
   let pathsToOpen = [];
   let urlsToOpen = [];
   let devMode = args['dev'];
@@ -227,7 +246,6 @@ module.exports = function parseCommandLine(processArgs) {
     profileStartup,
     timeout,
     clearWindowState,
-    packageCmd,
     addToLastWindow,
     mainProcess,
     benchmark,
