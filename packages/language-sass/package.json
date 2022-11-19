@@ -16,7 +16,6 @@
     "url": "https://github.com/atom/language-sass/issues"
   },
   "devDependencies": {
-    "coffeelint": "^1.10.1",
     "dedent": "^0.7.0"
   }
 }

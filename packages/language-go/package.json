@@ -20,8 +20,5 @@
   },
   "dependencies": {
     "tree-sitter-go": "0.19.1"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
   }
 }

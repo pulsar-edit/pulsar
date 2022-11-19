@@ -15,9 +15,6 @@
   "bugs": {
     "url": "https://github.com/atom/language-json/issues"
   },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
-  },
   "dependencies": {
     "tree-sitter-json": "0.20.0"
   }

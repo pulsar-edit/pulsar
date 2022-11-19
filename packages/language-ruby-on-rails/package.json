@@ -14,8 +14,5 @@
   },
   "bugs": {
     "url": "https://github.com/atom/language-ruby-on-rails/issues"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
   }
 }
