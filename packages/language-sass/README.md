@@ -1,5 +1,4 @@
 # Sass/SCSS language support in Atom
-![CI Status](https://github.com/atom/language-sass/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to Sass/SCSS files in Atom.
 
