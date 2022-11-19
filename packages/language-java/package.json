@@ -6,15 +6,8 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-java",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-java.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-java/issues"
-  },
   "dependencies": {
     "tree-sitter-java": "0.19.1"
   },
