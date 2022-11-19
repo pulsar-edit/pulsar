@@ -132,24 +132,20 @@ intel_mac_task:
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 xcode-select --install
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    - export PATH="/usr/local/bin:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - ln -s /usr/local/opt/python3 /usr/local/bin/python
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
   test_script:
-    - export PATH="/usr/local/bin:$PATH"
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:/usr/local/bin:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
