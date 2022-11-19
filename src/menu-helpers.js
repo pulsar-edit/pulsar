@@ -49,7 +49,7 @@ function unmerge(menu, item) {
     }
   }
 
-  if (matchingItem.submenu == null || matchingItem.submenu.length === 0) {
+  if (matchingItem.submenu == null || matchingItem.submenu.filter( ({type}) => type !== 'separator' ).length === 0) {
     menu.splice(matchingItemIndex, 1);
   }
 }
