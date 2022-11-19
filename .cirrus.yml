@@ -134,6 +134,7 @@ intel_mac_task:
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
+    - ln -s /usr/local/bin/python3 /usr/local/bin/python
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
