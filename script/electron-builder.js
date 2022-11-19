@@ -1,68 +1,8 @@
 const path = require('path')
-const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
-
-// Monkey-patch to not remove things I explicitly didn't say so
-// See: https://github.com/electron-userland/electron-builder/issues/6957
-let transformer = require('app-builder-lib/out/fileTransformer')
-const builder_util_1 = require("builder-util");
-
-transformer.createTransformer = function(srcDir, configuration, extraMetadata, extraTransformer) {
-    const mainPackageJson = path.join(srcDir, "package.json");
-    const isRemovePackageScripts = configuration.removePackageScripts !== false;
-    const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
-    const packageJson = path.sep + "package.json";
-    return file => {
-        if (file === mainPackageJson) {
-            return modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords);
-        }
-        if (extraTransformer != null) {
-            return extraTransformer(file);
-        } else {
-            return null;
-        }
-    };
-}
-async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords) {
-    const mainPackageData = JSON.parse(await fs.readFile(file, "utf-8"));
-    if (extraMetadata != null) {
-        builder_util_1.deepAssign(mainPackageData, extraMetadata);
-        return JSON.stringify(mainPackageData, null, 2);
-    }
-    return null;
-}
-/// END Monkey-Patch
-
-// Monkey-patch disables default top level node module excluded files
-// files: https://github.com/electron-userland/electron-builder/blob/28cb86bdcb6dd0b10e75a69ccd34ece6cca1d204/packages/app-builder-lib/src/util/NodeModuleCopyHelper.ts#L15-L33
-const {NodeModuleCopyHelper} = require('app-builder-lib/out/util/NodeModuleCopyHelper');
-const MOCK_BASE_DIR_SPECIAL_PREFIX = "\0\b"; // used to identify mocked string
-const mockDepPathSymbol = Symbol();
-
-path.normalize = ( oldPathNormalize => function(...args) {
-    if (!args[0]?.startsWith(MOCK_BASE_DIR_SPECIAL_PREFIX)) return oldPathNormalize.apply(this,args);
-    args[0] = args[0].substring(MOCK_BASE_DIR_SPECIAL_PREFIX.length);
-    const ret = oldPathNormalize.apply(this,args);
-    const mockDepPath = new String(MOCK_BASE_DIR_SPECIAL_PREFIX + ret);
-    mockDepPath[mockDepPathSymbol] = true;
-    return mockDepPath;
-})(path.normalize);
-
-Array.prototype.pop = ( oldArrayPop => function(...args) {
-    const ret = oldArrayPop.apply(this,args);
-    if (!ret?.[mockDepPathSymbol]) return ret;
-    return ret.substring(MOCK_BASE_DIR_SPECIAL_PREFIX.length);
-})(Array.prototype.pop);
-
-NodeModuleCopyHelper.prototype.collectNodeModules = (oldCollectNodeModules => function(...args) {
-    args[0] = MOCK_BASE_DIR_SPECIAL_PREFIX + args[0];
-    return oldCollectNodeModules.apply(this,args);
-})(NodeModuleCopyHelper.prototype.collectNodeModules);
-/// END Monkey-Patch
 
 const builder = require("electron-builder")
 const Platform = builder.Platform
-
 
 const pngIcon = 'resources/app-icons/nightly/png/1024.png'
 const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
@@ -138,7 +78,6 @@ let options = {
   "extraMetadata": {
   },
   "asarUnpack": ["node_modules/github/bin/*"]
-
 }
 
 function whatToBuild() {
