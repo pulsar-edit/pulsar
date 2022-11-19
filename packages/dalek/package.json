@@ -15,15 +15,6 @@
   },
   "devDependencies": {
     "atom-mocha-test-runner": "^1.0.0",
-    "sinon": "9.0.3",
-    "standard": "^8.6.0"
-  },
-  "standard": {
-    "env": {
-      "jasmine": true
-    },
-    "globals": [
-      "atom"
-    ]
+    "sinon": "9.0.3"
   }
 }

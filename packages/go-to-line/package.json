@@ -4,9 +4,6 @@
   "main": "./lib/go-to-line-view",
   "description": "Jump to a specific editor line number with `ctrl-g`.",
   "license": "MIT",
-  "scripts": {
-    "lint": "standard"
-  },
   "activationCommands": {
     "atom-text-editor": [
       "go-to-line:toggle"
@@ -15,17 +12,5 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": "*"
-  },
-  "devDependencies": {
-    "standard": "^8.6.0"
-  },
-  "standard": {
-    "globals": [
-      "atom",
-      "waitsForPromise"
-    ],
-    "ignore": [
-      "spec/fixtures"
-    ]
   }
 }
