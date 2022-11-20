@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
-const cp = require('child_process')
+const cp = require('child_process');
+const path = require('path');
 
 const packagesPath = path.join(__dirname, '..', 'packages');
 
