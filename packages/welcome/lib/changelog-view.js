@@ -26,6 +26,16 @@ export default class ChangeLogView {
     atom.config.set('welcome.lastViewedChangeLog', atom.getVersion().split(" ")[0]);
   }
 
+  wasVersionDismissed() {
+    const lastVersion = atom.config.get('welcome.lastViewedChangeLog');
+    const curVersion = atom.getVersion().split(".");
+    if (lastVersion[0] < curVersion[0] && lastVersion[1] < curVersion[1] && lastVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   update() {}
 
   serialize() {
@@ -127,7 +137,7 @@ export default class ChangeLogView {
               <label>
                 <input className="input-checkbox"
                   type="checkbox"
-                  checked="false"
+                  checked={this.wasVersionDismissed()}
                   onchange={this.dismissVersion}
                 />
                 Dismiss this Change Log
