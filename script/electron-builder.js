@@ -27,7 +27,6 @@ let options = {
     "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
     "!**/node_modules/*.d.ts",
     "!**/node_modules/.bin",
-    "!**/node_modules/{.coveralls.yml,karma.conf.js,test.js}",
     "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
     "!.editorconfig",
     "!**/._*",
