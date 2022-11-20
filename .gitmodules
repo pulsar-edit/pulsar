@@ -1,3 +1,99 @@
 [submodule "ppm"]
 	path = ppm
 	url = https://github.com/pulsar-edit/ppm.git
+[submodule "packages/archive-view"]
+	path = packages/archive-view
+	url = https://github.com/pulsar-edit/archive-view.git
+[submodule "packages/autocomplete-atom-api"]
+	path = packages/autocomplete-atom-api
+	url = https://github.com/pulsar-edit/autocomplete-atom-api.git
+[submodule "packages/autocomplete-css"]
+	path = packages/autocomplete-css
+	url = https://github.com/pulsar-edit/autocomplete-css.git
+[submodule "packages/autocomplete-html"]
+	path = packages/autocomplete-html
+	url = https://github.com/pulsar-edit/autocomplete-html.git
+[submodule "packages/autocomplete-plus"]
+	path = packages/autocomplete-plus
+	url = https://github.com/pulsar-edit/autocomplete-plus.git
+[submodule "packages/autocomplete-snippets"]
+	path = packages/autocomplete-snippets
+	url = https://github.com/pulsar-edit/autocomplete-snippets.git
+[submodule "packages/autosave"]
+	path = packages/autosave
+	url = https://github.com/pulsar-edit/autosave.git
+[submodule "packages/background-tips"]
+	path = packages/background-tips
+	url = https://github.com/pulsar-edit/background-tips.git
+[submodule "packages/bookmarks"]
+	path = packages/bookmarks
+	url = https://github.com/pulsar-edit/bookmarks.git
+[submodule "packages/bracket-matcher"]
+	path = packages/bracket-matcher
+	url = https://github.com/pulsar-edit/bracket-matcher.git
+[submodule "packages/command-palette"]
+	path = packages/command-palette
+	url = https://github.com/pulsar-edit/command-palette.git
+[submodule "packages/encoding-selector"]
+	path = packages/encoding-selector
+	url = https://github.com/pulsar-edit/encoding-selector.git
+[submodule "packages/find-and-replace"]
+	path = packages/find-and-replace
+	url = https://github.com/pulsar-edit/find-and-replace.git
+[submodule "packages/fuzzy-finder"]
+	path = packages/fuzzy-finder
+	url = https://github.com/pulsar-edit/fuzzy-finder.git
+[submodule "packages/github"]
+	path = packages/github
+	url = https://github.com/pulsar-edit/github.git
+[submodule "packages/image-view"]
+	path = packages/image-view
+	url = https://github.com/pulsar-edit/image-view.git
+[submodule "packages/keybinding-resolver"]
+	path = packages/keybinding-resolver
+	url = https://github.com/pulsar-edit/keybinding-resolver.git
+[submodule "packages/markdown-preview"]
+	path = packages/markdown-preview
+	url = https://github.com/pulsar-edit/markdown-preview.git
+[submodule "packages/notifications"]
+	path = packages/notifications
+	url = https://github.com/pulsar-edit/notifications.git
+[submodule "packages/open-on-github"]
+	path = packages/open-on-github
+	url = https://github.com/pulsar-edit/open-on-github.git
+[submodule "packages/package-generator"]
+	path = packages/package-generator
+	url = https://github.com/pulsar-edit/package-generator.git
+[submodule "packages/settings-view"]
+	path = packages/settings-view
+	url = https://github.com/pulsar-edit/settings-view.git
+[submodule "packages/snippets"]
+	path = packages/snippets
+	url = https://github.com/pulsar-edit/snippets.git
+[submodule "packages/spell-check"]
+	path = packages/spell-check
+	url = https://github.com/pulsar-edit/spell-check.git
+[submodule "packages/status-bar"]
+	path = packages/status-bar
+	url = https://github.com/pulsar-edit/status-bar.git
+[submodule "packages/styleguide"]
+	path = packages/styleguide
+	url = https://github.com/pulsar-edit/styleguide.git
+[submodule "packages/symbols-view"]
+	path = packages/symbols-view
+	url = https://github.com/pulsar-edit/symbols-view.git
+[submodule "packages/tabs"]
+	path = packages/tabs
+	url = https://github.com/pulsar-edit/tabs.git
+[submodule "packages/timecop"]
+	path = packages/timecop
+	url = https://github.com/pulsar-edit/timecop.git
+[submodule "packages/tree-view"]
+	path = packages/tree-view
+	url = https://github.com/pulsar-edit/tree-view.git
+[submodule "packages/whitespace"]
+	path = packages/whitespace
+	url = https://github.com/pulsar-edit/whitespace.git
+[submodule "packages/wrap-guide"]
+	path = packages/wrap-guide
+	url = https://github.com/pulsar-edit/wrap-guide.git
