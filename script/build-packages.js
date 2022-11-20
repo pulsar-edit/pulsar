@@ -7,7 +7,7 @@ const packagesPath = path.join(__dirname, '..', 'packages');
 fs.readdir(packagesPath,{withFileTypes:true}).then( dirents => Promise.all(dirents.map( dirent => {
   if (!dirent.isDirectory()) return;
   return new Promise((resolve, reject) =>
-    child.exec(
+    cp.exec(
       `npm i`,
       { cwd: path.join(packagesPath, dirent.name) },
       (error, stdout, stderr) => error ? reject(error) : resolve()
