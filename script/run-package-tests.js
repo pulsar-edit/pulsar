@@ -6,9 +6,10 @@ const packJson = require('../package.json')
 module.exports = function(filter) {
   let packagePath = []
 
-  for(let pack in packJson.packageDependencies) {
+  const packagesPath = path.join(__dirname, '..', 'packages')
+  for(let pack of fs.readdirSync(packagesPath)) {
     if(pack.match(filter)) {
-      let basePath = path.join('node_modules', pack)
+      let basePath = path.join(packagesPath, pack)
       let testPath = path.join(basePath, 'test')
       let specPath = path.join(basePath, 'spec')
       if(fs.existsSync(testPath)) packagePath.push(testPath)
