@@ -74,7 +74,7 @@ export default class WelcomePackage {
 
   showChangeLog() {
     return Promise.all([
-      atom.workspace.open(CHANGELOG_URI, { split: 'up' });
+      atom.workspace.open(CHANGELOG_URI, { split: 'down' });
     ]);
   }
 
