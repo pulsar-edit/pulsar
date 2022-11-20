@@ -45,7 +45,10 @@ let options = {
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
-    },
+    }, {
+      "form": "packages",
+      "to": "packages"
+    }
   ],
   compression: "normal",
   deb: { afterInstall: "script/post-install.sh" },
