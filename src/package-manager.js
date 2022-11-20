@@ -224,11 +224,6 @@ module.exports = class PackageManager {
       return packagePath;
     }
 
-    packagePath = path.join(this.resourcePath, 'node_modules', name);
-    if (this.hasAtomEngine(packagePath)) {
-      return packagePath;
-    }
-
     return null;
   }
 
@@ -417,15 +412,6 @@ module.exports = class PackageManager {
 
   setPackageState(name, state) {
     this.packageStates[name] = state;
-  }
-
-  hasAtomEngine(packagePath) {
-    const metadata = this.loadPackageMetadata(packagePath, true);
-    return (
-      metadata != null &&
-      metadata.engines != null &&
-      metadata.engines.atom != null
-    );
   }
 
   unobserveDisabledPackages() {
