@@ -45,6 +45,10 @@ export default class WelcomePackage {
       atom.commands.add('atom-workspace', 'welcome:show', () => this.show())
     );
 
+    this.subscriptions.add(
+      atom.commands.add('atom-workspace', 'welcome:showchangelog', () => this.showChangeLog())
+    );
+
     if (atom.config.get('welcome.showOnStartup')) {
       await this.show();
       this.reporterProxy.sendEvent('show-on-initial-load');
@@ -56,7 +60,7 @@ export default class WelcomePackage {
       // Usually getVersion Returns something along MAJOR.MINOR.PATCH ARCH
       // So we will account for that when checking what version they have.
       if (lastViewedVersion[0] < curVersion[0] && lastViewedVersion[1] < curVersion[1] && lastViewedVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
-        await atom.workspace.open(CHANGELOG_URI);
+        await this.showChangeLog();
       }
     }
   }
@@ -65,6 +69,12 @@ export default class WelcomePackage {
     return Promise.all([
       atom.workspace.open(WELCOME_URI, { split: 'left' }),
       atom.workspace.open(GUIDE_URI, { split: 'right' })
+    ]);
+  }
+
+  showChangeLog() {
+    return Promise.all([
+      atom.workspace.open(CHANGELOG_URI, { split: 'up' });
     ]);
   }
 
