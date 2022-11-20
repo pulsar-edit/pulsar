@@ -335,7 +335,7 @@ module.exports = class Package {
 
     for (let [keymapPath, map] of this.keymaps) {
       this.keymapDisposables.add(
-        this.keymapManager.add(keymapPath, map, 0, true)
+        this.keymapManager.add(keymapPath, map)
       );
     }
     this.menuManager.update();
@@ -365,7 +365,7 @@ module.exports = class Package {
         try {
           const itemsBySelector = map['context-menu'];
           this.activationDisposables.add(
-            this.contextMenuManager.add(itemsBySelector, true)
+            this.contextMenuManager.add(itemsBySelector)
           );
         } catch (error) {
           if (error.code === 'EBADSELECTOR') {
