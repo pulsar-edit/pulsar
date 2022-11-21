@@ -11,28 +11,17 @@ const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
 const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 
-const cGrammarPath = require.resolve('language-c/grammars/tree-sitter-c.cson');
-const pythonGrammarPath = require.resolve(
-  'language-python/grammars/tree-sitter-python.cson'
-);
-const jsGrammarPath = require.resolve(
-  'language-javascript/grammars/tree-sitter-javascript.cson'
-);
-const jsdocGrammarPath = require.resolve(
-  'language-javascript/grammars/tree-sitter-jsdoc.cson'
-);
-const htmlGrammarPath = require.resolve(
-  'language-html/grammars/tree-sitter-html.cson'
-);
-const ejsGrammarPath = require.resolve(
-  'language-html/grammars/tree-sitter-ejs.cson'
-);
-const rubyGrammarPath = require.resolve(
-  'language-ruby/grammars/tree-sitter-ruby.cson'
-);
-const rustGrammarPath = require.resolve(
-  'language-rust-bundled/grammars/tree-sitter-rust.cson'
-);
+
+const packagesPath = path.join(__dirname,'..','packages');
+
+const cGrammarPath = path.join(packagesPath,'language-c/grammars/tree-sitter-c.cson');
+const pythonGrammarPath = path.join(packagesPath,'language-python/grammars/tree-sitter-python.cson');
+const jsGrammarPath = path.join(packagesPath,'language-javascript/grammars/tree-sitter-javascript.cson');
+const jsdocGrammarPath = path.join(packagesPath,'language-javascript/grammars/tree-sitter-jsdoc.cson');
+const htmlGrammarPath = path.join(packagesPath,'language-html/grammars/tree-sitter-html.cson');
+const ejsGrammarPath = path.join(packagesPath,'language-html/grammars/tree-sitter-ejs.cson');
+const rubyGrammarPath = path.join(packagesPath,'language-ruby/grammars/tree-sitter-ruby.cson');
+const rustGrammarPath = path.join(packagesPath,'language-rust-bundled/grammars/tree-sitter-rust.cson');
 
 describe('TreeSitterLanguageMode', () => {
   let editor, buffer;
