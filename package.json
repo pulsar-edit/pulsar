@@ -275,18 +275,6 @@
     "start": "electron --enable-logging . -f",
     "dist": "node script/electron-builder.js"
   },
-  "standard-engine": "./script/node_modules/standard",
-  "standard": {
-    "env": {
-      "atomtest": true,
-      "browser": true,
-      "jasmine": true,
-      "node": true
-    },
-    "globals": [
-      "atom"
-    ]
-  },
   "devDependencies": {
     "@playwright/test": "1.22.2",
     "electron": "12.2.3",
