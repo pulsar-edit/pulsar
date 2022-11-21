@@ -4,9 +4,7 @@ const TreeSitterGrammar = require('../src/tree-sitter-grammar');
 const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
 const TreeIndenter = require('../src/tree-indenter');
 
-const jsGrammarPath = require.resolve(
-  path.join(__dirname,'..','packages','language-javascript','grammars','tree-sitter-javascript.cson')
-);
+const jsGrammarPath = path.join(__dirname,'..','packages','language-javascript','grammars','tree-sitter-javascript.cson');
 
 const TAB_LENGTH = 2;
 
