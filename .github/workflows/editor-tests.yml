@@ -17,13 +17,6 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
-
-    - name: Install windows-build-tools
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        npm i --global windows-build-tools@4.0.0
-        npm config set msvs_version 2019
-
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
