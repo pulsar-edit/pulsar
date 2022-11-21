@@ -57,7 +57,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: packages
-        key: linux-packages-${{ hashFiles('packages/*/package.json') }}
+        key: linux-packages-${{ hashFiles('packages/about/package.json') }} # somehow include all packages/*/package.json
 
   test:
     name: Test Packages
@@ -103,7 +103,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: packages
-        key: linux-packages-${{ hashFiles('packages/*/package.json') }}
+        key: linux-packages-${{ hashFiles('packages/about/package.json') }}
 
     - name: Run Package Tests for ${{ matrix.descr }}
       uses: GabrielBB/xvfb-action@v1
