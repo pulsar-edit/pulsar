@@ -31,9 +31,6 @@ jobs:
     - name: build dependencies
       run: yarn build
 
-    - name: build packages
-      run: yarn build:packages
-
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1
       with:

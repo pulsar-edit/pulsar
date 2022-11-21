@@ -89,7 +89,7 @@
   "private": true,
   "scripts": {
     "preinstall": "node -e 'process.exit(0)'",
-    "build": "electron-rebuild",
+    "build": "electron-rebuild && npm run build:packages",
     "build:apm": "cd ppm && yarn install",
     "build:packages": "node script/build-packages.js",
     "start": "electron --enable-logging . -f",

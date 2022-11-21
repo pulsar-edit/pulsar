@@ -35,9 +35,6 @@ jobs:
     - name: build dependencies
       run: yarn build:apm
 
-    - name: build packages
-      run: yarn build:packages
-
     - name: Cache node_modules
       id: cache-node
       uses: actions/cache@v3
