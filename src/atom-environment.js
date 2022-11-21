@@ -221,7 +221,8 @@ class AtomEnvironment {
       id: packagejson.branding.id,
       name: packagejson.branding.name,
       urlWeb: packagejson.branding.urlWeb,
-      urlGH: packagejson.branding.urlGH
+      urlGH: packagejson.branding.urlGH,
+      urlForum: packagejson.branding.urlForum
     };
 
     // Keep instances of HistoryManager in sync
