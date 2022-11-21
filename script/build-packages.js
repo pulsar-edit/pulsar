@@ -9,8 +9,8 @@ const dirents = fs.readdirSync(packagesPath,{withFileTypes:true});
 for (const dirent of dirents) {
   if (!dirent.isDirectory()) continue;
   const packagePath = path.join(packagesPath, dirent.name);
-  console.log(`${packagePath}$ npm ci`);
-  const res = cp.spawnSync('npm',['ci','--legacy-peer-deps'],{
+  console.log(`${packagePath}$ npm i`);
+  const res = cp.spawnSync('npm',['i','--legacy-peer-deps'],{
     cwd: packagePath,
     shell: true,
     stdio: "inherit",
