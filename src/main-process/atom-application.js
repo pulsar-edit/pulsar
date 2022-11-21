@@ -590,24 +590,24 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on('application:open-documentation', () =>
-      shell.openExternal('http://flight-manual.atom.io')
+      shell.openExternal('https://pulsar-edit.dev/docs/')
     );
     this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/atom/atom/discussions')
+      shell.openExternal('https://github.com/orgs/pulsar-edit/discussions')
     );
     this.on('application:open-faq', () =>
-      shell.openExternal('https://atom.io/faq')
+      shell.openExternal('https://pulsar-edit.dev/docs/launch-manual/sections/faq/')
     );
     this.on('application:open-terms-of-use', () =>
       shell.openExternal('https://atom.io/terms')
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
-        'https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs'
+        'https://github.com/pulsar-edit/pulsar/issues/new/choose'
       )
     );
     this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/search?q=+is%3Aissue+user%3Aatom')
+      shell.openExternal('https://github.com/pulsar-edit/pulsar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
     );
 
     this.on('application:install-update', () => {
