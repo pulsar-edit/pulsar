@@ -1,5 +1,5 @@
 const { protocol } = require('electron');
-const fs = require('fs-plus');
+const fs = require('fs/promises');
 const path = require('path');
 
 // Handles requests with 'atom' protocol.
@@ -30,20 +30,20 @@ module.exports = class AtomProtocolHandler {
 
   // Creates the 'atom' custom protocol handler.
   registerAtomProtocol() {
-    protocol.registerFileProtocol('atom', (request, callback) => {
+    protocol.registerFileProtocol('atom', async (request, callback) => {
       const relativePath = path.normalize(request.url.substr(7));
 
       let filePath;
       if (relativePath.indexOf('assets/') === 0) {
         const assetsPath = path.join(process.env.ATOM_HOME, relativePath);
-        const stat = fs.statSyncNoException(assetsPath);
+        const stat = await fs.stat(assetsPath).catch( () => false );
         if (stat && stat.isFile()) filePath = assetsPath;
       }
 
       if (!filePath) {
         for (let loadPath of this.loadPaths) {
           filePath = path.join(loadPath, relativePath);
-          const stat = fs.statSyncNoException(filePath);
+          const stat = await fs.stat(filePath).catch( () => false );
           if (stat && stat.isFile()) break;
         }
       }
