@@ -7,8 +7,8 @@
   "branding": {
     "id": "pulsar",
     "name": "Pulsar",
-    "urlWeb": "https://atom.io/",
-    "urlGH": "https://github.com/pulsar-edit"
+    "urlWeb": "https://pulsar-edit.dev",
+    "urlGH": "https://github.com/orgs/pulsar-edit"
   },
   "main": "./src/main-process/main.js",
   "repository": {
