@@ -1,5 +1,4 @@
 # XML language support in Atom
-[![CI](https://github.com/atom/language-xml/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-xml/actions/workflows/ci.yml)
 
 Adds syntax highlighting and snippets to XML files in Atom.
 

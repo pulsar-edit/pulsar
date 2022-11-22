@@ -72,9 +72,14 @@ export default class WelcomeView {
             <ul>
               <li>
                 The{' '}
+<<<<<<< HEAD
                 {/* // TODO_PULSAR: Update to our docs or test {atom.branding.urlweb}+"/docs" */}
                 <a
                   href={atom.branding.urlWeb + "/docs"}
+=======
+                <a
+                  href={atom.branding.urlWeb + "docs"}
+>>>>>>> origin/master
                   dataset={{ event: 'atom-docs' }}
                 >
                   {this.brand} docs
@@ -84,7 +89,11 @@ export default class WelcomeView {
               <li>
                 The {this.brand} forum at{' '}
                 <a
+<<<<<<< HEAD
                   href={atom.branding.urlGH + "/discussions"}
+=======
+                  href={atom.branding.urlForum}
+>>>>>>> origin/master
                   dataset={{ event: 'discussions' }}
                 >
                   Github Discussions
@@ -98,7 +107,7 @@ export default class WelcomeView {
                 >
                   {this.brand} org
                 </a>
-                . This is where all GitHub-created {this.brand} packages can be found.
+                . This is where all {this.brand} org packages can be found.
               </li>
             </ul>
           </section>
@@ -121,8 +130,8 @@ export default class WelcomeView {
             </a>{' '}
             <span className="text-subtle">×</span>{' '}
             <a
-              className="icon icon-octoface"
-              href="https://github.com/pulsar-edit"
+              className="icon icon-heart"
+              href={atom.branding.urlWeb + "community"}
               dataset={{ event: 'footer-octocat' }}
             />
           </footer>

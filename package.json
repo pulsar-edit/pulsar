@@ -7,8 +7,9 @@
   "branding": {
     "id": "pulsar",
     "name": "Pulsar",
-    "urlWeb": "https://pulsar-edit.dev",
-    "urlGH": "https://github.com/orgs/pulsar-edit"
+    "urlWeb": "https://pulsar-edit.dev/",
+    "urlGH": "https://github.com/pulsar-edit",
+    "urlForum": "https://github.com/orgs/pulsar-edit/discussions"
   },
   "main": "./src/main-process/main.js",
   "repository": {

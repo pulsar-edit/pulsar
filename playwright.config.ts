@@ -1,4 +1,4 @@
-module.exports = {
+let config = {
   testDir: 'integration',
   timeout: 60000,
   expect: {
@@ -6,3 +6,9 @@ module.exports = {
     toMatchSnapshot: {threshold: 0.2},
   }
 }
+
+if(process.env.CI) {
+  config.retries = 3
+}
+
+module.exports = config

@@ -62,17 +62,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   if (handleStartupEventWithSquirrel()) {
     return;
-  } else if (args.packageCmd) {
-    const PackageManager = require('../package-manager');
-    const cp = require('child_process');
-    const ppmPath = PackageManager.possibleApmPaths();
-    while ( true ) {
-      const arg = process.argv.shift();
-      if (arg === '-p' || arg === '--package') break;
-    }
-    const exitCode = cp.spawnSync(ppmPath, process.argv, {stdio: 'inherit'}).status;
-    process.exit(exitCode)
-    return;
   } else if (args.test && args.mainProcess) {
     app.setPath(
       'userData',
