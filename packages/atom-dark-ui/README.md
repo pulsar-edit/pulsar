@@ -1,8 +1,8 @@
-# Atom Dark UI theme
+# Pulsar Dark UI theme
 
-A dark UI theme for Atom.
+A dark UI theme for Pulsar.
 
-This theme is installed by default with Atom and can be activated by going to
+This theme is installed by default with Pulsar and can be activated by going to
 the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
 _UI Themes_ drop-down menu.
 
