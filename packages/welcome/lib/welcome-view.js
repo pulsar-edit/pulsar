@@ -72,14 +72,8 @@ export default class WelcomeView {
             <ul>
               <li>
                 The{' '}
-<<<<<<< HEAD
-                {/* // TODO_PULSAR: Update to our docs or test {atom.branding.urlweb}+"/docs" */}
-                <a
-                  href={atom.branding.urlWeb + "/docs"}
-=======
                 <a
                   href={atom.branding.urlWeb + "docs"}
->>>>>>> origin/master
                   dataset={{ event: 'atom-docs' }}
                 >
                   {this.brand} docs
@@ -89,11 +83,7 @@ export default class WelcomeView {
               <li>
                 The {this.brand} forum at{' '}
                 <a
-<<<<<<< HEAD
-                  href={atom.branding.urlGH + "/discussions"}
-=======
                   href={atom.branding.urlForum}
->>>>>>> origin/master
                   dataset={{ event: 'discussions' }}
                 >
                   Github Discussions
