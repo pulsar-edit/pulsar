@@ -1,9 +1,9 @@
-# Source code support in Pulsar
+# Source code support in Atom
 
 Adds basic comment, indent, and outdent patterns used as a fallback by all
-source files in Pulsar.
+source files in Atom.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
+Originally [converted](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate)
 from the [Source TextMate bundle](https://github.com/textmate/source.tmbundle).
 
 Contributions are greatly appreciated. Please fork this repository and open a

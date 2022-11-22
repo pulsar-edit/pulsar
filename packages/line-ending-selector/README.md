@@ -2,7 +2,7 @@
 
 ![status bar tile](https://cloud.githubusercontent.com/assets/1305617/9274149/6b317568-4293-11e5-83ba-614a6c0d9890.png)
 
-This is an [Pulsar](https://pulsar-edit.dev) package that displays the current line ending type of a file: `CRLF` (Windows), `LF` (Unix), or `Mixed` (both). It also lets you change the line ending of a file.
+This is an [Atom](https://atom.io) package that displays the current line ending type of a file: `CRLF` (Windows), `LF` (Unix), or `Mixed` (both). It also lets you change the line ending of a file.
 
 ## To Use
 
@@ -21,7 +21,7 @@ You can click the line ending in the status-bar to open a modal with the line en
 
 **Note:** Because the `CR` line ending style is not used in any modern operating system, this package only supports converting *from* `CR` line endings not to it.
 
-### Pulsar Commands
+### Atom Commands
 
 You can also change a file's line endings by using or <kbd>cmd-shift-P</kbd> searching for these commands:
 

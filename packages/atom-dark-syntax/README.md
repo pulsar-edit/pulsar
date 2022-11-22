@@ -1,8 +1,8 @@
-# Pulsar Dark Syntax theme
+# Atom Dark Syntax theme
 
-A dark syntax theme for Pulsar.
+A dark syntax theme for Atom.
 
-This theme is installed by default with Pulsar and can be activated by going to
+This theme is installed by default with Atom and can be activated by going to
 the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
 _Syntax Themes_ dropdown menu.
 
