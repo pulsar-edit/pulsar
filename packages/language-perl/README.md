@@ -1,5 +1,4 @@
 # Perl language support in Atom
-[![CI](https://github.com/atom/language-perl/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-perl/actions/workflows/ci.yml)
 
 Adds syntax highlighting and snippets to Perl files in Atom.
 

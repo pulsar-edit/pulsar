@@ -1,5 +1,4 @@
 # TODO support in Atom
-[![CI](https://github.com/atom/language-todo/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-todo/actions/workflows/ci.yml)
 
 Adds syntax highlighting to `TODO`, `FIXME`, `CHANGED`, `XXX`, `IDEA`, `HACK`, `NOTE`, `REVIEW`, `NB`, `BUG`, `QUESTION`, `COMBAK`, `TEMP`, `DEBUG`, `OPTIMIZE`, and `WARNING` in comments
 and text in Atom.
