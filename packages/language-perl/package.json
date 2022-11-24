@@ -1,7 +1,7 @@
 {
   "name": "language-perl",
   "version": "0.38.1",
-  "description": "Perl language support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for Perl",
   "engines": {
     "atom": "*",
     "node": "*"
