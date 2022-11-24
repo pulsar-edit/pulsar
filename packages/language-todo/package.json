@@ -1,7 +1,7 @@
 {
   "name": "language-todo",
   "version": "0.29.4",
-  "description": "TODO/FIXME highlighting support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for TODO/FIXME highlighting",
   "engines": {
     "atom": "*",
     "node": "*"
