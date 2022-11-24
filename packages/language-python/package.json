@@ -1,11 +1,11 @@
 {
   "name": "language-python",
   "version": "0.53.6",
+  "description": "Provides grammar(s) and snippet(s) for Python",
   "engines": {
     "atom": "*",
     "node": "*"
   },
-  "description": "Python language support in Atom",
   "keywords": [
     "tree-sitter"
   ],
