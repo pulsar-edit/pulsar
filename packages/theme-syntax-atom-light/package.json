@@ -1,8 +1,8 @@
 {
-  "name": "atom-light-syntax",
+  "name": "theme-syntax-atom-light",
   "theme": "syntax",
   "version": "0.29.1",
-  "description": "A light syntax theme",
+  "description": "A light syntax theme for Atom, repurposed for Pulsar",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
