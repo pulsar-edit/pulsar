@@ -1,5 +1,5 @@
 {
-  "name": "base16-tomorrow-dark-theme",
+  "name": "theme-syntax-base16-tomorrow-dark",
   "theme": "syntax",
   "version": "1.6.0",
   "description": "Base16 dark theme developed for Atom, repurposed for Pulsar",
