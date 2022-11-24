@@ -1,7 +1,7 @@
 {
   "name": "language-xml",
   "version": "0.35.3",
-  "description": "XML language support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for XML",
   "engines": {
     "atom": "*",
     "node": "*"
