@@ -1,8 +1,7 @@
 {
   "name": "language-csharp",
   "version": "1.1.0",
-  "private": true,
-  "description": "C# language support for Atom",
+  "description": "Provides grammar(s) and snippet(s) for C#",
   "repository": "https://github.com/atom/language-csharp",
   "keywords": [
     "C#",
