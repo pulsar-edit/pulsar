@@ -1,7 +1,7 @@
 {
   "name": "theme-syntax-base16-tomorrow-light",
   "theme": "syntax",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Base16 light theme developed for Atom, repurposed for Pulsar",
   "keywords": [
     "base16",

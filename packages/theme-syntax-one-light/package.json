@@ -1,7 +1,7 @@
 {
   "name": "theme-syntax-one-light",
   "theme": "syntax",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "One light syntax theme developed for Atom, repurposed for Pulsar",
   "keywords": [
     "light",
