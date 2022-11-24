@@ -95,7 +95,8 @@ let options = {
     "target": [
       { target: "appimage" },
       { target: "deb" },
-      { target: "rpm" }
+      { target: "rpm" },
+      { target: "tar.gz" }
     ],
   },
   "mac": {
