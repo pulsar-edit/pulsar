@@ -1,7 +1,8 @@
 {
   "name": "language-typescript",
+  "main": "lib/main",
   "version": "0.6.4",
-  "description": "TypeScript language support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for TypeScript",
   "keywords": [
     "tree-sitter"
   ],
@@ -9,7 +10,6 @@
     "atom": ">=1.19.1",
     "node": "*"
   },
-  "main": "lib/main",
   "homepage": "https://atom.io/packages/language-typescript",
   "repository": {
     "type": "git",
