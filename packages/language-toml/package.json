@@ -1,6 +1,6 @@
 {
   "name": "language-toml",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "description": "Provides grammar(s) and snippet(s) for Tom's Obvious, Minimal Language (TOML)",
   "repository": "https://github.com/atom/language-toml",
   "license": "MIT",

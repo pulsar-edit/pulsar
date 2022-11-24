@@ -1,6 +1,6 @@
 {
   "name": "language-json",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Provides grammar(s) for JSON",
   "engines": {
     "atom": "*",

@@ -1,6 +1,6 @@
 {
   "name": "language-git",
-  "version": "0.19.1",
+  "version": "0.19.2",
   "description": "Provides grammar(s) and snippet(s) for Git",
   "engines": {
     "atom": "*",

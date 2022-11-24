@@ -1,6 +1,6 @@
 {
   "name": "language-sql",
-  "version": "0.25.10",
+  "version": "0.25.11",
   "description": "Provides grammar(s) for SQL",
   "engines": {
     "atom": "*",

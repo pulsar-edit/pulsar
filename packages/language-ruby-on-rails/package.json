@@ -1,6 +1,6 @@
 {
   "name": "language-ruby-on-rails",
-  "version": "0.25.3",
+  "version": "0.25.4",
   "description": "Provides grammar(s) and snippet(s) for Ruby on Rails",
   "license": "MIT",
   "engines": {

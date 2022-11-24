@@ -1,6 +1,6 @@
 {
   "name": "language-make",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "Provides grammar(s) for Make",
   "engines": {
     "atom": "*",

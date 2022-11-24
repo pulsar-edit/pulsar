@@ -1,6 +1,6 @@
 {
-  "version": "0.50.0",
   "name": "language-coffee-script",
+  "version": "0.50.1",
   "description": "Provides grammar(s) and snippet(s) for CoffeeScript",
   "license": "MIT",
   "engines": {

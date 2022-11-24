@@ -1,6 +1,6 @@
 {
   "name": "language-shell-script",
-  "version": "0.28.2",
+  "version": "0.28.3",
   "description": "Provides grammar(s) and snippet(s) for various Shell scripts",
   "keywords": [
     "tree-sitter"

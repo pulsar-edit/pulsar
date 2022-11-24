@@ -1,6 +1,6 @@
 {
   "name": "language-text",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "Provides grammar(s) and snippet(s) for standard text files",
   "engines": {
     "atom": "*",

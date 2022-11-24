@@ -1,7 +1,7 @@
 {
   "name": "language-typescript",
   "main": "lib/main",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Provides grammar(s) and snippet(s) for TypeScript",
   "keywords": [
     "tree-sitter"

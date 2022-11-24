@@ -1,6 +1,6 @@
 {
   "name": "language-sass",
-  "version": "0.62.2",
+  "version": "0.62.3",
   "description": "Provides grammar(s) and snippet(s) for Sass/SCSS",
   "license": "MIT",
   "engines": {

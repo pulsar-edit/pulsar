@@ -1,6 +1,6 @@
 {
   "name": "language-c",
-  "version": "0.60.20",
+  "version": "0.60.21",
   "main": "lib/main",
   "description": "Provides grammar(s) and snippet(s) for C/C++",
   "keywords": [

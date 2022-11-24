@@ -1,6 +1,6 @@
 {
   "name": "language-property-list",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Provides grammar(s) and snippet(s) for Property List",
   "engines": {
     "atom": "*",

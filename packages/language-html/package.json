@@ -1,7 +1,7 @@
 {
   "name": "language-html",
   "main": "lib/main",
-  "version": "0.53.1",
+  "version": "0.53.2",
   "description": "Provides grammar(s) and snippet(s) for HTML",
   "keywords": [
     "tree-sitter"

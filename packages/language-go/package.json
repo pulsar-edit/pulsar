@@ -1,6 +1,6 @@
 {
   "name": "language-go",
-  "version": "0.47.3",
+  "version": "0.47.4",
   "description": "Provides grammar(s) and snippet(s) for Go",
   "keywords": [
     "tree-sitter"

@@ -1,6 +1,6 @@
 {
   "name": "language-objective-c",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "description": "Provides grammar(s) and snippet(s) for Objective-C",
   "engines": {
     "atom": "*",

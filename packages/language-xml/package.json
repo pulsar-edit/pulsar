@@ -1,6 +1,6 @@
 {
   "name": "language-xml",
-  "version": "0.35.3",
+  "version": "0.35.4",
   "description": "Provides grammar(s) and snippet(s) for XML",
   "engines": {
     "atom": "*",

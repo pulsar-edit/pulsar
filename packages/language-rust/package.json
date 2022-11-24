@@ -1,7 +1,7 @@
 {
   "name": "language-rust",
   "main": "lib/main.js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Provides grammar(s) for Rust",
   "keywords": [
     "language",

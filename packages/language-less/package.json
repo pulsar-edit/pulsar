@@ -1,6 +1,6 @@
 {
   "name": "language-less",
-  "version": "0.34.3",
+  "version": "0.34.4",
   "description": "Provides grammar(s) for Less",
   "license": "MIT",
   "engines": {
