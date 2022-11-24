@@ -1,7 +1,7 @@
 {
   "name": "language-make",
   "version": "0.23.0",
-  "description": "Make language support in Atom",
+  "description": "Provides grammar(s) for Make",
   "engines": {
     "atom": "*",
     "node": "*"
