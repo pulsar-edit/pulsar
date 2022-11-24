@@ -1,10 +1,10 @@
 {
   "name": "language-css",
-  "description": "CSS support in Atom",
+  "version": "0.45.4",
+  "description": "Provides grammar(s) and snippet(s) for CSS",
   "keywords": [
     "tree-sitter"
   ],
-  "version": "0.45.4",
   "engines": {
     "atom": "*",
     "node": "*"
