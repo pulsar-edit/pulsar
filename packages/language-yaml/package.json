@@ -1,7 +1,7 @@
 {
   "name": "language-yaml",
   "version": "0.32.0",
-  "description": "YAML language support in Atom",
+  "description": "Provides grammar(s) for YAML",
   "engines": {
     "atom": "*",
     "node": "*"
