@@ -1,5 +1,5 @@
 {
-  "name": "language-coffee-script",
+  "name": "language-coffeescript",
   "version": "0.50.1",
   "description": "Provides grammar(s) and snippet(s) for CoffeeScript",
   "license": "MIT",
