@@ -9,21 +9,6 @@ else
   exit 1
 fi
 
-case $(basename $0) in
-  pulsar-beta)
-    CHANNEL=beta
-    ;;
-  pulsar-nightly)
-    CHANNEL=nightly
-    ;;
-  pulsar-dev)
-    CHANNEL=dev
-    ;;
-  *)
-    CHANNEL=stable
-    ;;
-esac
-
 # Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't been set.
 if [ -z "$ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT" ]
 then
@@ -109,15 +94,7 @@ if [ $OS == 'Mac' ]; then
     ATOM_EXECUTABLE_NAME="${ATOM_APP_NAME%.*}"
   else
     # Else choose it from the inferred channel name
-    if [ "$CHANNEL" == 'beta' ]; then
-      ATOM_EXECUTABLE_NAME="Pulsar Beta"
-    elif [ "$CHANNEL" == 'nightly' ]; then
-      ATOM_EXECUTABLE_NAME="Pulsar Nightly"
-    elif [ "$CHANNEL" == 'dev' ]; then
-      ATOM_EXECUTABLE_NAME="Pulsar Dev"
-    else
-      ATOM_EXECUTABLE_NAME="Pulsar"
-    fi
+    ATOM_EXECUTABLE_NAME="Pulsar"
   fi
 
   if [ -z "${PULSAR_PATH}" ]; then
@@ -152,20 +129,7 @@ if [ $OS == 'Mac' ]; then
 elif [ $OS == 'Linux' ]; then
   SCRIPT=$(readlink -f "$0")
 
-  case $CHANNEL in
-    beta)
-      PULSAR_PATH="/opt/Pulsar-beta/pulsar"
-      ;;
-    nightly)
-      PULSAR_PATH="/opt/Pulsar-nightly/pulsar"
-      ;;
-    dev)
-      PULSAR_PATH="/opt/Pulsar-dev/pulsar"
-      ;;
-    *)
-      PULSAR_PATH="/opt/Pulsar/pulsar"
-      ;;
-  esac
+  PULSAR_PATH="/opt/Pulsar/pulsar"
 
   #Will allow user to get context menu on cinnamon desktop enviroment
   if [[ "$(expr substr $(printenv | grep "DESKTOP_SESSION=") 17 8)" == "cinnamon" ]]; then
