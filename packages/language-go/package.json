@@ -1,10 +1,10 @@
 {
   "name": "language-go",
-  "description": "Go language support in Atom",
+  "version": "0.47.3",
+  "description": "Provides grammar(s) and snippet(s) for Go",
   "keywords": [
     "tree-sitter"
   ],
-  "version": "0.47.3",
   "license": "MIT",
   "engines": {
     "atom": "*",
