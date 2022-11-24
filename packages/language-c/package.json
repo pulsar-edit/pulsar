@@ -1,11 +1,11 @@
 {
-  "version": "0.60.20",
   "name": "language-c",
-  "description": "Atom language support for C/C++",
+  "version": "0.60.20",
+  "main": "lib/main",
+  "description": "Provides grammar(s) and snippet(s) for C/C++",
   "keywords": [
     "tree-sitter"
   ],
-  "main": "lib/main",
   "homepage": "https://atom.github.io/language-c",
   "repository": {
     "type": "git",
