@@ -1,7 +1,7 @@
 {
   "name": "language-git",
   "version": "0.19.1",
-  "description": "Git editing support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for Git",
   "engines": {
     "atom": "*",
     "node": "*"
