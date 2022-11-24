@@ -1,7 +1,7 @@
 {
   "version": "0.50.0",
   "name": "language-coffee-script",
-  "description": "CoffeeScript language support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for CoffeeScript",
   "license": "MIT",
   "engines": {
     "atom": "*",
