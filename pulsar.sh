@@ -10,10 +10,7 @@ else
 fi
 
 # Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't been set.
-if [ -z "$ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT" ]
-then
-  export ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT=true
-fi
+: ${ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT:=true}
 
 ATOM_ADD=false
 ATOM_NEW_WINDOW=false
@@ -89,7 +86,7 @@ if [ $OS == 'Mac' ]; then
     ATOM_APP_NAME="$(basename "$ATOM_APP")"
   fi
 
-  if [ ! -z "${ATOM_APP_NAME}" ]; then
+  if [ -n "${ATOM_APP_NAME}" ]; then
     # If ATOM_APP_NAME is known, use it as the executable name
     ATOM_EXECUTABLE_NAME="${ATOM_APP_NAME%.*}"
   else
@@ -136,6 +133,7 @@ elif [ $OS == 'Linux' ]; then
     cp "resources/linux/desktopenviroment/cinnamon/pulsar.nemo_action" "/usr/share/nemo/actions/pulsar.nemo_action"
   fi
 
+  #Set tmpdir only if tmpdir is unset
   : ${TMPDIR:=/tmp}
 
   [ -x "$PULSAR_PATH" ] || PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
