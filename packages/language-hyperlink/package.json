@@ -1,7 +1,7 @@
 {
   "name": "language-hyperlink",
   "version": "0.17.1",
-  "description": "Hyperlink colorization in Atom",
+  "description": "Provides grammar(s) for Hyperlink colorization",
   "engines": {
     "atom": "*",
     "node": "*"
