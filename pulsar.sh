@@ -129,8 +129,18 @@ elif [ $OS == 'Linux' ]; then
   PULSAR_PATH="/opt/Pulsar/pulsar"
 
   #Will allow user to get context menu on cinnamon desktop enviroment
-  if [[ "$(expr substr $(printenv | grep "DESKTOP_SESSION=") 17 8)" == "cinnamon" ]]; then
-    cp "resources/linux/desktopenviroment/cinnamon/pulsar.nemo_action" "/usr/share/nemo/actions/pulsar.nemo_action"
+  #Add a check to make sure that DESKTOP_SESSION is set before attempting to grep it
+  #expr substr is expecting 3 arguments string, index, length
+  #If grep doesnt find anything is provides an empty string which causes the expr: syntax error: missing argument after '8' error
+  #Im also not quite sure why they used grep instead of simply [ "${DESKTOP_SESSION}" == "cinnamon" ]
+  if [ -n "${DESKTOP_SESSION}" ] && [ "$(expr substr $(printenv | grep 'DESKTOP_SESSION=') 17 8)" == "cinnamon" ]; then
+    #This local path is almost assuredly wrong as it shouldnt exist in a standard install
+    ACTION_PATH="resources/linux/desktopenviroment/cinnamon/pulsar.nemo_action"
+
+    #Validate the file exists before attempting to copy it
+    if [ -f "${ACTION_PATH}" ]; then
+        cp "${$ACTION_PATH}" "/usr/share/nemo/actions/pulsar.nemo_action"
+    fi
   fi
 
   #Set tmpdir only if tmpdir is unset
