@@ -1,7 +1,7 @@
 {
   "name": "language-property-list",
   "version": "0.9.1",
-  "description": "Property List support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for Property List",
   "engines": {
     "atom": "*",
     "node": "*"
