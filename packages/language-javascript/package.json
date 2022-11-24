@@ -1,12 +1,12 @@
 {
   "name": "language-javascript",
+  "main": "lib/main",
   "version": "0.134.2",
-  "description": "JavaScript language support in Atom",
+  "description": "Provides grammar(s) and snippet(s) for JavaScript",
   "engines": {
     "atom": "*",
     "node": "*"
   },
-  "main": "lib/main",
   "homepage": "http://atom.github.io/language-javascript",
   "repository": {
     "type": "git",
