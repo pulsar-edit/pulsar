@@ -1,5 +1,5 @@
 const root = document.documentElement;
-const themeName = 'one-dark-ui';
+const themeName = 'theme-ui-one-dark';
 
 module.exports = {
   activate(state) {
