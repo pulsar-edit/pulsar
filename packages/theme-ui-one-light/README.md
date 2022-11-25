@@ -28,7 +28,7 @@ To make changes, go to `Settings > Themes > One Light UI > Settings` or the cog 
 It's also possible to resize only certain areas by adding the following to your `styles.less` (Use DevTools to find the right selectors):
 
 ```css
-.theme-one-light-ui {
+.theme-theme-ui-one-light {
   .tab-bar { font-size: 18px; }
   .tree-view { font-size: 14px; }
   .status-bar { font-size: 12px; }

@@ -6979,7 +6979,7 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
 "theme-syntax-one-light@file:packages/theme-syntax-one-light":
   version "1.8.4"
 
-"one-light-ui@file:packages/one-light-ui":
+"theme-ui-one-light@file:packages/theme-ui-one-light":
   version "1.12.5"
 
 onetime@^5.1.0:

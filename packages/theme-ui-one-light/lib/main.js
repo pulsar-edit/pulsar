@@ -1,5 +1,5 @@
 const root = document.documentElement;
-const themeName = 'one-light-ui';
+const themeName = 'theme-ui-one-light';
 
 module.exports = {
   activate(state) {

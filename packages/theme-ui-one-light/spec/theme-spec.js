@@ -1,4 +1,4 @@
-const themeName = 'one-light-ui';
+const themeName = 'theme-ui-one-light';
 
 describe(`${themeName} theme`, () => {
   beforeEach(() => {

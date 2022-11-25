@@ -4,7 +4,7 @@
 
 > The font used in the screenshot is [Fira Mono](https://github.com/mozilla/Fira).
 
-There is also a matching [UI theme](../one-light-ui).
+There is also a matching [UI theme](../theme-ui-one-light).
 
 ### Install
 
