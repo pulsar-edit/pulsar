@@ -55,11 +55,11 @@ describe('atom.themes', function() {
         4,
         {},
         [],
-        'atom-dark-ui'
+        'theme-ui-atom-dark'
       ]);
 
       expect(atom.themes.getEnabledThemeNames()).toEqual([
-        'atom-dark-ui',
+        'theme-ui-atom-dark',
         'theme-ui-atom-light'
       ]);
     }));
@@ -68,7 +68,7 @@ describe('atom.themes', function() {
     it('returns the theme directories before the themes are loaded', function() {
       atom.config.set('core.themes', [
         'theme-with-index-less',
-        'atom-dark-ui',
+        'theme-ui-atom-dark',
         'theme-ui-atom-light'
       ]);
 
@@ -77,7 +77,7 @@ describe('atom.themes', function() {
       // syntax theme is not a dir at this time, so only two.
       expect(paths.length).toBe(2);
       expect(paths[0]).toContain('theme-ui-atom-light');
-      expect(paths[1]).toContain('atom-dark-ui');
+      expect(paths[1]).toContain('theme-ui-atom-dark');
     });
 
     it('ignores themes that cannot be resolved to a directory', function() {
@@ -106,7 +106,7 @@ describe('atom.themes', function() {
       runs(function() {
         didChangeActiveThemesHandler.reset();
         expect(document.querySelectorAll('style.theme')).toHaveLength(0);
-        atom.config.set('core.themes', ['atom-dark-ui']);
+        atom.config.set('core.themes', ['theme-ui-atom-dark']);
       });
 
       waitsFor('b', () => didChangeActiveThemesHandler.callCount === 1);
@@ -120,8 +120,8 @@ describe('atom.themes', function() {
           document
             .querySelector('style[priority="1"]')
             .getAttribute('source-path')
-        ).toMatch(/atom-dark-ui/);
-        atom.config.set('core.themes', ['theme-ui-atom-light', 'atom-dark-ui']);
+        ).toMatch(/theme-ui-atom-dark/);
+        atom.config.set('core.themes', ['theme-ui-atom-light', 'theme-ui-atom-dark']);
       });
 
       waitsFor('c', () => didChangeActiveThemesHandler.callCount === 1);
@@ -135,7 +135,7 @@ describe('atom.themes', function() {
           document
             .querySelectorAll('style[priority="1"]')[0]
             .getAttribute('source-path')
-        ).toMatch(/atom-dark-ui/);
+        ).toMatch(/theme-ui-atom-dark/);
         expect(
           document
             .querySelectorAll('style[priority="1"]')[1]
@@ -151,10 +151,10 @@ describe('atom.themes', function() {
         expect(document.querySelectorAll('style[priority="1"]')).toHaveLength(
           2
         );
-        // atom-dark-ui has a directory path, the syntax one doesn't
+        // theme-ui-atom-dark has a directory path, the syntax one doesn't
         atom.config.set('core.themes', [
           'theme-with-index-less',
-          'atom-dark-ui'
+          'theme-ui-atom-dark'
         ]);
       });
 
@@ -166,12 +166,12 @@ describe('atom.themes', function() {
         );
         const importPaths = atom.themes.getImportPaths();
         expect(importPaths.length).toBe(1);
-        expect(importPaths[0]).toContain('atom-dark-ui');
+        expect(importPaths[0]).toContain('theme-ui-atom-dark');
       });
     });
 
     it('adds theme-* classes to the workspace for each active theme', function() {
-      atom.config.set('core.themes', ['atom-dark-ui', 'theme-syntax-atom-dark']);
+      atom.config.set('core.themes', ['theme-ui-atom-dark', 'theme-syntax-atom-dark']);
 
       let didChangeActiveThemesHandler;
       atom.themes.onDidChangeActiveThemes(
@@ -181,7 +181,7 @@ describe('atom.themes', function() {
 
       const workspaceElement = atom.workspace.getElement();
       runs(function() {
-        expect(workspaceElement).toHaveClass('theme-atom-dark-ui');
+        expect(workspaceElement).toHaveClass('theme-theme-ui-atom-dark');
 
         atom.themes.onDidChangeActiveThemes(
           (didChangeActiveThemesHandler = jasmine.createSpy())
@@ -200,7 +200,7 @@ describe('atom.themes', function() {
         expect(workspaceElement).toHaveClass(
           'theme-theme-with-syntax-variables'
         );
-        expect(workspaceElement).not.toHaveClass('theme-atom-dark-ui');
+        expect(workspaceElement).not.toHaveClass('theme-theme-ui-atom-dark');
         expect(workspaceElement).not.toHaveClass('theme-theme-syntax-atom-dark');
       });
     });

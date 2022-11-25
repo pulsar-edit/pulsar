@@ -10,7 +10,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 |---------|------------------|-----------------|
 | **about** | [`./about`](./about) | |
 | **theme-syntax-atom-dark** | [`./theme-syntax-atom-dark`](./theme-syntax-atom-dark) | |
-| **atom-dark-ui** | [`./atom-dark-ui`](./atom-dark-ui) | |
+| **theme-ui-atom-dark** | [`./theme-ui-atom-dark`](./theme-ui-atom-dark) | |
 | **theme-syntax-atom-light** | [`./theme-syntax-atom-light`](./theme-syntax-atom-light) | |
 | **theme-ui-atom-light** | [`./theme-ui-atom-light`](./theme-ui-atom-light) | |
 | **autocomplete-atom-api** | [`atom/autocomplete-atom-api`][autocomplete-atom-api] |  |
