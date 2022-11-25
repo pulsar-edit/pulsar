@@ -155,7 +155,7 @@ module.exports = class ThemeManager {
         'theme-syntax-base16-tomorrow-dark',
         'theme-syntax-base16-tomorrow-light',
         'theme-syntax-solarized-dark',
-        'solarized-light-syntax'
+        'theme-syntax-solarized-light'
       ];
       themeNames = _.intersection(themeNames, builtInThemeNames);
       if (themeNames.length === 0) {

@@ -87,7 +87,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **settings-view** | [`atom/settings-view`][settings-view] |  |
 | **snippets** | [`atom/snippets`][snippets] |  |
 | **theme-syntax-solarized-dark** | [`./theme-syntax-solarized-dark`](./theme-syntax-solarized-dark) | |
-| **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
+| **theme-syntax-solarized-light** | [`./theme-syntax-solarized-light`](./theme-syntax-solarized-light) | |
 | **spell-check** | [`atom/spell-check`][spell-check] |  |
 | **status-bar** | [`atom/status-bar`][status-bar] | [#18282](https://github.com/atom/atom/issues/18282) |
 | **styleguide** | [`atom/styleguide`][styleguide] | [#18283](https://github.com/atom/atom/issues/18283) |
