@@ -5926,7 +5926,7 @@ ky@0.30.0:
   dependencies:
     tree-sitter-ruby "^0.19.0"
 
-"language-rust-bundled@file:packages/language-rust-bundled":
+"language-rust@file:packages/language-rust":
   version "0.1.1"
   dependencies:
     tree-sitter-rust "0.20.1"

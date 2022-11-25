@@ -31,7 +31,7 @@ const rubyGrammarPath = require.resolve(
   'language-ruby/grammars/tree-sitter-ruby.cson'
 );
 const rustGrammarPath = require.resolve(
-  'language-rust-bundled/grammars/tree-sitter-rust.cson'
+  'language-rust/grammars/tree-sitter-rust.cson'
 );
 
 describe('TreeSitterLanguageMode', () => {
