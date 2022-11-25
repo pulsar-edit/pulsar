@@ -6970,7 +6970,7 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-"one-dark-syntax@file:packages/one-dark-syntax":
+"theme-syntax-one-dark@file:packages/theme-syntax-one-dark":
   version "1.8.4"
 
 "one-dark-ui@file:packages/one-dark-ui":

@@ -78,7 +78,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **link** | [`./link`](./link) | |
 | **markdown-preview** | [`atom/markdown-preview`][markdown-preview] |  |
 | **notifications** | [`atom/notifications`][notifications] | [#18277](https://github.com/atom/atom/issues/18277) |
-| **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | |
+| **theme-syntax-one-dark** | [`./theme-syntax-one-dark`](./theme-syntax-one-dark) | |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | |
 | **theme-syntax-one-light** | [`./theme-syntax-one-light`](./theme-syntax-one-light) | |
 | **one-light-ui** | [`./one-light-ui`](./one-light-ui) | |
