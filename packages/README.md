@@ -65,7 +65,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **language-ruby-on-rails** | [`./language-ruby-on-rails`](./language-ruby-on-rails) |  |
 | **language-rust** | [`./language-rust`](./language-rust) |  |
 | **language-sass** | [`./language-sass`](./language-sass) |  |
-| **language-shellscript** | [`./language-shellscript`](./language-shellscript) |  |
+| **language-shell-script** | [`./language-shell-script`](./language-shell-script) |  |
 | **language-source** | [`./language-source`](./language-source) |  |
 | **language-sql** | [`./language-sql`](./language-sql) |  |
 | **language-text** | [`./language-text`](./language-text) |  |

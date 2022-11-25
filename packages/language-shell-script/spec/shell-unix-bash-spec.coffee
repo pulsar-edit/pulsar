@@ -13,7 +13,7 @@ describe "Shell script grammar", ->
     atom.config.set('core.useTreeSitterParsers', false)
 
     waitsForPromise ->
-      atom.packages.activatePackage("language-shellscript")
+      atom.packages.activatePackage("language-shell-script")
 
     runs ->
       grammar = atom.grammars.grammarForScopeName("source.shell")

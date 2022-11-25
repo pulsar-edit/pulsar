@@ -184,9 +184,9 @@ describe "Git grammars", ->
 
       expect(tokens[0]).toEqual value: "x", scopes: ["text.git-rebase", "meta.exec-command.git-rebase", "support.function.git-rebase"]
 
-    it "includes language-shellscript highlighting when using the exec command", ->
+    it "includes language-shell-script highlighting when using the exec command", ->
       waitsForPromise ->
-        atom.packages.activatePackage("language-shellscript")
+        atom.packages.activatePackage("language-shell-script")
 
       runs ->
         {tokens} = grammar.tokenizeLine "exec echo 'Hello World'"

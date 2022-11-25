@@ -5934,7 +5934,7 @@ ky@0.30.0:
 "language-sass@file:packages/language-sass":
   version "0.62.2"
 
-"language-shellscript@file:packages/language-shellscript":
+"language-shell-script@file:packages/language-shell-script":
   version "0.28.2"
   dependencies:
     tree-sitter-bash "0.19.0"

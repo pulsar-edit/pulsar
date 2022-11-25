@@ -684,10 +684,10 @@ describe('GrammarRegistry', () => {
       it('recognizes shell scripts with shebang lines', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-shellscript/grammars/shell-unix-bash.cson')
+          require.resolve('language-shell-script/grammars/shell-unix-bash.cson')
         );
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-shellscript/grammars/tree-sitter-bash.cson')
+          require.resolve('language-shell-script/grammars/tree-sitter-bash.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
