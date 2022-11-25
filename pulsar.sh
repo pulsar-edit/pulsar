@@ -131,7 +131,7 @@ elif [ $OS == 'Linux' ]; then
   #Will allow user to get context menu on cinnamon desktop enviroment
   #Add a check to make sure that DESKTOP_SESSION is set before attempting to grep it
   #expr substr is expecting 3 arguments string, index, length
-  #If grep doesnt find anything is provides an empty string which causes the expr: syntax error: missing argument after '8' error
+  #If grep doesnt find anything is provides an empty string which causes the expr: syntax error: missing argument after '8' error - see pulsar-edit/pulsar#174
   #Im also not quite sure why they used grep instead of simply [ "${DESKTOP_SESSION}" == "cinnamon" ]
   if [ -n "${DESKTOP_SESSION}" ] && [ "$(expr substr $(printenv | grep 'DESKTOP_SESSION=') 17 8)" == "cinnamon" ]; then
     #This local path is almost assuredly wrong as it shouldnt exist in a standard install
