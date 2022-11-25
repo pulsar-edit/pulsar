@@ -2238,7 +2238,7 @@ atom-keymap@8.2.15:
 "theme-syntax-atom-light@file:packages/theme-syntax-atom-light":
   version "0.29.1"
 
-"atom-light-ui@file:packages/atom-light-ui":
+"theme-ui-atom-light@file:packages/theme-ui-atom-light":
   version "0.46.3"
 
 atom-pathspec@^0.0.0:
