@@ -4263,7 +4263,7 @@ describe('TextEditor', () => {
         });
 
         it('indents the new line to the correct level when editor.autoIndent is true and using an off-side rule language', async () => {
-          await atom.packages.activatePackage('language-coffee-script');
+          await atom.packages.activatePackage('language-coffeescript');
           editor.update({ autoIndent: true });
           atom.grammars.assignLanguageMode(editor, 'source.coffee');
           editor.setText('if true\n  return trueelse\n  return false');
@@ -8630,7 +8630,7 @@ describe('TextEditor', () => {
 
     describe('coffeescript', () => {
       beforeEach(async () => {
-        await atom.packages.activatePackage('language-coffee-script');
+        await atom.packages.activatePackage('language-coffeescript');
         editor = await atom.workspace.open('coffee.coffee');
       });
 

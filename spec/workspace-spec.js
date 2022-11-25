@@ -1583,7 +1583,7 @@ describe('Workspace', () => {
   describe('the grammar-used hook', () => {
     it('fires when opening a file or changing the grammar of an open file', async () => {
       await atom.packages.activatePackage('language-javascript');
-      await atom.packages.activatePackage('language-coffee-script');
+      await atom.packages.activatePackage('language-coffeescript');
 
       const observeTextEditorsSpy = jasmine.createSpy('observeTextEditors');
       const javascriptGrammarUsed = jasmine.createSpy('javascript');
@@ -1598,7 +1598,7 @@ describe('Workspace', () => {
         }
       );
       atom.packages.onDidTriggerActivationHook(
-        'language-coffee-script:grammar-used',
+        'language-coffeescript:grammar-used',
         coffeeScriptGrammarUsed
       );
 
@@ -1619,7 +1619,7 @@ describe('Workspace', () => {
   describe('the root-scope-used hook', () => {
     it('fires when opening a file or changing the grammar of an open file', async () => {
       await atom.packages.activatePackage('language-javascript');
-      await atom.packages.activatePackage('language-coffee-script');
+      await atom.packages.activatePackage('language-coffeescript');
 
       const observeTextEditorsSpy = jasmine.createSpy('observeTextEditors');
       const javascriptGrammarUsed = jasmine.createSpy('javascript');
@@ -1969,7 +1969,7 @@ describe('Workspace', () => {
     waitsForPromise(() => atom.packages.activatePackage('language-javascript'));
 
     waitsForPromise(() =>
-      atom.packages.activatePackage('language-coffee-script')
+      atom.packages.activatePackage('language-coffeescript')
     );
 
     waitsForPromise(() => atom.packages.activatePackage('language-todo'));
@@ -1993,7 +1993,7 @@ describe('Workspace', () => {
       });
 
       atom2.packages.loadPackage('language-javascript');
-      atom2.packages.loadPackage('language-coffee-script');
+      atom2.packages.loadPackage('language-coffeescript');
       atom2.packages.loadPackage('language-todo');
       atom2.project.deserialize(atom.project.serialize());
       atom2.workspace.deserialize(

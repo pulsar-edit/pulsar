@@ -428,7 +428,7 @@ describe('TextMateLanguageMode', () => {
 
     describe('when the buffer contains hard-tabs', () => {
       beforeEach(async () => {
-        atom.packages.activatePackage('language-coffee-script');
+        atom.packages.activatePackage('language-coffeescript');
 
         buffer = atom.project.bufferForPathSync('sample-with-tabs.coffee');
         languageMode = new TextMateLanguageMode({
@@ -482,7 +482,7 @@ describe('TextMateLanguageMode', () => {
         fullyTokenize(editor.getBuffer().getLanguageMode());
         tokenizationCount = 0;
 
-        await atom.packages.activatePackage('language-coffee-script');
+        await atom.packages.activatePackage('language-coffeescript');
         fullyTokenize(editor.getBuffer().getLanguageMode());
         expect(tokenizationCount).toBe(1);
       });
@@ -833,7 +833,7 @@ describe('TextMateLanguageMode', () => {
     }); // ensure we don't infinitely loop (regression test)
 
     it('does not report columns beyond the length of the line', async () => {
-      await atom.packages.activatePackage('language-coffee-script');
+      await atom.packages.activatePackage('language-coffeescript');
 
       buffer = new TextBuffer({ text: '# hello\n# world' });
       languageMode = new TextMateLanguageMode({
@@ -1363,7 +1363,7 @@ describe('TextMateLanguageMode', () => {
 
     it('works for coffee-script', async () => {
       const editor = await atom.workspace.open('coffee.coffee');
-      await atom.packages.activatePackage('language-coffee-script');
+      await atom.packages.activatePackage('language-coffeescript');
       buffer = editor.buffer;
       languageMode = editor.languageMode;
 

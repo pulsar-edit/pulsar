@@ -170,7 +170,7 @@ describe 'TextMate HTML grammar', ->
   describe 'CoffeeScript script tags', ->
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage('language-coffee-script')
+        atom.packages.activatePackage('language-coffeescript')
 
     it 'tokenizes the content inside the tag as CoffeeScript', ->
       lines = grammar.tokenizeLines '''

@@ -5842,7 +5842,7 @@ ky@0.30.0:
 "language-clojure@file:packages/language-clojure":
   version "0.22.8"
 
-"language-coffee-script@file:packages/language-coffee-script":
+"language-coffeescript@file:packages/language-coffeescript":
   version "0.50.0"
 
 "language-csharp@file:packages/language-csharp":

@@ -348,7 +348,7 @@ describe('GrammarRegistry', () => {
     });
 
     it('selects a grammar based on the file path case insensitively', async () => {
-      await atom.packages.activatePackage('language-coffee-script');
+      await atom.packages.activatePackage('language-coffeescript');
       expect(atom.grammars.selectGrammar('/tmp/source.coffee').scopeName).toBe(
         'source.coffee'
       );
@@ -403,7 +403,7 @@ describe('GrammarRegistry', () => {
 
     it('uses the number of newlines in the first line regex to determine the number of lines to test against', async () => {
       await atom.packages.activatePackage('language-property-list');
-      await atom.packages.activatePackage('language-coffee-script');
+      await atom.packages.activatePackage('language-coffeescript');
 
       let fileContent = 'first-line\n<html>';
       expect(
@@ -507,7 +507,7 @@ describe('GrammarRegistry', () => {
 
       it('favors user-defined file types over built-in ones of equal length', async () => {
         await atom.packages.activatePackage('language-ruby');
-        await atom.packages.activatePackage('language-coffee-script');
+        await atom.packages.activatePackage('language-coffeescript');
 
         atom.config.set('core.customFileTypes', {
           'source.coffee': ['Rakefile'],
@@ -602,7 +602,7 @@ describe('GrammarRegistry', () => {
           require.resolve('language-c/grammars/tree-sitter-cpp.cson')
         );
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-coffee-script/grammars/coffeescript.cson')
+          require.resolve('language-coffeescript/grammars/coffeescript.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(

@@ -42,7 +42,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **keybinding-resolver** | [`atom/keybinding-resolver`][keybinding-resolver] | [#18275](https://github.com/atom/atom/issues/18275) |
 | **language-c** | [`./language-c`](./language-c) |  |
 | **language-clojure** | [`./language-clojure`](./language-clojure) |  |
-| **language-coffee-script** | [`./language-coffee-script`](./language-coffee-script) |  |
+| **language-coffeescript** | [`./language-coffeescript`](./language-coffeescript) |  |
 | **language-csharp** | [`./language-csharp`](./language-csharp) |  |
 | **language-css** | [`./language-css`](./language-css) |  |
 | **language-gfm** | [`./language-gfm`](./language-gfm) |  |

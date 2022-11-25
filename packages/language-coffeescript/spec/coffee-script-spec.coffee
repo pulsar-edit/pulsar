@@ -6,7 +6,7 @@ describe "CoffeeScript grammar", ->
 
   beforeEach ->
     waitsForPromise ->
-      atom.packages.activatePackage("language-coffee-script")
+      atom.packages.activatePackage("language-coffeescript")
 
     runs ->
       grammar = atom.grammars.grammarForScopeName("source.coffee")
