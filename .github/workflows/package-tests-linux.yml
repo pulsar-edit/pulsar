@@ -35,27 +35,6 @@ jobs:
     - name: build dependencies
       run: yarn build:apm
 
-    - name: Cache node_modules
-      id: cache-node
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: linux-modules-${{ hashFiles('package.json') }}
-
-    - name: Cache apm 
-      id: cache-apm
-      uses: actions/cache@v3
-      with:
-        path: apm
-        key: linux-apm-${{ hashFiles('apm/package.json') }}
-
-    - name: Cache packages 
-      id: cache-packages
-      uses: actions/cache@v3
-      with:
-        path: packages
-        key: linux-packages-${{ hashFiles('packages/about/package.json') }} # somehow include all packages/*/package.json
-
   test:
     name: Test Packages
     needs: setup
@@ -80,27 +59,6 @@ jobs:
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v2
-
-    - name: Restore node_modules from Cache
-      id: restore-node
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: linux-modules-${{ hashFiles('package.json') }}
-
-    - name: Restore apm from Cache
-      id: restore-apm
-      uses: actions/cache@v3
-      with:
-        path: apm
-        key: linux-apm-${{ hashFiles('apm/package.json') }}
-
-    - name: Restore packages from Cache
-      id: restore-packages
-      uses: actions/cache@v3
-      with:
-        path: packages
-        key: linux-packages-${{ hashFiles('packages/about/package.json') }}
 
     - name: Run Package Tests for ${{ matrix.descr }}
       uses: GabrielBB/xvfb-action@v1
