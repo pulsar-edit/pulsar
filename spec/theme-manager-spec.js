@@ -171,7 +171,7 @@ describe('atom.themes', function() {
     });
 
     it('adds theme-* classes to the workspace for each active theme', function() {
-      atom.config.set('core.themes', ['atom-dark-ui', 'atom-dark-syntax']);
+      atom.config.set('core.themes', ['atom-dark-ui', 'theme-syntax-atom-dark']);
 
       let didChangeActiveThemesHandler;
       atom.themes.onDidChangeActiveThemes(
@@ -201,7 +201,7 @@ describe('atom.themes', function() {
           'theme-theme-with-syntax-variables'
         );
         expect(workspaceElement).not.toHaveClass('theme-atom-dark-ui');
-        expect(workspaceElement).not.toHaveClass('theme-atom-dark-syntax');
+        expect(workspaceElement).not.toHaveClass('theme-theme-syntax-atom-dark');
       });
     });
   });
@@ -575,7 +575,7 @@ h2 {
   describe('when in safe mode', function() {
     describe('when the enabled UI and syntax themes are bundled with Atom', function() {
       beforeEach(function() {
-        atom.config.set('core.themes', ['atom-light-ui', 'atom-dark-syntax']);
+        atom.config.set('core.themes', ['atom-light-ui', 'theme-syntax-atom-dark']);
 
         waitsForPromise(() => atom.themes.activateThemes());
       });
@@ -584,7 +584,7 @@ h2 {
         const activeThemeNames = atom.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
         expect(activeThemeNames).toContain('atom-light-ui');
-        expect(activeThemeNames).toContain('atom-dark-syntax');
+        expect(activeThemeNames).toContain('theme-syntax-atom-dark');
       });
     });
 

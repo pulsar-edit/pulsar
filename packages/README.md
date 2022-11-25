@@ -9,7 +9,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | Package | Where to find it | Migration issue |
 |---------|------------------|-----------------|
 | **about** | [`./about`](./about) | |
-| **atom-dark-syntax** | [`./atom-dark-syntax`](./atom-dark-syntax) | |
+| **theme-syntax-atom-dark** | [`./theme-syntax-atom-dark`](./theme-syntax-atom-dark) | |
 | **atom-dark-ui** | [`./atom-dark-ui`](./atom-dark-ui) | |
 | **atom-light-syntax** | [`./atom-light-syntax`](./atom-light-syntax) | |
 | **atom-light-ui** | [`./atom-light-ui`](./atom-light-ui) | |
