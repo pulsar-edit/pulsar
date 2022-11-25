@@ -8292,7 +8292,7 @@ socks@^2.6.2:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
 
-"solarized-dark-syntax@file:packages/solarized-dark-syntax":
+"theme-syntax-solarized-dark@file:packages/theme-syntax-solarized-dark":
   version "1.3.0"
 
 "solarized-light-syntax@file:packages/solarized-light-syntax":

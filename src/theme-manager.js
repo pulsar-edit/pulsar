@@ -154,7 +154,7 @@ module.exports = class ThemeManager {
         'theme-ui-atom-light',
         'theme-syntax-base16-tomorrow-dark',
         'theme-syntax-base16-tomorrow-light',
-        'solarized-dark-syntax',
+        'theme-syntax-solarized-dark',
         'solarized-light-syntax'
       ];
       themeNames = _.intersection(themeNames, builtInThemeNames);
