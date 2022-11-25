@@ -2235,7 +2235,7 @@ atom-keymap@8.2.15:
     property-accessors "^1"
     season "^6.0.2"
 
-"atom-light-syntax@file:packages/atom-light-syntax":
+"theme-syntax-atom-light@file:packages/theme-syntax-atom-light":
   version "0.29.1"
 
 "atom-light-ui@file:packages/atom-light-ui":

@@ -150,7 +150,7 @@ module.exports = class ThemeManager {
       const builtInThemeNames = [
         'theme-syntax-atom-dark',
         'atom-dark-ui',
-        'atom-light-syntax',
+        'theme-syntax-atom-light',
         'atom-light-ui',
         'base16-tomorrow-dark-theme',
         'base16-tomorrow-light-theme',

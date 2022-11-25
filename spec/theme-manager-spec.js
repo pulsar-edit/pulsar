@@ -610,7 +610,7 @@ h2 {
       beforeEach(function() {
         atom.config.set('core.themes', [
           'installed-dark-ui',
-          'atom-light-syntax'
+          'theme-syntax-atom-light'
         ]);
 
         waitsForPromise(() => atom.themes.activateThemes());
@@ -620,7 +620,7 @@ h2 {
         const activeThemeNames = atom.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
         expect(activeThemeNames).toContain('one-dark-ui');
-        expect(activeThemeNames).toContain('atom-light-syntax');
+        expect(activeThemeNames).toContain('theme-syntax-atom-light');
       });
     });
 
