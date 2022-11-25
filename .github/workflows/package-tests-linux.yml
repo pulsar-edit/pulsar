@@ -5,12 +5,14 @@ on:
 env:
   APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
 jobs:
-  setup:
-    name: Build Editor
+  test:
+    name: Test Packages
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
     steps:
     - name: Install windows-build-tools
       if: ${{ matrix.os == 'windows-latest' }}
@@ -32,35 +34,13 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    - name: build packages
+      run: yarn build:packages
+
     - name: build dependencies
       run: yarn build:apm
-
-  test:
-    name: Test Packages
-    needs: setup
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - filter: autocomplete|language
-            descr: syntax-related
-          - filter: dark|light
-            descr: themes
-          - filter: git-diff|go-to-line|grammar-selector|line-ending-selector|autoflow|autosave|symbols-view|spell-check|bracket-matcher|whitespace|wrap-guide|snippets|encoding-selector
-            descr: editor related
-          - filter: deprecation-cop|dev-live-reload|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
-            descr: development helpers
-          - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|status-bar|settings-view|notifications
-            descr: UI elements
-          - filter: image-view|bookmarks|keybinding-resolver|link|timecop
-            descr: others
-
-    steps:
-    - name: Checkout the latest code
-      uses: actions/checkout@v2
 
     - name: Run Package Tests for ${{ matrix.descr }}
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: node -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
+        run: node ./script/run-package-tests

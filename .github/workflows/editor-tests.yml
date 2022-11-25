@@ -4,7 +4,7 @@ on:
   - pull_request
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
 jobs:
   tests:
     name: tests
@@ -30,6 +30,9 @@ jobs:
 
     - name: build dependencies
       run: yarn build
+
+    - name: build packages # this should not be required but currently a lot of core tests test core packages
+      run: yarn build:packages
 
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1
