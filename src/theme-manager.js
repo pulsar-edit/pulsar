@@ -153,7 +153,7 @@ module.exports = class ThemeManager {
         'theme-syntax-atom-light',
         'theme-ui-atom-light',
         'theme-syntax-base16-tomorrow-dark',
-        'base16-tomorrow-light-theme',
+        'theme-syntax-base16-tomorrow-light',
         'solarized-dark-syntax',
         'solarized-light-syntax'
       ];

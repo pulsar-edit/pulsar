@@ -22,7 +22,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **autosave** | [`atom/autosave`][autosave] | [#17834](https://github.com/atom/atom/issues/17834) |
 | **background-tips** | [`atom/background-tips`][background-tips] | [#17835](https://github.com/atom/atom/issues/17835) |
 | **theme-syntax-base16-tomorrow-dark** | [`./theme-syntax-base16-tomorrow-dark`](./theme-syntax-base16-tomorrow-dark) | |
-| **base16-tomorrow-light-theme** | [`./base16-tomorrow-light-theme`](./base16-tomorrow-light-theme) | |
+| **theme-syntax-base16-tomorrow-light** | [`./theme-syntax-base16-tomorrow-light`](./theme-syntax-base16-tomorrow-light) | |
 | **bookmarks** | [`atom/bookmarks`][bookmarks] | [#18273](https://github.com/atom/atom/issues/18273) |
 | **bracket-matcher** | [`atom/bracket-matcher`][bracket-matcher] |  |
 | **command-palette** | [`atom/command-palette`][command-palette] |  |

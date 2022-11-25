@@ -10,4 +10,4 @@ Atom theme using the ever popular [Base16 Tomorrow](https://web.archive.org/web/
 This theme is installed by default with Atom and can be activated by going to the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the _Syntax Themes_ drop-down menu.
 
 A
-[light version](../base16-tomorrow-light-theme) of this theme is also available.
+[light version](../theme-syntax-base16-tomorrow-light) of this theme is also available.

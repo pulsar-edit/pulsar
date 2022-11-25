@@ -2462,7 +2462,7 @@ balanced-match@^1.0.0:
 "theme-syntax-base16-tomorrow-dark@file:packages/theme-syntax-base16-tomorrow-dark":
   version "1.6.0"
 
-"base16-tomorrow-light-theme@file:packages/base16-tomorrow-light-theme":
+"theme-syntax-base16-tomorrow-light@file:packages/theme-syntax-base16-tomorrow-light":
   version "1.6.0"
 
 base64-js@^1.3.1, base64-js@^1.5.1:
