@@ -28,7 +28,7 @@ To make changes, go to `Settings > Themes > One Dark UI > Settings` or the cog i
 It's also possible to resize only certain areas by adding the following to your `styles.less` (Use DevTools to find the right selectors):
 
 ```css
-.theme-one-dark-ui {
+.theme-theme-ui-one-dark {
   .tab-bar { font-size: 18px; }
   .tree-view { font-size: 14px; }
   .status-bar { font-size: 12px; }

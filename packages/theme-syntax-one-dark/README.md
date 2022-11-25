@@ -4,7 +4,7 @@
 
 > The font used in the screenshot is [Fira Mono](https://github.com/mozilla/Fira).
 
-There is also a matching [UI theme](https://atom.io/themes/one-dark-ui).
+There is also a matching [UI theme](https://atom.io/themes/theme-ui-one-dark).
 
 ### Install
 

@@ -567,7 +567,7 @@ h2 {
       const activeThemeNames = atom.themes.getActiveThemeNames();
       expect(console.warn.callCount).toBe(2);
       expect(activeThemeNames.length).toBe(2);
-      expect(activeThemeNames).toContain('one-dark-ui');
+      expect(activeThemeNames).toContain('theme-ui-one-dark');
       expect(activeThemeNames).toContain('theme-syntax-one-dark');
     });
   });
@@ -601,7 +601,7 @@ h2 {
       it('uses the default dark UI and syntax themes', function() {
         const activeThemeNames = atom.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
-        expect(activeThemeNames).toContain('one-dark-ui');
+        expect(activeThemeNames).toContain('theme-ui-one-dark');
         expect(activeThemeNames).toContain('theme-syntax-one-dark');
       });
     });
@@ -619,7 +619,7 @@ h2 {
       it('uses the default one-dark UI theme', function() {
         const activeThemeNames = atom.themes.getActiveThemeNames();
         expect(activeThemeNames.length).toBe(2);
-        expect(activeThemeNames).toContain('one-dark-ui');
+        expect(activeThemeNames).toContain('theme-ui-one-dark');
         expect(activeThemeNames).toContain('theme-syntax-atom-light');
       });
     });

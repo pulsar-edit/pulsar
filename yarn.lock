@@ -6973,7 +6973,7 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
 "theme-syntax-one-dark@file:packages/theme-syntax-one-dark":
   version "1.8.4"
 
-"one-dark-ui@file:packages/one-dark-ui":
+"theme-ui-one-dark@file:packages/theme-ui-one-dark":
   version "1.12.5"
 
 "theme-syntax-one-light@file:packages/theme-syntax-one-light":

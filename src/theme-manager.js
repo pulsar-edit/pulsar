@@ -159,12 +159,12 @@ module.exports = class ThemeManager {
       ];
       themeNames = _.intersection(themeNames, builtInThemeNames);
       if (themeNames.length === 0) {
-        themeNames = ['theme-syntax-one-dark', 'one-dark-ui'];
+        themeNames = ['theme-syntax-one-dark', 'theme-ui-one-dark'];
       } else if (themeNames.length === 1) {
         if (themeNames[0].endsWith('-ui')) {
           themeNames.unshift('theme-syntax-one-dark');
         } else {
-          themeNames.push('one-dark-ui');
+          themeNames.push('theme-ui-one-dark');
         }
       }
     }
