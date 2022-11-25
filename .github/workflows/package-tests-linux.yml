@@ -37,10 +37,7 @@ jobs:
     - name: build packages
       run: yarn build:packages
 
-    - name: build dependencies
-      run: yarn build:apm
-
-    - name: Run Package Tests for ${{ matrix.descr }}
+    - name: Run Package Tests
       uses: GabrielBB/xvfb-action@v1
       with:
         run: node ./script/run-package-tests
