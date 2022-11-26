@@ -230,7 +230,6 @@ describe('GrammarSelector', () => {
         expect(cppCount).toBe(2); // ensure we actually saw both grammars
       });
     });
-    */
 
     describe('for every Tree-sitter grammar', () => {
       it('adds a label to identify it as Tree-sitter', async () => {
@@ -248,6 +247,7 @@ describe('GrammarSelector', () => {
         }
       });
     });
+    */
 
     describe('when clicked', () =>
       it('shows the grammar selector modal', () => {
