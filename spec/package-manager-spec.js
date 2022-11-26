@@ -25,8 +25,8 @@ describe('PackageManager', () => {
       const packageManger = new PackageManager({});
       const configDirPath = path.join('~', 'someConfig');
       packageManger.initialize({ configDirPath });
-      expect(packageManger.packageDirPaths.length).toBe(1);
-      expect(packageManger.packageDirPaths[0]).toBe(
+      expect(packageManger.packageDirPaths.length).toBe(2);
+      expect(packageManger.packageDirPaths[1]).toBe(
         path.join(configDirPath, 'packages')
       );
     });
