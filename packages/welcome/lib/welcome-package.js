@@ -73,9 +73,17 @@ export default class WelcomePackage {
   }
 
   showChangeLog() {
-    return Promise.all([
-      atom.workspace.open(CHANGELOG_URI, { split: 'down' })
-    ]);
+    if (atom.config.get('welcome.showOnStartup')) {
+      // If the welcome view will also appear open the changelog on the bottom pane
+      return Promise.all([
+        atom.workspace.open(CHANGELOG_URI, { split: 'down' })
+      ]);
+    } else {
+      // But if the welcome view is disabled, show the changelog in place of the welcome view.
+      return Promise.all([
+        atom.workspace.open(CHANGELOG_URI, { split: 'left' })
+      ]);
+    }
   }
 
   consumeReporter(reporter) {
