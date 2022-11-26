@@ -19,8 +19,6 @@ const env = Object.assign({},process.env,{
 for (const dirent of dirents) {
   if (!dirent.isDirectory()) continue;
   const packagePath = path.join(packagesPath, dirent.name);
-  if (false) {
-  }
   console.log(`${packagePath}$ npm i`);
   const res = cp.spawnSync('npm',['i','--legacy-peer-deps','--target=' + target,'--disturl=' + disturl,'--arch=' + arch],{
     cwd: packagePath,
