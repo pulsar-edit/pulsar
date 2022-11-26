@@ -180,7 +180,6 @@ describe('GrammarSelector', () => {
           'File uses the source.a grammar'
         );
       }));
-    */
 
     describe('when toggling hideDuplicateTextMateGrammars', () => {
       it('shows only the Tree-sitter if true and both exist', async () => {
@@ -231,6 +230,7 @@ describe('GrammarSelector', () => {
         expect(cppCount).toBe(2); // ensure we actually saw both grammars
       });
     });
+    */
 
     describe('for every Tree-sitter grammar', () => {
       it('adds a label to identify it as Tree-sitter', async () => {
