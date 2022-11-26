@@ -140,7 +140,7 @@ export default class ChangeLogView {
                   checked={this.wasVersionDismissed()}
                   onchange={this.dismissVersion}
                 />
-                Want to Dismiss this Change Log?
+                Dismiss this Change Log
               </label>
             </section>
           </div>
