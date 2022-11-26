@@ -12,6 +12,8 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-20.04
     strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-2019]
       fail-fast: false
     steps:
     - name: Install windows-build-tools
