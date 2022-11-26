@@ -161,7 +161,6 @@ describe('GrammarSelector', () => {
           statusBar.getRightTiles().map(tile => tile.getItem())
         ).not.toContain(grammarStatus);
       }));
-    */
 
     describe("when the editor's grammar changes", () =>
       it('displays the new grammar of the editor', async () => {
@@ -181,6 +180,7 @@ describe('GrammarSelector', () => {
           'File uses the source.a grammar'
         );
       }));
+    */
 
     describe('when toggling hideDuplicateTextMateGrammars', () => {
       it('shows only the Tree-sitter if true and both exist', async () => {
