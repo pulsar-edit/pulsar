@@ -19,7 +19,7 @@ const env = Object.assign({},process.env,{
   npm_config_target_arch: process.arch,
   npm_config_disturl: "https://atom.io/download/electron",
   npm_config_runtime: "electron",
-  HOME: path.join(process.env.USERPROFILE,"./.electron-gyp"),
+  // HOME: path.join(process.env.USERPROFILE,"./.electron-gyp"),
 });
 
 /*
