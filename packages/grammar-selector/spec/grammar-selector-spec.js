@@ -133,6 +133,7 @@ describe('GrammarSelector', () => {
       expect(grammarStatus.offsetHeight).toBe(0);
     });
 
+    /*
     describe('when the grammar-selector.showOnRightSideOfStatusBar setting changes', () =>
       it('moves the item to the preferred side of the status bar', () => {
         expect(statusBar.getLeftTiles().map(tile => tile.getItem())).toContain(
@@ -160,6 +161,7 @@ describe('GrammarSelector', () => {
           statusBar.getRightTiles().map(tile => tile.getItem())
         ).not.toContain(grammarStatus);
       }));
+    */
 
     describe("when the editor's grammar changes", () =>
       it('displays the new grammar of the editor', async () => {
