@@ -471,25 +471,6 @@ describe('GrammarRegistry', () => {
       });
     });
 
-    it('favors non-bundled packages when breaking scoring ties', async () => {
-      await atom.packages.activatePackage('language-ruby');
-      await atom.packages.activatePackage(
-        path.join(__dirname, 'fixtures', 'packages', 'package-with-rb-filetype')
-      );
-
-      atom.grammars.grammarForScopeName('source.ruby').bundledPackage = true;
-      atom.grammars.grammarForScopeName('test.rb').bundledPackage = false;
-
-      expect(
-        atom.grammars.selectGrammar('test.rb', '#!/usr/bin/env ruby').scopeName
-      ).toBe('source.ruby');
-      expect(
-        atom.grammars.selectGrammar('test.rb', '#!/usr/bin/env testruby')
-          .scopeName
-      ).toBe('test.rb');
-      expect(atom.grammars.selectGrammar('test.rb').scopeName).toBe('test.rb');
-    });
-
     describe('when there is no file path', () => {
       it('does not throw an exception (regression)', () => {
         expect(() =>

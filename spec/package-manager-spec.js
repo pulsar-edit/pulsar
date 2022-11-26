@@ -24,7 +24,8 @@ describe('PackageManager', () => {
     it('adds regular package path', () => {
       const packageManger = new PackageManager({});
       const configDirPath = path.join('~', 'someConfig');
-      packageManger.initialize({ configDirPath });
+      const resourcePath = path.join('~', '/atom');
+      packageManger.initialize({ configDirPath, resourcePath });
       expect(packageManger.packageDirPaths.length).toBe(2);
       expect(packageManger.packageDirPaths[1]).toBe(
         path.join(configDirPath, 'packages')
