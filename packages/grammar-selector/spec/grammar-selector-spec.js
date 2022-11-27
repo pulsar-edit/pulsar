@@ -259,7 +259,6 @@ describe('GrammarSelector', () => {
         grammarStatus.click();
         expect(eventHandler).toHaveBeenCalled();
       }));
-    */
 
     describe('when the package is deactivated', () =>
       it('removes the view', () => {
@@ -267,6 +266,7 @@ describe('GrammarSelector', () => {
         atom.packages.deactivatePackage('grammar-selector');
         expect(grammarTile.destroy).toHaveBeenCalled();
       }));
+    */
   });
 });
 
