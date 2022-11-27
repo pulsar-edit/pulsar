@@ -11,10 +11,8 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     strategy:
-      matrix:
-        os: [ubuntu-20.04, macos-latest, windows-2019]
       fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v2
