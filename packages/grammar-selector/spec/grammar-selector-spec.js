@@ -125,6 +125,7 @@ describe('GrammarSelector', () => {
       expect(grammarStatus).toBeVisible();
     });
 
+    /*
     it('hides the label when the current grammar is null', async () => {
       jasmine.attachToDOM(editor.getElement());
       spyOn(editor, 'getGrammar').andReturn(null);
@@ -133,7 +134,6 @@ describe('GrammarSelector', () => {
       expect(grammarStatus.offsetHeight).toBe(0);
     });
 
-    /*
     describe('when the grammar-selector.showOnRightSideOfStatusBar setting changes', () =>
       it('moves the item to the preferred side of the status bar', () => {
         expect(statusBar.getLeftTiles().map(tile => tile.getItem())).toContain(
