@@ -9,10 +9,10 @@ const disturl = "https://electronjs.org/headers";
 const packagesPath = path.join(__dirname, '..', 'packages');
 const dirents = fs.readdirSync(packagesPath,{withFileTypes:true});
 const env = Object.assign({},process.env,{
-  npm_config_target: "12.2.3",
-  npm_config_arch: process.arch,
-  npm_config_target_arch: process.arch,
-  npm_config_disturl: "https://electronjs.org/headers",
+  npm_config_target: target,
+  npm_config_arch: arch,
+  npm_config_target_arch: arch,
+  npm_config_disturl: disturl,
   npm_config_runtime: "electron",
 });
 
