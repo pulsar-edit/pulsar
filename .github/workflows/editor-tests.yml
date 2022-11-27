@@ -26,6 +26,11 @@ jobs:
         node-version: 16
 
     - name: install dependencies
+      if: ${{ matrix.os == 'windows-2019' }}
+      run: yarn install --ignore-scripts || ( sleep 1 && yarn cache clean && yarn install --ignore-scripts ) || ( sleep 1 && yarn cache clean && yarn install --ignore-scripts )
+
+    - name: install dependencies
+      if: ${{ matrix.os != 'windows-2019' }}
       run: yarn install
 
     - name: build dependencies
