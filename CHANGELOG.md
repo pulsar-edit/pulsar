@@ -8,6 +8,7 @@
 - Config watching fixes
 - Bump tree-sitter to 0.20.1 and all grammars to their recent versions
 - Native support for Apple Silicon
+- Change Log Window added to Welcome Package
 
 # Atom v1.6.0
 See https://atom.io/releases
