@@ -247,7 +247,6 @@ describe('GrammarSelector', () => {
         }
       });
     });
-    */
 
     describe('when clicked', () =>
       it('shows the grammar selector modal', () => {
@@ -260,6 +259,7 @@ describe('GrammarSelector', () => {
         grammarStatus.click();
         expect(eventHandler).toHaveBeenCalled();
       }));
+    */
 
     describe('when the package is deactivated', () =>
       it('removes the view', () => {
