@@ -1,5 +1,4 @@
 # SQL language support in Atom
-[![CI](https://github.com/atom/language-sql/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-sql/actions/workflows/ci.yml)
 
 Adds syntax highlighting to SQL files in Atom.
 

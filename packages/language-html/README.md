@@ -1,5 +1,4 @@
 # HTML language support in Atom
-![CI Status](https://github.com/atom/language-html/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to HTML files in Atom.
 

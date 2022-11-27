@@ -1,5 +1,4 @@
 # Hyperlink colorization in Atom
-[![CI](https://github.com/atom/language-hyperlink/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-hyperlink/actions/workflows/ci.yml)
 
 Adds syntax highlighting to hyperlinks embedded in strings, comments, and plain
 text in Atom.

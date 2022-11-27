@@ -1,5 +1,4 @@
 # Go language support in Atom
-![CI Status](https://github.com/atom/language-go/actions/workflows/main.yml/badge.svg)
 
 Adds syntax highlighting and snippets to Go files in Atom.
 
