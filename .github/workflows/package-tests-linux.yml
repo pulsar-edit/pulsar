@@ -10,9 +10,9 @@ jobs:
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
-    runs-on: ubuntu-20.04
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v2
