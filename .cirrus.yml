@@ -175,16 +175,16 @@ windows_task:
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
-    - cd ppm; npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
+    - cd ppm; npx yarn install || npx yarn install || npx yarn cache clean; npx yarn install || npx yarn install
   install_without_scripts_script:
-    - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
+    - npx yarn install --ignore-scripts || sleep 1 && npx yarn install --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-scripts || sleep 2 && npx yarn install --ignore-scripts || echo "Giving up"
   rebuild_for_electron_script:
     - npx yarn build || npx yarn build || npx yarn build
   build_packages_script:
     - npx yarn run build:packages || npx yarn run build:packages || npx yarn run build:packages
   # install_only_electron_script:
   #   - rm -R node_modules/electron
-  #   - npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
+  #   - npx yarn install || npx yarn install || npx yarn cache clean; npx yarn install || npx yarn install
     # - npx playwright test --reporter=list
   videos_artifacts:
     path: tests\videos\**
