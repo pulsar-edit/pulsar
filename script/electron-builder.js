@@ -4,8 +4,8 @@ const fs = require("fs/promises");
 const builder = require("electron-builder")
 const Platform = builder.Platform
 
-const pngIcon = 'resources/app-icons/nightly/png/1024.png'
-const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
+const pngIcon = 'resources/app-icons/beta.png'
+const icoIcon = 'resources/app-icons/beta.ico'
 
 let options = {
   "appId": "com.pulsar-edit.pulsar",
