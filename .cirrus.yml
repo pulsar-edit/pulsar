@@ -177,7 +177,7 @@ windows_task:
   build_apm_script:
     - cd ppm; npx yarn install || npx yarn install || npx yarn cache clean; npx yarn install || npx yarn install
   install_without_scripts_script:
-    - npx yarn install --ignore-scripts || sleep 1 && npx yarn install --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-scripts || sleep 2 && npx yarn install --ignore-scripts || echo "Giving up"
+    - npx yarn install --ignore-scripts || sleep 1 && npx yarn install --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-scripts || sleep 2 && npx yarn install --ignore-scripts
   rebuild_for_electron_script:
     - npx yarn build || npx yarn build || npx yarn build
   build_packages_script:
