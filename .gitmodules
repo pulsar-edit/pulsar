@@ -1,9 +1,6 @@
 [submodule "ppm"]
 	path = ppm
 	url = https://github.com/pulsar-edit/ppm.git
-[submodule "packages/archive-view"]
-	path = packages/archive-view
-	url = https://github.com/pulsar-edit/archive-view.git
 [submodule "packages/autocomplete-atom-api"]
 	path = packages/autocomplete-atom-api
 	url = https://github.com/pulsar-edit/autocomplete-atom-api.git
