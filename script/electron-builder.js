@@ -46,7 +46,7 @@ let options = {
       "from": pngIcon,
       "to": "pulsar.png"
     }, {
-      "form": "packages",
+      "from": "packages",
       "to": "packages"
     }
   ],
