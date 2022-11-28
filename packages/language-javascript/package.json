@@ -7,15 +7,8 @@
     "node": "*"
   },
   "main": "lib/main",
-  "homepage": "http://atom.github.io/language-javascript",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-javascript.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-javascript/issues"
-  },
   "keywords": [
     "tree-sitter"
   ],

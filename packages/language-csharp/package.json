@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "private": true,
   "description": "C# language support for Atom",
-  "repository": "https://github.com/atom/language-csharp",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "keywords": [
     "C#",
     "csharp",
@@ -12,6 +12,5 @@
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
-  },
-  "dependencies": {}
+  }
 }
