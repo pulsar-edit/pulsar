@@ -168,7 +168,7 @@ windows_task:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   install_deps_script:
-    - choco install nodejs --version=14.16.0 -y
+    - choco install nodejs --version=16.18.1 -y
     - choco install python --version=3.10.3	-y
     - choco install git visualstudio2019-workload-vctools -y
     - git submodule init
