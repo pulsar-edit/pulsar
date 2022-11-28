@@ -20,7 +20,7 @@ for (const dirent of dirents) {
   if (!dirent.isDirectory()) continue;
   const packagePath = path.join(packagesPath, dirent.name);
   console.log(`${packagePath}$ npm i`);
-  const res = cp.spawnSync('npm',['i','--legacy-peer-deps','--target=' + target,'--disturl=' + disturl,'--arch=' + arch],{
+  const res = cp.spawnSync('npm',['i','--legacy-peer-deps','--target=' + target,'--disturl=' + disturl,'--arch=' + arch,'--save=false','--fund=false','--audit=false'],{
     cwd: packagePath,
     env,
     shell: true,
