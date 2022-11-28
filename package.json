@@ -277,7 +277,7 @@
     "preinstall": "node -e 'process.exit(0)'",
     "build": "electron-rebuild",
     "build:apm": "cd ppm && yarn install",
-    "start": "electron --enable-logging . -f",
+    "start": "electron --enable-logging=true . -f",
     "dist": "node script/electron-builder.js"
   },
   "standard-engine": "./script/node_modules/standard",
