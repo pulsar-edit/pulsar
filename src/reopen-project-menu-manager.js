@@ -1,6 +1,8 @@
 const { CompositeDisposable } = require('event-kit');
 const path = require('path');
 
+const TASK_DESCRIPTION_MAX_LENGTH = 260;
+
 module.exports = class ReopenProjectMenuManager {
   constructor({ menu, commands, history, config, open }) {
     this.menuManager = menu;
@@ -57,9 +59,14 @@ module.exports = class ReopenProjectMenuManager {
   }
 
   static taskDescription(paths) {
-    return paths
+    const description = paths
       .map(path => `${ReopenProjectMenuManager.betterBaseName(path)} (${path})`)
       .join(' ');
+    if (description.length > TASK_DESCRIPTION_MAX_LENGTH) {
+      return description.substring(0, TASK_DESCRIPTION_MAX_LENGTH - 3) + "..."
+    } else {
+      return description;
+    }
   }
 
   // Windows users can right-click Pulsar taskbar and remove project from the jump list.

@@ -7,11 +7,15 @@ const {
 } = require('electron');
 const getAppName = require('../get-app-name');
 const path = require('path');
+const fs = require('fs');
 const url = require('url');
 const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
-const ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
+let ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
+if(!fs.existsSync(ICON_PATH)) {
+  ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'pulsar.png');
+}
 
 let includeShellLoadTime = true;
 let nextId = 0;
