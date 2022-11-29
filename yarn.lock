@@ -15,6 +15,13 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@atom/fuzzy-native@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@atom/fuzzy-native/-/fuzzy-native-1.2.1.tgz#2a773bfa230da99e65c6708218b09bbd78293191"
+  integrity sha512-ABUIbeQqfoA4WUK+PAsspM9jLaGlj0wjyIc9CIi1OMAHv71/vqrpJHPX2fHWiREEXYxwh/CBCshhkOWESbnNnQ==
+  dependencies:
+    nan "^2.14.2"
+
 "@atom/source-map-support@^0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@atom/source-map-support/-/source-map-support-0.3.4.tgz#55ccbe0e64b2c742c5b333f357f9a93161145cfd"
