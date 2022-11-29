@@ -22,6 +22,7 @@
   "license": "MIT",
   "electronVersion": "12.2.3",
   "dependencies": {
+    "@atom/fuzzy-native": "^1.2.1",
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
     "async": "3.2.4",
