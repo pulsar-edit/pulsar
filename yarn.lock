@@ -4791,9 +4791,9 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
-"github@https://github.com/pulsar-edit/github.git#v0.36.11":
-  version "0.36.11"
-  resolved "https://github.com/pulsar-edit/github.git#9d24c3a547d83732782c08b596420485f81f13b6"
+"github@https://github.com/pulsar-edit/github.git#v0.36.12":
+  version "0.36.12"
+  resolved "https://github.com/pulsar-edit/github.git#8c645aa8cdf7b8f0d85e68852f51aa741c72f438"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
