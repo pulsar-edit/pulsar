@@ -18,6 +18,7 @@ const env = Object.assign({},process.env,{
 
 for (const dirent of dirents) {
   if (!dirent.isDirectory()) continue;
+  if (["github","bracket-matcher"].includes(dirent.name)) continue; // prevent errors for now
   const packagePath = path.join(packagesPath, dirent.name);
   console.log(`${packagePath}$ npm i`);
   const res = cp.spawnSync('npm',['i','--legacy-peer-deps','--target=' + target,'--disturl=' + disturl,'--arch=' + arch,'--save=false','--fund=false','--audit=false'],{
