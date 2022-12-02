@@ -47,7 +47,7 @@ module.exports = class ContextMenuManager {
       '.overlayer': [] // TODO: Remove once color picker package stops touching private data
     };
     this.clear();
-    this.keymapManager.onDidLoadBundledKeymaps(() => this.loadPlatformItems());
+    this.loadPlatformItems();
   }
 
   initialize({resourcePath, devMode}) {

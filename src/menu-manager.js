@@ -63,7 +63,7 @@ module.exports = MenuManager = class MenuManager {
     this.initialized = false;
     this.pendingUpdateOperation = null;
     this.template = [];
-    this.keymapManager.onDidLoadBundledKeymaps(() => this.loadPlatformItems());
+    this.loadPlatformItems();
     this.packageManager.onDidActivateInitialPackages(() => this.sortPackagesMenu());
   }
 
