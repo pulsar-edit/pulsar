@@ -33,7 +33,14 @@ let options = {
     "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
     "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
     "!**/{appveyor.yml,.travis.yml,circle.yml}",
-    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+
+    "spec/jasmine-test-runner.js",
+    "spec/spec-helper.js",
+    "spec/jasmine-junit-reporter.js",
+    "spec/spec-helper-functions.js",
+    "spec/atom-reporter.js",
+    "spec/jasmine-list-reporter.js",
   ],
   "extraResources": [
     {
@@ -63,7 +70,8 @@ let options = {
     "target": [
       { target: "appimage" },
       { target: "deb" },
-      { target: "rpm" }
+      { target: "rpm" },
+      { target: "tar.gz" }
     ],
   },
   "mac": {
