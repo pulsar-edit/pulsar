@@ -75,7 +75,7 @@
     "fuzzy-finder": "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3",
     "git-diff": "file:packages/git-diff",
     "git-utils": "5.7.1",
-    "github": "https://github.com/pulsar-edit/github.git#v0.36.12-fix",
+    "github": "https://github.com/pulsar-edit/github.git#v0.36.13",
     "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
