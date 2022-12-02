@@ -52,7 +52,7 @@ module.exports = class ContextMenuManager {
   initialize({resourcePath, devMode}) {
     this.resourcePath = resourcePath;
     this.devMode = devMode;
-    this.loadPlatformItems();
+    this.keymapManager.onDidLoadBundledKeymaps(() => this.loadPlatformItems());
   }
 
   loadPlatformItems() {

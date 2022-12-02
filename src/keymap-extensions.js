@@ -3,8 +3,18 @@ const path = require('path');
 const KeymapManager = require('atom-keymap');
 const CSON = require('season');
 
+KeymapManager.prototype.onDidLoadBundledKeymaps = function(callback) {
+  return this.emitter.on('did-load-bundled-keymaps', callback);
+};
+
 KeymapManager.prototype.onDidLoadUserKeymap = function(callback) {
   return this.emitter.on('did-load-user-keymap', callback);
+};
+
+KeymapManager.prototype.loadBundledKeymaps = function() {
+  const keymapsPath = path.join(this.resourcePath, 'keymaps');
+  this.loadKeymap(keymapsPath);
+  return this.emitter.emit('did-load-bundled-keymaps');
 };
 
 KeymapManager.prototype.getUserKeymapPath = function() {
