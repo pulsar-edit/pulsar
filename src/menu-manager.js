@@ -63,12 +63,12 @@ module.exports = MenuManager = class MenuManager {
     this.initialized = false;
     this.pendingUpdateOperation = null;
     this.template = [];
-    this.loadPlatformItems();
     this.packageManager.onDidActivateInitialPackages(() => this.sortPackagesMenu());
   }
 
   initialize({resourcePath}) {
     this.resourcePath = resourcePath;
+    this.loadPlatformItems();
     this.keymapManager.onDidReloadKeymap(() => this.update());
     this.update();
     this.initialized = true;

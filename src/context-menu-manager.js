@@ -47,12 +47,12 @@ module.exports = class ContextMenuManager {
       '.overlayer': [] // TODO: Remove once color picker package stops touching private data
     };
     this.clear();
-    this.loadPlatformItems();
   }
 
   initialize({resourcePath, devMode}) {
     this.resourcePath = resourcePath;
     this.devMode = devMode;
+    this.loadPlatformItems();
   }
 
   loadPlatformItems() {
