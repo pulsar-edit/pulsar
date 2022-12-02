@@ -3,6 +3,10 @@ const path = require('path');
 const KeymapManager = require('atom-keymap');
 const CSON = require('season');
 
+KeymapManager.prototype.onDidLoadUserKeymap = function(callback) {
+  return this.emitter.on('did-load-user-keymap', callback);
+};
+
 KeymapManager.prototype.getUserKeymapPath = function() {
   if (this.configDirPath == null) {
     return "";
