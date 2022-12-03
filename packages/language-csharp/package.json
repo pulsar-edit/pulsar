@@ -1,8 +1,9 @@
 {
   "name": "language-csharp",
   "version": "1.1.1",
+  "private": true,
   "description": "Provides grammar(s) and snippet(s) for C#",
-  "repository": "https://github.com/atom/language-csharp",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "keywords": [
     "C#",
     "csharp",
@@ -11,6 +12,5 @@
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
-  },
-  "dependencies": {}
+  }
 }

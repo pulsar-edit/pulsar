@@ -171,7 +171,7 @@ windows_task:
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
-    - cd ppm; npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
+    - cd ppm; npm install
   install_without_scripts_script:
     - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
   rebuild_for_electron_script:

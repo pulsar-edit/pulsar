@@ -7,14 +7,7 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-less",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-less.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/language-less/issues"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "devDependencies": {
     "bluebird": "^2.9.25",
     "coffeelint": "^1.10.1",

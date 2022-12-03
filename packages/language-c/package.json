@@ -6,15 +6,8 @@
   "keywords": [
     "tree-sitter"
   ],
-  "homepage": "https://atom.github.io/language-c",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-c.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-c/issues"
-  },
   "engines": {
     "atom": "*",
     "node": "*"

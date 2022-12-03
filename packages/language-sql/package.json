@@ -6,15 +6,8 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-sql",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-sql.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-sql/issues"
-  },
   "devDependencies": {
     "coffeelint": "^1.10.1"
   }

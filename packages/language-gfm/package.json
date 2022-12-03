@@ -2,7 +2,7 @@
   "name": "language-gfm",
   "version": "0.90.9",
   "description": "Provides grammar(s) and snippet(s) for GitHub Flavored Markdown (GFM)",
-  "repository": "https://github.com/atom/language-gfm",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": "*"

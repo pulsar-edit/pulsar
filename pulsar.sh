@@ -9,26 +9,8 @@ else
   exit 1
 fi
 
-case $(basename $0) in
-  pulsar-beta)
-    CHANNEL=beta
-    ;;
-  pulsar-nightly)
-    CHANNEL=nightly
-    ;;
-  pulsar-dev)
-    CHANNEL=dev
-    ;;
-  *)
-    CHANNEL=stable
-    ;;
-esac
-
 # Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't been set.
-if [ -z "$ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT" ]
-then
-  export ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT=true
-fi
+: ${ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT:=true}
 
 ATOM_ADD=false
 ATOM_NEW_WINDOW=false
@@ -104,20 +86,12 @@ if [ $OS == 'Mac' ]; then
     ATOM_APP_NAME="$(basename "$ATOM_APP")"
   fi
 
-  if [ ! -z "${ATOM_APP_NAME}" ]; then
+  if [ -n "${ATOM_APP_NAME}" ]; then
     # If ATOM_APP_NAME is known, use it as the executable name
     ATOM_EXECUTABLE_NAME="${ATOM_APP_NAME%.*}"
   else
     # Else choose it from the inferred channel name
-    if [ "$CHANNEL" == 'beta' ]; then
-      ATOM_EXECUTABLE_NAME="Pulsar Beta"
-    elif [ "$CHANNEL" == 'nightly' ]; then
-      ATOM_EXECUTABLE_NAME="Pulsar Nightly"
-    elif [ "$CHANNEL" == 'dev' ]; then
-      ATOM_EXECUTABLE_NAME="Pulsar Dev"
-    else
-      ATOM_EXECUTABLE_NAME="Pulsar"
-    fi
+    ATOM_EXECUTABLE_NAME="Pulsar"
   fi
 
   if [ -z "${PULSAR_PATH}" ]; then
@@ -152,26 +126,24 @@ if [ $OS == 'Mac' ]; then
 elif [ $OS == 'Linux' ]; then
   SCRIPT=$(readlink -f "$0")
 
-  case $CHANNEL in
-    beta)
-      PULSAR_PATH="/opt/Pulsar-beta/pulsar"
-      ;;
-    nightly)
-      PULSAR_PATH="/opt/Pulsar-nightly/pulsar"
-      ;;
-    dev)
-      PULSAR_PATH="/opt/Pulsar-dev/pulsar"
-      ;;
-    *)
-      PULSAR_PATH="/opt/Pulsar/pulsar"
-      ;;
-  esac
+  PULSAR_PATH="/opt/Pulsar/pulsar"
 
   #Will allow user to get context menu on cinnamon desktop enviroment
-  if [[ "$(expr substr $(printenv | grep "DESKTOP_SESSION=") 17 8)" == "cinnamon" ]]; then
-    cp "resources/linux/desktopenviroment/cinnamon/pulsar.nemo_action" "/usr/share/nemo/actions/pulsar.nemo_action"
+  #Add a check to make sure that DESKTOP_SESSION is set before attempting to grep it
+  #expr substr is expecting 3 arguments string, index, length
+  #If grep doesnt find anything is provides an empty string which causes the expr: syntax error: missing argument after '8' error - see pulsar-edit/pulsar#174
+  #Im also not quite sure why they used grep instead of simply [ "${DESKTOP_SESSION}" == "cinnamon" ]
+  if [ -n "${DESKTOP_SESSION}" ] && [ "$(expr substr $(printenv | grep 'DESKTOP_SESSION=') 17 8)" == "cinnamon" ]; then
+    #This local path is almost assuredly wrong as it shouldnt exist in a standard install
+    ACTION_PATH="resources/linux/desktopenviroment/cinnamon/pulsar.nemo_action"
+
+    #Validate the file exists before attempting to copy it
+    if [ -f "${ACTION_PATH}" ]; then
+        cp "${$ACTION_PATH}" "/usr/share/nemo/actions/pulsar.nemo_action"
+    fi
   fi
 
+  #Set tmpdir only if tmpdir is unset
   : ${TMPDIR:=/tmp}
 
   [ -x "$PULSAR_PATH" ] || PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
