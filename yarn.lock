@@ -5933,136 +5933,136 @@ ky@0.30.0:
   integrity sha512-X/u76z4JtDVq10u1JA5UQfatPxgPaVDMYTrgHyiTpGN2z4TMEJkIHsoSBBSg9SWZEIXTKsi9kHgiQ9o3Y/4yog==
 
 "language-c@file:packages/language-c":
-  version "0.60.20"
+  version "0.60.21"
   dependencies:
     tree-sitter-c "0.20.2"
     tree-sitter-cpp "0.20.0"
 
 "language-clojure@file:packages/language-clojure":
-  version "0.22.8"
+  version "0.22.9"
 
 "language-coffeescript@file:packages/language-coffeescript":
-  version "0.50.0"
+  version "0.50.1"
 
 "language-csharp@file:packages/language-csharp":
-  version "1.1.0"
+  version "1.1.1"
 
 "language-css@file:packages/language-css":
-  version "0.45.4"
+  version "0.45.5"
   dependencies:
     tree-sitter-css "^0.19.0"
 
 "language-gfm@file:packages/language-gfm":
-  version "0.90.8"
+  version "0.90.9"
 
 "language-git@file:packages/language-git":
-  version "0.19.1"
+  version "0.19.2"
 
 "language-go@file:packages/language-go":
-  version "0.47.3"
+  version "0.47.4"
   dependencies:
     tree-sitter-go "0.19.1"
 
 "language-html@file:packages/language-html":
-  version "0.53.1"
+  version "0.53.2"
   dependencies:
     atom-grammar-test "^0.6.3"
     tree-sitter-embedded-template "0.19.0"
     tree-sitter-html "0.19.0"
 
 "language-hyperlink@file:packages/language-hyperlink":
-  version "0.17.1"
+  version "0.17.2"
 
 "language-java@file:packages/language-java":
-  version "0.32.1"
+  version "0.32.2"
   dependencies:
     tree-sitter-java "0.19.1"
 
 "language-javascript@file:packages/language-javascript":
-  version "0.134.2"
+  version "0.134.3"
   dependencies:
     tree-sitter-javascript "0.19.0"
     tree-sitter-jsdoc "0.19.0"
     tree-sitter-regex "0.19.0"
 
 "language-json@file:packages/language-json":
-  version "1.0.5"
+  version "1.0.6"
   dependencies:
     tree-sitter-json "0.20.0"
 
 "language-less@file:packages/language-less":
-  version "0.34.3"
+  version "0.34.4"
 
 "language-make@file:packages/language-make":
-  version "0.23.0"
+  version "0.23.1"
 
 "language-mustache@file:packages/language-mustache":
-  version "0.14.5"
+  version "0.14.6"
 
 "language-objective-c@file:packages/language-objective-c":
-  version "0.16.0"
+  version "0.16.1"
 
 "language-perl@file:packages/language-perl":
-  version "0.38.1"
+  version "0.38.2"
 
 "language-php@file:packages/language-php":
-  version "0.48.1"
+  version "0.48.2"
 
 "language-property-list@file:packages/language-property-list":
-  version "0.9.1"
+  version "0.9.2"
 
 "language-python@file:packages/language-python":
-  version "0.53.6"
+  version "0.53.7"
   dependencies:
     atom-grammar-test "^0.6.4"
     tree-sitter-python "0.19.0"
 
 "language-ruby-on-rails@file:packages/language-ruby-on-rails":
-  version "0.25.3"
+  version "0.25.4"
 
 "language-ruby@file:packages/language-ruby":
-  version "0.73.0"
+  version "0.73.1"
   dependencies:
     tree-sitter-ruby "^0.19.0"
 
 "language-rust@file:packages/language-rust":
-  version "0.1.1"
+  version "0.1.2"
   dependencies:
     tree-sitter-rust "0.20.1"
 
 "language-sass@file:packages/language-sass":
-  version "0.62.2"
+  version "0.62.3"
 
 "language-shell-script@file:packages/language-shell-script":
-  version "0.28.2"
+  version "0.28.3"
   dependencies:
     tree-sitter-bash "0.19.0"
 
 "language-source@file:packages/language-source":
-  version "0.9.0"
+  version "0.9.1"
 
 "language-sql@file:packages/language-sql":
-  version "0.25.10"
+  version "0.25.11"
 
 "language-text@file:packages/language-text":
-  version "0.7.4"
+  version "0.7.5"
 
 "language-todo@file:packages/language-todo":
-  version "0.29.4"
+  version "0.29.5"
 
 "language-toml@file:packages/language-toml":
-  version "0.20.0"
+  version "0.20.1"
 
 "language-typescript@file:packages/language-typescript":
-  version "0.6.4"
+  version "0.6.5"
   dependencies:
     tree-sitter-typescript "0.20.1"
 
 "language-xml@file:packages/language-xml":
-  version "0.35.3"
+  version "0.35.4"
 
 "language-yaml@file:packages/language-yaml":
-  version "0.32.0"
+  version "0.32.1"
 
 latest-version@^5.1.0:
   version "5.1.0"
