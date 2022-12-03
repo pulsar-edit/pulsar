@@ -161,7 +161,7 @@ module.exports = class ThemeManager {
       if (themeNames.length === 0) {
         themeNames = ['theme-syntax-one-dark', 'theme-ui-one-dark'];
       } else if (themeNames.length === 1) {
-        if (themeNames[0].endsWith('-ui')) {
+        if (themeNames[0].startsWith('theme-ui')) {
           themeNames.unshift('theme-syntax-one-dark');
         } else {
           themeNames.push('theme-ui-one-dark');
