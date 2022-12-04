@@ -2,7 +2,7 @@
 
 Grammar and snippets for plain text files in Pulsar.
 
-Originally [converted](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate)
+Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [Text TextMate bundle](https://github.com/textmate/text.tmbundle).
 
 Contributions are greatly appreciated. Please fork this repository and open a
