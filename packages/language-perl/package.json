@@ -6,13 +6,6 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-perl",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-perl.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-perl/issues"
-  }
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT"
 }

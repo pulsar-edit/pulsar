@@ -7,14 +7,7 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-sass",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-sass.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/language-sass/issues"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "devDependencies": {
     "dedent": "^0.7.0"
   }

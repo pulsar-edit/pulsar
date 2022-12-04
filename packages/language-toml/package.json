@@ -2,7 +2,7 @@
   "name": "language-toml",
   "version": "0.20.0",
   "description": "Syntax highlighting for Tom's Obvious, Minimal Language (TOML).",
-  "repository": "https://github.com/atom/language-toml",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": "*"

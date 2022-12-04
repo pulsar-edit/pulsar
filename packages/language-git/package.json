@@ -6,13 +6,6 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-git",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-git.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-git/issues"
-  }
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT"
 }
