@@ -54,6 +54,7 @@ let options = {
     "keymaps/**/*",
     "menus/**/*",
     "node_modules/**/*",
+    "node_modules/dugite/git/cmd/git.exe",
     "resources/**/*",
     "script/**/*",
     "src/**/*",
