@@ -54,7 +54,6 @@ let options = {
     "keymaps/**/*",
     "menus/**/*",
     "node_modules/**/*",
-    "node_modules/dugite/git/cmd/git.exe",
     "resources/**/*",
     "script/**/*",
     "src/**/*",
@@ -120,7 +119,10 @@ let options = {
   },
   "extraMetadata": {
   },
-  "asarUnpack": ["node_modules/github/bin/*"]
+  "asarUnpack": [
+    "node_modules/github/bin/*",
+    "node_modules/dugite/git/cmd/git.exe"
+  ]
 
 }
 
