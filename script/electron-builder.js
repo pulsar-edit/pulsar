@@ -53,7 +53,7 @@ let options = {
     "exports/**/*",
     "keymaps/**/*",
     "menus/**/*",
-    "node_modules/**/**",
+    "node_modules/**/*",
     "resources/**/*",
     "script/**/*",
     "src/**/*",
@@ -120,8 +120,7 @@ let options = {
   "extraMetadata": {
   },
   "asarUnpack": [
-    "node_modules/github/bin/*",
-    "node_modules/dugite/git/**/**"
+    "node_modules/github/bin/*, node_modules/dugite/git"
   ]
 
 }
