@@ -53,7 +53,7 @@ let options = {
     "exports/**/*",
     "keymaps/**/*",
     "menus/**/*",
-    "node_modules/**/*",
+    "node_modules/**/**",
     "resources/**/*",
     "script/**/*",
     "src/**/*",
@@ -121,7 +121,7 @@ let options = {
   },
   "asarUnpack": [
     "node_modules/github/bin/*",
-    "node_modules/dugite/git/cmd/git.exe"
+    "node_modules/dugite/git/**/**"
   ]
 
 }
