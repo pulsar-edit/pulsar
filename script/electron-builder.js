@@ -120,7 +120,10 @@ let options = {
   "extraMetadata": {
   },
   "asarUnpack": [
-    "node_modules/github/bin/*, node_modules/dugite/git"
+    "node_modules/github/bin/*",
+    "node_modules/github/lib/*",
+    "node_modules/dugite/git/**/*" // The git folder isn't created during the install.
+    // As we can see it's not included in the asarArchive, meaning dugite/git doesn't exist
   ]
 
 }

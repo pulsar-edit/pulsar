@@ -172,8 +172,10 @@ windows_task:
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
     - cd ppm; npm install
-  install_without_scripts_script:
-    - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
+  install_with_scripts_script:
+    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
+  #install_without_scripts_script:
+  #  - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
   rebuild_for_electron_script:
     - npx yarn build || npx yarn build || npx yarn build
   # install_only_electron_script:
