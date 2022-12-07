@@ -76,6 +76,30 @@ let options = {
     "spec/spec-helper-functions.js",
     "spec/atom-reporter.js",
     "spec/jasmine-list-reporter.js",
+
+    // The following are taken directly from Atom (Hoping they still apply)
+    "!**/{.jshintrc,.npmignore,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
+    "!**/{.coffeelintignore,.git-keep}",
+    "!**/git-utils/deps",
+    "!**/oniguruma/deps",
+    "!**/less/dist",
+    "!**/npm/{doc,html,man}",
+    "!**/pegjs/examples",
+    "!**/get-parameter-names/node_modules/{testla,.bin}",
+    "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
+    "!**/build/Release/{obj.target,obj,.deps}",
+    "!**/deps/libgit2",
+    // These are only required in dev-mode, when pegjs grammars aren't precompiled
+    "!node_modules/loophole",
+    "!node_modules/pegjs",
+    "!node_modules/.bin/pegjs",
+    // node_modules of the fuzzy-native package are only required for building it
+    "!node_modules/fuzzy-native/node_modules",
+    // Ignore *.cc and *.h files from native modules
+    "!**/*.{cc,h}",
+    // Handpicked spec folders
+    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector,link,json-schema-traverse}/spec"
+
   ],
   "extraResources": [
     {
@@ -121,9 +145,9 @@ let options = {
   },
   "asarUnpack": [
     "node_modules/github/bin/*",
-    "node_modules/github/lib/*",
-    "node_modules/dugite/git/**/*" // The git folder isn't created during the install.
-    // As we can see it's not included in the asarArchive, meaning dugite/git doesn't exist
+    "node_modules/github/lib/*", // Resolves Error in console
+    "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
+    "**/node_modules/spellchecker/**", // Matching Atom Glob
   ]
 
 }
