@@ -48,14 +48,14 @@ let options = {
   "publish": null,
   files: [
     "package.json",
-    "docs/**/*",
+    "!docs/",
     "dot-atom/**/*",
     "exports/**/*",
-    "keymaps/**/*",
-    "menus/**/*",
+    "!keymaps/",
+    "!menus/",
     "node_modules/**/*",
     "resources/**/*",
-    "script/**/*",
+    "!script/",
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
@@ -110,8 +110,8 @@ let options = {
     // The following are cherry-picked for Pulsar
     "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
     "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
-    "!**/{Makefile,.editorconfig,.nycrc,.coffeelint.json,.github,.vscode}",
-    "!**/*.js.map"
+    "!**/{Makefile,.editorconfig,.nycrc,.coffeelint.json,.github,.vscode,coffeelint.json}",
+    "!**/*.js.map",
   ],
   "extraResources": [
     {
