@@ -85,10 +85,14 @@ let options = {
     "!**/less/dist",
     "!**/npm/{doc,html,man}",
     "!**/pegjs/examples",
-    "!**/get-parameter-names/node_modules/{testla,.bin}",
+    "!**/get-parameter-names/node_modules/testla",
+    "!**/get-parameter-names/node_modules/.bin/testla",
+    "!**/jasmine-reporters/ext",
+    "!**/node_modules/native-mate",
     "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
     "!**/build/Release/{obj.target,obj,.deps}",
     "!**/deps/libgit2",
+    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
     "!node_modules/loophole",
     "!node_modules/pegjs",
@@ -98,8 +102,16 @@ let options = {
     // Ignore *.cc and *.h files from native modules
     "!**/*.{cc,h}",
     // Handpicked spec folders
-    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector,link,json-schema-traverse}/spec"
+    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
+    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
+    // Ignore babel-core spec
+    "!**/node_modules/babel-core/lib/transformation/transforers/spec",
 
+    // The following are cherry-picked for Pulsar
+    "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
+    "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
+    "!**/{Makefile,.editorconfig,.nycrc,.coffeelint.json,.github,.vscode}",
+    "!**/*.js.map"
   ],
   "extraResources": [
     {
