@@ -94,9 +94,9 @@ let options = {
     "!**/deps/libgit2",
     "!**/node_modules/spellchecker/vendor/hunspell/.*",
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
-    "!node_modules/loophole",
-    "!node_modules/pegjs",
-    "!node_modules/.bin/pegjs",
+      // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
+      // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
+      // "!node_modules/.bin/pegjs",
     // node_modules of the fuzzy-native package are only required for building it
     "!node_modules/fuzzy-native/node_modules",
     // Ignore *.cc and *.h files from native modules
