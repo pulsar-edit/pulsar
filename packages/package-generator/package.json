@@ -16,7 +16,7 @@
     "temp": "^0.8.1",
     "underscore-plus": "^1.0.0"
   },
-  "repository": "https://github.com/pulsar-edit/package-generator",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": "*"
   },
