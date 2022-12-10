@@ -93,37 +93,36 @@ let options = {
     // Build Chain Exclusions
     "!**/*.{cc,h}", // Ignore *.cc and *.h files from native modules
     "!**/*.js.map",
+    "!**/{Makefile}",
     "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
     "!**/build/Release/{obj.target,obj,.deps}",
-    "!**/{Makefile}",
 
     // Test Exclusions
-    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
     "!**/pegjs/examples",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
     "!**/node_modules/babel-core/lib/transformation/transforers/spec", // Ignore babel-core spec
     "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
     "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
     "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
 
     // Other Exclusions
+    "!**/._*",
     "!**/node_modules/*.d.ts",
     "!**/node_modules/.bin",
-    "!**/._*",
+    "!**/node_modules/native-mate",
+    "!node_modules/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
+    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
     "!**/less/dist",
     "!**/get-parameter-names/node_modules/testla",
     "!**/get-parameter-names/node_modules/.bin/testla",
     "!**/jasmine-reporters/ext",
-    "!**/node_modules/native-mate",
     "!**/deps/libgit2",
-    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
       // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
       // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
       // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
-    // node_modules of the fuzzy-native package are only required for building it
-    "!node_modules/fuzzy-native/node_modules",
   ],
   "extraResources": [
     {
