@@ -38,10 +38,9 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 const builder = require("electron-builder")
 const Platform = builder.Platform
 
-const generate = require('./lib/generate-metadata.js')
 
-const pngIcon = 'resources/app-icons/nightly/png/1024.png'
-const icoIcon = 'resources/app-icons/nightly/pulsar.ico'
+const pngIcon = 'resources/app-icons/beta.png'
+const icoIcon = 'resources/app-icons/beta.ico'
 
 let options = {
   "appId": "com.pulsar-edit.pulsar",
@@ -49,14 +48,14 @@ let options = {
   "publish": null,
   files: [
     "package.json",
-    "docs/**/*",
+    "!docs/",
     "dot-atom/**/*",
     "exports/**/*",
-    "keymaps/**/*",
-    "menus/**/*",
+    "!keymaps/",
+    "!menus/",
     "node_modules/**/*",
     "resources/**/*",
-    "script/**/*",
+    "!script/",
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
@@ -69,7 +68,50 @@ let options = {
     "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
     "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
     "!**/{appveyor.yml,.travis.yml,circle.yml}",
-    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+
+    "spec/jasmine-test-runner.js",
+    "spec/spec-helper.js",
+    "spec/jasmine-junit-reporter.js",
+    "spec/spec-helper-functions.js",
+    "spec/atom-reporter.js",
+    "spec/jasmine-list-reporter.js",
+
+    // The following are taken directly from Atom (Hoping they still apply)
+    "!**/{.jshintrc,.npmignore,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
+    "!**/{.coffeelintignore,.git-keep}",
+    "!**/git-utils/deps",
+    "!**/oniguruma/deps",
+    "!**/less/dist",
+    "!**/npm/{doc,html,man}",
+    "!**/pegjs/examples",
+    "!**/get-parameter-names/node_modules/testla",
+    "!**/get-parameter-names/node_modules/.bin/testla",
+    "!**/jasmine-reporters/ext",
+    "!**/node_modules/native-mate",
+    "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
+    "!**/build/Release/{obj.target,obj,.deps}",
+    "!**/deps/libgit2",
+    "!**/node_modules/spellchecker/vendor/hunspell/.*",
+    // These are only required in dev-mode, when pegjs grammars aren't precompiled
+      // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
+      // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
+      // "!node_modules/.bin/pegjs",
+    // node_modules of the fuzzy-native package are only required for building it
+    "!node_modules/fuzzy-native/node_modules",
+    // Ignore *.cc and *.h files from native modules
+    "!**/*.{cc,h}",
+    // Handpicked spec folders
+    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
+    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
+    // Ignore babel-core spec
+    "!**/node_modules/babel-core/lib/transformation/transforers/spec",
+
+    // The following are cherry-picked for Pulsar
+    "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
+    "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
+    "!**/{Makefile,.editorconfig,.nycrc,.coffeelint.json,.github,.vscode,coffeelint.json}",
+    "!**/*.js.map",
   ],
   "extraResources": [
     {
@@ -77,7 +119,7 @@ let options = {
       "to": "pulsar.sh"
     }, {
       "from": "ppm",
-      "to": "app/apm"
+      "to": "app/ppm"
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
@@ -92,11 +134,12 @@ let options = {
   "linux": {
     "icon": pngIcon,
     "category": "Development",
-    "synopsis": "A hackable text editor for the 22nd century",
+    "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
       { target: "appimage" },
       { target: "deb" },
-      { target: "rpm" }
+      { target: "rpm" },
+      { target: "tar.gz" }
     ],
   },
   "mac": {
@@ -111,11 +154,33 @@ let options = {
     ]
   },
   "extraMetadata": {
+  },
+  "asarUnpack": [
+    "node_modules/github/bin/*",
+    "node_modules/github/lib/*", // Resolves Error in console
+    "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
+    "**/node_modules/spellchecker/**", // Matching Atom Glob
+  ]
+
+}
+
+function whatToBuild() {
+  const argvStartingWith = process.argv.findIndex(e => e.match('electron-builder.js'))
+  const what = process.argv[argvStartingWith + 1]
+  if(what) {
+    const filter = e => e.target === what
+    options.linux.target = options.linux.target.filter(filter)
+    options.win.target = options.win.target.filter(filter)
+    // options.mac.target = options.mac.target.filter(filter)
+    return options
+  } else {
+    return options
   }
 }
 
 async function main() {
   const package = await fs.readFile('package.json', "utf-8")
+  let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
     //targets: Platform.LINUX.createTarget(),

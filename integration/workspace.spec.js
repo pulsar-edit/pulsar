@@ -52,24 +52,32 @@ test.describe('Opening Atom for the first time', () => {
 
   test('the editor opens at the welcome page', async () => {
     const workspace = editor.page.locator('atom-workspace')
-    await expect(workspace).toHaveText(/A hackable text editor/, {
+    await expect(workspace).toHaveText(/A Community-led Hyper-Hackable Text Editor/, {
       useInnerText: true,
     })
   })
 
-  // FIXME: mock backend, Atom's servers are unreliable!
-  // test('allows to search for packages', async () => {
-  //   await runCommand(editor, 'Settings View: Open')
-  //   await editor.page.locator('a.icon', { hasText: 'Install' }).click()
-  //   await typeInEditor(editor, '.packages', "language-javascript")
-  //   await expect(editor.page.locator('.package-name', { hasText: 'language-javascript' }).first())
-  //     .toBeVisible()
-  // })
+  //test('shows core packages', async () => {
+  //  await runCommand(editor, 'Settings View: Open')
+  //  await editor.page.locator('a.icon', { hasText: 'Packages' }).click()
+  //  await expect(editor.page.locator('.package-name', { hasText: 'about' }).first())
+  //    .toBeVisible()
+  //})
+
+  //test('allows to install for packages', async () => {
+  //  await runCommand(editor, 'Settings View: Open')
+  //  await editor.page.locator('a.icon', { hasText: 'Install' }).click()
+  //  await typeInEditor(editor, '.packages', "termination")
+  //  await editor.page.locator('button.install-button:visible', { hasText: 'Install' }).click()
+  //  test.setTimeout(120000);
+  //  await expect(editor.page.locator('button', { hasText: 'Settings' }).first())
+  //    .toBeVisible({ timeout: 120000 })
+  //})
 
   test.describe('the editor have syntax highlight', async () => {
     test.beforeAll(async () => {
       const workspace = editor.page.locator('atom-workspace')
-      await expect(workspace).toHaveText(/A hackable text editor/, {
+      await expect(workspace).toHaveText(/A Community-led Hyper-Hackable Text Editor/, {
         useInnerText: true,
       })
       await runCommand(editor, 'Tabs: Close All Tabs')

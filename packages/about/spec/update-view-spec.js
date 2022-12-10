@@ -257,7 +257,7 @@ describe('UpdateView', () => {
           expect(
             aboutElement.querySelector('.about-default-update-message')
               .textContent
-          ).toBe('Atom will check for updates automatically');
+          ).toBe('Pulsar will check for updates automatically');
 
           atom.config.set('core.automaticallyUpdate', false);
           await scheduler.getNextUpdatePromise();
@@ -307,7 +307,7 @@ describe('UpdateView', () => {
           expect(
             aboutElement.querySelector('.about-default-update-message')
               .textContent
-          ).toBe('Atom will check for updates automatically');
+          ).toBe('Pulsar will check for updates automatically');
         });
 
         describe('checking for updates', function() {

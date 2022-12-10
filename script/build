@@ -1,4 +1,0 @@
-#!/usr/bin/env node
-
-console.warn('`script/build` is deprecated. Use `node script/build.js` instead');
-require('./build.js');

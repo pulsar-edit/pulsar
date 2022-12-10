@@ -167,11 +167,18 @@ module.exports = class AtomApplication extends EventEmitter {
     if (
       !socketPath ||
       options.test ||
-      options.benchmark ||
-      options.benchmarkTest ||
       (process.platform !== 'win32' && !fs.existsSync(socketPath))
     ) {
       return createApplication(options);
+    }
+
+    // We haven't returned yet, so another editor main process must be running.
+    if (options.benchmark || options.benchmarkTest) {
+      // We have to log this quite early -- here is the latest we can log this
+      // and have it show in the same terminal where the second instance of the
+      // editor is being launched. The Promise below hands things off
+      // to the existing, older editor main process that is already running.
+      console.log('The benchmarking feature has been removed.');
     }
 
     return new Promise(resolve => {
@@ -237,7 +244,7 @@ module.exports = class AtomApplication extends EventEmitter {
     this.storageFolder = new StorageFolder(process.env.ATOM_HOME);
     this.autoUpdateManager = new AutoUpdateManager(
       this.version,
-      options.test || options.benchmark || options.benchmarkTest,
+      options.test,
       this.config
     );
 
@@ -266,7 +273,7 @@ module.exports = class AtomApplication extends EventEmitter {
     );
 
     let socketServerPromise;
-    if (options.test || options.benchmark || options.benchmarkTest) {
+    if (options.test) {
       socketServerPromise = Promise.resolve();
     } else {
       socketServerPromise = this.listenForArgumentsFromNewProcess();
@@ -380,15 +387,14 @@ module.exports = class AtomApplication extends EventEmitter {
         env
       });
     } else if (benchmark || benchmarkTest) {
-      return this.runBenchmarks({
-        headless: true,
-        test: benchmarkTest,
-        resourcePath: this.resourcePath,
-        executedFrom,
-        pathsToOpen,
-        timeout,
-        env
-      });
+      // We are keeping these startup options so we can print a removal message.
+      // Printing a message saying benchmarks are removed will help avoid
+      // confusion about the editor failing to launch in this mode.
+      console.log("The benchmarking feature has been removed.");
+      if (this.getAllWindows().length === 0) {
+        console.log("Quitting.");
+        app.quit();
+      };
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -584,24 +590,24 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on('application:open-documentation', () =>
-      shell.openExternal('http://flight-manual.atom.io')
+      shell.openExternal('https://pulsar-edit.dev/docs/')
     );
     this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/atom/atom/discussions')
+      shell.openExternal('https://github.com/orgs/pulsar-edit/discussions')
     );
     this.on('application:open-faq', () =>
-      shell.openExternal('https://atom.io/faq')
+      shell.openExternal('https://pulsar-edit.dev/docs/launch-manual/sections/faq/')
     );
     this.on('application:open-terms-of-use', () =>
       shell.openExternal('https://atom.io/terms')
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
-        'https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs'
+        'https://github.com/pulsar-edit/pulsar/issues/new/choose'
       )
     );
     this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/search?q=+is%3Aissue+user%3Aatom')
+      shell.openExternal('https://github.com/pulsar-edit/pulsar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
     );
 
     this.on('application:install-update', () => {
@@ -909,12 +915,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'run-benchmarks', (event, benchmarksPath) => {
-        this.runBenchmarks({
-          resourcePath: this.devResourcePath,
-          pathsToOpen: [benchmarksPath],
-          headless: false,
-          test: false
-        });
+        // Printing a message saying benchmarks are removed will help avoid
+        // confusion about the benchmarking feature not working.
+        console.log("The benchmarking feature has been removed.");
       })
     );
 
@@ -1768,67 +1771,6 @@ module.exports = class AtomApplication extends EventEmitter {
     });
     this.addWindow(window);
     if (env) window.replaceEnvironment(env);
-    return window;
-  }
-
-  runBenchmarks({
-    headless,
-    test,
-    resourcePath,
-    executedFrom,
-    pathsToOpen,
-    env
-  }) {
-    let windowInitializationScript;
-    if (resourcePath !== this.resourcePath && !fs.existsSync(resourcePath)) {
-      ({ resourcePath } = this);
-    }
-
-    try {
-      windowInitializationScript = require.resolve(
-        path.resolve(this.devResourcePath, 'src', 'initialize-benchmark-window')
-      );
-    } catch (error) {
-      windowInitializationScript = require.resolve(
-        path.resolve(
-          __dirname,
-          '..',
-          '..',
-          'src',
-          'initialize-benchmark-window'
-        )
-      );
-    }
-
-    const benchmarkPaths = [];
-    if (pathsToOpen != null) {
-      for (let pathToOpen of pathsToOpen) {
-        benchmarkPaths.push(
-          path.resolve(executedFrom, fs.normalize(pathToOpen))
-        );
-      }
-    }
-
-    if (benchmarkPaths.length === 0) {
-      process.stderr.write('Error: Specify at least one benchmark path.\n\n');
-      process.exit(1);
-    }
-
-    const devMode = true;
-    const isSpec = true;
-    const safeMode = false;
-    const window = this.createWindow({
-      windowInitializationScript,
-      resourcePath,
-      headless,
-      test,
-      isSpec,
-      devMode,
-      benchmarkPaths,
-      safeMode,
-      env
-    });
-    this.addWindow(window);
     return window;
   }
 

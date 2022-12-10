@@ -1,4 +1,4 @@
-## One Dark UI theme [![Build Status](https://travis-ci.org/atom/one-dark-ui.svg?branch=master)](https://travis-ci.org/atom/one-dark-ui)
+## One Dark UI theme
 
 A dark UI theme that adapts to most syntax themes.
 

@@ -81,8 +81,3 @@ jobs:
       - name: Test
         run: |
           atom --test spec
-
-      - name: Lint
-        run: |
-          coffeelint grammars
-          coffeelint spec
