@@ -16,7 +16,7 @@
     "temp": "^0.8.1",
     "underscore-plus": "^1.0.0"
   },
-  "repository": "https://github.com/atom/package-generator",
+  "repository": "https://github.com/pulsar-edit/package-generator",
   "engines": {
     "atom": "*"
   },
@@ -27,7 +27,7 @@
     "createInDevMode": {
       "default": false,
       "type": "boolean",
-      "description": "When disabled, generated packages are linked into Atom in both normal mode and dev mode. When enabled, generated packages are linked into Atom only in dev mode."
+      "description": "When disabled, generated packages are linked into Pulsar in both normal mode and dev mode. When enabled, generated packages are linked into Pulsar only in dev mode."
     },
     "packageSyntax": {
       "default": "javascript",
