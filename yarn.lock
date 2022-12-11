@@ -3705,17 +3705,13 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dugite@1.92.0:
-  version "1.92.0"
-  resolved "https://registry.yarnpkg.com/dugite/-/dugite-1.92.0.tgz#34a32a35ba5e69a61c62afa686a9a27944e0f5f0"
-  integrity sha512-Xra5E2ISwy+sCUrlcBkBsOpP85u5lsbaMnRpnvMJpO+KSoCGccMUimekGS+Ry8ZRni80gHw83MKSrdycaH2bZg==
+dugite@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.1.0.tgz#6f50c2244e57aaac2f36440aa7289815c73a688c"
+  integrity sha512-4l4jJz5zC6Q+/8doQNQZ9Ss3rmnO/JCHfOmQO+zGv+TIOUXimzfS02RvUOuFpEhZuaFTeFBSuK6ll/02TX3SxA==
   dependencies:
-    checksum "^0.1.1"
-    got "^9.6.0"
-    mkdirp "^0.5.1"
     progress "^2.0.3"
-    rimraf "^2.5.4"
-    tar "^4.4.7"
+    tar "^6.1.11"
 
 dugite@^1.86.0:
   version "1.110.0"
@@ -4791,9 +4787,9 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
-"github@https://github.com/pulsar-edit/github.git#v0.36.11":
-  version "0.36.11"
-  resolved "https://github.com/pulsar-edit/github.git#9d24c3a547d83732782c08b596420485f81f13b6"
+"github@https://github.com/pulsar-edit/github.git#v0.36.13":
+  version "0.36.13"
+  resolved "https://github.com/pulsar-edit/github.git#3202eb1eb5a2061bbc919489cc5e25656de531f7"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -4809,7 +4805,7 @@ github-from-package@0.0.0:
     classnames "2.2.6"
     compare-sets "1.0.1"
     dompurify "2.0.17"
-    dugite "1.92.0"
+    dugite "2.1.0"
     event-kit "2.5.3"
     fs-extra "4.0.3"
     graphql "14.5.8"
