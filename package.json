@@ -211,7 +211,7 @@
     "exception-reporting": "file:./packages/exception-reporting",
     "find-and-replace": "0.220.1",
     "fuzzy-finder": "1.14.3",
-    "github": "0.36.12",
+    "github": "0.36.13",
     "git-diff": "file:./packages/git-diff",
     "go-to-line": "file:./packages/go-to-line",
     "grammar-selector": "file:./packages/grammar-selector",
