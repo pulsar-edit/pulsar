@@ -47,29 +47,18 @@ let options = {
   "npmRebuild": false,
   "publish": null,
   files: [
+    // --- Inclusions ---
+    // Core Repo Inclusions
     "package.json",
-    "!docs/",
     "dot-atom/**/*",
     "exports/**/*",
-    "!keymaps/",
-    "!menus/",
-    "node_modules/**/*",
     "resources/**/*",
-    "!script/",
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
-    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
-    "!**/node_modules/*.d.ts",
-    "!**/node_modules/.bin",
-    "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
-    "!.editorconfig",
-    "!**/._*",
-    "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
-    "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
-    "!**/{appveyor.yml,.travis.yml,circle.yml}",
-    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+    "node_modules/**/*",
 
+    // Core Repo Test Inclusions
     "spec/jasmine-test-runner.js",
     "spec/spec-helper.js",
     "spec/jasmine-junit-reporter.js",
@@ -77,41 +66,63 @@ let options = {
     "spec/atom-reporter.js",
     "spec/jasmine-list-reporter.js",
 
-    // The following are taken directly from Atom (Hoping they still apply)
-    "!**/{.jshintrc,.npmignore,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
-    "!**/{.coffeelintignore,.git-keep}",
+    // --- Exclusions ---
+    // Core Repo Exclusions
+    "!docs/",
+    "!keymaps/",
+    "!menus/",
+    "!script/",
+
+    // Git Related Exclusions
+    "!**/{.git,.gitignore,.gitattributes,.git-keep,.github}",
+    "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
+
+    // Development Tools Exclusions
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json,.npmignore}",
+    "!**/npm/{doc,html,man}",
+    "!.editorconfig",
+    "!**/{appveyor.yml,.travis.yml,circle.yml}",
+    "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+    "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+    "!**/{.jshintrc,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
+    "!**/{.coffeelintignore,.editorconfig,.nycrc,.coffeelint.json,.vscode,coffeelint.json}",
+
+    // Common File Exclusions
+    "!**/{.DS_Store,.hg,.svn,CVS,RCS,SCCS}",
+
+    // Build Chain Exclusions
+    "!**/*.{cc,h}", // Ignore *.cc and *.h files from native modules
+    "!**/*.js.map",
+    "!**/{Makefile}",
+    "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
+    "!**/build/Release/{obj.target,obj,.deps}",
+
+    // Test Exclusions
+    "!**/pegjs/examples",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+    "!**/node_modules/babel-core/lib/transformation/transforers/spec", // Ignore babel-core spec
+    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
+    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
+    "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
+
+    // Other Exclusions
+    "!**/._*",
+    "!**/node_modules/*.d.ts",
+    "!**/node_modules/.bin",
+    "!**/node_modules/native-mate",
+    "!node_modules/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
+    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
     "!**/less/dist",
-    "!**/npm/{doc,html,man}",
-    "!**/pegjs/examples",
     "!**/get-parameter-names/node_modules/testla",
     "!**/get-parameter-names/node_modules/.bin/testla",
     "!**/jasmine-reporters/ext",
-    "!**/node_modules/native-mate",
-    "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
-    "!**/build/Release/{obj.target,obj,.deps}",
     "!**/deps/libgit2",
-    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
       // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
       // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
-      // "!node_modules/.bin/pegjs",
-    // node_modules of the fuzzy-native package are only required for building it
-    "!node_modules/fuzzy-native/node_modules",
-    // Ignore *.cc and *.h files from native modules
-    "!**/*.{cc,h}",
-    // Handpicked spec folders
-    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
-    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
-    // Ignore babel-core spec
-    "!**/node_modules/babel-core/lib/transformation/transforers/spec",
-
-    // The following are cherry-picked for Pulsar
-    "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
-    "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
-    "!**/{Makefile,.editorconfig,.nycrc,.coffeelint.json,.github,.vscode,coffeelint.json}",
-    "!**/*.js.map",
+      // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
   ],
   "extraResources": [
     {
