@@ -140,7 +140,7 @@
     "one-light-syntax": "file:packages/one-light-syntax",
     "one-light-ui": "file:packages/one-light-ui",
     "open-on-github": "https://codeload.github.com/atom/open-on-github/legacy.tar.gz/refs/tags/v1.3.2",
-    "package-generator": "https://codeload.github.com/atom/package-generator/legacy.tar.gz/refs/tags/v1.3.0",
+    "package-generator": "file:packages/package-generator",
     "pathwatcher": "^8.1.2",
     "postcss": "8.2.10",
     "postcss-selector-parser": "6.0.4",
