@@ -1,0 +1,22 @@
+{
+  "name": "autocomplete-css",
+  "version": "0.17.5",
+  "description": "CSS property name and value autocompletions",
+  "main": "./lib/main",
+  "license": "MIT",
+  "repository": "https://github.com/atom/autocomplete-css",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "getProvider"
+      }
+    }
+  },
+  "devDependencies": {
+    "coffeelint": "^1.9.7",
+    "request": "^2.53.0"
+  }
+}
