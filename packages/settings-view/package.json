@@ -1,0 +1,52 @@
+{
+  "name": "settings-view",
+  "version": "0.261.11",
+  "main": "./lib/main",
+  "description": "Edit config settings, install packages, and change themes",
+  "license": "MIT",
+  "uriHandler": {
+    "method": "handleURI",
+    "deferActivation": false
+  },
+  "configSchema": {
+    "packageUpdateConcurrency": {
+      "title": "Maximum simultaneous package updates",
+      "description": "Limit how many processes run simultaneously during package updates. If your machine slows down while updating many packages at once, set this value to a small positive number (e.g., `1` or `2`).",
+      "type": "integer",
+      "default": -1
+    }
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "dompurify": "^2.0.17",
+    "etch": "0.9.0",
+    "fs-plus": "^3.0.0",
+    "fuzzaldrin": "^2.1",
+    "glob": "4.3.1",
+    "hosted-git-info": "^2.8.9",
+    "marked": "^4.0.10",
+    "request": "^2.83.0",
+    "season": "^6.0.2",
+    "semver": "^5.3.0",
+    "underscore-plus": "^1.0.6"
+  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": "*"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    },
+    "snippets": {
+      "versions": {
+        "0.1.0": "consumeSnippets"
+      }
+    }
+  },
+  "deserializers": {
+    "SettingsView": "createSettingsView"
+  }
+}
