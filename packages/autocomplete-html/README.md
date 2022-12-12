@@ -1,7 +1,6 @@
 # HTML Autocomplete package
-[![OS X Build Status](https://travis-ci.org/atom/autocomplete-html.svg?branch=master)](https://travis-ci.org/atom/autocomplete-html) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/bsaqbg1fljpd9q1b/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/autocomplete-html/branch/master) [![Dependency Status](https://david-dm.org/atom/autocomplete-html.svg)](https://david-dm.org/atom/autocomplete-html)
 
-HTML tag and attribute autocompletions in Atom.
+HTML tag and attribute autocompletions in Pulsar.
 
 Tag and attribute autocompletions are powered by the list of HTML tags [here](https://github.com/adobe/brackets/blob/master/src/extensions/default/HTMLCodeHints/HtmlTags.json) and HTML attributes [here](https://github.com/adobe/brackets/blob/master/src/extensions/default/HTMLCodeHints/HtmlAttributes.json).
 Descriptions are powered by [MDN](https://developer.mozilla.org).

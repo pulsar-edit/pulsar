@@ -4,7 +4,7 @@
   "description": "HTML element and attribute autocompletions",
   "main": "./lib/main",
   "license": "MIT",
-  "repository": "https://github.com/atom/autocomplete-html",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },
@@ -16,7 +16,6 @@
     }
   },
   "devDependencies": {
-    "coffeelint": "^1.9.7",
     "request": "^2.53.0"
   }
 }
