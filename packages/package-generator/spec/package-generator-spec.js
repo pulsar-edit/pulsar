@@ -180,15 +180,6 @@ describe('Package Generator', () => {
           })
         })
 
-        describe(`when the ${type} is a coffeescript package`, () => {
-          it('calls `apm init` with the correct syntax option', async () => {
-            atom.config.set('package-generator.packageSyntax', 'coffeescript')
-            await generatePackage(true)
-            expect(apmExecute.argsForCall[0][0]).toBe(atom.packages.getApmPath())
-            expect(apmExecute.argsForCall[0][1]).toEqual(packageInitCommandFor(`${packagePath}`, type, 'coffeescript'))
-          })
-        })
-
         describe(`when the ${type} is a javascript package`, () => {
           it('calls `apm init` with the correct syntax option', async () => {
             atom.config.set('package-generator.packageSyntax', 'javascript')

@@ -30,7 +30,6 @@
       "default": "javascript",
       "type": "string",
       "enum": [
-        "coffeescript",
         "javascript"
       ],
       "description": "The syntax to generate packages with."
