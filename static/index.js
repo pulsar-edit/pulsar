@@ -7,7 +7,6 @@
   const path = require('path');
   const Module = require('module');
   const getWindowLoadSettings = require('../src/get-window-load-settings');
-  const getReleaseChannel = require('../src/get-release-channel');
   const StartupTime = require('../src/startup-time');
   const entryPointDirPath = __dirname;
   let blobStore = null;
@@ -19,7 +18,9 @@
   }
   StartupTime.addMarker('window:start', startWindowTime);
 
-  window.onload = function() {
+  window.onload = async function() {
+    const {superstring} = require('superstring');
+    await superstring;
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
