@@ -7328,6 +7328,19 @@ pathwatcher@^8.0.0, pathwatcher@^8.1.0, pathwatcher@^8.1.2:
     nan "^2.10.0"
     underscore-plus "~1.x"
 
+"pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f":
+  version "8.1.2"
+  resolved "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1"
+  dependencies:
+    async "~0.2.10"
+    emissary "^1.3.2"
+    event-kit "^2.1.0"
+    fs-plus "^3.0.0"
+    grim "^2.0.1"
+    iconv-lite "~0.4.4"
+    nan "^2.10.0"
+    underscore-plus "~1.x"
+
 pause-stream@0.0.11:
   version "0.0.11"
   resolved "https://registry.yarnpkg.com/pause-stream/-/pause-stream-0.0.11.tgz#fe5a34b0cbce12b5aa6a2b403ee2e73b602f1445"
@@ -8716,6 +8729,10 @@ superstring@^2.4.4:
   dependencies:
     nan "^2.14.2"
 
+"superstring@https://github.com/pulsar-edit/superstring-wasm.git#3fa4588":
+  version "2.4.4"
+  resolved "https://github.com/pulsar-edit/superstring-wasm.git#3fa4588b079dd5a0e37d3003671a9130d7fbc75b"
+
 supports-color@6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-6.0.0.tgz#76cfe742cf1f41bb9b1c29ad03068c05b4c0e40a"
@@ -8894,10 +8911,9 @@ temp@^0.9.0, temp@~0.9.0:
     mkdirp "^0.5.1"
     rimraf "~2.6.2"
 
-text-buffer@^13.18.6:
+"text-buffer@https://github.com/pulsar-edit/text-buffer.git#5cd684c07":
   version "13.18.6"
-  resolved "https://registry.yarnpkg.com/text-buffer/-/text-buffer-13.18.6.tgz#0191a6185177b26e3560cb07988701ac2d30ae9f"
-  integrity sha512-kgtWyJL9ktX0+ynDxUILaB/XGsaMOSzbKgyyDO9s4sN6X8Cq+ZIMNRDDMG29iztK8nZxuynzcuo1vHQojpdT9A==
+  resolved "https://github.com/pulsar-edit/text-buffer.git#5cd684c07e3712766393b17bbd67d7af8850ed8a"
   dependencies:
     delegato "^1.0.0"
     diff "^2.2.1"
@@ -8907,9 +8923,9 @@ text-buffer@^13.18.6:
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    pathwatcher "^8.1.0"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
     serializable "^1.0.3"
-    superstring "^2.4.4"
+    superstring "https://github.com/pulsar-edit/superstring-wasm.git#3fa4588"
     underscore-plus "^1.0.0"
     winattr "^3.0.0"
 
