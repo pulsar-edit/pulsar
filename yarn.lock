@@ -2270,13 +2270,11 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "0.10.7"
   resolved "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7#c9d51fa721d543ccfc1b2189101155e81db6b97d"
 
-"autocomplete-css@https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5":
+"autocomplete-css@file:packages/autocomplete-css":
   version "0.17.5"
-  resolved "https://codeload.github.com/atom/autocomplete-css/legacy.tar.gz/refs/tags/v0.17.5#a6b38bca90bdba18a2f40c366266cda93bf582c3"
 
-"autocomplete-html@https://github.com/pulsar-edit/autocomplete-html.git#v0.8.9":
+"autocomplete-html@file:packages/autocomplete-html":
   version "0.8.9"
-  resolved "https://github.com/pulsar-edit/autocomplete-html.git#4d0c180bade12e90ec3fce944ba3759723e64ba4"
 
 "autocomplete-plus@https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4":
   version "2.42.4"
@@ -3705,17 +3703,13 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dugite@1.92.0:
-  version "1.92.0"
-  resolved "https://registry.yarnpkg.com/dugite/-/dugite-1.92.0.tgz#34a32a35ba5e69a61c62afa686a9a27944e0f5f0"
-  integrity sha512-Xra5E2ISwy+sCUrlcBkBsOpP85u5lsbaMnRpnvMJpO+KSoCGccMUimekGS+Ry8ZRni80gHw83MKSrdycaH2bZg==
+dugite@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.1.0.tgz#6f50c2244e57aaac2f36440aa7289815c73a688c"
+  integrity sha512-4l4jJz5zC6Q+/8doQNQZ9Ss3rmnO/JCHfOmQO+zGv+TIOUXimzfS02RvUOuFpEhZuaFTeFBSuK6ll/02TX3SxA==
   dependencies:
-    checksum "^0.1.1"
-    got "^9.6.0"
-    mkdirp "^0.5.1"
     progress "^2.0.3"
-    rimraf "^2.5.4"
-    tar "^4.4.7"
+    tar "^6.1.11"
 
 dugite@^1.86.0:
   version "1.110.0"
@@ -4791,9 +4785,9 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
-"github@https://github.com/pulsar-edit/github.git#v0.36.11":
-  version "0.36.11"
-  resolved "https://github.com/pulsar-edit/github.git#9d24c3a547d83732782c08b596420485f81f13b6"
+"github@https://github.com/pulsar-edit/github.git#v0.36.13":
+  version "0.36.13"
+  resolved "https://github.com/pulsar-edit/github.git#3202eb1eb5a2061bbc919489cc5e25656de531f7"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -4809,7 +4803,7 @@ github-from-package@0.0.0:
     classnames "2.2.6"
     compare-sets "1.0.1"
     dompurify "2.0.17"
-    dugite "1.92.0"
+    dugite "2.1.0"
     event-kit "2.5.3"
     fs-extra "4.0.3"
     graphql "14.5.8"
@@ -7222,9 +7216,8 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-"package-generator@https://codeload.github.com/atom/package-generator/legacy.tar.gz/refs/tags/v1.3.0":
+"package-generator@file:packages/package-generator":
   version "1.3.0"
-  resolved "https://codeload.github.com/atom/package-generator/legacy.tar.gz/refs/tags/v1.3.0#ddf15bc1e1a2539b2c4d16ede9ec0cd4cec868e2"
   dependencies:
     fs-plus "^3.0.0"
     temp "^0.8.1"

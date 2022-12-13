@@ -1,0 +1,2225 @@
+{
+  "tags": [
+    "a",
+    "b",
+    "blockquote",
+    "body",
+    "br",
+    "button",
+    "canvas",
+    "code",
+    "div",
+    "em",
+    "form",
+    "footer",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "head",
+    "header",
+    "hgroup",
+    "hr",
+    "html",
+    "i",
+    "iframe",
+    "img",
+    "input",
+    "label",
+    "li",
+    "nav",
+    "ol",
+    "p",
+    "pre",
+    "select",
+    "span",
+    "strong",
+    "sub",
+    "summary",
+    "table",
+    "td",
+    "textarea",
+    "th",
+    "title",
+    "tr",
+    "ul",
+    "abbr",
+    "address",
+    "area",
+    "article",
+    "aside",
+    "audio",
+    "base",
+    "bdi",
+    "bdo",
+    "big",
+    "caption",
+    "cite",
+    "col",
+    "colgroup",
+    "command",
+    "datalist",
+    "dd",
+    "del",
+    "details",
+    "dfn",
+    "dialog",
+    "dl",
+    "dt",
+    "embed",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "ilayer",
+    "ins",
+    "kbd",
+    "keygen",
+    "legend",
+    "link",
+    "main",
+    "map",
+    "mark",
+    "marquee",
+    "menu",
+    "meta",
+    "meter",
+    "noscript",
+    "object",
+    "optgroup",
+    "option",
+    "output",
+    "param",
+    "progress",
+    "q",
+    "rp",
+    "rt",
+    "ruby",
+    "samp",
+    "script",
+    "section",
+    "small",
+    "source",
+    "style",
+    "sup",
+    "tbody",
+    "tfoot",
+    "thead",
+    "time",
+    "track",
+    "tt",
+    "var",
+    "video",
+    "wbr"
+  ],
+  "properties": {
+    "width": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Specifies the width of an element."
+    },
+    "height": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Specifies the height of an element."
+    },
+    "margin": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Sets the margin area on all four sides of an element."
+    },
+    "margin-left": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Sets the margin area on the left side of an element."
+    },
+    "margin-right": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Sets the margin area on the right side of an element."
+    },
+    "margin-top": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Sets the margin area on the top of an element."
+    },
+    "margin-bottom": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Sets the margin area on the bottom of an element."
+    },
+    "padding": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Sets the padding area on all four sides of an element."
+    },
+    "padding-left": {
+      "values": [],
+      "description": "Sets the width of the padding area on the left side of an element."
+    },
+    "padding-right": {
+      "values": [],
+      "description": "Sets the width of the padding area on the right side of an element."
+    },
+    "padding-top": {
+      "values": [],
+      "description": "Sets the height of the padding area on the top of an element."
+    },
+    "padding-bottom": {
+      "values": [],
+      "description": "Sets the height of the padding area on the bottom of an element."
+    },
+    "font": {
+      "values": [],
+      "description": "Either a shorthand property for setting font-style, font-variant, font-weight, font-size, line-height, and font-family ; or a way to set the element's font to a system font, using specific keywords."
+    },
+    "font-size": {
+      "values": [],
+      "description": "Specifies the size of the font."
+    },
+    "font-style": {
+      "values": [
+        "italic",
+        "normal",
+        "oblique"
+      ],
+      "description": "Specifies whether a font should be styled with a normal, italic, or oblique face from its font-family."
+    },
+    "font-weight": {
+      "values": [
+        "bold",
+        "bolder",
+        "lighter",
+        "normal",
+        "100",
+        "200",
+        "300",
+        "400",
+        "500",
+        "600",
+        "700",
+        "800",
+        "900",
+        "inherit"
+      ],
+      "description": "Specifies the weight (or boldness) of the font."
+    },
+    "font-family": {
+      "values": [
+        "cursive",
+        "fantasy",
+        "inherit",
+        "monospace",
+        "sans-serif",
+        "serif"
+      ],
+      "description": "Specifies a prioritized list of one or more font family names and/or generic family names for the selected element."
+    },
+    "border": {
+      "values": [],
+      "description": "A shorthand property for setting all individual border property values at once: border-width, border-style, and border-color."
+    },
+    "border-radius": {
+      "values": [],
+      "description": "Allows Web authors to define how rounded border corners are."
+    },
+    "border-top": {
+      "values": [],
+      "description": "A shorthand that sets the values of border-top-color, border-top-style, and border-top-width."
+    },
+    "border-bottom": {
+      "values": [],
+      "description": "A shorthand that sets the values of border-bottom-color, border-bottom-style, and border-bottom-width."
+    },
+    "border-left": {
+      "values": [],
+      "description": "A shorthand that sets the values of border-left-color, border-left-style, and border-left-width."
+    },
+    "border-right": {
+      "values": [],
+      "description": "A shorthand that sets the values of border-right-color, border-right-style, and border-right-width."
+    },
+    "border-color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "A shorthand property for setting the color of the four sides of an element's border."
+    },
+    "border-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "A shorthand property for setting the widths on all four sides of an element's border: border-top-width, border-right-width, border-bottom-width, and border-left-width."
+    },
+    "position": {
+      "values": [
+        "absolute",
+        "fixed",
+        "relative",
+        "static",
+        "sticky",
+        "inherit"
+      ],
+      "description": "Specifies how an element is positioned in a document."
+    },
+    "text-align": {
+      "values": [
+        "center",
+        "left",
+        "justify",
+        "right",
+        "inherit"
+      ],
+      "description": "Describes how inline content like text is aligned in its parent block element."
+    },
+    "background": {
+      "values": [],
+      "description": "The CSS background shorthand property lets you adjust all of the available background style options at once, including color image, origin and size, repeat method, and other features."
+    },
+    "background-color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the background color of an element, using either a color value or the keyword transparent."
+    },
+    "background-position": {
+      "values": [
+        "left",
+        "center",
+        "right",
+        "bottom",
+        "top"
+      ],
+      "description": "Sets the initial position for each defined background image, relative to the background position layer defined by background-origin."
+    },
+    "background-repeat": {
+      "values": [
+        "no-repeat",
+        "repeat",
+        "repeat-x",
+        "repeat-y",
+        "round",
+        "space"
+      ],
+      "description": "Defines how background images are repeated."
+    },
+    "background-image": {
+      "values": [
+        "image()",
+        "linear-gradient()",
+        "radial-gradient()",
+        "repeating-linear-gradient()",
+        "repeating-radial-gradient()",
+        "url()"
+      ],
+      "description": "Sets one or more background images on an element."
+    },
+    "background-size": {
+      "values": [
+        "auto",
+        "contain",
+        "cover"
+      ],
+      "description": "Specifies the size of an element's background image."
+    },
+    "background-clip": {
+      "values": [
+        "border-box",
+        "content-box",
+        "padding-box",
+        "inherit"
+      ],
+      "description": "Specifies if an element's background, whether a color or an image, extends underneath its border."
+    },
+    "right": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Participates in specifying the horizontal position of a positioned element."
+    },
+    "left": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Participates in specifying the horizontal position of a positioned element."
+    },
+    "top": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Participates in specifying the vertical position of a positioned element."
+    },
+    "bottom": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Participates in specifying the vertical position of a positioned element."
+    },
+    "overflow": {
+      "values": [
+        "auto",
+        "hidden",
+        "scroll",
+        "visible",
+        "inherit"
+      ],
+      "description": "Shorthand for the overflow-x and overflow-y properties, and specifies what to do when content is too large to fit in its block-level container."
+    },
+    "overflow-x": {
+      "values": [
+        "auto",
+        "hidden",
+        "scroll",
+        "visible",
+        "inherit"
+      ],
+      "description": "Specifies whether to clip content, render a scroll bar, or display overflow content of a block-level element, when it overflows at the left and right edges."
+    },
+    "overflow-y": {
+      "values": [
+        "auto",
+        "hidden",
+        "scroll",
+        "visible",
+        "inherit"
+      ],
+      "description": "Specifies whether to clip content, render a scroll bar, or display overflow content of a block-level element, when it overflows at the top and bottom edges."
+    },
+    "opacity": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Specifies the level of transparency of an element, that is, the degree to which the content behind the element is visible."
+    },
+    "cursor": {
+      "values": [
+        "alias",
+        "all-scroll",
+        "auto",
+        "cell",
+        "col-resize",
+        "context-menu",
+        "copy",
+        "crosshair",
+        "default",
+        "e-resize",
+        "ew-resize",
+        "grab",
+        "grabbing",
+        "help",
+        "inherit",
+        "move",
+        "n-resize",
+        "ne-resize",
+        "nesw-resize",
+        "no-drop",
+        "none",
+        "not-allowed",
+        "ns-resize",
+        "nw-resize",
+        "nwse-resize",
+        "pointer",
+        "progress",
+        "row-resize",
+        "s-resize",
+        "se-resize",
+        "sw-resize",
+        "text",
+        "vertical-text",
+        "w-resize",
+        "wait",
+        "zoom-in",
+        "zoom-out"
+      ],
+      "description": "Specifies which mouse cursor to display when the mouse pointer is over an element."
+    },
+    "display": {
+      "values": [
+        "block",
+        "contents",
+        "flex",
+        "flow-root",
+        "grid",
+        "inline",
+        "inline-block",
+        "inline-flex",
+        "inline-grid",
+        "inline-table",
+        "list-item",
+        "none",
+        "run-in",
+        "subgrid",
+        "table",
+        "table-caption",
+        "table-cell",
+        "table-column",
+        "table-column-group",
+        "table-footer-group",
+        "table-header-group",
+        "table-row",
+        "table-row-group",
+        "inherit"
+      ],
+      "description": "Specifies the type of rendering box used for an element."
+    },
+    "color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the foreground color value of an element's text content and text decorations."
+    },
+    "visibility": {
+      "values": [
+        "collapse",
+        "hidden",
+        "visible",
+        "inherit"
+      ],
+      "description": "Can show or hide an element without affecting the layout of a document (i."
+    },
+    "float": {
+      "values": [
+        "left",
+        "right",
+        "none",
+        "inherit"
+      ],
+      "description": "Specifies that an element should be placed along the left or right side of its container, allowing text and inline elements to wrap around it."
+    },
+    "text-decoration": {
+      "values": [
+        "line-through",
+        "none",
+        "overline",
+        "underline",
+        "inherit"
+      ],
+      "description": "Specifies the appearance of decorative lines used on text."
+    },
+    "line-height": {
+      "values": [
+        "normal",
+        "inherit"
+      ],
+      "description": "Sets the amount of space used for lines, such as in text."
+    },
+    "z-index": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Specifies the z-order of a positioned element and its descendants."
+    },
+    "vertical-align": {
+      "values": [
+        "baseline",
+        "bottom",
+        "middle",
+        "sub",
+        "super",
+        "text-bottom",
+        "text-top",
+        "top",
+        "inherit"
+      ],
+      "description": "Specifies the vertical alignment of an inline or table-cell box."
+    },
+    "box-sizing": {
+      "values": [
+        "border-box",
+        "content-box",
+        "inherit"
+      ],
+      "description": "Used to alter the default CSS box model used to calculate width and height of the elements."
+    },
+    "clear": {
+      "values": [
+        "both",
+        "left",
+        "none",
+        "right",
+        "inherit"
+      ],
+      "description": "Specifies whether an element can be next to floating elements that precede it or must be moved down (cleared) below them."
+    },
+    "white-space": {
+      "values": [
+        "normal",
+        "nowrap",
+        "pre",
+        "pre-line",
+        "pre-wrap",
+        "inherit"
+      ],
+      "description": "Determines how whitespace inside an element is handled."
+    },
+    "max-width": {
+      "values": [
+        "none",
+        "inherit"
+      ],
+      "description": "Sets the maximum width of an element."
+    },
+    "outline": {
+      "values": [
+        "inherit"
+      ],
+      "description": "A shorthand property for setting one or more of the individual outline properties outline-style, outline-width, and outline-color in a single declaration."
+    },
+    "content": {
+      "values": [
+        "attr()",
+        "close-quote",
+        "no-close-quote",
+        "no-open-quote",
+        "normal",
+        "none",
+        "open-quote",
+        "inherit"
+      ],
+      "description": "Used with the ::before and ::after pseudo-elements to generate content in an element."
+    },
+    "min-width": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Sets the minimum width of an element."
+    },
+    "min-height": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Sets the minimum height of an element."
+    },
+    "list-style": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset",
+        "url()",
+        "armenian",
+        "circle",
+        "decimal",
+        "decimal-leading-zero",
+        "disc",
+        "georgian",
+        "inside",
+        "lower-alpha",
+        "lower-greek",
+        "lower-latin",
+        "lower-roman",
+        "outside",
+        "square",
+        "upper-alpha",
+        "upper-latin",
+        "upper-roman"
+      ],
+      "description": "A shorthand for setting the individual values that define how a list is displayed: list-style-type, list-style-image, and list-style-position."
+    },
+    "box-shadow": {
+      "values": [],
+      "description": "Used to add shadow effects around an element's frame."
+    },
+    "text-shadow": {
+      "values": [],
+      "description": "Adds shadows to text."
+    },
+    "text-indent": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Specifies the amount of indentation (empty space) that is put before lines of text in a block."
+    },
+    "max-height": {
+      "values": [
+        "none",
+        "inherit"
+      ],
+      "description": "Sets the maximum height of an element."
+    },
+    "text-overflow": {
+      "values": [
+        "clip",
+        "ellipsis",
+        "inherit"
+      ],
+      "description": "Determines how overflowed content that is not displayed is signaled to users."
+    },
+    "border-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "A shorthand property that sets the line style for all four sides of an element's border."
+    },
+    "border-spacing": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Specifies the distance between the borders of adjacent table cells."
+    },
+    "border-collapse": {
+      "values": [
+        "collapse",
+        "separate",
+        "inherit"
+      ],
+      "description": "Specifies whether a table's borders are separated (cells have distinct borders from each other) or collapsed (adjacent cells share borders)."
+    },
+    "border-left-color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the color of an element's left border."
+    },
+    "border-left-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "Sets the line style of an element's left border."
+    },
+    "border-left-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "Sets the width of the left border of a box."
+    },
+    "border-right-color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the color of an element's right border."
+    },
+    "border-right-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "Sets the line style of an element's right border."
+    },
+    "border-right-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "Sets the width of the right border of a box."
+    },
+    "border-top-color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the color of an element's top border."
+    },
+    "border-top-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "Sets the line style of an element's top border."
+    },
+    "border-top-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "Sets the width of the top border of a box."
+    },
+    "border-bottom-color": {
+      "values": [
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the color of an element's bottom border."
+    },
+    "border-bottom-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "Sets the line style of an element's bottom border."
+    },
+    "border-bottom-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "Sets the width of the bottom border of a box."
+    },
+    "border-top-left-radius": {
+      "values": [],
+      "description": "Sets the rounding of the top-left corner of the element."
+    },
+    "border-top-right-radius": {
+      "values": [],
+      "description": "Sets the rounding of the top-right corner of the element."
+    },
+    "border-bottom-left-radius": {
+      "values": [],
+      "description": "Sets the rounding of the bottom-left corner of the element."
+    },
+    "border-bottom-right-radius": {
+      "values": [],
+      "description": "Sets the rounding of the bottom-right corner of the element."
+    },
+    "user-select": {
+      "values": [
+        "all",
+        "auto",
+        "contain",
+        "none",
+        "text"
+      ],
+      "description": "Controls whether the user can select text."
+    },
+    "text-transform": {
+      "values": [
+        "capitalize",
+        "full-width",
+        "lowercase",
+        "none",
+        "uppercase",
+        "inherit"
+      ],
+      "description": "Specifies how to capitalize an element's text."
+    },
+    "list-style-type": {
+      "values": [
+        "armenian",
+        "circle",
+        "decimal",
+        "decimal-leading-zero",
+        "disc",
+        "georgian",
+        "lower-alpha",
+        "lower-greek",
+        "lower-latin",
+        "lower-roman",
+        "none",
+        "square",
+        "upper-alpha",
+        "upper-latin",
+        "upper-roman",
+        "inherit"
+      ],
+      "description": "Specifies the appearance of a list item element."
+    },
+    "word-wrap": {
+      "values": [
+        "break-word",
+        "normal"
+      ]
+    },
+    "transition": {
+      "values": [],
+      "description": "A shorthand property for transition-property, transition-duration, transition-timing-function, and transition-delay."
+    },
+    "letter-spacing": {
+      "values": [
+        "normal",
+        "inherit"
+      ],
+      "description": "Specifies the spacing behavior between text characters."
+    },
+    "transform": {
+      "values": [
+        "matrix()",
+        "matrix3d()",
+        "none",
+        "perspective()",
+        "rotate()",
+        "rotate3d()",
+        "rotateX()",
+        "rotateY()",
+        "rotateZ()",
+        "scale()",
+        "scale3d()",
+        "scaleX()",
+        "scaleY()",
+        "scaleZ()",
+        "skewX()",
+        "skewY()",
+        "translate()",
+        "translate3d()",
+        "translateX()",
+        "translateY()",
+        "translateZ()"
+      ],
+      "description": "Lets you modify the coordinate space of the CSS visual formatting model."
+    },
+    "pointer-events": {
+      "values": [
+        "all",
+        "auto",
+        "fill",
+        "inherit",
+        "none",
+        "painted",
+        "stroke",
+        "visible",
+        "visibleFill",
+        "visiblePainted",
+        "visibleStroke"
+      ],
+      "description": "Specifies under what circumstances (if any) a particular graphic element can become the target of mouse events."
+    },
+    "direction": {
+      "values": [
+        "ltr",
+        "rtl",
+        "inherit"
+      ],
+      "description": "Sets the direction of text, table columns, and horizontal overflow."
+    },
+    "clip": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Defines what portion of an element is visible."
+    },
+    "table-layout": {
+      "values": [
+        "auto",
+        "fixed",
+        "inherit"
+      ],
+      "description": "Specifies the algorithm used to lay out table cells, rows, and columns."
+    },
+    "src": {
+      "values": [
+        "url()"
+      ]
+    },
+    "resize": {
+      "values": [
+        "both",
+        "horizontal",
+        "none",
+        "vertical",
+        "inherit"
+      ],
+      "description": "The resize CSS sets whether an element is resizable, and if so, in which direction(s)."
+    },
+    "word-break": {
+      "values": [
+        "normal",
+        "break-all",
+        "keep-all"
+      ],
+      "description": "Specifies whether or not the browser should insert line breaks wherever the text would otherwise overflow its content box."
+    },
+    "filter": {
+      "values": [
+        "blur()",
+        "brightness()",
+        "contrast()",
+        "custom()",
+        "drop-shadow()",
+        "grayscale()",
+        "hue-rotate()",
+        "invert()",
+        "none",
+        "opacity()",
+        "sepia()",
+        "saturate()",
+        "url()"
+      ],
+      "description": "Lets you apply graphical effects like blurring or color shifting to an element."
+    },
+    "transform-origin": {
+      "values": [
+        "bottom",
+        "center",
+        "left",
+        "right",
+        "top"
+      ],
+      "description": "Lets you modify the origin for transformations of an element."
+    },
+    "font-variant": {
+      "values": [
+        "normal",
+        "small-caps",
+        "inherit"
+      ],
+      "description": "A shorthand for the longhand properties font-variant-caps, font-variant-numeric, font-variant-alternates, font-variant-ligatures, and font-variant-east-asian."
+    },
+    "quotes": {
+      "values": [
+        "none",
+        "inherit"
+      ],
+      "description": "Indicates how user agents should render quotation marks."
+    },
+    "unicode-bidi": {
+      "values": [
+        "bidi-override",
+        "embed",
+        "normal",
+        "inherit"
+      ],
+      "description": "The unicode-bidi CSS property, together with the direction property, determines how bidirectional text in a document is handled."
+    },
+    "word-spacing": {
+      "values": [
+        "normal",
+        "inherit"
+      ],
+      "description": "Specifies the spacing behavior between tags and words."
+    },
+    "text-rendering": {
+      "values": [
+        "auto",
+        "geometricPrecision",
+        "optimizeLegibility",
+        "optimizeSpeed"
+      ],
+      "description": "Provides information to the rendering engine about what to optimize for when rendering text."
+    },
+    "outline-color": {
+      "values": [
+        "invert",
+        "inherit"
+      ],
+      "type": "color",
+      "description": "Sets the color of an element's outline."
+    },
+    "list-style-position": {
+      "values": [
+        "inside",
+        "outside",
+        "inherit"
+      ],
+      "description": "Specifies the position of the marker box in the principal block box."
+    },
+    "outline-offset": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Sets the amount of space between an outline and the edge or border of an element."
+    },
+    "orphans": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Specifies the minimum number of lines in a block container that must be shown at the bottom of a page, region, or column."
+    },
+    "outline-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "Sets the style of an element's outline."
+    },
+    "outline-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "Sets the width (thickness) of an element's outline."
+    },
+    "flex": {
+      "values": [
+        "auto",
+        "initial",
+        "none"
+      ],
+      "description": "Specifies how a flex item will grow or shrink so as to fit the space available in its flex container."
+    },
+    "flex-grow": {
+      "values": [],
+      "description": "Specifies the flex grow factor of a flex item."
+    },
+    "flex-direction": {
+      "values": [
+        "column",
+        "column-reverse",
+        "row",
+        "row-reverse"
+      ],
+      "description": "Specifies how flex items are placed in the flex container defining the main axis and the direction (normal or reversed)."
+    },
+    "flex-flow": {
+      "values": [
+        "column",
+        "column-reverse",
+        "nowrap",
+        "row",
+        "row-reverse",
+        "wrap",
+        "wrap-reverse"
+      ],
+      "description": "A shorthand property for flex-direction and flex-wrap individual properties."
+    },
+    "flex-wrap": {
+      "values": [
+        "nowrap",
+        "wrap",
+        "wrap-reverse"
+      ],
+      "description": "Specifies whether flex items are forced into a single line or can be wrapped onto multiple lines."
+    },
+    "flex-shrink": {
+      "values": [],
+      "description": "Specifies the flex shrink factor of a flex item."
+    },
+    "flex-basis": {
+      "values": [
+        "auto"
+      ],
+      "description": "Specifies the initial main size of a flex item."
+    },
+    "list-style-image": {
+      "values": [
+        "none",
+        "url()",
+        "inherit"
+      ],
+      "description": "Specifies an image to be used as the list item marker."
+    },
+    "unicode-range": {
+      "values": []
+    },
+    "align-items": {
+      "values": [
+        "baseline",
+        "center",
+        "flex-end",
+        "flex-start",
+        "stretch"
+      ],
+      "description": "Defines how the browser distributes space between and around flex items along the cross-axis of their container."
+    },
+    "transition-delay": {
+      "values": [],
+      "description": "Specifies the amount of time to wait between a change being requested to a property that is to be transitioned and the start of the transition effect."
+    },
+    "transition-duration": {
+      "values": [],
+      "description": "Specifies the number of seconds or milliseconds a transition animation should take to complete."
+    },
+    "justify-content": {
+      "values": [
+        "center",
+        "flex-end",
+        "flex-start",
+        "space-around",
+        "space-between"
+      ],
+      "description": "Defines how the browser distributes space between and around content items along the main axis of their container."
+    },
+    "transition-property": {
+      "values": [
+        "all",
+        "none"
+      ],
+      "description": "Used to specify the names of CSS properties to which a transition effect should be applied."
+    },
+    "order": {
+      "values": [],
+      "description": "Specifies the order used to lay out flex items in their flex container."
+    },
+    "transition-timing-function": {
+      "values": [
+        "cubic-bezier()",
+        "ease",
+        "ease-in",
+        "ease-in-out",
+        "ease-out",
+        "linear",
+        "step-end",
+        "step-start",
+        "steps()"
+      ],
+      "description": "Used to describe how the intermediate values of the CSS properties being affected by a transition effect are calculated."
+    },
+    "background-attachment": {
+      "values": [
+        "fixed",
+        "local",
+        "scroll",
+        "inherit"
+      ],
+      "description": "If a background-image is specified, the background-attachment CSS property determines whether that image's position is fixed within the viewport, or scrolls along with its containing block."
+    },
+    "background-origin": {
+      "values": [
+        "border-box",
+        "content-box",
+        "padding-box",
+        "inherit"
+      ],
+      "description": "Sets the background positioning area, i."
+    },
+    "backface-visibility": {
+      "values": [
+        "hidden",
+        "visible"
+      ],
+      "description": "Determines whether or not the back face of the element is visible when facing the user."
+    },
+    "page-break-inside": {
+      "values": [
+        "auto",
+        "avoid",
+        "inherit"
+      ],
+      "description": "Adjusts page breaks inside the current element."
+    },
+    "page-break-after": {
+      "values": [
+        "always",
+        "auto",
+        "avoid",
+        "left",
+        "right",
+        "inherit"
+      ],
+      "description": "Adjusts page breaks after the current element."
+    },
+    "widows": {
+      "values": [
+        "inherit"
+      ],
+      "description": "Specifies the minimum number of lines in a block container that must be shown at the top of a page, region, or column."
+    },
+    "counter-increment": {
+      "values": [
+        "none",
+        "inherit"
+      ],
+      "description": "Increases or decreases the value of a CSS counter by a given value."
+    },
+    "counter-reset": {
+      "values": [
+        "none",
+        "inherit"
+      ],
+      "description": "Resets a CSS counter to a given value."
+    },
+    "perspective-origin": {
+      "values": [
+        "bottom",
+        "center",
+        "left",
+        "right",
+        "top"
+      ],
+      "description": "Determines the position at which the viewer is looking."
+    },
+    "perspective": {
+      "values": [
+        "none"
+      ],
+      "description": "Determines the distance between the z=0 plane and the user in order to give to the 3D-positioned element some perspective."
+    },
+    "empty-cells": {
+      "values": [
+        "hide",
+        "show",
+        "inherit"
+      ],
+      "description": "Specifies how the user agent should render borders and backgrounds around table cells that have no visible content."
+    },
+    "caption-side": {
+      "values": [
+        "bottom",
+        "top",
+        "inherit"
+      ],
+      "description": "Puts the content of a table's caption on the specified side."
+    },
+    "transform-style": {
+      "values": [
+        "flat",
+        "preserve-3d"
+      ],
+      "description": "Determines if the children of the element are positioned in the 3D-space or are flattened in the plane of the element."
+    },
+    "border-image": {
+      "values": [
+        "url()"
+      ],
+      "description": "Allows drawing an image on the borders of elements."
+    },
+    "font-stretch": {
+      "values": [
+        "condensed",
+        "expanded",
+        "extra-condensed",
+        "extra-expanded",
+        "normal",
+        "semi-condensed",
+        "semi-expanded",
+        "ultra-condensed",
+        "ultra-expanded"
+      ],
+      "description": "Selects a normal, condensed, or expanded face from a font."
+    },
+    "will-change": {
+      "values": [
+        "auto",
+        "contents",
+        "opacity",
+        "scroll-position",
+        "transform",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "Provides a way for authors to hint browsers about the kind of changes to be expected on an element, so that the browser can set up appropriate optimizations ahead of time before the element is actually changed."
+    },
+    "animation": {
+      "values": [],
+      "description": "A shorthand property for the various animation properties: animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode, and animation-play-state."
+    },
+    "page-break-before": {
+      "values": [
+        "always",
+        "auto",
+        "avoid",
+        "left",
+        "right",
+        "inherit"
+      ],
+      "description": "Adjusts page breaks before the current element."
+    },
+    "align-self": {
+      "values": [
+        "auto",
+        "baseline",
+        "center",
+        "flex-end",
+        "flex-start",
+        "stretch"
+      ],
+      "description": "Aligns flex items of the current flex line overriding the align-items value."
+    },
+    "align-content": {
+      "values": [
+        "center",
+        "flex-end",
+        "flex-start",
+        "space-around",
+        "space-between",
+        "stretch"
+      ],
+      "description": "Defines how the browser distributes space between and around content items along the cross-axis of their container, which is serving as a flexible box container."
+    },
+    "border-image-slice": {
+      "values": [],
+      "description": "Divides the image specified by border-image-source in nine regions: the four corners, the four edges and the middle."
+    },
+    "border-image-width": {
+      "values": [
+        "auto"
+      ],
+      "description": "Defines the width of the border image by defining inward offsets from the border edges."
+    },
+    "border-image-outset": {
+      "values": [],
+      "description": "Describes by what amount the border image area extends beyond the border box."
+    },
+    "border-image-repeat": {
+      "values": [
+        "repeat",
+        "round",
+        "space",
+        "stretch"
+      ],
+      "description": "Defines how the middle part of a border image is handled so that it can match the size of the border."
+    },
+    "tab-size": {
+      "values": [],
+      "description": "Used to customize the width of a tab (U+0009) character."
+    },
+    "object-fit": {
+      "values": [
+        "contain",
+        "cover",
+        "fill",
+        "none",
+        "scale-down"
+      ],
+      "description": "Specifies how a replaced element, such as an img or video, should be resized to fit its container."
+    },
+    "font-kerning": {
+      "values": [
+        "auto",
+        "none",
+        "normal"
+      ],
+      "description": "Controls the usage of the kerning information stored in a font."
+    },
+    "animation-name": {
+      "values": [
+        "none"
+      ],
+      "description": "Specifies one or more animations that should be applied to an element."
+    },
+    "animation-duration": {
+      "values": [],
+      "description": "Specifies the length of time that an animation should take to complete one cycle."
+    },
+    "border-image-source": {
+      "values": [],
+      "description": "Defines the image to use instead of the style of the border."
+    },
+    "animation-fill-mode": {
+      "values": [
+        "backwards",
+        "both",
+        "forwards",
+        "none"
+      ],
+      "description": "Specifies how a CSS animation should apply styles to its target before and after its execution."
+    },
+    "animation-timing-function": {
+      "values": [
+        "cubic-bezier()",
+        "ease",
+        "ease-in",
+        "ease-in-out",
+        "ease-out",
+        "linear",
+        "step-end",
+        "step-start",
+        "steps()"
+      ],
+      "description": "Specifies how a CSS animation should progress over the duration of each cycle."
+    },
+    "animation-iteration-count": {
+      "values": [
+        "infinite"
+      ],
+      "description": "Specifies the number of times an animation cycle should be played before stopping."
+    },
+    "animation-delay": {
+      "values": [],
+      "description": "Specifies when an animation should start."
+    },
+    "font-variant-ligatures": {
+      "values": [
+        "normal",
+        "none"
+      ],
+      "description": "Controls which ligatures and contextual forms are used in textual content of the elements it applies to."
+    },
+    "background-blend-mode": {
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "darken",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "luminosity",
+        "multiply",
+        "normal",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light"
+      ],
+      "description": "Describes how the element's background images should blend with each other and the element's background color."
+    },
+    "object-position": {
+      "values": [
+        "left",
+        "center",
+        "right",
+        "bottom",
+        "top"
+      ],
+      "description": "Determines the alignment of the selected element inside its box."
+    },
+    "mix-blend-mode": {
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "darken",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "luminosity",
+        "multiply",
+        "normal",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light"
+      ],
+      "description": "Describes how an element's content should blend with the content of the element's direct parent and the element's background."
+    },
+    "shape-outside": {
+      "values": [
+        "none",
+        "inherit",
+        "circle()",
+        "ellipse()",
+        "polygon()",
+        "inset()",
+        "margin-box",
+        "border-box",
+        "padding-box",
+        "content-box",
+        "url()",
+        "image()",
+        "linear-gradient()",
+        "radial-gradient()",
+        "repeating-linear-gradient()",
+        "repeating-radial-gradient()"
+      ],
+      "description": "Defines a shape around which inline content should wrap."
+    },
+    "shape-margin": {
+      "values": [],
+      "description": "Adds a margin to shape-outside."
+    },
+    "isolation": {
+      "values": [
+        "auto",
+        "isolate"
+      ],
+      "description": "Defines if the element must create a new stacking context."
+    },
+    "shape-image-threshold": {
+      "values": [],
+      "description": "Defines the alpha channel threshold used to extract the shape using an image as the value for shape-outside."
+    },
+    "animation-direction": {
+      "values": [
+        "alternate",
+        "alternate-reverse",
+        "normal",
+        "reverse"
+      ],
+      "description": "Specifies whether an animation should play forwards, backwards, or alternating back and forth."
+    },
+    "animation-play-state": {
+      "values": [
+        "paused",
+        "running"
+      ],
+      "description": "Specifies whether an animation is running or paused."
+    },
+    "all": {
+      "values": [],
+      "description": "The CSS all shorthand property resets all properties, apart from unicode-bidi and direction, to their initial or inherited value."
+    },
+    "column-fill": {
+      "values": [
+        "auto",
+        "balance"
+      ],
+      "description": "Controls how contents are partitioned into columns."
+    },
+    "text-align-last": {
+      "values": [
+        "center",
+        "left",
+        "justify",
+        "right",
+        "inherit"
+      ],
+      "description": "Describes how the last line of a block or a line, right before a forced line break, is aligned."
+    },
+    "text-decoration-color": {
+      "values": [],
+      "type": "color",
+      "description": "Sets the color of the decorative additions to text that are specified by text-decoration-line ; these include underlines and overlines, strikethroughs, and wavy lines like those typically used to indicate content is misspelled (for example)."
+    },
+    "text-decoration-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "solid",
+        "wavy"
+      ],
+      "description": "Sets the style of the lines specified by text-decoration-line."
+    },
+    "text-decoration-line": {
+      "values": [
+        "line-through",
+        "none",
+        "overline",
+        "underline"
+      ],
+      "description": "Sets the kind of decoration that is used on text in an element."
+    },
+    "font-size-adjust": {
+      "values": [
+        "auto",
+        "none"
+      ],
+      "description": "Specifies that font size should be chosen based on the height of lowercase letters rather than the height of capital letters."
+    },
+    "text-underline-position": {
+      "values": [
+        "alphabetic",
+        "auto",
+        "below",
+        "left",
+        "right"
+      ],
+      "description": "Specifies the position of the underline which is set using the text-decoration property's underline value."
+    },
+    "scroll-behavior": {
+      "values": [
+        "auto",
+        "smooth"
+      ],
+      "description": "Specifies the scrolling behavior for a scrolling box, when scrolling happens due to navigation or CSSOM scrolling APIs."
+    },
+    "grid-column": {
+      "values": [
+        "auto"
+      ],
+      "description": "A shorthand property for grid-column-start and grid-column-end specifying a grid item's size and location within the grid row by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the inline-start and inline-end edge of its grid area."
+    },
+    "grid-row": {
+      "values": [
+        "auto"
+      ],
+      "description": "A shorthand property for grid-row-start and grid-row-end specifying a grid item’s size and location within the grid row by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the inline-start and inline-end edge of its grid area."
+    },
+    "grid-template": {
+      "values": [
+        "none"
+      ],
+      "description": "A shorthand property for defining grid columns, rows, and areas."
+    },
+    "caret-color": {
+      "values": [
+        "auto"
+      ],
+      "type": "color",
+      "description": "Sets the color of the insertion caret—the visible indicator of the point at which the next character typed by the user will be inserted—within an element such as input or one with the contenteditable attribute set."
+    },
+    "grid-template-columns": {
+      "values": [
+        "auto"
+      ],
+      "description": "Defines the line names and track sizing functions of the grid columns."
+    },
+    "grid-auto-columns": {
+      "values": [],
+      "description": "Specifies the size of an implicitly-created grid column track."
+    },
+    "grid-auto-flow": {
+      "values": [
+        "row",
+        "column",
+        "dense"
+      ],
+      "description": "Controls how the auto-placement algorithm works, specifying exactly how auto-placed items get flowed into the grid."
+    },
+    "grid-auto-rows": {
+      "values": [],
+      "description": "Specifies the size of an implicitly-created grid row track."
+    },
+    "grid-column-start": {
+      "values": [],
+      "description": "Specifies a grid item’s start position within the grid column by contributing a line, a span, or nothing (automatic) to its grid placement."
+    },
+    "grid-template-rows": {
+      "values": [
+        "auto"
+      ],
+      "description": "Defines the line names and track sizing functions of the grid rows."
+    },
+    "grid-row-end": {
+      "values": [],
+      "description": "Specifies a grid item’s end position within the grid row by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the inline-end edge of its grid area."
+    },
+    "grid-column-end": {
+      "values": [],
+      "description": "Specifies a grid item’s end position within the grid column by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the block-end edge of its grid area."
+    },
+    "grid-row-start": {
+      "values": [],
+      "description": "Specifies a grid item’s start position within the grid row by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the inline-start edge of its grid area."
+    },
+    "box-decoration-break": {
+      "values": [
+        "clone",
+        "slice"
+      ],
+      "description": "Specifies how the background, padding, border, border-image, box-shadow, margin, and clip-path of an element are applied when the box for the element is fragmented."
+    },
+    "break-after": {
+      "values": [
+        "always",
+        "auto",
+        "avoid",
+        "avoid-column",
+        "avoid-page",
+        "avoid-region",
+        "column",
+        "left",
+        "page",
+        "region",
+        "right"
+      ],
+      "description": "Defines how page, column, or region breaks should behave after a generated box."
+    },
+    "break-before": {
+      "values": [
+        "always",
+        "auto",
+        "avoid",
+        "avoid-column",
+        "avoid-page",
+        "avoid-region",
+        "column",
+        "left",
+        "page",
+        "region",
+        "right"
+      ],
+      "description": "Defines how page, column, or region breaks should behave before a generated box."
+    },
+    "break-inside": {
+      "values": [
+        "auto",
+        "avoid",
+        "avoid-column",
+        "avoid-page",
+        "avoid-region"
+      ],
+      "description": "Defines how page, column, or region breaks should behave inside a generated box."
+    },
+    "columns": {
+      "values": [],
+      "description": "A shorthand property allowing to set both the column-width and the column-count properties at the same time."
+    },
+    "column-count": {
+      "values": [],
+      "description": "Describes the number of columns of the element."
+    },
+    "column-gap": {
+      "values": [
+        "normal"
+      ],
+      "description": "Sets the size of the gap between columns for elements which are specified to be displayed as multi-column elements."
+    },
+    "column-rule": {
+      "values": [],
+      "description": "In multi-column layouts, the column-rule CSS property specifies a straight line, or \"rule\", to be drawn between each column."
+    },
+    "column-rule-color": {
+      "values": [],
+      "type": "color",
+      "description": "Lets you set the color of the rule or line drawn between columns in multi-column layouts."
+    },
+    "column-rule-style": {
+      "values": [
+        "dashed",
+        "dotted",
+        "double",
+        "groove",
+        "hidden",
+        "inset",
+        "none",
+        "outset",
+        "ridge",
+        "solid",
+        "inherit"
+      ],
+      "description": "Lets you set the style of the rule drawn between columns in multi-column layouts."
+    },
+    "column-rule-width": {
+      "values": [
+        "medium",
+        "thin",
+        "thick",
+        "inherit"
+      ],
+      "description": "Lets you set the width of the rule drawn between columns in multi-column layouts."
+    },
+    "column-span": {
+      "values": [
+        "all",
+        "none"
+      ],
+      "description": "Makes it possible for an element to span across all columns when its value is set to all."
+    },
+    "column-width": {
+      "values": [
+        "auto",
+        "inherit"
+      ],
+      "description": "Specifies the minimum column width."
+    },
+    "flow-into": {
+      "values": [
+        "none"
+      ],
+      "type": "named-flow"
+    },
+    "flow-from": {
+      "values": [
+        "none",
+        "inherit"
+      ],
+      "type": "named-flow"
+    },
+    "font-feature-settings": {
+      "values": [
+        "normal"
+      ],
+      "description": "Gives you control over advanced typographic features in OpenType fonts."
+    },
+    "font-language-override": {
+      "values": [
+        "normal"
+      ],
+      "description": "Controls the usage of language-specific glyphs in a typeface."
+    },
+    "font-synthesis": {
+      "values": [
+        "none",
+        "style",
+        "weight"
+      ],
+      "description": "Controls which missing typefaces, bold or italic, may be synthesized by the browser."
+    },
+    "font-variant-alternates": {
+      "values": [
+        "normal"
+      ],
+      "description": "Controls the usage of alternate glyphs."
+    },
+    "font-variant-caps": {
+      "values": [
+        "normal",
+        "small-caps",
+        "all-small-caps",
+        "petite-caps",
+        "all-petite-caps",
+        "unicase",
+        "titling-caps"
+      ],
+      "description": "Controls the usage of alternate glyphs for capital letters."
+    },
+    "font-variant-east-asian": {
+      "values": [
+        "normal"
+      ],
+      "description": "Controls the usage of alternate glyphs for East Asian scripts, like Japanese and Chinese."
+    },
+    "font-variant-numeric": {
+      "values": [
+        "normal"
+      ],
+      "description": "Controls the usage of alternate glyphs for numbers, fractions, and ordinal markers."
+    },
+    "font-variant-position": {
+      "values": [
+        "normal",
+        "sub",
+        "super"
+      ],
+      "description": "Controls the usage of alternate, smaller glyphs that are positioned as superscript or subscript relative to the baseline of the font (which remains unchanged)."
+    },
+    "hyphens": {
+      "values": [
+        "auto",
+        "manual",
+        "none"
+      ],
+      "description": "Specifies how words should be hyphenated when text wraps across multiple lines."
+    },
+    "image-orientation": {
+      "values": [],
+      "description": "Describes how to correct the default orientation of an image."
+    },
+    "image-resolution": {
+      "values": [
+        "from-image",
+        "snap"
+      ]
+    },
+    "region-break-after": {
+      "values": [
+        "always",
+        "auto",
+        "avoid",
+        "avoid-column",
+        "avoid-page",
+        "avoid-region",
+        "column",
+        "left",
+        "page",
+        "region",
+        "right"
+      ]
+    },
+    "region-break-before": {
+      "values": [
+        "always",
+        "auto",
+        "avoid",
+        "avoid-column",
+        "avoid-page",
+        "avoid-region",
+        "column",
+        "left",
+        "page",
+        "region",
+        "right"
+      ]
+    },
+    "region-break-inside": {
+      "values": [
+        "auto",
+        "avoid",
+        "avoid-column",
+        "avoid-page",
+        "avoid-region"
+      ]
+    },
+    "region-fragment": {
+      "values": [
+        "auto",
+        "break"
+      ]
+    },
+    "shape-inside": {
+      "values": [
+        "auto",
+        "circle()",
+        "ellipse()",
+        "inherit",
+        "outside-shape",
+        "polygon()",
+        "rectangle()"
+      ]
+    },
+    "text-decoration-skip": {
+      "values": [
+        "edges",
+        "ink",
+        "none",
+        "objects",
+        "spaces"
+      ],
+      "description": "Specifies what parts of the element’s content any text decoration affecting the element must skip over."
+    },
+    "text-emphasis": {
+      "values": [],
+      "description": "A shorthand property for setting text-emphasis-style and text-emphasis-color in one declaration."
+    },
+    "text-emphasis-color": {
+      "values": [],
+      "type": "color",
+      "description": "Defines the color used to draw emphasis marks on text being rendered in the HTML document."
+    },
+    "text-emphasis-position": {
+      "values": [
+        "above",
+        "below",
+        "left",
+        "right"
+      ],
+      "description": "Describes where emphasis marks are drawn at."
+    },
+    "text-emphasis-style": {
+      "values": [
+        "circle",
+        "dot",
+        "double-circle",
+        "filled",
+        "none",
+        "open",
+        "sesame",
+        "triangle"
+      ],
+      "description": "Defines the type of emphasis used."
+    },
+    "font-display": {
+      "values": [
+        "auto",
+        "block",
+        "swap",
+        "fallback",
+        "optional"
+      ]
+    },
+    "grid": {
+      "values": [],
+      "description": "A shorthand property that sets all of the explicit grid properties (grid-template-rows, grid-template-columns, and grid-template-areas), all the implicit grid properties (grid-auto-rows, grid-auto-columns, and grid-auto-flow), and the gutter properties (grid-column-gap and grid-row-gap) in a single declaration."
+    },
+    "grid-area": {
+      "values": [],
+      "description": "A shorthand property for grid-row-start, grid-column-start, grid-row-end and grid-column-end, specifying a grid item’s size and location within the grid row by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the edges of its grid area."
+    },
+    "grid-column-gap": {
+      "values": [],
+      "description": "Specifies the gutter between grid columns."
+    },
+    "grid-gap": {
+      "values": [],
+      "description": "A shorthand property for grid-row-gap and grid-column-gap specifying the gutters between grid rows and columns."
+    },
+    "grid-row-gap": {
+      "values": [],
+      "description": "Specifies the gutter between grid rows."
+    },
+    "grid-template-areas": {
+      "values": [],
+      "description": "Specifies named grid areas."
+    },
+    "hanging-punctuation": {
+      "values": [
+        "allow-end",
+        "first",
+        "force-end",
+        "last",
+        "none"
+      ],
+      "description": "Specifies whether a punctuation mark should hang at the start or end of a line of text."
+    }
+  },
+  "pseudoSelectors": {
+    "::after": {
+      "description": "Matches a virtual last child of the selected element."
+    },
+    "::before": {
+      "description": "Creates a pseudo-element that is the first child of the element matched."
+    },
+    "::first-letter": {
+      "description": "Matches the first letter of the first line of a block, if it is not preceded by any other content."
+    },
+    "::first-line": {
+      "description": "Applies styles only to the first line of an element."
+    },
+    "::selection": {
+      "description": "Applies rules to the portion of a document that has been highlighted."
+    },
+    ":active": {
+      "description": "Matches when an element is being activated by the user."
+    },
+    ":checked": {
+      "description": "Matches any radio input, checkbox input or option element that is checked or toggled to an on state."
+    },
+    ":default": {
+      "description": "Matches any user interface element that is the default among a group of similar elements"
+    },
+    ":dir": {
+      "argument": "direction",
+      "description": "Matches elements based on the directionality of the text contained in it."
+    },
+    ":disabled": {
+      "description": "Matches any disabled element."
+    },
+    ":empty": {
+      "description": "Matches any element that has no children at all."
+    },
+    ":enabled": {
+      "description": "Matches any enabled element."
+    },
+    ":first": {
+      "description": "Describes the styling of the first page when printing a document."
+    },
+    ":first-child": {
+      "description": "Matches any element that is the first child element of its parent."
+    },
+    ":first-of-type": {
+      "description": "Matches the first sibling of its type in the list of children of its parent element."
+    },
+    ":focus": {
+      "description": "Matches an element that has focus."
+    },
+    ":fullscreen": {
+      "description": "Applies to any element that's currently being displayed in full-screen mode."
+    },
+    ":hover": {
+      "description": "Matches when the user designates an element with a pointing device, but does not necessarily activate it."
+    },
+    ":indeterminate": {
+      "description": "Matches any checkbox input whose indeterminate DOM property is set to true by JavaScript."
+    },
+    ":invalid": {
+      "description": "Matches any <input> or <form> element whose content fails to validate according to the input's type setting."
+    },
+    ":lang": {
+      "argument": "language",
+      "description": "Matches elements based on the language the element is determined to be in."
+    },
+    ":last-child": {
+      "description": "Matches any element that is the last child element of its parent."
+    },
+    ":last-of-type": {
+      "description": "Matches the last sibling with the given element name in the list of children of its parent element."
+    },
+    ":left": {
+      "description": "Matches any left page when printing a page."
+    },
+    ":link": {
+      "description": "Matches links inside elements."
+    },
+    ":not": {
+      "argument": "selector",
+      "description": "Matches an element that is not represented by the argument."
+    },
+    ":nth-child": {
+      "argument": "an+b",
+      "description": "Matches an element that has an+b-1 siblings before it in the document tree."
+    },
+    ":nth-last-child": {
+      "argument": "an+b",
+      "description": "Matches an element that has an+b-1 siblings after it in the document tree."
+    },
+    ":nth-last-of-type": {
+      "argument": "an+b",
+      "description": "Matches an element that has an+b-1 siblings with the same element name after it in the document tree."
+    },
+    ":nth-of-type": {
+      "argument": "an+b",
+      "description": "Matches an element that has an+b-1 siblings with the same element name before it in the document tree"
+    },
+    ":only-child": {
+      "description": "Matches any element which is the only child of its parent."
+    },
+    ":only-of-type": {
+      "description": "Matches any element that has no siblings of the given type."
+    },
+    ":optional": {
+      "description": "Matches any <input> element that does not have the required attribute set on it."
+    },
+    ":out-of-range": {
+      "description": "Matches when an element has its value attribute outside the specified range limitations for this element."
+    },
+    ":read-only": {
+      "description": "Matches when an element is not writable by the user."
+    },
+    ":read-write": {
+      "description": "Matches when an element is editable by user like text input element."
+    },
+    ":required": {
+      "description": "Matches any <input> element that has the required attribute set on it."
+    },
+    ":right": {
+      "description": "Matches any right page when printing a page. It allows to describe the styling of right-side page."
+    },
+    ":root": {
+      "description": "Matches the root element of a tree representing the document."
+    },
+    ":scope": {
+      "description": "Matches the elements that are a reference point for selectors to match against."
+    },
+    ":target": {
+      "description": "Matches the unique element, if any, with an id matching the fragment identifier of the URI of the document."
+    },
+    ":valid": {
+      "description": "Matches any <input> or <form> element whose content validates correctly according to the input's type setting"
+    },
+    ":visited": {
+      "description": "Matches links that have been visited."
+    }
+  }
+}
