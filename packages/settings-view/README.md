@@ -54,4 +54,4 @@ Use the [developer tools](https://pulsar-edit.dev/docs/launch-manual/sections/co
 Always feel free to help out!  Whether it's [filing bugs and feature requests](https://github.com/pulsar-edit/pulsar/issues/new) or working on some of the [open issues](https://github.com/pulsar-edit/pulsar/issues), Pulsar's [contributing guide](https://github.com/pulsar-edit/.github/blob/main/CONTRIBUTING.md) will help get you started while the [guide for contributing to packages](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#contributing-to-official-pulsar-packages) has some extra information.
 
 ## License
-MIT License.  See [the license](../../LICENSE.md) for more details.
+MIT License.  See [the license](https://github.com/pulsar-edit/pulsar/blob/master/LICENSE.md) for more details.
