@@ -1,5 +1,5 @@
 # VERSION:        0.2
-# DESCRIPTION:    Image to build Atom
+# DESCRIPTION:    Image to build Pulsar
 
 FROM ubuntu:20.04
 
