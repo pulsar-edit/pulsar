@@ -23,7 +23,12 @@ linux_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
-    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "test failed"
+  build_binary_script:
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
+    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -31,10 +36,6 @@ linux_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_binary_script:
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
 arm_linux_task:
   alias: linux
@@ -78,7 +79,7 @@ arm_linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
-    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "test failed"
+    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -99,7 +100,13 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "test failed"
+  build_arm_binary_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -107,11 +114,6 @@ silicon_mac_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_arm_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
 intel_mac_task:
   alias: mac
