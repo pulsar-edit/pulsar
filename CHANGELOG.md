@@ -19,6 +19,7 @@
 - Removed all telemetry from Core Editor
 - New Pulsar Website
 - New Test Runner to Improve Testing
+- Added Apple Silicon support to `github` Package v0.36.13
 
 
 ### Pulsar

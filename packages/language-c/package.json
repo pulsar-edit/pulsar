@@ -6,15 +6,8 @@
     "tree-sitter"
   ],
   "main": "lib/main",
-  "homepage": "https://atom.github.io/language-c",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-c.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-c/issues"
-  },
   "engines": {
     "atom": "*",
     "node": "*"
@@ -22,8 +15,5 @@
   "dependencies": {
     "tree-sitter-c": "0.20.2",
     "tree-sitter-cpp": "0.20.0"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
   }
 }
