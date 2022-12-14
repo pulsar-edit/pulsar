@@ -3,7 +3,7 @@ linux_task:
   container:
     image: node:16-slim
     memory: 8G
-  test_script:
+  install_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -22,6 +22,7 @@ linux_task:
                 xvfb
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
+  build_script:
     - yarn build
   build_binary_script:
     - yarn dist || yarn dist
@@ -35,7 +36,7 @@ arm_linux_task:
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
-  prepare_script:
+  install_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -62,6 +63,7 @@ arm_linux_task:
     - gem install fpm
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
+  build_script:
     - yarn build
     - rm -Rf node-modules/electron && yarn install --check-files
   build_binary_script:
@@ -75,14 +77,15 @@ silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  test_script:
+  install_script:
     - brew install node@16 yarn git python
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
+  build_script:
     - yarn build
-  build_arm_binary_script:
+  build_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
   binary_artifacts:
@@ -93,7 +96,7 @@ intel_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  dist_script:
+  install_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 xcode-select --install
@@ -103,7 +106,9 @@ intel_mac_task:
     - ln -s /usr/local/bin/python3 /usr/local/bin/python
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
+  build_script:
     - arch -x86_64 npx yarn build
+  build_binary_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
@@ -116,17 +121,14 @@ windows_task:
   env:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
-  install_deps_script:
+  install_script:
     - choco install nodejs --version=14.15.0 -y
     - choco install python --version=3.10.3	-y
     - choco install git visualstudio2019-workload-vctools -y
     - npm config set python 'C:\Python310\python.exe'
-  install_with_scripts_script:
-    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines
-  rebuild_for_electron_script:
+    - npx yarn install || sleep 1 && npx yarn install
+  build_script:
     - npx yarn build || npx yarn build || npx yarn build
-  videos_artifacts:
-    path: tests\videos\**
   build_binary_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - npx yarn dist || npx yarn dist || npx yarn dist
