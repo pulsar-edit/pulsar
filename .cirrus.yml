@@ -20,12 +20,9 @@ linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
-    - git submodule init
-    - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
-    - yarn run build:apm
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -71,12 +68,9 @@ arm_linux_task:
     - source /etc/profile.d/rvm.sh
     - rvm install ruby
     - gem install fpm
-    - git submodule init
-    - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
-    - yarn run build:apm
     - rm -Rf node-modules/electron && yarn install --check-files
   build_binary_script:
     - source /etc/profile.d/rvm.sh
@@ -100,14 +94,11 @@ silicon_mac_task:
     memory: 8G
   test_script:
     - brew install node@16 yarn git python
-    - git submodule init
-    - git submodule update
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
-    - yarn run build:apm
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -135,12 +126,9 @@ intel_mac_task:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
     - ln -s /usr/local/bin/python3 /usr/local/bin/python
-    - git submodule init
-    - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
-    - arch -x86_64 yarn run build:apm
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
@@ -170,18 +158,10 @@ windows_task:
     - git submodule init
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
-  build_apm_script:
-    - cd ppm; npm install
   install_with_scripts_script:
-    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
-  #install_without_scripts_script:
-  #  - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
+    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines
   rebuild_for_electron_script:
     - npx yarn build || npx yarn build || npx yarn build
-  # install_only_electron_script:
-  #   - rm -R node_modules/electron
-  #   - npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
-    # - npx playwright test --reporter=list
   videos_artifacts:
     path: tests\videos\**
   build_binary_script:
