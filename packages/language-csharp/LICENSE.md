@@ -1,6 +1,7 @@
 MIT License
 
-Copyright (c) 2016 .NET Foundation, GitHub Inc.
+Copyright (c) 2022 Pulsar-Edit
+Original work copyright (c) 2016 .NET Foundation, GitHub Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,5 +23,5 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 
-This package uses the 
+This package uses the
 https://github.com/dotnet/csharp-tmLanguage from the .NET Foundation

@@ -7,8 +7,5 @@
     "atom": "*",
     "node": "*"
   },
-  "repository": "https://github.com/pulsar-edit/pulsar",
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
-  }
+  "repository": "https://github.com/pulsar-edit/pulsar"
 }

@@ -1,4 +1,5 @@
 # Pulsar next version
+- Bump github package to 0.36.13 (add Silicon Apple support)
 - Bump to Electron 12 and Node 14
 - Added a rebranded API
 - Removed experimental file watchers on the editor
