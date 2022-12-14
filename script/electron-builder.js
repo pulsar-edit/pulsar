@@ -1,43 +1,7 @@
 const path = require('path')
-const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
-const generateMetadata = require('./generate-metadata-for-builder')
-
-// Monkey-patch to not remove things I explicitly didn't say so
-// See: https://github.com/electron-userland/electron-builder/issues/6957
-let transformer = require('app-builder-lib/out/fileTransformer')
-const builder_util_1 = require("builder-util");
-
-transformer.createTransformer = function(srcDir, configuration, extraMetadata, extraTransformer) {
-    const mainPackageJson = path.join(srcDir, "package.json");
-    const isRemovePackageScripts = configuration.removePackageScripts !== false;
-    const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
-    const packageJson = path.sep + "package.json";
-    return file => {
-        if (file === mainPackageJson) {
-            return modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords);
-        }
-        if (extraTransformer != null) {
-            return extraTransformer(file);
-        }
-        else {
-            return null;
-        }
-    };
-}
-async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords) {
-    const mainPackageData = JSON.parse(await fs.readFile(file, "utf-8"));
-    if (extraMetadata != null) {
-        builder_util_1.deepAssign(mainPackageData, extraMetadata);
-        return JSON.stringify(mainPackageData, null, 2);
-    }
-    return null;
-}
-/// END Monkey-Patch
 
 const builder = require("electron-builder")
-const Platform = builder.Platform
-
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
@@ -129,9 +93,6 @@ let options = {
       "from": "pulsar.sh",
       "to": "pulsar.sh"
     }, {
-      "from": "ppm",
-      "to": "app/ppm"
-    }, {
       "from": pngIcon,
       "to": "pulsar.png"
     },
@@ -164,8 +125,6 @@ let options = {
       { "target": "portable" }
     ]
   },
-  "extraMetadata": {
-  },
   "asarUnpack": [
     "node_modules/github/bin/*",
     "node_modules/github/lib/*", // Resolves Error in console
@@ -190,11 +149,8 @@ function whatToBuild() {
 }
 
 async function main() {
-  const package = await fs.readFile('package.json', "utf-8")
   let options = whatToBuild()
-  options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
-    //targets: Platform.LINUX.createTarget(),
     config: options
   }).then((result) => {
     console.log("Built binaries")
