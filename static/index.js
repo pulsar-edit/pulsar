@@ -10,11 +10,9 @@
   const path = require('path');
   const Module = require('module');
   const getWindowLoadSettings = require('../src/get-window-load-settings');
-  const getReleaseChannel = require('../src/get-release-channel');
   const StartupTime = require('../src/startup-time');
   const entryPointDirPath = __dirname;
   let blobStore = null;
-  let useSnapshot = false;
   const remote = require('@electron/remote')
 
   const startupMarkers = remote.getCurrentWindow().startupMarkers;
@@ -24,7 +22,9 @@
   }
   StartupTime.addMarker('window:start', startWindowTime);
 
-  window.onload = function() {
+  window.onload = async function() {
+    const {superstring} = require('superstring');
+    await superstring;
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
@@ -46,59 +46,13 @@
         !getWindowLoadSettings().resourcePath.startsWith(
           process.resourcesPath + path.sep
         );
-      useSnapshot = !devMode && typeof snapshotResult !== 'undefined';
 
-      if (devMode) {
-        const metadata = require('../package.json');
-        if (!metadata._deprecatedPackages) {
-          try {
-            metadata._deprecatedPackages = require('../script/deprecated-packages.json');
-          } catch (requireError) {
-            console.error(
-              'Failed to setup deprecated packages list',
-              requireError.stack
-            );
-          }
-        }
-      } else if (useSnapshot) {
-        Module.prototype.require = function(module) {
-          const absoluteFilePath = Module._resolveFilename(module, this, false);
-          let relativeFilePath = path.relative(
-            entryPointDirPath,
-            absoluteFilePath
-          );
-          if (process.platform === 'win32') {
-            relativeFilePath = relativeFilePath.replace(/\\/g, '/');
-          }
-          let cachedModule =
-            snapshotResult.customRequire.cache[relativeFilePath];
-          if (!cachedModule) {
-            cachedModule = { exports: Module._load(module, this, false) };
-            snapshotResult.customRequire.cache[relativeFilePath] = cachedModule;
-          }
-          return cachedModule.exports;
-        };
-
-        snapshotResult.setGlobals(
-          global,
-          process,
-          window,
-          document,
-          console,
-          require
-        );
-      }
-
-      const FileSystemBlobStore = useSnapshot
-        ? snapshotResult.customRequire('../src/file-system-blob-store.js')
-        : require('../src/file-system-blob-store');
+      const FileSystemBlobStore = require('../src/file-system-blob-store');
       blobStore = FileSystemBlobStore.load(
         path.join(process.env.ATOM_HOME, 'blob-store')
       );
 
-      const NativeCompileCache = useSnapshot
-        ? snapshotResult.customRequire('../src/native-compile-cache.js')
-        : require('../src/native-compile-cache');
+      const NativeCompileCache = require('../src/native-compile-cache');
       NativeCompileCache.setCacheStore(blobStore);
       NativeCompileCache.setV8Version(process.versions.v8);
       NativeCompileCache.install();
@@ -134,26 +88,16 @@
   }
 
   function setupWindow() {
-    const CompileCache = useSnapshot
-      ? snapshotResult.customRequire('../src/compile-cache.js')
-      : require('../src/compile-cache');
+    const CompileCache = require('../src/compile-cache');
     CompileCache.setAtomHomeDirectory(process.env.ATOM_HOME);
     CompileCache.install(process.resourcesPath, require);
 
-    const ModuleCache = useSnapshot
-      ? snapshotResult.customRequire('../src/module-cache.js')
-      : require('../src/module-cache');
+    const ModuleCache = require('../src/module-cache');
     ModuleCache.register(getWindowLoadSettings());
 
-    useSnapshot
-      ? snapshotResult.customRequire(
-          '../node_modules/document-register-element/build/document-register-element.node.js'
-        )
-      : require('document-register-element');
+    require('document-register-element');
 
-    const Grim = useSnapshot
-      ? snapshotResult.customRequire('../node_modules/grim/lib/grim.js')
-      : require('grim');
+    const Grim = require('grim');
     const documentRegisterElement = document.registerElement;
 
     document.registerElement = (type, options) => {
@@ -166,18 +110,14 @@
 
     const { userSettings, appVersion } = getWindowLoadSettings();
 
-    const CSON = useSnapshot
-      ? snapshotResult.customRequire('../node_modules/season/lib/cson.js')
-      : require('season');
+    const CSON = require('season');
     CSON.setCacheDir(path.join(CompileCache.getCacheDirectory(), 'cson'));
 
     const initScriptPath = path.relative(
       entryPointDirPath,
       getWindowLoadSettings().windowInitializationScript
     );
-    const initialize = useSnapshot
-      ? snapshotResult.customRequire(initScriptPath)
-      : require(initScriptPath);
+    const initialize = require(initScriptPath);
 
     StartupTime.addMarker('window:initialize:start');
 

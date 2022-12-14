@@ -1,0 +1,33 @@
+---
+engines:
+  duplication:
+    minTokenMatch: 80
+exclude_paths:
+  - "spec/fixtures/**"
+  - "packages/*/spec/fixtures/**"
+
+# Since Codacy exposes significantly little on the config.
+# We can use the rest of this document to solidify our settings.
+#
+# Quality Settings: (Below are changed values, rest are default)
+#   * Pull requests won't pass the quality gate when:
+#     - New issues are over: 15 'critical'
+#   * Commits won't pass the quality gate:
+#     - New issues are over: 15 'critical'
+#   * The repository is below the quality goals when:
+#     - Issues are over: 20%
+#     - Complexity is over: 10%
+#     - File is complex when over: 20
+#     - Duplication is over: 30
+#     - File is duplicated when over: 1 'cloned block'
+#     - Coverage is under: 60%
+# Enabled Engines:
+#   - CSSLint 1.0.5
+#   - CoffeeLint 2.1.0
+#   - ESLint 8.23.1
+#   - Hadolint 1.18.2
+#   - Jackson Linter 2.10.2
+#   - PMD 6.48.0
+#   - SpellCheck 0.8.0
+#   - Stylelint 14.2.0
+#

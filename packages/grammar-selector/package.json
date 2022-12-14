@@ -18,20 +18,6 @@
       }
     }
   },
-  "devDependencies": {
-    "standard": "^10.0.3"
-  },
-  "standard": {
-    "globals": [
-      "atom",
-      "beforeEach",
-      "describe",
-      "expect",
-      "it",
-      "jasmine",
-      "spyOn"
-    ]
-  },
   "configSchema": {
     "showOnRightSideOfStatusBar": {
       "type": "boolean",

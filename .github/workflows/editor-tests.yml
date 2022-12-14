@@ -2,9 +2,15 @@ name: Editor tests
 on:
   - push
   - pull_request
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
 jobs:
   tests:
     name: tests
+    if: |
+      !startsWith(github.event.pull_request.title, '[skip-ci]') &&
+      !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-latest, windows-2019]

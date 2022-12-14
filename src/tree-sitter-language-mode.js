@@ -116,10 +116,7 @@ class TreeSitterLanguageMode {
   parse(language, oldTree, ranges) {
     const parser = PARSER_POOL.pop() || new Parser();
     parser.setLanguage(language);
-    const result = parser.parse(this.buffer.getText(), oldTree, {
-      syncTimeoutMicros: this.syncTimeoutMicros,
-      includedRanges: ranges
-    });
+    const result = parser.parse(this.buffer.getText(), oldTree)
 
     if (result.then) {
       return result.then(tree => {

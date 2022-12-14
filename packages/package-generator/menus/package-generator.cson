@@ -1,0 +1,10 @@
+'menu': [
+  'label': 'Packages'
+  'submenu': [
+    'label': 'Package Generator'
+    'submenu': [
+      { 'label': 'Generate Package', 'command': 'package-generator:generate-package' }
+      { 'label': 'Generate Syntax Theme', 'command': 'package-generator:generate-syntax-theme' }
+    ]
+  ]
+]

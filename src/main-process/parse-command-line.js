@@ -38,17 +38,6 @@ module.exports = function parseCommandLine(processArgs) {
       ATOM_HOME               The root path for all configuration files and folders.
                               Defaults to \`~/.pulsar\`.`
   );
-  // Deprecated 1.0 API preview flag
-  options
-    .alias('1', 'one')
-    .boolean('1')
-    .describe('1', 'This option is no longer supported.');
-  options
-    .boolean('include-deprecated-apis')
-    .describe(
-      'include-deprecated-apis',
-      'This option is not currently supported.'
-    );
   options
     .alias('d', 'dev')
     .boolean('d')
@@ -57,7 +46,11 @@ module.exports = function parseCommandLine(processArgs) {
     .alias('f', 'foreground')
     .boolean('f')
     .describe('f', 'Keep the main process in the foreground.');
-  options.help('help', 'Print this usage message.').alias('h', 'help');
+  options.help(false)
+  options
+    .alias('h', 'help')
+    .boolean('h')
+    .describe('h', 'Print this usage message.')
   options
     .alias('l', 'log-file')
     .string('l')
@@ -89,13 +82,13 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('benchmark')
     .describe(
       'benchmark',
-      'Open a new window that runs the specified benchmarks.'
+      'This option is no longer supported.'
     );
   options
     .boolean('benchmark-test')
     .describe(
       'benchmark-test',
-      'Run a faster version of the benchmarks in headless mode.'
+      'This option is no longer supported.'
     );
   options
     .alias('t', 'test')
@@ -132,6 +125,13 @@ module.exports = function parseCommandLine(processArgs) {
       'enable-electron-logging',
       'Enable low-level logging messages from Electron.'
     );
+  options
+    .alias('p', 'package')
+    .boolean('p')
+    .describe(
+      'package',
+      'Delegate all commands to Pulsar\'s package management. Run with --package for more details'
+    );
   options.boolean('uri-handler');
   options
     .version(
@@ -144,6 +144,22 @@ module.exports = function parseCommandLine(processArgs) {
 
   // NB: if --help or --version are given, this also displays the relevant message and exits
   let args = options.argv;
+
+  if (args['package']) {
+    const PackageManager = require('../package-manager');
+    const cp = require('child_process');
+    const ppmPath = PackageManager.possibleApmPaths();
+    const ppmArgs = args['_'];
+    const exitCode = cp.spawnSync(ppmPath, ppmArgs, {stdio: 'inherit'}).status;
+    process.exit(exitCode);
+    return;
+  }
+
+  if (args['help']) {
+    options.showHelp();
+    process.exit(0);
+    return;
+  }
 
   // If --uri-handler is set, then we parse NOTHING else
   if (args.uriHandler) {
