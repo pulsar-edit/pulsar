@@ -155,7 +155,7 @@
     "service-hub": "^0.7.4",
     "settings-view": "https://github.com/pulsar-edit/settings-view.git#v0.261.11",
     "sinon": "9.2.1",
-    "snippets": "https://codeload.github.com/pulsar-edit/snippets/legacy.tar.gz/refs/tags/v1.6.1",
+    "snippets": "https://github.com/pulsar-edit/snippets.git#009b767",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1",
