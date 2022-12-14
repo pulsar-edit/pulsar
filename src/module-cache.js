@@ -58,15 +58,6 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
 
   for (let childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
     if (path.basename(childPath) === '.bin') continue;
-    if (
-      rootPath === modulePath &&
-      (rootMetadata.packageDependencies &&
-        rootMetadata.packageDependencies.hasOwnProperty(
-          path.basename(childPath)
-        ))
-    ) {
-      continue;
-    }
 
     const childMetadataPath = path.join(childPath, 'package.json');
     if (!fs.isFileSync(childMetadataPath)) continue;
@@ -133,15 +124,6 @@ function loadFolderCompatibility(
 
   for (let childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
     if (path.basename(childPath) === '.bin') continue;
-    if (
-      rootPath === modulePath &&
-      (rootMetadata.packageDependencies &&
-        rootMetadata.packageDependencies.hasOwnProperty(
-          path.basename(childPath)
-        ))
-    ) {
-      continue;
-    }
     loadFolderCompatibility(childPath, rootPath, rootMetadata, moduleCache);
   }
 }
@@ -175,25 +157,7 @@ function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
     }
   }
 
-  function onDirectory(childPath) {
-    // Don't include extensions from bundled packages
-    // These are generated and stored in the package's own metadata cache
-    if (rootMetadata.name === 'atom') {
-      const parentPath = path.dirname(childPath);
-      if (parentPath === nodeModulesPath) {
-        const packageName = path.basename(childPath);
-        if (
-          rootMetadata.packageDependencies &&
-          rootMetadata.packageDependencies.hasOwnProperty(packageName)
-        )
-          return false;
-      }
-    }
-
-    return true;
-  }
-
-  fs.traverseTreeSync(rootPath, onFile, onDirectory);
+  fs.traverseTreeSync(rootPath, onFile, () => true);
 }
 
 function satisfies(version, rawRange) {

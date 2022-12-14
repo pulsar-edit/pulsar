@@ -18,11 +18,6 @@ module.exports = class ThemePackage extends Package {
     this.config.removeAtKeyPath('core.themes', this.name);
   }
 
-  preload() {
-    this.loadTime = 0;
-    this.configSchemaRegisteredOnLoad = this.registerConfigSchemaFromMetadata();
-  }
-
   finishLoading() {
     this.path = path.join(this.packageManager.resourcePath, this.path);
   }

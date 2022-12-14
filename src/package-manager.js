@@ -46,15 +46,8 @@ module.exports = class PackageManager {
     this.packageDirPaths = [];
     this.deferredActivationHooks = [];
     this.triggeredActivationHooks = new Set();
-    this.packagesCache =
-      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
-    this.packageDependencies =
-      packageJSON.packageDependencies != null
-        ? packageJSON.packageDependencies
-        : {};
     this.initialPackagesLoaded = false;
     this.initialPackagesActivated = false;
-    this.preloadedPackages = {};
     this.loadedPackages = {};
     this.activePackages = {};
     this.activatingPackages = {};
@@ -68,12 +61,12 @@ module.exports = class PackageManager {
   initialize(params) {
     this.devMode = params.devMode;
     this.resourcePath = params.resourcePath;
+    // this.packageDirPaths.push(path.join(this.resourcePath, 'packages'));
     if (params.configDirPath != null && !params.safeMode) {
       if (this.devMode) {
         this.packageDirPaths.push(
           path.join(params.configDirPath, 'dev', 'packages')
         );
-        this.packageDirPaths.push(path.join(this.resourcePath, 'packages'));
       }
       this.packageDirPaths.push(path.join(params.configDirPath, 'packages'));
     }
@@ -95,14 +88,7 @@ module.exports = class PackageManager {
     this.serviceHub.clear();
     await this.deactivatePackages();
     this.loadedPackages = {};
-    this.preloadedPackages = {};
     this.packageStates = {};
-    this.packagesCache =
-      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
-    this.packageDependencies =
-      packageJSON.packageDependencies != null
-        ? packageJSON.packageDependencies
-        : {};
     this.triggeredActivationHooks.clear();
     this.activatePromise = null;
   }
@@ -238,21 +224,7 @@ module.exports = class PackageManager {
       return packagePath;
     }
 
-    packagePath = path.join(this.resourcePath, 'node_modules', name);
-    if (this.hasAtomEngine(packagePath)) {
-      return packagePath;
-    }
-
     return null;
-  }
-
-  // Public: Is the package with the given name bundled with Pulsar?
-  //
-  // * `name` - The {String} package name.
-  //
-  // Returns a {Boolean}.
-  isBundledPackage(name) {
-    return this.getPackageDependencies().hasOwnProperty(name);
   }
 
   /*
@@ -419,22 +391,11 @@ module.exports = class PackageManager {
             const packagePath = path.join(packageDirPath, packageName);
             packages.push({
               name: packageName,
-              path: packagePath,
-              isBundled: false
+              path: packagePath
             });
             packagesByName.add(packageName);
           }
         }
-      }
-    }
-
-    for (const packageName in this.packageDependencies) {
-      if (!packagesByName.has(packageName)) {
-        packages.push({
-          name: packageName,
-          path: path.join(this.resourcePath, 'node_modules', packageName),
-          isBundled: true
-        });
       }
     }
 
@@ -451,19 +412,6 @@ module.exports = class PackageManager {
 
   setPackageState(name, state) {
     this.packageStates[name] = state;
-  }
-
-  getPackageDependencies() {
-    return this.packageDependencies;
-  }
-
-  hasAtomEngine(packagePath) {
-    const metadata = this.loadPackageMetadata(packagePath, true);
-    return (
-      metadata != null &&
-      metadata.engines != null &&
-      metadata.engines.atom != null
-    );
   }
 
   unobserveDisabledPackages() {
@@ -543,59 +491,6 @@ module.exports = class PackageManager {
     );
   }
 
-  preloadPackages() {
-    const result = [];
-    for (const packageName in this.packagesCache) {
-      result.push(
-        this.preloadPackage(packageName, this.packagesCache[packageName])
-      );
-    }
-    return result;
-  }
-
-  preloadPackage(packageName, pack) {
-    const metadata = pack.metadata || {};
-    if (typeof metadata.name !== 'string' || metadata.name.length < 1) {
-      metadata.name = packageName;
-    }
-
-    if (
-      metadata.repository != null &&
-      metadata.repository.type === 'git' &&
-      typeof metadata.repository.url === 'string'
-    ) {
-      metadata.repository.url = metadata.repository.url.replace(
-        /(^git\+)|(\.git$)/g,
-        ''
-      );
-    }
-
-    const options = {
-      path: pack.rootDirPath,
-      name: packageName,
-      preloadedPackage: true,
-      bundledPackage: true,
-      metadata,
-      packageManager: this,
-      config: this.config,
-      styleManager: this.styleManager,
-      commandRegistry: this.commandRegistry,
-      keymapManager: this.keymapManager,
-      notificationManager: this.notificationManager,
-      grammarRegistry: this.grammarRegistry,
-      themeManager: this.themeManager,
-      menuManager: this.menuManager,
-      contextMenuManager: this.contextMenuManager,
-      deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry
-    };
-
-    pack = metadata.theme ? new ThemePackage(options) : new Package(options);
-    pack.preload();
-    this.preloadedPackages[packageName] = pack;
-    return pack;
-  }
-
   loadPackages() {
     // Ensure atom exports is already in the require cache so the load time
     // of the first package isn't skewed by being the first to require atom
@@ -629,8 +524,7 @@ module.exports = class PackageManager {
       const name = path.basename(nameOrPath);
       return this.loadAvailablePackage({
         name,
-        path: packagePath,
-        isBundled: this.isBundledPackagePath(packagePath)
+        path: packagePath
       });
     }
 
@@ -639,33 +533,11 @@ module.exports = class PackageManager {
   }
 
   loadAvailablePackage(availablePackage, disabledPackageNames) {
-    const preloadedPackage = this.preloadedPackages[availablePackage.name];
-
-    if (
-      disabledPackageNames != null &&
-      disabledPackageNames.has(availablePackage.name)
-    ) {
-      if (preloadedPackage != null) {
-        preloadedPackage.deactivate();
-        delete preloadedPackage[availablePackage.name];
-      }
-      return null;
-    }
+    if (disabledPackageNames?.has(availablePackage.name)) return;
 
     const loadedPackage = this.getLoadedPackage(availablePackage.name);
     if (loadedPackage != null) {
       return loadedPackage;
-    }
-
-    if (preloadedPackage != null) {
-      if (availablePackage.isBundled) {
-        preloadedPackage.finishLoading();
-        this.loadedPackages[availablePackage.name] = preloadedPackage;
-        return preloadedPackage;
-      } else {
-        preloadedPackage.deactivate();
-        delete preloadedPackage[availablePackage.name];
-      }
     }
 
     let metadata;
@@ -680,7 +552,6 @@ module.exports = class PackageManager {
       path: availablePackage.path,
       name: availablePackage.name,
       metadata,
-      bundledPackage: availablePackage.isBundled,
       packageManager: this,
       config: this.config,
       styleManager: this.styleManager,
@@ -914,52 +785,26 @@ module.exports = class PackageManager {
     }
   }
 
-  isBundledPackagePath(packagePath) {
-    if (
-      this.devMode &&
-      !this.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)
-    ) {
-      return false;
-    }
-
-    if (this.resourcePathWithTrailingSlash == null) {
-      this.resourcePathWithTrailingSlash = `${this.resourcePath}${path.sep}`;
-    }
-
-    return (
-      packagePath != null &&
-      packagePath.startsWith(this.resourcePathWithTrailingSlash)
-    );
-  }
-
   loadPackageMetadata(packagePathOrAvailablePackage, ignoreErrors = false) {
-    let isBundled, packageName, packagePath;
+    let packageName, packagePath;
     if (typeof packagePathOrAvailablePackage === 'object') {
       const availablePackage = packagePathOrAvailablePackage;
       packageName = availablePackage.name;
       packagePath = availablePackage.path;
-      isBundled = availablePackage.isBundled;
     } else {
       packagePath = packagePathOrAvailablePackage;
       packageName = path.basename(packagePath);
-      isBundled = this.isBundledPackagePath(packagePath);
     }
 
     let metadata;
-    if (isBundled && this.packagesCache[packageName] != null) {
-      metadata = this.packagesCache[packageName].metadata;
-    }
-
-    if (metadata == null) {
-      const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
-      if (metadataPath) {
-        try {
-          metadata = CSON.readFileSync(metadataPath);
-          this.normalizePackageMetadata(metadata);
-        } catch (error) {
-          if (!ignoreErrors) {
-            throw error;
-          }
+    const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
+    if (metadataPath) {
+      try {
+        metadata = CSON.readFileSync(metadataPath);
+        this.normalizePackageMetadata(metadata);
+      } catch (error) {
+        if (!ignoreErrors) {
+          throw error;
         }
       }
     }
