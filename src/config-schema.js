@@ -359,7 +359,8 @@ const configSchema = {
       },
       useTreeSitterParsers: {
         type: 'boolean',
-        default: true,
+        // FIXME: Revert this to true in the future
+        default: false,
         description: 'Use Tree-sitter parsers for supported languages.'
       },
       colorProfile: {
