@@ -73,7 +73,7 @@
     "fuzzaldrin": "^2.1",
     "fuzzy-finder": "https://github.com/pulsar-edit/fuzzy-finder.git#simplify-code",
     "git-diff": "file:packages/git-diff",
-    "git-utils": "https://github.com/pulsar-edit/git-utils.git#e61e4ff",
+    "git-utils": "https://github.com/pulsar-edit/git-utils.git#499c4ce",
     "github": "https://github.com/pulsar-edit/github.git#v0.36.13",
     "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
@@ -141,7 +141,7 @@
     "oniguruma": "https://github.com/Aerijo/napi-oniguruma.git",
     "open-on-github": "https://codeload.github.com/atom/open-on-github/legacy.tar.gz/refs/tags/v1.3.2",
     "package-generator": "file:packages/package-generator",
-    "pathwatcher": "https://github.com/atom/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
+    "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
     "postcss": "8.2.10",
     "postcss-selector-parser": "6.0.4",
     "prebuild-install": "6.0.0",
@@ -303,7 +303,6 @@
     "playwright": "1.22.2",
     "playwright-core": "1.22.2",
     "random-seed": "0.3.0",
-    "shadow-cljs": "^2.20.5",
     "webdriverio": "7.20.9"
   }
 }
