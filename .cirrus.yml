@@ -99,7 +99,7 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "test failed"
   always:
     videos_artifacts:
       path: ./tests/videos/**
