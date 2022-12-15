@@ -82,7 +82,7 @@ export default class ChangeLogView {
               </li>
               <li>
                 <a href="#">
-                  Migrated to a new Repository Backend
+                  Migrated to a new Pulsar Package Repository Backend
                 </a>
               </li>
               <li>
@@ -102,7 +102,7 @@ export default class ChangeLogView {
               </li>
               <li>
                 <a href="#">
-                  Native support for Apple Silicon
+                  Native support for Apple Silicon and ARM Linux
                 </a>
               </li>
               <li>
@@ -111,13 +111,18 @@ export default class ChangeLogView {
                 </a>
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/59">
-                  Bumped Async to v3.2.4
+                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
+                  Removed all telemetry from the editor.
                 </a>
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
-                  Removed all telemetry from the editor.
+                <a href="https://pulsar-edit.dev">
+                  New Pulsar Website
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/pulsar-edit/pulsar/pull/186">
+                  Apple Silicon support for `github` Package v0.36.13
                 </a>
               </li>
 
