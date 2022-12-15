@@ -126,7 +126,7 @@ windows_task:
     - choco install python --version=3.10.3	-y
     - choco install git visualstudio2019-workload-vctools -y
     - npm config set python 'C:\Python310\python.exe'
-    - npx yarn install || sleep 1 && npx yarn install
+    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines
   build_script:
     - npx yarn build || npx yarn build || npx yarn build
   build_binary_script:
