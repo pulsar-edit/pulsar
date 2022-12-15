@@ -4,6 +4,7 @@
 - Format defined in [Pulsar Change Log](PENDING_APPROVAL)
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+
 ## [Unreleased]
 
 - Bump to Electron 12 and Node 14
@@ -20,7 +21,6 @@
 - New Pulsar Website
 - New Test Runner to Improve Testing
 - Added Apple Silicon support to `github` Package v0.36.13
-
 
 ### Pulsar
 - Added:    Incorporate settings-view to core [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/220)
@@ -176,5 +176,7 @@
   * [@Sertonix](https://github.com/pulsar-edit/background-tips/pull/2)
   * [@Sertonix](https://github.com/pulsar-edit/background-tips/pull/1)
 
+
 ## Atom v1.6.0
-See https://atom.io/releases
+
+- See https://atom.io/releases
