@@ -82,27 +82,27 @@ export default class ChangeLogView {
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/pulsar/pull/68">
                   Migrated to a new Pulsar Package Repository Backend
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/settings-view/pull/2">
                   Better error messages when a package fails to install.
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/pulsar/pull/67">
                   Configuration file watching fixes
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/pulsar/pull/14">
                   Bumped Tree-Sitter to 0.20.1 and all grammars to their recent versions
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/pulsar/pull/101">
                   Native support for Apple Silicon and ARM Linux
                 </a>
               </li>
