@@ -59,6 +59,7 @@ export default class ChangeLogView {
           </div>
           <div className="welcome-panel">
             <p>Take a look at some of the awesome things {atom.branding.name} has changed:</p>
+            <p>Feel free to read our [Full Change Log](https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md).</p>
             <ul>
               <li>
                 <a href="https://github.com/pulsar-edit/pulsar/pull/28">
