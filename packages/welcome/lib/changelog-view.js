@@ -50,7 +50,7 @@ export default class ChangeLogView {
       <div className="welcome">
         <div className="welcome-container">
           <div className="header">
-            <a title="pulsar-edit.dev" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
+            <a title="Full Change Log" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
               {/* LOGO GOES HERE */}
               <h1 className="welcome-title">
                 Change Log
