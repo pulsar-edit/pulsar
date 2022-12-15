@@ -50,7 +50,7 @@ export default class ChangeLogView {
       <div className="welcome">
         <div className="welcome-container">
           <div className="header">
-            <a title="pulsar-edit.dev" href={atom.branding.urlWeb}>
+            <a title="Full Change Log" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
               {/* LOGO GOES HERE */}
               <h1 className="welcome-title">
                 Change Log
@@ -59,6 +59,7 @@ export default class ChangeLogView {
           </div>
           <div className="welcome-panel">
             <p>Take a look at some of the awesome things {atom.branding.name} has changed:</p>
+            <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
                 <a href="https://github.com/pulsar-edit/pulsar/pull/28">
@@ -72,7 +73,7 @@ export default class ChangeLogView {
               </li>
               <li>
                 <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Removed experimental file watchers on the editor
+                  Removed experimental file watchers on the editor and fixes for how the Config File is watched.
                 </a>
               </li>
               <li>
@@ -81,28 +82,28 @@ export default class ChangeLogView {
                 </a>
               </li>
               <li>
-                <a href="#">
-                  Migrated to a new Repository Backend
+                <a href="https://github.com/pulsar-edit/pulsar/pull/68">
+                  Migrated to a new Pulsar Package Repository Backend
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/settings-view/pull/2">
                   Better error messages when a package fails to install.
                 </a>
               </li>
               <li>
-                <a href="#">
-                  Configuration file watching fixes
-                </a>
-              </li>
-              <li>
-                <a href="#">
+                <a href="https://github.com/pulsar-edit/pulsar/pull/14">
                   Bumped Tree-Sitter to 0.20.1 and all grammars to their recent versions
                 </a>
               </li>
               <li>
-                <a href="#">
-                  Native support for Apple Silicon
+                <a href="https://github.com/pulsar-edit/pulsar/pull/101">
+                  Native support for ARM Linux
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/pulsar-edit/pulsar/pull/54">
+                  Native Support for Apple Silicon
                 </a>
               </li>
               <li>
@@ -111,13 +112,18 @@ export default class ChangeLogView {
                 </a>
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/59">
-                  Bumped Async to v3.2.4
+                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
+                  Removed all telemetry from the editor.
                 </a>
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
-                  Removed all telemetry from the editor.
+                <a href="https://pulsar-edit.dev">
+                  New Pulsar Website
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/pulsar-edit/pulsar/pull/186">
+                  Apple Silicon support for `github` Package v0.36.13
                 </a>
               </li>
 

@@ -1,0 +1,7 @@
+{
+  "name": "package-with-bugs-property-email",
+  "version": "1.0.0",
+  "repository": "https://github.com/example/package-with-bugs-property-email",
+  "bugs": {"email": "issues@example.com"},
+  "main": "main"
+}
