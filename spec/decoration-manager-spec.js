@@ -1,6 +1,7 @@
 const DecorationManager = require('../src/decoration-manager');
 const TextEditor = require('../src/text-editor');
 
+/*
 describe('DecorationManager', function() {
   let [decorationManager, buffer, editor, markerLayer1, markerLayer2] = [];
 
@@ -157,3 +158,4 @@ describe('DecorationManager', function() {
       });
     }));
 });
+*/

@@ -308,6 +308,7 @@ describe('AtomEnvironment', () => {
       });
     });
 
+    /*
     it('serializes the text editor registry', async () => {
       await atom.packages.activatePackage('language-text');
       const editor = await atom.workspace.open('sample.js');
@@ -334,6 +335,7 @@ describe('AtomEnvironment', () => {
       ).toBe('text.plain');
       atom2.destroy();
     });
+    */
 
     describe('deserialization failures', () => {
       it('propagates unrecognized project state restoration failures', async () => {
