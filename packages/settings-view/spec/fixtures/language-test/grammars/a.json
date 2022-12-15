@@ -1,0 +1,9 @@
+{
+  "scopeName": "source.a",
+  "fileTypes": [
+    ".a",
+    ".aa",
+    "a"
+  ],
+  "name": "A Grammar"
+}

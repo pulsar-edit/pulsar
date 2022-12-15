@@ -1,0 +1,6 @@
+{
+  "name": "package-without-bugs-property",
+  "version": "1.0.0",
+  "repository": "https://github.com/example/package-without-bugs-property",
+  "main": "main"
+}
