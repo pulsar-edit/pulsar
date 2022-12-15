@@ -73,7 +73,7 @@ export default class ChangeLogView {
               </li>
               <li>
                 <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Removed experimental file watchers on the editor
+                  Removed experimental file watchers on the editor and fixes for how the Config File is watched.
                 </a>
               </li>
               <li>
@@ -89,11 +89,6 @@ export default class ChangeLogView {
               <li>
                 <a href="https://github.com/pulsar-edit/settings-view/pull/2">
                   Better error messages when a package fails to install.
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Configuration file watching fixes
                 </a>
               </li>
               <li>
