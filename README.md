@@ -64,7 +64,7 @@
 
 <!---------------------------{ Images }--------------------------->
 
-[Preview]: https://user-images.githubusercontent.com/378023/49132478-f4b77680-f31f-11e8-9e10-e8454d8d9b7e.png 'Preview of the editor.'
+[Preview]: https://github.com/pulsar-edit/pulsar/blob/master/resources/readme.png 'Preview of the editor.'
 
 
 <!---------------------------{ Badges }--------------------------->
