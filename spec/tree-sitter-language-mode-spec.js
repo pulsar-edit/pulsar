@@ -11,28 +11,14 @@ const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
 const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 
-const cGrammarPath = require.resolve('language-c/grammars/tree-sitter-c.cson');
-const pythonGrammarPath = require.resolve(
-  'language-python/grammars/tree-sitter-python.cson'
-);
-const jsGrammarPath = require.resolve(
-  'language-javascript/grammars/tree-sitter-javascript.cson'
-);
-const jsdocGrammarPath = require.resolve(
-  'language-javascript/grammars/tree-sitter-jsdoc.cson'
-);
-const htmlGrammarPath = require.resolve(
-  'language-html/grammars/tree-sitter-html.cson'
-);
-const ejsGrammarPath = require.resolve(
-  'language-html/grammars/tree-sitter-ejs.cson'
-);
-const rubyGrammarPath = require.resolve(
-  'language-ruby/grammars/tree-sitter-ruby.cson'
-);
-const rustGrammarPath = require.resolve(
-  'language-rust-bundled/grammars/tree-sitter-rust.cson'
-);
+const cGrammarPath = path.join(__dirname,'fixtures','tree-sitter','c.cson');
+const pythonGrammarPath = path.join(__dirname,'fixtures','tree-sitter','python.cson');
+const jsGrammarPath = path.join(__dirname,'fixtures','tree-sitter','javascript.cson');
+const jsdocGrammarPath = path.join(__dirname,'fixtures','tree-sitter','jsdoc.cson');
+const htmlGrammarPath = path.join(__dirname,'fixtures','tree-sitter','html.cson');
+const ejsGrammarPath = path.join(__dirname,'fixtures','tree-sitter','ejs.cson');
+const rubyGrammarPath = path.join(__dirname,'fixtures','tree-sitter','ruby.cson');
+const rustGrammarPath = path.join(__dirname,'fixtures','tree-sitter','rust.cson');
 
 describe('TreeSitterLanguageMode', () => {
   let editor, buffer;
