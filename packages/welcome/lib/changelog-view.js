@@ -103,7 +103,12 @@ export default class ChangeLogView {
               </li>
               <li>
                 <a href="https://github.com/pulsar-edit/pulsar/pull/101">
-                  Native support for Apple Silicon and ARM Linux
+                  Native support for ARM Linux
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/pulsar-edit/pulsar/pull/54">
+                  Native Support for Apple Silicon
                 </a>
               </li>
               <li>
