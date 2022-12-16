@@ -63,6 +63,7 @@ module.exports = {
     settingsView = null
     packageManager = null
     statusView = null
+    atom.notifications.addWarning("Warning! You have disabled the settings-view package. If you want to enable it again you have to edit the [`config.cson`](https://pulsar-edit.dev/docs/launch-manual/sections/using-pulsar/#global-configuration-settings)");
   },
 
   consumeStatusBar (statusBar) {
