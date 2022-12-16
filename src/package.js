@@ -34,6 +34,7 @@ module.exports = class Package {
 
     this.mainModule = null;
     this.path = params.path;
+    this.metadata = params.metadata || this.packageManager.loadPackageMetadata(this.path);
     this.name =
       (this.metadata && this.metadata.name) ||
       params.name ||
