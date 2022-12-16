@@ -144,31 +144,6 @@ module.exports = class ThemeManager {
         this.packageManager.resolvePackagePath(themeName)
     );
 
-    // Use a built-in syntax and UI theme any time the configured themes are not
-    // available.
-    if (themeNames.length < 2) {
-      const builtInThemeNames = [
-        'atom-dark-syntax',
-        'atom-dark-ui',
-        'atom-light-syntax',
-        'atom-light-ui',
-        'base16-tomorrow-dark-theme',
-        'base16-tomorrow-light-theme',
-        'solarized-dark-syntax',
-        'solarized-light-syntax'
-      ];
-      themeNames = _.intersection(themeNames, builtInThemeNames);
-      if (themeNames.length === 0) {
-        themeNames = ['one-dark-syntax', 'one-dark-ui'];
-      } else if (themeNames.length === 1) {
-        if (themeNames[0].endsWith('-ui')) {
-          themeNames.unshift('one-dark-syntax');
-        } else {
-          themeNames.push('one-dark-ui');
-        }
-      }
-    }
-
     // Reverse so the first (top) theme is loaded after the others. We want
     // the first/top theme to override later themes in the stack.
     return themeNames.reverse();
