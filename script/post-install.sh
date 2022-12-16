@@ -1,9 +1,12 @@
 #!/bin/sh
 
-if [ -f "/usr/bin/pulsar" ]
+FILESOURCE='/opt/Pulsar/resources/pulsar.sh'
+FILEDEST='/usr/bin/pulsar'
+
+if [ -f "$FILEDEST" ]
 then
-  rm /usr/bin/pulsar
+  rm "$FILEDEST"
 else
-  echo "File '/usr/bin/pulsar' not found (this is not an error)"
+  echo "File '$FILEDEST' not found (this is not an error)"
 fi
-cp /opt/Pulsar/resources/pulsar.sh /usr/bin/pulsar
+cp "$FILESOURCE" "$FILEDEST"
