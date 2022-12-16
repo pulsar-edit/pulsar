@@ -19,10 +19,10 @@ describe('GrammarRegistry', () => {
   describe('.assignLanguageMode(buffer, languageId)', () => {
     it('assigns to the buffer a language mode with the given language id', async () => {
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','css.cson')
+        path.join(__dirname,'fixtures','grammars','css.cson')
       );
 
       const buffer = new TextBuffer();
@@ -51,7 +51,7 @@ describe('GrammarRegistry', () => {
     describe('when no languageId is passed', () => {
       it('makes the buffer use the null grammar', () => {
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'grammars','css.cson')
+          path.join(__dirname,'fixtures','grammars','css.cson')
         );
 
         const buffer = new TextBuffer();
@@ -72,10 +72,10 @@ describe('GrammarRegistry', () => {
   describe('.assignGrammar(buffer, grammar)', () => {
     it('allows a TextMate grammar to be assigned directly, even when Tree-sitter is permitted', () => {
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'tree-sitter','javascript.cson')
+        path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
       );
       const tmGrammar = grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
 
       const buffer = new TextBuffer();
@@ -91,10 +91,10 @@ describe('GrammarRegistry', () => {
       });
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'tree-sitter','javascript.cson')
+        path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
       );
 
       const grammar = grammarRegistry.grammarForId('source.js');
@@ -109,10 +109,10 @@ describe('GrammarRegistry', () => {
       atom.config.set('core.useTreeSitterParsers', true);
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'tree-sitter','javascript.cson')
+        path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
       );
 
       const grammar = grammarRegistry.grammarForId('source.js');
@@ -129,10 +129,10 @@ describe('GrammarRegistry', () => {
   describe('.autoAssignLanguageMode(buffer)', () => {
     it('assigns to the buffer a language mode based on the best available grammar', () => {
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','css.cson')
+        path.join(__dirname,'fixtures','grammars','css.cson')
       );
 
       const buffer = new TextBuffer();
@@ -152,10 +152,10 @@ describe('GrammarRegistry', () => {
       const buffer = new TextBuffer();
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','c.cson')
+        path.join(__dirname,'fixtures','grammars','c.cson')
       );
 
       buffer.setPath('test.js');
@@ -176,12 +176,12 @@ describe('GrammarRegistry', () => {
       grammarRegistry.maintainLanguageMode(buffer);
 
       const textMateGrammar = grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       expect(buffer.getLanguageMode().grammar).toBe(textMateGrammar);
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'tree-sitter','javascript.cson')
+        path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
       );
       expect(buffer.getLanguageMode().grammar).toBe(textMateGrammar);
     });
@@ -196,12 +196,12 @@ describe('GrammarRegistry', () => {
       grammarRegistry.maintainLanguageMode(buffer);
 
       const treeSitterGrammar = grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'tree-sitter','javascript.cson')
+        path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
       );
       expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
     });
@@ -213,7 +213,7 @@ describe('GrammarRegistry', () => {
       grammarRegistry.maintainLanguageMode(buffer);
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','css.cson')
+        path.join(__dirname,'fixtures','grammars','css.cson')
       );
       expect(grammarRegistry.assignLanguageMode(buffer, 'source.css')).toBe(
         true
@@ -221,7 +221,7 @@ describe('GrammarRegistry', () => {
       expect(buffer.getLanguageMode().getLanguageId()).toBe('source.css');
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       expect(buffer.getLanguageMode().getLanguageId()).toBe('source.css');
     });
@@ -229,7 +229,7 @@ describe('GrammarRegistry', () => {
     it('returns a disposable that can be used to stop the registry from updating the buffer', async () => {
       const buffer = new TextBuffer();
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
 
       const previousSubscriptionCount = buffer.emitter.getTotalListenerCount();
@@ -263,7 +263,7 @@ describe('GrammarRegistry', () => {
     it("doesn't do anything when called a second time with the same buffer", async () => {
       const buffer = new TextBuffer();
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       const disposable1 = grammarRegistry.maintainLanguageMode(buffer);
       const disposable2 = grammarRegistry.maintainLanguageMode(buffer);
@@ -287,7 +287,7 @@ describe('GrammarRegistry', () => {
     it('does not retain the buffer after the buffer is destroyed', () => {
       const buffer = new TextBuffer();
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
 
       const disposable = grammarRegistry.maintainLanguageMode(buffer);
@@ -307,7 +307,7 @@ describe('GrammarRegistry', () => {
     it('does not retain the buffer when the grammar registry is destroyed', () => {
       const buffer = new TextBuffer();
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
 
       grammarRegistry.maintainLanguageMode(buffer);
@@ -525,10 +525,10 @@ describe('GrammarRegistry', () => {
         });
 
         grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
         );
         grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'tree-sitter','javascript.cson')
+        path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
         );
 
         const grammar = grammarRegistry.selectGrammar('test.js');
@@ -540,10 +540,10 @@ describe('GrammarRegistry', () => {
         atom.config.set('core.useTreeSitterParsers', true);
 
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'grammars','javascript.cson')
+          path.join(__dirname,'fixtures','grammars','javascript.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','javascript.cson')
+          path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
         );
 
         const grammar = grammarRegistry.selectGrammar('test.js');
@@ -553,7 +553,7 @@ describe('GrammarRegistry', () => {
       it('only favors a tree-sitter grammar if it actually matches in some way (regression)', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','javascript.cson')
+          path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
         );
 
         const grammar = grammarRegistry.selectGrammar('test', '');
@@ -565,13 +565,13 @@ describe('GrammarRegistry', () => {
       it('recognizes C++ header files', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','c.cson')
+          path.join(__dirname,'fixtures','tree-sitter','c.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','cpp.cson')
+          path.join(__dirname,'fixtures','tree-sitter','cpp.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'grammars','coffeescript.cson')
+          path.join(__dirname,'fixtures','grammars','coffeescript.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -614,13 +614,13 @@ describe('GrammarRegistry', () => {
       it('recognizes C++ files that do not match the content regex (regression)', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'grammars','c.cson')
+          path.join(__dirname,'fixtures','grammars','c.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'grammars','cpp.cson')
+          path.join(__dirname,'fixtures','grammars','cpp.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','cpp.cson')
+          path.join(__dirname,'fixtures','tree-sitter','cpp.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -635,7 +635,7 @@ describe('GrammarRegistry', () => {
       it('does not apply content regexes from grammars without filetype or first line matches', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','cpp.cson')
+          path.join(__dirname,'fixtures','tree-sitter','cpp.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -653,10 +653,10 @@ describe('GrammarRegistry', () => {
       it('recognizes shell scripts with shebang lines', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'grammars','shell-unix-bash.cson')
+          path.join(__dirname,'fixtures','grammars','shell-unix-bash.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','bash.cson')
+          path.join(__dirname,'fixtures','tree-sitter','bash.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -697,10 +697,10 @@ describe('GrammarRegistry', () => {
       it('recognizes JavaScript files that use Flow', () => {
         atom.config.set('core.useTreeSitterParsers', true);
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','javascript.cson')
+          path.join(__dirname,'fixtures','tree-sitter','javascript.cson')
         );
         grammarRegistry.loadGrammarSync(
-          path.join(__dirname,'tree-sitter','flow.cson')
+          path.join(__dirname,'fixtures','tree-sitter','flow.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -801,13 +801,13 @@ describe('GrammarRegistry', () => {
       const buffer2 = new TextBuffer();
 
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','c.cson')
+        path.join(__dirname,'fixtures','grammars','c.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','html.cson')
+        path.join(__dirname,'fixtures','grammars','html.cson')
       );
       grammarRegistry.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
 
       grammarRegistry.maintainLanguageMode(buffer1);
@@ -824,10 +824,10 @@ describe('GrammarRegistry', () => {
       );
 
       grammarRegistryCopy.loadGrammarSync(
-        path.join(__dirname,'grammars','c.cson')
+        path.join(__dirname,'fixtures','grammars','c.cson')
       );
       grammarRegistryCopy.loadGrammarSync(
-        path.join(__dirname,'grammars','html.cson')
+        path.join(__dirname,'fixtures','grammars','html.cson')
       );
 
       expect(buffer1Copy.getLanguageMode().getLanguageId()).toBe(null);
@@ -839,7 +839,7 @@ describe('GrammarRegistry', () => {
       expect(buffer2Copy.getLanguageMode().getLanguageId()).toBe(null);
 
       grammarRegistryCopy.loadGrammarSync(
-        path.join(__dirname,'grammars','javascript.cson')
+        path.join(__dirname,'fixtures','grammars','javascript.cson')
       );
       expect(buffer1Copy.getLanguageMode().getLanguageId()).toBe('source.c');
       expect(buffer2Copy.getLanguageMode().getLanguageId()).toBe('source.js');
