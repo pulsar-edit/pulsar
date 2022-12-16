@@ -2,7 +2,7 @@
   "name": "pulsar",
   "author": "Pulsar Community <noreply@pulsar-edit.com>",
   "productName": "Pulsar",
-  "version": "1.63.0-dev",
+  "version": "1.100.0-dev",
   "description": "A Community-led Hyper-Hackable Text Editor",
   "branding": {
     "id": "pulsar",
@@ -74,6 +74,7 @@
     "text-buffer": "^13.18.6",
     "tree-sitter": "0.20.0",
     "typescript-simple": "8.0.6",
+    "underscore-plus": "^1.7.0",
     "vscode-ripgrep": "1.9.0",
     "winreg": "^1.2.1",
     "yargs": "16.1.0"
