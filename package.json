@@ -170,6 +170,7 @@
     "tree-sitter": "0.20.0",
     "tree-view": "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1",
     "typescript-simple": "8.0.6",
+    "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
     "welcome": "file:packages/welcome",
