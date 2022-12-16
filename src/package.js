@@ -236,7 +236,7 @@ module.exports = class Package {
   }
 
   registerConfigSchemaFromMetadata() {
-    const configSchema = this.metadata?.configSchema;
+    const configSchema = this.metadata.configSchema;
     if (configSchema) {
       this.config.setSchema(this.name, {
         type: 'object',
@@ -968,7 +968,7 @@ module.exports = class Package {
   getActivationHooks() {
     if (this.metadata && this.activationHooks) return this.activationHooks;
 
-    if (this.metadata?.activationHooks) {
+    if (this.metadata.activationHooks) {
       if (Array.isArray(this.metadata.activationHooks)) {
         this.activationHooks = Array.from(
           new Set(this.metadata.activationHooks)
@@ -1003,7 +1003,7 @@ module.exports = class Package {
   getWorkspaceOpeners() {
     if (this.workspaceOpeners) return this.workspaceOpeners;
 
-    if (this.metadata?.workspaceOpeners) {
+    if (this.metadata.workspaceOpeners) {
       if (Array.isArray(this.metadata.workspaceOpeners)) {
         this.workspaceOpeners = Array.from(
           new Set(this.metadata.workspaceOpeners)
