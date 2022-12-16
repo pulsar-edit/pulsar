@@ -3,7 +3,7 @@ linux_task:
   container:
     image: node:16-slim
     memory: 8G
-  test_script:
+  prepair_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -23,9 +23,16 @@ linux_task:
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
     - yarn install || yarn install
+  build_script:
     - yarn build
     - yarn run build:apm
+  build_binary_script:
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -34,10 +41,6 @@ linux_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_binary_script:
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
 arm_linux_task:
   alias: linux
@@ -46,7 +49,7 @@ arm_linux_task:
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
-  prepare_script:
+  prepair_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -74,7 +77,9 @@ arm_linux_task:
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
     - yarn install || yarn install
+  build_script:
     - yarn build
     - yarn run build:apm
     - rm -Rf node-modules/electron && yarn install --check-files
@@ -98,16 +103,24 @@ silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  test_script:
+  prepair_script:
     - brew install node@16 yarn git python
     - git submodule init
     - git submodule update
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
     - yarn install || yarn install
+  build_script:
     - yarn build
     - yarn run build:apm
+  build_binary_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -116,18 +129,13 @@ silicon_mac_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_arm_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
 
 intel_mac_task:
   alias: mac
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
-  dist_script:
+  prepair_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 xcode-select --install
@@ -138,9 +146,12 @@ intel_mac_task:
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
+  build_script:
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
+  build_binary_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
@@ -163,27 +174,18 @@ windows_task:
   env:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
-  install_deps_script:
+  prepair_script:
     - choco install nodejs --version=14.15.0 -y
     - choco install python --version=3.10.3	-y
     - choco install git visualstudio2019-workload-vctools -y
     - git submodule init
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
-  build_apm_script:
-    - cd ppm; npm install
-  install_with_scripts_script:
+  install_script:
     - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
-  #install_without_scripts_script:
-  #  - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
-  rebuild_for_electron_script:
+  build_script:
+    - cd ppm; npm install
     - npx yarn build || npx yarn build || npx yarn build
-  # install_only_electron_script:
-  #   - rm -R node_modules/electron
-  #   - npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
-    # - npx playwright test --reporter=list
-  videos_artifacts:
-    path: tests\videos\**
   build_binary_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - npx yarn dist || npx yarn dist || npx yarn dist
