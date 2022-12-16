@@ -86,18 +86,6 @@ module.exports = class Package {
     return 0;
   }
 
-  finishLoading() {
-    this.measure('loadTime', () => {
-      this.path = path.join(this.packageManager.resourcePath, this.path);
-      ModuleCache.add(this.path, this.metadata);
-
-      this.loadStylesheets();
-      // Unfortunately some packages are accessing `@mainModulePath`, so we need
-      // to compute that variable eagerly also for preloaded packages.
-      this.getMainModulePath();
-    });
-  }
-
   load() {
     this.measure('loadTime', () => {
       try {
