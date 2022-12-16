@@ -171,11 +171,6 @@
   }
 
   {
-    label: 'F&ind'
-    submenu: []
-  }
-
-  {
     label: '&Packages'
     submenu: [
       { label: 'Open Package Manager', command: 'settings-view:view-installed-packages' }
