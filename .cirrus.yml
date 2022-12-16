@@ -108,7 +108,7 @@ intel_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
   build_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn build
   build_binary_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
