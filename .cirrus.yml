@@ -22,7 +22,7 @@ linux_task:
                 xvfb
     - git submodule init
     - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`echo '0-beta'`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
@@ -73,7 +73,7 @@ arm_linux_task:
     - gem install fpm
     - git submodule init
     - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`echo '0-beta'`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
@@ -104,7 +104,7 @@ silicon_mac_task:
     - git submodule update
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - sed -i -e "s/[0-9]*-dev/`echo '0-beta'`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
@@ -137,7 +137,7 @@ intel_mac_task:
     - ln -s /usr/local/bin/python3 /usr/local/bin/python
     - git submodule init
     - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`echo '0-beta'`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
     - arch -x86_64 yarn run build:apm
@@ -185,7 +185,7 @@ windows_task:
   videos_artifacts:
     path: tests\videos\**
   build_binary_script:
-    - sed -i -e "s/[0-9]*-dev/`echo '0-beta'`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - npx yarn dist || npx yarn dist || npx yarn dist
   binary_artifacts:
     path: .\binaries\*
