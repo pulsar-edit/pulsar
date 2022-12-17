@@ -14,8 +14,8 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **atom-light-syntax** | [`./atom-light-syntax`](./atom-light-syntax) | |
 | **atom-light-ui** | [`./atom-light-ui`](./atom-light-ui) | |
 | **autocomplete-atom-api** | [`atom/autocomplete-atom-api`][autocomplete-atom-api] |  |
-| **autocomplete-css** | [`./autocomplete-css`][./autocomplete-css] |  |
-| **autocomplete-html** | [`./autocomplete-html`][./autocomplete-html] |  |
+| **autocomplete-css** | [`./autocomplete-css`](./autocomplete-css) |  |
+| **autocomplete-html** | [`./autocomplete-html`](./autocomplete-html) |  |
 | **autocomplete-plus** | [`atom/autocomplete-plus`][autocomplete-plus] |  |
 | **autocomplete-snippets** | [`atom/autocomplete-snippets`][autocomplete-snippets] |  |
 | **autoflow** | [`./autoflow`](./autoflow) | |
