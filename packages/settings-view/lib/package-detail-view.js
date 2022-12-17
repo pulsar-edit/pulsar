@@ -17,8 +17,6 @@ import PackageReadmeView from './package-readme-view'
 import PackageSnippetsView from './package-snippets-view'
 import SettingsPanel from './settings-panel'
 
-const NORMALIZE_PACKAGE_DATA_README_ERROR = 'ERROR: No README data found!'
-
 export default class PackageDetailView {
   constructor (pack, settingsView, packageManager, snippetsProvider) {
     this.pack = pack
@@ -369,13 +367,7 @@ export default class PackageDetailView {
 
   renderReadme () {
     let readme
-    if (this.pack.metadata.readme && this.pack.metadata.readme.trim() !== NORMALIZE_PACKAGE_DATA_README_ERROR) {
-      readme = this.pack.metadata.readme
-    } else {
-      readme = null
-    }
-
-    if (this.readmePath && fs.existsSync(this.readmePath) && fs.statSync(this.readmePath).isFile() && !readme) {
+    if (this.readmePath && fs.existsSync(this.readmePath) && fs.statSync(this.readmePath).isFile()) {
       readme = fs.readFileSync(this.readmePath, {encoding: 'utf8'})
     }
 

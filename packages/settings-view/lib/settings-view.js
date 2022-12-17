@@ -157,15 +157,9 @@ export default class SettingsView {
   }
 
   getPackages () {
-    let bundledPackageMetadataCache
     if (this.packages != null) { return this.packages }
 
     this.packages = atom.packages.getLoadedPackages()
-
-    try {
-      const packageMetadata = require(path.join(atom.getLoadSettings().resourcePath, 'package.json'))
-      bundledPackageMetadataCache = packageMetadata ? packageMetadata._atomPackages : null
-    } catch (error) {}
 
     // Include disabled packages so they can be re-enabled from the UI
     const disabledPackages = atom.config.get('core.disabledPackages') || []
@@ -178,11 +172,7 @@ export default class SettingsView {
 
       try {
         metadata = require(path.join(packagePath, 'package.json'))
-      } catch (error) {
-        if (bundledPackageMetadataCache && bundledPackageMetadataCache[packageName]) {
-          metadata = bundledPackageMetadataCache[packageName].metadata
-        }
-      }
+      } catch (error) {}
       if (metadata == null) {
         continue
       }
