@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Not gonna lie, this is some black magic, but I will try to explain it
+#Not gonna lie, this is some magical stuff, but I will try to explain it
 
 #Automatic variables used by complete
 #COMPREPLY = An array of autocompletions to pass back to the shell
