@@ -31,8 +31,8 @@ case $1 in
     fi
 
     case $option in
-      hardlink)
-        #If hardlinking, copy the update_editor file as well
+      copy)
+        #If copying, copy the update_editor file as well
         hooks+=( "$(readlink -f "update_editor.sh")" "${hooks[@]}" )
 
         for hook in "${hooks[@]}"; do

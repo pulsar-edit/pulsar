@@ -44,10 +44,10 @@ function __completion() {
     3)
       case "${COMP_WORDS[COMP_CWORD-2]}" in
         install)
-          #When attempting to autocomplete for the third parameter ie hardlink
+          #When attempting to autocomplete for the third parameter ie copy
           #/symbolic AND the command is install
           #Generate a list of Words from the provded string
-          COMPREPLY=( $(compgen -W "hardlink symbolic" -- ${cur}) )
+          COMPREPLY=( $(compgen -W "copy symbolic" -- ${cur}) )
           ;;
       esac
       ;;
