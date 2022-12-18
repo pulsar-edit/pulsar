@@ -62,12 +62,8 @@ module.exports = class AtomWindow extends EventEmitter {
         disableBlinkFeatures: 'Auxclick',
         nodeIntegration: true,
         contextIsolation: false,
-        enableRemoteModule: true,
         sandbox: false,
         webviewTag: true,
-
-        // TodoElectronIssue: remote module is deprecated https://www.electronjs.org/docs/breaking-changes#default-changed-enableremotemodule-defaults-to-false
-        enableRemoteModule: true,
         // node support in threads
         nodeIntegrationInWorker: true
       },
