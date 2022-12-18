@@ -9,8 +9,8 @@ module.exports =
 class AtomIoClient
   constructor: (@packageManager, @baseURL) ->
     @baseURL ?= 'https://api.pulsar-edit.dev/api/'
-    # 12 hour expiry
-    @expiry = 1000 * 60 * 60 * 12
+    # 2 hour expiry
+    @expiry = 1000 * 60 * 60 * 2
     @createAvatarCache()
     @expireAvatarCache()
 
@@ -56,10 +56,10 @@ class AtomIoClient
       .then (packages) =>
         # copypasta from below
         key = if loadThemes then 'themes/featured' else 'packages/featured'
-        cached =
-          data: packages
-          createdOn: Date.now()
-        localStorage.setItem(@cacheKeyForPath(key), JSON.stringify(cached))
+        cached = @deepCache(key, packages)
+          # data: packages
+          # createdOn: Date.now()
+        # localStorage.setItem(@cacheKeyForPath(key), JSON.stringify(cached))
         # end copypasta
         callback(null, packages)
       .catch (error) ->
@@ -81,13 +81,24 @@ class AtomIoClient
         body = @parseJSON(body)
         delete body.versions
 
-        cached =
-          data: body
-          createdOn: Date.now()
-        localStorage.setItem(@cacheKeyForPath(path), JSON.stringify(cached))
+        cached = @deepCache(path, body)
+        # cached =
+        #   data: body
+        #   createdOn: Date.now()
+        # localStorage.setItem(@cacheKeyForPath(path), JSON.stringify(cached))
         callback(err, cached.data)
       catch error
         callback(error)
+
+  deepCache: (path, body) ->
+    console.log "CACHING", path
+    cached =
+      data: body
+      createdOn: Date.now()
+    localStorage.setItem(@cacheKeyForPath(path), JSON.stringify(cached))
+    if(body instanceof Array)
+      body.forEach (child) => @deepCache("packages/#{child.name}", child)
+    cached
 
   cacheKeyForPath: (path) ->
     "settings-view:#{path}"
@@ -98,6 +109,7 @@ class AtomIoClient
   # This could use a better name, since it checks whether it's appropriate to return
   # the cached data and pretends it's null if it's stale and we're online
   fetchFromCache: (packagePath) ->
+    console.log "GetCache", packagePath
     cached = localStorage.getItem(@cacheKeyForPath(packagePath))
     cached = if cached then @parseJSON(cached)
     if cached? and (not @online() or Date.now() - cached.createdOn < @expiry)
