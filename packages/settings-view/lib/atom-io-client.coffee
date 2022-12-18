@@ -91,7 +91,6 @@ class AtomIoClient
         callback(error)
 
   deepCache: (path, body) ->
-    console.log "CACHING", path
     cached =
       data: body
       createdOn: Date.now()
@@ -109,7 +108,6 @@ class AtomIoClient
   # This could use a better name, since it checks whether it's appropriate to return
   # the cached data and pretends it's null if it's stale and we're online
   fetchFromCache: (packagePath) ->
-    console.log "GetCache", packagePath
     cached = localStorage.getItem(@cacheKeyForPath(packagePath))
     cached = if cached then @parseJSON(cached)
     if cached? and (not @online() or Date.now() - cached.createdOn < @expiry)
