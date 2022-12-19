@@ -1,5 +1,6 @@
-# Note: Because of the optional chaining operator (?.), "object.property" in the comments usually means ("object.property" or "object?.property")
-# Even though sometimes it doesn't seem like using the chaining operator would make any sense, it's still supported. example: Math?.PI
+# "?." means "?." or "."
+# Even though sometimes it doesn't seem like using the chaining operator would make any sense, it's still supported.
+# Example: Math?.PI
 # Negative look-behinds for "." should cover "?."
 'scopeName': 'source.js'
 'fileTypes': [
@@ -540,7 +541,7 @@
     ]
   }
   {
-    # [.|?.]foo = ... => ...
+    # [?.]foo = ... => ...
     'begin': '''(?x)
       (?=
         (\\?\\.|\\.)?[a-zA-Z_$][\\w$]*
@@ -731,7 +732,7 @@
     'name': 'meta.class.js'
   }
   {
-    'match': '(new)\\s+([\\w$]+[\\w.$]*)'
+    'match': '(new)\\s+([\\w$]+(?:\\??\\.[\\w$]*)*)'
     'name': 'meta.class.instance.constructor.js'
     'captures':
       '1':
@@ -740,7 +741,7 @@
         'name': 'entity.name.type.instance.js'
         'patterns': [
           {
-            'include': '#period_or_optional_property'
+            'include': '#period_or_illegal_optional_property'
           }
         ]
   }
@@ -754,7 +755,9 @@
     'end': '''(?x)
       (?<=\\)) | (?=
         (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*
-          (assert|clear|debug|error|info|log|profile|profileEnd|time|timeEnd|warn)
+          (assert|clear|count|countReset|debug|dir|dirxml|error|group|groupCollapsed|
+           groupEnd|info|log|profile|profileEnd|table|time|timeEnd|timeLog|trace|
+           timeStamp|warn)
           \\s*\\(
         )) \\s*\\S
       )
@@ -774,6 +777,45 @@
             ]
           '2':
             'name': 'support.function.console.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # JSON
+    'begin': '(?<![\\w$])JSON(?![\\w$]|\\s*:)'
+    'beginCaptures':
+      '0':
+        'name': 'support.class.json.js'
+    'end': '''(?x)
+      (?<=\\)) | (?=
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*
+          (parse|stringify)
+          \\s*\\(
+        )) \\s*\\S
+      )
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'begin': '\\s*(\\?\\.|\\.)\\s*(\\w+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
+          '2':
+            'name': 'support.function.json.js'
         'end': '(?<=\\))'
         'name': 'meta.method-call.js'
         'patterns': [
@@ -848,7 +890,7 @@
         'name': 'support.class.promise.js'
     'end': '''(?x)
       (?<=\\)) | (?=
-        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*(all|race|reject|resolve)\\s*\\() )\\s*\\S
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*(all|allSettled|any|race|reject|resolve)\\s*\\() )\\s*\\S
       )
     '''
     'patterns': [
@@ -982,13 +1024,11 @@
     'match': '(?<!\\.)\\b(delete|in|of|instanceof|new|typeof|void)(?!\\s*:)\\b'
     'name': 'keyword.operator.$1.js'
   }
+  # By default, three dots = spread
+  # `keyword.operator.rest.js` is only done in specific cases in functions
   {
     'match': '\\.\\.\\.'
     'name': 'keyword.operator.spread.js'
-  }
-  {
-    'match': '\\.\\.\\.'
-    'name': 'keyword.operator.rest.js'
   }
   {
     'match': '(?<!\\.)\\b(true|false)(?!\\s*:)\\b'
@@ -1004,10 +1044,11 @@
   }
   {
     'match': '''(?x) (?<!\\$) \\b
-      (AggregateError|Array|ArrayBuffer|Atomics|Boolean|DataView|Date|Error|EvalError|Float32Array|Float64Array
-      |Function|Generator|GeneratorFunction|Int16Array|Int32Array|Int8Array|InternalError|Intl|JSON|Map|Number
+      (AggregateError|Array|ArrayBuffer|AsyncFunction|AsyncGeneratorFunction|Atomics|BigInt|BigInt64Array
+      |BigUInt64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array
+      |Function|Generator|GeneratorFunction|Int16Array|Int32Array|Int8Array|InternalError|Intl|Map|Number
       |Object|Proxy|RangeError|ReferenceError|Reflect|RegExp|Set|SharedArrayBuffer|SIMD|String|Symbol|SyntaxError
-      |TypeError|Uint16Array|Uint32Array|Uint8Array|Uint8ClampedArray|URIError|WeakMap|WeakSet)
+      |TypedArray|TypeError|Uint16Array|Uint32Array|Uint8Array|Uint8ClampedArray|URIError|WeakMap|WeakRef|WeakSet)
       \\b
     '''
     'name': 'support.class.js'
@@ -1501,6 +1542,12 @@
           '1':
             'name': 'entity.name.function.js'
           '2':
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
+          '3':
             'name': 'punctuation.definition.string.begin.js'
         'end': '`'
         'endCaptures':
@@ -2240,6 +2287,17 @@
             'patterns': [
               'include': '$self'
             ]
+      }
+    ]
+  'period_or_illegal_optional_property':
+    'patterns': [
+      {
+        'match': '\\.'
+        'name': 'meta.delimiter.property.period.js'
+      }
+      {
+        'match': '\\?\\.'
+        'name': 'invalid.illegal.meta.delimiter.property.optional.js'
       }
     ]
   'period_or_optional_property':
