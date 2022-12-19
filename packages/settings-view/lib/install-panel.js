@@ -86,7 +86,7 @@ export default class InstallPanel {
             <div className='text native-key-bindings' tabIndex='-1'>
               <span className='icon icon-question' />
               <span ref='publishedToText'>Packages are published to </span>
-              <a className='link' onclick={this.didClickOpenAtomIo.bind(this)}>pulsar-edit.dev</a>
+              <a className='link' onclick={this.didClickOpenAtomIo.bind(this)}>web.pulsar-edit.dev</a>
               <span> and are installed to {path.join(process.env.ATOM_HOME, 'packages')}</span>
             </div>
 
