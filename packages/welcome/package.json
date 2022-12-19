@@ -10,7 +10,6 @@
     "atom": ">0.50.0"
   },
   "scripts": {
-    "lint": "standard",
     "test": "atom --test test/*.test.js"
   },
   "consumedServices": {
@@ -42,12 +41,6 @@
     "etch": "0.9.0"
   },
   "devDependencies": {
-    "atom-mocha-test-runner": "^1.0.0",
-    "standard": "^8.6.0"
-  },
-  "standard": {
-    "globals": [
-      "atom"
-    ]
+    "atom-mocha-test-runner": "^1.0.0"
   }
 }

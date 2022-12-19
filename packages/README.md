@@ -14,8 +14,8 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **atom-light-syntax** | [`./atom-light-syntax`](./atom-light-syntax) | |
 | **atom-light-ui** | [`./atom-light-ui`](./atom-light-ui) | |
 | **autocomplete-atom-api** | [`atom/autocomplete-atom-api`][autocomplete-atom-api] |  |
-| **autocomplete-css** | [`atom/autocomplete-css`][autocomplete-css] |  |
-| **autocomplete-html** | [`atom/autocomplete-html`][autocomplete-html] |  |
+| **autocomplete-css** | [`./autocomplete-css`](./autocomplete-css) |  |
+| **autocomplete-html** | [`./autocomplete-html`](./autocomplete-html) |  |
 | **autocomplete-plus** | [`atom/autocomplete-plus`][autocomplete-plus] |  |
 | **autocomplete-snippets** | [`atom/autocomplete-snippets`][autocomplete-snippets] |  |
 | **autoflow** | [`./autoflow`](./autoflow) | |
@@ -83,8 +83,8 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **one-light-syntax** | [`./one-light-syntax`](./one-light-syntax) | |
 | **one-light-ui** | [`./one-light-ui`](./one-light-ui) | |
 | **open-on-github** | [`atom/open-on-github`][open-on-github] | [#18278](https://github.com/atom/atom/issues/18278) |
-| **package-generator** | [`atom/package-generator`][package-generator] | [#18279](https://github.com/atom/atom/issues/18279) |
-| **settings-view** | [`atom/settings-view`][settings-view] |  |
+| **settings-view** | [`./settings-view`](./settings-view) |  |
+| **package-generator** | [`./package-generator`](./package-generator) | |
 | **snippets** | [`atom/snippets`][snippets] |  |
 | **solarized-dark-syntax** | [`./solarized-dark-syntax`](./solarized-dark-syntax) | |
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
@@ -102,8 +102,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 
 [archive-view]: https://github.com/pulsar-edit/archive-view
 [autocomplete-atom-api]: https://github.com/pulsar-edit/autocomplete-atom-api
-[autocomplete-css]: https://github.com/pulsar-edit/autocomplete-css
-[autocomplete-html]: https://github.com/pulsar-edit/autocomplete-html
 [autocomplete-plus]: https://github.com/pulsar-edit/autocomplete-plus
 [autocomplete-snippets]: https://github.com/pulsar-edit/autocomplete-snippets
 [autosave]: https://github.com/pulsar-edit/autosave
@@ -120,8 +118,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 [markdown-preview]: https://github.com/pulsar-edit/markdown-preview
 [notifications]: https://github.com/pulsar-edit/notifications
 [open-on-github]: https://github.com/pulsar-edit/open-on-github
-[package-generator]: https://github.com/pulsar-edit/package-generator
-[settings-view]: https://github.com/pulsar-edit/settings-view
 [snippets]: https://github.com/pulsar-edit/snippets
 [spell-check]: https://github.com/pulsar-edit/spell-check
 [status-bar]: https://github.com/pulsar-edit/status-bar
