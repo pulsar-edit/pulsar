@@ -78,7 +78,11 @@ if [ $OS == 'Mac' ]; then
   else
     SCRIPT="$0"
   fi
-  ATOM_APP="$(dirname "$(dirname "$(dirname "$(dirname "$SCRIPT")")")")"
+
+  # NOTE: We may have to check macos versions for backwards compatibility
+  # ATOM_APP="$(dirname $(dirname "$(dirname "$(dirname "$SCRIPT")")")")"
+  ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
+
   if [ "$ATOM_APP" == . ]; then
     unset ATOM_APP
   else
@@ -121,7 +125,7 @@ if [ $OS == 'Mac' ]; then
       exit ${ATOM_EXIT}
     fi
   else
-    open -a "$PULSAR_PATH/$ATOM_APP_NAME" -n --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
+    open -a "$PULSAR_PATH/$ATOM_APP_NAME" -n -g --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
   fi
 elif [ $OS == 'Linux' ]; then
   SCRIPT=$(readlink -f "$0")
