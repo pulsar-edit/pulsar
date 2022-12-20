@@ -40,7 +40,9 @@ if (args.resourcePath) {
   const stableResourcePath = path.dirname(path.dirname(__dirname));
   const defaultRepositoryPath = path.join(
     // Setting the path for the app
-    app.getPath('home','pulsar-edit','pulsar')
+    app.getPath('home'),
+    'pulsar-edit',
+    'pulsar'
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {
