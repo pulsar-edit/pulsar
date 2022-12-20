@@ -41,7 +41,7 @@ if (args.resourcePath) {
   const defaultRepositoryPath = path.join(
     // Setting the path for the app
     app.getPath('home'),
-    'pulsar-edit',
+    'github',
     'pulsar'
   );
 
