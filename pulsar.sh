@@ -79,8 +79,6 @@ if [ $OS == 'Mac' ]; then
     SCRIPT="$0"
   fi
 
-  # NOTE: We may have to check macos versions for backwards compatibility
-  # ATOM_APP="$(dirname $(dirname "$(dirname "$(dirname "$SCRIPT")")")")"
   ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
 
   if [ "$ATOM_APP" == . ]; then
