@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#This hook launches after a git pull. It cannot affect a git merge, and will not
+#be executed if a merge fails
+#See https://git-scm.com/docs/githooks#_post_merge
+
+if [[ -L "$0" ]]; then
+    #If our launched script is a link, grab the root
+    hookRoot="$(dirname $(readlink --canonicalize $0))"
+else
+    #Otherwise use the launched script directory
+    hookRoot="$(dirname "$0")"
+fi
+
+"${hookRoot}/update_editor.sh" $0

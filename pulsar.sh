@@ -78,7 +78,9 @@ if [ $OS == 'Mac' ]; then
   else
     SCRIPT="$0"
   fi
-  ATOM_APP="$(dirname "$(dirname "$(dirname "$(dirname "$SCRIPT")")")")"
+
+  ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
+
   if [ "$ATOM_APP" == . ]; then
     unset ATOM_APP
   else
@@ -121,7 +123,7 @@ if [ $OS == 'Mac' ]; then
       exit ${ATOM_EXIT}
     fi
   else
-    open -a "$PULSAR_PATH/$ATOM_APP_NAME" -n --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
+    open -a "$PULSAR_PATH/$ATOM_APP_NAME" -n -g --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
   fi
 elif [ $OS == 'Linux' ]; then
   SCRIPT=$(readlink -f "$0")
@@ -149,7 +151,7 @@ elif [ $OS == 'Linux' ]; then
   [ -x "$PULSAR_PATH" ] || PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
 
   if [ $EXPECT_OUTPUT ]; then
-    "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@"
+    "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -158,7 +160,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   else
     (
-    nohup "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@" > "$ATOM_HOME/nohup.out" 2>&1
+    nohup "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
     if [ $? -ne 0 ]; then
       cat "$ATOM_HOME/nohup.out"
       exit $?

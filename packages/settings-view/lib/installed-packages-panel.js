@@ -150,7 +150,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
 
     for (let pack of packages.core) {
       if (pack.repository == null) {
-        pack.repository = `https://github.com/atom/${pack.name}`
+        pack.repository = `https://github.com/pulsar-edit/${pack.name}`
       }
     }
 

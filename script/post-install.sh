@@ -1,4 +1,10 @@
 #!/bin/sh
 
-rm /usr/bin/pulsar
-cp /opt/Pulsar/resources/pulsar.sh /usr/bin/pulsar
+FILESOURCE='/opt/Pulsar/resources/pulsar.sh'
+FILEDEST='/usr/bin/pulsar'
+
+if [ -f "$FILEDEST" ]
+then
+  rm "$FILEDEST"
+fi
+cp "$FILESOURCE" "$FILEDEST"
