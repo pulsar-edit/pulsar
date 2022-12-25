@@ -60,7 +60,7 @@ module.exports = class CommandInstaller {
 
   installAtomCommand(askForPrivilege, callback) {
     this.installCommand(
-      path.join(this.getResourcesDirectory(), 'app', 'pulsar.sh'),
+      path.join(this.getResourcesDirectory(), 'pulsar.sh'),
       this.getCommandNameForChannel('pulsar'),
       askForPrivilege,
       callback
@@ -72,9 +72,8 @@ module.exports = class CommandInstaller {
       path.join(
         this.getResourcesDirectory(),
         'app',
-        'apm',
-        'node_modules',
-        '.bin',
+        'ppm',
+        'bin',
         'apm'
       ),
       this.getCommandNameForChannel('apm'),
