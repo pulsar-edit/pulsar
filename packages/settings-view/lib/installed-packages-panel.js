@@ -148,12 +148,6 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
     packages.core = packages.core.filter(({theme}) => !theme)
     packages.git = (packages.git || []).filter(({theme}) => !theme)
 
-    for (let pack of packages.core) {
-      if (pack.repository == null) {
-        pack.repository = `https://github.com/pulsar-edit/${pack.name}`
-      }
-    }
-
     for (let packageType of ['dev', 'core', 'user', 'git']) {
       for (let pack of packages[packageType]) {
         pack.owner = ownerFromRepository(pack.repository)
