@@ -16,7 +16,7 @@ ATOM_ADD=false
 ATOM_NEW_WINDOW=false
 EXIT_CODE_OVERRIDE=
 
-while getopts ":anwtfvh-:" opt; do
+while getopts ":anwtfvhp-:" opt; do
   case "$opt" in
     -)
       case "${OPTARG}" in
@@ -30,10 +30,9 @@ while getopts ":anwtfvh-:" opt; do
           WAIT=1
           ;;
         help|version)
-          REDIRECT_STDERR=1
           EXPECT_OUTPUT=1
           ;;
-        foreground|benchmark|benchmark-test|test)
+        foreground|benchmark|benchmark-test|test|package)
           EXPECT_OUTPUT=1
           ;;
         enable-electron-logging)
@@ -50,11 +49,7 @@ while getopts ":anwtfvh-:" opt; do
     w)
       WAIT=1
       ;;
-    h|v)
-      REDIRECT_STDERR=1
-      EXPECT_OUTPUT=1
-      ;;
-    f|t)
+    f|t|h|v|p)
       EXPECT_OUTPUT=1
       ;;
   esac
