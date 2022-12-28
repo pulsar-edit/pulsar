@@ -149,7 +149,12 @@ module.exports = function parseCommandLine(processArgs) {
     const PackageManager = require('../package-manager');
     const cp = require('child_process');
     const ppmPath = PackageManager.possibleApmPaths();
-    const ppmArgs = args['_'];
+
+    let ppmArgs = [...processArgs]
+    while(true) {
+      const arg = ppmArgs.shift()
+      if(arg === '-p' || arg === '--package' || ppmArgs.length === 0) break;
+    }
     const exitCode = cp.spawnSync(ppmPath, ppmArgs, {stdio: 'inherit'}).status;
     process.exit(exitCode);
     return;
