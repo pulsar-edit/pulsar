@@ -72,6 +72,8 @@ let options = {
     "!keymaps/",
     "!menus/",
     "!script/",
+    "!integration/",
+    "!hooks/",
 
     // Git Related Exclusions
     "!**/{.git,.gitignore,.gitattributes,.git-keep,.github}",
