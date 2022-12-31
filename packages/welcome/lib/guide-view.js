@@ -254,8 +254,7 @@ export default class GuideView {
                 </p>
                 <p>
                   The init script is a bit of JavaScript or CoffeeScript run at
-                  startup. You can use it to quickly change the behaviour of
-                  {this.brand}.
+                  startup. You can use it to quickly change the behaviour of {this.brand}.
                 </p>
                 <p>
                   <button

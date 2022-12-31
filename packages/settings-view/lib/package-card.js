@@ -143,7 +143,7 @@ export default class PackageCard {
         if (packageVersion !== this.pack.version) {
           this.refs.versionValue.classList.add('text-warning')
           this.refs.packageMessage.classList.add('text-warning')
-          this.refs.packageMessage.textContent = `Version ${packageVersion} is not the latest version available for this package, but it's the latest that is compatible with your version of Atom.`
+          this.refs.packageMessage.textContent = `Version ${packageVersion} is not the latest version available for this package, but it's the latest that is compatible with your version of Pulsar.`
         }
 
         this.installablePack = pack
@@ -154,9 +154,9 @@ export default class PackageCard {
         this.refs.packageMessage.classList.add('text-error')
         this.refs.packageMessage.insertAdjacentText(
           'beforeend',
-          `There's no version of this package that is compatible with your Atom version. The version must satisfy ${this.pack.engines.atom}.`
+          `There's no version of this package that is compatible with your Pulsar version. The version must satisfy ${this.pack.engines.atom}.`
         )
-        console.error(`No available version compatible with the installed Atom version: ${atom.getVersion()}`)
+        console.error(`No available version compatible with the installed Pulsar version: ${atom.getVersion()}`)
       }
 
       callback()
@@ -212,7 +212,7 @@ export default class PackageCard {
           detail = `${oldVersion} -> ${newVersion}`
         }
 
-        const notification = atom.notifications.addSuccess(`Restart Atom to complete the update of \`${this.pack.name}\`.`, {
+        const notification = atom.notifications.addSuccess(`Restart Pulsar to complete the update of \`${this.pack.name}\`.`, {
           dismissable: true,
           buttons: [{
             text: 'Restart now',
@@ -238,7 +238,7 @@ export default class PackageCard {
 
     const packageAuthorClickHandler = (event) => {
       event.stopPropagation()
-      shell.openExternal(`https://pulsar-edit.dev/users/${ownerFromRepository(this.pack.repository)}`)
+      shell.openExternal(`https://web.pulsar-edit.dev/users/${ownerFromRepository(this.pack.repository)}`) //TODO: Fix - This does not current exist but this will at least be more accurate
     }
     this.refs.loginLink.addEventListener('click', packageAuthorClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.loginLink.removeEventListener('click', packageAuthorClickHandler) }))
