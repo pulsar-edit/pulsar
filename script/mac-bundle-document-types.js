@@ -418,7 +418,7 @@ const docs = [
     "name": "Source"
   },
   {
-    "ext": [ "cfm", "cfml", "dbm", "dist", "dot", "ics", "ifb", "dwt", "g", "in" "l", "m4", "mp", "mtml", "orig", "pde", "rej", "servlet", "s5", "tmp", "tpl", "tt", "xql", "yy", "*" ],
+    "ext": [ "cfm", "cfml", "dbm", "dist", "dot", "ics", "ifb", "dwt", "g", "in", "l", "m4", "mp", "mtml", "orig", "pde", "rej", "servlet", "s5", "tmp", "tpl", "tt", "xql", "yy", "*" ],
     "name": "Document"
   },
   {
@@ -427,7 +427,7 @@ const docs = [
     "LSItemContentTypes": [ "public.data" ]
   },
   {
-    // Adds Folder Support 
+    // Adds Folder Support
     "LSItemContentTypes": [ "public.directory", "com.apple.bundle", "com.apple.resolvable" ]
   }
 ];
