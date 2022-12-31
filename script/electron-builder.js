@@ -174,7 +174,6 @@ let options = {
     "perMachine": true,
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
-    "removeDefaultUninstallWelcomePage": true,
     "uninstallDisplayName": "Pulsar-Edit Pulsar",
     "runAfterFinish": true,
     "createDesktopShortcut": true,
