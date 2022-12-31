@@ -164,7 +164,6 @@ let options = {
     "target": [
       { "target": "nsis" },
       { "target": "portable" },
-      { "target": "msi" }
     ],
     "requestedExecutionLevel": "asInvoker",
 
