@@ -166,7 +166,11 @@ let options = {
       "NSAppleScriptEnabled": "YES",
       "NSMainNibFile": "MainMenu",
       "NSRequiresAquaSystemAppearance": "NO",
-      "CFBundleDocumentTypes": macBundleDocumentTypes.create()
+      "CFBundleDocumentTypes": macBundleDocumentTypes.create(),
+      "CFBundleURLTypes": [
+        { "CFBundleURLSchemes": [ "atom" ] },
+        {"CFBundleURLName": "Atom Shared Session Protocol" }
+      ]
     },
   },
   "win": {
