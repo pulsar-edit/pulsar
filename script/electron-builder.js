@@ -163,8 +163,22 @@ let options = {
     "icon": icoIcon,
     "target": [
       { "target": "nsis" },
-      { "target": "portable" }
-    ]
+      { "target": "portable" },
+      { "target": "msi" }
+    ],
+    "requestedExecutionLevel": "asInvoker",
+
+  },
+  // Windows NSIS Configuration
+  "nsis": {
+    "perMachine": true,
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "removeDefaultUninstallWelcomePage": true,
+    "uninstallDisplayName": "Pulsar-Edit Pulsar",
+    "runAfterFinish": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
   },
   "extraMetadata": {
   },
