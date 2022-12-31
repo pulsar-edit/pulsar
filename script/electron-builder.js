@@ -159,14 +159,18 @@ let options = {
     "icon": pngIcon,
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
-    "extendInfo": [
+    "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
-      { "CFBundleExecutable": "Pulsar" },
-      { "CFBundleIdentifier": "dev.pulsar-edit.pulsar" },
-      { "NSAppleScriptEnabled": "YES" },
-      { "NSMainNibFile": "MainMenu" },
-      { "NSRequiresAquaSystemAppearance": "NO" },
-    ]
+      "CFBundleExecutable": "Pulsar",
+      "CFBundleIdentifier": "dev.pulsar-edit.pulsar",
+      "NSAppleScriptEnabled": "YES",
+      "NSMainNibFile": "MainMenu",
+      "NSRequiresAquaSystemAppearance": "NO",
+      "CFBundleDocumentTypes": [
+        { "CFBundleTypeExtensions": [ "adb", "ads" ] },
+        { "CFBundleTypeIconFile": "file.icns" }
+      ]
+    },
   },
   "win": {
     "icon": icoIcon,
