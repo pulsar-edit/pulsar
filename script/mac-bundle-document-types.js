@@ -433,7 +433,7 @@ const docs = [
 ];
 
 function create() {
-  let obj;
+  let obj = [];
 
   for (let i = 0; i < docs.length; i++) {
     let tmp = {
