@@ -157,7 +157,16 @@ let options = {
   },
   "mac": {
     "icon": pngIcon,
-    "category": "Development"
+    "category": "public.app-category.developer-tools",
+    "minimumSystemVersion": "10.8",
+    "extendInfo": [
+      // This contains extra values that will be inserted into the App's plist
+      { "CFBundleExecutable": "Pulsar" },
+      { "CFBundleIdentifier": "dev.pulsar-edit.pulsar" },
+      { "NSAppleScriptEnabled": "YES" },
+      { "NSMainNibFile": "MainMenu" },
+      { "NSRequiresAquaSystemAppearance": "NO" },
+    ]
   },
   "win": {
     "icon": icoIcon,
