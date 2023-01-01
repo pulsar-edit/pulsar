@@ -142,6 +142,10 @@ let options = {
     afterInstall: "script/post-install.sh",
     compression: 'xz'
   },
+  pacman: {
+    afterInstall: "script/post-install.sh",
+    compression: 'xz'
+  },
   "linux": {
     "icon": pngIcon,
     "category": "Development",
@@ -150,7 +154,8 @@ let options = {
       { target: "appimage" },
       { target: "deb" },
       { target: "rpm" },
-      { target: "tar.gz" }
+      { target: "tar.gz" },
+      { target: "pacman" }
     ],
   },
   "mac": {
