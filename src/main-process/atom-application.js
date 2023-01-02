@@ -1379,33 +1379,14 @@ module.exports = class AtomApplication extends EventEmitter {
       }
       openedWindow.replaceEnvironment(env);
     } else {
-      let resourcePath, windowInitializationScript;
-      if (devMode) {
-        try {
-          windowInitializationScript = require.resolve(
-            path.join(
-              this.devResourcePath,
-              'src',
-              'initialize-application-window'
-            )
-          );
-          resourcePath = this.devResourcePath;
-        } catch (error) {}
-      }
+      let resourcePath
 
-      if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve(
-          '../initialize-application-window'
-        );
-      }
       if (!resourcePath) resourcePath = this.resourcePath;
-      if (!windowDimensions)
-        windowDimensions = this.getDimensionsForNewWindow();
+      if (!windowDimensions) windowDimensions = this.getDimensionsForNewWindow();
 
       StartupTime.addMarker('main-process:atom-application:create-window');
       openedWindow = this.createWindow({
         locationsToOpen,
-        windowInitializationScript,
         resourcePath,
         devMode,
         safeMode,
@@ -1607,31 +1588,10 @@ module.exports = class AtomApplication extends EventEmitter {
       bestWindow.focus();
       return bestWindow;
     } else {
-      let windowInitializationScript;
       let { resourcePath } = this;
-      if (devMode) {
-        try {
-          windowInitializationScript = require.resolve(
-            path.join(
-              this.devResourcePath,
-              'src',
-              'initialize-application-window'
-            )
-          );
-          resourcePath = this.devResourcePath;
-        } catch (error) {}
-      }
-
-      if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve(
-          '../initialize-application-window'
-        );
-      }
-
       const windowDimensions = this.getDimensionsForNewWindow();
       const window = this.createWindow({
         resourcePath,
-        windowInitializationScript,
         devMode,
         safeMode,
         windowDimensions,
@@ -1660,13 +1620,8 @@ module.exports = class AtomApplication extends EventEmitter {
     const packagePath = this.getPackageManager(devMode).resolvePackagePath(
       packageName
     );
-    const windowInitializationScript = path.resolve(
-      packagePath,
-      packageUrlMain
-    );
     const windowDimensions = this.getDimensionsForNewWindow();
     const window = this.createWindow({
-      windowInitializationScript,
       resourcePath: this.resourcePath,
       devMode,
       safeMode,
@@ -1711,7 +1666,6 @@ module.exports = class AtomApplication extends EventEmitter {
     timeout,
     env
   }) {
-    let windowInitializationScript;
     if (resourcePath !== this.resourcePath && !fs.existsSync(resourcePath)) {
       ({ resourcePath } = this);
     }
@@ -1725,16 +1679,6 @@ module.exports = class AtomApplication extends EventEmitter {
         return process.exit(124); // Use the same exit code as the UNIX timeout util.
       };
       setTimeout(timeoutHandler, timeoutInSeconds * 1000);
-    }
-
-    try {
-      windowInitializationScript = require.resolve(
-        path.resolve(this.devResourcePath, 'src', 'initialize-test-window')
-      );
-    } catch (error) {
-      windowInitializationScript = require.resolve(
-        path.resolve(__dirname, '..', '..', 'src', 'initialize-test-window')
-      );
     }
 
     const testPaths = [];
@@ -1757,7 +1701,6 @@ module.exports = class AtomApplication extends EventEmitter {
       safeMode = false;
     }
     const window = this.createWindow({
-      windowInitializationScript,
       resourcePath,
       headless,
       isSpec,
