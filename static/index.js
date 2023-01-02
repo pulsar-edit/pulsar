@@ -108,14 +108,12 @@
     const CSON = require('season');
     CSON.setCacheDir(path.join(CompileCache.getCacheDirectory(), 'cson'));
 
-    const initScriptPath = path.relative(
-      entryPointDirPath,
-      getWindowLoadSettings().windowInitializationScript
-    );
-    const initialize = require(initScriptPath);
+    const initializeMainWindow = require('../src/initialize-application-window');
+    const initializeTestWindow = require('../src/initialize-test-window');
 
     StartupTime.addMarker('window:initialize:start');
 
+    const initialize = getWindowLoadSettings().isSpec ? initializeTestWindow : initializeMainWindow
     return initialize({ blobStore: blobStore }).then(function() {
       StartupTime.addMarker('window:initialize:end');
       electron.ipcRenderer.send('window-command', 'window:loaded');
