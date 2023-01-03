@@ -2036,14 +2036,12 @@ aproba@^1.0.3:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-"archive-view@https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0":
+"archive-view@file:packages/archive-view":
   version "0.66.0"
-  resolved "https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0#e4563bf7cf4d6916eee4a949ca260315e8b2fe06"
   dependencies:
     etch "0.9.0"
-    fs-plus "^3.0.0"
     humanize-plus "~1.8.2"
-    ls-archive "1.3.4"
+    ls-archive "https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz"
     temp "~0.8.1"
 
 archiver-utils@^2.1.0:
@@ -6269,10 +6267,9 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-ls-archive@1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/ls-archive/-/ls-archive-1.3.4.tgz#52150919dab1acb094cdcef9dde9c66934a4650f"
-  integrity sha512-7GmjZOckV+gzm4PM1/LcWIsZIRsSkAVmIchoEf5xjquNKU0Ti5KUvGQ3dl/7VsbZIduMOPwRDXrvpo3LVJ0Pmg==
+"ls-archive@https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz":
+  version "1.3.1"
+  resolved "https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz#43baa626a66f9c904548741b5bdf2f8095fbc7d9"
   dependencies:
     async "~0.2.9"
     colors "~0.6.2"
