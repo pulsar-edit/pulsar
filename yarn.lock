@@ -5229,9 +5229,8 @@ image-size@~0.5.0:
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.5.5.tgz#09dfd4ab9d20e29eb1c3e80b8990378df9e3cb9c"
   integrity sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==
 
-"image-view@https://codeload.github.com/atom/image-view/legacy.tar.gz/refs/tags/v0.64.0":
+"image-view@file:packages/image-view":
   version "0.64.0"
-  resolved "https://codeload.github.com/atom/image-view/legacy.tar.gz/refs/tags/v0.64.0#49cfc1c780ea30c813672802f3c54fd30217716d"
   dependencies:
     bytes "^3.0.0"
     etch "0.9.0"
