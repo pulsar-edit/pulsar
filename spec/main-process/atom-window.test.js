@@ -25,7 +25,7 @@ describe('AtomWindow', function() {
   });
 
   describe('creating a real window', function() {
-    let resourcePath, windowInitializationScript, atomHome;
+    let resourcePath, atomHome;
     let original;
 
     this.timeout(10 * 1000);
@@ -38,10 +38,6 @@ describe('AtomWindow', function() {
       };
 
       resourcePath = path.resolve(__dirname, '../..');
-
-      windowInitializationScript = require.resolve(
-        path.join(resourcePath, 'src/initialize-application-window')
-      );
 
       atomHome = await new Promise((resolve, reject) => {
         temp.mkdir('launch-', (err, rootPath) => {
@@ -89,7 +85,6 @@ describe('AtomWindow', function() {
     it('creates a real, properly configured BrowserWindow', async function() {
       const w = new AtomWindow(app, service, {
         resourcePath,
-        windowInitializationScript,
         headless: true,
         extra: 'extra-load-setting'
       });

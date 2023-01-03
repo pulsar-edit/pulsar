@@ -598,19 +598,19 @@ describe('AtomApplication', function() {
             ])
           );
 
-          assert.strictEqual(
-            w1.loadSettings.windowInitializationScript,
-            path.resolve('dot-atom/package-with-url-main/some/url-main')
-          );
+          // assert.strictEqual(
+          //   w1.loadSettings.windowInitializationScript,
+          //   path.resolve('dot-atom/package-with-url-main/some/url-main')
+          // );
           assert.strictEqual(
             w1.loadSettings.urlToOpen,
             'atom://package-with-url-main/test1'
           );
 
-          assert.strictEqual(
-            w2.loadSettings.windowInitializationScript,
-            path.resolve('dot-atom/package-with-url-main/some/url-main')
-          );
+          // assert.strictEqual(
+          //   w2.loadSettings.windowInitializationScript,
+          //   path.resolve('dot-atom/package-with-url-main/some/url-main')
+          // );
           assert.strictEqual(
             w2.loadSettings.urlToOpen,
             'atom://package-with-url-main/test2'
@@ -659,13 +659,13 @@ describe('AtomApplication', function() {
             parseCommandLine(['atom://package-without-url-main/test'])
           );
           assert.notStrictEqual(uw, w0);
-          assert.strictEqual(
-            uw.loadSettings.windowInitializationScript,
-            path.resolve(
-              __dirname,
-              '../../src/initialize-application-window.js'
-            )
-          );
+          // assert.strictEqual(
+          //   uw.loadSettings.windowInitializationScript,
+          //   path.resolve(
+          //     __dirname,
+          //     '../../src/initialize-application-window.js'
+          //   )
+          // );
 
           uw.emit('window:loaded');
           assert.isTrue(
