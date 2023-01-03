@@ -5,6 +5,7 @@ import path from 'path'
 import electron from 'electron'
 import etch from 'etch'
 import hostedGitInfo from 'hosted-git-info'
+import {debounce} from 'text-buffer/lib/helpers'
 
 import {CompositeDisposable, TextEditor} from 'atom'
 
@@ -44,7 +45,9 @@ export default class InstallPanel {
         }
       })
     )
-    this.refs.searchEditor.getBuffer().stopChangingDelay = 1500;
+    const searchBuffer = this.refs.searchEditor.getBuffer();
+    searchBuffer.debouncedEmitDidStopChangingEvent = debounce(searchBuffer.emitDidStopChangingEvent.bind(searchBuffer), 1500);
+    // TODO remove hack to extend stop changing delay
     this.disposables.add(
       this.refs.searchEditor.onDidStopChanging(() => {
         this.performSearch()
