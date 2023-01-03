@@ -44,7 +44,7 @@
     "background-tips": "https://codeload.github.com/pulsar-edit/background-tips/legacy.tar.gz/refs/tags/v0.28.1",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
     "base16-tomorrow-light-theme": "file:packages/base16-tomorrow-light-theme",
-    "bookmarks": "https://codeload.github.com/atom/bookmarks/legacy.tar.gz/refs/tags/v0.46.0",
+    "bookmarks": "file:packages/bookmarks",
     "bracket-matcher": "https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0",
     "chai": "4.3.4",
     "clear-cut": "^2.0.2",

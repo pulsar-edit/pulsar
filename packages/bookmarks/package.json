@@ -1,0 +1,31 @@
+{
+  "name": "bookmarks",
+  "version": "0.46.0",
+  "main": "./lib/main",
+  "description": "Can mark lines, then jump back to them",
+  "license": "MIT",
+  "repository": "https://github.com/atom/bookmarks",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "atom-select-list": "^0.7.0"
+  },
+  "devDependencies": {
+    "standard": "^10.0.3"
+  },
+  "standard": {
+    "env": [
+      "browser",
+      "node",
+      "atomtest",
+      "jasmine"
+    ],
+    "globals": [
+      "atom"
+    ],
+    "ignore": [
+      "spec/fixtures"
+    ]
+  }
+}
