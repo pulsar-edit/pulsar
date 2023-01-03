@@ -196,7 +196,7 @@
     "autoflow": "file:./packages/autoflow",
     "autosave": "0.24.6",
     "background-tips": "0.28.0",
-    "bookmarks": "./packages/bookmarks",
+    "bookmarks": "file:./packages/bookmarks",
     "bracket-matcher": "0.92.0",
     "command-palette": "0.43.5",
     "dalek": "file:./packages/dalek",
