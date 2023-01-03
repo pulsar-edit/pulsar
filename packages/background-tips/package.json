@@ -11,19 +11,5 @@
   },
   "dependencies": {
     "underscore-plus": "1.x"
-  },
-  "devDependencies": {
-    "standard": "^10.0.3"
-  },
-  "standard": {
-    "env": {
-      "atomtest": true,
-      "browser": true,
-      "jasmine": true,
-      "node": true
-    },
-    "globals": [
-      "atom"
-    ]
   }
 }

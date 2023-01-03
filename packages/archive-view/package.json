@@ -9,20 +9,6 @@
     "ls-archive": "https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz",
     "temp": "~0.8.1"
   },
-  "devDependencies": {
-    "standard": "^11.0.1"
-  },
-  "standard": {
-    "env": {
-      "atomtest": true,
-      "browser": true,
-      "jasmine": true,
-      "node": true
-    },
-    "globals": [
-      "atom"
-    ]
-  },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
