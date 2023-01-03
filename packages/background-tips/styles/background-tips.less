@@ -1,0 +1,37 @@
+// The ui-variables file is provided by base themes provided by Pulsar.
+//
+// See https://github.com/pulsar-edit/pulsar/blob/master/packages/atom-dark-ui/styles/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+
+background-tips {
+  display: block;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .background-message {
+    user-select: none;
+    cursor: default;
+
+    .message {
+      padding: 0 @component-padding*3;
+      opacity: 0;
+      transition: opacity .3s ease-in-out;
+      &.fade-in {
+        opacity: 1;
+      }
+
+      .keystroke {
+        border: 2px solid;
+        padding: 0 @component-padding/2;
+        border-radius: @component-border-radius * 3;
+        font-family: "Helvetica Neue", Arial, sans-serif;
+      }
+    }
+  }
+}
