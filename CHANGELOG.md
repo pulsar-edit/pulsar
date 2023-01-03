@@ -7,6 +7,21 @@
 
 ## [Unreleased]
 
+- Fixed a bug where MacOSX menus like "Open" don't do anything
+- Fixed a bug where devtools won't open (https://github.com/pulsar-edit/pulsar/issues/260)
+- Fixed a bug where the editor refused to open with the message "GPU process
+isn't usable. Goodbye" (https://github.com/pulsar-edit/pulsar/issues/233)
+- Fixed logo artifacts on Linux
+- Fixed commands like `--version`, `--package` or `--help` did not show outputs
+- Fixed additional flags not being sent to `--package`
+- Small improvement on the binary size
+- Fixed "install command line tools" on Mac and Windows
+- Cached queries for featured packages (featured packages will load faster, and
+less errors on the settings-view regarding package info)
+- Added warning when `settings-view` is disabled, describint how to re-enable it
+
+## v1.100.1-beta
+
 - Bump to Electron 12 and Node 14
 - Added a rebranding API
 - Removed experimental file watchers on the editor
