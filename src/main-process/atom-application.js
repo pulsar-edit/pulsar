@@ -620,6 +620,37 @@ module.exports = class AtomApplication extends EventEmitter {
         this.openPaths({ pathsToOpen: paths });
       });
 
+      this.on('application:open', () => {
+        if( (const win = this.focusedWindow()) ) {
+          win.sendCommand('application:open')
+        } else {
+          this.promptForPathToOpen(
+            'all',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
+      });
+      this.on('application:open-file', () => {
+        if( (const win = this.focusedWindow()) ) {
+          win.sendCommand('application:open-file')
+        } else {
+          this.promptForPathToOpen(
+            'file',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
+      });
+      this.on('application:open-folder', () => {
+        if( (const win = this.focusedWindow()) ) {
+          win.sendCommand('application:open-folder')
+        } else {
+          this.promptForPathToOpen(
+            'folder',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
+      });
+
       this.on('application:bring-all-windows-to-front', () =>
         Menu.sendActionToFirstResponder('arrangeInFront:')
       );
@@ -1059,7 +1090,6 @@ module.exports = class AtomApplication extends EventEmitter {
   // command - The string representing the command.
   // args - The optional arguments to pass along.
   sendCommand(command, ...args) {
-    console.log("WILL SEND COMMAND", command)
     if (!this.emit(command, ...args)) {
       const focusedWindow = this.focusedWindow();
       if (focusedWindow) {
