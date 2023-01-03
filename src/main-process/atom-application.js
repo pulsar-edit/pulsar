@@ -1059,7 +1059,6 @@ module.exports = class AtomApplication extends EventEmitter {
   // command - The string representing the command.
   // args - The optional arguments to pass along.
   sendCommand(command, ...args) {
-    console.log("WILL SEND COMMAND", command)
     if (!this.emit(command, ...args)) {
       const focusedWindow = this.focusedWindow();
       if (focusedWindow) {
