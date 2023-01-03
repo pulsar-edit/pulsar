@@ -1,7 +1,4 @@
 # Bookmarks package
-[![macOS Build Status](https://travis-ci.org/atom/bookmarks.svg?branch=master)](https://travis-ci.org/atom/bookmarks)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/vjsf78pj4rw6ibcw/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/bookmarks/branch/master)
-[![Dependency Status](https://david-dm.org/atom/bookmarks.svg)](https://david-dm.org/atom/bookmarks)
 
 Bookmark lines in the editor.
 
@@ -17,4 +14,4 @@ Bookmark lines in the editor.
 |`bookmarks:select-to-next-bookmark`|Select the text to the next bookmark| | | |
 |`bookmarks:select-to-previous-bookmark`|Select the text to the previous bookmark| | | |
 
-![atom-bookmarks](https://cloud.githubusercontent.com/assets/1545996/10419203/97d75e32-7035-11e5-818f-5b34d60865c1.png)
+![](https://cloud.githubusercontent.com/assets/1545996/10419203/97d75e32-7035-11e5-818f-5b34d60865c1.png)
