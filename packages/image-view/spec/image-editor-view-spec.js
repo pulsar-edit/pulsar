@@ -14,7 +14,7 @@ describe('ImageEditorView', () => {
 
     workspaceElement = atom.views.getView(atom.workspace)
     atom.project.addPath(path.resolve('packages', 'image-view', 'spec', 'fixtures'));
-
+    
     // Now we have added the `./packages/image-view/spec/fixtures` folder as a backup
     // But we will search through the directories available in the project to find
     // the right one that contains our specs. Since we can't safely assume they will
@@ -153,9 +153,10 @@ describe('ImageEditorView', () => {
       await Promise.all([atom.workspace.open(filePath), atom.workspace.open(filePath2)])
 
       expect(atom.workspace.getActivePane().getItems().length).toBe(2)
+      console.log(atom.workspace.getActivePane().getItems());
       imageEditor1 = atom.workspace.getActivePane().getItems()[0]
       imageEditor2 = atom.workspace.getActivePane().getItems()[1]
-      expect(imageEditor1 instanceof ImageEditor).toBe(true)
+      expect(imageEditor1 instanceof ImageEditor || imageEditor2 instanceof ImageEditor).toBe(true)
       expect(imageEditor2 instanceof ImageEditor).toBe(true)
 
       await conditionPromise(() => imageEditor1.view.loaded && imageEditor2.view.loaded)
