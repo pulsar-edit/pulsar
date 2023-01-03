@@ -2036,14 +2036,12 @@ aproba@^1.0.3:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-"archive-view@https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0":
+"archive-view@file:packages/archive-view":
   version "0.66.0"
-  resolved "https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0#e4563bf7cf4d6916eee4a949ca260315e8b2fe06"
   dependencies:
     etch "0.9.0"
-    fs-plus "^3.0.0"
     humanize-plus "~1.8.2"
-    ls-archive "1.3.4"
+    ls-archive "https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz"
     temp "~0.8.1"
 
 archiver-utils@^2.1.0:
@@ -2438,9 +2436,8 @@ babel-preset-atomic@^5.0.0:
     "@types/babel__core" "^7.1.19"
     "@types/babel__preset-env" "7.9.2"
 
-"background-tips@https://codeload.github.com/pulsar-edit/background-tips/legacy.tar.gz/refs/tags/v0.28.1":
+"background-tips@file:packages/background-tips":
   version "0.28.1"
-  resolved "https://codeload.github.com/pulsar-edit/background-tips/legacy.tar.gz/refs/tags/v0.28.1#acf57779caaf199e80368fb7b6d08cbe44f4f826"
   dependencies:
     underscore-plus "1.x"
 
@@ -2518,9 +2515,8 @@ bluebird@^3.5.0, bluebird@^3.5.5:
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
-"bookmarks@https://codeload.github.com/atom/bookmarks/legacy.tar.gz/refs/tags/v0.46.0":
+"bookmarks@file:packages/bookmarks":
   version "0.46.0"
-  resolved "https://codeload.github.com/atom/bookmarks/legacy.tar.gz/refs/tags/v0.46.0#6370ab1681697a1f59fcb6bc07e42fc5caa84ad0"
   dependencies:
     atom-select-list "^0.7.0"
 
@@ -5232,9 +5228,8 @@ image-size@~0.5.0:
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.5.5.tgz#09dfd4ab9d20e29eb1c3e80b8990378df9e3cb9c"
   integrity sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==
 
-"image-view@https://codeload.github.com/atom/image-view/legacy.tar.gz/refs/tags/v0.64.0":
+"image-view@file:packages/image-view":
   version "0.64.0"
-  resolved "https://codeload.github.com/atom/image-view/legacy.tar.gz/refs/tags/v0.64.0#49cfc1c780ea30c813672802f3c54fd30217716d"
   dependencies:
     bytes "^3.0.0"
     etch "0.9.0"
@@ -6270,10 +6265,9 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-ls-archive@1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/ls-archive/-/ls-archive-1.3.4.tgz#52150919dab1acb094cdcef9dde9c66934a4650f"
-  integrity sha512-7GmjZOckV+gzm4PM1/LcWIsZIRsSkAVmIchoEf5xjquNKU0Ti5KUvGQ3dl/7VsbZIduMOPwRDXrvpo3LVJ0Pmg==
+"ls-archive@https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz":
+  version "1.3.1"
+  resolved "https://github.com/pulsar-edit/node-ls-archive/archive/refs/tags/v1.3.1.tar.gz#43baa626a66f9c904548741b5bdf2f8095fbc7d9"
   dependencies:
     async "~0.2.9"
     colors "~0.6.2"
