@@ -621,7 +621,8 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       this.on('application:open', () => {
-        if( (const win = this.focusedWindow()) ) {
+        const win = this.focusedWindow();
+        if(win) {
           win.sendCommand('application:open')
         } else {
           this.promptForPathToOpen(
@@ -631,7 +632,8 @@ module.exports = class AtomApplication extends EventEmitter {
         }
       });
       this.on('application:open-file', () => {
-        if( (const win = this.focusedWindow()) ) {
+        const win = this.focusedWindow();
+        if(win) {
           win.sendCommand('application:open-file')
         } else {
           this.promptForPathToOpen(
@@ -641,7 +643,8 @@ module.exports = class AtomApplication extends EventEmitter {
         }
       });
       this.on('application:open-folder', () => {
-        if( (const win = this.focusedWindow()) ) {
+        const win = this.focusedWindow();
+        if(win) {
           win.sendCommand('application:open-folder')
         } else {
           this.promptForPathToOpen(
