@@ -44,6 +44,7 @@ export default class InstallPanel {
         }
       })
     )
+    this.refs.searchEditor.getBuffer().stopChangingDelay = 1500;
     this.disposables.add(
       this.refs.searchEditor.onDidStopChanging(() => {
         this.performSearch()
