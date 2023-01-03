@@ -165,12 +165,9 @@ let options = {
       { "target": "nsis" },
       { "target": "portable" },
     ],
-    "requestedExecutionLevel": "asInvoker",
-
   },
   // Windows NSIS Configuration
   "nsis": {
-    "perMachine": true,
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "uninstallDisplayName": "Pulsar",
