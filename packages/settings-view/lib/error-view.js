@@ -67,13 +67,11 @@ class CompileToolsErrorView {
         <div className='icon icon-alert compile-tools-heading compile-tools-message'>Compiler tools not found</div>
         <div className='compile-tools-message'>Packages that depend on modules that contain C/C++ code will fail to install.</div>
         <div className='compile-tools-message'>
-          <span>Read </span>
-          <a className='link' href='https://github.com/atom/atom/blob/master/docs/build-instructions/windows.md'>here</a>
-          <span> for instructions on installing Python and Visual Studio.</span>
+          <span>Please install Python and Visual Studio to continue.</span>
         </div>
         <div className='compile-tools-message'>
           <span>Run </span>
-          <code className='alert-danger'>apm install --check</code>
+          <code className='alert-danger'>pulsar -p install --check</code>
           <span> after installing to test compiling a native module.</span>
         </div>
       </div>

@@ -11,3 +11,7 @@
 //     console.log(`Saved! ${editor.getPath()}`)
 //   )
 // );
+//
+// See the Pulsar Launch manual for more information on this file and how to
+// customize it.
+// https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#the-init-file

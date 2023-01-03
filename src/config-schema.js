@@ -1,5 +1,5 @@
 // This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config
+// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Pulsar API site when documented
 // schemas.
 const configSchema = {
   core: {
@@ -312,7 +312,7 @@ const configSchema = {
         enum: ['no', 'yes', 'always'],
         default: 'yes',
         description:
-          "When selected 'no', a blank environment is loaded. When selected 'yes' and Pulsar is started from the icon or `atom` by itself from the command line, restores the last state of all Pulsar windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Pulsar windows always, no matter how Pulsar is started."
+          "When selected 'no', a blank environment is loaded. When selected 'yes' and Pulsar is started from the icon or `pulsar` by itself from the command line, restores the last state of all Pulsar windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Pulsar windows always, no matter how Pulsar is started."
       },
       reopenProjectMenuCount: {
         description:
@@ -322,14 +322,14 @@ const configSchema = {
       },
       automaticallyUpdate: {
         description:
-          'Automatically update Pulsar when a new release is available.',
+          'Automatically update Pulsar when a new release is available. **Note**: Currently not functional, please download new releases from [pulsar-edit.dev](https://pulsar-edit.dev/download.html)',
         type: 'boolean',
-        default: true
+        default: false
       },
       useProxySettingsWhenCallingApm: {
-        title: 'Use Proxy Settings When Calling APM',
+        title: 'Use Proxy Settings When Calling PPM',
         description:
-          'Use detected proxy settings when calling the `apm` command-line tool.',
+          'Use detected proxy settings when calling the `pulsar -p` or `ppm` command-line tool.',
         type: 'boolean',
         default: true
       },
@@ -621,7 +621,7 @@ if (process.platform === 'darwin') {
     type: 'boolean',
     default: false,
     description:
-      'Use pre-Lion fullscreen on macOS. This does not create a new desktop space for the atom on fullscreen mode.'
+      'Use pre-Lion fullscreen on macOS. This does not create a new desktop space for Pulsar on fullscreen mode.'
   };
 }
 
