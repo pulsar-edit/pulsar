@@ -23,12 +23,28 @@ class JasmineListReporter extends TerminalReporter {
 
     let msg = '';
     if (result.passed()) {
-      msg = this.stringWithColor_('[pass]', this.color_.pass());
+      msg = "\u001b[34m[pass]\u001b[0m";
     } else {
-      msg = this.stringWithColor_('[FAIL]', this.color_.fail());
+      msg = "\u001b[1m\u001b[31m[FAIL]\u001b[0m";
+      this.flatFailures ||= [];
+
+      for(let result of spec.results_.items_) {
+        if(!result.passed_) {
+          this.flatFailures.push(result)
+        }
+      }
+
       this.addFailureToFailures_(spec);
     }
     this.printLine_(msg);
+  }
+
+  reportFailures_(spec) {
+    this.printLine_("\n\nALL FILES THAT FAILED:")
+    for(let failure of this.flatFailures) {
+      const onlyFile = failure.filteredStackTrace.replace(/.*\((.*)\).*/, '$1')
+      this.printLine_(onlyFile)
+    }
   }
 }
 
