@@ -17,7 +17,7 @@ isn't usable. Goodbye" (https://github.com/pulsar-edit/pulsar/issues/233)
 - Small improvement on the binary size
 - Fixed "install command line tools" on Mac and Windows
 - Cached queries for featured packages (featured packages will load faster, and
-less errors on the settings-view regarding package info)
+fewer errors on the settings-view regarding package info)
 - Added warning when `settings-view` is disabled, describing how to re-enable it
 
 ## v1.100.1-beta
