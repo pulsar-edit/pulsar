@@ -16,14 +16,56 @@ module.exports = function(filter) {
     }
   }
 
+  runSpecs(packagePath, true)
+}
+
+function runSpecs(files, retry) {
   let env = process.env
   env.ATOM_JASMINE_REPORTER='list'
-  const res = cp.spawnSync('yarn', ['start', '--test', ...packagePath], {
+  const res = cp.spawn('yarn', ['start', '--test', ...files], {
     cwd: process.cwd(),
-    detached: true,
-    stdio: "inherit",
     env: env
   })
 
-  process.exit(res.status)
+  let out;
+  res.stdout.on('data', data => {
+     process.stdout.write(data.toString());
+  });
+
+  res.stderr.on('data', data => {
+     const strData = data.toString();
+     process.stderr.write(strData);
+
+     if(strData.match(/ALL FILES THAT FAILED/)) {
+       out = '';
+     } else if(out !== undefined) {
+       out += strData;
+     }
+  });
+
+  res.on('close', code => {
+    if(code !== 0 && retry) {
+      const failed = filterFiles(out)
+      runSpecs(failed, false)
+    } else {
+      process.exit(code)
+    }
+  });
+}
+
+function filterFiles(output) {
+  let files = new Set()
+  let start = true
+  for(let out of output.split("\n")) {
+    if(start) {
+      if(out !== '') {
+        start = false
+        files.add(out.replace(/:\d+:\d+/, ''))
+      }
+    } else if(out !== '') {
+      files.add(out.replace(/:\d+:\d+/, ''))
+    } else {
+      return files
+    }
+  }
 }
