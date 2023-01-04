@@ -163,8 +163,17 @@ let options = {
     "icon": icoIcon,
     "target": [
       { "target": "nsis" },
-      { "target": "portable" }
-    ]
+      { "target": "portable" },
+    ],
+  },
+  // Windows NSIS Configuration
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "uninstallDisplayName": "Pulsar",
+    "runAfterFinish": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
   },
   "extraMetadata": {
   },
