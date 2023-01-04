@@ -16,11 +16,13 @@ module.exports = function(filter) {
     }
   }
 
-  // console.log('yarn', 'start', '--test', ...packagePath)
+  let env = process.env
+  env.ATOM_JASMINE_REPORTER='list'
   const res = cp.spawnSync('yarn', ['start', '--test', ...packagePath], {
     cwd: process.cwd(),
     detached: true,
-    stdio: "inherit"
+    stdio: "inherit",
+    env: env
   })
 
   process.exit(res.status)
