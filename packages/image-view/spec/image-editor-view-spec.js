@@ -153,11 +153,6 @@ describe('ImageEditorView', () => {
       await Promise.all([atom.workspace.open(filePath), atom.workspace.open(filePath2)])
 
       expect(atom.workspace.getActivePane().getItems().length).toBe(2)
-      expect(filePath).toBe("/home/runner/work/pulsar/packages/image-view/spec/fixtures/binary-file.png");
-      console.log(atom.workspace.getActivePane().getItems());
-      console.log(`Length of Active Pane Items: ${atom.workspace.getActivePane().getItems().length}`);
-      console.log(`filePath: ${filePath}`);
-      console.log(`filePath2: ${filePath2}`);
       imageEditor1 = atom.workspace.getActivePane().getItems()[0]
       imageEditor2 = atom.workspace.getActivePane().getItems()[1]
       expect(imageEditor1 instanceof ImageEditor).toBe(true)
