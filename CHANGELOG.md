@@ -7,7 +7,7 @@
 
 ## [Unreleased]
 
-- Fixed a bug where MacOSX menus like "Open" don't do anything
+- Fixed a bug where macOS menus like "Open" don't do anything
 - Fixed a bug where devtools won't open (https://github.com/pulsar-edit/pulsar/issues/260)
 - Fixed a bug where the editor refused to open with the message "GPU process
 isn't usable. Goodbye" (https://github.com/pulsar-edit/pulsar/issues/233)
