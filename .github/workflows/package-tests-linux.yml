@@ -1,8 +1,6 @@
 name: Package tests for Pulsar on Linux
 on:
   - pull_request
-env:
-  APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
 jobs:
   setup:
     name: Build Editor
@@ -39,14 +37,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: node_modules
-        key: linux-modules-${{ hashFiles('package.json') }}
+        key: linux-modules-${{ hashFiles('package.json', 'packages/**') }}
 
-    - name: Cache apm
-      id: cache-apm
+    - name: Cache ppm
+      id: cache-ppm
       uses: actions/cache@v3
       with:
-        path: apm
-        key: linux-apm-${{ hashFiles('apm/package.json') }}
+        path: ppm
+        key: linux-ppm-${{ hashFiles('ppm/package.json') }}
 
   test:
     name: Test Packages
@@ -56,18 +54,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - filter: autocomplete|language
-            descr: syntax-related
+          - filter: language
+            descr: language-related
           - filter: dark|light
             descr: themes
           - filter: git-diff|go-to-line|grammar-selector|line-ending-selector|autoflow|autosave|symbols-view|spell-check|bracket-matcher|whitespace|wrap-guide|snippets|encoding-selector
             descr: editor related
           - filter: deprecation-cop|dev-live-reload|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
             descr: development helpers
-          - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|status-bar|settings-view|notifications
+          - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|settings-view|notifications
             descr: UI elements
           - filter: image-view|bookmarks|keybinding-resolver|link|timecop
             descr: others
+          - filter: autocomplete|status-bar
+            descr: all failures
 
     steps:
     - name: Checkout the latest code
@@ -78,14 +78,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: node_modules
-        key: linux-modules-${{ hashFiles('package.json') }}
+        key: linux-modules-${{ hashFiles('package.json', 'packages/**') }}
 
-    - name: Restore apm from Cache
-      id: restore-apm
+    - name: Restore ppm from Cache
+      id: restore-ppm
       uses: actions/cache@v3
       with:
-        path: apm
-        key: linux-apm-${{ hashFiles('apm/package.json') }}
+        path: ppm
+        key: linux-ppm-${{ hashFiles('ppm/package.json') }}
 
     - name: Run Package Tests for ${{ matrix.descr }}
       uses: GabrielBB/xvfb-action@v1
