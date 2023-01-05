@@ -1,0 +1,91 @@
+name: Package Tests for Pulsar on Linux (Verbose)
+
+on:
+  - push
+  - pull_request
+
+env:
+  APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
+
+jobs:
+  setup:
+    name: Build Editor
+    if: |
+      !startsWith(github.event.pull_request.title, '[skip-ci]') &&
+      !startsWith(github.event.pull_request.title, '[skip-package-ci]')
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install windows-build-tools
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        npm i --global windows-build-tools@4.0.0
+        npm config set msvs_version 2019
+
+    - name: Checkout the latest code
+      uses: actions/checkout@v2
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install Dependencies
+      run: yarn install
+
+    - name: Build Dependencies
+      run: yarn build
+
+    - name: Build APM
+      run: yarn build:apm
+  test:
+    name: Test Packages
+    needs: setup
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        packages:
+          - autocomplete
+          - language
+          - dark|light
+          - git-diff
+          - go-to-line
+          - grammar-selector
+          - line-ending-selector
+          - autoflow
+          - autosave
+          - symbols-view
+          - spell-check
+          - bracket-matcher
+          - whitespace
+          - wrap-guide
+          - snippets
+          - encoding-selector
+          - deprecation-cop
+          - dev-live-reload
+          - incompatible-packages
+          - package-generator
+          - exception-reporting
+          - metrics
+          - update-package-dependencies
+          - styleguide
+          - welcome
+          - about
+          - background-tips
+          - tabs
+          - tree-view
+          - archive-view
+          - markdown-preview
+          - status-bar
+          - settings-view
+          - notifications
+          - image-view
+          - bookmarks
+          - keybinding-resolver
+          - link
+          - timecop
+    steps:
+    - name: Run Package Tests - ${{ matrix.packages }}
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: node -e "require('./script/run-package-tests')(/${{ matrix.packages }}/)"
