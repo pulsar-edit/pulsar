@@ -32,9 +32,11 @@ class JasmineListReporter extends TerminalReporter {
   reportFailures_(spec) {
     super.reportFailures_(spec);
 
-    this.printLine_("\n\nALL TESTS THAT FAILED:")
-    for(let failure of this.flatFailures) {
-      this.printLine_(failure)
+    if(this.flatFailures && this.flatFailures.length > 0) {
+      this.printLine_("\n\nALL TESTS THAT FAILED:")
+      for(let failure of this.flatFailures) {
+        this.printLine_(failure)
+      }
     }
   }
 }
