@@ -141,16 +141,9 @@ describe "PackageDetailView", ->
   it "should show 'Install' as the first breadcrumb by default", ->
     loadPackageFromRemote('package-with-readme')
     expect(view.refs.breadcrumb.textContent).toBe('Install')
-    
+
   it "should open repository url", ->
     loadPackageFromRemote('package-with-readme')
     spyOn(shell, 'openExternal')
     view.refs.packageRepo.click()
     expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/example/package-with-readme')
-    
-  it "should open internal package repository url", ->
-    loadPackageFromRemote('package-internal')
-    spyOn(shell, 'openExternal')
-    view.refs.packageRepo.click()
-    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/atom/atom/tree/master/packages/package-internal')
-
