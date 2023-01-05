@@ -16,12 +16,17 @@ module.exports = function(filter) {
     }
   }
 
-  runSpecs(packagePath, true)
+  runSpecs(packagePath, [])
 }
 
-function runSpecs(files, retry) {
+function runSpecs(files, retries) {
   let env = process.env
   env.ATOM_JASMINE_REPORTER='list'
+  if(retries.length > 0) {
+    // Escape possible tests that can generate a regexp that will not match...
+    const escaped = retries.map(str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    env.SPEC_FILTER = escaped.join("|")
+  }
   const res = cp.spawn('yarn', ['start', '--test', ...files], {
     cwd: process.cwd(),
     env: env
@@ -36,7 +41,7 @@ function runSpecs(files, retry) {
      const strData = data.toString();
      process.stderr.write(strData);
 
-     if(strData.match(/ALL FILES THAT FAILED/)) {
+     if(strData.match(/ALL TESTS THAT FAILED:/)) {
        out = '';
      } else if(out !== undefined) {
        out += strData;
@@ -44,28 +49,28 @@ function runSpecs(files, retry) {
   });
 
   res.on('close', code => {
-    if(code !== 0 && retry) {
-      const failed = filterFiles(out)
-      runSpecs(failed, false)
+    if(code !== 0 && retries.length === 0) {
+      const failed = filterSpecs(out)
+      runSpecs(files, failed)
     } else {
       process.exit(code)
     }
   });
 }
 
-function filterFiles(output) {
-  let files = new Set()
+function filterSpecs(output) {
+  let descriptions = []
   let start = true
   for(let out of output.split("\n")) {
     if(start) {
       if(out !== '') {
         start = false
-        files.add(out.replace(/:\d+:\d+/, ''))
+        descriptions.push(out)
       }
     } else if(out !== '') {
-      files.add(out.replace(/:\d+:\d+/, ''))
+      descriptions.push(out)
     } else {
-      return files
+      return descriptions
     }
   }
 }

@@ -2,13 +2,7 @@ const { TerminalReporter } = require('jasmine-tagged');
 
 class JasmineListReporter extends TerminalReporter {
   fullDescription(spec) {
-    let fullDescription = 'it ' + spec.description;
-    let currentSuite = spec.suite;
-    while (currentSuite) {
-      fullDescription = currentSuite.description + ' > ' + fullDescription;
-      currentSuite = currentSuite.parentSuite;
-    }
-    return fullDescription;
+    return getFullDescription(spec, true);
   }
 
   reportSpecStarting(spec) {
@@ -26,13 +20,9 @@ class JasmineListReporter extends TerminalReporter {
       msg = "\u001b[34m[pass]\u001b[0m";
     } else {
       msg = "\u001b[1m\u001b[31m[FAIL]\u001b[0m";
-      this.flatFailures ||= [];
 
-      for(let result of spec.results_.items_) {
-        if(!result.passed_) {
-          this.flatFailures.push(result)
-        }
-      }
+      this.flatFailures ||= [];
+      this.flatFailures.push(getFullDescription(spec, false))
 
       this.addFailureToFailures_(spec);
     }
@@ -40,12 +30,29 @@ class JasmineListReporter extends TerminalReporter {
   }
 
   reportFailures_(spec) {
-    this.printLine_("\n\nALL FILES THAT FAILED:")
+    super.reportFailures_(spec);
+
+    this.printLine_("\n\nALL TESTS THAT FAILED:")
     for(let failure of this.flatFailures) {
-      const onlyFile = failure.filteredStackTrace.replace(/.*\((.*)\).*/, '$1')
-      this.printLine_(onlyFile)
+      this.printLine_(failure)
     }
   }
 }
 
-module.exports = { JasmineListReporter };
+function getFullDescription(spec, tokens) {
+  let fullDescription = spec.description;
+  if(tokens) fullDescription = `it ${fullDescription}`;
+
+  let currentSuite = spec.suite;
+  while (currentSuite) {
+    if(tokens) {
+      fullDescription = `${currentSuite.description} > ${fullDescription}`;
+    } else {
+      fullDescription = `${currentSuite.description} ${fullDescription}`;
+    }
+    currentSuite = currentSuite.parentSuite;
+  }
+  return fullDescription;
+}
+
+module.exports = { JasmineListReporter, getFullDescription };
