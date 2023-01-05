@@ -4,7 +4,7 @@ on:
   - pull_request
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
 jobs:
   tests:
     name: tests
@@ -34,4 +34,4 @@ jobs:
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: yarn start --test spec
+        run: node -e "require('./script/run-tests')(['spec'])"
