@@ -1,5 +1,5 @@
 const path = require('path')
-const fs = require('fs-plus')
+const fs = require('fs')
 const {Emitter, File, CompositeDisposable} = require('atom')
 const ImageEditorView = require('./image-editor-view')
 
@@ -7,7 +7,11 @@ const ImageEditorView = require('./image-editor-view')
 module.exports =
 class ImageEditor {
   static deserialize ({filePath}) {
-    if (fs.isFileSync(filePath)) {
+    let fileStats;
+    try {
+      fileStats = fs.statSync(filePath);
+    } catch (e) {}
+    if (fileStats?.isFile()) {
       return new ImageEditor(filePath)
     } else {
       console.warn(`Could not deserialize image editor for path '${filePath}' because that file no longer exists`)

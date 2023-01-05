@@ -24,7 +24,12 @@ describe('ImageEditorView', () => {
 
     for (let i = 0; i < projectDirectories.length; i++) {
       let possibleProjectDir = projectDirectories[i].resolve('binary-file.png');
-      if (fs.existsSync(possibleProjectDir)) {
+      let isProjectDir = false;
+      try {
+        fs.statSync(possibleProjectDir);
+        isProjectDir = true;
+      } catch (e) {}
+      if (isProjectDir) {
         filePath = projectDirectories[i].resolve('binary-file.png');
         filePath2 = projectDirectories[i].resolve('binary-file-2.png');
       }
