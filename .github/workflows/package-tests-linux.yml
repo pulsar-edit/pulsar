@@ -67,7 +67,7 @@ jobs:
           - filter: image-view|bookmarks|keybinding-resolver|link|timecop
             descr: others
           - filter: autocomplete|status-bar
-            descr: all failures
+            descr: every known package that's failing
 
     steps:
     - name: Checkout the latest code
