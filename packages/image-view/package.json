@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "bytes": "^3.0.0",
-    "etch": "0.9.0",
-    "fs-plus": "^3.0.0"
+    "etch": "0.9.0"
   },
   "consumedServices": {
     "status-bar": {

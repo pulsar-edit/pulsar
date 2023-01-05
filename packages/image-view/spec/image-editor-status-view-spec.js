@@ -1,6 +1,6 @@
 const {it, fit, ffit, beforeEach, afterEach, conditionPromise, emitterEventPromise} = require('./async-spec-helpers') // eslint-disable-line no-unused-vars
 
-const fs = require('fs-plus')
+const fs = require('fs')
 const path = require('path')
 
 describe('ImageEditorStatusView', () => {
