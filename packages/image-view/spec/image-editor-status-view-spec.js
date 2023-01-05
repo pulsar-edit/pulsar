@@ -1,6 +1,7 @@
 const {it, fit, ffit, beforeEach, afterEach, conditionPromise, emitterEventPromise} = require('./async-spec-helpers') // eslint-disable-line no-unused-vars
 
 const fs = require('fs-plus')
+const path = require('path')
 
 describe('ImageEditorStatusView', () => {
   let filePath, filePath2, statusBar
@@ -9,8 +10,26 @@ describe('ImageEditorStatusView', () => {
     jasmine.useRealClock() // Needed for conditionPromise
 
     const workspaceElement = atom.views.getView(atom.workspace)
-    filePath = atom.project.getDirectories()[0].resolve('binary-file.png')
-    filePath2 = atom.project.getDirectories()[0].resolve('binary-file-2.png')
+
+    atom.project.addPath(path.resolve('packages', 'image-view', 'spec', 'fixtures'));
+
+    // Now like image-editor-view-spec.js we have added the `./packages/image-view/spec/fixtures`
+    // folder as a backup
+    // But we will search through the directories available in the project to find
+    // the right one that contians our specs. Since we can't safely assume they
+    // will always be the first ones
+
+    let projectDirectories = atom.project.getDirectories();
+
+    for (let i = 0; i < projectDirectories.length; i++) {
+      let possibleProjectDir = projectDirectories[i].resolve('binary-file.png');
+      if (fs.existsSync(possibleProjectDir)) {
+        filePath = projectDirectories[i].resolve('binary-file.png');
+        filePath2 = projectDirectories[i].resolve('binary-file-2.png');
+      }
+    }
+    //filePath = atom.project.getDirectories()[0].resolve('binary-file.png')
+    //filePath2 = atom.project.getDirectories()[0].resolve('binary-file-2.png')
     jasmine.attachToDOM(workspaceElement)
 
     await atom.packages.activatePackage('image-view')
