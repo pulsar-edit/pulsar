@@ -50,6 +50,7 @@ Tests failed. Retrying failed tests...
 }
 
 function filterSpecs(output) {
+  if(!output) return ''
   let descriptions = []
   let start = true
   for(let out of output.split("\n")) {
