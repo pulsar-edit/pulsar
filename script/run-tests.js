@@ -1,6 +1,6 @@
 const cp = require('child_process')
 
-module.exports = function(files) {
+function runAllSpecs(files) {
   runSpecs(files, [])
 }
 
@@ -64,4 +64,12 @@ function filterSpecs(output) {
       return descriptions
     }
   }
+}
+
+if(process.argv[0] === __filename) {
+  runAllSpecs(process.argv.splice(1))
+} else if(process.argv[1] === __filename) {
+  runAllSpecs(process.argv.splice(2))
+} else {
+  module.exports = runAllSpecs
 }
