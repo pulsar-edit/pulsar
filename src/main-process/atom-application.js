@@ -620,6 +620,40 @@ module.exports = class AtomApplication extends EventEmitter {
         this.openPaths({ pathsToOpen: paths });
       });
 
+      this.on('application:open', () => {
+        const win = this.focusedWindow();
+        if(win) {
+          win.sendCommand('application:open')
+        } else {
+          this.promptForPathToOpen(
+            'all',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
+      });
+      this.on('application:open-file', () => {
+        const win = this.focusedWindow();
+        if(win) {
+          win.sendCommand('application:open-file')
+        } else {
+          this.promptForPathToOpen(
+            'file',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
+      });
+      this.on('application:open-folder', () => {
+        const win = this.focusedWindow();
+        if(win) {
+          win.sendCommand('application:open-folder')
+        } else {
+          this.promptForPathToOpen(
+            'folder',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
+      });
+
       this.on('application:bring-all-windows-to-front', () =>
         Menu.sendActionToFirstResponder('arrangeInFront:')
       );

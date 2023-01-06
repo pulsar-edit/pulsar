@@ -2,6 +2,7 @@ const path = require('path')
 const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
 const generateMetadata = require('./generate-metadata-for-builder')
+const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
 // Monkey-patch to not remove things I explicitly didn't say so
 // See: https://github.com/electron-userland/electron-builder/issues/6957
@@ -43,7 +44,7 @@ const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
 
 let options = {
-  "appId": "com.pulsar-edit.pulsar",
+  "appId": "dev.pulsar-edit.pulsar",
   "npmRebuild": false,
   "publish": null,
   files: [
@@ -157,14 +158,36 @@ let options = {
   },
   "mac": {
     "icon": pngIcon,
-    "category": "Development"
+    "category": "public.app-category.developer-tools",
+    "minimumSystemVersion": "10.8",
+    "extendInfo": {
+      // This contains extra values that will be inserted into the App's plist
+      "CFBundleExecutable": "Pulsar",
+      "NSAppleScriptEnabled": "YES",
+      "NSMainNibFile": "MainMenu",
+      "NSRequiresAquaSystemAppearance": "NO",
+      "CFBundleDocumentTypes": macBundleDocumentTypes.create(),
+      "CFBundleURLTypes": [
+        { "CFBundleURLSchemes": [ "atom" ] },
+        {"CFBundleURLName": "Atom Shared Session Protocol" }
+      ]
+    },
   },
   "win": {
     "icon": icoIcon,
     "target": [
       { "target": "nsis" },
-      { "target": "portable" }
-    ]
+      { "target": "portable" },
+    ],
+  },
+  // Windows NSIS Configuration
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "uninstallDisplayName": "Pulsar",
+    "runAfterFinish": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
   },
   "extraMetadata": {
   },

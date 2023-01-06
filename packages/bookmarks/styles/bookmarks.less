@@ -1,0 +1,20 @@
+@import "octicon-utf-codes.less";
+
+atom-text-editor {
+  .gutter .line-number.bookmarked .icon-right {
+    visibility: visible;
+
+    &:before {
+      content: @bookmark;
+      color: #09C;
+    }
+  }
+}
+
+.bookmarks-view {
+  .bookmark {
+    .line-text {
+      font-family: monospace;
+    }
+  }
+}
