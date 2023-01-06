@@ -46,6 +46,7 @@ module.exports = class AboutView extends EtchComponent {
   handleTermsOfUseClick(e) {
     e.preventDefault();
     shell.openExternal('https://atom.io/terms'); //If we use this then this URL will need updating but button disabled (L#182)
+    // TODO Update to Privacy Policy once `pulsar-edit.github.io` #161 is resolved
   }
 
   handleHowToUpdateClick(e) {
@@ -223,4 +224,3 @@ module.exports = class AboutView extends EtchComponent {
     return 'info';
   }
 };
-
