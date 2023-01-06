@@ -23,12 +23,7 @@ describe('ImageEditorStatusView', () => {
 
     for (let i = 0; i < projectDirectories.length; i++) {
       let possibleProjectDir = projectDirectories[i].resolve('binary-file.png');
-      let isProjectDir = false;
-      try {
-        fs.statSync(possibleProjectDir);
-        isProjectDir = true;
-      } catch (e) {}
-      if (isProjectDir) {
+      if (fs.existsSync(possibleProjectDir)) {
         filePath = projectDirectories[i].resolve('binary-file.png');
         filePath2 = projectDirectories[i].resolve('binary-file-2.png');
       }
