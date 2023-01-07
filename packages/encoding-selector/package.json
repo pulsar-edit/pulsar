@@ -1,0 +1,23 @@
+{
+  "name": "encoding-selector",
+  "version": "0.23.9",
+  "main": "./lib/main",
+  "description": "Select the encoding to use for the current editor with `ctrl-shift-U`.",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": ">=0.141.0"
+  },
+  "dependencies": {
+    "atom-select-list": "^0.7.0",
+    "iconv-lite": "^0.4.4",
+    "jschardet": "^1.1.0"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  }
+}
