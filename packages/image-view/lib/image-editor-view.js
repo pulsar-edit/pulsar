@@ -1,4 +1,4 @@
-const fs = require('fs-plus')
+const fs = require('fs')
 const {Emitter, CompositeDisposable, Disposable} = require('atom')
 const etch = require('etch')
 const $ = etch.dom
