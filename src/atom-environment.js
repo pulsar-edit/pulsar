@@ -52,18 +52,18 @@ const stat = util.promisify(fs.stat);
 
 let nextId = 0;
 
-// Essential: Pulsar global for dealing with packages, themes, menus, and the window.
-//
-// An instance of this class is always available as the `atom` global.
+/**
+ * @class AtomEnvironment
+ * @classdesc Pulsar global for dealing with packages, themes, menus, and the window.
+ *
+ * An instance of this class is always available as the `atom` global.
+ */
 class AtomEnvironment {
-  /*
-  Section: Properties
-  */
 
   constructor(params = {}) {
     this.id = params.id != null ? params.id : nextId++;
 
-    // Public: A {Clipboard} instance
+    /** @type {Clipboard} */
     this.clipboard = params.clipboard;
     this.updateProcessEnv = params.updateProcessEnv || updateProcessEnv;
     this.enablePersistence = params.enablePersistence;
@@ -76,19 +76,19 @@ class AtomEnvironment {
     this.disposables = new CompositeDisposable();
     this.pathsWithWaitSessions = new Set();
 
-    // Public: A {DeserializerManager} instance
+    /** @type {DeserializerManager} */
     this.deserializers = new DeserializerManager(this);
     this.deserializeTimings = {};
 
-    // Public: A {ViewRegistry} instance
+    /** @type {ViewRegistry} */
     this.views = new ViewRegistry(this);
 
-    // Public: A {NotificationManager} instance
+    /** @type {NotificationManager} */
     this.notifications = new NotificationManager();
 
     this.stateStore = new StateStore('AtomEnvironments', 1);
 
-    // Public: A {Config} instance
+    /** @type {Config} */
     this.config = new Config({
       saveCallback: settings => {
         if (this.enablePersistence) {
@@ -104,28 +104,28 @@ class AtomEnvironment {
       properties: _.clone(ConfigSchema)
     });
 
-    // Public: A {KeymapManager} instance
+    /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
       notificationManager: this.notifications
     });
 
-    // Public: A {TooltipManager} instance
+    /** @type {TooltipManager} */
     this.tooltips = new TooltipManager({
       keymapManager: this.keymaps,
       viewRegistry: this.views
     });
 
-    // Public: A {CommandRegistry} instance
+    /** @type {CommandRegistry} */
     this.commands = new CommandRegistry();
     this.uriHandlerRegistry = new URIHandlerRegistry();
 
-    // Public: A {GrammarRegistry} instance
+    /** @type {GrammarRegistry} */
     this.grammars = new GrammarRegistry({ config: this.config });
 
-    // Public: A {StyleManager} instance
+    /** @type {StyleManager} */
     this.styles = new StyleManager();
 
-    // Public: A {PackageManager} instance
+    /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
       styleManager: this.styles,
@@ -138,7 +138,7 @@ class AtomEnvironment {
       uriHandlerRegistry: this.uriHandlerRegistry
     });
 
-    // Public: A {ThemeManager} instance
+    /** @type {ThemeManager} */
     this.themes = new ThemeManager({
       packageManager: this.packages,
       config: this.config,
@@ -147,20 +147,20 @@ class AtomEnvironment {
       viewRegistry: this.views
     });
 
-    // Public: A {MenuManager} instance
+    /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
       packageManager: this.packages
     });
 
-    // Public: A {ContextMenuManager} instance
+    /** @type {ContextMenuManager} */
     this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
     this.packages.setThemeManager(this.themes);
 
-    // Public: A {Project} instance
+    /** @type {Project} */
     this.project = new Project({
       notificationManager: this.notifications,
       packageManager: this.packages,
@@ -171,7 +171,7 @@ class AtomEnvironment {
     this.commandInstaller = new CommandInstaller(this.applicationDelegate);
     this.protocolHandlerInstaller = new ProtocolHandlerInstaller();
 
-    // Public: A {TextEditorRegistry} instance
+    /** @type {TextEditorRegistry} */
     this.textEditors = new TextEditorRegistry({
       config: this.config,
       grammarRegistry: this.grammars,
@@ -179,7 +179,7 @@ class AtomEnvironment {
       packageManager: this.packages
     });
 
-    // Public: A {Workspace} instance
+    /** @type {Workspace} */
     this.workspace = new Workspace({
       config: this.config,
       project: this.project,
@@ -214,7 +214,7 @@ class AtomEnvironment {
       applicationDelegate: this.applicationDelegate
     });
 
-    // Public: A {HistoryManager} instance
+    /** @type {HistoryManager} */
     this.history = new HistoryManager({
       project: this.project,
       commands: this.commands,
@@ -339,6 +339,12 @@ class AtomEnvironment {
     );
   }
 
+  /**
+   * @name preloadPackages
+   * @private
+   * @memberof AtomEnvironment
+   * @desc Returns output of `preloadPackages()` for this Classes Instance of `Packages`.
+   */
   preloadPackages() {
     return this.packages.preloadPackages();
   }
@@ -469,15 +475,15 @@ class AtomEnvironment {
     this.uninstallWindowEventHandler();
   }
 
-  /*
-  Section: Event Subscription
-  */
-
-  // Extended: Invoke the given callback whenever {::beep} is called.
-  //
-  // * `callback` {Function} to be called whenever {::beep} is called.
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  /**
+   * @memberof AtomEnvironment
+   * @function onDidBeep
+   * @desc Invoke the given callback whenever {@link ::beep} is called.
+   * @listens ::beep
+   * @param {function} callback - Function to be called whenever {@link ::beep} is called.
+   * @returns {Disposable} on which `.dispose()` can be called to unsubscribe.
+   * @category Event Subscription
+   */
   onDidBeep(callback) {
     return this.emitter.on('did-beep', callback);
   }
@@ -1186,11 +1192,11 @@ class AtomEnvironment {
     this.packages.triggerActivationHook('core:loaded-shell-environment');
   }
 
-  /*
-  Section: Messaging the User
-  */
-
-  // Essential: Visually and audibly trigger a beep.
+  /**
+   * Visually and audibly trigger a beep.
+   * @fires beep
+   * @category Messaging the User
+   */
   beep() {
     if (this.config.get('core.audioBeep'))
       this.applicationDelegate.playBeepSound();
