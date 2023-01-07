@@ -169,12 +169,18 @@ let options = {
       "CFBundleDocumentTypes": macBundleDocumentTypes.create(),
       "CFBundleURLTypes": [
         { "CFBundleURLSchemes": [ "atom" ] },
-        {"CFBundleURLName": "Atom Shared Session Protocol" }
+        { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
   },
   "win": {
     "icon": icoIcon,
+    "extraResources": [
+      {
+        "from": icoIcon,
+        "to": "pulsar.ico"
+      },
+    ],
     "target": [
       { "target": "nsis" },
       { "target": "portable" },
