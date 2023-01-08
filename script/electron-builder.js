@@ -42,6 +42,7 @@ const Platform = builder.Platform
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
+const svgIcon = 'resources/app-icons/beta.svg'
 
 let options = {
   "appId": "dev.pulsar-edit.pulsar",
@@ -146,7 +147,6 @@ let options = {
     compression: 'xz'
   },
   "linux": {
-    "icon": pngIcon,
     "category": "Development",
     "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
@@ -154,6 +154,12 @@ let options = {
       { target: "deb" },
       { target: "rpm" },
       { target: "tar.gz" }
+    ],
+    "extraResources": [
+      {
+        "from": svgIcon,
+        "to": "pulsar.svg"
+      },
     ],
   },
   "mac": {
