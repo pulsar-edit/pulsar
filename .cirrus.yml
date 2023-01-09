@@ -24,7 +24,6 @@ linux_task:
                 xvfb
     - git submodule init
     - git submodule update
-    - if [[ ! -v CIRRUS_TAG ]]; then sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json; fi
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
@@ -37,7 +36,7 @@ linux_task:
       type: text/xml
       format: junit
   build_binary_script:
-    - yarn dist || yarn dist
+    - node script/cirrus-publish.js || node script/cirrus-publish.js
   binary_artifacts:
     path: ./binaries/*
 #
