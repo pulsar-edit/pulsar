@@ -204,7 +204,7 @@ let options = {
   ]
 }
 
-if(!process.env.CIRRUS_TAG) {
+if(!process.env.PUBLISH) {
   options.publish = null
 }
 
