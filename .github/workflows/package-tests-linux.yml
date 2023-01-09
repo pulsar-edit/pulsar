@@ -3,7 +3,7 @@ on:
   - push
   - pull_request
 env:
-  GH_TOKEN: ENCRYPTED[6d14ba69cf5e64396922927c5fada6636a6619a172af9520a43cfa4d5215450bdf3310b7c9e3939832340d1977e6c356]
+  APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
 jobs:
   setup:
     name: Build Editor
