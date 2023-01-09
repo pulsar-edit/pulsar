@@ -204,9 +204,7 @@ let options = {
   ]
 }
 
-if(process.env.PUBLISH) {
-  options.publish = 'always'
-} else {
+if(!process.env.PUBLISH) {
   options.publish = null
 }
 
@@ -228,10 +226,13 @@ async function main() {
   const package = await fs.readFile('package.json', "utf-8")
   let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
-  builder.build({
-    //targets: Platform.LINUX.createTarget(),
-    config: options
-  }).then((result) => {
+  let res
+  if(process.env.PUBLISH) {
+    res = builder.build({config: options}, {publish: 'always'})
+  } else {
+    res = builder.build({config: options})
+  }
+  res.then((result) => {
     console.log("Built binaries")
     fs.mkdir('binaries').catch(() => "")
     Promise.all(result.map(r => fs.copyFile(r, path.join('binaries', path.basename(r)))))
