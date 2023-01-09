@@ -3,6 +3,8 @@ linux_task:
   container:
     image: node:16-slim
     memory: 8G
+  env:
+    GH_TOKEN: ENCRYPTED[6d14ba69cf5e64396922927c5fada6636a6619a172af9520a43cfa4d5215450bdf3310b7c9e3939832340d1977e6c356]
   test_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
@@ -45,6 +47,7 @@ arm_linux_task:
     image: node:16-slim
     memory: 8G
   env:
+    GH_TOKEN: ENCRYPTED[6d14ba69cf5e64396922927c5fada6636a6619a172af9520a43cfa4d5215450bdf3310b7c9e3939832340d1977e6c356]
     USE_SYSTEM_FPM: 'true'
   prepare_script:
     - apt-get update
@@ -98,6 +101,8 @@ silicon_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
+  env:
+    GH_TOKEN: ENCRYPTED[6d14ba69cf5e64396922927c5fada6636a6619a172af9520a43cfa4d5215450bdf3310b7c9e3939832340d1977e6c356]
   test_script:
     - brew install node@16 yarn git python
     - git submodule init
@@ -127,6 +132,8 @@ intel_mac_task:
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
+  env:
+    GH_TOKEN: ENCRYPTED[6d14ba69cf5e64396922927c5fada6636a6619a172af9520a43cfa4d5215450bdf3310b7c9e3939832340d1977e6c356]
   dist_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
@@ -161,6 +168,7 @@ windows_task:
   windows_container:
     image: cirrusci/windowsservercore:visualstudio2022-2022.06.23
   env:
+    GH_TOKEN: ENCRYPTED[6d14ba69cf5e64396922927c5fada6636a6619a172af9520a43cfa4d5215450bdf3310b7c9e3939832340d1977e6c356]
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   install_deps_script:
