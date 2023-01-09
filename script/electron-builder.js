@@ -147,6 +147,7 @@ let options = {
     compression: 'xz'
   },
   "linux": {
+    "icon": "resources/icons",
     "category": "Development",
     "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
