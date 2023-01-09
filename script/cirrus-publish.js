@@ -8,6 +8,7 @@ if(branch) {
   const matches = branch.match(/^release-v(.*)$/)
   if(matches) {
     fs.writeFileSync('package.json', pack.replace(/\"\d.*?\"/, `"${matches[1]}"`))
+    process.env.PUBLISH='t'
   } else if(branch === 'master') {
     fs.writeFileSync('package.json', pack.replace(/[0-9]*-dev/, timestamp))
   } else {
