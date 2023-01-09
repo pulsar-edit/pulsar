@@ -46,7 +46,6 @@ const icoIcon = 'resources/app-icons/beta.ico'
 let options = {
   "appId": "dev.pulsar-edit.pulsar",
   "npmRebuild": false,
-  "publish": null,
   files: [
     // --- Inclusions ---
     // Core Repo Inclusions
@@ -203,7 +202,10 @@ let options = {
     "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
   ]
+}
 
+if(!process.env.CIRRUS_TAG) {
+  options.publish = null
 }
 
 function whatToBuild() {
