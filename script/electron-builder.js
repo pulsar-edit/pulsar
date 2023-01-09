@@ -204,7 +204,9 @@ let options = {
   ]
 }
 
-if(!process.env.PUBLISH) {
+if(process.env.PUBLISH) {
+  options.publish = 'always'
+} else {
   options.publish = null
 }
 
