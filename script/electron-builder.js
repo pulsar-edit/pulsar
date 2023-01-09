@@ -205,10 +205,7 @@ let options = {
 }
 
 if(process.env.PUBLISH) {
-  options.publish = {
-    provider: 'github',
-    publish: 'always'
-  }
+  options.publish = 'always'
 } else {
   options.publish = null
 }
