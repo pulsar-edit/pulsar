@@ -1,0 +1,25 @@
+{
+  "name": "image-view",
+  "version": "0.64.0",
+  "description": "Open images in an editor",
+  "main": "./lib/main",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "bytes": "^3.0.0",
+    "etch": "0.9.0"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "deserializers": {
+    "ImageEditor": "deserialize"
+  }
+}

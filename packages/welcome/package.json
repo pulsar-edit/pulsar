@@ -12,9 +12,6 @@
   "scripts": {
     "test": "atom --test test/*.test.js"
   },
-  "consumedServices": {
-
-  },
   "configSchema": {
     "showOnStartup": {
       "type": "boolean",

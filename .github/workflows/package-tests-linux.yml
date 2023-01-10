@@ -37,14 +37,13 @@ jobs:
       uses: actions/cache@v3
       with:
         path: node_modules
-        key: linux-modules-${{ hashFiles('package.json', 'packages/**') }}
 
     - name: Cache ppm
-      id: cache-ppm
+      id: cache-apm
       uses: actions/cache@v3
       with:
-        path: ppm
-        key: linux-ppm-${{ hashFiles('ppm/package.json') }}
+        path: apm
+        key: linux-apm-$env:GITHUB_SHA
 
   test:
     name: Test Packages
@@ -78,14 +77,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: node_modules
-        key: linux-modules-${{ hashFiles('package.json', 'packages/**') }}
+        key: linux-modules-$env:GITHUB_SHA
 
     - name: Restore ppm from Cache
       id: restore-ppm
       uses: actions/cache@v3
       with:
         path: ppm
-        key: linux-ppm-${{ hashFiles('ppm/package.json') }}
+        key: linux-apm-$env:GITHUB_SHA
 
     - name: Run Package Tests for ${{ matrix.descr }}
       uses: GabrielBB/xvfb-action@v1

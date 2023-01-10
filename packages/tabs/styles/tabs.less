@@ -1,0 +1,109 @@
+@import "ui-variables";
+@import "octicon-mixins";
+
+@close-icon-size: 12px;
+
+.tab-bar {
+  display: flex;
+  -webkit-user-select: none;
+  margin: 0;
+
+  .tab {
+    font-size: 11px;
+    position: relative;
+    padding-left: 10px;
+    padding-right: 10px + @close-icon-size + 2px;
+    -webkit-user-drag: element;
+    flex: 1;
+    max-width: 175px;
+    min-width: 40px;
+    transition: max-width .25s ease-in-out;
+
+    &.active {
+      flex: 2;
+      width: -webkit-fit-content;
+
+      .title {
+        padding-right: 10px;
+      }
+    }
+
+    .title {
+      overflow: hidden;
+      white-space: pre;
+      text-overflow: ellipsis;
+      &.temp {
+        font-style: italic;
+      }
+    }
+
+    .hide-icon {
+      &.icon:before {
+        display: none;
+      }
+    }
+
+    .close-icon {
+      .octicon(x, @close-icon-size);
+      position: absolute;
+      top: 1px;
+      right: 10px;
+      cursor: default;
+    }
+
+    &.modified:hover .close-icon {
+      color: @background-color-info;
+    }
+
+    &.modified:not(:hover) .close-icon {
+      &:before { display: none; }
+      top: 11px;
+      right: 11px;
+      width: 8px;
+      height: 8px;
+      border: 2px solid @background-color-info;
+      border-radius: 12px;
+    }
+  }
+
+  /* Drag and Drop */
+  .placeholder {
+    position: relative;
+    top: 0;
+    padding: 0;
+    height: @tab-height;
+    z-index: 999;
+    list-style: none;
+    background: @background-color-info;
+    pointer-events: none;
+
+    // bar
+    &:before {
+      content: "";
+      position: absolute;
+      width: 2px;
+      margin: -1px; padding: 0;
+      height: inherit;
+      background: inherit;
+    }
+
+    // dot
+    &:after {
+      content: "";
+      position: absolute;
+      top: @tab-height;
+      margin-top: -1px;
+      margin-left: -2px;
+      z-index: 9999;
+      width: 4px;
+      height: 4px;
+      background: inherit;
+      border-radius: 4px;
+      border: 1px solid transparent;
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
+}

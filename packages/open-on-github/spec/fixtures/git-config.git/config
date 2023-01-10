@@ -1,0 +1,19 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = false
+[remote "origin"]
+	url = https://github.com/some-user/some-repo.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[remote "some-remote"]
+	url = https://github.com/foo/bar.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[atom "open-on-github"]
+	remote = some-remote
+	branch = some-branch
