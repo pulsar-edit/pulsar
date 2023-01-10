@@ -1,7 +1,7 @@
 linux_task:
   alias: linux
   container:
-    image: node:lts-slim
+    image: node:16-slim
     memory: 8G
   test_script:
     - apt-get update
@@ -39,18 +39,72 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
 
+arm_linux_task:
+  alias: linux
+  arm_container:
+    image: node:16-slim
+    memory: 8G
+  env:
+    USE_SYSTEM_FPM: 'true'
+  prepare_script:
+    - apt-get update
+    - export DEBIAN_FRONTEND="noninteractive"
+    - apt-get install -y
+                gnupg2
+                procps
+                curl
+                rpm
+                build-essential
+                git
+                libsecret-1-dev
+                fakeroot
+                libx11-dev
+                libxkbfile-dev
+                libgdk-pixbuf2.0-dev
+                libgtk-3-dev
+                libxss-dev
+                libasound2-dev
+                libnss3
+                xvfb
+    - gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+    - \curl -sSL https://get.rvm.io | bash -s stable
+    - source /etc/profile.d/rvm.sh
+    - rvm install ruby
+    - gem install fpm
+    - git submodule init
+    - git submodule update
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - yarn install || yarn install
+    - yarn build
+    - yarn run build:apm
+    - rm -Rf node-modules/electron && yarn install --check-files
+  build_binary_script:
+    - source /etc/profile.d/rvm.sh
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
+    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
+
 silicon_mac_task:
   alias: mac
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
   test_script:
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - brew install node@16 yarn git python
     - git submodule init
     - git submodule update
     - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
     - yarn build
     - yarn run build:apm
@@ -67,24 +121,40 @@ silicon_mac_task:
     - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
-  build_x86_dependencies_script:
+
+intel_mac_task:
+  alias: mac
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    memory: 8G
+  dist_script:
+    - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
+    - arch -x86_64 xcode-select --install
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    - export PATH="/usr/local/bin:$PATH"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 brew install node@16 yarn git python
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
-    - yarn install || yarn install
-    - ln -s /usr/local/opt/python3 /usr/local/bin/python
+    - ln -s /usr/local/bin/python3 /usr/local/bin/python
+    - git submodule init
+    - git submodule update
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
     - arch -x86_64 npx yarn build
-    - arch -x86_64 npx yarn run build:apm
-  dist_x86_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - sudo rm -rf /Library/Developer/CommandLineTools
-    - arch -x86_64 xcode-select --install
+    - arch -x86_64 yarn run build:apm
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   binary_artifacts:
     path: ./binaries/*
+  test_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
 
 windows_task:
   alias: windows
@@ -95,14 +165,17 @@ windows_task:
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   install_deps_script:
     - choco install nodejs --version=14.15.0 -y
-    - choco install python git visualstudio2019-workload-vctools -y
+    - choco install python --version=3.10.3	-y
+    - choco install git visualstudio2019-workload-vctools -y
     - git submodule init
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   build_apm_script:
-    - cd ppm; npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
-  install_without_scripts_script:
-    - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
+    - cd ppm; npm install
+  install_with_scripts_script:
+    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
+  #install_without_scripts_script:
+  #  - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
   rebuild_for_electron_script:
     - npx yarn build || npx yarn build || npx yarn build
   # install_only_electron_script:

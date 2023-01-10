@@ -79,7 +79,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   }
 
   const releaseChannel = getReleaseChannel(app.getVersion());
-  let appUserModelId = 'com.squirrel.atom.' + process.arch;
+  let appUserModelId = 'dev.pulsar-edit.pulsar.' + process.arch;
 
   // If the release channel is not stable, we append it to the app user model id.
   // This allows having the different release channels as separate items in the taskbar.
@@ -105,7 +105,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   if (args.userDataDir != null) {
     app.setPath('userData', args.userDataDir);
-  } else if (args.test || args.benchmark || args.benchmarkTest) {
+  } else if (args.test) {
     app.setPath('userData', temp.mkdirSync('atom-test-data'));
   }
 

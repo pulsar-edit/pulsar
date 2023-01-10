@@ -855,14 +855,9 @@ describe "JavaScript grammar", ->
       expect(tokens[14]).toEqual value: '`', scopes: ['source.js', 'string.quoted.template.js', 'punctuation.definition.string.end.js']
 
   describe "HTML template strings", ->
-    # TODO: Remove after Atom 1.21 is released
     [tagScope, entityScope] = []
-    if parseFloat(atom.getVersion()) <= 1.21
-      tagScope = 'meta.tag.inline.any.html'
-      entityScope = 'entity.name.tag.inline.any.html'
-    else
-      tagScope = 'meta.tag.inline.b.html'
-      entityScope = 'entity.name.tag.inline.b.html'
+    tagScope = 'meta.tag.inline.b.html'
+    entityScope = 'entity.name.tag.inline.b.html'
 
     beforeEach ->
       waitsForPromise ->

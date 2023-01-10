@@ -7,15 +7,5 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-coffee-script",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-coffee-script.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/language-coffee-script/issues"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
-  }
+  "repository": "https://github.com/pulsar-edit/pulsar"
 }

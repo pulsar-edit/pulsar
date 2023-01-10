@@ -1,8 +1,8 @@
 # Dev Live Reload package
 
-This live reloads the Atom `.less` files. You edit styles and they are magically reflected in any running Atom windows. Magic! :tophat: :sparkles: :rabbit2:
+This live reloads the Pulsar `.less` files. You edit styles and they are magically reflected in any running Pulsar windows. Magic! :tophat: :sparkles: :rabbit2:
 
-Installed by default on Atom windows running in dev mode. Use the "Application: Open Dev" command to open a new dev mode window.
+Installed by default on Pulsar windows running in dev mode. Use the "Application: Open Dev" command to open a new dev mode window.
 
 Use <kbd>meta-shift-ctrl-r</kbd> to reload all core and package stylesheets.
 

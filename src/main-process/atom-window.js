@@ -7,11 +7,15 @@ const {
 } = require('electron');
 const getAppName = require('../get-app-name');
 const path = require('path');
+const fs = require('fs');
 const url = require('url');
 const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
-const ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
+let ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
+if(!fs.existsSync(ICON_PATH)) {
+  ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'pulsar.png');
+}
 
 let includeShellLoadTime = true;
 let nextId = 0;
@@ -252,7 +256,7 @@ module.exports = class AtomWindow extends EventEmitter {
         buttons: ['Close Window', 'Reload', 'Keep It Open'],
         cancelId: 2, // Canceling should be the least destructive action
         message: 'The editor has crashed',
-        detail: 'Please report this issue to https://github.com/atom/atom'
+        detail: 'Please report this issue to https://github.com/pulsar-edit/pulsar'
       });
 
       switch (result.response) {

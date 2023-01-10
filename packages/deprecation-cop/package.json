@@ -24,8 +24,5 @@
   },
   "deserializers": {
     "DeprecationCopView": "deserializeDeprecationCopView"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.9.7"
   }
 }

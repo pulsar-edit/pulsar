@@ -9,7 +9,6 @@
     "atom": ">0.48.0"
   },
   "dependencies": {
-    "fs-plus": "^3.0.0",
     "node-uuid": "~1.4.7",
     "stack-trace": "0.0.9",
     "underscore-plus": "^1.7.0"

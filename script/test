@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-console.warn(
-  '`script/test` is deprecated. Use `node script/test.js` instead'
-);
-require('./test.js');
