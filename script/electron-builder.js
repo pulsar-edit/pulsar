@@ -151,6 +151,9 @@ let options = {
     compression: 'xz'
   },
   "linux": {
+    // Giving a single PNG icon to electron-builder prevents the correct
+    // construction of the icon path, so we have to specify a folder containing
+    // multiple icons named each with its size.
     "icon": "resources/icons",
     "category": "Development",
     "synopsis": "A Community-led Hyper-Hackable Text Editor",
@@ -162,6 +165,10 @@ let options = {
     ],
     "extraResources": [
       {
+        // Extra SVG icon included in the resources folder to give a chance to
+        // Linux packagers to add a scalable desktop icon under
+        // /usr/share/icons/hicolor/scalable
+        // (used only by desktops to show it on bar/switcher and app menus).  
         "from": svgIcon,
         "to": "pulsar.svg"
       },
