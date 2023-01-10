@@ -44,6 +44,12 @@ export default class InstallPanel {
         }
       })
     )
+    const searchBuffer = this.refs.searchEditor.getBuffer();
+    searchBuffer.debouncedEmitDidStopChangingEvent = (timer => () => {
+      clearTimeout(timer);
+      timer = setTimeout(searchBuffer.emitDidStopChangingEvent.bind(searchBuffer), 700);
+    })();
+    // TODO remove hack to extend stop changing delay
     this.disposables.add(
       this.refs.searchEditor.onDidStopChanging(() => {
         this.performSearch()

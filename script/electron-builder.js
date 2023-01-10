@@ -141,9 +141,13 @@ let options = {
     },
   ],
   compression: "normal",
-  deb: { afterInstall: "script/post-install.sh" },
+  deb: {
+    afterInstall: "script/post-install.sh",
+    afterRemove: "script/post-uninstall.sh",
+  },
   rpm: {
     afterInstall: "script/post-install.sh",
+    afterRemove: "script/post-uninstall.sh",
     compression: 'xz'
   },
   "linux": {
