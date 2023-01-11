@@ -71,7 +71,7 @@ fewer errors on the settings-view regarding package info)
 - Added: Convert body params to query params [@Spiker985](https://github.com/pulsar-edit/ppm/pull/47)
 - Fixed: src: Update Electron header download URL [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/43)
 
-## v1.100.1-beta
+## v1.100.0-beta
 
 - Bump to Electron 12 and Node 14
 - Added a rebranding API
