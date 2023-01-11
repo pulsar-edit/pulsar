@@ -1,5 +1,6 @@
 const SelectList = require('atom-select-list')
-const {it, fit, ffit, beforeEach, afterEach} = require('./async-spec-helpers') // eslint-disable-line
+// const {it, fit, ffit, beforeEach, afterEach} = require('./async-spec-helpers') // eslint-disable-line
+const path = require('path');
 
 describe('EncodingSelector', () => {
   let editor
@@ -9,7 +10,7 @@ describe('EncodingSelector', () => {
 
     await atom.packages.activatePackage('status-bar')
     await atom.packages.activatePackage('encoding-selector')
-    editor = await atom.workspace.open('sample.js')
+    editor = await atom.workspace.open(path.join(__dirname, 'fixtures', 'sample.js'))
   })
 
   afterEach(async () => {
@@ -21,7 +22,7 @@ describe('EncodingSelector', () => {
       atom.commands.dispatch(editor.getElement(), 'encoding-selector:show')
       await SelectList.getScheduler().getNextUpdatePromise()
 
-      expect(document.body.querySelectorAll('.encoding-selector li').length).toBeGreaterThan(1)
+      expect(document.body.querySelectorAll('.encoding-selector la').length).toBeGreaterThan(1)
     })
   })
 
