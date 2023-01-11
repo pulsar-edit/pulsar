@@ -54,24 +54,98 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - filter: autocomplete|language
-            descr: language-related
-          - filter: dark|light
-            descr: themes
-          - filter: git-diff|go-to-line|grammar-selector|line-ending-selector
-            descr: editor related - 1
-          - filter: autoflow|autosave|symbols-view|spell-check|bracket-matcher
-            descr: editor related - 2
-          - filter: whitespace|wrap-guide|snippets|encoding-selector
-            descr: editor related - 3
-          - filter: deprecation-cop|dev-live-reload|package-generator|metrics|update-package-dependencies|styleguide
-            descr: development helpers
-          - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|settings-view|notifications
-            descr: UI elements
-          - filter: image-view|bookmarks|keybinding-resolver|link|timecop
-            descr: others
-          - filter: incompatible-packages|status-bar
-            descr: every known package that's failing
+          - package: "atom-dark-syntax"
+          - package: "atom-dark-ui"
+          - package: "atom-light-syntax"
+          - package: "atom-light-ui"
+          - package: "base16-tomorrow-dark-theme"
+          - package: "base16-tomorrow-light-theme"
+          - package: "one-dark-ui"
+          - package: "one-light-ui"
+          - package: "one-dark-syntax"
+          - package: "one-light-syntax"
+          - package: "solarized-dark-syntax"
+          - package: "solarized-light-syntax"
+          - package: "about"
+          - package: "archive-view"
+          - package: "autocomplete-atom-api"
+          - package: "autocomplete-css"
+          - package: "autocomplete-html"
+          - package: "autocomplete-plus"
+          - package: "autocomplete-snippets"
+          - package: "autoflow"
+          - package: "autosave"
+          - package: "background-tips"
+          - package: "bookmarks"
+          - package: "bracket-matcher"
+          - package: "command-palette"
+          - package: "dalek"
+          - package: "deprecation-cop"
+          - package: "dev-live-reload"
+          - package: "encoding-selector"
+          - package: "exception-reporting"
+          - package: "find-and-replace"
+          - package: "fuzzy-finder"
+          - package: "github"
+          - package: "git-diff"
+          - package: "go-to-line"
+          - package: "grammar-selector"
+          - package: "image-view"
+          - package: "incompatible-packages"
+          - package: "keybinding-resolver"
+          - package: "line-ending-selector"
+          - package: "link"
+          - package: "markdown-preview"
+          - package: "notifications"
+          - package: "open-on-github"
+          - package: "package-generator"
+          - package: "settings-view"
+          - package: "snippets"
+          - package: "spell-check"
+          - package: "status-bar"
+          - package: "styleguide"
+          - package: "symbols-view"
+          - package: "tabs"
+          - package: "timecop"
+          - package: "tree-view"
+          - package: "update-package-dependencies"
+          - package: "welcome"
+          - package: "whitespace"
+          - package: "wrap-guide"
+          - package: "language-c"
+          - package: "language-clojure"
+          - package: "language-coffee-script"
+          - package: "language-csharp"
+          - package: "language-css"
+          - package: "language-gfm"
+          - package: "language-git"
+          - package: "language-go"
+          - package: "language-html"
+          - package: "language-hyperlink"
+          - package: "language-java"
+          - package: "language-javascript"
+          - package: "language-json"
+          - package: "language-less"
+          - package: "language-make"
+          - package: "language-mustache"
+          - package: "language-objective-c"
+          - package: "language-perl"
+          - package: "language-php"
+          - package: "language-property-list"
+          - package: "language-python"
+          - package: "language-ruby"
+          - package: "language-ruby-on-rails"
+          - package: "language-rust-bundled"
+          - package: "language-sass"
+          - package: "language-shellscript"
+          - package: "language-source"
+          - package: "language-sql"
+          - package: "language-text"
+          - package: "language-todo"
+          - package: "language-toml"
+          - package: "language-typescript"
+          - package: "language-xml"
+          - package: "language-yaml"
 
     steps:
     - name: Checkout the latest code
@@ -91,7 +165,8 @@ jobs:
         path: ppm
         key: linux-apm-$env:GITHUB_SHA
 
-    - name: Run Package Tests for ${{ matrix.descr }}
+    - name: Run ${{ matrix.package }} Tests
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: node -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
+        run: yarn start --test node_modules/${{ matrix.package }}
+        # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"
