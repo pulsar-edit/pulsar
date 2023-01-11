@@ -54,19 +54,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - filter: language
+          - filter: autocomplete|language
             descr: language-related
           - filter: dark|light
             descr: themes
-          - filter: git-diff|go-to-line|grammar-selector|line-ending-selector|autoflow|autosave|symbols-view|spell-check|bracket-matcher|whitespace|wrap-guide|snippets|encoding-selector
-            descr: editor related
-          - filter: deprecation-cop|dev-live-reload|incompatible-packages|package-generator|metrics|update-package-dependencies|styleguide
+          - filter: git-diff|go-to-line|grammar-selector|line-ending-selector
+            descr: editor related - 1
+          - filter: autoflow|autosave|symbols-view|spell-check|bracket-matcher
+            descr: editor related - 2
+          - filter: whitespace|wrap-guide|snippets|encoding-selector
+            descr: editor related - 3
+          - filter: deprecation-cop|dev-live-reload|package-generator|metrics|update-package-dependencies|styleguide
             descr: development helpers
           - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|settings-view|notifications
             descr: UI elements
           - filter: image-view|bookmarks|keybinding-resolver|link|timecop
             descr: others
-          - filter: autocomplete|status-bar
+          - filter: incompatible-packages|status-bar
             descr: every known package that's failing
 
     steps:
