@@ -100,7 +100,7 @@ beforeEach(function() {
   spyOn(Date, 'now').andCallFake(() => window.now);
   spyOn(window, "setTimeout").andCallFake(window.fakeSetTimeout);
   spyOn(window, "clearTimeout").andCallFake(window.fakeClearTimeout);
-  spyOn(_, "debounce").andCallFake(mockDebounce);
+  // spyOn(_, "debounce").andCallFake(mockDebounce);
 
   const spy = spyOn(atom.packages, 'resolvePackagePath').andCallFake(function(packageName) {
     if (specPackageName && (packageName === specPackageName)) {
