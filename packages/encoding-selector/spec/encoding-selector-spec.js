@@ -22,7 +22,7 @@ describe('EncodingSelector', () => {
       atom.commands.dispatch(editor.getElement(), 'encoding-selector:show')
       await SelectList.getScheduler().getNextUpdatePromise()
 
-      expect(document.body.querySelectorAll('.encoding-selector la').length).toBeGreaterThan(1)
+      expect(document.body.querySelectorAll('.encoding-selector li').length).toBeGreaterThan(1)
     })
   })
 
