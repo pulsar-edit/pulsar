@@ -27,7 +27,7 @@ jobs:
       run: yarn build:apm
 
     - name: build the editor
-      run: yarn dist appimage && mv binaries/Pulsar*AppImage pulsar.appimage
+      run: (yarn dist deb || yarn dist deb) && mv binaries/*deb pulsar.deb
 
     - name: Cache node_modules
       id: cache-node
@@ -40,11 +40,11 @@ jobs:
       id: cache-pulsar
       uses: actions/cache@v3
       with:
-        path: pulsar.appimage
+        path: pulsar.deb
         key: pulsar-$env:GITHUB_SHA
 
   test:
-    name: Test Packages
+    name: Package
     needs: setup
     runs-on: ubuntu-20.04
     strategy:
@@ -159,11 +159,12 @@ jobs:
       id: restore-pulsar
       uses: actions/cache@v3
       with:
-        path: pulsar.appimage
+        path: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
         key: pulsar-$env:GITHUB_SHA
 
+    - name: Install xvfb
+      run: sudo apt-get install -y xvfb
+
     - name: Run ${{ matrix.package }} Tests
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: cd node_modules/${{ matrix.package }} && if [[ -f spec ]]; then ../../pulsar.appimage --test spec; fi
+      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test spec
         # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"
