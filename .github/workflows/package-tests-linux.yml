@@ -9,12 +9,6 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-20.04
     steps:
-    - name: Install windows-build-tools
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        npm i --global windows-build-tools@4.0.0
-        npm config set msvs_version 2019
-
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
@@ -32,6 +26,9 @@ jobs:
     - name: build dependencies
       run: yarn build:apm
 
+    - name: build the editor
+      run: yarn dist appimage && mv binaries/Pulsar*appimage pulsar.appimage
+
     - name: Cache node_modules
       id: cache-node
       uses: actions/cache@v3
@@ -39,12 +36,12 @@ jobs:
         path: node_modules
         key: linux-modules-$env:GITHUB_SH
 
-    - name: Cache ppm
-      id: cache-apm
+    - name: Cache pulsar
+      id: cache-pulsar
       uses: actions/cache@v3
       with:
-        path: apm
-        key: linux-apm-$env:GITHUB_SHA
+        path: pulsar.appimage
+        key: pulsar-$env:GITHUB_SHA
 
   test:
     name: Test Packages
@@ -158,15 +155,15 @@ jobs:
         path: node_modules
         key: linux-modules-$env:GITHUB_SHA
 
-    - name: Restore ppm from Cache
-      id: restore-ppm
+    - name: Restore pulsar from Cache
+      id: restore-pulsar
       uses: actions/cache@v3
       with:
-        path: ppm
-        key: linux-apm-$env:GITHUB_SHA
+        path: pulsar.appimage
+        key: pulsar-$env:GITHUB_SHA
 
     - name: Run ${{ matrix.package }} Tests
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: yarn start --test node_modules/${{ matrix.package }}
+        run: cd node_modules/${{ matrix.package }} && if [[ -f spec ]]; then ../../pulsar.appimage --test spec; fi
         # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"
