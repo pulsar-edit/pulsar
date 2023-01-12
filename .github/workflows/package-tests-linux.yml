@@ -27,7 +27,7 @@ jobs:
       run: yarn build:apm
 
     - name: build the editor
-      run: yarn dist appimage && mv binaries/Pulsar*appimage pulsar.appimage
+      run: yarn dist appimage && mv binaries/Pulsar*AppImage pulsar.appimage
 
     - name: Cache node_modules
       id: cache-node
