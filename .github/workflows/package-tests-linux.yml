@@ -1,6 +1,8 @@
 name: Package tests for Pulsar on Linux
 on:
   - pull_request
+env:
+  ATOM_JASMINE_REPORTER: list
 jobs:
   setup:
     name: Build Editor
@@ -34,7 +36,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: node_modules
-        key: linux-modules-$env:GITHUB_SH
+        key: linux-modules-$env:GITHUB_SHA
 
     - name: Cache pulsar
       id: cache-pulsar
@@ -159,12 +161,15 @@ jobs:
       id: restore-pulsar
       uses: actions/cache@v3
       with:
-        path: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
+        path: pulsar.deb
         key: pulsar-$env:GITHUB_SHA
+
+    - name: Install Pulsar
+      run: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
 
     - name: Install xvfb
       run: sudo apt-get install -y xvfb
 
     - name: Run ${{ matrix.package }} Tests
-      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test spec
+      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi
         # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"
