@@ -31,13 +31,6 @@ jobs:
     - name: build the editor
       run: (yarn dist deb || yarn dist deb) && mv binaries/*deb pulsar.deb
 
-    - name: Cache node_modules
-      id: cache-node
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: linux-modules-$env:GITHUB_SHA
-
     - name: Cache pulsar
       id: cache-pulsar
       uses: actions/cache@v3
@@ -150,12 +143,11 @@ jobs:
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
-    - name: Restore node_modules from Cache
-      id: restore-node
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: linux-modules-$env:GITHUB_SHA
+    - name: Install Dependencies
+      run: yarn install || yarn install
+
+    - name: Build Dependencies
+      run: yarn build || yarn build
 
     - name: Restore pulsar from Cache
       id: restore-pulsar
