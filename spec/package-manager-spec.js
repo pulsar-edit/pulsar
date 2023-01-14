@@ -1436,7 +1436,7 @@ describe('PackageManager', () => {
       });
 
       it('loads any tree-sitter grammars defined in the package', async () => {
-        atom.config.set('core.useTreeSitterParsers', true);
+        atom.config.set('core.languageParser', 'node-tree-sitter');
         await atom.packages.activatePackage('package-with-tree-sitter-grammar');
         const grammar = atom.grammars.selectGrammar('test.somelang');
         expect(grammar.name).toBe('Some Language');

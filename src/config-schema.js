@@ -357,10 +357,21 @@ const configSchema = {
           }
         ]
       },
-      useTreeSitterParsers: {
-        type: 'boolean',
-        default: true,
-        description: 'Use Tree-sitter parsers for supported languages.'
+      languageParser: {
+        type: 'string',
+        default: 'node-tree-sitter',
+        description: 'Which parser should be used for supported languages',
+        enum: [
+          {
+            value: 'textmate', description: 'TextMate grammars (regex-based)'
+          },
+          {
+            value: 'node-tree-sitter', description: 'Tree-sitter (old Atom implementation - deprecated)'
+          },
+          {
+            value: 'wasm-tree-sitter', description: 'Tree-sitter (WASM implementation)'
+          }
+        ]
       },
       colorProfile: {
         description:

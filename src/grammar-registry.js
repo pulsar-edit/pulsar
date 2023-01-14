@@ -4,7 +4,7 @@ const CSON = require('season');
 const FirstMate = require('first-mate');
 const { Disposable, CompositeDisposable } = require('event-kit');
 const TextMateLanguageMode = require('./text-mate-language-mode');
-const TreeSitterLanguageMode = require('./tree-sitter-language-mode');
+const NodeTreeSitterLanguageMode = require('./tree-sitter-language-mode');
 const TreeSitterGrammar = require('./tree-sitter-grammar');
 const ScopeDescriptor = require('./scope-descriptor');
 const Token = require('./token');
@@ -42,7 +42,7 @@ module.exports = class GrammarRegistry {
     this.textmateRegistry.onDidUpdateGrammar(grammarAddedOrUpdated);
 
     this.subscriptions.add(
-      this.config.onDidChange('core.useTreeSitterParsers', () => {
+      this.config.onDidChange('core.languageMode', () => {
         this.grammarScoresByBuffer.forEach((score, buffer) => {
           if (!this.languageOverridesByBufferId.has(buffer.id)) {
             this.autoAssignLanguageMode(buffer);
@@ -197,7 +197,7 @@ module.exports = class GrammarRegistry {
 
   languageModeForGrammarAndBuffer(grammar, buffer) {
     if (grammar instanceof TreeSitterGrammar) {
-      return new TreeSitterLanguageMode({
+      return new NodeTreeSitterLanguageMode({
         grammar,
         buffer,
         config: this.config,
@@ -656,7 +656,7 @@ module.exports = class GrammarRegistry {
   }
 
   shouldUseTreeSitterParser(languageId) {
-    return this.config.get('core.useTreeSitterParsers', {
+    return this.config.get('core.languageParser', {
       scope: new ScopeDescriptor({ scopes: [languageId] })
     });
   }
