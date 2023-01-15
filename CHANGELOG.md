@@ -4,8 +4,10 @@
 - Format defined in [Pulsar Change Log](PENDING_APPROVAL)
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-
 ## [Unreleased]
+
+
+## 1.101.0-beta
 
 - Fixed a bug where macOS menus like "Open" don't do anything
 - Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
