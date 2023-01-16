@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+### Pulsar
+- Changed: use `let` and `const` in js snippets [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/326)
 
 ## 1.101.0-beta
 
