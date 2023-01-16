@@ -42,6 +42,7 @@ const Platform = builder.Platform
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
+const svgIcon = 'resources/app-icons/beta.svg'
 
 let options = {
   "appId": "dev.pulsar-edit.pulsar",
@@ -150,7 +151,10 @@ let options = {
     compression: 'xz'
   },
   "linux": {
-    "icon": pngIcon,
+    // Giving a single PNG icon to electron-builder prevents the correct
+    // construction of the icon path, so we have to specify a folder containing
+    // multiple icons named each with its size.
+    "icon": "resources/icons",
     "category": "Development",
     "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
@@ -158,6 +162,16 @@ let options = {
       { target: "deb" },
       { target: "rpm" },
       { target: "tar.gz" }
+    ],
+    "extraResources": [
+      {
+        // Extra SVG icon included in the resources folder to give a chance to
+        // Linux packagers to add a scalable desktop icon under
+        // /usr/share/icons/hicolor/scalable
+        // (used only by desktops to show it on bar/switcher and app menus).  
+        "from": svgIcon,
+        "to": "pulsar.svg"
+      },
     ],
   },
   "mac": {
