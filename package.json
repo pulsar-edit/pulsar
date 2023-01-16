@@ -2,7 +2,7 @@
   "name": "pulsar",
   "author": "Pulsar Community <noreply@pulsar-edit.com>",
   "productName": "Pulsar",
-  "version": "1.100.0-dev",
+  "version": "1.101.0-dev",
   "description": "A Community-led Hyper-Hackable Text Editor",
   "branding": {
     "id": "pulsar",
