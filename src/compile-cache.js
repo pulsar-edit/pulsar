@@ -249,7 +249,12 @@ exports.install = function(resourcesPath, nodeRequire) {
       writable: false,
       value: function(module, filePath) {
         const code = compileFileAtPath(compiler, filePath, extension);
-        return module._compile(code, filePath);
+        // FIXME: this is to avoid the weird compilation errors on Electron
+        try {
+          return module._compile(code, filePath);
+        } catch (e) {
+          console.error(e)
+        }
       }
     });
   });
