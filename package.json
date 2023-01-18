@@ -19,10 +19,38 @@
   "bugs": {
     "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
+  "alias": {
+    "atom": "./exports/atom"
+  },
+  "targets": {
+    "renderer": {
+      "source": "static/index.js",
+      "context": "node",
+      "distDir": "app/static",
+      "optimize": false,
+      "outputFormat": "commonjs",
+      "includeNodeModules": {
+        "atom": false,
+        "@babel/core": false,
+        "electron": false,
+        "fs-admin": false,
+        "scrollbar-style": false,
+        "oniguruma": false,
+        "tree-sitter": false,
+        "superstring": false,
+        "nsfw": false,
+        "git-utils": false,
+        "keyboard-layout": false,
+        "pathwatcher": false,
+
+        "@atom/fuzzy-native": false,
+        "keytar": false
+      }
+    }
+  },
   "license": "MIT",
   "electronVersion": "12.2.3",
   "dependencies": {
-    "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
     "about": "file:packages/about",
     "archive-view": "https://codeload.github.com/atom/archive-view/legacy.tar.gz/refs/tags/v0.66.0",
@@ -152,6 +180,7 @@
     "snippets": "https://codeload.github.com/pulsar-edit/snippets/legacy.tar.gz/refs/tags/v1.6.1",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
+    "source-map-support": "^0.5.21",
     "spell-check": "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1",
     "status-bar": "https://codeload.github.com/atom/status-bar/legacy.tar.gz/refs/tags/v1.8.17",
     "styleguide": "https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12",
@@ -276,12 +305,14 @@
     "dist": "node script/electron-builder.js"
   },
   "devDependencies": {
+    "@parcel/transformer-coffeescript": "^2.8.2",
     "@playwright/test": "1.22.2",
     "electron": "12.2.3",
     "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
     "eslint": "^8.27.0",
     "eslint-plugin-node": "^11.1.0",
+    "parcel": "^2.8.2",
     "playwright": "1.22.2",
     "playwright-core": "1.22.2",
     "random-seed": "0.3.0",
