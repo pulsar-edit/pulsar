@@ -41,11 +41,11 @@ fewer errors on the settings-view regarding package info)
 - Fixed: Resolve 40 Failing `image-view` Tests [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/293)
 - Added: Added changelog entries that we missed [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/292)
 - Removed: meta: Delete preinstall script from package.json [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/296)
-- Added: Improve MacOS Builds [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/280)
+- Added: Improve macOS Builds [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/280)
 - Fixed: Fix `archive-view` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/294)
 - Added: Improved Windows Builds [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/279)
 - Added: More Bundles [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/290)
-- Fixed: Fix macos open without window [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/291)
+- Fixed: Fix macOS open without window [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/291)
 - Removed: delete workflow from language-java [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/285)
 - Removed: Remove handlers for opening things on Mac [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/288)
 - Rebrand: Rebranding and relinking to new site [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/282)
@@ -219,7 +219,7 @@ fewer errors on the settings-view regarding package info)
   * [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/39)
 
 ### autocomplete-html
-- Fixed:    Finding the proper Node version [@mauricioszabo](https://github.com/pulsar-edit/autocomplete-html/pull/1)  
+- Fixed:    Finding the proper Node version [@mauricioszabo](https://github.com/pulsar-edit/autocomplete-html/pull/1)
 
 ### settings-view
 - Added:    Remember Scroll Position [@jonian](https://github.com/pulsar-edit/settings-view/pull/12)

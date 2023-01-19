@@ -1,5 +1,5 @@
 /**
-  The MacOS configuration MUST be passed this exact object structure in order to
+  The macOS configuration MUST be passed this exact object structure in order to
   build the plist file as expected and accepted.
   mac.extendInfo.CFBundleDocumentTypes is a plist entry that MUST receive an array.
 
@@ -11,7 +11,7 @@
   But I do not recommend changing the structure of the object without careful testing.
 
   The Extensions and Names of the files have all been taken from a Known working
-  configuration of Atom's plist that was included with the MacOS build.
+  configuration of Atom's plist that was included with the macOS build.
 
   But as we now build this for ourselves we will take advantage of our new methods
   and ensure we use the wins electron-builder provides by staying on platform.
