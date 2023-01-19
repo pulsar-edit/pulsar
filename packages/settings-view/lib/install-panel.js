@@ -139,7 +139,7 @@ export default class InstallPanel {
       this.refs.searchThemesButton.classList.remove('selected')
       this.refs.searchEditor.setPlaceholderText('Search packages')
       this.refs.publishedToText.textContent = 'Packages are published to '
-      this.atomIoURL = 'https://pulsar-edit.dev/packages'
+      this.atomIoURL = 'https://web.pulsar-edit.dev/packages'
       this.loadFeaturedPackages()
     }
   }
