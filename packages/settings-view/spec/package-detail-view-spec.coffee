@@ -152,4 +152,4 @@ describe "PackageDetailView", ->
     loadPackageFromRemote('package-internal')
     spyOn(shell, 'openExternal')
     view.refs.packageRepo.click()
-    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/atom/atom/tree/master/packages/package-internal')
+    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/pulsar-edit/pulsar/tree/master/packages/package-internal')
