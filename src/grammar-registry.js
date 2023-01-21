@@ -5,6 +5,7 @@ const FirstMate = require('first-mate');
 const { Disposable, CompositeDisposable } = require('event-kit');
 const TextMateLanguageMode = require('./text-mate-language-mode');
 const NodeTreeSitterLanguageMode = require('./tree-sitter-language-mode');
+const WASMTreeSitterLanguageMode = require('./wasm-tree-sitter-language-mode');
 const TreeSitterGrammar = require('./tree-sitter-grammar');
 const ScopeDescriptor = require('./scope-descriptor');
 const Token = require('./token');
@@ -196,7 +197,9 @@ module.exports = class GrammarRegistry {
   }
 
   languageModeForGrammarAndBuffer(grammar, buffer) {
-    if (grammar instanceof TreeSitterGrammar) {
+    if(grammar === 'tree-sitter') {
+      return new WASMTreeSitterLanguageMode(buffer, this.config);
+    } else if (grammar instanceof TreeSitterGrammar) {
       return new NodeTreeSitterLanguageMode({
         grammar,
         buffer,
@@ -224,14 +227,18 @@ module.exports = class GrammarRegistry {
   selectGrammarWithScore(filePath, fileContents) {
     let bestMatch = null;
     let highestScore = -Infinity;
-    this.forEachGrammar(grammar => {
-      const score = this.getGrammarScore(grammar, filePath, fileContents);
-      if (score > highestScore || bestMatch == null) {
-        bestMatch = grammar;
-        highestScore = score;
-      }
-    });
-    return { grammar: bestMatch, score: highestScore };
+    if(this.config.get('core.languageParser') === 'wasm-tree-sitter') {
+      return {grammar: "tree-sitter", score: 10}
+    } else {
+      this.forEachGrammar(grammar => {
+        const score = this.getGrammarScore(grammar, filePath, fileContents);
+        if (score > highestScore || bestMatch == null) {
+          bestMatch = grammar;
+          highestScore = score;
+        }
+      });
+      return { grammar: bestMatch, score: highestScore };
+    }
   }
 
   // Extended: Returns a {Number} representing how well the grammar matches the
@@ -252,7 +259,7 @@ module.exports = class GrammarRegistry {
 
       // Prefer either TextMate or Tree-sitter grammars based on the user's settings.
       if (isTreeSitter) {
-        if (this.shouldUseTreeSitterParser(grammar.scopeName)) {
+        if (this.shouldUseOldTreeSitterParser(grammar.scopeName)) {
           score += 0.1;
         } else {
           return -Infinity;
@@ -355,7 +362,7 @@ module.exports = class GrammarRegistry {
 
   grammarForId(languageId) {
     if (!languageId) return null;
-    if (this.shouldUseTreeSitterParser(languageId)) {
+    if (this.shouldUseOldTreeSitterParser(languageId)) {
       return (
         this.treeSitterGrammarsById[languageId] ||
         this.textmateRegistry.grammarForScopeName(languageId)
@@ -655,10 +662,11 @@ module.exports = class GrammarRegistry {
     return grammarWithLongestMatch;
   }
 
-  shouldUseTreeSitterParser(languageId) {
+  shouldUseOldTreeSitterParser(languageId) {
+    return false
     return this.config.get('core.languageParser', {
       scope: new ScopeDescriptor({ scopes: [languageId] })
-    });
+    }) === 'node-tree-sitter';
   }
 };
 
