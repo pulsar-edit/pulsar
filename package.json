@@ -167,6 +167,7 @@
     "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
+    "web-tree-sitter": "^0.20.7",
     "welcome": "file:packages/welcome",
     "whitespace": "https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8",
     "winreg": "^1.2.1",
