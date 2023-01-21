@@ -10,7 +10,7 @@ class WASMTreeSitterLanguageMode {
     console.log("Reset!")
     this.scopeNames = {}
     this.scopeIds = {}
-    this.lastId = 255
+    this.lastId = 257
     this.buffer = buffer
     this.config = config
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
@@ -114,7 +114,8 @@ class WASMTreeSitterLanguageMode {
       captures.forEach(({name, node}) => {
         if(!this.scopeNames[name]) {
           console.log("Add Scope", name)
-          this.lastId++
+          this.lastId += 2
+          console.log("ID of Scope", this.lastId)
           const newId = this.lastId;
           this.scopeNames[name] = newId
           this.scopeIds[newId] = name
@@ -128,11 +129,11 @@ class WASMTreeSitterLanguageMode {
           position: node.startPosition
         })
 
-        // boundaries.push({
-        //   closeScopeIds: [id],
-        //   openScopeIds: [],
-        //   position: node.endPosition
-        // })
+        boundaries.push({
+          closeScopeIds: [id],
+          openScopeIds: [],
+          position: node.endPosition
+        })
         oldScopes = [id]
       })
     })
@@ -143,7 +144,7 @@ class WASMTreeSitterLanguageMode {
       position: Point.INFINITY
     })
 
-    console.log("B", boundaries)
+    // console.log("B", boundaries)
 
     return {
       getOpenScopeIds () {
@@ -156,8 +157,8 @@ class WASMTreeSitterLanguageMode {
         return boundaries[0].closeScopeIds
       },
 
-      getPosition () {
-        console.log("getPosition")
+      getPosition (...args) {
+        console.log("getPosition", args)
         return (boundaries[0] && boundaries[0].position) || Point.INFINITY
       },
 
@@ -167,7 +168,14 @@ class WASMTreeSitterLanguageMode {
       },
 
       seek(pos) {
-        console.log("POS", pos)
+        console.log("SEEK POS", pos)
+        while(boundaries.length > 0) {
+          const f = boundaries[0].position
+          if(f.row > pos.row) break
+          if(f.row == pos.row && f.column >= pos.column) break
+          boundaries.shift()
+        }
+        console.log("BOUNDARIES", boundaries)
         return []
       }
     }
