@@ -7,16 +7,12 @@ const initPromise = Parser.init()
 
 class WASMTreeSitterLanguageMode {
   constructor( buffer, config) {
-    console.log("Reset!")
     this.scopeNames = {}
     this.scopeIds = {}
     this.lastId = 257
     this.buffer = buffer
     this.config = config
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
-
-    // console.log("BUFFER!", buffer)
-    // console.log("GRAMMAR!", grammar)
 
     initPromise.then(() =>
       Parser.Language.load('/tmp/grammars/javascript/grammar.wasm')
@@ -34,26 +30,12 @@ class WASMTreeSitterLanguageMode {
   }
 
   updateForInjection(...args) {
-    // console.log("INJ", args)
   }
 
   onDidChangeHighlighting(fn) {
   }
 
   tokenizedLineForRow(row) {
-    // console.log(new Error().stack)
-    // console.log("TOKEN FOR ROW", args)
-    // if(row === 1) {
-    //   return {
-    //     openScopes: [256],
-    //     tags: [],
-    //     closeScopes: [],
-    //     scopes: [
-    //       { value: 'const', scopes: ['source', 'keyword'] },
-    //       { value: 'a', scopes: ['source'] },
-    //     ]
-    //   }
-    // }
   }
 
   getScopeChain(...args) {
@@ -69,42 +51,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   buildHighlightIterator() {
-    // // return new HighlightIterator(this)
-    //
-    //   // const displayLayer = buffer.addDisplayLayer()
-    //
-    //   const boundaries = [{
-    //     position: Point(0, 0),
-    //     closeScopeIds: [],
-    //     openScopeIds: [1, 259]
-    //   }, {
-    //     position: Point(0, 2),
-    //     closeScopeIds: [259, 1],
-    //     openScopeIds: []
-    //   }]
-    //
-    //   const iterator = {
-    //     getOpenScopeIds () {
-    //       return boundaries[0].openScopeIds
-    //     },
-    //
-    //     getCloseScopeIds () {
-    //       return boundaries[0].closeScopeIds
-    //     },
-    //
-    //     getPosition () {
-    //       return (boundaries[0] && boundaries[0].position) || Point.INFINITY
-    //     },
-    //
-    //     moveToSuccessor () {
-    //       return boundaries.shift()
-    //     },
-    //
-    //     seek () {
-    //       return []
-    //     }
-    //   }
-    //   return iterator
     if(!this.parser) return nullIterator;
     const tree = this.parser.parse(this.buffer.getText())
     const matches = this.syntaxQuery.matches(tree.rootNode)
@@ -113,13 +59,10 @@ class WASMTreeSitterLanguageMode {
     matches.forEach(({captures}) => {
       captures.forEach(({name, node}) => {
         if(!this.scopeNames[name]) {
-          console.log("Add Scope", name)
           this.lastId += 2
-          console.log("ID of Scope", this.lastId)
           const newId = this.lastId;
           this.scopeNames[name] = newId
           this.scopeIds[newId] = name
-          console.log("Added Scope", this.scopeIds)
         }
         const id = this.scopeNames[name]
         // console.log("Token", node.startPosition, "kind", name)
@@ -148,34 +91,28 @@ class WASMTreeSitterLanguageMode {
 
     return {
       getOpenScopeIds () {
-        console.log("Open", boundaries[0].openScopeIds)
         return boundaries[0].openScopeIds
       },
 
       getCloseScopeIds () {
-        console.log("Close", boundaries[0].closeScopeIds)
         return boundaries[0].closeScopeIds
       },
 
-      getPosition (...args) {
-        console.log("getPosition", args)
+      getPosition () {
         return (boundaries[0] && boundaries[0].position) || Point.INFINITY
       },
 
       moveToSuccessor () {
-        console.log("moveToSuccessor")
         return boundaries.shift()
       },
 
       seek(pos) {
-        console.log("SEEK POS", pos)
         while(boundaries.length > 0) {
           const f = boundaries[0].position
           if(f.row > pos.row) break
           if(f.row == pos.row && f.column >= pos.column) break
           boundaries.shift()
         }
-        console.log("BOUNDARIES", boundaries)
         return []
       }
     }
@@ -206,55 +143,3 @@ const nullIterator = {
   getOpenScopeIds: () => [],
   getCloseScopeIds: () => []
 }
-
-// class HighlightIterator {
-//   constructor(languageMode) {
-//     this.languageMode = languageMode
-//   }
-//
-//   seek(targetPosition, endRow) {
-//     console.log("SEEK", targetPosition, endRow)
-//     this.seeking = targetPosition.column
-//     return [259]
-//   }
-//
-//   // compare(...args) {
-//   //   console.log("COMPARE", args)
-//   //   return 1;
-//   // }
-//   moveToSuccessor() {
-//     console.log("moveToSuccessor")
-//     this.seeking = this.languageMode.buffer.getText().length;
-//   }
-//
-//   getPosition() {
-//     console.log("getPosition")
-//     const lineSize = this.languageMode.buffer.getText().length;
-//     console.log("RES", this.seeking, lineSize)
-//     if(this.seeking < lineSize) {
-//       console.log("RET", this.seeking)
-//       return new Point(0, this.seeking - 1);
-//     } else {
-//       console.log("RET - INFINITY")
-//       return Point.INFINITY;
-//     }
-//   }
-//
-//   getOpenScopeIds() {
-//     console.log("getOpen")
-//     if(this.seeking === 0) {
-//       return [259];
-//     } else {
-//       return [];
-//     }
-//   }
-//
-//   getCloseScopeIds() {
-//     console.log("getClose")
-//     if(this.seeking === 0) {
-//       return [259];
-//     } else {
-//       return [];
-//     }
-//   }
-// }
