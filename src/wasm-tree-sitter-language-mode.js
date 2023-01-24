@@ -24,11 +24,13 @@ class WASMTreeSitterLanguageMode {
       this.syntaxQuery = lang.query(syntaxQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
+      this.tree = this.parser.parse(buffer.getText())
+      this._createBoundaries()
       global.mode = this
     })
 
     this.rootScopeDescriptor = new ScopeDescriptor({
-      scopes: ['javascript']
+      scopes: ['ruby']
     });
   }
 
@@ -45,28 +47,31 @@ class WASMTreeSitterLanguageMode {
     console.log("getScopeChain", args)
   }
 
-  bufferDidChange(...args) {
-    // console.log("bufferDidChange", args)
+  bufferDidChange(change) {
+    if(!this.tree) return;
+    this.tree.edit({
+      startPosition: change.newRange.start,
+      oldEndPosition: change.oldRange.end,
+      newEndPosition: change.newRange.end
+    })
+    this.tree = this.parser.parse(this.buffer.getText(), this.tree)
+    // this.tree = this.parser.parse(this.buffer.getText())
+    this._createBoundaries()
   }
 
-  bufferDidFinishTransaction(...args) {
-    // console.log("bufferDidFinishTransaction", args)
-  }
-
-  buildHighlightIterator() {
-    if(!this.parser) return nullIterator;
-    const tree = this.parser.parse(this.buffer.getText())
-    const matches = this.syntaxQuery.matches(tree.rootNode)
-    let boundaries = createTree((a, b) => {
+  _createBoundaries() {
+    let oldScopes = []
+    // console.log("\n\n\n**************\nStarting tokenizer")
+    // console.log("ALL Matches", matches)
+    const matches = this.syntaxQuery.matches(this.tree.rootNode)
+    this.boundaries = createTree((a, b) => {
       const rows = a.row - b.row
       if(rows === 0)
         return a.column - b.column
       else
         return rows
     })
-    let oldScopes = []
-    // console.log("\n\n\n**************\nStarting tokenizer")
-    // console.log("ALL Matches", matches)
+
     matches.forEach(({captures}) => {
       captures.forEach(capture => {
         const node = capture.node
@@ -84,13 +89,13 @@ class WASMTreeSitterLanguageMode {
         const ids = names.map(name => this.scopeNames.get(name))
         // console.log("ADDING", node.startPosition, names, ids)
 
-        let old = boundaries.get(node.startPosition)
+        let old = this.boundaries.get(node.startPosition)
         // console.log("Old Bound", old)
         if(old) {
           // console.log("Pushing new", ids, names, old)
           old.openScopeIds.push(...ids)
         } else {
-          boundaries = boundaries.insert(node.startPosition, {
+          this.boundaries = this.boundaries.insert(node.startPosition, {
             closeScopeIds: oldScopes,
             openScopeIds: [...ids],
             openScopeNames: names,
@@ -99,11 +104,11 @@ class WASMTreeSitterLanguageMode {
           oldScopes = ids
         }
 
-        old = boundaries.get(node.endPosition)
+        old = this.boundaries.get(node.endPosition)
         if(old) {
           old.closeScopeIds.push(...ids)
         } else {
-          boundaries = boundaries.insert(node.endPosition, {
+          this.boundaries = this.boundaries.insert(node.endPosition, {
             closeScopeIds: [...ids],
             openScopeIds: [],
             closeScopeNames: names,
@@ -113,13 +118,20 @@ class WASMTreeSitterLanguageMode {
       })
     })
 
-    boundaries = boundaries.insert(Point.INFINITY, {
+    this.boundaries = this.boundaries.insert(Point.INFINITY, {
       closeScopeIds: oldScopes,
       openScopeIds: [],
       position: Point.INFINITY
     })
+  }
 
-    global.b = boundaries
+  bufferDidFinishTransaction(...args) {
+    // console.log("bufferDidFinishTransaction", args)
+  }
+
+  buildHighlightIterator() {
+    if(!this.parser) return nullIterator;
+    const boundaries = this.boundaries
     let iterator = boundaries.ge({row: 0, column: 0})
 
     return {
