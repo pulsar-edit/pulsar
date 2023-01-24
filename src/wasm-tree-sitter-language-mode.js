@@ -4,20 +4,23 @@ const fs = require('fs');
 const { Point } = require('text-buffer');
 
 const initPromise = Parser.init()
+createTree = require("functional-red-black-tree")
 
 class WASMTreeSitterLanguageMode {
   constructor( buffer, config) {
-    this.scopeNames = {}
-    this.scopeIds = {}
+    this.scopeNames = new Map()
+    this.scopeIds = new Map()
     this.lastId = 257
     this.buffer = buffer
     this.config = config
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
     initPromise.then(() =>
-      Parser.Language.load('/tmp/grammars/javascript/grammar.wasm')
+      Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
     ).then(lang => {
-      const syntaxQuery = fs.readFileSync('/tmp/grammars/javascript/queries/highlights.scm', 'utf-8')
+      let syntaxQuery = ''
+      syntaxQuery += fs.readFileSync('/tmp/grammars/ruby/queries/highlights.scm', 'utf-8')
+      // syntaxQuery += fs.readFileSync('/tmp/grammars/ruby/queries/tags.scm', 'utf-8')
       this.syntaxQuery = lang.query(syntaxQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
@@ -54,73 +57,104 @@ class WASMTreeSitterLanguageMode {
     if(!this.parser) return nullIterator;
     const tree = this.parser.parse(this.buffer.getText())
     const matches = this.syntaxQuery.matches(tree.rootNode)
-    let boundaries = []
+    let boundaries = createTree((a, b) => {
+      const rows = a.row - b.row
+      if(rows === 0)
+        return a.column - b.column
+      else
+        return rows
+    })
     let oldScopes = []
+    // console.log("\n\n\n**************\nStarting tokenizer")
+    // console.log("ALL Matches", matches)
     matches.forEach(({captures}) => {
-      captures.forEach(({name, node}) => {
-        if(!this.scopeNames[name]) {
-          this.lastId += 2
-          const newId = this.lastId;
-          this.scopeNames[name] = newId
-          this.scopeIds[newId] = name
-        }
-        const id = this.scopeNames[name]
-        // console.log("Token", node.startPosition, "kind", name)
-        boundaries.push({
-          closeScopeIds: oldScopes,
-          openScopeIds: [id],
-          position: node.startPosition
+      captures.forEach(capture => {
+        const node = capture.node
+        const names = capture.name.split('.')
+        names.forEach(name => {
+          if(!this.scopeNames.get(name)) {
+            this.lastId += 2
+            const newId = this.lastId;
+            // console.log("New ID", newId)
+            this.scopeNames.set(name, newId)
+            this.scopeIds.set(newId, name)
+          }
         })
 
-        boundaries.push({
-          closeScopeIds: [id],
-          openScopeIds: [],
-          position: node.endPosition
-        })
-        oldScopes = [id]
+        const ids = names.map(name => this.scopeNames.get(name))
+        // console.log("ADDING", node.startPosition, names, ids)
+
+        let old = boundaries.get(node.startPosition)
+        // console.log("Old Bound", old)
+        if(old) {
+          // console.log("Pushing new", ids, names, old)
+          old.openScopeIds.push(...ids)
+        } else {
+          boundaries = boundaries.insert(node.startPosition, {
+            closeScopeIds: oldScopes,
+            openScopeIds: [...ids],
+            openScopeNames: names,
+            position: node.startPosition
+          })
+          oldScopes = ids
+        }
+
+        old = boundaries.get(node.endPosition)
+        if(old) {
+          old.closeScopeIds.push(...ids)
+        } else {
+          boundaries = boundaries.insert(node.endPosition, {
+            closeScopeIds: [...ids],
+            openScopeIds: [],
+            closeScopeNames: names,
+            position: node.endPosition
+          })
+        }
       })
     })
 
-    boundaries.push({
+    boundaries = boundaries.insert(Point.INFINITY, {
       closeScopeIds: oldScopes,
       openScopeIds: [],
       position: Point.INFINITY
     })
 
-    // console.log("B", boundaries)
+    global.b = boundaries
+    let iterator = boundaries.ge({row: 0, column: 0})
 
     return {
       getOpenScopeIds () {
-        return boundaries[0].openScopeIds
+        return iterator.value.openScopeIds
       },
 
       getCloseScopeIds () {
-        return boundaries[0].closeScopeIds
+        return iterator.value.closeScopeIds
       },
 
       getPosition () {
-        return (boundaries[0] && boundaries[0].position) || Point.INFINITY
+        return (iterator.value && iterator.value.position) || Point.INFINITY
       },
 
       moveToSuccessor () {
-        return boundaries.shift()
+        return iterator.next()
       },
 
       seek(pos) {
-        while(boundaries.length > 0) {
-          const f = boundaries[0].position
-          if(f.row > pos.row) break
-          if(f.row == pos.row && f.column >= pos.column) break
-          boundaries.shift()
-        }
+        // while(boundaries.length > 0) {
+        //   const f = boundaries[0].position
+        //   if(f.row > pos.row) break
+        //   if(f.row == pos.row && f.column >= pos.column) break
+        //   boundaries.shift()
+        // }
+        iterator = boundaries.ge(pos)
         return []
       }
     }
   }
 
   classNameForScopeId(scopeId) {
-    console.log('classNameForScopeId', scopeId, this.scopeIds)
-    const scope = this.scopeIds[scopeId]
+    // console.log('classNameForScopeId', scopeId, this.scopeIds)
+    const scope = this.scopeIds.get(scopeId)
     if(scope) return `syntax--${scope}`
     // // console.log("classNameForScopeId", scopeId)
     // if(scopeId === 259) {
@@ -143,3 +177,36 @@ const nullIterator = {
   getOpenScopeIds: () => [],
   getCloseScopeIds: () => []
 }
+
+// createTree = require("functional-red-black-tree")
+// tree = createTree((a, b) => (a.row - b.row) + (a.column - b.column) / 10)
+//
+// nt = tree.
+//   insert({row: 1, column: 1}, '1,1').
+//   insert({row: 0, column: 1}, '0,1').
+//   insert({row: 1, column: 0}, '1,0').
+//   insert({row: 0, column: 0}, '0,0').
+//   insert({row: 0, column: 2}, '0,2')
+//
+// nt.get = function(key) {
+//   var cmp = this._compare
+//   var n = this.root
+//   while(n) {
+//     var d = cmp(key, n.key)
+//     console.log("RETURN OF", d, "Inside", n)
+//     if(d === 0) {
+//       return n.value
+//     }
+//     if(d <= 0) {
+//       n = n.left
+//     } else {
+//       n = n.right
+//     }
+//   }
+//   return
+// }
+//
+// nt.get({row: 0, column: 1})
+// it = nt.ge({row: 0, column: 1})
+//
+// compare({row: 0, column: 1}, {row: 0, column: 1}) === 0
