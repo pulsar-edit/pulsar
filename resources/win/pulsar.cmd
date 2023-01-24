@@ -16,6 +16,8 @@ FOR %%a IN (%*) DO (
   IF /I "%%a"=="--test"                     SET EXPECT_OUTPUT=YES
   IF /I "%%a"=="--benchmark"                SET EXPECT_OUTPUT=YES
   IF /I "%%a"=="--benchmark-test"           SET EXPECT_OUTPUT=YES
+  IF /I "%%a"=="-p"                         SET EXPECT_OUTPUT=YES
+  IF /I "%%a"=="--package"                  SET EXPECT_OUTPUT=YES
   IF /I "%%a"=="-v"                         SET EXPECT_OUTPUT=YES
   IF /I "%%a"=="--version"                  SET EXPECT_OUTPUT=YES
   IF /I "%%a"=="--enable-electron-logging"  SET ELECTRON_ENABLE_LOGGING=YES
