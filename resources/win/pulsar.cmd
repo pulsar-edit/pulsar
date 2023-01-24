@@ -41,11 +41,11 @@ IF "%ATOM_ADD%"=="YES" (
 
 IF "%EXPECT_OUTPUT%"=="YES" (
   IF "%WAIT%"=="YES" (
-    powershell -noexit "Start-Process -FilePath \"%~dp0\..\..\<%= atomExeName %>\" -ArgumentList \"--pid=$pid $env:PSARGS\" ; wait-event"
+    powershell -noexit "Start-Process -FilePath \"%~dp0\..\Pulsar.exe\" -ArgumentList \"--pid=$pid $env:PSARGS\" ; wait-event"
     exit 0
   ) ELSE (
-    "%~dp0\..\..\<%= atomExeName %>" %*
+    "%~dp0\..\Pulsar.exe" %*
   )
 ) ELSE (
-  "%~dp0\..\app\apm\bin\node.exe" "%~dp0\pulsar.js" "<%= atomExeName %>" %*
+  "%~dp0\app\ppm\bin\node.exe" "%~dp0\pulsar.js" "Pulsar.exe" %*
 )
