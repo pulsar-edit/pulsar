@@ -67,6 +67,7 @@
     "fs-admin": "0.19.0",
     "fs-plus": "^3.1.1",
     "fstream": "1.0.12",
+    "functional-red-black-tree": "^1.0.1",
     "fuzzy-finder": "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3",
     "git-diff": "file:packages/git-diff",
     "git-utils": "5.7.1",
