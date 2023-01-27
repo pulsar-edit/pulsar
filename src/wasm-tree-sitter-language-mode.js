@@ -18,14 +18,11 @@ class WASMTreeSitterLanguageMode {
     initPromise.then(() =>
       Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
     ).then(lang => {
-      let syntaxQuery = ''
-      syntaxQuery += fs.readFileSync('/tmp/grammars/ruby/queries/highlights.scm', 'utf-8')
-      // syntaxQuery += fs.readFileSync('/tmp/grammars/ruby/queries/tags.scm', 'utf-8')
+      const syntaxQuery = fs.readFileSync('/tmp/grammars/ruby/queries/highlights.scm', 'utf-8')
       this.syntaxQuery = lang.query(syntaxQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
       this.tree = this.parser.parse(buffer.getText())
-      this._createBoundaries()
       global.mode = this
     })
 
@@ -48,29 +45,44 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidChange(change) {
+    global.nt = this.buffer.getText()
     if(!this.tree) return;
+
+    const startIndex = this.buffer.characterIndexForPosition(change.newRange.start)
+    // console.log("EDITING", {
+    //   startPosition: change.newRange.start,
+    //   oldEndPosition: change.oldRange.end,
+    //   newEndPosition: change.newRange.end,
+    //   startIndex: startIndex,
+    //   oldEndIndex: startIndex + change.oldText.length,
+    //   newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
+    // }, change)
     this.tree.edit({
       startPosition: change.newRange.start,
       oldEndPosition: change.oldRange.end,
-      newEndPosition: change.newRange.end
+      newEndPosition: change.newRange.end,
+      startIndex: startIndex,
+      oldEndIndex: startIndex + change.oldText.length,
+      newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
-    this.tree = this.parser.parse(this.buffer.getText(), this.tree)
-    // this.tree = this.parser.parse(this.buffer.getText())
-    this._createBoundaries()
+    const newTree = this.parser.parse(this.buffer.getText(), this.tree)
+    // console.log("CHANGES", this.tree.getChangedRanges(newTree))
+
+    this.tree = newTree
+    // this._createBoundaries(change)
   }
 
-  _createBoundaries() {
+  _createBoundaries(change) {
     let oldScopes = []
     // console.log("\n\n\n**************\nStarting tokenizer")
     // console.log("ALL Matches", matches)
-    const matches = this.syntaxQuery.matches(this.tree.rootNode)
-    this.boundaries = createTree((a, b) => {
-      const rows = a.row - b.row
-      if(rows === 0)
-        return a.column - b.column
-      else
-        return rows
-    })
+    let matches
+    // if(change) {
+    //   matches = this.syntaxQuery.matches(this.tree.rootNode, change.newRange.start, change.newRange.end)
+    // } else {
+      matches = this.syntaxQuery.matches(this.tree.rootNode)
+    // }
+    this.boundaries = createTree(comparePoints)
 
     matches.forEach(({captures}) => {
       captures.forEach(capture => {
@@ -131,8 +143,12 @@ class WASMTreeSitterLanguageMode {
 
   buildHighlightIterator() {
     if(!this.parser) return nullIterator;
-    const boundaries = this.boundaries
-    let iterator = boundaries.ge({row: 0, column: 0})
+    // const boundaries// = this.boundaries
+    let iterator// = boundaries.ge({row: 0, column: 0})
+    const createBoundaries = () => {
+      this._createBoundaries()
+      return this.boundaries
+    }
 
     return {
       getOpenScopeIds () {
@@ -152,13 +168,7 @@ class WASMTreeSitterLanguageMode {
       },
 
       seek(pos) {
-        // while(boundaries.length > 0) {
-        //   const f = boundaries[0].position
-        //   if(f.row > pos.row) break
-        //   if(f.row == pos.row && f.column >= pos.column) break
-        //   boundaries.shift()
-        // }
-        iterator = boundaries.ge(pos)
+        iterator = createBoundaries().ge(pos)
         return []
       }
     }
@@ -222,3 +232,11 @@ const nullIterator = {
 // it = nt.ge({row: 0, column: 1})
 //
 // compare({row: 0, column: 1}, {row: 0, column: 1}) === 0
+
+function comparePoints(a, b) {
+  const rows = a.row - b.row
+  if(rows === 0)
+    return a.column - b.column
+  else
+    return rows
+}
