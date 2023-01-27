@@ -83,7 +83,6 @@ describe "PackageCard", ->
         name: 'some-package'
         version: '0.1.0'
         repository: 'http://github.com/omgwow/some-package'
-      spyOn(PackageCard::, 'isDeprecated').andReturn(false)
       card = new PackageCard(pack, new SettingsView(), packageManager)
 
       jasmine.attachToDOM(card.element)
@@ -360,7 +359,6 @@ describe "PackageCard", ->
     it "shows the settings, uninstall, and disable buttons", ->
       atom.config.set('package-with-config.setting', 'something')
       pack = atom.packages.getLoadedPackage('package-with-config')
-      spyOn(PackageCard::, 'isDeprecated').andReturn(false)
       card = new PackageCard(pack, new SettingsView(), packageManager)
 
       jasmine.attachToDOM(card.element)
@@ -375,7 +373,6 @@ describe "PackageCard", ->
 
     it "does not show the settings button when there are no settings", ->
       pack = atom.packages.getLoadedPackage('package-with-config')
-      spyOn(PackageCard::, 'isDeprecated').andReturn(false)
       spyOn(PackageCard::, 'hasSettings').andReturn(false)
       card = new PackageCard(pack, new SettingsView(), packageManager)
 
@@ -385,179 +382,3 @@ describe "PackageCard", ->
       expect(card.refs.uninstallButton).toBeVisible()
       expect(card.refs.enablementButton).toBeVisible()
       expect(card.refs.enablementButton.textContent).toBe 'Disable'
-
-  ###
-  hasDeprecations, no update: disabled-settings, uninstall, disable
-  hasDeprecations, has update: update, disabled-settings, uninstall, disable
-  ###
-  describe "when the package has deprecations", ->
-    beforeEach ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
-
-      waitsFor ->
-        atom.packages.isPackageLoaded('package-with-config') is true
-
-      runs ->
-        atom.config.set('package-with-config.setting', 'something')
-
-    describe "when hasDeprecations is true and NO update is available", ->
-      beforeEach ->
-        spyOn(PackageCard::, 'isDeprecated').andReturn true
-        spyOn(PackageCard::, 'isInstalled').andReturn true
-        spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
-          hasDeprecations: true
-          version: '<=1.0.0'
-        pack = atom.packages.getLoadedPackage('package-with-config')
-        pack.version = pack.metadata.version
-        card = new PackageCard(pack, new SettingsView(), packageManager)
-        jasmine.attachToDOM(card.element)
-
-      it "shows the correct state", ->
-        spyOn(atom.packages, 'isPackageDisabled').andReturn false
-        card.updateInterfaceState()
-        expect(card.refs.updateButtonGroup).not.toBeVisible()
-        expect(card.refs.installButtonGroup).not.toBeVisible()
-
-        expect(card.element).toHaveClass 'deprecated'
-        expect(card.refs.packageMessage.textContent).toContain 'no update available'
-        expect(card.refs.packageMessage).toHaveClass 'text-warning'
-        expect(card.refs.settingsButton.disabled).toBe true
-        expect(card.refs.uninstallButton).toBeVisible()
-        expect(card.refs.enablementButton).toBeVisible()
-        expect(card.refs.enablementButton.textContent).toBe 'Disable'
-        expect(card.refs.enablementButton.disabled).toBe false
-
-      it "displays a disabled enable button when the package is disabled", ->
-        spyOn(atom.packages, 'isPackageDisabled').andReturn true
-        card.updateInterfaceState()
-        expect(card.refs.updateButtonGroup).not.toBeVisible()
-        expect(card.refs.installButtonGroup).not.toBeVisible()
-
-        expect(card.element).toHaveClass 'deprecated'
-        expect(card.refs.packageMessage.textContent).toContain 'no update available'
-        expect(card.refs.packageMessage).toHaveClass 'text-warning'
-        expect(card.refs.settingsButton.disabled).toBe true
-        expect(card.refs.uninstallButton).toBeVisible()
-        expect(card.refs.enablementButton).toBeVisible()
-        expect(card.refs.enablementButton.textContent).toBe 'Enable'
-        expect(card.refs.enablementButton.disabled).toBe true
-
-    # NOTE: the mocking here is pretty delicate
-    describe "when hasDeprecations is true and there is an update is available", ->
-      beforeEach ->
-        spyOn(PackageCard::, 'isDeprecated').andCallFake (version) ->
-          semver = require 'semver'
-          version = version ? card?.pack?.version ? '1.0.0'
-          semver.satisfies(version, '<=1.0.1')
-        spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
-          hasDeprecations: true
-          version: '<=1.0.1'
-        pack = atom.packages.getLoadedPackage('package-with-config')
-        pack.version = pack.metadata.version
-        card = new PackageCard(pack, new SettingsView(), packageManager)
-        jasmine.attachToDOM(card.element)
-
-      it "explains that the update WILL NOT fix the deprecations when the new version isnt higher than the max version", ->
-        card.displayAvailableUpdate('1.0.1')
-        expect(card.refs.packageMessage.textContent).not.toContain 'no update available'
-        expect(card.refs.packageMessage.textContent).toContain 'still contains deprecations'
-
-      describe "when the available update fixes deprecations", ->
-        it "explains that the update WILL fix the deprecations when the new version is higher than the max version", ->
-          card.displayAvailableUpdate('1.1.0')
-          expect(card.refs.packageMessage.textContent).not.toContain 'no update available'
-          expect(card.refs.packageMessage.textContent).toContain 'without deprecations'
-
-          expect(card.refs.updateButtonGroup).toBeVisible()
-          expect(card.refs.installButtonGroup).not.toBeVisible()
-          expect(card.refs.packageActionButtonGroup).toBeVisible()
-          expect(card.refs.uninstallButton).toBeVisible()
-          expect(card.refs.enablementButton).toBeVisible()
-          expect(card.refs.enablementButton.textContent).toBe 'Disable'
-
-        it "updates the package and shows a restart notification when the update button is clicked", ->
-          expect(atom.packages.getLoadedPackage('package-with-config')).toBeTruthy()
-
-          [updateCallback] = []
-          packageManager.runCommand.andCallFake (args, callback) ->
-            updateCallback = callback
-            onWillThrowError: ->
-          spyOn(packageManager, 'update').andCallThrough()
-
-          originalLoadPackage = atom.packages.loadPackage
-          spyOn(atom.packages, 'loadPackage').andCallFake ->
-            pack = originalLoadPackage.call(atom.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
-            pack.metadata.version = '1.1.0' if pack?
-            pack
-
-          card.pack.latestVersion = "1.1.0"
-          card.displayAvailableUpdate('1.1.0')
-          expect(card.refs.updateButtonGroup).toBeVisible()
-
-          expect(atom.packages.getLoadedPackage('package-with-config')).toBeTruthy()
-          card.refs.updateButton.click()
-
-          expect(card.refs.updateButton.disabled).toBe true
-          expect(card.refs.updateButton).toHaveClass 'is-installing'
-
-          expect(packageManager.update).toHaveBeenCalled()
-          expect(packageManager.update.mostRecentCall.args[0].name).toEqual 'package-with-config'
-          expect(packageManager.runCommand).toHaveBeenCalled()
-          expect(card.element).toHaveClass 'deprecated'
-
-          expect(card.refs.updateButtonGroup).toBeVisible()
-          expect(card.refs.installButtonGroup).not.toBeVisible()
-
-          updateCallback(0, '', '')
-
-          waits 0 # Wait for PackageCard.update promise to resolve
-
-          runs ->
-            expect(card.refs.updateButton.disabled).toBe false
-            expect(card.refs.updateButton).not.toHaveClass 'is-installing'
-            expect(card.refs.updateButtonGroup).not.toBeVisible()
-            expect(card.refs.installButtonGroup).not.toBeVisible()
-            expect(card.refs.packageActionButtonGroup).toBeVisible()
-            expect(card.refs.versionValue.textContent).toBe '1.0.0' # Does not update until restart
-
-            notifications = atom.notifications.getNotifications()
-            expect(notifications.length).toBe 1
-            notif = notifications[0]
-
-            expect(notif.options.detail).toBe "1.0.0 -> 1.1.0"
-            expect(notif.options.buttons.length).toBe(2)
-
-            spyOn(atom, 'restartApplication')
-            notif.options.buttons[0].onDidClick()
-            expect(atom.restartApplication).toHaveBeenCalled()
-
-            spyOn(notif, 'dismiss')
-            notif.options.buttons[1].onDidClick()
-            expect(notif.dismiss).toHaveBeenCalled()
-
-        it "shows the sha in the notification when a git url package is updated", ->
-          expect(atom.packages.getLoadedPackage('package-with-config')).toBeTruthy()
-
-          [updateCallback] = []
-          packageManager.runCommand.andCallFake (args, callback) ->
-            updateCallback = callback
-            onWillThrowError: ->
-          spyOn(packageManager, 'update').andCallThrough()
-
-          card.pack.apmInstallSource = {type: 'git', sha: 'cf23df2207d99a74fbe169e3eba035e633b65d94'}
-          card.pack.latestSha = 'a296114f3d0deec519a41f4c62e7fc56075b7f01'
-
-          card.displayAvailableUpdate('1.1.0')
-          expect(card.refs.updateButtonGroup).toBeVisible()
-
-          expect(atom.packages.getLoadedPackage('package-with-config')).toBeTruthy()
-          card.refs.updateButton.click()
-
-          updateCallback(0, '', '')
-
-          waits 0 # Wait for PackageCard.update promise to resolve
-
-          runs ->
-            notifications = atom.notifications.getNotifications()
-            expect(notifications.length).toBe 1
-            expect(notifications[0].options.detail).toBe "cf23df22 -> a296114f"

@@ -2349,16 +2349,16 @@ atom-slick@^2, atom-slick@^2.0.0:
 "autocomplete-html@file:packages/autocomplete-html":
   version "0.8.9"
 
-"autocomplete-plus@https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4":
-  version "2.42.4"
-  resolved "https://codeload.github.com/atom/autocomplete-plus/legacy.tar.gz/refs/tags/v2.42.4#dcfe8ea2b844d27f3d30c7cae4621638ca13e0a8"
+"autocomplete-plus@https://github.com/pulsar-edit/autocomplete-plus.git#48ecced":
+  version "2.42.6"
+  resolved "https://github.com/pulsar-edit/autocomplete-plus.git#48eccede0d3f2dfe4ba3deb050f4cd241efc6153"
   dependencies:
     atom-slick "^2.0.0"
-    dompurify "^2.0.7"
+    dompurify "^2.2.6"
     fuzzaldrin "^2.1.0"
     fuzzaldrin-plus "^0.6.0"
     grim "^2.0.1"
-    marked "^0.7.0"
+    marked "^4.0.10"
     minimatch "^3.0.3"
     selector-kit "^0.1"
     stable "^0.1.5"
@@ -3822,10 +3822,15 @@ dompurify@^1.0.2, dompurify@^1.0.3:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.11.tgz#fe0f4a40d147f7cebbe31a50a1357539cfc1eb4d"
   integrity sha512-XywCTXZtc/qCX3iprD1pIklRVk/uhl8BKpkTxr+ZyMVUzSUg7wkQXRBp/euJ5J5moa1QvfpvaPQVP71z1O59dQ==
 
-dompurify@^2.0.17, dompurify@^2.0.7:
+dompurify@^2.0.17:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.1.tgz#f9cb1a275fde9af6f2d0a2644ef648dd6847b631"
   integrity sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==
+
+dompurify@^2.2.6:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.3.tgz#f4133af0e6a50297fc8874e2eaedc13a3c308c03"
+  integrity sha512-q6QaLcakcRjebxjg8/+NP+h0rPfatOgOzc46Fst9VAA3jF2ApfKBNKMzdP4DYTqtUMXSCd5pRS/8Po/OmoCHZQ==
 
 domutils@^3.0.1:
   version "3.0.1"
@@ -6699,11 +6704,6 @@ marked@^0.6.2:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.6.3.tgz#79babad78af638ba4d522a9e715cdfdd2429e946"
   integrity sha512-Fqa7eq+UaxfMriqzYLayfqAE40WN03jf+zHjT18/uXNuzjq3TY0XTbrAoPeqSJrAmPz11VuUA+kBPYOhHt9oOQ==
-
-marked@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
-  integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
 
 marked@^4.0.10:
   version "4.2.2"
