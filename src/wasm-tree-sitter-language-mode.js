@@ -19,10 +19,13 @@ class WASMTreeSitterLanguageMode {
       Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
     ).then(lang => {
       const syntaxQuery = fs.readFileSync('/tmp/grammars/ruby/queries/highlights.scm', 'utf-8')
+      const localsQuery = fs.readFileSync('/tmp/grammars/ruby/queries/locals.scm', 'utf-8')
       this.syntaxQuery = lang.query(syntaxQuery)
+      this.localsQuery = lang.query(localsQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
       this.tree = this.parser.parse(buffer.getText())
+      this.boundaries = createTree(comparePoints)
       global.mode = this
     })
 
@@ -69,20 +72,19 @@ class WASMTreeSitterLanguageMode {
     // console.log("CHANGES", this.tree.getChangedRanges(newTree))
 
     this.tree = newTree
-    // this._createBoundaries(change)
   }
 
-  _createBoundaries(change) {
+  _updateBoundaries(from, to) {
+    const syntax = this.syntaxQuery.matches(this.tree.rootNode, from, to)
+    const locals = this.localsQuery.matches(this.tree.rootNode, from, to)
+    const matches = syntax //.concat(locals)
+
+    let oldDataIterator = this.boundaries.ge(from)
     let oldScopes = []
-    // console.log("\n\n\n**************\nStarting tokenizer")
-    // console.log("ALL Matches", matches)
-    let matches
-    // if(change) {
-    //   matches = this.syntaxQuery.matches(this.tree.rootNode, change.newRange.start, change.newRange.end)
-    // } else {
-      matches = this.syntaxQuery.matches(this.tree.rootNode)
-    // }
-    this.boundaries = createTree(comparePoints)
+    while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
+      this.boundaries = this.boundaries.remove(oldDataIterator.key)
+      oldDataIterator.next()
+    }
 
     matches.forEach(({captures}) => {
       captures.forEach(capture => {
@@ -143,20 +145,19 @@ class WASMTreeSitterLanguageMode {
 
   buildHighlightIterator() {
     if(!this.parser) return nullIterator;
-    // const boundaries// = this.boundaries
     let iterator// = boundaries.ge({row: 0, column: 0})
-    const createBoundaries = () => {
-      this._createBoundaries()
+    const updateBoundaries = (start, end) => {
+      this._updateBoundaries(start, end)
       return this.boundaries
     }
 
     return {
       getOpenScopeIds () {
-        return iterator.value.openScopeIds
+        return [...new Set(iterator.value.openScopeIds)]
       },
 
       getCloseScopeIds () {
-        return iterator.value.closeScopeIds
+        return [...new Set(iterator.value.closeScopeIds)]
       },
 
       getPosition () {
@@ -167,8 +168,9 @@ class WASMTreeSitterLanguageMode {
         return iterator.next()
       },
 
-      seek(pos) {
-        iterator = createBoundaries().ge(pos)
+      seek(start, endRow) {
+        const end = {row: endRow + 1, column: 0}
+        iterator = updateBoundaries(start, end).ge(start)
         return []
       }
     }
