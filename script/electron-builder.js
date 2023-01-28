@@ -138,6 +138,9 @@ let options = {
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
+    }, {
+      "from": "LICENSE.md",
+      "to": "LICENSE.md"
     },
   ],
   compression: "normal",
@@ -168,7 +171,7 @@ let options = {
         // Extra SVG icon included in the resources folder to give a chance to
         // Linux packagers to add a scalable desktop icon under
         // /usr/share/icons/hicolor/scalable
-        // (used only by desktops to show it on bar/switcher and app menus).  
+        // (used only by desktops to show it on bar/switcher and app menus).
         "from": svgIcon,
         "to": "pulsar.svg"
       },
