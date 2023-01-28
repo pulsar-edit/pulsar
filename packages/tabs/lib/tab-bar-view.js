@@ -7,23 +7,22 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
-let TabBarView;
+
 let BrowserWindow = null; // Defer require until actually used
 const {ipcRenderer} = require('electron');
 
 const {CompositeDisposable} = require('atom');
 const TabView = require('./tab-view.js');
 
-module.exports =
-(TabBarView = class TabBarView {
+class TabBarView {
   constructor(pane, location) {
     this.pane = pane;
     this.location = location;
-    this.element = document.createElement('ul');
+    this.element = document.createElement("ul");
     this.element.classList.add("list-inline");
     this.element.classList.add("tab-bar");
     this.element.classList.add("inset-panel");
-    this.element.setAttribute('is', 'atom-tabs');
+    this.element.setAttribute("is", "atom-tabs");
     this.element.setAttribute("tabindex", -1);
     this.element.setAttribute("location", this.location);
 
@@ -34,20 +33,18 @@ module.exports =
     this.paneElement = this.pane.getElement();
 
     this.subscriptions.add(atom.commands.add(this.paneElement, {
-      'tabs:keep-pending-tab': () => this.terminatePendingStates(),
-      'tabs:close-tab': () => this.closeTab(this.getActiveTab()),
-      'tabs:close-other-tabs': () => this.closeOtherTabs(this.getActiveTab()),
-      'tabs:close-tabs-to-right': () => this.closeTabsToRight(this.getActiveTab()),
-      'tabs:close-tabs-to-left': () => this.closeTabsToLeft(this.getActiveTab()),
-      'tabs:close-saved-tabs': () => this.closeSavedTabs(),
-      'tabs:close-all-tabs': event => {
+      "tabs:keep-pending-tab": () => this.terminatePendingState(),
+      "tabs:close-tab": () => this.closeTab(this.getActiveTab()),
+      "tabs:close-other-tabs": () => this.closeOtherTabs(this.getActiveTab()),
+      "tabs:close-tabs-to-right": () => this.closeTabsToRight(this.getActiveTab()),
+      "tabs:close-tabs-to-left": () => this.closeTabsToLeft(this.getActiveTab()),
+      "tabs:close-saved-tabs": () => this.closeSavedTabs(),
+      "tabs:close-all-tabs": event => {
         event.stopPropagation();
         return this.closeAllTabs();
       },
-      'tabs:open-in-new-window': () => this.openInNewWindow()
-    }
-    )
-    );
+      "tabs:open-in-new-window": () => this.openInNewWindow()
+    }));
 
     const addElementCommands = commands => {
       const commandsWithPropagationStopped = {};
@@ -60,16 +57,16 @@ module.exports =
     };
 
     addElementCommands({
-      'tabs:close-tab': () => this.closeTab(),
-      'tabs:close-other-tabs': () => this.closeOtherTabs(),
-      'tabs:close-tabs-to-right': () => this.closeTabsToRight(),
-      'tabs:close-tabs-to-left': () => this.closeTabsToLeft(),
-      'tabs:close-saved-tabs': () => this.closeSavedTabs(),
-      'tabs:close-all-tabs': () => this.closeAllTabs(),
-      'tabs:split-up': () => this.splitTab('splitUp'),
-      'tabs:split-down': () => this.splitTab('splitDown'),
-      'tabs:split-left': () => this.splitTab('splitLeft'),
-      'tabs:split-right': () => this.splitTab('splitRight')
+      "tabs:close-tab": () => this.closeTab(),
+      "tabs:close-other-tabs": () => this.closeOtherTabs(),
+      "tabs:close-tabs-to-right": () => this.closeTabsToRight(),
+      "tabs:close-tabs-to-left": () => this.closeTabsToLeft(),
+      "tabs:close-saved-tabs": () => this.closeSavedTabs(),
+      "tabs:close-all-tabs": () => this.closeAllTabs(),
+      "tabs:split-up": () => this.splitTab("splitUp"),
+      "tabs:split-down": () => this.splitTab("splitDown"),
+      "tabs:split-left": () => this.splitTab("splitLeft"),
+      "tabs:split-right": () => this.splitTab("splitRight")
     });
 
     this.element.addEventListener("mouseenter", this.onMouseEnter.bind(this));
@@ -90,28 +87,23 @@ module.exports =
 
     this.subscriptions.add(this.pane.onDidDestroy(() => {
       return this.destroy();
-    })
-    );
+    }));
 
     this.subscriptions.add(this.pane.onDidAddItem(({item, index}) => {
       return this.addTabForItem(item, index);
-    })
-    );
+    }));
 
     this.subscriptions.add(this.pane.onDidMoveItem(({item, newIndex}) => {
       return this.moveItemTabToIndex(item, newIndex);
-    })
-    );
+    }));
 
     this.subscriptions.add(this.pane.onDidRemoveItem(({item}) => {
       return this.removeTabForItem(item);
-    })
-    );
+    }));
 
     this.subscriptions.add(this.pane.onDidChangeActiveItem(item => {
       return this.updateActiveTab();
-    })
-    );
+    }));
 
     this.subscriptions.add(atom.config.observe('tabs.tabScrolling', value => this.updateTabScrolling(value)));
     this.subscriptions.add(atom.config.observe('tabs.tabScrollingThreshold', value => this.updateTabScrollingThreshold(value)));
@@ -126,6 +118,7 @@ module.exports =
 
     this.onDropOnOtherWindow = this.onDropOnOtherWindow.bind(this);
     ipcRenderer.on('tab:dropped', this.onDropOnOtherWindow);
+
   }
 
   destroy() {
@@ -135,13 +128,15 @@ module.exports =
   }
 
   terminatePendingStates() {
-    for (let tab of Array.from(this.getTabs())) { if (typeof tab.terminatePendingState === 'function') {
-      tab.terminatePendingState();
-    } }
+    for (let tab of this.getTabs()) {
+      if (typeof tab.terminatePendingState === "function") {
+        tab.terminatePendingState();
+      }
+    }
   }
 
   addTabForItem(item, index) {
-    var tabView = new TabView({
+    let tabView = new TabView({
       item,
       pane: this.pane,
       tabs: this.tabs,
@@ -150,11 +145,17 @@ module.exports =
       },
       location: this.location
     });
-    if (this.isItemMovingBetweenPanes) { tabView.terminatePendingState(); }
+    if (this.isItemMovingBetweenPanes) {
+      tabView.terminatePendingState();
+    }
+
     this.tabsByElement.set(tabView.element, tabView);
     this.insertTabAtIndex(tabView, index);
+
     if (atom.config.get('tabs.addNewTabsAtEnd')) {
-      if (!this.isItemMovingBetweenPanes) { return this.pane.moveItem(item, this.pane.getItems().length - 1); }
+      if (!this.isItemMovingBetweenPanes) {
+        return this.pane.moveItem(item, this.pane.getItems().length - 1);
+      }
     }
   }
 
@@ -170,7 +171,9 @@ module.exports =
 
   insertTabAtIndex(tab, index) {
     let followingTab;
-    if (index != null) { followingTab = this.tabs[index]; }
+    if (index != null) {
+      followingTab = this.tabs[index];
+    }
     if (followingTab) {
       this.element.insertBefore(tab.element, followingTab.element);
       this.tabs.splice(index, 0, tab);
@@ -192,7 +195,10 @@ module.exports =
       this.tabsByElement.delete(tab);
       tab.destroy();
     }
-    for (tab of Array.from(this.getTabs())) { tab.updateTitle(); }
+    for (tab of this.getTabs()) {
+      tab.updateTitle();
+    }
+
     return this.updateTabBarVisibility();
   }
 
@@ -255,7 +261,7 @@ module.exports =
     }
     if (itemURI == null) { return; }
     this.closeTab(tab);
-    for (tab of Array.from(this.getTabs())) { tab.element.style.maxWidth = ''; }
+    for (tab of this.getTabs()) { tab.element.style.maxWidth = ''; }
     const pathsToOpen = [atom.project.getPaths(), itemURI].reduce(((a, b) => a.concat(b)), []);
     return atom.open({pathsToOpen, newWindow: true, devMode: atom.devMode, safeMode: atom.safeMode});
   }
@@ -274,7 +280,7 @@ module.exports =
     const tabs = this.getTabs();
     if (active == null) { active = this.rightClickedTab; }
     if (active == null) { return; }
-    return Array.from(tabs).filter((tab) => tab !== active).map((tab) => this.closeTab(tab));
+    return tabs.filter((tab) => tab !== active).map((tab) => this.closeTab(tab));
   }
 
   closeTabsToRight(active) {
@@ -314,7 +320,7 @@ module.exports =
   closeSavedTabs() {
     return (() => {
       const result = [];
-      for (let tab of Array.from(this.getTabs())) {
+      for (let tab of this.getTabs()) {
         if (!(typeof tab.item.isModified === 'function' ? tab.item.isModified() : undefined)) { result.push(this.closeTab(tab)); } else {
           result.push(undefined);
         }
@@ -324,7 +330,7 @@ module.exports =
   }
 
   closeAllTabs() {
-    return Array.from(this.getTabs()).map((tab) => this.closeTab(tab));
+    return this.getTabs().map((tab) => this.closeTab(tab));
   }
 
   getWindowId() {
@@ -365,7 +371,7 @@ module.exports =
     }
 
     if (typeof item.getAllowedLocations === 'function') {
-      for (let location of Array.from(item.getAllowedLocations())) {
+      for (let location of item.getAllowedLocations()) {
         event.dataTransfer.setData(`allowed-location-${location}`, 'true');
       }
     } else {
@@ -400,7 +406,7 @@ module.exports =
     if (!event.currentTarget.contains(event.relatedTarget)) {
       this.removePlaceholder();
       this.lastDropTargetIndex = null;
-      return Array.from(this.getTabs()).map((tab) => (tab.element.style.maxWidth = ''));
+      return this.getTabs().map((tab) => (tab.element.style.maxWidth = ''));
     }
   }
 
@@ -470,7 +476,9 @@ module.exports =
   }
 
   onDrop(event) {
-    if (!this.isAtomTabEvent(event)) { return; }
+    if (!this.isAtomTabEvent(event)) {
+      return;
+    }
 
     event.preventDefault();
 
@@ -494,7 +502,7 @@ module.exports =
       if ((fromPane != null ? fromPane.id : undefined) !== fromPaneId) {
         // If dragging from a different pane container, we have to be more
         // exhaustive in our search.
-        fromPane = Array.from(document.querySelectorAll('atom-pane'))
+        fromPane = document.querySelectorAll('atom-pane')
           .map(paneEl => paneEl.model)
           .find(pane => pane.id === fromPaneId);
       }
@@ -525,9 +533,15 @@ module.exports =
 
   // Show the tab bar when a tab is being dragged in this pane when alwaysShowTabBar = false
   onPaneDragEnter(event) {
-    if (!this.isAtomTabEvent(event)) { return; }
-    if (!this.itemIsAllowed(event, this.location)) { return; }
-    if ((this.pane.getItems().length > 1) || atom.config.get('tabs.alwaysShowTabBar')) { return; }
+    if (!this.isAtomTabEvent(event)) {
+      return;
+    }
+    if (!this.itemIsAllowed(event, this.location)) {
+      return;
+    }
+    if ((this.pane.getItems().length > 1) || atom.config.get('tabs.alwaysShowTabBar')) {
+      return;
+    }
     if (this.paneElement.contains(event.relatedTarget)) {
       return this.element.classList.remove('hidden');
     }
@@ -535,9 +549,15 @@ module.exports =
 
   // Hide the tab bar when the dragged tab leaves this pane when alwaysShowTabBar = false
   onPaneDragLeave(event) {
-    if (!this.isAtomTabEvent(event)) { return; }
-    if (!this.itemIsAllowed(event, this.location)) { return; }
-    if ((this.pane.getItems().length > 1) || atom.config.get('tabs.alwaysShowTabBar')) { return; }
+    if (!this.isAtomTabEvent(event)) {
+      return;
+    }
+    if (!this.itemIsAllowed(event, this.location)) {
+      return;
+    }
+    if ((this.pane.getItems().length > 1) || atom.config.get('tabs.alwaysShowTabBar')) {
+      return;
+    }
     if (!this.paneElement.contains(event.relatedTarget)) {
       return this.element.classList.add('hidden');
     }
@@ -576,7 +596,9 @@ module.exports =
 
   onClick(event) {
     const tab = this.tabForElement(event.target);
-    if (!tab) { return; }
+    if (!tab) {
+      return;
+    }
 
     event.preventDefault();
     if ((event.button === 2) || ((event.button === 0) && (event.ctrlKey === true))) {
@@ -591,8 +613,8 @@ module.exports =
   }
 
   onDoubleClick(event) {
-    let tab;
-    if (tab = this.tabForElement(event.target)) {
+    let tab = this.tabForElement(event.target);
+    if (tab) {
       return (typeof tab.item.terminatePendingState === 'function' ? tab.item.terminatePendingState() : undefined);
     } else if (event.target === this.element) {
       atom.commands.dispatch(this.element, 'application:new-file');
@@ -639,13 +661,13 @@ module.exports =
   removeDropTargetClasses() {
     let dropTarget;
     const workspaceElement = atom.workspace.getElement();
-    for (dropTarget of Array.from(workspaceElement.querySelectorAll('.tab-bar .is-drop-target'))) {
+    for (dropTarget of workspaceElement.querySelectorAll('.tab-bar .is-drop-target')) {
       dropTarget.classList.remove('is-drop-target');
     }
 
     return (() => {
       const result = [];
-      for (dropTarget of Array.from(workspaceElement.querySelectorAll('.tab-bar .drop-target-is-after'))) {
+      for (dropTarget of workspaceElement.querySelectorAll('.tab-bar .drop-target-is-after')) {
         result.push(dropTarget.classList.remove('drop-target-is-after'));
       }
       return result;
@@ -653,19 +675,23 @@ module.exports =
   }
 
   getDropTargetIndex(event) {
-    const {
-      target
-    } = event;
+    const { target } = event;
 
-    if (this.isPlaceholder(target)) { return; }
+    if (this.isPlaceholder(target)) {
+      return;
+    }
 
     const tabs = this.getTabs();
     let tab = this.tabForElement(target);
-    if (tab == null) { tab = tabs[tabs.length - 1]; }
+    if (tab == null) {
+      tab = tabs[tabs.length - 1];
+    }
 
-    if (tab == null) { return 0; }
+    if (tab == null) {
+      return 0;
+    }
 
-    const {left, width} = tab.element.getBoundingClientRect();
+    const { left, width } = tab.element.getBoundingClientRect();
     const elementCenter = left + (width / 2);
     const elementIndex = tabs.indexOf(tab);
 
@@ -677,7 +703,9 @@ module.exports =
   }
 
   getPlaceholder() {
-    if (this.placeholderEl != null) { return this.placeholderEl; }
+    if (this.placeholderEl != null) {
+      return this.placeholderEl;
+    }
 
     this.placeholderEl = document.createElement("li");
     this.placeholderEl.classList.add("placeholder");
@@ -696,22 +724,23 @@ module.exports =
   }
 
   onMouseEnter() {
-    for (let tab of Array.from(this.getTabs())) {
-      const {width} = tab.element.getBoundingClientRect();
+    for (let tab of this.getTabs()) {
+      const { width } = tab.element.getBoundingClientRect();
       tab.element.style.maxWidth = width.toFixed(2) + 'px';
     }
   }
 
   onMouseLeave() {
-    for (let tab of Array.from(this.getTabs())) { tab.element.style.maxWidth = ''; }
+    for (let tab of this.getTabs()) {
+      tab.element.style.maxWidth = '';
+    }
   }
 
   tabForElement(element) {
     let currentElement = element;
     while (currentElement != null) {
-      var tab;
-      if (tab = this.tabsByElement.get(currentElement)) {
-        return tab;
+      if (this.tabsByElement.get(currentElement)) {
+        return this.tabsByElement.get(currentElement);
       } else {
         currentElement = currentElement.parentElement;
       }
@@ -719,7 +748,7 @@ module.exports =
   }
 
   isAtomTabEvent(event) {
-    for (let item of Array.from(event.dataTransfer.items)) {
+    for (let item of event.dataTransfer.items) {
       if (item.type === 'atom-tab-event') {
         return true;
       }
@@ -729,7 +758,7 @@ module.exports =
   }
 
   itemIsAllowed(event, location) {
-    for (let item of Array.from(event.dataTransfer.items)) {
+    for (let item of event.dataTransfer.items) {
       if ((item.type === 'allow-all-locations') || (item.type === `allowed-location-${location}`)) {
         return true;
       }
@@ -737,4 +766,7 @@ module.exports =
 
     return false;
   }
-});
+
+}
+
+module.exports = TabBarView;
