@@ -23,7 +23,7 @@ class TabBarView {
     this.paneElement = this.pane.getElement();
 
     this.subscriptions.add(atom.commands.add(this.paneElement, {
-      "tabs:keep-pending-tab": () => this.terminatePendingState(),
+      "tabs:keep-pending-tab": () => this.terminatePendingStates(),
       "tabs:close-tab": () => this.closeTab(this.getActiveTab()),
       "tabs:close-other-tabs": () => this.closeOtherTabs(this.getActiveTab()),
       "tabs:close-tabs-to-right": () => this.closeTabsToRight(this.getActiveTab()),
