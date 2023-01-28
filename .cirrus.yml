@@ -96,8 +96,14 @@ arm_linux_task:
 silicon_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-ventura-xcode:14.2
     memory: 8G
+  env:
+    CSC_LINK: ENCRYPTED[e85e52debc6c3f1bc044786a751babe748480c69bd7a3ab71b4e1a19d9cf493587cdcd9c23706143ed1d63401807b59d]
+    CSC_KEY_PASSWORD: ENCRYPTED[72ac29759e42fadfa23d28fc6f8011bd79d137c2df4dfc10c605dcdd579800e42193a8a5d71733891d76ae0741b0f815]
+    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
   test_script:
     - brew install node@16 yarn git python
     - git submodule init
@@ -125,8 +131,14 @@ silicon_mac_task:
 intel_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-ventura-xcode:14.2
     memory: 8G
+  env:
+    CSC_LINK: ENCRYPTED[e85e52debc6c3f1bc044786a751babe748480c69bd7a3ab71b4e1a19d9cf493587cdcd9c23706143ed1d63401807b59d]
+    CSC_KEY_PASSWORD: ENCRYPTED[72ac29759e42fadfa23d28fc6f8011bd79d137c2df4dfc10c605dcdd579800e42193a8a5d71733891d76ae0741b0f815]
+    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
   dist_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
