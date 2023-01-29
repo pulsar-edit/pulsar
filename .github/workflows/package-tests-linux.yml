@@ -2,6 +2,7 @@ name: Package tests for Pulsar on Linux
 on:
   - pull_request
 env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
 jobs:
   setup:
