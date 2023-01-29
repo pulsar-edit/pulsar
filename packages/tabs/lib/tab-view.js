@@ -1,20 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let TabView;
 const path = require('path');
 const {Disposable, CompositeDisposable} = require('atom');
 const getIconServices = require('./get-icon-services');
 
 const layout = require('./layout');
 
-module.exports =
-(TabView = class TabView {
+class TabView {
   constructor({item, pane, didClickCloseIcon, tabs, location}) {
     this.item = item;
     this.pane = pane;
@@ -275,7 +265,7 @@ module.exports =
     } else {
       title = this.item.getTitle();
       useLongTitle = false;
-      for (let tab of Array.from(this.tabs)) {
+      for (let tab of this.tabs) {
         if (tab !== this) {
           if (tab.item.getTitle() === title) {
             tab.updateTitle({updateSiblings: false, useLongTitle: true});
@@ -364,7 +354,7 @@ module.exports =
   }
 
   repoForPath() {
-    for (let dir of Array.from(atom.project.getDirectories())) {
+    for (let dir of atom.project.getDirectories()) {
       if (dir.contains(this.path)) { return atom.project.repositoryForDirectory(dir); }
     }
     return Promise.resolve(null);
@@ -406,4 +396,6 @@ module.exports =
     delete this.status;
     return this.updateVcsColoring();
   }
-});
+}
+
+module.exports = TabView;
