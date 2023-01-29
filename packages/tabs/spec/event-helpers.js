@@ -1,108 +1,111 @@
-const buildMouseEvent = (type, target, {which, ctrlKey, relatedTarget} = {}) => {
-  const event = new MouseEvent(type, {bubbles: true, cancelable: true})
-  if (which != null) {
-    Object.defineProperty(event, 'which', {
-      get () {
-        return which
-      }
-    })
-  }
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
+ */
 
-  if (ctrlKey != null) {
+const buildMouseEvent = (type, target, param) => {
+  if (param === null) {
+    param = {};
+  }
+  //const {button, ctrlKey, which, relatedTarget} = param;
+  const event = new MouseEvent(type, {bubbles: true, cancelable: true});
+
+  if (param?.button != null) {
+    Object.defineProperty(event, 'button', {
+      get() {
+        return param?.button;
+      }
+    });
+  }
+  if (param?.ctrlKey != null) {
     Object.defineProperty(event, 'ctrlKey', {
-      get () {
-        return ctrlKey
+      get() {
+        return param?.ctrlKey;
       }
-    })
+    });
   }
-
-  if (relatedTarget != null) {
+  if (param?.which != null) {
+    Object.defineProperty(event, 'which', {
+      get() {
+        return param?.which;
+      }
+    });
+  }
+  if (param?.relatedTarget != null) {
     Object.defineProperty(event, 'relatedTarget', {
-      get () {
-        return relatedTarget
+      get() {
+        return param?.relatedTarget;
       }
-    })
+    });
   }
-
   Object.defineProperty(event, 'target', {
-    get () {
-      return target
+    get() {
+      return target;
     }
-  })
-
+  });
   Object.defineProperty(event, 'srcObject', {
-    get () {
-      return target
+    get() {
+      return target;
     }
-  })
+  });
+  spyOn(event, "preventDefault");
+  return event;
+};
 
-  spyOn(event, 'preventDefault')
-  return event
-}
+module.exports.triggerMouseEvent = function(type, target, param) {
+  if (param == null) { param = {}; }
+  const {which, ctrlKey} = param;
+  const event = buildMouseEvent(...arguments);
+  target.dispatchEvent(event);
+  return event;
+};
 
-module.exports.triggerMouseEvent = (type, target, {which, ctrlKey} = {}) => {
-  const event = buildMouseEvent(type, target, {which, ctrlKey})
-  target.dispatchEvent(event)
-  return event
-}
-
-module.exports.triggerClickEvent = (target, options) => {
+module.exports.triggerClickEvent = function(target, options) {
   const events = {
     mousedown: buildMouseEvent('mousedown', target, options),
     mouseup: buildMouseEvent('mouseup', target, options),
     click: buildMouseEvent('click', target, options)
-  }
+  };
 
-  target.dispatchEvent(events.mousedown)
-  target.dispatchEvent(events.mouseup)
-  target.dispatchEvent(events.click)
+  target.dispatchEvent(events.mousedown);
+  target.dispatchEvent(events.mouseup);
+  target.dispatchEvent(events.click);
 
-  return events
-}
+  return events;
+};
 
-module.exports.buildDragEvents = (dragged, dropTarget) => {
+module.exports.buildDragEvents = function(dragged, dropTarget) {
   const dataTransfer = {
     data: {},
-    setData (key, value) {
-      this.data[key] = `${value}` // Drag events stringify data values
-    },
-    getData (key) {
-      return this.data[key]
-    },
-    clearData (key) {
-      if (key) {
-        delete this.data[key]
-      } else {
-        this.data = {}
-      }
-    }
-  }
+    setData(key, value) { return this.data[key] = `${value}`; }, // Drag events stringify data values
+    getData(key) { return this.data[key]; }
+  };
 
   Object.defineProperty(
     dataTransfer,
     'items', {
-      get () {
-        return Object.keys(dataTransfer.data).map(key => ({type: key}))
-      }
+    get() {
+      return Object.keys(dataTransfer.data).map(key => ({
+        type: key
+      }));
     }
-  )
+  }
+  );
 
-  const dragStartEvent = buildMouseEvent('dragstart', dragged)
-  Object.defineProperty(dragStartEvent, 'dataTransfer', {
-    get () {
-      return dataTransfer
-    }
-  })
+  const dragStartEvent = buildMouseEvent("dragstart", dragged);
+  Object.defineProperty(dragStartEvent, 'dataTransfer', {get() { return dataTransfer; }});
 
-  const dropEvent = buildMouseEvent('drop', dropTarget)
-  Object.defineProperty(dropEvent, 'dataTransfer', {
-    get () {
-      return dataTransfer
-    }
-  })
+  const dropEvent = buildMouseEvent("drop", dropTarget);
+  Object.defineProperty(dropEvent, 'dataTransfer', {get() { return dataTransfer; }});
 
-  return [dragStartEvent, dropEvent]
-}
+  return [dragStartEvent, dropEvent];
+};
+
+module.exports.buildWheelEvent = delta => new WheelEvent("mousewheel", {wheelDeltaY: delta});
+
+module.exports.buildWheelPlusShiftEvent = delta => new WheelEvent("mousewheel", {wheelDeltaY: delta, shiftKey: true});
 
 module.exports.buildDragEnterLeaveEvents = (enterRelatedTarget, leaveRelatedTarget) => {
   const dataTransfer = {
@@ -149,7 +152,3 @@ module.exports.buildDragEnterLeaveEvents = (enterRelatedTarget, leaveRelatedTarg
 
   return [dragEnterEvent, dragLeaveEvent]
 }
-
-module.exports.buildWheelEvent = delta => new WheelEvent('mousewheel', {wheelDeltaY: delta})
-
-module.exports.buildWheelPlusShiftEvent = delta => new WheelEvent('mousewheel', {wheelDeltaY: delta, shiftKey: true})

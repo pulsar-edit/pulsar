@@ -11,8 +11,7 @@ const temp = require('temp');
 const TabBarView = require('../lib/tab-bar-view');
 const layout = require('../lib/layout');
 const main = require('../lib/main');
-let {triggerMouseEvent, triggerClickEvent, buildDragEvents, buildDragEnterLeaveEvents, buildWheelEvent, buildWheelPlusShiftEvent} = require("./event-helpers.coffee");
-({buildDragEnterLeaveEvents} = require("./event-helpers"));
+let {triggerMouseEvent, triggerClickEvent, buildDragEvents, buildDragEnterLeaveEvents, buildWheelEvent, buildWheelPlusShiftEvent} = require("./event-helpers.js");
 
 describe("Tabs package main", function() {
   let centerElement = null;
