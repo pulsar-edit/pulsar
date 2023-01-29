@@ -3,7 +3,7 @@ const buildMouseEvent = (type, target, param) => {
   if (param === null) {
     param = {};
   }
-  //const {button, ctrlKey, which, relatedTarget} = param;
+
   const event = new MouseEvent(type, {bubbles: true, cancelable: true});
 
   if (param?.button != null) {
