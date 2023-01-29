@@ -2349,9 +2349,8 @@ atom-slick@^2, atom-slick@^2.0.0:
 "autocomplete-html@file:packages/autocomplete-html":
   version "0.8.9"
 
-"autocomplete-plus@https://github.com/pulsar-edit/autocomplete-plus.git#48ecced":
+"autocomplete-plus@file:./packages/autocomplete-plus":
   version "2.42.6"
-  resolved "https://github.com/pulsar-edit/autocomplete-plus.git#48eccede0d3f2dfe4ba3deb050f4cd241efc6153"
   dependencies:
     atom-slick "^2.0.0"
     dompurify "^2.2.6"
@@ -2652,9 +2651,9 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0":
+"bracket-matcher@https://github.com/pulsar-edit/bracket-matcher.git#c877977":
   version "0.92.0"
-  resolved "https://codeload.github.com/atom/bracket-matcher/legacy.tar.gz/refs/tags/v0.92.0#fe75cb7dd3f286d9f20b1d1edd7fec085730a866"
+  resolved "https://github.com/pulsar-edit/bracket-matcher.git#c877977ac7e9b7fe43c2100a1880c7ffc119280b"
   dependencies:
     first-mate "^7.4.1"
     underscore-plus "1.x"
@@ -5460,7 +5459,6 @@ image-size@~0.5.0:
   dependencies:
     bytes "^3.0.0"
     etch "0.9.0"
-    fs-plus "^3.0.0"
 
 import-fresh@^3.0.0, import-fresh@^3.1.0, import-fresh@^3.2.1:
   version "3.3.0"
@@ -8698,13 +8696,12 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@https://codeload.github.com/pulsar-edit/snippets/legacy.tar.gz/refs/tags/v1.6.1":
+"snippets@https://github.com/pulsar-edit/snippets.git#fe00fd6":
   version "1.6.1"
-  resolved "https://codeload.github.com/pulsar-edit/snippets/legacy.tar.gz/refs/tags/v1.6.1#dc5e28086e77beeec63b35b3d52f6b32dc5994ab"
+  resolved "https://github.com/pulsar-edit/snippets.git#fe00fd6933fa33f819d14cdd6938d538d25ba1dd"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
-    fs-plus "^3.0.0"
     loophole "^1"
     pegjs "~0.8.0"
     scoped-property-store "^0.17.0"

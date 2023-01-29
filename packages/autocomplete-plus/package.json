@@ -1,0 +1,260 @@
+{
+  "name": "autocomplete-plus",
+  "version": "2.42.6",
+  "main": "./lib/main",
+  "description": "Display possible completions in the editor while typing",
+  "repository": "https://github.com/atom/autocomplete-plus",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.189.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-slick": "^2.0.0",
+    "dompurify": "^2.2.6",
+    "fuzzaldrin": "^2.1.0",
+    "fuzzaldrin-plus": "^0.6.0",
+    "grim": "^2.0.1",
+    "marked": "^4.0.10",
+    "minimatch": "^3.0.3",
+    "selector-kit": "^0.1",
+    "stable": "^0.1.5",
+    "underscore-plus": "^1.6.6"
+  },
+  "devDependencies": {
+    "atom-jasmine3-test-runner": "^5.1.8",
+    "coffeelint": "^1.9.7",
+    "fs-plus": ">=2.4.0",
+    "standard": "^8.3.0",
+    "temp": ">=0.7.0"
+  },
+  "providedServices": {
+    "autocomplete.watchEditor": {
+      "versions": {
+        "1.0.0": "provideWatchEditor"
+      }
+    }
+  },
+  "consumedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "1.0.0": "consumeProvider_1",
+        "1.1.0": "consumeProvider_1_1",
+        "2.0.0": "consumeProvider_2",
+        "3.0.0": "consumeProvider_3",
+        "4.0.0": "consumeProvider_4"
+      }
+    },
+    "snippets": {
+      "versions": {
+        "0.1.0": "consumeSnippets"
+      }
+    }
+  },
+  "configSchema": {
+    "enableAutoActivation": {
+      "title": "Show Suggestions On Keystroke",
+      "description": "Suggestions will show as you type if this preference is enabled. If it is disabled, you can still see suggestions by using the keymapping for 'autocomplete-plus:activate' (shown below).",
+      "type": "boolean",
+      "default": true,
+      "order": 1
+    },
+    "autoActivationDelay": {
+      "title": "Delay Before Suggestions Are Shown",
+      "description": "If you are experiencing performance issues when typing, you should try increasing this value to a non-zero number (e.g. 100).",
+      "type": "integer",
+      "default": 0,
+      "order": 2
+    },
+    "maxVisibleSuggestions": {
+      "title": "Maximum Visible Suggestions",
+      "description": "The suggestion list will only show this many suggestions.",
+      "type": "integer",
+      "default": 10,
+      "minimum": 1,
+      "order": 3
+    },
+    "confirmCompletion": {
+      "title": "Keymap For Confirming A Suggestion",
+      "description": "You should use the key(s) indicated here to confirm a suggestion from the suggestion list and have it inserted into the file.",
+      "type": "string",
+      "default": "tab and enter",
+      "enum": [
+        "tab",
+        "enter",
+        "tab and enter",
+        "tab always, enter when suggestion explicitly selected",
+        "none"
+      ],
+      "order": 4
+    },
+    "useCoreMovementCommands": {
+      "title": "Use Core Movement Commands",
+      "description": "Disable this if you want to bind your own keystrokes to move around the suggestion list. You will also need to add definitions to your keymap. See: https://github.com/atom/autocomplete-plus#remapping-movement-commands",
+      "type": "boolean",
+      "default": true,
+      "order": 5
+    },
+    "fileBlacklist": {
+      "title": "File Blacklist",
+      "description": "Suggestions will not be provided for files matching this list, e.g. `*.md` for Markdown files. To blacklist more than one file extension, use comma as a separator, e.g. `*.md, *.txt` (both Markdown and text files).",
+      "type": "array",
+      "default": [
+        ".*"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "order": 6
+    },
+    "scopeBlacklist": {
+      "title": "Scope Blacklist",
+      "description": "Suggestions will not be provided for scopes matching this list. See: http://flight-manual.atom.io/behind-atom/sections/scoped-settings-scopes-and-scope-descriptors/",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "order": 7
+    },
+    "includeCompletionsFromAllBuffers": {
+      "title": "Include Completions From All Buffers",
+      "description": "For grammars with no registered provider(s), the default provider will include completions from all buffers, instead of just the buffer you are currently editing.",
+      "type": "boolean",
+      "default": true,
+      "order": 8
+    },
+    "strictMatching": {
+      "title": "Use Strict Matching For Built-In Provider",
+      "description": "Fuzzy searching is performed if this is disabled; if it is enabled, suggestions must begin with the prefix from the current word.",
+      "type": "boolean",
+      "default": false,
+      "order": 9
+    },
+    "minimumWordLength": {
+      "description": "Only autocomplete when you've typed at least this many characters. Note: May not affect external providers.",
+      "type": "integer",
+      "default": 3,
+      "order": 10
+    },
+    "extraWordCharacters": {
+      "description": "Characters to consider part of words for the purpose of autocomplete, even if they are included in the editor.nonWordCharacters setting",
+      "type": "string",
+      "default": "",
+      "order": 10.5
+    },
+    "enableBuiltinProvider": {
+      "title": "Enable Built-In Provider",
+      "description": "The package comes with a built-in provider that will provide suggestions using the words in your current buffer or all open buffers. You will get better suggestions by installing additional autocomplete+ providers. To stop using the built-in provider, disable this option.",
+      "type": "boolean",
+      "default": true,
+      "order": 11
+    },
+    "builtinProviderBlacklist": {
+      "title": "Built-In Provider Blacklist",
+      "description": "Don't use the built-in provider for these selector(s).",
+      "type": "string",
+      "default": ".source.gfm",
+      "order": 12
+    },
+    "backspaceTriggersAutocomplete": {
+      "title": "Allow Backspace To Trigger Autocomplete",
+      "description": "If enabled, typing `backspace` will show the suggestion list if suggestions are available. If disabled, suggestions will not be shown while backspacing.",
+      "type": "boolean",
+      "default": false,
+      "order": 13
+    },
+    "enableAutoConfirmSingleSuggestion": {
+      "title": "Automatically Confirm Single Suggestion",
+      "description": "If enabled, automatically insert suggestion on manual activation with 'autocomplete-plus:activate' when there is only one match.",
+      "type": "boolean",
+      "default": true,
+      "order": 14
+    },
+    "suggestionListFollows": {
+      "title": "Suggestions List Follows",
+      "description": "With 'Cursor' the suggestion list appears at the cursor's position. With 'Word' it appears at the beginning of the word that's being completed.",
+      "type": "string",
+      "default": "Word",
+      "enum": [
+        "Word",
+        "Cursor"
+      ],
+      "order": 15
+    },
+    "suppressActivationForEditorClasses": {
+      "title": "Suppress Activation For Editor Classes",
+      "description": "Don't auto-activate when any of these classes are present in the editor.",
+      "type": "array",
+      "default": [
+        "vim-mode.command-mode",
+        "vim-mode.visual-mode",
+        "vim-mode.operator-pending-mode"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "order": 17
+    },
+    "consumeSuffix": {
+      "title": "Consume suggestion text following the cursor",
+      "description": "Completing a suggestion consumes text following the cursor matching the suffix of the chosen suggestion.",
+      "type": "boolean",
+      "default": true,
+      "order": 18
+    },
+    "useAlternateScoring": {
+      "description": "Prefers runs of consecutive characters, acronyms and start of words. (Experimental)",
+      "type": "boolean",
+      "default": true,
+      "order": 19
+    },
+    "useLocalityBonus": {
+      "description": "Gives words near the cursor position a higher score than those far away",
+      "type": "boolean",
+      "default": true,
+      "order": 20
+    },
+    "enableExtendedUnicodeSupport": {
+      "description": "Identifies non-latin alphabet characters as letters",
+      "type": "boolean",
+      "default": false,
+      "order": 21
+    },
+    "similarSuggestionRemoval": {
+      "description": "Should similar suggestions be removed from the list? If so how to determine they are similar.",
+      "type": "string",
+      "default": "none",
+      "enum": [
+        {
+          "value": "none",
+          "description": "Do not remove similar suggestions"
+        },
+        {
+          "value": "textOrSnippet",
+          "description": "Remove when the insertion text or snippet match"
+        }
+      ],
+      "order": 22
+    },
+    "moveToCancel": {
+      "description": "Moving up when the first item is selected or down when the last item is selected cancels the suggestion list.",
+      "type": "boolean",
+      "default": false,
+      "order": 23
+    }
+  },
+  "standard": {
+    "globals": [
+      "CustomEvent",
+      "HTMLElement",
+      "advanceClock",
+      "atom",
+      "getComputedStyle",
+      "waitsForPromise"
+    ],
+    "ignore": [
+      "**/spec/fixtures/**"
+    ]
+  },
+  "atomTestRunner": "./spec/custom-runner"
+}
