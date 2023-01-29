@@ -21,7 +21,7 @@ describe("Tabs package main", function() {
 
     waitsForPromise(() => atom.workspace.open('sample.js'));
 
-    return waitsForPromise(() => atom.packages.activatePackage("tabs"));
+    waitsForPromise(() => atom.packages.activatePackage("tabs"));
   });
 
   describe(".activate()", () => it("appends a tab bar all existing and new panes", function() {
@@ -35,10 +35,10 @@ describe("Tabs package main", function() {
     expect(centerElement.querySelectorAll('.pane').length).toBe(2);
     const tabBars = centerElement.querySelectorAll('.pane > .tab-bar');
     expect(tabBars.length).toBe(2);
-    return expect(tabBars[1].getAttribute('location')).toBe('center');
+    expect(tabBars[1].getAttribute('location')).toBe('center');
   }));
 
-  return describe(".deactivate()", () => it("removes all tab bar views and stops adding them to new panes", function() {
+  describe(".deactivate()", () => it("removes all tab bar views and stops adding them to new panes", function() {
     const pane = atom.workspace.getActivePane();
     pane.splitRight();
     jasmine.attachToDOM(centerElement);
@@ -47,13 +47,13 @@ describe("Tabs package main", function() {
 
     waitsForPromise(() => Promise.resolve(atom.packages.deactivatePackage('tabs'))); // Wrapped so works with Promise & non-Promise deactivate
 
-    return runs(function() {
+    runs(function() {
       expect(centerElement.querySelectorAll('.pane').length).toBe(2);
       expect(centerElement.querySelectorAll('.pane > .tab-bar').length).toBe(0);
 
       pane.splitRight();
       expect(centerElement.querySelectorAll('.pane').length).toBe(3);
-      return expect(centerElement.querySelectorAll('.pane > .tab-bar').length).toBe(0);
+      expect(centerElement.querySelectorAll('.pane > .tab-bar').length).toBe(0);
     });
   }));
 });
@@ -109,13 +109,13 @@ describe("TabBarView", function() {
 
     waitsForPromise(() => atom.workspace.open('sample.js'));
 
-    return runs(function() {
+    runs(function() {
       editor1 = atom.workspace.getActiveTextEditor();
       pane = atom.workspace.getActivePane();
       pane.addItem(item1, {index: 0});
       pane.addItem(item2, {index: 2});
       pane.activateItem(item2);
-      return tabBar = new TabBarView(pane, 'center');
+      tabBar = new TabBarView(pane, 'center');
     });
   });
 
@@ -131,7 +131,7 @@ describe("TabBarView", function() {
 
     // Minor OS differences cause fractional-pixel differences so ignore fractional part
     expect(parseFloat(tabBar.tabAtIndex(0).element.style.maxWidth.replace('px', '')).toFixed(0)).toBe(initialWidth1);
-    return expect(parseFloat(tabBar.tabAtIndex(2).element.style.maxWidth.replace('px', '')).toFixed(0)).toBe(initialWidth2);
+    expect(parseFloat(tabBar.tabAtIndex(2).element.style.maxWidth.replace('px', '')).toFixed(0)).toBe(initialWidth2);
   }));
 
   describe("when the mouse is moved away from the tab bar", () => it("resets the width on every tab", function() {
@@ -141,7 +141,7 @@ describe("TabBarView", function() {
     triggerMouseEvent('mouseleave', tabBar.element);
 
     expect(tabBar.tabAtIndex(0).element.style.maxWidth).toBe('');
-    return expect(tabBar.tabAtIndex(1).element.style.maxWidth).toBe('');
+    expect(tabBar.tabAtIndex(1).element.style.maxWidth).toBe('');
   }));
 
   describe("when a drag leave event moves the mouse from the tab bar", () => it("resets the width on every tab", function() {
@@ -151,7 +151,7 @@ describe("TabBarView", function() {
     triggerMouseEvent('dragleave', tabBar.element);
 
     expect(tabBar.tabAtIndex(0).element.style.maxWidth).toBe('');
-    return expect(tabBar.tabAtIndex(1).element.style.maxWidth).toBe('');
+    expect(tabBar.tabAtIndex(1).element.style.maxWidth).toBe('');
   }));
 
   describe(".initialize(pane)", function() {
@@ -172,12 +172,12 @@ describe("TabBarView", function() {
       expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title').textContent).toBe(item2.getTitle());
       expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title').dataset.name).toBeUndefined();
       expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title').dataset.path).toBeUndefined();
-      return expect(tabBar.element.querySelectorAll('.tab')[0].dataset.type).toBe('TestView');
+      expect(tabBar.element.querySelectorAll('.tab')[0].dataset.type).toBe('TestView');
     });
 
     it("highlights the tab for the active pane item", () => expect(tabBar.element.querySelectorAll('.tab')[2]).toHaveClass('active'));
 
-    return it("emits a warning when ::onDid... functions are not valid Disposables", function() {
+    it("emits a warning when ::onDid... functions are not valid Disposables", function() {
       class BadView {
         constructor() {
           this.element = document.createElement('div');
@@ -209,7 +209,7 @@ describe("TabBarView", function() {
       expect(warnings[3].object).toBe(badItem);
 
       expect(warnings[4].message).toContain("onDidSave");
-      return expect(warnings[4].object).toBe(badItem);
+      expect(warnings[4].object).toBe(badItem);
     });
   });
 
@@ -220,7 +220,7 @@ describe("TabBarView", function() {
 
     pane.activateItem(item2);
     expect(tabBar.element.querySelectorAll('.active').length).toBe(1);
-    return expect(tabBar.element.querySelectorAll('.tab')[2]).toHaveClass('active');
+    expect(tabBar.element.querySelectorAll('.tab')[2]).toHaveClass('active');
   }));
 
   describe("when a new item is added to the pane", function() {
@@ -235,10 +235,10 @@ describe("TabBarView", function() {
         }
       });
 
-      return runs(function() {
+      runs(function() {
         editor2.insertText('x');
         pane.activateItem(editor2);
-        return expect(tabBar.tabForItem(editor2).element).toHaveClass('modified');
+        expect(tabBar.tabForItem(editor2).element).toHaveClass('modified');
       });
     });
 
@@ -248,26 +248,26 @@ describe("TabBarView", function() {
         const item3 = new TestView('Item 3');
         pane.activateItem(item3);
         expect(tabBar.element.querySelectorAll('.tab').length).toBe(4);
-        return expect(tabBar.tabAtIndex(3).element.querySelector('.title').textContent).toMatch('Item 3');
+        expect(tabBar.tabAtIndex(3).element.querySelector('.title').textContent).toMatch('Item 3');
       });
 
-      return it("puts the new tab at the last index of the pane's items", function() {
+      it("puts the new tab at the last index of the pane's items", function() {
         atom.config.set("tabs.addNewTabsAtEnd", true);
         const item3 = new TestView('Item 3');
         // activate item1 so default is to add immediately after
         pane.activateItem(item1);
         pane.activateItem(item3);
-        return expect(pane.getItems()[pane.getItems().length - 1]).toEqual(item3);
+        expect(pane.getItems()[pane.getItems().length - 1]).toEqual(item3);
       });
     });
 
-    return describe("when addNewTabsAtEnd is set to false in package settings", () => it("adds a tab for the new item at the same index as the item in the pane", function() {
+    describe("when addNewTabsAtEnd is set to false in package settings", () => it("adds a tab for the new item at the same index as the item in the pane", function() {
       atom.config.set("tabs.addNewTabsAtEnd", false);
       pane.activateItem(item1);
       const item3 = new TestView('Item 3');
       pane.activateItem(item3);
       expect(tabBar.element.querySelectorAll('.tab').length).toBe(4);
-      return expect(tabBar.tabAtIndex(1).element.querySelector('.title').textContent).toMatch('Item 3');
+      expect(tabBar.tabAtIndex(1).element.querySelector('.title').textContent).toMatch('Item 3');
     }));
   });
 
@@ -275,10 +275,10 @@ describe("TabBarView", function() {
     it("removes the item's tab from the tab bar", function() {
       pane.destroyItem(item2);
       expect(tabBar.getTabs().length).toBe(2);
-      return expect(tabBar.element.textContent).not.toMatch('Item 2');
+      expect(tabBar.element.textContent).not.toMatch('Item 2');
     });
 
-    return it("updates the titles of the remaining tabs", function() {
+    it("updates the titles of the remaining tabs", function() {
       expect(tabBar.tabForItem(item2).element.textContent).toMatch('Item 2');
       item2.longTitle = '2';
       const item2a = new TestView('Item 2');
@@ -287,7 +287,7 @@ describe("TabBarView", function() {
       expect(tabBar.tabForItem(item2).element.textContent).toMatch('2');
       expect(tabBar.tabForItem(item2a).element.textContent).toMatch('2a');
       pane.destroyItem(item2a);
-      return expect(tabBar.tabForItem(item2).element.textContent).toMatch('Item 2');
+      expect(tabBar.tabForItem(item2).element.textContent).toMatch('Item 2');
     });
   });
 
@@ -306,7 +306,7 @@ describe("TabBarView", function() {
       // allows dragging
       expect(mousedown.preventDefault).not.toHaveBeenCalled();
       expect(click.preventDefault).toHaveBeenCalled();
-      return expect(pane.activate.callCount).toBe(2);
+      expect(pane.activate.callCount).toBe(2);
     });
 
     it("closes the tab when middle clicked", function() {
@@ -318,10 +318,10 @@ describe("TabBarView", function() {
       expect(tabBar.getTabs().length).toBe(2);
       expect(tabBar.element.textContent).not.toMatch('sample.js');
 
-      return expect(click.preventDefault).toHaveBeenCalled();
+      expect(click.preventDefault).toHaveBeenCalled();
     });
 
-    return it("doesn't switch tab when right (or ctrl-left) clicked", function() {
+    it("doesn't switch tab when right (or ctrl-left) clicked", function() {
       spyOn(pane, 'activate');
 
       let {mousedown} = triggerClickEvent(tabBar.tabAtIndex(0).element, {button: 2});
@@ -334,7 +334,7 @@ describe("TabBarView", function() {
 
       // We don't switch tabs, but the pane should still be activated
       // because of the mouse click
-      return expect(pane.activate).toHaveBeenCalled();
+      expect(pane.activate).toHaveBeenCalled();
     });
   });
 
@@ -344,7 +344,7 @@ describe("TabBarView", function() {
     expect(pane.getItems().indexOf(editor1)).toBe(-1);
     expect(editor1.isDestroyed()).toBeTruthy();
     expect(tabBar.getTabs().length).toBe(2);
-    return expect(tabBar.element.textContent).not.toMatch('sample.js');
+    expect(tabBar.element.textContent).not.toMatch('sample.js');
   }));
 
   describe("when an item is activated", function() {
@@ -364,7 +364,7 @@ describe("TabBarView", function() {
       jasmine.attachToDOM(container);
 
       // Expect there to be content to scroll
-      return expect(tabBar.element.scrollWidth).toBeGreaterThan(tabBar.element.clientWidth);
+      expect(tabBar.element.scrollWidth).toBeGreaterThan(tabBar.element.clientWidth);
     });
 
     it("does not scroll to the item when it is visible", function() {
@@ -378,10 +378,10 @@ describe("TabBarView", function() {
       expect(tabBar.element.scrollLeft).toBe(0);
 
       pane.activateItem(item3);
-      return expect(tabBar.element.scrollLeft).not.toBe(0);
+      expect(tabBar.element.scrollLeft).not.toBe(0);
     });
 
-    return it("scrolls to the item when it isn't completely visible", function() {
+    it("scrolls to the item when it isn't completely visible", function() {
       tabBar.element.scrollLeft = 5;
       expect(tabBar.element.scrollLeft).toBe(5); // This can be 0 if there is no horizontal scrollbar
 
@@ -389,13 +389,13 @@ describe("TabBarView", function() {
       expect(tabBar.element.scrollLeft).toBe(0);
 
       pane.activateItem(item3);
-      return expect(tabBar.element.scrollLeft).toBe(tabBar.element.scrollWidth - tabBar.element.clientWidth);
+      expect(tabBar.element.scrollLeft).toBe(tabBar.element.scrollWidth - tabBar.element.clientWidth);
     });
   });
 
   describe("when a tab item's title changes", () => it("updates the title of the item's tab", function() {
     editor1.buffer.setPath('/this/is-a/test.txt');
-    return expect(tabBar.tabForItem(editor1).element.textContent).toMatch('test.txt');
+    expect(tabBar.tabForItem(editor1).element.textContent).toMatch('test.txt');
   }));
 
   describe("when two tabs have the same title", () => it("displays the long title on the tab if it's available from the item", function() {
@@ -413,7 +413,7 @@ describe("TabBarView", function() {
     item2.emitTitleChanged();
 
     expect(tabBar.tabForItem(item1).element.textContent).toMatch("Grumpy Old Man");
-    return expect(tabBar.tabForItem(item2).element.textContent).toMatch("Old Man");
+    expect(tabBar.tabForItem(item2).element.textContent).toMatch("Old Man");
   }));
 
   describe("the close button", function() {
@@ -430,14 +430,14 @@ describe("TabBarView", function() {
       const tabs = tabBar.element.querySelectorAll('.tab');
       expect(tabs[2].querySelector('.close-icon')).not.toEqual(null);
       expect(tabs[3].querySelector('.close-icon')).not.toEqual(null);
-      return expect(tabs[4].querySelector('.close-icon')).not.toEqual(null);
+      expect(tabs[4].querySelector('.close-icon')).not.toEqual(null);
     });
 
     if (atom.workspace.getRightDock == null) { return; }
-    return describe("in docks", function() {
+    describe("in docks", function() {
       beforeEach(function() {
         pane = atom.workspace.getRightDock().getActivePane();
-        return tabBar = new TabBarView(pane, 'right');
+        tabBar = new TabBarView(pane, 'right');
       });
 
       it("isn't shown if the method returns true", function() {
@@ -445,7 +445,7 @@ describe("TabBarView", function() {
         expect(typeof item1.isPermanentDockItem).toBe('function');
         pane.activateItem(item1);
         const tab = tabBar.element.querySelector('.tab');
-        return expect(tab.querySelector('.close-icon')).toEqual(null);
+        expect(tab.querySelector('.close-icon')).toEqual(null);
       });
 
       it("is shown if the method returns false", function() {
@@ -453,15 +453,15 @@ describe("TabBarView", function() {
         expect(typeof item1.isPermanentDockItem).toBe('function');
         pane.activateItem(item1);
         const tab = tabBar.element.querySelector('.tab');
-        return expect(tab.querySelector('.close-icon')).not.toBeUndefined();
+        expect(tab.querySelector('.close-icon')).not.toBeUndefined();
       });
 
-      return it("is shown if the method doesn't exist", function() {
+      it("is shown if the method doesn't exist", function() {
         item1 = new TestView('Item 1', undefined, "squirrel", "sample.js");
         expect(item1.isPermanentDockItem).toBeUndefined();
         pane.activateItem(item1);
         const tab = tabBar.element.querySelector('.tab');
-        return expect(tab.querySelector('.close-icon')).not.toEqual(null);
+        expect(tab.querySelector('.close-icon')).not.toEqual(null);
       });
     });
   });
@@ -469,21 +469,21 @@ describe("TabBarView", function() {
   describe("when an item has an icon defined", function() {
     it("displays the icon on the tab", function() {
       expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("icon");
-      return expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("icon-squirrel");
+      expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("icon-squirrel");
     });
 
     it("hides the icon from the tab if the icon is removed", function() {
       item1.getIconName = null;
       item1.emitIconChanged();
       expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("icon");
-      return expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("icon-squirrel");
+      expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("icon-squirrel");
     });
 
     it("updates the icon on the tab if the icon is changed", function() {
       item1.getIconName = () => "zap";
       item1.emitIconChanged();
       expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("icon");
-      return expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("icon-zap");
+      expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("icon-zap");
     });
 
     describe("when showIcon is set to true in package settings", function() {
@@ -494,21 +494,21 @@ describe("TabBarView", function() {
 
         waitsFor(() => tabBar.tabForItem(item1).updateIconVisibility.callCount > 0);
 
-        return runs(() => tabBar.tabForItem(item1).updateIconVisibility.reset());
+        runs(() => tabBar.tabForItem(item1).updateIconVisibility.reset());
       });
 
       it("doesn't hide the icon", () => expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("hide-icon"));
 
-      return it("hides the icon from the tab when showIcon is changed to false", function() {
+      it("hides the icon from the tab when showIcon is changed to false", function() {
         atom.config.set("tabs.showIcons", false);
 
         waitsFor(() => tabBar.tabForItem(item1).updateIconVisibility.callCount > 0);
 
-        return runs(() => expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("hide-icon"));
+        runs(() => expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("hide-icon"));
       });
     });
 
-    return describe("when showIcon is set to false in package settings", function() {
+    describe("when showIcon is set to false in package settings", function() {
       beforeEach(function() {
         spyOn(tabBar.tabForItem(item1), 'updateIconVisibility').andCallThrough();
 
@@ -516,17 +516,17 @@ describe("TabBarView", function() {
 
         waitsFor(() => tabBar.tabForItem(item1).updateIconVisibility.callCount > 0);
 
-        return runs(() => tabBar.tabForItem(item1).updateIconVisibility.reset());
+        runs(() => tabBar.tabForItem(item1).updateIconVisibility.reset());
       });
 
       it("hides the icon", () => expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass("hide-icon"));
 
-      return it("shows the icon on the tab when showIcon is changed to true", function() {
+      it("shows the icon on the tab when showIcon is changed to true", function() {
         atom.config.set("tabs.showIcons", true);
 
         waitsFor(() => tabBar.tabForItem(item1).updateIconVisibility.callCount > 0);
 
-        return expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("hide-icon");
+        expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("hide-icon");
       });
     });
   });
@@ -534,14 +534,14 @@ describe("TabBarView", function() {
   describe("when the item doesn't have an icon defined", function() {
     it("doesn't display an icon on the tab", function() {
       expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title')).not.toHaveClass("icon");
-      return expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title')).not.toHaveClass("icon-squirrel");
+      expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title')).not.toHaveClass("icon-squirrel");
     });
 
-    return it("shows the icon on the tab if an icon is defined", function() {
+    it("shows the icon on the tab if an icon is defined", function() {
       item2.getIconName = () => "squirrel";
       item2.emitIconChanged();
       expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title')).toHaveClass("icon");
-      return expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title')).toHaveClass("icon-squirrel");
+      expect(tabBar.element.querySelectorAll('.tab')[2].querySelector('.title')).toHaveClass("icon-squirrel");
     });
   });
 
@@ -558,7 +558,7 @@ describe("TabBarView", function() {
     editor1.undo();
     advanceClock(editor1.buffer.stoppedChangingDelay);
     expect(editor1.isModified()).toBeFalsy();
-    return expect(tab.element).not.toHaveClass('modified');
+    expect(tab.element).not.toHaveClass('modified');
   }));
 
   describe("when a pane item moves to a new index", function() {
@@ -571,10 +571,10 @@ describe("TabBarView", function() {
       pane.moveItem(editor1, 0);
       expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 1", "Item 2"]);
       pane.moveItem(item1, 2);
-      return expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 2", "Item 1"]);
+      expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 2", "Item 1"]);
   }));
 
-    return describe("when addNewTabsAtEnd is set to false in package settings", () => it("updates the order of the tabs to match the new item order", function() {
+    describe("when addNewTabsAtEnd is set to false in package settings", () => it("updates the order of the tabs to match the new item order", function() {
       atom.config.set("tabs.addNewTabsAtEnd", false);
       expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "sample.js", "Item 2"]);
       pane.moveItem(item2, 1);
@@ -582,7 +582,7 @@ describe("TabBarView", function() {
       pane.moveItem(editor1, 0);
       expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 1", "Item 2"]);
       pane.moveItem(item1, 2);
-      return expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 2", "Item 1"]);
+      expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 2", "Item 1"]);
   }));
 });
 
@@ -598,7 +598,7 @@ describe("TabBarView", function() {
       expect(pane.getItems().length).toBe(2);
       expect(pane.getItems().indexOf(item2)).toBe(-1);
       expect(tabBar.getTabs().length).toBe(2);
-      return expect(tabBar.element.textContent).not.toMatch('Item 2');
+      expect(tabBar.element.textContent).not.toMatch('Item 2');
     }));
 
     describe("when tabs:close-other-tabs is fired", () => it("closes all other tabs except the active tab", function() {
@@ -607,7 +607,7 @@ describe("TabBarView", function() {
       expect(pane.getItems().length).toBe(1);
       expect(tabBar.getTabs().length).toBe(1);
       expect(tabBar.element.textContent).not.toMatch('sample.js');
-      return expect(tabBar.element.textContent).toMatch('Item 2');
+      expect(tabBar.element.textContent).toMatch('Item 2');
     }));
 
     describe("when tabs:close-tabs-to-right is fired", () => it("closes only the tabs to the right of the active tab", function() {
@@ -617,7 +617,7 @@ describe("TabBarView", function() {
       expect(pane.getItems().length).toBe(2);
       expect(tabBar.getTabs().length).toBe(2);
       expect(tabBar.element.textContent).not.toMatch('Item 2');
-      return expect(tabBar.element.textContent).toMatch('Item 1');
+      expect(tabBar.element.textContent).toMatch('Item 1');
     }));
 
     describe("when tabs:close-tabs-to-left is fired", () => it("closes only the tabs to the left of the active tab", function() {
@@ -627,20 +627,20 @@ describe("TabBarView", function() {
       expect(pane.getItems().length).toBe(2);
       expect(tabBar.getTabs().length).toBe(2);
       expect(tabBar.element.textContent).toMatch('Item 2');
-      return expect(tabBar.element.textContent).not.toMatch('Item 1');
+      expect(tabBar.element.textContent).not.toMatch('Item 1');
     }));
 
     describe("when tabs:close-all-tabs is fired", () => it("closes all the tabs", function() {
       expect(pane.getItems().length).toBeGreaterThan(0);
       atom.commands.dispatch(tabBar.element, 'tabs:close-all-tabs');
-      return expect(pane.getItems().length).toBe(0);
+      expect(pane.getItems().length).toBe(0);
     }));
 
     describe("when tabs:close-saved-tabs is fired", () => it("closes all the saved tabs", function() {
       item1.isModified = () => true;
       atom.commands.dispatch(tabBar.element, 'tabs:close-saved-tabs');
       expect(pane.getItems().length).toBe(1);
-      return expect(pane.getItems()[0]).toBe(item1);
+      expect(pane.getItems()[0]).toBe(item1);
     }));
 
     describe("when tabs:split-up is fired", () => it("splits the selected tab up", function() {
@@ -650,7 +650,7 @@ describe("TabBarView", function() {
       atom.commands.dispatch(tabBar.element, 'tabs:split-up');
       expect(atom.workspace.getCenter().getPanes().length).toBe(2);
       expect(atom.workspace.getCenter().getPanes()[1]).toBe(pane);
-      return expect(atom.workspace.getCenter().getPanes()[0].getItems()[0].getTitle()).toBe(item2.getTitle());
+      expect(atom.workspace.getCenter().getPanes()[0].getItems()[0].getTitle()).toBe(item2.getTitle());
     }));
 
     describe("when tabs:split-down is fired", () => it("splits the selected tab down", function() {
@@ -660,7 +660,7 @@ describe("TabBarView", function() {
       atom.commands.dispatch(tabBar.element, 'tabs:split-down');
       expect(atom.workspace.getCenter().getPanes().length).toBe(2);
       expect(atom.workspace.getCenter().getPanes()[0]).toBe(pane);
-      return expect(atom.workspace.getCenter().getPanes()[1].getItems()[0].getTitle()).toBe(item2.getTitle());
+      expect(atom.workspace.getCenter().getPanes()[1].getItems()[0].getTitle()).toBe(item2.getTitle());
     }));
 
     describe("when tabs:split-left is fired", () => it("splits the selected tab to the left", function() {
@@ -670,7 +670,7 @@ describe("TabBarView", function() {
       atom.commands.dispatch(tabBar.element, 'tabs:split-left');
       expect(atom.workspace.getCenter().getPanes().length).toBe(2);
       expect(atom.workspace.getCenter().getPanes()[1]).toBe(pane);
-      return expect(atom.workspace.getCenter().getPanes()[0].getItems()[0].getTitle()).toBe(item2.getTitle());
+      expect(atom.workspace.getCenter().getPanes()[0].getItems()[0].getTitle()).toBe(item2.getTitle());
     }));
 
     describe("when tabs:split-right is fired", () => it("splits the selected tab to the right", function() {
@@ -680,15 +680,15 @@ describe("TabBarView", function() {
       atom.commands.dispatch(tabBar.element, 'tabs:split-right');
       expect(atom.workspace.getCenter().getPanes().length).toBe(2);
       expect(atom.workspace.getCenter().getPanes()[0]).toBe(pane);
-      return expect(atom.workspace.getCenter().getPanes()[1].getItems()[0].getTitle()).toBe(item2.getTitle());
+      expect(atom.workspace.getCenter().getPanes()[1].getItems()[0].getTitle()).toBe(item2.getTitle());
     }));
 
-    return describe("when tabs:open-in-new-window is fired", function() {
+    describe("when tabs:open-in-new-window is fired", function() {
       describe("by right-clicking on a tab", function() {
         beforeEach(function() {
           triggerClickEvent(tabBar.tabForItem(item1).element, {button: 2});
           expect(atom.workspace.getCenter().getPanes().length).toBe(1);
-          return spyOn(atom, 'open');
+          spyOn(atom, 'open');
         });
 
         it("opens new window, closes current tab", function() {
@@ -698,10 +698,10 @@ describe("TabBarView", function() {
           expect(pane.getItems().length).toBe(2);
           expect(tabBar.getTabs().length).toBe(2);
           expect(tabBar.element.textContent).toMatch('Item 2');
-          return expect(tabBar.element.textContent).not.toMatch('Item 1');
+          expect(tabBar.element.textContent).not.toMatch('Item 1');
         });
 
-        return it("resets the width on every tab", function() {
+        it("resets the width on every tab", function() {
           // mouseenter (which will get emitted when going to right-click the tab) fixes the tab widths
           // Make sure after the command is executed the widths are reset
           triggerMouseEvent('mouseenter', tabBar.element);
@@ -709,16 +709,16 @@ describe("TabBarView", function() {
 
           jasmine.attachToDOM(tabBar.element);
           expect(tabBar.tabAtIndex(0).element.style.maxWidth).toBe('');
-          return expect(tabBar.tabAtIndex(1).element.style.maxWidth).toBe('');
+          expect(tabBar.tabAtIndex(1).element.style.maxWidth).toBe('');
         });
       });
 
-      return describe("from the command palette", () => // See #309 for background
+      describe("from the command palette", () => // See #309 for background
 
       it("does nothing", function() {
         spyOn(atom, 'open');
         atom.commands.dispatch(tabBar.element, 'tabs:open-in-new-window');
-        return expect(atom.open).not.toHaveBeenCalled();
+        expect(atom.open).not.toHaveBeenCalled();
       }));
     });
   });
@@ -734,15 +734,15 @@ describe("TabBarView", function() {
         expect(pane.getItems().length).toBe(2);
         expect(pane.getItems().indexOf(item2)).toBe(-1);
         expect(tabBar.getTabs().length).toBe(2);
-        return expect(tabBar.element.textContent).not.toMatch('Item 2');
+        expect(tabBar.element.textContent).not.toMatch('Item 2');
       });
 
-      return it("does nothing if no tabs are open", function() {
+      it("does nothing if no tabs are open", function() {
         atom.commands.dispatch(paneElement, 'tabs:close-tab');
         atom.commands.dispatch(paneElement, 'tabs:close-tab');
         atom.commands.dispatch(paneElement, 'tabs:close-tab');
         expect(pane.getItems().length).toBe(0);
-        return expect(tabBar.getTabs().length).toBe(0);
+        expect(tabBar.getTabs().length).toBe(0);
       });
     });
 
@@ -751,7 +751,7 @@ describe("TabBarView", function() {
       expect(pane.getItems().length).toBe(1);
       expect(tabBar.getTabs().length).toBe(1);
       expect(tabBar.element.textContent).not.toMatch('sample.js');
-      return expect(tabBar.element.textContent).toMatch('Item 2');
+      expect(tabBar.element.textContent).toMatch('Item 2');
     }));
 
     describe("when tabs:close-tabs-to-right is fired", () => it("closes only the tabs to the right of the active tab", function() {
@@ -760,29 +760,29 @@ describe("TabBarView", function() {
       expect(pane.getItems().length).toBe(2);
       expect(tabBar.getTabs().length).toBe(2);
       expect(tabBar.element.textContent).not.toMatch('Item 2');
-      return expect(tabBar.element.textContent).toMatch('Item 1');
+      expect(tabBar.element.textContent).toMatch('Item 1');
     }));
 
     describe("when tabs:close-all-tabs is fired", () => it("closes all the tabs", function() {
       expect(pane.getItems().length).toBeGreaterThan(0);
       atom.commands.dispatch(paneElement, 'tabs:close-all-tabs');
-      return expect(pane.getItems().length).toBe(0);
+      expect(pane.getItems().length).toBe(0);
     }));
 
     describe("when tabs:close-saved-tabs is fired", () => it("closes all the saved tabs", function() {
       item1.isModified = () => true;
       atom.commands.dispatch(paneElement, 'tabs:close-saved-tabs');
       expect(pane.getItems().length).toBe(1);
-      return expect(pane.getItems()[0]).toBe(item1);
+      expect(pane.getItems()[0]).toBe(item1);
     }));
 
-    return describe("when pane:close is fired", () => it("destroys all the tabs within the pane", function() {
+    describe("when pane:close is fired", () => it("destroys all the tabs within the pane", function() {
       const pane2 = pane.splitDown({copyActiveItem: true});
       const tabBar2 = new TabBarView(pane2, 'center');
       const tab2 = tabBar2.tabAtIndex(0);
       spyOn(tab2, 'destroy');
 
-      return waitsForPromise(() => Promise.resolve(pane2.close()).then(() => expect(tab2.destroy).toHaveBeenCalled()));
+      waitsForPromise(() => Promise.resolve(pane2.close()).then(() => expect(tab2.destroy).toHaveBeenCalled()));
     }));
   });
 
@@ -809,7 +809,7 @@ describe("TabBarView", function() {
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 1", "Item 2"]);
         expect(pane.getItems()).toEqual([editor1, item1, item2]);
         expect(pane.getActiveItem()).toBe(item1);
-        return expect(pane.activate).toHaveBeenCalled();
+        expect(pane.activate).toHaveBeenCalled();
       }));
 
       describe("when it is dropped on a tab that's earlier in the list", () => it("moves the tab and its item, shows the tab's item, and focuses the pane", function() {
@@ -825,7 +825,7 @@ describe("TabBarView", function() {
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "Item 2", "sample.js"]);
         expect(pane.getItems()).toEqual([item1, item2, editor1]);
         expect(pane.getActiveItem()).toBe(item2);
-        return expect(pane.activate).toHaveBeenCalled();
+        expect(pane.activate).toHaveBeenCalled();
       }));
 
       describe("when it is dropped on itself", () => it("doesn't move the tab or item, but does make it the active item and focuses the pane", function() {
@@ -841,10 +841,10 @@ describe("TabBarView", function() {
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "sample.js", "Item 2"]);
         expect(pane.getItems()).toEqual([item1, editor1, item2]);
         expect(pane.getActiveItem()).toBe(item1);
-        return expect(pane.activate).toHaveBeenCalled();
+        expect(pane.activate).toHaveBeenCalled();
       }));
 
-      return describe("when it is dropped on the tab bar", () => it("moves the tab and its item to the end", function() {
+      describe("when it is dropped on the tab bar", () => it("moves the tab and its item to the end", function() {
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "sample.js", "Item 2"]);
         expect(pane.getItems()).toEqual([item1, editor1, item2]);
         expect(pane.getActiveItem()).toBe(item2);
@@ -855,7 +855,7 @@ describe("TabBarView", function() {
         tabBar.onDrop(dropEvent);
 
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js", "Item 2", "Item 1"]);
-        return expect(pane.getItems()).toEqual([editor1, item2, item1]);
+        expect(pane.getItems()).toEqual([editor1, item2, item1]);
     }));
   });
 
@@ -889,7 +889,7 @@ describe("TabBarView", function() {
         expect(tabBar2.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 2", "Item 1"]);
         expect(pane2.getItems()).toEqual([item2b, item1]);
         expect(pane2.activeItem).toBe(item1);
-        return expect(pane2.activate).toHaveBeenCalled();
+        expect(pane2.activate).toHaveBeenCalled();
       });
 
       describe("when the tab is dragged to an empty pane", () => it("removes the tab and item from their original pane and moves them to the target pane", function() {
@@ -916,7 +916,7 @@ describe("TabBarView", function() {
         expect(tabBar2.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1"]);
         expect(pane2.getItems()).toEqual([item1]);
         expect(pane2.activeItem).toBe(item1);
-        return expect(pane2.activate).toHaveBeenCalled();
+        expect(pane2.activate).toHaveBeenCalled();
       }));
 
       describe("when addNewTabsAtEnd is set to true in package settings", () => it("moves the dragged tab to the desired index in the new pane", function() {
@@ -938,7 +938,7 @@ describe("TabBarView", function() {
         expect(pane.getItems()).toEqual([item1, item2b, editor1, item2]);
         expect(pane.getActiveItem()).toBe(item2b);
 
-        return atom.config.set("tabs.addNewTabsAtEnd", false);
+        atom.config.set("tabs.addNewTabsAtEnd", false);
       }));
 
       describe("when alwaysShowTabBar is set to true in package settings", () => it("always shows the tab bar in the new pane", function() {
@@ -952,14 +952,14 @@ describe("TabBarView", function() {
         expect(tabBar2.element).not.toHaveClass('hidden');
 
         tabBar2.onPaneDragLeave(dragLeaveEvent);
-        return expect(tabBar2.element).not.toHaveClass('hidden');
+        expect(tabBar2.element).not.toHaveClass('hidden');
       }));
 
-      return describe("when alwaysShowTabBar is set to false in package settings", function() {
+      describe("when alwaysShowTabBar is set to false in package settings", function() {
         beforeEach(function() {
           atom.config.set("tabs.alwaysShowTabBar", false);
           expect(pane2.getItems().length).toBe(1);
-          return expect(tabBar2.element).toHaveClass('hidden');
+          expect(tabBar2.element).toHaveClass('hidden');
         });
 
         it("toggles the tab bar in the new pane", function() {
@@ -970,7 +970,7 @@ describe("TabBarView", function() {
           expect(tabBar2.element).not.toHaveClass('hidden');
 
           tabBar2.onPaneDragLeave(dragLeaveEvent);
-          return expect(tabBar2.element).toHaveClass('hidden');
+          expect(tabBar2.element).toHaveClass('hidden');
         });
 
         it("does not toggle the tab bar if the item cannot be moved to that pane", function() {
@@ -981,10 +981,10 @@ describe("TabBarView", function() {
           expect(tabBar2.element).toHaveClass('hidden');
 
           tabBar2.onPaneDragLeave(dragLeaveEvent);
-          return expect(tabBar2.element).toHaveClass('hidden');
+          expect(tabBar2.element).toHaveClass('hidden');
         });
 
-        return it("does not toggle the tab bar if the item being dragged is not a tab", function() {
+        it("does not toggle the tab bar if the item being dragged is not a tab", function() {
           const [dragEnterEvent, dragLeaveEvent] = Array.from(buildDragEnterLeaveEvents(pane2.getElement(), pane.getElement()));
           dragEnterEvent.dataTransfer.clearData('atom-tab-event');
           dragLeaveEvent.dataTransfer.clearData('atom-tab-event');
@@ -993,7 +993,7 @@ describe("TabBarView", function() {
           expect(tabBar2.element).toHaveClass('hidden');
 
           tabBar2.onPaneDragLeave(dragLeaveEvent);
-          return expect(tabBar2.element).toHaveClass('hidden');
+          expect(tabBar2.element).toHaveClass('hidden');
         });
       });
     });
@@ -1026,7 +1026,7 @@ describe("TabBarView", function() {
         // Drag out of pane
         delete layout.test.pane;
         tab.ondrag({target: tab, clientX: 200, clientY: 200});
-        return expect(layout.view.classList.contains('visible')).toBe(false);
+        expect(layout.view.classList.contains('visible')).toBe(false);
       });
 
       it("cleaves the pane in two", function() {
@@ -1042,7 +1042,7 @@ describe("TabBarView", function() {
         tab.ondragend({target: tab, clientX: 80, clientY: 50});
         expect(atom.workspace.getCenter().getPanes().length).toEqual(2);
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "sample.js"]);
-        return expect(atom.workspace.getActivePane().getItems().length).toEqual(1);
+        expect(atom.workspace.getActivePane().getItems().length).toEqual(1);
       });
 
       describe("when the dragged tab is the only one in the pane", () => it("does nothing", function() {
@@ -1059,7 +1059,7 @@ describe("TabBarView", function() {
         tab.ondrag({target: tab, clientX: 80, clientY: 50});
         tab.ondragend({target: tab, clientX: 80, clientY: 50});
         expect(atom.workspace.getCenter().getPanes().length).toEqual(1);
-        return expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js"]);
+        expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["sample.js"]);
     }));
 
       describe("when the pane is empty", () => it("moves the tab to the target pane", function() {
@@ -1077,10 +1077,10 @@ describe("TabBarView", function() {
         tab.ondragend({target: tab, clientX: 80, clientY: 50});
         expect(atom.workspace.getCenter().getPanes().length).toEqual(2);
         expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "sample.js"]);
-        return expect(atom.workspace.getActivePane().getItems().length).toEqual(1);
+        expect(atom.workspace.getActivePane().getItems().length).toEqual(1);
       }));
 
-      return describe("when the tab is not allowed in that pane", () => it("does not move the tab, nor does it create a split", function() {
+      describe("when the tab is not allowed in that pane", () => it("does not move the tab, nor does it create a split", function() {
         layout.test = {
           pane,
           itemView: pane.getElement().querySelector('.item-views'),
@@ -1095,7 +1095,7 @@ describe("TabBarView", function() {
         layout.lastSplit = 'left';
         tab.ondragend({target: tab, clientX: 80, clientY: 50});
 
-        return expect(pane.split).not.toHaveBeenCalled();
+        expect(pane.split).not.toHaveBeenCalled();
       }));
     });
 
@@ -1111,7 +1111,7 @@ describe("TabBarView", function() {
       expect(tabBar.getTabs().map(tab => tab.element.textContent)).toEqual(["Item 1", "sample.js", "Item 2"]);
       expect(pane.getItems()).toEqual([item1, editor1, item2]);
       expect(pane.getActiveItem()).toBe(item2);
-      return expect(pane.activate).not.toHaveBeenCalled();
+      expect(pane.activate).not.toHaveBeenCalled();
     }));
 
     describe("when a tab is dragged out of application", () => it("should carry the file's information", function() {
@@ -1120,7 +1120,7 @@ describe("TabBarView", function() {
 
       expect(dragStartEvent.dataTransfer.getData("text/plain")).toEqual(editor1.getPath());
       if (process.platform === 'darwin') {
-        return expect(dragStartEvent.dataTransfer.getData("text/uri-list")).toEqual(`file://${editor1.getPath()}`);
+        expect(dragStartEvent.dataTransfer.getData("text/uri-list")).toEqual(`file://${editor1.getPath()}`);
       }
     }));
 
@@ -1147,10 +1147,10 @@ describe("TabBarView", function() {
 
         waitsFor(() => tabBar.moveItemBetweenPanes.callCount > 0);
 
-        return runs(function() {
+        runs(function() {
           const editor = atom.workspace.getActiveTextEditor();
           expect(editor.getPath()).toBe(editor1.getPath());
-          return expect(pane.getItems()).toEqual([item1, editor, item2]);});
+          expect(pane.getItems()).toEqual([item1, editor, item2]);});
     });
 
       it("transfers the text of the editor when it is modified", function() {
@@ -1171,10 +1171,10 @@ describe("TabBarView", function() {
 
         waitsFor(() => tabBar.moveItemBetweenPanes.callCount > 0);
 
-        return runs(() => expect(atom.workspace.getActiveTextEditor().getText()).toBe('I came from another window'));
+        runs(() => expect(atom.workspace.getActiveTextEditor().getText()).toBe('I came from another window'));
       });
 
-      return it("allows untitled editors to be moved between windows", function() {
+      it("allows untitled editors to be moved between windows", function() {
         editor1.getBuffer().setPath(null);
         editor1.setText('I have no path');
 
@@ -1194,15 +1194,15 @@ describe("TabBarView", function() {
 
         waitsFor(() => tabBar.moveItemBetweenPanes.callCount > 0);
 
-        return runs(function() {
+        runs(function() {
           expect(atom.workspace.getActiveTextEditor().getText()).toBe('I have no path');
-          return expect(atom.workspace.getActiveTextEditor().getPath()).toBeUndefined();
+          expect(atom.workspace.getActiveTextEditor().getPath()).toBeUndefined();
         });
       });
     });
 
     if (atom.workspace.getLeftDock != null) {
-      return describe("when a tab is dragged to another pane container", function() {
+      describe("when a tab is dragged to another pane container", function() {
         let [pane2, tabBar2, dockItem] = Array.from([]);
 
         beforeEach(function() {
@@ -1211,7 +1211,7 @@ describe("TabBarView", function() {
           pane2 = atom.workspace.getLeftDock().getActivePane();
           dockItem = new TestView('Dock Item');
           pane2.addItem(dockItem);
-          return tabBar2 = new TabBarView(pane2, 'left');
+          tabBar2 = new TabBarView(pane2, 'left');
         });
 
         it("removes the tab and item from their original pane and moves them to the target pane", function() {
@@ -1240,10 +1240,10 @@ describe("TabBarView", function() {
           expect(tabBar2.getTabs().map(tab => tab.element.textContent)).toEqual(["Dock Item", "Item 1"]);
           expect(pane2.getItems()).toEqual([dockItem, item1]);
           expect(pane2.activeItem).toBe(item1);
-          return expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
+          expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
         });
 
-        return it("shows a placeholder and allows the tab be dropped only if the item supports the target pane container location", function() {
+        it("shows a placeholder and allows the tab be dropped only if the item supports the target pane container location", function() {
           item1.getAllowedLocations = () => ['center', 'bottom'];
           let [dragStartEvent, dropEvent] = Array.from(buildDragEvents(tabBar.tabAtIndex(0).element, tabBar2.element));
           tabBar.onDragStart(dragStartEvent);
@@ -1264,7 +1264,7 @@ describe("TabBarView", function() {
           tabBar2.onDrop(dropEvent);
           expect(tabBar2.element.querySelector('.placeholder')).toBeNull();
           expect(pane.getItems()).toEqual([editor1, item2]);
-          return expect(pane2.getItems()).toEqual([dockItem, item1]);
+          expect(pane2.getItems()).toEqual([dockItem, item1]);
       });
     });
     }
@@ -1278,7 +1278,7 @@ describe("TabBarView", function() {
     expect(newFileHandler.callCount).toBe(0);
 
     triggerMouseEvent("dblclick", tabBar.element);
-    return expect(newFileHandler.callCount).toBe(1);
+    expect(newFileHandler.callCount).toBe(1);
   }));
 
   describe("when the mouse wheel is used on the tab bar", function() {
@@ -1292,60 +1292,60 @@ describe("TabBarView", function() {
         it("changes the active tab to the previous tab", function() {
           expect(pane.getActiveItem()).toBe(item2);
           tabBar.element.dispatchEvent(buildWheelEvent(120));
-          return expect(pane.getActiveItem()).toBe(editor1);
+          expect(pane.getActiveItem()).toBe(editor1);
         });
 
-        return it("changes the active tab to the previous tab only after the wheelDelta crosses the threshold", function() {
+        it("changes the active tab to the previous tab only after the wheelDelta crosses the threshold", function() {
           expect(pane.getActiveItem()).toBe(item2);
           tabBar.element.dispatchEvent(buildWheelEvent(50));
           expect(pane.getActiveItem()).toBe(item2);
           tabBar.element.dispatchEvent(buildWheelEvent(50));
           expect(pane.getActiveItem()).toBe(item2);
           tabBar.element.dispatchEvent(buildWheelEvent(50));
-          return expect(pane.getActiveItem()).toBe(editor1);
+          expect(pane.getActiveItem()).toBe(editor1);
         });
       });
 
       describe("when the mouse wheel scrolls down", () => it("changes the active tab to the previous tab", function() {
         expect(pane.getActiveItem()).toBe(item2);
         tabBar.element.dispatchEvent(buildWheelEvent(-120));
-        return expect(pane.getActiveItem()).toBe(item1);
+        expect(pane.getActiveItem()).toBe(item1);
       }));
 
       describe("when the mouse wheel scrolls up and shift key is pressed", () => it("does not change the active tab", function() {
         expect(pane.getActiveItem()).toBe(item2);
         tabBar.element.dispatchEvent(buildWheelPlusShiftEvent(120));
-        return expect(pane.getActiveItem()).toBe(item2);
+        expect(pane.getActiveItem()).toBe(item2);
       }));
 
       describe("when the mouse wheel scrolls down and shift key is pressed", () => it("does not change the active tab", function() {
         expect(pane.getActiveItem()).toBe(item2);
         tabBar.element.dispatchEvent(buildWheelPlusShiftEvent(-120));
-        return expect(pane.getActiveItem()).toBe(item2);
+        expect(pane.getActiveItem()).toBe(item2);
       }));
 
-      return describe("when the tabScrolling is changed to false", () => it("does not change the active tab when scrolling", function() {
+      describe("when the tabScrolling is changed to false", () => it("does not change the active tab when scrolling", function() {
         atom.config.set("tabs.tabScrolling", false);
 
         expect(pane.getActiveItem()).toBe(item2);
         tabBar.element.dispatchEvent(buildWheelEvent(120));
-        return expect(pane.getActiveItem()).toBe(item2);
+        expect(pane.getActiveItem()).toBe(item2);
       }));
     });
 
-    return describe("when tabScrolling is false in package settings", function() {
+    describe("when tabScrolling is false in package settings", function() {
       beforeEach(() => atom.config.set("tabs.tabScrolling", false));
 
       describe("when the mouse wheel scrolls up one unit", () => it("does not change the active tab", function() {
         expect(pane.getActiveItem()).toBe(item2);
         tabBar.element.dispatchEvent(buildWheelEvent(120));
-        return expect(pane.getActiveItem()).toBe(item2);
+        expect(pane.getActiveItem()).toBe(item2);
       }));
 
-      return describe("when the mouse wheel scrolls down one unit", () => it("does not change the active tab", function() {
+      describe("when the mouse wheel scrolls down one unit", () => it("does not change the active tab", function() {
         expect(pane.getActiveItem()).toBe(item2);
         tabBar.element.dispatchEvent(buildWheelEvent(-120));
-        return expect(pane.getActiveItem()).toBe(item2);
+        expect(pane.getActiveItem()).toBe(item2);
       }));
     });
   });
@@ -1355,19 +1355,19 @@ describe("TabBarView", function() {
 
     describe("when more than one tab is open", () => it("shows the tab bar", function() {
       expect(pane.getItems().length).toBe(3);
-      return expect(tabBar.element).not.toHaveClass('hidden');
+      expect(tabBar.element).not.toHaveClass('hidden');
     }));
 
-    return describe("when only one tab is open", () => it("shows the tab bar", function() {
+    describe("when only one tab is open", () => it("shows the tab bar", function() {
       expect(pane.getItems().length).toBe(3);
 
       waitsForPromise(() => pane.destroyItem(item1));
 
       waitsForPromise(() => pane.destroyItem(item2));
 
-      return runs(function() {
+      runs(function() {
         expect(pane.getItems().length).toBe(1);
-        return expect(tabBar.element).not.toHaveClass('hidden');
+        expect(tabBar.element).not.toHaveClass('hidden');
       });
     }));
   });
@@ -1377,7 +1377,7 @@ describe("TabBarView", function() {
 
     describe("when more than one tab is open", () => it("shows the tab bar", function() {
       expect(pane.getItems().length).toBe(3);
-      return expect(tabBar.element).not.toHaveClass('hidden');
+      expect(tabBar.element).not.toHaveClass('hidden');
     }));
 
     describe("when only one tab is open", () => it("hides the tab bar", function() {
@@ -1387,13 +1387,13 @@ describe("TabBarView", function() {
 
       waitsForPromise(() => pane.destroyItem(item2));
 
-      return runs(function() {
+      runs(function() {
         expect(pane.getItems().length).toBe(1);
-        return expect(tabBar.element).toHaveClass('hidden');
+        expect(tabBar.element).toHaveClass('hidden');
       });
     }));
 
-    return describe("when there are multiple panes", () => it("hides each tab bar separately", function() {
+    describe("when there are multiple panes", () => it("hides each tab bar separately", function() {
       const item3 = new TestView('Item 3');
       const item4 = new TestView('Item 4');
       const pane2 = pane.splitRight({items: [item3, item4]});
@@ -1404,11 +1404,11 @@ describe("TabBarView", function() {
 
       waitsForPromise(() => pane2.destroyItem(item3));
 
-      return runs(function() {
+      runs(function() {
         expect(pane2.getItems().length).toBe(1);
 
         expect(tabBar.element).not.toHaveClass('hidden');
-        return expect(tabBar2.element).toHaveClass('hidden');
+        expect(tabBar2.element).toHaveClass('hidden');
       });
     }));
   });
@@ -1429,10 +1429,10 @@ describe("TabBarView", function() {
         editor1 = null;
         waitsForPromise(() => atom.workspace.open('sample.txt', {pending: true}).then(o => editor1 = o));
 
-        return runs(function() {
+        runs(function() {
           pane.activateItem(editor1);
           expect(tabBar.element.querySelectorAll('.tab .temp').length).toBe(1);
-          return expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass('temp');
+          expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).toHaveClass('temp');
         });
       }));
 
@@ -1440,11 +1440,11 @@ describe("TabBarView", function() {
         editor1 = null;
         waitsForPromise(() => atom.workspace.open('sample.txt', {pending: true}).then(o => editor1 = o));
 
-        return runs(function() {
+        runs(function() {
           pane.activateItem(editor1);
           expect(isPending(editor1)).toBe(true);
           atom.commands.dispatch(atom.workspace.getActivePane().getElement(), 'tabs:keep-pending-tab');
-          return expect(isPending(editor1)).toBe(false);
+          expect(isPending(editor1)).toBe(false);
         });
       }));
 
@@ -1458,23 +1458,23 @@ describe("TabBarView", function() {
             return atom.workspace.open('sample2.txt', {pending: true}).then(o => editor2 = o);
           }));
 
-          return runs(function() {
+          runs(function() {
             expect(editor1.isDestroyed()).toBe(true);
             expect(tabBar.tabForItem(editor1)).toBeUndefined();
-            return expect(tabBar.tabForItem(editor2).element.querySelector('.title')).toHaveClass('temp');
+            expect(tabBar.tabForItem(editor2).element.querySelector('.title')).toHaveClass('temp');
           });
         });
 
-        return it("makes the tab permanent when double-clicking the tab", function() {
+        it("makes the tab permanent when double-clicking the tab", function() {
           let editor2 = null;
 
           waitsForPromise(() => atom.workspace.open('sample.txt', {pending: true}).then(o => editor2 = o));
 
-          return runs(function() {
+          runs(function() {
             pane.activateItem(editor2);
             expect(tabBar.tabForItem(editor2).element.querySelector('.title')).toHaveClass('temp');
             triggerMouseEvent('dblclick', tabBar.tabForItem(editor2).element, {button: 0});
-            return expect(tabBar.tabForItem(editor2).element.querySelector('.title')).not.toHaveClass('temp');
+            expect(tabBar.tabForItem(editor2).element.querySelector('.title')).not.toHaveClass('temp');
           });
         });
       });
@@ -1488,7 +1488,7 @@ describe("TabBarView", function() {
           return advanceClock(editor1.buffer.stoppedChangingDelay);
         }));
 
-        return runs(() => expect(tabBar.tabForItem(editor1).element.querySelector('.title')).not.toHaveClass('temp'));
+        runs(() => expect(tabBar.tabForItem(editor1).element.querySelector('.title')).not.toHaveClass('temp'));
       }));
 
       describe("when saving a file", () => it("makes the tab permanent", function() {
@@ -1499,7 +1499,7 @@ describe("TabBarView", function() {
           return editor1.save();
         }));
 
-        return runs(() => expect(tabBar.tabForItem(editor1).element.querySelector('.title')).not.toHaveClass('temp'));
+        runs(() => expect(tabBar.tabForItem(editor1).element.querySelector('.title')).not.toHaveClass('temp'));
       }));
 
       describe("when splitting a pending tab", function() {
@@ -1512,33 +1512,33 @@ describe("TabBarView", function() {
           const tabBar2 = new TabBarView(pane2, 'center');
           const newEditor = pane2.getActiveItem();
           expect(isPending(newEditor)).toBe(false);
-          return expect(tabBar2.tabForItem(newEditor).element.querySelector('.title')).not.toHaveClass('temp');
+          expect(tabBar2.tabForItem(newEditor).element.querySelector('.title')).not.toHaveClass('temp');
         });
 
-        return it("keeps the pending tab in the old pane", function() {
+        it("keeps the pending tab in the old pane", function() {
           expect(isPending(editor1)).toBe(true);
-          return expect(tabBar.tabForItem(editor1).element.querySelector('.title')).toHaveClass('temp');
+          expect(tabBar.tabForItem(editor1).element.querySelector('.title')).toHaveClass('temp');
         });
       });
 
-      return describe("when dragging a pending tab to a different pane", () => it("makes the tab permanent in the other pane", function() {
+      describe("when dragging a pending tab to a different pane", () => it("makes the tab permanent in the other pane", function() {
         editor1 = null;
         waitsForPromise(() => atom.workspace.open('sample.txt', {pending: true}).then(o => editor1 = o));
 
-        return runs(function() {
+        runs(function() {
           pane.activateItem(editor1);
           const pane2 = pane.splitRight();
 
           const tabBar2 = new TabBarView(pane2, 'center');
           tabBar2.moveItemBetweenPanes(pane, 0, pane2, 1, editor1);
 
-          return expect(tabBar2.tabForItem(pane2.getActiveItem()).element.querySelector('.title')).not.toHaveClass('temp');
+          expect(tabBar2.tabForItem(pane2.getActiveItem()).element.querySelector('.title')).not.toHaveClass('temp');
         });
       }));
     });
   }
 
-  return describe("integration with version control systems", function() {
+  describe("integration with version control systems", function() {
     let [repository, tab, tab1] = Array.from([]);
 
     beforeEach(function() {
@@ -1585,25 +1585,25 @@ describe("TabBarView", function() {
       it("adds custom style for new items", function() {
         repository.getCachedPathStatus.andReturn('new');
         tab.updateVcsStatus(repository);
-        return expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-added");
+        expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-added");
       });
 
       it("adds custom style for modified items", function() {
         repository.getCachedPathStatus.andReturn('modified');
         tab.updateVcsStatus(repository);
-        return expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-modified");
+        expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-modified");
       });
 
       it("adds custom style for ignored items", function() {
         repository.isPathIgnored.andReturn(true);
         tab.updateVcsStatus(repository);
-        return expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-ignored");
+        expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-ignored");
       });
 
-      return it("does not add any styles for items not in the repository", function() {
+      it("does not add any styles for items not in the repository", function() {
         expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("status-added");
         expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("status-modified");
-        return expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("status-ignored");
+        expect(tabBar.element.querySelectorAll('.tab')[0].querySelector('.title')).not.toHaveClass("status-ignored");
       });
     });
 
@@ -1611,7 +1611,7 @@ describe("TabBarView", function() {
       it("updates status for items in the repository", function() {
         tab.updateVcsStatus.reset();
         repository.emitDidChangeStatuses();
-        return expect(tab.updateVcsStatus.calls.length).toEqual(1);
+        expect(tab.updateVcsStatus.calls.length).toEqual(1);
       });
 
       it("updates the status of an item if it has changed", function() {
@@ -1619,13 +1619,13 @@ describe("TabBarView", function() {
         expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).not.toHaveClass("status-modified");
         repository.emitDidChangeStatus({path: tab.path, pathStatus: "modified"});
         expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-modified");
-        return expect(repository.getCachedPathStatus.calls.length).toBe(0);
+        expect(repository.getCachedPathStatus.calls.length).toBe(0);
       });
 
-      return it("does not update status for items not in the repository", function() {
+      it("does not update status for items not in the repository", function() {
         tab1.updateVcsStatus.reset();
         repository.emitDidChangeStatuses();
-        return expect(tab1.updateVcsStatus.calls.length).toEqual(0);
+        expect(tab1.updateVcsStatus.calls.length).toEqual(0);
       });
     });
 
@@ -1633,13 +1633,13 @@ describe("TabBarView", function() {
       it("does not update VCS subscription if the item's path remains the same", function() {
         tab.setupVcsStatus.reset();
         tab.item.buffer.emitter.emit('did-save', {path: tab.path});
-        return expect(tab.setupVcsStatus.calls.length).toBe(0);
+        expect(tab.setupVcsStatus.calls.length).toBe(0);
       });
 
-      return it("updates VCS subscription if the item's path has changed", function() {
+      it("updates VCS subscription if the item's path has changed", function() {
         tab.setupVcsStatus.reset();
         tab.item.buffer.emitter.emit('did-save', {path: '/some/other/path'});
-        return expect(tab.setupVcsStatus.calls.length).toBe(1);
+        expect(tab.setupVcsStatus.calls.length).toBe(1);
       });
     });
 
@@ -1649,10 +1649,10 @@ describe("TabBarView", function() {
 
         expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-added");
         atom.config.set("tabs.enableVcsColoring", false);
-        return expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).not.toHaveClass("status-added");
+        expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).not.toHaveClass("status-added");
       });
 
-      return it("adds status to the tab if enableVcsColoring is set to true", function() {
+      it("adds status to the tab if enableVcsColoring is set to true", function() {
         atom.config.set("tabs.enableVcsColoring", false);
         repository.getCachedPathStatus.andReturn('modified');
         expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).not.toHaveClass("status-modified");
@@ -1660,15 +1660,15 @@ describe("TabBarView", function() {
 
         waitsFor(() => (repository.changeStatusCallbacks != null ? repository.changeStatusCallbacks.length : undefined) > 0);
 
-        return runs(() => expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-modified"));
+        runs(() => expect(tabBar.element.querySelectorAll('.tab')[1].querySelector('.title')).toHaveClass("status-modified"));
       });
     });
 
     if (atom.workspace.getLeftDock != null) {
-      return describe("a pane in the dock", function() {
+      describe("a pane in the dock", function() {
         beforeEach(() => main.activate());
         afterEach(() => main.deactivate());
-        return it("gets decorated with tabs", function() {
+        it("gets decorated with tabs", function() {
           const dock = atom.workspace.getLeftDock();
           const dockElement = dock.getElement();
           const item = new TestView('Dock Item 1');
@@ -1677,7 +1677,7 @@ describe("TabBarView", function() {
           pane.activateItem(item);
           expect(dockElement.querySelectorAll('.tab').length).toBe(1);
           pane.destroyItem(item);
-          return expect(dockElement.querySelectorAll('.tab').length).toBe(0);
+          expect(dockElement.querySelectorAll('.tab').length).toBe(0);
         });
       });
     }
