@@ -3,7 +3,7 @@
   "version": "2.42.6",
   "main": "./lib/main",
   "description": "Display possible completions in the editor while typing",
-  "repository": "https://github.com/atom/autocomplete-plus",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": ">=0.189.0 <2.0.0"
