@@ -145,7 +145,7 @@
     "scoped-property-store": "^0.17.0",
     "scrollbar-style": "^4.0.1",
     "season": "^6.0.2",
-    "semver": "7.3.2",
+    "semver": "7.3.8",
     "service-hub": "^0.7.4",
     "settings-view": "file:packages/settings-view",
     "sinon": "9.2.1",
