@@ -49,10 +49,10 @@ Set.prototype.jasmineToString = function() {
 
 Set.prototype.isEqual = function(other) {
   if (other instanceof Set) {
-    let next;
     if (this.size !== other.size) { return false; }
     const values = this.values();
-    while (!(next = values.next()).done) {
+    let next = values.next();
+    while (!next.done) {
       if (!other.has(next.value)) { return false; }
     }
     return true;
@@ -78,16 +78,16 @@ if (process.env.CI) {
 
 const {testPaths} = atom.getLoadSettings();
 
-if (specPackagePath = FindParentDir.sync(testPaths[0], 'package.json')) {
+specPackagePath = FindParentDir.sync(testPaths[0], 'package.json');
+if (specPackagePath) {
   const packageMetadata = require(path.join(specPackagePath, 'package.json'));
   specPackageName = packageMetadata.name;
 }
 
-if ((specDirectory = FindParentDir.sync(testPaths[0], 'fixtures'))) {
-  specProjectPath = path.join(specDirectory, 'fixtures');
-} else {
-  specProjectPath = require('os').tmpdir();
-}
+specDirectory = FindParentDir.sync(testPaths[0], 'fixtures');
+specProjectPath = specDirectory
+  ? path.join(specDirectory, 'fixtures')
+  : require('os').tmpdir();
 
 beforeEach(function() {
   // Do not clobber recent project history

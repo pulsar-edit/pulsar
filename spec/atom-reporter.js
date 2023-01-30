@@ -63,7 +63,7 @@ module.exports =
 (AtomReporter = (function() {
   AtomReporter = class AtomReporter {
     static initClass() {
-  
+
       this.prototype.startedAt = null;
       this.prototype.runningSpecCount = 0;
       this.prototype.completeSpecCount = 0;
@@ -323,10 +323,10 @@ class SuiteResultView {
   }
 
   parentSuiteView() {
-    let suiteViewElement;
     if (!this.suite.parentSuite) { return; }
 
-    if (!(suiteViewElement = document.querySelector(`#suite-view-${this.suite.parentSuite.id}`))) {
+    let suiteViewElement = document.querySelector(`#suite-view-${this.suite.parentSuite.id}`);
+    if (!suiteViewElement) {
       const suiteView = new SuiteResultView(this.suite.parentSuite);
       suiteView.attach();
       suiteViewElement = suiteView.element;
@@ -381,8 +381,8 @@ class SpecResultView {
   }
 
   parentSuiteView() {
-    let suiteViewElement;
-    if (!(suiteViewElement = document.querySelector(`#suite-view-${this.spec.suite.id}`))) {
+    let suiteViewElement = document.querySelector(`#suite-view-${this.spec.suite.id}`);
+    if (!suiteViewElement) {
       const suiteView = new SuiteResultView(this.spec.suite);
       suiteView.attach();
       suiteViewElement = suiteView.element;

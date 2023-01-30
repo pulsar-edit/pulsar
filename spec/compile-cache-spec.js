@@ -94,7 +94,7 @@ describe('CompileCache', () => {
 
   return describe('overriding Error.prepareStackTrace', function() {
     it('removes the override on the next tick, and always assigns the raw stack', function() {
-      if (process.platform === 'win32') { return; } // Flakey Error.stack contents on Win32
+      if (process.platform === 'win32') { return null; } // Flakey Error.stack contents on Win32
 
       Error.prepareStackTrace = () => 'a-stack-trace';
 
