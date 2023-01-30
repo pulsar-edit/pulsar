@@ -171,7 +171,7 @@
     "whitespace": "https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8",
     "winreg": "^1.2.1",
     "wrap-guide": "https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0",
-    "yargs": "16.1.0"
+    "yargs": "17.6.2"
   },
   "packageDependencies": {
     "atom-dark-syntax": "file:./packages/atom-dark-syntax",
