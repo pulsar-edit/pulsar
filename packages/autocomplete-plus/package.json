@@ -3,7 +3,7 @@
   "version": "2.42.6",
   "main": "./lib/main",
   "description": "Display possible completions in the editor while typing",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/atom/autocomplete-plus",
   "license": "MIT",
   "engines": {
     "atom": ">=0.189.0 <2.0.0"
@@ -21,7 +21,6 @@
     "underscore-plus": "^1.6.6"
   },
   "devDependencies": {
-    "atom-jasmine3-test-runner": "^5.1.8",
     "coffeelint": "^1.9.7",
     "fs-plus": ">=2.4.0",
     "standard": "^8.3.0",
@@ -255,6 +254,5 @@
     "ignore": [
       "**/spec/fixtures/**"
     ]
-  },
-  "atomTestRunner": "./spec/custom-runner"
+  }
 }

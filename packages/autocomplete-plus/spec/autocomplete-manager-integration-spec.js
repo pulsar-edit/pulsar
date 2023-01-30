@@ -84,7 +84,7 @@ describe('Autocomplete Manager', () => {
 
       expect(provider.onDidInsertSuggestion).toHaveBeenCalled();
 
-      ({editor, triggerPosition, suggestion} = provider.onDidInsertSuggestion.calls.mostRecent().args[0])
+      ({editor, triggerPosition, suggestion} = provider.onDidInsertSuggestion.mostRecentCall.args[0])
       expect(editor).toBe(editor)
       expect(triggerPosition).toEqual([0, 1])
       expect(suggestion.text).toBe('ab')
@@ -152,7 +152,7 @@ describe('Autocomplete Manager', () => {
     })
 
     it('it hides the suggestion list when the user keeps typing', async () => {
-      spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => ['acd', 'ade'].filter((t) => t.startsWith(prefix)).map((t) => ({text: t})))
+      spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => ['acd', 'ade'].filter((t) => t.startsWith(prefix)).map((t) => ({text: t})))
 
       expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
 
@@ -207,7 +207,7 @@ describe('Autocomplete Manager', () => {
     })
 
     it('does not display empty suggestions', async () => {
-      spyOn(provider, 'getSuggestions').and.callFake(() => {
+      spyOn(provider, 'getSuggestions').andCallFake(() => {
         let list = ['ab', '', 'abcd', null]
         return (list.map((text) => ({text})))
       })
@@ -232,14 +232,14 @@ describe('Autocomplete Manager', () => {
       })
 
       it('caches the blacklist result', async () => {
-        spyOn(path, 'basename').and.callThrough()
+        spyOn(path, 'basename').andCallThrough()
 
         editor.insertText('a')
         editor.insertText('b')
         editor.insertText('c')
 
         await waitForAutocompleteToDisappear(editor)
-        expect(path.basename.calls.count()).toBe(1)
+        expect(path.basename.callCount).toBe(1)
       })
 
       it('shows suggestions when the path is changed to not match the blacklist', async () => {
@@ -279,7 +279,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('does not display empty suggestions', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => {
+        spyOn(provider, 'getSuggestions').andCallFake(() => {
           let list = ['ab', '', 'abcd', null]
           return (list.map((text) => ({text})))
         })
@@ -295,7 +295,7 @@ describe('Autocomplete Manager', () => {
 
     describe('when the type option has a space in it', () =>
       it('does not display empty suggestions', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'ab', type: 'local function'}, {text: 'abc', type: ' another ~ function   '}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'ab', type: 'local function'}, {text: 'abc', type: ' another ~ function   '}])
 
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
         editor.insertText('a')
@@ -311,7 +311,7 @@ describe('Autocomplete Manager', () => {
 
     describe('when the className option has a space in it', () =>
       it('does not display empty suggestions', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'ab', className: 'local function'}, {text: 'abc', className: ' another  ~ function   '}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'ab', className: 'local function'}, {text: 'abc', className: ' another  ~ function   '}])
 
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
         editor.insertText('a')
@@ -326,7 +326,7 @@ describe('Autocomplete Manager', () => {
 
     describe('when multiple cursors are defined', () => {
       it('autocompletes word when there is only a prefix', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'shift'}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'shift'}])
 
         editor.getBuffer().insert([0, 0], 's:extra:s')
         editor.setSelectedBufferRanges([[[0, 1], [0, 1]], [[0, 9], [0, 9]]])
@@ -356,7 +356,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('cancels the autocomplete when text differs between cursors', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [])
 
         editor.getBuffer().insert([0, 0], 's:extra:a')
         editor.setCursorBufferPosition([0, 1])
@@ -456,7 +456,7 @@ describe('Autocomplete Manager', () => {
 
         editor.setText('var something = abc')
         editor.setCursorBufferPosition([0, 10000])
-        spyOn(provider, 'getSuggestions').and.callFake((options) => {
+        spyOn(provider, 'getSuggestions').andCallFake((options) => {
           prefix = options.prefix
           resolveSuggestionsPromise()
           return []
@@ -721,7 +721,7 @@ describe('Autocomplete Manager', () => {
 
       describe('when a suggestion description is specified', () => {
         it('shows the maxVisibleSuggestions in the suggestion popup, but with extra height for the description', async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => {
+          spyOn(provider, 'getSuggestions').andCallFake(() => {
             let list = ['ab', 'abc', 'abcd', 'abcde']
             return (list.map((text) => ({text, description: `${text} yeah ok`})))
           })
@@ -741,7 +741,7 @@ describe('Autocomplete Manager', () => {
         })
 
         it('parses markdown in the description', async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => {
+          spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => {
             let list = [
               {text: 'ab', descriptionMarkdown: '**mmmmmmmmmmmmmmmmmmmmmmmmmm**'},
               {text: 'abc', descriptionMarkdown: '**mmmmmmmmmmmmmmmmmmmmmm**'},
@@ -772,7 +772,7 @@ describe('Autocomplete Manager', () => {
 
         it('adjusts the width when the description changes', async () => {
           let listWidth = null
-          spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => {
+          spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => {
             let list = [
               {text: 'ab', description: 'mmmmmmmmmmmmmmmmmmmmmmmmmm'},
               {text: 'abc', description: 'mmmmmmmmmmmmmmmmmmmmmm'},
@@ -875,7 +875,7 @@ describe('Autocomplete Manager', () => {
 
     describe('when match.snippet is used', () => {
       beforeEach(() => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => {
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => {
           let list = ['method(${1:something})', 'method2(${1:something})', 'method3(${1:something})', 'namespace\\\\method4(${1:something})']
           return (list.map((snippet) => ({snippet, replacementPrefix: prefix})))
         })
@@ -929,7 +929,7 @@ describe('Autocomplete Manager', () => {
 
     describe('when the matched prefix is highlighted', () => {
       it('highlights the prefix of the word in the suggestion list', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => [{text: 'items', replacementPrefix: prefix}])
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => [{text: 'items', replacementPrefix: prefix}])
 
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
 
@@ -952,7 +952,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('highlights repeated characters in the prefix', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => [{text: 'apply', replacementPrefix: prefix}])
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => [{text: 'apply', replacementPrefix: prefix}])
 
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
 
@@ -976,7 +976,7 @@ describe('Autocomplete Manager', () => {
 
       describe('when the prefix does not match the word', () => {
         it('does not render any character-match spans', async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => [{text: 'omgnope', replacementPrefix: prefix}])
+          spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => [{text: 'omgnope', replacementPrefix: prefix}])
 
           editor.moveToBottom()
           editor.insertText('x')
@@ -997,7 +997,7 @@ describe('Autocomplete Manager', () => {
           beforeEach(() => atom.packages.activatePackage('snippets'))
 
           it('does not highlight the snippet html; ref issue 301', async () => {
-            spyOn(provider, 'getSuggestions').and.callFake(() => [{snippet: 'ab(${1:c})c'}])
+            spyOn(provider, 'getSuggestions').andCallFake(() => [{snippet: 'ab(${1:c})c'}])
 
             editor.moveToBottom()
             editor.insertText('c')
@@ -1011,7 +1011,7 @@ describe('Autocomplete Manager', () => {
           })
 
           it('does not highlight the snippet html when highlight beginning of the word', async () => {
-            spyOn(provider, 'getSuggestions').and.callFake(() => [{snippet: 'abcde(${1:e}, ${1:f})f'}])
+            spyOn(provider, 'getSuggestions').andCallFake(() => [{snippet: 'abcde(${1:e}, ${1:f})f'}])
 
             editor.moveToBottom()
             editor.insertText('c')
@@ -1036,7 +1036,7 @@ describe('Autocomplete Manager', () => {
 
     describe('when a replacementPrefix is not specified', () => {
       beforeEach(() => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'something'}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'something'}])
       })
 
       it('replaces with the default input prefix', async () => {
@@ -1101,7 +1101,7 @@ describe('Autocomplete Manager', () => {
       let suggestion = {text: 'something'}
 
       beforeEach(() => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [suggestion])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [suggestion])
       })
 
       it('adds isPrefixModified the first time suggestion is shown', async () => {
@@ -1135,7 +1135,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('places the suggestion list at the cursor', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ab', leftLabel: 'void'}, {text: 'abc', leftLabel: 'void'}])
+        spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ab', leftLabel: 'void'}, {text: 'abc', leftLabel: 'void'}])
 
         editor.insertText('omghey ab')
         triggerAutocompletion(editor, false, 'c')
@@ -1150,7 +1150,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('closes the suggestion list if the user keeps typing', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => ['acd', 'ade'].filter((t) => t.startsWith(prefix)).map((t) => ({text: t})))
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => ['acd', 'ade'].filter((t) => t.startsWith(prefix)).map((t) => ({text: t})))
 
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
 
@@ -1166,7 +1166,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('keeps the suggestion list visible if the user keeps typing', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => ['acd', 'ade'].filter((t) => t.startsWith(prefix)).map((t) => ({text: t})))
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => ['acd', 'ade'].filter((t) => t.startsWith(prefix)).map((t) => ({text: t})))
 
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
 
@@ -1196,7 +1196,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('displays the suggestion list taking into account the passed back replacementPrefix', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(options => [{text: '::before', replacementPrefix: '::', leftLabel: 'void'}])
+        spyOn(provider, 'getSuggestions').andCallFake(options => [{text: '::before', replacementPrefix: '::', leftLabel: 'void'}])
 
         editor.insertText('xxxxxxxxxxx ab:')
         triggerAutocompletion(editor, false, ':')
@@ -1208,7 +1208,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('displays the suggestion list with a negative margin to align the prefix with the word-container', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ab', leftLabel: 'void'}, {text: 'abc', leftLabel: 'void'}])
+        spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ab', leftLabel: 'void'}, {text: 'abc', leftLabel: 'void'}])
 
         editor.insertText('omghey ab')
         triggerAutocompletion(editor, false, 'c')
@@ -1308,7 +1308,7 @@ describe('Autocomplete Manager', () => {
 
       describe('when the replacementPrefix is empty', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'someMethod()', replacementPrefix: ''}])
+          spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'someMethod()', replacementPrefix: ''}])
         })
 
         it('will insert the text without replacing anything', async () => {
@@ -1422,7 +1422,7 @@ describe('Autocomplete Manager', () => {
 
       describe('when a suffix of the replacement matches the text after the cursor', () => {
         it('overwrites that existing text with the replacement', async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => [
+          spyOn(provider, 'getSuggestions').andCallFake(() => [
             {text: 'oneomgtwo', replacementPrefix: 'one'}
           ])
 
@@ -1438,7 +1438,7 @@ describe('Autocomplete Manager', () => {
         })
 
         it('does not overwrite any text if the "consumeSuffix" setting is disabled', async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => [
+          spyOn(provider, 'getSuggestions').andCallFake(() => [
             {text: 'oneomgtwo', replacementPrefix: 'one'}
           ])
 
@@ -1456,7 +1456,7 @@ describe('Autocomplete Manager', () => {
         })
 
         it('does not overwrite non-word characters', async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => [
+          spyOn(provider, 'getSuggestions').andCallFake(() => [
             {text: 'oneomgtwo()', replacementPrefix: 'one'}
           ])
 
@@ -1474,7 +1474,7 @@ describe('Autocomplete Manager', () => {
 
       describe('when the cursor suffix does not match the replacement', () => {
         beforeEach(() =>
-          spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'oneomgTwo', replacementPrefix: 'one'}]))
+          spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'oneomgTwo', replacementPrefix: 'one'}]))
 
         it('replaces the suffix with the replacement', async () => {
           editor.setText('ontwothree')
@@ -1525,7 +1525,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('accepts the suggestion if there is one', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'omgok'}])
+        spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'omgok'}])
 
         triggerAutocompletion(editor)
         await timeoutPromise(100)
@@ -1539,7 +1539,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('does not accept the suggestion if the event detail is activatedManually: false', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'omgok'}])
+        spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'omgok'}])
 
         triggerAutocompletion(editor)
         await timeoutPromise(100)
@@ -1550,7 +1550,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('does not accept the suggestion if auto-confirm single suggestion is disabled', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'omgok'}])
+        spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'omgok'}])
 
         triggerAutocompletion(editor)
         await timeoutPromise(100)
@@ -1563,7 +1563,7 @@ describe('Autocomplete Manager', () => {
 
       it('includes the correct value for activatedManually when explicitly triggered', async () => {
         let receivedOptions
-        spyOn(provider, 'getSuggestions').and.callFake((options) => {
+        spyOn(provider, 'getSuggestions').andCallFake((options) => {
           receivedOptions = options
           return [{text: 'omgok'}, {text: 'ahgok'}]
         })
@@ -1580,7 +1580,7 @@ describe('Autocomplete Manager', () => {
       })
 
       it('does not auto-accept a single suggestion when filtering', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) => {
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) => {
           let list = []
           if ('a'.indexOf(prefix) === 0) { list.push('a') }
           if ('abc'.indexOf(prefix) === 0) { list.push('abc') }
@@ -1601,7 +1601,7 @@ describe('Autocomplete Manager', () => {
     describe('when the replacementPrefix doesnt match the actual prefix', () => {
       describe('when snippets are not used', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'something', replacementPrefix: 'bcm'}])
+          spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'something', replacementPrefix: 'bcm'}])
         })
 
         it('only replaces the suggestion at cursors whos prefix matches the replacementPrefix', async () => {
@@ -1625,7 +1625,7 @@ defm`
 
       describe('when snippets are used', () => {
         beforeEach(async () => {
-          spyOn(provider, 'getSuggestions').and.callFake(() => [{snippet: 'ok(${1:omg})', replacementPrefix: 'bcm'}])
+          spyOn(provider, 'getSuggestions').andCallFake(() => [{snippet: 'ok(${1:omg})', replacementPrefix: 'bcm'}])
           await atom.packages.activatePackage('snippets')
         })
 
@@ -1651,7 +1651,7 @@ defm`
 
     describe('select-previous event', () => {
       it('selects the previous item in the list', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'ab'}, {text: 'abc'}, {text: 'abcd'}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'ab'}, {text: 'abc'}, {text: 'abcd'}])
 
         triggerAutocompletion(editor, false, 'a')
         await waitForAutocomplete(editor)
@@ -1670,7 +1670,7 @@ defm`
       })
 
       it('closes the autocomplete when up arrow pressed when only one item displayed', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) =>
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) =>
           [{text: 'quicksort'}, {text: 'quack'}].filter(val => val.text.startsWith(prefix))
         )
 
@@ -1700,7 +1700,7 @@ defm`
       })
 
       it('does not close the autocomplete when up arrow pressed with multiple items displayed but triggered on one item', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(({prefix}) =>
+        spyOn(provider, 'getSuggestions').andCallFake(({prefix}) =>
           [{text: 'quicksort'}, {text: 'quack'}].filter(val => val.text.startsWith(prefix))
         )
 
@@ -1745,7 +1745,7 @@ defm`
       })
 
       it('wraps to the first item when triggered at the end of the list', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'ab'}, {text: 'abc'}, {text: 'abcd'}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'ab'}, {text: 'abc'}, {text: 'abcd'}])
 
         triggerAutocompletion(editor, false, 'a')
         await waitForAutocomplete(editor)
@@ -1772,7 +1772,7 @@ defm`
     describe('label rendering', () => {
       describe('when no labels are specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok'}])
         })
 
         it('displays the text in the suggestion', async () => {
@@ -1790,7 +1790,7 @@ defm`
 
       describe('when `type` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', type: 'omg'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'omg'}])
         })
 
         it('displays an icon in the icon-container', async () => {
@@ -1804,7 +1804,7 @@ defm`
 
       describe('when the `type` specified has a default icon', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', type: 'snippet'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'snippet'}])
         })
 
         it('displays the default icon in the icon-container', async () => {
@@ -1818,7 +1818,7 @@ defm`
 
       describe('when `type` is an empty string', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', type: ''}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: ''}])
         })
 
         it('does not display an icon in the icon-container', async () => {
@@ -1832,7 +1832,7 @@ defm`
 
       describe('when `iconHTML` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', iconHTML: '<i class="omg"></i>'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', iconHTML: '<i class="omg"></i>'}])
         })
 
         it('displays an icon in the icon-container', async () => {
@@ -1846,7 +1846,7 @@ defm`
 
       describe('when `iconHTML` is false', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', type: 'something', iconHTML: false}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'something', iconHTML: false}])
         })
 
         it('does not display an icon in the icon-container', async () => {
@@ -1860,7 +1860,7 @@ defm`
 
       describe('when `iconHTML` is not a string and a `type` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', type: 'something', iconHTML: true}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'something', iconHTML: true}])
         })
 
         it('displays the default icon in the icon-container', async () => {
@@ -1874,7 +1874,7 @@ defm`
 
       describe('when `iconHTML` is not a string and no type is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', iconHTML: true}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', iconHTML: true}])
         })
 
         it('it does not display an icon', async () => {
@@ -1888,7 +1888,7 @@ defm`
 
       describe('when `rightLabel` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', rightLabel: '<i class="something">sometext</i>'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', rightLabel: '<i class="something">sometext</i>'}])
         })
 
         it('displays the text in the suggestion', async () => {
@@ -1902,7 +1902,7 @@ defm`
 
       describe('when `rightLabelHTML` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', rightLabelHTML: '<i class="something">sometext</i>'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', rightLabelHTML: '<i class="something">sometext</i>'}])
         })
 
         it('displays the text in the suggestion', async () => {
@@ -1916,7 +1916,7 @@ defm`
 
       describe('when `leftLabel` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', leftLabel: '<i class="something">sometext</i>'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', leftLabel: '<i class="something">sometext</i>'}])
         })
 
         it('displays the text in the suggestion', async () => {
@@ -1930,7 +1930,7 @@ defm`
 
       describe('when `leftLabelHTML` is specified', () => {
         beforeEach(() => {
-          spyOn(provider, 'getSuggestions').and.callFake(options => [{text: 'ok', leftLabelHTML: '<i class="something">sometext</i>'}])
+          spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', leftLabelHTML: '<i class="something">sometext</i>'}])
         })
 
         it('displays the text in the suggestion', async () => {
@@ -1945,7 +1945,7 @@ defm`
 
     describe('when clicking in the suggestion list', () => {
       beforeEach(() => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => {
+        spyOn(provider, 'getSuggestions').andCallFake(() => {
           let list = ['ab', 'abc', 'abcd', 'abcde']
           return (list.map((text) => ({text, description: `${text} yeah ok`})))
         })
@@ -1990,7 +1990,7 @@ defm`
 
     describe('Keybind to navigate to descriptionMoreLink', () => {
       it('triggers openExternal on keybind if there is a description', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'ab', description: 'it is ab'}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'ab', description: 'it is ab'}])
         let shell = require('electron').shell
         spyOn(shell, 'openExternal')
 
@@ -2003,7 +2003,7 @@ defm`
       })
 
       it('does not trigger openExternal on keybind if there is not a description', async () => {
-        spyOn(provider, 'getSuggestions').and.callFake(() => [{text: 'ab'}])
+        spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'ab'}])
         let shell = require('electron').shell
         spyOn(shell, 'openExternal')
 
@@ -2032,8 +2032,8 @@ defm`
       })
 
       ;({ autocompleteManager } = mainModule)
-      spyOn(autocompleteManager, 'findSuggestions').and.callThrough()
-      spyOn(autocompleteManager, 'displaySuggestions').and.callThrough()
+      spyOn(autocompleteManager, 'findSuggestions').andCallThrough()
+      spyOn(autocompleteManager, 'displaySuggestions').andCallThrough()
     })
 
     describe('when strict matching is used', () => {
@@ -2048,7 +2048,7 @@ defm`
         editor.insertText('o')
 
         await conditionPromise(
-          () => autocompleteManager.findSuggestions.calls.count() === 1
+          () => autocompleteManager.findSuggestions.callCount === 1
         )
       })
     })
@@ -2194,7 +2194,7 @@ defm`
 
       it('does not update the suggestion list while composition is in progress', async () => {
         const activeElement = editorView.querySelector('input')
-        spyOn(autocompleteManager.suggestionList, 'changeItems').and.callThrough()
+        spyOn(autocompleteManager.suggestionList, 'changeItems').andCallThrough()
 
         editor.moveToBottom()
         editor.insertText('q')
@@ -2203,26 +2203,26 @@ defm`
         await waitForAutocomplete(editor)
 
         expect(autocompleteManager.suggestionList.changeItems).toHaveBeenCalled()
-        expect(autocompleteManager.suggestionList.changeItems.calls.mostRecent().args[0][0].text).toBe('quicksort')
-        autocompleteManager.suggestionList.changeItems.calls.reset()
+        expect(autocompleteManager.suggestionList.changeItems.mostRecentCall.args[0][0].text).toBe('quicksort')
+        autocompleteManager.suggestionList.changeItems.callCount = 0
 
         activeElement.dispatchEvent(buildIMECompositionEvent('compositionstart', {data: 'i', target: activeElement}))
         triggerAutocompletion(editor, false, 'i')
 
         await conditionPromise(() =>
-          autocompleteManager.suggestionList.changeItems.calls.count() > 0
+          autocompleteManager.suggestionList.changeItems.callCount > 0
         )
 
-        expect(autocompleteManager.suggestionList.changeItems.calls.mostRecent().args[0][0].text).toBe('quicksort')
-        autocompleteManager.suggestionList.changeItems.calls.reset()
+        expect(autocompleteManager.suggestionList.changeItems.mostRecentCall.args[0][0].text).toBe('quicksort')
+        autocompleteManager.suggestionList.changeItems.callCount = 0
 
         activeElement.dispatchEvent(buildIMECompositionEvent('compositionupdate', {data: 'ï', target: activeElement}))
         editor.selectLeft()
 
         editor.insertText('ï')
 
-        const initialCallCount = autocompleteManager.suggestionList.changeItems.calls.count()
-        await conditionPromise(() => autocompleteManager.suggestionList.changeItems.calls.count() > initialCallCount)
+        const initialCallCount = autocompleteManager.suggestionList.changeItems.callCount
+        await conditionPromise(() => autocompleteManager.suggestionList.changeItems.callCount > initialCallCount)
 
         expect(autocompleteManager.suggestionList.changeItems).toHaveBeenCalledWith(null)
         activeElement.dispatchEvent(buildIMECompositionEvent('compositionend', {target: activeElement}))

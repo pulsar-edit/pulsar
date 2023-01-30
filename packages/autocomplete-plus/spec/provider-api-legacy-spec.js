@@ -203,7 +203,7 @@ describe('Provider API Legacy', () => {
       triggerAutocompletion(editor, true, 'o')
       await waitForAutocomplete(editor)
 
-      let args = testProvider.requestHandler.calls.mostRecent().args[0]
+      let args = testProvider.requestHandler.mostRecentCall.args[0]
       expect(args.editor).toBeDefined()
       expect(args.buffer).toBeDefined()
       expect(args.cursor).toBeDefined()

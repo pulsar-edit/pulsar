@@ -296,7 +296,7 @@ describe('Suggestion List Element', () => {
     })
 
     it('cycles to the last element in the suggestion list when the current selection is at the start of the list', () => {
-      spyOn(suggestionListElement, 'visibleItems').and.returnValue(['a', 'b', 'c', 'd', 'e'])
+      spyOn(suggestionListElement, 'visibleItems').andReturn(['a', 'b', 'c', 'd', 'e'])
       spyOn(suggestionListElement, 'setSelectedIndex')
 
       suggestionListElement.moveSelectionUp()
@@ -307,7 +307,7 @@ describe('Suggestion List Element', () => {
 
   describe('moveSelectionDown', () => {
     it('increases the selected index if the current selection is not at the end of the list', () => {
-      spyOn(suggestionListElement, 'visibleItems').and.returnValue(['a', 'b', 'c', 'd', 'e'])
+      spyOn(suggestionListElement, 'visibleItems').andReturn(['a', 'b', 'c', 'd', 'e'])
       spyOn(suggestionListElement, 'setSelectedIndex')
       suggestionListElement.selectedIndex = 3
 
@@ -325,7 +325,7 @@ describe('Suggestion List Element', () => {
       }
       spyOn(model.activeEditor, 'moveDown')
       spyOn(model, 'cancel')
-      spyOn(suggestionListElement, 'visibleItems').and.returnValue(['a', 'b', 'c', 'd', 'e'])
+      spyOn(suggestionListElement, 'visibleItems').andReturn(['a', 'b', 'c', 'd', 'e'])
 
       suggestionListElement.model = model
       suggestionListElement.selectedIndex = 4
@@ -338,7 +338,7 @@ describe('Suggestion List Element', () => {
     })
 
     it('cycles to the first element in the suggestion list when the current suggestion is at the end of the list', () => {
-      spyOn(suggestionListElement, 'visibleItems').and.returnValue(['a', 'b', 'c', 'd', 'e'])
+      spyOn(suggestionListElement, 'visibleItems').andReturn(['a', 'b', 'c', 'd', 'e'])
       spyOn(suggestionListElement, 'setSelectedIndex')
       suggestionListElement.selectedIndex = 4
 
@@ -381,7 +381,7 @@ describe('Suggestion List Element', () => {
       }
       spyOn(model.activeEditor, 'moveDown')
       spyOn(model, 'cancel')
-      spyOn(suggestionListElement, 'visibleItems').and.returnValue(['a'])
+      spyOn(suggestionListElement, 'visibleItems').andReturn(['a'])
 
       suggestionListElement.model = model
       suggestionListElement.moveToCancel = true
@@ -424,7 +424,7 @@ describe('Suggestion List Element', () => {
       }
       spyOn(model.activeEditor, 'moveToBottom')
       spyOn(model, 'cancel')
-      spyOn(suggestionListElement, 'visibleItems').and.returnValue(['a'])
+      spyOn(suggestionListElement, 'visibleItems').andReturn(['a'])
 
       suggestionListElement.model = model
       suggestionListElement.moveToCancel = true
