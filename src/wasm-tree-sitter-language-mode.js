@@ -218,7 +218,7 @@ class WASMTreeSitterLanguageMode {
     if(existing) {
       return existing
     } else {
-      const obj = {}
+      const obj = {openScopeIds: [], closeScopeIds: [], position: key}
       this.boundaries = this.boundaries.insert(key, obj)
       return obj
     }
