@@ -10,6 +10,9 @@ const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
   constructor( buffer, config) {
     this.lastId = 259
+    // Keeps a map of where each variable scope opens or closes
+    // Format: {"startRow,startCol,endRow,endCol": {node: ts-node, depth: int, vars {name: str, scopeIds: [num]}}}
+    this.nestedScopes = new Map()
     this.scopeNames = new Map([["variable", VAR_ID]])
     this.scopeIds = new Map([[VAR_ID, "variable"]])
     this.buffer = buffer
@@ -59,14 +62,6 @@ class WASMTreeSitterLanguageMode {
     if(!this.tree) return;
 
     const startIndex = this.buffer.characterIndexForPosition(change.newRange.start)
-    // console.log("EDITING", {
-    //   startPosition: change.newRange.start,
-    //   oldEndPosition: change.oldRange.end,
-    //   newEndPosition: change.newRange.end,
-    //   startIndex: startIndex,
-    //   oldEndIndex: startIndex + change.oldText.length,
-    //   newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
-    // }, change)
     this.tree.edit({
       startPosition: change.newRange.start,
       oldEndPosition: change.oldRange.end,
@@ -76,6 +71,9 @@ class WASMTreeSitterLanguageMode {
       newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
     const newTree = this.parser.parse(this.buffer.getText(), this.tree)
+
+    const changes = newTree.getChangedRanges(this.tree)
+    console.log("WHAT WAS CHANGED", changes)
 
     this.tree = newTree
   }
@@ -90,6 +88,7 @@ class WASMTreeSitterLanguageMode {
       oldScopes = oldDataIterator.value.closeScopeIds
       oldDataIterator.next()
     }
+    oldScopes = oldScopes || []
 
     syntax.forEach(capture => {
       const node = capture.node
@@ -107,18 +106,15 @@ class WASMTreeSitterLanguageMode {
       const ids = names.map(name => this.scopeNames.get(name))
       let old = this.boundaries.get(node.startPosition)
       if(old) {
-        old.node = node
-
+        old.openNode = node
         if(old.openScopeIds.length === 0) {
-          console.log("APPENDING", names, node)
           old.openScopeIds = [...ids]
         }
       } else {
-        console.log("ADDING", names, node)
         this.boundaries = this.boundaries.insert(node.startPosition, {
           closeScopeIds: [...oldScopes],
           openScopeIds: [...ids],
-          node: node,
+          openNode: node,
           position: node.startPosition
         })
         oldScopes = ids
@@ -126,13 +122,13 @@ class WASMTreeSitterLanguageMode {
 
       old = this.boundaries.get(node.endPosition)
       if(old) {
+        old.closeNode = node
         if(old.closeScopeIds.length === 0) old.closeScopeIds = ids.reverse()
       } else {
-        console.log("REMOVING", names, node)
         this.boundaries = this.boundaries.insert(node.endPosition, {
           closeScopeIds: ids.reverse(),
           openScopeIds: [],
-          node: node,
+          closeNode: node,
           position: node.endPosition
         })
       }
@@ -153,35 +149,76 @@ class WASMTreeSitterLanguageMode {
   }
 
   _updateWithLocals(locals) {
-    try {
     locals.forEach(({name, node}) => {
       let openNode = this._getOrInsert(node.startPosition, node)
+      if(!openNode.openNode) openNode.openNode = node
       let closeNode = this._getOrInsert(node.endPosition, node)
+      if(!closeNode.closeNode) closeNode.closeNode = node
 
       if(name === "local.scope") {
-        openNode.scopeDepth = 1
-        closeNode.scopeDepth = 0
+        const oldScope = this._getParentScope(node)
+        const oldDepth = oldScope?.depth || 0
+        const key = this._generateScopeKey(node)
+        // console.log("Generating scope", key, node)
+        /// FIXME - this is WRONG, and we need to invalidate things
+        if(!this.nestedScopes.get(key)) {
+          this.nestedScopes.set(key, {
+            node: node,
+            depth: oldDepth+1,
+            vars: new Map()
+          })
+        }
       } else if(name === "local.reference") {
-      } else if(name === "local.definition" && openNode.openScopeIds.indexOf(VAR_ID) === -1) {
-        console.log("Before: open", openNode.openScopeIds, "close", closeNode.closeScopeIds)
-        openNode.openScopeIds = [...openNode.openScopeIds, VAR_ID]
-        closeNode.closeScopeIds = [VAR_ID, ...closeNode.closeScopeIds]
-        // closeNode.closeScopeIds.push(this.scopeNames.get("variable"))
-        console.log("After: open", openNode.openScopeIds, "close", closeNode.closeScopeIds)
-        console.log("Open", openNode, "Close", closeNode)
+        const varScope = this._getParentScopeContainingVar(node, node.text)
+        if(varScope) {
+          let oldScopes = this.boundaries.get(node.startPosition)
+          oldScopes.openScopeIds = varScope.openNode.openScopeIds
+          oldScopes = this.boundaries.get(node.endPosition)
+          oldScopes.closeScopeIds = varScope.closeNode.closeScopeIds
+        }
+      } else if(name === "local.definition") {
+        const shouldAddVarToScopes = openNode.openScopeIds.indexOf(VAR_ID) === -1
+        if(shouldAddVarToScopes) {
+          openNode.openScopeIds = [...openNode.openScopeIds, VAR_ID]
+          closeNode.closeScopeIds = [VAR_ID, ...closeNode.closeScopeIds]
+        }
+
+        const parentScope = this._getParentScope(node)
+        if(parentScope) {
+          parentScope.vars.set(node.text, {openNode, closeNode})
+          parentScope.vars.set(node.text, {openNode, closeNode})
+        }
       }
     })
-  } catch (e) {
-    console.log("WOW, A BIG ERROR", e)
-  }
   }
 
-  _getOrInsert(key, node) {
+  _getParentScopeContainingVar(node, varText) {
+    const parent = this._getParentScope(node)
+    if(!parent) return
+    const varScope = parent.vars.get(varText)
+    return varScope ? varScope : this._getParentScopeContainingVar(parent.node, varText)
+  }
+
+  _getParentScope(node) {
+    const parent = node.parent
+    if(!parent || parent.type === 'program') return
+    const key = this._generateScopeKey(parent)
+    // console.log("Getting key", key)
+    const scope = this.nestedScopes.get(key)
+    return scope ? scope : this._getParentScope(parent)
+  }
+
+  _generateScopeKey(node) {
+    return `${node.startPosition.row},${node.startPosition.column},` +
+      `${node.endPosition.row},${node.endPosition.column}`
+  }
+
+  _getOrInsert(key) {
     const existing = this.boundaries.get(key)
     if(existing) {
       return existing
     } else {
-      const obj = {node}
+      const obj = {}
       this.boundaries = this.boundaries.insert(key, obj)
       return obj
     }
@@ -201,17 +238,14 @@ class WASMTreeSitterLanguageMode {
 
     return {
       getOpenScopeIds () {
-        console.log("OPEN", [...new Set(iterator.value.openScopeIds)])
         return [...new Set(iterator.value.openScopeIds)]
       },
 
       getCloseScopeIds () {
-        console.log("CLOSE", [...new Set(iterator.value.closeScopeIds)])
         return [...new Set(iterator.value.closeScopeIds)]
       },
 
       getPosition () {
-        console.log("POS", (iterator.value && iterator.value.position))
         return (iterator.value && iterator.value.position) || Point.INFINITY
       },
 
