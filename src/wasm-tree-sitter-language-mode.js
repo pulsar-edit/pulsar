@@ -1,16 +1,17 @@
 const Parser = require('web-tree-sitter');
 const ScopeDescriptor = require('./scope-descriptor')
 const fs = require('fs');
-const { Point } = require('text-buffer');
+const { Point, Range } = require('text-buffer');
 
 const initPromise = Parser.init()
 createTree = require("functional-red-black-tree")
 
+const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
   constructor( buffer, config) {
-    this.scopeNames = new Map()
-    this.scopeIds = new Map()
-    this.lastId = 257
+    this.lastId = 259
+    this.scopeNames = new Map([["variable", VAR_ID]])
+    this.scopeIds = new Map([[VAR_ID, "variable"]])
     this.buffer = buffer
     this.config = config
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
@@ -24,8 +25,13 @@ class WASMTreeSitterLanguageMode {
       this.localsQuery = lang.query(localsQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
-      this.tree = this.parser.parse(buffer.getText())
+
+      // Force first highlight
+      this.tree = this.parser.parse("")
       this.boundaries = createTree(comparePoints)
+      const startRange = new Range([0, 0], [0, 0])
+      const range = buffer.getRange()
+      buffer.emitDidChangeEvent({oldRange: startRange, newRange: range, oldText: ""})
       global.mode = this
     })
 
@@ -48,6 +54,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidChange(change) {
+    console.log("B", this)
     global.nt = this.buffer.getText()
     if(!this.tree) return;
 
@@ -69,74 +76,115 @@ class WASMTreeSitterLanguageMode {
       newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
     const newTree = this.parser.parse(this.buffer.getText(), this.tree)
-    // console.log("CHANGES", this.tree.getChangedRanges(newTree))
 
     this.tree = newTree
   }
 
   _updateBoundaries(from, to) {
-    const syntax = this.syntaxQuery.matches(this.tree.rootNode, from, to)
-    const locals = this.localsQuery.matches(this.tree.rootNode, from, to)
-    const matches = syntax //.concat(locals)
+    const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
 
     let oldDataIterator = this.boundaries.ge(from)
     let oldScopes = []
     while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
       this.boundaries = this.boundaries.remove(oldDataIterator.key)
+      oldScopes = oldDataIterator.value.closeScopeIds
       oldDataIterator.next()
     }
 
-    matches.forEach(({captures}) => {
-      captures.forEach(capture => {
-        const node = capture.node
-        const names = capture.name.split('.')
-        names.forEach(name => {
-          if(!this.scopeNames.get(name)) {
-            this.lastId += 2
-            const newId = this.lastId;
-            // console.log("New ID", newId)
-            this.scopeNames.set(name, newId)
-            this.scopeIds.set(newId, name)
-          }
-        })
+    syntax.forEach(capture => {
+      const node = capture.node
+      const names = capture.name.split('.')
 
-        const ids = names.map(name => this.scopeNames.get(name))
-        // console.log("ADDING", node.startPosition, names, ids)
-
-        let old = this.boundaries.get(node.startPosition)
-        // console.log("Old Bound", old)
-        if(old) {
-          // console.log("Pushing new", ids, names, old)
-          old.openScopeIds.push(...ids)
-        } else {
-          this.boundaries = this.boundaries.insert(node.startPosition, {
-            closeScopeIds: oldScopes,
-            openScopeIds: [...ids],
-            openScopeNames: names,
-            position: node.startPosition
-          })
-          oldScopes = ids
-        }
-
-        old = this.boundaries.get(node.endPosition)
-        if(old) {
-          old.closeScopeIds.push(...ids)
-        } else {
-          this.boundaries = this.boundaries.insert(node.endPosition, {
-            closeScopeIds: [...ids],
-            openScopeIds: [],
-            closeScopeNames: names,
-            position: node.endPosition
-          })
+      names.forEach(name => {
+        if(!this.scopeNames.get(name)) {
+          this.lastId += 2
+          const newId = this.lastId;
+          this.scopeNames.set(name, newId)
+          this.scopeIds.set(newId, name)
         }
       })
+
+      const ids = names.map(name => this.scopeNames.get(name))
+      let old = this.boundaries.get(node.startPosition)
+      if(old) {
+        old.node = node
+
+        if(old.openScopeIds.length === 0) {
+          console.log("APPENDING", names, node)
+          old.openScopeIds = [...ids]
+        }
+      } else {
+        console.log("ADDING", names, node)
+        this.boundaries = this.boundaries.insert(node.startPosition, {
+          closeScopeIds: [...oldScopes],
+          openScopeIds: [...ids],
+          node: node,
+          position: node.startPosition
+        })
+        oldScopes = ids
+      }
+
+      old = this.boundaries.get(node.endPosition)
+      if(old) {
+        if(old.closeScopeIds.length === 0) old.closeScopeIds = ids.reverse()
+      } else {
+        console.log("REMOVING", names, node)
+        this.boundaries = this.boundaries.insert(node.endPosition, {
+          closeScopeIds: ids.reverse(),
+          openScopeIds: [],
+          node: node,
+          position: node.endPosition
+        })
+      }
     })
 
     this.boundaries = this.boundaries.insert(Point.INFINITY, {
-      closeScopeIds: oldScopes,
+      closeScopeIds: [...oldScopes],
       openScopeIds: [],
       position: Point.INFINITY
     })
+
+    console.log("Syntax", syntax)
+    if(this.localsQuery) {
+      const locals = this.localsQuery.captures(this.tree.rootNode, from, to)
+      console.log("Locals", locals)
+      this._updateWithLocals(locals)
+    }
+  }
+
+  _updateWithLocals(locals) {
+    try {
+    locals.forEach(({name, node}) => {
+      let openNode = this._getOrInsert(node.startPosition, node)
+      let closeNode = this._getOrInsert(node.endPosition, node)
+
+      if(name === "local.scope") {
+        openNode.scopeDepth = 1
+        closeNode.scopeDepth = 0
+      } else if(name === "local.reference") {
+      } else if(name === "local.definition" && openNode.openScopeIds.indexOf(VAR_ID) === -1) {
+        console.log("Before: open", openNode.openScopeIds, "close", closeNode.closeScopeIds)
+        openNode.openScopeIds = [...openNode.openScopeIds, VAR_ID]
+        closeNode.closeScopeIds = [VAR_ID, ...closeNode.closeScopeIds]
+        // closeNode.closeScopeIds.push(this.scopeNames.get("variable"))
+        console.log("After: open", openNode.openScopeIds, "close", closeNode.closeScopeIds)
+        console.log("Open", openNode, "Close", closeNode)
+      }
+    })
+  } catch (e) {
+    console.log("WOW, A BIG ERROR", e)
+  }
+  }
+
+  _getOrInsert(key, node) {
+    const existing = this.boundaries.get(key)
+    if(existing) {
+      return existing
+    } else {
+      const obj = {node}
+      this.boundaries = this.boundaries.insert(key, obj)
+      return obj
+    }
   }
 
   bufferDidFinishTransaction(...args) {
@@ -153,14 +201,17 @@ class WASMTreeSitterLanguageMode {
 
     return {
       getOpenScopeIds () {
+        console.log("OPEN", [...new Set(iterator.value.openScopeIds)])
         return [...new Set(iterator.value.openScopeIds)]
       },
 
       getCloseScopeIds () {
+        console.log("CLOSE", [...new Set(iterator.value.closeScopeIds)])
         return [...new Set(iterator.value.closeScopeIds)]
       },
 
       getPosition () {
+        console.log("POS", (iterator.value && iterator.value.position))
         return (iterator.value && iterator.value.position) || Point.INFINITY
       },
 
