@@ -1561,19 +1561,3 @@ TreeSitterLanguageMode.LanguageLayer = LanguageLayer;
 TreeSitterLanguageMode.prototype.syncTimeoutMicros = 1000;
 
 module.exports = TreeSitterLanguageMode;
-
-function spyOn(obj, fnName) {
-  const fn = obj[fnName]
-  console.log("FN", fn)
-  function newFn(...args) {
-    console.log("Calling", fnName)
-    const ret = fn.bind(this)(...args)
-    console.log("Returning from", fnName, ret)
-    return ret
-  }
-  obj[fnName] = newFn
-}
-
-Object.getOwnPropertyNames(HighlightIterator.prototype).forEach(n => {
-  spyOn(HighlightIterator.prototype, n)
-})
