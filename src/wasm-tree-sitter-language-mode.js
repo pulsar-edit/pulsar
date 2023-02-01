@@ -99,11 +99,11 @@ class WASMTreeSitterLanguageMode {
         const range = new Range(from, to)
         console.log("WILL INVALIDATE", range)
         /// FIXME - this doesn't invalidate
-        this._updateBoundaries(from, to, true)
-        const evt = {oldRange: range, newRange: range, oldText: this.buffer.getTextInRange(range)}
-        for (const id in this.displayLayers) {
-          this.displayLayers[id].bufferDidChange(evt)
-        }
+        // this._updateBoundaries(from, to, true)
+        // const evt = {oldRange: range, newRange: range, oldText: this.buffer.getTextInRange(range)}
+        // for (const id in this.displayLayers) {
+        //   this.displayLayers[id].bufferDidChange(evt)
+        // }
 
         // FIXME - and this triggers an infinite loop :(
         // this.buffer.emitDidChangeEvent(evt)
