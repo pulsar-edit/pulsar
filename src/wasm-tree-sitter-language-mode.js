@@ -4,7 +4,7 @@ const fs = require('fs');
 const { Point, Range } = require('text-buffer');
 
 const initPromise = Parser.init()
-createTree = require("functional-red-black-tree")
+createTree = require("./rb-tree")
 
 const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
@@ -54,8 +54,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidChange(change) {
-    console.log("B", this)
-    global.nt = this.buffer.getText()
     if(!this.tree) return;
 
     const startIndex = this.buffer.characterIndexForPosition(change.newRange.start)
@@ -68,23 +66,50 @@ class WASMTreeSitterLanguageMode {
       newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
     const newTree = this.parser.parse(this.buffer.getText(), this.tree)
-
-    const changes = newTree.getChangedRanges(this.tree)
-    console.log("WHAT WAS CHANGED", changes)
-
+    // const changes = newTree.getChangedRanges(this.tree)
     this.tree = newTree
   }
 
-  _updateBoundaries(from, to) {
+  _updateBoundaries(from, to, stopInvalidating) {
     const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
 
     let oldDataIterator = this.boundaries.ge(from)
     let oldScopes = []
+
+    let scopesInvalidated = createTree(comparePoints)
+    let oldBoundaries = this.boundaries
     while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
+      const oldValue = oldDataIterator.value
+      if(oldValue.definition) scopesInvalidated = scopesInvalidated.insert(oldDataIterator.key)
       this.boundaries = this.boundaries.remove(oldDataIterator.key)
       oldScopes = oldDataIterator.value.closeScopeIds
       oldDataIterator.next()
     }
+
+    // Invalidate parents
+    if(!stopInvalidating) {
+      let parentScopes = createTree(comparePoints)
+      scopesInvalidated.forEach(key => {
+        const parent = findNodeInCurrentScope(
+          oldBoundaries, key, v => v.scope === 'open')
+        if(parent) parentScopes = parentScopes.insert(parent.position, parent)
+      })
+      parentScopes.forEach((_, val) => {
+        const from = val.position, to = val.closeScopeNode.position
+        const range = new Range(from, to)
+        console.log("WILL INVALIDATE", range)
+        /// FIXME - this doesn't invalidate
+        this._updateBoundaries(from, to, true)
+        const evt = {oldRange: range, newRange: range, oldText: this.buffer.getTextInRange(range)}
+        for (const id in this.displayLayers) {
+          this.displayLayers[id].bufferDidChange(evt)
+        }
+
+        // FIXME - and this triggers an infinite loop :(
+        // this.buffer.emitDidChangeEvent(evt)
+      })
+    }
+
     oldScopes = oldScopes || []
 
     syntax.forEach(capture => {
@@ -137,10 +162,8 @@ class WASMTreeSitterLanguageMode {
       position: Point.INFINITY
     })
 
-    console.log("Syntax", syntax)
     if(this.localsQuery) {
       const locals = this.localsQuery.captures(this.tree.rootNode, from, to)
-      console.log("Locals", locals)
       this._updateWithLocals(locals)
     }
   }
@@ -155,24 +178,18 @@ class WASMTreeSitterLanguageMode {
       if(name === "local.scope") {
         openNode.scope = "open"
         closeNode.scope = "close"
-        // const oldScope = this._getParentScope(node)
-        // const oldDepth = oldScope?.depth || 0
-        // const key = this._generateScopeKey(node)
-        // // console.log("Generating scope", key, node)
-        // /// FIXME - this is WRONG, and we need to invalidate things
-        // if(!this.nestedScopes.get(key)) {
-        //   this.nestedScopes.set(key, {
-        //     node: node,
-        //     depth: oldDepth+1,
-        //     vars: new Map()
-        //   })
-        // }
+        openNode.closeScopeNode = closeNode
+        closeNode.openScopeNode = openNode
+        const parentNode = findNodeInCurrentScope(
+          this.boundaries, node.startPosition, v => v.scope === 'open')
+        const depth = parentNode?.depth || 0
+        openNode.depth = depth + 1
+        closeNode.depth = depth + 1
       } else if(name === "local.reference") {
-        // const varScope = this._getParentScopeContainingVar(node, node.text)
-        const varScope = this._getNodeDefiningVar(node)
-        console.log("Var scope", varScope)
+        const varName = node.text
+        const varScope = findNodeInCurrentScope(
+          this.boundaries, node.startPosition, v => v.definition === varName)
         if(varScope) {
-          // let oldScopes = this.boundaries.get(node.startPosition)
           openNode.openScopeIds = varScope.openScopeIds
           closeNode.closeScopeIds = varScope.closeDefinition.closeScopeIds
         }
@@ -187,17 +204,6 @@ class WASMTreeSitterLanguageMode {
         openNode.closeDefinition = closeNode
       }
     })
-  }
-
-  _getNodeDefiningVar(node) {
-    const varName = node.text
-    let iterator = this.boundaries.find(node.startPosition)
-    while(iterator.hasPrev) {
-      iterator.prev()
-      const value = iterator.value
-      if(value.definition === varName) return value
-      // if(value.scope === 'close') return
-    }
   }
 
   _getOrInsert(key) {
@@ -306,6 +312,25 @@ const nullIterator = {
 // it = nt.ge({row: 0, column: 1})
 //
 // compare({row: 0, column: 1}, {row: 0, column: 1}) === 0
+
+function findNodeInCurrentScope(boundaries, position, filter) {
+  let iterator = boundaries.ge(position)
+  while(iterator.hasPrev) {
+    iterator.prev()
+    const value = iterator.value
+    if(filter(value)) return value
+
+    if(value.scope === 'close') {
+      // If we have a closing scope, there's an "inner scope" that we will
+      // ignore, and move the iterator BEFORE the inner scope position
+      iterator = boundaries.lt(value.openScopeNode.position)
+    } else if(value.scope === 'open') {
+      // But, if we find an "open" scope, we check depth. If it's `1`, we
+      // got into the last nested scope we were inside, so it's time to quit
+      if(value.depth === 1) return
+    }
+  }
+}
 
 function comparePoints(a, b) {
   const rows = a.row - b.row
