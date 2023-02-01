@@ -1887,8 +1887,8 @@ abbrev@1:
 "about@file:packages/about":
   version "1.9.1"
   dependencies:
-    etch "0.9.0"
-    semver "^5.5.0"
+    etch "^0.14.1"
+    semver "^7.3.8"
 
 acorn-jsx@^5.3.2:
   version "5.3.2"
@@ -2085,10 +2085,10 @@ aproba@^1.0.3:
 "archive-view@file:packages/archive-view":
   version "0.66.0"
   dependencies:
-    etch "0.9.0"
+    etch "^0.14.1"
     humanize-plus "~1.8.2"
     ls-archive "1.3.4"
-    temp "~0.8.1"
+    temp "^0.9.4"
 
 archiver-utils@^2.1.0:
   version "2.1.0"
@@ -4358,7 +4358,7 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-etch@0.14.1, etch@^0.14.0:
+etch@0.14.1, etch@^0.14.0, etch@^0.14.1:
   version "0.14.1"
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.14.1.tgz#48286244c9fc44a9bb097a433a561fb1da6b58c9"
   integrity sha512-+IwqSDBhaQFMUHJu4L/ir0dhDoW5IIihg4Z9lzsIxxne8V0PlSg0gnk2STaKWjGJQnDR4cxpA+a/dORX9kycTA==
@@ -9226,7 +9226,7 @@ temp@0.9.1:
   dependencies:
     rimraf "~2.6.2"
 
-temp@0.9.4, temp@^0.9.0, temp@~0.9.0:
+temp@0.9.4, temp@^0.9.0, temp@^0.9.4, temp@~0.9.0:
   version "0.9.4"
   resolved "https://registry.yarnpkg.com/temp/-/temp-0.9.4.tgz#cd20a8580cb63635d0e4e9d4bd989d44286e7620"
   integrity sha512-yYrrsWnrXMcdsnu/7YMYAofM1ktpL5By7vZhf15CrXijWWrEYZks5AXBudalfSWJLlnen/QUJUB5aoB0kqZUGA==
