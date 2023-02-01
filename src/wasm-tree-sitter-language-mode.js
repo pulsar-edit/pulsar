@@ -10,9 +10,6 @@ const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
   constructor( buffer, config) {
     this.lastId = 259
-    // Keeps a map of where each variable scope opens or closes
-    // Format: {"startRow,startCol,endRow,endCol": {node: ts-node, depth: int, vars {name: str, scopeIds: [num]}}}
-    this.nestedScopes = new Map()
     this.scopeNames = new Map([["variable", VAR_ID]])
     this.scopeIds = new Map([[VAR_ID, "variable"]])
     this.buffer = buffer
@@ -188,11 +185,6 @@ class WASMTreeSitterLanguageMode {
 
         openNode.definition = node.text
         openNode.closeDefinition = closeNode
-        // const parentScope = this._getParentScope(node)
-        // if(parentScope) {
-        //   parentScope.vars.set(node.text, {openNode, closeNode})
-        //   parentScope.vars.set(node.text, {openNode, closeNode})
-        // }
       }
     })
   }
