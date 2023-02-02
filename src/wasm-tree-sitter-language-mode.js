@@ -60,6 +60,9 @@ class WASMTreeSitterLanguageMode {
 
   bufferDidChange(change) {
     if(!this.tree) return;
+    // This is here to avoid infinite loops
+    // because Pulsar invalidates more ranges than we ask :(
+    this.needsInvalidation = true
 
     const startIndex = this.buffer.characterIndexForPosition(change.newRange.start)
     this.tree.edit({
@@ -75,7 +78,7 @@ class WASMTreeSitterLanguageMode {
     this.tree = newTree
   }
 
-  _updateBoundaries(from, to, stopInvalidating) {
+  _updateBoundaries(from, to) {
     const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
 
     let oldDataIterator = this.boundaries.ge(from)
@@ -101,8 +104,8 @@ class WASMTreeSitterLanguageMode {
       oldDataIterator.next()
     }
 
-    // Invalidate parents
-    if(!stopInvalidating) {
+    if(this.needsInvalidation) {
+      this.needsInvalidation = false
       let parentScopes = createTree(comparePoints)
       scopesInvalidated.forEach(key => {
         const parent = findNodeInCurrentScope(
@@ -200,7 +203,6 @@ class WASMTreeSitterLanguageMode {
       let closeNode = this._getOrInsert(node.endPosition, node)
       if(!closeNode.closeNode) closeNode.closeNode = node
 
-      console.log("Updating local", node.text, node.startPosition, name,  openNode)
       if(name === "local.scope") {
         openNode.scope = "open"
         closeNode.scope = "close"
