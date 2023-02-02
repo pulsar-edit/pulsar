@@ -69,8 +69,16 @@
     'name': 'punctuation.separator.namespace.access.cpp'
   }
   {
-    'match': '\\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|typeid|xor|xor_eq|alignof|alignas)\\b'
+    'match': '\\b(typeid|alignof|alignas)\\b'
     'name': 'keyword.operator.cpp'
+  }
+  {
+    'match': '\\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|xor|xor_eq)\\b'
+    'name': 'keyword.operator.alias.cpp'
+  }
+  {
+    'match': '\\bstatic_assert\\b'
+    'name': 'keyword.static-assert.cpp'
   }
   {
     'match': '\\b(class|decltype|wchar_t|char16_t|char32_t)\\b'
@@ -242,7 +250,7 @@
         "name": "meta.using-namespace-declaration.cpp"
       },
       {
-        'begin': '\\b(namespace)\\b\\s*([_A-Za-z][_A-Za-z0-9]*\\b)?+'
+        'begin': '\\b(namespace)\\b\\s*((?:[_A-Za-z][_A-Za-z0-9]*\\b(::)?)*)?+'
         'beginCaptures':
           '1':
             'name': 'storage.type.cpp'
@@ -281,32 +289,35 @@
         ]
       }
       {
-        'begin': '\\b(class|struct)\\b\\s*([_A-Za-z][_A-Za-z0-9]*\\b)?+(\\s*:\\s*(public|protected|private)\\s*([_A-Za-z][_A-Za-z0-9]*\\b)((\\s*,\\s*(public|protected|private)\\s*[_A-Za-z][_A-Za-z0-9]*\\b)*))?'
+        'begin': '\\b(class|struct)\\b\\s*([_A-Za-z][_A-Za-z0-9]*\\b)?+(\\s*:\\s)?'
         'beginCaptures':
           '1':
             'name': 'storage.type.cpp'
           '2':
             'name': 'entity.name.type.cpp'
-          '4':
-            'name': 'storage.type.modifier.cpp'
-          '5':
-            'name': 'entity.name.type.inherited.cpp'
-          '6':
-            'patterns': [
-              {
-                'match': '(public|protected|private)'
-                'name': 'storage.type.modifier.cpp'
-              }
-              {
-                'match': '[_A-Za-z][_A-Za-z0-9]*'
-                'name': 'entity.name.type.inherited.cpp'
-              }
-            ]
         'end': '(?<=\\})|(?=(;|\\(|\\)|>|\\[|\\]|=))'
         'name': 'meta.class-struct-block.cpp'
         'patterns': [
           {
             'include': '#angle_brackets'
+          }
+          {
+            'begin': '(virtual\\s*)?(public|protected|private)\\s*(virtual\\s*)?([_A-Za-z][_A-Za-z0-9]*)\\b'
+            'beginCaptures':
+              '1':
+                'name': 'storage.type.modifier.cpp'
+              '2':
+                'name': 'storage.type.modifier.cpp'
+              '3':
+                'name': 'storage.type.modifier.cpp'
+              '4':
+                'name': 'entity.name.type.inherited.cpp'
+            'end': '(\\{)|(\\s*\\n)|(,)?'
+            'patterns': [
+              {
+                'include': '#angle_brackets'
+              }
+            ]
           }
           {
             'begin': '\\{'
