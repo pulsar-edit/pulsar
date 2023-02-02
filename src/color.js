@@ -84,7 +84,7 @@ module.exports = class Color {
   // Essential: Returns a {String} in the form `'#abcdef'`.
   toHexString() {
     let colorObj = ParsedColor.rgb(this.red, this.green, this.blue);
-    return colorObj.hex();
+    return (colorObj.hex()).toUpperCase();
   }
 
   // Essential: Returns a {String} in the form `'rgba(25, 50, 75, .9)'`.
