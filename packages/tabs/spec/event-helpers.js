@@ -1,6 +1,6 @@
 
 const buildMouseEvent = (type, target, param) => {
-  if (param === null) {
+  if (param == null) {
     param = {};
   }
 
