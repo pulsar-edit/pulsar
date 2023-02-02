@@ -2,6 +2,7 @@ const Parser = require('web-tree-sitter');
 const ScopeDescriptor = require('./scope-descriptor')
 const fs = require('fs');
 const { Point, Range } = require('text-buffer');
+const { Emitter } = require('event-kit');
 
 const initPromise = Parser.init()
 createTree = require("./rb-tree")
@@ -9,6 +10,7 @@ createTree = require("./rb-tree")
 const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
   constructor( buffer, config) {
+    this.emitter = new Emitter();
     this.lastId = 259
     this.scopeNames = new Map([["variable", VAR_ID]])
     this.scopeIds = new Map([[VAR_ID, "variable"]])
@@ -20,9 +22,11 @@ class WASMTreeSitterLanguageMode {
       Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
     ).then(lang => {
       const syntaxQuery = fs.readFileSync('/tmp/grammars/ruby/queries/highlights.scm', 'utf-8')
-      const localsQuery = fs.readFileSync('/tmp/grammars/ruby/queries/locals.scm', 'utf-8')
+      if(fs.existsSync('/tmp/grammars/ruby/queries/locals.scm')) {
+        const localsQuery = fs.readFileSync('/tmp/grammars/ruby/queries/locals.scm', 'utf-8')
+        this.localsQuery = lang.query(localsQuery)
+      }
       this.syntaxQuery = lang.query(syntaxQuery)
-      this.localsQuery = lang.query(localsQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
 
@@ -43,7 +47,8 @@ class WASMTreeSitterLanguageMode {
   updateForInjection(...args) {
   }
 
-  onDidChangeHighlighting(fn) {
+  onDidChangeHighlighting(callback) {
+    return this.emitter.on('did-change-highlighting', callback)
   }
 
   tokenizedLineForRow(row) {
@@ -78,9 +83,19 @@ class WASMTreeSitterLanguageMode {
 
     let scopesInvalidated = createTree(comparePoints)
     let oldBoundaries = this.boundaries
+    let invalidatedNames = new Set()
     while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
       const oldValue = oldDataIterator.value
-      if(oldValue.definition) scopesInvalidated = scopesInvalidated.insert(oldDataIterator.key)
+      if(oldValue.definition) {
+        scopesInvalidated = scopesInvalidated.insert(oldDataIterator.key, oldDataIterator.value)
+        // New scope name
+        invalidatedNames.add(this.buffer.getTextInRange([
+          oldDataIterator.value.openNode.startPosition,
+          oldDataIterator.value.openNode.endPosition
+        ]))
+        // Old scope name
+        invalidatedNames.add(oldDataIterator.value.openNode.text)
+      }
       this.boundaries = this.boundaries.remove(oldDataIterator.key)
       oldScopes = oldDataIterator.value.closeScopeIds
       oldDataIterator.next()
@@ -94,19 +109,11 @@ class WASMTreeSitterLanguageMode {
           oldBoundaries, key, v => v.scope === 'open')
         if(parent) parentScopes = parentScopes.insert(parent.position, parent)
       })
+
       parentScopes.forEach((_, val) => {
         const from = val.position, to = val.closeScopeNode.position
         const range = new Range(from, to)
-        console.log("WILL INVALIDATE", range)
-        /// FIXME - this doesn't invalidate
-        // this._updateBoundaries(from, to, true)
-        // const evt = {oldRange: range, newRange: range, oldText: this.buffer.getTextInRange(range)}
-        // for (const id in this.displayLayers) {
-        //   this.displayLayers[id].bufferDidChange(evt)
-        // }
-
-        // FIXME - and this triggers an infinite loop :(
-        // this.buffer.emitDidChangeEvent(evt)
+        this._invalidateReferences(oldBoundaries, range, invalidatedNames)
       })
     }
 
@@ -168,6 +175,24 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
+  _invalidateReferences(oldBoundaries, range, invalidatedNames) {
+    const {start, end} = range
+    let it = oldBoundaries.ge(start)
+    while(it.hasNext) {
+      const node = it.value.openNode
+      if(node && !it.value.definition) {
+        const txt = node.text
+        if(invalidatedNames.has(txt)) {
+          console.log("Invalidating", node.startPosition, node.text)
+          const range = new Range(node.startPosition, node.endPosition)
+          this.emitter.emit('did-change-highlighting', range)
+        }
+      }
+      it.next()
+      if(comparePoints(it.key, end) >= 0) return
+    }
+  }
+
   _updateWithLocals(locals) {
     locals.forEach(({name, node}) => {
       let openNode = this._getOrInsert(node.startPosition, node)
@@ -175,6 +200,7 @@ class WASMTreeSitterLanguageMode {
       let closeNode = this._getOrInsert(node.endPosition, node)
       if(!closeNode.closeNode) closeNode.closeNode = node
 
+      console.log("Updating local", node.text, node.startPosition, name,  openNode)
       if(name === "local.scope") {
         openNode.scope = "open"
         closeNode.scope = "close"
@@ -185,7 +211,7 @@ class WASMTreeSitterLanguageMode {
         const depth = parentNode?.depth || 0
         openNode.depth = depth + 1
         closeNode.depth = depth + 1
-      } else if(name === "local.reference") {
+      } else if(name === "local.reference" && !openNode.definition) {
         const varName = node.text
         const varScope = findNodeInCurrentScope(
           this.boundaries, node.startPosition, v => v.definition === varName)
@@ -247,6 +273,7 @@ class WASMTreeSitterLanguageMode {
       },
 
       seek(start, endRow) {
+        // debugger
         const end = {row: endRow + 1, column: 0}
         iterator = updateBoundaries(start, end).ge(start)
         return []
