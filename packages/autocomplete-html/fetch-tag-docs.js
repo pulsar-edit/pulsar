@@ -31,7 +31,7 @@ const fetch = () => {
   })
 
   return tagsPromise.then((tags) => {
-    if (!tags) return
+    if (!tags) return undefined;
 
     const MAX = 10
     const queue = Object.keys(tags)
@@ -82,7 +82,7 @@ const fetch = () => {
               } else {
                 docs[tagName] = filterExcerpt(tagName, doc.excerpt)
               }
-              return
+              return undefined;
             }
           }
         }

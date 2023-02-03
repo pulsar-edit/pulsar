@@ -192,7 +192,7 @@ Tooltip.prototype.enter = function(event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).enter(event);
-      return;
+      return undefined;
     }
 
     this.inState[event.type === 'focusin' ? 'focus' : 'hover'] = true;
@@ -203,7 +203,7 @@ Tooltip.prototype.enter = function(event) {
     this.hoverState === 'in'
   ) {
     this.hoverState = 'in';
-    return;
+    return undefined;
   }
 
   clearTimeout(this.timeout);
@@ -234,13 +234,13 @@ Tooltip.prototype.leave = function(event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).leave(event);
-      return;
+      return undefined;
     }
 
     this.inState[event.type === 'focusout' ? 'focus' : 'hover'] = false;
   }
 
-  if (this.isInStateTrue()) return;
+  if (this.isInStateTrue()) return undefined;
 
   clearTimeout(this.timeout);
 

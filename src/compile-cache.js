@@ -179,9 +179,10 @@ exports.install = function(resourcesPath, nodeRequire) {
         return null;
       }
 
-      let match, lastMatch;
+      let lastMatch;
       INLINE_SOURCE_MAP_REGEXP.lastIndex = 0;
-      while ((match = INLINE_SOURCE_MAP_REGEXP.exec(fileData))) {
+      let match = INLINE_SOURCE_MAP_REGEXP.exec(fileData);
+      while (match) {
         lastMatch = match;
       }
       if (lastMatch == null) {

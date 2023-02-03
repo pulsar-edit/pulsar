@@ -49,7 +49,7 @@ KeymapManager.prototype.getUserKeymapPath = function() {
 KeymapManager.prototype.loadUserKeymap = function() {
   const userKeymapPath = this.getUserKeymapPath();
   if (!fs.isFileSync(userKeymapPath)) {
-    return;
+    return undefined;
   }
   try {
     this.loadKeymap(userKeymapPath, {watch: true, suppressErrors: true, priority: 100});
