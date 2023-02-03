@@ -197,7 +197,19 @@ class WASMTreeSitterLanguageMode {
   }
 
   _updateWithLocals(locals) {
-    locals.forEach(({name, node}) => {
+    const size = locals.length
+    for(let i = 0; i < size; i++) {
+      const {name, node} = locals[i]
+      const nextOne = locals[i+1]
+
+      const duplicatedLocalScope = nextOne &&
+        comparePoints(node.startPosition, nextOne.node.startPosition) === 0 &&
+        comparePoints(node.endPosition, nextOne.node.endPosition) === 0
+      if(duplicatedLocalScope) {
+        // Local reference have lower precedence over everything else
+        if(name === 'local.reference') continue;
+      }
+
       let openNode = this._getOrInsert(node.startPosition, node)
       if(!openNode.openNode) openNode.openNode = node
       let closeNode = this._getOrInsert(node.endPosition, node)
@@ -231,7 +243,7 @@ class WASMTreeSitterLanguageMode {
         openNode.definition = node.text
         openNode.closeDefinition = closeNode
       }
-    })
+    }
   }
 
   _getOrInsert(key) {
