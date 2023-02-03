@@ -184,6 +184,7 @@ exports.install = function(resourcesPath, nodeRequire) {
       let match = INLINE_SOURCE_MAP_REGEXP.exec(fileData);
       while (match) {
         lastMatch = match;
+        match = INLINE_SOURCE_MAP_REGEXP.exec(fileData);
       }
       if (lastMatch == null) {
         return null;
