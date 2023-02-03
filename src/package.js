@@ -639,7 +639,7 @@ module.exports = class Package {
           fs.resolve(stylesheetDirPath, name, ['css', 'less', ''])
         );
       } else {
-      	let indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']);
+        let indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']);
         return indexStylesheet
           ? [indexStylesheet]
           : fs.listSync(stylesheetDirPath, ['css', 'less']);

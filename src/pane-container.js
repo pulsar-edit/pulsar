@@ -43,7 +43,7 @@ module.exports = class PaneContainer {
 
   getElement() {
     if (this.element == null) {
-    	this.element = createPaneContainerElement().initialize(this, {
+      this.element = createPaneContainerElement().initialize(this, {
         views: this.viewRegistry
       });
     }

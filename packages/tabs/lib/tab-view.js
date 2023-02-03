@@ -244,7 +244,7 @@ class TabView {
 
     let itemClass = this.item.constructor != null ? this.item.constructor.name : undefined;
     if (itemClass) {
-    	this.element.dataset.type = itemClass
+      this.element.dataset.type = itemClass
       return this.element.dataset.type;
     } else {
       return delete this.element.dataset.type;
@@ -261,8 +261,8 @@ class TabView {
     if (updateSiblings === false) {
       title = this.item.getTitle();
       if (useLongTitle) {
-      	let left = typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined;
-      	title = left != null ? left : title;
+        let left = typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined;
+        title = left != null ? left : title;
       }
       this.itemTitle.textContent = title;
     } else {
@@ -278,7 +278,7 @@ class TabView {
       }
       if (useLongTitle) {
         let left1 = typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined;
-      	title = left1 != null ? left1 : title;
+        title = left1 != null ? left1 : title;
       }
 
       this.itemTitle.textContent = title;

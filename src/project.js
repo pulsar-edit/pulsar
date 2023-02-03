@@ -577,8 +577,8 @@ module.exports = class Project extends Model {
         return this.defaultDirectoryProvider.normalizePath(fs.resolveHome(uri));
         // TODO: what should we do here when there are multiple directories?
       } else {
-      	let projectPath = this.getPaths()[0];
-      	if (projectPath) {
+        let projectPath = this.getPaths()[0];
+        if (projectPath) {
           return this.defaultDirectoryProvider.normalizePath(
             fs.resolveHome(path.join(projectPath, uri))
           );
