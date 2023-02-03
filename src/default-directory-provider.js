@@ -54,10 +54,10 @@ module.exports = class DefaultDirectoryProvider {
   //
   // Returns a {String} with normalized path.
   normalizePath(uri) {
-    let matchData, pathWithNormalizedDiskDriveLetter;
+    let pathWithNormalizedDiskDriveLetter = uri;
     // Normalize disk drive letter on Windows to avoid opening two buffers for the same file
-    pathWithNormalizedDiskDriveLetter = uri;
-    if (process.platform === 'win32' && (matchData = uri.match(/^([a-z]):/))) {
+    let matchData = uri.match(/^([a-z]):/);
+    if (process.platform === 'win32' && matchData) {
       pathWithNormalizedDiskDriveLetter = `${matchData[1].toUpperCase()}${uri.slice(1)}`;
     }
     return path.normalize(pathWithNormalizedDiskDriveLetter);

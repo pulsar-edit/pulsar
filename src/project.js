@@ -566,23 +566,25 @@ module.exports = class Project extends Model {
 
   resolvePath(uri) {
     if (!uri) {
-      return;
+      return undefined;
     }
 
     if (uri.match(/[A-Za-z0-9+-.]+:\/\//)) {
       // leave path alone if it has a scheme
       return uri;
     } else {
-      let projectPath;
       if (fs.isAbsolute(uri)) {
         return this.defaultDirectoryProvider.normalizePath(fs.resolveHome(uri));
         // TODO: what should we do here when there are multiple directories?
-      } else if ((projectPath = this.getPaths()[0])) {
-        return this.defaultDirectoryProvider.normalizePath(
-          fs.resolveHome(path.join(projectPath, uri))
-        );
       } else {
-        return undefined;
+      	let projectPath = this.getPaths()[0];
+      	if (projectPath) {
+          return this.defaultDirectoryProvider.normalizePath(
+            fs.resolveHome(path.join(projectPath, uri))
+          );
+        } else {
+          return undefined;
+        }
       }
     }
   }

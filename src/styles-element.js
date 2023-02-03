@@ -22,9 +22,8 @@ class StylesElement extends HTMLElement {
   }
 
   connectedCallback() {
-    let left;
-    this.context =
-      (left = this.getAttribute('context')) != null ? left : undefined;
+    let left = this.getAttribute('context');
+    this.context = left != null ? left : undefined;
   }
 
   disconnectedCallback() {
@@ -109,16 +108,14 @@ class StylesElement extends HTMLElement {
   }
 
   styleElementRemoved(styleElement) {
-    let left;
     if (!this.styleElementMatchesContext(styleElement)) {
       return;
     }
 
-    const styleElementClone =
-      (left = this.styleElementClonesByOriginalElement.get(styleElement)) !=
-      null
-        ? left
-        : styleElement;
+    let left = this.styleElementClonesByOriginalElement.get(styleElement);
+    const styleElementClone = left != null
+      ? left
+      : styleElement;
     styleElementClone.remove();
     this.emitter.emit('did-remove-style-element', styleElementClone);
   }

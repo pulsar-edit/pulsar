@@ -197,8 +197,8 @@ function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
 }
 
 function satisfies(version, rawRange) {
-  let parsedRange;
-  if (!(parsedRange = cache.ranges[rawRange])) {
+  let parsedRange = cache.ranges[rawRange];
+  if (!parsedRange) {
     parsedRange = new Range(rawRange);
     cache.ranges[rawRange] = parsedRange;
   }

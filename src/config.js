@@ -1289,8 +1289,8 @@ class Config {
         return undefined;
       }
     } else {
-      let schema;
-      if ((schema = this.getSchema(keyPath)) == null) {
+      let schema = this.getSchema(keyPath);
+      if (schema == null) {
         if (schema === false) {
           throw new Error(`Illegal key path ${keyPath}`);
         }

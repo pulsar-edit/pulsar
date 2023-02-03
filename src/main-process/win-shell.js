@@ -41,7 +41,8 @@ class ShellOption {
       });
       return reg.create(() =>
         reg.set(part.name, Registry.REG_SZ, part.value, () => {
-          if (--doneCount === 0) return callback();
+          doneCount -= 1;
+          if (doneCount === 0) return callback();
         })
       );
     });
