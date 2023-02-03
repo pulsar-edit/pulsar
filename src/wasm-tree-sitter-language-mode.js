@@ -17,6 +17,8 @@ class WASMTreeSitterLanguageMode {
     this.buffer = buffer
     this.config = config
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
+    this.newRanges = []
+    this.oldNodeTexts = new Set()
 
     initPromise.then(() =>
       Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
@@ -64,6 +66,13 @@ class WASMTreeSitterLanguageMode {
     // because Pulsar invalidates more ranges than we ask :(
     this.needsInvalidation = true
 
+    const possibleDefinition = this.boundaries.lt(change.oldRange.end).value?.definition
+    if(possibleDefinition) {
+      this.newRanges.push(change.newRange)
+      // This needs to be here because tree-sitter CHANGES nodes that are affected by `.edit`
+      this.oldNodeTexts.add(possibleDefinition)
+    }
+
     const startIndex = this.buffer.characterIndexForPosition(change.newRange.start)
     this.tree.edit({
       startPosition: change.newRange.start,
@@ -84,44 +93,13 @@ class WASMTreeSitterLanguageMode {
     let oldDataIterator = this.boundaries.ge(from)
     let oldScopes = []
 
-    let scopesInvalidated = createTree(comparePoints)
-    let oldBoundaries = this.boundaries
-    let invalidatedNames = new Set()
     while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
-      const oldValue = oldDataIterator.value
-      if(oldValue.definition) {
-        scopesInvalidated = scopesInvalidated.insert(oldDataIterator.key, oldDataIterator.value)
-        // New scope name
-        invalidatedNames.add(this.buffer.getTextInRange([
-          oldDataIterator.value.openNode.startPosition,
-          oldDataIterator.value.openNode.endPosition
-        ]))
-        // Old scope name
-        invalidatedNames.add(oldDataIterator.value.openNode.text)
-      }
       this.boundaries = this.boundaries.remove(oldDataIterator.key)
       oldScopes = oldDataIterator.value.closeScopeIds
       oldDataIterator.next()
     }
 
-    if(this.needsInvalidation) {
-      this.needsInvalidation = false
-      let parentScopes = createTree(comparePoints)
-      scopesInvalidated.forEach(key => {
-        const parent = findNodeInCurrentScope(
-          oldBoundaries, key, v => v.scope === 'open')
-        if(parent) parentScopes = parentScopes.insert(parent.position, parent)
-      })
-
-      parentScopes.forEach((_, val) => {
-        const from = val.position, to = val.closeScopeNode.position
-        const range = new Range(from, to)
-        this._invalidateReferences(oldBoundaries, range, invalidatedNames)
-      })
-    }
-
     oldScopes = oldScopes || []
-
     syntax.forEach(capture => {
       const node = capture.node
       const names = capture.name.split('.')
@@ -175,18 +153,39 @@ class WASMTreeSitterLanguageMode {
     if(this.localsQuery) {
       const locals = this.localsQuery.captures(this.tree.rootNode, from, to)
       this._updateWithLocals(locals)
+      this._prepareInvalidations()
     }
   }
 
-  _invalidateReferences(oldBoundaries, range, invalidatedNames) {
+  _prepareInvalidations() {
+    let nodes = this.oldNodeTexts
+    let parentScopes = createTree(comparePoints)
+
+    this.newRanges.forEach(range => {
+      const newNodeText = this.boundaries.lt(range.end).value?.definition
+      if(newNodeText) nodes.add(newNodeText)
+      const parent = findNodeInCurrentScope(
+        this.boundaries, range.start, v => v.scope === 'open'
+      )
+      if(parent) parentScopes = parentScopes.insert(parent.position, parent)
+    })
+    parentScopes.forEach((_, val) => {
+      const from = val.position, to = val.closeScopeNode.position
+      const range = new Range(from, to)
+      this._invalidateReferences(range, nodes)
+    })
+    this.oldNodeTexts = new Set()
+    this.newRanges = []
+  }
+
+  _invalidateReferences(range, invalidatedNames) {
     const {start, end} = range
-    let it = oldBoundaries.ge(start)
+    let it = this.boundaries.ge(start)
     while(it.hasNext) {
       const node = it.value.openNode
       if(node && !it.value.definition) {
         const txt = node.text
         if(invalidatedNames.has(txt)) {
-          console.log("Invalidating", node.startPosition, node.text)
           const range = new Range(node.startPosition, node.endPosition)
           this.emitter.emit('did-change-highlighting', range)
         }
@@ -320,39 +319,6 @@ const nullIterator = {
   getOpenScopeIds: () => [],
   getCloseScopeIds: () => []
 }
-
-// createTree = require("functional-red-black-tree")
-// tree = createTree((a, b) => (a.row - b.row) + (a.column - b.column) / 10)
-//
-// nt = tree.
-//   insert({row: 1, column: 1}, '1,1').
-//   insert({row: 0, column: 1}, '0,1').
-//   insert({row: 1, column: 0}, '1,0').
-//   insert({row: 0, column: 0}, '0,0').
-//   insert({row: 0, column: 2}, '0,2')
-//
-// nt.get = function(key) {
-//   var cmp = this._compare
-//   var n = this.root
-//   while(n) {
-//     var d = cmp(key, n.key)
-//     console.log("RETURN OF", d, "Inside", n)
-//     if(d === 0) {
-//       return n.value
-//     }
-//     if(d <= 0) {
-//       n = n.left
-//     } else {
-//       n = n.right
-//     }
-//   }
-//   return
-// }
-//
-// nt.get({row: 0, column: 1})
-// it = nt.ge({row: 0, column: 1})
-//
-// compare({row: 0, column: 1}, {row: 0, column: 1}) === 0
 
 function findNodeInCurrentScope(boundaries, position, filter) {
   let iterator = boundaries.ge(position)
