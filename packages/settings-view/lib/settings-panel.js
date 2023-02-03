@@ -330,7 +330,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
         return floatValue
       }
     } else if (type === 'integer') {
-      let intValue = parseInt(value)
+      let intValue = parseInt(value, 10)
       if (isNaN(intValue)) {
         return value
       } else {

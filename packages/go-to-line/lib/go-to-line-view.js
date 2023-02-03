@@ -63,10 +63,10 @@ class GoToLineView {
     const currentRow = editor.getCursorBufferPosition().row;
     const rowLineNumber = lineNumber.split(/:+/)[0] || '';
     const row =
-      rowLineNumber.length > 0 ? parseInt(rowLineNumber) - 1 : currentRow;
+      rowLineNumber.length > 0 ? parseInt(rowLineNumber, 10) - 1 : currentRow;
     const columnLineNumber = lineNumber.split(/:+/)[1] || '';
     const column =
-      columnLineNumber.length > 0 ? parseInt(columnLineNumber) - 1 : -1;
+      columnLineNumber.length > 0 ? parseInt(columnLineNumber, 10) - 1 : -1;
 
     const position = new Point(row, column);
     editor.setCursorBufferPosition(position);

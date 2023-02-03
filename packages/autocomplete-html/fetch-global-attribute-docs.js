@@ -24,7 +24,7 @@ const fetch = () => {
   })
 
   attributesPromise.then((attributes) => {
-    if (!attributes) return
+    if (!attributes) return undefined;
 
     const MAX = 10
     const queue = []
@@ -75,7 +75,7 @@ const fetch = () => {
           for (let doc of searchResults.documents) {
             if (doc.url === `${mdnHTMLURL}/${attributeName}`) {
               docs[attributeName] = filterExcerpt(attributeName, doc.excerpt)
-              return
+              return undefined;
             }
           }
         }

@@ -10,7 +10,7 @@ function getActivePath (target) {
     if (selected) {
       return selected.dataset.path
     }
-    return
+    return undefined;
   }
 
   const tab = target.closest('.tab-bar > .tab')
@@ -20,7 +20,7 @@ function getActivePath (target) {
     if (title && title.dataset.path) {
       return title.dataset.path
     }
-    return
+    return undefined;
   }
 
   const paneItem = atom.workspace.getActivePaneItem()

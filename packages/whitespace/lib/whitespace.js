@@ -93,11 +93,11 @@ module.exports = class Whitespace {
 
     let editorTextInsertedSubscription = editor.onDidInsertText(function (event) {
       if (event.text !== '\n') {
-        return
+        return undefined;
       }
 
       if (!buffer.isRowBlank(event.range.start.row)) {
-        return
+        return undefined;
       }
 
       let scopeDescriptor = editor.getRootScopeDescriptor()

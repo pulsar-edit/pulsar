@@ -171,7 +171,11 @@ export default class UpdatesPanel {
 
     const queue = asyncQueue(function (packageCard, callback) {
       const onUpdateCompleted = function (err) {
-        err == null ? successfulUpdatesCount++ : failedUpdatesCount++
+        if (err == null) {
+          successfulUpdatesCount++;
+        } else {
+          failedUpdatesCount++;
+        }
       }
 
       if (updatingPackages.includes(packageCard.pack)) {
