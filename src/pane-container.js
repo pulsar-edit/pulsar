@@ -42,11 +42,12 @@ module.exports = class PaneContainer {
   }
 
   getElement() {
-    return this.element != null
-      ? this.element
-      : (this.element = createPaneContainerElement().initialize(this, {
-          views: this.viewRegistry
-        }));
+    if (this.element == null) {
+    	this.element = createPaneContainerElement().initialize(this, {
+        views: this.viewRegistry
+      });
+    }
+    return this.element;
   }
 
   destroy() {

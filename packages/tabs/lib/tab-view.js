@@ -234,7 +234,6 @@ class TabView {
   }
 
   updateDataAttributes() {
-    let itemClass;
     if (this.path) {
       this.itemTitle.dataset.name = path.basename(this.path);
       this.itemTitle.dataset.path = this.path;
@@ -243,8 +242,10 @@ class TabView {
       delete this.itemTitle.dataset.path;
     }
 
-    if ((itemClass = this.item.constructor != null ? this.item.constructor.name : undefined)) {
-      return this.element.dataset.type = itemClass;
+    let itemClass = this.item.constructor != null ? this.item.constructor.name : undefined;
+    if (itemClass) {
+    	this.element.dataset.type = itemClass
+      return this.element.dataset.type;
     } else {
       return delete this.element.dataset.type;
     }
@@ -254,13 +255,15 @@ class TabView {
     let title;
     if (param == null) { param = {}; }
     let {updateSiblings, useLongTitle} = param;
-    if (this.updatingTitle) { return; }
+    if (this.updatingTitle) { return undefined; }
     this.updatingTitle = true;
 
     if (updateSiblings === false) {
       title = this.item.getTitle();
-      if (useLongTitle) { let left;
-      title = (left = (typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined)) != null ? left : title; }
+      if (useLongTitle) {
+      	let left = typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined;
+      	title = left != null ? left : title;
+      }
       this.itemTitle.textContent = title;
     } else {
       title = this.item.getTitle();
@@ -273,13 +276,16 @@ class TabView {
           }
         }
       }
-      if (useLongTitle) { let left1;
-      title = (left1 = (typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined)) != null ? left1 : title; }
+      if (useLongTitle) {
+        let left1 = typeof this.item.getLongTitle === 'function' ? this.item.getLongTitle() : undefined;
+      	title = left1 != null ? left1 : title;
+      }
 
       this.itemTitle.textContent = title;
     }
 
-    return this.updatingTitle = false;
+    this.updatingTitle = false;
+    return this.updatingTitle;
   }
 
   updateIcon() {

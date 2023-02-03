@@ -631,7 +631,6 @@ module.exports = class Package {
         path.join(this.path, styleSheetPath)
       );
     } else {
-      let indexStylesheet;
       const stylesheetDirPath = this.getStylesheetsPath();
       if (this.metadata.mainStyleSheet) {
         return [fs.resolve(this.path, this.metadata.mainStyleSheet)];
@@ -639,12 +638,11 @@ module.exports = class Package {
         return this.metadata.styleSheets.map(name =>
           fs.resolve(stylesheetDirPath, name, ['css', 'less', ''])
         );
-      } else if (
-        (indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']))
-      ) {
-        return [indexStylesheet];
       } else {
-        return fs.listSync(stylesheetDirPath, ['css', 'less']);
+      	let indexStylesheet = fs.resolve(this.path, 'index', ['css', 'less']);
+        return indexStylesheet
+          ? [indexStylesheet]
+          : fs.listSync(stylesheetDirPath, ['css', 'less']);
       }
     }
   }

@@ -257,10 +257,10 @@ class TabBarView {
   }
 
   splitTab(fn) {
-    let item;
-    if (item = this.rightClickedTab != null ? this.rightClickedTab.item : undefined) {
-      let copiedItem;
-      if (copiedItem = typeof item.copy === 'function' ? item.copy() : undefined) {
+    let item = this.rightClickedTab != null ? this.rightClickedTab.item : undefined;
+    if (item) {
+      let copiedItem = typeof item.copy === 'function' ? item.copy() : undefined;
+      if (copiedItem) {
         return this.pane[fn]({items: [copiedItem]});
       }
     }
@@ -324,7 +324,8 @@ class TabBarView {
   }
 
   getWindowId() {
-    return this.windowId != null ? this.windowId : (this.windowId = atom.getCurrentWindow().id);
+    if (this.windowId == null) { this.windowId = atom.getCurrentWindow().id; }
+    return this.windowId;
   }
 
   onDragStart(event) {
@@ -350,14 +351,14 @@ class TabBarView {
     if (item == null) { return; }
 
     if (typeof item.getURI === 'function') {
-      let left;
-      itemURI = (left = item.getURI()) != null ? left : '';
+      let left = item.getURI();
+      itemURI = left != null ? left : '';
     } else if (typeof item.getPath === 'function') {
-      let left1;
-      itemURI = (left1 = item.getPath()) != null ? left1 : '';
+      let left1 = item.getPath();
+      itemURI = left1 != null ? left1 : '';
     } else if (typeof item.getUri === 'function') {
-      let left2;
-      itemURI = (left2 = item.getUri()) != null ? left2 : '';
+      let left2 = item.getUri();
+      itemURI = left2 != null ? left2 : '';
     }
 
     if (typeof item.getAllowedLocations === 'function') {
@@ -408,44 +409,46 @@ class TabBarView {
 
   onDragOver(event) {
     let tab;
-    if (!this.isAtomTabEvent(event)) { return; }
-    if (!this.itemIsAllowed(event, this.location)) { return; }
+    if (!this.isAtomTabEvent(event)) { return undefined; }
+    if (!this.itemIsAllowed(event, this.location)) { return undefined; }
 
     event.preventDefault();
     event.stopPropagation();
 
     const newDropTargetIndex = this.getDropTargetIndex(event);
-    if (newDropTargetIndex == null) { return; }
-    if (this.lastDropTargetIndex === newDropTargetIndex) { return; }
+    if (newDropTargetIndex == null) { return undefined; }
+    if (this.lastDropTargetIndex === newDropTargetIndex) { return undefined; }
     this.lastDropTargetIndex = newDropTargetIndex;
 
     this.removeDropTargetClasses();
 
     const tabs = this.getTabs();
     const placeholder = this.getPlaceholder();
-    if (placeholder == null) { return; }
+    if (placeholder == null) { return undefined; }
 
     if (newDropTargetIndex < tabs.length) {
       tab = tabs[newDropTargetIndex];
       tab.element.classList.add('is-drop-target');
       return tab.element.parentElement.insertBefore(placeholder, tab.element);
     } else {
-      if (tab = tabs[newDropTargetIndex - 1]) {
-        let sibling;
+      tab = tabs[newDropTargetIndex - 1];
+      if (tab) {
+        let sibling = tab.element.nextSibling;
         tab.element.classList.add('drop-target-is-after');
-        if ((sibling = tab.element.nextSibling)) {
+        if (sibling) {
           return tab.element.parentElement.insertBefore(placeholder, sibling);
         } else {
           return tab.element.parentElement.appendChild(placeholder);
         }
       }
+      return undefined;
     }
   }
 
   onDropOnOtherWindow(event, fromPaneId, fromItemIndex) {
     if (this.pane.id === fromPaneId) {
-      let itemToRemove;
-      if (itemToRemove = this.pane.getItems()[fromItemIndex]) {
+      let itemToRemove = this.pane.getItems()[fromItemIndex];
+      if (itemToRemove) {
         this.pane.destroyItem(itemToRemove);
       }
     }
