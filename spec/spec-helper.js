@@ -54,6 +54,7 @@ Set.prototype.isEqual = function(other) {
     let next = values.next();
     while (!next.done) {
       if (!other.has(next.value)) { return false; }
+      next = values.next();
     }
     return true;
   } else {
