@@ -342,7 +342,8 @@ class TextMateLanguageMode {
           this.stackForRow(row - 1),
           this.openScopesForRow(row)
         );
-        if (--rowsRemaining === 0) {
+        rowsRemaining -= 1;
+        if (rowsRemaining === 0) {
           filledRegion = false;
           endRow = row;
           break;

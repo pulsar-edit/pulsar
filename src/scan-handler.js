@@ -39,7 +39,7 @@ module.exports = function(rootPaths, regexSource, options, searchOptions = {}) {
 };
 
 var processPaths = function(rootPath, paths) {
-  if (paths == null || paths.length == 0) {
+  if (paths == null || paths.length === 0) {
     return paths;
   }
   const rootPathBase = path.basename(rootPath);

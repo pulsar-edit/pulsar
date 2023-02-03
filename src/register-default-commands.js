@@ -709,8 +709,8 @@ var showSyntaxTree = function(descriptor, notificationManager) {
 };
 
 var copyPathToClipboard = function(editor, project, clipboard, relative) {
-  let filePath;
-  if (filePath = editor.getPath()) {
+  let filePath = editor.getPath();
+  if (filePath) {
     if (relative) {
       filePath = project.relativize(filePath);
     }

@@ -67,7 +67,7 @@ module.exports = class StateStore {
 
   load(key) {
     return this.dbPromise.then(db => {
-      if (!db) return;
+      if (!db) return undefined;
 
       return new Promise((resolve, reject) => {
         const request = db

@@ -19,7 +19,7 @@ exports.spawn = function(command, args, callback) {
     spawnedProcess = ChildProcess.spawn(command, args);
   } catch (error) {
     process.nextTick(() => callback && callback(error, stdout));
-    return;
+    return undefined;
   }
 
   spawnedProcess.stdout.on('data', data => {
