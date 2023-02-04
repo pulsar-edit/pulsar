@@ -21,7 +21,7 @@ module.exports = class SyntaxScopeMap {
           const termNode = selectorNode.nodes[i];
 
           switch (termNode.type) {
-            case 'tag':
+            case 'tag': {
               if (!currentTable) currentTable = this.namedScopeTable;
               if (!currentTable[termNode.value])
                 currentTable[termNode.value] = {};
@@ -34,8 +34,9 @@ module.exports = class SyntaxScopeMap {
                 currentIndexValue = null;
               }
               break;
+            }
 
-            case 'string':
+            case 'string': {
               if (!currentTable) currentTable = this.anonymousScopeTable;
               const value = termNode.value.slice(1, -1).replace(/\\"/g, '"');
               if (!currentTable[value]) currentTable[value] = {};
@@ -48,8 +49,9 @@ module.exports = class SyntaxScopeMap {
                 currentIndexValue = null;
               }
               break;
+            }
 
-            case 'universal':
+            case 'universal': {
               if (currentTable) {
                 if (!currentTable['*']) currentTable['*'] = {};
                 currentTable = currentTable['*'];
@@ -69,8 +71,9 @@ module.exports = class SyntaxScopeMap {
                 currentIndexValue = null;
               }
               break;
+            }
 
-            case 'combinator':
+            case 'combinator': {
               if (currentIndexValue != null) {
                 rejectSelector(selector);
               }
@@ -82,14 +85,16 @@ module.exports = class SyntaxScopeMap {
                 rejectSelector(selector);
               }
               break;
+            }
 
-            case 'pseudo':
+            case 'pseudo': {
               if (termNode.value === ':nth-child') {
                 currentIndexValue = termNode.nodes[0].nodes[0].value;
               } else {
                 rejectSelector(selector);
               }
               break;
+            }
 
             default:
               rejectSelector(selector);
