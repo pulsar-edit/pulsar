@@ -47,7 +47,7 @@ class ImageEditor {
         this.editorView = new ImageEditorView(this)
       } catch (e) {
         console.warn(`Could not create ImageEditorView. This can be intentional in the event of an image file being deleted by an external program.`)
-        return
+        return undefined;
       }
     }
     return this.editorView
