@@ -1119,7 +1119,9 @@ class LayerHighlightIterator {
   }
 
   seek(targetIndex, containingTags, containingTagStartIndices) {
-    while (this.treeCursor.gotoParent()) {}
+    while (this.treeCursor.gotoParent()) {
+      // loop terminated when parent is falsy
+    }
 
     this.atEnd = true;
     this.closeTags.length = 0;

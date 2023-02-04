@@ -123,7 +123,6 @@ describe('Windows Squirrel Update', function() {
           (args != null ? args[3].match(/Desktop/i) : undefined)
         ) {
           fs.writeFileSync(desktopShortcutPath, '');
-        } else {
         }
         // simply ignore other commands
 
