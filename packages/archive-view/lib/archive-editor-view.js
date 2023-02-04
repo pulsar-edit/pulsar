@@ -162,7 +162,9 @@ export default class ArchiveEditorView {
     let fileSize
     try {
       fileSize = fs.statSync(this.path)?.size;
-    } catch (e) {}
+    } catch (e) {
+      // continue regardless of exception
+    }
     if (fileSize == null) fileSize = -1
     this.refs.summary.textContent = `${humanize.fileSize(fileSize)} with ${fileLabel} and ${directoryLabel}`
   }

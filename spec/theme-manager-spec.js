@@ -13,7 +13,9 @@ describe('atom.themes', function() {
     runs(function() {
       try {
         temp.cleanupSync();
-      } catch (error) {}
+      } catch (error) {
+        // continue regardless of exception
+      }
     });
   });
 

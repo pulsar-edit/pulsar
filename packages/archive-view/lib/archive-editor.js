@@ -13,7 +13,9 @@ module.exports = {
       let isFile = false
       try {
         isFile = fs.statSync(filePath)?.isFile()
-      } catch (e) {}
+      } catch (e) {
+        // continue regardless of exception
+      }
       if (isFile) {
         return new ArchiveEditorView(filePath)
       }
@@ -43,7 +45,9 @@ module.exports = {
     let isFile = false
     try {
       isFile = fs.statSync(params.path)?.isFile()
-    } catch (e) {}
+    } catch (e) {
+      // continue regardless of exception
+    }
     if (isFile) {
       return new ArchiveEditorView(params.path)
     } else {

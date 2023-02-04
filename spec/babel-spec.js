@@ -31,7 +31,9 @@ describe('Babel transpiler support', function() {
     CompileCache.setCacheDirectory(originalCacheDir);
     try {
       return temp.cleanupSync();
-    } catch (error) {}
+    } catch (error) {
+      return undefined;
+    }
   });
 
   describe('when a .js file starts with /** @babel */;', () =>

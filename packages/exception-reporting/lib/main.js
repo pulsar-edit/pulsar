@@ -31,7 +31,9 @@ export default {
               secondaryException
             );
             getReporter().reportUncaughtException(secondaryException);
-          } catch (error) {}
+          } catch (error) {
+            // continue regardless of exception
+          }
         }
       })
     );
@@ -48,7 +50,9 @@ export default {
                 secondaryException
               );
               getReporter().reportUncaughtException(secondaryException);
-            } catch (error) {}
+            } catch (error) {
+              // continue regardless of exception
+            }
           }
         })
       );

@@ -10,7 +10,9 @@ describe('ModuleCache', function() {
   afterEach(function() {
     try {
       temp.cleanupSync();
-    } catch (error) {}
+    } catch (error) {
+      // continue regardless of exception
+    }
   });
 
   it('resolves Electron module paths without hitting the filesystem', function() {

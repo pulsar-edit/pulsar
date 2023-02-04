@@ -1205,7 +1205,9 @@ module.exports = class Package {
           }
           traversePath(path.join(modulePath, 'node_modules'));
         }
-      } catch (error) {}
+      } catch (error) {
+        // continue regardless of exception
+      }
     };
 
     traversePath(path.join(this.path, 'node_modules'));
@@ -1331,7 +1333,9 @@ module.exports = class Package {
           this.getIncompatibleNativeModulesStorageKey()
         );
         if (arrayAsString) return JSON.parse(arrayAsString);
-      } catch (error1) {}
+      } catch (error1) {
+        // continue regardless of exception
+      }
     }
 
     const incompatibleNativeModules = [];
@@ -1346,7 +1350,9 @@ module.exports = class Package {
         let version;
         try {
           ({ version } = require(`${nativeModulePath}/package.json`));
-        } catch (error2) {}
+        } catch (error2) {
+          // continue regardless of exception
+        }
         incompatibleNativeModules.push({
           path: nativeModulePath,
           name: path.basename(nativeModulePath),

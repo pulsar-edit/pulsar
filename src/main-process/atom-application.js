@@ -1391,7 +1391,9 @@ module.exports = class AtomApplication extends EventEmitter {
             )
           );
           resourcePath = this.devResourcePath;
-        } catch (error) {}
+        } catch (error) {
+          // continue regardless of exception
+        }
       }
 
       if (!windowInitializationScript) {
@@ -1620,7 +1622,9 @@ module.exports = class AtomApplication extends EventEmitter {
             )
           );
           resourcePath = this.devResourcePath;
-        } catch (error) {}
+        } catch (error) {
+          // continue regardless of exception
+        }
       }
 
       if (!windowInitializationScript) {

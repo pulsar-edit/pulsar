@@ -67,7 +67,9 @@ describe('Windows Squirrel Update', function() {
     electron.app.quit.reset();
     try {
       temp.cleanupSync();
-    } catch (error) {}
+    } catch (error) {
+      // continue regardless of exception
+    }
   });
 
   it('quits the app on all squirrel events', function() {

@@ -116,7 +116,9 @@ function readCachedJavaScript(relativeCachePath) {
   if (fs.isFileSync(cachePath)) {
     try {
       return fs.readFileSync(cachePath, 'utf8');
-    } catch (error) {}
+    } catch (error) {
+      // continue regardless of exception
+    }
   }
   return null;
 }

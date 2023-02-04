@@ -11,7 +11,9 @@ describe('DefaultDirectoryProvider', function() {
   afterEach(function() {
     try {
       temp.cleanupSync();
-    } catch (error) {}
+    } catch (error) {
+      // continue regardless of exception
+    }
   });
 
   describe('.directoryForURISync(uri)', function() {

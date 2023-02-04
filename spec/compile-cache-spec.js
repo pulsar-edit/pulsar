@@ -33,7 +33,9 @@ describe('CompileCache', () => {
     CSON.setCacheDir(CompileCache.getCacheDirectory());
     try {
       return temp.cleanupSync();
-    } catch (error) {}
+    } catch (error) {
+      return undefined;
+    }
   });
 
   describe('addPathToCache(filePath, atomHome)', () => {

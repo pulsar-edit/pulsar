@@ -9,7 +9,9 @@ class DefaultFileIcons {
     let isSymbolicLinkSync = false
     try {
       fs.lstatSync(filePath)?.isSymbolicLink();
-    } catch (e) {}
+    } catch (e) {
+      // continue regardless of exception
+    }
     if (isSymbolicLinkSync) return 'icon-file-symlink-file'
 
     if (base === 'readme' && ['','.markdown','.md','.mdown','.mkd','.mkdown','.rmd','.ron'].includes(extension)) {

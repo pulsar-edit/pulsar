@@ -10,7 +10,9 @@ class ImageEditor {
     let fileStats;
     try {
       fileStats = fs.statSync(filePath);
-    } catch (e) {}
+    } catch (e) {
+      // continue regardless of exception
+    }
     if (fileStats?.isFile()) {
       return new ImageEditor(filePath)
     } else {

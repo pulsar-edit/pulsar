@@ -8,7 +8,9 @@ describe('AtomEnvironment', () => {
   afterEach(() => {
     try {
       temp.cleanupSync();
-    } catch (error) {}
+    } catch (error) {
+      // continue regardless of exception
+    }
   });
 
   describe('window sizing methods', () => {
