@@ -1290,10 +1290,8 @@ class Config {
       }
     } else {
       let schema = this.getSchema(keyPath);
-      if (schema == null) {
-        if (schema === false) {
-          throw new Error(`Illegal key path ${keyPath}`);
-        }
+      if (schema == null || schema === false) {
+        throw new Error(`Illegal key path ${keyPath}`);
       }
       return this.constructor.executeSchemaEnforcers(keyPath, value, schema);
     }
