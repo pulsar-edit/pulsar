@@ -16,7 +16,7 @@ function afterEach (fn) {
   })
 }
 
-;['it', 'fit', 'ffit', 'fffit'].forEach(name => {
+['it', 'fit', 'ffit', 'fffit'].forEach(name => {
   exports[name] = (description, fn) => {
     if (fn === undefined) {
       global[name](description)

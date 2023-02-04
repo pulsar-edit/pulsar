@@ -383,7 +383,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (this.getAllWindows().length === 0) {
         console.log("Quitting.");
         app.quit();
-      };
+      }
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
