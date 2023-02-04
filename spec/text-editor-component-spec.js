@@ -1243,11 +1243,11 @@ describe('TextEditorComponent', () => {
               }
 
               expect(renderedText).toBe(expectedText, failureMessage);
-              expect(parseInt(renderedLine.dataset.screenRow)).toBe(
+              expect(parseInt(renderedLine.dataset.screenRow, 10)).toBe(
                 renderedStartRow + k,
                 failureMessage
               );
-              expect(parseInt(renderedLineNumber.dataset.screenRow)).toBe(
+              expect(parseInt(renderedLineNumber.dataset.screenRow, 10)).toBe(
                 renderedStartRow + k,
                 failureMessage
               );
@@ -2878,7 +2878,7 @@ describe('TextEditorComponent', () => {
 
       // Inline styled height is updated when line height changes
       element.style.fontSize =
-        parseInt(getComputedStyle(element).fontSize) + 10 + 'px';
+        parseInt(getComputedStyle(element).fontSize, 10) + 10 + 'px';
       TextEditor.didUpdateStyles();
       await component.getNextUpdatePromise();
       expect(decorationElement1.offsetHeight).toBe(
@@ -5547,7 +5547,7 @@ describe('TextEditorComponent', () => {
       const initialKoreanCharacterWidth = editor.getKoreanCharWidth();
       const initialRenderedLineCount = queryOnScreenLineElements(element)
         .length;
-      const initialFontSize = parseInt(getComputedStyle(element).fontSize);
+      const initialFontSize = parseInt(getComputedStyle(element).fontSize, 10);
 
       expect(initialKoreanCharacterWidth).toBeDefined();
       expect(initialDoubleCharacterWidth).toBeDefined();
@@ -5610,7 +5610,7 @@ describe('TextEditorComponent', () => {
       component.setScrollLeftColumn(10);
       await component.getNextUpdatePromise();
 
-      const initialFontSize = parseInt(getComputedStyle(element).fontSize);
+      const initialFontSize = parseInt(getComputedStyle(element).fontSize, 10);
       element.style.fontSize = initialFontSize - 5 + 'px';
       TextEditor.didUpdateStyles();
       await component.getNextUpdatePromise();
@@ -5627,7 +5627,7 @@ describe('TextEditorComponent', () => {
         autoHeight: false
       });
       element.style.fontSize =
-        parseInt(getComputedStyle(element).fontSize) + 5 + 'px';
+        parseInt(getComputedStyle(element).fontSize, 10) + 5 + 'px';
       TextEditor.didUpdateStyles();
       element.style.display = 'none';
       await component.getNextUpdatePromise();

@@ -1469,7 +1469,7 @@ module.exports = class AtomApplication extends EventEmitter {
   // Kill the process with the given pid.
   killProcess(pid) {
     try {
-      const parsedPid = parseInt(pid);
+      const parsedPid = parseInt(pid, 10);
       if (isFinite(parsedPid)) this._killProcess(parsedPid);
     } catch (error) {
       if (error.code !== 'ESRCH') {

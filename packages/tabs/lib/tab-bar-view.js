@@ -475,10 +475,10 @@ class TabBarView {
 
     event.preventDefault();
 
-    const fromWindowId  = parseInt(event.dataTransfer.getData('from-window-id'));
-    const fromPaneId    = parseInt(event.dataTransfer.getData('from-pane-id'));
-    const fromIndex     = parseInt(event.dataTransfer.getData('sortable-index'));
-    const fromPaneIndex = parseInt(event.dataTransfer.getData('from-pane-index'));
+    const fromWindowId  = parseInt(event.dataTransfer.getData('from-window-id'), 10);
+    const fromPaneId    = parseInt(event.dataTransfer.getData('from-pane-id'), 10);
+    const fromIndex     = parseInt(event.dataTransfer.getData('sortable-index'), 10);
+    const fromPaneIndex = parseInt(event.dataTransfer.getData('from-pane-index'), 10);
 
     const hasUnsavedChanges = event.dataTransfer.getData('has-unsaved-changes') === 'true';
     const modifiedText = event.dataTransfer.getData('modified-text');

@@ -302,8 +302,8 @@ module.exports = class TextEditor {
     this.subscribeToDisplayLayer();
 
     if (this.cursors.length === 0 && !params.suppressCursorCreation) {
-      const initialLine = Math.max(parseInt(params.initialLine) || 0, 0);
-      const initialColumn = Math.max(parseInt(params.initialColumn) || 0, 0);
+      const initialLine = Math.max(parseInt(params.initialLine, 10) || 0, 0);
+      const initialColumn = Math.max(parseInt(params.initialColumn, 10) || 0, 0);
       this.addCursorAtBufferPosition([initialLine, initialColumn]);
     }
 

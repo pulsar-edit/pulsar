@@ -1543,14 +1543,14 @@ module.exports = class TextEditorComponent {
 
     if (avoidOverflow !== false) {
       const computedStyle = window.getComputedStyle(element);
-      const elementTop = wrapperTop + parseInt(computedStyle.marginTop);
+      const elementTop = wrapperTop + parseInt(computedStyle.marginTop, 10);
       const elementBottom = elementTop + clientRect.height;
       const flippedElementTop =
         wrapperTop -
         this.getLineHeight() -
         clientRect.height -
-        parseInt(computedStyle.marginBottom);
-      const elementLeft = wrapperLeft + parseInt(computedStyle.marginLeft);
+        parseInt(computedStyle.marginBottom, 10);
+      const elementLeft = wrapperLeft + parseInt(computedStyle.marginLeft, 10);
       const elementRight = elementLeft + clientRect.width;
 
       if (elementBottom > windowInnerHeight && flippedElementTop >= 0) {
@@ -3398,7 +3398,7 @@ module.exports = class TextEditorComponent {
   }
 
   getChromeVersion() {
-    return this.props.chromeVersion || parseInt(process.versions.chrome);
+    return this.props.chromeVersion || parseInt(process.versions.chrome, 10);
   }
 };
 

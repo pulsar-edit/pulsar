@@ -1438,7 +1438,7 @@ Config.addSchemaEnforcers({
 
   integer: {
     coerce(keyPath, value, schema) {
-      value = parseInt(value);
+      value = parseInt(value, 10);
       if (isNaN(value) || !isFinite(value)) {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(
