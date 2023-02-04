@@ -4,7 +4,7 @@ async function conditionPromise(
 ) {
   const startTime = Date.now();
 
-  while (true) {
+  for (;;) {
     await timeoutPromise(100);
 
     // if condition is sync

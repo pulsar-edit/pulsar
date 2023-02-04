@@ -335,7 +335,7 @@ class TextMateLanguageMode {
       if (startRow > lastRow) continue;
 
       let row = startRow;
-      while (true) {
+      for (;;) {
         const previousStack = this.stackForRow(row);
         this.tokenizedLines[row] = this.buildTokenizedLineForRow(
           row,
@@ -575,8 +575,10 @@ class TextMateLanguageMode {
           scopes.push(tag);
         } else {
           const matchingStartTag = tag + 1;
-          while (true) {
-            if (scopes.pop() === matchingStartTag) break;
+          for (;;) {
+            if (scopes.pop() === matchingStartTag) {
+              break;
+            }
             if (scopes.length === 0) {
               break;
             }
@@ -940,7 +942,7 @@ class TextMateHighlightIterator {
   moveToSuccessor() {
     this.openScopeIds = [];
     this.closeScopeIds = [];
-    while (true) {
+    for (;;) {
       if (this.tagIndex === this.currentLineTags.length) {
         if (this.isAtTagBoundary()) {
           break;

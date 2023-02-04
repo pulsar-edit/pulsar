@@ -7,7 +7,7 @@ import { NativeWatcherRegistry } from '../src/native-watcher-registry';
 
 function findRootDirectory() {
   let current = process.cwd();
-  while (true) {
+  for (;;) {
     let next = path.resolve(current, '..');
     if (next === current) {
       return next;

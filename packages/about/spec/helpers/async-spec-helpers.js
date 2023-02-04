@@ -6,7 +6,7 @@ const { setTimeout } = global;
 export async function conditionPromise(condition) {
   const startTime = now();
 
-  while (true) {
+  for (;;) {
     await timeoutPromise(100);
 
     if (await condition()) {

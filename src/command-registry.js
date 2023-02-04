@@ -243,7 +243,7 @@ module.exports = class CommandRegistry {
     const commandNames = new Set();
     const commands = [];
     let currentTarget = target;
-    while (true) {
+    for (;;) {
       let listeners;
       for (const name in this.inlineListenersByCommandName) {
         listeners = this.inlineListenersByCommandName[name];
@@ -378,7 +378,7 @@ module.exports = class CommandRegistry {
 
     this.emitter.emit('will-dispatch', dispatchedEvent);
 
-    while (true) {
+    for (;;) {
       const commandInlineListeners = this.inlineListenersByCommandName[
         event.type
       ]

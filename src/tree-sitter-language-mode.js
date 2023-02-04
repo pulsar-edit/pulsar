@@ -506,7 +506,7 @@ class TreeSitterLanguageMode {
     const iterator = this.buildHighlightIterator();
     let start = { row, column: 0 };
     const scopes = iterator.seek(start, row);
-    while (true) {
+    for (;;) {
       const end = iterator.getPosition();
       if (end.row > row) {
         end.row = row;

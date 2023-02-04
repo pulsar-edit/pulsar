@@ -4797,7 +4797,7 @@ module.exports = class TextEditor {
   foldBufferRow(bufferRow) {
     let position = Point(bufferRow, Infinity);
     const languageMode = this.buffer.getLanguageMode();
-    while (true) {
+    for (;;) {
       const foldableRange =
         languageMode.getFoldableRangeContainingPoint &&
         languageMode.getFoldableRangeContainingPoint(

@@ -773,7 +773,7 @@ describe('TextMateLanguageMode', () => {
         }
       ];
 
-      while (true) {
+      for (;;) {
         const boundary = {
           position: iterator.getPosition(),
           closeTags: iterator

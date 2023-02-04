@@ -35,7 +35,7 @@ function afterEach (fn) {
 async function conditionPromise (condition, description = 'anonymous condition') {
   const startTime = Date.now()
 
-  while (true) {
+  for (;;) {
     await timeoutPromise(100)
 
     if (await condition()) {
