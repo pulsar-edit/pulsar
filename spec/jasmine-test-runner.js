@@ -35,7 +35,7 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
   let documentTitle = null;
   Object.defineProperty(document, 'title', {
     get() { return documentTitle; },
-    set(title) { return documentTitle = title; }
+    set(title) { documentTitle = title; }
   }
   );
 
