@@ -83,8 +83,9 @@ module.exports = class Color {
 
   // Essential: Returns a {String} in the form `'#abcdef'`.
   toHexString() {
-    let colorObj = ParsedColor.rgb(this.red, this.green, this.blue);
-    return colorObj.hex();
+    return `#${numberToHexString(this.red)}${numberToHexString(
+      this.green
+    )}${numberToHexString(this.blue)}`;
   }
 
   // Essential: Returns a {String} in the form `'rgba(25, 50, 75, .9)'`.
@@ -134,4 +135,9 @@ function parseColor(colorString) {
 function parseAlpha(alphaString) {
   const alpha = parseFloat(alphaString);
   return isNaN(alpha) ? 1 : Math.min(Math.max(alpha, 0), 1);
+}
+
+function numberToHexString(number) {
+  const hex = number.toString(16);
+  return number < 16 ? `0${hex}` : hex;
 }
