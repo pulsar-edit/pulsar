@@ -19,6 +19,7 @@ export default class InstallPanel {
     this.packageManager = packageManager
     this.disposables = new CompositeDisposable()
     this.client = this.packageManager.getClient()
+    this.ppm = atom.ppm;
     this.atomIoURL = 'https://web.pulsar-edit.dev/'
 
     etch.initialize(this)
@@ -289,15 +290,24 @@ export default class InstallPanel {
         }
       })
     } else {
-      this.client.featuredPackages((error, packages) => {
-        if (error) {
-          handle(error)
-        } else {
-          this.refs.loadingMessage.style.display = 'none'
-          this.refs.featuredHeading.textContent = 'Featured Packages'
-          this.addPackageViews(this.refs.featuredContainer, packages)
-        }
-      })
+      this.ppm.getFeaturedPackages()
+        .then((packages) => {
+          this.refs.loadingMessage.style.display = 'none';
+          this.refs.featuredHeading.textContent = 'Featured Packages';
+          this.addPackageViews(this.refs.featuredContainer, packages);
+        })
+        .catch((err) => {
+          handle(err);
+        });
+      //this.client.featuredPackages((error, packages) => {
+      //  if (error) {
+      //    handle(error)
+      //  } else {
+      //    this.refs.loadingMessage.style.display = 'none'
+      //    this.refs.featuredHeading.textContent = 'Featured Packages'
+      //    this.addPackageViews(this.refs.featuredContainer, packages)
+      //  }
+      //})
     }
   }
 

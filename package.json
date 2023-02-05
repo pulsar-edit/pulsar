@@ -155,6 +155,7 @@
     "spell-check": "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1",
     "status-bar": "file:packages/status-bar",
     "styleguide": "https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12",
+    "superagent": "^8.0.9",
     "superstring": "^2.4.4",
     "symbols-view": "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4",
     "tabs": "file:packages/tabs",

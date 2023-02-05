@@ -45,6 +45,7 @@ const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const AutoUpdateManager = require('./auto-update-manager');
 const StartupTime = require('./startup-time');
+const PPM = require('./ppm.js');
 const getReleaseChannel = require('./get-release-channel');
 const packagejson = require("../package.json");
 
@@ -63,6 +64,9 @@ class AtomEnvironment {
   constructor(params = {}) {
     this.id = params.id != null ? params.id : nextId++;
 
+    /** @type {PPM} */
+    this.ppm = new PPM();
+    
     /** @type {Clipboard} */
     this.clipboard = params.clipboard;
     this.updateProcessEnv = params.updateProcessEnv || updateProcessEnv;
