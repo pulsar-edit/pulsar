@@ -176,7 +176,7 @@ let options = {
     ],
   },
   "mac": {
-    "icon": pngIcon,
+    "icon": icnsIcon,
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
     "extendInfo": {
