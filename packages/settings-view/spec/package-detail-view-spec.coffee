@@ -148,8 +148,8 @@ describe "PackageDetailView", ->
     view.refs.packageRepo.click()
     expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/example/package-with-readme')
 
-  # it "should open internal package repository url", ->
-  #   loadPackageFromRemote('package-internal')
-  #   spyOn(shell, 'openExternal')
-  #   view.refs.packageRepo.click()
-  #   expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/atom/atom/tree/master/packages/package-internal')
+  it "should open internal package repository url", ->
+    loadPackageFromRemote('package-internal')
+    spyOn(shell, 'openExternal')
+    view.refs.packageRepo.click()
+    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/pulsar-edit/pulsar/tree/master/packages/package-internal')
