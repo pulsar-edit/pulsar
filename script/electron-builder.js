@@ -138,6 +138,9 @@ let options = {
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
+    }, {
+      "from": "LICENSE.md",
+      "to": "LICENSE.md"
     },
   ],
   compression: "normal",
