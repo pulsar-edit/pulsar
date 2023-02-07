@@ -2349,9 +2349,8 @@ atom-slick@^2, atom-slick@^2.0.0:
 "autocomplete-html@file:packages/autocomplete-html":
   version "0.8.9"
 
-"autocomplete-plus@https://github.com/pulsar-edit/autocomplete-plus.git#1f056ef":
+"autocomplete-plus@file:./packages/autocomplete-plus":
   version "2.42.6"
-  resolved "https://github.com/pulsar-edit/autocomplete-plus.git#1f056ef9c1fbc666309433024318678370f6bbc5"
   dependencies:
     atom-slick "^2.0.0"
     dompurify "^2.2.6"
