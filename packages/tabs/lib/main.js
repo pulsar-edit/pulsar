@@ -1,7 +1,7 @@
 const {CompositeDisposable, Disposable} = require('atom')
 const getIconServices = require('./get-icon-services')
 const layout = require('./layout')
-const TabBarView = require('./tab-bar-view.js')
+const TabBarView = require('./tab-bar-view')
 const MRUListView = require('./mru-list-view')
 const _ = require('underscore-plus')
 
