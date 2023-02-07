@@ -1274,6 +1274,16 @@ describe("TabBarView", () => {
     expect(newFileHandler.callCount).toBe(1);
   }));
 
+  describe("when the tab bar is right-clicked", () => {
+    it("adds the right-clicked class when right-clicked", () => {
+      triggerClickEvent(tabBar.tabAtIndex(0).element, {button: 2});
+      expect(tabBar.tabAtIndex(0).element.classList.contains('right-clicked')).toBe(true);
+      triggerClickEvent(tabBar.tabAtIndex(2).element, {button: 2});
+      expect(tabBar.tabAtIndex(2).element.classList.contains('right-clicked')).toBe(true);
+      expect(tabBar.tabAtIndex(0).element.classList.contains('right-clicked')).toBe(false);
+    });
+  });
+
   describe("when the mouse wheel is used on the tab bar", () => {
     describe("when tabScrolling is true in package settings", () => {
       beforeEach(() => {
