@@ -35,7 +35,6 @@ exports.default = async function notarizing(ctx) {
 	} else {
 		console.log("using notarytool");
 
-		notarise_args.tool = "notarytool";
 		notarise_args = {
 			...notarise_args,
 			tool: "notarytool",
