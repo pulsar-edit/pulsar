@@ -1,0 +1,148 @@
+@import "ui-variables";
+@import "syntax-variables";
+
+.styleguide [data-name="variables"] {
+
+  // Text colors
+  .color( text-color );
+  .color( text-color-subtle );
+  .color( text-color-highlight );
+  .color( text-color-selected );
+  .color( text-color-info );
+  .color( text-color-success );
+  .color( text-color-warning );
+  .color( text-color-error );
+
+  // Background colors
+  .color( background-color-info );
+  .color( background-color-success );
+  .color( background-color-warning );
+  .color( background-color-error );
+  .color( background-color-highlight );
+  .color( background-color-selected );
+  .color( app-background-color );
+
+  // Base colors
+  .color( base-background-color );
+  .color( base-border-color );
+
+  // Pane colors
+  .color( pane-item-background-color );
+  .color( pane-item-border-color );
+
+  // Input colors
+  .color( input-background-color );
+  .color( input-border-color );
+
+  // Panel colors
+  .color( tool-panel-background-color );
+  .color( tool-panel-border-color );
+  .color( inset-panel-background-color );
+  .color( inset-panel-border-color );
+  .color( panel-heading-background-color );
+  .color( panel-heading-border-color );
+  .color( overlay-background-color );
+  .color( overlay-border-color );
+
+  // Button colors
+  .color( button-background-color );
+  .color( button-background-color-hover );
+  .color( button-background-color-selected );
+  .color( button-border-color );
+
+  // Tab colors
+  .color( tab-bar-background-color );
+  .color( tab-bar-border-color );
+  .color( tab-background-color );
+  .color( tab-background-color-active );
+  .color( tab-border-color );
+
+  // Tree-view colors
+  .color( tree-view-background-color );
+  .color( tree-view-border-color );
+
+  // Site colors
+  .color( ui-site-color-1 );
+  .color( ui-site-color-2 );
+  .color( ui-site-color-3 );
+  .color( ui-site-color-4 );
+  .color( ui-site-color-5 );
+
+  // Component sizes
+  .size( disclosure-arrow-size );
+  .size( component-padding );
+  .size( component-icon-padding );
+  .size( component-icon-size );
+  .size( component-line-height );
+  .size( tab-height );
+  .size( font-size );
+
+  // Misc
+  .radius( component-border-radius );
+  .font( font-family );
+
+
+  // Visualize --------------------------------
+
+  .is-color:before,
+  .is-size:after,
+  .is-radius:after {
+    content: "";
+    display: inline-block;
+    height: 20px;
+    vertical-align: middle;
+  }
+  .is-color:before {
+    margin-right: @component-padding*1.5;
+    width: 20%;
+  }
+  .is-size:after {
+    margin-left: @component-padding*1.5;
+    height: 4px;
+    background-color: @text-color;
+  }
+  .is-radius:after {
+    width: 20px;
+    margin-left: @component-padding*1.5;
+    background-color: @text-color;
+  }
+  .is-font:after {
+    margin-left: @component-padding;
+    color: @text-color-highlight;
+  }
+
+
+  // Mixins --------------------------------
+
+  .color(@variable) {
+    .is-color.@{variable}:before {
+      background-color: @@variable;
+    }
+  }
+
+  .size(@variable) {
+    .is-size.@{variable}:after {
+      width: @@variable;
+    }
+  }
+
+  .radius(@variable) {
+    .is-radius.@{variable}:after {
+      border-radius: @@variable;
+    }
+  }
+
+  .font(@variable) {
+    .is-font.@{variable}:after {
+      content: @@variable;
+      font-family: @@variable;
+    }
+  }
+
+
+  // Custom styling for vars --------------------------------
+
+  .example-code {
+    display: none; // remove, doesn't make much sense here
+  }
+}

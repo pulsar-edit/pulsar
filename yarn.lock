@@ -9037,9 +9037,8 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-3.1.1.tgz#31f1281b3832630434831c310c01cccda8cbe006"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
-"styleguide@https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12":
+"styleguide@file:./packages/styleguide":
   version "0.49.12"
-  resolved "https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12#d2c09228e5da99017034227b8bc571fea56bc63b"
   dependencies:
     atom-select-list "^0.7.0"
     dedent "^0.7.0"
