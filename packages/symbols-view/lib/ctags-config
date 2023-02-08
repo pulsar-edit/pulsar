@@ -1,0 +1,198 @@
+--langdef=CoffeeScript
+--langmap=CoffeeScript:.coffee
+--regex-CoffeeScript=/^[ \t]*(@?[a-zA-Z$_\.0-9]+)[ \t]*(=|\:)[ \t]*(\(.*\))?[ \t]*(-|=)>/\1/f,function/
+--regex-CoffeeScript=/^[ \t]*([a-zA-Z$_0-9]+\:\:[a-zA-Z$_\.0-9]+)[ \t]*(=|\:)[ \t]*(\(.*\))?[ \t]*(-|=)>/\1/f,function/
+--regex-CoffeeScript=/^[ \t]*describe[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-CoffeeScript=/^[ \t]*describe[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-CoffeeScript=/^[ \t]*it[ \t]"([^"]+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-CoffeeScript=/^[ \t]*it[ \t]'([^']+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-CoffeeScript=/^[ \t]*f+describe[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/focused\: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*f+describe[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/focused: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*f+it[ \t]"([^"]+)"[ \t]*,[ \t]+[-=]>/focused: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*f+it[ \t]'([^']+)'[ \t]*,[ \t]+[-=]>/focused: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*xdescribe[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/disabled\: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*xdescribe[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/disabled: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*xit[ \t]"([^"]+)"[ \t]*,[ \t]+[-=]>/disabled: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*xit[ \t]'([^']+)'[ \t]*,[ \t]+[-=]>/disabled: \1/f,function/
+--regex-CoffeeScript=/^[ \t]*class[ \t]*([a-zA-Z$_\.0-9]+)[ \t]*/\1/f,function/
+
+--langdef=ColdFusion
+--langmap=ColdFusion:.cfc
+--langmap=ColdFusion:+.cfm
+--langmap=ColdFusion:+.cfml
+--regex-ColdFusion=/(,|(;|^)[ \t]*(var|([A-Za-z_$][A-Za-z0-9_$.]*\.)*))[ \t]*([A-Za-z0-9_$]+)[ \t]*=[ \t]*function[ \t]*\(/\5/,function/
+--regex-ColdFusion=/function[ \t]+([A-Za-z0-9_$]+)[ \t]*\([^)]*\)/\1/,function/
+--regex-ColdFusion=/cffunction[ \t]+([A-Za-z0-9_$]+)[ \t]*\([^)]*\)/\1/,cffunction/
+--regex-ColdFusion=/(,|^|\*\/)[ \t]*([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*:[ \t]*function[ \t]*\(/\2/,function/
+--regex-ColdFusion=/(,|^|\*\/)[ \t]*(static[ \t]+)?(while|if|for|function|switch|with|([A-Za-z_$][A-Za-z0-9_$]+))[ \t]*\(.*\)[ \t]*\{/\2\4/,function/
+--regex-ColdFusion=/(,|^|\*\/)[ \t]*get[ \t]+([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*\([ \t]*\)[ \t]*\{/get \2/,function/
+--regex-ColdFusion=/(,|^|\*\/)[ \t]*set[ \t]+([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*\([ \t]*([A-Za-z_$][A-Za-z0-9_$]+)?[ \t]*\)[ \t]*\{/set \2/,function/
+--regex-ColdFusion=/(,|^|\*\/)[ \t]*async[ \t]+([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*\([ \t]*([A-Za-z_$].+)?[ \t]*\)[ \t]*\{/\2/,function/
+--regex-ColdFusion=/component[ \t]+([A-Za-z0-9._$]+)[ \t]*/\1/c,component/
+--regex-ColdFusion=/^[ \t]*given[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*given[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*story[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*story[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*feature[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*feature[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*when[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*when[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*then[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*then[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*describe[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*describe[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*it[ \t]"([^"]+)"[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*it[ \t]'([^']+)'[ \t]*,[ \t]+[-=]>/\1/f,function/
+--regex-ColdFusion=/^[ \t]*xdescribe[ \t]"(.+)"[ \t]*,[ \t]+[-=]>/disabled\: \1/f,function/
+--regex-ColdFusion=/^[ \t]*xdescribe[ \t]'(.+)'[ \t]*,[ \t]+[-=]>/disabled: \1/f,function/
+--regex-ColdFusion=/^[ \t]*xit[ \t]"([^"]+)"[ \t]*,[ \t]+[-=]>/disabled: \1/f,function/
+--regex-ColdFusion=/^[ \t]*xit[ \t]'([^']+)'[ \t]*,[ \t]+[-=]>/disabled: \1/f,function/
+
+--langdef=Css
+--langmap=Css:.css
+--langmap=Css:+.less
+--langmap=Css:+.scss
+--regex-Css=/^[ \t]*(.+)[ \t]*\{/\1/f,function/
+--regex-Css=/^[ \t]*(.+)[ \t]*,[ \t]*$/\1/f,function/
+--regex-Css=/^[ \t]*[@$]([a-zA-Z$_][-a-zA-Z$_0-9]*)[ \t]*:/\1/f,function/
+
+--langdef=Sass
+--langmap=Sass:.sass
+--regex-Sass=/^[ \t]*([#.]*[a-zA-Z_0-9]+)[ \t]*$/\1/f,function/
+
+--langdef=Yaml
+--langmap=Yaml:.yaml
+--langmap=Yaml:+.yml
+--regex-Yaml=/^[ \t]*([a-zA-Z_0-9 ]+)[ \t]*\:[ \t]*/\1/f,function/
+
+--regex-Html=/^[ \t]*<([a-zA-Z]+)[ \t]*.*>/\1/f,function/
+
+--langdef=Markdown
+--langmap=Markdown:.md
+--langmap=Markdown:+.markdown
+--langmap=Markdown:+.mdown
+--langmap=Markdown:+.mkd
+--langmap=Markdown:+.mkdown
+--langmap=Markdown:+.ron
+--regex-Markdown=/^#+[ \t]*([^#]+)/\1/f,function/
+
+--langdef=Json
+--langmap=Json:.json
+--regex-Json=/^[ \t]*"([^"]+)"[ \t]*\:/\1/f,function/
+
+--langdef=Cson
+--langmap=Cson:.cson
+--langmap=Cson:+.gyp
+--regex-Cson=/^[ \t]*'([^']+)'[ \t]*\:/\1/f,function/
+--regex-Cson=/^[ \t]*"([^"]+)"[ \t]*\:/\1/f,function/
+--regex-Cson=/^[ \t]*([^'"]+)[ \t]*\:/\1/f,function/
+
+--langmap=C++:+.mm
+
+--langmap=Ruby:+(Rakefile)
+
+--langmap=Php:+.module
+
+--langdef=Go
+--langmap=Go:.go
+--regex-Go=/func([ \t]+\([^)]+\))?[ \t]+([a-zA-Z0-9_]+)/\2/f,func/
+--regex-Go=/var[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)/\1/v,var/
+--regex-Go=/type[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)/\1/t,type/
+
+--langdef=Capnp
+--langmap=Capnp:.capnp
+--regex-Capnp=/struct[ \t]+([A-Za-z]+)/\1/s,struct/
+--regex-Capnp=/enum[ \t]+([A-Za-z]+)/\1/e,enum/
+--regex-Capnp=/using[ \t]+([A-Za-z]+)[ \t]+=[ \t]+import/\1/u,using/
+--regex-Capnp=/const[ \t]+([A-Za-z]+)/\1/c,const/
+
+--langmap=perl:+.pod
+--regex-perl=/with[ \t]+([^;]+)[ \t]*?;/\1/w,role,roles/
+--regex-perl=/extends[ \t]+['"]([^'"]+)['"][ \t]*?;/\1/e,extends/
+--regex-perl=/use[ \t]+base[ \t]+['"]([^'"]+)['"][ \t]*?;/\1/e,extends/
+--regex-perl=/use[ \t]+parent[ \t]+['"]([^'"]+)['"][ \t]*?;/\1/e,extends/
+--regex-perl=/Mojo::Base[ \t]+['"]([^'"]+)['"][ \t]*?;/\1/e,extends/
+--regex-perl=/^[ \t]*?use[ \t]+([^;]+)[ \t]*?;/\1/u,use,uses/
+--regex-perl=/^[ \t]*?require[ \t]+((\w|\:)+)/\1/r,require,requires/
+--regex-perl=/^[ \t]*?has[ \t]+['"]?(\w+)['"]?/\1/a,attribute,attributes/
+--regex-perl=/^[ \t]*?\*(\w+)[ \t]*?=/\1/a,alias,aliases/
+--regex-perl=/->helper\([ \t]?['"]?(\w+)['"]?/\1/h,helper,helpers/
+--regex-perl=/^[ \t]*?our[ \t]*?[\$@%](\w+)/\1/o,our,ours/
+--regex-perl=/^\=head1[ \t]+(.+)/\1/p,pod,Plain Old Documentation/
+--regex-perl=/^\=head2[ \t]+(.+)/-- \1/p,pod,Plain Old Documentation/
+--regex-perl=/^\=head[3-5][ \t]+(.+)/---- \1/p,pod,Plain Old Documentation/
+
+--regex-JavaScript=/(,|(;|^)[ \t]*(var|let|([A-Za-z_$][A-Za-z0-9_$.]*\.)*))[ \t]*([A-Za-z0-9_$]+)[ \t]*=[ \t]*function[ \t]*\(/\5/,function/
+--regex-JavaScript=/function[ \t]+([A-Za-z0-9_$]+)[ \t]*\([^)]*\)/\1/,function/
+--regex-JavaScript=/(,|^|\*\/)[ \t]*([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*:[ \t]*function[ \t]*\(/\2/,function/
+--regex-JavaScript=/(,|^|\*\/)[ \t]*(static[ \t]+)?(while|if|for|function|switch|with|([A-Za-z_$][A-Za-z0-9_$]+))[ \t]*\(.*\)[ \t]*\{/\2\4/,function/
+--regex-JavaScript=/(,|^|\*\/)[ \t]*get[ \t]+([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*\([ \t]*\)[ \t]*\{/get \2/,function/
+--regex-JavaScript=/(,|^|\*\/)[ \t]*set[ \t]+([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*\([ \t]*([A-Za-z_$][A-Za-z0-9_$]+)?[ \t]*\)[ \t]*\{/set \2/,function/
+--regex-JavaScript=/(,|^|\*\/)[ \t]*async[ \t]+([A-Za-z_$][A-Za-z0-9_$]+)[ \t]*\([ \t]*([A-Za-z_$].+)?[ \t]*\)[ \t]*\{/\2/,function/
+--regex-JavaScript=/class[ \t]+([A-Za-z0-9._$]+)[ \t]*/\1/c,class/
+--regex-JavaScript=/^[ \t]*describe\("([^"]+)"[ \t]*,/\1/f,function/
+--regex-JavaScript=/^[ \t]*describe\('([^']+)'[ \t]*,/\1/f,function/
+--regex-JavaScript=/^[ \t]*it\("([^"]+)"[ \t]*,/\1/f,function/
+--regex-JavaScript=/^[ \t]*it\('([^']+)'[ \t]*,/\1/f,function/
+--regex-JavaScript=/^[ \t]*f+describe\('([^']+)'[ \t]*,/focused: \1/f,function/
+--regex-JavaScript=/^[ \t]*f+describe\("([^"]+)"[ \t]*,/focused: \1/f,function/
+--regex-JavaScript=/^[ \t]*f+it\('([^']+)'[ \t]*,/focused: \1/f,function/
+--regex-JavaScript=/^[ \t]*f+it\("([^"]+)"[ \t]*,/focused: \1/f,function/
+--regex-JavaScript=/^[ \t]*xdescribe\('([^']+)'[ \t]*,/disabled: \1/f,function/
+--regex-JavaScript=/^[ \t]*xdescribe\("([^"]+)"[ \t]*,/disabled: \1/f,function/
+--regex-JavaScript=/^[ \t]*xit\('([^']+)'[ \t]*,/disabled: \1/f,function/
+--regex-JavaScript=/^[ \t]*xit\("([^"]+)"[ \t]*,/disabled: \1/f,function/
+
+--langdef=haxe
+--langmap=haxe:.hx
+--regex-haxe=/^package[ \t]+([A-Za-z0-9_.]+)/\1/p,package/
+--regex-haxe=/^[ \t]*[(@:macro|private|public|static|override|inline|dynamic)( \t)]*function[ \t]+([A-Za-z0-9_]+)/\1/f,function/
+--regex-haxe=/^[ \t]*([private|public|static|protected|inline][ \t]*)+var[ \t]+([A-Za-z0-9_]+)/\2/v,variable/
+--regex-haxe=/^[ \t]*package[ \t]*([A-Za-z0-9_]+)/\1/p,package/
+--regex-haxe=/^[ \t]*(extern[ \t]*|@:native\([^)]*\)[ \t]*)*class[ \t]+([A-Za-z0-9_]+)[ \t]*[^\{]*/\2/c,class/
+--regex-haxe=/^[ \t]*(extern[ \t]+)?interface[ \t]+([A-Za-z0-9_]+)/\2/i,interface/
+--regex-haxe=/^[ \t]*typedef[ \t]+([A-Za-z0-9_]+)/\1/t,typedef/
+--regex-haxe=/^[ \t]*enum[ \t]+([A-Za-z0-9_]+)/\1/t,typedef/
+--regex-haxe=/^[ \t]*+([A-Za-z0-9_]+)(;|\([^)]*:[^)]*\))/\1/t,enum_field/
+
+--langdef=Elixir
+--langmap=Elixir:.ex.exs
+--regex-Elixir=/^[ \t]*def(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\2/f,functions,functions (def ...)/
+--regex-Elixir=/^[ \t]*defcallback[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\1/c,callbacks,callbacks (defcallback ...)/
+--regex-Elixir=/^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\1/d,delegates,delegates (defdelegate ...)/
+--regex-Elixir=/^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/e,exceptions,exceptions (defexception ...)/
+--regex-Elixir=/^[ \t]*defimpl[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/i,implementations,implementations (defimpl ...)/
+--regex-Elixir=/^[ \t]*defmacro(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)\(/\2/a,macros,macros (defmacro ...)/
+--regex-Elixir=/^[ \t]*defmacro(p?)[ \t]+([a-zA-Z0-9_?!]+)?[ \t]+([^ \tA-Za-z0-9_]+)[ \t]*[a-zA-Z0-9_!?!]/\3/o,operators,operators (e.g. "defmacro a <<< b")/
+--regex-Elixir=/^[ \t]*defmodule[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/m,modules,modules (defmodule ...)/
+--regex-Elixir=/^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\.)*([A-Z][a-zA-Z0-9_?!]*)/\2/p,protocols,protocols (defprotocol...)/
+--regex-Elixir=/^[ \t]*Record\.defrecord[ \t]+:([a-zA-Z0-9_]+)/\1/r,records,records (defrecord...)/
+
+--langdef=Nim
+--langmap=Nim:.nim
+--regex-Nim=/^[\t\s]*proc\s+([_A-Za-z0-9]+)\**(\[\w+(\:\s+\w+)?\])?\s*\(/\1/f,function/
+--regex-Nim=/^[\t\s]*iterator\s+([_A-Za-z0-9]+)\**(\[\w+(\:\s+\w+)?\])?\s*\(/\1/i,iterator/
+--regex-Nim=/^[\t\s]*macro\s+([_A-Za-z0-9]+)\**(\[\w+(\:\s+\w+)?\])?\s*\(/\1/m,macro/
+--regex-Nim=/^[\t\s]*method\s+([_A-Za-z0-9]+)\**(\[\w+(\:\s+\w+)?\])?\s*\(/\1/h,method/
+--regex-Nim=/^[\t\s]*template\s+([_A-Za-z0-9]+)\**(\[\w+(\:\s+\w+)?\])?\s*\(/\1/t,generics/
+--regex-Nim=/^[\t\s]*converter\s+([_A-Za-z0-9]+)\**(\[\w+(\:\s+\w+)?\])?\s*\(/\1/c,converter/
+
+--langdef=Fountain
+--langmap=Fountain:.fountain
+--langmap=Fountain:+.ftn
+--regex-Fountain=/^(([iI][nN][tT]|[eE][xX][tT]|[^\w][eE][sS][tT]|\.|[iI]\.?\/[eE]\.?)([^\n]+))/\1/f,function/
+
+--langdef=Julia
+--langmap=Julia:.jl
+--regex-Julia=/^[ \t]*(function|macro|abstract|type|typealias|immutable)[ \t]+([^ \t({[]+).*$/\2/f,function/
+--regex-Julia=/^[ \t]*(([^@#$ \t({[]+)|\(([^@#$ \t({[]+)\)|\((\$)\))[ \t]*(\{.*\})?[ \t]*\([^#]*\)[ \t]*=([^=].*$|$)/\2\3\4/f,function/
+
+--langdef=Latex
+--langmap=latex:.tex
+--regex-latex=/\\label\{([^}]*)\}/\1/l,label/
+--regex-latex=/\\section\{([^}]*)\}/\1/s,section/
+--regex-latex=/\\subsection\{([^}]*)\}/\1/t,subsection/
+--regex-latex=/\\subsubsection\{([^}]*)\}/\1/u,subsubsection/
+--regex-latex=/\\section\*\{([^}]*)\}/\1/s,section/
+--regex-latex=/\\subsection\*\{([^}]*)\}/\1/t,subsection/
+--regex-latex=/\\subsubsection\*\{([^}]*)\}/\1/u,subsubsection/
