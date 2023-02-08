@@ -1,0 +1,53 @@
+{
+  "name": "symbols-view",
+  "version": "0.118.4",
+  "main": "./lib/main",
+  "description": "Jump to a function/method in the current editor with `cmd-r`.",
+  "license": "MIT",
+  "activationCommands": {
+    "atom-workspace": [
+      "symbols-view:toggle-project-symbols"
+    ],
+    "atom-text-editor": [
+      "symbols-view:go-to-declaration",
+      "symbols-view:return-from-declaration",
+      "symbols-view:toggle-file-symbols"
+    ]
+  },
+  "dependencies": {
+    "async": "^0.2.6",
+    "atom-select-list": "^0.7.0",
+    "ctags": "^3.1.0",
+    "fs-plus": "^3.0.0",
+    "fuzzaldrin": "^2.1.0",
+    "humanize-plus": "^1.8.2",
+    "temp": "^0.8.3",
+    "underscore-plus": "^1.6.6"
+  },
+  "configSchema": {
+    "useEditorGrammarAsCtagsLanguage": {
+      "default": true,
+      "type": "boolean",
+      "description": "Force ctags to use the name of the current file's language in Atom when generating tags. By default, ctags automatically selects the language of a source file, ignoring those files whose language cannot be determined. This option forces the specified language to be used instead of automatically selecting the language based upon its extension."
+    },
+    "quickJumpToFileSymbol": {
+      "default": true,
+      "type": "boolean",
+      "description": "Automatically visit selected file-symbols"
+    }
+  },
+  "repository": "https://github.com/pulsar-edit/symbols-view",
+  "engines": {
+    "atom": "*"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "eslint": "^3.12.2",
+    "eslint-config-fbjs": "^1.1.1",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-flowtype": "^2.29.1",
+    "eslint-plugin-jasmine": "^2.2.0",
+    "eslint-plugin-prefer-object-spread": "^1.1.0",
+    "eslint-plugin-react": "^5.2.2"
+  }
+}

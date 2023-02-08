@@ -1,0 +1,17 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Symbols'
+      'submenu': [
+        { 'label': 'File Symbols', 'command': 'symbols-view:toggle-file-symbols' }
+        { 'label': 'Project Symbols', 'command': 'symbols-view:toggle-project-symbols' }
+      ]
+    ]
+  }
+]
+
+'context-menu':
+  'atom-text-editor:not([mini])': [
+    { 'label': 'Go to Declaration', 'command': 'symbols-view:go-to-declaration' }
+  ]
