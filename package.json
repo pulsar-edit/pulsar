@@ -170,7 +170,7 @@
     "welcome": "file:packages/welcome",
     "whitespace": "https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8",
     "winreg": "^1.2.1",
-    "wrap-guide": "https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0",
+    "wrap-guide": "file:./packages/wrap-guide",
     "yargs": "17.6.2"
   },
   "packageDependencies": {
@@ -231,7 +231,7 @@
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "welcome": "file:./packages/welcome",
     "whitespace": "0.37.8",
-    "wrap-guide": "0.41.0",
+    "wrap-guide": "file:./packages/wrap-guide",
     "language-c": "file:./packages/language-c",
     "language-clojure": "file:./packages/language-clojure",
     "language-coffee-script": "file:./packages/language-coffee-script",

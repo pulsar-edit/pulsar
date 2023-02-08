@@ -10097,9 +10097,8 @@ wrap-ansi@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
 
-"wrap-guide@https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0":
+"wrap-guide@file:./packages/wrap-guide":
   version "0.41.0"
-  resolved "https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0#bd23ce8c207d589c742bd324135de81b6eb7ec02"
 
 wrappy@1:
   version "1.0.2"
