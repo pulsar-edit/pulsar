@@ -36,7 +36,7 @@
       "description": "Automatically visit selected file-symbols"
     }
   },
-  "repository": "https://github.com/pulsar-edit/symbols-view",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": "*"
   },
