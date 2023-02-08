@@ -223,7 +223,7 @@
     "snippets": "1.6.1",
     "spell-check": "0.77.1",
     "status-bar": "file:./packages/status-bar",
-    "styleguide": "0.49.12",
+    "styleguide": "file:./packages/styleguide",
     "symbols-view": "file:./packages/symbols-view",
     "tabs": "file:./packages/tabs",
     "timecop": "0.36.2",
