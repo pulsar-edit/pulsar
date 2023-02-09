@@ -90,6 +90,7 @@ scopes:
   '"#define"': 'keyword.control.directive'
   '"#include"': 'keyword.control.directive'
   'preproc_directive': 'keyword.control.directive'
+  '"static_assert"': 'keyword.control.directive'
 
   '"if"': 'keyword.control'
   '"else"': 'keyword.control'
@@ -133,12 +134,14 @@ scopes:
   call_expression > identifier,
   call_expression > field_expression > field_identifier,
   call_expression > scoped_identifier > identifier,
+  call_expression > qualified_identifier > identifier,
   template_function > identifier,
   template_function > scoped_identifier > identifier,
   template_method > field_identifier,
   function_declarator > identifier,
   function_declarator > field_identifier,
   function_declarator > scoped_identifier > identifier,
+  function_declarator > qualified_identifier > identifier,
   destructor_name > identifier
   ''': 'entity.name.function'
 
@@ -224,8 +227,8 @@ scopes:
   '"=="': 'keyword.operator'
   '"!"': 'keyword.operator'
   '"!="': 'keyword.operator'
-  'relational_expression > "<"': 'keyword.operator'
-  'relational_expression > ">"': 'keyword.operator'
+  'binary_expression > "<"': 'keyword.operator'
+  'binary_expression > ">"': 'keyword.operator'
   '">="': 'keyword.operator'
   '"<="': 'keyword.operator'
   '"&&"': 'keyword.operator'
