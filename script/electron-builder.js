@@ -40,9 +40,9 @@ const builder = require("electron-builder")
 const Platform = builder.Platform
 
 
-const pngIcon  = 'resources/app-icons/beta.png'
-const icoIcon  = 'resources/app-icons/beta.ico'
-const svgIcon  = 'resources/app-icons/beta.svg'
+const pngIcon = 'resources/app-icons/beta.png'
+const icoIcon = 'resources/app-icons/beta.ico'
+const svgIcon = 'resources/app-icons/beta.svg'
 const icnsIcon = 'resources/app-icons/beta.icns'
 
 let options = {
