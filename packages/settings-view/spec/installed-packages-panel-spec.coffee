@@ -32,9 +32,6 @@ describe 'InstalledPackagesPanel', ->
         expect(@panel.refs.devCount.textContent.trim()).toBe '0/1'
         expect(@panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 0
 
-        expect(@panel.refs.deprecatedCount.textContent.trim()).toBe '0/0'
-        expect(@panel.refs.deprecatedPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 0
-
   describe 'when the packages have finished loading', ->
     beforeEach ->
       settingsView = new SettingsView
@@ -58,9 +55,6 @@ describe 'InstalledPackagesPanel', ->
       expect(@panel.refs.devCount.textContent.trim()).toBe '1'
       expect(@panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 1
 
-      expect(@panel.refs.deprecatedCount.textContent.trim()).toBe '0'
-      expect(@panel.refs.deprecatedPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 0
-
     it 'filters packages by name', ->
       @panel.refs.filterEditor.setText('user-')
       window.advanceClock(@panel.refs.filterEditor.getBuffer().stoppedChangingDelay)
@@ -72,9 +66,6 @@ describe 'InstalledPackagesPanel', ->
 
       expect(@panel.refs.devCount.textContent.trim()).toBe '0/1'
       expect(@panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 0
-
-      expect(@panel.refs.deprecatedCount.textContent.trim()).toBe '0/0'
-      expect(@panel.refs.deprecatedPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 0
 
     it 'adds newly installed packages to the list', ->
       [installCallback] = []
@@ -116,40 +107,6 @@ describe 'InstalledPackagesPanel', ->
         expect(@panel.refs.communityCount.textContent.trim()).toBe '0'
         expect(@panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 0
 
-    it 'correctly handles deprecated packages', ->
-      resolve = null
-      promise = new Promise (r) -> resolve = r
-      jasmine.unspy(@packageManager, 'getOutdated')
-      spyOn(@packageManager, 'getOutdated').andReturn(promise)
-      jasmine.attachToDOM(@panel.element)
-
-      [updateCallback] = []
-      spyOn(atom.packages, 'isDeprecatedPackage').andCallFake =>
-        return true if @installed.user[0].version is '1.0.0'
-        false
-      spyOn(@packageManager, 'runCommand').andCallFake (args, callback) ->
-        updateCallback = callback
-        onWillThrowError: ->
-          atom.packages.activatePackage
-      spyOn(atom.packages, 'activatePackage').andCallFake (name) =>
-        @installed.user[0].version = '1.1.0'
-
-      expect(@panel.refs.deprecatedSection).not.toBeVisible()
-      @panel.loadPackages()
-
-      waits 1
-      runs ->
-        expect(@panel.refs.deprecatedSection).toBeVisible()
-        expect(@panel.refs.deprecatedCount.textContent.trim()).toBe '1'
-        expect(@panel.refs.deprecatedPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe 1
-
-        spyOn(PackageCard::, 'displayAvailableUpdate')
-        resolve([{name: 'user-package', latestVersion: '1.1.0'}])
-
-      waits 1
-      runs ->
-        expect(PackageCard::displayAvailableUpdate).toHaveBeenCalledWith('1.1.0')
-
   describe 'expanding and collapsing sub-sections', ->
     beforeEach ->
       settingsView = new SettingsView
@@ -158,10 +115,6 @@ describe 'InstalledPackagesPanel', ->
       spyOn(@packageManager, 'getOutdated').andReturn new Promise ->
       spyOn(@packageManager, 'loadCompatiblePackageVersion').andCallFake ->
       spyOn(@packageManager, 'getInstalled').andReturn Promise.resolve(@installed)
-      spyOn(atom.packages, 'isDeprecatedPackage').andCallFake =>
-        return true if @installed.user[0].version is '1.0.0'
-        false
-
       @panel = new InstalledPackagesPanel(settingsView, @packageManager)
 
       waitsFor ->
@@ -171,7 +124,6 @@ describe 'InstalledPackagesPanel', ->
       @panel.element.querySelector('.sub-section.installed-packages .sub-section-heading').click()
       expect(@panel.element.querySelector('.sub-section.installed-packages')).toHaveClass 'collapsed'
 
-      expect(@panel.element.querySelector('.sub-section.deprecated-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass 'collapsed'
 
@@ -179,12 +131,11 @@ describe 'InstalledPackagesPanel', ->
       expect(@panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass 'collapsed'
 
     it 'can collapse and expand any of the sub-sections', ->
-      expect(@panel.element.querySelectorAll('.sub-section-heading.has-items').length).toBe 4
+      expect(@panel.element.querySelectorAll('.sub-section-heading.has-items').length).toBe 3
 
       for element in @panel.element.querySelectorAll('.sub-section-heading.has-items')
         element.click()
 
-      expect(@panel.element.querySelector('.sub-section.deprecated-packages')).toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.installed-packages')).toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.core-packages')).toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.dev-packages')).toHaveClass 'collapsed'
@@ -192,7 +143,6 @@ describe 'InstalledPackagesPanel', ->
       for element in @panel.element.querySelectorAll('.sub-section-heading.has-items')
         element.click()
 
-      expect(@panel.element.querySelector('.sub-section.deprecated-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass 'collapsed'
@@ -202,9 +152,8 @@ describe 'InstalledPackagesPanel', ->
       window.advanceClock(@panel.refs.filterEditor.getBuffer().stoppedChangingDelay)
 
       hasItems = @panel.element.querySelectorAll('.sub-section-heading.has-items')
-      expect(hasItems.length).toBe 2
-      expect(hasItems[0].textContent).toMatch /Deprecated Packages/
-      expect(hasItems[1].textContent).toMatch /Community Packages/
+      expect(hasItems.length).toBe 1
+      expect(hasItems[0].textContent).toMatch /Community Packages/
 
   describe 'when there are no packages', ->
     beforeEach ->
@@ -224,14 +173,13 @@ describe 'InstalledPackagesPanel', ->
 
     it 'has a count of zero in all headings', ->
       expect(@panel.element.querySelector('.section-heading-count').textContent).toMatch /^0+$/
-      expect(@panel.element.querySelectorAll('.sub-section .icon-package').length).toBe 5
+      expect(@panel.element.querySelectorAll('.sub-section .icon-package').length).toBe 4
       expect(@panel.element.querySelectorAll('.sub-section .icon-package.has-items').length).toBe 0
 
     it 'can not collapse and expand any of the sub-sections', ->
       for element in @panel.element.querySelectorAll('.sub-section .icon-package')
         element.click()
 
-      expect(@panel.element.querySelector('.sub-section.deprecated-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass 'collapsed'
       expect(@panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass 'collapsed'
@@ -241,5 +189,5 @@ describe 'InstalledPackagesPanel', ->
       window.advanceClock(@panel.refs.filterEditor.getBuffer().stoppedChangingDelay)
 
       expect(@panel.element.querySelector('.section-heading-count').textContent).toMatch /^(0\/0)+$/
-      expect(@panel.element.querySelectorAll('.sub-section .icon-package').length).toBe 5
+      expect(@panel.element.querySelectorAll('.sub-section .icon-package').length).toBe 4
       expect(@panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe 0

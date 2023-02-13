@@ -1,0 +1,13 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = false
+[remote "upstream/color"]
+	url = https://github.com/some-user/some-repo.git
+	fetch = +refs/heads/*:refs/remotes/upstream/color/*
+[branch "baz"]
+	remote = upstream/color
+	merge = refs/heads/baz

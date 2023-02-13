@@ -1,0 +1,51 @@
+{
+  "name": "status-bar",
+  "version": "1.8.17",
+  "main": "./lib/main",
+  "description": "Display information about the current editor such as cursor position, file path, grammar, current branch, ahead/behind commits counts, and line diff count.",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "fs-plus": "^3.0.1",
+    "grim": "^2.0.1",
+    "underscore-plus": "^1.0.0"
+  },
+  "providedServices": {
+    "status-bar": {
+      "description": "A container for indicators at the bottom of the workspace",
+      "versions": {
+        "1.1.0": "provideStatusBar",
+        "0.58.0": "legacyProvideStatusBar"
+      }
+    }
+  },
+  "configSchema": {
+    "isVisible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show status bar at the bottom of the workspace"
+    },
+    "fullWidth": {
+      "order": 1,
+      "type": "boolean",
+      "default": true,
+      "title": "Full-width",
+      "description": "Fit the status-bar to the window's full-width"
+    },
+    "cursorPositionFormat": {
+      "order": 2,
+      "type": "string",
+      "default": "%L:%C",
+      "description": "Format for the cursor position status bar element, where %L is the line number and %C is the column number"
+    },
+    "selectionCountFormat": {
+      "order": 2,
+      "type": "string",
+      "default": "(%L, %C)",
+      "description": "Format for the selection count status bar element, where %L is the line count and %C is the character count"
+    }
+  }
+}
