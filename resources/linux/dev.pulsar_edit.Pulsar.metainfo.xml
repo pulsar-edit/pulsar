@@ -2,16 +2,15 @@
 <component type="desktop-application">
   <id>dev.pulsar_edit.Pulsar</id>
   <name>Pulsar</name>
-  <developer_name>Pulsar Team</developer_name>
+  <developer_name>Pulsar-edit</developer_name>
   <summary>A Community-led Hyper-Hackable Text Editor</summary>
-  <metadata_license>CC0-1.0</metadata_license>
+  <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
   <url type="homepage">https://pulsar-edit.dev</url>
   <url type="bugtracker">https://github.com/pulsar-edit/pulsar/issues/</url>
   <update_contact>admin@pulsar-edit.dev</update_contact>
   <description>
     <p>Pulsar aims to not only reach feature parity with the original Atom, but to bring Pulsar into the 21st century by updating the underlying architecture, and supporting modern features.</p>
-    <p>Pulsar is being made by a community who came together from the stellar remnants of Atom. A community that wants to build upon the huge legacy that was left and make a uniquely hackable editor.</p>
   </description>
   <screenshots>
     <screenshot>
