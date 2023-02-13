@@ -18,9 +18,6 @@
       <image type="source">https://raw.githubusercontent.com/pulsar-edit/pulsar/master/resources/readme.png</image>
     </screenshot>
   </screenshots>
-  <releases>
-    <release version="1.101.0" date="2023-01-15"/>
-  </releases>
   <kudos>
     <kudo>HiDpiIcon</kudo>
   </kudos>
