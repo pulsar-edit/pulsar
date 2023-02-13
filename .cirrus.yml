@@ -123,6 +123,7 @@ silicon_mac_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
