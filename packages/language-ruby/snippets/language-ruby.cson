@@ -296,10 +296,10 @@
     'body': 'until ${1:condition}\n\t$0\nend'
   'usage_if()':
     'prefix': 'usai'
-    'body': 'if ARGV.$1\n\tabort "Usage:  #\{\\$PROGRAM_NAME} ${2:ARGS_GO_HERE}"\nend' # '"#{var}"' makes a coffeelint issue. Use '"#\{var}"' instead.
+    'body': 'if ARGV.$1\n\tabort "Usage:  #\{\\$PROGRAM_NAME} ${2:ARGS_GO_HERE}"\nend'
   'usage_unless()':
     'prefix': 'usau'
-    'body': 'unless ARGV.$1\n\tabort "Usage:  #\{\\$PROGRAM_NAME} ${2:ARGS_GO_HERE}"\nend' # '"#{var}"' makes a coffeelint issue. Use '"#\{var}"' instead.
+    'body': 'unless ARGV.$1\n\tabort "Usage:  #\{\\$PROGRAM_NAME} ${2:ARGS_GO_HERE}"\nend'
   'when …':
     'prefix': 'when'
     'body': 'when ${1:condition}\n\t$0'

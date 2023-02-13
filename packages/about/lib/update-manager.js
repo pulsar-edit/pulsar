@@ -125,7 +125,7 @@ let UpdateManager = class UpdateManager {
   getReleaseNotesURLForVersion(appVersion) {
     // Dev versions will not have a releases page
     if (appVersion.indexOf('dev') > -1) {
-      return 'https://atom.io/releases';
+      return 'https://pulsar-edit.dev/download.html';
     }
 
     if (!appVersion.startsWith('v')) {

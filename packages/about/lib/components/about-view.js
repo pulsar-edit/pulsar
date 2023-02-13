@@ -31,7 +31,7 @@ module.exports = class AboutView extends EtchComponent {
   handleReleaseNotesClick(e) {
     e.preventDefault();
     shell.openExternal(
-      this.props.updateManager.getReleaseNotesURLForAvailableVersion()
+      this.props.updateManager.getReleaseNotesURLForAvailableVersion() //update-manager.js will need updating when we decide how to do the changelog
     );
   }
 
@@ -45,13 +45,14 @@ module.exports = class AboutView extends EtchComponent {
 
   handleTermsOfUseClick(e) {
     e.preventDefault();
-    shell.openExternal('https://atom.io/terms');
+    shell.openExternal('https://atom.io/terms'); //If we use this then this URL will need updating but button disabled (L#182)
+    // TODO Update to Privacy Policy once `pulsar-edit.github.io` #161 is resolved
   }
 
   handleHowToUpdateClick(e) {
     e.preventDefault();
     shell.openExternal(
-      'https://flight-manual.atom.io/getting-started/sections/installing-atom/'
+            'https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar'
     );
   }
 
@@ -79,7 +80,7 @@ module.exports = class AboutView extends EtchComponent {
         $.header(
           { className: 'about-header' },
           $.a(
-            { className: 'about-atom-io', href: 'https://atom.io' },
+            { className: 'about-atom-io', href: `${atom.branding.urlWeb}`, },
             $(AtomLogo)
           ),
           $.div(
@@ -177,33 +178,26 @@ module.exports = class AboutView extends EtchComponent {
             },
             'License'
           ),
-          $.button(
+          //Disabled the below as we don't have this but can reuse if there is the need
+          /*$.button(
             {
               className: 'btn terms-of-use',
               onclick: this.handleTermsOfUseClick.bind(this)
             },
             'Terms of Use'
-          )
+          )*/
         )
       ),
 
       $.div(
         { className: 'about-love group-start' },
-        $.span({ className: 'icon icon-code' }),
+        $.a({ className: 'icon icon-code', href: `${atom.branding.urlGH}` }),
         $.span({ className: 'inline' }, ' with '),
-        $.span({ className: 'icon icon-heart' }),
+        $.a({ className: 'icon icon-heart', href: `${atom.branding.urlWeb}` + "community" }),
         $.span({ className: 'inline' }, ' by '),
-        $.a({ className: 'icon icon-logo-github', href: 'https://github.com' })
+        //$.a({ className: 'icon icon-logo-github', href: `${atom.branding.urlWeb}` }) Replace icon with Pulsar word logo and delete following line
+        $.a({ className: 'inline', href: `${atom.branding.urlWeb}` }, 'Pulsar Team')
       ),
-
-      $.div(
-        { className: 'about-credits group-item' },
-        $.span({ className: 'inline' }, 'And the awesome '),
-        $.a(
-          { href: 'https://github.com/pulsar-edit/pulsar/contributors' },
-          'Pulsar community'
-        )
-      )
     );
   }
 

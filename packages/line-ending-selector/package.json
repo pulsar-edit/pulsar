@@ -19,9 +19,6 @@
       }
     }
   },
-  "devDependencies": {
-    "standard": "^5.1.0"
-  },
   "configSchema": {
     "defaultLineEnding": {
       "title": "Default line ending",
@@ -34,22 +31,5 @@
         "CRLF"
       ]
     }
-  },
-  "standard": {
-    "globals": [
-      "advanceClock",
-      "atom",
-      "beforeEach",
-      "expect",
-      "describe",
-      "it",
-      "jasmine",
-      "MouseEvent",
-      "runs",
-      "spyOn",
-      "waits",
-      "waitsFor",
-      "waitsForPromise"
-    ]
   }
 }

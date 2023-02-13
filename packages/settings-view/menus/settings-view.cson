@@ -1,0 +1,16 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Settings View'
+      'submenu': [
+        { 'label': 'Open', 'command': 'settings-view:open' }
+        { 'label': 'Show Keybindings', 'command': 'settings-view:show-keybindings' }
+        { 'label': 'Install Packages/Themes', 'command': 'settings-view:install-packages-and-themes' }
+        { 'label': 'Update Packages/Themes', 'command': 'settings-view:check-for-package-updates' }
+        { 'label': 'Manage Packages', 'command': 'settings-view:uninstall-packages' }
+        { 'label': 'Manage Themes', 'command': 'settings-view:uninstall-themes' }
+      ]
+    ]
+  }
+]

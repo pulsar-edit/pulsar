@@ -11,12 +11,11 @@
   },
   "main": "lib/main",
   "license": "MIT",
-  "repository": "https://github.com/atom/language-ruby",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "dependencies": {
     "tree-sitter-ruby": "^0.19.0"
   },
   "devDependencies": {
-    "coffeelint": "^1.10.1",
     "dedent": "^0.7.0"
   }
 }

@@ -39,17 +39,6 @@ const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
 // incompatible way.
 const APPLICATION_STATE_VERSION = '1';
 
-const getDefaultPath = () => {
-  const editor = atom.workspace.getActiveTextEditor();
-  if (!editor || !editor.getPath()) {
-    return;
-  }
-  const paths = atom.project.getPaths();
-  if (paths) {
-    return paths[0];
-  }
-};
-
 const getSocketSecretPath = applicationVersion => {
   const { username } = os.userInfo();
   const atomHome = path.resolve(process.env.ATOM_HOME);
@@ -599,7 +588,7 @@ module.exports = class AtomApplication extends EventEmitter {
       shell.openExternal('https://pulsar-edit.dev/docs/launch-manual/sections/faq/')
     );
     this.on('application:open-terms-of-use', () =>
-      shell.openExternal('https://atom.io/terms')
+      shell.openExternal('https://atom.io/terms') //TODO: This needs to be updated for when we have our own published on the site
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
@@ -632,25 +621,37 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       this.on('application:open', () => {
-        this.promptForPathToOpen(
-          'all',
-          createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
-        );
+        const win = this.focusedWindow();
+        if(win) {
+          win.sendCommand('application:open')
+        } else {
+          this.promptForPathToOpen(
+            'all',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
       });
       this.on('application:open-file', () => {
-        this.promptForPathToOpen(
-          'file',
-          createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
-        );
+        const win = this.focusedWindow();
+        if(win) {
+          win.sendCommand('application:open-file')
+        } else {
+          this.promptForPathToOpen(
+            'file',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
       });
       this.on('application:open-folder', () => {
-        this.promptForPathToOpen(
-          'folder',
-          createOpenSettings({ sameWindow: true }),
-          getDefaultPath()
-        );
+        const win = this.focusedWindow();
+        if(win) {
+          win.sendCommand('application:open-folder')
+        } else {
+          this.promptForPathToOpen(
+            'folder',
+            createOpenSettings({ sameWindow: true })
+          );
+        }
       });
 
       this.on('application:bring-all-windows-to-front', () =>
