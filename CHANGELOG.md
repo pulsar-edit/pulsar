@@ -4,14 +4,20 @@
 - Format defined in [Pulsar Change Log](PENDING_APPROVAL)
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-
 ## [Unreleased]
 
+### Pulsar
+- Changed: use `let` and `const` in js snippets [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/326)
+
+## 1.101.0-beta
+
 - Fixed a bug where macOS menus like "Open" don't do anything
+- Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
 - Fixed a bug where devtools won't open (https://github.com/pulsar-edit/pulsar/issues/260)
 - Fixed a bug where the editor refused to open with the message "GPU process
 isn't usable. Goodbye" (https://github.com/pulsar-edit/pulsar/issues/233)
 - Fixed logo artifacts on Linux
+- Fixed Windows Taskbar Icon being 'Cut in Half'
 - Fixed commands like `--version`, `--package` or `--help` did not show outputs
 - Fixed additional flags not being sent to `--package`
 - Small improvement on the binary size
@@ -20,7 +26,56 @@ isn't usable. Goodbye" (https://github.com/pulsar-edit/pulsar/issues/233)
 fewer errors on the settings-view regarding package info)
 - Added warning when `settings-view` is disabled, describing how to re-enable it
 
-## v1.100.1-beta
+### Pulsar
+- Added: script: Clean up `pulsar` and `ppm` on uninstall [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/297)
+- Added: increase search query delay [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/289)
+- Fixed: update `packages/README.md` [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/317)
+- Fixed: Fix Windows Icon being cut in half [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/318)
+- Removed: remove unused json [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/309)
+- Added: add ignored `package-lock.json` to packages [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/308)
+- Rebrand: Rebrand AppUserModelID - Ensure Pulsar is separated as its own App Icon on Windows [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/315)
+- Removed: remove fs-plus from image-view package [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/305)
+- Added: Additional Bundling of Core Packages [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/314)
+- Fixed: Resolve some `about` package tests (6 Resolved Tests) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/310)
+- Fixed: Fix Package Test Cache Issue [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/302)
+- Fixed: Resolve all Tests within `language-html` (Resolves 2 Failing Tests) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/300)
+- Fixed: Resolve all Tests within `language-javascript` (Resolves 24 Failing Tests) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/299)
+- Fixed: Resolve 40 Failing `image-view` Tests [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/293)
+- Added: Added changelog entries that we missed [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/292)
+- Removed: meta: Delete preinstall script from package.json [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/296)
+- Added: Improve macOS Builds [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/280)
+- Fixed: Fix `archive-view` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/294)
+- Added: Improved Windows Builds [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/279)
+- Added: More Bundles [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/290)
+- Fixed: Fix macOS open without window [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/291)
+- Removed: delete workflow from language-java [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/285)
+- Removed: Remove handlers for opening things on Mac [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/288)
+- Rebrand: Rebranding and relinking to new site [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/282)
+- Added: script: symlink ppm in post-install.sh (for .deb and .rpm packages) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/273)
+- Added: Add --no-sandbox to start script [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/276)
+- Added: exclude directories from build [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/265)
+- Added: add warning when settings-view is disabled [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/243)
+- Fixed: Fix typo [@snowcatridge10](https://github.com/pulsar-edit/pulsar/pull/267)
+- Fixed: Fix install on packaged code [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/269)
+- Fixed: Fix Logo weirdness [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/271)
+- Fixed: Fix installing shell commands to path (macOS) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/263)
+- Fixed: 🍎 Fix wrong app name resolution in pulsar.sh on Mac [@soupertonic](https://github.com/pulsar-edit/pulsar/pull/252)
+- Fixed: Postinstall error with rm usr/bin/pulsar [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/228)
+- Added: Made changes to the main.js file. [@CatPerson136](https://github.com/pulsar-edit/pulsar/pull/232)
+- Added: Add `--no-sandbox` to Linux Launch [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/262)
+- Removed: removed unused files [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/219)
+- Rebrand: rebrand package publish domain [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/245)
+- Removed: remove metrics code from welcome package [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/244)
+- Fixed: Deep cache for settings view [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/250)
+- Fixed: fix syntax error in `packages/README.md` [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/248)
+- Removed: remove package.json dependencies [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/169)
+- Added: `underscore-plus` to dependencies [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/218)
+
+### ppm
+- Added: Convert body params to query params [@Spiker985](https://github.com/pulsar-edit/ppm/pull/47)
+- Fixed: src: Update Electron header download URL [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/43)
+
+## v1.100.0-beta
 
 - Bump to Electron 12 and Node 14
 - Added a rebranding API
@@ -102,7 +157,7 @@ fewer errors on the settings-view regarding package info)
 - Fixed:    `yarn install` due to syntax error [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/16)
 - Added:    Bundled most language grammars into the editor [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/14)
 - Bumped:   `autocomplete-html` 0.8.8 -> 0.8.9 [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/14)
-- Bumped:   `tree-sitter` NA -> 0.20.0 [@mauricioszaba](https://github.com/pulsar-edit/pulsar/pull/14)
+- Bumped:   `tree-sitter` NA -> 0.20.0 [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/14)
 - Added:    Branding Config on Global Atom API [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/7)
 - Added:    `yarn` as method to build editor. [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/6)
 - Bumped:   `fs-admin` 0.15.0 -> 0.19.0 [@kaosine](https://github.com/pulsar-edit/pulsar/pull/4)
@@ -166,7 +221,7 @@ fewer errors on the settings-view regarding package info)
   * [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/39)
 
 ### autocomplete-html
-- Fixed:    Finding the proper Node version [@mauricioszabo](https://github.com/pulsar-edit/autocomplete-html/pull/1)  
+- Fixed:    Finding the proper Node version [@mauricioszabo](https://github.com/pulsar-edit/autocomplete-html/pull/1)
 
 ### settings-view
 - Added:    Remember Scroll Position [@jonian](https://github.com/pulsar-edit/settings-view/pull/12)

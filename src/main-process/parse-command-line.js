@@ -195,7 +195,7 @@ module.exports = function parseCommandLine(processArgs) {
       `Only one of the --add and --new-window options may be specified at the same time.\n\n${options.help()}`
     );
 
-    // Exiting the main process with a nonzero exit code on MacOS causes the app open to fail with the mysterious
+    // Exiting the main process with a nonzero exit code on macOS causes the app open to fail with the mysterious
     // message "LSOpenURLsWithRole() failed for the application /Applications/Pulsar Dev.app with error -10810."
     process.exit(0);
   }

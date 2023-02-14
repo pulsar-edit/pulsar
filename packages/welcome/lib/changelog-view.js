@@ -53,69 +53,40 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/28">
-                  Bump to Electron 12 and Node 14
-                </a>
+                Fixed a bug where macOS menus like "Open" don't do anything.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/7">
-                  Added a rebranding API
-                </a>
+                Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Removed experimental file watchers on the editor and fixes for how the Config File is watched.
-                </a>
+                Fixed a bug where devtools won't open.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/131">
-                  Ability to install packages from Git Repositories
-                </a>
+                Fixed a bug where the editor refused to open with the message "GPU process isn't usable. Goodbye"
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/68">
-                  Migrated to a new Pulsar Package Repository Backend
-                </a>
+                Fixed logo artifacts on Linux.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/settings-view/pull/2">
-                  Better error messages when a package fails to install.
-                </a>
+                Fixed Windows Taskbar Icon being 'Cut in Half'
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/14">
-                  Bumped Tree-Sitter to 0.20.1 and all grammars to their recent versions
-                </a>
+                Fixed commands like `--version`, `--package` or `--help` did not show outputs.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/101">
-                  Native support for ARM Linux
-                </a>
+                Fixed additional flags not being sent to `--package`.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/54">
-                  Native Support for Apple Silicon
-                </a>
+                Small improvement on the binary size.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/105">
-                  Removed Benchmark Mode
-                </a>
+                Fixed "install command line tools" on Mac and Windows.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
-                  Removed all telemetry from the editor.
-                </a>
+                Cached queries for featured packages (featured packages will load faster, and fewer errors on the settings-view regarding package info).
               </li>
               <li>
-                <a href="https://pulsar-edit.dev">
-                  New Pulsar Website
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/186">
-                  Apple Silicon support for `github` Package v0.36.13
-                </a>
+                Added warning when `settings-view` is disabled, describing how to re-enable it.
               </li>
 
             </ul>
