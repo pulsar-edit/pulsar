@@ -9094,8 +9094,9 @@ sylvester@^0.0.12:
   resolved "https://registry.yarnpkg.com/sylvester/-/sylvester-0.0.12.tgz#5a884415cd2d002c57e7a3aac99462a75ce9fdb4"
   integrity sha512-SzRP5LQ6Ts2G5NyAa/jg16s8e3R7rfdFjizy1zeoecYWw+nGL+YA1xZvW/+iJmidBGSdLkuvdwTYEyJEb+EiUw==
 
-"symbols-view@file:./packages/symbols-view":
+"symbols-view@https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4":
   version "0.118.4"
+  resolved "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4#cd1b515d4a3d720402b85301ea8e4d6c8815aaf2"
   dependencies:
     async "^0.2.6"
     atom-select-list "^0.7.0"
