@@ -53,6 +53,9 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
+                Signed Pulsar macOS Binaries
+              </li>
+              <li>
                 Fixed a bug where `pulsar` on Windows could never trigger
               </li>
               <li>

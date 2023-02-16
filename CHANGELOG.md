@@ -21,6 +21,7 @@
 - PPM no longer assumes `master` for git branches
 
 ### Pulsar
+- Added: implement signing and notarizing for macOS, PR #4 lol [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/387)
 - Fixed: Pin `python` brew installation to `3.10` during MacOS Intel Cirrus Build [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/384)
 - Update: Bump `ppm` to `a46537c0b7f0eaaef5404ef88003951fdc988c65` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/383)
 - Added: Add new macOS icon [@mdibella-dev](https://github.com/pulsar-edit/pulsar/pull/372)
