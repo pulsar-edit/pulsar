@@ -277,6 +277,7 @@
     "private-js-docs": "jsdoc2md --private ./src/**/*.js ./packages/**/*.js > ./docs/Source-Code-Documentation.md"
   },
   "devDependencies": {
+    "@electron/notarize": "^1.2.3",
     "@playwright/test": "1.22.2",
     "electron": "12.2.3",
     "electron-builder": "23.3.1",
