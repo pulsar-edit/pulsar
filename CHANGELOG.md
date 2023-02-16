@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## 1.102.0
+
 - Fixed a bug where `pulsar` on Windows could never trigger
 - Fixed `github` package shelling out to `git` on macOS
 - Fixed minor bugs found during fixes to tests
