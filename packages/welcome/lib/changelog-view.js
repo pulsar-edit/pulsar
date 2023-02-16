@@ -53,40 +53,34 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a bug where macOS menus like "Open" don't do anything.
+                Fixed a bug where `pulsar` on Windows could never trigger
               </li>
               <li>
-                Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
+                Fixed `github` package shelling out to `git` on macOS
               </li>
               <li>
-                Fixed a bug where devtools won't open.
+                Fixed minor bugs found during fixes to tests
               </li>
               <li>
-                Fixed a bug where the editor refused to open with the message "GPU process isn't usable. Goodbye"
+                Improved our testing infastructure to aide in finding and fixing further bugs
               </li>
               <li>
-                Fixed logo artifacts on Linux.
+                Updated many dependencies of Pulsar and it's core packages
               </li>
               <li>
-                Fixed Windows Taskbar Icon being 'Cut in Half'
+                New Pulsar Icon on macOS
               </li>
               <li>
-                Fixed commands like `--version`, `--package` or `--help` did not show outputs.
+                Selected text is styled by default
               </li>
               <li>
-                Fixed additional flags not being sent to `--package`.
+                Restored `right-clicked` CSS class on tags
               </li>
               <li>
-                Small improvement on the binary size.
+                Fixed syntax highlighting on C++
               </li>
               <li>
-                Fixed "install command line tools" on Mac and Windows.
-              </li>
-              <li>
-                Cached queries for featured packages (featured packages will load faster, and fewer errors on the settings-view regarding package info).
-              </li>
-              <li>
-                Added warning when `settings-view` is disabled, describing how to re-enable it.
+                Updated JavaScript snippets to modern ES6 syntax
               </li>
 
             </ul>

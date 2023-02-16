@@ -6,6 +6,17 @@
 
 ## [Unreleased]
 
+- Fixed a bug where `pulsar` on Windows could never trigger
+- Fixed `github` package shelling out to `git` on macOS
+- Fixed minor bugs found during fixes to tests
+- Improved our testing infastructure to aide in finding and fixing further bugs
+- Updated many dependencies of Pulsar and it's core packages
+- New Pulsar Icon on macOS
+- Selected text is styled by default
+- Restored `right-clicked` CSS class on tags
+- Fixed syntax highlighting on C++
+- Updated JavaScript snippets to modern ES6 syntax
+
 ### Pulsar
 - Added: Add new macOS icon [@mdibella-dev](https://github.com/pulsar-edit/pulsar/pull/372)
 - Fixed: type $ as # [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/378)
