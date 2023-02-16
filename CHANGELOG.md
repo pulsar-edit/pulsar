@@ -16,8 +16,10 @@
 - Restored `right-clicked` CSS class on tags
 - Fixed syntax highlighting on C++
 - Updated JavaScript snippets to modern ES6 syntax
+- PPM no longer assumes `master` for git branches
 
 ### Pulsar
+- Fixed: Pin `python` brew installation to `3.10` during MacOS Intel Cirrus Build [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/384)
 - Update: Bump `ppm` to `a46537c0b7f0eaaef5404ef88003951fdc988c65` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/383)
 - Added: Add new macOS icon [@mdibella-dev](https://github.com/pulsar-edit/pulsar/pull/372)
 - Fixed: type $ as # [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/378)
