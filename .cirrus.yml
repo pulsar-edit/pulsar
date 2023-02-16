@@ -1,3 +1,6 @@
+env:
+  PYTHON_VERSION: 3.10
+
 linux_task:
   alias: linux
   container:
@@ -99,10 +102,10 @@ silicon_mac_task:
     image: ghcr.io/cirruslabs/macos-monterey-base:latest
     memory: 8G
   test_script:
-    - brew install node@16 yarn git python
+    - brew install node@16 yarn git python@$PYTHON_VERSION
     - git submodule init
     - git submodule update
-    - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
+    - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - yarn install || yarn install
@@ -133,8 +136,8 @@ intel_mac_task:
     - arch -x86_64 xcode-select --install
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
-    - arch -x86_64 brew install node@16 yarn git python
-    - ln -s /usr/local/bin/python3 /usr/local/bin/python
+    - arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
+    - ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
