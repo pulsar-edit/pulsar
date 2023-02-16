@@ -53,40 +53,40 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a bug where macOS menus like "Open" don't do anything.
+                Signed Pulsar macOS Binaries
               </li>
               <li>
-                Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
+                Fixed a bug where `pulsar` on Windows could never trigger
               </li>
               <li>
-                Fixed a bug where devtools won't open.
+                Fixed `github` package shelling out to `git` on macOS
               </li>
               <li>
-                Fixed a bug where the editor refused to open with the message "GPU process isn't usable. Goodbye"
+                Fixed minor bugs found during fixes to tests
               </li>
               <li>
-                Fixed logo artifacts on Linux.
+                Improved our testing infastructure to aide in finding and fixing further bugs
               </li>
               <li>
-                Fixed Windows Taskbar Icon being 'Cut in Half'
+                Updated many dependencies of Pulsar and its core packages
               </li>
               <li>
-                Fixed commands like `--version`, `--package` or `--help` did not show outputs.
+                New Pulsar Icon on macOS
               </li>
               <li>
-                Fixed additional flags not being sent to `--package`.
+                Selected text is styled by default
               </li>
               <li>
-                Small improvement on the binary size.
+                Restored `right-clicked` CSS class on tags
               </li>
               <li>
-                Fixed "install command line tools" on Mac and Windows.
+                Fixed syntax highlighting on C++
               </li>
               <li>
-                Cached queries for featured packages (featured packages will load faster, and fewer errors on the settings-view regarding package info).
+                Updated JavaScript snippets to modern ES6 syntax
               </li>
               <li>
-                Added warning when `settings-view` is disabled, describing how to re-enable it.
+                PPM no longer assumes `master` for git branches
               </li>
 
             </ul>
