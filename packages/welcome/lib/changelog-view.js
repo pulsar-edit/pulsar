@@ -65,7 +65,7 @@ export default class ChangeLogView {
                 Improved our testing infastructure to aide in finding and fixing further bugs
               </li>
               <li>
-                Updated many dependencies of Pulsar and it's core packages
+                Updated many dependencies of Pulsar and its core packages
               </li>
               <li>
                 New Pulsar Icon on macOS
