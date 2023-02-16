@@ -19,7 +19,11 @@ const getAppDirectory = () => {
         0,
         process.execPath.indexOf('.app') + 4
       );
-    case 'linux':
+    case 'linux': 
+      if (process.env.XDG_CONFIG_HOME) {
+        return process.env.XDG_CONFIG_HOME;
+        } else { 
+          return path.join(process.env.HOME, '.config')};
     case 'win32':
       return path.join(process.execPath, '..');
   }
@@ -46,7 +50,7 @@ module.exports = {
     }
 
     // Fall back to default .atom folder in users home folder
-    process.env.ATOM_HOME = path.join(homePath, '.pulsar');
+    process.env.ATOM_HOME = path.join(getAppDirectory(), 'pulsar');
   },
 
   setUserData: app => {
