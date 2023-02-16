@@ -3,6 +3,7 @@
 /* eslint-env jasmine */
 
 import GoToLineView from '../lib/go-to-line-view';
+const path = require('path');
 
 describe('GoToLine', () => {
   let editor = null;
@@ -11,7 +12,7 @@ describe('GoToLine', () => {
 
   beforeEach(() => {
     waitsForPromise(() => {
-      return atom.workspace.open('sample.js');
+      return atom.workspace.open(path.join(__dirname, 'fixtures', 'sample.js'));
     });
 
     runs(() => {

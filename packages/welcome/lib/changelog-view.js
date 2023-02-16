@@ -53,69 +53,40 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/28">
-                  Bump to Electron 12 and Node 14
-                </a>
+                Signed Pulsar macOS Binaries
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/7">
-                  Added a rebranding API
-                </a>
+                Fixed a bug where `pulsar` on Windows could never trigger
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Removed experimental file watchers on the editor and fixes for how the Config File is watched.
-                </a>
+                Fixed `github` package shelling out to `git` on macOS
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/131">
-                  Ability to install packages from Git Repositories
-                </a>
+                Fixed minor bugs found during fixes to tests
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/68">
-                  Migrated to a new Pulsar Package Repository Backend
-                </a>
+                Improved our testing infastructure to aide in finding and fixing further bugs
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/settings-view/pull/2">
-                  Better error messages when a package fails to install.
-                </a>
+                Updated many dependencies of Pulsar and its core packages
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/14">
-                  Bumped Tree-Sitter to 0.20.1 and all grammars to their recent versions
-                </a>
+                New Pulsar Icon on macOS
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/101">
-                  Native support for ARM Linux
-                </a>
+                Selected text is styled by default
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/54">
-                  Native Support for Apple Silicon
-                </a>
+                Restored `right-clicked` CSS class on tags
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/105">
-                  Removed Benchmark Mode
-                </a>
+                Fixed syntax highlighting on C++
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
-                  Removed all telemetry from the editor.
-                </a>
+                Updated JavaScript snippets to modern ES6 syntax
               </li>
               <li>
-                <a href="https://pulsar-edit.dev">
-                  New Pulsar Website
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/186">
-                  Apple Silicon support for `github` Package v0.36.13
-                </a>
+                PPM no longer assumes `master` for git branches
               </li>
 
             </ul>

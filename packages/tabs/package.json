@@ -4,7 +4,7 @@
   "main": "./lib/main",
   "description": "Display a selectable tab for each editor open.",
   "license": "MIT",
-  "repository": "https://github.com/pulsar-tabs/pulsar",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": ">=1.17.0"
   },

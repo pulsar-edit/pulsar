@@ -1,9 +1,9 @@
 name: Package tests for Pulsar on Linux
 on:
-  - push
   - pull_request
 env:
-  APM_PATH: ./apm/node_modules/atom-package-manager/bin/apm
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ATOM_JASMINE_REPORTER: list
 jobs:
   setup:
     name: Build Editor
@@ -12,12 +12,6 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-20.04
     steps:
-    - name: Install windows-build-tools
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        npm i --global windows-build-tools@4.0.0
-        npm config set msvs_version 2019
-
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
@@ -35,60 +29,141 @@ jobs:
     - name: build dependencies
       run: yarn build:apm
 
-    - name: Cache node_modules
-      id: cache-node
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: linux-modules-$env:GITHUB_SHA
+    - name: build the editor
+      run: (yarn dist deb || yarn dist deb) && mv binaries/*deb pulsar.deb
 
-    - name: Cache apm
-      id: cache-apm
+    - name: Cache pulsar
+      id: cache-pulsar
       uses: actions/cache@v3
       with:
-        path: apm
-        key: linux-apm-$env:GITHUB_SHA
+        path: pulsar.deb
+        key: pulsar-$env:GITHUB_SHA
 
   test:
-    name: Test Packages
+    name: Package
     needs: setup
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         include:
-          - filter: autocomplete|language
-            descr: syntax-related
-          - filter: dark|light
-            descr: themes
-          - filter: git-diff|go-to-line|grammar-selector|line-ending-selector|autoflow|autosave|symbols-view|spell-check|bracket-matcher|whitespace|wrap-guide|snippets|encoding-selector
-            descr: editor related
-          - filter: deprecation-cop|dev-live-reload|incompatible-packages|package-generator|exception-reporting|metrics|update-package-dependencies|styleguide
-            descr: development helpers
-          - filter: welcome|about|background-tips|tabs|tree-view|archive-view|markdown-preview|status-bar|settings-view|notifications
-            descr: UI elements
-          - filter: image-view|bookmarks|keybinding-resolver|link|timecop
-            descr: others
+          - package: "atom-dark-syntax"
+          - package: "atom-dark-ui"
+          - package: "atom-light-syntax"
+          - package: "atom-light-ui"
+          - package: "base16-tomorrow-dark-theme"
+          - package: "base16-tomorrow-light-theme"
+          - package: "one-dark-ui"
+          - package: "one-light-ui"
+          - package: "one-dark-syntax"
+          - package: "one-light-syntax"
+          - package: "solarized-dark-syntax"
+          - package: "solarized-light-syntax"
+          - package: "about"
+          - package: "archive-view"
+          - package: "autocomplete-atom-api"
+          - package: "autocomplete-css"
+          - package: "autocomplete-html"
+          - package: "autocomplete-plus"
+          - package: "autocomplete-snippets"
+          - package: "autoflow"
+          - package: "autosave"
+          - package: "background-tips"
+          - package: "bookmarks"
+          - package: "bracket-matcher"
+          - package: "command-palette"
+          - package: "dalek"
+          - package: "deprecation-cop"
+          - package: "dev-live-reload"
+          - package: "encoding-selector"
+          - package: "exception-reporting"
+          - package: "find-and-replace"
+          - package: "fuzzy-finder"
+          - package: "github"
+          - package: "git-diff"
+          - package: "go-to-line"
+          - package: "grammar-selector"
+          - package: "image-view"
+          - package: "incompatible-packages"
+          - package: "keybinding-resolver"
+          - package: "line-ending-selector"
+          - package: "link"
+          - package: "markdown-preview"
+          - package: "notifications"
+          - package: "open-on-github"
+          - package: "package-generator"
+          - package: "settings-view"
+          - package: "snippets"
+          - package: "spell-check"
+          - package: "status-bar"
+          - package: "styleguide"
+          - package: "symbols-view"
+          - package: "tabs"
+          - package: "timecop"
+          - package: "tree-view"
+          - package: "update-package-dependencies"
+          - package: "welcome"
+          - package: "whitespace"
+          - package: "wrap-guide"
+          - package: "language-c"
+          - package: "language-clojure"
+          - package: "language-coffee-script"
+          - package: "language-csharp"
+          - package: "language-css"
+          - package: "language-gfm"
+          - package: "language-git"
+          - package: "language-go"
+          - package: "language-html"
+          - package: "language-hyperlink"
+          - package: "language-java"
+          - package: "language-javascript"
+          - package: "language-json"
+          - package: "language-less"
+          - package: "language-make"
+          - package: "language-mustache"
+          - package: "language-objective-c"
+          - package: "language-perl"
+          - package: "language-php"
+          - package: "language-property-list"
+          - package: "language-python"
+          - package: "language-ruby"
+          - package: "language-ruby-on-rails"
+          - package: "language-rust-bundled"
+          - package: "language-sass"
+          - package: "language-shellscript"
+          - package: "language-source"
+          - package: "language-sql"
+          - package: "language-text"
+          - package: "language-todo"
+          - package: "language-toml"
+          - package: "language-typescript"
+          - package: "language-xml"
+          - package: "language-yaml"
 
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
-    - name: Restore node_modules from Cache
-      id: restore-node
+    - name: Install Dependencies
+      run: yarn install || yarn install
+
+    - name: Build Dependencies
+      run: yarn build || yarn build
+
+    - name: Restore pulsar from Cache
+      id: restore-pulsar
       uses: actions/cache@v3
       with:
-        path: node_modules
-        key: linux-modules-$env:GITHUB_SHA
+        path: pulsar.deb
+        key: pulsar-$env:GITHUB_SHA
 
-    - name: Restore apm from Cache
-      id: restore-apm
-      uses: actions/cache@v3
-      with:
-        path: apm
-        key: linux-apm-$env:GITHUB_SHA
+    - name: Install Pulsar
+      run: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
 
-    - name: Run Package Tests for ${{ matrix.descr }}
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: node -e "require('./script/run-package-tests')(/${{ matrix.filter }}/)"
+    - name: Install xvfb
+      run: sudo apt-get install -y xvfb
+
+    - name: Run ${{ matrix.package }} Tests
+      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi
+        # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"

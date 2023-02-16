@@ -605,7 +605,7 @@ const configSchema = {
         type: 'boolean',
         default: true,
         description:
-          'Add multiple cursors when pressing the Ctrl key (Command key on MacOS) and clicking the editor.'
+          'Add multiple cursors when pressing the Ctrl key (Command key on macOS) and clicking the editor.'
       }
     }
   }
