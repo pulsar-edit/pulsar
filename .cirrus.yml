@@ -96,7 +96,7 @@ arm_linux_task:
 silicon_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-ventura-base:latest
     memory: 8G
   test_script:
     - brew install node@16 yarn git python
@@ -125,7 +125,7 @@ silicon_mac_task:
 intel_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-ventura-base:latest
     memory: 8G
   dist_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
