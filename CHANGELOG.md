@@ -18,6 +18,7 @@
 - Updated JavaScript snippets to modern ES6 syntax
 
 ### Pulsar
+- Update: Bump `ppm` to `a46537c0b7f0eaaef5404ef88003951fdc988c65` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/383)
 - Added: Add new macOS icon [@mdibella-dev](https://github.com/pulsar-edit/pulsar/pull/372)
 - Fixed: type $ as # [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/378)
 - Update: deps: Update github to v0.36.14-pretranspiled-take-2 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/375)
@@ -46,6 +47,8 @@
 - Updated: update copyright year (2023) [@icecream17](https://github.com/pulsar-edit/pulsar/pull/332)
 
 ### ppm
+- Fixed: fix: Don't assume `master` when checking git packages for upgrades [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/56)
+- Fixed: meta: Normalize package.json and lockfile line endings [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/54)
 - Update: spec: Fixtures Node v10.20.1 --> Electron v12.2.3 [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/52)
 - Fixed: Fix .com links, pulsar rebranding and rebranding readme [@Daeraxa](https://github.com/pulsar-edit/ppm/pull/48)
 

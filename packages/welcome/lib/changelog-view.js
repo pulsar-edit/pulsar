@@ -82,6 +82,9 @@ export default class ChangeLogView {
               <li>
                 Updated JavaScript snippets to modern ES6 syntax
               </li>
+              <li>
+                PPM no longer assumes `master` for git branches
+              </li>
 
             </ul>
 
