@@ -12,7 +12,7 @@
 - Fixed `github` package shelling out to `git` on macOS
 - Fixed minor bugs found during fixes to tests
 - Improved our testing infastructure to aide in finding and fixing further bugs
-- Updated many dependencies of Pulsar and it's core packages
+- Updated many dependencies of Pulsar and its core packages
 - New Pulsar Icon on macOS
 - Selected text is styled by default
 - Restored `right-clicked` CSS class on tags
