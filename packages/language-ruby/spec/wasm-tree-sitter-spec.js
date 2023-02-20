@@ -40,7 +40,7 @@ describe('WASM Tree-sitter Ruby grammar', () => {
           const expected = exactPos[1]
           reason(dedent`
             Expected to find scope "${expected}" but found "${scopes}"
-            at class-was-ts.rb:${row+1}:${exactPos.index+1}
+            at class-wasm-ts.rb:${row+1}:${exactPos.index+1}
           `)
           return scopes.indexOf(expected) !== -1
         })
@@ -51,7 +51,7 @@ describe('WASM Tree-sitter Ruby grammar', () => {
           const expected = pos[1]
           reason(dedent`
             Expected to find scope "${expected}" but found "${scopes}"
-            at class-node.ts.rb:${row+1}:${col+1}
+            at class-wasm-ts.rb:${row+1}:${col+1}
           `)
           return scopes.indexOf(expected) !== -1
         })
