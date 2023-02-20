@@ -19,6 +19,8 @@ class WASMTreeSitterLanguageMode {
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
     this.newRanges = []
     this.oldNodeTexts = new Set()
+    let resolve
+    this.ready = new Promise(r => resolve = r)
 
     initPromise.then(() =>
       Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
@@ -38,6 +40,7 @@ class WASMTreeSitterLanguageMode {
       const startRange = new Range([0, 0], [0, 0])
       const range = buffer.getRange()
       buffer.emitDidChangeEvent({oldRange: startRange, newRange: range, oldText: ""})
+      resolve(true)
       global.mode = this
     })
 
@@ -103,43 +106,45 @@ class WASMTreeSitterLanguageMode {
     }
 
     oldScopes = oldScopes || []
-    syntax.forEach(capture => {
-      const node = capture.node
-      const names = capture.name.split('.')
+    syntax.forEach(({node, name}) => {
+      // const node = capture.node
+      // const names = capture.name.split('.')
 
-      names.forEach(name => {
-        if(!this.scopeNames.get(name)) {
-          this.lastId += 2
-          const newId = this.lastId;
-          this.scopeNames.set(name, newId)
-          this.scopeIds.set(newId, name)
-        }
-      })
+      // names.forEach(name => {
+      let id = this.scopeNames.get(name)
+      if(!id) {
+        this.lastId += 2
+        id = this.lastId
+        const newId = this.lastId;
+        this.scopeNames.set(name, newId)
+        this.scopeIds.set(newId, name)
+      }
+      // })
 
-      const ids = names.map(name => this.scopeNames.get(name))
+      // const ds = names.map(name => this.scopeNames.get(name))
       let old = this.boundaries.get(node.startPosition)
       if(old) {
         old.openNode = node
         if(old.openScopeIds.length === 0) {
-          old.openScopeIds = [...ids]
+          old.openScopeIds = [id]
         }
       } else {
         this.boundaries = this.boundaries.insert(node.startPosition, {
           closeScopeIds: [...oldScopes],
-          openScopeIds: [...ids],
+          openScopeIds: [id],
           openNode: node,
           position: node.startPosition
         })
-        oldScopes = ids
+        oldScopes = [id]
       }
 
       old = this.boundaries.get(node.endPosition)
       if(old) {
         old.closeNode = node
-        if(old.closeScopeIds.length === 0) old.closeScopeIds = ids.reverse()
+        if(old.closeScopeIds.length === 0) old.closeScopeIds = [id]
       } else {
         this.boundaries = this.boundaries.insert(node.endPosition, {
-          closeScopeIds: ids.reverse(),
+          closeScopeIds: [id],
           openScopeIds: [],
           closeNode: node,
           position: node.endPosition
@@ -284,7 +289,6 @@ class WASMTreeSitterLanguageMode {
       },
 
       seek(start, endRow) {
-        // debugger
         const end = {row: endRow + 1, column: 0}
         iterator = updateBoundaries(start, end).ge(start)
         return []
@@ -293,19 +297,36 @@ class WASMTreeSitterLanguageMode {
   }
 
   classNameForScopeId(scopeId) {
-    // console.log('classNameForScopeId', scopeId, this.scopeIds)
     const scope = this.scopeIds.get(scopeId)
-    if(scope) return `syntax--${scope}`
-    // // console.log("classNameForScopeId", scopeId)
-    // if(scopeId === 259) {
-    //   return "syntax--keyword"
-    // }
+    if(scope) return `syntax--${scope.replace(/\./g, ' syntax--')}`
   }
 
   scopeForId(scopeId) {
     return this.scopeIds[scopeId]
   }
 
+  scopeDescriptorForPosition(position) {
+    if(!this.tree) return new ScopeDescriptor({scopes: ['text']})
+    const current = Point.fromObject(position)
+    let begin = Point.fromObject(position)
+    begin.column = 0
+    const end = Point.fromObject([begin.row+1, 0])
+    this._updateBoundaries(begin, end)
+    const it = this.boundaries.ge(begin)
+    if(!it.value) return new ScopeDescriptor({scopes: ['text']})
+
+    let scopeIds = []
+    while(comparePoints(it.key, current) <= 0) {
+      const closing = new Set(it.value.closeScopeIds)
+      scopeIds = scopeIds.filter(s => !closing.has(s))
+      scopeIds.push(...it.value.openScopeIds)
+      if(!it.hasNext) break
+      it.next()
+    }
+
+    const scopes = scopeIds.map(id => this.classNameForScopeId(id).replace(/^syntax--/, '').replace(/\s?syntax--/g, '.'))
+    return new ScopeDescriptor({scopes})
+  }
 }
 module.exports = WASMTreeSitterLanguageMode;
 

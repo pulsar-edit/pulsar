@@ -10,8 +10,7 @@ describe('WASM Tree-sitter Ruby grammar', () => {
   });
 
   it('tokenizes symbols', async () => {
-    const editor = await openDocument('classes-node-ts.rb');
-    console.log('I', editor.scopeDescriptorForBufferPosition([0, 0]))
+    const editor = await openDocument('classes-wasm-ts.rb');
 
     let allMatches = [], lastNonComment = 0
     editor.getBuffer().getLines().forEach((row, i) => {
@@ -33,12 +32,15 @@ describe('WASM Tree-sitter Ruby grammar', () => {
     allMatches.forEach(({text, row, col}) => {
       const exactPos = text.match(/\^\s+(.*)/)
       if(exactPos) {
-        console.log(`finds ${exactPos[1]} on row ${row+1} and column ${exactPos.index+1}`)
+        console.log(
+          'Scopes:',
+          editor.scopeDescriptorForBufferPosition([row, exactPos.index]).toString()
+        )
         expect(editor.scopeDescriptorForBufferPosition([row, exactPos.index]).scopes).toSatisfy((scopes, reason) => {
           const expected = exactPos[1]
           reason(dedent`
             Expected to find scope "${expected}" but found "${scopes}"
-            at class-node.ts.rb:${row+1}:${exactPos.index+1}
+            at class-was-ts.rb:${row+1}:${exactPos.index+1}
           `)
           return scopes.indexOf(expected) !== -1
         })
