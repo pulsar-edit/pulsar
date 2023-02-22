@@ -32,10 +32,6 @@ describe('WASM Tree-sitter Ruby grammar', () => {
     allMatches.forEach(({text, row, col}) => {
       const exactPos = text.match(/\^\s+(.*)/)
       if(exactPos) {
-        console.log(
-          'Scopes:',
-          editor.scopeDescriptorForBufferPosition([row, exactPos.index]).toString()
-        )
         expect(editor.scopeDescriptorForBufferPosition([row, exactPos.index]).scopes).toSatisfy((scopes, reason) => {
           const expected = exactPos[1]
           reason(dedent`

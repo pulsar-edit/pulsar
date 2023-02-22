@@ -9,7 +9,7 @@ createTree = require("./rb-tree")
 
 const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
-  constructor( buffer, config) {
+  constructor(buffer, config, grammar) {
     this.emitter = new Emitter();
     this.lastId = 259
     this.scopeNames = new Map([["variable", VAR_ID]])
@@ -23,14 +23,12 @@ class WASMTreeSitterLanguageMode {
     this.ready = new Promise(r => resolve = r)
 
     initPromise.then(() =>
-      Parser.Language.load('/tmp/grammars/ruby/grammar.wasm')
+      Parser.Language.load(grammar.grammarPath)
     ).then(lang => {
-      const syntaxQuery = fs.readFileSync('/tmp/grammars/ruby/queries/highlights.scm', 'utf-8')
-      if(fs.existsSync('/tmp/grammars/ruby/queries/locals.scm')) {
-        const localsQuery = fs.readFileSync('/tmp/grammars/ruby/queries/locals.scm', 'utf-8')
-        this.localsQuery = lang.query(localsQuery)
+      this.syntaxQuery = lang.query(grammar.syntaxQuery)
+      if(grammar.localsQuery) {
+        this.localsQuery = lang.query(grammar.localsQuery)
       }
-      this.syntaxQuery = lang.query(syntaxQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
 
@@ -45,7 +43,7 @@ class WASMTreeSitterLanguageMode {
     })
 
     this.rootScopeDescriptor = new ScopeDescriptor({
-      scopes: ['ruby']
+      scopes: [grammar.scopeName]
     });
   }
 
