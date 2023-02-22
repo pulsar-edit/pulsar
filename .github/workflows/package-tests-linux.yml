@@ -145,6 +145,11 @@ jobs:
     - name: Checkout the latest code
       uses: actions/checkout@v2
 
+    - name: Setup node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 16
+
     - name: Install Dependencies
       run: yarn install || yarn install
 
