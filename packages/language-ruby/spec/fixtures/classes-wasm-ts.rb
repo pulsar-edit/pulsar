@@ -2,8 +2,8 @@ require "a"
 # ^ function.method.builtin
 
 class Car < Vehicle
-  # <- keyword.other
-  #    ^ entity.name.type.class
+  # <- keyword
+  #    ^ constructor
 
   def init(id)
     # <- keyword
