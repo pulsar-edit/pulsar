@@ -21,6 +21,7 @@ class WASMTreeSitterLanguageMode {
     this.oldNodeTexts = new Set()
     let resolve
     this.ready = new Promise(r => resolve = r)
+    this.grammar = grammar
 
     initPromise.then(() =>
       Parser.Language.load(grammar.grammarPath)
@@ -28,6 +29,10 @@ class WASMTreeSitterLanguageMode {
       this.syntaxQuery = lang.query(grammar.syntaxQuery)
       if(grammar.localsQuery) {
         this.localsQuery = lang.query(grammar.localsQuery)
+      }
+      this.grammar = grammar
+      if(grammar.foldsQuery) {
+        this.foldsQuery = lang.query(grammar.foldsQuery)
       }
       this.parser = new Parser()
       this.parser.setLanguage(lang)
@@ -45,6 +50,10 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [grammar.scopeName]
     });
+  }
+
+  getGrammar() {
+    return this.grammar
   }
 
   updateForInjection(...args) {
@@ -324,6 +333,37 @@ class WASMTreeSitterLanguageMode {
 
     const scopes = scopeIds.map(id => this.classNameForScopeId(id).replace(/^syntax--/, '').replace(/\s?syntax--/g, '.'))
     return new ScopeDescriptor({scopes})
+  }
+
+  getFoldableRanges() {
+    if(!this.tree) return [];
+    console.log("Folds")
+    return []
+  }
+
+  getFoldableRangesAtIndentLevel(level) {
+    if(!this.tree) return [];
+    console.log("FoldsIdent", level)
+    return []
+  }
+
+  getFoldableRangeContainingPoint(point) {
+    const foldsAtRow = this._getFoldsAtRow(point.row)
+    console.log("FoldsPoint", foldsAtRow)
+    const node = foldsAtRow[0]?.node
+    if(node) return new Range(node.startPosition, node.endPosition)
+  }
+
+  isFoldableAtRow(row) {
+    const foldsAtRow = this._getFoldsAtRow(row)
+    return foldsAtRow.length !== 0
+  }
+
+  _getFoldsAtRow(row) {
+    if(!this.tree) return []
+    const folds = this.foldsQuery.captures(this.tree.rootNode,
+      {row: row, column: 0}, {row: row+1, column: 0})
+    return folds.filter(fold => fold.node.startPosition.row === row)
   }
 }
 module.exports = WASMTreeSitterLanguageMode;
