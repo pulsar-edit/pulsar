@@ -4378,7 +4378,7 @@
       "description": ""
     }
   },
-  "psuedoSelectors": {
+  "pseudoSelectors": {
     "::after": {
       "description": "Matches a virtual last child of the selected element."
     },

@@ -83,12 +83,12 @@ async function update() {
 
   const properties = await buildProperties(parsedFiles);
   const tags = await getTagsHTML();
-  const psuedoSelectors = await getPsuedoSelectors();
+  const pseudoSelectors = await getPseudoSelectors();
 
   const completions = {
     tags: tags,
     properties: properties,
-    psuedoSelectors: psuedoSelectors
+    pseudoSelectors: pseudoSelectors
   };
 
   // Now to write out our updated file
@@ -226,7 +226,7 @@ async function getTagsHTML() {
   return tags;
 }
 
-async function getPsuedoSelectors() {
+async function getPseudoSelectors() {
   // For now since there is no best determined way to collect all modern psudoselectors
   // We will just grab the existing list for our existing `completions.json`
 
