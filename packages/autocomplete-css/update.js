@@ -76,19 +76,25 @@
 
 const css = require("@webref/css");
 const fs = require("fs");
+const CSSParser = require("./cssValueDefinitionSyntaxExtractor.js");
 
 async function update() {
   const parsedFiles = await css.listAll();
 
+  const properties = await buildProperties(parsedFiles);
+  const tags = await getTagsHTML();
+  const psuedoSelectors = await getPsuedoSelectors();
+
   const completions = {
-    tags: [],
-    properties: {},
-    psuedoSelectors: {}
+    tags: tags,
+    properties: properties,
+    psuedoSelectors: psuedoSelectors
   };
 
-  const properties = await buildProperties(parsedFiles);
-  console.log(properties);
+  // Now to write out our updated file
+  fs.writeFileSync("completions.json", JSON.stringify(completions, null, 2));
 
+  console.log("Updated all `autocomplete-css` completions.");
 }
 
 async function buildProperties(css) {
@@ -106,14 +112,13 @@ async function buildProperties(css) {
       for (const prop of css[spec].properties) {
 
         const propDescription = await getDescriptionOfProp(prop.name);
-        const propValues = await getValuesOfProp(prop.value, css[spec].values);
+        const propValues = getValuesOfProp(prop.value, css[spec].values);
 
         propertyObj[prop.name] = {
           values: propValues,
           description: propDescription
         };
-        //console.log(propertyObj);
-        //process.exit(1);
+
       }
     } // else continue our loop
   }
@@ -132,15 +137,19 @@ async function getDescriptionOfProp(name) {
     let breaks = file.split("---");
 
     // The first two breaks should be the yaml metadata block
-    let data = breaks[2].replace(/\{\S+\}/gm, "");
+    let data = breaks[2].replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "").replace(/\{\{CSSRef\}\}/gm, "");
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {
       if (summaryRaw[i].length > 1) {
         return summaryRaw[i]
+          .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
           .replace(/\*/g, "")
           .replace(/\`/g, "")
-          .replace(/\[([\S ]+)\]\(\S+\)/, '$1');
+          .replace(/\{/g, "")
+          .replace(/\}/g, "")
+          .replace(/\"/g, "")
+          .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
       }
     }
   } else {
@@ -149,12 +158,81 @@ async function getDescriptionOfProp(name) {
   }
 }
 
-async function getValuesOfProp(value, allValues) {
+function getValuesOfProp(value, allValues) {
   // value holds the value string of the values we expect
   // allValues holds all of the values that apply to the spec
   // Like mentioned above `value` = "value1 | value2 | <valueGroupName>"
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
 
+  if (!value || value.length < 0) {
+    return [];
+  }
 
+  let values = [];
+  let parser = new CSSParser(value);
+
+  let rawArrayValues = parser.parse();
+
+  for (const val of rawArrayValues) {
+    if (val.length > 1) {
+      // Since some values contain `||` some splits leave a zero length string
+      if (val.trim().startsWith("<") && val.trim().endsWith(">")) {
+        // This is a valueGroup lookup key
+        let valueGroup = parseValueGroup(val.trim(), allValues);
+        values = values.concat(valueGroup);
+      } else {
+        values.push(val.trim());
+      }
+    }
+  }
+
+  return values;
+
+}
+
+function parseValueGroup(valueGroupName, allValues) {
+  // Will lookup a valueGroup name within allValues and parse it
+
+  let resolvedValueGroupString;
+
+  for (const spec in allValues) {
+    if (Array.isArray(allValues[spec].values)) {
+      for (const val of allValues[spec].values) {
+        if (val.name === valueGroupName) {
+          resolvedValueGroupString = val.value;
+          break;
+        }
+      }
+    }
+  }
+
+  return getValuesOfProp(resolvedValueGroupString);
+}
+
+async function getTagsHTML() {
+  // This will also use our dep of `mdn/content` to find all tags currently
+  // within their docs. By simply grabbing all folders of tag docs by their name
+
+  let tags = [];
+
+  let files = fs.readdirSync("./node_modules/content/files/en-us/web/html/element");
+
+  files.forEach(file => {
+    if (file != "index.md") {
+      tags.push(file);
+    }
+  });
+
+  return tags;
+}
+
+async function getPsuedoSelectors() {
+  // For now since there is no best determined way to collect all modern psudoselectors
+  // We will just grab the existing list for our existing `completions.json`
+
+  let existingCompletions = require("./completions.json");
+
+  return existingCompletions.pseudoSelectors;
 }
 
 update();
