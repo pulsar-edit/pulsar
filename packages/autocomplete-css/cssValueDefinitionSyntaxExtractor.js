@@ -23,7 +23,7 @@ class CSSParser {
       "!": "Exclamation Point Multiplier"
     };
 
-    this.seperators = {
+    this.separators = {
       "&&": "Double Ampersand Combinator",
       "||": "Double Bar Combinator",
       "|": "Single Bar Combinator",
@@ -65,10 +65,10 @@ class CSSParser {
       return this.parse();
     }
 
-    if (this.isSeperator().status) {
+    if (this.isSeparators().status) {
       // We don't actually care about seperators
       this.offLoadBuffer();
-      this.next(this.isSeperator().who.length);
+      this.next(this.isSeparators().who.length);
       return this.parse();
     }
 
@@ -84,7 +84,7 @@ class CSSParser {
       return this.parse();
     }
 
-    if (!this.isStartDiscardable() && !this.isEndDiscardable() && !this.isKeyword().status && !this.isSeperator().status && !this.isStartFold() && !this.isEndFold()) {
+    if (!this.isStartDiscardable() && !this.isEndDiscardable() && !this.isKeyword().status && !this.isSeparators().status && !this.isStartFold() && !this.isEndFold()) {
       this.buffer += this.cur();
       this.next();
       return this.parse();
@@ -108,9 +108,9 @@ class CSSParser {
     return { status: false };
   }
 
-  isSeperator() {
-    for (const name in this.seperators) {
-      if (this.seperators.hasOwnProperty(name) && this.value.substr(this.index, name.length) === name) {
+  isSeparators() {
+    for (const name in this.separators) {
+      if (this.separators.hasOwnProperty(name) && this.value.substr(this.index, name.length) === name) {
         return { status: true, who: name };
       }
     }
