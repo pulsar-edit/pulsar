@@ -38,13 +38,12 @@ class WASMTreeSitterLanguageMode {
       this.parser.setLanguage(lang)
 
       // Force first highlight
-      this.tree = this.parser.parse("")
       this.boundaries = createTree(comparePoints)
       const startRange = new Range([0, 0], [0, 0])
       const range = buffer.getRange()
-      buffer.emitDidChangeEvent({oldRange: startRange, newRange: range, oldText: ""})
+      this.tree = this.parser.parse(buffer.getText())
+      this.emitter.emit('did-change-highlighting', range)
       resolve(true)
-      global.mode = this
     })
 
     this.rootScopeDescriptor = new ScopeDescriptor({
@@ -336,26 +335,48 @@ class WASMTreeSitterLanguageMode {
   }
 
   getFoldableRanges() {
-    if(!this.tree) return [];
     console.log("Folds")
+    if(!this.tree) return [];
     return []
   }
 
   getFoldableRangesAtIndentLevel(level) {
-    if(!this.tree) return [];
     console.log("FoldsIdent", level)
+    if(!this.tree) return [];
     return []
   }
 
-  getFoldableRangeContainingPoint(point) {
+  indentLevelForLine(line, tabLength) {
+    console.log("INDENT")
+    let indentLength = 0;
+    for (let i = 0, { length } = line; i < length; i++) {
+      const char = line[i];
+      if (char === '\t') {
+        indentLength += tabLength - (indentLength % tabLength);
+      } else if (char === ' ') {
+        indentLength++;
+      } else {
+        break;
+      }
+    }
+    return indentLength / tabLength;
+  }
+
+  getFoldableRangeContainingPoint(point, tabLength) {
     const foldsAtRow = this._getFoldsAtRow(point.row)
-    console.log("FoldsPoint", foldsAtRow)
     const node = foldsAtRow[0]?.node
-    if(node) return new Range(node.startPosition, node.endPosition)
+    if(node) {
+      const children = node.children
+      const lastNode = children[children.length-1]
+      const range = new Range([node.startPosition.row, Infinity], lastNode.startPosition)
+      return range
+    }
   }
 
   isFoldableAtRow(row) {
+    // console.log("Is Foldable?", row)
     const foldsAtRow = this._getFoldsAtRow(row)
+    // console.log("Is Foldable Res?", foldsAtRow.length !== 0)
     return foldsAtRow.length !== 0
   }
 
