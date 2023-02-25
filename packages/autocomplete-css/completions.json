@@ -142,19 +142,32 @@
   ],
   "properties": {
     "-webkit-text-fill-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The -webkit-text-fill-color CSS property specifies the fill color of characters of text. If this property is not set, the value of the color property is used."
     },
     "-webkit-text-stroke-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The -webkit-text-stroke-color CSS property specifies the stroke color of characters of text. If this property is not set, the value of the color property is used."
     },
     "-webkit-text-stroke-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The -webkit-text-stroke-width CSS property specifies the width of the stroke for text."
     },
     "-webkit-text-stroke": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick",
+        "currentcolor"
+      ],
       "description": "The -webkit-text-stroke CSS property specifies the width and color of strokes for text characters. This is a shorthand property for the longhand properties -webkit-text-stroke-width and -webkit-text-stroke-color."
     },
     "touch-action": {
@@ -426,13 +439,32 @@
     },
     "mix-blend-mode": {
       "values": [
+        "normal",
+        "multiply",
+        "screen",
+        "overlay",
+        "darken",
+        "lighten",
+        "color-dodge",
+        "color-burn",
+        "hard-light",
+        "soft-light",
+        "difference",
+        "exclusion",
+        "hue",
+        "saturation",
+        "color",
+        "luminosity",
         "plus-darker",
         "plus-lighter"
       ],
       "description": "The mix-blend-mode CSS property sets how an element's content should blend with the content of the element's parent and the element's background."
     },
     "isolation": {
-      "values": [],
+      "values": [
+        "auto",
+        "isolate"
+      ],
       "description": "The isolation CSS property determines whether an element must create a new glossary(stacking context)."
     },
     "background-blend-mode": {
@@ -441,13 +473,38 @@
     },
     "align-content": {
       "values": [
-        "normal"
+        "normal",
+        "first",
+        "last",
+        "baseline",
+        "space-between",
+        "space-around",
+        "space-evenly",
+        "stretch",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "flex-start",
+        "flex-end"
       ],
       "description": "The CSS align-content property sets the distribution of space between and around content items along a flexbox's cross-axis or a grid's block axis."
     },
     "justify-content": {
       "values": [
         "normal",
+        "space-between",
+        "space-around",
+        "space-evenly",
+        "stretch",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "flex-start",
+        "flex-end",
         "left",
         "right"
       ],
@@ -462,6 +519,18 @@
         "auto",
         "normal",
         "stretch",
+        "first",
+        "last",
+        "baseline",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "self-start",
+        "self-end",
+        "flex-start",
+        "flex-end",
         "left",
         "right"
       ],
@@ -471,7 +540,19 @@
       "values": [
         "auto",
         "normal",
-        "stretch"
+        "stretch",
+        "first",
+        "last",
+        "baseline",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "self-start",
+        "self-end",
+        "flex-start",
+        "flex-end"
       ],
       "description": "The align-self CSS property overrides a grid or flex item's align-items value. In Grid, it aligns the item inside the glossary(Grid Areas, grid area). In Flexbox, it aligns the item on the glossary(cross axis)."
     },
@@ -483,6 +564,18 @@
       "values": [
         "normal",
         "stretch",
+        "first",
+        "last",
+        "baseline",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "self-start",
+        "self-end",
+        "flex-start",
+        "flex-end",
         "left",
         "right",
         "legacy",
@@ -496,7 +589,19 @@
     "align-items": {
       "values": [
         "normal",
-        "stretch"
+        "stretch",
+        "first",
+        "last",
+        "baseline",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "self-start",
+        "self-end",
+        "flex-start",
+        "flex-end"
       ],
       "description": "The CSS align-items property sets the align-self value on all direct children as a group. In Flexbox, it controls the alignment of items on the glossary(Cross Axis). In Grid Layout, it controls the alignment of items on the Block Axis within their glossary(Grid Areas, grid area)."
     },
@@ -535,7 +640,9 @@
     "anchor-scroll": {
       "values": [
         "none",
-        "default"
+        "default",
+        "implicit",
+        "popover"
       ],
       "description": ""
     },
@@ -546,7 +653,10 @@
       "description": ""
     },
     "anchor-default": {
-      "values": [],
+      "values": [
+        "implicit",
+        "popover"
+      ],
       "description": ""
     },
     "position-fallback": {
@@ -556,11 +666,18 @@
       "description": ""
     },
     "animation-composition": {
-      "values": [],
+      "values": [
+        "replace",
+        "add",
+        "accumulate"
+      ],
       "description": "The animation-composition CSS property specifies the Glossary(composite operation) to use when multiple animations affect the same property simultaneously."
     },
     "animation-timeline": {
-      "values": [],
+      "values": [
+        "auto",
+        "none"
+      ],
       "description": "The animation-timeline CSS property specifies the timeline that is used to control the progress of an animation."
     },
     "animation-name": {
@@ -574,19 +691,31 @@
       "description": "The animation-duration CSS property sets the length of time that an animation takes to complete one cycle."
     },
     "animation-timing-function": {
-      "values": [],
+      "values": [
+        "linear"
+      ],
       "description": "The animation-timing-function CSS property sets how an animation progresses through the duration of each cycle."
     },
     "animation-iteration-count": {
-      "values": [],
+      "values": [
+        "infinite"
+      ],
       "description": "The animation-iteration-count CSS property sets the number of times an animation sequence should be played before stopping."
     },
     "animation-direction": {
-      "values": [],
+      "values": [
+        "normal",
+        "reverse",
+        "alternate",
+        "alternate-reverse"
+      ],
       "description": "The animation-direction CSS property sets whether an animation should play forward, backward, or alternate back and forth between playing the sequence forward and backward."
     },
     "animation-play-state": {
-      "values": [],
+      "values": [
+        "running",
+        "paused"
+      ],
       "description": "The animation-play-state CSS property sets whether an animation is running or paused."
     },
     "animation-delay": {
@@ -594,15 +723,40 @@
       "description": "The animation-delay CSS property specifies the amount of time to wait from applying the animation to an element before beginning to perform the animation. The animation can start later, immediately from its beginning, or immediately and partway through the animation."
     },
     "animation-fill-mode": {
-      "values": [],
+      "values": [
+        "none",
+        "forwards",
+        "backwards",
+        "both"
+      ],
       "description": "The animation-fill-mode CSS property sets how a CSS animation applies styles to its target before and after its execution."
     },
     "animation": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": "The animation shorthand CSS property applies an animation between styles. It is a shorthand for animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode, and animation-play-state."
     },
     "background-position": {
-      "values": [],
+      "values": [
+        "left",
+        "center",
+        "right",
+        "top",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "center",
+        "left",
+        "right",
+        "center",
+        "top",
+        "bottom"
+      ],
       "description": "The background-position CSS property sets the initial position for each background image. The position is relative to the position layer set by background-origin."
     },
     "background-position-x": {
@@ -642,27 +796,41 @@
       "description": ""
     },
     "background-clip": {
-      "values": [],
+      "values": [
+        "border-box",
+        "padding-box",
+        "content-box"
+      ],
       "description": "The background-clip CSS property sets whether an element's background extends underneath its border box, padding box, or content box."
     },
     "border-top-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-top-color CSS property sets the color of an element's top border. It can also be set with the shorthand CSS properties border-color or border-top."
     },
     "border-right-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-right-color CSS property sets the color of an element's right border. It can also be set with the shorthand CSS properties border-color or border-right."
     },
     "border-bottom-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-bottom-color CSS property sets the color of an element's bottom border. It can also be set with the shorthand CSS properties border-color or border-bottom."
     },
     "border-left-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-left-color CSS property sets the color of an element's left border. It can also be set with the shorthand CSS properties border-color or border-left."
     },
     "border-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-color shorthand CSS property sets the color of an element's border."
     },
     "border-radius": {
@@ -723,27 +891,50 @@
       "description": ""
     },
     "background-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The background-color CSS property sets the background color of an element."
     },
     "background-image": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": "The background-image CSS property sets one or more background images on an element."
     },
     "background-repeat": {
-      "values": [],
+      "values": [
+        "repeat-x",
+        "repeat-y",
+        "repeat",
+        "space",
+        "round",
+        "no-repeat"
+      ],
       "description": "The background-repeat CSS property sets how background images are repeated. A background image can be repeated along the horizontal and vertical axes, or not repeated at all."
     },
     "background-attachment": {
-      "values": [],
+      "values": [
+        "scroll",
+        "fixed",
+        "local"
+      ],
       "description": "The background-attachment CSS property sets whether a background image's position is fixed within the viewport, or scrolls with its containing block."
     },
     "background-origin": {
-      "values": [],
+      "values": [
+        "border-box",
+        "padding-box",
+        "content-box"
+      ],
       "description": "The background-origin CSS property sets the background's origin: from the border start, inside the border, or inside the padding."
     },
     "background-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "cover",
+        "contain"
+      ],
       "description": "The background-size CSS property sets the size of the element's background image."
     },
     "background": {
@@ -751,63 +942,213 @@
       "description": "CSSRef(CSS Background)"
     },
     "border-top-style": {
-      "values": [],
+      "values": [
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset"
+      ],
       "description": "The border-top-style CSS property sets the line style of an element's top border."
     },
     "border-right-style": {
-      "values": [],
+      "values": [
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset"
+      ],
       "description": "The border-right-style CSS property sets the line style of an element's right border."
     },
     "border-bottom-style": {
-      "values": [],
+      "values": [
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset"
+      ],
       "description": "The border-bottom-style CSS property sets the line style of an element's bottom border."
     },
     "border-left-style": {
-      "values": [],
+      "values": [
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset"
+      ],
       "description": "The border-left-style CSS property sets the line style of an element's left border."
     },
     "border-style": {
-      "values": [],
+      "values": [
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset"
+      ],
       "description": "The border-style shorthand CSS property sets the line style for all four sides of an element's border."
     },
     "border-top-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The border-top-width CSS property sets the width of the top border of an element."
     },
     "border-right-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The border-right-width CSS property sets the width of the right border of an element."
     },
     "border-bottom-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The border-bottom-width CSS property sets the width of the bottom border of an element."
     },
     "border-left-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The border-left-width CSS property sets the width of the left border of an element."
     },
     "border-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The border-width shorthand CSS property sets the width of an element's border."
     },
     "border-top": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick",
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset",
+        "currentcolor"
+      ],
       "description": "The border-top shorthand CSS property sets all the properties of an element's top border."
     },
     "border-right": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick",
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset",
+        "currentcolor"
+      ],
       "description": "The border-right shorthand CSS property sets all the properties of an element's right border."
     },
     "border-bottom": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick",
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset",
+        "currentcolor"
+      ],
       "description": "The border-bottom shorthand CSS property sets an element's bottom border. It sets the values of border-bottom-width, border-bottom-style and border-bottom-color."
     },
     "border-left": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick",
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset",
+        "currentcolor"
+      ],
       "description": "The border-left shorthand CSS property sets all the properties of an element's left border."
     },
     "border": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick",
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset",
+        "currentcolor"
+      ],
       "description": "CSSRef(CSS Borders)"
     },
     "border-top-left-radius": {
@@ -863,7 +1204,8 @@
     },
     "box-shadow": {
       "values": [
-        "none"
+        "none",
+        "inset"
       ],
       "description": "The box-shadow CSS property adds shadow effects around an element's frame. You can set multiple effects separated by commas. A box shadow is described by X and Y offsets relative to the element, blur and spread radius, and color."
     },
@@ -1037,7 +1379,9 @@
       "description": ""
     },
     "color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The color CSS property sets the foreground color value of an element's text and text decorations, and sets the currentcolor value. currentcolor may be used as an indirect value on _other_ properties and is the default for other color properties, such as border-color."
     },
     "opacity": {
@@ -1215,6 +1559,8 @@
     },
     "font-weight": {
       "values": [
+        "normal",
+        "bold",
         "bolder",
         "lighter"
       ],
@@ -1250,6 +1596,17 @@
     },
     "font": {
       "values": [
+        "normal",
+        "small-caps",
+        "normal",
+        "ultra-condensed",
+        "extra-condensed",
+        "condensed",
+        "semi-condensed",
+        "semi-expanded",
+        "expanded",
+        "extra-expanded",
+        "ultra-expanded",
         "caption",
         "icon",
         "menu",
@@ -1300,7 +1657,15 @@
     "font-variant-ligatures": {
       "values": [
         "normal",
-        "none"
+        "none",
+        "common-ligatures",
+        "no-common-ligatures",
+        "discretionary-ligatures",
+        "no-discretionary-ligatures",
+        "historical-ligatures",
+        "no-historical-ligatures",
+        "contextual",
+        "no-contextual"
       ],
       "description": "The font-variant-ligatures CSS property controls which Glossary(ligature, ligatures) and Glossary(contextual forms) are used in textual content of the elements it applies to. This leads to more harmonized forms in the resulting text."
     },
@@ -1327,6 +1692,12 @@
     "font-variant-numeric": {
       "values": [
         "normal",
+        "lining-nums",
+        "oldstyle-nums",
+        "proportional-nums",
+        "tabular-nums",
+        "diagonal-fractions",
+        "stacked-fractions",
         "ordinal",
         "slashed-zero"
       ],
@@ -1348,6 +1719,14 @@
     "font-variant-east-asian": {
       "values": [
         "normal",
+        "jis78",
+        "jis83",
+        "jis90",
+        "jis04",
+        "simplified",
+        "traditional",
+        "full-width",
+        "proportional-width",
         "ruby"
       ],
       "description": "The font-variant-east-asian CSS property controls the use of alternate glyphs for East Asian scripts, like Japanese and Chinese."
@@ -1356,6 +1735,14 @@
       "values": [
         "normal",
         "none",
+        "common-ligatures",
+        "no-common-ligatures",
+        "discretionary-ligatures",
+        "no-discretionary-ligatures",
+        "historical-ligatures",
+        "no-historical-ligatures",
+        "contextual",
+        "no-contextual",
         "small-caps",
         "all-small-caps",
         "petite-caps",
@@ -1369,8 +1756,22 @@
         "swash()",
         "ornaments()",
         "annotation()",
+        "lining-nums",
+        "oldstyle-nums",
+        "proportional-nums",
+        "tabular-nums",
+        "diagonal-fractions",
+        "stacked-fractions",
         "ordinal",
         "slashed-zero",
+        "jis78",
+        "jis83",
+        "jis90",
+        "jis04",
+        "simplified",
+        "traditional",
+        "full-width",
+        "proportional-width",
         "ruby",
         "sub",
         "super",
@@ -1495,13 +1896,38 @@
     },
     "align-tracks": {
       "values": [
-        "normal"
+        "normal",
+        "first",
+        "last",
+        "baseline",
+        "space-between",
+        "space-around",
+        "space-evenly",
+        "stretch",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "flex-start",
+        "flex-end"
       ],
       "description": "The align-tracks CSS property sets the alignment in the masonry axis for grid containers that have masonry in their block axis."
     },
     "justify-tracks": {
       "values": [
         "normal",
+        "space-between",
+        "space-around",
+        "space-evenly",
+        "stretch",
+        "unsafe",
+        "safe",
+        "center",
+        "start",
+        "end",
+        "flex-start",
+        "flex-end",
         "left",
         "right"
       ],
@@ -1515,16 +1941,24 @@
     },
     "grid-template": {
       "values": [
-        "none"
+        "none",
+        "minmax(",
+        "fit-content("
       ],
       "description": "The grid-template CSS property is a shorthand property for defining glossary(grid column, grid columns), glossary(grid_row, grid rows), and glossary(grid areas, grid areas)."
     },
     "grid-auto-columns": {
-      "values": [],
+      "values": [
+        "minmax(",
+        "fit-content("
+      ],
       "description": "The grid-auto-columns CSS property specifies the size of an implicitly-created grid column glossary(grid tracks, track) or pattern of tracks."
     },
     "grid-auto-rows": {
-      "values": [],
+      "values": [
+        "minmax(",
+        "fit-content("
+      ],
       "description": "The grid-auto-rows CSS property specifies the size of an implicitly-created grid row glossary(grid tracks, track) or pattern of tracks."
     },
     "grid-auto-flow": {
@@ -1596,7 +2030,24 @@
       "description": ""
     },
     "object-position": {
-      "values": [],
+      "values": [
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
       "description": "The object-position CSS property specifies the alignment of the selected replaced element's contents within the element's box. Areas of the box which aren't covered by the replaced element's object will show the element's background."
     },
     "image-orientation": {
@@ -1761,7 +2212,8 @@
     },
     "link-parameters": {
       "values": [
-        "none"
+        "none",
+        "param("
       ],
       "description": ""
     },
@@ -1797,6 +2249,7 @@
     },
     "counter-reset": {
       "values": [
+        "reversed(",
         "none"
       ],
       "description": "The counter-reset CSS property resets a CSS counter to a given value."
@@ -1958,19 +2411,27 @@
       "description": "The border-inline-color CSS property defines the color of the logical inline borders of an element, which maps to a physical border color depending on the element's writing mode, directionality, and text orientation. It corresponds to the border-top-color and border-bottom-color, or border-right-color and border-left-color property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "border-block-start": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-block-start CSS property is a shorthand property for setting the individual logical block-start border property values in a single place in the style sheet."
     },
     "border-block-end": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-block-end CSS property is a shorthand property for setting the individual logical block-end border property values in a single place in the style sheet."
     },
     "border-inline-start": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-inline-start CSS property is a shorthand property for setting the individual logical inline-start border property values in a single place in the style sheet."
     },
     "border-inline-end": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The border-inline-end CSS property is a shorthand property for setting the individual logical inline-end border property values in a single place in the style sheet."
     },
     "border-block": {
@@ -1999,6 +2460,9 @@
     },
     "clip-path": {
       "values": [
+        "fill-box",
+        "stroke-box",
+        "view-box",
         "none"
       ],
       "description": "The clip-path CSS property creates a clipping region that sets what part of an element should be shown. Parts that are inside the region are shown, while those outside are hidden."
@@ -2011,41 +2475,89 @@
       "description": ""
     },
     "mask-image": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": "The mask-image CSS property sets the image that is used as mask layer for an element."
     },
     "mask-mode": {
-      "values": [],
+      "values": [
+        "alpha",
+        "luminance",
+        "match-source"
+      ],
       "description": "The mask-mode CSS property sets whether the mask reference defined by mask-image is treated as a luminance or alpha mask."
     },
     "mask-repeat": {
-      "values": [],
+      "values": [
+        "repeat-x",
+        "repeat-y",
+        "repeat",
+        "space",
+        "round",
+        "no-repeat"
+      ],
       "description": "The mask-repeat CSS property sets how mask images are repeated. A mask image can be repeated along the horizontal axis, the vertical axis, both axes, or not repeated at all."
     },
     "mask-position": {
-      "values": [],
+      "values": [
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
       "description": "The mask-position CSS property sets the initial position, relative to the mask position layer set by mask-origin, for each defined mask image."
     },
     "mask-clip": {
       "values": [
+        "fill-box",
+        "stroke-box",
+        "view-box",
         "no-clip"
       ],
       "description": "The mask-clip CSS property determines the area which is affected by a mask. The painted content of an element must be restricted to this area."
     },
     "mask-origin": {
-      "values": [],
+      "values": [
+        "fill-box",
+        "stroke-box",
+        "view-box"
+      ],
       "description": "The mask-origin CSS property sets the origin of a mask."
     },
     "mask-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "cover",
+        "contain"
+      ],
       "description": "The mask-size CSS property specifies the sizes of the mask images. The size of the image can be fully or partially constrained in order to preserve its intrinsic ratio."
     },
     "mask-composite": {
-      "values": [],
+      "values": [
+        "add",
+        "subtract",
+        "intersect",
+        "exclude"
+      ],
       "description": "The mask-composite CSS property represents a compositing operation used on the current mask layer with the mask layers below it."
     },
     "mask": {
-      "values": [],
+      "values": [
+        "no-clip"
+      ],
       "description": "The mask CSS shorthand property hides an element (partially or fully) by masking or clipping the image at specific points."
     },
     "mask-border-source": {
@@ -2125,15 +2637,32 @@
       "description": "The columns CSS shorthand property sets the number of columns to use when drawing an element's contents, as well as those columns' widths."
     },
     "column-rule-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The column-rule-color CSS property sets the color of the line drawn between columns in a multi-column layout."
     },
     "column-rule-style": {
-      "values": [],
+      "values": [
+        "none",
+        "hidden",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset"
+      ],
       "description": "The column-rule-style CSS property sets the style of the line drawn between columns in a multi-column layout."
     },
     "column-rule-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The column-rule-width CSS property sets the width of the line drawn between columns in a multi-column layout."
     },
     "column-rule": {
@@ -2171,47 +2700,91 @@
       "description": ""
     },
     "overflow-clip-margin-top": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-right": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-bottom": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-left": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-block-start": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-inline-start": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-block-end": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-inline-end": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": "The overflow-clip-margin CSS property determines how far outside its bounds an element with [overflow: clip](/en-US/docs/Web/CSS/overflow) may be painted before being clipped."
     },
     "overflow-clip-margin-inline": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "overflow-clip-margin-block": {
-      "values": [],
+      "values": [
+        "content-box",
+        "padding-box",
+        "border-box"
+      ],
       "description": ""
     },
     "text-overflow": {
@@ -2764,7 +3337,8 @@
     },
     "scrollbar-color": {
       "values": [
-        "auto"
+        "auto",
+        "currentcolor"
       ],
       "description": "The scrollbar-color CSS property sets the color of the scrollbar track and thumb."
     },
@@ -2791,7 +3365,8 @@
     },
     "shape-outside": {
       "values": [
-        "none"
+        "none",
+        "margin-box"
       ],
       "description": "The shape-outside CSS property defines a shape—which may be non-rectangular—around which adjacent inline content should wrap. By default, inline content wraps around its margin box; shape-outside provides a way to customize this wrapping, making it possible to wrap text around complex objects rather than simple boxes."
     },
@@ -3414,7 +3989,9 @@
       "description": "The text-decoration-style CSS property sets the style of the lines specified by  cssxref(text-decoration-line) . The style applies to all lines that are set with text-decoration-line."
     },
     "text-decoration-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The text-decoration-color CSS property sets the color of decorations added to text by  cssxref(text-decoration-line) ."
     },
     "text-decoration-thickness": {
@@ -3505,7 +4082,9 @@
       "description": "The text-emphasis-style CSS property sets the appearance of emphasis marks. It can also be set, and reset, using the text-emphasis shorthand."
     },
     "text-emphasis-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": "The text-emphasis-color CSS property sets the color of emphasis marks. This value can also be set using the text-emphasis shorthand."
     },
     "text-emphasis": {
@@ -3532,7 +4111,8 @@
     },
     "text-shadow": {
       "values": [
-        "none"
+        "none",
+        "currentcolor"
       ],
       "description": "The text-shadow CSS property adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations. Each shadow is described by some combination of X and Y offsets from the element, blur radius, and color."
     },
@@ -3568,7 +4148,24 @@
       "description": "The perspective CSS property determines the distance between the z=0 plane and the user in order to give a 3D-positioned element some perspective."
     },
     "perspective-origin": {
-      "values": [],
+      "values": [
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
       "description": "The perspective-origin CSS property determines the position at which the viewer is looking. It is used as the _vanishing point_ by the perspective property."
     },
     "backface-visibility": {
@@ -3618,7 +4215,8 @@
     },
     "transition-property": {
       "values": [
-        "none"
+        "none",
+        "all"
       ],
       "description": "The transition-property CSS property sets the CSS properties to which a transition effect should be applied."
     },
@@ -3627,7 +4225,9 @@
       "description": "The transition-duration CSS property sets the length of time a transition animation should take to complete. By default, the value is 0s, meaning that no animation will occur."
     },
     "transition-timing-function": {
-      "values": [],
+      "values": [
+        "linear"
+      ],
       "description": "The transition-timing-function CSS property sets how intermediate values are calculated for CSS properties being affected by a transition effect."
     },
     "transition-delay": {
@@ -3635,7 +4235,9 @@
       "description": "The transition-delay CSS property specifies the duration to wait before starting a property's transition effect when its value changes."
     },
     "transition": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": "The transition CSS property is a shorthand property for  cssxref(transition-property) ,  cssxref(transition-duration) ,  cssxref(transition-timing-function) , and  cssxref(transition-delay) ."
     },
     "outline": {
@@ -3643,7 +4245,11 @@
       "description": "The outline CSS shorthand property sets most of the outline properties in a single declaration."
     },
     "outline-width": {
-      "values": [],
+      "values": [
+        "thin",
+        "medium",
+        "thick"
+      ],
       "description": "The CSS outline-width property sets the thickness of an element's outline. An outline is a line that is drawn around an element, outside the border."
     },
     "outline-style": {
@@ -3654,6 +4260,7 @@
     },
     "outline-color": {
       "values": [
+        "currentcolor",
         "invert"
       ],
       "description": "The outline-color CSS property sets the color of an element's outline."
@@ -3675,6 +4282,8 @@
     },
     "cursor": {
       "values": [
+        "url(",
+        "src(",
         "auto",
         "default",
         "none",
@@ -3716,7 +4325,8 @@
     },
     "caret-color": {
       "values": [
-        "auto"
+        "auto",
+        "currentcolor"
       ],
       "description": "The caret-color CSS property sets the color of the insertion caret, the visible marker where the next character typed will be inserted. This is sometimes referred to as the text input cursor. The caret appears in elements such as input or those with the contenteditable attribute. The caret is typically a thin vertical line that flashes to help make it more noticeable. By default, it is black, but its color can be altered with this property."
     },
@@ -3777,7 +4387,8 @@
     },
     "accent-color": {
       "values": [
-        "auto"
+        "auto",
+        "currentcolor"
       ],
       "description": "The accent-color CSS property sets the accent color for user-interface controls generated by some elements."
     },
@@ -3811,7 +4422,9 @@
     },
     "will-change": {
       "values": [
-        "auto"
+        "auto",
+        "scroll-position",
+        "contents"
       ],
       "description": "The will-change CSS property hints to browsers how an element is expected to change. Browsers may set up optimizations before an element is actually changed. These kinds of optimizations can increase the responsiveness of a page by doing potentially expensive work before they are actually required."
     },
@@ -3921,11 +4534,15 @@
       "description": ""
     },
     "fill-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": ""
     },
     "fill-image": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": ""
     },
     "fill-origin": {
@@ -3940,15 +4557,43 @@
       "description": ""
     },
     "fill-position": {
-      "values": [],
+      "values": [
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
       "description": ""
     },
     "fill-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "cover",
+        "contain"
+      ],
       "description": ""
     },
     "fill-repeat": {
-      "values": [],
+      "values": [
+        "repeat-x",
+        "repeat-y",
+        "repeat",
+        "space",
+        "round",
+        "no-repeat"
+      ],
       "description": ""
     },
     "fill-opacity": {
@@ -4025,11 +4670,15 @@
       "description": ""
     },
     "stroke-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": ""
     },
     "stroke-image": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": ""
     },
     "stroke-origin": {
@@ -4044,15 +4693,43 @@
       "description": ""
     },
     "stroke-position": {
-      "values": [],
+      "values": [
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
       "description": ""
     },
     "stroke-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "cover",
+        "contain"
+      ],
       "description": ""
     },
     "stroke-repeat": {
-      "values": [],
+      "values": [
+        "repeat-x",
+        "repeat-y",
+        "repeat",
+        "space",
+        "round",
+        "no-repeat"
+      ],
       "description": ""
     },
     "stroke-opacity": {
@@ -4072,7 +4749,9 @@
       "description": "The filter CSS property applies graphical effects like blur or color shift to an element. Filters are commonly used to adjust the rendering of images, backgrounds, and borders."
     },
     "flood-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": ""
     },
     "flood-opacity": {
@@ -4088,7 +4767,9 @@
       "description": ""
     },
     "lighting-color": {
-      "values": [],
+      "values": [
+        "currentcolor"
+      ],
       "description": ""
     },
     "math-style": {
@@ -4114,7 +4795,21 @@
     },
     "offset-path": {
       "values": [
-        "none"
+        "none",
+        "url(",
+        "src(",
+        "content-box",
+        "padding-box",
+        "border-box",
+        "fill-box",
+        "stroke-box",
+        "view-box",
+        "content-box",
+        "padding-box",
+        "border-box",
+        "fill-box",
+        "stroke-box",
+        "view-box"
       ],
       "description": "The offset-path CSS property specifies a motion path for an element to follow and defines the element's positioning within the parent container or SVG coordinate system."
     },
@@ -4124,13 +4819,45 @@
     },
     "offset-position": {
       "values": [
-        "auto"
+        "auto",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
       ],
       "description": "The offset-position CSS property defines the initial position of the offset-path."
     },
     "offset-anchor": {
       "values": [
-        "auto"
+        "auto",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "center",
+        "right",
+        "top",
+        "center",
+        "bottom",
+        "left",
+        "right",
+        "top",
+        "bottom"
       ],
       "description": "The offset-anchor CSS property specifies the point inside the box of an element traveling along an offset-path that is actually moving along the path."
     },
@@ -4292,11 +5019,15 @@
       "description": ""
     },
     "fill": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": ""
     },
     "stroke": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": ""
     },
     "marker-start": {

@@ -112,7 +112,7 @@ async function buildProperties(css) {
       for (const prop of css[spec].properties) {
 
         const propDescription = await getDescriptionOfProp(prop.name);
-        const propValues = getValuesOfProp(prop.value, css[spec].values);
+        const propValues = getValuesOfProp(prop.value, css);
 
         propertyObj[prop.name] = {
           values: propValues,
@@ -206,6 +206,8 @@ function parseValueGroup(valueGroupName, allValues) {
     }
   }
 
+
+
   return getValuesOfProp(resolvedValueGroupString);
 }
 
@@ -219,7 +221,7 @@ async function getTagsHTML() {
   const replaceTags = {
     "heading_elements": [ "h1", "h2", "h3", "h4", "h5", "h6" ],
   };
-  
+
   let tags = [];
 
   let files = fs.readdirSync("./node_modules/content/files/en-us/web/html/element");
