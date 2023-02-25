@@ -335,15 +335,23 @@ class WASMTreeSitterLanguageMode {
   }
 
   getFoldableRanges() {
-    console.log("Folds")
     if(!this.tree) return [];
-    return []
+    const folds = this.foldsQuery.captures(this.tree.rootNode)
+    return folds.map(fold => this._makeFoldableRange(fold.node))
   }
 
   getFoldableRangesAtIndentLevel(level) {
-    console.log("FoldsIdent", level)
+    const tabLength = this.buffer.displayLayers[0]?.tabLength || 2
+    const minCol = (level-1) * tabLength
+    const maxCol = (level) * tabLength
     if(!this.tree) return [];
-    return []
+    return this.foldsQuery
+      .captures(this.tree.rootNode)
+      .filter(fold => {
+        const {column} = fold.node.startPosition
+        return column > minCol && column <= maxCol
+      })
+      .map(fold => this._makeFoldableRange(fold.node))
   }
 
   indentLevelForLine(line, tabLength) {
@@ -366,17 +374,19 @@ class WASMTreeSitterLanguageMode {
     const foldsAtRow = this._getFoldsAtRow(point.row)
     const node = foldsAtRow[0]?.node
     if(node) {
-      const children = node.children
-      const lastNode = children[children.length-1]
-      const range = new Range([node.startPosition.row, Infinity], lastNode.startPosition)
-      return range
+      return this._makeFoldableRange(node)
     }
   }
 
+  _makeFoldableRange(node) {
+    const children = node.children
+    const lastNode = children[children.length-1]
+    const range = new Range([node.startPosition.row, Infinity], lastNode.startPosition)
+    return range
+  }
+
   isFoldableAtRow(row) {
-    // console.log("Is Foldable?", row)
     const foldsAtRow = this._getFoldsAtRow(row)
-    // console.log("Is Foldable Res?", foldsAtRow.length !== 0)
     return foldsAtRow.length !== 0
   }
 
