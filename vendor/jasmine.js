@@ -1448,6 +1448,13 @@ jasmine.Matchers.prototype.toContain = function(expected) {
   return this.env.contains_(this.actual, expected);
 };
 
+jasmine.Matchers.prototype.toSatisfy = function(fn) {
+  const msgFun = (string) => {
+    this.message = () => string
+  }
+  return fn(this.actual, msgFun)
+};
+
 /**
  * Matcher that checks that the expected item is NOT an element in the actual Array.
  *

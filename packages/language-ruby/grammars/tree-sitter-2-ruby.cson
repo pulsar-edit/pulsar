@@ -1,0 +1,98 @@
+name: 'Ruby'
+scopeName: 'source.ruby'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-ruby'
+
+injectionRegex: 'rb|ruby'
+treeSitter:
+  grammar: 'ts/grammar.wasm'
+  syntaxQuery: 'ts/highlights.scm'
+  localsQuery: 'ts/locals.scm'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(\w*ruby|rake)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=ruby'
+]
+
+fileTypes: [
+  'rb',
+  'rake',
+  'Podfile',
+  'Brewfile',
+  'Rakefile',
+  'Gemfile'
+]
+
+comments:
+  start: '# '
+
+folds: [
+  {
+    type: ['block', 'do_block']
+    start: {type: 'block_parameters'}
+    end: {index: -1}
+  }
+  {
+    type: 'begin'
+    start: {index: 0}
+    end: {type: 'rescue'}
+  }
+  {
+    type: 'heredoc_body',
+    end: {type: 'heredoc_end'}
+  }
+  {
+    type: [
+      'hash'
+      'array'
+      'begin'
+      'block'
+      'do_block'
+    ]
+    start: {index: 0}
+    end: {index: -1}
+  }
+  {
+    type: 'argument_list'
+    start: {index: 0, type: '('}
+    end: {index: -1}
+  }
+  {
+    type: 'class'
+    start: {type: 'superclass'}
+    end: {index: -1}
+  }
+  {
+    type: 'class'
+    start: {index: 1}
+    end: {index: -1}
+  }
+  {
+    type: ['method', 'singleton_method']
+    start: {type: 'method_parameters'}
+    end: {index: -1}
+  }
+  {
+    type: ['method', 'singleton_method']
+    start: {index: 1}
+    end: {index: -1}
+  }
+  {
+    type: 'then',
+    start: {index: 0, type: '"then"'}
+  }
+  {
+    type: 'then'
+  }
+  {
+    type: 'case',
+    end: {index: -1}
+  }
+  {
+    type: 'else'
+    start: {index: 0}
+  }
+]
