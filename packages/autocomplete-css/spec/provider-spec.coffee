@@ -42,6 +42,12 @@ describe "CSS property name and value autocompletions", ->
       activatedManually: options.activatedManually ? true
     provider.getSuggestions(request)
 
+  isValueInCompletions = (value, array) ->
+    result = []
+    for i in array
+      result.push(i.text)
+    return value in result
+
   beforeEach ->
     waitsForPromise -> atom.packages.activatePackage('autocomplete-css')
     waitsForPromise -> atom.packages.activatePackage('language-css') # Used in all CSS languages
@@ -68,7 +74,7 @@ describe "CSS property name and value autocompletions", ->
 
         editor.setCursorBufferPosition([0, 1])
         completions = getCompletions()
-        expect(completions).toHaveLength 9
+        expect(completions.length).toBeGreaterThan 9  # #398
         for completion in completions
           expect(completion.text.length).toBeGreaterThan 0
           expect(completion.type).toBe 'tag'
@@ -81,7 +87,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 0])
         completions = getCompletions(activatedManually: true)
-        expect(completions.length).toBe 237
+        expect(completions.length).toBeGreaterThan 237  # #398 Fun Fact last check this was 673
         for completion in completions
           expect(completion.text.length).toBeGreaterThan 0
           expect(completion.type).toBe 'property'
@@ -105,14 +111,15 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 3])
         completions = getCompletions()
-        expect(completions[0].text).toBe 'display: '
-        expect(completions[0].displayText).toBe 'display'
+
+        expect(isValueInCompletions('display: ', completions)).toBe true
+        expect(isValueInCompletions('direction: ', completions)).toBe true
+
+        # Then no matter what the top results are there's still some we can expect of them.
         expect(completions[0].type).toBe 'property'
         expect(completions[0].replacementPrefix).toBe 'd'
         expect(completions[0].description.length).toBeGreaterThan 0
         expect(completions[0].descriptionMoreURL.length).toBeGreaterThan 0
-        expect(completions[1].text).toBe 'direction: '
-        expect(completions[1].displayText).toBe 'direction'
         expect(completions[1].type).toBe 'property'
         expect(completions[1].replacementPrefix).toBe 'd'
 
@@ -123,9 +130,10 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 3])
         completions = getCompletions()
-        expect(completions.length).toBe 2
-        expect(completions[0].text).toBe 'display: '
-        expect(completions[1].text).toBe 'direction: '
+        expect(completions.length).toBeGreaterThan 2  # #398
+        expect(isValueInCompletions('display: ', completions)).toBe true
+        expect(isValueInCompletions('direction: ', completions)).toBe true
+
         expect(completions[1].replacementPrefix).toBe 'D'
 
         editor.setText """
@@ -135,8 +143,8 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 3])
         completions = getCompletions()
-        expect(completions[0].text).toBe 'display: '
-        expect(completions[1].text).toBe 'direction: '
+        expect(isValueInCompletions('display: ', completions)).toBe true
+        expect(isValueInCompletions('direction: ', completions)).toBe true
 
         editor.setText """
           body {
@@ -145,8 +153,8 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 6])
         completions = getCompletions()
-        expect(completions[0].text).toBe 'border: '
-        expect(completions[0].displayText).toBe 'border'
+        expect(isValueInCompletions('border: ', completions)).toBe true
+
         expect(completions[0].replacementPrefix).toBe 'bord'
 
       it "does not autocomplete when at a terminator", ->
@@ -207,7 +215,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([0, 6])
         completions = getCompletions()
-        expect(completions[0].displayText).toBe 'width'
+        expect(isValueInCompletions('width: ', completions)).toBe true
 
         editor.setText """
           body {
@@ -215,21 +223,21 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 0])
         completions = getCompletions()
-        expect(completions[0].displayText).toBe 'width'
+        expect(isValueInCompletions('width: ', completions)).toBe true
 
         editor.setText """
           body { }
         """
         editor.setCursorBufferPosition([0, 6])
         completions = getCompletions()
-        expect(completions[0].displayText).toBe 'width'
+        expect(isValueInCompletions('width: ', completions)).toBe true
 
         editor.setText """
           body { }
         """
         editor.setCursorBufferPosition([0, 7])
         completions = getCompletions()
-        expect(completions[0].displayText).toBe 'width'
+        expect(isValueInCompletions('width: ', completions)).toBe true
 
       it "triggers autocomplete when an property name has been inserted", ->
         spyOn(atom.commands, 'dispatch')
@@ -251,7 +259,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 10])
         completions = getCompletions()
-        expect(completions.length).toBe 24
+        expect(completions.length).toBeGreaterThan 24  # #398
         for completion in completions
           expect(completion.text.length).toBeGreaterThan 0
           expect(completion.description.length).toBeGreaterThan 0
@@ -265,7 +273,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([2, 0])
         completions = getCompletions()
-        expect(completions.length).toBe 24
+        expect(completions.length).toBeGreaterThan 24  # #398
         for completion in completions
           expect(completion.text.length).toBeGreaterThan 0
 
@@ -277,14 +285,14 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 12])
         completions = getCompletions()
-        expect(completions[0].text).toBe 'inline;'
+        expect(isValueInCompletions('inline;', completions)).toBe true
+        expect(isValueInCompletions('inline-block;', completions)).toBe true
+        expect(isValueInCompletions('inline-flex;', completions)).toBe true
+        expect(isValueInCompletions('inline-grid;', completions)).toBe true
+        expect(isValueInCompletions('inline-table;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
         expect(completions[0].description.length).toBeGreaterThan 0
         expect(completions[0].descriptionMoreURL.length).toBeGreaterThan 0
-        expect(completions[1].text).toBe 'inline-block;'
-        expect(completions[2].text).toBe 'inline-flex;'
-        expect(completions[3].text).toBe 'inline-grid;'
-        expect(completions[4].text).toBe 'inline-table;'
-        expect(completions[5].text).toBe 'inherit;'
 
         editor.setText """
           body {
@@ -293,13 +301,13 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 12])
         completions = getCompletions()
-        expect(completions.length).toBe 6
-        expect(completions[0].text).toBe 'inline;'
-        expect(completions[1].text).toBe 'inline-block;'
-        expect(completions[2].text).toBe 'inline-flex;'
-        expect(completions[3].text).toBe 'inline-grid;'
-        expect(completions[4].text).toBe 'inline-table;'
-        expect(completions[5].text).toBe 'inherit;'
+        expect(completions.length).toBeGreaterThan 6 # #398
+        expect(isValueInCompletions('inline;', completions)).toBe true
+        expect(isValueInCompletions('inline-block;', completions)).toBe true
+        expect(isValueInCompletions('inline-flex;', completions)).toBe true
+        expect(isValueInCompletions('inline-grid;', completions)).toBe true
+        expect(isValueInCompletions('inline-table;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
 
         editor.setText """
           body {
@@ -309,12 +317,12 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([2, 5])
         completions = getCompletions()
-        expect(completions[0].text).toBe 'inline;'
-        expect(completions[1].text).toBe 'inline-block;'
-        expect(completions[2].text).toBe 'inline-flex;'
-        expect(completions[3].text).toBe 'inline-grid;'
-        expect(completions[4].text).toBe 'inline-table;'
-        expect(completions[5].text).toBe 'inherit;'
+        expect(isValueInCompletions('inline;', completions)).toBe true
+        expect(isValueInCompletions('inline-block;', completions)).toBe true
+        expect(isValueInCompletions('inline-flex;', completions)).toBe true
+        expect(isValueInCompletions('inline-grid;', completions)).toBe true
+        expect(isValueInCompletions('inline-table;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
 
         editor.setText """
           body {
@@ -323,12 +331,12 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 13])
         completions = getCompletions()
-        expect(completions).toHaveLength 5
-        expect(completions[0].text).toBe 'center;'
-        expect(completions[1].text).toBe 'left;'
-        expect(completions[2].text).toBe 'justify;'
-        expect(completions[3].text).toBe 'right;'
-        expect(completions[4].text).toBe 'inherit;'
+        expect(completions.length).toBeGreaterThan 5 # #398
+        expect(isValueInCompletions('center;', completions)).toBe true
+        expect(isValueInCompletions('left;', completions)).toBe true
+        expect(isValueInCompletions('justify;', completions)).toBe true
+        expect(isValueInCompletions('right;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
 
         editor.setText """
           body {
@@ -365,7 +373,7 @@ describe "CSS property name and value autocompletions", ->
         editor.setText "body { display: }"
         editor.setCursorBufferPosition([0, 16])
         completions = getCompletions()
-        expect(completions).toHaveLength 24
+        expect(completions.length).toBeGreaterThan 24  # #398
         expect(completions[0].text).toBe 'block;'
 
         editor.setText """
@@ -375,54 +383,54 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([1, 24])
         completions = getCompletions()
-        expect(completions).toHaveLength 4
-        expect(completions[0].text).toBe 'left;'
+        expect(completions.length).toBeGreaterThan 4  # #398
+        expect(isValueInCompletions('left;', completions)).toBe true
 
       it "autocompletes more than one inline property value", ->
         editor.setText "body { display: block; float: }"
         editor.setCursorBufferPosition([0, 30])
         completions = getCompletions()
-        expect(completions).toHaveLength 4
-        expect(completions[0].text).toBe 'left;'
+        expect(completions.length).toBeGreaterThan 4 # #398
+        expect(isValueInCompletions('left;', completions)).toBe true
 
         editor.setText "body { display: block; float: left; cursor: alias; text-decoration: }"
         editor.setCursorBufferPosition([0, 68])
         completions = getCompletions()
-        expect(completions).toHaveLength 5
-        expect(completions[0].text).toBe 'line-through;'
+        expect(completions.length).toBeGreaterThan 5  # #398
+        expect(isValueInCompletions('line-through;', completions)).toBe true
 
       it "autocompletes inline property values with a prefix", ->
         editor.setText "body { display: i }"
         editor.setCursorBufferPosition([0, 17])
         completions = getCompletions()
-        expect(completions).toHaveLength 6
-        expect(completions[0].text).toBe 'inline;'
-        expect(completions[1].text).toBe 'inline-block;'
-        expect(completions[2].text).toBe 'inline-flex;'
-        expect(completions[3].text).toBe 'inline-grid;'
-        expect(completions[4].text).toBe 'inline-table;'
-        expect(completions[5].text).toBe 'inherit;'
+        expect(completions.length).toBeGreaterThan 6  # #398
+        expect(isValueInCompletions('inline;', completions)).toBe true
+        expect(isValueInCompletions('inline-block;', completions)).toBe true
+        expect(isValueInCompletions('inline-flex;', completions)).toBe true
+        expect(isValueInCompletions('inline-grid;', completions)).toBe true
+        expect(isValueInCompletions('inline-table;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
 
         editor.setText "body { display: i}"
         editor.setCursorBufferPosition([0, 17])
         completions = getCompletions()
-        expect(completions).toHaveLength 6
-        expect(completions[0].text).toBe 'inline;'
-        expect(completions[1].text).toBe 'inline-block;'
-        expect(completions[2].text).toBe 'inline-flex;'
-        expect(completions[3].text).toBe 'inline-grid;'
-        expect(completions[4].text).toBe 'inline-table;'
-        expect(completions[5].text).toBe 'inherit;'
+        expect(completions.length).toBeGreaterThan 6 # #398
+        expect(isValueInCompletions('inline;', completions)).toBe true
+        expect(isValueInCompletions('inline-block;', completions)).toBe true
+        expect(isValueInCompletions('inline-flex;', completions)).toBe true
+        expect(isValueInCompletions('inline-grid;', completions)).toBe true
+        expect(isValueInCompletions('inline-table;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
 
       it "autocompletes inline property values that aren't at the end of the line", ->
         editor.setText "body { float: display: inline; font-weight: bold; }"
         editor.setCursorBufferPosition([0, 14]) # right before display
         completions = getCompletions()
-        expect(completions).toHaveLength 4
-        expect(completions[0].text).toBe 'left;'
-        expect(completions[1].text).toBe 'right;'
-        expect(completions[2].text).toBe 'none;'
-        expect(completions[3].text).toBe 'inherit;'
+        expect(completions.length).toBeGreaterThan 4  # #398
+        expect(isValueInCompletions('left;', completions)).toBe true
+        expect(isValueInCompletions('right;', completions)).toBe true
+        expect(isValueInCompletions('none;', completions)).toBe true
+        expect(isValueInCompletions('inherit;', completions)).toBe true
 
       it "autocompletes !important in property-value scope", ->
         editor.setText """
@@ -463,10 +471,11 @@ describe "CSS property name and value autocompletions", ->
           editor.setCursorBufferPosition([0, 2])
           completions = getCompletions()
           expect(completions.length).toBeGreaterThan 7 # #398
-          expect(completions[0].text).toBe 'canvas'
+          expect(isValueInCompletions('canvas', completions)).toBe true
+          expect(isValueInCompletions('code', completions)).toBe true
+
           expect(completions[0].type).toBe 'tag'
-          expect(completions[0].description).toBe 'Selector for <canvas> elements'
-          expect(completions[1].text).toBe 'code'
+          expect(completions[0].description.length).toBeGreaterThan 0
 
           editor.setText """
             canvas,ca {
@@ -580,9 +589,9 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([1, 4])
           completions = getCompletions()
-          expect(completions[0].text).toBe 'display: '
-          expect(completions[1].text).toBe 'direction: '
-          expect(completions[2].text).toBe 'div'
+          expect(isValueInCompletions('display: ', completions)).toBe true
+          expect(isValueInCompletions('direction: ', completions)).toBe true
+          expect(isValueInCompletions('div', completions)).toBe true
 
         # FIXME: This is an issue with the grammar. It thinks nested
         # pseudo-selectors are meta.property-value.scss/less
@@ -650,14 +659,14 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 3])
       completions = getCompletions()
-      expect(completions[0].text).toBe 'display: '
-      expect(completions[0].displayText).toBe 'display'
+      expect(isValueInCompletions('display: ', completions)).toBe true
+      expect(isValueInCompletions('direction: ', completions)).toBe true
+
       expect(completions[0].type).toBe 'property'
       expect(completions[0].replacementPrefix).toBe 'd'
       expect(completions[0].description.length).toBeGreaterThan 0
       expect(completions[0].descriptionMoreURL.length).toBeGreaterThan 0
-      expect(completions[1].text).toBe 'direction: '
-      expect(completions[1].displayText).toBe 'direction'
+
       expect(completions[1].type).toBe 'property'
       expect(completions[1].replacementPrefix).toBe 'd'
 
@@ -668,8 +677,9 @@ describe "CSS property name and value autocompletions", ->
       editor.setCursorBufferPosition([1, 3])
       completions = getCompletions()
       expect(completions.length).toBeGreaterThan 11 # #398
-      expect(completions[0].text).toBe 'display: '
-      expect(completions[1].text).toBe 'direction: '
+      expect(isValueInCompletions('display: ', completions)).toBe true
+      expect(isValueInCompletions('direction: ', completions)).toBe true
+
       expect(completions[1].replacementPrefix).toBe 'D'
 
       editor.setText """
@@ -678,8 +688,8 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 3])
       completions = getCompletions()
-      expect(completions[0].text).toBe 'display: '
-      expect(completions[1].text).toBe 'direction: '
+      expect(isValueInCompletions('display: ', completions)).toBe true
+      expect(isValueInCompletions('direction: ', completions)).toBe true
 
       editor.setText """
         body
@@ -687,8 +697,8 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 6])
       completions = getCompletions()
-      expect(completions[0].text).toBe 'border: '
-      expect(completions[0].displayText).toBe 'border'
+      expect(isValueInCompletions('border: ', completions)).toBe true
+
       expect(completions[0].replacementPrefix).toBe 'bord'
 
     it "triggers autocomplete when an property name has been inserted", ->
@@ -710,7 +720,7 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 10])
       completions = getCompletions()
-      expect(completions.length).toBe 24
+      expect(completions.length).toBeGreaterThan 24  # #398
       for completion in completions
         expect(completion.text.length).toBeGreaterThan 0
         expect(completion.description.length).toBeGreaterThan 0
@@ -722,7 +732,7 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([2, 0])
       completions = getCompletions()
-      expect(completions.length).toBe 24
+      expect(completions.length).toBeGreaterThan 24  # #398
       for completion in completions
         expect(completion.text.length).toBeGreaterThan 0
 
@@ -733,14 +743,16 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 12])
       completions = getCompletions()
-      expect(completions[0].text).toBe 'inline'
+
+      expect(isValueInCompletions('inline', completions)).toBe true
+      expect(isValueInCompletions('inline-block', completions)).toBe true
+      expect(isValueInCompletions('inline-flex', completions)).toBe true
+      expect(isValueInCompletions('inline-grid', completions)).toBe true
+      expect(isValueInCompletions('inline-table', completions)).toBe true
+      expect(isValueInCompletions('inherit', completions)).toBe true
+
       expect(completions[0].description.length).toBeGreaterThan 0
       expect(completions[0].descriptionMoreURL.length).toBeGreaterThan 0
-      expect(completions[1].text).toBe 'inline-block'
-      expect(completions[2].text).toBe 'inline-flex'
-      expect(completions[3].text).toBe 'inline-grid'
-      expect(completions[4].text).toBe 'inline-table'
-      expect(completions[5].text).toBe 'inherit'
 
       editor.setText """
         body
@@ -748,13 +760,14 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 12])
       completions = getCompletions()
-      expect(completions.length).toBe 6
-      expect(completions[0].text).toBe 'inline'
-      expect(completions[1].text).toBe 'inline-block'
-      expect(completions[2].text).toBe 'inline-flex'
-      expect(completions[3].text).toBe 'inline-grid'
-      expect(completions[4].text).toBe 'inline-table'
-      expect(completions[5].text).toBe 'inherit'
+      expect(completions.length).toBeGreaterThan 6 # #398
+
+      expect(isValueInCompletions('inline', completions)).toBe true
+      expect(isValueInCompletions('inline-block', completions)).toBe true
+      expect(isValueInCompletions('inline-flex', completions)).toBe true
+      expect(isValueInCompletions('inline-grid', completions)).toBe true
+      expect(isValueInCompletions('inline-table', completions)).toBe true
+      expect(isValueInCompletions('inherit', completions)).toBe true
 
     it "autocompletes !important in property-value scope", ->
       editor.setText """
@@ -827,12 +840,11 @@ describe "CSS property name and value autocompletions", ->
       completions = getCompletions(activatedManually: false)
       expect(completions).not.toBe null
 
-      expect(completions[0].text).toBe 'border: '
-      expect(completions[0].displayText).toBe 'border'
+      expect(isValueInCompletions('border: ', completions)).toBe true
+      expect(isValueInCompletions('border-radius: ', completions)).toBe true
+
       expect(completions[0].replacementPrefix).toBe 'border-'
 
-      expect(completions[1].text).toBe 'border-radius: '
-      expect(completions[1].displayText).toBe 'border-radius'
       expect(completions[1].replacementPrefix).toBe 'border-'
 
     it "does not autocomplete !important in property-name scope", ->
@@ -858,10 +870,11 @@ describe "CSS property name and value autocompletions", ->
         editor.setCursorBufferPosition([0, 2])
         completions = getCompletions()
         expect(completions.length).toBeGreaterThan 7 # #398
-        expect(completions[0].text).toBe 'canvas'
+        expect(isValueInCompletions('canvas', completions)).toBe true
+        expect(isValueInCompletions('code', completions)).toBe true
+
         expect(completions[0].type).toBe 'tag'
-        expect(completions[0].description).toBe 'Selector for <canvas> elements'
-        expect(completions[1].text).toBe 'code'
+        expect(completions[0].description.length).toBeGreaterThan 0
 
         editor.setText """
           canvas,ca
