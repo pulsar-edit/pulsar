@@ -3820,7 +3820,7 @@ dompurify@2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.17.tgz#505ffa126a580603df4007e034bdc9b6b738668e"
   integrity sha512-nNwwJfW55r8akD8MSFz6k75bzyT2y6JEa1O3JrZFBf+Y5R9JXXU4OsRl0B9hKoPgHTw2b7ER5yJ5Md97MMUJPg==
 
-dompurify@^1.0.2, dompurify@^1.0.3:
+dompurify@^1.0.3:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.11.tgz#fe0f4a40d147f7cebbe31a50a1357539cfc1eb4d"
   integrity sha512-XywCTXZtc/qCX3iprD1pIklRVk/uhl8BKpkTxr+ZyMVUzSUg7wkQXRBp/euJ5J5moa1QvfpvaPQVP71z1O59dQ==
@@ -6680,15 +6680,14 @@ markdown-it@^12.3.2:
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
 
-"markdown-preview@https://codeload.github.com/atom/markdown-preview/legacy.tar.gz/refs/tags/v0.160.2":
+"markdown-preview@file:./packages/markdown-preview":
   version "0.160.2"
-  resolved "https://codeload.github.com/atom/markdown-preview/legacy.tar.gz/refs/tags/v0.160.2#6d6f4075ea5b5ec5a683104b12f2e91ad33fa392"
   dependencies:
     cheerio "^1.0.0-rc.3"
-    dompurify "^1.0.2"
+    dompurify "^2.0.17"
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
-    marked "^0.6.2"
+    marked "^0.7.0"
     underscore-plus "^1.0.0"
     yaml-front-matter "^4.0.0"
 
@@ -6702,10 +6701,10 @@ marked@^0.3.6:
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
   integrity sha512-ea2eGWOqNxPcXv8dyERdSr/6FmzvWwzjMxpfGB/sbMccXoct+xY+YukPD+QTUZwyvK7BZwcr4m21WBOW41pAkg==
 
-marked@^0.6.2:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.6.3.tgz#79babad78af638ba4d522a9e715cdfdd2429e946"
-  integrity sha512-Fqa7eq+UaxfMriqzYLayfqAE40WN03jf+zHjT18/uXNuzjq3TY0XTbrAoPeqSJrAmPz11VuUA+kBPYOhHt9oOQ==
+marked@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
+  integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
 
 marked@^4.0.10:
   version "4.2.2"
@@ -7591,9 +7590,9 @@ parse5-htmlparser2-tree-adapter@^7.0.0:
     parse5 "^7.0.0"
 
 parse5@^7.0.0:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.1.tgz#4649f940ccfb95d8754f37f73078ea20afe0c746"
-  integrity sha512-kwpuwzB+px5WUg9pyK0IcK/shltJN5/OVhQagxhCQNtT9Y9QRZqNY2e1cmbu/paRh5LMnz/oVTVLBpjFmMZhSg==
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.2.tgz#0736bebbfd77793823240a23b7fc5e010b7f8e32"
+  integrity sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==
   dependencies:
     entities "^4.4.0"
 
@@ -9046,9 +9045,8 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-3.1.1.tgz#31f1281b3832630434831c310c01cccda8cbe006"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
-"styleguide@https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12":
+"styleguide@file:./packages/styleguide":
   version "0.49.12"
-  resolved "https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12#d2c09228e5da99017034227b8bc571fea56bc63b"
   dependencies:
     atom-select-list "^0.7.0"
     dedent "^0.7.0"
@@ -10100,9 +10098,8 @@ wrap-ansi@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
 
-"wrap-guide@https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0":
+"wrap-guide@file:./packages/wrap-guide":
   version "0.41.0"
-  resolved "https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0#bd23ce8c207d589c742bd324135de81b6eb7ec02"
 
 wrappy@1:
   version "1.0.2"

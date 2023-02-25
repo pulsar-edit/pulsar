@@ -1,0 +1,25 @@
+{
+  "name": "wrap-guide",
+  "version": "0.41.0",
+  "main": "./lib/main",
+  "description": "Displays a vertical line at the 80th character in the editor.\nThis packages uses the config value of `editor.preferredLineLength` when set.",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": "*"
+  },
+  "configSchema": {
+    "columns": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`."
+    },
+    "enabled": {
+      "default": true,
+      "type": "boolean"
+    }
+  }
+}
