@@ -213,13 +213,24 @@ async function getTagsHTML() {
   // This will also use our dep of `mdn/content` to find all tags currently
   // within their docs. By simply grabbing all folders of tag docs by their name
 
+  // Some of the page titles from MDN's docs don't accurately reflect what we
+  // would expect to apper. The object below is named after what the name of the
+  // folder from MDN's docs is called, whose value is then the array we would instead expect.
+  const replaceTags = {
+    "heading_elements": [ "h1", "h2", "h3", "h4", "h5", "h6" ],
+  };
+  
   let tags = [];
 
   let files = fs.readdirSync("./node_modules/content/files/en-us/web/html/element");
 
   files.forEach(file => {
     if (file != "index.md") {
-      tags.push(file);
+      if (Array.isArray(replaceTags[file])) {
+        tags = tags.concat(replaceTags[file]);
+      } else {
+        tags.push(file);
+      }
     }
   });
 
