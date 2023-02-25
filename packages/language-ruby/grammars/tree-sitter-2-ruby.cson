@@ -8,6 +8,7 @@ treeSitter:
   grammar: 'ts/grammar.wasm'
   syntaxQuery: 'ts/highlights.scm'
   localsQuery: 'ts/locals.scm'
+  foldsQuery: 'ts/folds.scm'
 
 firstLineRegex: [
   # shebang line
