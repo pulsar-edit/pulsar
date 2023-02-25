@@ -2695,3 +2695,57 @@ jasmine.version_= {
   "build": 1,
   "revision": 1354556913
 };
+
+// Additional helpers for grammar tests
+
+// Satisfies is a generic matcher that allows us to rewrite the error message
+jasmine.Matchers.prototype.toSatisfy = function(fn) {
+  const msgFun = (string) => {
+    this.message = () => string
+  }
+  return fn(this.actual, msgFun)
+};
+
+// This will normalize the comments for the special format of grammar tests
+// that TextMate and Tree-Sitter do
+//
+// Basically, receiving a text editor and the regex that probably defines
+// what a comment is, it'll return an object with `expect` - that is what was
+// expected to pass the test, like a scope description for example, and two
+// Point-compatible fields - `editorPosition`, that is basically in what
+// position of the editor `expect` should be satisfied, and `testPosition`, that
+// is where in file the test actually happened. This makes it easier for us
+// to construct an error showing where EXACTLY was the assertion that failed
+function normalizeTreeSitterTextData(editor, commentRegex) {
+  let allMatches = [], lastNonComment = 0
+  editor.getBuffer().getLines().forEach((row, i) => {
+    const m = row.match(commentRegex)
+    if(m) {
+      const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
+      if(scope.scopes.find(s => s.match(/comment/))) {
+        allMatches.push({row: lastNonComment, text: row, col: m.index, testRow: i})
+        return
+      }
+    }
+    lastNonComment = i
+  })
+  return allMatches.map(({text, row, col, testRow}) => {
+    const exactPos = text.match(/\^\s+(.*)/)
+    if(exactPos) {
+      const expected = exactPos[1]
+      return {
+        expected,
+        editorPosition: {row, column: exactPos.index},
+        testPosition: {row: testRow, column: col}
+      }
+    } else {
+      const pos = text.match(/\<-\s+(.*)/)
+      return {
+        expected: pos[1],
+        editorPosition: {row, column: col},
+        testPosition: {row: testRow, column: col}
+      }
+    }
+  })
+}
+if (isCommonJS) exports.normalizeTreeSitterTextData = normalizeTreeSitterTextData;
