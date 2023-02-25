@@ -10,6 +10,7 @@ fileTypes: [
   'composer.lock'
   'geojson'
   'gltf'
+  'har'
   'htmlhintrc'
   'ipynb'
   'jscsrc'
