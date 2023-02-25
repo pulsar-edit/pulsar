@@ -250,7 +250,7 @@ async function getTagsHTML() {
   // within their docs. By simply grabbing all folders of tag docs by their name
 
   // Some of the page titles from MDN's docs don't accurately reflect what we
-  // would expect to apper. The object below is named after what the name of the
+  // would expect to appear. The object below is named after what the name of the
   // folder from MDN's docs is called, whose value is then the array we would instead expect.
   const replaceTags = {
     "heading_elements": [ "h1", "h2", "h3", "h4", "h5", "h6" ],
