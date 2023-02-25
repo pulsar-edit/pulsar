@@ -43,6 +43,7 @@ const Platform = builder.Platform
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
 const svgIcon = 'resources/app-icons/beta.svg'
+const icnsIcon = 'resources/app-icons/beta.icns'
 
 let options = {
   "appId": "dev.pulsar-edit.pulsar",
@@ -178,9 +179,12 @@ let options = {
     ],
   },
   "mac": {
-    "icon": pngIcon,
+    "icon": icnsIcon,
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
+    "hardenedRuntime": true,
+    "entitlements": "resources/mac/entitlements.plist",
+    "entitlementsInherit": "resources/mac/entitlements.plist",
     "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
       "CFBundleExecutable": "Pulsar",
@@ -193,6 +197,9 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
+  },
+  "dmg": {
+    "sign": false
   },
   "win": {
     "icon": icoIcon,
@@ -226,6 +233,7 @@ let options = {
   },
   "extraMetadata": {
   },
+  "afterSign": "script/mac-notarise.js",
   "asarUnpack": [
     "node_modules/github/bin/*",
     "node_modules/github/lib/*", // Resolves Error in console
