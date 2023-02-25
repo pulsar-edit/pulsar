@@ -511,7 +511,11 @@
       "description": "The CSS justify-content property defines how the browser distributes space between and around content items along the Glossary(Main Axis, main-axis) of a flex container, and the inline axis of a grid container."
     },
     "place-content": {
-      "values": [],
+      "values": [
+        "normal",
+        "left",
+        "right"
+      ],
       "description": "The place-content CSS shorthand property allows you to align content along both the block and inline directions at once (i.e. the align-content and justify-content properties) in a relevant layout system such as Grid or Flexbox."
     },
     "justify-self": {
@@ -557,7 +561,13 @@
       "description": "The align-self CSS property overrides a grid or flex item's align-items value. In Grid, it aligns the item inside the glossary(Grid Areas, grid area). In Flexbox, it aligns the item on the glossary(cross axis)."
     },
     "place-self": {
-      "values": [],
+      "values": [
+        "auto",
+        "normal",
+        "stretch",
+        "left",
+        "right"
+      ],
       "description": "The place-self CSS shorthand property allows you to align an individual item in both the block and inline directions at once (i.e. the align-self and justify-self properties) in a relevant layout system such as Grid or Flexbox. If the second value is not present, the first value is also used for it."
     },
     "justify-items": {
@@ -578,11 +588,7 @@
         "flex-end",
         "left",
         "right",
-        "legacy",
-        "legacy",
-        "left",
-        "right",
-        "center"
+        "legacy"
       ],
       "description": "The CSS justify-items property defines the default justify-self for all items of the box, giving them all a default way of justifying each box along the appropriate axis."
     },
@@ -606,7 +612,14 @@
       "description": "The CSS align-items property sets the align-self value on all direct children as a group. In Flexbox, it controls the alignment of items on the glossary(Cross Axis). In Grid Layout, it controls the alignment of items on the Block Axis within their glossary(Grid Areas, grid area)."
     },
     "place-items": {
-      "values": [],
+      "values": [
+        "normal",
+        "stretch",
+        "left",
+        "right",
+        "legacy",
+        "center"
+      ],
       "description": "The CSS place-items shorthand property allows you to align items along both the block and inline directions at once (i.e. the align-items and justify-items properties) in a relevant layout system such as Grid or Flexbox. If the second value is not set, the first value is also used for it."
     },
     "row-gap": {
@@ -622,7 +635,9 @@
       "description": "The column-gap CSS property sets the size of the gap (Gutters,gutter) between an element's columns."
     },
     "gap": {
-      "values": [],
+      "values": [
+        "normal"
+      ],
       "description": "The gap CSS property sets the gaps (gutters) between rows and columns. It is a shorthand for row-gap and column-gap."
     },
     "grid-row-gap": {
@@ -743,18 +758,6 @@
         "center",
         "right",
         "top",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "center",
-        "left",
-        "right",
-        "center",
-        "top",
         "bottom"
       ],
       "description": "The background-position CSS property sets the initial position for each background image. The position is relative to the position layer set by background-origin."
@@ -845,7 +848,10 @@
       "description": ""
     },
     "corners": {
-      "values": [],
+      "values": [
+        "round",
+        "angle"
+      ],
       "description": ""
     },
     "border-limit": {
@@ -1199,7 +1205,15 @@
       "description": "The border-image-repeat CSS property defines how the edge regions and middle region of a source image are adjusted to fit the dimensions of an element's border image. The middle region can be displayed by using the keyword fill in the border-image-slice property."
     },
     "border-image": {
-      "values": [],
+      "values": [
+        "none",
+        "fill",
+        "auto",
+        "stretch",
+        "repeat",
+        "round",
+        "space"
+      ],
       "description": "The border-image CSS property draws an image around a given element. It replaces the element's regular border."
     },
     "box-shadow": {
@@ -1234,7 +1248,9 @@
       "description": "The margin-left CSS property sets the margin area on the left side of an element. A positive value places it farther from its neighbors, while a negative value places it closer."
     },
     "margin": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin CSS shorthand property sets the margin area on all four sides of an element."
     },
     "margin-trim": {
@@ -1375,7 +1391,10 @@
       "description": "The print-color-adjust CSS property sets what, if anything, the Glossary(user agent) may do to optimize the appearance of the element on the output device."
     },
     "color-adjust": {
-      "values": [],
+      "values": [
+        "economy",
+        "exact"
+      ],
       "description": ""
     },
     "color": {
@@ -1415,7 +1434,12 @@
       "description": "The container-name CSS property specifies a list of query container names used by the [@container](/en-US/docs/Web/CSS/@container) at-rule in a container query."
     },
     "container": {
-      "values": [],
+      "values": [
+        "none",
+        "normal",
+        "size",
+        "inline-size"
+      ],
       "description": "The container shorthand CSS property establishes the element as a query container and specifies the name or name for the containment context used in a container query."
     },
     "content-visibility": {
@@ -1427,7 +1451,10 @@
       "description": "The content-visibility CSS property controls whether or not an element renders its contents at all, along with forcing a strong set of containments, allowing user agents to potentially omit large swathes of layout and rendering work until it becomes needed. It enables the user agent to skip an element's rendering work (including layout and painting) until it is needed — which makes the initial page load much faster."
     },
     "content": {
-      "values": [],
+      "values": [
+        "normal",
+        "none"
+      ],
       "description": "The content CSS property replaces an element with a generated value. Objects inserted using the content property are anonymous replaced elements."
     },
     "quotes": {
@@ -1461,7 +1488,36 @@
       "description": ""
     },
     "display": {
-      "values": [],
+      "values": [
+        "block",
+        "inline",
+        "run-in",
+        "flow",
+        "flow-root",
+        "table",
+        "flex",
+        "grid",
+        "ruby",
+        "list-item",
+        "table-row-group",
+        "table-header-group",
+        "table-footer-group",
+        "table-row",
+        "table-cell",
+        "table-column-group",
+        "table-column",
+        "table-caption",
+        "ruby-base",
+        "ruby-text",
+        "ruby-base-container",
+        "ruby-text-container",
+        "contents",
+        "none",
+        "inline-block",
+        "inline-table",
+        "inline-flex",
+        "inline-grid"
+      ],
       "description": "The display CSS property sets whether an element is treated as a block or inline element and the layout used for its children, such as flow layout, grid or flex."
     },
     "order": {
@@ -1524,12 +1580,21 @@
       "description": "The flex-wrap CSS property sets whether flex items are forced onto one line or can wrap onto multiple lines. If wrapping is allowed, it sets the direction that lines are stacked."
     },
     "flex-flow": {
-      "values": [],
+      "values": [
+        "row",
+        "row-reverse",
+        "column",
+        "column-reverse",
+        "nowrap",
+        "wrap",
+        "wrap-reverse"
+      ],
       "description": "The flex-flow CSS shorthand property specifies the direction of a flex container, as well as its wrapping behavior."
     },
     "flex": {
       "values": [
-        "none"
+        "none",
+        "content"
       ],
       "description": "The flex CSS shorthand property sets how a flex _item_ will grow or shrink to fit the space available in its flex container."
     },
@@ -1543,13 +1608,23 @@
     },
     "flex-basis": {
       "values": [
-        "content"
+        "content",
+        "auto",
+        "min-content",
+        "max-content",
+        "fit-content()"
       ],
       "description": "The flex-basis CSS property sets the initial main size of a flex item. It sets the size of the content box unless otherwise set with box-sizing."
     },
     "font-size-adjust": {
       "values": [
-        "none"
+        "none",
+        "ex-height",
+        "cap-height",
+        "ch-width",
+        "ic-width",
+        "ic-height",
+        "from-font"
       ],
       "description": "The font-size-adjust CSS property sets the size of lower-case letters relative to the current font size (which defines the size of upper-case letters)."
     },
@@ -1597,8 +1672,11 @@
     "font": {
       "values": [
         "normal",
+        "italic",
+        "oblique",
         "small-caps",
-        "normal",
+        "bolder",
+        "lighter",
         "ultra-condensed",
         "extra-condensed",
         "condensed",
@@ -1607,6 +1685,7 @@
         "expanded",
         "extra-expanded",
         "ultra-expanded",
+        "math",
         "caption",
         "icon",
         "menu",
@@ -1942,6 +2021,7 @@
     "grid-template": {
       "values": [
         "none",
+        "subgrid",
         "minmax(",
         "fit-content("
       ],
@@ -1971,8 +2051,8 @@
     },
     "grid": {
       "values": [
-        "auto-flow",
-        "dense",
+        "none",
+        "subgrid",
         "auto-flow",
         "dense"
       ],
@@ -2009,9 +2089,9 @@
     "object-fit": {
       "values": [
         "fill",
+        "none",
         "contain",
         "cover",
-        "none",
         "scale-down"
       ],
       "description": "The object-fit CSS property sets how the content of a replaced element, such as an img or video, should be resized to fit its container."
@@ -2033,17 +2113,6 @@
       "values": [
         "left",
         "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
         "right",
         "top",
         "bottom"
@@ -2085,7 +2154,20 @@
     "vertical-align": {
       "values": [
         "first",
-        "last"
+        "last",
+        "baseline",
+        "text-bottom",
+        "alphabetic",
+        "ideographic",
+        "middle",
+        "central",
+        "mathematical",
+        "text-top",
+        "sub",
+        "super",
+        "top",
+        "center",
+        "bottom"
       ],
       "description": "The vertical-align CSS property sets vertical alignment of an inline, inline-block or table-cell box."
     },
@@ -2134,10 +2216,7 @@
         "ex",
         "ideographic",
         "ideographic-ink",
-        "text",
-        "alphabetic",
-        "ideographic",
-        "ideographic-ink"
+        "alphabetic"
       ],
       "description": ""
     },
@@ -2237,7 +2316,11 @@
       "description": "The list-style-position CSS property sets the position of the ::marker relative to a list item."
     },
     "list-style": {
-      "values": [],
+      "values": [
+        "inside",
+        "outside",
+        "none"
+      ],
       "description": "The list-style CSS shorthand property allows you to set all the list style properties at once."
     },
     "marker-side": {
@@ -2267,51 +2350,93 @@
       "description": "The counter-set CSS property sets a CSS counter to a given value. It manipulates the value of existing counters, and will only create new counters if there isn't already a counter of the given name on the element."
     },
     "block-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "min-content",
+        "max-content",
+        "fit-content()"
+      ],
       "description": "The block-size CSS property defines the horizontal or vertical size of an element's block, depending on its writing mode. It corresponds to either the width or the height property, depending on the value of writing-mode."
     },
     "inline-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "min-content",
+        "max-content",
+        "fit-content()"
+      ],
       "description": "The inline-size CSS property defines the horizontal or vertical size of an element's block, depending on its writing mode. It corresponds to either the width or the height property, depending on the value of writing-mode."
     },
     "min-block-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "min-content",
+        "max-content",
+        "fit-content()"
+      ],
       "description": "The min-block-size CSS property defines the minimum horizontal or vertical size of an element's block, depending on its writing mode. It corresponds to either the min-width or the min-height property, depending on the value of writing-mode."
     },
     "min-inline-size": {
-      "values": [],
+      "values": [
+        "auto",
+        "min-content",
+        "max-content",
+        "fit-content()"
+      ],
       "description": "The min-inline-size CSS property defines the horizontal or vertical minimal size of an element's block, depending on its writing mode. It corresponds to either the min-width or the min-height property, depending on the value of writing-mode."
     },
     "max-block-size": {
-      "values": [],
+      "values": [
+        "none",
+        "min-content",
+        "max-content",
+        "fit-content()"
+      ],
       "description": "The max-block-size CSS property specifies the maximum size of an element in the direction opposite that of the writing direction as specified by writing-mode. That is, if the writing direction is horizontal, then max-block-size is equivalent to max-height; if the writing direction is vertical, max-block-size is the same as max-width."
     },
     "max-inline-size": {
-      "values": [],
+      "values": [
+        "none",
+        "min-content",
+        "max-content",
+        "fit-content()"
+      ],
       "description": "The max-inline-size CSS property defines the horizontal or vertical maximum size of an element's block, depending on its writing mode. It corresponds to either the max-width or the max-height property, depending on the value of writing-mode."
     },
     "margin-block-start": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin-block-start CSS property defines the logical block start margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation."
     },
     "margin-block-end": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin-block-end CSS property defines the logical block end margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation."
     },
     "margin-inline-start": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin-inline-start CSS property defines the logical inline start margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation. It corresponds to the margin-top, margin-right, margin-bottom, or margin-left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "margin-inline-end": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin-inline-end CSS property defines the logical inline end margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation. In other words, it corresponds to the margin-top, margin-right, margin-bottom or margin-left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "margin-block": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin-block CSS shorthand property defines the logical block start and end margins of an element, which maps to physical margins depending on the element's writing mode, directionality, and text orientation."
     },
     "margin-inline": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The margin-inline CSS shorthand property is a shorthand property that defines both the logical inline start and end margins of an element, which maps to physical margins depending on the element's writing mode, directionality, and text orientation."
     },
     "padding-block-start": {
@@ -2505,17 +2630,6 @@
         "center",
         "right",
         "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "right",
-        "top",
         "bottom"
       ],
       "description": "The mask-position CSS property sets the initial position, relative to the mask position layer set by mask-origin, for each defined mask image."
@@ -2599,7 +2713,17 @@
       "description": "The mask-border-repeat CSS property sets how the edge regions of a source image are adjusted to fit the dimensions of an element's mask border."
     },
     "mask-border": {
-      "values": [],
+      "values": [
+        "none",
+        "fill",
+        "auto",
+        "stretch",
+        "repeat",
+        "round",
+        "space",
+        "luminance",
+        "alpha"
+      ],
       "description": "The mask-border CSS shorthand property lets you create a mask along the edge of an element's border."
     },
     "mask-type": {
@@ -2618,12 +2742,15 @@
     "column-span": {
       "values": [
         "none",
-        "all"
+        "all",
+        "auto"
       ],
       "description": "The column-span CSS property makes it possible for an element to span across all columns when its value is set to all."
     },
     "column-width": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The column-width CSS property sets the ideal column width in a multi-column layout. The container will have as many columns as can fit without any of them having a width less than the column-width value. If the width of the container is narrower than the specified value, the single column's width will be smaller than the declared column width."
     },
     "column-count": {
@@ -2633,7 +2760,9 @@
       "description": "The column-count CSS property breaks an element's content into the specified number of columns."
     },
     "columns": {
-      "values": [],
+      "values": [
+        "auto"
+      ],
       "description": "The columns CSS shorthand property sets the number of columns to use when drawing an element's contents, as well as those columns' widths."
     },
     "column-rule-color": {
@@ -2790,7 +2919,8 @@
     "text-overflow": {
       "values": [
         "clip",
-        "ellipsis"
+        "ellipsis",
+        "fade"
       ],
       "description": "The text-overflow CSS property sets how hidden overflow content is signaled to users. It can be clipped, display an ellipsis ('…'), or display a custom string."
     },
@@ -2803,7 +2933,8 @@
     },
     "line-clamp": {
       "values": [
-        "none"
+        "none",
+        "auto"
       ],
       "description": ""
     },
@@ -3087,7 +3218,18 @@
       "description": ""
     },
     "block-step": {
-      "values": [],
+      "values": [
+        "none",
+        "margin",
+        "padding",
+        "auto",
+        "center",
+        "start",
+        "end",
+        "up",
+        "down",
+        "nearest"
+      ],
       "description": ""
     },
     "line-height-step": {
@@ -3557,7 +3699,14 @@
       "description": ""
     },
     "pause": {
-      "values": [],
+      "values": [
+        "none",
+        "x-weak",
+        "weak",
+        "medium",
+        "strong",
+        "x-strong"
+      ],
       "description": ""
     },
     "rest-before": {
@@ -3583,7 +3732,14 @@
       "description": ""
     },
     "rest": {
-      "values": [],
+      "values": [
+        "none",
+        "x-weak",
+        "weak",
+        "medium",
+        "strong",
+        "x-strong"
+      ],
       "description": ""
     },
     "cue-before": {
@@ -3599,7 +3755,9 @@
       "description": ""
     },
     "cue": {
-      "values": [],
+      "values": [
+        "none"
+      ],
       "description": ""
     },
     "voice-family": {
@@ -3690,7 +3848,14 @@
       "description": "The empty-cells CSS property sets whether borders and backgrounds appear around table cells that have no visible content."
     },
     "text-transform": {
-      "values": [],
+      "values": [
+        "none",
+        "capitalize",
+        "uppercase",
+        "lowercase",
+        "full-width",
+        "full-size-kana"
+      ],
       "description": "The text-transform CSS property specifies how to capitalize an element's text. It can be used to make text appear in all-uppercase or all-lowercase, or with each word capitalized. It also can help improve legibility for ruby."
     },
     "word-boundary-detection": {
@@ -3974,7 +4139,9 @@
         "underline",
         "overline",
         "line-through",
-        "blink"
+        "blink",
+        "spelling-error",
+        "grammar-error"
       ],
       "description": "The text-decoration-line CSS property sets the kind of decoration that is used on text in an element, such as an underline or overline."
     },
@@ -4002,12 +4169,26 @@
       "description": "The text-decoration-thickness CSS property sets the stroke thickness of the decoration line that is used on text in an element, such as a line-through, underline, or overline."
     },
     "text-decoration": {
-      "values": [],
+      "values": [
+        "none",
+        "underline",
+        "overline",
+        "line-through",
+        "blink",
+        "auto",
+        "from-font",
+        "solid",
+        "double",
+        "dotted",
+        "dashed",
+        "wavy"
+      ],
       "description": "The text-decoration shorthand CSS property sets the appearance of decorative lines on text. It is a shorthand for text-decoration-line, text-decoration-color, text-decoration-style, and the newer text-decoration-thickness property."
     },
     "text-underline-position": {
       "values": [
         "auto",
+        "from-font",
         "under",
         "left",
         "right"
@@ -4088,7 +4269,16 @@
       "description": "The text-emphasis-color CSS property sets the color of emphasis marks. This value can also be set using the text-emphasis shorthand."
     },
     "text-emphasis": {
-      "values": [],
+      "values": [
+        "none",
+        "filled",
+        "open",
+        "dot",
+        "circle",
+        "double-circle",
+        "triangle",
+        "sesame"
+      ],
       "description": "The text-emphasis CSS property applies emphasis marks to text (except spaces and control characters). It is a shorthand for text-emphasis-style and text-emphasis-color."
     },
     "text-emphasis-position": {
@@ -4112,7 +4302,7 @@
     "text-shadow": {
       "values": [
         "none",
-        "currentcolor"
+        "inset"
       ],
       "description": "The text-shadow CSS property adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations. Each shadow is described by some combination of X and Y offsets from the element, blur radius, and color."
     },
@@ -4153,17 +4343,6 @@
         "center",
         "right",
         "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "right",
-        "top",
         "bottom"
       ],
       "description": "The perspective-origin CSS property determines the position at which the viewer is looking. It is used as the _vanishing point_ by the perspective property."
@@ -4186,18 +4365,6 @@
         "left",
         "center",
         "right",
-        "top",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "center",
-        "left",
-        "right",
-        "center",
         "top",
         "bottom"
       ],
@@ -4241,7 +4408,10 @@
       "description": "The transition CSS property is a shorthand property for  cssxref(transition-property) ,  cssxref(transition-duration) ,  cssxref(transition-timing-function) , and  cssxref(transition-delay) ."
     },
     "outline": {
-      "values": [],
+      "values": [
+        "invert",
+        "auto"
+      ],
       "description": "The outline CSS shorthand property sets most of the outline properties in a single declaration."
     },
     "outline-width": {
@@ -4340,7 +4510,12 @@
       "description": ""
     },
     "caret": {
-      "values": [],
+      "values": [
+        "auto",
+        "bar",
+        "block",
+        "underscore"
+      ],
       "description": ""
     },
     "nav-up": {
@@ -4562,17 +4737,6 @@
         "center",
         "right",
         "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "right",
-        "top",
         "bottom"
       ],
       "description": ""
@@ -4698,17 +4862,6 @@
         "center",
         "right",
         "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "right",
-        "top",
         "bottom"
       ],
       "description": ""
@@ -4803,12 +4956,6 @@
         "border-box",
         "fill-box",
         "stroke-box",
-        "view-box",
-        "content-box",
-        "padding-box",
-        "border-box",
-        "fill-box",
-        "stroke-box",
         "view-box"
       ],
       "description": "The offset-path CSS property specifies a motion path for an element to follow and defines the element's positioning within the parent container or SVG coordinate system."
@@ -4824,17 +4971,6 @@
         "center",
         "right",
         "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "right",
-        "top",
         "bottom"
       ],
       "description": "The offset-position CSS property defines the initial position of the offset-path."
@@ -4844,17 +4980,6 @@
         "auto",
         "left",
         "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
-        "center",
-        "right",
-        "top",
-        "center",
-        "bottom",
-        "left",
         "right",
         "top",
         "bottom"
@@ -4869,7 +4994,11 @@
       "description": "The offset-rotate CSS property defines the orientation/direction of the element as it is positioned along the offset-path."
     },
     "offset": {
-      "values": [],
+      "values": [
+        "auto",
+        "none",
+        "reverse"
+      ],
       "description": "The offset CSS shorthand property sets all the properties required for animating an element along a defined path."
     },
     "scroll-timeline-name": {
@@ -4888,7 +5017,13 @@
       "description": "The scroll-timeline-axis CSS property can be used to specify the scrollbar that will be used to provide the timeline for a scroll-timeline animation."
     },
     "scroll-timeline": {
-      "values": [],
+      "values": [
+        "none",
+        "block",
+        "inline",
+        "vertical",
+        "horizontal"
+      ],
       "description": "The scroll-timeline CSS shorthand property defines a name that can be used to identify the source element of a scroll timeline, along with the scrollbar axis that should provide the timeline."
     },
     "view-timeline-name": {
@@ -4913,11 +5048,19 @@
       "description": ""
     },
     "view-timeline": {
-      "values": [],
+      "values": [
+        "none",
+        "block",
+        "inline",
+        "vertical",
+        "horizontal"
+      ],
       "description": ""
     },
     "animation-range": {
-      "values": [],
+      "values": [
+        "normal"
+      ],
       "description": ""
     },
     "animation-range-start": {

@@ -12,6 +12,15 @@ packagesToTest =
     name: 'language-postcss'
     file: 'test.postcss'
 
+# Throughout the entirety of this test document there are many places that the
+# original Atom tests would check for exact values of returned items such as
+# matching properties or matching tags. But as the web changes this is
+# combersome to maintain, to do Pulsar's best to avoid regressions in this aspect
+# these locations will now check for more than the last good value.
+# This of course assumes that the web won't start removing matching items faster
+# than adding. But locations of this behavior will be marked accordingly with: #398
+# https://github.com/pulsar-edit/pulsar/pull/398
+
 Object.keys(packagesToTest).forEach (packageLabel) ->
   unless atom.packages.getAvailablePackageNames().includes(packagesToTest[packageLabel].name)
     console.warn "Skipping tests for #{packageLabel} because it is not installed"
@@ -453,7 +462,7 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([0, 2])
           completions = getCompletions()
-          expect(completions.length).toBe 7
+          expect(completions.length).toBeGreaterThan 7 # #398
           expect(completions[0].text).toBe 'canvas'
           expect(completions[0].type).toBe 'tag'
           expect(completions[0].description).toBe 'Selector for <canvas> elements'
@@ -465,7 +474,7 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([0, 9])
           completions = getCompletions()
-          expect(completions.length).toBe 7
+          expect(completions.length).toBeGreaterThan 7 # #398
           expect(completions[0].text).toBe 'canvas'
 
           editor.setText """
@@ -474,7 +483,7 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([0, 9])
           completions = getCompletions()
-          expect(completions.length).toBe 7
+          expect(completions.length).toBeGreaterThan 7 # #398
           expect(completions[0].text).toBe 'canvas'
 
           editor.setText """
@@ -483,7 +492,7 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([0, 10])
           completions = getCompletions()
-          expect(completions.length).toBe 7
+          expect(completions.length).toBeGreaterThan 7 # #398
           expect(completions[0].text).toBe 'canvas'
 
         it "does not autocompletes when prefix is preceded by class or id char", ->
@@ -526,7 +535,7 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([0, 5])
           completions = getCompletions()
-          expect(completions.length).toBe 5
+          expect(completions.length).toBeGreaterThan 5 # #398
           expect(completions[0].text).toBe ':first'
           expect(completions[0].type).toBe 'pseudo-selector'
           expect(completions[0].description.length).toBeGreaterThan 0
@@ -539,7 +548,7 @@ describe "CSS property name and value autocompletions", ->
           """
           editor.setCursorBufferPosition([0, 7])
           completions = getCompletions()
-          expect(completions.length).toBe 4
+          expect(completions.length).toBeGreaterThan 4 # #398
           expect(completions[0].snippet).toBe ':nth-child(${1:an+b})'
           expect(completions[0].type).toBe 'pseudo-selector'
           expect(completions[0].description.length).toBeGreaterThan 0
@@ -658,7 +667,7 @@ describe "CSS property name and value autocompletions", ->
       """
       editor.setCursorBufferPosition([1, 3])
       completions = getCompletions()
-      expect(completions.length).toBe 11
+      expect(completions.length).toBeGreaterThan 11 # #398
       expect(completions[0].text).toBe 'display: '
       expect(completions[1].text).toBe 'direction: '
       expect(completions[1].replacementPrefix).toBe 'D'
@@ -848,7 +857,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([0, 2])
         completions = getCompletions()
-        expect(completions.length).toBe 7
+        expect(completions.length).toBeGreaterThan 7 # #398
         expect(completions[0].text).toBe 'canvas'
         expect(completions[0].type).toBe 'tag'
         expect(completions[0].description).toBe 'Selector for <canvas> elements'
@@ -859,7 +868,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([0, 9])
         completions = getCompletions()
-        expect(completions.length).toBe 7
+        expect(completions.length).toBeGreaterThan 7 # #398
         expect(completions[0].text).toBe 'canvas'
 
         editor.setText """
@@ -867,7 +876,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([0, 9])
         completions = getCompletions()
-        expect(completions.length).toBe 7
+        expect(completions.length).toBeGreaterThan 7 # #398
         expect(completions[0].text).toBe 'canvas'
 
         editor.setText """
@@ -875,7 +884,7 @@ describe "CSS property name and value autocompletions", ->
         """
         editor.setCursorBufferPosition([0, 10])
         completions = getCompletions()
-        expect(completions.length).toBe 7
+        expect(completions.length).toBeGreaterThan 7 # #398
         expect(completions[0].text).toBe 'canvas'
 
       it "does not autocomplete when prefix is preceded by class or id char", ->

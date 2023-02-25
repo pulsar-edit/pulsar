@@ -114,10 +114,27 @@ async function buildProperties(css) {
         const propDescription = await getDescriptionOfProp(prop.name);
         const propValues = getValuesOfProp(prop.value, css);
 
-        propertyObj[prop.name] = {
-          values: propValues,
-          description: propDescription
-        };
+        if (typeof propertyObj[prop.name] !== "object") {
+          propertyObj[prop.name] = {
+            values: dedupPropValues(propValues),
+            description: propDescription
+          };
+        } else {
+          // So seems this happens way more often than assumed.
+          // So instead of discard a previously entered entry, we will prioritize
+          // having values accomponing it. So whoever has the longer array of
+          // values will be used as the tiebreaker.
+          if (propertyObj[prop.name].values.length < propValues.length) {
+            propertyObj[prop.name] = {
+              values: dedupPropValues(propValues),
+              description: propDescription
+            };
+          }
+        }
+        // Unfortunately the no duplication guarantee of @webref/css seems
+        // inaccurate. As there are duplicate `display` definitions.
+        // The first containing all the data we want, and the later containing nothing.
+        // This protects against overriding previously definied definitions.
 
       }
     } // else continue our loop
@@ -195,18 +212,35 @@ function parseValueGroup(valueGroupName, allValues) {
 
   let resolvedValueGroupString;
 
-  for (const spec in allValues) {
-    if (Array.isArray(allValues[spec].values)) {
-      for (const val of allValues[spec].values) {
-        if (val.name === valueGroupName) {
-          resolvedValueGroupString = val.value;
-          break;
+  // Now we can receive two kinds of Basic Data Types here
+  // - Non-Terminal Data Types: <'valueGroupName'> which will share the name of a property
+  // - And the standard that this was built to deal with.
+
+  if (valueGroupName.startsWith("<'") && valueGroupName.endsWith("'>")) {
+    // Non-Terminal Data Types
+    for (const spec in allValues) {
+      if (Array.isArray(allValues[spec].properties)) {
+        for (const prop of allValues[spec].properties) {
+          if (prop.name === valueGroupName.replace("<'", "").replace("'>", "")) {
+            resolvedValueGroupString = prop.value;
+            break;
+          }
+        }
+      }
+    }
+  } else {
+    // Standard handling
+    for (const spec in allValues) {
+      if (Array.isArray(allValues[spec].values)) {
+        for (const val of allValues[spec].values) {
+          if (val.name === valueGroupName) {
+            resolvedValueGroupString = val.value;
+            break;
+          }
         }
       }
     }
   }
-
-
 
   return getValuesOfProp(resolvedValueGroupString);
 }
@@ -246,6 +280,21 @@ async function getPseudoSelectors() {
   let existingCompletions = require("./completions.json");
 
   return existingCompletions.pseudoSelectors;
+}
+
+function dedupPropValues(values) {
+  // Takes an array of values and returns an array without any duplicates
+  let out = [];
+  let check = {};
+
+  for (let i = 0; i < values.length; i++) {
+    if (!check[values[i]]) {
+      out.push(values[i]);
+      check[values[i]] = true;
+    }
+  }
+  console.log(`Dedup Took: ${values} returned: ${out}`);
+  return out;
 }
 
 update();
