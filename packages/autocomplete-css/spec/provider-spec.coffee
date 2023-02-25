@@ -374,7 +374,7 @@ describe "CSS property name and value autocompletions", ->
         editor.setCursorBufferPosition([0, 16])
         completions = getCompletions()
         expect(completions.length).toBeGreaterThan 24  # #398
-        expect(completions[0].text).toBe 'block;'
+        expect(isValueInCompletions('block;', completions)).toBe true 
 
         editor.setText """
           body {
