@@ -110,8 +110,9 @@ async function update() {
   const fullArrayHtmlElements = buildHtmlElementsArray(htmlElementsRaw);
 
   const tagsWithAttrs = matchElementInterface(fullArrayHtmlElements, chromiumElements.DOMPinnedProperties);
-  // tagsWithAttrs gives us an already built object for tags. Without description.
-
+  // tagsWithAttrs gives us an already built object for tags. Including their description.
+  fs.writeFileSync("./tmp-working.json", JSON.stringify(tagsWithAttrs, null, 2));
+  console.log(GLOBAL_ATTRIBUTES);
 
 }
 
@@ -141,6 +142,9 @@ function matchElementInterface(elements, domProperties) {
       outElements[ele.name].attributes = tags;
     }
 
+    let desc = getElementDescription(ele.name);
+    outElements[ele.name].description = desc;
+
   }
 
   return outElements;
@@ -157,7 +161,7 @@ function resolveElementInterfaceAttrs(element, domProperties) {
   // Now to loop through every interface and resolve the tags within.
   while (interfaceArray.length > 0) {
     let interface = interfaceArray[0];
-    console.log(`Searching domProperties for ${interface}`);
+
     if (domProperties[interface]) {
       // First add all immediate props
       for (const prop in domProperties[interface].props) {
@@ -184,6 +188,73 @@ function resolveElementInterfaceAttrs(element, domProperties) {
 
   // Return our final list of attributes
   return attrs;
+}
+
+function getElementDescription(element) {
+  // We will gather a description by checking if there's a document written
+  // on MDN for our Element and then extract a summary from there.
+
+  // Some elements are similar enough they exist in a single folder of a different
+  // name. So we will manually intervein in those cases.
+
+  const substitueElements = {
+    "h1": "heading_elements",
+    "h2": "heading_elements",
+    "h3": "heading_elements",
+    "h4": "heading_elements",
+    "h5": "heading_elements",
+    "h6": "heading_elements"
+  };
+
+  if (substitueElements[element]) {
+    element = substitueElements[element];
+  }
+
+  let file;
+
+  // First lets find the file, but when not initially found, we will continue
+  // to search valid locations. Since MDN has content of valid tags seperated
+  // by essentially the spec they exist in.
+  if (fs.existsSync(`./node_modules/content/files/en-us/web/html/element/${element}/index.md`)) {
+    file = fs.readFileSync(`./node_modules/content/files/en-us/web/html/element/${element}/index.md`, { encoding: "utf8" });
+  } else if (fs.existsSync(`./node_modules/content/files/en-us/web/svg/element/${element}/index.md`)) {
+    file = fs.readFileSync(`./node_modules/content/files/en-us/web/svg/element/${element}/index.md`, { encoding: "utf8" });
+  } else if (fs.existsSync(`./node_modules/content/files/en-us/web/mathml/element/${element}/index.md`)) {
+    file = fs.readFileSync(`./node_modules/content/files/en-us/web/mathml/element/${element}/index.md`, { encoding: "utf8" });
+  }
+
+  if (typeof file === "string") {
+    // Now lets parse the file, as long as it was assigned at some point in
+    // the above checks.
+
+    // This logic is largely borrowed from `autocomplete-css` update.js Which does the same thing.
+    let breaks = file.split("---");
+
+    // The first two breaks should be the yaml metadata block
+    let data = breaks[2].replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "")
+                        .replace(/\{\{HTMLSidebar\}\}/gm, "") // Used when within `web/html`
+                        .replace(/\{\{SVGRef\}\}/gm, "") // used when within `web/svg`
+                        .replace(/\{\{MathMLRef\}\}/gm, ""); // used when within `web/mathml`
+
+    let summaryRaw = data.split("\n");
+    // In case the first few lines is an empty line break
+    for (let i = 0; i < summaryRaw.length; i++) {
+      if (summaryRaw[i].length > 1) {
+        return summaryRaw[i]
+                .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
+                .replace(/\*/g, "")
+                .replace(/\`/g, "")
+                .replace(/\{/g, "")
+                .replace(/\}/g, "")
+                .replace(/\"/g, "")
+                .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
+      }
+    }
+  } else {
+    // No proper file was ever found. Return an empty description
+    return "";
+  }
+
 }
 
 
