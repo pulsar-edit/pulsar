@@ -101,11 +101,16 @@ const chromiumElementsShim = require("./chromium-elements-shim.js");
 const elements = require("@webref/elements");
 const fs = require("fs");
 
+let GLOBAL_ATTRIBUTES = [];
+
 async function update() {
   const chromiumElements = await chromiumElementsShim.bootstrap();
   const htmlElementsRaw = await elements.listAll();
 
   const fullArrayHtmlElements = buildHtmlElementsArray(htmlElementsRaw);
+
+  const tagsWithAttrs = matchElementInterface(fullArrayHtmlElements, chromiumElements.DOMPinnedProperties);
+  // tagsWithAttrs gives us an already built object for tags. Without description.
 
 
 }
@@ -123,5 +128,63 @@ function buildHtmlElementsArray(elements) {
 
   return elementArray;
 }
+
+function matchElementInterface(elements, domProperties) {
+  let outElements = {};
+
+  for (const ele of elements) {
+    let tags = resolveElementInterfaceAttrs(ele, domProperties);
+
+    outElements[ele.name] = {};
+
+    if (tags.length > 0) {
+      outElements[ele.name].attributes = tags;
+    }
+
+  }
+
+  return outElements;
+}
+
+function resolveElementInterfaceAttrs(element, domProperties) {
+  let attrs = [];
+  let interfaceArray = [];
+
+  if (typeof element.interface === "string") {
+    interfaceArray.push(element.interface);
+  }
+
+  // Now to loop through every interface and resolve the tags within.
+  while (interfaceArray.length > 0) {
+    let interface = interfaceArray[0];
+    console.log(`Searching domProperties for ${interface}`);
+    if (domProperties[interface]) {
+      // First add all immediate props
+      for (const prop in domProperties[interface].props) {
+        attrs.push(prop);
+
+        // Then add any needed values to our global attributes
+        if (domProperties[interface].props[prop].global && !GLOBAL_ATTRIBUTES.includes(prop)) {
+          GLOBAL_ATTRIBUTES.push(prop);
+        }
+      }
+      // Now resolve any additional interfaces, by adding them to our existing array
+      if (typeof domProperties[interface].inheritance === "string") {
+        interfaceArray.push(domProperties[interface].inheritance);
+      }
+      if (Array.isArray(domProperties[interface].includes)) {
+        interfaceArray = interfaceArray.concat(domProperties[interface].includes);
+      }
+    }
+    // Now we have done everything needed for this one interface to be resolved,
+    // so we can just remove the first element of the array and let the while
+    // loop continue
+    interfaceArray.shift();
+  }
+
+  // Return our final list of attributes
+  return attrs;
+}
+
 
 update();
