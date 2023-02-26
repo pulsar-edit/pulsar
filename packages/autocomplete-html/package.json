@@ -16,6 +16,11 @@
     }
   },
   "devDependencies": {
-    "request": "^2.53.0"
+    "@webref/elements": "^2.1.0",
+    "chrome-devtools-frontend": "^1.0.1070764",
+    "content": "github:mdn/content",
+    "esm": "^3.2.25",
+    "request": "^2.53.0",
+    "ts-import": "^2.0.40"
   }
 }
