@@ -95,9 +95,24 @@
   within the `web/html/attributes` folder. Instead we may have to parse
   a table of values from `attributes/index.md` as that contains many items and links
   to unwritten pages.
+  ==============================================================================
+  ==============================================================================
+  The last note of our implementation.
+  The provided attributes used within our `completions.json` seem interesting.
+  The majority of them are only attributes that are not suggested via tags we have.
+  Additionally all of the information, like mentioned earlier, would be rather
+  difficult to automatically collect. Since we have no reliable way to obtain `type`,
+  `global` values. With only the `description` being acheivable. But considering
+  that this list is non-exhustive, and is explicitely items not included above
+  it leads me to beleive that this list has been manually curated since inception.
+  And rather than attempt to manually curate all of it's unique parts with only
+  descriptions and global status being manual, while increasing the size ten-fold
+  to include all possible attributes, it may be best to leave as is, and reinsert
+  it into our completions during update time.
  */
 
 const chromiumElementsShim = require("./chromium-elements-shim.js");
+const curatedAttributes = require("./curated-attributes.json");
 const elements = require("@webref/elements");
 const fs = require("fs");
 
@@ -111,9 +126,22 @@ async function update() {
 
   const tagsWithAttrs = matchElementInterface(fullArrayHtmlElements, chromiumElements.DOMPinnedProperties);
   // tagsWithAttrs gives us an already built object for tags. Including their description.
-  fs.writeFileSync("./tmp-working.json", JSON.stringify(tagsWithAttrs, null, 2));
-  console.log(GLOBAL_ATTRIBUTES);
 
+  // Like mentioned in the docs above, instead of manually curate and organize
+  // several aspects of the attributes portion of the file
+  // we will simply just insert the manually curated file itself, allowing for any
+  // change to occur to it later on as needed, as no good data source specifies
+  // what is needed to create it.
+
+  const completion = {
+    tags: tagsWithAttrs,
+    attributes: curatedAttributes
+  };
+
+  // Now to write our file
+  fs.writeFileSync("./completions.json", JSON.stringify(completion, null, 2));
+
+  console.log("Updated all `autocomplete-html` completions.");
 }
 
 function buildHtmlElementsArray(elements) {

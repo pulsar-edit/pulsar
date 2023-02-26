@@ -8,6 +8,9 @@
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },
+  "scripts": {
+    "update": "node ./update/update.js"
+  },
   "providedServices": {
     "autocomplete.provider": {
       "versions": {
@@ -20,7 +23,6 @@
     "chrome-devtools-frontend": "^1.0.1070764",
     "content": "github:mdn/content",
     "esm": "^3.2.25",
-    "request": "^2.53.0",
     "ts-import": "^2.0.40"
   }
 }
