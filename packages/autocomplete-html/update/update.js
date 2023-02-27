@@ -225,17 +225,8 @@ function getElementDescription(element) {
   // Some elements are similar enough they exist in a single folder of a different
   // name. So we will manually intervein in those cases.
 
-  const substitueElements = {
-    "h1": "heading_elements",
-    "h2": "heading_elements",
-    "h3": "heading_elements",
-    "h4": "heading_elements",
-    "h5": "heading_elements",
-    "h6": "heading_elements"
-  };
-
-  if (substitueElements[element]) {
-    element = substitueElements[element];
+  if (element.match(/^h[1-6]$/)) {
+    element = 'heading_elements';
   }
 
   let file;
