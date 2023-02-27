@@ -241,7 +241,6 @@ module.exports = class GrammarRegistry {
       }
     });
     return { grammar: bestMatch, score: highestScore };
-    // }
   }
 
   // Extended: Returns a {Number} representing how well the grammar matches the
