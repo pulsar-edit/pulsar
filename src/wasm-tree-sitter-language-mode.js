@@ -86,7 +86,6 @@ class WASMTreeSitterLanguageMode {
       newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
     const newTree = this.parser.parse(this.buffer.getText(), this.tree)
-    // const changes = newTree.getChangedRanges(this.tree)
     this.tree = newTree
   }
 
@@ -113,10 +112,6 @@ class WASMTreeSitterLanguageMode {
 
     oldScopes = oldScopes || []
     syntax.forEach(({node, name}) => {
-      // const node = capture.node
-      // const names = capture.name.split('.')
-
-      // names.forEach(name => {
       let id = this.scopeNames.get(name)
       if(!id) {
         this.lastId += 2
@@ -127,7 +122,6 @@ class WASMTreeSitterLanguageMode {
       }
       // })
 
-      // const ds = names.map(name => this.scopeNames.get(name))
       let old = this.boundaries.get(node.startPosition)
       if(old) {
         old.openNode = node
@@ -266,7 +260,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidFinishTransaction(...args) {
-    // console.log("bufferDidFinishTransaction", args)
   }
 
   buildHighlightIterator() {
@@ -355,7 +348,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   indentLevelForLine(line, tabLength) {
-    console.log("INDENT")
     let indentLength = 0;
     for (let i = 0, { length } = line; i < length; i++) {
       const char = line[i];
