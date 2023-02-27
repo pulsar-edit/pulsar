@@ -2,6 +2,7 @@
   ".source.b": {
     "BAR": {
       "prefix": "b",
+      "command": "sample-command",
       "body": "bar?\nline two"
     }
   }
