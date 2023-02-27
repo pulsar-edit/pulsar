@@ -12,6 +12,10 @@ module.exports = class WASMTreeSitterGrammar {
       const lPath = path.join(dirName, params.treeSitter.localsQuery)
       this.localsQuery = fs.readFileSync(lPath, 'utf-8')
     }
+
+    const iPath = path.join(dirName, params.treeSitter.indentsQuery)
+    this.indentsQuery = fs.readFileSync(iPath, 'utf-8')
+
     this.grammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
