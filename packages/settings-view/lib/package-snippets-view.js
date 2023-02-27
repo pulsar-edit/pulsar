@@ -56,7 +56,7 @@ export default class PackageSnippetsView {
 
             <p>To <strong>disable</strong> most snippets and <strong>enable</strong> just a few, use the <kbd>Copy</kbd> button on any snippet you want to enable, then paste the result into your own snippets file.</p>
 
-            <p>To <strong>enable</strong> most snippets and <strong>disable</strong> just a few, use the <kbd>Copy</kbd> button on any snippet you want to enable, paste the result into your own snippets file, and change the body to <code>null</code>.</p>
+            <p>To <strong>enable</strong> most snippets and <strong>disable</strong> just a few, use the <kbd>Copy</kbd> button on any snippet you want to disable, paste the result into your own snippets file, and change the body to <code>null</code>.</p>
           </div>
         </div>
 
