@@ -21,6 +21,7 @@ class WASMTreeSitterLanguageMode {
     this.oldNodeTexts = new Set()
     let resolve
     this.ready = new Promise(r => resolve = r)
+    this.grammar = grammar
 
     initPromise.then(() =>
       Parser.Language.load(grammar.grammarPath)
@@ -29,23 +30,30 @@ class WASMTreeSitterLanguageMode {
       if(grammar.localsQuery) {
         this.localsQuery = lang.query(grammar.localsQuery)
       }
+      this.grammar = grammar
+      if(grammar.foldsQuery) {
+        this.foldsQuery = lang.query(grammar.foldsQuery)
+      }
       this.indentsQuery = lang.query(grammar.indentsQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
 
       // Force first highlight
-      this.tree = this.parser.parse("")
       this.boundaries = createTree(comparePoints)
       const startRange = new Range([0, 0], [0, 0])
       const range = buffer.getRange()
-      buffer.emitDidChangeEvent({oldRange: startRange, newRange: range, oldText: ""})
+      this.tree = this.parser.parse(buffer.getText())
+      this.emitter.emit('did-change-highlighting', range)
       resolve(true)
-      global.mode = this
     })
 
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [grammar.scopeName]
     });
+  }
+
+  getGrammar() {
+    return this.grammar
   }
 
   updateForInjection(...args) {
@@ -79,7 +87,6 @@ class WASMTreeSitterLanguageMode {
       newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
     const newTree = this.parser.parse(this.buffer.getText(), this.tree)
-    // const changes = newTree.getChangedRanges(this.tree)
     this.tree = newTree
   }
 
@@ -106,10 +113,6 @@ class WASMTreeSitterLanguageMode {
 
     oldScopes = oldScopes || []
     syntax.forEach(({node, name}) => {
-      // const node = capture.node
-      // const names = capture.name.split('.')
-
-      // names.forEach(name => {
       let id = this.scopeNames.get(name)
       if(!id) {
         this.lastId += 2
@@ -120,7 +123,6 @@ class WASMTreeSitterLanguageMode {
       }
       // })
 
-      // const ds = names.map(name => this.scopeNames.get(name))
       let old = this.boundaries.get(node.startPosition)
       if(old) {
         old.openNode = node
@@ -259,7 +261,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidFinishTransaction(...args) {
-    // console.log("bufferDidFinishTransaction", args)
   }
 
   buildHighlightIterator() {
@@ -327,9 +328,25 @@ class WASMTreeSitterLanguageMode {
     return new ScopeDescriptor({scopes})
   }
 
-  // suggestedIndentForLineAtBufferRow(row, line, tabLength) {
-  //   console.log("suggestedIndentForLineAtBufferRow", row, line, tabLength)
-  // }
+  getFoldableRanges() {
+    if(!this.tree) return [];
+    const folds = this.foldsQuery.captures(this.tree.rootNode)
+    return folds.map(fold => this._makeFoldableRange(fold.node))
+  }
+
+  getFoldableRangesAtIndentLevel(level) {
+    const tabLength = this.buffer.displayLayers[0]?.tabLength || 2
+    const minCol = (level-1) * tabLength
+    const maxCol = (level) * tabLength
+    if(!this.tree) return [];
+    return this.foldsQuery
+      .captures(this.tree.rootNode)
+      .filter(fold => {
+        const {column} = fold.node.startPosition
+        return column > minCol && column <= maxCol
+      })
+      .map(fold => this._makeFoldableRange(fold.node))
+  }
 
   suggestedIndentForBufferRow(row, tabLength, options) {
     if(row === 0) return 0;
@@ -383,6 +400,33 @@ class WASMTreeSitterLanguageMode {
       }
     }
     return indentLength / tabLength;
+  }
+
+  getFoldableRangeContainingPoint(point, tabLength) {
+    const foldsAtRow = this._getFoldsAtRow(point.row)
+    const node = foldsAtRow[0]?.node
+    if(node) {
+      return this._makeFoldableRange(node)
+    }
+  }
+
+  _makeFoldableRange(node) {
+    const children = node.children
+    const lastNode = children[children.length-1]
+    const range = new Range([node.startPosition.row, Infinity], lastNode.startPosition)
+    return range
+  }
+
+  isFoldableAtRow(row) {
+    const foldsAtRow = this._getFoldsAtRow(row)
+    return foldsAtRow.length !== 0
+  }
+
+  _getFoldsAtRow(row) {
+    if(!this.tree) return []
+    const folds = this.foldsQuery.captures(this.tree.rootNode,
+      {row: row, column: 0}, {row: row+1, column: 0})
+    return folds.filter(fold => fold.node.startPosition.row === row)
   }
 }
 module.exports = WASMTreeSitterLanguageMode;

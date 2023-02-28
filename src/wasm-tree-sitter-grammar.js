@@ -8,19 +8,22 @@ module.exports = class WASMTreeSitterGrammar {
     const dirName = path.dirname(grammarPath)
     const qPath = path.join(dirName, params.treeSitter.syntaxQuery)
     this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
-    if(params.treeSitter.localsQuery) {
-      const lPath = path.join(dirName, params.treeSitter.localsQuery)
-      this.localsQuery = fs.readFileSync(lPath, 'utf-8')
-    }
-
-    const iPath = path.join(dirName, params.treeSitter.indentsQuery)
+    this._loadQueryIfExists(params,dirName, 'localsQuery')
+    this._loadQueryIfExists(params,dirName, 'foldsQuery')
     this.indentsQuery = fs.readFileSync(iPath, 'utf-8')
-
     this.grammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
     this.fileTypes = params.fileTypes || [];
     this.registry = registry
+    this.name = params.name
+  }
+
+  _loadQueryIfExists(params, dirName, queryName) {
+    if(params.treeSitter[queryName]) {
+      const p = path.join(dirName, params.treeSitter[queryName])
+      this[queryName] = fs.readFileSync(p, 'utf-8')
+    }
   }
 
   // TODO: Why is this here?
