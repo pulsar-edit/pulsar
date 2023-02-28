@@ -8,6 +8,16 @@ const initPromise = Parser.init()
 createTree = require("./rb-tree")
 
 const VAR_ID = 257
+const conversions = new Map([
+  ['function.method.builtin', 'keyword.other.special-method'],
+  ['number', 'constant.numeric'],
+  // 'punctuation.special':
+  // 'punctuation.bracket':
+  // 'string':
+  // 'embedded':
+  // 'punctuation.bracket':
+  ['string.special.regex', 'string.regexp']
+])
 class WASMTreeSitterLanguageMode {
   constructor(buffer, config, grammar) {
     this.emitter = new Emitter();
@@ -26,6 +36,8 @@ class WASMTreeSitterLanguageMode {
     initPromise.then(() =>
       Parser.Language.load(grammar.grammarPath)
     ).then(lang => {
+      // FIXME: debug only
+      this.lang = lang
       this.syntaxQuery = lang.query(grammar.syntaxQuery)
       if(grammar.localsQuery) {
         this.localsQuery = lang.query(grammar.localsQuery)
@@ -112,6 +124,9 @@ class WASMTreeSitterLanguageMode {
 
     oldScopes = oldScopes || []
     syntax.forEach(({node, name}) => {
+      const translated = conversions.get(name)
+      console.log("Scoping", node.text, 'with name', name, 'translated to', translated)
+      if(translated) name = translated
       let id = this.scopeNames.get(name)
       if(!id) {
         this.lastId += 2

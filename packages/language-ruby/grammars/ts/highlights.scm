@@ -1,37 +1,35 @@
 ; Keywords
 
-[
-  "alias"
-  "and"
-  "begin"
-  "break"
-  "case"
-  "class"
-  "def"
-  "do"
-  "else"
-  "elsif"
-  "end"
-  "ensure"
-  "for"
-  "if"
-  "in"
-  "module"
-  "next"
-  "or"
-  "rescue"
-  "retry"
-  "return"
-  "then"
-  "unless"
-  "until"
-  "when"
-  "while"
-  "yield"
-] @keyword
+"alias" @keyword.control.alias
+"and" @keyword.control.and
+"begin" @keyword.control.begin
+"break" @keyword.control.break
+"case" @keyword.control.case
+"class" @keyword.control.class
+"def" @keyword.control.def
+"do" @keyword.control.do
+"else" @keyword.control.else
+"elsif" @keyword.control.elsif
+"end" @keyword.control.end
+"ensure" @keyword.control.ensure
+"for" @keyword.control.for
+"if" @keyword.control.if
+"in" @keyword.control.in
+"module" @keyword.control.module
+"next" @keyword.control.next
+"or" @keyword.control.or
+"rescue" @keyword.control.rescue
+"retry" @keyword.control.retry
+"return" @keyword.control.return
+"then" @keyword.control.then
+"unless" @keyword.control.unless
+"until" @keyword.control.until
+"when" @keyword.control.when
+"while" @keyword.control.while
+"yield" @keyword.control.yield
 
-((identifier) @keyword
- (#match? @keyword "^(private|protected|public)$"))
+((identifier) @keyword.other.special-method
+ (#match? @keyword.other.special-method "^(private|protected|public)$"))
 
 ; Function calls
 
@@ -59,6 +57,14 @@
 
 ((identifier) @constant.builtin
  (#match? @constant.builtin "^__(FILE|LINE|ENCODING)__$"))
+
+;; Class stuff
+("class"
+  [(scope_resolution) (constant)]
+  "<" @punctuation.separator.inheritance)
+("class" (constant) @entity.name.type.class)
+("class" (scope_resolution (constant) @entity.name.type.class))
+(scope_resolution "::" @punctuation.separator.namespace)
 
 ((constant) @constant
  (#match? @constant "^[A-Z\\d_]+$"))
@@ -100,7 +106,7 @@
   (bare_symbol)
 ] @string.special.symbol
 
-(regex) @string.special.regex
+; (regex) @string.special.regex
 (escape_sequence) @escape
 
 [
@@ -144,3 +150,9 @@
   "%w("
   "%i("
 ] @punctuation.bracket
+
+;; Additional things
+(regex
+ "/" @punctuation.section.regexp
+ (string_content) @string.regexp
+ "/" @punctuation.section.regexp)
