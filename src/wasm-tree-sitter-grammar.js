@@ -10,6 +10,7 @@ module.exports = class WASMTreeSitterGrammar {
     this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
     this._loadQueryIfExists(params,dirName, 'localsQuery')
     this._loadQueryIfExists(params,dirName, 'foldsQuery')
+    this.indentsQuery = fs.readFileSync(iPath, 'utf-8')
     this.grammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
