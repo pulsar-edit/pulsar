@@ -1,14 +1,13 @@
 /**
   This file will manage the updating of `autocomplete-html` `completions.json`
-  We will partially utilize `@webref/elements` .listAll() function that returns
+  We will partially utilize `@webref/elements` `.listAll()` function that returns
   a full list of HTML Elements along with a defined `interface`.
-  To be able to use this `interface` in any meaningful way, we will utilize
-  the dataset of Attributes that apply to each `interface` from Chromiums DevTools
-  resource 'https://github.com/ChromeDevTools/devtools-frontend'
-  Finally from here we will utilize https://github.com/mdn/content to parse
+  To use this `interface` in any meaningful way, we will utilize the dataset
+  of Attributes that apply to each `interface` from Chromiums DevTools resource
+  `https://github.com/ChromeDevTools/devtools-frontend`.
+  Finally from here we will utilize `https://github.com/mdn/content` to parse
   the Markdown docs of MDN's website to retreive descriptions for each element.
-  ==============================================================================
-  ==============================================================================
+
   Now for a summary of our `completions.json` file we aim to generate.
   There are two top level elements, `tags` and `attributes`, both objects.
   Within `tags` we expect the following:
@@ -37,82 +36,24 @@
   - description: A text description of the attribute
   - attribOption: A string array of valid values that can exist within the attribute.
                   Such as the case with `rel` where only so many valid options exist.
-  ==============================================================================
-  ==============================================================================
-  A quick check in for the structure of `@webref/elements` `listAll()` return.
-  This will return an object, where each top level key is a HTML spec name.
-  Then within each will be some information on the spec, and `elements` an array
-  of objects that will contain the `name` of our element, and it's interface name.
-  {
-    "css-masking-1": {
-      "spec": {},
-      "elements": [
-        { "name": "clipPath", "interface": "SVGClipPathElement" },
-        { "name": "mask", "interface": "SVGMaskElement" }
-      ]
-    }
-  };
 
-  The `interface` here should match a return that we can receive from DevTools data.
-  ==============================================================================
-  ==============================================================================
-  DevTools data then, is an object where the top level key is that of an `interface`
-  This interface can be retreived from `@webref/elements` or may be declared
-  internally.
-  Then within each `interface` object several possible values:
-    - inheritance: The value is a string. 'An inherited Type.' An additional
-                    applicable interface.
-    - includes: An array of strings. 'A set of Types to also include properties from.'
-                Additional interfaces to includes properties of.
-    - props: An object list of valid properties for the interface. Each prop
-             iteself may contain values or may be empty. Possible values:
-             * global: Only present when `global: true`, otherwise a global
-                        Attribute value.
-            * specs: A number. Refers to `SPECS` exported from the same DevTools
-                    source code. Where values are `html`, `dom`, `cssom`.
-                    We likely will not find any use here.
-  To view the structure of this file visit:
-  https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/models/javascript_metadata/DOMPinnedProperties.ts
-  ==============================================================================
-  ==============================================================================
-  Finally with the topics covered above we are able to collect all the data needed.
-  The only value that is not being retreived or covered here is:
-  - `type`: The type defined within our `completions` attributes. Now the global
-  attribute could be retreived by looking for the value from the DevTools data
-  or could be known that when we find MDNs documentation for it, the global
-  attribute docs reside in a different folder than the rest of the docs. But
-  for all other types we may need to keep a manual list of where it applies.
-  Most types only apply to a single attribute so would be simple, but
-  `boolean` and `flag` types may have to be manually maintained.
-  - `attribOption`: The valid values to pass an attribute currently
-  does not have any consistent method to retreive valid values.
-  Ideally this can be found within the `@webref` data, or alternatively may be
-  collected from MDNs `web/html/attributes` documents. But may prove to be difficult
-  to reliably parse.
+  Although with our data sources mentioned above, we are able to collect nearly
+  all the data needed. Except the `type` that is defined within our
+  `completions.json` as well as the `attribOption` within our completions.
 
-  A note is that further research shows that MDNs attributes documentation cannot
-  be created the same way as one would expect. That is by the folder names
-  within the `web/html/attributes` folder. Instead we may have to parse
-  a table of values from `attributes/index.md` as that contains many items and links
-  to unwritten pages.
-  ==============================================================================
-  ==============================================================================
-  The last note of our implementation.
-  The provided attributes used within our `completions.json` seem interesting.
-  The majority of them are only attributes that are not suggested via tags we have.
-  Additionally all of the information, like mentioned earlier, would be rather
-  difficult to automatically collect. Since we have no reliable way to obtain `type`,
-  `global` values. With only the `description` being acheivable. But considering
-  that this list is non-exhustive, and is explicitely items not included above
-  it leads me to beleive that this list has been manually curated since inception.
-  And rather than attempt to manually curate all of it's unique parts with only
-  descriptions and global status being manual, while increasing the size ten-fold
-  to include all possible attributes, it may be best to leave as is, and reinsert
-  it into our completions during update time.
- */
+  Studying these closer reveals that all attributes listing with our `completions.json`
+  do not appear elsewhere, and are nearly all global attributes.
+
+  In this case since there is no sane way to collect this data, we will leave this
+  list as a manually maintained section of our `completions.json`.
+  This does mean that `curated-attributes.json` is a static document that
+  will require manual updating in the future. Or most ideally, will find a way
+  to automatically generate the needed data.
+*/
 
 const chromiumElementsShim = require("./chromium-elements-shim.js");
 const curatedAttributes = require("./curated-attributes.json");
+const validate = require("./validate.js");
 const elements = require("@webref/elements");
 const fs = require("fs");
 
@@ -121,6 +62,18 @@ let GLOBAL_ATTRIBUTES = [];
 async function update() {
   const chromiumElements = await chromiumElementsShim.bootstrap();
   const htmlElementsRaw = await elements.listAll();
+
+  // Lets then validate our current data
+  if (!validate.htmlElementsRaw(htmlElementsRaw)) {
+    console.log(validate.htmlElementsRaw(htmlElementsRaw));
+    process.exit(1);
+  }
+
+  // Then validate the devtools data
+  if (!validate.devToolsDom(chromiumElements.DOMPinnedProperties)) {
+    console.log(validate.devToolsDom(chromiumElements.DOMPinnedProperties));
+    process.exit(1);
+  }
 
   const fullArrayHtmlElements = buildHtmlElementsArray(htmlElementsRaw);
 
@@ -188,24 +141,24 @@ function resolveElementInterfaceAttrs(element, domProperties) {
 
   // Now to loop through every interface and resolve the tags within.
   while (interfaceArray.length > 0) {
-    let interface = interfaceArray[0];
+    let inter = interfaceArray[0];
 
-    if (domProperties[interface]) {
+    if (domProperties[inter]) {
       // First add all immediate props
-      for (const prop in domProperties[interface].props) {
+      for (const prop in domProperties[inter].props) {
         attrs.push(prop);
 
         // Then add any needed values to our global attributes
-        if (domProperties[interface].props[prop].global && !GLOBAL_ATTRIBUTES.includes(prop)) {
+        if (domProperties[inter].props[prop].global && !GLOBAL_ATTRIBUTES.includes(prop)) {
           GLOBAL_ATTRIBUTES.push(prop);
         }
       }
       // Now resolve any additional interfaces, by adding them to our existing array
-      if (typeof domProperties[interface].inheritance === "string") {
-        interfaceArray.push(domProperties[interface].inheritance);
+      if (typeof domProperties[inter].inheritance === "string") {
+        interfaceArray.push(domProperties[inter].inheritance);
       }
-      if (Array.isArray(domProperties[interface].includes)) {
-        interfaceArray = interfaceArray.concat(domProperties[interface].includes);
+      if (Array.isArray(domProperties[inter].includes)) {
+        interfaceArray = interfaceArray.concat(domProperties[inter].includes);
       }
     }
     // Now we have done everything needed for this one interface to be resolved,
@@ -259,15 +212,7 @@ function getElementDescription(element) {
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {
       if (summaryRaw[i].length > 1) {
-        return summaryRaw[i]
-                .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
-                  // ^ Parses special MDN Markdown Links.
-                  // eg. {{htmlattrxref("title")}} => title
-                  // Where we still want to keep the text within
-                .replace(/[\*\`\{\}\"]/g, "") // Removes special Markdown based characters
-                .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
-                // ^ Parses Markdown links, extracting only the linked text
-                // eg. [HTML](/en-US/docs/Web/HTML) => HTML
+        return sanitizeDescription(summaryRaw[i]);
       }
     }
   } else {
@@ -277,5 +222,20 @@ function getElementDescription(element) {
 
 }
 
+function sanitizeDescription(input) {
+  return input
+          .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
+            // ^ Parses special MDN Markdown Links.
+            // eg. {{htmlattrxref("title")}} => title
+            // Where we still want to keep the text within
+          .replace(/[\*\`\{\}\"]/g, "") // Removes special Markdown based characters
+          .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
+          // ^ Parses Markdown links, extracting only the linked text
+          // eg. [HTML](/en-US/docs/Web/HTML) => HTML
+}
 
 update();
+
+module.exports = {
+  sanitizeDescription,
+};
