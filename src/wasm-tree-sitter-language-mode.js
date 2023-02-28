@@ -46,6 +46,7 @@ class WASMTreeSitterLanguageMode {
       if(grammar.foldsQuery) {
         this.foldsQuery = lang.query(grammar.foldsQuery)
       }
+      this.indentsQuery = lang.query(grammar.indentsQuery)
       this.parser = new Parser()
       this.parser.setLanguage(lang)
 
@@ -362,6 +363,45 @@ class WASMTreeSitterLanguageMode {
       .map(fold => this._makeFoldableRange(fold.node))
   }
 
+  suggestedIndentForBufferRow(row, tabLength, options) {
+    if(row === 0) return 0;
+    const indents = this.indentsQuery.captures(
+      this.tree.rootNode,
+      {row: row-1, column: 0},
+      {row: row, column: 0}
+    )
+    const indent = indents.find(i => i.node.startPosition.row === row-1)
+    const lastLineIndent = this.indentLevelForLine(
+      this.buffer.getLines()[row-1], tabLength
+    )
+
+    if(indent?.name === 'indent') {
+      return lastLineIndent + 1
+    } else {
+      const suggestion = this.suggestedIndentForEditedBufferRow(row, tabLength)
+      return suggestion !== undefined ? suggestion : lastLineIndent
+    }
+  }
+
+  suggestedIndentForEditedBufferRow(row, tabLength) {
+    const indents = this.indentsQuery.captures(
+      this.tree.rootNode,
+      {row: row, column: 0},
+      {row: row+1, column: 0}
+    )
+    const indent = indents.find(i => i.node.startPosition.row === row)
+    if(indent?.name === "indent_end") {
+      if(this.buffer.getLines()[row].trim() === indent.node.text) {
+        const parent = indent.node.parent
+        if(parent) return this.indentLevelForLine(
+          this.buffer.getLines()[parent.startPosition.row],
+          tabLength
+        )
+      }
+    }
+  }
+
+  // Copied from original tree-sitter. I honestly didn't even read this.
   indentLevelForLine(line, tabLength) {
     let indentLength = 0;
     for (let i = 0, { length } = line; i < length; i++) {

@@ -9,6 +9,7 @@ treeSitter:
   syntaxQuery: 'ts/highlights.scm'
   localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
+  indentsQuery: 'ts/indents.scm'
 
 firstLineRegex: [
   # shebang line
