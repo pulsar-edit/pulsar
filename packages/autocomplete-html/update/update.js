@@ -243,12 +243,12 @@ function getElementDescription(element) {
   // First lets find the file, but when not initially found, we will continue
   // to search valid locations. Since MDN has content of valid tags seperated
   // by essentially the spec they exist in.
-  if (fs.existsSync(`./node_modules/content/files/en-us/web/html/element/${element}/index.md`)) {
-    file = fs.readFileSync(`./node_modules/content/files/en-us/web/html/element/${element}/index.md`, { encoding: "utf8" });
-  } else if (fs.existsSync(`./node_modules/content/files/en-us/web/svg/element/${element}/index.md`)) {
-    file = fs.readFileSync(`./node_modules/content/files/en-us/web/svg/element/${element}/index.md`, { encoding: "utf8" });
-  } else if (fs.existsSync(`./node_modules/content/files/en-us/web/mathml/element/${element}/index.md`)) {
-    file = fs.readFileSync(`./node_modules/content/files/en-us/web/mathml/element/${element}/index.md`, { encoding: "utf8" });
+  const filePath = [ "html", "svg", "mathml" ].map(path =>
+    `./node_modules/content/files/en-us/web/${path}/element/${element}/index.md`
+  ).find(f => fs.existsSync(f));
+
+  if (filePath) {
+    file = fs.readFileSync(filePath, { encoding: "utf8" });
   }
 
   if (typeof file === "string") {
@@ -270,12 +270,13 @@ function getElementDescription(element) {
       if (summaryRaw[i].length > 1) {
         return summaryRaw[i]
                 .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
-                .replace(/\*/g, "")
-                .replace(/\`/g, "")
-                .replace(/\{/g, "")
-                .replace(/\}/g, "")
-                .replace(/\"/g, "")
+                  // ^ Parses special MDN Markdown Links.
+                  // eg. {{htmlattrxref("title")}} => title
+                  // Where we still want to keep the text within
+                .replace(/[\*\`\{\}\"]/g, "") // Removes special Markdown based characters
                 .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
+                // ^ Parses Markdown links, extracting only the linked text
+                // eg. [HTML](/en-US/docs/Web/HTML) => HTML
       }
     }
   } else {
