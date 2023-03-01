@@ -2718,9 +2718,9 @@ jasmine.Matchers.prototype.toSatisfy = function(fn) {
 // to construct an error showing where EXACTLY was the assertion that failed
 function normalizeTreeSitterTextData(editor, commentRegex) {
   let allMatches = [], lastNonComment = 0
-  const checkAssert = new RegExp(commentRegex.source + '\\s*[\\<\\-|\\^]')
+  const checkAssert = new RegExp('^' + commentRegex.source + '\\s*[\\<\\-|\\^]')
   editor.getBuffer().getLines().forEach((row, i) => {
-    const m = row.match(commentRegex)
+    const m = row.trim().match(commentRegex)
     if(m) {
       const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
       if(scope.scopes.find(s => s.match(/comment/)) && row.match(checkAssert)) {
