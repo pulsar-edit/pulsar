@@ -7,6 +7,7 @@ module.exports = class WASMTreeSitterGrammar {
     this.scopeName = params.scopeName
     const dirName = path.dirname(grammarPath)
     const qPath = path.join(dirName, params.treeSitter.syntaxQuery)
+    const iPath = path.join(dirName, params.treeSitter.indentsQuery)
     this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
     this._loadQueryIfExists(params,dirName, 'localsQuery')
     this._loadQueryIfExists(params,dirName, 'foldsQuery')
