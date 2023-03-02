@@ -26,6 +26,7 @@ class WASMTreeSitterLanguageMode {
     initPromise.then(() =>
       Parser.Language.load(grammar.grammarPath)
     ).then(lang => {
+      this.lang = lang
       this.syntaxQuery = lang.query(grammar.syntaxQuery)
       if(grammar.localsQuery) {
         this.localsQuery = lang.query(grammar.localsQuery)
