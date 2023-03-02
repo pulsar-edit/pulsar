@@ -42,11 +42,11 @@ describe "CSS property name and value autocompletions", ->
       activatedManually: options.activatedManually ? true
     provider.getSuggestions(request)
 
-  isValueInCompletions = (value, array) ->
-    result = []
-    for i in array
-      result.push(i.text)
-    return value in result
+  isValueInCompletions = (value, completions) ->
+    completionsNodesText = []
+    for completion in completions
+      completionsNodesText.push(completion.text)
+    return value in completionsNodesText
 
   beforeEach ->
     waitsForPromise -> atom.packages.activatePackage('autocomplete-css')
@@ -374,7 +374,7 @@ describe "CSS property name and value autocompletions", ->
         editor.setCursorBufferPosition([0, 16])
         completions = getCompletions()
         expect(completions.length).toBeGreaterThan 24  # #398
-        expect(isValueInCompletions('block;', completions)).toBe true 
+        expect(isValueInCompletions('block;', completions)).toBe true
 
         editor.setText """
           body {
