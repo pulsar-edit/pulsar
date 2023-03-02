@@ -3,7 +3,7 @@ Version:        <%= version %>
 Release:        0.1%{?dist}
 Summary:        <%= description %>
 License:        MIT
-URL:            https://atom.io/
+URL:            https://pulsar-edit.dev
 AutoReqProv:    no # Avoid libchromiumcontent.so missing dependency
 Prefix:         <%= installDir %>
 
@@ -25,7 +25,7 @@ Requires: alsa-lib, git-core, (glib2 or kde-cli-tools or xdg-utils), lsb-core-no
 mkdir -p "%{buildroot}/<%= installDir %>/share/<%= appFileName %>/"
 cp -r "<%= appName %>"/* "%{buildroot}/<%= installDir %>/share/<%= appFileName %>/"
 mkdir -p "%{buildroot}/<%= installDir %>/bin/"
-ln -sf "../share/<%= appFileName %>/resources/app/apm/node_modules/.bin/apm" "%{buildroot}/<%= installDir %>/bin/<%= apmFileName %>"
+ln -sf "../share/<%= appFileName %>/resources/app/ppm/node_modules/.bin/apm" "%{buildroot}/<%= installDir %>/bin/<%= apmFileName %>"
 cp pulsar.sh "%{buildroot}/<%= installDir %>/bin/<%= appFileName %>"
 chmod 755 "%{buildroot}/<%= installDir %>/bin/<%= appFileName %>"
 mkdir -p "%{buildroot}/<%= installDir %>/share/applications/"
