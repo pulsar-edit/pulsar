@@ -1,11 +1,132 @@
 const Parser = require('web-tree-sitter');
 const ScopeDescriptor = require('./scope-descriptor')
-const fs = require('fs');
+// const fs = require('fs');
 const { Point, Range } = require('text-buffer');
 const { Emitter } = require('event-kit');
 
 const initPromise = Parser.init()
-createTree = require("./rb-tree")
+const createTree = require("./rb-tree")
+
+class PositionIndex {
+  constructor () {
+    this.map = new Map
+    // TODO: It probably doesn't actually matter what order these are visited
+    // in.
+    this.order = []
+    this.rangeData = new Map
+  }
+
+  _normalizePoint (point) {
+    return `${point.row},${point.column}`
+  }
+
+  _normalizeRange (syntax) {
+    let { startPosition, endPosition } = syntax.node;
+    return `${this._normalizePoint(startPosition)}/${this._normalizePoint(endPosition)}`
+  }
+
+  _keyToObject (key) {
+    let [row, column] = key.split(',');
+    return { row: Number(row), column: Number(column) }
+  }
+
+  setDataForRange (syntax, props) {
+    let key = this._normalizeRange(syntax);
+    return this.rangeData.set(key, props);
+  }
+
+  getDataForRange (syntax) {
+    let key = this._normalizeRange(syntax);
+    return this.rangeData.get(key);
+  }
+
+  store (syntax, id) {
+    let {
+      node,
+      setProperties: props = {}
+    } = syntax;
+
+    let {
+      startPosition: start,
+      endPosition: end
+    } = node;
+
+    let data = this.getDataForRange(syntax);
+    if (data && data.final) {
+      // A previous rule covering this exact range marked itself as "final." We
+      // should not add an additional scope.
+      return;
+    } else if (data && props.shy) {
+      // This node will only apply if we haven't yet marked this range with
+      // anything.
+      return;
+    } else {
+      // TODO: We may want to handle the case where more than one token will
+      // want to set data for a given range. Do we merge objects? Store each
+      // dataset separately?
+      this.setDataForRange(syntax, props);
+    }
+
+    // We should open this scope at `start`.
+    this.set(node, start, id, 'open');
+
+    // We should close this scope at `end`.
+    this.set(node, end, id, 'close');
+  }
+
+  set (node, point, id, which) {
+    let key = this._normalizePoint(point)
+    if (!this.order.includes(key)) {
+      this.order.push(key);
+    }
+    if (!this.map.has(key)) {
+      this.map.set(key, {
+        open: [],
+        close: [],
+        openNodes: [],
+        closeNodes: []
+      })
+    }
+    let bundle = this.map.get(key);
+    let idBundle = bundle[which];
+    let nodeBundle = bundle[`${which}Nodes`];
+
+    if (which === 'open') {
+      // TODO: For now, assume that if two tokens both open at (X, Y), the one
+      // that spans a greater distance in the buffer will be encountered first.
+      // If that's not true, this logic may need to be more complex.
+
+      // If an earlier token has already opened at this point, we want to open
+      // after it.
+      idBundle.push(id)
+      nodeBundle.push(node)
+    } else {
+      // If an earlier token has already closed at this point, we want to close
+      // before it.
+      idBundle.unshift(id)
+      nodeBundle.unshift(node)
+    }
+  }
+
+  get (point) {
+    let key = this._normalizePoint(point)
+    return this.map.get(key)
+  }
+
+  clear () {
+    this.map.clear()
+    this.rangeData.clear()
+    this.order = []
+  }
+
+  *[Symbol.iterator] () {
+    for (let key of this.order) {
+      let point = this._keyToObject(key);
+      yield [point, this.map.get(key)]
+    }
+  }
+}
+
 
 const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
@@ -29,7 +150,7 @@ class WASMTreeSitterLanguageMode {
       this.lang = lang
       this.syntaxQuery = lang.query(grammar.syntaxQuery)
       if(grammar.localsQuery) {
-        this.localsQuery = lang.query(grammar.localsQuery)
+        // this.localsQuery = lang.query(grammar.localsQuery)
       }
       this.grammar = grammar
       if(grammar.foldsQuery) {
@@ -41,7 +162,7 @@ class WASMTreeSitterLanguageMode {
 
       // Force first highlight
       this.boundaries = createTree(comparePoints)
-      const startRange = new Range([0, 0], [0, 0])
+      // const startRange = new Range([0, 0], [0, 0])
       const range = buffer.getRange()
       this.tree = this.parser.parse(buffer.getText())
       this.emitter.emit('did-change-highlighting', range)
@@ -51,6 +172,22 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [grammar.scopeName]
     });
+  }
+
+  // A hack to force an existing buffer to react to an update in the SCM file.
+  _reloadSyntaxQuery () {
+    // let _oldSyntaxQuery = this.syntaxQuery;
+    this.grammar._reloadQueryFiles()
+    let lang = this.parser.getLanguage()
+    this.syntaxQuery = lang.query(this.grammar.syntaxQuery)
+    // let range = this.buffer.getRange()
+    // this._updateSyntax(range.start, range.end)
+    // Force first highlight
+    this.boundaries = createTree(comparePoints)
+    // const startRange = new Range([0, 0], [0, 0])
+    const range = this.buffer.getRange()
+    this.tree = this.parser.parse(this.buffer.getText())
+    this.emitter.emit('did-change-highlighting', range)
   }
 
   getGrammar() {
@@ -101,65 +238,226 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
-  _updateSyntax(from, to) {
-    const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
-    let oldDataIterator = this.boundaries.ge(from)
-    let oldScopes = []
+  _findInvalidationRange(from, to) {
+    let iterate = (from, to) => {
+      let iterator = this.boundaries.ge(from)
 
-    while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
-      this.boundaries = this.boundaries.remove(oldDataIterator.key)
-      oldScopes = oldDataIterator.value.closeScopeIds
-      oldDataIterator.next()
+      let newFrom = from;
+      let newTo = to;
+      while (iterator.hasNext && comparePoints(iterator.key, to) <= 0) {
+        let { key, value } = iterator
+        let { closeNodes, openNodes } = value
+
+        for (let o of openNodes) {
+          if (comparePoints(o.endPosition, newTo) > 0) {
+            newTo = o.endPosition;
+          }
+        }
+
+        for (let c of closeNodes) {
+          if (comparePoints(c.startPosition, newFrom) < 0) {
+            newFrom = c.startPosition;
+          }
+        }
+
+        iterator.next()
+      }
+
+      let didChange = comparePoints(from, newFrom) !== 0 || comparePoints(to, newTo) !== 0;
+
+      return [newFrom, newTo, didChange];
+    };
+
+    let currentFrom = from;
+    let currentTo = to;
+    let stable = false;
+    while (!stable) {
+      let [newFrom, newTo, didChange] = iterate(currentFrom, currentTo);
+      if (!didChange) {
+        stable = true;
+        break;
+      }
+      currentFrom = newFrom;
+      currentTo = newTo;
     }
 
+    return [currentFrom, currentTo];
+  }
+
+  _updateSyntax(from, to) {
+    console.log('_updateSyntax', from, to);
+    let [realFrom, realTo] = this._findInvalidationRange(from, to)
+    console.log('(widening to:)', realFrom, realTo);
+
+    from = realFrom;
+    to = realTo;
+
+    const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
+    console.log('captures:', syntax);
+    let oldDataIterator = this.boundaries.ge(from)
+    let oldScopes = []
+    // Remove all boundaries data for the given range.
+    while (oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
+      let { key, value } = oldDataIterator
+      this.boundaries = this.boundaries.remove(key)
+      oldScopes = value.closeScopeIds
+      oldDataIterator.next()
+      // TODO: Doesn't this mean that we'll miss the last item in the iterator
+      // under certain circumstances?
+    }
+
+    // TODO: Still don't quite understand this; need to revisit.
     oldScopes = oldScopes || []
-    syntax.forEach(({node, name}) => {
-      let id = this.scopeNames.get(name)
-      if(!id) {
-        this.lastId += 2
-        id = this.lastId
-        const newId = this.lastId;
-        this.scopeNames.set(name, newId)
-        this.scopeIds.set(newId, name)
-      }
-      // })
 
-      let old = this.boundaries.get(node.startPosition)
-      if(old) {
-        old.openNode = node
-        if(old.openScopeIds.length === 0) {
-          old.openScopeIds = [id]
-        }
-      } else {
-        this.boundaries = this.boundaries.insert(node.startPosition, {
-          closeScopeIds: [...oldScopes],
-          openScopeIds: [id],
-          openNode: node,
-          position: node.startPosition
-        })
-        oldScopes = [id]
-      }
+    if (!this.positionIndex) {
+      this.positionIndex = new PositionIndex();
+    }
+    this.positionIndex.clear()
 
-      old = this.boundaries.get(node.endPosition)
-      if(old) {
-        old.closeNode = node
-        if(old.closeScopeIds.length === 0) old.closeScopeIds = [id]
-      } else {
-        this.boundaries = this.boundaries.insert(node.endPosition, {
-          closeScopeIds: [id],
-          openScopeIds: [],
-          closeNode: node,
-          position: node.endPosition
-        })
-      }
-    })
+    console.log('oldScopes:', oldScopes.map(s => this.scopeForId(s)));
 
+    let inspect = (id) => {
+      if (Array.isArray(id)) {
+        return id.map(i => inspect(i))
+      }
+      return this.scopeForId(id)
+    };
+
+    syntax.forEach((s) => {
+      let { name } = s
+      let id = this.findOrCreateScopeId(name)
+
+      // PositionIndex takes all our syntax tokens and consolidates them into a
+      // fixed set of boundaries to visit in order. If a token has data, it
+      // sets that data so that a later token for the same range can read it.
+      this.positionIndex.store(s, id)
+    });
+
+    for (let [point, data] of this.positionIndex) {
+      let bundle = {
+        closeScopeIds: [...data.close],
+        openScopeIds: [...data.open],
+        closeNodes: [...data.closeNodes],
+        openNodes: [...data.openNodes],
+        position: point
+      }
+      console.log('inserting', bundle, 'at point:', point, 'close:', inspect(bundle.closeScopeIds), 'open:', inspect(bundle.openScopeIds));
+      this.boundaries = this.boundaries.insert(point, bundle)
+    }
+
+    // syntax.forEach(({ node, name }) => {
+    //   // let id = this.scopeNames.get(name)
+    //   // console.log(' handling node:', name, node);
+    //   // if (!id) {
+    //   //   this.lastId += 2
+    //   //   id = this.lastId
+    //   //   const newId = this.lastId;
+    //   //   this.scopeNames.set(name, newId)
+    //   //   this.scopeIds.set(newId, name)
+    //   // }
+    //   let id = this.findOrCreateScopeId(name)
+    //   let old = this.boundaries.get(node.startPosition)
+    //   if (old) {
+    //     // console.log(' found node:', this.scopeForId(id));
+    //     old.openNode = node
+    //     if (old.openScopeIds.length === 0) {
+    //       old.openScopeIds = [id]
+    //     }
+    //   } else {
+    //     let bundle = {
+    //       closeScopeIds: [...oldScopes],
+    //       openScopeIds: [id],
+    //       openNode: node,
+    //       position: node.startPosition
+    //     }
+    //     console.log('inserting close', s(bundle.closeScopeIds), 'open', s(bundle.openScopeIds), 'at', node.startPosition);
+    //     this.boundaries = this.boundaries.insert(node.startPosition, bundle)
+    //     oldScopes = [id]
+    //   }
+    //
+    //   old = this.boundaries.get(node.endPosition)
+    //   if (old) {
+    //     old.closeNode = node
+    //     if (old.closeScopeIds.length === 0) {
+    //       old.closeScopeIds = [id]
+    //     }
+    //   } else {
+    //     this.boundaries = this.boundaries.insert(node.endPosition, {
+    //       closeScopeIds: [id],
+    //       openScopeIds: [],
+    //       closeNode: node,
+    //       position: node.endPosition
+    //     })
+    //   }
+    // })
+
+    console.log('closing', oldScopes.map(s => this.scopeForId(s)), 'at the end of the document');
     this.boundaries = this.boundaries.insert(Point.INFINITY, {
       closeScopeIds: [...oldScopes],
       openScopeIds: [],
       position: Point.INFINITY
     })
   }
+
+  // _updateSyntax(from, to) {
+  //   const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
+  //   let oldDataIterator = this.boundaries.ge(from)
+  //   let oldScopes = []
+  //
+  //   while( oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
+  //     this.boundaries = this.boundaries.remove(oldDataIterator.key)
+  //     oldScopes = oldDataIterator.value.closeScopeIds
+  //     oldDataIterator.next()
+  //   }
+  //
+  //   oldScopes = oldScopes || []
+  //   syntax.forEach(({node, name}) => {
+  //     let id = this.scopeNames.get(name)
+  //     if(!id) {
+  //       this.lastId += 2
+  //       id = this.lastId
+  //       const newId = this.lastId;
+  //       this.scopeNames.set(name, newId)
+  //       this.scopeIds.set(newId, name)
+  //     }
+  //     // })
+  //
+  //     let old = this.boundaries.get(node.startPosition)
+  //     if(old) {
+  //       old.openNode = node
+  //       if(old.openScopeIds.length === 0) {
+  //         old.openScopeIds = [id]
+  //       }
+  //     } else {
+  //       this.boundaries = this.boundaries.insert(node.startPosition, {
+  //         closeScopeIds: [...oldScopes],
+  //         openScopeIds: [id],
+  //         openNode: node,
+  //         position: node.startPosition
+  //       })
+  //       oldScopes = [id]
+  //     }
+  //
+  //     old = this.boundaries.get(node.endPosition)
+  //     if(old) {
+  //       old.closeNode = node
+  //       if(old.closeScopeIds.length === 0) old.closeScopeIds = [id]
+  //     } else {
+  //       this.boundaries = this.boundaries.insert(node.endPosition, {
+  //         closeScopeIds: [id],
+  //         openScopeIds: [],
+  //         closeNode: node,
+  //         position: node.endPosition
+  //       })
+  //     }
+  //   })
+  //
+  //   this.boundaries = this.boundaries.insert(Point.INFINITY, {
+  //     closeScopeIds: [...oldScopes],
+  //     openScopeIds: [],
+  //     position: Point.INFINITY
+  //   })
+  // }
 
   _prepareInvalidations() {
     let nodes = this.oldNodeTexts
@@ -299,33 +597,106 @@ class WASMTreeSitterLanguageMode {
 
   classNameForScopeId(scopeId) {
     const scope = this.scopeIds.get(scopeId)
-    if(scope) return `syntax--${scope.replace(/\./g, ' syntax--')}`
+    if (scope) {
+      return `syntax--${scope.replace(/\./g, ' syntax--')}`
+    }
   }
 
-  scopeForId(scopeId) {
-    return this.scopeIds[scopeId]
+  scopeForId (scopeId) {
+    return this.scopeIds.get(scopeId)
   }
 
-  scopeDescriptorForPosition(position) {
-    if(!this.tree) return new ScopeDescriptor({scopes: ['text']})
-    const current = Point.fromObject(position)
-    let begin = Point.fromObject(position)
+  findOrCreateScopeId (name) {
+    let id = this.scopeNames.get(name)
+    if (!id) {
+      this.lastId += 2
+      id = this.lastId
+      const newId = this.lastId;
+      this.scopeNames.set(name, newId)
+      this.scopeIds.set(newId, name)
+    }
+    return id
+  }
+
+  syntaxTreeScopeDescriptorForPosition(point) {
+    point = this.buffer.clipPosition(Point.fromObject(point));
+
+    // If the position is the end of a line, get node of left character instead of newline
+    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    if (
+      point.column > 0 &&
+      point.column === this.buffer.lineLengthForRow(point.row)
+    ) {
+      point = point.copy();
+      point.column--;
+    }
+
+    let scopes = [];
+
+    let root = this.tree.rootNode;
+    let rangeIncludesPoint = (start, end, point) => {
+      return comparePoints(start, point) <= 0 && comparePoints(end, point) >= 0
+    };
+
+    let iterate = (node, isAnonymous = false) => {
+      let { startPosition: start, endPosition: end } = node;
+      if (rangeIncludesPoint(start, end, point)) {
+        scopes.push(isAnonymous ? `"${node.type}"` : node.type);
+        let namedChildrenIds = node.namedChildren.map(c => c.typeId);
+        for (let child of node.children) {
+          let isAnonymous = !namedChildrenIds.includes(child.typeId);
+          iterate(child, isAnonymous);
+        }
+      }
+    };
+
+    iterate(root);
+
+    scopes.unshift(this.grammar.scopeName);
+    return new ScopeDescriptor({ scopes });
+  }
+
+  scopeDescriptorForPosition (point) {
+    // If the position is the end of a line, get scope of left character instead of newline
+    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    if (
+      point.column > 0 &&
+      point.column === this.buffer.lineLengthForRow(point.row)
+    ) {
+      point = point.copy();
+      point.column--;
+    }
+
+    if (!this.tree) {
+      return new ScopeDescriptor({scopes: ['text']})
+    }
+    const current = Point.fromObject(point, true)
+    let begin = Point.fromObject(point, true)
     begin.column = 0
-    const end = Point.fromObject([begin.row+1, 0])
+
+    const end = Point.fromObject([begin.row + 1, 0])
     this._updateBoundaries(begin, end)
-    const it = this.boundaries.ge(begin)
-    if(!it.value) return new ScopeDescriptor({scopes: ['text']})
+
+    // Start at the beginning.
+    const it = this.boundaries.ge(new Point(0, 0))
+    if (!it.value) {
+      return new ScopeDescriptor({scopes: ['text']})
+    }
 
     let scopeIds = []
-    while(comparePoints(it.key, current) <= 0) {
+    while (comparePoints(it.key, current) <= 0) {
       const closing = new Set(it.value.closeScopeIds)
       scopeIds = scopeIds.filter(s => !closing.has(s))
       scopeIds.push(...it.value.openScopeIds)
-      if(!it.hasNext) break
+      if (!it.hasNext) { break }
       it.next()
     }
 
-    const scopes = scopeIds.map(id => this.classNameForScopeId(id).replace(/^syntax--/, '').replace(/\s?syntax--/g, '.'))
+    const scopes = scopeIds.map(id => this.scopeForId(id))
+
+    if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
+      scopes.unshift(this.grammar.scopeName);
+    }
     return new ScopeDescriptor({scopes})
   }
 
@@ -350,24 +721,69 @@ class WASMTreeSitterLanguageMode {
   }
 
   suggestedIndentForBufferRow(row, tabLength, options) {
-    if(row === 0) return 0;
+    console.log('suggestedLineForBufferRow', row, tabLength);
+    if (row === 0) { return 0; }
+
+    const lastLineIndent = this.indentLevelForLine(
+      this.buffer.lineForRow(row - 1), tabLength
+    )
+    let amount = lastLineIndent
+
+    console.log('going from', row - 1, 'to', row, this.tree.rootNode);
     const indents = this.indentsQuery.captures(
       this.tree.rootNode,
-      {row: row-1, column: 0},
+      {row: row - 1, column: 0},
       {row: row, column: 0}
     )
-    const indent = indents.find(i => i.node.startPosition.row === row-1)
-    const lastLineIndent = this.indentLevelForLine(
-      this.buffer.getLines()[row-1], tabLength
-    )
+    console.log('indents:', indents);
 
-    if(indent?.name === 'indent') {
-      return lastLineIndent + 1
-    } else {
-      const suggestion = this.suggestedIndentForEditedBufferRow(row, tabLength)
-      return suggestion !== undefined ? suggestion : lastLineIndent
+    let delta = 0;
+    for (let { name, node } of indents) {
+      let text = node.text;
+      if (!text || !text.length) { continue; }
+      if (name === 'indent') { delta++ }
+      else if (name === 'indent_end') { delta-- }
+      console.log('delta is now:', delta);
     }
+
+    if (delta > 1) { delta = 1; }
+    if (delta < 0) { delta = 0; }
+
+    return lastLineIndent + delta;
   }
+
+  // suggestedIndentForEditedBufferRow(row, tabLength) {
+  //   if (row === 0) { return 0; }
+  //
+  //   const indents = this.indentsQuery.captures(
+  //     this.tree.rootNode,
+  //     {row: row, column: 0},
+  //     {row: row + 1, column: 0}
+  //   )
+  //
+  //   console.log('edited indents:', indents);
+  //
+  //   let currentLineIndent = this.indentLevelForLine(this.buffer.lineForRow(row), tabLength);
+  //   let originalLineIndent = this.suggestedIndentForBufferRow(row, tabLength);
+  //   // let startingLineIndent = Math.
+  //   console.log('starting at', originalLineIndent);
+  //
+  //   let delta = 0;
+  //   for (let { name, node } of indents) {
+  //     if (!node.text?.length) { continue; }
+  //
+  //     if (name === 'branch') {
+  //       delta--
+  //     }
+  //   }
+  //
+  //   if (delta === 0) {
+  //     return currentLineIndent;
+  //   }
+  //
+  //   if (delta < -1) { delta = -1; }
+  //   return Math.max(0, originalLineIndent + delta);
+  // }
 
   suggestedIndentForEditedBufferRow(row, tabLength) {
     const indents = this.indentsQuery.captures(
@@ -375,9 +791,13 @@ class WASMTreeSitterLanguageMode {
       {row: row, column: 0},
       {row: row+1, column: 0}
     )
-    const indent = indents.find(i => i.node.startPosition.row === row)
-    if(indent?.name === "indent_end") {
-      if(this.buffer.getLines()[row].trim() === indent.node.text) {
+    console.log('indents:', indents);
+    const indent = indents.find(i => {
+      return i.node.startPosition.row === row && i.name === 'branch'
+    });
+    console.log('specific indent:', indent);
+    if(indent?.name === "branch") {
+      if(this.buffer.lineForRow(row).trim() === indent.node.text) {
         const parent = indent.node.parent
         if(parent) return this.indentLevelForLine(
           this.buffer.getLines()[parent.startPosition.row],
@@ -386,7 +806,6 @@ class WASMTreeSitterLanguageMode {
       }
     }
   }
-
   // Copied from original tree-sitter. I honestly didn't even read this.
   indentLevelForLine(line, tabLength) {
     let indentLength = 0;
@@ -424,9 +843,12 @@ class WASMTreeSitterLanguageMode {
   }
 
   _getFoldsAtRow(row) {
-    if(!this.tree) return []
-    const folds = this.foldsQuery.captures(this.tree.rootNode,
-      {row: row, column: 0}, {row: row+1, column: 0})
+    if (!this.tree) { return [] }
+    const folds = this.foldsQuery.captures(
+      this.tree.rootNode,
+      { row: row, column: 0 },
+      { row: row + 1, column: 0 }
+    )
     return folds.filter(fold => fold.node.startPosition.row === row)
   }
 }
@@ -466,4 +888,11 @@ function comparePoints(a, b) {
     return a.column - b.column
   else
     return rows
+}
+
+function isBetweenPoints (point, a, b) {
+  let comp = comparePoints(a, b);
+  let lesser = comp > 0 ? b : a;
+  let greater = comp > 0 ? a : b;
+  return comparePoints(point, lesser) >= 0 && comparePoints(point, greater) <= 0;
 }

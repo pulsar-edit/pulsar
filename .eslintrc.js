@@ -7,7 +7,7 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:node/recommended",
-    "plugin:jsdoc/recommended"
+    // "plugin:jsdoc/recommended"
   ],
   overrides: [],
   parserOptions: {
