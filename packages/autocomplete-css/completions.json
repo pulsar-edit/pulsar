@@ -1003,11 +1003,11 @@
         "saturation",
         "color",
         "luminosity",
+        "plus-darker",
+        "plus-lighter",
         "inherit",
         "initial",
-        "unset",
-        "plus-darker",
-        "plus-lighter"
+        "unset"
       ],
       "description": "The mix-blend-mode CSS property sets how an element's content should blend with the content of the element's parent and the element's background."
     },
@@ -1035,9 +1035,6 @@
         "first",
         "last",
         "baseline",
-        "inherit",
-        "initial",
-        "unset",
         "space-between",
         "space-around",
         "space-evenly",
@@ -1048,7 +1045,10 @@
         "start",
         "end",
         "flex-start",
-        "flex-end"
+        "flex-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS align-content property sets the distribution of space between and around content items along a flexbox's cross-axis or a grid's block axis."
     },
@@ -1059,9 +1059,6 @@
         "space-around",
         "space-evenly",
         "stretch",
-        "inherit",
-        "initial",
-        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1070,7 +1067,10 @@
         "flex-start",
         "flex-end",
         "left",
-        "right"
+        "right",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS justify-content property defines how the browser distributes space between and around content items along the Glossary(Main Axis, main-axis) of a flex container, and the inline axis of a grid container."
     },
@@ -1093,9 +1093,6 @@
         "first",
         "last",
         "baseline",
-        "inherit",
-        "initial",
-        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1106,7 +1103,10 @@
         "flex-start",
         "flex-end",
         "left",
-        "right"
+        "right",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS justify-self property sets the way a box is justified inside its alignment container along the appropriate axis."
     },
@@ -1118,9 +1118,6 @@
         "first",
         "last",
         "baseline",
-        "inherit",
-        "initial",
-        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1129,7 +1126,10 @@
         "self-start",
         "self-end",
         "flex-start",
-        "flex-end"
+        "flex-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The align-self CSS property overrides a grid or flex item's align-items value. In Grid, it aligns the item inside the glossary(Grid Areas, grid area). In Flexbox, it aligns the item on the glossary(cross axis)."
     },
@@ -1153,9 +1153,6 @@
         "first",
         "last",
         "baseline",
-        "inherit",
-        "initial",
-        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1167,7 +1164,10 @@
         "flex-end",
         "left",
         "right",
-        "legacy"
+        "legacy",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS justify-items property defines the default justify-self for all items of the box, giving them all a default way of justifying each box along the appropriate axis."
     },
@@ -1178,9 +1178,6 @@
         "first",
         "last",
         "baseline",
-        "inherit",
-        "initial",
-        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1189,7 +1186,10 @@
         "self-start",
         "self-end",
         "flex-start",
-        "flex-end"
+        "flex-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS align-items property sets the align-self value on all direct children as a group. In Flexbox, it controls the alignment of items on the glossary(Cross Axis). In Grid Layout, it controls the alignment of items on the Block Axis within their glossary(Grid Areas, grid area)."
     },
@@ -2425,15 +2425,15 @@
         "block",
         "inline",
         "run-in",
-        "inherit",
-        "initial",
-        "unset",
         "flow",
         "flow-root",
         "table",
         "flex",
         "grid",
         "ruby",
+        "inherit",
+        "initial",
+        "unset",
         "list-item",
         "table-row-group",
         "table-header-group",
@@ -2547,12 +2547,12 @@
         "row-reverse",
         "column",
         "column-reverse",
-        "inherit",
-        "initial",
-        "unset",
         "nowrap",
         "wrap",
-        "wrap-reverse"
+        "wrap-reverse",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The flex-flow CSS shorthand property specifies the direction of a flex container, as well as its wrapping behavior."
     },
@@ -2755,15 +2755,15 @@
         "none",
         "common-ligatures",
         "no-common-ligatures",
-        "inherit",
-        "initial",
-        "unset",
         "discretionary-ligatures",
         "no-discretionary-ligatures",
         "historical-ligatures",
         "no-historical-ligatures",
         "contextual",
-        "no-contextual"
+        "no-contextual",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-ligatures CSS property controls which Glossary(ligature, ligatures) and Glossary(contextual forms) are used in textual content of the elements it applies to. This leads to more harmonized forms in the resulting text."
     },
@@ -2798,15 +2798,15 @@
         "normal",
         "lining-nums",
         "oldstyle-nums",
-        "inherit",
-        "initial",
-        "unset",
         "proportional-nums",
         "tabular-nums",
         "diagonal-fractions",
         "stacked-fractions",
         "ordinal",
-        "slashed-zero"
+        "slashed-zero",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-numeric CSS property controls the usage of alternate glyphs for numbers, fractions, and ordinal markers."
     },
@@ -2835,12 +2835,12 @@
         "jis04",
         "simplified",
         "traditional",
-        "inherit",
-        "initial",
-        "unset",
         "full-width",
         "proportional-width",
-        "ruby"
+        "ruby",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-east-asian CSS property controls the use of alternate glyphs for East Asian scripts, like Japanese and Chinese."
     },
@@ -2850,9 +2850,6 @@
         "none",
         "common-ligatures",
         "no-common-ligatures",
-        "inherit",
-        "initial",
-        "unset",
         "discretionary-ligatures",
         "no-discretionary-ligatures",
         "historical-ligatures",
@@ -2865,6 +2862,9 @@
         "all-petite-caps",
         "unicase",
         "titling-caps",
+        "inherit",
+        "initial",
+        "unset",
         "stylistic()",
         "historical-forms",
         "styleset(",
@@ -3058,9 +3058,6 @@
         "first",
         "last",
         "baseline",
-        "inherit",
-        "initial",
-        "unset",
         "space-between",
         "space-around",
         "space-evenly",
@@ -3071,7 +3068,10 @@
         "start",
         "end",
         "flex-start",
-        "flex-end"
+        "flex-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The align-tracks CSS property sets the alignment in the masonry axis for grid containers that have masonry in their block axis."
     },
@@ -3082,9 +3082,6 @@
         "space-around",
         "space-evenly",
         "stretch",
-        "inherit",
-        "initial",
-        "unset",
         "unsafe",
         "safe",
         "center",
@@ -3093,7 +3090,10 @@
         "flex-start",
         "flex-end",
         "left",
-        "right"
+        "right",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The justify-tracks CSS property sets the alignment in the masonry axis for grid containers that have masonry in their inline axis."
     },
@@ -6204,14 +6204,14 @@
         "overline",
         "line-through",
         "blink",
-        "inherit",
-        "initial",
-        "unset",
         "solid",
         "double",
         "dotted",
         "dashed",
-        "wavy"
+        "wavy",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-decoration shorthand CSS property sets the appearance of decorative lines on text. It is a shorthand for text-decoration-line, text-decoration-color, text-decoration-style, and the newer text-decoration-thickness property."
     },

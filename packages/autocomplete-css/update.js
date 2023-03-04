@@ -175,7 +175,7 @@ async function getDescriptionOfProp(name) {
   }
 }
 
-function getValuesOfProp(value, allValues) {
+function getValuesOfProp(value, allValues, appendImplicitValues=true) {
   // value holds the value string of the values we expect
   // allValues holds all of the values that apply to the spec
   // Like mentioned above `value` = "value1 | value2 | <valueGroupName>"
@@ -206,8 +206,11 @@ function getValuesOfProp(value, allValues) {
     }
   }
 
-  // Add the implicit values to the end...
-  values = values.concat(implicitValues);
+  if (appendImplicitValues === true) {
+    // Add the implicit values to the end...
+    values = values.concat(implicitValues);
+  };
+
   return values;
 
 }
@@ -247,7 +250,7 @@ function parseValueGroup(valueGroupName, allValues) {
     }
   }
 
-  return getValuesOfProp(resolvedValueGroupString);
+  return getValuesOfProp(resolvedValueGroupString, allValues=null, appendImplicitValues=false);
 }
 
 async function getTagsHTML() {
