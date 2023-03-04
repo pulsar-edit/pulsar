@@ -1,11 +1,16 @@
 const Parser = require('web-tree-sitter');
 const ScopeDescriptor = require('./scope-descriptor')
+const { Patch } = require('superstring');
 // const fs = require('fs');
 const { Point, Range } = require('text-buffer');
 const { Emitter } = require('event-kit');
 
 const initPromise = Parser.init()
 const createTree = require("./rb-tree")
+
+function last(array) {
+  return array[array.length - 1];
+}
 
 class PositionIndex {
   constructor () {
@@ -140,6 +145,7 @@ class WASMTreeSitterLanguageMode {
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
     this.newRanges = []
     this.oldNodeTexts = new Set()
+
     let resolve
     this.ready = new Promise(r => resolve = r)
     this.grammar = grammar
@@ -165,6 +171,8 @@ class WASMTreeSitterLanguageMode {
       // const startRange = new Range([0, 0], [0, 0])
       const range = buffer.getRange()
       this.tree = this.parser.parse(buffer.getText())
+      console.log('TREE:', this.tree, this.tree.then);
+      this._updateBoundaries(range.start, range.end)
       this.emitter.emit('did-change-highlighting', range)
       resolve(true)
     })
@@ -176,22 +184,22 @@ class WASMTreeSitterLanguageMode {
 
   // A hack to force an existing buffer to react to an update in the SCM file.
   _reloadSyntaxQuery () {
-    // let _oldSyntaxQuery = this.syntaxQuery;
-    this.grammar._reloadQueryFiles()
-    let lang = this.parser.getLanguage()
-    this.syntaxQuery = lang.query(this.grammar.syntaxQuery)
-    // let range = this.buffer.getRange()
-    // this._updateSyntax(range.start, range.end)
+    this.grammar._reloadQueryFiles();
+
+    let lang = this.parser.getLanguage();
+    this.syntaxQuery = lang.query(this.grammar.syntaxQuery);
+
     // Force first highlight
-    this.boundaries = createTree(comparePoints)
-    // const startRange = new Range([0, 0], [0, 0])
+    this.boundaries = createTree(comparePoints);
     const range = this.buffer.getRange()
     this.tree = this.parser.parse(this.buffer.getText())
+    this._updateBoundaries(range.start, range.end);
+
     this.emitter.emit('did-change-highlighting', range)
   }
 
   getGrammar() {
-    return this.grammar
+    return this.grammar;
   }
 
   updateForInjection(...args) {
@@ -209,13 +217,17 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidChange(change) {
-    if(!this.tree) return;
+    console.log('bufferDidChange:', change);
+    if (!this.tree) return;
 
     this.newRanges.push(change.newRange)
     const possibleDefinition = this.boundaries.lt(change.oldRange.end).value?.definition
     if(possibleDefinition) this.oldNodeTexts.add(possibleDefinition)
 
     const startIndex = this.buffer.characterIndexForPosition(change.newRange.start)
+
+    // Mark edits in the tree, but don't actually reparse until
+    // `bufferDidFinishTransaction`.
     this.tree.edit({
       startPosition: change.newRange.start,
       oldEndPosition: change.oldRange.end,
@@ -224,20 +236,79 @@ class WASMTreeSitterLanguageMode {
       oldEndIndex: startIndex + change.oldText.length,
       newEndIndex: this.buffer.characterIndexForPosition(change.newRange.end)
     })
+  }
+
+  bufferDidFinishTransaction({ changes }) {
+    console.log('bufferDidFinishTransaction', changes);
+    // TODO: There's got to be a better way to do this. If I consider just the
+    // new range _or_ the old range, it seems like there are edge cases that
+    // would confound the strategy.
+    let megaRanges = changes.map(({ newRange, oldRange }) => {
+      return combineRanges([newRange, oldRange]);
+    })
+
+    let combinedRangeOfChanges = combineRanges(megaRanges);
+
+
     const newTree = this.parser.parse(this.buffer.getText(), this.tree)
-    this.tree = newTree
+    const rangesWithSyntaxChanges = this.tree.getChangedRanges(newTree);
+    this.tree = newTree;
+
+    console.log('"new" tree has text:', newTree.rootNode.text);
+
+    let combinedRangeWithSyntaxChange = null;
+
+    if (rangesWithSyntaxChanges.length > 0) {
+      // Syntax changes are guaranteed to be ordered, so we can take a shortcut.
+      combinedRangeWithSyntaxChange = new Range(
+        rangesWithSyntaxChanges[0].startPosition,
+        last(rangesWithSyntaxChanges).endPosition
+      );
+    }
+
+    if (combinedRangeWithSyntaxChange) {
+      combinedRangeOfChanges = combineRanges([
+        combinedRangeOfChanges,
+        combinedRangeWithSyntaxChange
+      ]);
+    }
+
+    console.log('updating boundaries:', combinedRangeOfChanges.start, combinedRangeOfChanges.end);
+    this._updateBoundaries(
+      combinedRangeOfChanges.start,
+      combinedRangeOfChanges.end
+    );
   }
 
   _updateBoundaries(from, to) {
-    this._updateSyntax(from, to)
+    // Run the captures and see how much of the document will be affected.
+    let range = this._captureBoundsOfSyntaxUpdate(from, to);
 
-    if(this.localsQuery) {
+    // If there are no captures, use the original from/to range.
+    if (!range) {
+      range = new Range(from, to);
+    }
+
+    if (this.localsQuery) {
       const locals = this.localsQuery.captures(this.tree.rootNode, from, to)
       this._updateWithLocals(locals)
       this._prepareInvalidations()
     }
+
+    this._updateSyntax(range.start, range.end);
+
+    console.log('invalidating:', range.start, range.end);
+
+    // TODO: I don't know why this needs a tick in order to do the right thing.
+    // I will investigate.
+    setTimeout(() => {
+      this.emitter.emit('did-change-highlighting', range)
+    }, 50);
   }
 
+  // FIXME: This was a different strategy for determining how much of the
+  // document to invalidate: crawl `this.boundaries` between `from` and `to`,
+  // then take the earliest and latest positions of affected nodes.
   _findInvalidationRange(from, to) {
     let iterate = (from, to) => {
       let iterator = this.boundaries.ge(from)
@@ -281,27 +352,53 @@ class WASMTreeSitterLanguageMode {
       currentTo = newTo;
     }
 
-    return [currentFrom, currentTo];
+    return new Range(currentFrom, currentTo);
+
+    // return [currentFrom, currentTo];
+  }
+
+  _captureBoundsOfSyntaxUpdate (from, to) {
+    const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to);
+
+    if (syntax.length === 0) { return null; }
+
+    let earliest = null;
+    let latest = null;
+    syntax.forEach(({ node }) => {
+      if (!earliest) {
+        earliest = node.startPosition;
+      } else if (comparePoints(node.startPosition, earliest) < 0) {
+        earliest = node.startPosition;
+      }
+
+      if (!latest) {
+        latest = node.endPosition;
+      } else if (comparePoints(node.endPosition, latest) > 0) {
+        latest = node.endPosition;
+      }
+    });
+
+    earliest.column = 0;
+
+    let combinedRange = new Range(earliest, latest);
+
+    return combinedRange;
   }
 
   _updateSyntax(from, to) {
     console.log('_updateSyntax', from, to);
-    let [realFrom, realTo] = this._findInvalidationRange(from, to)
-    console.log('(widening to:)', realFrom, realTo);
-
-    from = realFrom;
-    to = realTo;
 
     const syntax = this.syntaxQuery.captures(this.tree.rootNode, from, to)
-    console.log('captures:', syntax);
+
     let oldDataIterator = this.boundaries.ge(from)
     let oldScopes = []
     // Remove all boundaries data for the given range.
     while (oldDataIterator.hasNext && comparePoints(oldDataIterator.key, to) <= 0 ) {
       let { key, value } = oldDataIterator
+      console.log('@ removing:', key, value);
       this.boundaries = this.boundaries.remove(key)
-      oldScopes = value.closeScopeIds
-      oldDataIterator.next()
+      oldScopes = value.closeScopeIds;
+      oldDataIterator.next();
       // TODO: Doesn't this mean that we'll miss the last item in the iterator
       // under certain circumstances?
     }
@@ -323,27 +420,46 @@ class WASMTreeSitterLanguageMode {
       return this.scopeForId(id)
     };
 
+    let earliest = null;
+    let latest = null;
     syntax.forEach((s) => {
-      let { name } = s
+      let { name, node } = s
       let id = this.findOrCreateScopeId(name)
 
+      if (!earliest) {
+        earliest = node.startPosition;
+      } else if (comparePoints(node.startPosition, earliest) < 0) {
+        earliest = node.startPosition;
+      }
+
+      if (!latest) {
+        latest = node.endPosition;
+      } else if (comparePoints(node.endPosition, latest) > 0) {
+        latest = node.endPosition;
+      }
       // PositionIndex takes all our syntax tokens and consolidates them into a
       // fixed set of boundaries to visit in order. If a token has data, it
       // sets that data so that a later token for the same range can read it.
       this.positionIndex.store(s, id)
     });
 
+    let combinedRange = new Range(earliest, latest);
+
     for (let [point, data] of this.positionIndex) {
+      let closeScopeIds = [...oldScopes, ...data.close];
       let bundle = {
-        closeScopeIds: [...data.close],
+        closeScopeIds,
         openScopeIds: [...data.open],
         closeNodes: [...data.closeNodes],
         openNodes: [...data.openNodes],
         position: point
       }
-      console.log('inserting', bundle, 'at point:', point, 'close:', inspect(bundle.closeScopeIds), 'open:', inspect(bundle.openScopeIds));
+      oldScopes = [];
+      console.log('@ at position', point, 'close:', inspect(bundle.closeScopeIds), 'open:', inspect(bundle.openScopeIds));
       this.boundaries = this.boundaries.insert(point, bundle)
     }
+
+
 
     // syntax.forEach(({ node, name }) => {
     //   // let id = this.scopeNames.get(name)
@@ -391,12 +507,16 @@ class WASMTreeSitterLanguageMode {
     //   }
     // })
 
-    console.log('closing', oldScopes.map(s => this.scopeForId(s)), 'at the end of the document');
+    // console.log('closing', oldScopes.map(s => this.scopeForId(s)), 'at the end of the document');
     this.boundaries = this.boundaries.insert(Point.INFINITY, {
       closeScopeIds: [...oldScopes],
       openScopeIds: [],
       position: Point.INFINITY
     })
+
+    console.log('combinedRange:', combinedRange.start, combinedRange.end);
+
+    return combinedRange;
   }
 
   // _updateSyntax(from, to) {
@@ -559,9 +679,6 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
-  bufferDidFinishTransaction(...args) {
-  }
-
   buildHighlightIterator() {
     if(!this.parser) return nullIterator;
     let iterator// = boundaries.ge({row: 0, column: 0})
@@ -570,29 +687,31 @@ class WASMTreeSitterLanguageMode {
       return this.boundaries
     }
 
-    return {
-      getOpenScopeIds () {
-        return [...new Set(iterator.value.openScopeIds)]
-      },
+    return new HighlightIterator(this);
 
-      getCloseScopeIds () {
-        return [...new Set(iterator.value.closeScopeIds)]
-      },
-
-      getPosition () {
-        return (iterator.value && iterator.value.position) || Point.INFINITY
-      },
-
-      moveToSuccessor () {
-        return iterator.next()
-      },
-
-      seek(start, endRow) {
-        const end = {row: endRow + 1, column: 0}
-        iterator = updateBoundaries(start, end).ge(start)
-        return []
-      }
-    }
+    // return {
+    //   getOpenScopeIds () {
+    //     return iterator.value.openScopeIds
+    //   },
+    //
+    //   getCloseScopeIds () {
+    //     return iterator.value.closeScopeIds
+    //   },
+    //
+    //   getPosition () {
+    //     return (iterator.value && iterator.value.position) || Point.INFINITY
+    //   },
+    //
+    //   moveToSuccessor () {
+    //     return iterator.next()
+    //   },
+    //
+    //   seek(start, endRow) {
+    //     const end = {row: endRow + 1, column: 0}
+    //     iterator = updateBoundaries(start, end).ge(start)
+    //     return []
+    //   }
+    // }
   }
 
   classNameForScopeId(scopeId) {
@@ -674,8 +793,8 @@ class WASMTreeSitterLanguageMode {
     let begin = Point.fromObject(point, true)
     begin.column = 0
 
-    const end = Point.fromObject([begin.row + 1, 0])
-    this._updateBoundaries(begin, end)
+    // const end = Point.fromObject([begin.row + 1, 0])
+    // this._updateBoundaries(begin, end)
 
     // Start at the beginning.
     const it = this.boundaries.ge(new Point(0, 0))
@@ -721,7 +840,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   suggestedIndentForBufferRow(row, tabLength, options) {
-    console.log('suggestedLineForBufferRow', row, tabLength);
+    // console.log('suggestedLineForBufferRow', row, tabLength);
     if (row === 0) { return 0; }
 
     const lastLineIndent = this.indentLevelForLine(
@@ -729,13 +848,13 @@ class WASMTreeSitterLanguageMode {
     )
     let amount = lastLineIndent
 
-    console.log('going from', row - 1, 'to', row, this.tree.rootNode);
+    // console.log('going from', row - 1, 'to', row, this.tree.rootNode);
     const indents = this.indentsQuery.captures(
       this.tree.rootNode,
       {row: row - 1, column: 0},
       {row: row, column: 0}
     )
-    console.log('indents:', indents);
+    // console.log('indents:', indents);
 
     let delta = 0;
     for (let { name, node } of indents) {
@@ -743,7 +862,7 @@ class WASMTreeSitterLanguageMode {
       if (!text || !text.length) { continue; }
       if (name === 'indent') { delta++ }
       else if (name === 'indent_end') { delta-- }
-      console.log('delta is now:', delta);
+      // console.log('delta is now:', delta);
     }
 
     if (delta > 1) { delta = 1; }
@@ -791,11 +910,11 @@ class WASMTreeSitterLanguageMode {
       {row: row, column: 0},
       {row: row+1, column: 0}
     )
-    console.log('indents:', indents);
+    // console.log('indents:', indents);
     const indent = indents.find(i => {
       return i.node.startPosition.row === row && i.name === 'branch'
     });
-    console.log('specific indent:', indent);
+    // console.log('specific indent:', indent);
     if(indent?.name === "branch") {
       if(this.buffer.lineForRow(row).trim() === indent.node.text) {
         const parent = indent.node.parent
@@ -895,4 +1014,82 @@ function isBetweenPoints (point, a, b) {
   let lesser = comp > 0 ? b : a;
   let greater = comp > 0 ? a : b;
   return comparePoints(point, lesser) >= 0 && comparePoints(point, greater) <= 0;
+}
+
+class HighlightIterator {
+  constructor (languageMode) {
+    this.languageMode = languageMode
+  }
+
+  getBoundaries () {
+    let { boundaries } = this.languageMode;
+    if (!boundaries) {
+      let range = this.languageMode.buffer.getRange();
+      this.languageMode._updateBoundaries(
+        range.start, range.end);
+      return this.languageMode.boundaries;
+    }
+    return boundaries;
+  }
+
+  seek (start, endRow) {
+
+    let end = { row: endRow, column: 0 };
+
+    // let range = this.languageMode._findInvalidationRange(start, end);
+    //
+    // console.log('SEEK range:', range);
+
+    this.end = end;
+
+    let boundaries = this.getBoundaries();
+    this.iterator = boundaries.ge(start);
+
+    // TODO: What is this return value used for?
+    return []
+  }
+
+  getOpenScopeIds () {
+    return this.iterator.value.openScopeIds;
+  }
+
+  getCloseScopeIds () {
+    return this.iterator.value.closeScopeIds;
+  }
+
+  getPosition () {
+    let position = this.iterator.value?.position;
+    return position || Point.INFINITY;
+  }
+
+  moveToSuccessor () {
+    this.iterator.next();
+    if (this.iterator.key && this.end) {
+      if (comparePoints(this.iterator.key, this.end) > 0) {
+        this.iterator = { value: null };
+      }
+    }
+  }
+}
+
+
+function combineRanges (ranges) {
+  // console.log('combineRanges', ranges);
+  let earliest = null;
+  let latest = null;
+  ranges.forEach(({ end, start }) => {
+    if (!earliest) {
+      earliest = start;
+    } else if (comparePoints(start, earliest) < 0) {
+      earliest = start;
+    }
+
+    if (!latest) {
+      latest = end;
+    } else if (comparePoints(end, latest) > 0) {
+      latest = end;
+    }
+  });
+
+  return new Range(earliest, latest);
 }
