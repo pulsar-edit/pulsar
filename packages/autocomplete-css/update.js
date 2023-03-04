@@ -185,8 +185,12 @@ function getValuesOfProp(value, allValues, appendImplicitValues=true) {
   let implicitValues = [ "inherit", "initial", "unset" ];
 
   if (!value || value.length < 0) {
-    return implicitValues;
-  }
+    if (appendImplicitValues === true) {
+      return implicitValues;
+    }
+
+    return [];
+  };
 
   let values = [];
   let parser = new CSSParser(value);

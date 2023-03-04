@@ -212,19 +212,19 @@
     },
     "rx": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
     "ry": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
@@ -424,42 +424,42 @@
     },
     "-webkit-text-fill-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The -webkit-text-fill-color CSS property specifies the fill color of characters of text. If this property is not set, the value of the color property is used."
     },
     "-webkit-text-stroke-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The -webkit-text-stroke-color CSS property specifies the stroke color of characters of text. If this property is not set, the value of the color property is used."
     },
     "-webkit-text-stroke-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The -webkit-text-stroke-width CSS property specifies the width of the stroke for text."
     },
     "-webkit-text-stroke": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
         "thick",
-        "currentcolor"
+        "currentcolor",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The -webkit-text-stroke CSS property specifies the width and color of strokes for text characters. This is a shorthand property for the longhand properties -webkit-text-stroke-width and -webkit-text-stroke-color."
     },
@@ -1077,11 +1077,11 @@
     "place-content": {
       "values": [
         "normal",
+        "left",
+        "right",
         "inherit",
         "initial",
-        "unset",
-        "left",
-        "right"
+        "unset"
       ],
       "description": "The place-content CSS shorthand property allows you to align content along both the block and inline directions at once (i.e. the align-content and justify-content properties) in a relevant layout system such as Grid or Flexbox."
     },
@@ -1138,11 +1138,11 @@
         "auto",
         "normal",
         "stretch",
+        "left",
+        "right",
         "inherit",
         "initial",
-        "unset",
-        "left",
-        "right"
+        "unset"
       ],
       "description": "The place-self CSS shorthand property allows you to align an individual item in both the block and inline directions at once (i.e. the align-self and justify-self properties) in a relevant layout system such as Grid or Flexbox. If the second value is not present, the first value is also used for it."
     },
@@ -1197,13 +1197,13 @@
       "values": [
         "normal",
         "stretch",
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "right",
         "legacy",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS place-items shorthand property allows you to align items along both the block and inline directions at once (i.e. the align-items and justify-items properties) in a relevant layout system such as Grid or Flexbox. If the second value is not set, the first value is also used for it."
     },
@@ -1262,11 +1262,11 @@
       "values": [
         "none",
         "default",
+        "implicit",
+        "popover",
         "inherit",
         "initial",
-        "unset",
-        "implicit",
-        "popover"
+        "unset"
       ],
       "description": ""
     },
@@ -1281,11 +1281,11 @@
     },
     "anchor-default": {
       "values": [
+        "implicit",
+        "popover",
         "inherit",
         "initial",
-        "unset",
-        "implicit",
-        "popover"
+        "unset"
       ],
       "description": ""
     },
@@ -1398,10 +1398,10 @@
     },
     "animation": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The animation shorthand CSS property applies an animation between styles. It is a shorthand for animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode, and animation-play-state."
     },
@@ -1479,46 +1479,46 @@
     },
     "border-top-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-top-color CSS property sets the color of an element's top border. It can also be set with the shorthand CSS properties border-color or border-top."
     },
     "border-right-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-right-color CSS property sets the color of an element's right border. It can also be set with the shorthand CSS properties border-color or border-right."
     },
     "border-bottom-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-bottom-color CSS property sets the color of an element's bottom border. It can also be set with the shorthand CSS properties border-color or border-bottom."
     },
     "border-left-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-left-color CSS property sets the color of an element's left border. It can also be set with the shorthand CSS properties border-color or border-left."
     },
     "border-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-color shorthand CSS property sets the color of an element's border."
     },
@@ -1555,13 +1555,13 @@
         "all",
         "sides",
         "corners",
-        "inherit",
-        "initial",
-        "unset",
         "top",
         "right",
         "bottom",
-        "left"
+        "left",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -1612,19 +1612,19 @@
     },
     "background-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The background-color CSS property sets the background color of an element."
     },
     "background-image": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The background-image CSS property sets one or more background images on an element."
     },
@@ -1666,12 +1666,12 @@
     },
     "background-size": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "cover",
-        "contain"
+        "contain",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-size CSS property sets the size of the element's background image."
     },
@@ -1775,64 +1775,61 @@
     },
     "border-top-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-top-width CSS property sets the width of the top border of an element."
     },
     "border-right-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-right-width CSS property sets the width of the right border of an element."
     },
     "border-bottom-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-bottom-width CSS property sets the width of the bottom border of an element."
     },
     "border-left-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-left-width CSS property sets the width of the left border of an element."
     },
     "border-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-width shorthand CSS property sets the width of an element's border."
     },
     "border-top": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
         "thick",
@@ -1846,15 +1843,15 @@
         "ridge",
         "inset",
         "outset",
-        "currentcolor"
+        "currentcolor",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-top shorthand CSS property sets all the properties of an element's top border."
     },
     "border-right": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
         "thick",
@@ -1868,15 +1865,15 @@
         "ridge",
         "inset",
         "outset",
-        "currentcolor"
+        "currentcolor",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-right shorthand CSS property sets all the properties of an element's right border."
     },
     "border-bottom": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
         "thick",
@@ -1890,15 +1887,15 @@
         "ridge",
         "inset",
         "outset",
-        "currentcolor"
+        "currentcolor",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-bottom shorthand CSS property sets an element's bottom border. It sets the values of border-bottom-width, border-bottom-style and border-bottom-color."
     },
     "border-left": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
         "thick",
@@ -1912,15 +1909,15 @@
         "ridge",
         "inset",
         "outset",
-        "currentcolor"
+        "currentcolor",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-left shorthand CSS property sets all the properties of an element's left border."
     },
     "border": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
         "thick",
@@ -1934,7 +1931,10 @@
         "ridge",
         "inset",
         "outset",
-        "currentcolor"
+        "currentcolor",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "CSSRef(CSS Borders)"
     },
@@ -1981,19 +1981,19 @@
     },
     "border-image-slice": {
       "values": [
+        "fill",
         "inherit",
         "initial",
-        "unset",
-        "fill"
+        "unset"
       ],
       "description": "The border-image-slice CSS property divides the image specified by border-image-source into regions. These regions form the components of an element's border image."
     },
     "border-image-width": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The border-image-width CSS property sets the width of an element's border image."
     },
@@ -2020,70 +2020,70 @@
     "border-image": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "fill",
         "auto",
         "stretch",
         "repeat",
         "round",
-        "space"
+        "space",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-image CSS property draws an image around a given element. It replaces the element's regular border."
     },
     "box-shadow": {
       "values": [
         "none",
+        "inset",
         "inherit",
         "initial",
-        "unset",
-        "inset"
+        "unset"
       ],
       "description": "The box-shadow CSS property adds shadow effects around an element's frame. You can set multiple effects separated by commas. A box shadow is described by X and Y offsets relative to the element, blur and spread radius, and color."
     },
     "margin-top": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-top CSS property sets the margin area on the top of an element. A positive value places it farther from its neighbors, while a negative value places it closer."
     },
     "margin-right": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-right CSS property sets the margin area on the right side of an element. A positive value places it farther from its neighbors, while a negative value places it closer."
     },
     "margin-bottom": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-bottom CSS property sets the margin area on the bottom of an element. A positive value places it farther from its neighbors, while a negative value places it closer."
     },
     "margin-left": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-left CSS property sets the margin area on the left side of an element. A positive value places it farther from its neighbors, while a negative value places it closer."
     },
     "margin": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin CSS shorthand property sets the margin area on all four sides of an element."
     },
@@ -2251,10 +2251,10 @@
         "normal",
         "light",
         "dark",
+        "only",
         "inherit",
         "initial",
-        "unset",
-        "only"
+        "unset"
       ],
       "description": "The color-scheme CSS property allows an element to indicate which color schemes it can comfortably be rendered in."
     },
@@ -2291,10 +2291,10 @@
     },
     "color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The color CSS property sets the foreground color value of an element's text and text decorations, and sets the currentcolor value. currentcolor may be used as an indirect value on _other_ properties and is the default for other color properties, such as border-color."
     },
@@ -2344,12 +2344,12 @@
     "container": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "size",
-        "inline-size"
+        "inline-size",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The container shorthand CSS property establishes the element as a query container and specifies the name or name for the containment context used in a container query."
     },
@@ -2431,9 +2431,6 @@
         "flex",
         "grid",
         "ruby",
-        "inherit",
-        "initial",
-        "unset",
         "list-item",
         "table-row-group",
         "table-header-group",
@@ -2452,17 +2449,20 @@
         "inline-block",
         "inline-table",
         "inline-flex",
-        "inline-grid"
+        "inline-grid",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The display CSS property sets whether an element is treated as a block or inline element and the layout used for its children, such as flow layout, grid or flex."
     },
     "order": {
       "values": [
+        "reading",
+        "layout",
         "inherit",
         "initial",
-        "unset",
-        "reading",
-        "layout"
+        "unset"
       ],
       "description": "The order CSS property sets the order to lay out an item in a flex or grid container. Items in a container are sorted by ascending order value and then by their source code order."
     },
@@ -2559,10 +2559,10 @@
     "flex": {
       "values": [
         "none",
+        "content",
         "inherit",
         "initial",
-        "unset",
-        "content"
+        "unset"
       ],
       "description": "The flex CSS shorthand property sets how a flex _item_ will grow or shrink to fit the space available in its flex container."
     },
@@ -2586,12 +2586,12 @@
       "values": [
         "content",
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The flex-basis CSS property sets the initial main size of a flex item. It sets the size of the content box unless otherwise set with box-sizing."
     },
@@ -2622,20 +2622,17 @@
       "values": [
         "normal",
         "bold",
+        "bolder",
+        "lighter",
         "inherit",
         "initial",
-        "unset",
-        "bolder",
-        "lighter"
+        "unset"
       ],
       "description": "The font-weight CSS property sets the weight (or boldness) of the font. The weights available depend on the font-family that is currently set."
     },
     "font-stretch": {
       "values": [
         "normal",
-        "inherit",
-        "initial",
-        "unset",
         "ultra-condensed",
         "extra-condensed",
         "condensed",
@@ -2643,7 +2640,10 @@
         "semi-expanded",
         "expanded",
         "extra-expanded",
-        "ultra-expanded"
+        "ultra-expanded",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-stretch CSS property selects a normal, condensed, or expanded face from a font."
     },
@@ -2660,10 +2660,10 @@
     },
     "font-size": {
       "values": [
+        "math",
         "inherit",
         "initial",
-        "unset",
-        "math"
+        "unset"
       ],
       "description": "The font-size CSS property sets the size of the font. Changing the font size also updates the sizes of the font size-relative &lt;length&gt; units, such as em, ex, and so forth."
     },
@@ -2672,9 +2672,6 @@
         "normal",
         "italic",
         "oblique",
-        "inherit",
-        "initial",
-        "unset",
         "small-caps",
         "bolder",
         "lighter",
@@ -2692,7 +2689,10 @@
         "menu",
         "message-box",
         "small-caption",
-        "status-bar"
+        "status-bar",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font CSS shorthand property sets all the different properties of an element's font. Alternatively, it sets an element's font to a system font."
     },
@@ -2813,16 +2813,16 @@
     "font-variant-alternates": {
       "values": [
         "normal",
-        "inherit",
-        "initial",
-        "unset",
         "stylistic()",
         "historical-forms",
         "styleset(",
         "character-variant(",
         "swash()",
         "ornaments()",
-        "annotation()"
+        "annotation()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-alternates CSS property controls the usage of alternate glyphs. These alternate glyphs may be referenced by alternative names defined in @font-feature-values."
     },
@@ -2862,9 +2862,6 @@
         "all-petite-caps",
         "unicase",
         "titling-caps",
-        "inherit",
-        "initial",
-        "unset",
         "stylistic()",
         "historical-forms",
         "styleset(",
@@ -2893,7 +2890,10 @@
         "super",
         "text",
         "emoji",
-        "unicode"
+        "unicode",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant CSS shorthand property allows you to set all the font variants for a font."
     },
@@ -2986,15 +2986,15 @@
         "inline-start",
         "inline-end",
         "snap-block",
-        "inherit",
-        "initial",
-        "unset",
         "snap-inline",
         "left",
         "right",
         "top",
         "bottom",
-        "none"
+        "none",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The float CSS property places an element on the left or right side of its container, allowing text and inline elements to wrap around it. The element is removed from the normal flow of the page, though still remaining a part of the flow (in contrast to absolute positioning."
     },
@@ -3023,20 +3023,20 @@
     "grid-template-columns": {
       "values": [
         "none",
+        "subgrid",
         "inherit",
         "initial",
-        "unset",
-        "subgrid"
+        "unset"
       ],
       "description": "The grid-template-columns CSS property defines the line names and track sizing functions of the glossary(grid column, grid columns)."
     },
     "grid-template-rows": {
       "values": [
         "none",
+        "subgrid",
         "inherit",
         "initial",
-        "unset",
-        "subgrid"
+        "unset"
       ],
       "description": "The grid-template-rows CSS property defines the line names and track sizing functions of the glossary(grid_row, grid rows)."
     },
@@ -3109,32 +3109,32 @@
     "grid-template": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "subgrid",
         "minmax(",
-        "fit-content("
+        "fit-content(",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The grid-template CSS property is a shorthand property for defining glossary(grid column, grid columns), glossary(grid_row, grid rows), and glossary(grid areas, grid areas)."
     },
     "grid-auto-columns": {
       "values": [
+        "minmax(",
+        "fit-content(",
         "inherit",
         "initial",
-        "unset",
-        "minmax(",
-        "fit-content("
+        "unset"
       ],
       "description": "The grid-auto-columns CSS property specifies the size of an implicitly-created grid column glossary(grid tracks, track) or pattern of tracks."
     },
     "grid-auto-rows": {
       "values": [
+        "minmax(",
+        "fit-content(",
         "inherit",
         "initial",
-        "unset",
-        "minmax(",
-        "fit-content("
+        "unset"
       ],
       "description": "The grid-auto-rows CSS property specifies the size of an implicitly-created grid row glossary(grid tracks, track) or pattern of tracks."
     },
@@ -3152,12 +3152,12 @@
     "grid": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "subgrid",
         "auto-flow",
-        "dense"
+        "dense",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The grid CSS property is a shorthand property that sets all of the explicit and implicit grid properties in a single declaration."
     },
@@ -3233,10 +3233,10 @@
     "image-resolution": {
       "values": [
         "from-image",
+        "snap",
         "inherit",
         "initial",
-        "unset",
-        "snap"
+        "unset"
       ],
       "description": "The image-resolution CSS property specifies the intrinsic resolution of all raster images used in or on the element. It affects content images such as replaced elements and generated content, and decorative images such as background-image images."
     },
@@ -3266,10 +3266,10 @@
       "values": [
         "from-image",
         "none",
+        "flip",
         "inherit",
         "initial",
-        "unset",
-        "flip"
+        "unset"
       ],
       "description": "The image-orientation CSS property specifies a layout-independent correction to the orientation of an image."
     },
@@ -3315,14 +3315,14 @@
         "central",
         "mathematical",
         "text-top",
-        "inherit",
-        "initial",
-        "unset",
         "sub",
         "super",
         "top",
         "center",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The vertical-align CSS property sets vertical alignment of an inline, inline-block or table-cell box."
     },
@@ -3355,14 +3355,14 @@
     },
     "baseline-shift": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "sub",
         "super",
         "top",
         "center",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -3415,11 +3415,11 @@
     "initial-letter": {
       "values": [
         "normal",
+        "drop",
+        "raise",
         "inherit",
         "initial",
-        "unset",
-        "drop",
-        "raise"
+        "unset"
       ],
       "description": "The initial-letter CSS property sets styling for dropped, raised, and sunken initial letters."
     },
@@ -3495,19 +3495,19 @@
     },
     "list-style-image": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The list-style-image CSS property sets an image to be used as the list item marker."
     },
     "list-style-type": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The list-style-type CSS property sets the marker (such as a disc, character, or custom counter style) of a list item element."
     },
@@ -3525,10 +3525,10 @@
       "values": [
         "inside",
         "outside",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The list-style CSS shorthand property allows you to set all the list style properties at once."
     },
@@ -3544,155 +3544,155 @@
     },
     "counter-reset": {
       "values": [
+        "reversed(",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "reversed(",
-        "none"
+        "unset"
       ],
       "description": "The counter-reset CSS property resets a CSS counter to a given value."
     },
     "counter-increment": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The counter-increment CSS property increases or decreases the value of a CSS counter by a given value."
     },
     "counter-set": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The counter-set CSS property sets a CSS counter to a given value. It manipulates the value of existing counters, and will only create new counters if there isn't already a counter of the given name on the element."
     },
     "block-size": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The block-size CSS property defines the horizontal or vertical size of an element's block, depending on its writing mode. It corresponds to either the width or the height property, depending on the value of writing-mode."
     },
     "inline-size": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The inline-size CSS property defines the horizontal or vertical size of an element's block, depending on its writing mode. It corresponds to either the width or the height property, depending on the value of writing-mode."
     },
     "min-block-size": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The min-block-size CSS property defines the minimum horizontal or vertical size of an element's block, depending on its writing mode. It corresponds to either the min-width or the min-height property, depending on the value of writing-mode."
     },
     "min-inline-size": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The min-inline-size CSS property defines the horizontal or vertical minimal size of an element's block, depending on its writing mode. It corresponds to either the min-width or the min-height property, depending on the value of writing-mode."
     },
     "max-block-size": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The max-block-size CSS property specifies the maximum size of an element in the direction opposite that of the writing direction as specified by writing-mode. That is, if the writing direction is horizontal, then max-block-size is equivalent to max-height; if the writing direction is vertical, max-block-size is the same as max-width."
     },
     "max-inline-size": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The max-inline-size CSS property defines the horizontal or vertical maximum size of an element's block, depending on its writing mode. It corresponds to either the max-width or the max-height property, depending on the value of writing-mode."
     },
     "margin-block-start": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-block-start CSS property defines the logical block start margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation."
     },
     "margin-block-end": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-block-end CSS property defines the logical block end margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation."
     },
     "margin-inline-start": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-inline-start CSS property defines the logical inline start margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation. It corresponds to the margin-top, margin-right, margin-bottom, or margin-left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "margin-inline-end": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-inline-end CSS property defines the logical inline end margin of an element, which maps to a physical margin depending on the element's writing mode, directionality, and text orientation. In other words, it corresponds to the margin-top, margin-right, margin-bottom or margin-left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "margin-block": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-block CSS shorthand property defines the logical block start and end margins of an element, which maps to physical margins depending on the element's writing mode, directionality, and text orientation."
     },
     "margin-inline": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The margin-inline CSS shorthand property is a shorthand property that defines both the logical inline start and end margins of an element, which maps to physical margins depending on the element's writing mode, directionality, and text orientation."
     },
@@ -3890,37 +3890,37 @@
     },
     "border-block-start": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-block-start CSS property is a shorthand property for setting the individual logical block-start border property values in a single place in the style sheet."
     },
     "border-block-end": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-block-end CSS property is a shorthand property for setting the individual logical block-end border property values in a single place in the style sheet."
     },
     "border-inline-start": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-inline-start CSS property is a shorthand property for setting the individual logical inline-start border property values in a single place in the style sheet."
     },
     "border-inline-end": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The border-inline-end CSS property is a shorthand property for setting the individual logical inline-end border property values in a single place in the style sheet."
     },
@@ -3974,13 +3974,13 @@
     },
     "clip-path": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "fill-box",
         "stroke-box",
         "view-box",
-        "none"
+        "none",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The clip-path CSS property creates a clipping region that sets what part of an element should be shown. Parts that are inside the region are shown, while those outside are hidden."
     },
@@ -4043,35 +4043,35 @@
     },
     "mask-clip": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "fill-box",
         "stroke-box",
         "view-box",
-        "no-clip"
+        "no-clip",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-clip CSS property determines the area which is affected by a mask. The painted content of an element must be restricted to this area."
     },
     "mask-origin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "fill-box",
         "stroke-box",
-        "view-box"
+        "view-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-origin CSS property sets the origin of a mask."
     },
     "mask-size": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "cover",
-        "contain"
+        "contain",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-size CSS property specifies the sizes of the mask images. The size of the image can be fully or partially constrained in order to preserve its intrinsic ratio."
     },
@@ -4089,10 +4089,10 @@
     },
     "mask": {
       "values": [
+        "no-clip",
         "inherit",
         "initial",
-        "unset",
-        "no-clip"
+        "unset"
       ],
       "description": "The mask CSS shorthand property hides an element (partially or fully) by masking or clipping the image at specific points."
     },
@@ -4117,19 +4117,19 @@
     },
     "mask-border-slice": {
       "values": [
+        "fill",
         "inherit",
         "initial",
-        "unset",
-        "fill"
+        "unset"
       ],
       "description": "The mask-border-slice CSS property divides the image set by mask-border-source into regions. These regions are used to form the components of an element's mask border."
     },
     "mask-border-width": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The mask-border-width CSS property sets the width of an element's mask border."
     },
@@ -4156,9 +4156,6 @@
     "mask-border": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "fill",
         "auto",
         "stretch",
@@ -4166,7 +4163,10 @@
         "round",
         "space",
         "luminance",
-        "alpha"
+        "alpha",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-border CSS shorthand property lets you create a mask along the edge of an element's border."
     },
@@ -4182,21 +4182,21 @@
     },
     "clip": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "> Warning: Where possible, authors are encouraged to use the newer clip-path property instead."
     },
     "column-span": {
       "values": [
         "none",
+        "all",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "all",
-        "auto"
+        "unset"
       ],
       "description": "The column-span CSS property makes it possible for an element to span across all columns when its value is set to all."
     },
@@ -4220,19 +4220,19 @@
     },
     "columns": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The columns CSS shorthand property sets the number of columns to use when drawing an element's contents, as well as those columns' widths."
     },
     "column-rule-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The column-rule-color CSS property sets the color of the line drawn between columns in a multi-column layout."
     },
@@ -4256,12 +4256,12 @@
     },
     "column-rule-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The column-rule-width CSS property sets the width of the line drawn between columns in a multi-column layout."
     },
@@ -4440,10 +4440,10 @@
       "values": [
         "clip",
         "ellipsis",
+        "fade",
         "inherit",
         "initial",
-        "unset",
-        "fade"
+        "unset"
       ],
       "description": "The text-overflow CSS property sets how hidden overflow content is signaled to users. It can be clipped, display an ellipsis ('…'), or display a custom string."
     },
@@ -4460,10 +4460,10 @@
     "line-clamp": {
       "values": [
         "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
@@ -4671,11 +4671,11 @@
     },
     "float-defer": {
       "values": [
+        "last",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "last",
-        "none"
+        "unset"
       ],
       "description": ""
     },
@@ -4795,20 +4795,20 @@
     "flow-into": {
       "values": [
         "none",
+        "element",
+        "content",
         "inherit",
         "initial",
-        "unset",
-        "element",
-        "content"
+        "unset"
       ],
       "description": ""
     },
     "flow-from": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
@@ -4867,9 +4867,6 @@
     "block-step": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "margin",
         "padding",
         "auto",
@@ -4878,7 +4875,10 @@
         "end",
         "up",
         "down",
-        "nearest"
+        "nearest",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5256,10 +5256,10 @@
     "scrollbar-color": {
       "values": [
         "auto",
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The scrollbar-color CSS property sets the color of the scrollbar track and thumb."
     },
@@ -5278,11 +5278,11 @@
       "values": [
         "auto",
         "outside-shape",
+        "shape-box",
+        "display",
         "inherit",
         "initial",
-        "unset",
-        "shape-box",
-        "display"
+        "unset"
       ],
       "description": ""
     },
@@ -5297,10 +5297,10 @@
     "shape-outside": {
       "values": [
         "none",
+        "margin-box",
         "inherit",
         "initial",
-        "unset",
-        "margin-box"
+        "unset"
       ],
       "description": "The shape-outside CSS property defines a shape—which may be non-rectangular—around which adjacent inline content should wrap. By default, inline content wraps around its margin box; shape-outside provides a way to customize this wrapping, making it possible to wrap text around complex objects rather than simple boxes."
     },
@@ -5333,72 +5333,72 @@
     "width": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The width CSS property sets an element's width. By default, it sets the width of the content area, but if box-sizing is set to border-box, it sets the width of the border area."
     },
     "height": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The height CSS property specifies the height of an element. By default, the property defines the height of the content area. If box-sizing is set to border-box, however, it instead determines the height of the border area."
     },
     "min-width": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The min-width CSS property sets the minimum width of an element. It prevents the used value of the width property from becoming smaller than the value specified for min-width."
     },
     "min-height": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The min-height CSS property sets the minimum height of an element. It prevents the used value of the height property from becoming smaller than the value specified for min-height."
     },
     "max-width": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The max-width CSS property sets the maximum width of an element. It prevents the used value of the width property from becoming larger than the value specified by max-width."
     },
     "max-height": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "min-content",
         "max-content",
-        "fit-content()"
+        "fit-content()",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The max-height CSS property sets the maximum height of an element. It prevents the used value of the height property from becoming larger than the value specified for max-height."
     },
@@ -5414,50 +5414,50 @@
     "contain-intrinsic-width": {
       "values": [
         "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The contain-intrinsic-width CSS property sets the width of an element that a browser will use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-height": {
       "values": [
         "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The contain-intrinsic-length CSS property sets the height of an element that a browser can use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-block-size": {
       "values": [
         "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The contain-intrinsic-block-size CSS logical property defines the block size of an element that a browser can use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-inline-size": {
       "values": [
         "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The contain-intrinsic-inline-size CSS logical property defines the inline-size of an element that a browser can use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-size": {
       "values": [
         "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The contain-intrinsic-size CSS shorthand property sets the size of an element that a browser will use for layout when the element is subject to size containment."
     },
@@ -5498,14 +5498,14 @@
     },
     "voice-balance": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "leftwards",
-        "rightwards"
+        "rightwards",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5535,121 +5535,121 @@
     },
     "pause-before": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "x-weak",
         "weak",
         "medium",
         "strong",
-        "x-strong"
+        "x-strong",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "pause-after": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "x-weak",
         "weak",
         "medium",
         "strong",
-        "x-strong"
+        "x-strong",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "pause": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "x-weak",
         "weak",
         "medium",
         "strong",
-        "x-strong"
+        "x-strong",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "rest-before": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "x-weak",
         "weak",
         "medium",
         "strong",
-        "x-strong"
+        "x-strong",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "rest-after": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "x-weak",
         "weak",
         "medium",
         "strong",
-        "x-strong"
+        "x-strong",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "rest": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "x-weak",
         "weak",
         "medium",
         "strong",
-        "x-strong"
+        "x-strong",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "cue-before": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "cue-after": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "cue": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "voice-family": {
       "values": [
+        "preserve",
         "inherit",
         "initial",
-        "unset",
-        "preserve"
+        "unset"
       ],
       "description": ""
     },
@@ -5669,29 +5669,29 @@
     },
     "voice-pitch": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "absolute",
         "x-low",
         "low",
         "medium",
         "high",
-        "x-high"
+        "x-high",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "voice-range": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "absolute",
         "x-low",
         "low",
         "medium",
         "high",
-        "x-high"
+        "x-high",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5783,10 +5783,10 @@
       "values": [
         "normal",
         "manual",
+        "auto()",
         "inherit",
         "initial",
-        "unset",
-        "auto()"
+        "unset"
       ],
       "description": ""
     },
@@ -6012,12 +6012,12 @@
         "left",
         "right",
         "center",
-        "inherit",
-        "initial",
-        "unset",
         "justify",
         "match-parent",
-        "justify-all"
+        "justify-all",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-align CSS property sets the horizontal alignment of the inline-level content inside a block element or table-cell box. This means it works like vertical-align but in the horizontal direction."
     },
@@ -6129,11 +6129,11 @@
     },
     "text-indent": {
       "values": [
+        "hanging",
+        "each-line",
         "inherit",
         "initial",
-        "unset",
-        "hanging",
-        "each-line"
+        "unset"
       ],
       "description": "The text-indent CSS property sets the length of empty space (indentation) that is put before lines of text in a block."
     },
@@ -6180,10 +6180,10 @@
     },
     "text-decoration-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The text-decoration-color CSS property sets the color of decorations added to text by  cssxref(text-decoration-line) ."
     },
@@ -6204,6 +6204,8 @@
         "overline",
         "line-through",
         "blink",
+        "auto",
+        "from-font",
         "solid",
         "double",
         "dotted",
@@ -6239,10 +6241,10 @@
     },
     "text-decoration-trim": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
@@ -6321,10 +6323,10 @@
     },
     "text-emphasis-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The text-emphasis-color CSS property sets the color of emphasis marks. This value can also be set using the text-emphasis shorthand."
     },
@@ -6371,10 +6373,10 @@
     "text-shadow": {
       "values": [
         "none",
+        "inset",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The text-shadow CSS property adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations. Each shadow is described by some combination of X and Y offsets from the element, blur radius, and color."
     },
@@ -6528,22 +6530,22 @@
     },
     "outline": {
       "values": [
+        "invert",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "invert",
-        "auto"
+        "unset"
       ],
       "description": "The outline CSS shorthand property sets most of the outline properties in a single declaration."
     },
     "outline-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "thin",
         "medium",
-        "thick"
+        "thick",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The CSS outline-width property sets the thickness of an element's outline. An outline is a line that is drawn around an element, outside the border."
     },
@@ -6558,11 +6560,11 @@
     },
     "outline-color": {
       "values": [
+        "currentcolor",
+        "invert",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor",
-        "invert"
+        "unset"
       ],
       "description": "The outline-color CSS property sets the color of an element's outline."
     },
@@ -6591,9 +6593,6 @@
     "cursor": {
       "values": [
         "url(",
-        "inherit",
-        "initial",
-        "unset",
         "src(",
         "auto",
         "default",
@@ -6630,17 +6629,20 @@
         "row-resize",
         "all-scroll",
         "zoom-in",
-        "zoom-out"
+        "zoom-out",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The cursor CSS property sets the mouse cursor, if any, to show when the mouse pointer is over an element."
     },
     "caret-color": {
       "values": [
         "auto",
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The caret-color CSS property sets the color of the insertion caret, the visible marker where the next character typed will be inserted. This is sometimes referred to as the text input cursor. The caret appears in elements such as input or those with the contenteditable attribute. The caret is typically a thin vertical line that flashes to help make it more noticeable. By default, it is black, but its color can be altered with this property."
     },
@@ -6659,56 +6661,56 @@
     "caret": {
       "values": [
         "auto",
-        "inherit",
-        "initial",
-        "unset",
         "bar",
         "block",
-        "underscore"
+        "underscore",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "nav-up": {
       "values": [
         "auto",
+        "current",
+        "root",
         "inherit",
         "initial",
-        "unset",
-        "current",
-        "root"
+        "unset"
       ],
       "description": ""
     },
     "nav-right": {
       "values": [
         "auto",
+        "current",
+        "root",
         "inherit",
         "initial",
-        "unset",
-        "current",
-        "root"
+        "unset"
       ],
       "description": ""
     },
     "nav-down": {
       "values": [
         "auto",
+        "current",
+        "root",
         "inherit",
         "initial",
-        "unset",
-        "current",
-        "root"
+        "unset"
       ],
       "description": ""
     },
     "nav-left": {
       "values": [
         "auto",
+        "current",
+        "root",
         "inherit",
         "initial",
-        "unset",
-        "current",
-        "root"
+        "unset"
       ],
       "description": ""
     },
@@ -6728,10 +6730,10 @@
     "accent-color": {
       "values": [
         "auto",
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": "The accent-color CSS property sets the accent color for user-interface controls generated by some elements."
     },
@@ -6885,10 +6887,10 @@
     },
     "fill-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": ""
     },
@@ -6930,12 +6932,12 @@
     },
     "fill-size": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "cover",
-        "contain"
+        "contain",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7065,10 +7067,10 @@
     },
     "stroke-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": ""
     },
@@ -7110,12 +7112,12 @@
     },
     "stroke-size": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "cover",
-        "contain"
+        "contain",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7161,10 +7163,10 @@
     },
     "flood-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": ""
     },
@@ -7189,10 +7191,10 @@
     },
     "lighting-color": {
       "values": [
+        "currentcolor",
         "inherit",
         "initial",
-        "unset",
-        "currentcolor"
+        "unset"
       ],
       "description": ""
     },
@@ -7219,19 +7221,16 @@
     "math-depth": {
       "values": [
         "auto-add",
+        "add()",
         "inherit",
         "initial",
-        "unset",
-        "add()"
+        "unset"
       ],
       "description": "The math-depth property describes a notion of _depth_ for each element of a mathematical formula, with respect to the top-level container of that formula. Concretely, this is used to determine the computed value of the font-size property when its specified value is math."
     },
     "offset-path": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "url(",
         "src(",
         "content-box",
@@ -7239,7 +7238,10 @@
         "border-box",
         "fill-box",
         "stroke-box",
-        "view-box"
+        "view-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The offset-path CSS property specifies a motion path for an element to follow and defines the element's positioning within the parent container or SVG coordinate system."
     },
@@ -7292,11 +7294,11 @@
     "offset": {
       "values": [
         "auto",
+        "none",
+        "reverse",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "reverse"
+        "unset"
       ],
       "description": "The offset CSS shorthand property sets all the properties required for animating an element along a defined path."
     },
@@ -7324,13 +7326,13 @@
     "scroll-timeline": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "block",
         "inline",
         "vertical",
-        "horizontal"
+        "horizontal",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The scroll-timeline CSS shorthand property defines a name that can be used to identify the source element of a scroll timeline, along with the scrollbar axis that should provide the timeline."
     },
@@ -7367,13 +7369,13 @@
     "view-timeline": {
       "values": [
         "none",
-        "inherit",
-        "initial",
-        "unset",
         "block",
         "inline",
         "vertical",
-        "horizontal"
+        "horizontal",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
