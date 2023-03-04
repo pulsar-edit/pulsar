@@ -141,6 +141,287 @@
     "xmp"
   ],
   "properties": {
+    "z-index": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto"
+      ],
+      "description": "The z-index CSS property sets the z-order of a positioned element and its descendants or flex items. Overlapping elements with a larger z-index cover those with a smaller one."
+    },
+    "page-break-before": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto",
+        "always",
+        "avoid",
+        "left",
+        "right"
+      ],
+      "description": "> Warning: This property has been replaced by the break-before property."
+    },
+    "page-break-after": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto",
+        "always",
+        "avoid",
+        "left",
+        "right"
+      ],
+      "description": "> Warning: This property has been replaced by the break-after property."
+    },
+    "page-break-inside": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "avoid",
+        "auto"
+      ],
+      "description": "> Warning: This property has been replaced by the break-inside property."
+    },
+    "cx": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "cy": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "r": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "rx": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto"
+      ],
+      "description": ""
+    },
+    "ry": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto"
+      ],
+      "description": ""
+    },
+    "x": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "y": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "vector-effect": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none",
+        "non-scaling-stroke",
+        "non-scaling-size",
+        "non-rotation",
+        "fixed-position"
+      ],
+      "description": ""
+    },
+    "d": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "shape-subtract": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "text-anchor": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "start",
+        "middle",
+        "end"
+      ],
+      "description": ""
+    },
+    "fill": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "stroke": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "marker-start": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "marker-mid": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "marker-end": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "marker": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "none"
+      ],
+      "description": ""
+    },
+    "paint-order": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "normal",
+        "fill",
+        "stroke",
+        "markers"
+      ],
+      "description": "The paint-order CSS property lets you control the order in which the fill and stroke (and painting markers) of text content and shapes are drawn."
+    },
+    "color-interpolation": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto",
+        "sRGB",
+        "linearRGB"
+      ],
+      "description": ""
+    },
+    "shape-rendering": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto",
+        "optimizeSpeed",
+        "crispEdges",
+        "geometricPrecision"
+      ],
+      "description": ""
+    },
+    "text-rendering": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto",
+        "optimizeSpeed",
+        "optimizeLegibility",
+        "geometricPrecision"
+      ],
+      "description": "The text-rendering CSS property provides information to the rendering engine about what to optimize for when rendering text."
+    },
+    "pointer-events": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset",
+        "auto",
+        "bounding-box",
+        "visiblePainted",
+        "visibleFill",
+        "visibleStroke",
+        "visible",
+        "painted",
+        "fill",
+        "stroke",
+        "all",
+        "none"
+      ],
+      "description": "The pointer-events CSS property sets under what circumstances (if any) a particular graphic element can become the target of pointer events."
+    },
+    "stop-color": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "stop-opacity": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
     "-webkit-text-fill-color": {
       "values": [
         "inherit",
@@ -6581,51 +6862,6 @@
       ],
       "description": "The text-combine-upright CSS property sets the combination of characters into the space of a single character. If the combined text is wider than 1em, the user agent must fit the contents within 1em. The resulting composition is treated as a single upright glyph for layout and decoration. This property only has an effect in vertical writing modes."
     },
-    "z-index": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto"
-      ],
-      "description": "The z-index CSS property sets the z-order of a positioned element and its descendants or flex items. Overlapping elements with a larger z-index cover those with a smaller one."
-    },
-    "page-break-before": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto",
-        "always",
-        "avoid",
-        "left",
-        "right"
-      ],
-      "description": "> Warning: This property has been replaced by the break-before property."
-    },
-    "page-break-after": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto",
-        "always",
-        "avoid",
-        "left",
-        "right"
-      ],
-      "description": "> Warning: This property has been replaced by the break-after property."
-    },
-    "page-break-inside": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "avoid",
-        "auto"
-      ],
-      "description": "> Warning: This property has been replaced by the break-inside property."
-    },
     "fill-rule": {
       "values": [
         "inherit",
@@ -7198,242 +7434,6 @@
         "compress",
         "dashes",
         "gaps"
-      ],
-      "description": ""
-    },
-    "cx": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "cy": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "r": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "rx": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto"
-      ],
-      "description": ""
-    },
-    "ry": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto"
-      ],
-      "description": ""
-    },
-    "x": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "y": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "vector-effect": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none",
-        "non-scaling-stroke",
-        "non-scaling-size",
-        "non-rotation",
-        "fixed-position"
-      ],
-      "description": ""
-    },
-    "d": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "shape-subtract": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "text-anchor": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "start",
-        "middle",
-        "end"
-      ],
-      "description": ""
-    },
-    "fill": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "stroke": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "marker-start": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "marker-mid": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "marker-end": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "marker": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "none"
-      ],
-      "description": ""
-    },
-    "paint-order": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "normal",
-        "fill",
-        "stroke",
-        "markers"
-      ],
-      "description": "The paint-order CSS property lets you control the order in which the fill and stroke (and painting markers) of text content and shapes are drawn."
-    },
-    "color-interpolation": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto",
-        "sRGB",
-        "linearRGB"
-      ],
-      "description": ""
-    },
-    "shape-rendering": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto",
-        "optimizeSpeed",
-        "crispEdges",
-        "geometricPrecision"
-      ],
-      "description": ""
-    },
-    "text-rendering": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto",
-        "optimizeSpeed",
-        "optimizeLegibility",
-        "geometricPrecision"
-      ],
-      "description": "The text-rendering CSS property provides information to the rendering engine about what to optimize for when rendering text."
-    },
-    "pointer-events": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset",
-        "auto",
-        "bounding-box",
-        "visiblePainted",
-        "visibleFill",
-        "visibleStroke",
-        "visible",
-        "painted",
-        "fill",
-        "stroke",
-        "all",
-        "none"
-      ],
-      "description": "The pointer-events CSS property sets under what circumstances (if any) a particular graphic element can become the target of pointer events."
-    },
-    "stop-color": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "stop-opacity": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
       ],
       "description": ""
     }
