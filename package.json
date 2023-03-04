@@ -149,7 +149,7 @@
     "service-hub": "^0.7.4",
     "settings-view": "file:packages/settings-view",
     "sinon": "9.2.1",
-    "snippets": "https://github.com/pulsar-edit/snippets.git#fe00fd6",
+    "snippets": "github:pulsar-edit/snippets#bb00f909c6c645b173f27346875d8fa0c7af09f7",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1",

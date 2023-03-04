@@ -8694,9 +8694,9 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@https://github.com/pulsar-edit/snippets.git#fe00fd6":
-  version "1.6.1"
-  resolved "https://github.com/pulsar-edit/snippets.git#fe00fd6933fa33f819d14cdd6938d538d25ba1dd"
+"snippets@github:pulsar-edit/snippets#bb00f909c6c645b173f27346875d8fa0c7af09f7":
+  version "1.7.0"
+  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/bb00f909c6c645b173f27346875d8fa0c7af09f7"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
