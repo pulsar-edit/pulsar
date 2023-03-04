@@ -99,7 +99,7 @@ if [ $OS == 'Mac' ]; then
       PULSAR_PATH="$HOME/Applications"
     else
       # We haven't found an Pulsar.app, use spotlight to search for Pulsar
-      PULSAR_PATH="$(mdfind "kMDItemCFBundleIdentifier == 'com.github.pulsar'" | grep -v ShipIt | head -1 | xargs -0 dirname)"
+      PULSAR_PATH="$(mdfind "kMDItemCFBundleIdentifier == 'dev.pulsar_edit.Pulsar'" | grep -v ShipIt | head -1 | xargs -0 dirname)"
 
       # Exit if Pulsar can't be found
       if [ ! -x "$PULSAR_PATH/$ATOM_APP_NAME" ]; then
