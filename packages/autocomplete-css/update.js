@@ -181,13 +181,14 @@ function getValuesOfProp(value, allValues) {
   // Like mentioned above `value` = "value1 | value2 | <valueGroupName>"
   // https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
 
-  // We will first insert the implicitly defined keywords that apply to all CSS properties
-  let values = [ "inherit", "initial", "unset" ];
+  // We will at least supply the implicitly defined keywords that apply to all CSS properties
+  let implicitValues = [ "inherit", "initial", "unset" ];
 
   if (!value || value.length < 0) {
-    return values;
+    return implicitValues;
   }
 
+  let values = [];
   let parser = new CSSParser(value);
 
   let rawArrayValues = parser.parse();
@@ -205,6 +206,8 @@ function getValuesOfProp(value, allValues) {
     }
   }
 
+  // Add the implicit values to the end...
+  values = values.concat(implicitValues);
   return values;
 
 }

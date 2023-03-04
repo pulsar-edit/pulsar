@@ -143,46 +143,46 @@
   "properties": {
     "z-index": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The z-index CSS property sets the z-order of a positioned element and its descendants or flex items. Overlapping elements with a larger z-index cover those with a smaller one."
     },
     "page-break-before": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "always",
         "avoid",
         "left",
-        "right"
+        "right",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "> Warning: This property has been replaced by the break-before property."
     },
     "page-break-after": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "always",
         "avoid",
         "left",
-        "right"
+        "right",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "> Warning: This property has been replaced by the break-after property."
     },
     "page-break-inside": {
       "values": [
+        "avoid",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "avoid",
-        "auto"
+        "unset"
       ],
       "description": "> Warning: This property has been replaced by the break-inside property."
     },
@@ -246,152 +246,149 @@
     },
     "vector-effect": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "non-scaling-stroke",
         "non-scaling-size",
         "non-rotation",
-        "fixed-position"
+        "fixed-position",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "d": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "shape-subtract": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "text-anchor": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "start",
         "middle",
-        "end"
+        "end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "fill": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "stroke": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "marker-start": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "marker-mid": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "marker-end": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "marker": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "paint-order": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "fill",
         "stroke",
-        "markers"
+        "markers",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The paint-order CSS property lets you control the order in which the fill and stroke (and painting markers) of text content and shapes are drawn."
     },
     "color-interpolation": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "sRGB",
-        "linearRGB"
+        "linearRGB",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "shape-rendering": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "optimizeSpeed",
         "crispEdges",
-        "geometricPrecision"
+        "geometricPrecision",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-rendering": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "optimizeSpeed",
         "optimizeLegibility",
-        "geometricPrecision"
+        "geometricPrecision",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-rendering CSS property provides information to the rendering engine about what to optimize for when rendering text."
     },
     "pointer-events": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "bounding-box",
         "visiblePainted",
@@ -402,7 +399,10 @@
         "fill",
         "stroke",
         "all",
-        "none"
+        "none",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The pointer-events CSS property sets under what circumstances (if any) a particular graphic element can become the target of pointer events."
     },
@@ -465,9 +465,6 @@
     },
     "touch-action": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "none",
         "pan-x",
@@ -477,7 +474,10 @@
         "pan-up",
         "pan-down",
         "pinch-zoom",
-        "manipulation"
+        "manipulation",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The touch-action CSS property sets how an element's region can be manipulated by a touchscreen user (for example, by zooming features built into the browser)."
     },
@@ -987,9 +987,6 @@
     },
     "mix-blend-mode": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "multiply",
         "screen",
@@ -1006,6 +1003,9 @@
         "saturation",
         "color",
         "luminosity",
+        "inherit",
+        "initial",
+        "unset",
         "plus-darker",
         "plus-lighter"
       ],
@@ -1013,11 +1013,11 @@
     },
     "isolation": {
       "values": [
+        "auto",
+        "isolate",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "isolate"
+        "unset"
       ],
       "description": "The isolation CSS property determines whether an element must create a new glossary(stacking context)."
     },
@@ -1031,13 +1031,13 @@
     },
     "align-content": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "first",
         "last",
         "baseline",
+        "inherit",
+        "initial",
+        "unset",
         "space-between",
         "space-around",
         "space-evenly",
@@ -1054,14 +1054,14 @@
     },
     "justify-content": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "space-between",
         "space-around",
         "space-evenly",
         "stretch",
+        "inherit",
+        "initial",
+        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1076,10 +1076,10 @@
     },
     "place-content": {
       "values": [
+        "normal",
         "inherit",
         "initial",
         "unset",
-        "normal",
         "left",
         "right"
       ],
@@ -1087,15 +1087,15 @@
     },
     "justify-self": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "normal",
         "stretch",
         "first",
         "last",
         "baseline",
+        "inherit",
+        "initial",
+        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1112,15 +1112,15 @@
     },
     "align-self": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "normal",
         "stretch",
         "first",
         "last",
         "baseline",
+        "inherit",
+        "initial",
+        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1135,12 +1135,12 @@
     },
     "place-self": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "normal",
         "stretch",
+        "inherit",
+        "initial",
+        "unset",
         "left",
         "right"
       ],
@@ -1148,14 +1148,14 @@
     },
     "justify-items": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "stretch",
         "first",
         "last",
         "baseline",
+        "inherit",
+        "initial",
+        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1173,14 +1173,14 @@
     },
     "align-items": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "stretch",
         "first",
         "last",
         "baseline",
+        "inherit",
+        "initial",
+        "unset",
         "unsafe",
         "safe",
         "center",
@@ -1195,11 +1195,11 @@
     },
     "place-items": {
       "values": [
+        "normal",
+        "stretch",
         "inherit",
         "initial",
         "unset",
-        "normal",
-        "stretch",
         "left",
         "right",
         "legacy",
@@ -1209,28 +1209,28 @@
     },
     "row-gap": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The row-gap CSS property sets the size of the gap (gutters,gutter) between an element's rows."
     },
     "column-gap": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The column-gap CSS property sets the size of the gap (Gutters,gutter) between an element's columns."
     },
     "gap": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The gap CSS property sets the gaps (gutters) between rows and columns. It is a shorthand for row-gap and column-gap."
     },
@@ -1260,11 +1260,11 @@
     },
     "anchor-scroll": {
       "values": [
+        "none",
+        "default",
         "inherit",
         "initial",
         "unset",
-        "none",
-        "default",
         "implicit",
         "popover"
       ],
@@ -1272,10 +1272,10 @@
     },
     "anchor-name": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
@@ -1291,40 +1291,40 @@
     },
     "position-fallback": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "animation-composition": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "replace",
         "add",
-        "accumulate"
+        "accumulate",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The animation-composition CSS property specifies the Glossary(composite operation) to use when multiple animations affect the same property simultaneously."
     },
     "animation-timeline": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": "The animation-timeline CSS property specifies the timeline that is used to control the progress of an animation."
     },
     "animation-name": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The animation-name CSS property specifies the names of one or more @keyframes at-rules that describe the animation to apply to an element. Multiple @keyframe at-rules are specified as a comma-separated list of names. If the specified name does not match any @keyframe at-rule, no properties are animated."
     },
@@ -1338,41 +1338,41 @@
     },
     "animation-timing-function": {
       "values": [
+        "linear",
         "inherit",
         "initial",
-        "unset",
-        "linear"
+        "unset"
       ],
       "description": "The animation-timing-function CSS property sets how an animation progresses through the duration of each cycle."
     },
     "animation-iteration-count": {
       "values": [
+        "infinite",
         "inherit",
         "initial",
-        "unset",
-        "infinite"
+        "unset"
       ],
       "description": "The animation-iteration-count CSS property sets the number of times an animation sequence should be played before stopping."
     },
     "animation-direction": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "reverse",
         "alternate",
-        "alternate-reverse"
+        "alternate-reverse",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The animation-direction CSS property sets whether an animation should play forward, backward, or alternate back and forth between playing the sequence forward and backward."
     },
     "animation-play-state": {
       "values": [
+        "running",
+        "paused",
         "inherit",
         "initial",
-        "unset",
-        "running",
-        "paused"
+        "unset"
       ],
       "description": "The animation-play-state CSS property sets whether an animation is running or paused."
     },
@@ -1386,13 +1386,13 @@
     },
     "animation-fill-mode": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "forwards",
         "backwards",
-        "both"
+        "both",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The animation-fill-mode CSS property sets how a CSS animation applies styles to its target before and after its execution."
     },
@@ -1407,73 +1407,73 @@
     },
     "background-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-position CSS property sets the initial position for each background image. The position is relative to the position layer set by background-origin."
     },
     "background-position-x": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "center",
         "left",
         "right",
         "x-start",
-        "x-end"
+        "x-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-position-x CSS property sets the initial horizontal position for each background image. The position is relative to the position layer set by background-origin."
     },
     "background-position-y": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "center",
         "top",
         "bottom",
         "y-start",
-        "y-end"
+        "y-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-position-y CSS property sets the initial vertical position for each background image. The position is relative to the position layer set by background-origin."
     },
     "background-position-inline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "center",
         "start",
-        "end"
+        "end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "background-position-block": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "center",
         "start",
-        "end"
+        "end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "background-clip": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "border-box",
         "padding-box",
-        "content-box"
+        "content-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-clip CSS property sets whether an element's background extends underneath its border box, padding box, or content box."
     },
@@ -1532,32 +1532,32 @@
     },
     "corner-shape": {
       "values": [
+        "round",
+        "angle",
         "inherit",
         "initial",
-        "unset",
-        "round",
-        "angle"
+        "unset"
       ],
       "description": ""
     },
     "corners": {
       "values": [
+        "round",
+        "angle",
         "inherit",
         "initial",
-        "unset",
-        "round",
-        "angle"
+        "unset"
       ],
       "description": ""
     },
     "border-limit": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "all",
         "sides",
         "corners",
+        "inherit",
+        "initial",
+        "unset",
         "top",
         "right",
         "bottom",
@@ -1567,46 +1567,46 @@
     },
     "border-clip": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "border-clip-top": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "border-clip-right": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "border-clip-bottom": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "border-clip-left": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
@@ -1630,37 +1630,37 @@
     },
     "background-repeat": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "repeat-x",
         "repeat-y",
         "repeat",
         "space",
         "round",
-        "no-repeat"
+        "no-repeat",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-repeat CSS property sets how background images are repeated. A background image can be repeated along the horizontal and vertical axes, or not repeated at all."
     },
     "background-attachment": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "scroll",
         "fixed",
-        "local"
+        "local",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-attachment CSS property sets whether a background image's position is fixed within the viewport, or scrolls with its containing block."
     },
     "background-origin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "border-box",
         "padding-box",
-        "content-box"
+        "content-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The background-origin CSS property sets the background's origin: from the border start, inside the border, or inside the padding."
     },
@@ -1685,9 +1685,6 @@
     },
     "border-top-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "hidden",
         "dotted",
@@ -1697,15 +1694,15 @@
         "groove",
         "ridge",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-top-style CSS property sets the line style of an element's top border."
     },
     "border-right-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "hidden",
         "dotted",
@@ -1715,15 +1712,15 @@
         "groove",
         "ridge",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-right-style CSS property sets the line style of an element's right border."
     },
     "border-bottom-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "hidden",
         "dotted",
@@ -1733,15 +1730,15 @@
         "groove",
         "ridge",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-bottom-style CSS property sets the line style of an element's bottom border."
     },
     "border-left-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "hidden",
         "dotted",
@@ -1751,15 +1748,15 @@
         "groove",
         "ridge",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-left-style CSS property sets the line style of an element's left border."
     },
     "border-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "hidden",
         "dotted",
@@ -1769,7 +1766,10 @@
         "groove",
         "ridge",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-style shorthand CSS property sets the line style for all four sides of an element's border."
     },
@@ -1972,10 +1972,10 @@
     },
     "border-image-source": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The border-image-source CSS property sets the source image used to create an element's border image."
     },
@@ -2007,22 +2007,22 @@
     },
     "border-image-repeat": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "stretch",
         "repeat",
         "round",
-        "space"
+        "space",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The border-image-repeat CSS property defines how the edge regions and middle region of a source image are adjusted to fit the dimensions of an element's border image. The middle region can be displayed by using the keyword fill in the border-image-slice property."
     },
     "border-image": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "fill",
         "auto",
         "stretch",
@@ -2034,10 +2034,10 @@
     },
     "box-shadow": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "inset"
       ],
       "description": "The box-shadow CSS property adds shadow effects around an element's frame. You can set multiple effects separated by commas. A box shadow is described by X and Y offsets relative to the element, blur and spread radius, and color."
@@ -2089,16 +2089,16 @@
     },
     "margin-trim": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "block",
         "inline",
         "block-start",
         "inline-start",
         "block-end",
-        "inline-end"
+        "inline-end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The margin-trim property allows the container to trim the margins of its children where they adjoin the container's edges."
     },
@@ -2144,9 +2144,6 @@
     },
     "break-before": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "avoid",
         "always",
@@ -2160,15 +2157,15 @@
         "avoid-column",
         "column",
         "avoid-region",
-        "region"
+        "region",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The break-before CSS property sets how page, column, or region breaks should behave before a generated box. If there is no generated box, the property is ignored."
     },
     "break-after": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "avoid",
         "always",
@@ -2182,20 +2179,23 @@
         "avoid-column",
         "column",
         "avoid-region",
-        "region"
+        "region",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The break-after CSS property sets how page, column, or region breaks should behave after a generated box. If there is no generated box, the property is ignored."
     },
     "break-inside": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "avoid",
         "avoid-page",
         "avoid-column",
-        "avoid-region"
+        "avoid-region",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The break-inside CSS property sets how page, column, or region breaks should behave inside a generated box. If there is no generated box, the property is ignored."
     },
@@ -2217,29 +2217,29 @@
     },
     "margin-break": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "keep",
-        "discard"
+        "discard",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "box-decoration-break": {
       "values": [
+        "slice",
+        "clone",
         "inherit",
         "initial",
-        "unset",
-        "slice",
-        "clone"
+        "unset"
       ],
       "description": "The box-decoration-break CSS property specifies how an element's fragments should be rendered when broken across multiple lines, columns, or pages."
     },
     "all": {
       "values": [
-        "inherit",
         "initial",
+        "inherit",
         "unset",
         "revert",
         "revert-layer"
@@ -2248,44 +2248,44 @@
     },
     "color-scheme": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "light",
         "dark",
+        "inherit",
+        "initial",
+        "unset",
         "only"
       ],
       "description": "The color-scheme CSS property allows an element to indicate which color schemes it can comfortably be rendered in."
     },
     "forced-color-adjust": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "none",
-        "preserve-parent-color"
+        "preserve-parent-color",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The forced-color-adjust CSS property allows authors to opt certain elements out of forced colors mode. This then restores the control of those values to CSS."
     },
     "print-color-adjust": {
       "values": [
+        "economy",
+        "exact",
         "inherit",
         "initial",
-        "unset",
-        "economy",
-        "exact"
+        "unset"
       ],
       "description": "The print-color-adjust CSS property sets what, if anything, the Glossary(user agent) may do to optimize the appearance of the element on the output device."
     },
     "color-adjust": {
       "values": [
+        "economy",
+        "exact",
         "inherit",
         "initial",
-        "unset",
-        "economy",
-        "exact"
+        "unset"
       ],
       "description": ""
     },
@@ -2308,45 +2308,45 @@
     },
     "contain": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "strict",
         "content",
         "size",
         "layout",
         "style",
-        "paint"
+        "paint",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The contain CSS property indicates that an element and its contents are, as much as possible, independent from the rest of the document tree."
     },
     "container-type": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "size",
-        "inline-size"
+        "inline-size",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The container-type CSS property is used to define the type of containment used in a container query."
     },
     "container-name": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The container-name CSS property specifies a list of query container names used by the [@container](/en-US/docs/Web/CSS/@container) at-rule in a container query."
     },
     "container": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "normal",
         "size",
         "inline-size"
@@ -2355,50 +2355,50 @@
     },
     "content-visibility": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "auto",
-        "hidden"
+        "hidden",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The content-visibility CSS property controls whether or not an element renders its contents at all, along with forcing a strong set of containments, allowing user agents to potentially omit large swathes of layout and rendering work until it becomes needed. It enables the user agent to skip an element's rendering work (including layout and painting) until it is needed — which makes the initial page load much faster."
     },
     "content": {
       "values": [
+        "normal",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "normal",
-        "none"
+        "unset"
       ],
       "description": "The content CSS property replaces an element with a generated value. Objects inserted using the content property are anonymous replaced elements."
     },
     "quotes": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": "The quotes CSS property sets how the browser should render quotation marks that are added using the open-quotes or close-quotes values of the CSS content property."
     },
     "string-set": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "bookmark-level": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
@@ -2412,22 +2412,22 @@
     },
     "bookmark-state": {
       "values": [
+        "open",
+        "closed",
         "inherit",
         "initial",
-        "unset",
-        "open",
-        "closed"
+        "unset"
       ],
       "description": ""
     },
     "display": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "block",
         "inline",
         "run-in",
+        "inherit",
+        "initial",
+        "unset",
         "flow",
         "flow-root",
         "table",
@@ -2484,72 +2484,72 @@
     },
     "visibility": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "hidden",
-        "collapse"
+        "collapse",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The visibility CSS property shows or hides an element without changing the layout of a document. The property can also hide rows or columns in a table."
     },
     "wrap-flow": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "both",
         "start",
         "end",
         "minimum",
         "maximum",
-        "clear"
+        "clear",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "wrap-through": {
       "values": [
+        "wrap",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "wrap",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "flex-direction": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "row",
         "row-reverse",
         "column",
-        "column-reverse"
+        "column-reverse",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The flex-direction CSS property sets how flex items are placed in the flex container defining the main axis and the direction (normal or reversed)."
     },
     "flex-wrap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "nowrap",
         "wrap",
-        "wrap-reverse"
+        "wrap-reverse",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The flex-wrap CSS property sets whether flex items are forced onto one line or can wrap onto multiple lines. If wrapping is allowed, it sets the direction that lines are stacked."
     },
     "flex-flow": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "row",
         "row-reverse",
         "column",
         "column-reverse",
+        "inherit",
+        "initial",
+        "unset",
         "nowrap",
         "wrap",
         "wrap-reverse"
@@ -2558,10 +2558,10 @@
     },
     "flex": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "content"
       ],
       "description": "The flex CSS shorthand property sets how a flex _item_ will grow or shrink to fit the space available in its flex container."
@@ -2584,11 +2584,11 @@
     },
     "flex-basis": {
       "values": [
+        "content",
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "content",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -2597,16 +2597,16 @@
     },
     "font-size-adjust": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "ex-height",
         "cap-height",
         "ch-width",
         "ic-width",
         "ic-height",
-        "from-font"
+        "from-font",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-size-adjust CSS property sets the size of lower-case letters relative to the current font size (which defines the size of upper-case letters)."
     },
@@ -2620,11 +2620,11 @@
     },
     "font-weight": {
       "values": [
+        "normal",
+        "bold",
         "inherit",
         "initial",
         "unset",
-        "normal",
-        "bold",
         "bolder",
         "lighter"
       ],
@@ -2632,10 +2632,10 @@
     },
     "font-stretch": {
       "values": [
+        "normal",
         "inherit",
         "initial",
         "unset",
-        "normal",
         "ultra-condensed",
         "extra-condensed",
         "condensed",
@@ -2649,12 +2649,12 @@
     },
     "font-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "italic",
-        "oblique"
+        "oblique",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-style CSS property sets whether a font should be styled with a normal, italic, or oblique face from its font-family."
     },
@@ -2669,12 +2669,12 @@
     },
     "font": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "italic",
         "oblique",
+        "inherit",
+        "initial",
+        "unset",
         "small-caps",
         "bolder",
         "lighter",
@@ -2698,66 +2698,66 @@
     },
     "font-synthesis-weight": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "font-synthesis-style": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "font-synthesis-small-caps": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "font-synthesis": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "weight",
         "style",
-        "small-caps"
+        "small-caps",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-synthesis CSS property controls which missing typefaces, bold, italic, or small-caps, may be synthesized by the browser."
     },
     "font-kerning": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "normal",
-        "none"
+        "none",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-kerning CSS property sets the use of the kerning information stored in a font."
     },
     "font-variant-ligatures": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "none",
         "common-ligatures",
         "no-common-ligatures",
+        "inherit",
+        "initial",
+        "unset",
         "discretionary-ligatures",
         "no-discretionary-ligatures",
         "historical-ligatures",
@@ -2769,38 +2769,38 @@
     },
     "font-variant-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "sub",
-        "super"
+        "super",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-position CSS property controls the use of alternate, smaller glyphs that are positioned as superscript or subscript."
     },
     "font-variant-caps": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "small-caps",
         "all-small-caps",
         "petite-caps",
         "all-petite-caps",
         "unicase",
-        "titling-caps"
+        "titling-caps",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-caps CSS property controls the use of alternate glyphs for capital letters."
     },
     "font-variant-numeric": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "lining-nums",
         "oldstyle-nums",
+        "inherit",
+        "initial",
+        "unset",
         "proportional-nums",
         "tabular-nums",
         "diagonal-fractions",
@@ -2812,10 +2812,10 @@
     },
     "font-variant-alternates": {
       "values": [
+        "normal",
         "inherit",
         "initial",
         "unset",
-        "normal",
         "stylistic()",
         "historical-forms",
         "styleset(",
@@ -2828,9 +2828,6 @@
     },
     "font-variant-east-asian": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "jis78",
         "jis83",
@@ -2838,6 +2835,9 @@
         "jis04",
         "simplified",
         "traditional",
+        "inherit",
+        "initial",
+        "unset",
         "full-width",
         "proportional-width",
         "ruby"
@@ -2846,13 +2846,13 @@
     },
     "font-variant": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "none",
         "common-ligatures",
         "no-common-ligatures",
+        "inherit",
+        "initial",
+        "unset",
         "discretionary-ligatures",
         "no-discretionary-ligatures",
         "historical-ligatures",
@@ -2899,96 +2899,96 @@
     },
     "font-feature-settings": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The font-feature-settings CSS property controls advanced typographic features in OpenType fonts."
     },
     "font-language-override": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The font-language-override CSS property controls the use of language-specific glyphs in a typeface."
     },
     "font-optical-sizing": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": "The font-optical-sizing CSS property sets whether text rendering is optimized for viewing at different sizes."
     },
     "font-variation-settings": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The font-variation-settings CSS property provides low-level control over variable font characteristics, by specifying the four letter axis names of the characteristics you want to vary, along with their values."
     },
     "font-palette": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "light",
-        "dark"
+        "dark",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-palette CSS property allows specifying one of the many palettes contained in a font that a user agent should use for the font. Users can also override the values in a palette or create a new palette by using the [@font-palette-values](/en-US/docs/Web/CSS/@font-palette-values) at-rule."
     },
     "font-variant-emoji": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "text",
         "emoji",
-        "unicode"
+        "unicode",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The font-variant-emoji CSS property specifies the default presentation style for displaying emojis."
     },
     "copy-into": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "static",
         "relative",
         "absolute",
         "sticky",
-        "fixed"
+        "fixed",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The position CSS property sets how an element is positioned in a document. The top, right, bottom, and left properties determine the final location of positioned elements."
     },
     "float": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "block-start",
         "block-end",
         "inline-start",
         "inline-end",
         "snap-block",
+        "inherit",
+        "initial",
+        "unset",
         "snap-inline",
         "left",
         "right",
@@ -3000,67 +3000,67 @@
     },
     "footnote-display": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "block",
         "inline",
-        "compact"
+        "compact",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "footnote-policy": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "line",
-        "block"
+        "block",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "grid-template-columns": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "subgrid"
       ],
       "description": "The grid-template-columns CSS property defines the line names and track sizing functions of the glossary(grid column, grid columns)."
     },
     "grid-template-rows": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "subgrid"
       ],
       "description": "The grid-template-rows CSS property defines the line names and track sizing functions of the glossary(grid_row, grid rows)."
     },
     "masonry-auto-flow": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "pack",
         "next",
         "definite-first",
-        "ordered"
+        "ordered",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The masonry-auto-flow CSS property modifies how items are placed when using masonry in CSS Grid Layout."
     },
     "align-tracks": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "first",
         "last",
         "baseline",
+        "inherit",
+        "initial",
+        "unset",
         "space-between",
         "space-around",
         "space-evenly",
@@ -3077,14 +3077,14 @@
     },
     "justify-tracks": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "space-between",
         "space-around",
         "space-evenly",
         "stretch",
+        "inherit",
+        "initial",
+        "unset",
         "unsafe",
         "safe",
         "center",
@@ -3099,19 +3099,19 @@
     },
     "grid-template-areas": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The grid-template-areas CSS property specifies named glossary(grid areas), establishing the cells in the grid and assigning them names."
     },
     "grid-template": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "subgrid",
         "minmax(",
         "fit-content("
@@ -3140,21 +3140,21 @@
     },
     "grid-auto-flow": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "row",
         "column",
-        "dense"
+        "dense",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The grid-auto-flow CSS property controls how the auto-placement algorithm works, specifying exactly how auto-placed items get flowed into the grid."
     },
     "grid": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "subgrid",
         "auto-flow",
         "dense"
@@ -3219,78 +3219,75 @@
     },
     "object-fit": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "fill",
         "none",
         "contain",
         "cover",
-        "scale-down"
+        "scale-down",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The object-fit CSS property sets how the content of a replaced element, such as an img or video, should be resized to fit its container."
     },
     "image-resolution": {
       "values": [
+        "from-image",
         "inherit",
         "initial",
         "unset",
-        "from-image",
         "snap"
       ],
       "description": "The image-resolution CSS property specifies the intrinsic resolution of all raster images used in or on the element. It affects content images such as replaced elements and generated content, and decorative images such as background-image images."
     },
     "object-view-box": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "object-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The object-position CSS property specifies the alignment of the selected replaced element's contents within the element's box. Areas of the box which aren't covered by the replaced element's object will show the element's background."
     },
     "image-orientation": {
       "values": [
+        "from-image",
+        "none",
         "inherit",
         "initial",
         "unset",
-        "from-image",
-        "none",
         "flip"
       ],
       "description": "The image-orientation CSS property specifies a layout-independent correction to the orientation of an image."
     },
     "image-rendering": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "smooth",
         "high-quality",
         "pixelated",
-        "crisp-edges"
+        "crisp-edges",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The image-rendering CSS property sets an image scaling algorithm. The property applies to an element itself, to any images set in its other properties, and to its descendants."
     },
     "dominant-baseline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "text-bottom",
         "alphabetic",
@@ -3299,15 +3296,15 @@
         "central",
         "mathematical",
         "hanging",
-        "text-top"
+        "text-top",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "vertical-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "first",
         "last",
         "baseline",
@@ -3318,6 +3315,9 @@
         "central",
         "mathematical",
         "text-top",
+        "inherit",
+        "initial",
+        "unset",
         "sub",
         "super",
         "top",
@@ -3328,20 +3328,17 @@
     },
     "baseline-source": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "first",
-        "last"
+        "last",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "alignment-baseline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "baseline",
         "text-bottom",
         "alphabetic",
@@ -3349,7 +3346,10 @@
         "middle",
         "central",
         "mathematical",
-        "text-top"
+        "text-top",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -3368,56 +3368,56 @@
     },
     "line-height": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The line-height CSS property sets the height of a line box. It's commonly used to set the distance between lines of text. On block-level elements, it specifies the minimum height of line boxes within the element. On non-replaced inline elements, it specifies the height that is used to calculate line box height."
     },
     "text-edge": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "leading",
         "text",
         "cap",
         "ex",
         "ideographic",
         "ideographic-ink",
-        "alphabetic"
+        "alphabetic",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "leading-trim": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "start",
         "end",
-        "both"
+        "both",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "inline-sizing": {
       "values": [
+        "normal",
+        "stretch",
         "inherit",
         "initial",
-        "unset",
-        "normal",
-        "stretch"
+        "unset"
       ],
       "description": ""
     },
     "initial-letter": {
       "values": [
+        "normal",
         "inherit",
         "initial",
         "unset",
-        "normal",
         "drop",
         "raise"
       ],
@@ -3425,71 +3425,71 @@
     },
     "initial-letter-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "border-box",
         "alphabetic",
         "ideographic",
         "hanging",
-        "leading"
+        "leading",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The initial-letter-align CSS property specifies the alignment of initial letters within a paragraph."
     },
     "initial-letter-wrap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "first",
         "all",
-        "grid"
+        "grid",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "line-grid": {
       "values": [
+        "match-parent",
+        "create",
         "inherit",
         "initial",
-        "unset",
-        "match-parent",
-        "create"
+        "unset"
       ],
       "description": ""
     },
     "line-snap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "baseline",
-        "contain"
+        "contain",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "box-snap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "block-start",
         "block-end",
         "center",
         "baseline",
-        "last-baseline"
+        "last-baseline",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "link-parameters": {
       "values": [
+        "none",
+        "param(",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "param("
+        "unset"
       ],
       "description": ""
     },
@@ -3513,32 +3513,32 @@
     },
     "list-style-position": {
       "values": [
+        "inside",
+        "outside",
         "inherit",
         "initial",
-        "unset",
-        "inside",
-        "outside"
+        "unset"
       ],
       "description": "The list-style-position CSS property sets the position of the ::marker relative to a list item."
     },
     "list-style": {
       "values": [
+        "inside",
+        "outside",
         "inherit",
         "initial",
         "unset",
-        "inside",
-        "outside",
         "none"
       ],
       "description": "The list-style CSS shorthand property allows you to set all the list style properties at once."
     },
     "marker-side": {
       "values": [
+        "match-self",
+        "match-parent",
         "inherit",
         "initial",
-        "unset",
-        "match-self",
-        "match-parent"
+        "unset"
       ],
       "description": ""
     },
@@ -3572,10 +3572,10 @@
     },
     "block-size": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -3584,10 +3584,10 @@
     },
     "inline-size": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -3596,10 +3596,10 @@
     },
     "min-block-size": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -3608,10 +3608,10 @@
     },
     "min-inline-size": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -3620,10 +3620,10 @@
     },
     "max-block-size": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "min-content",
         "max-content",
         "fit-content()"
@@ -3632,10 +3632,10 @@
     },
     "max-inline-size": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "min-content",
         "max-content",
         "fit-content()"
@@ -3986,58 +3986,58 @@
     },
     "clip-rule": {
       "values": [
+        "nonzero",
+        "evenodd",
         "inherit",
         "initial",
-        "unset",
-        "nonzero",
-        "evenodd"
+        "unset"
       ],
       "description": ""
     },
     "mask-image": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The mask-image CSS property sets the image that is used as mask layer for an element."
     },
     "mask-mode": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "alpha",
         "luminance",
-        "match-source"
+        "match-source",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-mode CSS property sets whether the mask reference defined by mask-image is treated as a luminance or alpha mask."
     },
     "mask-repeat": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "repeat-x",
         "repeat-y",
         "repeat",
         "space",
         "round",
-        "no-repeat"
+        "no-repeat",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-repeat CSS property sets how mask images are repeated. A mask image can be repeated along the horizontal axis, the vertical axis, both axes, or not repeated at all."
     },
     "mask-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-position CSS property sets the initial position, relative to the mask position layer set by mask-origin, for each defined mask image."
     },
@@ -4077,13 +4077,13 @@
     },
     "mask-composite": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "add",
         "subtract",
         "intersect",
-        "exclude"
+        "exclude",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-composite CSS property represents a compositing operation used on the current mask layer with the mask layers below it."
     },
@@ -4098,20 +4098,20 @@
     },
     "mask-border-source": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The mask-border-source CSS property sets the source image used to create an element's mask border."
     },
     "mask-border-mode": {
       "values": [
+        "luminance",
+        "alpha",
         "inherit",
         "initial",
-        "unset",
-        "luminance",
-        "alpha"
+        "unset"
       ],
       "description": "The mask-border-mode CSS property specifies the blending mode used in a mask border."
     },
@@ -4143,22 +4143,22 @@
     },
     "mask-border-repeat": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "stretch",
         "repeat",
         "round",
-        "space"
+        "space",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The mask-border-repeat CSS property sets how the edge regions of a source image are adjusted to fit the dimensions of an element's mask border."
     },
     "mask-border": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "fill",
         "auto",
         "stretch",
@@ -4172,11 +4172,11 @@
     },
     "mask-type": {
       "values": [
+        "luminance",
+        "alpha",
         "inherit",
         "initial",
-        "unset",
-        "luminance",
-        "alpha"
+        "unset"
       ],
       "description": "The mask-type CSS property sets whether an SVG mask element is used as a _luminance_ or an _alpha_ mask. It applies to the <mask> element itself."
     },
@@ -4191,10 +4191,10 @@
     },
     "column-span": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "all",
         "auto"
       ],
@@ -4202,19 +4202,19 @@
     },
     "column-width": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The column-width CSS property sets the ideal column width in a multi-column layout. The container will have as many columns as can fit without any of them having a width less than the column-width value. If the width of the container is narrower than the specified value, the single column's width will be smaller than the declared column width."
     },
     "column-count": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The column-count CSS property breaks an element's content into the specified number of columns."
     },
@@ -4238,9 +4238,6 @@
     },
     "column-rule-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "hidden",
         "dotted",
@@ -4250,7 +4247,10 @@
         "groove",
         "ridge",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The column-rule-style CSS property sets the style of the line drawn between columns in a multi-column layout."
     },
@@ -4275,388 +4275,385 @@
     },
     "column-fill": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "balance",
-        "balance-all"
+        "balance-all",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The column-fill CSS property controls how an element's contents are balanced when broken into columns."
     },
     "spatial-navigation-contain": {
       "values": [
+        "auto",
+        "contain",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "contain"
+        "unset"
       ],
       "description": ""
     },
     "spatial-navigation-action": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "focus",
-        "scroll"
+        "scroll",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "spatial-navigation-function": {
       "values": [
+        "normal",
+        "grid",
         "inherit",
         "initial",
-        "unset",
-        "normal",
-        "grid"
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-top": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-right": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-bottom": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-left": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-block-start": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-inline-start": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-block-end": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-inline-end": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow-clip-margin CSS property determines how far outside its bounds an element with [overflow: clip](/en-US/docs/Web/CSS/overflow) may be painted before being clipped."
     },
     "overflow-clip-margin-inline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-clip-margin-block": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-overflow": {
       "values": [
+        "clip",
+        "ellipsis",
         "inherit",
         "initial",
         "unset",
-        "clip",
-        "ellipsis",
         "fade"
       ],
       "description": "The text-overflow CSS property sets how hidden overflow content is signaled to users. It can be clipped, display an ellipsis ('…'), or display a custom string."
     },
     "block-ellipsis": {
       "values": [
+        "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
     "line-clamp": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "auto"
       ],
       "description": ""
     },
     "-webkit-line-clamp": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The -webkit-line-clamp CSS property allows limiting of the contents of a block to the specified number of lines."
     },
     "continue": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "discard",
         "-webkit-discard",
         "overflow",
         "paginate",
-        "fragments"
+        "fragments",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "max-lines": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "overflow-x": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "hidden",
         "clip",
         "scroll",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow-x CSS property sets what shows when content overflows a block-level element's left and right edges. This may be nothing, a scroll bar, or the overflow content."
     },
     "overflow-y": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "hidden",
         "clip",
         "scroll",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow-y CSS property sets what shows when content overflows a block-level element's top and bottom edges. This may be nothing, a scroll bar, or the overflow content."
     },
     "overflow-block": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "hidden",
         "clip",
         "scroll",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow-block CSS property sets what shows when content overflows the block start and block end edges of a box. This may be nothing, a scroll bar, or the overflow content."
     },
     "overflow-inline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "hidden",
         "clip",
         "scroll",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow-inline CSS property sets what shows when content overflows the inline start and end edges of a box. This may be nothing, a scroll bar, or the overflow content."
     },
     "overflow": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "visible",
         "hidden",
         "clip",
         "scroll",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow CSS shorthand property sets the desired behavior for an element's overflow — i.e. when an element's content is too big to fit in its block formatting context — in both directions."
     },
     "scroll-behavior": {
       "values": [
+        "auto",
+        "smooth",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "smooth"
+        "unset"
       ],
       "description": "The scroll-behavior CSS property sets the behavior for a scrolling box when scrolling is triggered by the navigation or CSSOM scrolling APIs."
     },
     "scrollbar-gutter": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "stable",
-        "both-edges"
+        "both-edges",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The scrollbar-gutter CSS property allows authors to reserve space for the scrollbar, preventing unwanted layout changes as the content grows while also avoiding unnecessary visuals when scrolling isn't needed."
     },
     "overscroll-behavior": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "contain",
         "none",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overscroll-behavior CSS property sets what a browser does when reaching the boundary of a scrolling area. It's a shorthand for overscroll-behavior-x and overscroll-behavior-y."
     },
     "overscroll-behavior-x": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "contain",
         "none",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overscroll-behavior-x CSS property sets the browser's behavior when the horizontal boundary of a scrolling area is reached."
     },
     "overscroll-behavior-y": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "contain",
         "none",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overscroll-behavior-y CSS property sets the browser's behavior when the vertical boundary of a scrolling area is reached."
     },
     "overscroll-behavior-inline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "contain",
         "none",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overscroll-behavior-inline CSS property sets the browser's behavior when the inline direction boundary of a scrolling area is reached."
     },
     "overscroll-behavior-block": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "contain",
         "none",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overscroll-behavior-block CSS property sets the browser's behavior when the block direction boundary of a scrolling area is reached."
     },
     "float-reference": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "inline",
         "column",
         "region",
-        "page"
+        "page",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "clear": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "inline-start",
         "inline-end",
         "block-start",
@@ -4665,7 +4662,10 @@
         "right",
         "top",
         "bottom",
-        "none"
+        "none",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The clear CSS property sets whether an element must be moved below (cleared) floating elements that precede it. The clear property applies to floating and non-floating elements."
     },
@@ -4689,82 +4689,82 @@
     },
     "page": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
     "top": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The top CSS property participates in specifying the vertical position of a positioned element. It has no effect on non-positioned elements."
     },
     "right": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The right CSS property participates in specifying the horizontal position of a positioned element. It has no effect on non-positioned elements."
     },
     "bottom": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The bottom CSS property participates in setting the vertical position of a positioned element. It has no effect on non-positioned elements."
     },
     "left": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The left CSS property participates in specifying the horizontal position of a positioned element. It has no effect on non-positioned elements."
     },
     "inset-block-start": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The inset-block-start CSS property defines the logical block start offset of an element, which maps to a physical inset depending on the element's writing mode, directionality, and text orientation. It corresponds to the top, right, bottom, or left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "inset-inline-start": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The inset-inline-start CSS property defines the logical inline start inset of an element, which maps to a physical offset depending on the element's writing mode, directionality, and text orientation. It corresponds to the top, right, bottom, or left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "inset-block-end": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The inset-block-end CSS property defines the logical block end offset of an element, which maps to a physical inset depending on the element's writing mode, directionality, and text orientation. It corresponds to the top, right, bottom, or left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
     "inset-inline-end": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The inset-inline-end CSS property defines the logical inline end inset of an element, which maps to a physical offset depending on the element's writing mode, directionality, and text orientation. It corresponds to the top, right, bottom, or left property depending on the values defined for writing-mode, direction, and text-orientation."
     },
@@ -4794,10 +4794,10 @@
     },
     "flow-into": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "element",
         "content"
       ],
@@ -4814,62 +4814,62 @@
     },
     "region-fragment": {
       "values": [
+        "auto",
+        "break",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "break"
+        "unset"
       ],
       "description": ""
     },
     "block-step-size": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "block-step-insert": {
       "values": [
+        "margin",
+        "padding",
         "inherit",
         "initial",
-        "unset",
-        "margin",
-        "padding"
+        "unset"
       ],
       "description": ""
     },
     "block-step-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "center",
         "start",
-        "end"
+        "end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "block-step-round": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "up",
         "down",
-        "nearest"
+        "nearest",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "block-step": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "margin",
         "padding",
         "auto",
@@ -4892,75 +4892,72 @@
     },
     "border-boundary": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "parent",
-        "display"
+        "display",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "ruby-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "alternate",
         "over",
         "under",
-        "inter-character"
+        "inter-character",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The ruby-position CSS property defines the position of a ruby element relatives to its base element. It can be positioned over the element (over), under it (under), or between the characters on their right side (inter-character)."
     },
     "ruby-merge": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "separate",
         "merge",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "ruby-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "start",
         "center",
         "space-between",
-        "space-around"
+        "space-around",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The ruby-align CSS property defines the distribution of the different ruby elements over the base."
     },
     "ruby-overhang": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "overflow-anchor": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": "The overflow-anchor CSS property provides a way to opt out of the browser's scroll anchoring behavior, which adjusts scroll position to minimize content shifts."
     },
     "scroll-start": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "start",
         "end",
@@ -4968,88 +4965,91 @@
         "left",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "scroll-start-target": {
       "values": [
+        "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
     "scroll-start-x": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "start",
         "end",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "scroll-start-y": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "start",
         "end",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "scroll-start-inline": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "start",
         "end",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "scroll-start-block": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "start",
         "end",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "scroll-snap-type": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "block",
         "inline",
         "both",
         "mandatory",
-        "proximity"
+        "proximity",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The scroll-snap-type CSS property sets how strictly snap points are enforced on the scroll container in case there is one."
     },
     "scroll-padding": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding shorthand property sets scroll padding on all sides of an element at once, much like the padding property does for padding on an element."
     },
@@ -5063,113 +5063,113 @@
     },
     "scroll-snap-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "start",
         "end",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The scroll-snap-align property specifies the box's snap position as an alignment of its snap area (as the alignment subject) within its snap container's snapport (as the alignment container). The two values specify the snapping alignment in the block axis and inline axis, respectively. If only one value is specified, the second value defaults to the same value."
     },
     "scroll-snap-stop": {
       "values": [
+        "normal",
+        "always",
         "inherit",
         "initial",
-        "unset",
-        "normal",
-        "always"
+        "unset"
       ],
       "description": "The scroll-snap-stop CSS property defines whether or not the scroll container is allowed to pass over possible snap positions."
     },
     "scroll-padding-top": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-top property defines offsets for the top of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-right": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-right property defines offsets for the right of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-bottom": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-bottom property defines offsets for the bottom of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-left": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-left property defines offsets for the left of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-inline-start": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-inline-start property defines offsets for the start edge in the inline dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-block-start": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-block-start property defines offsets for the start edge in the block dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-inline-end": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-inline-end property defines offsets for the end edge in the inline dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-block-end": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-block-end property defines offsets for the end edge in the block dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-block": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-block shorthand property sets the scroll padding of an element in the block dimension."
     },
     "scroll-padding-inline": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The scroll-padding-inline shorthand property sets the scroll padding of an element in the inline dimension."
     },
@@ -5255,32 +5255,32 @@
     },
     "scrollbar-color": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "currentcolor"
       ],
       "description": "The scrollbar-color CSS property sets the color of the scrollbar track and thumb."
     },
     "scrollbar-width": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "thin",
-        "none"
+        "none",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The scrollbar-width property allows the author to set the maximum thickness of an element's scrollbars when they are shown."
     },
     "shape-inside": {
       "values": [
+        "auto",
+        "outside-shape",
         "inherit",
         "initial",
         "unset",
-        "auto",
-        "outside-shape",
         "shape-box",
         "display"
       ],
@@ -5296,10 +5296,10 @@
     },
     "shape-outside": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "margin-box"
       ],
       "description": "The shape-outside CSS property defines a shape—which may be non-rectangular—around which adjacent inline content should wrap. By default, inline content wraps around its margin box; shape-outside provides a way to customize this wrapping, making it possible to wrap text around complex objects rather than simple boxes."
@@ -5322,20 +5322,20 @@
     },
     "text-size-adjust": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": "The text-size-adjust CSS property controls the text inflation algorithm used on some smartphones and tablets. Other browsers will ignore this property."
     },
     "width": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -5344,10 +5344,10 @@
     },
     "height": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -5356,10 +5356,10 @@
     },
     "min-width": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -5368,10 +5368,10 @@
     },
     "min-height": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "min-content",
         "max-content",
         "fit-content()"
@@ -5380,10 +5380,10 @@
     },
     "max-width": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "min-content",
         "max-content",
         "fit-content()"
@@ -5392,10 +5392,10 @@
     },
     "max-height": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "min-content",
         "max-content",
         "fit-content()"
@@ -5404,95 +5404,95 @@
     },
     "aspect-ratio": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The aspect-ratio CSS property sets a preferred aspect ratio for the box, which will be used in the calculation of auto sizes and some other layout functions."
     },
     "contain-intrinsic-width": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "auto"
       ],
       "description": "The contain-intrinsic-width CSS property sets the width of an element that a browser will use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-height": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "auto"
       ],
       "description": "The contain-intrinsic-length CSS property sets the height of an element that a browser can use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-block-size": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "auto"
       ],
       "description": "The contain-intrinsic-block-size CSS logical property defines the block size of an element that a browser can use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-inline-size": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "auto"
       ],
       "description": "The contain-intrinsic-inline-size CSS logical property defines the inline-size of an element that a browser can use for layout when the element is subject to size containment."
     },
     "contain-intrinsic-size": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "auto"
       ],
       "description": "The contain-intrinsic-size CSS shorthand property sets the size of an element that a browser will use for layout when the element is subject to size containment."
     },
     "min-intrinsic-sizing": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "legacy",
         "zero-if-scroll",
-        "zero-if-extrinsic"
+        "zero-if-extrinsic",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "box-sizing": {
       "values": [
+        "content-box",
+        "border-box",
         "inherit",
         "initial",
-        "unset",
-        "content-box",
-        "border-box"
+        "unset"
       ],
       "description": "The box-sizing CSS property sets how the total width and height of an element is calculated."
     },
     "voice-volume": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "silent",
         "x-soft",
         "soft",
         "medium",
         "loud",
-        "x-loud"
+        "x-loud",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5511,25 +5511,25 @@
     },
     "speak": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "never",
-        "always"
+        "always",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "speak-as": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "spell-out",
         "digits",
         "literal-punctuation",
-        "no-punctuation"
+        "no-punctuation",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5655,15 +5655,15 @@
     },
     "voice-rate": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "x-slow",
         "slow",
         "medium",
         "fast",
-        "x-fast"
+        "x-fast",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5697,43 +5697,43 @@
     },
     "voice-stress": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "strong",
         "moderate",
         "none",
-        "reduced"
+        "reduced",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "voice-duration": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
     "table-layout": {
       "values": [
+        "auto",
+        "fixed",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "fixed"
+        "unset"
       ],
       "description": "The table-layout CSS property sets the algorithm used to lay out table cells, rows, and columns."
     },
     "border-collapse": {
       "values": [
+        "separate",
+        "collapse",
         "inherit",
         "initial",
-        "unset",
-        "separate",
-        "collapse"
+        "unset"
       ],
       "description": "The border-collapse CSS property sets whether cells inside a table have shared or separate borders."
     },
@@ -5747,96 +5747,96 @@
     },
     "caption-side": {
       "values": [
+        "top",
+        "bottom",
         "inherit",
         "initial",
-        "unset",
-        "top",
-        "bottom"
+        "unset"
       ],
       "description": "The caption-side CSS property puts the content of a table's caption on the specified side. The values are relative to the cssxref('writing-mode') of the table."
     },
     "empty-cells": {
       "values": [
+        "show",
+        "hide",
         "inherit",
         "initial",
-        "unset",
-        "show",
-        "hide"
+        "unset"
       ],
       "description": "The empty-cells CSS property sets whether borders and backgrounds appear around table cells that have no visible content."
     },
     "text-transform": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "capitalize",
         "uppercase",
         "lowercase",
         "full-width",
-        "full-size-kana"
+        "full-size-kana",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-transform CSS property specifies how to capitalize an element's text. It can be used to make text appear in all-uppercase or all-lowercase, or with each word capitalized. It also can help improve legibility for ruby."
     },
     "word-boundary-detection": {
       "values": [
+        "normal",
+        "manual",
         "inherit",
         "initial",
         "unset",
-        "normal",
-        "manual",
         "auto()"
       ],
       "description": ""
     },
     "word-boundary-expansion": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "space",
-        "ideographic-space"
+        "ideographic-space",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "white-space": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "pre",
         "nowrap",
         "pre-wrap",
         "break-spaces",
-        "pre-line"
+        "pre-line",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The white-space CSS property sets how Glossary(whitespace, white space) inside an element is handled."
     },
     "text-space-collapse": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "collapse",
         "discard",
         "preserve",
         "preserve-breaks",
-        "preserve-spaces"
+        "preserve-spaces",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-space-trim": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "discard-inner",
         "discard-before",
-        "discard-after"
+        "discard-after",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -5850,46 +5850,46 @@
     },
     "word-break": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "keep-all",
         "break-all",
-        "break-word"
+        "break-word",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The word-break CSS property sets whether line breaks appear wherever the text would otherwise overflow its content box."
     },
     "line-break": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "loose",
         "normal",
         "strict",
-        "anywhere"
+        "anywhere",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The line-break CSS property sets how to break lines of Chinese, Japanese, or Korean (CJK) text when working with punctuation and symbols."
     },
     "hyphens": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "manual",
-        "auto"
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The hyphens CSS property specifies how words should be hyphenated when text wraps across multiple lines. It can prevent hyphenation entirely, hyphenate at manually-specified points within the text, or let the browser automatically insert hyphens where appropriate."
     },
     "hyphenate-character": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The hyphenate-character CSS property sets the character (or string) used at the end of a line before a hyphenation break."
     },
@@ -5903,118 +5903,118 @@
     },
     "hyphenate-limit-chars": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The hyphenate-limit-chars CSS property specifies the minimum word length to allow hyphenation of words as well as the minimum number of characters before and after the hyphen."
     },
     "hyphenate-limit-lines": {
       "values": [
+        "no-limit",
         "inherit",
         "initial",
-        "unset",
-        "no-limit"
+        "unset"
       ],
       "description": ""
     },
     "hyphenate-limit-last": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "always",
         "column",
         "page",
-        "spread"
+        "spread",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "overflow-wrap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "break-word",
-        "anywhere"
+        "anywhere",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The overflow-wrap CSS property applies to inline elements, setting whether the browser should insert line breaks within an otherwise unbreakable string to prevent text from overflowing its line box."
     },
     "word-wrap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "break-word",
-        "anywhere"
+        "anywhere",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-wrap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "wrap",
         "nowrap",
         "balance",
         "stable",
-        "pretty"
+        "pretty",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "wrap-before": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "avoid",
         "avoid-line",
         "avoid-flex",
         "line",
-        "flex"
+        "flex",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "wrap-after": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "avoid",
         "avoid-line",
         "avoid-flex",
         "line",
-        "flex"
+        "flex",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "wrap-inside": {
       "values": [
+        "auto",
+        "avoid",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "avoid"
+        "unset"
       ],
       "description": ""
     },
     "text-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "start",
         "end",
         "left",
         "right",
         "center",
+        "inherit",
+        "initial",
+        "unset",
         "justify",
         "match-parent",
         "justify-all"
@@ -6023,24 +6023,21 @@
     },
     "text-align-all": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "start",
         "end",
         "left",
         "right",
         "center",
         "justify",
-        "match-parent"
+        "match-parent",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-align-last": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "start",
         "end",
@@ -6048,51 +6045,54 @@
         "right",
         "center",
         "justify",
-        "match-parent"
+        "match-parent",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-align-last CSS property sets how the last line of a block or a line, right before a forced line break, is aligned."
     },
     "text-justify": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "none",
         "inter-word",
-        "inter-character"
+        "inter-character",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-justify CSS property sets what type of justification should be applied to text when text-align: justify; is set on an element."
     },
     "text-group-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "start",
         "end",
         "left",
         "right",
-        "center"
+        "center",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "word-spacing": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The word-spacing CSS property sets the length of space between words and between tags."
     },
     "letter-spacing": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": "The letter-spacing CSS property sets the horizontal spacing behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values of letter-spacing causes characters to spread farther apart, while negative values of letter-spacing bring characters closer together."
     },
@@ -6106,9 +6106,6 @@
     },
     "text-spacing": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "none",
         "auto",
@@ -6123,7 +6120,10 @@
         "space-adjacent",
         "ideograph-alpha",
         "ideograph-numeric",
-        "punctuation"
+        "punctuation",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -6139,42 +6139,42 @@
     },
     "hanging-punctuation": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "first",
         "force-end",
         "allow-end",
-        "last"
+        "last",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The hanging-punctuation CSS property specifies whether a punctuation mark should hang at the start or end of a line of text. Hanging punctuation may be placed outside the line box."
     },
     "text-decoration-line": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "underline",
         "overline",
         "line-through",
         "blink",
         "spelling-error",
-        "grammar-error"
+        "grammar-error",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-decoration-line CSS property sets the kind of decoration that is used on text in an element, such as an underline or overline."
     },
     "text-decoration-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "solid",
         "double",
         "dotted",
         "dashed",
-        "wavy"
+        "wavy",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-decoration-style CSS property sets the style of the lines specified by  cssxref(text-decoration-line) . The style applies to all lines that are set with text-decoration-line."
     },
@@ -6189,24 +6189,24 @@
     },
     "text-decoration-thickness": {
       "values": [
+        "auto",
+        "from-font",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "from-font"
+        "unset"
       ],
       "description": "The text-decoration-thickness CSS property sets the stroke thickness of the decoration line that is used on text in an element, such as a line-through, underline, or overline."
     },
     "text-decoration": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "underline",
         "overline",
         "line-through",
         "blink",
+        "inherit",
+        "initial",
+        "unset",
         "solid",
         "double",
         "dotted",
@@ -6217,23 +6217,23 @@
     },
     "text-underline-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "from-font",
         "under",
         "left",
-        "right"
+        "right",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-underline-position CSS property specifies the position of the underline which is set using the text-decoration property's underline value."
     },
     "text-underline-offset": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The text-underline-offset CSS property sets the offset distance of an underline text decoration line (applied using text-decoration) from its original position."
     },
@@ -6248,66 +6248,63 @@
     },
     "text-decoration-skip": {
       "values": [
+        "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "auto"
+        "unset"
       ],
       "description": "The text-decoration-skip CSS property sets what parts of an element's content any text decoration affecting the element must skip over. It controls all text decoration lines drawn by the element and also any text decoration lines drawn by its ancestors."
     },
     "text-decoration-skip-self": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "skip-all",
         "skip-underline",
         "skip-overline",
         "skip-line-through",
-        "no-skip"
+        "no-skip",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-decoration-skip-box": {
       "values": [
+        "none",
+        "all",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "all"
+        "unset"
       ],
       "description": ""
     },
     "text-decoration-skip-spaces": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "all",
         "start",
-        "end"
+        "end",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-decoration-skip-ink": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "none",
-        "all"
+        "all",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-decoration-skip-ink CSS property specifies how overlines and underlines are drawn when they pass over glyph ascenders and descenders."
     },
     "text-emphasis-style": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "filled",
         "open",
@@ -6315,7 +6312,10 @@
         "circle",
         "double-circle",
         "triangle",
-        "sesame"
+        "sesame",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-emphasis-style CSS property sets the appearance of emphasis marks. It can also be set, and reset, using the text-emphasis shorthand."
     },
@@ -6330,9 +6330,6 @@
     },
     "text-emphasis": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "filled",
         "open",
@@ -6340,155 +6337,158 @@
         "circle",
         "double-circle",
         "triangle",
-        "sesame"
+        "sesame",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-emphasis CSS property applies emphasis marks to text (except spaces and control characters). It is a shorthand for text-emphasis-style and text-emphasis-color."
     },
     "text-emphasis-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "over",
         "under",
         "right",
-        "left"
+        "left",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-emphasis-position CSS property sets where emphasis marks are drawn. Like ruby text, if there isn't enough room for emphasis marks, the line height is increased."
     },
     "text-emphasis-skip": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "spaces",
         "punctuation",
         "symbols",
-        "narrow"
+        "narrow",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-shadow": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "currentcolor"
       ],
       "description": "The text-shadow CSS property adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations. Each shadow is described by some combination of X and Y offsets from the element, blur radius, and color."
     },
     "translate": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The translate CSS property allows you to specify translation transforms individually and independently of the transform property. This maps better to typical user interface usage, and saves having to remember the exact order of transform functions to specify in the transform value."
     },
     "rotate": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The rotate CSS property allows you to specify rotation transforms individually and independently of the transform property. This maps better to typical user interface usage, and saves having to remember the exact order of transform functions to specify in the transform property."
     },
     "scale": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The scale CSS property allows you to specify scale transforms individually and independently of the transform property. This maps better to typical user interface usage, and saves having to remember the exact order of transform functions to specify in the transform value."
     },
     "transform-style": {
       "values": [
+        "flat",
+        "preserve-3d",
         "inherit",
         "initial",
-        "unset",
-        "flat",
-        "preserve-3d"
+        "unset"
       ],
       "description": "The transform-style CSS property sets whether children of an element are positioned in the 3D space or are flattened in the plane of the element."
     },
     "perspective": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The perspective CSS property determines the distance between the z=0 plane and the user in order to give a 3D-positioned element some perspective."
     },
     "perspective-origin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The perspective-origin CSS property determines the position at which the viewer is looking. It is used as the _vanishing point_ by the perspective property."
     },
     "backface-visibility": {
       "values": [
+        "visible",
+        "hidden",
         "inherit",
         "initial",
-        "unset",
-        "visible",
-        "hidden"
+        "unset"
       ],
       "description": "The backface-visibility CSS property sets whether the back face of an element is visible when turned towards the user."
     },
     "transform": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The transform CSS property lets you rotate, scale, skew, or translate an element."
     },
     "transform-origin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The transform-origin CSS property sets the origin for an element's transformations."
     },
     "transform-box": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "content-box",
         "border-box",
         "fill-box",
         "stroke-box",
-        "view-box"
+        "view-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The transform-box CSS property defines the layout box to which the transform, individual transform properties scale, and rotate, and transform-origin properties relate."
     },
     "transition-property": {
       "values": [
+        "none",
+        "all",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "all"
+        "unset"
       ],
       "description": "The transition-property CSS property sets the CSS properties to which a transition effect should be applied."
     },
@@ -6502,10 +6502,10 @@
     },
     "transition-timing-function": {
       "values": [
+        "linear",
         "inherit",
         "initial",
-        "unset",
-        "linear"
+        "unset"
       ],
       "description": "The transition-timing-function CSS property sets how intermediate values are calculated for CSS properties being affected by a transition effect."
     },
@@ -6519,10 +6519,10 @@
     },
     "transition": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The transition CSS property is a shorthand property for  cssxref(transition-property) ,  cssxref(transition-duration) ,  cssxref(transition-timing-function) , and  cssxref(transition-delay) ."
     },
@@ -6549,10 +6549,10 @@
     },
     "outline-style": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": "The outline-style CSS property sets the style of an element's outline. An outline is a line that is drawn around an element, outside the border."
     },
@@ -6576,24 +6576,24 @@
     },
     "resize": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "both",
         "horizontal",
         "vertical",
         "block",
-        "inline"
+        "inline",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The resize CSS property sets whether an element is resizable, and if so, in which directions."
     },
     "cursor": {
       "values": [
+        "url(",
         "inherit",
         "initial",
         "unset",
-        "url(",
         "src(",
         "auto",
         "default",
@@ -6636,32 +6636,32 @@
     },
     "caret-color": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "currentcolor"
       ],
       "description": "The caret-color CSS property sets the color of the insertion caret, the visible marker where the next character typed will be inserted. This is sometimes referred to as the text input cursor. The caret appears in elements such as input or those with the contenteditable attribute. The caret is typically a thin vertical line that flashes to help make it more noticeable. By default, it is black, but its color can be altered with this property."
     },
     "caret-shape": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "bar",
         "block",
-        "underscore"
+        "underscore",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "caret": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "bar",
         "block",
         "underscore"
@@ -6670,10 +6670,10 @@
     },
     "nav-up": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "current",
         "root"
       ],
@@ -6681,10 +6681,10 @@
     },
     "nav-right": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "current",
         "root"
       ],
@@ -6692,10 +6692,10 @@
     },
     "nav-down": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "current",
         "root"
       ],
@@ -6703,10 +6703,10 @@
     },
     "nav-left": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "current",
         "root"
       ],
@@ -6714,44 +6714,44 @@
     },
     "user-select": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "text",
         "none",
         "contain",
-        "all"
+        "all",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The user-select CSS property controls whether the user can select text. This doesn't have any effect on content loaded as part of a browser's user interface (its Glossary(Chrome, chrome)), except in textboxes."
     },
     "accent-color": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "currentcolor"
       ],
       "description": "The accent-color CSS property sets the accent color for user-interface controls generated by some elements."
     },
     "appearance": {
       "values": [
+        "none",
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "none",
-        "auto"
+        "unset"
       ],
       "description": "The appearance CSS property is used to control native appearance of UI controls, that are based on operating system's theme."
     },
     "input-security": {
       "values": [
+        "auto",
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "none"
+        "unset"
       ],
       "description": ""
     },
@@ -6773,113 +6773,113 @@
     },
     "view-transition-name": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "will-change": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "scroll-position",
-        "contents"
+        "contents",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The will-change CSS property hints to browsers how an element is expected to change. Browsers may set up optimizations before an element is actually changed. These kinds of optimizations can increase the responsiveness of a page by doing potentially expensive work before they are actually required."
     },
     "direction": {
       "values": [
+        "ltr",
+        "rtl",
         "inherit",
         "initial",
-        "unset",
-        "ltr",
-        "rtl"
+        "unset"
       ],
       "description": "The direction CSS property sets the direction of text, table columns, and horizontal overflow. Use rtl for languages written from right to left (like Hebrew or Arabic), and ltr for those written from left to right (like English and most other languages)."
     },
     "unicode-bidi": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "normal",
         "embed",
         "isolate",
         "bidi-override",
         "isolate-override",
-        "plaintext"
+        "plaintext",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The unicode-bidi CSS property, together with the direction property, determines how bidirectional text in a document is handled. For example, if a block of content contains both left-to-right and right-to-left text, the user-agent uses a complex Unicode algorithm to decide how to display the text. The unicode-bidi property overrides this algorithm and allows the developer to control the text embedding."
     },
     "writing-mode": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "horizontal-tb",
         "vertical-rl",
         "vertical-lr",
         "sideways-rl",
-        "sideways-lr"
+        "sideways-lr",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The writing-mode CSS property sets whether lines of text are laid out horizontally or vertically, as well as the direction in which blocks progress. When set for an entire document, it should be set on the root element (html element for HTML documents)."
     },
     "text-orientation": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "mixed",
         "upright",
-        "sideways"
+        "sideways",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-orientation CSS property sets the orientation of the text characters in a line. It only affects text in vertical mode (when writing-mode is not horizontal-tb). It is useful for controlling the display of languages that use vertical script, and also for making vertical table headers."
     },
     "glyph-orientation-vertical": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "0deg",
         "90deg",
-        "90"
+        "90",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "text-combine-upright": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "all",
-        "digits"
+        "digits",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The text-combine-upright CSS property sets the combination of characters into the space of a single character. If the combined text is wider than 1em, the user agent must fit the contents within 1em. The resulting composition is treated as a single upright glyph for layout and decoration. This property only has an effect in vertical writing modes."
     },
     "fill-rule": {
       "values": [
+        "nonzero",
+        "evenodd",
         "inherit",
         "initial",
-        "unset",
-        "nonzero",
-        "evenodd"
+        "unset"
       ],
       "description": ""
     },
     "fill-break": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "bounding-box",
         "slice",
-        "clone"
+        "clone",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -6894,37 +6894,37 @@
     },
     "fill-image": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "fill-origin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "match-parent",
         "fill-box",
         "stroke-box",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "fill-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -6941,15 +6941,15 @@
     },
     "fill-repeat": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "repeat-x",
         "repeat-y",
         "repeat",
         "space",
         "round",
-        "no-repeat"
+        "no-repeat",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -6971,37 +6971,37 @@
     },
     "stroke-align": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "center",
         "inset",
-        "outset"
+        "outset",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "stroke-linecap": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "butt",
         "round",
-        "square"
+        "square",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "stroke-linejoin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "crop",
         "arcs",
         "miter",
         "bevel",
         "round",
-        "fallback"
+        "fallback",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7015,21 +7015,21 @@
     },
     "stroke-break": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "bounding-box",
         "slice",
-        "clone"
+        "clone",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "stroke-dasharray": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
@@ -7043,23 +7043,23 @@
     },
     "stroke-dash-corner": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "stroke-dash-justify": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "stretch",
         "compress",
         "dashes",
-        "gaps"
+        "gaps",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7074,37 +7074,37 @@
     },
     "stroke-image": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "stroke-origin": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "match-parent",
         "fill-box",
         "stroke-box",
         "content-box",
         "padding-box",
-        "border-box"
+        "border-box",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "stroke-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7121,15 +7121,15 @@
     },
     "stroke-repeat": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "repeat-x",
         "repeat-y",
         "repeat",
         "space",
         "round",
-        "no-repeat"
+        "no-repeat",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7143,19 +7143,19 @@
     },
     "backdrop-filter": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The backdrop-filter CSS property lets you apply graphical effects such as blurring or color shifting to the area behind an element. Because it applies to everything _behind_ the element, to see the effect you must make the element or its background at least partially transparent."
     },
     "filter": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The filter CSS property applies graphical effects like blur or color shift to an element. Filters are commonly used to adjust the rendering of images, backgrounds, and borders."
     },
@@ -7178,12 +7178,12 @@
     },
     "color-interpolation-filters": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "sRGB",
-        "linearRGB"
+        "linearRGB",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
@@ -7198,40 +7198,40 @@
     },
     "math-style": {
       "values": [
+        "normal",
+        "compact",
         "inherit",
         "initial",
-        "unset",
-        "normal",
-        "compact"
+        "unset"
       ],
       "description": "The math-style property indicates whether MathML equations should render with normal or compact height."
     },
     "math-shift": {
       "values": [
+        "normal",
+        "compact",
         "inherit",
         "initial",
-        "unset",
-        "normal",
-        "compact"
+        "unset"
       ],
       "description": "The math-shift property indicates whether superscripts inside MathML formulas should be raised by a normal or compact shift."
     },
     "math-depth": {
       "values": [
+        "auto-add",
         "inherit",
         "initial",
         "unset",
-        "auto-add",
         "add()"
       ],
       "description": "The math-depth property describes a notion of _depth_ for each element of a mathematical formula, with respect to the top-level container of that formula. Concretely, this is used to determine the computed value of the font-size property when its specified value is math."
     },
     "offset-path": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "url(",
         "src(",
         "content-box",
@@ -7253,48 +7253,48 @@
     },
     "offset-position": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The offset-position CSS property defines the initial position of the offset-path."
     },
     "offset-anchor": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "auto",
         "left",
         "center",
         "right",
         "top",
-        "bottom"
+        "bottom",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The offset-anchor CSS property specifies the point inside the box of an element traveling along an offset-path that is actually moving along the path."
     },
     "offset-rotate": {
       "values": [
+        "auto",
+        "reverse",
         "inherit",
         "initial",
-        "unset",
-        "auto",
-        "reverse"
+        "unset"
       ],
       "description": "The offset-rotate CSS property defines the orientation/direction of the element as it is positioned along the offset-path."
     },
     "offset": {
       "values": [
+        "auto",
         "inherit",
         "initial",
         "unset",
-        "auto",
         "none",
         "reverse"
       ],
@@ -7302,31 +7302,31 @@
     },
     "scroll-timeline-name": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": "The scroll-timeline-name CSS property defines a name that can be used to identify an element as the source of a scroll timeline for an animation."
     },
     "scroll-timeline-axis": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "block",
         "inline",
         "vertical",
-        "horizontal"
+        "horizontal",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": "The scroll-timeline-axis CSS property can be used to specify the scrollbar that will be used to provide the timeline for a scroll-timeline animation."
     },
     "scroll-timeline": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "block",
         "inline",
         "vertical",
@@ -7336,40 +7336,40 @@
     },
     "view-timeline-name": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "view-timeline-axis": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "block",
         "inline",
         "vertical",
-        "horizontal"
+        "horizontal",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "view-timeline-inset": {
       "values": [
+        "auto",
         "inherit",
         "initial",
-        "unset",
-        "auto"
+        "unset"
       ],
       "description": ""
     },
     "view-timeline": {
       "values": [
+        "none",
         "inherit",
         "initial",
         "unset",
-        "none",
         "block",
         "inline",
         "vertical",
@@ -7379,61 +7379,61 @@
     },
     "animation-range": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "animation-range-start": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "animation-range-end": {
       "values": [
+        "normal",
         "inherit",
         "initial",
-        "unset",
-        "normal"
+        "unset"
       ],
       "description": ""
     },
     "stroke-alignment": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "center",
         "inner",
-        "outer"
+        "outer",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     },
     "stroke-dashcorner": {
       "values": [
+        "none",
         "inherit",
         "initial",
-        "unset",
-        "none"
+        "unset"
       ],
       "description": ""
     },
     "stroke-dashadjust": {
       "values": [
-        "inherit",
-        "initial",
-        "unset",
         "none",
         "stretch",
         "compress",
         "dashes",
-        "gaps"
+        "gaps",
+        "inherit",
+        "initial",
+        "unset"
       ],
       "description": ""
     }
