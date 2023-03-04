@@ -37,7 +37,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: pulsar.deb
-        key: pulsar-$env:GITHUB_SHA
+        key: pulsar-${{ github.sha }}
 
   test:
     name: Package
@@ -159,7 +159,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: pulsar.deb
-        key: pulsar-$env:GITHUB_SHA
+        key: pulsar-${{ github.sha }}
 
     - name: Install Pulsar
       run: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
