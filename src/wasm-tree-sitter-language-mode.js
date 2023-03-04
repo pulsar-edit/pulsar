@@ -299,11 +299,7 @@ class WASMTreeSitterLanguageMode {
 
     console.log('invalidating:', range.start, range.end);
 
-    // TODO: I don't know why this needs a tick in order to do the right thing.
-    // I will investigate.
-    setTimeout(() => {
-      this.emitter.emit('did-change-highlighting', range)
-    }, 50);
+    this.emitter.emit('did-change-highlighting', range)
   }
 
   // FIXME: This was a different strategy for determining how much of the
@@ -1032,29 +1028,50 @@ class HighlightIterator {
     return boundaries;
   }
 
+  openScopesAtPosition (position) {
+    let boundaries = this.getBoundaries();
+    // Start at the beginning.
+    const it = boundaries.ge(new Point(0, 0))
+
+    if (!it.value) { return [] }
+
+    let scopeIds = []
+    while (comparePoints(it.key, position) <= 0) {
+      const closing = it.value.closeScopeIds
+
+      for (let c of closing) {
+        scopeIds.splice(
+          scopeIds.lastIndexOf(c),
+          1
+        );
+      }
+
+      scopeIds.push(...it.value.openScopeIds)
+      if (!it.hasNext) { break }
+      it.next()
+    }
+
+    return scopeIds;
+  }
+
   seek (start, endRow) {
-
     let end = { row: endRow, column: 0 };
-
-    // let range = this.languageMode._findInvalidationRange(start, end);
-    //
-    // console.log('SEEK range:', range);
-
     this.end = end;
 
     let boundaries = this.getBoundaries();
     this.iterator = boundaries.ge(start);
 
-    // TODO: What is this return value used for?
-    return []
+    return this.openScopesAtPosition(start);
   }
 
   getOpenScopeIds () {
-    return this.iterator.value.openScopeIds;
+    let { value } = this.iterator;
+    return value.openScopeIds;
   }
 
   getCloseScopeIds () {
-    return this.iterator.value.closeScopeIds;
+    let { value } = this.iterator;
+    return value.closeScopeIds;
   }
 
   getPosition () {
@@ -1074,7 +1091,6 @@ class HighlightIterator {
 
 
 function combineRanges (ranges) {
-  // console.log('combineRanges', ranges);
   let earliest = null;
   let latest = null;
   ranges.forEach(({ end, start }) => {
