@@ -470,7 +470,7 @@
         "initial",
         "unset"
       ],
-      "description": "  Non-standard_header() "
+      "description": "  Non-standardheader() "
     },
     "-webkit-mask-box-image-outset": {
       "values": [
@@ -1924,7 +1924,7 @@
         "initial",
         "unset"
       ],
-      "description": "The orphans CSS property sets the minimum number of lines in a block container that must be shown at the _bottom_ of a page, region, or column."
+      "description": "The orphans CSS property sets the minimum number of lines in a block container that must be shown at the bottom of a page, region, or column."
     },
     "widows": {
       "values": [
@@ -1932,7 +1932,7 @@
         "initial",
         "unset"
       ],
-      "description": "The widows CSS property sets the minimum number of lines in a block container that must be shown at the _top_ of a page, region, or column."
+      "description": "The widows CSS property sets the minimum number of lines in a block container that must be shown at the top of a page, region, or column."
     },
     "margin-break": {
       "values": [
@@ -2015,7 +2015,7 @@
         "initial",
         "unset"
       ],
-      "description": "The color CSS property sets the foreground color value of an element's text and text decorations, and sets the currentcolor value. currentcolor may be used as an indirect value on _other_ properties and is the default for other color properties, such as border-color."
+      "description": "The color CSS property sets the foreground color value of an element's text and text decorations, and sets the currentcolor value. currentcolor may be used as an indirect value on other properties and is the default for other color properties, such as border-color."
     },
     "opacity": {
       "values": [
@@ -2283,7 +2283,7 @@
         "initial",
         "unset"
       ],
-      "description": "The flex CSS shorthand property sets how a flex _item_ will grow or shrink to fit the space available in its flex container."
+      "description": "The flex CSS shorthand property sets how a flex item will grow or shrink to fit the space available in its flex container."
     },
     "flex-grow": {
       "values": [
@@ -2757,7 +2757,7 @@
         "initial",
         "unset"
       ],
-      "description": "The grid-template-rows CSS property defines the line names and track sizing functions of the glossary(grid_row, grid rows)."
+      "description": "The grid-template-rows CSS property defines the line names and track sizing functions of the glossary(gridrow, grid rows)."
     },
     "masonry-auto-flow": {
       "values": [
@@ -2835,7 +2835,7 @@
         "initial",
         "unset"
       ],
-      "description": "The grid-template CSS property is a shorthand property for defining glossary(grid column, grid columns), glossary(grid_row, grid rows), and glossary(grid areas, grid areas)."
+      "description": "The grid-template CSS property is a shorthand property for defining glossary(grid column, grid columns), glossary(gridrow, grid rows), and glossary(grid areas, grid areas)."
     },
     "grid-auto-columns": {
       "values": [
@@ -3711,7 +3711,7 @@
         "initial",
         "unset"
       ],
-      "description": "« SVG Attribute reference home"
+      "description": "The clip-rule attribute only applies to graphics elements that are contained within a  SVGElement(clipPath)  element. The clip-rule attribute basically works as the  SVGAttr(fill-rule)  attribute, except that it applies to  SVGElement(clipPath)  definitions."
     },
     "mask-image": {
       "values": [
@@ -3897,7 +3897,7 @@
         "initial",
         "unset"
       ],
-      "description": "The mask-type CSS property sets whether an SVG mask element is used as a _luminance_ or an _alpha_ mask. It applies to the <mask> element itself."
+      "description": "The mask-type CSS property sets whether an SVG mask element is used as a luminance or an alpha mask. It applies to the <mask> element itself."
     },
     "clip": {
       "values": [
@@ -3906,7 +3906,7 @@
         "initial",
         "unset"
       ],
-      "description": "> Warning: Where possible, authors are encouraged to use the newer clip-path property instead."
+      "description": "The clip CSS property defines a visible portion of an element. The clip property applies only to absolutely positioned elements — that is, elements with position,position:absolute or position,position:fixed."
     },
     "column-span": {
       "values": [
@@ -4809,7 +4809,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-top property defines offsets for the top of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-top property defines offsets for the top of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-right": {
       "values": [
@@ -4818,7 +4818,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-right property defines offsets for the right of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-right property defines offsets for the right of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-bottom": {
       "values": [
@@ -4827,7 +4827,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-bottom property defines offsets for the bottom of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-bottom property defines offsets for the bottom of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-left": {
       "values": [
@@ -4836,7 +4836,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-left property defines offsets for the left of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-left property defines offsets for the left of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-inline-start": {
       "values": [
@@ -4845,7 +4845,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-inline-start property defines offsets for the start edge in the inline dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-inline-start property defines offsets for the start edge in the inline dimension of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-block-start": {
       "values": [
@@ -4854,7 +4854,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-block-start property defines offsets for the start edge in the block dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-block-start property defines offsets for the start edge in the block dimension of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-inline-end": {
       "values": [
@@ -4863,7 +4863,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-inline-end property defines offsets for the end edge in the inline dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-inline-end property defines offsets for the end edge in the inline dimension of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-block-end": {
       "values": [
@@ -4872,7 +4872,7 @@
         "initial",
         "unset"
       ],
-      "description": "The scroll-padding-block-end property defines offsets for the end edge in the block dimension of the _optimal viewing region_ of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
+      "description": "The scroll-padding-block-end property defines offsets for the end edge in the block dimension of the optimal viewing region of the scrollport: the region used as the target region for placing things in view of the user. This allows the author to exclude regions of the scrollport that are obscured by other content (such as fixed-positioned toolbars or sidebars) or to put more breathing room between a targeted element and the edges of the scrollport."
     },
     "scroll-padding-block": {
       "values": [
@@ -6156,7 +6156,7 @@
         "initial",
         "unset"
       ],
-      "description": "The perspective-origin CSS property determines the position at which the viewer is looking. It is used as the _vanishing point_ by the perspective property."
+      "description": "The perspective-origin CSS property determines the position at which the viewer is looking. It is used as the vanishing point by the perspective property."
     },
     "backface-visibility": {
       "values": [
@@ -6603,7 +6603,7 @@
         "initial",
         "unset"
       ],
-      "description": "> Warning: This property has been replaced by the break-before property."
+      "description": "The page-break-before CSS property adjusts page breaks before the current element."
     },
     "page-break-after": {
       "values": [
@@ -6616,7 +6616,7 @@
         "initial",
         "unset"
       ],
-      "description": "> Warning: This property has been replaced by the break-after property."
+      "description": "The page-break-after CSS property adjusts page breaks after the current element."
     },
     "page-break-inside": {
       "values": [
@@ -6626,7 +6626,7 @@
         "initial",
         "unset"
       ],
-      "description": "> Warning: This property has been replaced by the break-inside property."
+      "description": "The page-break-inside CSS property adjusts page breaks inside the current element."
     },
     "fill-rule": {
       "values": [
@@ -6636,7 +6636,7 @@
         "initial",
         "unset"
       ],
-      "description": "The fill-rule attribute is a presentation attribute defining the algorithm to use to determine the _inside_ part of a shape."
+      "description": "The fill-rule attribute is a presentation attribute defining the algorithm to use to determine the inside part of a shape."
     },
     "fill-break": {
       "values": [
@@ -6725,7 +6725,7 @@
         "initial",
         "unset"
       ],
-      "description": "The fill-opacity attribute is a presentation attribute defining the opacity of the paint server (_color_, _gradient_, _pattern_, etc.) applied to a shape."
+      "description": "The fill-opacity attribute is a presentation attribute defining the opacity of the paint server (color, gradient, pattern, etc.) applied to a shape."
     },
     "stroke-width": {
       "values": [
@@ -6905,7 +6905,7 @@
         "initial",
         "unset"
       ],
-      "description": "The stroke-opacity attribute is a presentation attribute defining the opacity of the paint server (_color_, _gradient_, _pattern_, etc.) applied to the stroke of a shape."
+      "description": "The stroke-opacity attribute is a presentation attribute defining the opacity of the paint server (color, gradient, pattern, etc.) applied to the stroke of a shape."
     },
     "backdrop-filter": {
       "values": [
@@ -6914,7 +6914,7 @@
         "initial",
         "unset"
       ],
-      "description": "The backdrop-filter CSS property lets you apply graphical effects such as blurring or color shifting to the area behind an element. Because it applies to everything _behind_ the element, to see the effect you must make the element or its background at least partially transparent."
+      "description": "The backdrop-filter CSS property lets you apply graphical effects such as blurring or color shifting to the area behind an element. Because it applies to everything behind the element, to see the effect you must make the element or its background at least partially transparent."
     },
     "filter": {
       "values": [
@@ -6990,7 +6990,7 @@
         "initial",
         "unset"
       ],
-      "description": "The math-depth property describes a notion of _depth_ for each element of a mathematical formula, with respect to the top-level container of that formula. Concretely, this is used to determine the computed value of the font-size property when its specified value is math."
+      "description": "The math-depth property describes a notion of depth for each element of a mathematical formula, with respect to the top-level container of that formula. Concretely, this is used to determine the computed value of the font-size property when its specified value is math."
     },
     "offset-path": {
       "values": [
@@ -7310,7 +7310,7 @@
         "initial",
         "unset"
       ],
-      "description": "The fill attribute has two different meanings. For shapes and text it's a presentation attribute that defines the color (_or any SVG paint servers like gradients or patterns_) used to paint the element; for animation it defines the final state of the animation."
+      "description": "The fill attribute has two different meanings. For shapes and text it's a presentation attribute that defines the color (or any SVG paint servers like gradients or patterns) used to paint the element; for animation it defines the final state of the animation."
     },
     "stroke": {
       "values": [
@@ -7319,7 +7319,7 @@
         "initial",
         "unset"
       ],
-      "description": "The stroke attribute is a presentation attribute defining the color (_or any SVG paint servers like gradients or patterns_) used to paint the outline of the shape;"
+      "description": "The stroke attribute is a presentation attribute defining the color (or any SVG paint servers like gradients or patterns) used to paint the outline of the shape;"
     },
     "marker-start": {
       "values": [

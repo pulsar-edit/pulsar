@@ -170,7 +170,9 @@ async function getDescriptionOfProp(name) {
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {
-      if (summaryRaw[i].length > 1) {
+      // Filtering the starting character protects agains't collecting accidental
+      // warnings or other notices within the MDN site.
+      if (summaryRaw[i].length > 1 && !summaryRaw[i].startsWith("> ") && !summaryRaw[i].startsWith("« ")) {
         return summaryRaw[i]
           .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
           .replace(/\*/g, "")
@@ -178,6 +180,7 @@ async function getDescriptionOfProp(name) {
           .replace(/\{/g, "")
           .replace(/\}/g, "")
           .replace(/\"/g, "")
+          .replace(/\_/g, "")
           .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
       }
     }
