@@ -125,6 +125,12 @@
 ;   (#eq? @function.method.builtin.ruby "new")
 ; )
 
+(element_reference
+  (constant) @support.class.ruby
+  (#match? @support.class.ruby "^(Set)$")
+  ; (#set! final "true")
+)
+
 (call
   method: [(identifier) (constant)] @keyword.other.special-method (#match? @keyword.other.special-method "^(extend)$"))
 

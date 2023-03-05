@@ -15,10 +15,13 @@ function last(array) {
 }
 
 function removeLastOccurrenceOf(array, item) {
-  return array.splice(
-    array.lastIndexOf(item),
-    1
-  );
+  return array.splice(array.lastIndexOf(item), 1);
+}
+
+function clamp (value, min, max) {
+  if (value < min) { return min; }
+  if (value > max) { return max; }
+  return value;
 }
 
 // A data structure for storing scope information during a `HighlightIterator`
@@ -187,7 +190,7 @@ class WASMTreeSitterLanguageMode {
     });
   }
 
-  // HACK: AForce an existing buffer to react to an update in the SCM file.
+  // HACK: Force an existing buffer to react to an update in the SCM file.
   _reloadSyntaxQuery () {
     this.grammar._reloadQueryFiles();
 
@@ -221,57 +224,6 @@ class WASMTreeSitterLanguageMode {
 
   onDidChangeHighlighting(callback) {
     return this.emitter.on('did-change-highlighting', callback)
-  }
-
-  tokenizedLineForRow(row) {
-    const lineText = this.buffer.lineForRow(row);
-    const tokens = [];
-
-    const iterator = this.buildHighlightIterator();
-    let start = { row, column: 0 };
-
-    const scopes = iterator.seek(start, row);
-
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const end = { ...iterator.getPosition() };
-      if (end.row > row) {
-        end.row = row;
-        end.column = lineText.length;
-      }
-
-      if (end.column > start.column) {
-        tokens.push(
-          new Token({
-            value: lineText.substring(start.column, end.column),
-            scopes: scopes.map(s => this.scopeForId(s))
-          })
-        );
-      }
-
-      if (end.column < lineText.length) {
-        const closeScopeCount = iterator.getCloseScopeIds().length;
-        for (let i = 0; i < closeScopeCount; i++) {
-          scopes.pop();
-        }
-        scopes.push(...iterator.getOpenScopeIds());
-        start = end;
-        iterator.moveToSuccessor();
-      } else {
-        break;
-      }
-    }
-
-    return new TokenizedLine({
-      openScopes: [],
-      text: lineText,
-      tokens,
-      tags: [],
-      ruleStack: [],
-      lineEnding: this.buffer.lineEndingForRow(row),
-      tokenIterator: null,
-      grammar: this.grammar
-    });
   }
 
   getScopeChain(...args) {
@@ -535,7 +487,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   buildHighlightIterator() {
-    if (!this.parser) return nullIterator;
+    if (!this.parser) return NullIterator;
     return new HighlightIterator(this);
   }
 
@@ -667,7 +619,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Re-parse the tree without replacing the existing tree.
-  forceAnonymousParse () {
+  forceAnonymousParse() {
     return this.parser.parse(this.buffer.getText(), this.tree);
   }
 
@@ -749,7 +701,6 @@ class WASMTreeSitterLanguageMode {
   // Returns a {Number}.
   suggestedIndentForBufferRow(row, tabLength, options = {}) {
     let indentTree = this.forceAnonymousParse();
-    // console.log('suggestedIndentForBufferRow', row, tabLength, options);
     if (row === 0) { return 0; }
 
     let comparisonRow = row - 1;
@@ -765,33 +716,35 @@ class WASMTreeSitterLanguageMode {
       this.buffer.lineForRow(comparisonRow), tabLength
     );
 
-    // console.log('comparisonRow:', comparisonRow, lastLineIndent);
-    const indents = this.indentsQuery.captures(
+    // Capture in two phases. The first phase affects whether this line should
+    // be indented from the previous line.
+    const indentCaptures = this.indentsQuery.captures(
       indentTree.rootNode,
-      {row: comparisonRow, column: 0},
-      {row: row + 1, column: 0}
+      { row: comparisonRow, column: 0 },
+      { row: row, column: 0 }
     );
 
-    // console.log('indents:', indents);
+    let indentDelta = this.getIndentDeltaFromCaptures(indentCaptures);
+    indentDelta = clamp(indentDelta, 0, 1);
 
-    let delta = 0;
-    for (let { name, node } of indents) {
-      let text = node.text;
-      if (!text || !text.length) { continue; }
-      if (name === 'indent') { delta++; }
-      else if (name === 'indent_end') { delta--; }
-    }
+    // The second phase tells us whether this line should be dedented from the
+    // previous line.
+    const dedentCaptures = this.indentsQuery.captures(
+      indentTree.rootNode,
+      { row: row, column: 0 },
+      { row: row + 1, column: 0 }
+    );
 
-    if (delta > 1) { delta = 1; }
-    if (delta < 0) { delta = 0; }
+    let dedentDelta = this.getIndentDeltaFromCaptures(dedentCaptures);
+    dedentDelta = clamp(dedentDelta, -1, 0);
 
-    return lastLineIndent + delta;
+    return lastLineIndent + indentDelta + dedentDelta;
   }
 
-  // Get the suggested indentation level for a line in the buffer on which the user is currently
-  // typing. This may return a different result from {::suggestedIndentForBufferRow} in order
-  // to avoid unexpected changes in indentation. It may also return undefined if no change should
-  // be made.
+  // Get the suggested indentation level for a line in the buffer on which the
+  // user is currently typing. This may return a different result from
+  // {::suggestedIndentForBufferRow} in order to avoid unexpected changes in
+  // indentation. It may also return undefined if no change should be made.
   //
   // * row - The row {Number}
   //
@@ -805,15 +758,13 @@ class WASMTreeSitterLanguageMode {
     let indentTree = this.forceAnonymousParse();
     const indents = this.indentsQuery.captures(
       indentTree.rootNode,
-      {row: row, column: 0},
-      {row: row+1, column: 0}
+      { row: row, column: 0 },
+      { row: row + 1, column: 0 }
     )
-    // console.log('suggestedIndentForEditedBufferRow', row);
-    // console.log('indents:', indents);
+
     const indent = indents.find(i => {
       return i.node.startPosition.row === row && i.name === 'branch'
     });
-    // console.log('specific indent:', indent);
     if (indent?.name === "branch") {
       if (this.buffer.lineForRow(row).trim() === indent.node.text) {
         const parent = indent.node.parent
@@ -825,8 +776,8 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
-  // Get the suggested indentation level for a given line of text, if it were inserted at the given
-  // row in the buffer.
+  // Get the suggested indentation level for a given line of text, if it were
+  // inserted at the given row in the buffer.
   //
   // * bufferRow - A {Number} indicating the buffer row
   //
@@ -835,17 +786,98 @@ class WASMTreeSitterLanguageMode {
     // console.log('suggestedIndentForLineAtBufferRow', row, line);
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
+
+  // Private
+  getIndentDeltaFromCaptures(captures) {
+    let delta = 0;
+    let positionSet = new Set;
+    for (let { name, node } of captures) {
+      // Ignore phantom captures.
+      let text = node.text;
+      if (!text || !text.length) { continue; }
+
+      // A given node may be marked with both (e.g.) `indent_end` and `branch`.
+      // Only consider a given range once.
+      let key = `${node.startIndex}/${node.endIndex}`;
+      if (positionSet.has(key)) {
+        continue;
+      } else {
+        positionSet.add(key);
+      }
+
+      if (name === 'indent') {
+        delta++;
+      } else if (name === 'indent_end' || name === 'branch') {
+        delta--;
+      }
+    }
+    return delta;
+  }
+
+  // DEPRECATED
+
+  tokenizedLineForRow(row) {
+    const lineText = this.buffer.lineForRow(row);
+    const tokens = [];
+
+    const iterator = this.buildHighlightIterator();
+    let start = { row, column: 0 };
+
+    const scopes = iterator.seek(start, row);
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const end = { ...iterator.getPosition() };
+      if (end.row > row) {
+        end.row = row;
+        end.column = lineText.length;
+      }
+
+      if (end.column > start.column) {
+        tokens.push(
+          new Token({
+            value: lineText.substring(start.column, end.column),
+            scopes: scopes.map(s => this.scopeForId(s))
+          })
+        );
+      }
+
+      if (end.column < lineText.length) {
+        const closeScopeCount = iterator.getCloseScopeIds().length;
+        for (let i = 0; i < closeScopeCount; i++) {
+          scopes.pop();
+        }
+        scopes.push(...iterator.getOpenScopeIds());
+        start = end;
+        iterator.moveToSuccessor();
+      } else {
+        break;
+      }
+    }
+
+    return new TokenizedLine({
+      openScopes: [],
+      text: lineText,
+      tokens,
+      tags: [],
+      ruleStack: [],
+      lineEnding: this.buffer.lineEndingForRow(row),
+      tokenIterator: null,
+      grammar: this.grammar
+    });
+  }
 }
+
 module.exports = WASMTreeSitterLanguageMode;
 
-const nullIterator = {
+const NullIterator = {
   seek: () => [],
   compare: () => 1,
   moveToSuccessor: () => {},
   getPosition: () => Point.INFINITY,
   getOpenScopeIds: () => [],
   getCloseScopeIds: () => []
-}
+};
 
 function findNodeInCurrentScope(boundaries, position, filter) {
   let iterator = boundaries.ge(position)
@@ -887,18 +919,25 @@ class HighlightIterator {
   }
 
   seek (start, endRow) {
-    let end = { row: endRow, column: Infinity };
+    let { buffer } = this.languageMode;
+    let end = {
+      row: endRow,
+      column: buffer.lineLengthForRow(endRow)
+    };
     this.end = end;
 
     let [boundaries, openScopes] = this.languageMode.getSyntaxBoundaries(
-      start, end, { includeOpenScopes: true });
+      start,
+      end,
+      { includeOpenScopes: true }
+    );
     this.iterator = boundaries.begin;
-
-    this.bufferRange = this.languageMode.buffer.getRange();
+    this.bufferRange = buffer.getRange();
     return openScopes;
   }
 
   getOpenScopeIds () {
+    // this.logPosition();
     return [...this.iterator.value.openScopeIds];
   }
 
@@ -909,6 +948,20 @@ class HighlightIterator {
   getPosition () {
     let position = this.iterator.key;
     return position || Point.INFINITY;
+  }
+
+  logPosition () {
+    let pos = this.getPosition();
+
+    console.log(
+      `[highlight] (${pos.row}, ${pos.column})`,
+      'close',
+      this.iterator.value.closeScopeIds.map(id => this.languageMode.scopeForId(id)),
+      'open',
+      this.iterator.value.openScopeIds.map(id => this.languageMode.scopeForId(id)),
+      'next?',
+      this.iterator.hasNext
+    );
   }
 
   moveToSuccessor () {
