@@ -5,9 +5,14 @@ const Parser = require('web-tree-sitter');
 module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.scopeName = params.scopeName
+    this._grammarPath = grammarPath
+    this.queryPaths = params.treeSitter
     const dirName = path.dirname(grammarPath)
     const qPath = path.join(dirName, params.treeSitter.syntaxQuery)
     const iPath = path.join(dirName, params.treeSitter.indentsQuery)
+
+    this.loadQueryFiles(grammarPath, this.queryPaths);
+
     this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
     this._loadQueryIfExists(params,dirName, 'localsQuery')
     this._loadQueryIfExists(params,dirName, 'foldsQuery')
@@ -18,10 +23,29 @@ module.exports = class WASMTreeSitterGrammar {
     this.fileTypes = params.fileTypes || [];
     this.registry = registry
     this.name = params.name
+
+  }
+
+  loadQueryFiles (grammarPath, queryPaths) {
+    console.log('loadQueryFiles', grammarPath, queryPaths);
+
+    if (!('syntaxQuery' in queryPaths)) {
+      throw new Error(`Syntax query must be present`);
+    }
+    let dirName = path.dirname(grammarPath)
+    for (let [key, name] of Object.entries(queryPaths)) {
+      if (!key.endsWith('Query')) { continue; }
+      let filePath = path.join(dirName, name);
+      this[key] = fs.readFileSync(filePath, 'utf-8');
+    }
+  }
+
+  _reloadQueryFiles () {
+    this.loadQueryFiles(this._grammarPath, this.queryPaths);
   }
 
   _loadQueryIfExists(params, dirName, queryName) {
-    if(params.treeSitter[queryName]) {
+    if (params.treeSitter[queryName]) {
       const p = path.join(dirName, params.treeSitter[queryName])
       this[queryName] = fs.readFileSync(p, 'utf-8')
     }
