@@ -147,14 +147,26 @@ async function getDescriptionOfProp(name) {
   // We will gather a description by checking if there's a document written
   // on MDN for our property and then extract a summary from there.
 
-  if (fs.existsSync(`./node_modules/content/files/en-us/web/css/${name}/index.md`)) {
-    let file = fs.readFileSync(`./node_modules/content/files/en-us/web/css/${name}/index.md`, { encoding: "utf8" });
+  // Since not all CSS property definitions will exist within the CSS docs
+  // While this seems strange, it's because some selectors are part of other
+  // specs and may not be worth mentioning standalone.
+  let file;
+  let filePath = [ "css", "svg/attribute" ].map(path =>
+    `./node_modules/content/files/en-us/web/${path}/${name}/index.md`
+  ).find(f => fs.existsSync(f));
 
+  if (filePath) {
+    file = fs.readFileSync(filePath, { encoding: "utf8" });
+  }
+
+  if (file) {
     // Here we will do a quick and dirty way to parse the markdown file to retreive a raw string
     let breaks = file.split("---");
 
     // The first two breaks should be the yaml metadata block
-    let data = breaks[2].replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "").replace(/\{\{CSSRef\}\}/gm, "");
+    let data = breaks[2].replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "")
+                        .replace(/\{\{CSSRef\}\}/gm, "")
+                        .replace(/\{\{SVGRef\}\}/gm, "");
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {

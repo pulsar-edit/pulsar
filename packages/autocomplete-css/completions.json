@@ -141,287 +141,6 @@
     "xmp"
   ],
   "properties": {
-    "z-index": {
-      "values": [
-        "auto",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "The z-index CSS property sets the z-order of a positioned element and its descendants or flex items. Overlapping elements with a larger z-index cover those with a smaller one."
-    },
-    "page-break-before": {
-      "values": [
-        "auto",
-        "always",
-        "avoid",
-        "left",
-        "right",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "> Warning: This property has been replaced by the break-before property."
-    },
-    "page-break-after": {
-      "values": [
-        "auto",
-        "always",
-        "avoid",
-        "left",
-        "right",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "> Warning: This property has been replaced by the break-after property."
-    },
-    "page-break-inside": {
-      "values": [
-        "avoid",
-        "auto",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "> Warning: This property has been replaced by the break-inside property."
-    },
-    "cx": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "cy": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "r": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "rx": {
-      "values": [
-        "auto",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "ry": {
-      "values": [
-        "auto",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "x": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "y": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "vector-effect": {
-      "values": [
-        "none",
-        "non-scaling-stroke",
-        "non-scaling-size",
-        "non-rotation",
-        "fixed-position",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "d": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "shape-subtract": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "text-anchor": {
-      "values": [
-        "start",
-        "middle",
-        "end",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "fill": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "stroke": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "marker-start": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "marker-mid": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "marker-end": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "marker": {
-      "values": [
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "paint-order": {
-      "values": [
-        "normal",
-        "fill",
-        "stroke",
-        "markers",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "The paint-order CSS property lets you control the order in which the fill and stroke (and painting markers) of text content and shapes are drawn."
-    },
-    "color-interpolation": {
-      "values": [
-        "auto",
-        "sRGB",
-        "linearRGB",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "shape-rendering": {
-      "values": [
-        "auto",
-        "optimizeSpeed",
-        "crispEdges",
-        "geometricPrecision",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "text-rendering": {
-      "values": [
-        "auto",
-        "optimizeSpeed",
-        "optimizeLegibility",
-        "geometricPrecision",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "The text-rendering CSS property provides information to the rendering engine about what to optimize for when rendering text."
-    },
-    "pointer-events": {
-      "values": [
-        "auto",
-        "bounding-box",
-        "visiblePainted",
-        "visibleFill",
-        "visibleStroke",
-        "visible",
-        "painted",
-        "fill",
-        "stroke",
-        "all",
-        "none",
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": "The pointer-events CSS property sets under what circumstances (if any) a particular graphic element can become the target of pointer events."
-    },
-    "stop-color": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
-    "stop-opacity": {
-      "values": [
-        "inherit",
-        "initial",
-        "unset"
-      ],
-      "description": ""
-    },
     "-webkit-text-fill-color": {
       "values": [
         "currentcolor",
@@ -3301,7 +3020,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The dominant-baseline attribute specifies the dominant baseline, which is the baseline used to align the box's text and inline-level contents. It also indicates the default alignment baseline of any boxes participating in baseline alignment in the box's alignment context."
     },
     "vertical-align": {
       "values": [
@@ -3351,7 +3070,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The alignment-baseline attribute specifies how an object is aligned with respect to its parent. This property specifies which baseline of this element is to be aligned with the corresponding baseline of the parent. For example, this allows alphabetic baselines in Roman text to stay aligned across font size changes. It defaults to the baseline with the same name as the computed value of the alignment-baseline property."
     },
     "baseline-shift": {
       "values": [
@@ -3364,7 +3083,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The baseline-shift attribute allows repositioning of the dominant-baseline relative to the dominant-baseline of the parent text content element. The shifted object might be a sub- or superscript."
     },
     "line-height": {
       "values": [
@@ -3992,7 +3711,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "« SVG Attribute reference home"
     },
     "mask-image": {
       "values": [
@@ -6851,7 +6570,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The glyph-orientation-vertical attribute affects the amount that the current text position advances as each glyph is rendered."
     },
     "text-combine-upright": {
       "values": [
@@ -6864,6 +6583,51 @@
       ],
       "description": "The text-combine-upright CSS property sets the combination of characters into the space of a single character. If the combined text is wider than 1em, the user agent must fit the contents within 1em. The resulting composition is treated as a single upright glyph for layout and decoration. This property only has an effect in vertical writing modes."
     },
+    "z-index": {
+      "values": [
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The z-index CSS property sets the z-order of a positioned element and its descendants or flex items. Overlapping elements with a larger z-index cover those with a smaller one."
+    },
+    "page-break-before": {
+      "values": [
+        "auto",
+        "always",
+        "avoid",
+        "left",
+        "right",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "> Warning: This property has been replaced by the break-before property."
+    },
+    "page-break-after": {
+      "values": [
+        "auto",
+        "always",
+        "avoid",
+        "left",
+        "right",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "> Warning: This property has been replaced by the break-after property."
+    },
+    "page-break-inside": {
+      "values": [
+        "avoid",
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "> Warning: This property has been replaced by the break-inside property."
+    },
     "fill-rule": {
       "values": [
         "nonzero",
@@ -6872,7 +6636,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The fill-rule attribute is a presentation attribute defining the algorithm to use to determine the _inside_ part of a shape."
     },
     "fill-break": {
       "values": [
@@ -6961,7 +6725,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The fill-opacity attribute is a presentation attribute defining the opacity of the paint server (_color_, _gradient_, _pattern_, etc.) applied to a shape."
     },
     "stroke-width": {
       "values": [
@@ -6969,7 +6733,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-width attribute is a presentation attribute defining the width of the stroke to be applied to the shape."
     },
     "stroke-align": {
       "values": [
@@ -6991,7 +6755,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-linecap attribute is a presentation attribute defining the shape to be used at the end of open subpaths when they are stroked."
     },
     "stroke-linejoin": {
       "values": [
@@ -7005,7 +6769,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-linejoin attribute is a presentation attribute defining the shape to be used at the corners of paths when they are stroked."
     },
     "stroke-miterlimit": {
       "values": [
@@ -7013,7 +6777,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-miterlimit attribute is a presentation attribute defining a limit on the ratio of the miter length to the  SVGAttr(stroke-width)  used to draw a miter join. When the limit is exceeded, the join is converted from a miter to a bevel."
     },
     "stroke-break": {
       "values": [
@@ -7033,7 +6797,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-dasharray attribute is a presentation attribute defining the pattern of dashes and gaps used to paint the outline of the shape;"
     },
     "stroke-dashoffset": {
       "values": [
@@ -7041,7 +6805,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-dashoffset attribute is a presentation attribute defining an offset on the rendering of the associated dash array."
     },
     "stroke-dash-corner": {
       "values": [
@@ -7141,7 +6905,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-opacity attribute is a presentation attribute defining the opacity of the paint server (_color_, _gradient_, _pattern_, etc.) applied to the stroke of a shape."
     },
     "backdrop-filter": {
       "values": [
@@ -7168,7 +6932,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The flood-color attribute indicates what color to use to flood the current filter primitive subregion."
     },
     "flood-opacity": {
       "values": [
@@ -7176,7 +6940,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The flood-opacity attribute indicates the opacity value to use across the current filter primitive subregion."
     },
     "color-interpolation-filters": {
       "values": [
@@ -7187,7 +6951,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The color-interpolation-filters attribute specifies the color space for imaging operations performed via filter effects."
     },
     "lighting-color": {
       "values": [
@@ -7196,7 +6960,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The lighting-color attribute defines the color of the light source for lighting filter primitives."
     },
     "math-style": {
       "values": [
@@ -7438,6 +7202,242 @@
         "unset"
       ],
       "description": ""
+    },
+    "cx": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The cx attribute define the x-axis coordinate of a center point."
+    },
+    "cy": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The cy attribute define the y-axis coordinate of a center point."
+    },
+    "r": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The r attribute defines the radius of a circle."
+    },
+    "rx": {
+      "values": [
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The rx attribute defines a radius on the x-axis."
+    },
+    "ry": {
+      "values": [
+        "auto",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The ry attribute defines a radius on the y-axis."
+    },
+    "x": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The x attribute defines an x-axis coordinate in the user coordinate system."
+    },
+    "y": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The y attribute defines a y-axis coordinate in the user coordinate system."
+    },
+    "vector-effect": {
+      "values": [
+        "none",
+        "non-scaling-stroke",
+        "non-scaling-size",
+        "non-rotation",
+        "fixed-position",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The vector-effect property specifies the vector effect to use when drawing an object. Vector effects are applied before any of the other compositing operations, i.e. filters, masks and clips."
+    },
+    "d": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The d attribute defines a path to be drawn."
+    },
+    "shape-subtract": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "text-anchor": {
+      "values": [
+        "start",
+        "middle",
+        "end",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The text-anchor attribute is used to align (start-, middle- or end-alignment) a string of pre-formatted text or auto-wrapped text where the wrapping area is determined from the inline-size property relative to a given point."
+    },
+    "fill": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The fill attribute has two different meanings. For shapes and text it's a presentation attribute that defines the color (_or any SVG paint servers like gradients or patterns_) used to paint the element; for animation it defines the final state of the animation."
+    },
+    "stroke": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The stroke attribute is a presentation attribute defining the color (_or any SVG paint servers like gradients or patterns_) used to paint the outline of the shape;"
+    },
+    "marker-start": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The marker-start attribute defines the arrowhead or polymarker that will be drawn at the first vertex of the given shape."
+    },
+    "marker-mid": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The marker-mid attribute defines the arrowhead or polymarker that will be drawn at all interior vertices of the given shape."
+    },
+    "marker-end": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The marker-end attribute defines the arrowhead or polymarker that will be drawn at the final vertex of the given shape."
+    },
+    "marker": {
+      "values": [
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": ""
+    },
+    "paint-order": {
+      "values": [
+        "normal",
+        "fill",
+        "stroke",
+        "markers",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The paint-order CSS property lets you control the order in which the fill and stroke (and painting markers) of text content and shapes are drawn."
+    },
+    "color-interpolation": {
+      "values": [
+        "auto",
+        "sRGB",
+        "linearRGB",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The color-interpolation attribute specifies the color space for gradient interpolations, color animations, and alpha compositing."
+    },
+    "shape-rendering": {
+      "values": [
+        "auto",
+        "optimizeSpeed",
+        "crispEdges",
+        "geometricPrecision",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The shape-rendering attribute provides hints to the renderer about what tradeoffs to make when rendering shapes like paths, circles, or rectangles."
+    },
+    "text-rendering": {
+      "values": [
+        "auto",
+        "optimizeSpeed",
+        "optimizeLegibility",
+        "geometricPrecision",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The text-rendering CSS property provides information to the rendering engine about what to optimize for when rendering text."
+    },
+    "pointer-events": {
+      "values": [
+        "auto",
+        "bounding-box",
+        "visiblePainted",
+        "visibleFill",
+        "visibleStroke",
+        "visible",
+        "painted",
+        "fill",
+        "stroke",
+        "all",
+        "none",
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The pointer-events CSS property sets under what circumstances (if any) a particular graphic element can become the target of pointer events."
+    },
+    "stop-color": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The stop-color attribute indicates what color to use at a gradient stop."
+    },
+    "stop-opacity": {
+      "values": [
+        "inherit",
+        "initial",
+        "unset"
+      ],
+      "description": "The stop-opacity attribute defines the opacity of a given color gradient stop."
     }
   },
   "pseudoSelectors": {
