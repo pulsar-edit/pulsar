@@ -184,7 +184,7 @@ function getValuesOfProp(value, allValues, appendImplicitValues=true) {
   // We will at least supply the implicitly defined keywords that apply to all CSS properties
   let implicitValues = [ "inherit", "initial", "unset" ];
 
-  if (!value || value.length < 0) {
+  if (!value) {
     if (appendImplicitValues === true) {
       return implicitValues;
     }
