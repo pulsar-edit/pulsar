@@ -6,6 +6,7 @@ const { Point, Range } = require('text-buffer');
 const { Emitter } = require('event-kit');
 const Token = require('./token');
 const TokenizedLine = require('./tokenized-line');
+const { matcherForSelector } = require('./selectors');
 
 const parserInitPromise = Parser.init();
 const createTree = require("./rb-tree")
@@ -552,21 +553,7 @@ class WASMTreeSitterLanguageMode {
     return new ScopeDescriptor({ scopes });
   }
 
-  scopeDescriptorForPosition (point) {
-    // If the position is the end of a line, get scope of left character instead of newline
-    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
-    if (
-      point.column > 0 &&
-      point.column === this.buffer.lineLengthForRow(point.row)
-    ) {
-      point = point.copy();
-      point.column--;
-    }
-
-    if (!this.tree) {
-      return new ScopeDescriptor({scopes: ['text']})
-    }
-
+  scopeMapAtPosition (point) {
     let positionIndex = new PositionIndex();
 
     let captures = this.syntaxQuery.captures(
@@ -591,6 +578,40 @@ class WASMTreeSitterLanguageMode {
       return node.endIndex - node.startIndex;
     });
 
+    console.log('scopeMapAtPosition returning', results);
+    return results;
+  }
+
+  // Returns the buffer range for the first scope to match the given scope
+  // selector, starting with the smallest scope and moving outward.
+  bufferRangeForScopeAtPosition(selector, position) {
+    let match = matcherForSelector(selector);
+    let results = this.scopeMapAtPosition(position);
+
+    results.reverse();
+    for (let { name, node } of results) {
+      if (match(name)) {
+        return new Range(node.startPosition, node.endPosition);
+      }
+    }
+  }
+
+  scopeDescriptorForPosition (point) {
+    // If the position is the end of a line, get scope of left character instead of newline
+    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    if (
+      point.column > 0 &&
+      point.column === this.buffer.lineLengthForRow(point.row)
+    ) {
+      point = point.copy();
+      point.column--;
+    }
+
+    if (!this.tree) {
+      return new ScopeDescriptor({scopes: ['text']})
+    }
+
+    let results = this.scopeMapAtPosition(point);
     let scopes = results.map(cap => cap.name);
     if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
       scopes.unshift(this.grammar.scopeName);
