@@ -36,7 +36,6 @@ class WASMTreeSitterLanguageMode {
     initPromise.then(() =>
       Parser.Language.load(grammar.grammarPath)
     ).then(lang => {
-      // FIXME: debug only
       this.lang = lang
       this.syntaxQuery = lang.query(grammar.syntaxQuery)
       if(grammar.localsQuery) {
