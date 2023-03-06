@@ -2771,7 +2771,9 @@ async function runGrammarTests(fullPath, commentRegex) {
       reason(`Expected to find scope "${expected}" but found "${scopes}"\n` +
         `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
       );
-      return scopes.indexOf(expected) !== -1;
+      const normalized = expected.replace(/([\.\-])/g, '\\$1')
+      const scopeRegex = new RegExp('^' + normalized + '(\\..+)?$')
+      return scopes.find(e => e.match(scopeRegex)) !== undefined;
     })
   })
 }
