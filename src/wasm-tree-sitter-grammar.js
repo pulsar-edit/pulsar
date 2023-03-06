@@ -1,15 +1,22 @@
 const fs = require('fs');
 const path = require('path');
-// const Parser = require('web-tree-sitter');
+const Parser = require('web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
+
+const parserInitPromise = Parser.init();
 
 module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.scopeName = params.scopeName
     this._grammarPath = grammarPath
     this.queryPaths = params.treeSitter
-    const dirName = path.dirname(grammarPath)
+    const dirName = path.dirname(grammarPath);
+
+    this.injectionRegex = buildRegex(
+      params.injectionRegex || params.injectionRegExp
+    );
+    this.injectionPointsByType = {};
 
     this.emitter = new Emitter;
     this.subscriptions = new CompositeDisposable;
@@ -26,7 +33,21 @@ module.exports = class WASMTreeSitterGrammar {
     this.firstLineRegex = buildRegex(params.firstLineRegex);
     this.fileTypes = params.fileTypes || [];
     this.registry = registry
-    this.name = params.name
+    this.name = params.name;
+    this.getLanguage();
+  }
+
+  getLanguageSync () {
+    // console.log('Grammar#getLanguageSync', this._language, this);
+    return this._language;
+  }
+
+  async getLanguage () {
+    await parserInitPromise;
+    if (!this._language) {
+      this._language = await Parser.Language.load(this.grammarPath);
+    }
+    return this._language;
   }
 
   loadQueryFiles (grammarPath, queryPaths) {
@@ -81,6 +102,27 @@ module.exports = class WASMTreeSitterGrammar {
   // TODO: Why is this here?
   deactivate() {
     this.registration?.dispose();
+  }
+
+  addInjectionPoint (injectionPoint) {
+    console.log('WASMTreeSitterGrammar#addInjectionPoint', injectionPoint);
+    let { type } = injectionPoint;
+    let injectionPoints = this.injectionPointsByType[type];
+    if (!injectionPoints) {
+      injectionPoints = this.injectionPointsByType[type] = [];
+    }
+    injectionPoints.push(injectionPoint);
+  }
+
+  removeInjectionPoint(injectionPoint) {
+    const injectionPoints = this.injectionPointsByType[injectionPoint.type];
+    if (injectionPoints) {
+      const index = injectionPoints.indexOf(injectionPoint);
+      if (index !== -1) injectionPoints.splice(index, 1);
+      if (injectionPoints.length === 0) {
+        delete this.injectionPointsByType[injectionPoint.type];
+      }
+    }
   }
 
   inspect() {
