@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const Parser = require('web-tree-sitter');
+// const Parser = require('web-tree-sitter');
+const { CompositeDisposable, Emitter } = require('event-kit');
+const { File } = require('pathwatcher');
 
 module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
@@ -8,22 +10,23 @@ module.exports = class WASMTreeSitterGrammar {
     this._grammarPath = grammarPath
     this.queryPaths = params.treeSitter
     const dirName = path.dirname(grammarPath)
-    const qPath = path.join(dirName, params.treeSitter.syntaxQuery)
-    const iPath = path.join(dirName, params.treeSitter.indentsQuery)
+
+    this.emitter = new Emitter;
+    this.subscriptions = new CompositeDisposable;
+    this._queryFileWatchers = [];
 
     this.loadQueryFiles(grammarPath, this.queryPaths);
 
-    this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
-    this._loadQueryIfExists(params,dirName, 'localsQuery')
-    this._loadQueryIfExists(params,dirName, 'foldsQuery')
-    this.indentsQuery = fs.readFileSync(iPath, 'utf-8')
+    // this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
+    // this._loadQueryIfExists(params,dirName, 'localsQuery')
+    // this._loadQueryIfExists(params,dirName, 'foldsQuery')
+    // this.indentsQuery = fs.readFileSync(iPath, 'utf-8')
     this.grammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
     this.fileTypes = params.fileTypes || [];
     this.registry = registry
     this.name = params.name
-
   }
 
   loadQueryFiles (grammarPath, queryPaths) {
@@ -36,8 +39,27 @@ module.exports = class WASMTreeSitterGrammar {
     for (let [key, name] of Object.entries(queryPaths)) {
       if (!key.endsWith('Query')) { continue; }
       let filePath = path.join(dirName, name);
-      this[key] = fs.readFileSync(filePath, 'utf-8');
+      this.loadQueryFile(filePath, key);
+      if (atom.inDevMode()) {
+        this.observeQueryFile(filePath, key);
+      }
     }
+  }
+
+  loadQueryFile(filePath, queryType) {
+    this[queryType] = fs.readFileSync(filePath, 'utf-8');
+  }
+
+  observeQueryFile(filePath, queryType) {
+    let watcher = new File(filePath);
+    this.subscriptions.add(watcher.onDidChange(() => {
+      this.loadQueryFile(filePath, queryType);
+      this.emitter.emit('did-change-query-file', { filePath, queryType });
+    }));
+  }
+
+  onDidChangeQueryFile(callback) {
+    return this.emitter.on('did-change-query-file', callback);
   }
 
   _reloadQueryFiles () {

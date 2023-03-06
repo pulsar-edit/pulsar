@@ -3,7 +3,7 @@ const ScopeDescriptor = require('./scope-descriptor')
 // const { Patch } = require('superstring');
 // const fs = require('fs');
 const { Point, Range } = require('text-buffer');
-const { Emitter } = require('event-kit');
+const { CompositeDisposable, Emitter } = require('event-kit');
 const Token = require('./token');
 const TokenizedLine = require('./tokenized-line');
 const { matcherForSelector } = require('./selectors');
@@ -25,9 +25,12 @@ function clamp (value, min, max) {
   return value;
 }
 
+const COMMENT_MATCHER = matcherForSelector('comment');
+
 // A data structure for storing scope information during a `HighlightIterator`
 // task. The data is reset in between each task.
 class PositionIndex {
+
   constructor () {
     this.map = new Map
     // TODO: It probably doesn't actually matter what order these are visited
@@ -60,6 +63,28 @@ class PositionIndex {
     return this.rangeData.get(key);
   }
 
+  test (existingData, props, node) {
+    let tests = [];
+    let candidateTests = Object.keys(props);
+
+    if (existingData?.final) { return false; }
+
+    for (let candidate of candidateTests) {
+      if (tests.includes(candidate)) { continue; }
+      if (!(candidate in PositionIndex.TESTS)) { continue; }
+      tests.push(candidate);
+    }
+
+    for (let key of tests) {
+      if (!(key in PositionIndex.TESTS)) { continue; }
+      let test = PositionIndex.TESTS[key];
+      if (!test(existingData, props, node)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   store (syntax, id) {
     let {
       node,
@@ -72,20 +97,27 @@ class PositionIndex {
     } = node;
 
     let data = this.getDataForRange(syntax);
-    if (data && data.final) {
-      // A previous rule covering this exact range marked itself as "final." We
-      // should not add an additional scope.
-      return false;
-    } else if (data && props.shy) {
-      // This node will only apply if we haven't yet marked this range with
-      // anything.
+
+    if (!this.test(data, props, node)) {
       return false;
     } else {
-      // TODO: We may want to handle the case where more than one token will
-      // want to set data for a given range. Do we merge objects? Store each
-      // dataset separately?
       this.setDataForRange(syntax, props);
     }
+
+    // if (data && data.final) {
+    //   // A previous rule covering this exact range marked itself as "final." We
+    //   // should not add an additional scope.
+    //   return false;
+    // } else if (data && props.shy) {
+    //   // This node will only apply if we haven't yet marked this range with
+    //   // anything.
+    //   return false;
+    // } else {
+    //   // TODO: We may want to handle the case where more than one token will
+    //   // want to set data for a given range. Do we merge objects? Store each
+    //   // dataset separately?
+    //   this.setDataForRange(syntax, props);
+    // }
 
     // We should open this scope at `start`.
     this.set(node, start, id, 'open');
@@ -149,6 +181,55 @@ class PositionIndex {
   }
 }
 
+PositionIndex.TESTS = {
+  // Passes only if another node has not already declared `final` for the exact
+  // same range. Used to prevent later scope matches from applying to a given
+  // capture.
+  final (existingData, props, node) {
+    return !(existingData && existingData.final);
+  },
+
+  // Passes only if no earlier capture has occurred for the exact same range.
+  shy (existingData) {
+    return existingData === undefined;
+  },
+
+  // Passes only if the given node is the first among its siblings.
+  onlyIfFirst (existingData, props, node) {
+    if (!node.parent) {
+      // Root nodes are always first.
+      return true;
+    }
+    return node.parent.firstChild.id === node.id;
+  },
+
+  // Passes only if the given node is the last among its siblings.
+  onlyIfLast (existingData, props, node) {
+    if (!node.parent) {
+      // Root nodes are always last.
+      return true;
+    }
+    return node.parent.lastChild.id === node.id;
+  },
+
+  // Passes if the node's text starts with the provided string. Used to work
+  // around nodes that are too generic.
+  onlyIfTextStartsWith(existingData, props, node) {
+    let str = props.onlyIfTextStartsWith;
+    let text = node.text;
+    return text.startsWith(str);
+  },
+
+  // Passes if the node's text ends with the provided string. Used to work
+  // around nodes that are too generic.
+  onlyIfTextEndsWith(existingData, props, node) {
+    let str = props.onlyIfTextEndsWith;
+    let text = node.text;
+    return text.endsWith(str);
+  }
+};
+
+
 
 const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
@@ -165,6 +246,8 @@ class WASMTreeSitterLanguageMode {
     this.grammar = grammar;
     this.rootScopeId = this.findOrCreateScopeId(this.grammar.scopeName);
 
+    this.subscriptions = new CompositeDisposable;
+
     this.readyPromise = parserInitPromise.then(() =>
       Parser.Language.load(grammar.grammarPath)
     ).then(lang => {
@@ -177,7 +260,9 @@ class WASMTreeSitterLanguageMode {
       if (grammar.foldsQuery) {
         this.foldsQuery = lang.query(grammar.foldsQuery);
       }
-      this.indentsQuery = lang.query(grammar.indentsQuery);
+      if (grammar.indentsQuery) {
+        this.indentsQuery = lang.query(grammar.indentsQuery);
+      }
       this.parser = new Parser();
       this.parser.setLanguage(lang);
 
@@ -189,17 +274,22 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [grammar.scopeName]
     });
+
+    if (atom.inDevMode()) {
+      this.observeQueryFileChanges();
+    }
   }
 
+
   // HACK: Force an existing buffer to react to an update in the SCM file.
-  _reloadSyntaxQuery () {
+  _reloadSyntaxQuery() {
     this.grammar._reloadQueryFiles();
 
     let lang = this.parser.getLanguage();
     this.syntaxQuery = lang.query(this.grammar.syntaxQuery);
 
     // Force first highlight
-    this.boundaries = createTree(comparePoints);
+    // this.boundaries = createTree(comparePoints);
     const range = this.buffer.getRange()
     this.tree = this.parser.parse(this.buffer.getText())
     // this._updateBoundaries(range.start, range.end);
@@ -207,9 +297,26 @@ class WASMTreeSitterLanguageMode {
     this.emitter.emit('did-change-highlighting', range)
   }
 
+  observeQueryFileChanges() {
+    this.subscriptions.add(
+      this.grammar.onDidChangeQueryFile(({ queryType }) => {
+        let lang = this.parser.getLanguage();
+        try {
+          this[queryType] = lang.query(this.grammar[queryType]);
+          // Force a re-highlight of the entire syntax file.
+          this.emitter.emit('did-change-highlighting', this.buffer.getRange());
+        } catch (error) {
+          console.error("Error parsing query file:");
+          console.error(error);
+        }
+      })
+    );
+  }
+
   destroy() {
     this.injectionsMarkerLayer.destroy();
     this.tree = null;
+    this.subscriptions.dispose();
   }
 
   getGrammar() {
@@ -221,14 +328,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   updateForInjection(...args) {
-  }
-
-  onDidChangeHighlighting(callback) {
-    return this.emitter.on('did-change-highlighting', callback)
-  }
-
-  getScopeChain(...args) {
-    console.log("getScopeChain", args)
   }
 
   bufferDidChange(change) {
@@ -261,7 +360,7 @@ class WASMTreeSitterLanguageMode {
     this.handleTextChange(edit, oldText, newText);
   }
 
-  bufferDidFinishTransaction({ changes }) {
+  bufferDidFinishTransaction() {
     // We don't need to iterate through the list of changes because we've been
     // building an affected buffer range with each individual change.
     let affectedRange = this.editedRange;
@@ -487,32 +586,39 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
+  /*
+  Section - Highlighting
+  */
+  onDidChangeHighlighting(callback) {
+    return this.emitter.on('did-change-highlighting', callback);
+  }
+
   buildHighlightIterator() {
     if (!this.parser) return NullIterator;
     return new HighlightIterator(this);
   }
 
   classNameForScopeId(scopeId) {
-    const scope = this.scopeIds.get(scopeId)
+    const scope = this.scopeIds.get(scopeId);
     if (scope) {
       return `syntax--${scope.replace(/\./g, ' syntax--')}`
     }
   }
 
-  scopeForId (scopeId) {
-    return this.scopeIds.get(scopeId)
+  scopeNameForScopeId (scopeId) {
+    return this.scopeIds.get(scopeId);
   }
 
   findOrCreateScopeId (name) {
-    let id = this.scopeNames.get(name)
+    let id = this.scopeNames.get(name);
     if (!id) {
-      this.lastId += 2
-      id = this.lastId
+      this.lastId += 2;
+      id = this.lastId;
       const newId = this.lastId;
-      this.scopeNames.set(name, newId)
-      this.scopeIds.set(newId, name)
+      this.scopeNames.set(name, newId);
+      this.scopeIds.set(newId, name);
     }
-    return id
+    return id;
   }
 
   syntaxTreeScopeDescriptorForPosition(point) {
@@ -530,14 +636,9 @@ class WASMTreeSitterLanguageMode {
 
     let scopes = [];
 
-    let root = this.tree.rootNode;
-    let rangeIncludesPoint = (start, end, point) => {
-      return comparePoints(start, point) <= 0 && comparePoints(end, point) >= 0
-    };
-
     let iterate = (node, isAnonymous = false) => {
       let { startPosition: start, endPosition: end } = node;
-      if (rangeIncludesPoint(start, end, point)) {
+      if (isBetweenPoints(point, start, end)) {
         scopes.push(isAnonymous ? `"${node.type}"` : node.type);
         let namedChildrenIds = node.namedChildren.map(c => c.typeId);
         for (let child of node.children) {
@@ -547,7 +648,7 @@ class WASMTreeSitterLanguageMode {
       }
     };
 
-    iterate(root);
+    iterate(this.tree.rootNode);
 
     scopes.unshift(this.grammar.scopeName);
     return new ScopeDescriptor({ scopes });
@@ -556,14 +657,18 @@ class WASMTreeSitterLanguageMode {
   scopeMapAtPosition (point) {
     let positionIndex = new PositionIndex();
 
+    // If the cursor is resting before column X, we want all scopes that cover
+    // the character in column X.
     let captures = this.syntaxQuery.captures(
       this.tree.rootNode,
       point,
-      point
+      { row: point.row, column: point.column + 1 }
     );
 
     // Captured nodes aren't guaranteed to overlap the point we asked for.
     captures = captures.filter(({ node }) => {
+      // Don't include nodes that end right before the point.
+      if (comparePoints(node.endPosition, point) === 0) { return false; }
       return isBetweenPoints(point, node.startPosition, node.endPosition);
     });
 
@@ -578,15 +683,25 @@ class WASMTreeSitterLanguageMode {
       return node.endIndex - node.startIndex;
     });
 
-    console.log('scopeMapAtPosition returning', results);
+    // console.log('scopeMapAtPosition returning', results);
     return results;
   }
 
   // Returns the buffer range for the first scope to match the given scope
   // selector, starting with the smallest scope and moving outward.
-  bufferRangeForScopeAtPosition(selector, position) {
+  bufferRangeForScopeAtPosition(selector, point) {
+    // If the position is the end of a line, get scope of left character instead of newline
+    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    if (
+      point.column > 0 &&
+      point.column === this.buffer.lineLengthForRow(point.row)
+    ) {
+      point = point.copy();
+      point.column--;
+    }
+
     let match = matcherForSelector(selector);
-    let results = this.scopeMapAtPosition(position);
+    let results = this.scopeMapAtPosition(point);
 
     results.reverse();
     for (let { name, node } of results) {
@@ -595,7 +710,6 @@ class WASMTreeSitterLanguageMode {
       }
     }
   }
-
   scopeDescriptorForPosition (point) {
     // If the position is the end of a line, get scope of left character instead of newline
     // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
@@ -660,6 +774,7 @@ class WASMTreeSitterLanguageMode {
     return indentLength / tabLength;
   }
 
+  // eslint-disable-next-line no-unused-vars
   getFoldableRangeContainingPoint(point, tabLength) {
     const foldsAtRow = this._getFoldsAtRow(point.row)
     const node = foldsAtRow[0]?.node
@@ -681,12 +796,15 @@ class WASMTreeSitterLanguageMode {
   }
 
   _getFoldsAtRow(row) {
-    if (!this.tree) { return [] }
+    if (!this.tree) { return []; }
     const folds = this.foldsQuery.captures(
       this.tree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
     )
+    if (!folds) {
+      return [];
+    }
     return folds.filter(fold => fold.node.startPosition.row === row)
   }
 
@@ -709,6 +827,17 @@ class WASMTreeSitterLanguageMode {
       commentStartString: commentStartEntry && commentStartEntry.value,
       commentEndString: commentEndEntry && commentEndEntry.value
     };
+  }
+
+  isRowCommented(row) {
+    const range = this.firstNonWhitespaceRange(row);
+    if (range) {
+      let descriptor = this.scopeDescriptorForPosition(range.start);
+      return descriptor.getScopesArray().some(
+        scope => COMMENT_MATCHER(scope)
+      );
+    }
+    return false;
   }
 
   /*
@@ -809,6 +938,14 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Private
+
+  firstNonWhitespaceRange(row) {
+    return this.buffer.findInRangeSync(
+      /\S/,
+      new Range(new Point(row, 0), new Point(row, Infinity))
+    );
+  }
+
   getIndentDeltaFromCaptures(captures) {
     let delta = 0;
     let positionSet = new Set;
@@ -858,7 +995,7 @@ class WASMTreeSitterLanguageMode {
         tokens.push(
           new Token({
             value: lineText.substring(start.column, end.column),
-            scopes: scopes.map(s => this.scopeForId(s))
+            scopes: scopes.map(s => this.scopeNameForScopeId(s))
           })
         );
       }
@@ -977,9 +1114,9 @@ class HighlightIterator {
     console.log(
       `[highlight] (${pos.row}, ${pos.column})`,
       'close',
-      this.iterator.value.closeScopeIds.map(id => this.languageMode.scopeForId(id)),
+      this.iterator.value.closeScopeIds.map(id => this.languageMode.scopeNameForScopeId(id)),
       'open',
-      this.iterator.value.openScopeIds.map(id => this.languageMode.scopeForId(id)),
+      this.iterator.value.openScopeIds.map(id => this.languageMode.scopeNameForScopeId(id)),
       'next?',
       this.iterator.hasNext
     );
