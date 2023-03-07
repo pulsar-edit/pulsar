@@ -92,8 +92,6 @@
   "defined?" @function.method.builtin.ruby
 )
 
-
-
 (class name: [(constant)]
   @entity.name.type.class.ruby
   (#set! final "true"))
@@ -219,20 +217,83 @@
 
 ; Literals
 
-; TODO: I can't mark these as @string.quoted.double.ruby yet because the "s
-; match _any_ delimiter, including single quotes and %Qs. This is probably a
-; bug in tree-sitter-ruby.
+; Single-quoted string 'foo'
 (
   (string
     "\"" @punctuation.definition.string.begin.ruby
-    (string_content)
+    (string_content)?
     "\"" @punctuation.definition.string.end.ruby
-  ) @string.quoted.ruby
-  (#set! final "true")
+  ) @string.quoted.single.ruby
+  (#match? @string.quoted.single.ruby "^'")
+  (#match? @string.quoted.single.ruby "'$")
+  (#set! final true)
 )
 
-; (will match empty strings)
-(string) @string.quoted.ruby
+; Double-quoted string "bar"
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby
+  ) @string.quoted.double.interpolated.ruby
+  (#match? @string.quoted.double.interpolated.ruby "^\"")
+  (#match? @string.quoted.double.interpolated.ruby "\"$")
+  (#set! final true)
+)
+
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby
+  ) @string.quoted.other.ruby
+  (#match? @string.quoted.other.ruby "^%q")
+  (#set! final true)
+)
+
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby
+  ) @string.quoted.other.interpolated.ruby
+  (#match? @string.quoted.other.interpolated.ruby "^%Q")
+  (#set! final true)
+)
+
+; (
+;   (
+;     (heredoc_beginning) @punctuation.definition.string.begin.ruby.html
+;     (#eq? @punctuation.definition.string.begin.ruby.html "<<-HTML")
+;   )
+;   (heredoc_body) @meta.embedded
+; )
+
+; TODO: Heredoc strings seem not to work as described.
+
+; (
+;   (heredoc_beginning) @meta.embedded
+;   (_)+ @meta.embedded
+;   ; (heredoc_body) @meta.embedded
+; ) ;@meta.embedded
+; (
+;   (_) @meta.embedded
+;   .
+;   (heredoc_body) @meta.embedded
+; )
+
+; (heredoc_end) @meta.embedded
+; (
+;   (assignment
+;     right: (heredoc_beginning)
+;     @punctuation.definition.string.begin.ruby.html
+;     (#match?
+;       @punctuation.definition.string.begin.ruby.html
+;       "^<<.HTML$"
+;     )
+;   )
+;   (heredoc_body)
+; ) @meta.embedded
 
 [
   (bare_string)
@@ -248,8 +309,12 @@
   (bare_symbol)
 ] @constant.other.symbol.ruby
 
-(regex) @string.special.regex
-(escape_sequence) @escape
+; (regex) @string.special.regex
+; (escape_sequence) @escape
+
+; (!regex
+;   (escape_sequence) @constant.character.escape.ruby
+; )
 
 [
   (integer)
@@ -326,9 +391,12 @@
   "+"
   "-"
   "*"
-  "/"
   "**"
 ] @keyword.operator.arithmetic.ruby
+
+(binary
+  "/" @keyword.operator.arithmetic.ruby
+)
 
 [
   "=>"

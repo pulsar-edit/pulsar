@@ -1,0 +1,12 @@
+name: 'Ruby (RegExp)'
+scopeName: 'source.regexp'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-regex'
+
+injectionRegex: 'regex'
+treeSitter:
+  grammar: 'ts/regex/tree-sitter-regex.wasm'
+  syntaxQuery: 'ts/regex/highlights.scm'
+  # localsQuery: 'ts/regex/locals.scm'
+  # foldsQuery: 'ts/regex/folds.scm'
+  # indentsQuery: 'ts/regex/indents.scm'
