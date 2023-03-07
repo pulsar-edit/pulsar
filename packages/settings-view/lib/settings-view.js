@@ -15,6 +15,7 @@ import ThemesPanel from './themes-panel'
 import InstalledPackagesPanel from './installed-packages-panel'
 import UpdatesPanel from './updates-panel'
 import UriHandlerPanel from './uri-handler-panel'
+import SearchSettingsPanel from './search-settings-panel'
 
 export default class SettingsView {
   constructor ({uri, packageManager, snippetsProvider, activePanel} = {}) {
@@ -120,6 +121,7 @@ export default class SettingsView {
     this.refs.openDotAtom.addEventListener('click', openDotAtomClickHandler)
     this.disposables.add(new Disposable(() => this.refs.openDotAtom.removeEventListener('click', openDotAtomClickHandler)))
 
+    this.addCorePanel('Search', 'search', () => new SearchSettingsPanel())
     this.addCorePanel('Core', 'settings', () => new GeneralPanel())
     this.addCorePanel('Editor', 'code', () => new EditorPanel())
     if (atom.config.getSchema('core.uriHandlerRegistration').type !== 'any') {
