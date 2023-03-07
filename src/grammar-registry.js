@@ -506,21 +506,28 @@ module.exports = class GrammarRegistry {
   //   * `content` A {Function} that is called with syntax nodes of the specified `type` and
   //     returns another syntax node or array of syntax nodes that contain the embedded source code.
   addInjectionPoint(grammarId, injectionPoint) {
-    const grammar = this.treeSitterGrammarsById[grammarId];
-    if (grammar) {
-      if (grammar.addInjectionPoint) {
-        grammar.addInjectionPoint(injectionPoint);
+    let grammarsToDispose = [];
+    const addOrCreateInjectionPoint = (table, grammarId) => {
+      let grammar = table[grammarId];
+      if (grammar) {
+        if (grammar.addInjectionPoint) {
+          grammar.addInjectionPoint(injectionPoint);
+        } else {
+          grammar.injectionPoints.push(injectionPoint);
+        }
+        grammarsToDispose.push(grammar);
       } else {
-        grammar.injectionPoints.push(injectionPoint);
+        table[grammarId] = { injectionPoints: [injectionPoint] }
       }
-    } else {
-      this.treeSitterGrammarsById[grammarId] = {
-        injectionPoints: [injectionPoint]
-      };
-    }
+    };
+
+    addOrCreateInjectionPoint(this.treeSitterGrammarsById, grammarId);
+    addOrCreateInjectionPoint(this.wasmTreeSitterGrammarsById, grammarId);
+
     return new Disposable(() => {
-      const grammar = this.treeSitterGrammarsById[grammarId];
-      grammar.removeInjectionPoint(injectionPoint);
+      for (let grammar of grammarsToDispose) {
+        grammar.removeInjectionPoint(injectionPoint);
+      }
     });
   }
 
@@ -687,11 +694,12 @@ module.exports = class GrammarRegistry {
   }
 
   // TODO: why is this being used? Can we remove it soon?
-  treeSitterGrammarForLanguageString(languageString) {
+  treeSitterGrammarForLanguageString(languageString, type = 'original') {
     let longestMatchLength = 0;
     let grammarWithLongestMatch = null;
-    for (const id in this.treeSitterGrammarsById) {
-      const grammar = this.treeSitterGrammarsById[id];
+    let table = type === 'original' ? this.treeSitterGrammarsById : this.wasmTreeSitterGrammarsById;
+    for (const id in table) {
+      const grammar = table[id];
       if (grammar.injectionRegex) {
         const match = languageString.match(grammar.injectionRegex);
         if (match) {

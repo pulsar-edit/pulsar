@@ -1,23 +1,28 @@
 [
-  (class)
+  "class"
   (singleton_class)
-  (method)
+  "def"
   (singleton_method)
-  (module)
-  (if)
-  (block)
-  (do_block)
-  (argument_list)
+  "module"
+  "if"
+  "else"
+  "unless"
+  ; (block)
+  ; (argument_list)
   (case)
   (while)
   (until)
   (for)
-  (begin)
-  (unless)
+  "begin"
+  "do"
+  "rescue"
+  ; (unless)
   "("
   "{"
   "["
 ] @indent
+
+
 
 [
   "end"
@@ -34,7 +39,7 @@
   (when)
   (elsif)
   (else)
-  (rescue)
+  "rescue"
   (ensure)
 ] @branch
 
