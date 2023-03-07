@@ -189,6 +189,7 @@
 
 ; A keyword-style parameter when defining a method.
 (keyword_parameter
+  (identifier) @constant.other.symbol.hashkey.parameter
   ":" @constant.other.symbol.parameter.ruby
   (#set! final "true")
 )

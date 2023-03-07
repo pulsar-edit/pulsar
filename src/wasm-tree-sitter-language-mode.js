@@ -248,7 +248,12 @@ class WASMTreeSitterLanguageMode {
     this.grammar = grammar;
     this.rootScopeId = this.findOrCreateScopeId(this.grammar.scopeName);
 
+    this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
+
+    this.subscriptions.add(
+      this.onDidTokenize(() => this.tokenized = true)
+    );
 
     this.rootLanguage = null;
     this.rootLanguageLayer = null;
@@ -672,6 +677,11 @@ class WASMTreeSitterLanguageMode {
   /*
   Section - Highlighting
   */
+
+  onDidTokenize(callback) {
+    return this.emitter.on('did-tokenize', callback);
+  }
+
   onDidChangeHighlighting(callback) {
     return this.emitter.on('did-change-highlighting', callback);
   }
@@ -780,8 +790,19 @@ class WASMTreeSitterLanguageMode {
   }
 
   getFoldableRanges() {
-    if (!this.tree) return [];
-    const folds = this.foldsQuery.captures(this.tree.rootNode)
+    console.log('getFoldableRanges', this.tokenized);
+    if (!this.tokenized) { return []; }
+
+    let layers = this.getAllLanguageLayers();
+    console.log('layers:', layers);
+
+    let folds = [];
+    for (let layer of layers) {
+      let folds = layer.getFolds();
+      console.log('layer', layer, 'FOLDS:', folds);
+      folds.push(...folds);
+    }
+    // const folds = this.foldsQuery.captures(this.tree.rootNode)
     return folds.map(fold => this._makeFoldableRange(fold.node))
   }
 
@@ -850,28 +871,46 @@ class WASMTreeSitterLanguageMode {
   }
 
   _makeFoldableRange(node) {
-    const children = node.children
-    const lastNode = children[children.length-1]
-    const range = new Range([node.startPosition.row, Infinity], lastNode.startPosition)
-    return range
+    const children = node.children;
+    const lastNode = last(children);
+
+    return new Range(
+      [node.startPosition.row, Infinity],
+      lastNode.startPosition
+    );
   }
 
   isFoldableAtRow(row) {
-    const foldsAtRow = this._getFoldsAtRow(row)
-    return foldsAtRow.length !== 0
+    const foldsAtRow = this._getFoldsAtRow(row);
+    return foldsAtRow.length !== 0;
   }
 
   _getFoldsAtRow(row) {
-    if (!this.tree) { return []; }
-    const folds = this.foldsQuery.captures(
-      this.tree.rootNode,
+    let layer = this.controllingLayerAtPoint(
+      new Point(row, 0)
+    );
+
+    let controllingLayer;
+    if (layer.foldsQuery) {
+      controllingLayer = layer;
+    } else {
+      controllingLayer = this.rootLanguageLayer;
+    }
+
+    let { foldsQuery } = controllingLayer;
+    if (!foldsQuery) { return []; }
+
+    let tree = controllingLayer.forceAnonymousParse();
+
+    let folds = foldsQuery.captures(
+      tree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
-    )
-    if (!folds) {
-      return [];
-    }
-    return folds.filter(fold => fold.node.startPosition.row === row)
+    );
+
+    if (!folds) { return []; }
+
+    return folds.filter(fold => fold.node.startPosition.row === row);
   }
 
   /*
@@ -910,33 +949,60 @@ class WASMTreeSitterLanguageMode {
   Section - auto-indent
   */
 
+  controllingLayerAtPoint(point) {
+    let injectionLayers = this.injectionLayersAtPoint(point);
+
+    if (injectionLayers.length === 0) {
+      return this.rootLanguageLayer;
+    } else {
+      return injectionLayers.sort(layer => -layer.depth)[0];
+    }
+  }
+
   // Get the suggested indentation level for an existing line in the buffer.
   //
   // * bufferRow - A {Number} indicating the buffer row
   //
   // Returns a {Number}.
   suggestedIndentForBufferRow(row, tabLength, options = {}) {
-    let indentTree = this.forceAnonymousParse();
+    // let indentTree = this.forceAnonymousParse();
     if (row === 0) { return 0; }
 
     let comparisonRow = row - 1;
 
     if (options.skipBlankLines !== false) {
       // Move upward until we find the a line with text on it.
-      while (this.buffer.isRowBlank(comparisonRow) || comparisonRow === 0) {
+      while (this.buffer.isRowBlank(comparisonRow) || comparisonRow > 0) {
         comparisonRow--;
       }
     }
 
+    // TODO: What's the right place to measure from? If we measure from the
+    // beginning of the new row, the injection's language layer might not know
+    // whether it controls that point. Feels better to measure from the end of
+    // the previous non-whitespace row, but we'll see.
+    let comparisonRowEnd = new Point(
+      comparisonRow,
+      this.buffer.lineLengthForRow(comparisonRow)
+    );
+
+    let controllingLayer = this.controllingLayerAtPoint(comparisonRowEnd);
+
+    console.log('COMPARISON ROW:', comparisonRow);
     const lastLineIndent = this.indentLevelForLine(
       this.buffer.lineForRow(comparisonRow), tabLength
     );
 
-    if (!this.indentsQuery) { return lastLineIndent; }
+    let { indentsQuery } = controllingLayer;
+    if (!indentsQuery) {
+      return lastLineIndent;
+    }
+
+    let indentTree = controllingLayer.forceAnonymousParse();
 
     // Capture in two phases. The first phase affects whether this line should
     // be indented from the previous line.
-    const indentCaptures = this.indentsQuery.captures(
+    const indentCaptures = indentsQuery.captures(
       indentTree.rootNode,
       { row: comparisonRow, column: 0 },
       { row: row, column: 0 }
@@ -947,7 +1013,7 @@ class WASMTreeSitterLanguageMode {
 
     // The second phase tells us whether this line should be dedented from the
     // previous line.
-    const dedentCaptures = this.indentsQuery.captures(
+    const dedentCaptures = indentsQuery.captures(
       indentTree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
@@ -971,14 +1037,17 @@ class WASMTreeSitterLanguageMode {
     // console.log('suggestedIndentForEditedBufferRow', row);
     if (row === 0) { return 0; }
 
-    if (!this.indentsQuery) {
-      return 0;
+    let controllingLayer = this.controllingLayerAtPoint(new Point(row, 0));
+    let { indentsQuery } = controllingLayer;
+
+    if (!indentsQuery) {
+      return undefined;
     }
 
     // Indents query won't work unless we re-parse the tree. Since we're typing
     // one character at a time, this should not be costly.
-    let indentTree = this.forceAnonymousParse();
-    const indents = this.indentsQuery.captures(
+    let indentTree = controllingLayer.forceAnonymousParse();
+    const indents = indentsQuery.captures(
       indentTree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
@@ -989,11 +1058,13 @@ class WASMTreeSitterLanguageMode {
     });
     if (indent?.name === "branch") {
       if (this.buffer.lineForRow(row).trim() === indent.node.text) {
-        const parent = indent.node.parent
-        if (parent) return this.indentLevelForLine(
-          this.buffer.getLines()[parent.startPosition.row],
-          tabLength
-        )
+        const parent = indent.node.parent;
+        if (parent) {
+          return this.indentLevelForLine(
+            this.buffer.getLines()[parent.startPosition.row],
+            tabLength
+          );
+        }
       }
     }
   }
@@ -1005,11 +1076,22 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForLineAtBufferRow(row, line, tabLength) {
-    // console.log('suggestedIndentForLineAtBufferRow', row, line);
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
 
   // Private
+
+  getAllInjectionLayers() {
+    let markers =  this.injectionsMarkerLayer.getMarkers();
+    return markers.map(m => m.languageLayer);
+  }
+
+  getAllLanguageLayers() {
+    return [
+      this.rootLanguageLayer,
+      ...this.getAllInjectionLayers()
+    ];
+  }
 
   injectionLayersAtPoint (point) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
@@ -1461,13 +1543,20 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
 
-    let language = this.grammar.getLanguageSync();
-    this.syntaxQuery = language.query(grammar.syntaxQuery);
+    this.language = this.grammar.getLanguageSync();
+    this.syntaxQuery = this.language.query(grammar.syntaxQuery);
+
+    let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
+
+    for (let query of otherQueries) {
+      if (grammar[query]) {
+        this[query] = this.language.query(grammar[query]);
+      }
+    }
 
     this.tree = null;
     this.scopeResolver = new ScopeResolver();
     this.languageScopeId = this.languageMode.findOrCreateScopeId(this.grammar.scopeName);
-    this.grammar.getLanguage();
     // console.log('new LanguageLayer', grammar.scopeName, marker, depth);
   }
 
@@ -1669,6 +1758,25 @@ class LanguageLayer {
       // console.log('affected range. populating injections');
       this._populateInjections(affectedRange, nodeRangeSet);
     }
+  }
+
+  forceAnonymousParse() {
+    return this.languageMode.parse(this.language, this.tree);
+  }
+
+  getText () {
+    let { buffer } = this.languageMode;
+    if (!this.marker) {
+      return buffer.getText();
+    } else {
+      return buffer.getTextInRange(this.marker.getRange());
+    }
+  }
+
+  getFolds() {
+    if (!this.foldsQuery) { return []; }
+    let foldsTree = this.forceAnonymousParse();
+    return this.foldsQuery.captures(foldsTree.rootNode);
   }
 
   scopeMapAtPosition(point) {
