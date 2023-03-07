@@ -900,10 +900,11 @@ class WASMTreeSitterLanguageMode {
     let { foldsQuery } = controllingLayer;
     if (!foldsQuery) { return []; }
 
-    let tree = controllingLayer.forceAnonymousParse();
+    // let tree = controllingLayer.forceAnonymousParse();
+
 
     let folds = foldsQuery.captures(
-      tree.rootNode,
+      controllingLayer.tree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
     );
