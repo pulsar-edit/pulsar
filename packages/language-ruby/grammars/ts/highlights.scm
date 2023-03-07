@@ -81,11 +81,9 @@
 
 ; Function calls
 
-; TODO: The TM grammar scopes this as `keyword.control.pseudo-method.ruby`; decide on
-; the best name for it.
 (
-  (identifier) @function.method.builtin.ruby
- (#eq? @function.method.builtin.ruby "require")
+  (identifier) @keyword.other.special-method
+ (#eq? @keyword.other.special-method "require")
 )
 
 (unary
