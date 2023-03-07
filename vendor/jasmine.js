@@ -2722,8 +2722,11 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
   editor.getBuffer().getLines().forEach((row, i) => {
     const m = row.trim().match(commentRegex)
     if(m) {
-      const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
-      if(scope.scopes.find(s => s.match(/comment/)) && row.match(checkAssert)) {
+      // const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
+      // FIXME: use editor.scopeDescriptorForBufferPosition when it works
+      const scope = editor.tokensForScreenRow(i)
+      const scopes = scope.flatMap(e => e.scopes)
+      if(scopes.find(s => s.match(/comment/)) && row.match(checkAssert)) {
         allMatches.push({row: lastNonComment, text: row, col: m.index, testRow: i})
         return
       }
@@ -2754,7 +2757,11 @@ if (isCommonJS) exports.normalizeTreeSitterTextData = normalizeTreeSitterTextDat
 async function openDocument(fullPath) {
   const editor = await atom.workspace.open(fullPath);
   const mode = editor.languageMode;
-  await mode.ready;
+  const ready = new Promise(resolve => {
+    mode.onDidChangeHighlighting(() => resolve(true))
+  })
+  await ready;
+  console.log("BAR")
   return editor;
 }
 
