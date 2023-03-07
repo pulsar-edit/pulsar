@@ -1,42 +1,50 @@
-; Keywords
+; Classes
+(scope_resolution (constant) @entity.name.type.class)
+(scope_resolution "::" @punctuation.separator.namespace)
+(superclass "<" @punctuation.separator.inheritance
+             (constant) @entity.other.inherited-class)
 
-"alias" @keyword.control.alias
-"and" @keyword.control.and
-"begin" @keyword.control.begin
-"break" @keyword.control.break
-"case" @keyword.control.case
+; Keywords
 "class" @keyword.control.class
-"def" @keyword.control.def
-"do" @keyword.control.do
-"else" @keyword.control.else
-"elsif" @keyword.control.elsif
-"end" @keyword.control.end
-"ensure" @keyword.control.ensure
-"for" @keyword.control.for
-"if" @keyword.control.if
-"in" @keyword.control.in
-"module" @keyword.control.module
-"next" @keyword.control.next
-"or" @keyword.control.or
-"rescue" @keyword.control.rescue
-"retry" @keyword.control.retry
-"return" @keyword.control.return
-"then" @keyword.control.then
-"unless" @keyword.control.unless
-"until" @keyword.control.until
-"when" @keyword.control.when
-"while" @keyword.control.while
-"yield" @keyword.control.yield
+
+[
+  "alias"
+  "and"
+  "begin"
+  "break"
+  "case"
+  "def"
+  "do"
+  "else"
+  "elsif"
+  "end"
+  "ensure"
+  "for"
+  "if"
+  "in"
+  "module"
+  "next"
+  "or"
+  "rescue"
+  "retry"
+  "return"
+  "then"
+  "unless"
+  "until"
+  "when"
+  "while"
+  "yield"
+] @keyword.control
 
 ((identifier) @keyword.other.special-method
  (#match? @keyword.other.special-method "^(private|protected|public)$"))
 
 ; Function calls
 
-((identifier) @function.method.builtin
- (#eq? @function.method.builtin "require"))
+((identifier) @keyword.other.special-method
+ (#eq? @keyword.other.special-method "require"))
 
-"defined?" @function.method.builtin
+"defined?" @keyword.other.special-method
 
 (call
   method: [(identifier) (constant)] @function.method)
@@ -53,37 +61,24 @@
 [
   (class_variable)
   (instance_variable)
-] @property
+] @variable.other.readwrite.instance
 
 ((identifier) @constant.builtin
  (#match? @constant.builtin "^__(FILE|LINE|ENCODING)__$"))
 
-;; Class stuff
-("class"
-  [(scope_resolution) (constant)]
-  "<" @punctuation.separator.inheritance)
-("class" (constant) @entity.name.type.class)
-("class" (scope_resolution (constant) @entity.name.type.class))
-(scope_resolution "::" @punctuation.separator.namespace)
+(self) @variable.language.self
+(super) @variable.language.super
 
-((constant) @constant
- (#match? @constant "^[A-Z\\d_]+$"))
+(block_parameter (identifier) @variable.function.parameter)
+(block_parameters (identifier) @variable.function.parameter)
+(destructured_parameter (identifier) @variable.function.parameter)
+(hash_splat_parameter (identifier) @variable.function.parameter)
+(lambda_parameters (identifier) @variable.function.parameter)
+(method_parameters (identifier) @variable.function.parameter)
+(splat_parameter (identifier) @variable.function.parameter)
 
-(constant) @constructor
-
-(self) @variable.builtin
-(super) @variable.builtin
-
-(block_parameter (identifier) @variable.parameter)
-(block_parameters (identifier) @variable.parameter)
-(destructured_parameter (identifier) @variable.parameter)
-(hash_splat_parameter (identifier) @variable.parameter)
-(lambda_parameters (identifier) @variable.parameter)
-(method_parameters (identifier) @variable.parameter)
-(splat_parameter (identifier) @variable.parameter)
-
-(keyword_parameter name: (identifier) @variable.parameter)
-(optional_parameter name: (identifier) @variable.parameter)
+(keyword_parameter name: (identifier) @variable.function.parameter)
+(optional_parameter name: (identifier) @variable.function.parameter)
 
 ((identifier) @function.method
  (#is-not? local))
@@ -106,19 +101,19 @@
   (bare_symbol)
 ] @string.special.symbol
 
-; (regex) @string.special.regex
+(regex) @string.special.regex
 (escape_sequence) @escape
 
 [
   (integer)
   (float)
-] @number
+] @constant.numeric
 
 [
   (nil)
   (true)
   (false)
-]@constant.builtin
+] @constant.builtin
 
 (interpolation
   "#{" @punctuation.special
@@ -126,11 +121,16 @@
 
 (comment) @comment
 
+; Punctuations
+"=" @keyword.operator.assignment
+"=>" @punctuation.separator.key-value
+((hash_key_symbol) ":" @punctuation.separator.key-value )
+"&." @punctuation.separator.method
+(method_parameters ["(" ")"] @punctuation.definition.parameters)
+
 ; Operators
 
 [
-"="
-"=>"
 "->"
 ] @operator
 
@@ -151,8 +151,4 @@
   "%i("
 ] @punctuation.bracket
 
-;; Additional things
-(regex
- "/" @punctuation.section.regexp
- (string_content) @string.regexp
- "/" @punctuation.section.regexp)
+(constant) @variable.other.constant
