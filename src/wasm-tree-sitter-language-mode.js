@@ -326,6 +326,10 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
+  onDidChangeHighlighting(callback) {
+    return this.emitter.on('did-change-highlighting', callback)
+  }
+
   getRootParser() {
     return this.getOrCreateParserForLanguage(this.rootLanguage);
   }
