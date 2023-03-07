@@ -7355,7 +7355,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The <marker> element defines the graphic that is to be used for drawing arrowheads or polymarkers on a given path, line, polyline or polygon element."
     },
     "paint-order": {
       "values": [

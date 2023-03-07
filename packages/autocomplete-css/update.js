@@ -151,7 +151,7 @@ async function getDescriptionOfProp(name) {
   // While this seems strange, it's because some selectors are part of other
   // specs and may not be worth mentioning standalone.
   let file;
-  let filePath = [ "css", "svg/attribute" ].map(path =>
+  let filePath = [ "css", "svg/attribute", "svg/element" ].map(path =>
     `./node_modules/content/files/en-us/web/${path}/${name}/index.md`
   ).find(f => fs.existsSync(f));
 
