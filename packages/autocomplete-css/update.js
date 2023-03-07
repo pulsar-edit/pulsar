@@ -21,6 +21,17 @@
       Within `content/files/en-us/web/css` is a directory of folders titled
       by the name of properties.
 
+    The last important thing to note here:
+      MDN doesn't have docs on everything. And that's a good thing. But it means
+      many of our items don't have any kind of description. For this situation
+      we have `manual-property-desc.json` which is a list of manually updated
+      descriptions for properties where there are none. This was a last resort
+      intended to provide the highest quality of completions possible.
+      Overtime many items on this list will likely be able to be removed just as
+      new ones are added. After running the update script you'll see a warning
+      saying how many properties are without completions that would then need to
+      be added to the JSON file.
+
   "spec-shortname": {
     "spec": {
       "title": "",
@@ -77,8 +88,9 @@
 const css = require("@webref/css");
 const fs = require("fs");
 const CSSParser = require("./cssValueDefinitionSyntaxExtractor.js");
+const manualPropertyDesc = require("./manual-property-desc.json");
 
-async function update() {
+async function update(params) {
   const parsedFiles = await css.listAll();
 
   const properties = await buildProperties(parsedFiles);
@@ -94,7 +106,30 @@ async function update() {
   // Now to write out our updated file
   fs.writeFileSync("completions.json", JSON.stringify(completions, null, 2));
 
+  // Now to determine how many properties have empty descriptions.
+
+  let count = 0;
+  let showEmpty = false;
+
+  for (const param of params) {
+    if (param === "--show-empty") {
+      showEmpty = true;
+    }
+  }
+
+  for (const prop in completions.properties) {
+    if (completions.properties[prop].description === "") {
+      if (showEmpty) {
+        console.log(prop);
+      }
+      count ++;
+    }
+  }
+
   console.log("Updated all `autocomplete-css` completions.");
+  console.log(`Total Completion Properties without a description: ${count}!`);
+  console.log("It is not required to fix the above empty completions issue.");
+  console.log("Use `node update.js --show-empty` to show the empty property names.");
 }
 
 async function buildProperties(css) {
@@ -185,7 +220,12 @@ async function getDescriptionOfProp(name) {
       }
     }
   } else {
-    // A document doesn't yet exist. Let's return an empty value.
+    // A document doesn't yet exist, let's ensure it's not in our manual list first
+    if (manualPropertyDesc[name]) {
+      return manualPropertyDesc[name].desc;
+    }
+    // A document doesn't yet exist. And it's not in our manual list
+    // Let's return an empty value.
     return "";
   }
 }
@@ -323,4 +363,4 @@ function dedupPropValues(values) {
   return out;
 }
 
-update();
+update(process.argv.slice(2));

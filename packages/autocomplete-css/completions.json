@@ -7290,7 +7290,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The shape-subtract property allows one to exclude part of the content area form the wrapping area. The excluded area is the addition of all the areas defined in a list of CSS basic shapes and/or SVG shapes."
     },
     "text-anchor": {
       "values": [
