@@ -1,4 +1,288 @@
 {
+  "-webkit-align-items": {
+    "desc": "Legacy Alias of align-items.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-align-content": {
+    "desc": "Legacy Alias of align-content.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-align-self": {
+    "desc": "Legacy Alias of align-self.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-name": {
+    "desc": "Legacy Alias of animation-name.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-duration": {
+    "desc": "Legacy Alias of animation-duration.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-timing-function": {
+    "desc": "Legacy Alias of animation-timing-function.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-iteration-count": {
+    "desc": "Legacy Alias of animation-iteration-count.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-direction": {
+    "desc": "Legacy Alias of animation-direction.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-play-state": {
+    "desc": "Legacy Alias of animation-play-state.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-delay": {
+    "desc": "Legacy Alias of animation-delay.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-fill-mode": {
+    "desc": "Legacy Alias of animation-fill-mode.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation": {
+    "desc": "Legacy Alias of animation.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-backface-visibility": {
+    "desc": "Legacy Alias of backface-visibility.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-background-clip": {
+    "desc": "Legacy Alias of background-clip.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-background-origin": {
+    "desc": "Legacy Alias of background-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-background-size": {
+    "desc": "Improper implementation of a legacy alias for background-size.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-bottom-left-radius": {
+    "desc": "Legacy Alias of border-bottom-left-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-bottom-right-radius": {
+    "desc": "Legacy Alias of border-bottom-right-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-top-left-radius": {
+    "desc": "Legacy Alias of border-top-left-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-top-right-radius": {
+    "desc": "Legacy Alias of border-top-right-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-radius": {
+    "desc": "Legacy Alias of border-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-box-shadow": {
+    "desc": "Legacy Alias of box-shadow.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-box-sizing": {
+    "desc": "Legacy Alias of box-sizing.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex": {
+    "desc": "Legacy Alias of flex.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-basis": {
+    "desc": "Legacy Alias of flex-basis.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-direction": {
+    "desc": "Legacy Alias of flex-direction.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-flow": {
+    "desc": "Legacy Alias of flex-flow.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-grow": {
+    "desc": "Legacy Alias of flex-grow.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-shrink": {
+    "desc": "Legacy Alias of flex-shrink.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-wrap": {
+    "desc": "Legacy Alias of flex-wrap.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-filter": {
+    "desc": "Legacy Alias of filter.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-justify-content": {
+    "desc": "Legacy Alias of justify-content.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask": {
+    "desc": "Legacy Alias of mask.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-outset": {
+    "desc": "Legacy Alias of mask-border-outset.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-repeat": {
+    "desc": "Legacy Alias of mask-border-repeat.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-slice": {
+    "desc": "Legacy Alias of mask-border-slice.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-source": {
+    "desc": "Legacy Alias of mask-border-source.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-width": {
+    "desc": "Legacy Alias of mask-border-width.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-clip": {
+    "desc": "Legacy Alias of mask-clip.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-image": {
+    "desc": "Legacy Alias of mask-image.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-origin": {
+    "desc": "Legacy Alias of mask-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-position": {
+    "desc": "Legacy Alias of mask-position.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-repeat": {
+    "desc": "Legacy Alias of mask-repeat.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-size": {
+    "desc": "Legacy Alias of mask-size.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-order": {
+    "desc": "Legacy Alias of order.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-perspective": {
+    "desc": "Legacy Alias of perspective.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-perspective-origin": {
+    "desc": "Legacy Alias of perspective-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transform-orgin": {
+    "desc": "Legacy Alias of transform-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transform-style": {
+    "desc": "Legacy Alias of transform-style.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transform": {
+    "desc": "Legacy Alias of transform.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-delay": {
+    "desc": "Legacy Alias of transition-delay.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-duration": {
+    "desc": "Legacy Alias of transition-duration.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-property": {
+    "desc": "Legacy Alias of transition-property.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-timing-function": {
+    "desc": "Legacy Alias of transition-timing-function.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition": {
+    "desc": "Legacy Alias of transition.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "fill-break": {
+    "desc": "This property specifies how the geometry of a fragmented box is treated for fills.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-break"
+  },
+  "fill-image": {
+    "desc": "This property sets the fill images of an element. Images are drawn with the first specified one on top (closest to the user) and each subsequent image behind the previous one.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-image"
+  },
+  "fill-origin": {
+    "desc": "This property specifies the coordinate system of the fill, setting the fill positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-origin"
+  },
+  "fill-position": {
+    "desc": "If fill images have been specified, this property specifies their initial position (after any resizing) within their corresponding fill positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-position"
+  },
+  "fill-size": {
+    "desc": "Specifies the size of the fill images. Values are interpreted identically to background-size, mutatis mutandi.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-size"
+  },
+  "fill-repeat": {
+    "desc": "Specifies how fill images are tiled after they have been sized and positioned.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-repeat"
+  },
+  "stroke-align": {
+    "desc": "This property allows the author to align a stroke along the outline.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-align"
+  },
+  "stroke-break": {
+    "desc": "This property specifies how the geometry of a fragmented box is treated for strokes.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-break"
+  },
+  "stroke-dash-corner": {
+    "desc": "The stroke-dash-corner property controls whether a dash is always painted at the vertices of a stroked shape.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#propdef-stroke-dash-corner"
+  },
+  "stroke-dash-justify": {
+    "desc": "The stroke-dash-justify property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along each of an element's subpaths.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#propdef-stroke-dash-justify"
+  },
+  "stroke-color": {
+    "desc": "This property sets the stroke colors of an element.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-color"
+  },
+  "stroke-image": {
+    "desc": "This property sets the stroke images of an element.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-image"
+  },
+  "stroke-origin": {
+    "desc": "This property specifies the coordinate system of the stroke, setting the stroke positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-origin"
+  },
+  "stroke-position": {
+    "desc": "If stroke images have been specified, this property specifies their initial position (after any resizing) within their corresponding stroke positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-position"
+  },
+  "stroke-size": {
+    "desc": "Specifies the size of the stroke images.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-size"
+  },
+  "stroke-repeat": {
+    "desc": "Specifies how stroke fill images are tiled after they have been sized and positioned.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-repeat"
+  },
   "shape-subtract": {
     "desc": "The shape-subtract property allows one to exclude part of the content area form the wrapping area. The excluded area is the addition of all the areas defined in a list of CSS basic shapes and/or SVG shapes.",
     "spec": "https://svgwg.org/svg2-draft/text.html#TextShapeSubtract"

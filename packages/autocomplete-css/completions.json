@@ -206,7 +206,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of align-items."
     },
     "-webkit-align-content": {
       "values": [
@@ -214,7 +214,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of align-content."
     },
     "-webkit-align-self": {
       "values": [
@@ -222,7 +222,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of align-self."
     },
     "-webkit-animation-name": {
       "values": [
@@ -230,7 +230,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-name."
     },
     "-webkit-animation-duration": {
       "values": [
@@ -238,7 +238,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-duration."
     },
     "-webkit-animation-timing-function": {
       "values": [
@@ -246,7 +246,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-timing-function."
     },
     "-webkit-animation-iteration-count": {
       "values": [
@@ -254,7 +254,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-iteration-count."
     },
     "-webkit-animation-direction": {
       "values": [
@@ -262,7 +262,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-direction."
     },
     "-webkit-animation-play-state": {
       "values": [
@@ -270,7 +270,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-play-state."
     },
     "-webkit-animation-delay": {
       "values": [
@@ -278,7 +278,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-delay."
     },
     "-webkit-animation-fill-mode": {
       "values": [
@@ -286,7 +286,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation-fill-mode."
     },
     "-webkit-animation": {
       "values": [
@@ -294,7 +294,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of animation."
     },
     "-webkit-backface-visibility": {
       "values": [
@@ -302,7 +302,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of backface-visibility."
     },
     "-webkit-background-clip": {
       "values": [
@@ -310,7 +310,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of background-clip."
     },
     "-webkit-background-origin": {
       "values": [
@@ -318,7 +318,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of background-origin."
     },
     "-webkit-background-size": {
       "values": [
@@ -326,7 +326,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Improper implementation of a legacy alias for background-size."
     },
     "-webkit-border-bottom-left-radius": {
       "values": [
@@ -334,7 +334,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of border-bottom-left-radius."
     },
     "-webkit-border-bottom-right-radius": {
       "values": [
@@ -342,7 +342,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of border-bottom-right-radius."
     },
     "-webkit-border-top-left-radius": {
       "values": [
@@ -350,7 +350,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of border-top-left-radius."
     },
     "-webkit-border-top-right-radius": {
       "values": [
@@ -358,7 +358,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of border-top-right-radius."
     },
     "-webkit-border-radius": {
       "values": [
@@ -366,7 +366,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of border-radius."
     },
     "-webkit-box-shadow": {
       "values": [
@@ -374,7 +374,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of box-shadow."
     },
     "-webkit-box-sizing": {
       "values": [
@@ -382,7 +382,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of box-sizing."
     },
     "-webkit-flex": {
       "values": [
@@ -390,7 +390,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex."
     },
     "-webkit-flex-basis": {
       "values": [
@@ -398,7 +398,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex-basis."
     },
     "-webkit-flex-direction": {
       "values": [
@@ -406,7 +406,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex-direction."
     },
     "-webkit-flex-flow": {
       "values": [
@@ -414,7 +414,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex-flow."
     },
     "-webkit-flex-grow": {
       "values": [
@@ -422,7 +422,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex-grow."
     },
     "-webkit-flex-shrink": {
       "values": [
@@ -430,7 +430,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex-shrink."
     },
     "-webkit-flex-wrap": {
       "values": [
@@ -438,7 +438,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of flex-wrap."
     },
     "-webkit-filter": {
       "values": [
@@ -446,7 +446,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of filter."
     },
     "-webkit-justify-content": {
       "values": [
@@ -454,7 +454,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of justify-content."
     },
     "-webkit-mask": {
       "values": [
@@ -462,7 +462,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask."
     },
     "-webkit-mask-box-image": {
       "values": [
@@ -478,7 +478,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-border-outset."
     },
     "-webkit-mask-box-image-repeat": {
       "values": [
@@ -486,7 +486,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-border-repeat."
     },
     "-webkit-mask-box-image-slice": {
       "values": [
@@ -494,7 +494,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-border-slice."
     },
     "-webkit-mask-box-image-source": {
       "values": [
@@ -502,7 +502,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-border-source."
     },
     "-webkit-mask-box-image-width": {
       "values": [
@@ -510,7 +510,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-border-width."
     },
     "-webkit-mask-clip": {
       "values": [
@@ -518,7 +518,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-clip."
     },
     "-webkit-mask-composite": {
       "values": [
@@ -534,7 +534,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-image."
     },
     "-webkit-mask-origin": {
       "values": [
@@ -542,7 +542,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-origin."
     },
     "-webkit-mask-position": {
       "values": [
@@ -550,7 +550,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-position."
     },
     "-webkit-mask-repeat": {
       "values": [
@@ -558,7 +558,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-repeat."
     },
     "-webkit-mask-size": {
       "values": [
@@ -566,7 +566,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of mask-size."
     },
     "-webkit-order": {
       "values": [
@@ -574,7 +574,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of order."
     },
     "-webkit-perspective": {
       "values": [
@@ -582,7 +582,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of perspective."
     },
     "-webkit-perspective-origin": {
       "values": [
@@ -590,7 +590,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of perspective-origin."
     },
     "-webkit-transform-origin": {
       "values": [
@@ -606,7 +606,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transform-style."
     },
     "-webkit-transform": {
       "values": [
@@ -614,7 +614,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transform."
     },
     "-webkit-transition-delay": {
       "values": [
@@ -622,7 +622,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transition-delay."
     },
     "-webkit-transition-duration": {
       "values": [
@@ -630,7 +630,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transition-duration."
     },
     "-webkit-transition-property": {
       "values": [
@@ -638,7 +638,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transition-property."
     },
     "-webkit-transition-timing-function": {
       "values": [
@@ -646,7 +646,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transition-timing-function."
     },
     "-webkit-transition": {
       "values": [
@@ -654,7 +654,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transition."
     },
     "-webkit-text-size-adjust": {
       "values": [
@@ -6647,7 +6647,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies how the geometry of a fragmented box is treated for fills."
     },
     "fill-color": {
       "values": [
@@ -6665,7 +6665,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property sets the fill images of an element. Images are drawn with the first specified one on top (closest to the user) and each subsequent image behind the previous one."
     },
     "fill-origin": {
       "values": [
@@ -6679,7 +6679,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies the coordinate system of the fill, setting the fill positioning area."
     },
     "fill-position": {
       "values": [
@@ -6692,7 +6692,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "If fill images have been specified, this property specifies their initial position (after any resizing) within their corresponding fill positioning area."
     },
     "fill-size": {
       "values": [
@@ -6703,7 +6703,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies the size of the fill images. Values are interpreted identically to background-size, mutatis mutandi."
     },
     "fill-repeat": {
       "values": [
@@ -6717,7 +6717,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies how fill images are tiled after they have been sized and positioned."
     },
     "fill-opacity": {
       "values": [
@@ -6744,7 +6744,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property allows the author to align a stroke along the outline."
     },
     "stroke-linecap": {
       "values": [
@@ -6788,7 +6788,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies how the geometry of a fragmented box is treated for strokes."
     },
     "stroke-dasharray": {
       "values": [
@@ -6814,7 +6814,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-dash-corner property controls whether a dash is always painted at the vertices of a stroked shape."
     },
     "stroke-dash-justify": {
       "values": [
@@ -6827,7 +6827,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-dash-justify property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along each of an element's subpaths."
     },
     "stroke-color": {
       "values": [
@@ -6836,7 +6836,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property sets the stroke colors of an element."
     },
     "stroke-image": {
       "values": [
@@ -6845,7 +6845,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property sets the stroke images of an element."
     },
     "stroke-origin": {
       "values": [
@@ -6859,7 +6859,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies the coordinate system of the stroke, setting the stroke positioning area."
     },
     "stroke-position": {
       "values": [
@@ -6872,7 +6872,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "If stroke images have been specified, this property specifies their initial position (after any resizing) within their corresponding stroke positioning area."
     },
     "stroke-size": {
       "values": [
@@ -6883,7 +6883,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies the size of the stroke images."
     },
     "stroke-repeat": {
       "values": [
@@ -6897,7 +6897,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies how stroke fill images are tiled after they have been sized and positioned."
     },
     "stroke-opacity": {
       "values": [
