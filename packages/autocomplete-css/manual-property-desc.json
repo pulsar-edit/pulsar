@@ -187,7 +187,7 @@
     "desc": "Legacy Alias of perspective-origin.",
     "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
   },
-  "-webkit-transform-orgin": {
+  "-webkit-transform-origin": {
     "desc": "Legacy Alias of transform-origin.",
     "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
   },
@@ -218,6 +218,38 @@
   "-webkit-transition": {
     "desc": "Legacy Alias of transition.",
     "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-appearance": {
+    "desc": "Legacy Name Alias of appearance.",
+    "spec": "https://drafts.csswg.org/css-ui/#appearance-switching"
+  },
+  "-webkit-user-select": {
+    "desc": "Alias shorthand property of user-select.",
+    "spec": "https://drafts.csswg.org/css-ui/#propdef--webkit-user-select"
+  },
+  "-webkit-text-size-adjust": {
+    "desc": "Vendor Prefixed Legacy Name Alias. (-vendorPrefix-)text-size-adjust",
+    "spec": "https://compat.spec.whatwg.org/#css-prefixed-aliases"
+  },
+  "-webkit-box-align": {
+    "desc": "Vendor prefixed property mapping to align-items.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-flex": {
+    "desc": "Vendor prefixed property mapping to flex-grow.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-ordinal-group": {
+    "desc": "Vendor prefixed property mapping to order.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-orient": {
+    "desc": "Vendor prefixed property mapping to flex-direction.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-pack": {
+    "desc": "Vendor prefixed property mapping to justify-content.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
   },
   "fill-break": {
     "desc": "This property specifies how the geometry of a fragmented box is treated for fills.",

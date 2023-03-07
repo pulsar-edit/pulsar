@@ -598,7 +598,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Alias of transform-origin."
     },
     "-webkit-transform-style": {
       "values": [
@@ -662,7 +662,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Vendor Prefixed Legacy Name Alias. (-vendorPrefix-)text-size-adjust"
     },
     "-webkit-box-align": {
       "values": [
@@ -670,7 +670,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Vendor prefixed property mapping to align-items."
     },
     "-webkit-box-flex": {
       "values": [
@@ -678,7 +678,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Vendor prefixed property mapping to flex-grow."
     },
     "-webkit-box-ordinal-group": {
       "values": [
@@ -686,7 +686,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Vendor prefixed property mapping to order."
     },
     "-webkit-box-orient": {
       "values": [
@@ -694,7 +694,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Vendor prefixed property mapping to flex-direction."
     },
     "-webkit-box-pack": {
       "values": [
@@ -702,7 +702,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Vendor prefixed property mapping to justify-content."
     },
     "mix-blend-mode": {
       "values": [
@@ -6482,7 +6482,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Alias shorthand property of user-select."
     },
     "-webkit-appearance": {
       "values": [
@@ -6490,7 +6490,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Legacy Name Alias of appearance."
     },
     "view-transition-name": {
       "values": [
