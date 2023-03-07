@@ -318,5 +318,17 @@
   "shape-subtract": {
     "desc": "The shape-subtract property allows one to exclude part of the content area form the wrapping area. The excluded area is the addition of all the areas defined in a list of CSS basic shapes and/or SVG shapes.",
     "spec": "https://svgwg.org/svg2-draft/text.html#TextShapeSubtract"
+  },
+  "stroke-alignment": {
+    "desc": "This property allows the author to align a stroke along the outline of the current object.",
+    "spec": "https://svgwg.org/specs/strokes/#SpecifyingStrokeAlignment"
+  },
+  "stroke-dashcorner": {
+    "desc": "The stroke-dashcorner property controls whether a dash is always painted at the vertices of a stroked shape.",
+    "spec": "https://svgwg.org/specs/strokes/#StrokeDashcornerProperty"
+  },
+  "stroke-dashadjust": {
+    "desc": "The stroke-dashadjust property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along an element's subpaths.",
+    "spec": "https://svgwg.org/specs/strokes/#StrokeDashadjustProperty"
   }
 }

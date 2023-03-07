@@ -7179,7 +7179,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property allows the author to align a stroke along the outline of the current object."
     },
     "stroke-dashcorner": {
       "values": [
@@ -7188,7 +7188,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-dashcorner property controls whether a dash is always painted at the vertices of a stroked shape."
     },
     "stroke-dashadjust": {
       "values": [
@@ -7201,7 +7201,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The stroke-dashadjust property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along an element's subpaths."
     },
     "cx": {
       "values": [
