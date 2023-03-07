@@ -316,7 +316,7 @@
     "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-repeat"
   },
   "shape-subtract": {
-    "desc": "The shape-subtract property allows one to exclude part of the content area form the wrapping area. The excluded area is the addition of all the areas defined in a list of CSS basic shapes and/or SVG shapes.",
+    "desc": "The shape-subtract property allows one to exclude part of the content area from the wrapping area. The excluded area is the addition of all the areas defined in a list of CSS basic shapes and/or SVG shapes.",
     "spec": "https://svgwg.org/svg2-draft/text.html#TextShapeSubtract"
   },
   "stroke-alignment": {
@@ -330,5 +330,209 @@
   "stroke-dashadjust": {
     "desc": "The stroke-dashadjust property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along an element's subpaths.",
     "spec": "https://svgwg.org/specs/strokes/#StrokeDashadjustProperty"
+  },
+  "grid-row-gap": {
+    "desc": "Shorthand for the row-gap property.",
+    "spec": "https://drafts.csswg.org/css-align-3/#gap-legacy"
+  },
+  "grid-column-gap": {
+    "desc": "Shorthand for the column-gap property.",
+    "spec": "https://drafts.csswg.org/css-align-3/#gap-legacy"
+  },
+  "grid-gap": {
+    "desc": "Shorthand for the gap property.",
+    "spec": "https://drafts.csswg.org/css-align-3/#gap-legacy"
+  },
+  "anchor-scroll": {
+    "desc": "The anchor-scroll property allows an author to compensate for none aligned positioned elements and their anchor without losing the performance benefits of the separate scrolling thread.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#scroll"
+  },
+  "anchor-name": {
+    "desc": "Allows anchor functions to refer to an anchor element by name.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#determining"
+  },
+  "anchor-default": {
+    "desc": "The anchor-default property defines the default anchor specifier for all anchor functions on the element.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#anchor-default"
+  },
+  "position-fallback": {
+    "desc": "Provides blocks of style rules to try out. The first that doesn't cause the element to overflow its containing block is taken as the winner.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#fallback-property"
+  },
+  "background-position-inline": {
+    "desc": "This property specifies the background position's inline-axis component.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#background-position-longhands"
+  },
+  "background-position-block": {
+    "desc": "This property specifies the background position's block-axis component.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#propdef-background-position-block"
+  },
+  "corner-shape": {
+    "desc": "The corner-shape property specifies a reinterpretation of the radii to define other corner shapes.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#corner-shaping"
+  },
+  "corners": {
+    "desc": "The corners shorthand sets corner-shape and border-radius in the same declaration.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#corners-shorthand"
+  },
+  "border-limit": {
+    "desc": "Specifies which part of the border is rendered.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-limit"
+  },
+  "border-clip": {
+    "desc": "Shorthand for border-clip-top, border-clip-right, border-clip-bottom, and border-clip-left.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-top": {
+    "desc": "Splits the top border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-right": {
+    "desc": "Splits the right border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-bottom": {
+    "desc": "Splits the bottom border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-left": {
+    "desc": "Splits the left border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "voice-family": {
+    "desc": "The voice-family property specifies a prioritized list of component values that are separated by commas to indicate that they are alternatives.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-family"
+  },
+  "voice-rate": {
+    "desc": "The voice-rate property manipulates the rate of generated synthetic speech in terms of words per minute.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-rate"
+  },
+  "voice-pitch": {
+    "desc": "The voice-pitch property specifies the 'baseline' pitch of the generated speech output, which depends on the user 'voice-family' instance, and varies across speech synthesis processors.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-pitch"
+  },
+  "voice-range": {
+    "desc": "The voice-range property specifies the variability in the 'baseline' pitch.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-range"
+  },
+  "voice-stress": {
+    "desc": "The voice-stress property manipulates the strength of emphasis, which is normally applied using a combination of pitch change, timing changes, loudness and other acoustic differences.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-stress"
+  },
+  "voice-duration": {
+    "desc": "The voice-duration property specifies how long it should take to render the selected element's content.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#mixing-props-voice-duration"
+  },
+  "voice-volume": {
+    "desc": "The voice-volume property allows authors to control the amplitude of the audio waveform generated by the speech synthesizer, and is also used to adjust the relative volume level of audio cues within the aural box model of the selected element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#mixing-props-voice-volume"
+  },
+  "voice-balance": {
+    "desc": "The voice-balance property controls the spatial distribution of audio output across a lateral sound stage: one extremity is on the left, the other extremity is on the right hand side, relative to the listener’s position.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#mixing-props-voice-balance"
+  },
+  "speak": {
+    "desc": "The speak property determines whether or not to render text aurally.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#speaking-props-speak"
+  },
+  "speak-as": {
+    "desc": "The speak-as property determines in what manner text gets rendered aurally, based upon a predefined list of possibilities.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#speaking-props-speak-as"
+  },
+  "pause-before": {
+    "desc": "The pause-before property specifies a prosodic boundary (silence with a specific duration) that occurs before the speech synthesis rendition of the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#pause-props-pause-before-after"
+  },
+  "pause-after": {
+    "desc": "The pause-after property specifies a prosodic boundary (silence with a specific duration) that occurs after the speech synthesis rendition of the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#pause-props-pause-before-after"
+  },
+  "pause": {
+    "desc": "The pause property is a shorthand property for pause-before and pause-after.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#pause-props-pause"
+  },
+  "rest-before": {
+    "desc": "The rest-before property specifies a prosodic boundary (silence with a specific duration) that occurs before the speech synthesis rendition of an element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#rest-props-rest-before-after"
+  },
+  "rest-after": {
+    "desc": "The rest-after property specifies a prosodic boundary (silence with a specific duration) that occurs after the speech synthesis rendition of an element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#rest-props-rest-before-after"
+  },
+  "rest": {
+    "desc": "The rest property is a shorthand for rest-before and rest-after.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#rest-props-rest"
+  },
+  "cue-before": {
+    "desc": "The cue-before property specifies auditory icons to be played before the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#cue-props-cue-before-after"
+  },
+  "cue-after": {
+    "desc": "The cue-after property specifies auditory icons to be played after the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#cue-props-cue-before-after"
+  },
+  "cue": {
+    "desc": "The cue property is a shorthand for cue-before and cue-after.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#cue-props-cue"
+  },
+  "word-boundary-detection": {
+    "desc": "This property allows the author to decide whether and how the user agent must analyse the content to determine where word boundaries are, and to insert virtual word boundaries accordingly.",
+    "spec": "https://drafts.csswg.org/css-text-4/#word-boundary-detection"
+  },
+  "word-boundary-expansion": {
+    "desc": "This property allows transforming certain word-separating characters into other word-separating characters, to accommodate variant typesetting styles.",
+    "spec": "https://drafts.csswg.org/css-text-4/#word-boundary-expansion"
+  },
+  "text-space-trim": {
+    "desc": "This property allows authors to specify trimming behavior at the beginning and end of a box.",
+    "spec": "https://drafts.csswg.org/css-text-4/#white-space-trim"
+  },
+  "hyphenate-limit-zone": {
+    "desc": "This property specifies the maximum amount of unfilled space (before justification) that may be left in the line box before hyphenation is triggered to pull part of a word from the next line back up into the current line.",
+    "spec": "https://drafts.csswg.org/css-text-4/#hyphenate-size-limits"
+  },
+  "hyphenate-limit-lines": {
+    "desc": "This property indicates the maximum number of successive hyphenated lines in an element. The no-limit value means that there is no limit.",
+    "spec": "https://drafts.csswg.org/css-text-4/#hyphenate-line-limits"
+  },
+  "hyphenate-limit-last": {
+    "desc": "This property indicates hyphenation behavior at the end of elements, column, pages, and spreads.",
+    "spec": "https://drafts.csswg.org/css-text-4/#hyphenate-line-limits"
+  },
+  "word-wrap": {
+    "desc": "This property specifies whether the UA may break at otherwise disallowed points within a line to prevent overflow, when an otherwise-unbreakable string is too long to fit within the line box.",
+    "spec": "https://drafts.csswg.org/css-text-4/#overflow-wrap-property"
+  },
+  "text-wrap": {
+    "desc": "This property specifies the mode for text wrapping.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-wrap"
+  },
+  "wrap-before": {
+    "desc": "The wrap-before property specifies modifications to break opportunities in line breaking.",
+    "spec": "https://drafts.csswg.org/css-text-4/#wrap-before"
+  },
+  "wrap-after": {
+    "desc": "The wrap-after property specifies modifications to break opportunities in line breaking.",
+    "spec": "https://drafts.csswg.org/css-text-4/#wrap-before"
+  },
+  "wrap-inside": {
+    "desc": "Specifies the line breaking behavior within a box. As determed by the line-breaking rules in effect.",
+    "spec": "https://drafts.csswg.org/css-text-4/#wrap-inside"
+  },
+  "text-align-all": {
+    "desc": "This longhand of the text-align shorthand property specifies the inline alignment of all lines of inline content in the block container, except for last lines overridden by a non-auto value of text-align-last.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-align-all-property"
+  },
+  "text-group-align": {
+    "desc": "This property aligns the contents of the line boxes as a group while maintaining their text alignment.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-group-align-property"
+  },
+  "line-padding": {
+    "desc": "Adjusts spacing only at the start/end of a line.",
+    "spec": "https://drafts.csswg.org/css-text-4/#line-padding-property"
+  },
+  "text-spacing": {
+    "desc": "This property is a shorthand for setting text-spacing-trim and text-autospace in a single declaration.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-spacing-property"
   }
 }
