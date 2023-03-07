@@ -11,16 +11,8 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
     super()
     etch.initialize(this)
     this.settingsView = settingsView
-    // Different settings sections
-    this.items = {
-      core: new List('name'),
-      editor: new List('name'),
-      uri_handling: new List('name'),
-      system: new List('name'),
-      keybindings: new List('name'),
-      packages: new List('name'),
-      themes: new List('name')
-    }
+    // Get all available settings
+    this.settingsSchema = atom.config.schema.properties;
 
     this.subscriptions = new CompositeDisposable()
     this.subscriptions.add(this.handleEvents())
@@ -126,6 +118,12 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
     console.log(text)
   }
 
+  // View Related Functions
+  injectLoading () {
+    
+  }
+
+  // Boiler Plate Functions
   scrollUp () {
     this.element.scrollTop -= document.body.offsetHeight / 20
   }
