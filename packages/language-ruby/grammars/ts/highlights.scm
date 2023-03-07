@@ -198,7 +198,7 @@
 ; A keyword-style argument when calling a method.
 (pair
   key: (hash_key_symbol) @constant.other.symbol.hashkey.ruby
-  ":" @constant.other.symbol.hashkey.ruby
+  ":" @punctuation.definition.constant.hashkey.ruby
   (#set! final "true")
 )
 
@@ -248,8 +248,8 @@
   (bare_symbol)
 ] @constant.other.symbol.ruby
 
-(regex) @string.special.regex
-(escape_sequence) @escape
+(regex "/" @punctuation.section.regexp (string_content) @string.special.regex)
+(escape_sequence) @constant.character.escape
 
 [
   (integer)
@@ -330,10 +330,8 @@
   "**"
 ] @keyword.operator.arithmetic.ruby
 
-[
-  "=>"
-  "->"
-] @keyword.operator.ruby
+"=>" @punctuation.separator.key-value
+"->" @keyword.operator.ruby
 
 [
   ","
