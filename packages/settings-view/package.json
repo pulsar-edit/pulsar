@@ -14,6 +14,12 @@
       "description": "Limit how many processes run simultaneously during package updates. If your machine slows down while updating many packages at once, set this value to a small positive number (e.g., `1` or `2`).",
       "type": "integer",
       "default": -1
+    },
+    "searchSettingsMinimumScore": {
+      "title": "Search Settings Minimum Score to Display Results",
+      "description": "Set the minimum similarity score required for a setting to appear in the search results, when searching for settings.",
+      "type": "integer",
+      "default": 2
     }
   },
   "dependencies": {

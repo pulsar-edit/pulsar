@@ -121,7 +121,7 @@ export default class SettingsView {
     this.refs.openDotAtom.addEventListener('click', openDotAtomClickHandler)
     this.disposables.add(new Disposable(() => this.refs.openDotAtom.removeEventListener('click', openDotAtomClickHandler)))
 
-    this.addCorePanel('Search', 'search', () => new SearchSettingsPanel())
+    this.addCorePanel('Search', 'search', () => new SearchSettingsPanel(this))
     this.addCorePanel('Core', 'settings', () => new GeneralPanel())
     this.addCorePanel('Editor', 'code', () => new EditorPanel())
     if (atom.config.getSchema('core.uriHandlerRegistration').type !== 'any') {
