@@ -265,6 +265,8 @@ class WASMTreeSitterLanguageMode {
     this.grammarForLanguageString = this.grammarForLanguageString.bind(this);
 
     this.parsersByLanguage = new Map();
+    let resolve
+    this.ready = new Promise(r => resolve = r)
 
     this.grammar.getLanguage().then(lang => {
       this.rootLanguage = lang;
@@ -274,21 +276,18 @@ class WASMTreeSitterLanguageMode {
         // this.localsQuery = lang.query(grammar.localsQuery)
       }
       this.grammar = grammar;
-      if (grammar.foldsQuery) {
+      if (grammar.foldsQuery !== undefined) {
         this.foldsQuery = lang.query(grammar.foldsQuery);
       }
-      if (grammar.indentsQuery) {
+      if (grammar.indentsQuery !== undefined) {
         this.indentsQuery = lang.query(grammar.indentsQuery);
       }
       return this.getOrCreateParserForLanguage(lang);
     }).then(parser => {
       this.rootLanguageLayer
         .update(null)
-        .then(() => this.emitter.emit('did-tokenize'));
-
-      // const range = buffer.getRange();
-      // this.tree = parser.parse(buffer.getText());
-      // this.emitter.emit('did-change-highlighting', range);
+        .then(() => this.emitter.emit('did-tokenize'))
+        .then(() => resolve(true));
     });
 
     // this.readyPromise = parserInitPromise.then(() =>
