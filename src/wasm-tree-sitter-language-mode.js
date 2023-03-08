@@ -244,20 +244,26 @@ const conversions = new Map([
   ['string.special.regex', 'string.regexp']
 ])
 class WASMTreeSitterLanguageMode {
-  constructor(buffer, config, grammar) {
+  constructor(grammar, buffer, config, grammars) {
     this.emitter = new Emitter();
     this.lastId = 259
     this.scopeNames = new Map([["variable", VAR_ID]])
     this.scopeIds = new Map([[VAR_ID, "variable"]])
-    this.buffer = buffer
-    this.config = config
+    this.buffer = buffer;
+    this.config = config;
+    this.grammarRegistry = grammars;
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
     this.newRanges = []
     this.oldNodeTexts = new Set()
     this.grammar = grammar;
     this.rootScopeId = this.findOrCreateScopeId(this.grammar.scopeName);
 
+    this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
+
+    this.subscriptions.add(
+      this.onDidTokenize(() => this.tokenized = true)
+    );
 
     this.rootLanguage = null;
     this.rootLanguageLayer = null;
@@ -357,13 +363,17 @@ class WASMTreeSitterLanguageMode {
   }
 
   observeQueryFileChanges() {
+    console.log('observing changes!');
     this.subscriptions.add(
       this.grammar.onDidChangeQueryFile(({ queryType }) => {
         // let lang = this.parser.getLanguage();
         let lang = this.rootLanguage;
+        console.log('got language:', lang);
         if (!lang) { return; }
         try {
-          this[queryType] = lang.query(this.grammar[queryType]);
+          let layer = this.rootLanguageLayer;
+          if (!layer[queryType]) { return; }
+          layer[queryType] = lang.query(this.grammar[queryType]);
           // Force a re-highlight of the entire syntax file.
           this.emitter.emit('did-change-highlighting', this.buffer.getRange());
         } catch (error) {
@@ -389,7 +399,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   updateForInjection(grammar) {
-    this.updateInjections(MAX_RANGE, grammar);
+    this.rootLanguageLayer.updateInjections(grammar);
   }
 
   bufferDidChange(change) {
@@ -420,6 +430,10 @@ class WASMTreeSitterLanguageMode {
 
     // this.tree.edit(edit);
     this.rootLanguageLayer.handleTextChange(edit, oldText, newText);
+
+    for (const marker of this.injectionsMarkerLayer.getMarkers()) {
+      marker.languageLayer.handleTextChange(edit, oldText, newText);
+    }
   }
 
   bufferDidFinishTransaction() {
@@ -475,7 +489,7 @@ class WASMTreeSitterLanguageMode {
     // for (let row = startRow; row < endRow; row++) {
     //   this.isFoldableCache[row] = undefined;
     // }
-    // console.log('invalidating:', range.start, range.end);
+    console.log('invalidating:', range.start, range.end);
     this.emitter.emit('did-change-highlighting', range);
   }
 
@@ -502,97 +516,10 @@ class WASMTreeSitterLanguageMode {
   //   }
   // }
 
-  updateInjections(range, grammar) {
-    if (!this.tree) { return; } // TEMP?
-    let existingInjectionMarkers = this.injectionsMarkerLayer
-      .findMarkers({ intersectsRange: range })
-      .filter(marker => marker.grammar = grammar);
-
-    if (existingInjectionMarkers.length > 0) {
-      range = range.union(
-        new Range(
-          existingInjectionMarkers[0].getRange().start,
-          last(existingInjectionMarkers).getRange().end
-        )
-      );
-    }
-
-    const markersToUpdate = new Map();
-    const nodes = this.tree.rootNode.descendantsOfType(
-      Object.keys(this.grammar.injectionPointsByType),
-      range.start,
-      range.end
-    );
-
-    let existingInjectionMarkerIndex = 0;
-    for (const node of nodes) {
-      for (const injectionPoint of this.grammar.injectionPointsByType[node.type]) {
-        const languageName = injectionPoint.language(node);
-        if (!languageName) { continue; }
-
-        const grammar = this.grammarForLanguageString(
-          languageName
-        );
-        if (!grammar) { continue; }
-
-        const contentNodes = injectionPoint.content(node);
-        if (!contentNodes) { continue; }
-
-        const injectionRange = rangeForNode(node);
-
-        let marker;
-
-        for (
-          let i = existingInjectionMarkerIndex,
-            n = existingInjectionMarkers.length;
-          i < n;
-          i++
-        ) {
-          const existingMarker = existingInjectionMarkers[i];
-          const comparison = existingMarker.getRange().compare(injectionRange);
-          if (comparison > 0) {
-            break;
-          } else if (comparison === 0) {
-            existingInjectionMarkerIndex = i;
-            if (existingMarker.languageLayer.grammar === grammar) {
-              marker = existingMarker;
-              break;
-            }
-          } else {
-            existingInjectionMarkerIndex = i;
-          }
-        }
-
-        if (!marker) {
-          marker = this.injectionsMarkerLayer.markRange(
-            injectionRange
-          );
-
-          marker.languageLayer = new LanguageLayer(
-            marker,
-            this,
-            grammar,
-            this.depth + 1
-          );
-          marker.parentLanguageLayer = this;
-        }
-
-        markersToUpdate.set(
-          marker,
-          new NodeRangeSet(
-            nodeRangeSet,
-            injectionNodes,
-            injectionPoint.newlinesBetween,
-            injectionPoint.includeChildren
-          )
-        );
-      }
-    }
-  }
-
   grammarForLanguageString(languageString) {
     return this.grammarRegistry.treeSitterGrammarForLanguageString(
-      languageString
+      languageString,
+      'wasm'
     );
   }
 
@@ -759,13 +686,17 @@ class WASMTreeSitterLanguageMode {
   /*
   Section - Highlighting
   */
+
+  onDidTokenize(callback) {
+    return this.emitter.on('did-tokenize', callback);
+  }
+
   onDidChangeHighlighting(callback) {
     return this.emitter.on('did-change-highlighting', callback);
   }
 
   buildHighlightIterator() {
     if (!this.rootLanguageLayer) {
-      console.warn('NO ROOT LANGUAGE!');
       return new NullLayerHighlightIterator();
     }
     return new HighlightIterator(this);
@@ -820,7 +751,7 @@ class WASMTreeSitterLanguageMode {
       }
     };
 
-    iterate(this.tree.rootNode);
+    iterate(this.rootTree.rootNode);
 
     scopes.unshift(this.grammar.scopeName);
     return new ScopeDescriptor({ scopes });
@@ -868,8 +799,19 @@ class WASMTreeSitterLanguageMode {
   }
 
   getFoldableRanges() {
-    if (!this.tree) return [];
-    const folds = this.foldsQuery.captures(this.tree.rootNode)
+    console.log('getFoldableRanges', this.tokenized);
+    if (!this.tokenized) { return []; }
+
+    let layers = this.getAllLanguageLayers();
+    console.log('layers:', layers);
+
+    let folds = [];
+    for (let layer of layers) {
+      let folds = layer.getFolds();
+      console.log('layer', layer, 'FOLDS:', folds);
+      folds.push(...folds);
+    }
+    // const folds = this.foldsQuery.captures(this.tree.rootNode)
     return folds.map(fold => this._makeFoldableRange(fold.node))
   }
 
@@ -938,28 +880,47 @@ class WASMTreeSitterLanguageMode {
   }
 
   _makeFoldableRange(node) {
-    const children = node.children
-    const lastNode = children[children.length-1]
-    const range = new Range([node.startPosition.row, Infinity], lastNode.startPosition)
-    return range
+    const children = node.children;
+    const lastNode = last(children);
+
+    return new Range(
+      [node.startPosition.row, Infinity],
+      lastNode.startPosition
+    );
   }
 
   isFoldableAtRow(row) {
-    const foldsAtRow = this._getFoldsAtRow(row)
-    return foldsAtRow.length !== 0
+    const foldsAtRow = this._getFoldsAtRow(row);
+    return foldsAtRow.length !== 0;
   }
 
   _getFoldsAtRow(row) {
-    if (!this.tree) { return []; }
-    const folds = this.foldsQuery.captures(
-      this.tree.rootNode,
+    let layer = this.controllingLayerAtPoint(
+      new Point(row, 0)
+    );
+
+    let controllingLayer;
+    if (layer.foldsQuery) {
+      controllingLayer = layer;
+    } else {
+      controllingLayer = this.rootLanguageLayer;
+    }
+
+    let { foldsQuery } = controllingLayer;
+    if (!foldsQuery) { return []; }
+
+    // let tree = controllingLayer.forceAnonymousParse();
+
+
+    let folds = foldsQuery.captures(
+      controllingLayer.tree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
-    )
-    if (!folds) {
-      return [];
-    }
-    return folds.filter(fold => fold.node.startPosition.row === row)
+    );
+
+    if (!folds) { return []; }
+
+    return folds.filter(fold => fold.node.startPosition.row === row);
   }
 
   /*
@@ -998,31 +959,60 @@ class WASMTreeSitterLanguageMode {
   Section - auto-indent
   */
 
+  controllingLayerAtPoint(point) {
+    let injectionLayers = this.injectionLayersAtPoint(point);
+
+    if (injectionLayers.length === 0) {
+      return this.rootLanguageLayer;
+    } else {
+      return injectionLayers.sort(layer => -layer.depth)[0];
+    }
+  }
+
   // Get the suggested indentation level for an existing line in the buffer.
   //
   // * bufferRow - A {Number} indicating the buffer row
   //
   // Returns a {Number}.
   suggestedIndentForBufferRow(row, tabLength, options = {}) {
-    let indentTree = this.forceAnonymousParse();
+    // let indentTree = this.forceAnonymousParse();
     if (row === 0) { return 0; }
 
     let comparisonRow = row - 1;
 
     if (options.skipBlankLines !== false) {
       // Move upward until we find the a line with text on it.
-      while (this.buffer.isRowBlank(comparisonRow) || comparisonRow === 0) {
+      while (this.buffer.isRowBlank(comparisonRow) || comparisonRow > 0) {
         comparisonRow--;
       }
     }
 
+    // TODO: What's the right place to measure from? If we measure from the
+    // beginning of the new row, the injection's language layer might not know
+    // whether it controls that point. Feels better to measure from the end of
+    // the previous non-whitespace row, but we'll see.
+    let comparisonRowEnd = new Point(
+      comparisonRow,
+      this.buffer.lineLengthForRow(comparisonRow)
+    );
+
+    let controllingLayer = this.controllingLayerAtPoint(comparisonRowEnd);
+
+    console.log('COMPARISON ROW:', comparisonRow);
     const lastLineIndent = this.indentLevelForLine(
       this.buffer.lineForRow(comparisonRow), tabLength
     );
 
+    let { indentsQuery } = controllingLayer;
+    if (!indentsQuery) {
+      return lastLineIndent;
+    }
+
+    let indentTree = controllingLayer.forceAnonymousParse();
+
     // Capture in two phases. The first phase affects whether this line should
     // be indented from the previous line.
-    const indentCaptures = this.indentsQuery.captures(
+    const indentCaptures = indentsQuery.captures(
       indentTree.rootNode,
       { row: comparisonRow, column: 0 },
       { row: row, column: 0 }
@@ -1033,7 +1023,7 @@ class WASMTreeSitterLanguageMode {
 
     // The second phase tells us whether this line should be dedented from the
     // previous line.
-    const dedentCaptures = this.indentsQuery.captures(
+    const dedentCaptures = indentsQuery.captures(
       indentTree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
@@ -1057,10 +1047,17 @@ class WASMTreeSitterLanguageMode {
     // console.log('suggestedIndentForEditedBufferRow', row);
     if (row === 0) { return 0; }
 
+    let controllingLayer = this.controllingLayerAtPoint(new Point(row, 0));
+    let { indentsQuery } = controllingLayer;
+
+    if (!indentsQuery) {
+      return undefined;
+    }
+
     // Indents query won't work unless we re-parse the tree. Since we're typing
     // one character at a time, this should not be costly.
-    let indentTree = this.forceAnonymousParse();
-    const indents = this.indentsQuery.captures(
+    let indentTree = controllingLayer.forceAnonymousParse();
+    const indents = indentsQuery.captures(
       indentTree.rootNode,
       { row: row, column: 0 },
       { row: row + 1, column: 0 }
@@ -1071,11 +1068,13 @@ class WASMTreeSitterLanguageMode {
     });
     if (indent?.name === "branch") {
       if (this.buffer.lineForRow(row).trim() === indent.node.text) {
-        const parent = indent.node.parent
-        if (parent) return this.indentLevelForLine(
-          this.buffer.getLines()[parent.startPosition.row],
-          tabLength
-        )
+        const parent = indent.node.parent;
+        if (parent) {
+          return this.indentLevelForLine(
+            this.buffer.getLines()[parent.startPosition.row],
+            tabLength
+          );
+        }
       }
     }
   }
@@ -1087,11 +1086,30 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForLineAtBufferRow(row, line, tabLength) {
-    // console.log('suggestedIndentForLineAtBufferRow', row, line);
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
 
   // Private
+
+  getAllInjectionLayers() {
+    let markers =  this.injectionsMarkerLayer.getMarkers();
+    return markers.map(m => m.languageLayer);
+  }
+
+  getAllLanguageLayers() {
+    return [
+      this.rootLanguageLayer,
+      ...this.getAllInjectionLayers()
+    ];
+  }
+
+  injectionLayersAtPoint (point) {
+    let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
+      containsPosition: point
+    });
+
+    return injectionMarkers.map(m => m.languageLayer);
+  }
 
   firstNonWhitespaceRange(row) {
     return this.buffer.findInRangeSync(
@@ -1222,6 +1240,16 @@ function findNodeInCurrentScope(boundaries, position, filter) {
 }
 
 function comparePoints(a, b) {
+  // if (typeof a === 'undefined' || typeof b === 'undefined') {
+  //   debugger;
+  // }
+  // console.log('comparePoints', a.toString(), b.toString());
+  // if (a.toString() === '[object Object]') {
+  //   debugger;
+  // }
+  // if (b.toString() === '[object Object]') {
+  //   debugger;
+  // }
   const rows = a.row - b.row
   if (rows === 0)
     return a.column - b.column
@@ -1234,67 +1262,6 @@ function isBetweenPoints (point, a, b) {
   let lesser = comp > 0 ? b : a;
   let greater = comp > 0 ? a : b;
   return comparePoints(point, lesser) >= 0 && comparePoints(point, greater) <= 0;
-}
-
-class OldHighlightIterator {
-  constructor (languageMode) {
-    this.languageMode = languageMode;
-  }
-
-  seek (start, endRow) {
-    let { buffer } = this.languageMode;
-    let end = {
-      row: endRow,
-      column: buffer.lineLengthForRow(endRow)
-    };
-    this.end = end;
-
-    let [boundaries, openScopes] = this.languageMode.getSyntaxBoundaries(
-      start,
-      end,
-      { includeOpenScopes: true }
-    );
-    this.iterator = boundaries.begin;
-    this.bufferRange = buffer.getRange();
-    return openScopes;
-  }
-
-  getOpenScopeIds () {
-    // this.logPosition();
-    return [...this.iterator.value.openScopeIds];
-  }
-
-  getCloseScopeIds () {
-    return [...this.iterator.value.closeScopeIds];
-  }
-
-  getPosition () {
-    let position = this.iterator.key;
-    return position || Point.INFINITY;
-  }
-
-  logPosition () {
-    let pos = this.getPosition();
-
-    console.log(
-      `[highlight] (${pos.row}, ${pos.column})`,
-      'close',
-      this.iterator.value.closeScopeIds.map(id => this.languageMode.scopeNameForScopeId(id)),
-      'open',
-      this.iterator.value.openScopeIds.map(id => this.languageMode.scopeNameForScopeId(id)),
-      'next?',
-      this.iterator.hasNext
-    );
-  }
-
-  moveToSuccessor () {
-    this.iterator.next();
-    if (this.iterator.key && this.end) {
-      if (comparePoints(this.iterator.key, this.end) > 0) {
-        this.iterator = { value: null };
-      }
-    }
-  }
 }
 
 class HighlightIterator {
@@ -1318,17 +1285,40 @@ class HighlightIterator {
 
     this.iterators = [];
 
+    const injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
+      {
+        intersectsRange: new Range(
+          start,
+          new Point(endRow + 1, 0)
+        )
+      }
+    );
+
     const iterator = this.languageMode.rootLanguageLayer.buildHighlightIterator();
 
-    let result = iterator.seek(start, endRow)
+    let openScopes = [];
+    let result = iterator.seek(start, endRow, openScopes);
     if (result) {
       this.iterators.push(iterator);
     }
 
+    for (const marker of injectionMarkers) {
+      const iterator = marker.languageLayer.buildHighlightIterator();
+      let result = iterator.seek(start, endRow, openScopes);
+      if (result) {
+        this.iterators.push(iterator);
+      }
+    }
+
+    // Sort the iterators so that the last one in the array is the earliest
+    // in the document, and represents the current position.
+    this.iterators.sort((a, b) => b.compare(a));
+    this.detectCoveredScope();
+
     // console.log('iterators:', this.iterators);
 
     // TODO: Injections.
-    return result;
+    return openScopes;
   }
 
   moveToSuccessor () {
@@ -1343,6 +1333,9 @@ class HighlightIterator {
     // }
     let leader = last(this.iterators);
     if (leader.moveToSuccessor()) {
+      // for (let it of this.iterators) {
+      //   console.log(it.languageLayer.grammar.scopeName, it.getPosition());
+      // }
       const leaderIndex = this.iterators.length - 1;
       let i = leaderIndex;
       while (i > 0 && this.iterators[i - 1].compare(leader) < 0) { i--; }
@@ -1352,6 +1345,7 @@ class HighlightIterator {
     } else {
       this.iterators.pop();
     }
+    this.detectCoveredScope();
 
     // detect covered scope?
   }
@@ -1368,7 +1362,7 @@ class HighlightIterator {
 
   getCloseScopeIds() {
     let iterator = last(this.iterators);
-    if (iterator) {
+    if (iterator && !this.currentScopeIsCovered) {
       return iterator.getCloseScopeIds();
     }
     return [];
@@ -1376,10 +1370,46 @@ class HighlightIterator {
 
   getOpenScopeIds() {
     let iterator = last(this.iterators);
-    if (iterator) {
+    if (iterator && !this.currentScopeIsCovered) {
       return iterator.getOpenScopeIds();
     }
     return [];
+  }
+
+  // Detect whether or not another more deeply-nested language layer has a
+  // scope boundary at this same position. If so, the current language layer's
+  // scope boundary should not be reported.
+  detectCoveredScope() {
+    const layerCount = this.iterators.length;
+    if (layerCount > 1) {
+      const first = this.iterators[layerCount - 1];
+      const next = this.iterators[layerCount - 2];
+
+      if (
+        comparePoints(next.getPosition(), first.getPosition()) === 0 &&
+        next.atEnd === first.atEnd &&
+        next.depth > first.depth
+        // !next.isAtInjectionBoundary()
+      ) {
+        // console.log('CURRENTLY COVERED:', first.name);
+        this.currentScopeIsCovered = true;
+        return;
+      }
+    }
+
+    //   currentScope
+    //
+    //   if (
+    //     next.offset === first.offset &&
+    //     next.atEnd === first.atEnd &&
+    //     next.depth > first.depth &&
+    //     !next.isAtInjectionBoundary()
+    //   ) {
+    //     this.currentScopeIsCovered = true;
+    //     return;
+    //   }
+    // }
+    this.currentScopeIsCovered = false;
   }
 
   logPosition() {
@@ -1391,7 +1421,9 @@ class HighlightIterator {
 class LayerHighlightIterator {
   constructor (languageLayer) {
     this.languageLayer = languageLayer;
-
+    this.name = languageLayer.grammar.scopeName;
+    this.depth = languageLayer.depth;
+    this.atEnd = false;
     // TODO
   }
 
@@ -1410,8 +1442,8 @@ class LayerHighlightIterator {
     }
   }
 
-  seek(start, endRow) {
-    // console.log('LayerHighlightIterator#seek', start, endRow);
+  seek(start, endRow, previousOpenScopes) {
+    // console.log('LayerHighlightIterator#seek', this.name, start, endRow);
     let end = this._getEndPosition(endRow);
     let [boundaries, openScopes] = this.languageLayer.getSyntaxBoundaries(
       start,
@@ -1419,26 +1451,45 @@ class LayerHighlightIterator {
       { includeOpenScopes: true }
     );
 
+    if (!boundaries) {
+      return false;
+    }
+
     // console.log('got boundaries:', boundaries, openScopes);
     this.iterator = boundaries.begin;
     this.end = end;
-    return openScopes;
+    previousOpenScopes.push(...openScopes);
+    return true;
   }
 
   _inspectScopes (ids) {
     if (Array.isArray(ids)) {
-      return [
-        ...ids.map(id => this._inspectScopes(id))
-      ];
+      return ids.map(id => this._inspectScopes(id)).join(', ')
     }
     return this.languageLayer.languageMode.scopeNameForScopeId(ids);
   }
 
   getOpenScopeIds () {
+    // console.log(
+    //   this.name,
+    //   'OPENING',
+    //   this.getPosition(),
+    //   this._inspectScopes(
+    //     this.iterator.value.openScopeIds
+    //   )
+    // );
     return [...this.iterator.value.openScopeIds];
   }
 
   getCloseScopeIds () {
+    // console.log(
+    //   this.name,
+    //   'CLOSING',
+    //   this.getPosition(),
+    //   this._inspectScopes(
+    //     this.iterator.value.closeScopeIds
+    //   )
+    // );
     return [...this.iterator.value.closeScopeIds];
   }
 
@@ -1462,9 +1513,21 @@ class LayerHighlightIterator {
     );
   }
 
+  compare(other) {
+    const result = comparePoints(this.iterator.key, other.iterator.key);
+
+    // const result = this.offset - other.offset;
+    if (result !== 0) { return result; }
+    if (result !== 0) return result;
+    if (this.atEnd && !other.atEnd) return -1;
+    if (other.atEnd && !this.atEnd) return 1;
+    return this.languageLayer.depth - other.languageLayer.depth;
+  }
+
   moveToSuccessor () {
     if (!this.iterator.hasNext) { return false; }
     this.iterator.next();
+    if (!this.iterator.hasNext) { this.atEnd = true; }
     if (this.iterator.key && this.end) {
       if (comparePoints(this.iterator.key, this.end) > 0) {
         this.iterator = { value: null };
@@ -1490,14 +1553,21 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
 
-    // TODO: Make sure this is synchronous.
-    let language = this.grammar.getLanguageSync();
-    this.syntaxQuery = language.query(grammar.syntaxQuery);
+    this.language = this.grammar.getLanguageSync();
+    this.syntaxQuery = this.language.query(grammar.syntaxQuery);
+
+    let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
+
+    for (let query of otherQueries) {
+      if (grammar[query]) {
+        this[query] = this.language.query(grammar[query]);
+      }
+    }
 
     this.tree = null;
     this.scopeResolver = new ScopeResolver();
     this.languageScopeId = this.languageMode.findOrCreateScopeId(this.grammar.scopeName);
-    this.grammar.getLanguage();
+    // console.log('new LanguageLayer', grammar.scopeName, marker, depth);
   }
 
   getSyntaxBoundaries(from, to, { includeOpenScopes = false } = {}) {
@@ -1518,7 +1588,7 @@ class LanguageLayer {
       this.scopeResolver.store(capture, id);
     }
 
-    if (from.isEqual(bufferRange.start)) {
+    if (from.isEqual(bufferRange.start) && from.column === 0) {
       this.scopeResolver.setBoundary(null, from, this.languageScopeId, 'open');
     }
 
@@ -1526,12 +1596,15 @@ class LanguageLayer {
       this.scopeResolver.setBoundary(null, to, this.languageScopeId, 'close');
     }
 
+    // console.log('CAPTURES ARE:', debugCaptures);
+
     let alreadyOpenScopes = [];
 
     if (from.isGreaterThan(bufferRange.start)) {
       alreadyOpenScopes.push(this.languageScopeId);
     }
 
+    let isEmpty = true;
     for (let [point, data] of this.scopeResolver) {
       if (point.isLessThan(from)) {
         alreadyOpenScopes.push(...data.open);
@@ -1550,7 +1623,12 @@ class LanguageLayer {
         openNodes: [...data.openNodes]
       };
 
+      isEmpty = false;
       boundaries = boundaries.insert(point, bundle);
+    }
+
+    if (isEmpty) {
+      return [];
     }
 
     if (includeOpenScopes) {
@@ -1569,7 +1647,7 @@ class LanguageLayer {
   }
 
   handleTextChange(edit) {
-    // console.log('handleTextChange', edit);
+    // console.log(this.grammar.scopeName, 'handleTextChange', edit);
     const {
       startPosition,
       oldEndPosition,
@@ -1595,6 +1673,8 @@ class LanguageLayer {
   }
 
   destroy() {
+    // console.log('DESTROY?!?!?');
+    // console.trace();
     this.tree = null;
     this.destroyed = true;
     this.marker?.destroy();
@@ -1608,23 +1688,28 @@ class LanguageLayer {
 
   update(nodeRangeSet) {
     // TODO: Async?
+    // console.group(this.grammar.scopeName, 'update');
     this._performUpdate(nodeRangeSet);
+    // console.groupEnd();
     return Promise.resolve();
   }
 
   updateInjections(grammar) {
     // TODO: Async?
-    if (!grammar.injectionRegex) { return; }
+    if (!grammar?.injectionRegex) { return; }
     this._populateInjections(MAX_RANGE, null);
   }
 
   _performUpdate(nodeRangeSet) {
+    // console.log('[ll]', this.grammar.scopeName, '_performUpdate', nodeRangeSet);
     let includedRanges = null;
     if (nodeRangeSet) {
       includedRanges = nodeRangeSet.getRanges(this.languageMode.buffer);
+      // console.log('includedRanges???', includedRanges);
       if (includedRanges.length === 0) {
         const range = this.marker.getRange();
         this.destroy();
+        // console.log(this.grammar.name, 'about to invalidate', range.start, range.end);
         this.languageMode.emitRangeUpdate(range);
         return;
       }
@@ -1640,9 +1725,13 @@ class LanguageLayer {
       includedRanges
     );
 
+    // console.log(this.grammar.scopeName, 'affectedRange:', affectedRange);
+
     if (this.tree) {
+      // let oldTree = this.tree;
       const rangesWithSyntaxChanges = this.tree.getChangedRanges(tree);
       this.tree = tree;
+      // console.log(this.grammar.scopeName, 'setting tree', 'new', tree, 'old', oldTree, 'changes', rangesWithSyntaxChanges);
 
       if (rangesWithSyntaxChanges.length > 0) {
         for (const range of rangesWithSyntaxChanges) {
@@ -1662,6 +1751,7 @@ class LanguageLayer {
         }
       }
     } else {
+      // console.log('setting tree');
       this.tree = tree;
       this.languageMode.emitRangeUpdate(rangeForNode(tree.rootNode));
       if (includedRanges) {
@@ -1675,8 +1765,28 @@ class LanguageLayer {
     }
 
     if (affectedRange) {
+      // console.log('affected range. populating injections');
       this._populateInjections(affectedRange, nodeRangeSet);
     }
+  }
+
+  forceAnonymousParse() {
+    return this.languageMode.parse(this.language, this.tree);
+  }
+
+  getText () {
+    let { buffer } = this.languageMode;
+    if (!this.marker) {
+      return buffer.getText();
+    } else {
+      return buffer.getTextInRange(this.marker.getRange());
+    }
+  }
+
+  getFolds() {
+    if (!this.foldsQuery) { return []; }
+    let foldsTree = this.forceAnonymousParse();
+    return this.foldsQuery.captures(foldsTree.rootNode);
   }
 
   scopeMapAtPosition(point) {
@@ -1714,7 +1824,21 @@ class LanguageLayer {
 
   scopeDescriptorForPosition(point) {
     let results = this.scopeMapAtPosition(point);
+
+    let injectionLayers = this.languageMode.injectionLayersAtPoint(point);
+
+    for (let layer of injectionLayers) {
+      results.push(
+        ...layer.scopeMapAtPosition(point)
+      );
+    }
+
+    results = results.sort(({ node }) => {
+      return node.endIndex - node.startIndex;
+    });
+
     let scopes = results.map(cap => cap.name);
+
     if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
       scopes.unshift(this.grammar.scopeName);
     }
@@ -1735,8 +1859,124 @@ class LanguageLayer {
     }
   }
 
-  _populateInjections () {
-    // no-op
+  _populateInjections (range, nodeRangeSet) {
+    // console.log(this.grammar.scopeName, '_populateInjections', range, nodeRangeSet);
+    let existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
+      .findMarkers({ intersectsRange: range })
+      .filter(marker => marker.parentLanguageLayer === this);
+
+    // console.log(this.grammar.scopeName, 'i have existingInjectionMarkers:', existingInjectionMarkers.map(m => m.inspect()));
+
+    if (existingInjectionMarkers.length > 0) {
+      range = range.union(
+        new Range(
+          existingInjectionMarkers[0].getRange().start,
+          last(existingInjectionMarkers).getRange().end
+        )
+      );
+    }
+
+    const markersToUpdate = new Map();
+    // console.log('checking', this.tree.rootNode, 'for any of:', this.grammar.injectionPointsByType, this.grammar);
+    const nodes = this.tree.rootNode.descendantsOfType(
+      Object.keys(this.grammar.injectionPointsByType),
+      range.start,
+      range.end
+    );
+
+    // console.log('any injections?', nodes);
+
+    let existingInjectionMarkerIndex = 0;
+    for (const node of nodes) {
+      for (const injectionPoint of this.grammar.injectionPointsByType[node.type]) {
+        const languageName = injectionPoint.language(node);
+        if (!languageName) { continue; }
+
+        const grammar = this.languageMode.grammarForLanguageString(
+          languageName
+        );
+        if (!grammar) { continue; }
+        // console.log('GRAMMAR?!?:', grammar);
+
+        const contentNodes = injectionPoint.content(node);
+        if (!contentNodes) { continue; }
+
+        const injectionNodes = [].concat(contentNodes);
+        if (!injectionNodes.length) continue;
+
+        const injectionRange = rangeForNode(node);
+
+        let marker;
+
+        for (
+          let i = existingInjectionMarkerIndex,
+            n = existingInjectionMarkers.length;
+          i < n;
+          i++
+        ) {
+          const existingMarker = existingInjectionMarkers[i];
+          const comparison = existingMarker.getRange().compare(injectionRange);
+          if (comparison > 0) {
+            break;
+          } else if (comparison === 0) {
+            existingInjectionMarkerIndex = i;
+            if (existingMarker.languageLayer.grammar === grammar) {
+              marker = existingMarker;
+              break;
+            }
+          } else {
+            existingInjectionMarkerIndex = i;
+          }
+        }
+
+        if (!marker) {
+          marker = this.languageMode.injectionsMarkerLayer.markRange(
+            injectionRange
+          );
+
+          // console.log(this.grammar.scopeName, 'created marker:', marker, 'for grammar:', grammar.scopeName);
+
+          // console.log('now we have:', this.languageMode.injectionsMarkerLayer.getMarkers());
+
+          marker.languageLayer = new LanguageLayer(
+            marker,
+            this.languageMode,
+            grammar,
+            this.depth + 1
+          );
+          marker.parentLanguageLayer = this;
+        }
+
+        markersToUpdate.set(
+          marker,
+          new NodeRangeSet(
+            nodeRangeSet,
+            injectionNodes,
+            injectionPoint.newlinesBetween,
+            injectionPoint.includeChildren
+          )
+        );
+      }
+    }
+
+
+    for (const marker of existingInjectionMarkers) {
+      if (!markersToUpdate.has(marker)) {
+        this.languageMode.emitRangeUpdate(
+          marker.getRange()
+        );
+        marker.languageLayer.destroy();
+      }
+    }
+
+    if (markersToUpdate.size > 0) {
+      const promises = [];
+      for (const [marker, nodeRangeSet] of markersToUpdate) {
+        // console.log('updating marker:', marker);
+        promises.push(marker.languageLayer.update(nodeRangeSet));
+      }
+      return Promise.all(promises);
+    }
   }
 }
 
@@ -1749,11 +1989,31 @@ class NodeRangeSet {
   }
 
   getRanges(buffer) {
+    // console.log('NodeRangeSet#getRanges', buffer, this, this.nodes);
     const previousRanges = this.previous && this.previous.getRanges(buffer);
+    // console.log('previousRanges:', previousRanges);
     const result = [];
+
+    // for (const node of this.nodes) {
+    //   let {
+    //     startPosition,
+    //     endPosition,
+    //     startIndex,
+    //     endIndex
+    //   } = node;
+    //   result.push({
+    //     startPosition,
+    //     endPosition,
+    //     startIndex,
+    //     endIndex
+    //   });
+    // }
+    //
+    // return result;
 
     for (const node of this.nodes) {
       let position = node.startPosition, index = node.startIndex;
+      // console.log('considering:', position, index, node);
 
       if (!this.includeChildren) {
         for (const child of node.children) {
