@@ -92,10 +92,10 @@ a.b
 #         ^ punctuation.brace.curly.end
 
 a { |x| x }
-# ^ punctuation.brace.curly.begin
+# ^ punctuation.section.scope.begin.ruby
 #   ^ punctuation.separator.variable
 #     ^ punctuation.separator.variable
-#         ^ punctuation.brace.curly.end
+#         ^ punctuation.section.scope.begin.end
 
 class << A::B
 # <- keyword.control.class
@@ -127,22 +127,16 @@ end
 %[te[s]t]
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
 #       ^ punctuation.definition.string.end
 
 %{te{s}t}
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
 #       ^ punctuation.definition.string.end
 
 %<te<s>t>
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
 #       ^ punctuation.definition.string.end
 
 %~te\~s~
@@ -155,7 +149,6 @@ end
 %Q(te(s)t)
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#    ^ punctuation.section.scope
 #     ^ string.quoted.other.interpolated
 #        ^ punctuation.definition.string.end
 
