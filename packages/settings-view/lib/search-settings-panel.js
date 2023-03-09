@@ -101,50 +101,59 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
       if (this.settingsSchema[setting].type === "object") {
         for (const item in this.settingsSchema[setting].properties) {
 
-          // Now to generate results for the top level settings within each package
-          // or area of settings such as `core` or `find-and-replace`.
-          // We will also still descend one level further if we find an object
-          const passString = (string) => {
-            return string?.toLowerCase() ?? "";
-          };
-
           let schema = this.settingsSchema[setting].properties[item];
 
-          let rankedTitle = this.getScore(text, passString(schema.title));
-          let rankedDescription = this.getScore(text, passString(schema.description));
-          let rankedSettingName = this.getScore(text, passString(setting));
-          let rankedSettingItem = this.getScore(text, passString(item));
-          schema.rank = {
-            title: rankedTitle,
-            description: rankedDescription,
-            settingName: rankedSettingName,
-            settingItem: rankedSettingItem
-          };
-          schema.path = `${setting}.${item}`;
+          schema.rank = this.generateRanks(text, schema.title, schema.description, setting, item)
 
-          // Now to calculate the total score of the search results.
-          // The total score will be a sum of all individual scores, with
-          // weighted bonus' for higher matches depending on where the match was
-          let titleBonus = (schema.rank.title.score > 0.8) ? 0.2 : 0;
-          let perfectTitleBonus = (schema.rank.title.score === 1) ? 0.1 : 0;
-          let descriptionBonus = (schema.rank.description.score > 0.5) ? 0.1 : 0;
-          let perfectDescriptionBonus = (schema.rank.title.score === 1) ? 0.1 : 0;
-          let settingNameBonus = (schema.rank.settingName.score > 0.8) ? 0.2 : 0;
-          let perfectSettingNameBonus = (schema.rank.title.score === 1) ? 0.1 : 0;
-          let settingItemBonus = (schema.rank.settingItem.score > 0.8) ? 0.2 : 0;
-          let perfectSettingItemBonus = (schema.rank.settingItem.score === 1) ? 0.1 : 0;
-          let totalScore =
-            schema.rank.title.score + titleBonus + perfectTitleBonus
-            + schema.rank.description.score + descriptionBonus + perfectDescriptionBonus
-            + schema.rank.settingName.score + settingNameBonus + perfectSettingNameBonus
-            + schema.rank.settingItem.score + settingItemBonus + perfectSettingItemBonus;
-          schema.rank.totalScore = totalScore;
-          rankedResults.push(schema);
+          schema.path = `${setting}.${item}`
+
+          rankedResults.push(schema)
         }
       }
     }
 
     this.processRanks(rankedResults)
+  }
+
+  handleSettingsString (string) {
+    return string?.toLowerCase() ?? "";
+  }
+
+  generateRanks (searchText, title, description, settingName, settingItem) {
+    // In charge of generating each setting entry's rank
+    let rankedTitle = this.getScore(searchText, this.handleSettingsString(title))
+    let rankedDescription = this.getScore(searchText, this.handleSettingsString(description))
+    let rankedSettingName = this.getScore(searchText, this.handleSettingsString(settingName))
+    let rankedSettingItem = this.getScore(searchText, this.handleSettingsString(settingItem))
+
+    let rank = {
+      title: rankedTitle,
+      description: rankedDescription,
+      settingName: rankedSettingName,
+      settingItem: rankedSettingItem
+    };
+
+    // Now to calculate the total score of the search resutls.
+    // The total score will be a sume of all individual scores,
+    // with weighted bonus' for higher matches depending on where the match was
+    let titleBonus = (rank.title.score > 0.8) ? 0.2 : 0;
+    let perfectTitleBonus = (rank.title.score === 1) ? 0.1 : 0;
+    let descriptionBonus = (rank.description.score > 0.5) ? 0.1 : 0;
+    let perfectDescriptionBonus = (rank.title.score === 1) ? 0.1 : 0;
+    let settingNameBonus = (rank.settingName.score > 0.8) ? 0.2 : 0;
+    let perfectSettingNameBonus = (rank.title.score === 1) ? 0.1 : 0;
+    let settingItemBonus = (rank.settingItem.score > 0.8) ? 0.2 : 0;
+    let perfectSettingItemBonus = (rank.settingItem.score === 1) ? 0.1 : 0;
+
+    let totalScore =
+      rank.title.score + titleBonus + perfectTitleBonus
+      + rank.description.score + descriptionBonus + perfectDescriptionBonus
+      + rank.settingName.score + settingNameBonus + perfectSettingNameBonus
+      + rank.settingItem.score + settingItemBonus + perfectSettingItemBonus;
+
+    rank.totalScore = totalScore;
+
+    return rank;
   }
 
   processRanks (ranks) {

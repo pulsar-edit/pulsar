@@ -48,7 +48,6 @@ export default class SearchSettingView {
   handleButtonEvents () {
     const settingsClickHandler = (event) => {
       event.stopPropagation()
-      //this.settingsView.showPanelForURI("atom://settings-view")
 
       // Lets check if the setting we want to open is built in or from a package
       const settingLocation = this.setting.path.split(".")[0]
@@ -74,8 +73,6 @@ export default class SearchSettingView {
           atom.workspace.open(`atom://config/packages/${settingLocation}`)
           break;
       }
-      //atom.workspace.open("atom://config/core/closeDeletedFileTabs")
-      // Open the relevant settings page
     }
 
     this.refs.settingLink.addEventListener('click', settingsClickHandler)
