@@ -38,7 +38,6 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   getLanguageSync () {
-    // console.log('Grammar#getLanguageSync', this._language, this);
     return this._language;
   }
 
@@ -51,8 +50,6 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   loadQueryFiles (grammarPath, queryPaths) {
-    console.log('loadQueryFiles', grammarPath, queryPaths);
-
     if (!('syntaxQuery' in queryPaths)) {
       throw new Error(`Syntax query must be present`);
     }

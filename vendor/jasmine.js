@@ -2718,11 +2718,15 @@ jasmine.Matchers.prototype.toSatisfy = function(fn) {
 // to construct an error showing where EXACTLY was the assertion that failed
 function normalizeTreeSitterTextData(editor, commentRegex) {
   let allMatches = [], lastNonComment = 0
+  const checkAssert = new RegExp('^' + commentRegex.source + '\\s*[\\<\\-|\\^]')
   editor.getBuffer().getLines().forEach((row, i) => {
-    const m = row.match(commentRegex)
+    const m = row.trim().match(commentRegex)
     if(m) {
-      const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
-      if(scope.scopes.find(s => s.match(/comment/))) {
+      // const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
+      // FIXME: use editor.scopeDescriptorForBufferPosition when it works
+      const scope = editor.tokensForScreenRow(i)
+      const scopes = scope.flatMap(e => e.scopes)
+      if(scopes.find(s => s.match(/comment/)) && row.match(checkAssert)) {
         allMatches.push({row: lastNonComment, text: row, col: m.index, testRow: i})
         return
       }
@@ -2740,6 +2744,7 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
       }
     } else {
       const pos = text.match(/\<-\s+(.*)/)
+      if(!pos) throw new Error(`Can't match ${text}`)
       return {
         expected: pos[1],
         editorPosition: {row, column: col},
@@ -2749,3 +2754,31 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
   })
 }
 if (isCommonJS) exports.normalizeTreeSitterTextData = normalizeTreeSitterTextData;
+
+async function openDocument(fullPath) {
+  const editor = await atom.workspace.open(fullPath);
+  const mode = editor.languageMode;
+  await mode.ready;
+  return editor;
+}
+
+async function runGrammarTests(fullPath, commentRegex) {
+  const editor = await openDocument(fullPath);
+
+  const normalized = normalizeTreeSitterTextData(editor, commentRegex)
+  expect(normalized.length).toSatisfy((n, reason) => {
+    reason("Tokenizer didn't run correctly - could not find any comment")
+    return n > 0
+  })
+  normalized.forEach(({expected, editorPosition, testPosition}) => {
+    expect(editor.scopeDescriptorForBufferPosition(editorPosition).scopes).toSatisfy((scopes, reason) => {
+      reason(`Expected to find scope "${expected}" but found "${scopes}"\n` +
+        `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
+      );
+      const normalized = expected.replace(/([\.\-])/g, '\\$1')
+      const scopeRegex = new RegExp('^' + normalized + '(\\..+)?$')
+      return scopes.find(e => e.match(scopeRegex)) !== undefined;
+    })
+  })
+}
+if (isCommonJS) exports.runGrammarTests = runGrammarTests;
