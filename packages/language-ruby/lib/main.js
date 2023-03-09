@@ -18,6 +18,7 @@ exports.activate = function() {
     },
     content(node) {
       return node;
-    }
+    },
+    includeChildren: true
   });
 };

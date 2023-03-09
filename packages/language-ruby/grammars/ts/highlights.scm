@@ -9,58 +9,56 @@
 
 (superclass
   (constant) @entity.name.type.class.ruby
-  .
-)
+  .)
+
 
 (superclass
   "<" @punctuation.separator.inheritance.ruby
   (constant) @entity.other.inherited-class.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 ; module [Foo]
 (module
   name: (constant) @entity.name.type.module.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 (singleton_class
-  "<<" @keyword.operator.assigment.ruby
-)
+  "<<" @keyword.operator.assigment.ruby)
 
 (call
-  method: (identifier) @keyword.other.special-method (#match? @keyword.other.special-method "^(raise|loop)$")
-)
+  method: (identifier) @keyword.other.special-method (#match? @keyword.other.special-method "^(raise|loop)$"))
 
 ; Mark `new` as a special method in all contexts, from `Foo.new` to
 ; `Foo::Bar::Baz.new` and so on.
 (call
   receiver: (_)
   method: (identifier) @function.method.builtin.ruby
-  (#eq? @function.method.builtin.ruby "new")
-)
+  (#eq? @function.method.builtin.ruby "new"))
+
 
 (superclass
   (scope_resolution
     scope: (constant) @entity.other.inherited-class.ruby
-    name: (constant) @entity.other.inherited-class.ruby
-  )
-)
+    name: (constant) @entity.other.inherited-class.ruby))
+
+
 
 (scope_resolution
   scope: (constant) @support.class.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 (scope_resolution
   "::" @keyword.operator.namespace.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 (scope_resolution
   name: (constant) @support.class.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 ; ((variable) @keyword.other.special-method
 ; (#match? @keyword.other.special-method "^(extend)$"))
@@ -73,23 +71,21 @@
 ; the interpolation.
 (
   (interpolation
-    "#{" @punctuation.section.embedded.begin.ruby
-    "}" @punctuation.section.embedded.end.ruby
-  ) @meta.embedded
-  (#set! final "true")
-)
+    "#{" @string.quoted.ruby @punctuation.section.embedded.begin.ruby
+    "}" @string.quoted.ruby @punctuation.section.embedded.end.ruby)
+  @meta.embedded)
+  ; (#set! final "true"))
+
 
 ; Function calls
 
 (
   (identifier) @keyword.other.special-method
- (#eq? @keyword.other.special-method "require")
-)
+ (#eq? @keyword.other.special-method "require"))
+
 
 (unary
-  "defined?" @function.method.builtin.ruby
-)
-
+  "defined?" @function.method.builtin.ruby)
 
 
 (class name: [(constant)]
@@ -102,9 +98,10 @@
 
 (method
   name: [(identifier) (constant)] @entity.name.function.ruby
-  (#set! final "true")
-)
-; (singleton_method name: [(identifier) (constant)] @function.method)
+  (#set! final "true"))
+
+(singleton_method "." @punctuation.separator.method.ruby) @meta.function.method.with-arguments
+
 
 ; Identifiers
 
@@ -125,9 +122,9 @@
 
 (element_reference
   (constant) @support.class.ruby
-  (#match? @support.class.ruby "^(Set)$")
+  (#match? @support.class.ruby "^(Set)$"))
   ; (#set! final "true")
-)
+
 
 (call
   method: [(identifier) (constant)] @keyword.other.special-method (#match? @keyword.other.special-method "^(extend)$"))
@@ -149,8 +146,8 @@
   scope: [(constant) (scope_resolution)]
   "::" @keyword.operator.namespace.ruby
   name: [(constant)] @support.class.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 
 ; (call
@@ -158,8 +155,9 @@
 ; )
 (call receiver: (constant)
  @support.class.ruby
- (#set! final "true")
-)
+ (#set! final "true"))
+
+(call "." @punctuation.separator.method (#set! final "true"))
 
 ((identifier) @constant.builtin.ruby
  (#match? @constant.builtin.ruby "^__(FILE|LINE|ENCODING)__$"))
@@ -189,26 +187,27 @@
 
 ; A keyword-style parameter when defining a method.
 (keyword_parameter
+  (identifier) @constant.other.symbol.hashkey.parameter
   ":" @constant.other.symbol.parameter.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 ; A keyword-style argument when calling a method.
 (pair
   key: (hash_key_symbol) @constant.other.symbol.hashkey.ruby
   ":" @punctuation.definition.constant.hashkey.ruby
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 (optional_parameter
-  name: (identifier) @variable.parameter.function.optional.ruby
-)
+  name: (identifier) @variable.parameter.function.optional.ruby)
+
 
 (
   (identifier) @support.function.kernel.ruby
   (#match? @support.function.kernel.ruby "^(abort|at_exit|autoload|binding|callcc|caller|caller_locations|chomp|chop|eval|exec|exit|fork|format|gets|global_variables|gsub|lambda|load|local_variables|open|p|print|printf|proc|putc|puts|rand|readline|readlines|select|set_trace_func|sleep|spawn|sprintf|srand|sub|syscall|system|test|trace_var|trap|untrace_var|warn)$")
-  (#set! final "true")
-)
+  (#set! final "true"))
+
 
 ;((constant) @constant.ruby
 ;  (#match? @constant.ruby "^[A-Z\\d_]+$"))
@@ -217,49 +216,132 @@
 
 ; Literals
 
-; TODO: I can't mark these as @string.quoted.double.ruby yet because the "s
-; match _any_ delimiter, including single quotes and %Qs. This is probably a
-; bug in tree-sitter-ruby.
+; Single-quoted string 'foo'
 (
   (string
     "\"" @punctuation.definition.string.begin.ruby
-    (string_content)
-    "\"" @punctuation.definition.string.end.ruby
-  ) @string.quoted.ruby
-  (#set! final "true")
-)
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby)
+  @string.quoted.single.ruby
+  (#match? @string.quoted.single.ruby "^'")
+  (#match? @string.quoted.single.ruby "'$")
+  (#set! final true))
 
-; (will match empty strings)
-(string) @string.quoted.ruby
+
+; Double-quoted string "bar"
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby)
+  @string.quoted.double.interpolated.ruby
+  (#match? @string.quoted.double.interpolated.ruby "^\"")
+  (#match? @string.quoted.double.interpolated.ruby "\"$")
+  (#set! final true))
+
+; "Other" strings
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby)
+  @string.quoted.other.interpolated.ruby
+  (#set! final true))
+
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby)
+  @string.quoted.other.ruby
+  (#match? @string.quoted.other.ruby "^%q")
+  (#set! final true))
+
+
+(
+  (string
+    "\"" @punctuation.definition.string.begin.ruby
+    (string_content)?
+    "\"" @punctuation.definition.string.end.ruby)
+  @string.quoted.other.interpolated.ruby
+  (#match? @string.quoted.other.interpolated.ruby "^%Q")
+  (#set! final true))
+
+
+; (
+;   (
+;     (heredoc_beginning) @punctuation.definition.string.begin.ruby.html
+;     (#eq? @punctuation.definition.string.begin.ruby.html "<<-HTML")
+;   )
+;   (heredoc_body) @meta.embedded
+; )
+
+; TODO: Heredoc strings seem not to work as described.
+
+; (
+;   (heredoc_beginning) @meta.embedded
+;   (_)+ @meta.embedded
+;   ; (heredoc_body) @meta.embedded
+; ) ;@meta.embedded
+; (
+;   (_) @meta.embedded
+;   .
+;   (heredoc_body) @meta.embedded
+; )
+
+; (heredoc_end) @meta.embedded
+; (
+;   (assignment
+;     right: (heredoc_beginning)
+;     @punctuation.definition.string.begin.ruby.html
+;     (#match?
+;       @punctuation.definition.string.begin.ruby.html
+;       "^<<.HTML$"
+;     )
+;   )
+;   (heredoc_body)
+; ) @meta.embedded
+
+(
+  (subshell
+    "`" @punctuation.definition.string.begin.ruby
+    (_)?
+    "`" @punctuation.definition.string.end.ruby)
+  (#set! final true))
 
 [
   (bare_string)
-  (subshell)
   (heredoc_body)
-  (heredoc_beginning)
-] @string.unquoted.ruby
+  (heredoc_beginning)]
+@string.unquoted.ruby
 
 [
   (simple_symbol)
   (delimited_symbol)
   (hash_key_symbol)
-  (bare_symbol)
-] @constant.other.symbol.ruby
+  (bare_symbol)]
+@constant.other.symbol.ruby
 
-(regex "/" @punctuation.section.regexp (string_content) @string.special.regex)
+(splat_parameter "*" @storage.type.variable (#set! final true))
+(rest_assignment "*" @storage.type.variable (#set! final true))
+
+(regex
+ "/" @punctuation.section.regexp
+ (string_content) @string.regexp.interpolated
+ "/" @punctuation.section.regexp)
 (escape_sequence) @constant.character.escape
 
 [
   (integer)
-  (float)
-] @constant.numeric.ruby
+  (float)]
+@constant.numeric.ruby
 
 (nil) @constant.language.nil.ruby
 
 [
   (true)
-  (false)
-] @constant.language.boolean.ruby
+  (false)]
+@constant.language.boolean.ruby
 
 ; TODO: tree-sitter-ruby doesn't currently let us distinguish line comments
 ; from block comments (the =begin/=end syntax). Until it does, the latter will
@@ -273,79 +355,90 @@
 
 ; To distinguish them from the bitwise "|" operator.
 (block_parameters
-  "|" @punctuation.separator.variable.ruby
-)
+  "|" @punctuation.separator.variable.ruby)
+
 
 (binary
-  "|" @keyword.operator.other.ruby
-)
+  "|" @keyword.operator.other.ruby)
+
 
 ; Operators
 
-"(" @punctuation.brace.round.begin.ruby
-")" @punctuation.brace.round.end.ruby
 "[" @punctuation.brace.square.begin.ruby
 "]" @punctuation.brace.square.end.ruby
-"{" @punctuation.brace.curly.begin.ruby
-"}" @punctuation.brace.curly.end.ruby
+
+(parenthesized_statements
+ "(" @punctuation.brace.round.begin.ruby
+ ")" @punctuation.brace.round.end.ruby)
+
+(hash
+ "{" @punctuation.brace.curly.begin.ruby
+ "}" @punctuation.brace.curly.end.ruby)
+
+(block
+ "{" @punctuation.section.scope.begin.ruby
+ "}" @punctuation.section.scope.end.ruby)
+
+; "{"
+; "}" @punctuation.brace.curly.end.ruby
 
 (conditional
   ["?" ":"] @keyword.operator.conditional.ruby
-  (#set! final "true")
-)
-
+  (#set! final "true"))
 
 [
   "="
   "||="
   "+="
   "-="
-  "<<"
-] @keyword.operator.assigment.ruby
+  "<<"]
+@keyword.operator.assigment.ruby
 
 [
   "||"
-  "&&"
-] @keyword.operator.logical.ruby
+  "&&"]
+@keyword.operator.logical.ruby
 
 [
-  "&"
-] @keyword.operator.other.ruby
+  "&"]
+@keyword.operator.other.ruby
 
 [
   "=="
   ">="
   "<="
   ">"
-  "<"
-] @keyword.operator.comparison.ruby
+  "<"]
+@keyword.operator.comparison.ruby
 
 [
   "+"
   "-"
-  "*"
-  "/"
-  "**"
-] @keyword.operator.arithmetic.ruby
+  "**"]
+@keyword.operator.arithmetic.ruby
 
 "=>" @punctuation.separator.key-value
 "->" @keyword.operator.ruby
+
+(binary "/" @keyword.operator.arithmetic.ruby)
+(binary "*" @keyword.operator.arithmetic.ruby)
 
 [
   ","
   ";"
   "."
-  ":"
-] @punctuation.separator.ruby
+  ":"]
+@punctuation.separator.ruby
 
 ; Keywords
+
+"class" @keyword.control.class
 [
   "alias"
   "and"
   "begin"
   "break"
   "case"
-  "class"
   "def"
   "do"
   "else"
@@ -366,11 +459,10 @@
   "until"
   "when"
   "while"
-  "yield"
-] @keyword.control.ruby
+  "yield"]
+@keyword.control.ruby
 
 ; Any identifiers we haven't caught yet can be given a generic scope.
 ((identifier) @function.method.ruby
  (#is-not? local)
- (#set! shy "true")
-)
+ (#set! shy "true"))
