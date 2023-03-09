@@ -2744,6 +2744,7 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
       }
     } else {
       const pos = text.match(/\<-\s+(.*)/)
+      if(!pos) throw new Error(`Can't match ${text}`)
       return {
         expected: pos[1],
         editorPosition: {row, column: col},
@@ -2757,11 +2758,7 @@ if (isCommonJS) exports.normalizeTreeSitterTextData = normalizeTreeSitterTextDat
 async function openDocument(fullPath) {
   const editor = await atom.workspace.open(fullPath);
   const mode = editor.languageMode;
-  const ready = new Promise(resolve => {
-    mode.onDidChangeHighlighting(() => resolve(true))
-  })
-  await ready;
-  console.log("BAR")
+  await mode.ready;
   return editor;
 }
 
