@@ -104,8 +104,40 @@ module.exports = class WASMTreeSitterGrammar {
     this.registration?.dispose();
   }
 
+  // Define a set of rules for when this grammar should delegate to a different
+  // grammar for certain regions of a buffer. Examples:
+  //
+  // * embedding one language inside another (e.g., JavaScript in HTML)
+  // * tokenizing certain structures with greater detail (e.g., regular
+  //   expressions in most languages)
+  // * highlighting non-standard augmentations to a language (e.g., JSDoc
+  //   comments in JavaScript)
+  //
+  // This differs from TextMate-style injections, which operate at the scope
+  // level and are currently incompatible with tree-sitter grammars.
+  //
+  // Expects an object with these keys:
+  //
+  // * `type` (string): The type of node to inject into.
+  // * `language` (function): Should return a string describing the language
+  //   that should inject into this area. Grammars that can inject into others
+  //   will define an `injectionRegex` property that will be tested against
+  //   this value; the longest match will win.
+  //   The function receives the node itself as an argument, so you can decide
+  //   the language based on the content of the node, or return `undefined` if
+  //   an injection should not take place.
+  // * `content` (function): Receives the matching node and should return the
+  //   node that will actually be injected into. Usually this will be the same
+  //   node that was given, but could also be a specific child or descendant of
+  //   that node, or potentially any other node in the tree.
+  //
+  // NOTE: Packages will call `atom.grammars.addInjectionPoint` with a given
+  // scope name, and that call will be delegated to any tree-sitter grammars
+  // that match that scope name, whether they're legacy-tree-sitter or
+  // modern-tree-sitter. But modern-tree-sitter grammars cannot be injected
+  // into by legacy-tree-sitter-grammars, and vice versa.
+  //
   addInjectionPoint (injectionPoint) {
-    console.log('WASMTreeSitterGrammar#addInjectionPoint', injectionPoint);
     let { type } = injectionPoint;
     let injectionPoints = this.injectionPointsByType[type];
     if (!injectionPoints) {
