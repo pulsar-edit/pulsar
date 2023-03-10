@@ -534,5 +534,297 @@
   "text-spacing": {
     "desc": "This property is a shorthand for setting text-spacing-trim and text-autospace in a single declaration.",
     "spec": "https://drafts.csswg.org/css-text-4/#text-spacing-property"
+  },
+  "animation-range-end": {
+    "desc": "Shifts the end time of the animation (i.e. where keyframes mapped to 100% progress are attached when the iteration count is 1) to the specified position on the timeline.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#valdef-animation-range-start-timeline-range-name-percentage"
+  },
+  "animation-range-start": {
+    "desc": "Shifts the start time of the animation (i.e. where keyframes mapped to 0% progress are attached when the iteration count is 1) to the specified position on the timeline.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-animation-range-start"
+  },
+  "animation-range": {
+    "desc": "The animation-range property is a shorthand that sets animation-range-start and animation-range-end together in a single declaration.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-animation-range"
+  },
+  "view-timeline": {
+    "desc": "This property is a shorthand for setting view-timeline-name and view-timeline-axis in a single declaration. It does not set view-timeline-inset.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline"
+  },
+  "view-timeline-inset": {
+    "desc": "Specifies an inset (positive) or outset (negative) adjustment of the scrollport when determining whether the box is in view when setting the bounds of the corresponding view progress timeline.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline-inset"
+  },
+  "view-timeline-axis": {
+    "desc": "Specifies an axis for each named view progress timeline associated with this scroll container.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline-axis"
+  },
+  "view-timeline-name": {
+    "desc": "Specifies names for any view progress timelines associated with this element’s principal box.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline-name"
+  },
+  "fill-color": {
+    "desc": "This property sets the fill color of an element. This color is drawn behind any fill images.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-color"
+  },
+  "view-transition-name": {
+    "desc": "The view-transition-name property 'names' an element as participating in a view transition.",
+    "spec": "https://drafts.csswg.org/css-view-transitions-1/#view-transition-name-prop"
+  },
+  "input-security": {
+    "desc": "For the purpose of this specification, a sensitive text input is a text input whose purpose is to accept sensitive input, as defined by the host language.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#input-security"
+  },
+  "nav-left": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "nav-down": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "nav-right": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "nav-up": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "caret": {
+    "desc": "This property is a shorthand for setting caret-color and caret-shape in one declaration.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#caret"
+  },
+  "caret-shape": {
+    "desc": "This property allows authors to specify the desired shape of the text insertion caret.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#caret-shape"
+  },
+  "text-emphasis-skip": {
+    "desc": "This property describes for which characters marks are drawn.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-emphasis-skip"
+  },
+  "text-decoration-skip-spaces": {
+    "desc": "This property specifies whether text decoration skips any spaces.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-spaces-property"
+  },
+  "text-decoration-skip-box": {
+    "desc": "This property specifies what parts of the element’s box area any text decoration affecting the element must skip over.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-box-property"
+  },
+  "text-decoration-skip-self": {
+    "desc": "This property specifies whether any text decoration lines drawn by its ancestors are propagated to or drawn across the element.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-self-property"
+  },
+  "text-decoration-trim": {
+    "desc": "This property adjusts the start and end points of line decorations, allowing the author to shorten, lengthen, or shift the decoration with respect to the text.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-inset-property"
+  },
+  "text-space-collapse": {
+    "desc": "Previous name of 'white-space-collapse'",
+    "spec": "https://drafts.csswg.org/css-text-4/#changes"
+  },
+  "min-intrinsic-sizing": {
+    "desc": "This property defines whether the min-content contribution of a non-replaced box is “compressed” under certain circumstances.",
+    "spec": "https://www.w3.org/TR/css-sizing-4/#intrinsic-contribution-override"
+  },
+  "shape-padding": {
+    "desc": "The shape-padding property adds padding to a shape-inside. This defines a new shape where every point is the specified distance from the shape-inside.",
+    "spec": "https://drafts.csswg.org/css-shapes-2/#propdef-shape-padding"
+  },
+  "shape-inside": {
+    "desc": "The shape-inside property adds one or more exclusion areas to the element’s wrapping context.",
+    "spec": "https://drafts.csswg.org/css-shapes-2/#shape-inside-property"
+  },
+  "scroll-start": {
+    "desc": "This property is a shorthand property that sets all of the scroll-start-* longhands in one declaration.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start"
+  },
+  "scroll-start-target": {
+    "desc": "This property is a shorthand property that sets all of the scroll-start-target-* longhands in one declaration.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-target"
+  },
+  "scroll-start-x": {
+    "desc": "Defines the scroll starting point in the block axis.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-physical"
+  },
+  "scroll-start-y": {
+    "desc": "Defines the scroll starting point in the inline axis.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-physical"
+  },
+  "scroll-start-inline": {
+    "desc": "Defines the flow for 'scroll-start' longhands.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-logical"
+  },
+  "scroll-start-block": {
+    "desc": "Defines the flow for 'scroll-start' longhands.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-logical"
+  },
+  "ruby-overhang": {
+    "desc": "The ruby-overhang property controls whether ruby annotations may overlap adjacent text outside the ruby container.",
+    "spec": "https://drafts.csswg.org/css-ruby-1/#ruby-overhang"
+  },
+  "ruby-merge": {
+    "desc": "This property controls how ruby annotation boxes should be rendered when there are more than one in a ruby container box: whether each pair should be kept separate, the annotations should be merged and rendered as a group, or the separation should be determined based on the space available.",
+    "spec": "https://drafts.csswg.org/css-ruby-1/#collapsed-ruby"
+  },
+  "border-boundary": {
+    "desc": "When the border-boundary property on an element is set to 'parent', additional borders of the element could be drawn where the element’s area and the borders of its parent are met.",
+    "spec": "https://drafts.csswg.org/css-round-display-1/#border-boundary-property"
+  },
+  "block-step": {
+    "desc": "This shorthand property allows for setting block-step-size, block-step-insert, block-step-align, and block-step-round in one declaration.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step"
+  },
+  "block-step-round": {
+    "desc": "This property specifies whether adjustments due to block-step-size insert positive or negative space.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-round"
+  },
+  "block-step-align": {
+    "desc": "This property specifies whether extra spacing derived from applying block-step-size is inserted before, inserted after, or split between both sides of the box.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-align"
+  },
+  "block-step-insert": {
+    "desc": "This property specifies whether extra spacing derived from applying block-step-size is inserted inside (like padding) or outside (like margin) the box’s border.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-insert"
+  },
+  "block-step-size": {
+    "desc": "This property defines the step unit for a block-level box’s block size.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-size"
+  },
+  "region-fragment": {
+    "desc": "The region-fragment property controls the behavior of the last usable region associated with a named flow.",
+    "spec": "https://drafts.csswg.org/css-regions-1/#propdef-region-fragment"
+  },
+  "flow-from": {
+    "desc": "The flow-from property makes a block container a region and associates it with a named flow.",
+    "spec": "https://drafts.csswg.org/css-regions-1/#flow-from"
+  },
+  "flow-into": {
+    "desc": "The ‘flow-into’ property can place an element or its contents into a named flow.",
+    "spec": "https://drafts.csswg.org/css-regions-1/#the-flow-into-property"
+  },
+  "page": {
+    "desc": "The page property is used to specify a particular type of page (called a named page) on which an element must be displayed.",
+    "spec": "https://www.w3.org/TR/css-page-3/#using-named-pages"
+  },
+  "float-offset": {
+    "desc": "This property pushes a page float in direction opposite of the where it has been floated with float.",
+    "spec": "https://drafts.csswg.org/css-page-floats-3/#the-float_offset-property"
+  },
+  "float-defer": {
+    "desc": "This property specifies whether the initial float reference of a page float is the fragmentation container in which the float anchor is placed after previous page floats have been placed, or in another one.",
+    "spec": "https://drafts.csswg.org/css-page-floats-3/#float-defer-property"
+  },
+  "float-reference": {
+    "desc": "The floats are aligning to the start or end of a float reference, specified by the float-reference attribute.",
+    "spec": "https://drafts.csswg.org/css-page-floats-3/#float-reference-property"
+  },
+  "max-lines": {
+    "desc": "A property that forces a fragment to break after a specified number of lines.",
+    "spec": "https://www.w3.org/TR/css-overflow-4/#max-lines"
+  },
+  "continue": {
+    "desc": "The continue property gives authors the ability to request that content that does not fit inside an element be fragmented, and provides alternatives for where the remaining content should continue.",
+    "spec": "https://www.w3.org/TR/css-overflow-4/#continue"
+  },
+  "line-clamp": {
+    "desc": "The line-clamp property is a shorthand for the max-lines, block-ellipsis, and continue properties.",
+    "spec": "https://www.w3.org/TR/css-overflow-3/#line-clamp"
+  },
+  "block-ellipsis": {
+    "desc": "This property allows inserting content into the last line box before a (forced or unforced) region break to indicate the continuity of truncated/interrupted content.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#block-ellipsis"
+  },
+  "overflow-clip-margin-block": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-block"
+  },
+  "overflow-clip-margin-inline": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-inline"
+  },
+  "overflow-clip-margin-inline-end": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-inline-end"
+  },
+  "overflow-clip-margin-block-end": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-block-end"
+  },
+  "overflow-clip-margin-inline-start": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-inline-start"
+  },
+  "overflow-clip-margin-block-start": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-block-start"
+  },
+  "overflow-clip-margin-left": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-left"
+  },
+  "overflow-clip-margin-bottom": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-bottom"
+  },
+  "overflow-clip-margin-right": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-right"
+  },
+  "overflow-clip-margin-top": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-top"
+  },
+  "spatial-navigation-function": {
+    "desc": "The default algorithm of spatial navigation specified in the § 8 Processing Model may need the fine tune depending on the layout types.",
+    "spec": "https://www.w3.org/TR/css-nav-1/#css-property-spatialnavigationfunction"
+  },
+  "spatial-navigation-action": {
+    "desc": "When the focus is inside of a scroll container and the user triggers spatial navigation, it is somewhat ambiguous whether they are requesting that the focus be moved in that direction, or whether the document should be scrolled in that direction.",
+    "spec": "https://www.w3.org/TR/css-nav-1/#css-property-spatialnavigationaction"
+  },
+  "spatial-navigation-contain": {
+    "desc": "Creates an additional spatial navigation container.",
+    "spec": "https://www.w3.org/TR/css-nav-1/#container"
+  },
+  "marker-side": {
+    "desc": "The marker-side property specifies whether an outside marker box is positioned based on the directionality of the list item itself (i.e. its originating element) or the directionality of the list container (i.e. the originating element’s parent).",
+    "spec": "https://www.w3.org/TR/css-lists-3/#marker-side"
+  },
+  "link-parameters": {
+    "desc": "The link-parameters property is one way to set link parameters on the element itself, and on all external CSS resources specified on the element.",
+    "spec": "https://drafts.csswg.org/css-link-params-1/#link-param-prop"
+  },
+  "box-snap": {
+    "desc": "Specifies how the block is snapped to the baseline grid.",
+    "spec": "https://www.w3.org/TR/css-line-grid-1/#box-snap"
+  },
+  "line-snap": {
+    "desc": "This property applies to all the line boxes directly contained by the element, and, when not none, causes each line box to shift (usually downward, possibly by zero) until it snaps to the line grid specified by line-grid.",
+    "spec": "https://www.w3.org/TR/css-line-grid-1/#line-snap"
+  },
+  "line-grid": {
+    "desc": "Specifies whether this box creates a new baseline grid for its descendants or uses the same baseline grid as its parent.",
+    "spec": "https://www.w3.org/TR/css-line-grid-1/#line-grid"
+  },
+  "initial-letter-wrap": {
+    "desc": "This property specifies whether lines impacted by an initial letter are shortened to fit the rectangular shape of the initial letter box or the contour of its glyph outline.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#initial-letter-wrapping"
+  },
+  "inline-sizing": {
+    "desc": "This property specifies how the logical height of the content area of an inline box is measured in relation to its contents.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#line-fill"
+  },
+  "leading-trim": {
+    "desc": "On inline boxes, specifies whether to trim the content box to match its corresponding text-edge metric.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#propdef-leading-trim"
+  },
+  "text-edge": {
+    "desc": "Inline boxes, whose primary purpose is to contain text, are sized in the block axis based on their font metrics.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#propdef-text-edge"
+  },
+  "baseline-source": {
+    "desc": "When an inline-level box has more than one possible source for baseline information (such as for a multi-line inline block or inline flex container) this property specifies whether the first baseline set or last baseline set is preferred for alignment, indicating the box’s baseline alignment preference.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#baseline-source"
   }
 }

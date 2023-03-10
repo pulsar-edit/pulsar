@@ -3054,7 +3054,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "When an inline-level box has more than one possible source for baseline information (such as for a multi-line inline block or inline flex container) this property specifies whether the first baseline set or last baseline set is preferred for alignment, indicating the box’s baseline alignment preference."
     },
     "alignment-baseline": {
       "values": [
@@ -3107,7 +3107,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Inline boxes, whose primary purpose is to contain text, are sized in the block axis based on their font metrics."
     },
     "leading-trim": {
       "values": [
@@ -3119,7 +3119,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "On inline boxes, specifies whether to trim the content box to match its corresponding text-edge metric."
     },
     "inline-sizing": {
       "values": [
@@ -3129,7 +3129,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies how the logical height of the content area of an inline box is measured in relation to its contents."
     },
     "initial-letter": {
       "values": [
@@ -3165,7 +3165,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether lines impacted by an initial letter are shortened to fit the rectangular shape of the initial letter box or the contour of its glyph outline."
     },
     "line-grid": {
       "values": [
@@ -3175,7 +3175,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies whether this box creates a new baseline grid for its descendants or uses the same baseline grid as its parent."
     },
     "line-snap": {
       "values": [
@@ -3186,7 +3186,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property applies to all the line boxes directly contained by the element, and, when not none, causes each line box to shift (usually downward, possibly by zero) until it snaps to the line grid specified by line-grid."
     },
     "box-snap": {
       "values": [
@@ -3200,7 +3200,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies how the block is snapped to the baseline grid."
     },
     "link-parameters": {
       "values": [
@@ -3210,7 +3210,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The link-parameters property is one way to set link parameters on the element itself, and on all external CSS resources specified on the element."
     },
     "list-style-image": {
       "values": [
@@ -3259,7 +3259,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The marker-side property specifies whether an outside marker box is positioned based on the directionality of the list item itself (i.e. its originating element) or the directionality of the list container (i.e. the originating element’s parent)."
     },
     "counter-reset": {
       "values": [
@@ -4011,7 +4011,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Creates an additional spatial navigation container."
     },
     "spatial-navigation-action": {
       "values": [
@@ -4022,7 +4022,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "When the focus is inside of a scroll container and the user triggers spatial navigation, it is somewhat ambiguous whether they are requesting that the focus be moved in that direction, or whether the document should be scrolled in that direction."
     },
     "spatial-navigation-function": {
       "values": [
@@ -4032,7 +4032,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The default algorithm of spatial navigation specified in the § 8 Processing Model may need the fine tune depending on the layout types."
     },
     "overflow-clip-margin-top": {
       "values": [
@@ -4043,7 +4043,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-right": {
       "values": [
@@ -4054,7 +4054,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-bottom": {
       "values": [
@@ -4065,7 +4065,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-left": {
       "values": [
@@ -4076,7 +4076,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-block-start": {
       "values": [
@@ -4087,7 +4087,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-inline-start": {
       "values": [
@@ -4098,7 +4098,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-block-end": {
       "values": [
@@ -4109,7 +4109,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-inline-end": {
       "values": [
@@ -4120,7 +4120,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin": {
       "values": [
@@ -4142,7 +4142,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "overflow-clip-margin-block": {
       "values": [
@@ -4153,7 +4153,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the overflow clip edge of a box."
     },
     "text-overflow": {
       "values": [
@@ -4174,7 +4174,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property allows inserting content into the last line box before a (forced or unforced) region break to indicate the continuity of truncated/interrupted content."
     },
     "line-clamp": {
       "values": [
@@ -4184,7 +4184,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The line-clamp property is a shorthand for the max-lines, block-ellipsis, and continue properties."
     },
     "-webkit-line-clamp": {
       "values": [
@@ -4207,7 +4207,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The continue property gives authors the ability to request that content that does not fit inside an element be fragmented, and provides alternatives for where the remaining content should continue."
     },
     "max-lines": {
       "values": [
@@ -4216,7 +4216,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "A property that forces a fragment to break after a specified number of lines."
     },
     "overflow-x": {
       "values": [
@@ -4369,7 +4369,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The floats are aligning to the start or end of a float reference, specified by the float-reference attribute."
     },
     "clear": {
       "values": [
@@ -4396,7 +4396,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether the initial float reference of a page float is the fragmentation container in which the float anchor is placed after previous page floats have been placed, or in another one."
     },
     "float-offset": {
       "values": [
@@ -4404,7 +4404,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property pushes a page float in direction opposite of the where it has been floated with float."
     },
     "page": {
       "values": [
@@ -4413,7 +4413,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The page property is used to specify a particular type of page (called a named page) on which an element must be displayed."
     },
     "top": {
       "values": [
@@ -4520,7 +4520,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The ‘flow-into’ property can place an element or its contents into a named flow."
     },
     "flow-from": {
       "values": [
@@ -4529,7 +4529,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The flow-from property makes a block container a region and associates it with a named flow."
     },
     "region-fragment": {
       "values": [
@@ -4539,7 +4539,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The region-fragment property controls the behavior of the last usable region associated with a named flow."
     },
     "block-step-size": {
       "values": [
@@ -4548,7 +4548,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property defines the step unit for a block-level box’s block size."
     },
     "block-step-insert": {
       "values": [
@@ -4558,7 +4558,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether extra spacing derived from applying block-step-size is inserted inside (like padding) or outside (like margin) the box’s border."
     },
     "block-step-align": {
       "values": [
@@ -4570,7 +4570,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether extra spacing derived from applying block-step-size is inserted before, inserted after, or split between both sides of the box."
     },
     "block-step-round": {
       "values": [
@@ -4581,7 +4581,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether adjustments due to block-step-size insert positive or negative space."
     },
     "block-step": {
       "values": [
@@ -4599,7 +4599,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This shorthand property allows for setting block-step-size, block-step-insert, block-step-align, and block-step-round in one declaration."
     },
     "line-height-step": {
       "values": [
@@ -4618,7 +4618,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "When the border-boundary property on an element is set to 'parent', additional borders of the element could be drawn where the element’s area and the borders of its parent are met."
     },
     "ruby-position": {
       "values": [
@@ -4641,7 +4641,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property controls how ruby annotation boxes should be rendered when there are more than one in a ruby container box: whether each pair should be kept separate, the annotations should be merged and rendered as a group, or the separation should be determined based on the space available."
     },
     "ruby-align": {
       "values": [
@@ -4663,7 +4663,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The ruby-overhang property controls whether ruby annotations may overlap adjacent text outside the ruby container."
     },
     "overflow-anchor": {
       "values": [
@@ -4689,7 +4689,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property is a shorthand property that sets all of the scroll-start-* longhands in one declaration."
     },
     "scroll-start-target": {
       "values": [
@@ -4699,7 +4699,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property is a shorthand property that sets all of the scroll-start-target-* longhands in one declaration."
     },
     "scroll-start-x": {
       "values": [
@@ -4711,7 +4711,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the scroll starting point in the block axis."
     },
     "scroll-start-y": {
       "values": [
@@ -4723,7 +4723,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the scroll starting point in the inline axis."
     },
     "scroll-start-inline": {
       "values": [
@@ -4735,7 +4735,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the flow for 'scroll-start' longhands."
     },
     "scroll-start-block": {
       "values": [
@@ -4747,7 +4747,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Defines the flow for 'scroll-start' longhands."
     },
     "scroll-snap-type": {
       "values": [
@@ -5003,7 +5003,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The shape-inside property adds one or more exclusion areas to the element’s wrapping context."
     },
     "shape-padding": {
       "values": [
@@ -5011,7 +5011,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The shape-padding property adds padding to a shape-inside. This defines a new shape where every point is the specified distance from the shape-inside."
     },
     "shape-outside": {
       "values": [
@@ -5189,7 +5189,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property defines whether the min-content contribution of a non-replaced box is “compressed” under certain circumstances."
     },
     "box-sizing": {
       "values": [
@@ -5545,7 +5545,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Previous name of 'white-space-collapse'"
     },
     "text-space-trim": {
       "values": [
@@ -5965,7 +5965,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property adjusts the start and end points of line decorations, allowing the author to shorten, lengthen, or shift the decoration with respect to the text."
     },
     "text-decoration-skip": {
       "values": [
@@ -5989,7 +5989,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether any text decoration lines drawn by its ancestors are propagated to or drawn across the element."
     },
     "text-decoration-skip-box": {
       "values": [
@@ -5999,7 +5999,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies what parts of the element’s box area any text decoration affecting the element must skip over."
     },
     "text-decoration-skip-spaces": {
       "values": [
@@ -6011,7 +6011,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property specifies whether text decoration skips any spaces."
     },
     "text-decoration-skip-ink": {
       "values": [
@@ -6087,7 +6087,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property describes for which characters marks are drawn."
     },
     "text-shadow": {
       "values": [
@@ -6375,7 +6375,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property allows authors to specify the desired shape of the text insertion caret."
     },
     "caret": {
       "values": [
@@ -6387,7 +6387,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property is a shorthand for setting caret-color and caret-shape in one declaration."
     },
     "nav-up": {
       "values": [
@@ -6398,7 +6398,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left)."
     },
     "nav-right": {
       "values": [
@@ -6409,7 +6409,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left)."
     },
     "nav-down": {
       "values": [
@@ -6420,7 +6420,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left)."
     },
     "nav-left": {
       "values": [
@@ -6431,7 +6431,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left)."
     },
     "user-select": {
       "values": [
@@ -6474,7 +6474,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "For the purpose of this specification, a sensitive text input is a text input whose purpose is to accept sensitive input, as defined by the host language."
     },
     "-webkit-user-select": {
       "values": [
@@ -6499,7 +6499,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The view-transition-name property 'names' an element as participating in a view transition."
     },
     "will-change": {
       "values": [
@@ -6656,7 +6656,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property sets the fill color of an element. This color is drawn behind any fill images."
     },
     "fill-image": {
       "values": [
@@ -7107,7 +7107,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies names for any view progress timelines associated with this element’s principal box."
     },
     "view-timeline-axis": {
       "values": [
@@ -7119,7 +7119,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies an axis for each named view progress timeline associated with this scroll container."
     },
     "view-timeline-inset": {
       "values": [
@@ -7128,7 +7128,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Specifies an inset (positive) or outset (negative) adjustment of the scrollport when determining whether the box is in view when setting the bounds of the corresponding view progress timeline."
     },
     "view-timeline": {
       "values": [
@@ -7141,7 +7141,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property is a shorthand for setting view-timeline-name and view-timeline-axis in a single declaration. It does not set view-timeline-inset."
     },
     "animation-range": {
       "values": [
@@ -7150,7 +7150,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The animation-range property is a shorthand that sets animation-range-start and animation-range-end together in a single declaration."
     },
     "animation-range-start": {
       "values": [
@@ -7159,7 +7159,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Shifts the start time of the animation (i.e. where keyframes mapped to 0% progress are attached when the iteration count is 1) to the specified position on the timeline."
     },
     "animation-range-end": {
       "values": [
@@ -7168,7 +7168,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Shifts the end time of the animation (i.e. where keyframes mapped to 100% progress are attached when the iteration count is 1) to the specified position on the timeline."
     },
     "stroke-alignment": {
       "values": [
