@@ -1,4 +1,10 @@
 ;; Collections
+(anon_fn_lit
+ "(" @punctuation.section.expression.begin
+ .
+ (sym_lit) @entity.name.function
+ ")" @punctuation.section.expression.end)
+
 (list_lit
  "(" @punctuation.section.expression.begin
  .
