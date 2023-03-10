@@ -49,3 +49,4 @@
 (str_lit) @string.quoted.double
 (num_lit) @constant.numeric
 (comment) @comment.line.semicolon
+(dis_expr) @comment.block.clojure
