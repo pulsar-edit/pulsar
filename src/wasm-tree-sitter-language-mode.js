@@ -79,6 +79,9 @@ class WASMTreeSitterLanguageMode {
 
     this.parsersByLanguage = new Map();
 
+    let resolve
+    this.ready = new Promise(r => resolve = r)
+
     this.grammar.getLanguage().then(lang => {
       this.rootLanguage = lang;
       this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
@@ -86,7 +89,8 @@ class WASMTreeSitterLanguageMode {
     }).then(() => {
       this.rootLanguageLayer
         .update(null)
-        .then(() => this.emitter.emit('did-tokenize'));
+        .then(() => this.emitter.emit('did-tokenize'))
+        .then(() => resolve(true));
     });
 
     this.rootScopeDescriptor = new ScopeDescriptor({
@@ -128,6 +132,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidChange(change) {
+    if(!this.rootLanguageLayer) return;
     // if (!this.tree) { return; }
 
     let { oldRange, newRange, oldText, newText } = change;
@@ -161,6 +166,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidFinishTransaction({ changes }) {
+    if(!this.rootLanguageLayer) return;
     for (let i = 0, { length } = changes; i < length; i++) {
       const { oldRange, newRange } = changes[i];
       spliceArray(
@@ -443,10 +449,10 @@ class WASMTreeSitterLanguageMode {
   }
 
   getFoldableRangesAtIndentLevel(level) {
+    if (!this.tree) return [];
     const tabLength = this.buffer.displayLayers[0]?.tabLength || 2
     const minCol = (level-1) * tabLength
     const maxCol = (level) * tabLength
-    if (!this.tree) return [];
     return this.foldsQuery
       .captures(this.tree.rootNode)
       .filter(fold => {

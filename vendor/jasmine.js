@@ -2757,8 +2757,7 @@ if (isCommonJS) exports.normalizeTreeSitterTextData = normalizeTreeSitterTextDat
 
 async function openDocument(fullPath) {
   const editor = await atom.workspace.open(fullPath);
-  const mode = editor.languageMode;
-  await mode.ready;
+  await editor.languageMode.ready;
   return editor;
 }
 
