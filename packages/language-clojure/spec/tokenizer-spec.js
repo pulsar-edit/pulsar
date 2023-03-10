@@ -11,8 +11,13 @@ describe('Clojure grammars', () => {
     await runGrammarTests(path.join(__dirname, 'fixtures', 'tokens.clj'), /;/)
   });
 
-  it('tokenizes the editor using node tree-sitter parser', async () => {
+  it('tokenizes the editor using node tree-sitter parser the same as TextMate', async () => {
     atom.config.set('core.languageParser', 'wasm-tree-sitter');
     await runGrammarTests(path.join(__dirname, 'fixtures', 'tokens.clj'), /;/)
+  });
+
+  it('tokenizes the editor using node tree-sitter parser (specific rules)', async () => {
+    atom.config.set('core.languageParser', 'wasm-tree-sitter');
+    await runGrammarTests(path.join(__dirname, 'fixtures', 'tree-sitter-tokens.clj'), /;/)
   });
 });
