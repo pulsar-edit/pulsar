@@ -1943,7 +1943,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Controls whether the box’s block-axis margins are discarded or kept at a fragmentation break."
     },
     "box-decoration-break": {
       "values": [
@@ -2006,7 +2006,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The color-adjust shorthand allows an author to set all of the performance-motivated color adjustment properties in one declaration."
     },
     "color": {
       "values": [
@@ -2110,7 +2110,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The string-set property contains one or more pairs, each consisting of an custom identifier (the name of the named string) followed by a content-list describing how to construct the value of the named string."
     },
     "bookmark-level": {
       "values": [
@@ -2119,7 +2119,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The bookmark-level property determines if a bookmark is created, and at what level."
     },
     "bookmark-label": {
       "values": [
@@ -2127,7 +2127,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Sets the text content of the bookmark label."
     },
     "bookmark-state": {
       "values": [
@@ -2137,7 +2137,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The bookmark-state may be open or closed."
     },
     "display": {
       "values": [
@@ -2191,7 +2191,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The reading-order property controls the order in which elements are rendered to speech or are navigated to when using (linear) sequention navigation methods."
     },
     "layout-order": {
       "values": [
@@ -2199,7 +2199,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "By allowing the layout to be rearranged without affecting the underlying document source order, the layout-order property lets authors keep a document’s reading and interaction order matched to the visual perception order in cases where it does not match the layout order."
     },
     "visibility": {
       "values": [
@@ -2225,7 +2225,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "An element becomes an exclusion when its wrap-flow property has a computed value other than auto."
     },
     "wrap-through": {
       "values": [
@@ -2235,7 +2235,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "Setting the wrap-through property to none prevents an element from inheriting its parent wrapping context."
     },
     "flex-direction": {
       "values": [
@@ -2423,7 +2423,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property controls whether user agents are allowed to synthesize bold font faces when a font family lacks bold faces."
     },
     "font-synthesis-style": {
       "values": [
@@ -2433,7 +2433,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property controls whether user agents are allowed to synthesize oblique font faces when a font family lacks oblique faces."
     },
     "font-synthesis-small-caps": {
       "values": [
@@ -2443,7 +2443,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "This property controls whether user agents are allowed to synthesize small caps font faces when a font family lacks small caps faces."
     },
     "font-synthesis": {
       "values": [
@@ -2683,7 +2683,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The copy-into property contains one or more pairs, each consisting of a custom identifier followed by a content-level keyword describing how to construct the value of the named content fragment."
     },
     "position": {
       "values": [
@@ -2726,7 +2726,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The footnote-display property determines whether a footnote is displayed as a block element or inline element."
     },
     "footnote-policy": {
       "values": [
@@ -2737,7 +2737,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The footnote-policy property allows authors some influence over the rendering of difficult pages."
     },
     "grid-template-columns": {
       "values": [
@@ -2966,7 +2966,7 @@
         "initial",
         "unset"
       ],
-      "description": ""
+      "description": "The object-view-box property specifies a 'view box' over an element, which allows zooming or panning over the element’s contents."
     },
     "object-position": {
       "values": [

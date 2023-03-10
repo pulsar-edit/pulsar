@@ -826,5 +826,73 @@
   "baseline-source": {
     "desc": "When an inline-level box has more than one possible source for baseline information (such as for a multi-line inline block or inline flex container) this property specifies whether the first baseline set or last baseline set is preferred for alignment, indicating the box’s baseline alignment preference.",
     "spec": "https://www.w3.org/TR/css-inline-3/#baseline-source"
+  },
+  "object-view-box": {
+    "desc": "The object-view-box property specifies a 'view box' over an element, which allows zooming or panning over the element’s contents.",
+    "spec": "https://drafts.csswg.org/css-images-5/#the-object-view-box"
+  },
+  "string-set": {
+    "desc": "The string-set property contains one or more pairs, each consisting of an custom identifier (the name of the named string) followed by a content-list describing how to construct the value of the named string.",
+    "spec": "https://drafts.csswg.org/css-gcpm-3/#setting-named-strings-the-string-set-pro"
+  },
+  "bookmark-level": {
+    "desc": "The bookmark-level property determines if a bookmark is created, and at what level.",
+    "spec": "https://drafts.csswg.org/css-content-3/#propdef-bookmark-level"
+  },
+  "bookmark-label": {
+    "desc": "Sets the text content of the bookmark label.",
+    "spec": "https://drafts.csswg.org/css-content-3/#bookmark-label"
+  },
+  "bookmark-state": {
+    "desc": "The bookmark-state may be open or closed.",
+    "spec": "https://drafts.csswg.org/css-content-3/#bookmark-state"
+  },
+  "footnote-policy": {
+    "desc": "The footnote-policy property allows authors some influence over the rendering of difficult pages.",
+    "spec": "https://drafts.csswg.org/css-gcpm-3/#footnote-policy"
+  },
+  "footnote-display": {
+    "desc": "The footnote-display property determines whether a footnote is displayed as a block element or inline element.",
+    "spec": "https://drafts.csswg.org/css-gcpm-3/#footnote-types"
+  },
+  "reading-order": {
+    "desc": "The reading-order property controls the order in which elements are rendered to speech or are navigated to when using (linear) sequention navigation methods.",
+    "spec": "https://drafts.csswg.org/css-display-4/#reading-order"
+  },
+  "layout-order": {
+    "desc": "By allowing the layout to be rearranged without affecting the underlying document source order, the layout-order property lets authors keep a document’s reading and interaction order matched to the visual perception order in cases where it does not match the layout order.",
+    "spec": "https://drafts.csswg.org/css-display-4/#layout-order"
+  },
+  "font-synthesis-weight": {
+    "desc": "This property controls whether user agents are allowed to synthesize bold font faces when a font family lacks bold faces.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-weightThis property controls whether user agents are allowed to synthesize bold font faces when a font family lacks bold faces."
+  },
+  "font-synthesis-style": {
+    "desc": "This property controls whether user agents are allowed to synthesize oblique font faces when a font family lacks oblique faces.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-style"
+  },
+  "font-synthesis-small-caps": {
+    "desc": "This property controls whether user agents are allowed to synthesize small caps font faces when a font family lacks small caps faces.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-small-caps"
+  },
+  "margin-break": {
+    "desc": "Controls whether the box’s block-axis margins are discarded or kept at a fragmentation break.",
+    "spec": "https://www.w3.org/TR/css-break-4/#break-margins"
+  },
+  "color-adjust": {
+    "desc": "The color-adjust shorthand allows an author to set all of the performance-motivated color adjustment properties in one declaration.",
+    "spec": "https://www.w3.org/TR/css-color-adjust-1/#color-adjust"
+  },
+  "wrap-flow": {
+    "desc": "An element becomes an exclusion when its wrap-flow property has a computed value other than auto.",
+    "spec": "https://drafts.csswg.org/css-exclusions-1/#wrap-flow-property"
+  },
+  "wrap-through": {
+    "desc": "Setting the wrap-through property to none prevents an element from inheriting its parent wrapping context.",
+    "spec": "https://drafts.csswg.org/css-exclusions-1/#wrap-through-property"
+  },
+  "copy-into": {
+    "desc": "The copy-into property contains one or more pairs, each consisting of a custom identifier followed by a content-level keyword describing how to construct the value of the named content fragment.",
+    "spec": "https://drafts.csswg.org/css-gcpm-4/#copy-into-heading"
   }
 }
