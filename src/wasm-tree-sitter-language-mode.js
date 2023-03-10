@@ -128,7 +128,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidChange(change) {
-    // if (!this.tree) { return; }
+    if (!this.rootLanguageLayer) { return; }
 
     let { oldRange, newRange, oldText, newText } = change;
     this.newRanges.push(change.newRange);
@@ -161,6 +161,8 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidFinishTransaction({ changes }) {
+    if (!this.rootLanguageLayer) { return; }
+
     for (let i = 0, { length } = changes; i < length; i++) {
       const { oldRange, newRange } = changes[i];
       spliceArray(
@@ -457,17 +459,17 @@ class WASMTreeSitterLanguageMode {
   }
 
   parse (language, oldTree, includedRanges) {
-    let devMode = atom.inDevMode();
+    // let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     let text = this.buffer.getText();
     // TODO: Is there a better way to feed the parser the contents of the file?
-    if (devMode) { console.time('Parsing'); }
+    // if (devMode) { console.time('Parsing'); }
     const result = parser.parse(
       text,
       oldTree,
       { includedRanges }
     );
-    if (devMode) { console.timeEnd('Parsing'); }
+    // if (devMode) { console.timeEnd('Parsing'); }
     return result;
   }
 
@@ -487,6 +489,8 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
+  // Given a node and a descriptor string like "lastChild.startPosition",
+  // navigates to the position described.
   resolveNodePosition(node, descriptor) {
     let parts = descriptor.split('.');
     let result = node;
@@ -556,6 +560,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   _getFoldsAtRow(row) {
+    if (!this.tokenized) { return []; }
     let layer = this.controllingLayerAtPoint(new Point(row, 0));
 
     let controllingLayer;
