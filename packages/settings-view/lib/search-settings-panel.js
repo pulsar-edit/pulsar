@@ -153,10 +153,10 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
 
   generateRanks (searchText, title, description, settingName, settingItem) {
     // In charge of generating each setting entry's rank
-    let rankedTitle = this.getScore(searchText, this.handleSettingsString(title))
-    let rankedDescription = this.getScore(searchText, this.handleSettingsString(description))
-    let rankedSettingName = this.getScore(searchText, this.handleSettingsString(settingName))
-    let rankedSettingItem = this.getScore(searchText, this.handleSettingsString(settingItem))
+    let rankedTitle = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(title))
+    let rankedDescription = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(description))
+    let rankedSettingName = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(settingName))
+    let rankedSettingItem = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(settingItem))
 
     let rank = {
       title: rankedTitle,
