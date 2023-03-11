@@ -22,10 +22,14 @@ export default class SearchSettingView {
     const path = this.setting.path;
     const description = this.setting.description ?? "";
     const packageName = this.setting.path.split(".")[0];
+    const icon = this.getIcon(packageName);
 
     return (
       <div className='search-result col-lg-8'>
-        <span className='search-package-name pull-right'>{packageName}</span>
+        <span className='search-package-name pull-right'>
+          {packageName}
+          <span className={icon}></span>
+        </span>
         <div className='body'>
           <h4 className='card-name'>
             <a ref='settingLink'>
@@ -46,6 +50,21 @@ export default class SearchSettingView {
   destroy () {
     this.disposables.dispose()
     return etch.destroy(this)
+  }
+
+  getIcon(namespace) {
+    // Takes a setting namespace and returns the appropriate icon for it.
+    switch(namespace) {
+      case "core":
+        return "icon icon-settings search-result-icon";
+        break;
+      case "editor":
+        return "icon icon-code search-result-icon";
+        break;
+      default:
+        return "icon icon-package search-result-icon";
+        break;
+    }
   }
 
   handleButtonEvents () {
