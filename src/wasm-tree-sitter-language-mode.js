@@ -1139,7 +1139,7 @@ class ScopeResolver {
   }
 }
 
-// Scope names can mark themselves with `${text}` to interpolate the node's
+// Scope names can mark themselves with `TEXT` to interpolate the node's
 // text into the capture.
 ScopeResolver.interpolateName = (name, node) => {
   return name.replace('TEXT', node.text);
@@ -1158,6 +1158,9 @@ ScopeResolver.interpolateName = (name, node) => {
 //
 // These tests come in handy for criteria that can't be represented by the
 // built-in predicates like `#match?` and `#eq?`.
+//
+// NOTE: Syntax queries will always be run through a `ScopeResolver`, but other
+// kinds of queries usually will not.
 //
 ScopeResolver.TESTS = {
   // Passes only if another node has not already declared `final` for the exact
@@ -1239,8 +1242,13 @@ ScopeResolver.TESTS = {
   },
 
   // Passes if this is _not_ a child of a node of the given type.
-  onlyIfNotChildOfType(...args) {
-    return !this.onlyIfChildOfType(...args);
+  onlyIfNotChildOfType(existingData, props, node) {
+    let { onlyIfNotChildOfType: type } = props;
+    let parent = node.parent;
+    if (!parent || parent.type !== type) {
+      return true;
+    }
+    return false;
   },
 
   // Passes if this node has a node of the given type in its ancestor chain.
@@ -1256,8 +1264,14 @@ ScopeResolver.TESTS = {
 
   // Passes if this node does not have a node of the given type in its ancestor
   // chain.
-  onlyIfNotDescendantOfType(...args) {
-    return !this.onlyIfDescendantOfType(...args);
+  onlyIfNotDescendantOfType(existingData, props, node) {
+    let { onlyIfNotDescendantOfType: type } = props;
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      if (current.type === type) { return false; }
+    }
+    return true;
   }
 };
 
