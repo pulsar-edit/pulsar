@@ -518,7 +518,7 @@ class WASMTreeSitterLanguageMode {
     let root = layer.tree.rootNode;
     let index = this.buffer.characterIndexForPosition(position);
     let node = root.descendantForIndex(index);
-    while (node && !where(node)) {
+    while (node && !where(node, this.grammar)) {
       node = node.parent;
     }
     return node;
