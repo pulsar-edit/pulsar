@@ -21,7 +21,7 @@ describe('Clojure grammars', () => {
     await runGrammarTests(path.join(__dirname, 'fixtures', 'tree-sitter-tokens.clj'), /;/)
   });
 
-  fit('folds Clojure code', async () => {
+  it('folds Clojure code', async () => {
     atom.config.set('core.languageParser', 'wasm-tree-sitter');
     await runFoldsTests(path.join(__dirname, 'fixtures', 'tree-sitter-folds.clj'), /;/)
   });
