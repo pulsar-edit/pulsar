@@ -1700,14 +1700,17 @@ class LanguageLayer {
   }
 
   getExtent() {
-    return this.marker?.getRange() ?? this.buffer.getRange();
+    return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
   }
 
   getSyntaxBoundaries(from, to, { includeOpenScopes = false } = {}) {
+    let { buffer } = this.languageMode;
     if (!this.tree) { return []; }
     if (!this.grammar.getLanguageSync()) { return []; }
-    from = Point.fromObject(from, true);
-    to = Point.fromObject(to, true);
+
+    from = buffer.clipPosition(Point.fromObject(from, true));
+    to = buffer.clipPosition(Point.fromObject(to, true));
+
     let boundaries = createTree(comparePoints);
     let extent = this.marker ? this.marker.getRange() : MAX_RANGE;
 
