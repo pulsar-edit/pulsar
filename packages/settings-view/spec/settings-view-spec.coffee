@@ -103,7 +103,7 @@ describe "SettingsView", ->
 
       expect(settingsView.refs.panelMenu.querySelector('li[name="Panel 1"]')).toExist()
       expect(settingsView.refs.panelMenu.querySelector('li[name="Panel 2"]')).toExist()
-      expect(settingsView.refs.panelMenu.children[1]).toHaveClass 'active'
+      expect(settingsView.refs.panelMenu.children[0]).toHaveClass 'active'
 
       jasmine.attachToDOM(settingsView.element)
       settingsView.refs.panelMenu.querySelector('li[name="Panel 1"] a').click()
