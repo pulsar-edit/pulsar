@@ -12,6 +12,8 @@ const createTree = require("./rb-tree")
 
 const FUNCTION_TRUE = () => true;
 
+let [foo, bar] = ["x", "y"]
+
 function last(array) {
   return array[array.length - 1];
 }
@@ -50,7 +52,7 @@ function ensureRangePropertyIsDefined(node) {
 const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
 
-const VAR_ID = 257
+const VAR_ID = 257;
 // const conversions = new Map([
 //   ['function.method.builtin', 'keyword.other.special-method'],
 //   ['number', 'constant.numeric'],
@@ -64,7 +66,7 @@ const VAR_ID = 257
 class WASMTreeSitterLanguageMode {
   constructor(grammar, buffer, config, grammars) {
     this.emitter = new Emitter();
-    this.lastId = 259
+    this.lastId = 259;
     this.scopeNames = new Map([["variable", VAR_ID]])
     this.scopeIds = new Map([[VAR_ID, "variable"]])
     this.buffer = buffer;
@@ -1665,29 +1667,31 @@ class LanguageLayer {
 
     this.subscriptions = new CompositeDisposable;
 
-    this.language = this.grammar.getLanguageSync();
-    this.syntaxQuery = this.language.query(grammar.syntaxQuery);
+    this.languageLoaded = this.grammar.getLanguage(language => {
+      this.language = language;
+      this.syntaxQuery = this.language.query(grammar.syntaxQuery);
 
-    let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
+      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
 
-    for (let query of otherQueries) {
-      if (grammar[query]) {
-        this[query] = this.language.query(grammar[query]);
+      for (let query of otherQueries) {
+        if (grammar[query]) {
+          this[query] = this.language.query(grammar[query]);
+        }
       }
-    }
+
+      if (atom.inDevMode()) {
+        // In dev mode, changes to query files should be applied in real time.
+        // This allows someone to save, e.g., `highlights.scm` and immediately
+        // see the impact of their change.
+        this.observeQueryFileChanges();
+      }
+    });
 
     this.tree = null;
     this.scopeResolver = new ScopeResolver(
       (name) => this.languageMode.getOrCreateScopeId(name)
     );
     this.languageScopeId = this.languageMode.getOrCreateScopeId(this.grammar.scopeName);
-
-    if (atom.inDevMode()) {
-      // In dev mode, changes to query files should be applied in real time.
-      // This allows someone to save, e.g., `highlights.scm` and immediately
-      // see the impact of their change.
-      this.observeQueryFileChanges();
-    }
   }
 
   observeQueryFileChanges() {
@@ -1713,7 +1717,7 @@ class LanguageLayer {
 
   getSyntaxBoundaries(from, to, { includeOpenScopes = false } = {}) {
     let { buffer } = this.languageMode;
-    if (!this.tree) { return []; }
+    if (!this.language || !this.tree) { return []; }
     if (!this.grammar.getLanguageSync()) { return []; }
 
     from = buffer.clipPosition(Point.fromObject(from, true));
@@ -1827,10 +1831,8 @@ class LanguageLayer {
     }
   }
 
-  update(nodeRangeSet) {
-    // TODO: Async?
-    this._performUpdate(nodeRangeSet);
-    return Promise.resolve();
+  async update(nodeRangeSet) {
+    await this._performUpdate(nodeRangeSet);
   }
 
   getLocalReferencesAtPoint(point) {
@@ -2013,7 +2015,8 @@ class LanguageLayer {
     this._populateInjections(MAX_RANGE, null);
   }
 
-  _performUpdate(nodeRangeSet) {
+  async _performUpdate(nodeRangeSet) {
+    await this.languageLoaded;
     let includedRanges = null;
     if (nodeRangeSet) {
       includedRanges = nodeRangeSet.getRanges(this.languageMode.buffer);
@@ -2106,7 +2109,7 @@ class LanguageLayer {
   }
 
   scopeMapAtPosition(point) {
-    if (!this.tree) { return []; }
+    if (!this.language || !this.tree) { return []; }
     let scopeResolver = new ScopeResolver();
 
     // If the cursor is resting before column X, we want all scopes that cover
@@ -2163,6 +2166,7 @@ class LanguageLayer {
   }
 
   _populateInjections (range, nodeRangeSet) {
+    const promises = [];
     let existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
       .findMarkers({ intersectsRange: range })
       .filter(marker => marker.parentLanguageLayer === this);
@@ -2236,6 +2240,7 @@ class LanguageLayer {
             grammar,
             this.depth + 1
           );
+
           marker.parentLanguageLayer = this;
         }
 
@@ -2261,12 +2266,12 @@ class LanguageLayer {
     }
 
     if (markersToUpdate.size > 0) {
-      const promises = [];
       for (const [marker, nodeRangeSet] of markersToUpdate) {
         promises.push(marker.languageLayer.update(nodeRangeSet));
       }
-      return Promise.all(promises);
     }
+
+    return Promise.all(promises);
   }
 }
 
