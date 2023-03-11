@@ -75,6 +75,13 @@ module.exports = {
         statusView.initialize(statusBar, packageManager, updates)
       }
     })
+
+    // Attach a settings button to the status bar
+    if (atom.config.get("settings-view.showSettingsIconInStatusBar")) {
+      const SettingsIconStatusView = require('./settings-icon-status-view')
+      statusViewIcon = new SettingsIconStatusView(statusBar)
+      statusViewIcon.attach()
+    }
   },
 
   consumeSnippets (snippets) {

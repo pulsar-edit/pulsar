@@ -14,6 +14,12 @@
       "description": "Limit how many processes run simultaneously during package updates. If your machine slows down while updating many packages at once, set this value to a small positive number (e.g., `1` or `2`).",
       "type": "integer",
       "default": -1
+    },
+    "showSettingsIconInStatusBar": {
+      "title": "Show Settings Icon in Status Bar",
+      "description": "Whether or not to show a settings icon in the Pulsar Status Bar.",
+      "type": "boolean",
+      "default": true
     }
   },
   "dependencies": {
