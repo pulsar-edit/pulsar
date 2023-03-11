@@ -137,11 +137,11 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
     // The total score will be a sume of all individual scores,
     // with weighted bonus' for higher matches depending on where the match was
     let titleBonus = (rank.title.score > 0.8) ? 0.2 : 0;
-    let perfectTitleBonus = (rank.title.score === 1) ? 0.1 : 0;
+    let perfectTitleBonus = (rank.title.score === 1) ? 0.2 : 0;
     let descriptionBonus = (rank.description.score > 0.5) ? 0.1 : 0;
     let perfectDescriptionBonus = (rank.title.score === 1) ? 0.1 : 0;
     let settingNameBonus = (rank.settingName.score > 0.8) ? 0.2 : 0;
-    let perfectSettingNameBonus = (rank.title.score === 1) ? 0.1 : 0;
+    let perfectSettingNameBonus = (rank.settingName.score === 1) ? 0.3 : 0;
     let settingItemBonus = (rank.settingItem.score > 0.8) ? 0.2 : 0;
     let perfectSettingItemBonus = (rank.settingItem.score === 1) ? 0.1 : 0;
 
