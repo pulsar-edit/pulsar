@@ -1,3 +1,6 @@
+env:
+  PYTHON_VERSION: 3.10
+
 linux_task:
   alias: linux
   container:
@@ -101,13 +104,19 @@ arm_linux_task:
 silicon_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-monterey-xcode:14
     memory: 8G
+  env:
+    CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
+    CSC_KEY_PASSWORD: ENCRYPTED[82bb72653d39578035ed1860ab4978703d50bd326d925a146ff08782f987ceb37ac2d8dbace52dec2b0e2ef92debf097]
+    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
   prepare_script:
-    - brew install node@16 yarn git python
+    - brew install node@16 yarn git python@$PYTHON_VERSION
     - git submodule init
     - git submodule update
-    - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
+    - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
@@ -136,16 +145,22 @@ silicon_mac_task:
 intel_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-monterey-xcode:14
     memory: 8G
+  env:
+    CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
+    CSC_KEY_PASSWORD: ENCRYPTED[82bb72653d39578035ed1860ab4978703d50bd326d925a146ff08782f987ceb37ac2d8dbace52dec2b0e2ef92debf097]
+    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
   prepare_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
     - echo A | softwareupdate --install-rosetta
     - arch -x86_64 xcode-select --install
     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
-    - arch -x86_64 brew install node@16 yarn git python
-    - ln -s /usr/local/bin/python3 /usr/local/bin/python
+    - arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
+    - ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json

@@ -1,0 +1,5 @@
+'.platform-darwin':
+  'cmd-ctrl-G': 'styleguide:show'
+
+'.platform-win32, .platform-linux':
+  'ctrl-G': 'styleguide:show'

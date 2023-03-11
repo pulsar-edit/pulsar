@@ -37,7 +37,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: pulsar.deb
-        key: pulsar-$env:GITHUB_SHA
+        key: pulsar-${{ github.sha }}
 
   test:
     name: Package
@@ -144,7 +144,10 @@ jobs:
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v2
-
+    - name: Setup NodeJS
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Install Dependencies
       run: yarn install || yarn install
 
@@ -156,7 +159,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: pulsar.deb
-        key: pulsar-$env:GITHUB_SHA
+        key: pulsar-${{ github.sha }}
 
     - name: Install Pulsar
       run: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
