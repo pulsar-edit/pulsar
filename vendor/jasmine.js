@@ -2718,7 +2718,7 @@ jasmine.Matchers.prototype.toSatisfy = function(fn) {
 // to construct an error showing where EXACTLY was the assertion that failed
 function normalizeTreeSitterTextData(editor, commentRegex) {
   let allMatches = [], lastNonComment = 0
-  const checkAssert = new RegExp('^' + commentRegex.source + '\\s*[\\<\\-|\\^]')
+  const checkAssert = new RegExp('^\\s*' + commentRegex.source + '\\s*[\\<\\-|\\^]')
   editor.getBuffer().getLines().forEach((row, i) => {
     const m = row.trim().match(commentRegex)
     if(m) {
@@ -2781,3 +2781,56 @@ async function runGrammarTests(fullPath, commentRegex) {
   })
 }
 if (isCommonJS) exports.runGrammarTests = runGrammarTests;
+
+async function runFoldsTests(fullPath, commentRegex) {
+  const editor = await openDocument(fullPath);
+  let grouped = {}
+  const normalized = normalizeTreeSitterTextData(editor, commentRegex).forEach(test => {
+    const [kind, id] = test.expected.split('.')
+    if(!kind || !id) {
+      throw new Error(`Folds must be in the format fold_end.some-id\n` +
+        `      at ${test.testPosition.row+1}:${test.testPosition.column+1}`)
+    }
+    grouped[id] ||= {}
+    grouped[id][kind] = test
+  })
+  for(const k in grouped) {
+    const v = grouped[k]
+    const keys = Object.keys(v)
+    if(keys.indexOf('fold_begin') === -1)
+      throw new Error(`Fold ${k} must contain fold_begin`)
+    if(keys.indexOf('fold_end') === -1)
+      throw new Error(`Fold ${k} must contain fold_end`)
+    if(keys.indexOf('fold_new_position') === -1)
+      throw new Error(`Fold ${k} must contain fold_new_position`)
+  }
+
+  for(const k in grouped) {
+    const fold = grouped[k]
+    const begin = fold['fold_begin']
+    const end = fold['fold_end']
+    const newPos = fold['fold_new_position']
+
+    expect(editor.isFoldableAtBufferRow(begin.editorPosition.row))
+      .toSatisfy((foldable, reason) => {
+        reason(`Editor is not foldable at row ${begin.editorPosition.row+1}\n` +
+          `      at ${fullPath}:${begin.testPosition.row+1}:${begin.testPosition.column+1}`)
+        return foldable
+      })
+      editor.foldBufferRow(begin.editorPosition.row)
+
+    expect(editor.screenPositionForBufferPosition(end.editorPosition))
+      .toSatisfy((screenPosition, reason) => {
+        const {row,column} = newPos.editorPosition
+        reason(`At row ${begin.editorPosition.row+1}, editor should fold ` +
+          `up to the ${end.editorPosition.row+1}:${end.editorPosition.column+1}\n` +
+          `    into the new position  ${row+1}:${column+1}\n`+
+          `    but folded to position ${screenPosition.row+1}:${screenPosition.column+1}\n`+
+          `      at ${fullPath}:${newPos.testPosition.row+1}:${newPos.testPosition.column+1}\n` +
+          `      at ${fullPath}:${end.testPosition.row+1}:${end.testPosition.column+1}`)
+        return row === screenPosition.row && column === screenPosition.column
+      })
+    editor.unfoldAll()
+  }
+}
+if (isCommonJS) exports.runFoldsTests = runFoldsTests;
