@@ -27,8 +27,8 @@ export default class SearchSettingView {
     return (
       <div className='search-result col-lg-8'>
         <span className='search-package-name pull-right'>
-          {packageName}
           <span className={icon}></span>
+          {packageName}
         </span>
         <div className='body'>
           <h4 className='card-name'>
