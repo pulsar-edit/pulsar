@@ -4,6 +4,7 @@
 import etch from 'etch'
 import { shell } from 'electron'
 import { Disposable, CompositeDisposable } from 'atom'
+import { getSettingTitle } from './rich-title'
 
 export default class SearchSettingView {
   constructor(setting, settingsView) {
@@ -17,20 +18,22 @@ export default class SearchSettingView {
   }
 
   render () {
-    const title = this.setting.title ?? "";
+    const title = this.setting.title ?? getSettingTitle(this.setting.path, this.setting.path.split(".")[1]);
     const path = this.setting.path;
     const description = this.setting.description ?? "";
+    const packageName = this.setting.path.split(".")[0];
 
     return (
-      <div className='package-card col-lg-8'>
+      <div className='search-result col-lg-8'>
+        <span className='search-package-name pull-right'>{packageName}</span>
         <div className='body'>
           <h4 className='card-name'>
             <a ref='settingLink'>
-              <span className='package-name'>{title}</span>
-              <span className='value'>{path}</span>
+              <span className='search-name'>{title}</span>
+              <span className='search-id'>{path}</span>
             </a>
           </h4>
-          <span className='package-description'>{description}</span>
+          <span className='search-description'>{description}</span>
 
         </div>
 

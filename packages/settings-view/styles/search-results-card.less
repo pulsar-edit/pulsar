@@ -1,0 +1,89 @@
+@import "octicon-mixins";
+@import "ui-variables";
+@import "variables";
+
+.settings-view {
+
+  .search-result {
+    padding: @component-padding*1.5;
+    margin-bottom: @component-padding;
+    list-style-type: none;
+    font-size: 1.2em;
+    border-radius: @component-border-radius*2;
+    border: 1px solid @base-border-color;
+    background-color: @package-card-background-color;
+    overflow: hidden;
+    -webkit-user-select: none;
+
+    &:hover {
+      background-color: contrast(@package-card-background-color, darken(@package-card-background-color, 2%), lighten(@package-card-background-color, 2%));
+    }
+    &:active {
+      background-color: @package-card-background-color;
+    }
+    &.disabled {
+      background-color: @package-card-disabled-background-color;
+      .body,
+      .avatar,
+      .author,
+      .stats {
+        opacity: .5;
+      }
+    }
+
+    &.col-lg-4 {
+      min-width: 190px;
+      padding: @component-padding 0;
+      padding-left: @component-padding;
+      padding-right: @component-padding;
+    }
+
+    .search-name {
+      margin-right: .8em;
+      font-weight: bolder;
+      color: @text-color-highlight;
+      cursor: pointer;
+    }
+
+    .search-id {
+      font-size: .8em;
+      margin-right: @component-padding;
+      display: block; /* Force newline on item to avoid complex line handling */
+    }
+
+    .search-description {
+      color: @text-color;
+      overflow: hidden;
+      min-height: 38px;
+      max-height: 38px;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* number of lines to show */
+      -webkit-box-orient: vertical;
+    }
+
+    .card-name {
+      font-weight: 300;
+      margin: 0 0 .2em 0;
+      font-size: 1.2em;
+      line-height: 1.4;
+
+      .css-truncate-target {
+        color: $greenDark;
+      }
+    }
+
+    .body {
+      .css-truncate-target {
+        max-width: 100%;
+      }
+    }
+
+    .search-package-name {
+      margin-right: .8em;
+      font-weight: bolder;
+      color: @text-color-highlight;
+    }
+
+  }
+}

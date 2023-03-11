@@ -4,6 +4,7 @@ import {CompositeDisposable, Disposable, TextEditor} from 'atom'
 import _ from 'underscore-plus'
 import CollapsibleSectionPanel from './collapsible-section-panel'
 import {getSettingDescription} from './rich-description'
+import {getSettingTitle} from './rich-title'
 
 const SCOPED_SETTINGS = [
   'autoIndent',
@@ -418,15 +419,6 @@ function elementForSetting (namespace, name, value) {
   }
 
   return controlGroup
-}
-
-function getSettingTitle (keyPath, name) {
-  if (name == null) {
-    name = ''
-  }
-  const schema = atom.config.getSchema(keyPath)
-  const title = schema != null ? schema.title : null
-  return title || _.uncamelcase(name).split('.').map(_.capitalize).join(' ')
 }
 
 function elementForOptions (namespace, name, value, {radio = false}) {
