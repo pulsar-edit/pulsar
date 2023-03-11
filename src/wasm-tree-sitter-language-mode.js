@@ -77,11 +77,6 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeId = this.getOrCreateScopeId(this.grammar.scopeName);
     this.ignoreScopeId = this.getOrCreateScopeId('ignore');
 
-    let resolveReady;
-    this.ready = new Promise((resolve) => {
-      resolveReady = resolve;
-    });
-
     this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
 
@@ -98,15 +93,14 @@ class WASMTreeSitterLanguageMode {
 
     this.parsersByLanguage = new Map();
 
-    this.grammar.getLanguage().then(lang => {
+    this.ready = this.grammar.getLanguage().then(lang => {
       this.rootLanguage = lang;
       this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
       return this.getOrCreateParserForLanguage(lang);
     }).then(() => {
-      this.rootLanguageLayer
+      return this.rootLanguageLayer
         .update(null)
         .then(() => this.emitter.emit('did-tokenize'))
-        .then(() => resolveReady(true));
     });
 
     this.rootScopeDescriptor = new ScopeDescriptor({
