@@ -12,8 +12,6 @@ const createTree = require("./rb-tree")
 
 const FUNCTION_TRUE = () => true;
 
-let [foo, bar] = ["x", "y"]
-
 function last(array) {
   return array[array.length - 1];
 }
@@ -1667,7 +1665,7 @@ class LanguageLayer {
 
     this.subscriptions = new CompositeDisposable;
 
-    this.languageLoaded = this.grammar.getLanguage(language => {
+    this.languageLoaded = this.grammar.getLanguage().then(language => {
       this.language = language;
       this.syntaxQuery = this.language.query(grammar.syntaxQuery);
 
@@ -2085,7 +2083,7 @@ class LanguageLayer {
     }
 
     if (affectedRange) {
-      this._populateInjections(affectedRange, nodeRangeSet);
+      await this._populateInjections(affectedRange, nodeRangeSet);
     }
   }
 
