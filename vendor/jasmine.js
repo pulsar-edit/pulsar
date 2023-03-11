@@ -2771,12 +2771,22 @@ async function runGrammarTests(fullPath, commentRegex) {
   })
   normalized.forEach(({expected, editorPosition, testPosition}) => {
     expect(editor.scopeDescriptorForBufferPosition(editorPosition).scopes).toSatisfy((scopes, reason) => {
-      reason(`Expected to find scope "${expected}" but found "${scopes}"\n` +
-        `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
-      );
-      const normalized = expected.replace(/([\.\-])/g, '\\$1')
-      const scopeRegex = new RegExp('^' + normalized + '(\\..+)?$')
-      return scopes.find(e => e.match(scopeRegex)) !== undefined;
+      const dontFindScope = expected.startsWith("!");
+      expected = expected.replace(/^!/, "")
+      if(dontFindScope) {
+        reason(`Expected to NOT find scope "${expected}" but found it\n` +
+          `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
+        );
+      } else {
+        reason(`Expected to find scope "${expected}" but found "${scopes}"\n` +
+          `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
+        );
+      }
+      const normalized = expected.replace(/([\.\-])/g, '\\$1');
+      const scopeRegex = new RegExp('^' + normalized + '(\\..+)?$');
+      let result = scopes.find(e => e.match(scopeRegex)) !== undefined;
+      if(dontFindScope) result = !result;
+      return result
     })
   })
 }
