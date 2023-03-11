@@ -2,13 +2,13 @@
 (anon_fn_lit
  "(" @punctuation.section.expression.begin
  .
- (sym_lit) @entity.name.function
+ (sym_lit) @entity.name.function @meta.expression
  ")" @punctuation.section.expression.end)
 
 (list_lit
  "(" @punctuation.section.expression.begin
  .
- (sym_lit) @entity.name.function
+ (sym_lit) @entity.name.function @meta.expression
  ")" @punctuation.section.expression.end)
 
 (vec_lit
