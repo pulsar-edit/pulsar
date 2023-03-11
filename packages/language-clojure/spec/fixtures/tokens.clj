@@ -15,14 +15,12 @@
   (+ a b 10 20))
   ;^ meta.expression
   ;^ entity.name.function
-  ;      ^ constant.numeric.long
+  ;      ^ constant.numeric
 
 (def a "A STRING")
   ; <- keyword.control
   ;  ^ entity.global
-  ;    ^ punctuation.definition.string.begin
   ;      ^ string.quoted.double
-  ;             ^ punctuation.definition.string.end
 
 #{'asd}
 ; <- punctuation.section.set.begin
