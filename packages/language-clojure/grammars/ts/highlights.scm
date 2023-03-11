@@ -1,3 +1,9 @@
+(quoting_lit
+  value: (list_lit
+          "(" @punctuation.section.expression.begin
+          .
+          (sym_lit) @meta.symbol (#set! final "true")))
+
 ;; Collections
 (anon_fn_lit
  "(" @punctuation.section.expression.begin
