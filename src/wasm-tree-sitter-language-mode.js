@@ -30,6 +30,18 @@ function rangeForNode(node) {
   return new Range(node.startPosition, node.endPosition);
 }
 
+// Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
+// that we don't break anything that relied on `range` being present.
+function ensureRangePropertyIsDefined(node) {
+  let done = node.range && node.range instanceof Range;
+  if (done) { return; }
+  let proto = Object.getPrototypeOf(node);
+
+  Object.defineProperty(proto, 'range', {
+    get () { return rangeForNode(this); }
+  });
+}
+
 // function pointForNodePosition(position) {
 //   let { row, column } = position;
 //   return new Point(row, column);
@@ -65,6 +77,11 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeId = this.getOrCreateScopeId(this.grammar.scopeName);
     this.ignoreScopeId = this.getOrCreateScopeId('ignore');
 
+    let resolveReady;
+    this.ready = new Promise((resolve) => {
+      resolveReady = resolve;
+    });
+
     this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
 
@@ -92,7 +109,7 @@ class WASMTreeSitterLanguageMode {
       this.rootLanguageLayer
         .update(null)
         .then(() => this.emitter.emit('did-tokenize'))
-        .then(() => resolve(true));
+        .then(() => resolveReady(true));
     });
 
     this.rootScopeDescriptor = new ScopeDescriptor({
@@ -116,7 +133,7 @@ class WASMTreeSitterLanguageMode {
 
   destroy() {
     this.injectionsMarkerLayer.destroy();
-    this.tree = null;
+    this.rootLanguageLayer = null;
     this.subscriptions.dispose();
   }
 
@@ -344,10 +361,9 @@ class WASMTreeSitterLanguageMode {
   syntaxTreeScopeDescriptorForPosition(point) {
     point = this.buffer.clipPosition(Point.fromObject(point));
 
-    // If the position is the end of a line, get node of left character instead of newline
-    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
-
-
+    // If the position is the end of a line, get node of left character instead
+    // of newline. This is to match TextMate behavior; see
+    // https://github.com/atom/atom/issues/18463
     if (
       point.column > 0 &&
       point.column === this.buffer.lineLengthForRow(point.row)
@@ -357,7 +373,6 @@ class WASMTreeSitterLanguageMode {
     }
 
     let layers = this.languageLayersAtPoint(point);
-
     let scopes = [];
 
     let iterate = (node, isAnonymous = false) => {
@@ -373,6 +388,7 @@ class WASMTreeSitterLanguageMode {
     };
 
     for (let layer of layers) {
+      scopes.push(layer.grammar.scopeName);
       iterate(layer.tree.rootNode);
     }
 
@@ -450,7 +466,7 @@ class WASMTreeSitterLanguageMode {
     return result;
   }
 
-  get rootTree () {
+  get tree () {
     return this.rootLanguageLayer?.tree
   }
 
@@ -460,7 +476,6 @@ class WASMTreeSitterLanguageMode {
 
   getSyntaxNodeContainingRange(range, where = FUNCTION_TRUE) {
     if (!this.rootLanguageLayer) { return null; }
-    let bundle = this.getSyntaxNodeAndGrammarContainingRange(range, where);
     return this.getSyntaxNodeAndGrammarContainingRange(range, where)?.node;
   }
 
@@ -599,7 +614,10 @@ class WASMTreeSitterLanguageMode {
     }
 
     if (options.endOffset) {
-      end = this.adjustPositionByOffset(Number(options.endOffset));
+      let endOffset = Number(options.endOffset);
+      if (!isNaN(endOffset)) {
+        end = this.adjustPositionByOffset(end, Number(options.endOffset));
+      }
     }
 
     return new Range(start, end);
@@ -620,7 +638,7 @@ class WASMTreeSitterLanguageMode {
     let layer = this.controllingLayerAtPoint(new Point(row, 0));
 
     let controllingLayer;
-    if (layer.foldsQuery) {
+    if (layer.foldsQuery && layer.tree) {
       controllingLayer = layer;
     } else {
       // TODO: Should we cascade down the list of layers, or just jump straight
@@ -871,6 +889,7 @@ class WASMTreeSitterLanguageMode {
 
   languageLayersAtPoint(point) {
     let injectionLayers = this.injectionLayersAtPoint(point);
+    injectionLayers = injectionLayers.sort((a, b) => b.depth - a.depth);
     return [
       this.rootLanguageLayer,
       ...injectionLayers
@@ -1012,14 +1031,11 @@ class ScopeResolver {
   _keyForRange (syntax) {
     let { startIndex, endIndex } = syntax.node;
     return `${startIndex}/${endIndex}`;
-    // let { startPosition, endPosition } = syntax.node;
-    // return `${this._keyForPoint(startPosition)}/${this._keyForPoint(endPosition)}`
   }
 
   _keyToObject (key) {
     let [row, column] = key.split(',');
     return new Point(Number(row), Number(column));
-    // return { row: Number(row), column: Number(column) }
   }
 
   setDataForRange (syntax, props) {
@@ -1035,18 +1051,9 @@ class ScopeResolver {
   // Given a syntax capture, test whether we should include its scope in the
   // document.
   test (existingData, props, node) {
-    let tests = [];
-    let candidateTests = Object.keys(props);
-
     if (existingData?.final) { return false; }
 
-    for (let candidate of candidateTests) {
-      if (tests.includes(candidate)) { continue; }
-      if (!(candidate in ScopeResolver.TESTS)) { continue; }
-      tests.push(candidate);
-    }
-
-    for (let key of tests) {
+    for (let key in props) {
       if (!(key in ScopeResolver.TESTS)) { continue; }
       let test = ScopeResolver.TESTS[key];
       if (!test(existingData, props, node)) {
@@ -1074,8 +1081,6 @@ class ScopeResolver {
 
     name = ScopeResolver.interpolateName(name, node);
 
-    let id = this.idForScope(name);
-
     let data = this.getDataForRange(syntax);
 
     if (!this.test(data, props, node, name)) {
@@ -1091,6 +1096,8 @@ class ScopeResolver {
       // for a given range, but not to apply its scope ID to any boundaries.
       return;
     }
+
+    let id = this.idForScope(name);
 
     // We should open this scope at `start`.
     this.setBoundary(start, id, 'open');
@@ -1142,7 +1149,7 @@ class ScopeResolver {
   }
 }
 
-// Scope names can mark themselves with `${text}` to interpolate the node's
+// Scope names can mark themselves with `TEXT` to interpolate the node's
 // text into the capture.
 ScopeResolver.interpolateName = (name, node) => {
   return name.replace('TEXT', node.text);
@@ -1161,6 +1168,9 @@ ScopeResolver.interpolateName = (name, node) => {
 //
 // These tests come in handy for criteria that can't be represented by the
 // built-in predicates like `#match?` and `#eq?`.
+//
+// NOTE: Syntax queries will always be run through a `ScopeResolver`, but other
+// kinds of queries usually will not.
 //
 ScopeResolver.TESTS = {
   // Passes only if another node has not already declared `final` for the exact
@@ -1242,8 +1252,13 @@ ScopeResolver.TESTS = {
   },
 
   // Passes if this is _not_ a child of a node of the given type.
-  onlyIfNotChildOfType(...args) {
-    return !this.onlyIfChildOfType(...args);
+  onlyIfNotChildOfType(existingData, props, node) {
+    let { onlyIfNotChildOfType: type } = props;
+    let parent = node.parent;
+    if (!parent || parent.type !== type) {
+      return true;
+    }
+    return false;
   },
 
   // Passes if this node has a node of the given type in its ancestor chain.
@@ -1259,8 +1274,14 @@ ScopeResolver.TESTS = {
 
   // Passes if this node does not have a node of the given type in its ancestor
   // chain.
-  onlyIfNotDescendantOfType(...args) {
-    return !this.onlyIfDescendantOfType(...args);
+  onlyIfNotDescendantOfType(existingData, props, node) {
+    let { onlyIfNotDescendantOfType: type } = props;
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      if (current.type === type) { return false; }
+    }
+    return true;
   }
 };
 
@@ -1468,11 +1489,19 @@ class HighlightIterator {
       const first = this.iterators[layerCount - 1];
       const next = this.iterators[layerCount - 2];
 
+      // In the tree-sitter EJS grammar I encountered a situation where an EJS
+      // scope was incorrectly being shadowed because `source.js` wanted to
+      // _close_ a scope on the same boundary that `text.html.ejs` wanted to
+      // _open_ one. This is one (clumsy) way to prevent that outcome.
+      let bothOpeningScopes = first.getOpenScopeIds().length > 0 && next.getOpenScopeIds().length > 0;
+      let bothClosingScopes = first.getCloseScopeIds().length > 0 && next.getCloseScopeIds().length > 0;
+
       if (
         comparePoints(next.getPosition(), first.getPosition()) === 0 &&
         next.atEnd === first.atEnd &&
         next.depth > first.depth &&
-        !next.isAtInjectionBoundary()
+        !next.isAtInjectionBoundary() &&
+        (bothOpeningScopes || bothClosingScopes)
       ) {
         this.currentScopeIsCovered = true;
         return;
@@ -1681,14 +1710,17 @@ class LanguageLayer {
   }
 
   getExtent() {
-    return this.marker?.getRange() ?? this.buffer.getRange();
+    return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
   }
 
   getSyntaxBoundaries(from, to, { includeOpenScopes = false } = {}) {
+    let { buffer } = this.languageMode;
     if (!this.tree) { return []; }
     if (!this.grammar.getLanguageSync()) { return []; }
-    from = Point.fromObject(from, true);
-    to = Point.fromObject(to, true);
+
+    from = buffer.clipPosition(Point.fromObject(from, true));
+    to = buffer.clipPosition(Point.fromObject(to, true));
+
     let boundaries = createTree(comparePoints);
     let extent = this.marker ? this.marker.getRange() : MAX_RANGE;
 
@@ -1700,12 +1732,12 @@ class LanguageLayer {
       let { node } = capture;
       // Phantom nodes invented by the parse tree.
       if (node.text === '') { continue; }
-      // let id = this.languageMode.getOrCreateScopeId(name);
       this.scopeResolver.store(capture);
     }
 
     // Ensure the whole source file (or whole bounds of the injection) is
-    // annotated with the root language scope name.
+    // annotated with the root language scope name. We _do not_ want to leave
+    // this up to the grammar author; it's too important.
     if (from.isEqual(extent.start) && from.column === 0) {
       this.scopeResolver.setBoundary(from, this.languageScopeId, 'open');
     }
@@ -2028,6 +2060,18 @@ class LanguageLayer {
       }
     } else {
       this.tree = tree;
+
+      // Like legacy tree-sitter, we're patching syntax nodes so that they have
+      // a `range` property that returns a `Range`. We're doing this for
+      // compatibility, but we can't get a reference to the node class itself;
+      // we have to wait until we have an instance and grab the prototype from
+      // there.
+      //
+      // This is the earliest place in the editor lifecycle where we're
+      // guaranteed to be holding an instance of `Node`. Once we patch it here,
+      // we're good to go.
+      ensureRangePropertyIsDefined(tree.rootNode);
+
       this.languageMode.emitRangeUpdate(rangeForNode(tree.rootNode));
       if (includedRanges) {
         affectedRange = new Range(

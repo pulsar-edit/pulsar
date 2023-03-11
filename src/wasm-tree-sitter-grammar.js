@@ -24,10 +24,6 @@ module.exports = class WASMTreeSitterGrammar {
 
     this.loadQueryFiles(grammarPath, this.queryPaths);
 
-    // this.syntaxQuery = fs.readFileSync(qPath, 'utf-8')
-    // this._loadQueryIfExists(params,dirName, 'localsQuery')
-    // this._loadQueryIfExists(params,dirName, 'foldsQuery')
-    // this.indentsQuery = fs.readFileSync(iPath, 'utf-8')
     this.grammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
@@ -99,6 +95,7 @@ module.exports = class WASMTreeSitterGrammar {
   // TODO: Why is this here?
   deactivate() {
     this.registration?.dispose();
+    this.subscriptions.dispose();
   }
 
   // Define a set of rules for when this grammar should delegate to a different
