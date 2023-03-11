@@ -2720,7 +2720,7 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
   let allMatches = [], lastNonComment = 0
   const checkAssert = new RegExp('^\\s*' + commentRegex.source + '\\s*[\\<\\-|\\^]')
   editor.getBuffer().getLines().forEach((row, i) => {
-    const m = row.trim().match(commentRegex)
+    const m = row.match(commentRegex)
     if(m) {
       // const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
       // FIXME: use editor.scopeDescriptorForBufferPosition when it works
