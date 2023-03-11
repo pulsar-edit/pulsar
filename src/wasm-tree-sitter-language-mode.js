@@ -98,9 +98,6 @@ class WASMTreeSitterLanguageMode {
 
     this.parsersByLanguage = new Map();
 
-    let resolve
-    this.ready = new Promise(r => resolve = r)
-
     this.grammar.getLanguage().then(lang => {
       this.rootLanguage = lang;
       this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
