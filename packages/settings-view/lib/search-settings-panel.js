@@ -95,9 +95,40 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
   filterSettings (text) {
     let rankedResults = [];
 
+    let searchTerm = text;
+    let namedFilter;
+    let useFilter = false;
+
+    // Now we will check if the user is filtering any results
+
+    if (text.startsWith("core: ")) {
+      searchTerm = text.replace("core: ", "");
+      namedFilter = "core";
+      useFilter = true;
+    }
+
+    if (text.startsWith("editor: ")) {
+      searchTerm = text.replace("editor: ", "");
+      namedFilter = "editor";
+      useFilter = true;
+    }
+
     for (const setting in this.settingsSchema) {
       // The top level item should always be an object, but just in case we will check.
       // If the top level item returned is not an object it will NOT be listed
+      if (useFilter) {
+
+        if (namedFilter !== setting) {
+          continue;
+          // We use this so that we can break out of our current loop iteration
+          // when using a filter that doesn't match the current namespace.
+          // But otherwise will process the settings when no filter is set
+          // or when the filter set matches our current namespace.
+          // This helps avoid processing any namespace that doesn't match our filter
+          // or process all of them as default.
+        }
+      }
+
       if (this.settingsSchema[setting].type === "object") {
         for (const item in this.settingsSchema[setting].properties) {
 
@@ -110,6 +141,7 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
           rankedResults.push(schema)
         }
       }
+
     }
 
     this.processRanks(rankedResults)

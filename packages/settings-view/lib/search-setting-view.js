@@ -19,10 +19,11 @@ export default class SearchSettingView {
 
   render () {
     const title = this.setting.title ?? getSettingTitle(this.setting.path, this.setting.path.split(".")[1]);
-    const path = this.setting.path;
+    const path = atom.config.get("settings-view.searchSettingsMetadata") ? this.setting.path + ": " : "";
     const description = this.setting.description ?? "";
     const packageName = this.setting.path.split(".")[0];
     const icon = this.getIcon(packageName);
+    const score = atom.config.get("settings-view.searchSettingsMetadata") ? this.setting.rank.totalScore.toFixed(2) + " Search Score" : "";
 
     return (
       <div className='search-result col-lg-8'>
@@ -34,7 +35,7 @@ export default class SearchSettingView {
           <h4 className='card-name'>
             <a ref='settingLink'>
               <span className='search-name'>{title}</span>
-              <span className='search-id'>{path}</span>
+              <span className='search-id'>{path}{score}</span>
             </a>
           </h4>
           <span className='search-description'>{description}</span>

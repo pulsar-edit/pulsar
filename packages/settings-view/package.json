@@ -20,6 +20,12 @@
       "description": "Set the minimum similarity score required for a setting to appear in the search results, when searching for settings.",
       "type": "integer",
       "default": 2
+    },
+    "searchSettingsMetadata": {
+      "title": "Display Search Settings Metadata along with Search Results",
+      "description": "Whether or not to display search metadata with the search results. Metadata will appear as `{namespace}.{settingName}:{searchScore}`.",
+      "type": "boolean",
+      "default": false
     }
   },
   "dependencies": {
