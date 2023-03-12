@@ -168,7 +168,7 @@
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
     "welcome": "file:packages/welcome",
-    "whitespace": "https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8",
+    "whitespace": "file:./packages/whitespace",
     "winreg": "^1.2.1",
     "wrap-guide": "file:./packages/wrap-guide",
     "yargs": "17.6.2"
@@ -230,7 +230,7 @@
     "tree-view": "0.229.1",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "welcome": "file:./packages/welcome",
-    "whitespace": "0.37.8",
+    "whitespace": "file:./packages/whitespace",
     "wrap-guide": "file:./packages/wrap-guide",
     "language-c": "file:./packages/language-c",
     "language-clojure": "file:./packages/language-clojure",
