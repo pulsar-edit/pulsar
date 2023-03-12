@@ -9299,9 +9299,8 @@ through@2, through@2.3.x, through@^2.3.8, through@~2.3, through@~2.3.1:
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
-"timecop@https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2":
+"timecop@file:./packages/timecop":
   version "0.36.2"
-  resolved "https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2#8965f20444701af3b6f86dfa9f144a46e1aaa9d0"
   dependencies:
     dedent "^0.7.0"
     etch "^0.12.6"
