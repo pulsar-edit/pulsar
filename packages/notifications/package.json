@@ -1,0 +1,36 @@
+{
+  "name": "notifications",
+  "main": "./lib/main",
+  "version": "0.72.1",
+  "description": "A tidy way to display notifications.",
+  "repository": "https://github.com/pulsar-edit/notifications",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+    "dompurify": "^1.0.3",
+    "fs-plus": "^3.0.0",
+    "marked": "^0.3.6",
+    "moment": "^2.19.3",
+    "semver": "^4.3.2",
+    "stacktrace-parser": "^0.1.3",
+    "temp": "^0.8.1"
+  },
+  "configSchema": {
+    "showErrorsInDevMode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show notifications for uncaught exceptions even if running in dev mode. If this config setting is disabled, uncaught exceptions will trigger the dev tools to open and be logged in the console tab."
+    },
+    "defaultTimeout": {
+      "type": "integer",
+      "default": 5000,
+      "minimum": 1000,
+      "description": "The default notification timeout for a non-dismissable notification."
+    }
+  },
+  "deserializers": {
+    "notifications/NotificationsLog": "createLog"
+  }
+}
