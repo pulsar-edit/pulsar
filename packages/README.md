@@ -39,7 +39,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **grammar-selector** | [`./grammar-selector`](./grammar-selector) | |
 | **image-view** | [`./image-view`](./image-view) | |
 | **incompatible-packages** | [`./incompatible-packages`](./incompatible-packages) | |
-| **keybinding-resolver** | [`./keybinding-resolver`][./keybinding-resolver] | |
+| **keybinding-resolver** | [`./keybinding-resolver`](./keybinding-resolver) | |
 | **language-c** | [`./language-c`](./language-c) |  |
 | **language-clojure** | [`./language-clojure`](./language-clojure) |  |
 | **language-coffee-script** | [`./language-coffee-script`](./language-coffee-script) |  |
