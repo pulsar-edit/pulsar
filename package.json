@@ -290,8 +290,5 @@
     "playwright-core": "1.22.2",
     "random-seed": "0.3.0",
     "webdriverio": "7.20.9"
-  },
-  "volta": {
-    "node": "16.19.1"
   }
 }
