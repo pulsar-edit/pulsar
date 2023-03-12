@@ -2656,9 +2656,8 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@https://github.com/pulsar-edit/bracket-matcher.git#c877977":
+"bracket-matcher@file:./packages/bracket-matcher":
   version "0.92.0"
-  resolved "https://github.com/pulsar-edit/bracket-matcher.git#c877977ac7e9b7fe43c2100a1880c7ffc119280b"
   dependencies:
     first-mate "^7.4.1"
     underscore-plus "1.x"

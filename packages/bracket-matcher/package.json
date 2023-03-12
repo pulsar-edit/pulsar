@@ -3,7 +3,7 @@
   "version": "0.92.0",
   "main": "./lib/main",
   "description": "Highlight the matching bracket for the `(){}[]` character under the cursor. Move the cursor to the matching bracket with `ctrl-m`.",
-  "repository": "https://github.com/pulsar-edit/bracket-matcher",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": "*"
