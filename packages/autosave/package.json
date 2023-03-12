@@ -4,7 +4,7 @@
   "version": "0.24.6",
   "private": true,
   "description": "Save editors when they lose focus or are closed",
-  "repository": "https://github.com/pulsar-edit/autosave",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": ">0.27.0"
   },

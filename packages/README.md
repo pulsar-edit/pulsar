@@ -19,7 +19,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **autocomplete-plus** | [`./autocomplete-plus`][./autocomplete-plus] |  |
 | **autocomplete-snippets** | [`./autocomplete-snippets`](./autocomplete-snippets) |  |
 | **autoflow** | [`./autoflow`](./autoflow) | |
-| **autosave** | [`pulsar-edit/autosave`][autosave] | [#17834](https://github.com/atom/atom/issues/17834) |
+| **autosave** | [`./autosave`][./autosave] | |
 | **background-tips** | [`./background-tips`](./background-tips) | |
 | **base16-tomorrow-dark-theme** | [`./base16-tomorrow-dark-theme`](./base16-tomorrow-dark-theme) | |
 | **base16-tomorrow-light-theme** | [`./base16-tomorrow-light-theme`](./base16-tomorrow-light-theme) | |
@@ -101,7 +101,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **wrap-guide** | [`./wrap-guide`][./wrap-guide] | |
 
 [autocomplete-atom-api]: https://github.com/pulsar-edit/autocomplete-atom-api
-[autosave]: https://github.com/pulsar-edit/autosave
 [bracket-matcher]: https://github.com/pulsar-edit/bracket-matcher
 [find-and-replace]: https://github.com/pulsar-edit/find-and-replace
 [fuzzy-finder]: https://github.com/pulsar-edit/fuzzy-finder

@@ -39,7 +39,7 @@
     "autocomplete-plus": "file:./packages/autocomplete-plus",
     "autocomplete-snippets": "file:packages/autocomplete-snippets",
     "autoflow": "file:packages/autoflow",
-    "autosave": "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6",
+    "autosave": "file:./packages/autosave",
     "babel-preset-atomic": "^5.0.0",
     "background-tips": "file:packages/background-tips",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
@@ -194,7 +194,7 @@
     "autocomplete-plus": "file:./packages/autocomplete-plus",
     "autocomplete-snippets": "file:./packages/autocomplete-snippets",
     "autoflow": "file:./packages/autoflow",
-    "autosave": "0.24.6",
+    "autosave": "file:./packages/autosave",
     "background-tips": "file:./packages/background-tips",
     "bookmarks": "file:./packages/bookmarks",
     "bracket-matcher": "0.92.0",
@@ -290,5 +290,8 @@
     "playwright-core": "1.22.2",
     "random-seed": "0.3.0",
     "webdriverio": "7.20.9"
+  },
+  "volta": {
+    "node": "16.19.1"
   }
 }

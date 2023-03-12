@@ -2379,11 +2379,8 @@ atom-slick@^2, atom-slick@^2.0.0:
   dependencies:
     underscore-plus "^1.7.0"
 
-"autosave@https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6":
+"autosave@file:./packages/autosave":
   version "0.24.6"
-  resolved "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6#bbd25c3364cfa5b3c73f9d4d08da93aaac339020"
-  dependencies:
-    fs-plus "^3.0.0"
 
 available-typed-arrays@^1.0.5:
   version "1.0.5"
