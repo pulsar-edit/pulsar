@@ -1455,6 +1455,17 @@ class HighlightIterator {
 
   getCloseScopeIds() {
     let iterator = last(this.iterators);
+    if (this.currentScopeIsCovered) {
+      console.log('Would close', iterator._inspectScopes(iterator.getCloseScopeIds()), 'but scope is covered!');
+    } else {
+      // console.log(
+      //   iterator.name,
+      //   'closing',
+      //   iterator._inspectScopes(
+      //     iterator.getCloseScopeIds()
+      //   )
+      // );
+    }
     if (iterator && !this.currentScopeIsCovered) {
       return iterator.getCloseScopeIds();
     }
@@ -1463,6 +1474,17 @@ class HighlightIterator {
 
   getOpenScopeIds() {
     let iterator = last(this.iterators);
+    if (this.currentScopeIsCovered) {
+      console.log('Would open', iterator._inspectScopes(iterator.getOpenScopeIds()), 'but scope is covered!');
+    } else {
+      // console.log(
+      //   iterator.name,
+      //   'opening',
+      //   iterator._inspectScopes(
+      //     iterator.getOpenScopeIds()
+      //   )
+      // );
+    }
     if (iterator && !this.currentScopeIsCovered) {
       return iterator.getOpenScopeIds();
     }
@@ -1481,29 +1503,45 @@ class HighlightIterator {
   // TODO: This only works for comparing the first two iterators; anything
   // deeper than that will be ignored. This probably isn't a problem, but we'll
   // see.
+
+  // EXPERIMENT: Rather than the commented-out logic below, let's try something
+  // more holistic that is off by default but triggered via an explicit
+  // `coverShallowerScopes` option in `atom.grammars.addInjectionPoint`.
   detectCoveredScope() {
     const layerCount = this.iterators.length;
     if (layerCount > 1) {
-      const first = this.iterators[layerCount - 1];
-      const next = this.iterators[layerCount - 2];
+      const [first, ...rest] = this.iterators;
+      let covered = rest.some(it => {
+        return it.coversIteratorAtPosition(
+          first,
+          first.getPosition()
+        );
+      });
 
-      // In the tree-sitter EJS grammar I encountered a situation where an EJS
-      // scope was incorrectly being shadowed because `source.js` wanted to
-      // _close_ a scope on the same boundary that `text.html.ejs` wanted to
-      // _open_ one. This is one (clumsy) way to prevent that outcome.
-      let bothOpeningScopes = first.getOpenScopeIds().length > 0 && next.getOpenScopeIds().length > 0;
-      let bothClosingScopes = first.getCloseScopeIds().length > 0 && next.getCloseScopeIds().length > 0;
-
-      if (
-        comparePoints(next.getPosition(), first.getPosition()) === 0 &&
-        next.atEnd === first.atEnd &&
-        next.depth > first.depth &&
-        !next.isAtInjectionBoundary() &&
-        (bothOpeningScopes || bothClosingScopes)
-      ) {
+      if (covered) {
         this.currentScopeIsCovered = true;
         return;
       }
+      // const first = this.iterators[layerCount - 1];
+      // const next = this.iterators[layerCount - 2];
+      //
+      // // In the tree-sitter EJS grammar I encountered a situation where an EJS
+      // // scope was incorrectly being shadowed because `source.js` wanted to
+      // // _close_ a scope on the same boundary that `text.html.ejs` wanted to
+      // // _open_ one. This is one (clumsy) way to prevent that outcome.
+      // let bothOpeningScopes = first.getOpenScopeIds().length > 0 && next.getOpenScopeIds().length > 0;
+      // let bothClosingScopes = first.getCloseScopeIds().length > 0 && next.getCloseScopeIds().length > 0;
+      //
+      // if (
+      //   comparePoints(next.getPosition(), first.getPosition()) === 0 &&
+      //   next.atEnd === first.atEnd &&
+      //   next.depth > first.depth &&
+      //   !next.isAtInjectionBoundary() &&
+      //   (bothOpeningScopes || bothClosingScopes)
+      // ) {
+      //   this.currentScopeIsCovered = true;
+      //   return;
+      // }
     }
 
     this.currentScopeIsCovered = false;
@@ -1524,6 +1562,8 @@ class LayerHighlightIterator {
     this.depth = languageLayer.depth;
     // TODO: Understand `atEnd` better.
     this.atEnd = false;
+    let { injectionPoint } = this.languageLayer;
+    this.coverShallowerScopes = injectionPoint?.coverShallowerScopes ?? false
   }
 
   // If this isn't the root language layer, we need to make sure this iterator
@@ -1541,6 +1581,12 @@ class LayerHighlightIterator {
     } else {
       return naiveEndPoint;
     }
+  }
+
+  coversIteratorAtPosition(iterator, position) {
+    if (!this.coverShallowerScopes) { return false; }
+    if (iterator.depth > this.depth) { return false; }
+    return isBetweenPoints(position, this.start, this.end);
   }
 
   seek(start, endRow, previousOpenScopes) {
@@ -1657,11 +1703,12 @@ class LayerHighlightIterator {
 // (b) choose the output of the most specific layer, depending on the task.
 //
 class LanguageLayer {
-  constructor(marker, languageMode, grammar, depth) {
+  constructor(marker, languageMode, grammar, depth, injectionPoint) {
     this.marker = marker;
     this.languageMode = languageMode;
     this.grammar = grammar;
     this.depth = depth;
+    this.injectionPoint = injectionPoint;
 
     this.subscriptions = new CompositeDisposable;
 
@@ -2236,7 +2283,8 @@ class LanguageLayer {
             marker,
             this.languageMode,
             grammar,
-            this.depth + 1
+            this.depth + 1,
+            injectionPoint
           );
 
           marker.parentLanguageLayer = this;
