@@ -24,7 +24,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **base16-tomorrow-dark-theme** | [`./base16-tomorrow-dark-theme`](./base16-tomorrow-dark-theme) | |
 | **base16-tomorrow-light-theme** | [`./base16-tomorrow-light-theme`](./base16-tomorrow-light-theme) | |
 | **bookmarks** | [`./bookmarks`](./bookmarks) | |
-| **bracket-matcher** | [`./bracket-matcher`][./bracket-matcher] |  |
+| **bracket-matcher** | [`./bracket-matcher`](./bracket-matcher) |  |
 | **command-palette** | [`./command-palette`](./command-palette) |  |
 | **dalek** | [`./dalek`](./dalek) | |
 | **deprecation-cop** | [`./deprecation-cop`](./deprecation-cop) | |
