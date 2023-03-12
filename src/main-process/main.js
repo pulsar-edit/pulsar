@@ -39,9 +39,10 @@ if (args.resourcePath) {
 } else {
   const stableResourcePath = path.dirname(path.dirname(__dirname));
   const defaultRepositoryPath = path.join(
+    // Setting the path for the app
     app.getPath('home'),
     'github',
-    'atom'
+    'pulsar'
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {

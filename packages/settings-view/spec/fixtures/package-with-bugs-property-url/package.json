@@ -1,0 +1,7 @@
+{
+  "name": "package-with-bugs-property-url",
+  "version": "1.0.0",
+  "repository": "https://github.com/example/package-with-bugs-property-url",
+  "bugs": {"url": "https://example.com/custom-issue-tracker/new", "email": "issues@example.com"},
+  "main": "main"
+}

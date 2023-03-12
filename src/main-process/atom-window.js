@@ -263,7 +263,7 @@ module.exports = class AtomWindow extends EventEmitter {
         buttons: ['Close Window', 'Reload', 'Keep It Open'],
         cancelId: 2, // Canceling should be the least destructive action
         message: 'The editor has crashed',
-        detail: 'Please report this issue to https://github.com/atom/atom'
+        detail: 'Please report this issue to https://github.com/pulsar-edit/pulsar'
       });
 
       switch (result.response) {

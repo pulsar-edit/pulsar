@@ -1,7 +1,7 @@
 const { Disposable } = require('atom');
 const etch = require('etch');
 const { shell } = require('electron');
-const AtomLogo = require('./atom-logo'); //Update to new Pulsar logo (L#83)
+const AtomLogo = require('./atom-logo');
 const EtchComponent = require('../etch-component');
 const UpdateView = require('./update-view');
 
@@ -46,6 +46,7 @@ module.exports = class AboutView extends EtchComponent {
   handleTermsOfUseClick(e) {
     e.preventDefault();
     shell.openExternal('https://atom.io/terms'); //If we use this then this URL will need updating but button disabled (L#182)
+    // TODO Update to Privacy Policy once `pulsar-edit.github.io` #161 is resolved
   }
 
   handleHowToUpdateClick(e) {
@@ -80,8 +81,7 @@ module.exports = class AboutView extends EtchComponent {
           { className: 'about-header' },
           $.a(
             { className: 'about-atom-io', href: `${atom.branding.urlWeb}`, },
-            //$(AtomLogo)
-            'Pulsar' //Remove and reinstate above line when available
+            $(AtomLogo)
           ),
           $.div(
             { className: 'about-header-info' },
@@ -224,4 +224,3 @@ module.exports = class AboutView extends EtchComponent {
     return 'info';
   }
 };
-

@@ -1,0 +1,38 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - name: Checkout the Latest Code
+      uses: actions/checkout@v3
+
+    - name: Setup NodeJS - ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install Dependencies
+      run: yarn install
+
+    - name: Generate Public JSDocs
+      run: yarn run js-docs
+
+    - name: Generate Private JSDocs
+      run: yarn run private-js-docs
+
+    - name: Commit All Changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: GH Action Documentation

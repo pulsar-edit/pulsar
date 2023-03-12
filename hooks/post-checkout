@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#This hook launches after a branch change, or branch checkout. It cannot affect
+#the outcome of a git switch or git checkout with the exception that the hook
+#exit status becomes the exit status of the antecedent command
+#See https://git-scm.com/docs/githooks#_post_checkout
+
+if [[ -L "$0" ]]; then
+    #If our launched script is a link, grab the root
+    hookRoot="$(dirname $(readlink --canonicalize "$0"))"
+else
+    #Otherwise use the launched script directory
+    hookRoot="$(dirname "$0")"
+fi
+
+if [[ "$1" == "$2" ]]; then
+    #Previous HEAD and new HEAD are the same, ignore
+    exit 0
+fi
+
+if [[ "$3" == '1' ]]; then
+    #A branch checkout will always be flagged as 1, and a file checkout as 0
+    "${hookRoot}/update_editor.sh" $0
+fi
