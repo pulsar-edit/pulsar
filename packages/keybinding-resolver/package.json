@@ -4,7 +4,7 @@
   "version": "0.39.1",
   "description": "Show what commands a keybinding resolves to",
   "license": "MIT",
-  "repository": "https://github.com/pulsar-edit/keybinding-resolver",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
     "atom": ">=1.17.0"
   },

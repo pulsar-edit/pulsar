@@ -6137,9 +6137,8 @@ key-path-helpers@^0.4.0:
   resolved "https://registry.yarnpkg.com/key-path-helpers/-/key-path-helpers-0.4.0.tgz#e87f6a159144adf2692e46f2a4641ce269c09119"
   integrity sha512-WGl1FG6zjyXCU6YrOVrvanyN3iiLFPLr/UmZ/jGiEOd7CXQV83/Ng5aLGK/Erehtr1nxU8dOwnRjseQDGElMQw==
 
-"keybinding-resolver@https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1":
+"keybinding-resolver@file:./packages/keybinding-resolver":
   version "0.39.1"
-  resolved "https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1#a1c08beb144cfca145bf19fe0830b2e82514d4cb"
   dependencies:
     etch "0.9.0"
     fs-plus "^3.0.0"
