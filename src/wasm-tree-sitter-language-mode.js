@@ -30,6 +30,10 @@ function rangeForNode(node) {
   return new Range(node.startPosition, node.endPosition);
 }
 
+function nodeBreadth(node) {
+  return node.endIndex - node.startIndex;
+}
+
 // Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
 // that we don't break anything that relied on `range` being present.
 function ensureRangePropertyIsDefined(node) {
@@ -41,11 +45,6 @@ function ensureRangePropertyIsDefined(node) {
     get () { return rangeForNode(this); }
   });
 }
-
-// function pointForNodePosition(position) {
-//   let { row, column } = position;
-//   return new Point(row, column);
-// }
 
 const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
@@ -65,8 +64,8 @@ class WASMTreeSitterLanguageMode {
   constructor(grammar, buffer, config, grammars) {
     this.emitter = new Emitter();
     this.lastId = 259;
-    this.scopeNames = new Map([["variable", VAR_ID]])
-    this.scopeIds = new Map([[VAR_ID, "variable"]])
+    this.scopeNames = new Map([["variable", VAR_ID]]);
+    this.scopeIds = new Map([[VAR_ID, "variable"]]);
     this.buffer = buffer;
     this.config = config;
     this.grammarRegistry = grammars;
@@ -75,12 +74,6 @@ class WASMTreeSitterLanguageMode {
     this.oldNodeTexts = new Set()
     this.grammar = grammar;
     this.rootScopeId = this.getOrCreateScopeId(this.grammar.scopeName);
-    this.ignoreScopeId = this.getOrCreateScopeId('ignore');
-
-    let resolveReady;
-    this.ready = new Promise((resolve) => {
-      resolveReady = resolve;
-    });
 
     this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
@@ -98,16 +91,14 @@ class WASMTreeSitterLanguageMode {
 
     this.parsersByLanguage = new Map();
 
-    this.grammar.getLanguage().then(lang => {
-      this.rootLanguage = lang;
-      this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
-      return this.getOrCreateParserForLanguage(lang);
-    }).then(() => {
-      this.rootLanguageLayer
-        .update(null)
-        .then(() => this.emitter.emit('did-tokenize'))
-        .then(() => resolveReady(true));
-    });
+    this.ready = this.grammar.getLanguage()
+      .then(language => {
+        this.rootLanguage = language;
+        this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
+        this.getOrCreateParserForLanguage(language);
+      })
+      .then(() => this.rootLanguageLayer.update(null))
+      .then(() => this.emitter.emit('did-tokenize'));
 
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [grammar.scopeName]
@@ -420,8 +411,8 @@ class WASMTreeSitterLanguageMode {
     }
 
     // We need the results sorted from smallest to biggest.
-    results = results.sort(({ node }) => {
-      return node.startIndex - node.endIndex;
+    results = results.sort((a, b) => {
+      return nodeBreadth(a.node) - nodeBreadth(b.node);
     });
 
     for (let { name, node } of results) {
@@ -433,11 +424,12 @@ class WASMTreeSitterLanguageMode {
 
   scopeDescriptorForPosition (point) {
     if (!this.rootLanguageLayer) {
-      return new ScopeDescriptor({scopes: ['text']})
+      return new ScopeDescriptor({ scopes: [this.grammar.scopeName, 'text'] });
     }
 
-    // If the position is the end of a line, get scope of left character instead of newline
-    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    // If the position is the end of a line, get scope of left character
+    // instead of newline. This is to match TextMate behavior; see
+    // https://github.com/atom/atom/issues/18463
     if (
       point.column > 0 &&
       point.column === this.buffer.lineLengthForRow(point.row)
@@ -446,7 +438,28 @@ class WASMTreeSitterLanguageMode {
       point.column--;
     }
 
-    return this.rootLanguageLayer.scopeDescriptorForPosition(point);
+    let results = this.rootLanguageLayer.scopeMapAtPosition(point);
+    let injectionLayers = this.injectionLayersAtPoint(point);
+
+    // Add in results from any applicable injection layers.
+    for (let layer of injectionLayers) {
+      let map = layer.scopeMapAtPosition(point);
+      results.push(...map);
+    }
+
+    // Order them from biggest to smallest.
+    results = results.sort((a, b) => {
+      return nodeBreadth(b.node) - nodeBreadth(a.node);
+    });
+
+    let scopes = results.map(cap => {
+      return ScopeResolver.interpolateName(cap.name, cap.node)
+    });
+
+    if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
+      scopes.unshift(this.grammar.scopeName);
+    }
+    return new ScopeDescriptor({ scopes });
   }
 
   parse (language, oldTree, includedRanges) {
@@ -465,8 +478,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   get tree () {
-    return this.rootLanguageLayer?.tree
-  }
+    return this.rootLanguageLayer?.tree }
 
   /*
   Section - Syntax Tree APIs
@@ -479,35 +491,52 @@ class WASMTreeSitterLanguageMode {
 
   getSyntaxNodeAndGrammarContainingRange(range, where = FUNCTION_TRUE) {
     if (!this.rootLanguageLayer) { return null; }
-    let layerStart = this.controllingLayerAtPoint(range.start);
-    let layerEnd = this.controllingLayerAtPoint(range.end);
 
-    // Select the layer with the lower depth. (Or else they're the same layer
-    // and it doesn't matter which we pick.)
-    let layer = layerStart.depth < layerEnd ? layerStart : layerEnd;
-    let { grammar } = layer;
+    let layersAtStart = this.languageLayersAtPoint(range.start);
+    let layersAtEnd = this.languageLayersAtPoint(range.end);
+    let sharedLayers = layersAtStart.filter(
+      layer => layersAtEnd.includes(layer)
+    );
 
-    let startNode = this.getSyntaxNodeAtPosition(range.start);
-    let endNode = this.getSyntaxNodeAtPosition(range.end);
+    let indexEnd = this.buffer.characterIndexForPosition(range.end);
 
-    if (startNode.id === endNode.id && where(startNode)) {
-      return { node: startNode, grammar };
-    }
+    sharedLayers.reverse();
+    for (let layer of sharedLayers) {
+      if (!layer.tree) { continue; }
+      let grammar = layer.grammar;
+      let rootNode = layer.tree.rootNode;
 
-    // Find the smallest common ancestor.
-    let startNodeAncestorIds = [startNode.id];
-    let current = startNode;
-    while (current.parent) {
-      current = current.parent;
-      startNodeAncestorIds.push(current.id);
-    }
-
-    let node = endNode;
-    while (node) {
-      if (startNodeAncestorIds.includes(node.id)) {
-        if (where(node)) { return { node, grammar }; }
+      if (!rootNode.range.containsRange(range)) {
+        if (layer === this.rootLanguageLayer) {
+          // This layer is responsible for the entire buffer, but our tree's
+          // root node may not actually span that entire range. If the buffer
+          // starts with empty lines, the tree may not start parsing until the
+          // first non-whitespace character.
+          //
+          // But this is the root language layer, so we're going to pretend
+          // that our tree's root node spans the entire buffer range.
+          if (where(rootNode, grammar)) {
+            return { node: rootNode, grammar };
+          } else {
+            return null;
+          }
+        } else {
+          continue;
+        }
       }
-      node = node.parent;
+
+      let node = this.getSyntaxNodeAtPosition(
+        range.start,
+        (node, grammar) => {
+          return node.startIndex < indexEnd &&
+            node.endIndex > indexEnd &&
+            where(node, grammar);
+        }
+      );
+
+      if (node) {
+        return { node, grammar };
+      }
     }
 
     return null;
@@ -519,27 +548,52 @@ class WASMTreeSitterLanguageMode {
     return node && rangeForNode(node);
   }
 
+  // Return the smallest syntax node at the given position, or the smallest
+  // node that matches the optional `where` predicate. The `where` predicate is
+  // given the node and the associated grammar as arguments.
   getSyntaxNodeAtPosition(position, where = FUNCTION_TRUE) {
     if (!this.rootLanguageLayer) { return null; }
-    let layer = this.controllingLayerAtPoint(position);
-    let root = layer.tree.rootNode;
-    let index = this.buffer.characterIndexForPosition(position);
-    let node = root.descendantForIndex(index);
-    while (node && !where(node)) {
-      node = node.parent;
+    let allLayers = this.languageLayersAtPoint(position);
+
+    // Start with the deepest layer and move outwards.
+    allLayers.reverse();
+    for (let layer of allLayers) {
+      let { tree: { rootNode } } = layer;
+      let grammar = layer.grammar;
+      if (!rootNode.range.containsPoint(position)) {
+        if (layer === this.rootLanguageLayer) {
+          // This layer is responsible for the entire buffer, but our tree's
+          // root node may not actually span that entire range. If the buffer
+          // starts with empty lines, the tree may not start parsing until the
+          // first non-whitespace character.
+          //
+          // But this is the root language layer, so we're going to pretend
+          // that our tree's root node spans the entire buffer range.
+          return (where(rootNode, grammar) ? rootNode : null);
+        } else {
+          continue;
+        }
+      }
+      let index = this.buffer.characterIndexForPosition(position);
+      let node = rootNode.descendantForIndex(index);
+      while (node && !where(node, grammar)) {
+        node = node.parent;
+      }
+      if (node) {
+        return node;
+      }
     }
-    return node;
   }
 
   /*
   Section - Folds
   */
   getFoldableRangeContainingPoint(point) {
-    const foldsAtRow = this._getFoldsAtRow(point.row)
+    const foldsAtRow = this._getFoldsAtRow(point.row);
     // const node = foldsAtRow[0]?.node
     const capture = foldsAtRow[0];
     if (capture) {
-      return this._makeFoldableRange(capture)
+      return this._makeFoldableRange(capture);
     }
   }
 
@@ -617,7 +671,6 @@ class WASMTreeSitterLanguageMode {
         end = this.adjustPositionByOffset(end, Number(options.endOffset));
       }
     }
-
     return new Range(start, end);
   }
 
@@ -761,7 +814,7 @@ class WASMTreeSitterLanguageMode {
       ({ node }) => node.endPosition.row >= comparisonRow
     );
 
-    let indentDelta = this.getIndentDeltaFromCaptures(indentCaptures, ['indent']);
+    let indentDelta = this.getIndentDeltaFromCaptures(indentCaptures, ['indent', 'indent_end']);
     indentDelta = clamp(indentDelta, 0, 1);
 
     // The second phase tells us whether this line should be dedented from the
@@ -873,7 +926,7 @@ class WASMTreeSitterLanguageMode {
     ];
   }
 
-  injectionLayersAtPoint (point) {
+  injectionLayersAtPoint(point) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
       containsPosition: point
     });
@@ -1087,8 +1140,8 @@ class ScopeResolver {
       this.setDataForRange(syntax, props);
     }
 
-    if (name === 'ignore') {
-      // "@ignore" is a magical variable in an SCM file that will not be
+    if (name === 'IGNORE') {
+      // "@IGNORE" is a magical variable in an SCM file that will not be
       // applied in the grammar, but allows us to prevent other kinds of scopes
       // from matching. We purposefully allowed this syntax node to set data
       // for a given range, but not to apply its scope ID to any boundaries.
@@ -1147,10 +1200,12 @@ class ScopeResolver {
   }
 }
 
-// Scope names can mark themselves with `TEXT` to interpolate the node's
-// text into the capture.
+// Scope names can mark themselves with `TEXT` to interpolate the node's text
+// into the capture, or `TYPE` to interpolate the anonymous node's type.
 ScopeResolver.interpolateName = (name, node) => {
-  return name.replace('TEXT', node.text);
+  name = name.replace('TEXT', node.text);
+  name = name.replace('TYPE', node.type);
+  return name;
 };
 
 // These tests are used to define criteria under which the scope should be
@@ -1744,7 +1799,8 @@ class LanguageLayer {
       this.grammar.onDidChangeQueryFile(({ queryType }) => {
         try {
           if (!this[queryType]) { return; }
-          this[queryType] = this.language.query(this.grammar[queryType]);
+          let query = this.language.query(this.grammar[queryType]);
+          this[queryType] = query;
           // Force a re-highlight of this layer's entire region.
           let range = this.marker?.getRange() || this.languageMode.buffer.getRange();
           this.languageMode.emitRangeUpdate(range);
@@ -1775,18 +1831,18 @@ class LanguageLayer {
 
     this.scopeResolver.clear();
 
-    for (let capture of captures) {
-      let { node } = capture;
-      // Phantom nodes invented by the parse tree.
-      if (node.text === '') { continue; }
-      this.scopeResolver.store(capture);
-    }
-
     // Ensure the whole source file (or whole bounds of the injection) is
     // annotated with the root language scope name. We _do not_ want to leave
     // this up to the grammar author; it's too important.
     if (from.isEqual(extent.start) && from.column === 0) {
       this.scopeResolver.setBoundary(from, this.languageScopeId, 'open');
+    }
+
+    for (let capture of captures) {
+      let { node } = capture;
+      // Phantom nodes invented by the parse tree.
+      if (node.text === '') { continue; }
+      this.scopeResolver.store(capture);
     }
 
     if (to.isEqual(extent.end)) {
@@ -2186,28 +2242,21 @@ class LanguageLayer {
     return results;
   }
 
-  scopeDescriptorForPosition(point) {
-    let results = this.scopeMapAtPosition(point);
+  getSyntaxNodeAtPosition(position, where = FUNCTION_TRUE) {
+    if (!this.language || !this.tree) { return null; }
+    let { buffer } = this.languageMode;
 
-    let injectionLayers = this.languageMode.injectionLayersAtPoint(point);
+    let index = buffer.characterIndexForPosition(position);
+    let node = this.tree.rootNode.descendantForIndex(index);
 
-    for (let layer of injectionLayers) {
-      let map = layer.scopeMapAtPosition(point);
-      results.push(...map);
+    while (node) {
+      if (where(node, this.grammar)) {
+        return node;
+      }
+      node = node.parent;
     }
 
-    results = results.sort(({ node }) => {
-      return node.endIndex - node.startIndex;
-    });
-
-    let scopes = results.map(cap => {
-      return ScopeResolver.interpolateName(cap.name, cap.node)
-    });
-
-    if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
-      scopes.unshift(this.grammar.scopeName);
-    }
-    return new ScopeDescriptor({ scopes });
+    return null;
   }
 
   _populateInjections (range, nodeRangeSet) {

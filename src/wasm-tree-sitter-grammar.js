@@ -9,7 +9,7 @@ const parserInitPromise = Parser.init();
 module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.scopeName = params.scopeName
-    this._grammarPath = grammarPath
+    this.grammarFilePath = grammarPath
     this.queryPaths = params.treeSitter
     const dirName = path.dirname(grammarPath);
 
@@ -22,9 +22,7 @@ module.exports = class WASMTreeSitterGrammar {
     this.subscriptions = new CompositeDisposable;
     this._queryFileWatchers = [];
 
-    this.loadQueryFiles(grammarPath, this.queryPaths);
-
-    this.grammarPath = path.join(dirName, params.treeSitter.grammar)
+    this.treeSitterGrammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
     this.fileTypes = params.fileTypes || [];
@@ -40,12 +38,14 @@ module.exports = class WASMTreeSitterGrammar {
   async getLanguage () {
     await parserInitPromise;
     if (!this._language) {
-      this._language = await Parser.Language.load(this.grammarPath);
+      this._language = await Parser.Language.load(this.treeSitterGrammarPath);
     }
+
+    await this.loadQueryFiles(this.grammarFilePath, this.queryPaths);
     return this._language;
   }
 
-  loadQueryFiles (grammarPath, queryPaths) {
+  async loadQueryFiles (grammarPath, queryPaths) {
     if (!('syntaxQuery' in queryPaths)) {
       throw new Error(`Syntax query must be present`);
     }
@@ -53,22 +53,34 @@ module.exports = class WASMTreeSitterGrammar {
     for (let [key, name] of Object.entries(queryPaths)) {
       if (!key.endsWith('Query')) { continue; }
       let filePath = path.join(dirName, name);
-      this.loadQueryFile(filePath, key);
+      await this.loadQueryFile(filePath, key);
       if (atom.inDevMode()) {
         this.observeQueryFile(filePath, key);
       }
     }
   }
 
-  loadQueryFile(filePath, queryType) {
-    this[queryType] = fs.readFileSync(filePath, 'utf-8');
+  async loadQueryFile(filePath, queryType) {
+    this[queryType] = await fs.promises.readFile(filePath, 'utf-8');
   }
 
   observeQueryFile(filePath, queryType) {
     let watcher = new File(filePath);
     this.subscriptions.add(watcher.onDidChange(() => {
-      this.loadQueryFile(filePath, queryType);
-      this.emitter.emit('did-change-query-file', { filePath, queryType });
+      let existingQuery = this[queryType];
+      this.loadQueryFile(filePath, queryType).then(() => {
+        // Sanity-check the language for errors.
+        try {
+          this._language.query(this[queryType]);
+        } catch (error) {
+          atom.beep();
+          console.error(`Error parsing query file: ${queryType}`);
+          console.error(error);
+          this[queryType] = existingQuery;
+          return;
+        }
+        this.emitter.emit('did-change-query-file', { filePath, queryType });
+      });
     }));
   }
 
