@@ -77,7 +77,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **line-ending-selector** | [`./line-ending-selector`](./line-ending-selector) | |
 | **link** | [`./link`](./link) | |
 | **markdown-preview** | [`./markdown-preview`][./markdown-preview] |  |
-| **notifications** | [`./notifications`][./notifications] | |
+| **notifications** | [`./notifications`](./notifications) | |
 | **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | |
 | **one-light-syntax** | [`./one-light-syntax`](./one-light-syntax) | |
