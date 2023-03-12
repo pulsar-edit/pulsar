@@ -93,7 +93,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **styleguide** | [`./styleguide`][./styleguide] | |
 | **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
 | **tabs** | [`./tabs`](./tabs) |  |
-| **timecop** | [`./timecop`][./timecop] | |
+| **timecop** | [`./timecop`](./timecop) | |
 | **tree-view** | [`pulsar-edit/tree-view`][tree-view] |  |
 | **update-package-dependencies** | [`./update-package-dependencies`](./update-package-dependencies) | |
 | **welcome** | [`./welcome`](./welcome) | |
