@@ -19,7 +19,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **autocomplete-plus** | [`./autocomplete-plus`][./autocomplete-plus] |  |
 | **autocomplete-snippets** | [`./autocomplete-snippets`](./autocomplete-snippets) |  |
 | **autoflow** | [`./autoflow`](./autoflow) | |
-| **autosave** | [`./autosave`][./autosave] | |
+| **autosave** | [`./autosave`](./autosave) | |
 | **background-tips** | [`./background-tips`](./background-tips) | |
 | **base16-tomorrow-dark-theme** | [`./base16-tomorrow-dark-theme`](./base16-tomorrow-dark-theme) | |
 | **base16-tomorrow-light-theme** | [`./base16-tomorrow-light-theme`](./base16-tomorrow-light-theme) | |
