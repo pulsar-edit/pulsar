@@ -77,7 +77,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **line-ending-selector** | [`./line-ending-selector`](./line-ending-selector) | |
 | **link** | [`./link`](./link) | |
 | **markdown-preview** | [`./markdown-preview`][./markdown-preview] |  |
-| **notifications** | [`atom/notifications`][notifications] | [#18277](https://github.com/atom/atom/issues/18277) |
+| **notifications** | [`./notifications`][./notifications] | |
 | **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | |
 | **one-light-syntax** | [`./one-light-syntax`](./one-light-syntax) | |
@@ -106,7 +106,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 [fuzzy-finder]: https://github.com/pulsar-edit/fuzzy-finder
 [github]: https://github.com/pulsar-edit/github
 [keybinding-resolver]: https://github.com/pulsar-edit/keybinding-resolver
-[notifications]: https://github.com/pulsar-edit/notifications
 [snippets]: https://github.com/pulsar-edit/snippets
 [spell-check]: https://github.com/pulsar-edit/spell-check
 [symbols-view]: https://github.com/pulsar-edit/symbols-view
