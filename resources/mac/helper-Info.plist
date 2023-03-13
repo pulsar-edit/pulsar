@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Pulsar Helper</string>
 	<key>CFBundleIdentifier</key>
-	<string>dev.pulsar_edit.Pulsar.helper</string>
+	<string>dev.pulsar-edit.pulsar.helper</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
