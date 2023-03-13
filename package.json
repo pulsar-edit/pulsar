@@ -20,7 +20,7 @@
     "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
   "license": "MIT",
-  "electronVersion": "19.1.3",
+  "electronVersion": "23.1.3",
   "dependencies": {
     "@babel/core": "7.18.6",
     "@electron/remote": "2.0.8",
@@ -71,7 +71,6 @@
     "fuzzy-finder": "https://github.com/pulsar-edit/fuzzy-finder.git#simplify-code",
     "git-diff": "file:packages/git-diff",
     "git-utils": "https://github.com/pulsar-edit/git-utils.git#f4e8c37",
-    "github": "https://codeload.github.com/pulsar-edit/github/tar.gz/refs/tags/v0.36.14-pretranspiled-take-2",
     "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
@@ -167,7 +166,6 @@
     "tree-sitter": "https://github.com/pulsar-edit/node-tree-sitter.git#c304335",
     "tree-view": "https://github.com/pulsar-edit/tree-view.git#4274c7a",
     "typescript-simple": "8.0.6",
-    "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
     "web-tree-sitter": "^0.20.7",
@@ -283,9 +281,9 @@
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
     "@playwright/test": "1.22.2",
-    "electron": "19.1.3",
+    "electron": "23.1.3",
     "electron-builder": "23.3.1",
-    "electron-rebuild": "3.2.7",
+    "@electron/rebuild": "3.2.10",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
     "eslint-plugin-node": "^11.1.0",
