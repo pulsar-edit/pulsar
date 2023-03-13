@@ -7,6 +7,6 @@ Section: devel
 Priority: optional
 Architecture: <%= arch %>
 Installed-Size: <%= installedSize %>
-Maintainer: Pulsar Community <noreply@pulsar-edit.com>
+Maintainer: Pulsar Community <admin@pulsar-edit.dev>
 Description: <%= description %>
  Pulsar is a free and open source text editor that is modern, approachable, and hackable to the core.
