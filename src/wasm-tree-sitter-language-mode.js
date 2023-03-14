@@ -2058,18 +2058,19 @@ class LanguageLayer {
   }
 
   observeQueryFileChanges() {
-    let buffer = this.languageMode.buffer;
     this.subscriptions.add(
       this.grammar.onDidChangeQueryFile(async ({ queryType }) => {
         if (this._pendingQueryFileChange) { return; }
         this._pendingQueryFileChange = true;
+
         try {
           if (!this[queryType]) { return; }
+
           let query = await this.grammar.getQuery(queryType);
-          console.log('new', queryType, query, buffer.id);
           this[queryType] = query;
+
           // Force a re-highlight of this layer's entire region.
-          let range = this.marker?.getRange() || this.languageMode.buffer.getRange();
+          let range = this.getExtent();
           this.languageMode.emitRangeUpdate(range);
           this._pendingQueryFileChange = false;
         } catch (error) {

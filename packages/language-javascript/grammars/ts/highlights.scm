@@ -12,13 +12,11 @@
 ; it out later on.
 (string
   "'" @punctuation.definition.string.begin.js
-  (#set! onlyIfFirst "true")
-)
+  (#set! onlyIfFirst "true"))
 
 (string
   "'" @punctuation.definition.string.end.js
-  (#set! onlyIfLast "true")
-)
+  (#set! onlyIfLast "true"))
 
 ; Double-quoted.
 
@@ -26,12 +24,11 @@
 
 (string
   "\"" @punctuation.definition.string.begin.js
-  (#set! onlyIfFirst true)
-)
+  (#set! onlyIfFirst true))
+
 (string
   "\"" @punctuation.definition.string.end.js
-  (#set! onlyIfLast true)
-)
+  (#set! onlyIfLast true))
 
 ; Template string (backticks).
 
@@ -39,19 +36,18 @@
 
 (template_string
   "`" @punctuation.definition.string.begin.js
-  (#set! onlyIfFirst true)
-)
+  (#set! onlyIfFirst true))
 
 (template_string
   "`" @punctuation.definition.string.end.js
-  (#set! onlyIfLast true)
-)
+  (#set! onlyIfLast true))
 
 ; Interpolations inside of template strings.
 (template_substitution
   "${" @punctuation.definition.template-expression.begin.js
   "}" @punctuation.definition.template-expression.end.js
 ) @meta.embedded.interpolation.js
+
 
 ; VARIABLES
 ; =========
@@ -63,14 +59,12 @@
 ] @storage.type.TYPE.js
 
 (variable_declarator
-  name: (identifier) @variable.other.assignment.js
-)
+  name: (identifier) @variable.other.assignment.js)
 
 ; A simple variable declaration:
 ; The "foo" in `let foo = true`
 (assignment_expression
-  left: (identifier) @variable.other.assignment.js
-)
+  left: (identifier) @variable.other.assignment.js)
 
 ; A variable object destructuring:
 ; The "foo" in `let { foo } = something`
@@ -78,16 +72,13 @@
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
 ((object_pattern
-  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js)
-)
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js))
 
 ; A variable object destructuring:
 ; The "foo" and "bar" in `let [foo, bar] = something`
 (variable_declarator
   (array_pattern
-    (identifier) @variable.other.assignment.destructuring.js
-  )
-)
+    (identifier) @variable.other.assignment.destructuring.js))
 
 (for_in_statement
   left: (identifier) @variable.other.assignment.loop.js)
@@ -115,22 +106,17 @@
         ; The "foo" in `function ({ foo }) {`.
         (shorthand_property_identifier_pattern) @variable.parameter.destructuring.shorthand.js
       ])
-  ]
-)
+  ])
 
 ; The "foo" in `function (...foo) {`.
 (formal_parameters
   (rest_pattern
-    (identifier) @variable.parameter.js
-  )
-)
+    (identifier) @variable.parameter.js))
 
 ; The "foo" in `function (foo = false) {`.
 (formal_parameters
   (assignment_pattern
-    (identifier) @variable.parameter.js.z
-  )
-)
+    (identifier) @variable.parameter.js))
 
 ; FUNCTIONS
 ; =========
