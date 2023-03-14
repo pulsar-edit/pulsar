@@ -26,6 +26,12 @@
       "description": "Whether or not to display search metadata with the search results. Metadata will appear as `{namespace}.{settingName}:{searchScore}`.",
       "type": "boolean",
       "default": false
+    },
+    "enableSettingsSearch": {
+      "title": "Enable Experimental Settings Search Feature",
+      "description": "Will enable or disable the new Experimental Settings Search.",
+      "type": "boolean",
+      "default": false
     }
   },
   "dependencies": {
