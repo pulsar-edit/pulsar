@@ -39,12 +39,17 @@ function resolveNodeDescriptor (node, descriptor) {
   let result = node;
   while (result !== null && parts.length > 0) {
     let part = parts.shift();
-    if (!result[part]) {
-      throw new Error(`Bad node descriptor: ${descriptor}`);
-    }
+    if (!result[part]) { return null; }
     result = result[part];
   }
   return result;
+}
+
+function resolveNodePosition (node, descriptor) {
+  let parts = descriptor.split('.');
+  let lastPart = parts.pop();
+  let result = resolveNodeDescriptor(node, parts.join('.'));
+  return result[lastPart];
 }
 
 // Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
@@ -135,11 +140,11 @@ class WASMTreeSitterLanguageMode {
   destroy() {
     let layers = this.getAllLanguageLayers();
     for (let layer of layers) {
-      layer.destroy();
+      layer?.destroy();
     }
-    this.injectionsMarkerLayer.destroy();
+    this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
-    this.subscriptions.dispose();
+    this.subscriptions?.dispose();
   }
 
   getGrammar() {
@@ -570,6 +575,7 @@ class WASMTreeSitterLanguageMode {
     // Start with the deepest layer and move outwards.
     allLayers.reverse();
     for (let layer of allLayers) {
+      if (!layer.tree) { continue; }
       let { tree: { rootNode } } = layer;
       let grammar = layer.grammar;
       if (!rootNode.range.containsPoint(position)) {
@@ -639,8 +645,8 @@ class WASMTreeSitterLanguageMode {
   // Given a node and a descriptor string like "lastChild.startPosition",
   // navigates to the position described.
   resolveNodePosition(node, descriptor) {
-    let result = resolveNodeDescriptor(node, descriptor);
-    if (!result.row || !result.column) {
+    let result = resolveNodePosition(node, descriptor);
+    if (typeof result.row !== 'number' || typeof result.column !== 'number') {
       throw new Error(`Bad position descriptor: ${descriptor}`);
     }
     return Point.fromObject(result);
@@ -660,22 +666,22 @@ class WASMTreeSitterLanguageMode {
     } = capture;
 
     let defaultOptions = {
-      end: 'lastChild.startPosition'
+      endAt: 'lastChild.startPosition'
     };
     let options = { ...defaultOptions, ...props };
 
     let start = new Point(node.startPosition.row, Infinity);
     let end;
     try {
-      end = this.resolveNodePosition(node, options.end);
+      end = this.resolveNodePosition(node, options.endAt);
     } catch {
-      end = this.resolveNodePosition(node, defaultOptions.end);
+      end = this.resolveNodePosition(node, defaultOptions.endAt);
     }
 
-    if (options.endOffset) {
-      let endOffset = Number(options.endOffset);
-      if (!isNaN(endOffset)) {
-        end = this.adjustPositionByOffset(end, Number(options.endOffset));
+    if (options.offsetEnd) {
+      let offsetEnd = Number(options.offsetEnd);
+      if (!isNaN(offsetEnd)) {
+        end = this.adjustPositionByOffset(end, Number(options.offsetEnd));
       }
     }
     return new Range(start, end);
@@ -824,39 +830,43 @@ class WASMTreeSitterLanguageMode {
     let indentDelta = this.getIndentDeltaFromCaptures(indentCaptures, ['indent', 'indent_end']);
     indentDelta = clamp(indentDelta, 0, 1);
 
-    // The second phase tells us whether this line should be dedented from the
-    // previous line.
-    let dedentCaptures = indentsQuery.captures(
-      indentTree.rootNode,
-      { row: row, column: 0 },
-      { row: row + 1, column: 0 }
-    );
+    let dedentDelta = 0;
 
-    let currentRowText = this.buffer.lineForRow(row);
-    dedentCaptures = dedentCaptures.filter(capture => {
-      // Imagine you've got:
-      //
-      // { ^foo, bar } = something
-      //
-      // and the caret represents the cursor. Pressing Enter will move
-      // everything after the cursor to a new line and _should_ indent the
-      // line, even though there's a closing brace on the new line that would
-      // otherwise mark a dedent.
-      //
-      // Thus we don't want to honor a dedent unless it's the first
-      // non-whitespace content in the line. We'll use similar logic for
-      // `suggestedIndentForEditedBufferRow`.
-      let { text } = capture.node;
-      // Filter out phantom nodes.
-      if (!text) { return false; }
-      return currentRowText.trim().startsWith(text);
-    });
+    if (options.skipDedentCheck !== true) {
+      // The second phase tells us whether this line should be dedented from the
+      // previous line.
+      let dedentCaptures = indentsQuery.captures(
+        indentTree.rootNode,
+        { row: row, column: 0 },
+        { row: row + 1, column: 0 }
+      );
 
-    let dedentDelta = this.getIndentDeltaFromCaptures(
-      dedentCaptures,
-      ['indent_end', 'branch']
-    );
-    dedentDelta = clamp(dedentDelta, -1, 0);
+      let currentRowText = this.buffer.lineForRow(row);
+      dedentCaptures = dedentCaptures.filter(capture => {
+        // Imagine you've got:
+        //
+        // { ^foo, bar } = something
+        //
+        // and the caret represents the cursor. Pressing Enter will move
+        // everything after the cursor to a new line and _should_ indent the
+        // line, even though there's a closing brace on the new line that would
+        // otherwise mark a dedent.
+        //
+        // Thus we don't want to honor a dedent unless it's the first
+        // non-whitespace content in the line. We'll use similar logic for
+        // `suggestedIndentForEditedBufferRow`.
+        let { text } = capture.node;
+        // Filter out phantom nodes.
+        if (!text) { return false; }
+        return currentRowText.trim().startsWith(text);
+      });
+
+      dedentDelta = this.getIndentDeltaFromCaptures(
+        dedentCaptures,
+        ['indent_end', 'branch']
+      );
+      dedentDelta = clamp(dedentDelta, -1, 0);
+    }
 
     return lastLineIndent + indentDelta + dedentDelta;
   }
@@ -895,6 +905,13 @@ class WASMTreeSitterLanguageMode {
       this.buffer.lineForRow(row), tabLength
     );
 
+    // This is the indent level that is suggested from context — the level we'd
+    // have if this line were completely blank. We won't alter the indent level
+    // of the current line — even if it's “wrong” — unless typing triggers a
+    // dedent. But once a dedent is triggered, we should dedent one level from
+    // this value, not from the current line indent.
+    const originalLineIndent = this.suggestedIndentForBufferRow(row, tabLength, { skipDedentCheck: true });
+
     for (let indent of indents) {
       let { node } = indent;
       if (!scopeResolver.store(indent, null)) {
@@ -903,7 +920,7 @@ class WASMTreeSitterLanguageMode {
       if (node.startPosition.row !== row) { continue; }
       if (indent.name !== 'branch') { continue; }
       if (node.text !== lineText) { continue; }
-      return Math.max(0, currentLineIndent - 1);
+      return Math.max(0, originalLineIndent - 1);
     }
 
     return currentLineIndent;
@@ -1177,15 +1194,15 @@ class ScopeResolver {
         range = ScopeResolver.ADJUSTMENTS[key](
           capture.node, value, props, range, this);
 
-        // If any single adjustment returns `null`, revert to the default
-        // behavior.
-        if (range === null) { return capture.node; }
+        // If any single adjustment returns `null`, we shouldn't store this
+        // capture.
+        if (range === null) { return null; }
       }
     }
 
-    // Any invalidity in the returned range will cause us to revert to the
-    // default behavior.
-    if (!this.isValidRange(range)) { return capture.node; }
+    // Any invalidity in the returned range means we shouldn't store this
+    // capture.
+    if (!this.isValidRange(range)) { return null; }
     return range;
   }
 
@@ -1221,6 +1238,13 @@ class ScopeResolver {
     name = ScopeResolver.interpolateName(name, node);
 
     let range = this.determineCaptureRange(syntax);
+    if (range === null) {
+      // This capture specified a range adjustment that turned out not to be
+      // valid. We view those adjustments as essential — that is, if the
+      // assumed conditions of the `#set!` rules result in invalidity, it means
+      // that we should not try to honor the capture in the first place.
+      return false;
+    }
     let data = this.getDataForRange(range);
 
     if (!this.test(data, props, node, name)) {
@@ -1229,8 +1253,8 @@ class ScopeResolver {
       this.setDataForRange(range, props);
     }
 
-    if (name === 'IGNORE') {
-      // "@IGNORE" is a magical variable in an SCM file that will not be
+    if (name === '_IGNORE_') {
+      // "@_IGNORE_" is a magical variable in an SCM file that will not be
       // applied in the grammar, but allows us to prevent other kinds of scopes
       // from matching. We purposefully allowed this syntax node to set data
       // for a given range, but not to apply its scope ID to any boundaries.
@@ -1290,8 +1314,13 @@ class ScopeResolver {
 // Scope names can mark themselves with `TEXT` to interpolate the node's text
 // into the capture, or `TYPE` to interpolate the anonymous node's type.
 ScopeResolver.interpolateName = (name, node) => {
-  name = name.replace('TEXT', node.text);
-  name = name.replace('TYPE', node.type);
+  // Only interpolate `_TEXT_` if we know the text has no spaces. Spaces are
+  // not valid in scope names.
+  if (name.includes('_TEXT_') &&
+   !node.text.includes(' ')) {
+    name = name.replace('_TEXT_', node.text);
+  }
+  name = name.replace('_TYPE_', node.type);
   return name;
 };
 
@@ -1430,33 +1459,17 @@ ScopeResolver.TESTS = {
 // assigned to captures that can transform the range to a subset or superset of
 // the initial range.
 ScopeResolver.ADJUSTMENTS = {
-  // Alter the given range to end at the beginning of a different node.
-  endAtStartOf (node, value, props, position) {
-    if (props.endAtEndOf && props.endAtStartOf) {
-      throw new Error(
-        `Must define only one of "endAtStartOf" and "endAtEndOf".`
-      );
-    }
-    let endNode = resolveNodeDescriptor(node, value);
-    if (!endNode) { return null; }
-
-    position.endIndex = endNode.startIndex;
-    position.endPosition = endNode.startPosition;
+  // Alter the given range to start at the start or end of a different node.
+  startAt(node, value, props, position, resolver) {
+    position.startPosition = resolveNodePosition(node, value);
+    position.endIndex = resolver.positionToIndex(position.startPosition);
     return position;
   },
 
-  // Alter the given range to end at the end of a different node.
-  endAtEndOf(node, value, props, position) {
-    if (props.endAtEndOf && props.endAtStartOf) {
-      throw new Error(
-        `Must define only one of "endAtStartOf" and "endAtEndOf".`
-      );
-    }
-    let endNode = resolveNodeDescriptor(node, value);
-    if (!endNode) { return null; }
-
-    position.endIndex = endNode.endIndex;
-    position.endPosition = endNode.endPosition;
+  // Alter the given range to end at the start or end of a different node.
+  endAt (node, value, props, position, resolver) {
+    position.endPosition = resolveNodePosition(node, value);
+    position.endIndex = resolver.positionToIndex(position.endPosition);
     return position;
   },
 
@@ -1762,7 +1775,7 @@ class HighlightIterator {
   getCloseScopeIds() {
     let iterator = last(this.iterators);
     if (this.currentScopeIsCovered) {
-      console.log('Would close', iterator._inspectScopes(iterator.getCloseScopeIds()), 'but scope is covered!');
+      // console.log('Would close', iterator._inspectScopes(iterator.getCloseScopeIds()), 'but scope is covered!');
     } else {
       // console.log(
       //   iterator.name,
@@ -1781,7 +1794,7 @@ class HighlightIterator {
   getOpenScopeIds() {
     let iterator = last(this.iterators);
     if (this.currentScopeIsCovered) {
-      console.log('Would open', iterator._inspectScopes(iterator.getOpenScopeIds()), 'but scope is covered!');
+      // console.log('Would open', iterator._inspectScopes(iterator.getOpenScopeIds()), 'but scope is covered!');
     } else {
       // console.log(
       //   iterator.name,
@@ -2030,14 +2043,23 @@ class LanguageLayer {
 
     this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
       this.language = language;
-      this.syntaxQuery = await this.grammar.getQuery('syntaxQuery');
+      try {
+        this.syntaxQuery = await this.grammar.getQuery('syntaxQuery');
+      } catch (error) {
+        console.warn(`Grammar ${grammar.scopeName} failed to load its "highlights.scm" file. Please fix this error or contact the maintainer.`);
+        console.error(error);
+      }
 
       let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
 
       for (let queryType of otherQueries) {
         if (grammar[queryType]) {
-          this[queryType] = await this.grammar.getQuery(queryType);
-          // this[queryType] = this.language.query(grammar[queryType]);
+          try {
+            let query = await this.grammar.getQuery(queryType);
+            this[queryType] = query;
+          } catch (error) {
+            console.warn(`Grammar ${grammar.scopeName} failed to load its ${queryType}. Please fix this error or contact the maintainer.`);
+          }
         }
       }
 
@@ -2090,6 +2112,7 @@ class LanguageLayer {
     let { buffer } = this.languageMode;
     if (!this.language || !this.tree) { return []; }
     if (!this.grammar.getLanguageSync()) { return []; }
+    if (!this.syntaxQuery) { return []; }
 
     from = buffer.clipPosition(Point.fromObject(from, true));
     to = buffer.clipPosition(Point.fromObject(to, true));

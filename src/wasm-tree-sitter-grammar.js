@@ -95,6 +95,7 @@ module.exports = class WASMTreeSitterGrammar {
         this[queryType] = contents;
         this.queryCache.delete(queryType);
       }
+    }).finally(() => {
       this.promisesForQueryFiles.delete(key);
     });
 
@@ -119,11 +120,13 @@ module.exports = class WASMTreeSitterGrammar {
   // promise.
   getQuery (queryType) {
     let inDevMode = atom.inDevMode();
+
     let query = this.queryCache.get(queryType);
     if (query) { return Promise.resolve(query); }
 
     let promise = this.promisesForQueries.get(queryType);
     if (promise) { return promise; }
+
     promise = new Promise((resolve, reject) => {
       this.getLanguage().then((language) => {
         let timeTag = `${this.scopeName} ${queryType} load time`;
@@ -140,10 +143,10 @@ module.exports = class WASMTreeSitterGrammar {
           reject(error);
         }
       });
-    }).then((query) => {
+    }).finally(() => {
       this.promisesForQueries.delete(queryType);
-      return query;
     });
+
     this.promisesForQueries.set(queryType, promise);
     return promise;
   }
