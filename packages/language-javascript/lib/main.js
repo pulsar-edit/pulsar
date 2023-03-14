@@ -66,7 +66,20 @@ exports.activate = function() {
         return comment;
       }
     });
+
+    atom.grammars.addInjectionPoint(scopeName, {
+      type: 'comment',
+      language: () => 'todo',
+      content: (comment) => comment
+    });
+
+    atom.grammars.addInjectionPoint(scopeName, {
+      type: 'comment',
+      language: () => 'hyperlink',
+      content: (comment) => comment
+    });
   }
+
 };
 
 const CSS_REGEX = /\bstyled\b|\bcss\b/i;
