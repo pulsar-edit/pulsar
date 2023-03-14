@@ -22,6 +22,10 @@ module.exports = class WASMTreeSitterGrammar {
     this.subscriptions = new CompositeDisposable;
     this._queryFileWatchers = [];
 
+    this.queryCache = new Map();
+    this.promisesForQueryFiles = new Map();
+    this.promisesForQueries = new Map();
+
     this.treeSitterGrammarPath = path.join(dirName, params.treeSitter.grammar)
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
@@ -41,7 +45,9 @@ module.exports = class WASMTreeSitterGrammar {
       this._language = await Parser.Language.load(this.treeSitterGrammarPath);
     }
 
-    await this.loadQueryFiles(this.grammarFilePath, this.queryPaths);
+    if (!this._queryFilesLoaded) {
+      await this.loadQueryFiles(this.grammarFilePath, this.queryPaths);
+    }
     return this._language;
   }
 
@@ -49,34 +55,114 @@ module.exports = class WASMTreeSitterGrammar {
     if (!('syntaxQuery' in queryPaths)) {
       throw new Error(`Syntax query must be present`);
     }
-    let dirName = path.dirname(grammarPath)
-    for (let [key, name] of Object.entries(queryPaths)) {
-      if (!key.endsWith('Query')) { continue; }
-      let filePath = path.join(dirName, name);
-      await this.loadQueryFile(filePath, key);
-      if (atom.inDevMode()) {
-        this.observeQueryFile(filePath, key);
-      }
+
+    if (this._loadQueryFilesPromise) {
+      return this._loadQueryFilesPromise;
     }
+
+    this._loadQueryFilesPromise = new Promise((resolve) => {
+      let promises = [];
+      let dirName = path.dirname(grammarPath);
+
+      for (let [key, name] of Object.entries(queryPaths)) {
+        if (!key.endsWith('Query')) { continue; }
+
+        let filePath = path.join(dirName, name);
+        promises.push(this.loadQueryFile(filePath, key));
+
+        if (atom.inDevMode() && !this._queryFilesLoaded) {
+          this.observeQueryFile(filePath, key);
+        }
+      }
+      Promise.all(promises).then(() => resolve());
+    }).then(() => {
+      this._queryFilesLoaded = true;
+      this._loadQueryFilesPromise = null;
+    });
+
+    return this._loadQueryFilesPromise;
   }
 
-  async loadQueryFile(filePath, queryType) {
-    this[queryType] = await fs.promises.readFile(filePath, 'utf-8');
+  loadQueryFile(filePath, queryType) {
+    let key = `${filePath}/${queryType}`;
+
+    let existingPromise = this.promisesForQueryFiles.get(key);
+    if (existingPromise) { return existingPromise; }
+
+    let promise = fs.promises.readFile(filePath, 'utf-8');
+    promise = promise.then((contents) => {
+      if (this[queryType] !== contents) {
+        this[queryType] = contents;
+        this.queryCache.delete(queryType);
+      }
+      this.promisesForQueryFiles.delete(key);
+    });
+
+    this.promisesForQueryFiles.set(key, promise);
+    return promise;
+  }
+
+  getQuerySync (queryType) {
+    let language = this.getLanguageSync();
+    if (!language) { return null; }
+    let query = this.queryCache.get(queryType);
+    if (!query) {
+      query = language.query(this[queryType]);
+      this.queryCache.set(queryType, query);
+    }
+    return query;
+  }
+
+  // Async, but designed so that multiple near-simultaneous calls to `getQuery`
+  // from multiple buffers will not cause multiple calls to `language.query`,
+  // since it's a major bottleneck. Instead they all receive the same unsettled
+  // promise.
+  getQuery (queryType) {
+    let inDevMode = atom.inDevMode();
+    let query = this.queryCache.get(queryType);
+    if (query) { return Promise.resolve(query); }
+
+    let promise = this.promisesForQueries.get(queryType);
+    if (promise) { return promise; }
+    promise = new Promise((resolve, reject) => {
+      this.getLanguage().then((language) => {
+        let timeTag = `${this.scopeName} ${queryType} load time`;
+        try {
+          if (inDevMode) { console.time(timeTag); }
+
+          query = language.query(this[queryType]);
+
+          if (inDevMode) { console.timeEnd(timeTag); }
+          this.queryCache.set(queryType, query);
+          resolve(query);
+        } catch (error) {
+          if (inDevMode) { console.timeEnd(timeTag); }
+          reject(error);
+        }
+      });
+    }).then((query) => {
+      this.promisesForQueries.delete(queryType);
+      return query;
+    });
+    this.promisesForQueries.set(queryType, promise);
+    return promise;
   }
 
   observeQueryFile(filePath, queryType) {
     let watcher = new File(filePath);
     this.subscriptions.add(watcher.onDidChange(() => {
       let existingQuery = this[queryType];
-      this.loadQueryFile(filePath, queryType).then(() => {
-        // Sanity-check the language for errors.
+      this.loadQueryFile(filePath, queryType).then(async () => {
+        // Sanity-check the language for errors before we let the buffers know
+        // about this change.
         try {
-          this._language.query(this[queryType]);
+          await this.getQuery(queryType);
         } catch (error) {
           atom.beep();
           console.error(`Error parsing query file: ${queryType}`);
           console.error(error);
           this[queryType] = existingQuery;
+          this.queryCache.delete(queryType);
           return;
         }
         this.emitter.emit('did-change-query-file', { filePath, queryType });
@@ -108,6 +194,7 @@ module.exports = class WASMTreeSitterGrammar {
   deactivate() {
     this.registration?.dispose();
     this.subscriptions.dispose();
+    this.queryCache.clear();
   }
 
   // Define a set of rules for when this grammar should delegate to a different

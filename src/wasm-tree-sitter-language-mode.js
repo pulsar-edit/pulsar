@@ -34,6 +34,19 @@ function nodeBreadth(node) {
   return node.endIndex - node.startIndex;
 }
 
+function resolveNodeDescriptor (node, descriptor) {
+  let parts = descriptor.split('.');
+  let result = node;
+  while (result !== null && parts.length > 0) {
+    let part = parts.shift();
+    if (!result[part]) {
+      throw new Error(`Bad node descriptor: ${descriptor}`);
+    }
+    result = result[part];
+  }
+  return result;
+}
+
 // Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
 // that we don't break anything that relied on `range` being present.
 function ensureRangePropertyIsDefined(node) {
@@ -120,6 +133,10 @@ class WASMTreeSitterLanguageMode {
   }
 
   destroy() {
+    let layers = this.getAllLanguageLayers();
+    for (let layer of layers) {
+      layer.destroy();
+    }
     this.injectionsMarkerLayer.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions.dispose();
@@ -143,11 +160,6 @@ class WASMTreeSitterLanguageMode {
 
     let { oldRange, newRange, oldText, newText } = change;
     this.newRanges.push(change.newRange);
-
-    // const possibleDefinition = this.boundaries.lt(change.oldRange.end).value?.definition
-    // if (possibleDefinition) {
-    //   this.oldNodeTexts.add(possibleDefinition)
-    // }
 
     const startIndex = this.buffer.characterIndexForPosition(
       change.newRange.start
@@ -627,14 +639,9 @@ class WASMTreeSitterLanguageMode {
   // Given a node and a descriptor string like "lastChild.startPosition",
   // navigates to the position described.
   resolveNodePosition(node, descriptor) {
-    let parts = descriptor.split('.');
-    let result = node;
-    while (result !== null && parts.length > 0) {
-      let part = parts.shift();
-      if (!result[part]) {
-        throw new Error(`Bad fold descriptor: ${descriptor}`);
-      }
-      result = result[part];
+    let result = resolveNodeDescriptor(node, descriptor);
+    if (!result.row || !result.column) {
+      throw new Error(`Bad position descriptor: ${descriptor}`);
     }
     return Point.fromObject(result);
   }
@@ -863,7 +870,7 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForEditedBufferRow(row, tabLength) {
-    let scopeResolver = new ScopeResolver();
+    let scopeResolver = new ScopeResolver(this.buffer);
     if (row === 0) { return 0; }
 
     let controllingLayer = this.controllingLayerAtPoint(new Point(row, 0));
@@ -1069,18 +1076,44 @@ class WASMTreeSitterLanguageMode {
 // under which various scopes get applied. When a given query capture is added,
 // `ScopeResolver` may "reject" it if it fails to pass the given test.
 class ScopeResolver {
-  constructor (idForScope = null) {
+  constructor (buffer, idForScope = null) {
+    this.buffer = buffer;
     this.idForScope = idForScope ?? (x => x);
-    this.map = new Map
-    this.rangeData = new Map
+    this.map = new Map;
+    this.rangeData = new Map;
+    this.patternCache = new Map;
+  }
+
+  getOrCompilePattern(pattern) {
+    let regex = this.patternCache.get(pattern);
+    if (!regex) {
+      regex = new RegExp(pattern);
+      this.patternCache.set(pattern, regex);
+    }
+    return regex;
+  }
+
+  indexToPosition (index) {
+    return this.buffer.positionForCharacterIndex(index);
+  }
+
+  positionToIndex(position)  {
+    return this.buffer.characterIndexForPosition(position);
+  }
+
+  adjustPositionByOffset(position, offset) {
+    let index = this.positionToIndex(position);
+    index += offset;
+    let newPosition = this.indexToPosition(index);
+    return this.buffer.clipPosition(newPosition);
   }
 
   _keyForPoint (point) {
     return `${point.row},${point.column}`
   }
 
-  _keyForRange (syntax) {
-    let { startIndex, endIndex } = syntax.node;
+  _keyForRange (range) {
+    let { startIndex, endIndex } = range;
     return `${startIndex}/${endIndex}`;
   }
 
@@ -1089,14 +1122,71 @@ class ScopeResolver {
     return new Point(Number(row), Number(column));
   }
 
-  setDataForRange (syntax, props) {
-    let key = this._keyForRange(syntax);
+  setDataForRange (range, props) {
+    let key = this._keyForRange(range);
     return this.rangeData.set(key, props);
   }
 
   getDataForRange (syntax) {
     let key = this._keyForRange(syntax);
     return this.rangeData.get(key);
+  }
+
+  adjustsCaptureRange(capture) {
+    let { setProperties: props = {} } = capture;
+    let keys = Object.keys(props);
+    if (keys.length === 0) { return false; }
+    return keys.some(k => k in ScopeResolver.ADJUSTMENTS);
+  }
+
+  isValidRange(range) {
+    let { startPosition, startIndex, endPosition, endIndex } = range;
+    if (!(
+      typeof startIndex === 'number' &&
+      typeof endIndex === 'number' &&
+      typeof startPosition === 'object' &&
+      typeof endPosition === 'object'
+    )) { return false; }
+    if (startIndex > endIndex) { return false; }
+    if (comparePoints(startPosition, endPosition) >= 0) { return false; }
+    return true;
+  }
+
+  determineCaptureRange (capture) {
+    // For our purposes, a "range" is not a `Range` object, but rather an
+    // object that has all four of `startPosition`, `endPosition`,
+    // `startIndex`, and `endIndex`. Any single node can thus fulfill this
+    // contract, but so can a plain object of our own construction.
+    let { setProperties: props = {} } = capture;
+    if (!this.adjustsCaptureRange(capture)) { return capture.node; }
+
+    let range = {
+      startPosition: capture.node.startPosition,
+      startIndex: capture.node.startIndex,
+      endPosition: capture.node.endPosition,
+      endIndex: capture.node.endIndex
+    };
+
+    for (let key in props) {
+      if (key in ScopeResolver.ADJUSTMENTS) {
+        let value = props[key];
+
+        // Transform the range successively. Later adjustments can optionally
+        // act on earlier adjustments, or they can ignore the current position
+        // and inspect the original node instead.
+        range = ScopeResolver.ADJUSTMENTS[key](
+          capture.node, value, props, range, this);
+
+        // If any single adjustment returns `null`, revert to the default
+        // behavior.
+        if (range === null) { return capture.node; }
+      }
+    }
+
+    // Any invalidity in the returned range will cause us to revert to the
+    // default behavior.
+    if (!this.isValidRange(range)) { return capture.node; }
+    return range;
   }
 
   // Given a syntax capture, test whether we should include its scope in the
@@ -1115,9 +1205,12 @@ class ScopeResolver {
   }
 
   // Attempt to add a syntax capture to the boundary data, along with its scope
-  // ID.
+  // ID. Will apply any adjustments to determine the range of the scope being
+  // applied, then check any test rules to see whether the scope should be
+  // added for that range.
   //
-  // Will return `false` if the scope should not be added for the given range.
+  // Will return `false` if the scope should not be added for the given range;
+  // otherwise will return the computed range.
   store (syntax) {
     let {
       node,
@@ -1125,19 +1218,15 @@ class ScopeResolver {
       setProperties: props = {}
     } = syntax;
 
-    let {
-      startPosition: start,
-      endPosition: end
-    } = node;
-
     name = ScopeResolver.interpolateName(name, node);
 
-    let data = this.getDataForRange(syntax);
+    let range = this.determineCaptureRange(syntax);
+    let data = this.getDataForRange(range);
 
     if (!this.test(data, props, node, name)) {
       return false;
     } else {
-      this.setDataForRange(syntax, props);
+      this.setDataForRange(range, props);
     }
 
     if (name === 'IGNORE') {
@@ -1145,42 +1234,46 @@ class ScopeResolver {
       // applied in the grammar, but allows us to prevent other kinds of scopes
       // from matching. We purposefully allowed this syntax node to set data
       // for a given range, but not to apply its scope ID to any boundaries.
-      return;
+      return false;
     }
 
     let id = this.idForScope(name);
 
-    // We should open this scope at `start`.
-    this.setBoundary(start, id, 'open');
+    let {
+      startPosition: start,
+      endPosition: end
+    } = range;
 
-    // We should close this scope at `end`.
+    this.setBoundary(start, id, 'open');
     this.setBoundary(end, id, 'close');
 
-    return true;
+    return range;
   }
 
   setBoundary (point, id, which) {
-    let key = this._keyForPoint(point)
+    let key = this._keyForPoint(point);
+
     if (!this.map.has(key)) {
       this.map.set(key, { open: [], close: [] })
     }
+
     let bundle = this.map.get(key);
     let idBundle = bundle[which];
 
     if (which === 'open') {
       // If an earlier token has already opened at this point, we want to open
       // after it.
-      idBundle.push(id)
+      idBundle.push(id);
     } else {
       // If an earlier token has already closed at this point, we want to close
       // before it.
-      idBundle.unshift(id)
+      idBundle.unshift(id);
     }
   }
 
   clear () {
-    this.map.clear()
-    this.rangeData.clear()
+    this.map.clear();
+    this.rangeData.clear();
   }
 
   *[Symbol.iterator] () {
@@ -1189,13 +1282,7 @@ class ScopeResolver {
     // boundaries.
     for (let key of this.map.keys()) {
       let point = this._keyToObject(key);
-      yield [point, this.map.get(key)]
-    }
-  }
-
-  debug () {
-    for (let [point, bundle] of this) {
-      console.log('at point:', point, bundle);
+      yield [point, this.map.get(key)];
     }
   }
 }
@@ -1217,7 +1304,7 @@ ScopeResolver.interpolateName = (name, node) => {
 // )
 //
 // For boolean rules, the second argument to `#set!` is arbitrary, but must be
-// something truthy.
+// something truthy; `true` is suggested.
 //
 // These tests come in handy for criteria that can't be represented by the
 // built-in predicates like `#match?` and `#eq?`.
@@ -1335,6 +1422,170 @@ ScopeResolver.TESTS = {
       if (current.type === type) { return false; }
     }
     return true;
+  }
+};
+
+// Usually, we want to map a scope to the exact range of a node in the tree,
+// but sometimes that isn't possible. "Adjustments" are pieces of metadata
+// assigned to captures that can transform the range to a subset or superset of
+// the initial range.
+ScopeResolver.ADJUSTMENTS = {
+  // Alter the given range to end at the beginning of a different node.
+  endAtStartOf (node, value, props, position) {
+    if (props.endAtEndOf && props.endAtStartOf) {
+      throw new Error(
+        `Must define only one of "endAtStartOf" and "endAtEndOf".`
+      );
+    }
+    let endNode = resolveNodeDescriptor(node, value);
+    if (!endNode) { return null; }
+
+    position.endIndex = endNode.startIndex;
+    position.endPosition = endNode.startPosition;
+    return position;
+  },
+
+  // Alter the given range to end at the end of a different node.
+  endAtEndOf(node, value, props, position) {
+    if (props.endAtEndOf && props.endAtStartOf) {
+      throw new Error(
+        `Must define only one of "endAtStartOf" and "endAtEndOf".`
+      );
+    }
+    let endNode = resolveNodeDescriptor(node, value);
+    if (!endNode) { return null; }
+
+    position.endIndex = endNode.endIndex;
+    position.endPosition = endNode.endPosition;
+    return position;
+  },
+
+  // Offset the start position by a fixed number of characters in either
+  // direction. Can act after other range alterations.
+  offsetStart(node, value, props, position, resolver) {
+    let offset = Number(value);
+    if (isNaN(offset)) { return null; }
+    let { startPosition } = position;
+
+    let offsetPosition = resolver.adjustPositionByOffset(startPosition, offset);
+    let offsetIndex = resolver.positionToIndex(offsetPosition);
+
+    position.startPosition = offsetPosition;
+    position.startIndex = offsetIndex;
+
+    return position;
+  },
+
+  // Offset the end position by a fixed number of characters in either
+  // direction. Can act after other range alterations.
+  offsetEnd(node, value, props, position, resolver) {
+    let offset = Number(value);
+    if (isNaN(offset)) { return null; }
+    let { endPosition } = position;
+
+    let offsetPosition = resolver.adjustPositionByOffset(endPosition, offset);
+    let offsetIndex = resolver.positionToIndex(offsetPosition);
+
+    position.endPosition = offsetPosition;
+    position.endIndex = offsetIndex;
+
+    return position;
+  },
+
+  // Change the start and end positions to correspond exactly to the extent of
+  // the match of the given regular expression. Will match against the text of
+  // the capture's node.
+  startAndEndAroundFirstMatchOf(node, value, props, position, resolver) {
+    let regex = resolver.getOrCompilePattern(value);
+    let match = node.text.match(regex);
+    if (!match) { return null; }
+    let oldStartPosition = { ...node.startPosition };
+    let startOffset = match.index;
+    let endOffset = match.index + match[0].length;
+
+    position.startPosition = resolver.adjustPositionByOffset(
+      oldStartPosition, startOffset);
+    position.endPosition = resolver.adjustPositionByOffset(
+      oldStartPosition, endOffset);
+
+    position.startIndex = resolver.positionToIndex(position.startPosition);
+    position.endIndex = resolver.positionToIndex(position.endIndex);
+
+    return position;
+  },
+
+  // Change the start position to the point at the beginning of the match of
+  // the given regular expression. Will match against the text of the capture's
+  // node.
+  startBeforeFirstMatchOf(node, value, props, position, resolver) {
+    let regex = resolver.getOrCompilePattern(value);
+    let match = node.text.match(regex);
+
+    if (!match) { return null; }
+    let oldStartPosition = { ...node.startPosition };
+
+    let startOffset = match.index;
+
+    position.startPosition = resolver.adjustPositionByOffset(
+      oldStartPosition, startOffset);
+    position.startIndex = resolver.positionToIndex(position.startPosition);
+
+    return position;
+  },
+
+  // Change the start position to the point at the end of the match of the
+  // given regular expression. Will match against the text of the capture's
+  // node.
+  startAfterFirstMatchOf(node, value, props, position, resolver) {
+    let regex = resolver.getOrCompilePattern(value);
+    let match = node.text.match(regex);
+
+    if (!match) { return null; }
+    let oldStartPosition = { ...node.startPosition };
+
+    let startOffset = match.index + match.length;
+
+    position.startPosition = resolver.adjustPositionByOffset(
+      oldStartPosition, startOffset);
+    position.startIndex = resolver.positionToIndex(position.startPosition);
+
+    return position;
+  },
+
+  // Change the end position to the point at the start of the match of the
+  // given regular expression. Will match against the text of the capture's
+  // node.
+  endBeforeFirstMatchOf(node, value, props, position, resolver) {
+    let regex = resolver.getOrCompilePattern(value);
+    let match = node.text.match(regex);
+
+    if (!match) { return null; }
+    let oldStartPosition = { ...node.startPosition };
+    let endOffset = match.index;
+
+    position.endPosition = resolver.adjustPositionByOffset(
+      oldStartPosition, endOffset);
+    position.endIndex = resolver.positionToIndex(position.endPosition);
+
+    return position;
+  },
+
+  // Change the end position to the point at the end of the match of the
+  // given regular expression. Will match against the text of the capture's
+  // node.
+  endAfterFirstMatchOf(node, value, props, position, resolver) {
+    let regex = resolver.getOrCompilePattern(value);
+    let match = node.text.match(regex);
+
+    if (!match) { return null; }
+    let oldStartPosition = { ...node.startPosition };
+    let endOffset = match.index + match.length;
+
+    position.endPosition = resolver.adjustPositionByOffset(
+      oldStartPosition, endOffset);
+    position.endIndex = resolver.positionToIndex(position.endPosition);
+
+    return position;
   }
 };
 
@@ -1646,6 +1897,13 @@ class LayerHighlightIterator {
 
   seek(start, endRow, previousOpenScopes) {
     let end = this._getEndPosition(endRow);
+    // let isDevMode = atom.inDevMode();
+
+    // let timeKey;
+    // if (isDevMode) {
+    //   timeKey = `${this.name} getSyntaxBoundaries`;
+    //   console.time(timeKey);
+    // }
     let [boundaries, openScopes] = this.languageLayer.getSyntaxBoundaries(
       start,
       end,
@@ -1653,6 +1911,7 @@ class LayerHighlightIterator {
     );
 
     if (!boundaries) {
+      // if (isDevMode) { console.timeEnd(timeKey); }
       return false;
     }
 
@@ -1660,6 +1919,7 @@ class LayerHighlightIterator {
     this.start = Point.fromObject(start, true);
     this.end = end;
     previousOpenScopes.push(...openScopes);
+    // if (isDevMode) { console.timeEnd(timeKey); }
     return true;
   }
 
@@ -1761,21 +2021,23 @@ class LanguageLayer {
   constructor(marker, languageMode, grammar, depth, injectionPoint) {
     this.marker = marker;
     this.languageMode = languageMode;
+    this.buffer = this.languageMode.buffer;
     this.grammar = grammar;
     this.depth = depth;
     this.injectionPoint = injectionPoint;
 
     this.subscriptions = new CompositeDisposable;
 
-    this.languageLoaded = this.grammar.getLanguage().then(language => {
+    this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
       this.language = language;
-      this.syntaxQuery = this.language.query(grammar.syntaxQuery);
+      this.syntaxQuery = await this.grammar.getQuery('syntaxQuery');
 
       let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
 
-      for (let query of otherQueries) {
-        if (grammar[query]) {
-          this[query] = this.language.query(grammar[query]);
+      for (let queryType of otherQueries) {
+        if (grammar[queryType]) {
+          this[queryType] = await this.grammar.getQuery(queryType);
+          // this[queryType] = this.language.query(grammar[queryType]);
         }
       }
 
@@ -1789,24 +2051,31 @@ class LanguageLayer {
 
     this.tree = null;
     this.scopeResolver = new ScopeResolver(
+      this.buffer,
       (name) => this.languageMode.getOrCreateScopeId(name)
     );
     this.languageScopeId = this.languageMode.getOrCreateScopeId(this.grammar.scopeName);
   }
 
   observeQueryFileChanges() {
+    let buffer = this.languageMode.buffer;
     this.subscriptions.add(
-      this.grammar.onDidChangeQueryFile(({ queryType }) => {
+      this.grammar.onDidChangeQueryFile(async ({ queryType }) => {
+        if (this._pendingQueryFileChange) { return; }
+        this._pendingQueryFileChange = true;
         try {
           if (!this[queryType]) { return; }
-          let query = this.language.query(this.grammar[queryType]);
+          let query = await this.grammar.getQuery(queryType);
+          console.log('new', queryType, query, buffer.id);
           this[queryType] = query;
           // Force a re-highlight of this layer's entire region.
           let range = this.marker?.getRange() || this.languageMode.buffer.getRange();
           this.languageMode.emitRangeUpdate(range);
+          this._pendingQueryFileChange = false;
         } catch (error) {
           console.error(`Error parsing query file: ${queryType}`);
           console.error(error);
+          this._pendingQueryFileChange = false;
         }
       })
     );
@@ -2209,9 +2478,12 @@ class LanguageLayer {
     return this.foldsQuery.captures(foldsTree.rootNode);
   }
 
+  // Given a point, return all syntax captures that are active at that point.
+  // Used by `scopeDescriptorForPosition` and `bufferRangeForScopeAtPosition`.
   scopeMapAtPosition(point) {
     if (!this.language || !this.tree) { return []; }
-    let scopeResolver = new ScopeResolver();
+    let { scopeResolver } = this;
+    scopeResolver.clear();
 
     // If the cursor is resting before column X, we want all scopes that cover
     // the character in column X.
@@ -2221,19 +2493,18 @@ class LanguageLayer {
       { row: point.row, column: point.column + 1 }
     );
 
-    // Captured nodes aren't guaranteed to overlap the point we asked for.
-    captures = captures.filter(({ node }) => {
-      // Don't include nodes that end right before the point.
-      if (comparePoints(node.endPosition, point) === 0) { return false; }
-      return isBetweenPoints(point, node.startPosition, node.endPosition);
-    });
-
     let results = [];
     for (let cap of captures) {
-      if (scopeResolver.store(cap, null)) {
+      let range = scopeResolver.store(cap);
+      if (!range) { continue; }
+      // A capture's range can be adjusted by rules. Don't include this scope
+      // unless its returned range includes this point.
+      if (comparePoints(range.endPosition, point) === 0) { continue; }
+      if (isBetweenPoints(point, range.startPosition, range.endPosition)) {
         results.push(cap);
       }
     }
+
     scopeResolver.clear();
     results = results.sort(({ node }) => {
       return node.endIndex - node.startIndex;
