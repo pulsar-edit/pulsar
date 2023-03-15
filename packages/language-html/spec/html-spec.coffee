@@ -181,11 +181,8 @@ describe 'TextMate HTML grammar', ->
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html']
-      # TODO: Remove when Atom 1.21 reaches stable
-      if parseFloat(atom.getVersion()) <= 1.20
-        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
-      else
-        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+
+      expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
       expect(lines[2][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it 'tokenizes multiline tags', ->
@@ -197,11 +194,8 @@ describe 'TextMate HTML grammar', ->
       '''
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
-      # TODO: Remove when Atom 1.21 reaches stable
-      if parseFloat(atom.getVersion()) <= 1.20
-        expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
-      else
-        expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+
+      expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
       expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it 'recognizes closing script tags in comments', ->

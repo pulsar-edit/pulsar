@@ -2,6 +2,7 @@ const path = require('path')
 const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
 const generateMetadata = require('./generate-metadata-for-builder')
+const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
 // Monkey-patch to not remove things I explicitly didn't say so
 // See: https://github.com/electron-userland/electron-builder/issues/6957
@@ -41,35 +42,26 @@ const Platform = builder.Platform
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
+const svgIcon = 'resources/app-icons/beta.svg'
+const icnsIcon = 'resources/app-icons/beta.icns'
 
 let options = {
-  "appId": "com.pulsar-edit.pulsar",
+  "appId": "dev.pulsar-edit.pulsar",
   "npmRebuild": false,
   "publish": null,
   files: [
+    // --- Inclusions ---
+    // Core Repo Inclusions
     "package.json",
-    "!docs/",
     "dot-atom/**/*",
     "exports/**/*",
-    "!keymaps/",
-    "!menus/",
-    "node_modules/**/*",
     "resources/**/*",
-    "!script/",
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
-    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
-    "!**/node_modules/*.d.ts",
-    "!**/node_modules/.bin",
-    "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
-    "!.editorconfig",
-    "!**/._*",
-    "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
-    "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
-    "!**/{appveyor.yml,.travis.yml,circle.yml}",
-    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+    "node_modules/**/*",
 
+    // Core Repo Test Inclusions
     "spec/jasmine-test-runner.js",
     "spec/spec-helper.js",
     "spec/jasmine-junit-reporter.js",
@@ -77,41 +69,65 @@ let options = {
     "spec/atom-reporter.js",
     "spec/jasmine-list-reporter.js",
 
-    // The following are taken directly from Atom (Hoping they still apply)
-    "!**/{.jshintrc,.npmignore,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
-    "!**/{.coffeelintignore,.git-keep}",
+    // --- Exclusions ---
+    // Core Repo Exclusions
+    "!docs/",
+    "!keymaps/",
+    "!menus/",
+    "!script/",
+    "!integration/",
+    "!hooks/",
+
+    // Git Related Exclusions
+    "!**/{.git,.gitignore,.gitattributes,.git-keep,.github}",
+    "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
+
+    // Development Tools Exclusions
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json,.npmignore}",
+    "!**/npm/{doc,html,man}",
+    "!.editorconfig",
+    "!**/{appveyor.yml,.travis.yml,circle.yml}",
+    "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+    "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+    "!**/{.jshintrc,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
+    "!**/{.coffeelintignore,.editorconfig,.nycrc,.coffeelint.json,.vscode,coffeelint.json}",
+
+    // Common File Exclusions
+    "!**/{.DS_Store,.hg,.svn,CVS,RCS,SCCS}",
+
+    // Build Chain Exclusions
+    "!**/*.{cc,h}", // Ignore *.cc and *.h files from native modules
+    "!**/*.js.map",
+    "!**/{Makefile}",
+    "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
+    "!**/build/Release/{obj.target,obj,.deps}",
+
+    // Test Exclusions
+    "!**/pegjs/examples",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+    "!**/node_modules/babel-core/lib/transformation/transforers/spec", // Ignore babel-core spec
+    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
+    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
+    "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
+
+    // Other Exclusions
+    "!**/._*",
+    "!**/node_modules/*.d.ts",
+    "!**/node_modules/.bin",
+    "!**/node_modules/native-mate",
+    "!node_modules/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
+    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
     "!**/less/dist",
-    "!**/npm/{doc,html,man}",
-    "!**/pegjs/examples",
     "!**/get-parameter-names/node_modules/testla",
     "!**/get-parameter-names/node_modules/.bin/testla",
     "!**/jasmine-reporters/ext",
-    "!**/node_modules/native-mate",
-    "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
-    "!**/build/Release/{obj.target,obj,.deps}",
     "!**/deps/libgit2",
-    "!**/node_modules/spellchecker/vendor/hunspell/.*",
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
       // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
       // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
-      // "!node_modules/.bin/pegjs",
-    // node_modules of the fuzzy-native package are only required for building it
-    "!node_modules/fuzzy-native/node_modules",
-    // Ignore *.cc and *.h files from native modules
-    "!**/*.{cc,h}",
-    // Handpicked spec folders
-    "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
-    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
-    // Ignore babel-core spec
-    "!**/node_modules/babel-core/lib/transformation/transforers/spec",
-
-    // The following are cherry-picked for Pulsar
-    "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
-    "!**/{.eslintignore,PULL_REQUEST_TEMPLATE.md,ISSUE_TEMPLATE.md,CONTRIBUTING.md,SECURITY.md}",
-    "!**/{Makefile,.editorconfig,.nycrc,.coffeelint.json,.github,.vscode,coffeelint.json}",
-    "!**/*.js.map",
+      // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
   ],
   "extraResources": [
     {
@@ -123,16 +139,26 @@ let options = {
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
+    }, {
+      "from": "LICENSE.md",
+      "to": "LICENSE.md"
     },
   ],
   compression: "normal",
-  deb: { afterInstall: "script/post-install.sh" },
+  deb: {
+    afterInstall: "script/post-install.sh",
+    afterRemove: "script/post-uninstall.sh",
+  },
   rpm: {
     afterInstall: "script/post-install.sh",
+    afterRemove: "script/post-uninstall.sh",
     compression: 'xz'
   },
   "linux": {
-    "icon": pngIcon,
+    // Giving a single PNG icon to electron-builder prevents the correct
+    // construction of the icon path, so we have to specify a folder containing
+    // multiple icons named each with its size.
+    "icon": "resources/icons",
     "category": "Development",
     "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
@@ -141,20 +167,73 @@ let options = {
       { target: "rpm" },
       { target: "tar.gz" }
     ],
+    "extraResources": [
+      {
+        // Extra SVG icon included in the resources folder to give a chance to
+        // Linux packagers to add a scalable desktop icon under
+        // /usr/share/icons/hicolor/scalable
+        // (used only by desktops to show it on bar/switcher and app menus).
+        "from": svgIcon,
+        "to": "pulsar.svg"
+      },
+    ],
   },
   "mac": {
-    "icon": pngIcon,
-    "category": "Development"
+    "icon": icnsIcon,
+    "category": "public.app-category.developer-tools",
+    "minimumSystemVersion": "10.8",
+    "hardenedRuntime": true,
+    "entitlements": "resources/mac/entitlements.plist",
+    "entitlementsInherit": "resources/mac/entitlements.plist",
+    "extendInfo": {
+      // This contains extra values that will be inserted into the App's plist
+      "CFBundleExecutable": "Pulsar",
+      "NSAppleScriptEnabled": "YES",
+      "NSMainNibFile": "MainMenu",
+      "NSRequiresAquaSystemAppearance": "NO",
+      "CFBundleDocumentTypes": macBundleDocumentTypes.create(),
+      "CFBundleURLTypes": [
+        { "CFBundleURLSchemes": [ "atom" ] },
+        { "CFBundleURLName": "Atom Shared Session Protocol" }
+      ]
+    },
+  },
+  "dmg": {
+    "sign": false
   },
   "win": {
     "icon": icoIcon,
+    "extraResources": [
+      {
+        "from": icoIcon,
+        "to": "pulsar.ico"
+      },
+      {
+        "from": "resources/win/pulsar.cmd",
+        "to": "pulsar.cmd"
+      },
+      {
+        "from": "resources/win/pulsar.js",
+        "to": "pulsar.js"
+      },
+    ],
     "target": [
       { "target": "nsis" },
-      { "target": "portable" }
-    ]
+      { "target": "portable" },
+    ],
+  },
+  // Windows NSIS Configuration
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "uninstallDisplayName": "Pulsar",
+    "runAfterFinish": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
   },
   "extraMetadata": {
   },
+  "afterSign": "script/mac-notarise.js",
   "asarUnpack": [
     "node_modules/github/bin/*",
     "node_modules/github/lib/*", // Resolves Error in console

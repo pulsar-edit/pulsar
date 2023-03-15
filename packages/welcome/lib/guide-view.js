@@ -16,13 +16,10 @@ export default class GuideView {
     this.didClickStylingButton = this.didClickStylingButton.bind(this);
     this.didClickInitScriptButton = this.didClickInitScriptButton.bind(this);
     this.didClickSnippetsButton = this.didClickSnippetsButton.bind(this);
-    this.didExpandOrCollapseSection = this.didExpandOrCollapseSection.bind(
-      this
-    );
     etch.initialize(this);
   }
 
-  update() {}
+  update() { }
 
   render() {
     return (
@@ -47,7 +44,7 @@ export default class GuideView {
                 </p>
                 <p>
                   In {this.brand} you can open individual files or a whole folder as a
-                  project. Opening a folder will ad a tree view, on the left side 
+                  project. Opening a folder will add a tree view, on the left side
                   (by default), listing all the files and folders belonging to your project.
                 </p>
                 <p>
@@ -257,8 +254,7 @@ export default class GuideView {
                 </p>
                 <p>
                   The init script is a bit of JavaScript or CoffeeScript run at
-                  startup. You can use it to quickly change the behaviour of
-                  {this.brand}.
+                  startup. You can use it to quickly change the behaviour of {this.brand}.
                 </p>
                 <p>
                   <button
@@ -358,8 +354,7 @@ export default class GuideView {
 
   getSectionProps(sectionName) {
     const props = {
-      dataset: { section: sectionName },
-      onclick: this.didExpandOrCollapseSection
+      dataset: { section: sectionName }
     };
     if (
       this.props.openSections &&
@@ -415,7 +410,6 @@ export default class GuideView {
   }
 
   didClickProjectButton() {
-    this.props.reporterProxy.sendEvent('clicked-project-cta');
     atom.commands.dispatch(
       atom.views.getView(atom.workspace),
       'application:open'
@@ -423,7 +417,6 @@ export default class GuideView {
   }
 
   didClickGitButton() {
-    this.props.reporterProxy.sendEvent('clicked-git-cta');
     atom.commands.dispatch(
       atom.views.getView(atom.workspace),
       'github:toggle-git-tab'
@@ -431,7 +424,6 @@ export default class GuideView {
   }
 
   didClickGitHubButton() {
-    this.props.reporterProxy.sendEvent('clicked-github-cta');
     atom.commands.dispatch(
       atom.views.getView(atom.workspace),
       'github:toggle-github-tab'
@@ -439,40 +431,26 @@ export default class GuideView {
   }
 
   didClickPackagesButton() {
-    this.props.reporterProxy.sendEvent('clicked-packages-cta');
     atom.workspace.open('atom://config/install', { split: 'left' });
   }
 
   didClickThemesButton() {
-    this.props.reporterProxy.sendEvent('clicked-themes-cta');
     atom.workspace.open('atom://config/themes', { split: 'left' });
   }
 
   didClickStylingButton() {
-    this.props.reporterProxy.sendEvent('clicked-styling-cta');
     atom.workspace.open('atom://.pulsar/stylesheet', { split: 'left' });
   }
 
   didClickInitScriptButton() {
-    this.props.reporterProxy.sendEvent('clicked-init-script-cta');
     atom.workspace.open('atom://.pulsar/init-script', { split: 'left' });
   }
 
   didClickSnippetsButton() {
-    this.props.reporterProxy.sendEvent('clicked-snippets-cta');
     atom.workspace.open('atom://.pulsar/snippets', { split: 'left' });
   }
 
   didClickTeletypeButton() {
-    this.props.reporterProxy.sendEvent('clicked-teletype-cta');
     atom.workspace.open('atom://config/packages/teletype', { split: 'left' });
-  }
-
-  didExpandOrCollapseSection(event) {
-    const sectionName = event.currentTarget.closest('details').dataset.section;
-    const action = event.currentTarget.hasAttribute('open')
-      ? 'collapse'
-      : 'expand';
-    this.props.reporterProxy.sendEvent(`${action}-${sectionName}-section`);
   }
 }

@@ -77,6 +77,12 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
   const jasmineEnv = jasmine.getEnv();
   jasmineEnv.addReporter(buildReporter({logFile, headless, resolveWithExitCode}));
 
+  if(process.env.SPEC_FILTER) {
+    const {getFullDescription} = require('./jasmine-list-reporter');
+    const regex = new RegExp(process.env.SPEC_FILTER)
+    jasmineEnv.specFilter = (spec) => getFullDescription(spec, false).match(regex)
+  }
+
   if (process.env.TEST_JUNIT_XML_PATH) {
     const {JasmineJUnitReporter} = require('./jasmine-junit-reporter');
     process.stdout.write(`Outputting JUnit XML to <${process.env.TEST_JUNIT_XML_PATH}>\n`);

@@ -7,15 +7,6 @@ export default class ChangeLogView {
   constructor(props) {
     this.props = props;
     etch.initialize(this);
-
-    this.element.addEventListener('click', event => {
-      const link = event.target.closest('a');
-      if (link && link.dataset.event) {
-        this.props.reporterProxy.sendEvent(
-          `clicked-welcome-${link.dataset.event}-link`
-        );
-      }
-    });
   }
 
   didChangeShowChangeLog() {
@@ -50,7 +41,7 @@ export default class ChangeLogView {
       <div className="welcome">
         <div className="welcome-container">
           <div className="header">
-            <a title="pulsar-edit.dev" href={atom.branding.urlWeb}>
+            <a title="Full Change Log" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
               {/* LOGO GOES HERE */}
               <h1 className="welcome-title">
                 Change Log
@@ -59,66 +50,43 @@ export default class ChangeLogView {
           </div>
           <div className="welcome-panel">
             <p>Take a look at some of the awesome things {atom.branding.name} has changed:</p>
+            <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/28">
-                  Bump to Electron 12 and Node 14
-                </a>
+                Signed Pulsar macOS Binaries
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/7">
-                  Added a rebranding API
-                </a>
+                Fixed a bug where `pulsar` on Windows could never trigger
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Removed experimental file watchers on the editor
-                </a>
+                Fixed `github` package shelling out to `git` on macOS
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/131">
-                  Ability to install packages from Git Repositories
-                </a>
+                Fixed minor bugs found during fixes to tests
               </li>
               <li>
-                <a href="#">
-                  Migrated to a new Repository Backend
-                </a>
+                Improved our testing infastructure to aide in finding and fixing further bugs
               </li>
               <li>
-                <a href="#">
-                  Better error messages when a package fails to install.
-                </a>
+                Updated many dependencies of Pulsar and its core packages
               </li>
               <li>
-                <a href="#">
-                  Configuration file watching fixes
-                </a>
+                New Pulsar Icon on macOS
               </li>
               <li>
-                <a href="#">
-                  Bumped Tree-Sitter to 0.20.1 and all grammars to their recent versions
-                </a>
+                Selected text is styled by default
               </li>
               <li>
-                <a href="#">
-                  Native support for Apple Silicon
-                </a>
+                Restored `right-clicked` CSS class on tags
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/105">
-                  Removed Benchmark Mode
-                </a>
+                Fixed syntax highlighting on C++
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/59">
-                  Bumped Async to v3.2.4
-                </a>
+                Updated JavaScript snippets to modern ES6 syntax
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
-                  Removed all telemetry from the editor.
-                </a>
+                PPM no longer assumes `master` for git branches
               </li>
 
             </ul>

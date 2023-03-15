@@ -1,0 +1,279 @@
+@import "octicon-mixins";
+@import "ui-variables";
+@import "variables";
+
+.settings-view {
+
+  // TODO: Somehow unify the "card".
+
+  .package-card {
+    padding: @component-padding*1.5;
+    margin-bottom: @component-padding;
+    list-style-type: none;
+    font-size: 1.2em;
+    border-radius: @component-border-radius*2;
+    border: 1px solid @base-border-color;
+    background-color: @package-card-background-color;
+    overflow: hidden;
+    cursor: pointer;
+    -webkit-user-select: none;
+
+    &:hover {
+      background-color: contrast(@package-card-background-color, darken(@package-card-background-color, 2%), lighten(@package-card-background-color, 2%));
+    }
+    &:active {
+      background-color: @package-card-background-color;
+    }
+
+    &.disabled {
+      background-color: @package-card-disabled-background-color;
+      .body,
+      .avatar,
+      .author,
+      .stats {
+        opacity: .5;
+      }
+    }
+
+    &.col-lg-4 {
+      min-width: 190px;
+      padding: @component-padding 0;
+      padding-left: @component-padding;
+      padding-right: @component-padding;
+    }
+
+    .thumbnail {
+      border-radius: 3px;
+      margin: 0;
+      min-height: 140px;
+      color: @text-color;
+      border-radius: @component-border-radius*2;
+      border: 1px solid @base-border-color;
+      background-color: @package-card-background-color;
+
+      .caption {
+        width: 100%;
+        position: relative;
+      }
+    }
+    .package-name {
+      margin-right: .5em;
+      font-weight: bolder;
+      color: @text-color-highlight;
+    }
+
+    .package-version {
+      font-size: .8em;
+      margin-right: @component-padding;
+    }
+
+    .description {
+      color: @text-color;
+      overflow: hidden;
+      min-height: 38px;
+      max-height: 38px;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* number of lines to show */
+      -webkit-box-orient: vertical;
+    }
+
+    .package-message p:last-child {
+      margin: 0;
+    }
+
+    .downloads {
+      color: @text-color-highlight;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 1; /* number of lines to show */
+      -webkit-box-orient: vertical;
+    }
+
+    .package-status {
+      right: 0px;
+      top: 5px;
+      text-align: center;
+
+      &.icon-cloud-download {
+        color: #428bca;
+      }
+
+      &.icon-check {
+        color: #6CC644;
+      }
+
+      &.icon-alert {
+        color: #BD2C00;
+      }
+    }
+
+    .card-name {
+      font-weight: 300;
+      margin: 0 0 .2em 0;
+      font-size: 1.2em;
+      line-height: 1.4;
+
+      .css-truncate-target {
+        color: $greenDark;
+      }
+    }
+
+    .stats {
+
+      .stats-item {
+        margin-left: @component-padding*1.5;
+        height: 26px;
+        display: inline-block;
+        line-height: 24px;
+        vertical-align: top;
+
+        .icon {
+          color: @text-color-subtle;
+        }
+      }
+
+      .star-box {
+        display: inline-block;
+        vertical-align: top;
+
+        .star-button {
+          padding: 0 6px;
+
+          .octicon {
+            margin-right: 0px;
+          }
+        }
+      }
+    }
+
+    .body {
+      .css-truncate-target {
+        max-width: 100%;
+      }
+    }
+
+    .package-description {
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      width: 100%;
+
+      a.linked-octicon {
+        text-decoration: none;
+
+        &:hover {
+          .octicon {
+            color: $greenDark;
+          }
+
+          .value {
+            color: $greenDark;
+          }
+        }
+      }
+
+      .action {
+        border-radius: 3px;
+        padding: 3px 6px;
+
+        &:hover {
+          background-color: #eaeaea;
+        }
+      }
+
+      .value {
+        color: #999;
+      }
+    }
+
+    .meta-user {
+      flex: 1 0 auto;
+      margin-top: @component-padding;
+      margin-right: @component-padding;
+
+      .avatar {
+        border-radius: @component-border-radius;
+        height: 24px;
+        width: 24px;
+        display: inline-block;
+        vertical-align: middle;
+        background-color: hsla(0,0%,0%,.1);
+      }
+
+      .author {
+        color: @text-color-subtle;
+        margin-left: @component-padding;
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+
+    .meta-controls {
+      margin-top: @component-padding/2;
+
+      .install-button.is-installing,
+      .uninstall-button.is-uninstalling {
+        opacity: 1; // override disabled style
+        background-image: linear-gradient(to right, transparent 50%, hsla(0,0%,0%,.15) 50%);
+        background-size: 10px 100%;
+        -webkit-animation: available-package-is-installing .5s linear infinite;
+      }
+
+      .status-indicator {
+        padding: 0;
+        width: @component-padding/2;
+        min-width: 4px;
+        pointer-events: none;
+        transition: background .4s;
+        background: @background-color-success;
+        &.is-disabled {
+          background: @background-color-warning;
+        }
+      }
+
+      .btn-toolbar > .btn-group {
+        float: left;
+        margin: @component-padding/2 0 0 @component-padding/2;
+      }
+    }
+
+    .meta-lower {
+      padding: 13px;
+      background-color: @input-background-color;
+      line-height: 1;
+    }
+
+    &.blank-slate {
+      text-align: center;
+      color: $beigeDark;
+      height: 132px;
+      line-height: 132px;
+    }
+
+    // End copy-paste from atom.io
+  }
+
+  // Remove hover styles if it's in a detail view
+  .package-detail .package-card {
+    cursor: default;
+    &:hover {
+      background-color: @package-card-background-color;
+    }
+    &.disabled {
+      background-color: @package-card-disabled-background-color;
+    }
+  }
+
+}
+
+@-webkit-keyframes available-package-is-installing {
+  100% { background-position: -10px 0px; }
+}

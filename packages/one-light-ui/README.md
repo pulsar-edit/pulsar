@@ -9,7 +9,7 @@ A light UI theme that adapts to most syntax themes.
 
 ### Install
 
-This theme comes bundled with Atom and can be activated by going to the __Settings > Themes__ section and selecting "One Light" from the __UI Themes__ drop-down menu.
+This theme comes bundled with Pulsar and can be activated by going to the __Settings > Themes__ section and selecting "One Light" from the __UI Themes__ drop-down menu.
 
 
 ### Settings

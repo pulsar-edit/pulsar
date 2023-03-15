@@ -1,0 +1,1919 @@
+{
+  "tags": {
+    "a": {
+      "attributes": [
+        "href",
+        "hreflang",
+        "media",
+        "rel",
+        "target",
+        "type"
+      ],
+      "description": "Creates a hyperlink to other web pages, files, locations within the same page, email addresses, or any other URL."
+    },
+    "abbr": {
+      "description": "Represents an abbreviation and optionally provides a full description for it."
+    },
+    "address": {
+      "description": "Indicates that the enclosed HTML provides contact information for a person or people, or for an organization."
+    },
+    "area": {
+      "attributes": [
+        "alt",
+        "coords",
+        "href",
+        "hreflang",
+        "media",
+        "rel",
+        "shape",
+        "target",
+        "type"
+      ],
+      "description": "Defines a hot-spot region on an image, and optionally associates it with a hypertext link."
+    },
+    "article": {
+      "description": "Represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable (e."
+    },
+    "aside": {
+      "description": "Represents a portion of a document whose content is only indirectly related to the document's main content."
+    },
+    "audio": {
+      "attributes": [
+        "autoplay",
+        "controls",
+        "loop",
+        "mediagroup",
+        "muted",
+        "preload",
+        "src"
+      ],
+      "description": "Used to embed sound content in documents."
+    },
+    "b": {
+      "description": "Represents a span of text stylistically different from normal text, without conveying any special importance or relevance, and that is typically rendered in boldface."
+    },
+    "base": {
+      "attributes": [
+        "href",
+        "target"
+      ],
+      "description": "Specifies the base URL to use for all relative URLs contained within a document."
+    },
+    "bdi": {
+      "description": "Isolates a span of text that might be formatted in a different direction from other text outside it."
+    },
+    "bdo": {
+      "description": "Used to override the current directionality of text."
+    },
+    "big": {
+      "description": "The big element is obsolete. Avoid using it and update existing code if possible."
+    },
+    "blockquote": {
+      "attributes": [
+        "cite"
+      ],
+      "description": "Indicates that the enclosed text is an extended quotation."
+    },
+    "body": {
+      "attributes": [
+        "onafterprint",
+        "onbeforeprint",
+        "onbeforeunload",
+        "onhashchange",
+        "onmessage",
+        "onoffline",
+        "ononline",
+        "onpagehide",
+        "onpageshow",
+        "onpopstate",
+        "onredo",
+        "onresize",
+        "onstorage",
+        "onundo",
+        "onunload"
+      ],
+      "description": "Represents the content of an HTML document."
+    },
+    "br": {
+      "description": "Produces a line break in text (carriage-return)."
+    },
+    "button": {
+      "attributes": [
+        "autofocus",
+        "disabled",
+        "form",
+        "formaction",
+        "formenctype",
+        "formmethod",
+        "formnovalidate",
+        "formtarget",
+        "name",
+        "type",
+        "value"
+      ],
+      "description": "Represents a clickable button, which can be used in forms, or anywhere in a document that needs simple, standard button functionality."
+    },
+    "canvas": {
+      "attributes": [
+        "height",
+        "width"
+      ],
+      "description": "Use the HTML canvas element with either the canvas scripting API or the WebGL API to draw graphics and animations."
+    },
+    "caption": {
+      "description": "Represents the title of a table."
+    },
+    "cite": {
+      "description": "Represents a reference to a creative work."
+    },
+    "code": {
+      "description": "Displays its contents styled in a fashion intended to indicate that the text is a short fragment of computer code."
+    },
+    "col": {
+      "attributes": [
+        "span"
+      ],
+      "description": "Defines a column within a table and is used for defining common semantics on all common cells."
+    },
+    "colgroup": {
+      "attributes": [
+        "span"
+      ],
+      "description": "Defines a group of columns within a table."
+    },
+    "command": {
+      "attributes": [
+        "checked",
+        "disabled",
+        "icon",
+        "label",
+        "radiogroup",
+        "type"
+      ],
+      "description": "The command element is obsolete. Avoid using it and update existing code if possible."
+    },
+    "datalist": {
+      "description": "Contains a set of option elements that represent the values available for other controls."
+    },
+    "dd": {
+      "description": "Provides the details about or the definition of the preceding term (dt) in a description list (dl)."
+    },
+    "del": {
+      "attributes": [
+        "cite",
+        "datetime"
+      ],
+      "description": "Represents a range of text that has been deleted from a document."
+    },
+    "details": {
+      "attributes": [
+        "open"
+      ],
+      "description": "Used as a disclosure widget from which the user can retrieve additional information."
+    },
+    "dfn": {
+      "description": "Represents the defining instance of a term."
+    },
+    "dialog": {
+      "attributes": [
+        "open"
+      ],
+      "description": "Represents a dialog box or other interactive component, such as an inspector or window."
+    },
+    "div": {
+      "description": "The generic container for flow content and does not inherently represent anything."
+    },
+    "dl": {
+      "description": "Represents a description list."
+    },
+    "dt": {
+      "description": "Specifies a term in a description or definition list, and as such must be used inside a dl element."
+    },
+    "em": {
+      "description": "Marks text that has stress emphasis."
+    },
+    "embed": {
+      "attributes": [
+        "height",
+        "src",
+        "type",
+        "width"
+      ],
+      "description": "Embeds external content at the specified point in the document."
+    },
+    "fieldset": {
+      "attributes": [
+        "disabled",
+        "form",
+        "name"
+      ],
+      "description": "Used to group several controls as well as labels (label) within a web form."
+    },
+    "figcaption": {
+      "description": "Represents a caption or a legend associated with a figure or an illustration described by the rest of the data of the figure element which is its immediate ancestor."
+    },
+    "figure": {
+      "description": "Represents self-contained content, frequently with a caption (figcaption), and is typically referenced as a single unit."
+    },
+    "footer": {
+      "description": "Represents a footer for its nearest sectioning content or sectioning root element."
+    },
+    "form": {
+      "attributes": [
+        "accept-charset",
+        "action",
+        "autocomplete",
+        "enctype",
+        "method",
+        "name",
+        "novalidate",
+        "target"
+      ],
+      "description": "Represents a document section that contains interactive controls to submit information to a web server."
+    },
+    "h1": {
+      "description": "The HTML h1 – h6 elements represent six levels of section headings."
+    },
+    "h2": {
+      "description": "The HTML h1 – h6 elements represent six levels of section headings."
+    },
+    "h3": {
+      "description": "The HTML h1 – h6 elements represent six levels of section headings."
+    },
+    "h4": {
+      "description": "The HTML h1 – h6 elements represent six levels of section headings."
+    },
+    "h5": {
+      "description": "The HTML h1 – h6 elements represent six levels of section headings."
+    },
+    "h6": {
+      "description": "The HTML h1 – h6 elements represent six levels of section headings."
+    },
+    "head": {
+      "description": "Provides general information (metadata) about the document, including its title and links to its scripts and style sheets."
+    },
+    "header": {
+      "description": "Represents introductory content, typically a group of introductory or navigational aids."
+    },
+    "hgroup": {
+      "description": "Represents a multi-level heading for a section of a document."
+    },
+    "hr": {
+      "description": "Represents a thematic break between paragraph-level elements (for example, a change of scene in a story, or a shift of topic with a section); historically, this has been presented as a horizontal rule or line."
+    },
+    "html": {
+      "attributes": [
+        "manifest",
+        "xml:lang",
+        "xmlns"
+      ],
+      "description": "Represents the root (top-level element) of an HTML document, so it is also referred to as the root element."
+    },
+    "i": {
+      "description": "Represents a range of text that is set off from the normal text for some reason, for example, technical terms, foreign language phrases, or fictional character thoughts."
+    },
+    "iframe": {
+      "attributes": [
+        "height",
+        "name",
+        "sandbox",
+        "seamless",
+        "src",
+        "srcdoc",
+        "width"
+      ],
+      "description": "Represents a nested browsing context, effectively embedding another HTML page into the current page."
+    },
+    "ilayer": {},
+    "img": {
+      "attributes": [
+        "alt",
+        "height",
+        "ismap",
+        "longdesc",
+        "src",
+        "usemap",
+        "width"
+      ],
+      "description": "Embeds an image into the document."
+    },
+    "input": {
+      "attributes": [
+        "accept",
+        "alt",
+        "autocomplete",
+        "autofocus",
+        "checked",
+        "dirname",
+        "disabled",
+        "form",
+        "formaction",
+        "formenctype",
+        "formmethod",
+        "formnovalidate",
+        "formtarget",
+        "height",
+        "list",
+        "max",
+        "maxlength",
+        "min",
+        "multiple",
+        "name",
+        "pattern",
+        "placeholder",
+        "readonly",
+        "required",
+        "size",
+        "src",
+        "step",
+        "type",
+        "value",
+        "width"
+      ],
+      "description": "Used to create interactive controls for web-based forms in order to accept data from the user."
+    },
+    "ins": {
+      "attributes": [
+        "cite",
+        "datetime"
+      ],
+      "description": "Represents a range of text that has been added to a document."
+    },
+    "kbd": {
+      "description": "Represents user input and produces an inline element displayed in the browser's default monospace font."
+    },
+    "keygen": {
+      "attributes": [
+        "autofocus",
+        "challenge",
+        "disabled",
+        "form",
+        "keytype",
+        "name"
+      ],
+      "description": "The keygen element is deprecated. Avoid using it and update existing code if possible."
+    },
+    "label": {
+      "attributes": [
+        "for",
+        "form"
+      ],
+      "description": "Represents a caption for an item in a user interface."
+    },
+    "legend": {
+      "description": "Represents a caption for the content of its parent fieldset."
+    },
+    "li": {
+      "attributes": [
+        "value"
+      ],
+      "description": "Used to represent an item in a list."
+    },
+    "link": {
+      "attributes": [
+        "disabled",
+        "href",
+        "hreflang",
+        "media",
+        "rel",
+        "sizes",
+        "type"
+      ],
+      "description": "Specifies relationships between the current document and an external resource."
+    },
+    "main": {
+      "description": "Represents the main content of the body of a document, portion of a document, or application."
+    },
+    "map": {
+      "attributes": [
+        "name"
+      ],
+      "description": "Used with area elements to define an image map (a clickable link area)."
+    },
+    "mark": {
+      "description": "Represents highlighted text, i."
+    },
+    "marquee": {
+      "attributes": [
+        "align",
+        "behavior",
+        "bgcolor",
+        "direction",
+        "height",
+        "hspace",
+        "loop",
+        "scrollamount",
+        "scrolldelay",
+        "truespeed",
+        "vspace",
+        "width"
+      ],
+      "description": "The marquee element is obsolete. Avoid using it and update existing code if possible."
+    },
+    "menu": {
+      "attributes": [
+        "label",
+        "type"
+      ],
+      "description": "Represents a group of commands that a user can perform or activate."
+    },
+    "meta": {
+      "attributes": [
+        "charset",
+        "content",
+        "http-equiv",
+        "name"
+      ],
+      "description": "Represents metadata that cannot be represented by other HTML meta-related elements, like base, link, script, style or title."
+    },
+    "meter": {
+      "attributes": [
+        "form",
+        "high",
+        "low",
+        "max",
+        "min",
+        "optimum",
+        "value"
+      ],
+      "description": "Represents either a scalar value within a known range or a fractional value."
+    },
+    "nav": {
+      "description": "Represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents."
+    },
+    "noscript": {
+      "description": "Defines a section of HTML to be inserted if a script type on the page is unsupported or if scripting is currently turned off in the browser."
+    },
+    "object": {
+      "attributes": [
+        "archive",
+        "codebase",
+        "codetype",
+        "data",
+        "declare",
+        "form",
+        "height",
+        "name",
+        "standby",
+        "type",
+        "usemap",
+        "width"
+      ],
+      "description": "Represents an external resource, which can be treated as an image, a nested browsing context, or a resource to be handled by a plugin."
+    },
+    "ol": {
+      "attributes": [
+        "reversed",
+        "start",
+        "type"
+      ],
+      "description": "Represents an ordered list of items, typically rendered as a numbered list."
+    },
+    "optgroup": {
+      "attributes": [
+        "disabled",
+        "label"
+      ],
+      "description": "Creates a grouping of options within a select element."
+    },
+    "option": {
+      "attributes": [
+        "disabled",
+        "label",
+        "selected",
+        "value"
+      ],
+      "description": "Used to define an item contained in a select, an optgroup, or a datalist element."
+    },
+    "output": {
+      "attributes": [
+        "for",
+        "form",
+        "name"
+      ],
+      "description": "Represents the result of a calculation or user action."
+    },
+    "p": {
+      "description": "Represents a paragraph of text."
+    },
+    "param": {
+      "attributes": [
+        "name",
+        "value"
+      ],
+      "description": "Defines parameters for an object element."
+    },
+    "pre": {
+      "description": "Represents preformatted text which is to be presented exactly as written in the HTML file."
+    },
+    "progress": {
+      "attributes": [
+        "form",
+        "max",
+        "value"
+      ],
+      "description": "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar."
+    },
+    "q": {
+      "attributes": [
+        "cite"
+      ],
+      "description": "Indicates that the enclosed text is a short inline quotation."
+    },
+    "rp": {
+      "description": "The HTML Ruby Fallback Parenthesis (rp) element is used to provide fall-back parentheses for browsers that do not support display of ruby annotations using the ruby element."
+    },
+    "rt": {
+      "description": "The HTML Ruby Text (rt) element specifies the ruby text component of a ruby annotation, which is used to provide pronunciation, translation, or transliteration information for East Asian typography."
+    },
+    "ruby": {
+      "description": "Represents a ruby annotation."
+    },
+    "samp": {
+      "description": "An element intended to identify sample output from a computer program."
+    },
+    "script": {
+      "attributes": [
+        "async",
+        "charset",
+        "defer",
+        "src",
+        "type"
+      ],
+      "description": "Used to embed or reference executable code; this is typically used to embed or refer to JavaScript code."
+    },
+    "section": {
+      "description": "Represents a standalone section — which doesn't have a more specific semantic element to represent it — contained within an HTML document."
+    },
+    "select": {
+      "attributes": [
+        "autofocus",
+        "disabled",
+        "form",
+        "multiple",
+        "name",
+        "required",
+        "size"
+      ],
+      "description": "Represents a control that provides a menu of options:"
+    },
+    "small": {
+      "description": "Makes the text font size one size smaller (for example, from large to medium, or from small to x-small) down to the browser's minimum font size."
+    },
+    "source": {
+      "attributes": [
+        "media",
+        "src",
+        "type"
+      ],
+      "description": "Specifies multiple media resources for the picture, the audio element, or the video element."
+    },
+    "span": {
+      "description": "A generic inline container for phrasing content, which does not inherently represent anything."
+    },
+    "strong": {
+      "description": "Gives text strong importance and is typically displayed in bold."
+    },
+    "style": {
+      "attributes": [
+        "disabled",
+        "media",
+        "scoped",
+        "type"
+      ],
+      "description": "Contains style information for a document, or part of a document."
+    },
+    "sub": {
+      "description": "Defines a span of text that should be displayed, for typographic reasons, lower, and often smaller, than the main span of text."
+    },
+    "summary": {
+      "description": "Used as a summary, caption, or legend for the content of a details element."
+    },
+    "sup": {
+      "description": "Defines a span of text that should be displayed, for typographic reasons, higher, and often smaller, than the main span of text."
+    },
+    "table": {
+      "attributes": [
+        "border"
+      ],
+      "description": "Represents tabular data — that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data."
+    },
+    "tbody": {
+      "description": "Groups one or more tr elements as the body of a table element."
+    },
+    "td": {
+      "attributes": [
+        "colspan",
+        "headers",
+        "rowspan"
+      ],
+      "description": "Defines a cell of a table that contains data."
+    },
+    "template": {
+      "attributes": [
+        "content"
+      ],
+      "description": "A mechanism for holding client-side content that is not to be rendered when a page is loaded but may subsequently be instantiated during runtime using JavaScript."
+    },
+    "textarea": {
+      "attributes": [
+        "autofocus",
+        "cols",
+        "dirname",
+        "disabled",
+        "form",
+        "label",
+        "maxlength",
+        "name",
+        "placeholder",
+        "readonly",
+        "required",
+        "rows",
+        "wrap"
+      ],
+      "description": "Represents a multi-line plain-text editing control."
+    },
+    "tfoot": {
+      "description": "Defines a set of rows summarizing the columns of the table."
+    },
+    "th": {
+      "attributes": [
+        "colspan",
+        "headers",
+        "rowspan",
+        "scope"
+      ],
+      "description": "Defines a cell as header of a group of table cells."
+    },
+    "thead": {
+      "description": "Defines a set of rows defining the head of the columns of the table."
+    },
+    "time": {
+      "attributes": [
+        "datetime",
+        "pubdate"
+      ],
+      "description": "Represents either a time on a 24-hour clock or a precise date in the Gregorian calendar (with optional time and timezone information)."
+    },
+    "title": {
+      "description": "Defines the title of the document, shown in a browser's title bar or on the page's tab."
+    },
+    "tr": {
+      "description": "Specifies that the markup contained inside the tr block comprises one row of a table, inside which the th and td elements create header and data cells, respectively, within the row."
+    },
+    "track": {
+      "attributes": [
+        "default",
+        "kind",
+        "label",
+        "src",
+        "srclang"
+      ],
+      "description": "Used as a child of the media elements audio and video."
+    },
+    "tt": {
+      "description": "The tt element is obsolete. Avoid using it and update existing code if possible."
+    },
+    "ul": {
+      "description": "Represents an unordered list of items, typically rendered as a bulleted list."
+    },
+    "var": {
+      "description": "Represents a variable in a mathematical expression or a programming context."
+    },
+    "video": {
+      "attributes": [
+        "autoplay",
+        "controls",
+        "height",
+        "loop",
+        "mediagroup",
+        "muted",
+        "poster",
+        "preload",
+        "src",
+        "width"
+      ],
+      "description": "Use the HTML video element to embed video content in a document."
+    },
+    "wbr": {
+      "description": "Represents a word break opportunity—a position within text where the browser may optionally break a line, though its line-breaking rules would not otherwise create a break at that location."
+    }
+  },
+  "attributes": {
+    "accesskey": {
+      "global": "true",
+      "description": "Provides a hint for generating a keyboard shortcut for the current element."
+    },
+    "class": {
+      "global": "true",
+      "type": "cssStyle",
+      "description": "A space-separated list of the classes of the element."
+    },
+    "contenteditable": {
+      "global": "true",
+      "type": "boolean",
+      "description": "An enumerated attribute indicating if the element should be editable by the user."
+    },
+    "contextmenu": {
+      "global": "true",
+      "description": "The id of a menu to use as the contextual menu for this element."
+    },
+    "dir": {
+      "attribOption": [
+        "ltr",
+        "rtl"
+      ],
+      "global": "true",
+      "description": "An enumerated attribute indicates the directionality of the element's text."
+    },
+    "draggable": {
+      "attribOption": [
+        "auto",
+        "false",
+        "true"
+      ],
+      "global": "true",
+      "description": "An enumerated attribute that indicates whether the element can be dragged, using the HTML Drag and Drop API."
+    },
+    "dropzone": {
+      "attribOption": [
+        "copy",
+        "move",
+        "link"
+      ],
+      "global": "true",
+      "description": "An enumerated attribute indicating what types of content can be dropped on an element, using the Drag and Drop API."
+    },
+    "hidden": {
+      "type": "flag",
+      "global": "true",
+      "description": "A Boolean attribute indicating that the element is not yet, or is no longer, relevant."
+    },
+    "id": {
+      "global": "true",
+      "type": "cssId",
+      "description": "Defines a unique identifier (ID) which must be unique in the whole document."
+    },
+    "lang": {
+      "attribOption": [
+        "ab",
+        "aa",
+        "af",
+        "sq",
+        "am",
+        "ar",
+        "an",
+        "hy",
+        "as",
+        "ay",
+        "az",
+        "ba",
+        "eu",
+        "bn",
+        "dz",
+        "bh",
+        "bi",
+        "br",
+        "bg",
+        "my",
+        "be",
+        "km",
+        "ca",
+        "zh",
+        "co",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "en",
+        "eo",
+        "et",
+        "fo",
+        "fa",
+        "fi",
+        "fr",
+        "fy",
+        "gl",
+        "gd",
+        "gv",
+        "ka",
+        "de",
+        "el",
+        "kl",
+        "gn",
+        "gu",
+        "ht",
+        "ha",
+        "he",
+        "hi",
+        "hu",
+        "is",
+        "io",
+        "id",
+        "ia",
+        "ie",
+        "iu",
+        "ik",
+        "ga",
+        "it",
+        "ja",
+        "jv",
+        "kn",
+        "ks",
+        "kk",
+        "rw",
+        "ky",
+        "rn",
+        "ko",
+        "ku",
+        "lo",
+        "la",
+        "lv",
+        "li",
+        "ln",
+        "lt",
+        "mk",
+        "mg",
+        "ms",
+        "ml",
+        "mt",
+        "mi",
+        "mr",
+        "mo",
+        "mn",
+        "na",
+        "ne",
+        "no",
+        "oc",
+        "or",
+        "om",
+        "ps",
+        "pl",
+        "pt",
+        "pa",
+        "qu",
+        "rm",
+        "ro",
+        "ru",
+        "sz",
+        "sm",
+        "sg",
+        "sa",
+        "sr",
+        "sh",
+        "st",
+        "tn",
+        "sn",
+        "ii",
+        "sd",
+        "si",
+        "ss",
+        "sk",
+        "sl",
+        "so",
+        "es",
+        "su",
+        "sw",
+        "sv",
+        "tl",
+        "tg",
+        "ta",
+        "tt",
+        "te",
+        "th",
+        "bo",
+        "ti",
+        "to",
+        "ts",
+        "tr",
+        "tk",
+        "tw",
+        "ug",
+        "uk",
+        "ur",
+        "uz",
+        "vi",
+        "vo",
+        "wa",
+        "cy",
+        "wo",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      "global": "true",
+      "description": "Participates in defining the language of the element, the language that its non-editable elements are written in or the language that the editable elements should be written in."
+    },
+    "role": {
+      "attribOption": [
+        "alert",
+        "alertdialog",
+        "article",
+        "application",
+        "banner",
+        "button",
+        "checkbox",
+        "columnheader",
+        "combobox",
+        "complementary",
+        "contentinfo",
+        "definition",
+        "directory",
+        "dialog",
+        "document",
+        "form",
+        "grid",
+        "gridcell",
+        "group",
+        "heading",
+        "img",
+        "link",
+        "list",
+        "listbox",
+        "listitem",
+        "log",
+        "main",
+        "marquee",
+        "math",
+        "menu",
+        "menubar",
+        "menuitem",
+        "menuitemcheckbox",
+        "menuitemradio",
+        "navigation",
+        "note",
+        "option",
+        "presentation",
+        "progressbar",
+        "radio",
+        "radiogroup",
+        "region",
+        "row",
+        "rowgroup",
+        "rowheader",
+        "scrollbar",
+        "search",
+        "separator",
+        "slider",
+        "spinbutton",
+        "status",
+        "tab",
+        "tablist",
+        "tabpanel",
+        "textbox",
+        "timer",
+        "toolbar",
+        "tooltip",
+        "tree",
+        "treegrid",
+        "treeitem"
+      ],
+      "global": "true"
+    },
+    "spellcheck": {
+      "global": "true",
+      "type": "boolean",
+      "description": "An enumerated attribute defines whether the element may be checked for spelling errors."
+    },
+    "style": {
+      "global": "true",
+      "type": "style",
+      "description": "Contains CSS styling declarations to be applied to the element."
+    },
+    "tabindex": {
+      "global": "true",
+      "description": "Indicates if its element can be focused, and if/where it participates in sequential keyboard navigation (usually with the Tab key, hence the name)."
+    },
+    "title": {
+      "global": "true",
+      "description": "Contains text representing advisory information, related to the element it belongs to."
+    },
+    "onabort": {
+      "global": "true"
+    },
+    "onblur": {
+      "global": "true"
+    },
+    "oncanplay": {
+      "global": "true"
+    },
+    "oncanplaythrough": {
+      "global": "true"
+    },
+    "onchange": {
+      "global": "true"
+    },
+    "onclick": {
+      "global": "true"
+    },
+    "oncontextmenu": {
+      "global": "true"
+    },
+    "oncuechange": {
+      "global": "true"
+    },
+    "ondblclick": {
+      "global": "true"
+    },
+    "ondrag": {
+      "global": "true"
+    },
+    "ondragend": {
+      "global": "true"
+    },
+    "ondragenter": {
+      "global": "true"
+    },
+    "ondragleave": {
+      "global": "true"
+    },
+    "ondragover": {
+      "global": "true"
+    },
+    "ondragstart": {
+      "global": "true"
+    },
+    "ondrop": {
+      "global": "true"
+    },
+    "ondurationchange": {
+      "global": "true"
+    },
+    "onemptied": {
+      "global": "true"
+    },
+    "onended": {
+      "global": "true"
+    },
+    "onerror": {
+      "global": "true"
+    },
+    "onfocus": {
+      "global": "true"
+    },
+    "oninput": {
+      "global": "true"
+    },
+    "oninvalid": {
+      "global": "true"
+    },
+    "onkeydown": {
+      "global": "true"
+    },
+    "onkeypress": {
+      "global": "true"
+    },
+    "onkeyup": {
+      "global": "true"
+    },
+    "onload": {
+      "global": "true"
+    },
+    "onloadeddata": {
+      "global": "true"
+    },
+    "onloadedmetadata": {
+      "global": "true"
+    },
+    "onloadstart": {
+      "global": "true"
+    },
+    "onmousedown": {
+      "global": "true"
+    },
+    "onmousemove": {
+      "global": "true"
+    },
+    "onmouseout": {
+      "global": "true"
+    },
+    "onmouseover": {
+      "global": "true"
+    },
+    "onmouseup": {
+      "global": "true"
+    },
+    "onmousewheel": {
+      "global": "true"
+    },
+    "onpause": {
+      "global": "true"
+    },
+    "onplay": {
+      "global": "true"
+    },
+    "onplaying": {
+      "global": "true"
+    },
+    "onprogress": {
+      "global": "true"
+    },
+    "onratechange": {
+      "global": "true"
+    },
+    "onreadystatechange": {
+      "global": "true"
+    },
+    "onreset": {
+      "global": "true"
+    },
+    "onscroll": {
+      "global": "true"
+    },
+    "onseeked": {
+      "global": "true"
+    },
+    "onseeking": {
+      "global": "true"
+    },
+    "onselect": {
+      "global": "true"
+    },
+    "onshow": {
+      "global": "true"
+    },
+    "onstalled": {
+      "global": "true"
+    },
+    "onsubmit": {
+      "global": "true"
+    },
+    "onsuspend": {
+      "global": "true"
+    },
+    "ontimeupdate": {
+      "global": "true"
+    },
+    "onvolumechange": {
+      "global": "true"
+    },
+    "onwaiting": {
+      "global": "true"
+    },
+    "aria-autocomplete": {
+      "attribOption": [
+        "inline",
+        "list",
+        "both",
+        "none"
+      ]
+    },
+    "aria-activedescendant": {
+      "global": "true"
+    },
+    "aria-atomic": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "global": "true",
+      "type": "boolean"
+    },
+    "aria-busy": {
+      "global": "true",
+      "type": "boolean"
+    },
+    "aria-checked": {
+      "attribOption": [
+        "true",
+        "false",
+        "mixed",
+        "undefined"
+      ]
+    },
+    "aria-controls": {
+      "global": "true"
+    },
+    "aria-describedby": {
+      "global": "true"
+    },
+    "aria-disabled": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "global": "true"
+    },
+    "aria-dropeffect": {
+      "attribOption": [
+        "copy",
+        "move",
+        "link",
+        "execute",
+        "popup",
+        "none"
+      ],
+      "global": "true"
+    },
+    "aria-expanded": {
+      "attribOption": [
+        "true",
+        "false",
+        "undefined"
+      ]
+    },
+    "aria-flowto": {
+      "global": "true"
+    },
+    "aria-grabbed": {
+      "attribOption": [
+        "true",
+        "false",
+        "undefined"
+      ],
+      "global": "true"
+    },
+    "aria-haspopup": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "global": "true",
+      "type": "boolean"
+    },
+    "aria-hidden": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "global": "true",
+      "type": "boolean"
+    },
+    "aria-invalid": {
+      "attribOption": [
+        "grammar",
+        "false",
+        "spelling",
+        "true"
+      ],
+      "global": "true"
+    },
+    "aria-label": {
+      "global": "true"
+    },
+    "aria-labelledby": {
+      "global": "true"
+    },
+    "aria-level": {},
+    "aria-live": {
+      "attribOption": [
+        "off",
+        "polite",
+        "assertive"
+      ],
+      "global": "true"
+    },
+    "aria-multiline": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "type": "boolean"
+    },
+    "aria-multiselectable": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "type": "boolean"
+    },
+    "aria-orientation": {
+      "attribOption": [
+        "vertical",
+        "horizontal"
+      ]
+    },
+    "aria-owns": {
+      "global": "true"
+    },
+    "aria-posinset": {},
+    "aria-pressed": {
+      "attribOption": [
+        "true",
+        "false",
+        "mixed",
+        "undefined"
+      ]
+    },
+    "aria-readonly": {
+      "attribOption": [
+        "true",
+        "false"
+      ]
+    },
+    "aria-relevant": {
+      "attribOption": [
+        "additions",
+        "removals",
+        "text",
+        "all",
+        "additions text"
+      ],
+      "global": "true"
+    },
+    "aria-required": {
+      "attribOption": [
+        "true",
+        "false"
+      ],
+      "type": "boolean"
+    },
+    "aria-selected": {
+      "attribOption": [
+        "true",
+        "false",
+        "undefined"
+      ]
+    },
+    "aria-setsize": {},
+    "aria-sort": {
+      "attribOption": [
+        "ascending",
+        "descending",
+        "none",
+        "other"
+      ]
+    },
+    "aria-valuemax": {},
+    "aria-valuemin": {},
+    "aria-valuenow": {},
+    "aria-valuetext": {},
+    "accept": {
+      "attribOption": [
+        "text/html",
+        "text/plain",
+        "application/msword",
+        "application/msexcel",
+        "application/postscript",
+        "application/x-zip-compressed",
+        "application/pdf",
+        "application/rtf",
+        "video/x-msvideo",
+        "video/quicktime",
+        "video/x-mpeg2",
+        "audio/x-pn/realaudio",
+        "audio/x-mpeg",
+        "audio/x-waw",
+        "audio/x-aiff",
+        "audio/basic",
+        "image/tiff",
+        "image/jpeg",
+        "image/gif",
+        "image/x-png",
+        "image/x-photo-cd",
+        "image/x-MS-bmp",
+        "image/x-rgb",
+        "image/x-portable-pixmap",
+        "image/x-portable-greymap",
+        "image/x-portablebitmap"
+      ]
+    },
+    "accept-charset": {},
+    "action": {},
+    "align": {},
+    "alt": {},
+    "archive": {},
+    "async": {
+      "type": "flag"
+    },
+    "autocomplete": {
+      "attribOption": [
+        "additional-name",
+        "address-level1",
+        "address-level2",
+        "address-level3",
+        "address-level4",
+        "address-line1",
+        "address-line2",
+        "address-line3",
+        "bday",
+        "bday-year",
+        "bday-day",
+        "bday-month",
+        "billing",
+        "cc-additional-name",
+        "cc-csc",
+        "cc-exp",
+        "cc-exp-month",
+        "cc-exp-year",
+        "cc-family-name",
+        "cc-given-name",
+        "cc-name",
+        "cc-number",
+        "cc-type",
+        "country",
+        "country-name",
+        "current-password",
+        "email",
+        "family-name",
+        "fax",
+        "given-name",
+        "home",
+        "honorific-prefix",
+        "honorific-suffix",
+        "impp",
+        "language",
+        "mobile",
+        "name",
+        "new-password",
+        "nickname",
+        "off",
+        "on",
+        "organization",
+        "organization-title",
+        "pager",
+        "photo",
+        "postal-code",
+        "sex",
+        "shipping",
+        "street-address",
+        "tel-area-code",
+        "tel",
+        "tel-country-code",
+        "tel-extension",
+        "tel-local",
+        "tel-local-prefix",
+        "tel-local-suffix",
+        "tel-national",
+        "transaction-amount",
+        "transaction-currency",
+        "url",
+        "username",
+        "work"
+      ]
+    },
+    "autofocus": {
+      "type": "flag"
+    },
+    "autoplay": {
+      "type": "flag"
+    },
+    "behavior": {
+      "attribOption": [
+        "scroll",
+        "slide",
+        "alternate"
+      ]
+    },
+    "bgcolor": {
+      "type": "color"
+    },
+    "border": {},
+    "challenge": {},
+    "charset": {
+      "attribOption": [
+        "iso-8859-1",
+        "utf-8",
+        "shift_jis",
+        "euc-jp",
+        "big5",
+        "gb2312",
+        "euc-kr",
+        "din_66003-kr",
+        "ns_4551-1-kr",
+        "sen_850200_b",
+        "csISO2022jp",
+        "hz-gb-2312",
+        "ibm852",
+        "ibm866",
+        "irv",
+        "iso-2022-kr",
+        "iso-8859-2",
+        "iso-8859-3",
+        "iso-8859-4",
+        "iso-8859-5",
+        "iso-8859-6",
+        "iso-8859-7",
+        "iso-8859-8",
+        "iso-8859-9",
+        "koi8-r",
+        "ks_c_5601",
+        "windows-1250",
+        "windows-1251",
+        "windows-1252",
+        "windows-1253",
+        "windows-1254",
+        "windows-1255",
+        "windows-1256",
+        "windows-1257",
+        "windows-1258",
+        "windows-874",
+        "x-euc",
+        "asmo-708",
+        "dos-720",
+        "dos-862",
+        "dos-874",
+        "cp866",
+        "cp1256"
+      ]
+    },
+    "checked": {
+      "type": "flag"
+    },
+    "cite": {},
+    "codebase": {},
+    "codetype": {},
+    "cols": {},
+    "colspan": {},
+    "content": {},
+    "controls": {
+      "type": "flag"
+    },
+    "coords": {},
+    "data": {},
+    "datetime": {},
+    "declare": {
+      "type": "flag"
+    },
+    "default": {
+      "type": "flag"
+    },
+    "defer": {
+      "type": "flag"
+    },
+    "direction": {
+      "attribOption": [
+        "left",
+        "right",
+        "up",
+        "down"
+      ]
+    },
+    "dirname": {},
+    "disabled": {
+      "type": "flag"
+    },
+    "enctype": {
+      "attribOption": [
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain"
+      ]
+    },
+    "for": {},
+    "form": {},
+    "formaction": {},
+    "formenctype": {
+      "attribOption": [
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain"
+      ]
+    },
+    "formmethod": {
+      "attribOption": [
+        "get",
+        "post"
+      ]
+    },
+    "formnovalidate": {
+      "type": "flag"
+    },
+    "formtarget": {
+      "attribOption": [
+        "_blank",
+        "_parent",
+        "_self",
+        "_top"
+      ]
+    },
+    "headers": {},
+    "height": {},
+    "high": {},
+    "href": {},
+    "hreflang": {},
+    "hspace": {},
+    "http-equiv": {
+      "attribOption": [
+        "content-type",
+        "default-style",
+        "refresh"
+      ]
+    },
+    "icon": {},
+    "ismap": {
+      "type": "flag"
+    },
+    "keytype": {
+      "attribOption": [
+        "dsa",
+        "ec",
+        "rsa"
+      ]
+    },
+    "kind": {
+      "attribOption": [
+        "captions",
+        "chapters",
+        "descriptions",
+        "metadata",
+        "subtitles"
+      ]
+    },
+    "label": {},
+    "list": {},
+    "longdesc": {},
+    "loop": {
+      "type": "flag"
+    },
+    "low": {},
+    "manifest": {},
+    "max": {},
+    "maxlength": {},
+    "media": {
+      "attribOption": [
+        "screen",
+        "tty",
+        "tv",
+        "projection",
+        "handheld",
+        "print",
+        "aural",
+        "braille",
+        "embossed",
+        "speech",
+        "all",
+        "width",
+        "min-width",
+        "max-width",
+        "height",
+        "min-height",
+        "max-height",
+        "device-width",
+        "min-device-width",
+        "max-device-width",
+        "device-height",
+        "min-device-height",
+        "max-device-height",
+        "orientation",
+        "aspect-ratio",
+        "min-aspect-ratio",
+        "max-aspect-ratio",
+        "device-aspect-ratio",
+        "min-device-aspect-ratio",
+        "max-device-aspect-ratio",
+        "color",
+        "min-color",
+        "max-color",
+        "color-index",
+        "min-color-index",
+        "max-color-index",
+        "monochrome",
+        "min-monochrome",
+        "max-monochrome",
+        "resolution",
+        "min-resolution",
+        "max-resolution",
+        "scan",
+        "grid"
+      ],
+      "allowMultipleValues": "true"
+    },
+    "mediagroup": {},
+    "method": {
+      "attribOption": [
+        "get",
+        "post"
+      ]
+    },
+    "min": {},
+    "multiple": {
+      "type": "flag"
+    },
+    "muted": {
+      "type": "flag"
+    },
+    "name": {},
+    "meta/name": {
+      "attribOption": [
+        "application-name",
+        "author",
+        "description",
+        "generator",
+        "keywords"
+      ]
+    },
+    "novalidate": {
+      "type": "flag"
+    },
+    "open": {
+      "type": "flag"
+    },
+    "optimum": {},
+    "pattern": {},
+    "placeholder": {},
+    "poster": {},
+    "preload": {
+      "attribOption": [
+        "auto",
+        "metadata",
+        "none"
+      ]
+    },
+    "pubdate": {},
+    "radiogroup": {},
+    "rel": {
+      "attribOption": [
+        "alternate",
+        "author",
+        "bookmark",
+        "help",
+        "license",
+        "next",
+        "nofollow",
+        "noreferrer",
+        "prefetch",
+        "prev",
+        "search",
+        "sidebar",
+        "tag",
+        "external"
+      ]
+    },
+    "link/rel": {
+      "attribOption": [
+        "alternate",
+        "author",
+        "help",
+        "icon",
+        "license",
+        "next",
+        "pingback",
+        "prefetch",
+        "prev",
+        "search",
+        "sidebar",
+        "stylesheet",
+        "tag"
+      ]
+    },
+    "readonly": {
+      "type": "flag"
+    },
+    "required": {
+      "type": "flag"
+    },
+    "reversed": {
+      "type": "flag"
+    },
+    "rows": {},
+    "rowspan": {},
+    "sandbox": {
+      "attribOption": [
+        "allow-forms",
+        "allow-same-origin",
+        "allow-scripts",
+        "allow-top-navigation"
+      ]
+    },
+    "seamless": {
+      "type": "flag"
+    },
+    "selected": {
+      "type": "flag"
+    },
+    "scope": {
+      "attribOption": [
+        "col",
+        "colgroup",
+        "row",
+        "rowgroup"
+      ]
+    },
+    "scoped": {
+      "type": "boolean"
+    },
+    "scrollamount": {},
+    "scrolldelay": {},
+    "shape": {
+      "attribOption": [
+        "circle",
+        "default",
+        "poly",
+        "rect"
+      ]
+    },
+    "size": {},
+    "sizes": {
+      "attribOption": [
+        "any"
+      ]
+    },
+    "span": {},
+    "src": {},
+    "srcdoc": {},
+    "srclang": {},
+    "standby": {},
+    "start": {},
+    "step": {},
+    "target": {
+      "attribOption": [
+        "_blank",
+        "_parent",
+        "_self",
+        "_top"
+      ]
+    },
+    "truespeed": {
+      "type": "flag"
+    },
+    "type": {},
+    "button/type": {
+      "attribOption": [
+        "button",
+        "reset",
+        "submit"
+      ]
+    },
+    "command/type": {
+      "attribOption": [
+        "command",
+        "checkbox",
+        "radio"
+      ]
+    },
+    "link/type": {
+      "attribOption": [
+        "text/css"
+      ]
+    },
+    "menu/type": {
+      "attribOption": [
+        "context",
+        "list",
+        "toolbar"
+      ]
+    },
+    "ol/type": {
+      "attribOption": [
+        "1",
+        "a",
+        "A",
+        "i",
+        "I"
+      ]
+    },
+    "script/type": {
+      "attribOption": [
+        "text/javascript",
+        "text/ecmascript",
+        "text/jscript",
+        "text/livescript",
+        "text/tcl",
+        "text/x-javascript",
+        "text/x-ecmascript",
+        "application/x-javascript",
+        "application/x-ecmascript",
+        "application/javascript",
+        "application/ecmascript",
+        "text/babel",
+        "text/jsx"
+      ]
+    },
+    "style/type": {
+      "attribOption": [
+        "text/css"
+      ]
+    },
+    "input/type": {
+      "attribOption": [
+        "button",
+        "checkbox",
+        "color",
+        "date",
+        "datetime",
+        "datetime-local",
+        "email",
+        "file",
+        "hidden",
+        "image",
+        "month",
+        "number",
+        "password",
+        "radio",
+        "range",
+        "reset",
+        "search",
+        "submit",
+        "tel",
+        "text",
+        "time",
+        "url",
+        "week"
+      ]
+    },
+    "usemap": {},
+    "value": {},
+    "vspace": {},
+    "width": {},
+    "wrap": {
+      "attribOption": [
+        "hard",
+        "soft"
+      ]
+    },
+    "xml:lang": {},
+    "xmlns": {}
+  }
+}

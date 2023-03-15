@@ -1,0 +1,8 @@
+{
+  ".source.b": {
+    "BAR": {
+      "prefix": "b",
+      "body": "bar?\nline two"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "core": [
+    {
+      "name": "core-theme",
+      "theme": "syntax"
+    },
+    {
+      "name": "core-package",
+      "version": "1.0.0"
+    }
+  ],
+  "user": [
+    {
+      "name": "user-theme",
+      "theme": "syntax"
+    },
+    {
+      "name": "user-package",
+      "version": "1.0.0"
+    }
+  ],
+  "dev": [
+    {
+      "name": "dev-theme",
+      "theme": "syntax"
+    },
+    {
+      "name": "dev-package",
+      "version": "1.0.0"
+    }
+  ]
+}

@@ -17,5 +17,5 @@
 #
 # This file uses CoffeeScript Object Notation (CSON).
 # If you are unfamiliar with CSON, you can read more about it in the
-# Pulsar Flight Manual:
-# http://flight-manual.atom.io/using-atom/sections/basic-customization/#_cson
+# Pulsar Launch Manual:
+# https://pulsar-edit.dev/docs/launch-manual/sections/using-pulsar/#configuring-with-cson

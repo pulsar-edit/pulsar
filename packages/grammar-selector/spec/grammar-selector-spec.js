@@ -17,7 +17,7 @@ describe('GrammarSelector', () => {
       path.join(__dirname, 'fixtures', 'language-with-no-name')
     );
 
-    editor = await atom.workspace.open('sample.js');
+    editor = await atom.workspace.open(path.join(__dirname, 'fixtures', 'sample.js'));
 
     textGrammar = atom.grammars.grammarForScopeName('text.plain');
     expect(textGrammar).toBeTruthy();
