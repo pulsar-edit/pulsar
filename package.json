@@ -153,6 +153,7 @@
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1",
+    "sqlite3": "4",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
     "superstring": "^2.4.4",
