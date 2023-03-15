@@ -128,8 +128,10 @@ async function update(params) {
 
   console.log("Updated all `autocomplete-css` completions.");
   console.log(`Total Completion Properties without a description: ${count}!`);
-  console.log("It is not required to fix the above empty completions issue.");
-  console.log("Use `node update.js --show-empty` to show the empty property names.");
+  if (count !== 0) {
+    console.log("It is not required to fix the above empty completions issue.");
+    console.log("Use `node update.js --show-empty` to show the empty property names.");
+  };
 }
 
 async function buildProperties(css) {
