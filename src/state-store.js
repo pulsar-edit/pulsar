@@ -1,44 +1,35 @@
-'use strict';
+const sqlite3 = require('sqlite3')
 
 module.exports = class StateStore {
   constructor(databaseName, version) {
     this.connected = false;
     this.databaseName = databaseName;
     this.version = version;
+    this._db = new sqlite3.Database('/tmp/pulsar-1.sqlite3')
+    this.ready = this.runOnPromise(
+      "CREATE TABLE IF NOT EXISTS state(key VARCHAR KEY UNIQUE, value VARCHAR)"
+    )
+
+    // Patch Buffer#toJSON because it's silly....
+    Buffer.prototype.toJSON = function() {
+      return {
+        "~$type": "Buffer",
+        "~$data": this.base64Slice()
+      }
+    }
   }
 
-  get dbPromise() {
-    if (!this._dbPromise) {
-      this._dbPromise = new Promise(resolve => {
-        const dbOpenRequest = indexedDB.open(this.databaseName, this.version);
-        dbOpenRequest.onupgradeneeded = event => {
-          let db = event.target.result;
-          db.onerror = error => {
-            atom.notifications.addFatalError('Error loading database', {
-              stack: new Error('Error loading database').stack,
-              dismissable: true
-            });
-            console.error('Error loading database', error);
-          };
-          db.createObjectStore('states');
-        };
-        dbOpenRequest.onsuccess = () => {
-          this.connected = true;
-          resolve(dbOpenRequest.result);
-        };
-        dbOpenRequest.onerror = error => {
-          atom.notifications.addFatalError('Could not connect to indexedDB', {
-            stack: new Error('Could not connect to indexedDB').stack,
-            dismissable: true
-          });
-          console.error('Could not connect to indexedDB', error);
-          this.connected = false;
-          resolve(null);
-        };
-      });
-    }
-
-    return this._dbPromise;
+  async runOnPromise(...args) {
+    await this.ready
+    return new Promise((resolve, reject) => {
+      this._db.get(...args, (error, val) => {
+        if(error) {
+          reject(error)
+        } else {
+          resolve(val)
+        }
+      })
+    })
   }
 
   isConnected() {
@@ -46,96 +37,48 @@ module.exports = class StateStore {
   }
 
   connect() {
-    return this.dbPromise.then(db => !!db);
+    return this.ready.then(() => !!this._db)
   }
 
   save(key, value) {
-    return new Promise((resolve, reject) => {
-      this.dbPromise.then(db => {
-        if (db == null) return resolve();
-
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .put({ value: value, storedAt: new Date().toString() }, key);
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this.runOnPromise(
+      `INSERT INTO state(key, value)
+          VALUES (?, ?)
+      ON CONFLICT(key) DO UPDATE
+        SET value = EXCLUDED.value`,
+      [key, JSON.stringify({value, storedAt: new Date().toString()})]
+    )
   }
 
   load(key) {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'])
-          .objectStore('states')
-          .get(key);
-
-        request.onsuccess = event => {
-          let result = event.target.result;
-          if (result && !result.isJSON) {
-            resolve(result.value);
+    return this.runOnPromise(
+      "SELECT value FROM state WHERE key = ?",
+      [key]
+    ).then(res => {
+      const val = res?.value
+      if(val) {
+        const parsed = JSON.parse(val, (key, val) => {
+          if(val && val['~$type'] === 'Buffer') {
+            return Buffer.from(val['~$data'], 'base64')
           } else {
-            resolve(null);
+            return val
           }
-        };
-
-        request.onerror = event => reject(event);
-      });
-    });
+        })
+        return parsed.value
+      }
+    })
   }
 
   delete(key) {
-    return new Promise((resolve, reject) => {
-      this.dbPromise.then(db => {
-        if (db == null) return resolve();
-
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .delete(key);
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return runOnPromise("DELETE FROM state WHERE key = ?", [key])
   }
 
   clear() {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .clear();
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return runOnPromise("DELETE FROM state")
   }
 
   count() {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'])
-          .objectStore('states')
-          .count();
-
-        request.onsuccess = () => {
-          resolve(request.result);
-        };
-        request.onerror = reject;
-      });
-    });
+    return runOnPromise("SELECT COUNT(*) c FROM state")
+      .then(r => r.c)
   }
 };
