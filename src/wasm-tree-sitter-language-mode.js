@@ -364,8 +364,13 @@ class WASMTreeSitterLanguageMode {
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
   // tree-sitter node names. Useful for understanding tree-sitter parsing or
   // for writing syntax highlighting query files.
+  //
+  // TODO: This probably behaves differently from the equivalent method in
+  // `TreeSitterLanguageMode`. Figure out whether it's worth replicating that
+  // behavior exactly.
   syntaxTreeScopeDescriptorForPosition(point) {
     point = this.buffer.clipPosition(Point.fromObject(point));
+    let index = this.buffer.characterIndexForPosition(point);
 
     // If the position is the end of a line, get node of left character instead
     // of newline. This is to match TextMate behavior; see
@@ -381,32 +386,38 @@ class WASMTreeSitterLanguageMode {
     let layers = this.languageLayersAtPoint(point);
     let scopes = [];
 
-    let iterate = (node, isAnonymous = false) => {
-      let { startPosition: start, endPosition: end } = node;
-      if (isBetweenPoints(point, start, end)) {
-        scopes.push(isAnonymous ? `"${node.type}"` : node.type);
-        let namedChildrenIds = node.namedChildren.map(c => c.typeId);
-        for (let child of node.children) {
-          let isAnonymous = !namedChildrenIds.includes(child.typeId);
-          iterate(child, isAnonymous);
-        }
-      }
-    };
-
     for (let layer of layers) {
-      scopes.push(layer.grammar.scopeName);
-      iterate(layer.tree.rootNode);
+      if (!layer.tree) { continue; }
+      let layerScopes = [];
+
+      let root = layer.tree.rootNode;
+      let current = root.descendantForIndex(index);
+
+      // Don't count this layer if the only thing we've matched is the root
+      // node.
+      if (current && !current.parent) { continue; }
+
+      while (current) {
+        layerScopes.unshift(current.type);
+        current = current.parent;
+      }
+
+      if (layerScopes.length > 0) {
+        layerScopes.unshift(layer.grammar.scopeName);
+      }
+
+      scopes.push(...layerScopes);
     }
 
-    scopes.unshift(this.grammar.scopeName);
     return new ScopeDescriptor({ scopes });
   }
 
   // Returns the buffer range for the first scope to match the given scope
   // selector, starting with the smallest scope and moving outward.
   bufferRangeForScopeAtPosition(selector, point) {
-    // If the position is the end of a line, get scope of left character instead of newline
-    // This is to match TextMate behaviour, see https://github.com/atom/atom/issues/18463
+    // If the position is the end of a line, get node of left character instead
+    // of newline. This is to match TextMate behavior; see
+    // https://github.com/atom/atom/issues/18463
     if (
       point.column > 0 &&
       point.column === this.buffer.lineLengthForRow(point.row)
