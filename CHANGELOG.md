@@ -6,12 +6,45 @@
 
 ## [Unreleased]
 
+## [Unreleased]
+
+- Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
+- Updated the instructions and look of the login flow for the `github` package.
+- Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
+- Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
+
+### Pulsar
+- Added: Add Automated updated of `autocomplete-css` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/398)
+- Bumped: ppm: Update submodule to 915cbf6e5f9ea1141ef5dcaf8 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/418)
+- Bumped: deps: Bump github to v0.36.15-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/415)
+- Added: actually cache based on sha [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/412)
+- Bumped: Bump `snippets` to bb00f9 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/408)
+- Added: [skip-ci] Small Readme Touchup [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/404)
+- Added: json language - add .har extension [@wesinator](https://github.com/pulsar-edit/pulsar/pull/396)
+- Added: Bundle `markdown-preview`, `styleguide`, `wrap-guide` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/374)
+- Added: Add GitHub Token to Doc CI [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/400)
+- Added: Add Setup Node to Package Tests [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/399)
+- Added: feat: add dev.pulsar_edit.Pulsar.metainfo.xml [@cat-master21](https://github.com/pulsar-edit/pulsar/pull/380)
+
+### Snippets
+- Added: Add `command` property that registers a command name for a snippet [@savetheclocktower](https://github.com/pulsar-edit/snippets/pull/10)
+- Removed: Remove implicit `g` flag from snippet transformations [@savetheclocktower](https://github.com/pulsar-edit/snippets/pull/7)
+- Fixed: Fix failing specs [@mauricioszabo](https://github.com/pulsar-edit/snippets/pull/6)
+- Added: cleanup and rename [@Sertonix](https://github.com/pulsar-edit/snippets/pull/5)
+
+### Github
+- Added: rebrand git-tab-view [@icecream17](https://github.com/pulsar-edit/github/pull/17)
+- Added: lib: Update login instructions for PATs, not OAuth [@DeeDeeG](https://github.com/pulsar-edit/github/pull/15)
+
+### PPM
+- Added: meta: Actually sync yarn.lock [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/60)
+
 ## 1.102.0
 
 - Fixed a bug where `pulsar` on Windows could never trigger
 - Fixed `github` package shelling out to `git` on macOS
 - Fixed minor bugs found during fixes to tests
-- Improved our testing infastructure to aide in finding and fixing further bugs
+- Improved our testing infrastructure to aide in finding and fixing further bugs
 - Updated many dependencies of Pulsar and its core packages
 - New Pulsar Icon on macOS
 - Selected text is styled by default
