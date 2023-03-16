@@ -14,6 +14,7 @@
 - Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
 
 ### Pulsar
+- Added: Show Settings Icon in Status Bar [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/421)
 - Added: Add Automated updated of `autocomplete-css` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/398)
 - Bumped: ppm: Update submodule to 915cbf6e5f9ea1141ef5dcaf8 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/418)
 - Bumped: deps: Bump github to v0.36.15-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/415)
