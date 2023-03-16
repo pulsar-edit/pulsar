@@ -32,6 +32,13 @@ module.exports = class WASMTreeSitterGrammar {
     this.fileTypes = params.fileTypes || [];
     this.registry = registry
     this.name = params.name;
+
+    this.commentStrings = {
+      commentStartString: params.comments && params.comments.start,
+      commentEndString: params.comments && params.comments.end
+    };
+
+    this.shouldObserveQueryFiles = atom.inDevMode() && !atom.inSpecMode();
     this.getLanguage();
   }
 
@@ -70,7 +77,7 @@ module.exports = class WASMTreeSitterGrammar {
         let filePath = path.join(dirName, name);
         promises.push(this.loadQueryFile(filePath, key));
 
-        if (atom.inDevMode() && !this._queryFilesLoaded) {
+        if (this.shouldObserveQueryFiles && !this._queryFilesLoaded) {
           this.observeQueryFile(filePath, key);
         }
       }
@@ -132,7 +139,6 @@ module.exports = class WASMTreeSitterGrammar {
         let timeTag = `${this.scopeName} ${queryType} load time`;
         try {
           if (inDevMode) { console.time(timeTag); }
-
           query = language.query(this[queryType]);
 
           if (inDevMode) { console.timeEnd(timeTag); }
@@ -149,6 +155,13 @@ module.exports = class WASMTreeSitterGrammar {
 
     this.promisesForQueries.set(queryType, promise);
     return promise;
+  }
+
+  async setQueryForTest (queryType, contents) {
+    await this.getLanguage();
+    this.queryCache.delete(queryType);
+    this[queryType] = contents;
+    return await this.getQuery(queryType);
   }
 
   observeQueryFile(filePath, queryType) {
