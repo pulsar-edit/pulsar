@@ -14,6 +14,90 @@
 <dl>
 <dt><a href="#etch">etch</a></dt>
 <dd></dd>
+<dt><a href="#css">css</a></dt>
+<dd><p>This file will manage the updating of <code>autocomplete-css</code> <code>completions.json</code>.
+  We will mainly utilize <code>@webref/css</code>.listAll() function that returns a full CSS
+  list of all properties seperated by their spec shortname. An example
+  of this format is defined below for ease of future modifications.</p>
+<p>  Some important notes about the data contained here:
+    - Often times the <code>value</code> within the <code>property</code> will be in the following format:
+      <code>&lt;valueGroupName&gt;</code> or even <code>&lt;valueGroupName&gt; | value | value2</code> or just <code>value | value2</code>
+      It will be important to build a parser that can handle this format.
+      The <code>&lt;valueGroupName&gt;</code> then can be realized via that specs <code>values</code> where
+      <code>values[x].name</code> will match the <code>&lt;valueGroupName&gt;</code>. Another important note about
+      handling values here is that oftentimes <code>values[x].values[]</code> won&#39;t actually
+      contain all possible values. And instead this must be handled by checking
+      <code>values[x].value</code> which is another string of <code>&lt;valueGroupName&gt; | value</code>.
+      So this should be handled by the same parser.
+    - Additionally an important note is that nowhere in this data do we get any kind
+      of description about the data that could lend a hand in being documentation.
+      So the documentation must be gathered seperatly. Likely the best way to collect
+      our documentation data is via <code>mdn/content</code>.
+      Within <code>content/files/en-us/web/css</code> is a directory of folders titled
+      by the name of properties.</p>
+<pre><code>The last important thing to note here:
+  MDN doesn&#39;t have docs on everything. And that&#39;s a good thing. But it means
+  many of our items don&#39;t have any kind of description. For this situation
+  we have `manual-property-desc.json` which is a list of manually updated
+  descriptions for properties where there are none. This was a last resort
+  intended to provide the highest quality of completions possible.
+  Overtime many items on this list will likely be able to be removed just as
+  new ones are added. After running the update script you&#39;ll see a warning
+  saying how many properties are without completions that would then need to
+  be added to the JSON file.
+</code></pre>
+<p>  &quot;spec-shortname&quot;: {
+    &quot;spec&quot;: {
+      &quot;title&quot;: &quot;&quot;,
+      &quot;url&quot;: &quot;&quot;
+    },
+    &quot;properties&quot;: [
+      {
+        &quot;name&quot;: &quot;&quot;,
+        &quot;value&quot;: &quot;&quot;,
+        &quot;initial&quot;: &quot;&quot;,
+        &quot;appliesTo&quot;: &quot;&quot;,
+        &quot;percentages&quot;: &quot;&quot;,
+        &quot;computedValue&quot;: &quot;&quot;,
+        &quot;canonicalOrder&quot;: &quot;&quot;,
+        &quot;animationType&quot;: &quot;&quot;,
+        &quot;media&quot;: &quot;&quot;,
+        &quot;styleDeclaration&quot;: [ &quot;&quot;, &quot;&quot;, &quot;&quot; ]
+      }
+    ],
+    &quot;atrules&quot;: [
+      {
+        &quot;name&quot;: &quot;&quot;,
+        &quot;descriptors&quot;: [
+          {
+            &quot;name&quot;: &quot;&quot;,
+            &quot;for&quot;: &quot;&quot;,
+            &quot;value&quot;: &quot;&quot;,
+            &quot;type&quot;: &quot;&quot;
+          }
+        ]
+      }
+    ],
+    &quot;selectors&quot;: [],
+    &quot;values&quot;: [
+      {
+        &quot;name&quot;: &quot;&quot;,
+        &quot;type&quot;: &quot;&quot;,
+        &quot;prose&quot;: &quot;Optional description&quot;,
+        &quot;value&quot;: &quot;&quot;,
+        &quot;values&quot;: [
+          {
+            &quot;name&quot;: &quot;&quot;,
+            &quot;prose&quot;: &quot;Optional Description&quot;,
+            &quot;type&quot;: &quot;&quot;,
+            &quot;value&quot;: &quot;&quot;
+          }
+        ]
+      }
+    ],
+    &quot;warnings&quot;: []
+  }</p>
+</dd>
 <dt><a href="#fs">fs</a></dt>
 <dd></dd>
 <dt><a href="#dalek">dalek</a></dt>
@@ -212,6 +296,95 @@ console.log(atom.clipboard.read());
 ## etch
 **Kind**: global constant  
 **Jsx**: etch.dom  
+<a name="css"></a>
+
+## css
+This file will manage the updating of `autocomplete-css` `completions.json`.
+  We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
+  list of all properties seperated by their spec shortname. An example
+  of this format is defined below for ease of future modifications.
+
+  Some important notes about the data contained here:
+    - Often times the `value` within the `property` will be in the following format:
+      `<valueGroupName>` or even `<valueGroupName> | value | value2` or just `value | value2`
+      It will be important to build a parser that can handle this format.
+      The `<valueGroupName>` then can be realized via that specs `values` where
+      `values[x].name` will match the `<valueGroupName>`. Another important note about
+      handling values here is that oftentimes `values[x].values[]` won't actually
+      contain all possible values. And instead this must be handled by checking
+      `values[x].value` which is another string of `<valueGroupName> | value`.
+      So this should be handled by the same parser.
+    - Additionally an important note is that nowhere in this data do we get any kind
+      of description about the data that could lend a hand in being documentation.
+      So the documentation must be gathered seperatly. Likely the best way to collect
+      our documentation data is via `mdn/content`.
+      Within `content/files/en-us/web/css` is a directory of folders titled
+      by the name of properties.
+
+    The last important thing to note here:
+      MDN doesn't have docs on everything. And that's a good thing. But it means
+      many of our items don't have any kind of description. For this situation
+      we have `manual-property-desc.json` which is a list of manually updated
+      descriptions for properties where there are none. This was a last resort
+      intended to provide the highest quality of completions possible.
+      Overtime many items on this list will likely be able to be removed just as
+      new ones are added. After running the update script you'll see a warning
+      saying how many properties are without completions that would then need to
+      be added to the JSON file.
+
+  "spec-shortname": {
+    "spec": {
+      "title": "",
+      "url": ""
+    },
+    "properties": [
+      {
+        "name": "",
+        "value": "",
+        "initial": "",
+        "appliesTo": "",
+        "percentages": "",
+        "computedValue": "",
+        "canonicalOrder": "",
+        "animationType": "",
+        "media": "",
+        "styleDeclaration": [ "", "", "" ]
+      }
+    ],
+    "atrules": [
+      {
+        "name": "",
+        "descriptors": [
+          {
+            "name": "",
+            "for": "",
+            "value": "",
+            "type": ""
+          }
+        ]
+      }
+    ],
+    "selectors": [],
+    "values": [
+      {
+        "name": "",
+        "type": "",
+        "prose": "Optional description",
+        "value": "",
+        "values": [
+          {
+            "name": "",
+            "prose": "Optional Description",
+            "type": "",
+            "value": ""
+          }
+        ]
+      }
+    ],
+    "warnings": []
+  }
+
+**Kind**: global constant  
 <a name="fs"></a>
 
 ## fs

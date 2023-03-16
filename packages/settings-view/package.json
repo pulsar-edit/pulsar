@@ -32,6 +32,12 @@
       "description": "Will enable or disable the new Experimental Settings Search.",
       "type": "boolean",
       "default": true
+    },
+    "showSettingsIconInStatusBar": {
+      "title": "Show Settings Icon in Status Bar",
+      "description": "Whether or not to show a settings icon in the Pulsar Status Bar.",
+      "type": "boolean",
+      "default": true
     }
   },
   "dependencies": {
