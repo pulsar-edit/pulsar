@@ -58,9 +58,9 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
             </div>
             <h4 className='sub-section-heading'>
               This feature is experimental.<br />
-              If you have feedback/suggestions, or you encounter any issues, feel free to report them
+              If you have feedback/suggestions, or you encounter any issues, feel free to report them here:&nbsp;
               <a href="https://github.com/orgs/pulsar-edit/discussions/150" style="text-decoration: underline;">
-                &nbsp;here (https://github.com/orgs/pulsar-edit/discussions/150)
+                https://github.com/orgs/pulsar-edit/discussions/150
               </a>
             </h4>
             <div className='editor-container'>
