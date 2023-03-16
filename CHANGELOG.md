@@ -8,6 +8,7 @@
 
 ## [Unreleased]
 
+- Added a new feature to Search for Pulsar's settings
 - Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
 - Updated the instructions and look of the login flow for the `github` package.
 - Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
