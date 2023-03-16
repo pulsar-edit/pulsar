@@ -6,7 +6,7 @@
 
 ## [Unreleased]
 
-## [Unreleased]
+## 1.103.0
 
 - Added a new feature to Search for Pulsar's settings
 - Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
