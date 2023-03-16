@@ -31,7 +31,7 @@
       "title": "Enable Experimental Settings Search Feature",
       "description": "Will enable or disable the new Experimental Settings Search.",
       "type": "boolean",
-      "default": false
+      "default": true
     }
   },
   "dependencies": {

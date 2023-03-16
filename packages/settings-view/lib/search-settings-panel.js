@@ -56,6 +56,13 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
             <div className='section-heading icon icon-search-save'>
               Search Pulsar's Settings
             </div>
+            <h4 className='sub-section-heading'>
+              This feature is experimental.<br />
+              If you have feedback/suggestions, or you encounter any issues, feel free to report them
+              <a href="https://github.com/orgs/pulsar-edit/discussions/150" style="text-decoration: underline;">
+                &nbsp;here (https://github.com/orgs/pulsar-edit/discussions/150)
+              </a>
+            </h4>
             <div className='editor-container'>
               <TextEditor ref='searchEditor' mini placeholderText='Start Searching for Settings' />
             </div>
