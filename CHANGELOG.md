@@ -18,6 +18,7 @@
 - Added: feature: Implement Search Settings Ability [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/416)
 - Added: Show Settings Icon in Status Bar [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/421)
 - Added: Add Automated updated of `autocomplete-css` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/398)
+- Bumped: ppm: Update submodule to 9af239277180f2a9ee9e86714 [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/403)
 - Bumped: ppm: Update submodule to 915cbf6e5f9ea1141ef5dcaf8 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/418)
 - Bumped: deps: Bump github to v0.36.15-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/415)
 - Added: actually cache based on sha [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/412)
@@ -40,6 +41,10 @@
 - Added: lib: Update login instructions for PATs, not OAuth [@DeeDeeG](https://github.com/pulsar-edit/github/pull/15)
 
 ### PPM
+- Fixed: src: Update default Pulsar install paths [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/49)
+- Bumped: deps: Upgrade npm to 6.14.18 [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/53)
+- Fixed: Fix installing with yarn on Windows [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/58)
+- Fixed: Fix inability to notice newer versions of git-installed packages [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/59)
 - Added: meta: Actually sync yarn.lock [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/60)
 
 ## 1.102.0
