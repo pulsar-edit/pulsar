@@ -395,7 +395,6 @@ class WASMTreeSitterLanguageMode {
       matches.push(...layerMatches);
     }
 
-
     // The nodes are mostly already sorted from smallest to largest,
     // but for files with multiple syntax trees (e.g. ERB), each tree's
     // nodes are separate. Sort the nodes from largest to smallest.
@@ -675,49 +674,69 @@ class WASMTreeSitterLanguageMode {
   Section - Folds
   */
   getFoldableRangeContainingPoint(point) {
-    const foldsAtRow = this.getFoldCapturesAtRow(point.row);
-    const capture = foldsAtRow[0];
-    if (capture) {
-      return this.resolveFoldRange(capture);
-    }
+    let fold = this.getFoldRangeForRow(point.row);
+    return fold ?? null;
   }
 
   getFoldableRanges() {
     if (!this.tokenized) { return []; }
 
     let layers = this.getAllLanguageLayers();
-
     let folds = [];
     for (let layer of layers) {
-      let folds = layer.getFolds();
+      let folds = layer.foldResolver.getAllFoldRanges();
       folds.push(...folds);
     }
-    return folds.map(fold => this.resolveFoldRange(fold.node));
+    return folds;
   }
 
-  getFoldableRangesAtIndentLevel(level) {
-    const tabLength = this.buffer.displayLayers[0]?.tabLength || 2
-    const minCol = (level-1) * tabLength
-    const maxCol = (level) * tabLength
-    if (!this.tree) return [];
-    return this.foldsQuery
-      .captures(this.tree.rootNode)
-      .filter(fold => {
-        const { column } = fold.node.startPosition;
-        return column > minCol && column <= maxCol;
-      })
-      .map(fold => this.resolveFoldRange(fold.node));
-  }
+  // This method is improperly named, and is based on an assumption that
+  // every nesting of folds carries an extra level of indentation. Several
+  // languages violate that — perhaps most notably the C grammar in its use of
+  // nested folds within `#ifdef` and its siblings.
+  //
+  // Instead, a level of `0` means “all folds,” and level of `1` means “all
+  // folds that are contained by exactly one other fold,” and so on. This
+  // happens to work as expected if you're working in a language where nested
+  // folds are always indented relative to their enclosing fold, but it doesn't
+  // require it.
+  //
+  getFoldableRangesAtIndentLevel(goalLevel) {
+    if (!this.tokenized) { return []; }
 
-  // Given a node and a descriptor string like "lastChild.startPosition",
-  // navigates to the position described.
-  // resolveNodePosition(node, descriptor) {
-  //   let result = resolveNodePosition(node, descriptor);
-  //   if (typeof result.row !== 'number' || typeof result.column !== 'number') {
-  //     throw new Error(`Bad position descriptor: ${descriptor}`);
-  //   }
-  //   return Point.fromObject(result);
-  // }
+    let rangeTree = createTree(comparePoints);
+
+    // No easy way around this. The way to pull it off is to get _all_ folds in
+    // the document on all language layers, then place their boundaries into a
+    // red-black tree so we can iterate through them later in the proper order
+    // while keeping track of nesting level.
+    let layers = this.getAllLanguageLayers();
+    for (let layer of layers) {
+      let folds = layer.foldResolver.getAllFoldRanges();
+
+      for (let fold of folds) {
+        rangeTree = rangeTree.insert(fold.start, { start: fold });
+        rangeTree = rangeTree.insert(fold.end, { end: fold });
+      }
+    }
+
+    let foldsByLevel = new Index();
+    let currentLevel = 0;
+    let iterator = rangeTree.begin;
+
+    while (iterator.key) {
+      let { start, end } = iterator.value;
+      if (start) {
+        foldsByLevel.add(currentLevel, start);
+        currentLevel++;
+      } else if (end) {
+        currentLevel--;
+      }
+      iterator.next();
+    }
+
+    return foldsByLevel.get(goalLevel) || [];
+  }
 
   adjustPositionByOffset(position, offset) {
     let { buffer } = this;
@@ -730,111 +749,63 @@ class WASMTreeSitterLanguageMode {
     if (this.isFoldableCache[row] != null) {
       return this.isFoldableCache[row];
     }
-    const foldsAtRow = this.getFoldCapturesAtRow(row);
-    let result = foldsAtRow.length !== 0;
+
+    let isFoldable = !!this.getFoldRangeForRow(row);
+
     // Don't bother to cache this result before we're able to load the folds
     // query.
     if (this.tokenized) {
-      this.isFoldableCache[row] = result;
+      // TODO: Cache actual ranges, not just booleans?
+      this.isFoldableCache[row] = isFoldable;
     }
-    return result;
+    return isFoldable;
   }
 
-  getFoldCapturesAtRow(row) {
-    if (!this.tokenized) { return []; }
+  getFoldRangeForRow(row) {
+    if (!this.tokenized) { return null; }
 
     let rowEnd = this.buffer.lineLengthForRow(row);
     let point = new Point(row, rowEnd);
     let layers = this.languageLayersAtPoint(point);
-    let captures = [];
 
+    let leadingCandidate = null;
+    // Multiple language layers may want to claim a fold for a given row.
+    // Prefer deeper layers over shallower ones.
     for (let layer of layers) {
-      if (!layer.foldsQuery || !layer.tree) { continue; }
-      let folds = layer.foldsQuery.captures(
-        layer.tree.rootNode,
-        { row: row, column: 0 },
-        { row: row + 1, column: 0 }
-      );
-
-      if (!folds) { continue; }
-
-      // Folds must start and end on different lines.
-      folds = folds.filter((capture) => {
-        let { start, end } = this.resolveFoldRange(capture);
-        return start.row === row && end.row > start.row;
-      });
-
-      captures.push(...folds);
+      let { depth } = layer;
+      let candidateFold = layer.foldResolver.getFoldRangeForRow(row);
+      if (!candidateFold) { continue; }
+      if (!leadingCandidate || depth > leadingCandidate.depth) {
+        leadingCandidate = { fold: candidateFold, depth };
+      }
     }
 
-    // // let controllingLayer;
-    // // if (layer.foldsQuery && layer.tree) {
-    // //   controllingLayer = layer;
-    // // } else {
-    // //   // TODO: What happens when a particular layer has no folds query? Should
-    // //   // we cascade down the list of layers, or just jump straight to the root?
-    // //   controllingLayer = this.rootLanguageLayer;
-    // // }
-    //
-    // let { foldsQuery } = controllingLayer;
-    // if (!foldsQuery) { return []; }
-    //
-    // let folds = foldsQuery.captures(
-    //   controllingLayer.tree.rootNode,
-    //   { row: row, column: 0 },
-    //   { row: row + 1, column: 0 }
-    // );
-    //
-    // if (!folds) { return []; }
-    // // Folds must start and end on different lines.
-    // return folds.filter((capture) => {
-    //   let { start, end } = this.resolveFoldRange(capture);
-    //   return start.row === row && end.row > row;
-    // });
-
-    return captures;
-  }
-
-  resolveFoldRange(capture) {
-    let { node, setProperties: props } = capture;
-    let start = new Point(node.startPosition.row, Infinity);
-    let end = node.endPosition;
-
-    let defaultOptions = {
-      endAt: 'lastChild.startPosition'
-    };
-
-    let options = { ...defaultOptions, ...props };
-
-    for (let key in options) {
-      if (!FoldAdjustments[key]) { continue; }
-      let value = options[key];
-      end = FoldAdjustments[key](end, node, value, props, this);
-    }
-
-    end = Point.fromObject(end, true);
-    end = this.buffer.clipPosition(end);
-
-    return new Range(start, end);
+    return leadingCandidate?.fold ?? null;
   }
 
   /*
   Section - Comments
   */
 
-  // TODO: I know that old tree-sitter is trying to centalize this data on the
-  // grammar itself, but I would rather invert the order of these lookups. As a
-  // config setting it can be scoped and overridden, but as a grammar property
-  // it's just a fact of life.
+  // TODO: I know that old tree-sitter moved toward placing this data on the
+  // grammar itself, but I would prefer to invert the order of these lookups.
+  // As a config setting it can be scoped and overridden, but as a grammar
+  // property it's just a fact of life that can't be worked around.
+  //
+  // TODO: Also, this should be revisited soon so that we can give the
+  // `snippets` package the ability to ask about all of a grammar's comment
+  // tokens — both line and block.
+  //
   commentStringsForPosition(position) {
     // First ask the grammar for its comment strings.
-    const range =
-      this.firstNonWhitespaceRange(position.row) ||
+    const range = this.firstNonWhitespaceRange(position.row) ||
       new Range(position, position);
     const { grammar } = this.getSyntaxNodeAndGrammarContainingRange(range);
 
     if (grammar) {
       let { commentStrings } = grammar;
+      // Some languages don't have block comments, so only check for the start
+      // delimiter.
       if (commentStrings && commentStrings.commentStartString) {
         return commentStrings;
       }
@@ -842,16 +813,15 @@ class WASMTreeSitterLanguageMode {
 
     // Fall back to a lookup through the config system.
     const scope = this.scopeDescriptorForPosition(position);
-    const commentStartEntries = this.config.getAll('editor.commentStart', {
-      scope
-    });
-    const commentEndEntries = this.config.getAll('editor.commentEnd', {
-      scope
-    });
+    const commentStartEntries = this.config.getAll(
+      'editor.commentStart', { scope });
+    const commentEndEntries = this.config.getAll(
+      'editor.commentEnd', { scope });
+
     const commentStartEntry = commentStartEntries[0];
-    const commentEndEntry = commentEndEntries.find(entry => {
-      return entry.scopeSelector === commentStartEntry.scopeSelector;
-    });
+    const commentEndEntry = commentEndEntries.find(entry => (
+      entry.scopeSelector === commentStartEntry.scopeSelector
+    ));
     return {
       commentStartString: commentStartEntry && commentStartEntry.value,
       commentEndString: commentEndEntry && commentEndEntry.value
@@ -1201,23 +1171,301 @@ class WASMTreeSitterLanguageMode {
   }
 }
 
-const FoldAdjustments = {
+// Acts like `compareBoundaries`, but treats starting and ending boundaries
+// differently, making it so that ending boundaries are visited before starting
+// boundaries.
+function compareBoundaries (a, b) {
+  if (!a.position) {
+    a = { position: a, boundary: 'end' };
+  }
+  if (!b.position) {
+    b = { position: b, boundary: 'end' };
+  }
+  let result = comparePoints(a.position, b.position);
+  if (result !== 0) { return result; }
+  if (a.boundary === b.boundary) { return 0; }
+  return a.boundary === 'end' ? -1 : 1;
+}
+
+// Responsible for deciding the ranges of folds on a given language layer.
+//
+// Understands two kinds of folds:
+//
+// * A “simple” fold is one with a capture name of `@fold` in a folds query. It
+//   can be described with only one capture. It starts at the end of the row
+//   that the captured node starts on, and ends at a configurable position
+//   controlled by the `endAt` adjustment (which defaults to
+//   `lastChild.startPosition`).
+//
+//   Simple folds should be used whenever you're able to predict the end of a
+//   fold range simply from holding a reference to its starting node.
+//
+// * A “divided” fold is one where the two ends of the fold must be described
+//   in two separate query captures. It starts at the end of the row of a node
+//   captured with the name of `@fold.start`, and it ends at the very next
+//   `@fold.end` that it encounters in the document.
+//
+//   When determining the end of a fold that is marked with `@fold.start`,
+//   Pulsar will search the buffer for the next “balanced” occurrence of
+//   `@fold.end`. For instance, when trying to find a match for a `@fold.start`
+//   on row 9, Pulsar might encounter another `@fold.start` on row 10,
+//   and would then understand that the next `@fold.end` it sees will end
+//   _that_ fold and not the one we're looking for. If Pulsar _does not_ find a
+//   matching `@fold.end`, the given line will not be considered to be
+//   foldable.
+//
+//   Because they can trigger a buffer-wide search, divided folds are
+//   not recommended to use unless they're truly needed. Use them only when the
+//   structure of the syntax tree doesn't allow you to determine the end of the
+//   fold without applying your own heuristic.
+//
+class FoldResolver {
+  constructor(buffer, layer) {
+    this.buffer = buffer;
+    this.layer = layer;
+
+    this.boundaries = null;
+    this.boundariesStartingPosition = null;
+  }
+
+  // Retrieve the first valid fold range for this row in this language layer —
+  // that is, the first fold range that spans more than one row.
+  getFoldRangeForRow(row) {
+    if (!this.layer.tree || !this.layer.foldsQuery) { return null; }
+    let start = Point.fromObject({ row, column: 0 });
+    let end = Point.fromObject({ row: row + 1, column: 0 });
+
+    let iterator = this.getOrCreateBoundariesIterator(
+      this.layer.tree.rootNode, start, end);
+
+    while (iterator.key) {
+      if (comparePoints(iterator.key.position, end) > 0) { break; }
+      let capture = iterator.value;
+      let { name } = capture;
+      if (name === 'fold') {
+        let range = this.resolveRangeForSimpleFold(capture);
+        if (this.isValidFold(range)) { return range; }
+      } else if (name === 'fold.start') {
+        let range = this.resolveRangeForDividedFold(capture);
+        if (this.isValidFold(range)) { return range; }
+      }
+      iterator.next();
+    }
+
+    return null;
+  }
+
+  isValidFold(range) {
+    return range && range.end.row > range.start.row;
+  }
+
+  // Returns all valid fold ranges in this language layer.
+  getAllFoldRanges() {
+    if (!this.layer.tree || !this.layer.foldsQuery) { return []; }
+    let range = this.layer.getExtent();
+    let iterator = this.getOrCreateBoundariesIterator(
+      this.layer.tree.rootNode, range.start, range.end);
+
+    let results = [];
+    while (iterator.key) {
+      let capture = iterator.value;
+      let { name } = capture;
+      if (name === 'fold') {
+        let range = this.resolveRangeForSimpleFold(capture);
+        if (this.isValidFold(range)) { results.push(range); }
+      } else if (name === 'fold.start') {
+        let range = this.resolveRangeForDividedFold(capture);
+        if (this.isValidFold(range)) { results.push(range); }
+      }
+      iterator.next();
+    }
+
+    return results;
+  }
+
+  // Invalidates the fold resolver's cached boundary data in response to a
+  // change in the document.
+  reset() {
+    this.boundaries = null;
+    this.boundariesRange = null;
+  }
+
+  canReuseBoundaries(start, end) {
+    if (!this.boundariesRange) { return false; }
+    return this.boundariesRange.containsRange(new Range(start, end));
+  }
+
+  getOrCreateBoundariesIterator(rootNode, start, end) {
+    if (this.canReuseBoundaries(start, end)) {
+      let result = this.boundaries.ge(start);
+      return result;
+    }
+
+    // The red-black tree we use here is a bit more complex up front than the
+    // one we use for syntax boundaries, because I didn't want the added
+    // complexity later on of having to aggregate boundaries when they share a
+    // position in the buffer.
+    //
+    // Instead of keying off of a plain buffer position, this tree also
+    // considers whether the boundary is a fold start or a fold end. If one
+    // boundary ends at the same point that another one starts, the ending
+    // boundary will be visited first.
+    let boundaries = createTree(compareBoundaries);
+    let captures = this.layer.foldsQuery.captures(rootNode, start, end);
+
+    for (let capture of captures) {
+      if (capture.name === 'fold') {
+        boundaries = boundaries.insert({
+          position: capture.node.startPosition,
+          boundary: 'start'
+        }, capture);
+      } else {
+        let key = this.keyForDividedFold(capture);
+        boundaries = boundaries.insert(key, capture);
+      }
+    }
+
+    this.boundaries = boundaries;
+    this.boundariesRange = new Range(start, end);
+
+    return boundaries.ge(start);
+  }
+
+  // Given a `@fold.start` capture, queries the rest of the layer's extent to
+  // find a matching `@fold.end`.
+  resolveRangeForDividedFold(capture) {
+    let { name } = capture;
+    let key = this.keyForDividedFold(capture);
+    if (name !== 'fold.start') { return null; }
+
+    let extent = this.layer.getExtent();
+
+    let iterator = this.getOrCreateBoundariesIterator(
+      this.layer.tree.rootNode,
+      key.position,
+      extent.end
+    );
+
+    let depth = 0;
+    let matchedEndCapture = null;
+
+    while (iterator.key && comparePoints(iterator.key.position, extent.end) <= 0) {
+      let { name, node } = iterator.value;
+      let isSelf = node.id === capture.node.id;
+      if (name === 'fold.end' && !isSelf) {
+        if (depth === 0) {
+          matchedEndCapture = iterator.value;
+          break;
+        } else {
+          depth--;
+        }
+      } else if (name === 'fold.start' && !isSelf) {
+        // A later `fold.start` has occurred, so the next `fold.end` will pair
+        // with it, not with ours.
+        depth++;
+      }
+      iterator.next();
+    }
+
+    // There's no guarantee that a matching `@fold.end` will even appear, so if
+    // it doesn't, then this row does not contain a valid fold.
+    if (!matchedEndCapture) { return null; }
+
+    return new Range(
+      this.resolvePositionForDividedFold(capture),
+      this.resolvePositionForDividedFold(matchedEndCapture)
+    );
+  }
+
+  keyForDividedFold(capture) {
+    let { name, node } = capture;
+    if (name === 'fold.start') {
+      // Eventually we'll alter this position to occur at the end of the given
+      // row, but we keep the original value around for a while because we want
+      // to honor whichever fold technically happens “earliest” on a given row.
+      return { position: node.startPosition, boundary: 'start' };
+    } else if (name === 'fold.end') {
+      return { position: node.startPosition, boundary: 'end' };
+    } else {
+      return null;
+    }
+  }
+
+  resolvePositionForDividedFold(capture) {
+    let { name, node } = capture;
+    if (name === 'fold.start') {
+      return new Point(node.startPosition.row, Infinity);
+    } else if (name === 'fold.end') {
+      let end = node.startPosition;
+      if (end.column === 0) {
+        // If the fold ends at the start of the line, adjust it so that it
+        // actually ends at the end of the previous line. This behavior is
+        // implied in the existing specs.
+        return new Point(end.row - 1, Infinity);
+      } else {
+        return new Point.fromObject(end, true);
+      }
+    } else {
+      return null;
+    }
+  }
+
+  resolveRangeForSimpleFold(capture) {
+    let { node, setProperties: props } = capture;
+    let start = new Point(node.startPosition.row, Infinity);
+    let end = node.endPosition;
+
+    let defaultOptions = { endAt: 'lastChild.startPosition' };
+    let options = { ...defaultOptions, ...props };
+
+    for (let key in options) {
+      if (!FoldResolver.ADJUSTMENTS[key]) { continue; }
+      let value = options[key];
+      end = FoldResolver.ADJUSTMENTS[key](
+        end, node, value, props, this.layer);
+    }
+
+    end = Point.fromObject(end, true);
+    end = this.buffer.clipPosition(end);
+
+    if (end.row <= start.row) { return null; }
+    return new Range(start, end);
+  }
+}
+
+FoldResolver.ADJUSTMENTS = {
+  // Use a node position descriptor to describe where the fold should end.
+  // Overrides the default descriptor of `lastChild.startPosition`.
   endAt (end, node, value) {
     end = resolveNodePosition(node, value);
     return end;
   },
 
-  offsetEnd (end, node, value, props, languageMode) {
+  // Adjust the end point by a fixed number of characters in either direction.
+  // Will cross rows if necessary.
+  offsetEnd (end, node, value, props, layer) {
+    let { languageMode } = layer;
     value = Number(value);
     if (isNaN(value)) { return end; }
     return languageMode.adjustPositionByOffset(end, value);
   },
 
-  adjustToStartOfRow (end) {
-    return { column: 0, row: end.row };
+  // Adjust the column of the fold's end point. Use `0` to end the fold at the
+  // start of the line.
+  adjustEndColumn (end, node, value, props, layer) {
+    let column = Number(value);
+    if (isNaN(column)) { return end; }
+    let newEnd = Point.fromObject({ column, row: end.row });
+    return layer.buffer.clipPosition(newEnd);
+  },
+
+  // Adjust the end point to be immediately before the current line begins.
+  // Useful if the end line also contains the start of a fold and thus should
+  // stay on a separate screen line.
+  adjustToEndOfPreviousRow (end) {
+    return new Point(end.row - 1, Infinity);
   }
 };
-
 
 // A data structure for storing scope information during a `HighlightIterator`
 // task. The data is reset in between each task.
@@ -2249,6 +2497,8 @@ class LanguageLayer {
 
     this.subscriptions = new CompositeDisposable;
 
+    this.foldResolver = new FoldResolver(this.buffer, this);
+
     this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
       this.language = language;
       try {
@@ -2285,6 +2535,11 @@ class LanguageLayer {
       (name) => this.languageMode.getOrCreateScopeId(name)
     );
     this.languageScopeId = this.languageMode.getOrCreateScopeId(this.grammar.scopeName);
+  }
+
+  inspect() {
+    let { scopeName } = this.grammar;
+    return `[LanguageLayer ${scopeName || '(anonymous)'} depth=${this.depth}]`;
   }
 
   observeQueryFileChanges() {
@@ -2424,6 +2679,7 @@ class LanguageLayer {
     this.tree = null;
     this.destroyed = true;
     this.marker?.destroy();
+    this.foldResolver?.reset();
     this.subscriptions.dispose();
 
     for (const marker of this.languageMode.injectionsMarkerLayer.getMarkers()) {
@@ -2434,6 +2690,13 @@ class LanguageLayer {
   }
 
   async update(nodeRangeSet) {
+    // Any update within the layer invalidates our cached fold boundary tree.
+    // Updates _outside_ of the layer will not require us to clear this data,
+    // because the base `isFoldableCache` is able to figure out how those
+    // changes affect the buffer and adjust accordingly. Hence there isn't much
+    // of a risk of using stale data in these scenarios.
+    if (this.foldResolver) { this.foldResolver.reset(); }
+
     await this._performUpdate(nodeRangeSet);
   }
 
@@ -2876,8 +3139,9 @@ class LanguageLayer {
 }
 
 // An injection `LanguageLayer` may need to parse and highlight a strange
-// subset of its stated range. A `NodeRangeSet` is how that strange subset is
-// determined.
+// subset of its stated range — for instance, all the descendants within a
+// parent that are of a particular type. A `NodeRangeSet` is how that strange
+// subset is expressed.
 class NodeRangeSet {
   constructor(previous, nodes, newlinesBetween, includeChildren) {
     this.previous = previous;
