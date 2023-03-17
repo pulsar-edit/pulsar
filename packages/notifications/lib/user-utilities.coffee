@@ -145,6 +145,18 @@ module.exports =
         # is lower than the version which normally ships with the version
         # of Atom which is running. This will happen when there's a locally
         # installed version of the package with a lower version than Atom's.
-        upToDate = installedVersion? and semver.gte(installedVersion, versionShippedWithAtom)
+        # https://github.com/atom/notifications/pull/52
+        #
+        # But because eventually all core packages will be bundled within the editor
+        # we cannot reliably check the version directly from the `packageDependencies`
+        # object. So for now will fail assuming it's up to date.
+        # TODO: (likely once decafed) we could instead find the installed bundled
+        # version and check the `package.json` there to find the bundled version.
+        # Or we could look at another way of included the bundled versions in Pulsar.
+        # But for now this seems a reasonable stop gap. To fail open in this very specific case.
+        if installedVersion.startsWith("file:")
+          upToDate = true;
+        else
+          upToDate = installedVersion? and semver.gte(installedVersion, versionShippedWithAtom)
 
       {isCore, upToDate, latestVersion, installedVersion, versionShippedWithAtom}
