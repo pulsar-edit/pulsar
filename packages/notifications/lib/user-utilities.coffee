@@ -154,7 +154,8 @@ module.exports =
         # version and check the `package.json` there to find the bundled version.
         # Or we could look at another way of included the bundled versions in Pulsar.
         # But for now this seems a reasonable stop gap. To fail open in this very specific case.
-        if installedVersion.startsWith("file:")
+        if installedVersion.indexOf("file:") > -1
+          # Seems CoffeeScript doesn't support `.startsWith()`, so mirroring `.indexOf()` from helper.coffee
           upToDate = true;
         else
           upToDate = installedVersion? and semver.gte(installedVersion, versionShippedWithAtom)
