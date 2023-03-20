@@ -23,11 +23,12 @@
   StartupTime.addMarker('window:start', startWindowTime);
 
   window.onload = async function() {
-    const {superstring} = require('superstring');
-    await superstring;
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
+      await require('second-mate').ready
+      const {superstring} = require('superstring');
+      await superstring;
 
       process.on('unhandledRejection', function(error, promise) {
         console.error(

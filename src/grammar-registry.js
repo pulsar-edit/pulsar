@@ -1,7 +1,7 @@
 const _ = require('underscore-plus');
 const Grim = require('grim');
 const CSON = require('season');
-const FirstMate = require('first-mate');
+const SecondMate = require('second-mate');
 const { Disposable, CompositeDisposable } = require('event-kit');
 const TextMateLanguageMode = require('./text-mate-language-mode');
 const NodeTreeSitterLanguageMode = require('./tree-sitter-language-mode');
@@ -22,7 +22,7 @@ module.exports = class GrammarRegistry {
   constructor({ config } = {}) {
     this.config = config;
     this.subscriptions = new CompositeDisposable();
-    this.textmateRegistry = new FirstMate.GrammarRegistry({
+    this.textmateRegistry = new SecondMate.GrammarRegistry({
       maxTokensPerLine: 100,
       maxLineLength: 1000
     });
@@ -286,7 +286,7 @@ module.exports = class GrammarRegistry {
       if (grammar.contentRegex) {
         const contentMatch = isTreeSitter
           ? grammar.contentRegex.test(contents)
-          : grammar.contentRegex.testSync(contents);
+          : grammar.contentRegex.findNextMatchSync(contents);
         if (contentMatch) {
           score += 0.05;
         } else {
@@ -339,6 +339,7 @@ module.exports = class GrammarRegistry {
 
   grammarMatchesPrefix(grammar, contents) {
     if (contents && grammar.firstLineRegex) {
+      debugger
       let escaped = false;
       let numberOfNewlinesInRegex = 0;
       for (let character of grammar.firstLineRegex.source) {
@@ -361,8 +362,8 @@ module.exports = class GrammarRegistry {
         .split('\n')
         .slice(0, numberOfNewlinesInRegex + 1)
         .join('\n');
-      if (grammar.firstLineRegex.testSync) {
-        return grammar.firstLineRegex.testSync(prefix);
+      if (grammar.firstLineRegex.findNextMatchSync) {
+        return grammar.firstLineRegex.findNextMatchSync(prefix);
       } else {
         return grammar.firstLineRegex.test(prefix);
       }
