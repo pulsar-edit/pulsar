@@ -1,0 +1,17 @@
+name: 'EJS (WASM)'
+scopeName: 'text.html.ejs'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-embedded-template'
+
+fileTypes: [
+  'ejs'
+  'html.ejs'
+]
+
+injectionRegex: '^(ejs|EJS)$'
+
+treeSitter:
+  grammar: 'tree-sitter-embedded-template/tree-sitter-embedded-template.wasm'
+  syntaxQuery: 'tree-sitter-embedded-template/ejs/highlights.scm'
+  foldsQuery: 'tree-sitter-embedded-template/ejs/folds.scm'
+  indentsQuery: 'tree-sitter-embedded-template/ejs/indents.scm'
