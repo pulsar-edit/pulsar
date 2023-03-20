@@ -2571,12 +2571,18 @@ class LayerHighlightIterator {
 //
 // The base `LanguageLayer` that's in charge of the entire buffer is the "root"
 // `LanguageLayer`. Other `LanguageLayer`s are created when injections are
-// required. Those injected languages may require injections themselves.
+// required. Those injected languages may require injections themselves,
+// meaning a layer could be of arbitrary depth.
+//
+// For example: a PHP file could inject an HTML grammar, which in turn injects
+// a JavaScript grammar for `SCRIPT` blocks, which in turn injects a regex
+// grammar for regular expressions.
 //
 // Thus, for many editor-related tasks that depend on the context of the
 // cursor, we should figure out how many different `LanguageLayer`s are
 // operating in that particular region, and either (a) compose their output or
-// (b) choose the output of the most specific layer, depending on the task.
+// (b) choose the output of the most specific layer that meets our needs,
+// depending on the task.
 //
 class LanguageLayer {
   constructor(marker, languageMode, grammar, depth, injectionPoint) {
@@ -2591,6 +2597,10 @@ class LanguageLayer {
 
     this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
       this.language = language;
+      // TODO: Currently, we require a syntax query, but we might want to
+      // rethink this. There are use cases for treating the root layer merely
+      // as a way to delegate to injections, in which case syntax highlighting
+      // wouldn't be needed.
       try {
         this.syntaxQuery = await this.grammar.getQuery('syntaxQuery');
       } catch (error) {
@@ -2598,6 +2608,8 @@ class LanguageLayer {
         console.error(error);
       }
 
+      // All other queries are optional. Regular expression language layers,
+      // for instance, don't really have a need for any of these.
       let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
 
       for (let queryType of otherQueries) {
@@ -2635,6 +2647,20 @@ class LanguageLayer {
     return `[LanguageLayer ${scopeName || '(anonymous)'} depth=${this.depth}]`;
   }
 
+  destroy() {
+    this.tree = null;
+    this.destroyed = true;
+    this.marker?.destroy();
+    this.foldResolver?.reset();
+    this.subscriptions.dispose();
+
+    for (const marker of this.languageMode.injectionsMarkerLayer.getMarkers()) {
+      if (marker.parentLanguageLayer === this) {
+        marker.languageLayer.destroy();
+      }
+    }
+  }
+
   observeQueryFileChanges() {
     this.subscriptions.add(
       this.grammar.onDidChangeQueryFile(async ({ queryType }) => {
@@ -2664,7 +2690,9 @@ class LanguageLayer {
     return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
   }
 
-  getSyntaxBoundaries(from, to, { includeOpenScopes = false } = {}) {
+  // Run a highlights query for the given range and process the raw captures
+  // through a `ScopeResolver`.
+  getSyntaxBoundaries(from, to) {
     let { buffer } = this.languageMode;
     if (!this.language || !this.tree) { return []; }
     if (!this.grammar.getLanguageSync()) { return []; }
@@ -2707,6 +2735,10 @@ class LanguageLayer {
       let { node } = capture;
       // Phantom nodes invented by the parse tree.
       if (node.text === '') { continue; }
+
+      // Ask the `ScopeResolver` to process each capture in turn. Some captures
+      // will be ignored if they fail certain tests, and some will have their
+      // original range altered.
       this.scopeResolver.store(capture);
     }
 
@@ -2720,6 +2752,8 @@ class LanguageLayer {
     }
 
     for (let [point, data] of this.scopeResolver) {
+      // The boundaries that occur before the start of our range will tell us
+      // which scopes should already be open when our range starts.
       if (point.isLessThan(from)) {
         alreadyOpenScopes.push(...data.open);
         for (let c of data.close) {
@@ -2738,11 +2772,7 @@ class LanguageLayer {
       boundaries = boundaries.insert(point, bundle);
     }
 
-    if (includeOpenScopes) {
-      return [boundaries, alreadyOpenScopes];
-    } else {
-      return boundaries;
-    }
+    return [boundaries, alreadyOpenScopes];
   }
 
   buildHighlightIterator() {
@@ -2778,20 +2808,6 @@ class LanguageLayer {
     }
   }
 
-  destroy() {
-    this.tree = null;
-    this.destroyed = true;
-    this.marker?.destroy();
-    this.foldResolver?.reset();
-    this.subscriptions.dispose();
-
-    for (const marker of this.languageMode.injectionsMarkerLayer.getMarkers()) {
-      if (marker.parentLanguageLayer === this) {
-        marker.languageLayer.destroy();
-      }
-    }
-  }
-
   update(nodeRangeSet) {
     // Any update within the layer invalidates our cached fold boundary tree.
     // Updates _outside_ of the layer will not require us to clear this data,
@@ -2800,19 +2816,17 @@ class LanguageLayer {
     // of a risk of using stale data in these scenarios.
     if (this.foldResolver) { this.foldResolver.reset(); }
 
-    // Practically updates that affect _only this layer_ will happen
+    // Practically speaking, updates that affect _only this layer_ will happen
     // synchronously, because we've made sure not to call this method until the
-    // root grammar's tree-sitter parser has been loaded. But we can't make
-    // that same guarantee for the grammars of injection layers, meaning that
-    // the first call to `_populateInjections` will probably go async as we
-    // wait for those grammars to finish loading their languages.
+    // root grammar's tree-sitter parser has been loaded. But we can't load any
+    // potential injection layers' languages because we don't know which ones
+    // we'll need until we parse this layer's tree for the first time.
     //
-    // Thus the first load of a window will have a small but noticeable delay
-    // on the highlighting of its injections, since we don't know which
-    // grammars/languages need to be loaded until the root tree is parsed. But
-    // all subsequent updates should be synchronous, no matter how many layers
-    // deep the injections go.
-    //
+    // Thus the first call to `_populateInjections` will probably go async
+    // while we wait for the injections' parsers to load, and the user might
+    // notice the delay. But once that happens, all subsequent updates _should_
+    // be synchronous, except for a case where a change in the buffer causes us
+    // to need a new kind of injection whose parser hasn't yet been loaded.
     return this._performUpdate(nodeRangeSet);
   }
 
@@ -2988,9 +3002,9 @@ class LanguageLayer {
   }
 
   updateInjections(grammar) {
-    // This is a random grammar in the registry that has been added or updated,
-    // so we only care about it if it could possibly affect an injection of
-    // ours.
+    // This method is called when a random grammar in the registry has been
+    // added or updated, so we only care about it if it could possibly affect
+    // an injection of ours.
     if (!grammar?.injectionRegex) { return; }
 
     // We don't need to consume the grammar itself; we'll just call
@@ -3111,25 +3125,31 @@ class LanguageLayer {
     );
 
     let results = [];
-    for (let cap of captures) {
-      let range = scopeResolver.store(cap);
+    for (let capture of captures) {
+      // Storing the capture will return its range (after any potential
+      // adjustments) — or `false`, to signify that the capture was ignored.
+      let range = scopeResolver.store(capture);
       if (!range) { continue; }
-      // A capture's range can be adjusted by rules. Don't include this scope
-      // unless its returned range includes this point.
+
+      // Since the range might have been adjusted, we wait until after resolution
       if (comparePoints(range.endPosition, point) === 0) { continue; }
       if (isBetweenPoints(point, range.startPosition, range.endPosition)) {
-        results.push(cap);
+        results.push(capture);
       }
     }
 
     scopeResolver.reset();
-    results = results.sort(({ node }) => {
-      return node.endIndex - node.startIndex;
+
+    // Sort from biggest to smallest.
+    results = results.sort((a, b) => {
+      return nodeBreadth(b) - nodeBreadth(a);
     });
 
     return results;
   }
 
+  // Like `WASMTreeSitterLanguageMode#getSyntaxNodeAtPosition`, but for just this
+  // layer.
   getSyntaxNodeAtPosition(position, where = FUNCTION_TRUE) {
     if (!this.language || !this.tree) { return null; }
     let { buffer } = this.languageMode;
