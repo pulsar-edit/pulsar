@@ -812,7 +812,7 @@ class TextMateLanguageMode {
       if (indentation < startIndentLevel) {
         break;
       } else if (indentation === startIndentLevel) {
-        if (foldEndRegex && foldEndRegex.searchSync(line)) foldEndRow = nextRow;
+        if (foldEndRegex && foldEndRegex.findNextMatchSync(line)) foldEndRow = nextRow;
         break;
       }
       foldEndRow = nextRow;
