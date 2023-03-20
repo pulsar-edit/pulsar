@@ -200,12 +200,12 @@ module.exports = class GrammarRegistry {
 
   languageModeForGrammarAndBuffer(grammar, buffer) {
     if (grammar instanceof WASMTreeSitterGrammar) {
-      return new WASMTreeSitterLanguageMode(
+      return new WASMTreeSitterLanguageMode({
         grammar,
         buffer,
-        this.config,
-        this
-      );
+        config: this.config,
+        grammars: this
+      });
     } else if (grammar instanceof TreeSitterGrammar) {
       return new NodeTreeSitterLanguageMode({
         grammar,
