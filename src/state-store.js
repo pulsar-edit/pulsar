@@ -70,15 +70,15 @@ module.exports = class StateStore {
   }
 
   delete(key) {
-    return runOnPromise("DELETE FROM state WHERE key = ?", [key])
+    return this.runOnPromise("DELETE FROM state WHERE key = ?", [key])
   }
 
   clear() {
-    return runOnPromise("DELETE FROM state")
+    return this.runOnPromise("DELETE FROM state")
   }
 
   count() {
-    return runOnPromise("SELECT COUNT(*) c FROM state")
+    return this.runOnPromise("SELECT COUNT(*) c FROM state")
       .then(r => r.c)
   }
 };
