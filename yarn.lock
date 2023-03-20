@@ -8503,9 +8503,9 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
-"second-mate@https://github.com/pulsar-edit/second-mate.git#2d8edc5":
+"second-mate@https://github.com/pulsar-edit/second-mate.git#8261ea5":
   version "8.0.0"
-  resolved "https://github.com/pulsar-edit/second-mate.git#2d8edc5fe099226ca9c116281d72b1b176ff33d9"
+  resolved "https://github.com/pulsar-edit/second-mate.git#8261ea528d4d3877f72a7093f702fd5f0616bb45"
   dependencies:
     emissary "^1.3.3"
     event-kit "^2.5.3"
