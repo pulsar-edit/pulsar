@@ -3630,7 +3630,7 @@ domhandler@^5.0.1, domhandler@^5.0.2, domhandler@^5.0.3:
   dependencies:
     domelementtype "^2.3.0"
 
-dompurify@^1.0.2, dompurify@^1.0.3:
+dompurify@^1.0.3:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.11.tgz#fe0f4a40d147f7cebbe31a50a1357539cfc1eb4d"
   integrity sha512-XywCTXZtc/qCX3iprD1pIklRVk/uhl8BKpkTxr+ZyMVUzSUg7wkQXRBp/euJ5J5moa1QvfpvaPQVP71z1O59dQ==
@@ -3761,7 +3761,7 @@ electron@23.1.3:
     "@types/node" "^16.11.26"
     extract-zip "^2.0.1"
 
-emissary@^1, emissary@^1.0.0, emissary@^1.2.0, emissary@^1.3.2:
+emissary@^1, emissary@^1.0.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4341,7 +4341,7 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
-"first-mate@https://github.com/pulsar-edit/first-mate.git#change-oniguruma", "first-mate@https://github.com/pulsar-edit/first-mate.git#ef23195":
+"first-mate@https://github.com/pulsar-edit/first-mate.git#change-oniguruma":
   version "7.4.3"
   resolved "https://github.com/pulsar-edit/first-mate.git#ef23195c61c86f1f27c0b43ec9a614869a4100e1"
   dependencies:
@@ -4885,7 +4885,7 @@ grapheme-splitter@^1.0.2, grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-grim@2.0.3, grim@^2.0.1, grim@^2.0.2:
+grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/grim/-/grim-2.0.3.tgz#66e575efc4577981d959da0764926b4aaded4b0d"
   integrity sha512-FM20Ump11qYLK9k9DbL8yzVpy+YBieya1JG15OeH8s+KbHq8kL4SdwRtURwIUHniSxb24EoBUpwKfFjGNVi4/Q==
@@ -6356,15 +6356,14 @@ markdown-it@^12.3.2:
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
 
-"markdown-preview@https://codeload.github.com/atom/markdown-preview/legacy.tar.gz/refs/tags/v0.160.2":
+"markdown-preview@file:./packages/markdown-preview":
   version "0.160.2"
-  resolved "https://codeload.github.com/atom/markdown-preview/legacy.tar.gz/refs/tags/v0.160.2#6d6f4075ea5b5ec5a683104b12f2e91ad33fa392"
   dependencies:
     cheerio "^1.0.0-rc.3"
-    dompurify "^1.0.2"
+    dompurify "^2.0.17"
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
-    marked "^0.6.2"
+    marked "^0.7.0"
     underscore-plus "^1.0.0"
     yaml-front-matter "^4.0.0"
 
@@ -6373,10 +6372,10 @@ marked@^0.3.6:
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
   integrity sha512-ea2eGWOqNxPcXv8dyERdSr/6FmzvWwzjMxpfGB/sbMccXoct+xY+YukPD+QTUZwyvK7BZwcr4m21WBOW41pAkg==
 
-marked@^0.6.2:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.6.3.tgz#79babad78af638ba4d522a9e715cdfdd2429e946"
-  integrity sha512-Fqa7eq+UaxfMriqzYLayfqAE40WN03jf+zHjT18/uXNuzjq3TY0XTbrAoPeqSJrAmPz11VuUA+kBPYOhHt9oOQ==
+marked@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
+  integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
 
 marked@^4.0.10:
   version "4.2.2"
@@ -8066,6 +8065,18 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
+"second-mate@https://github.com/pulsar-edit/second-mate.git#2d8edc5":
+  version "8.0.0"
+  resolved "https://github.com/pulsar-edit/second-mate.git#2d8edc5fe099226ca9c116281d72b1b176ff33d9"
+  dependencies:
+    emissary "^1.3.3"
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+    underscore-plus "^1"
+    vscode-oniguruma "^1.7.0"
+
 selector-kit@^0.1:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/selector-kit/-/selector-kit-0.1.0.tgz#304338fceccea35ec28ffaddb792ab7715633e6f"
@@ -8243,9 +8254,9 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@https://github.com/pulsar-edit/snippets.git#009b767":
-  version "1.6.1"
-  resolved "https://github.com/pulsar-edit/snippets.git#009b7675513b93eb54aec046de3d9302faada94d"
+"snippets@github:pulsar-edit/snippets#bb00f909c6c645b173f27346875d8fa0c7af09f7":
+  version "1.7.0"
+  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/bb00f909c6c645b173f27346875d8fa0c7af09f7"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
@@ -8614,9 +8625,8 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-3.1.1.tgz#31f1281b3832630434831c310c01cccda8cbe006"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
-"styleguide@https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12":
+"styleguide@file:./packages/styleguide":
   version "0.49.12"
-  resolved "https://codeload.github.com/atom/styleguide/legacy.tar.gz/refs/tags/v0.49.12#d2c09228e5da99017034227b8bc571fea56bc63b"
   dependencies:
     atom-select-list "^0.7.0"
     dedent "^0.7.0"
@@ -9329,6 +9339,11 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+vscode-oniguruma@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/vscode-oniguruma/-/vscode-oniguruma-1.7.0.tgz#439bfad8fe71abd7798338d1cd3dc53a8beea94b"
+  integrity sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==
+
 vscode-ripgrep@1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.9.0.tgz#d6cdea4d290f3c2919472cdcfe2440d5fb1f99db"
@@ -9596,9 +9611,8 @@ wrap-ansi@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
 
-"wrap-guide@https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0":
+"wrap-guide@file:./packages/wrap-guide":
   version "0.41.0"
-  resolved "https://codeload.github.com/atom/wrap-guide/legacy.tar.gz/refs/tags/v0.41.0#bd23ce8c207d589c742bd324135de81b6eb7ec02"
 
 wrappy@1:
   version "1.0.2"
