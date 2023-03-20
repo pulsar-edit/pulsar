@@ -3991,7 +3991,7 @@ electron@12.2.3:
     "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
-emissary@^1, emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2:
+emissary@^1, emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4605,7 +4605,7 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
-first-mate@7.4.3, first-mate@^7.4.1:
+first-mate@^7.4.1:
   version "7.4.3"
   resolved "https://registry.yarnpkg.com/first-mate/-/first-mate-7.4.3.tgz#058b9b6d2f43e38a5f0952669338cff2c46ae2dd"
   integrity sha512-PtZUpaPmcV5KV4Rw5TfwczEnExN+X1o3Q/G82E4iRJ0tW91fm3Yi7pa5t4cBH8r3D6EyoBKvfpG2jKE+TZ0/nw==
@@ -5194,7 +5194,7 @@ graphql@14.5.8:
   dependencies:
     iterall "^1.2.2"
 
-grim@2.0.3, grim@^2.0.1, grim@^2.0.2:
+grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/grim/-/grim-2.0.3.tgz#66e575efc4577981d959da0764926b4aaded4b0d"
   integrity sha512-FM20Ump11qYLK9k9DbL8yzVpy+YBieya1JG15OeH8s+KbHq8kL4SdwRtURwIUHniSxb24EoBUpwKfFjGNVi4/Q==
@@ -8503,6 +8503,18 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
+"second-mate@https://github.com/pulsar-edit/second-mate.git#2d8edc5":
+  version "8.0.0"
+  resolved "https://github.com/pulsar-edit/second-mate.git#2d8edc5fe099226ca9c116281d72b1b176ff33d9"
+  dependencies:
+    emissary "^1.3.3"
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+    underscore-plus "^1"
+    vscode-oniguruma "^1.7.0"
+
 selector-kit@^0.1:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/selector-kit/-/selector-kit-0.1.0.tgz#304338fceccea35ec28ffaddb792ab7715633e6f"
@@ -9809,6 +9821,11 @@ verror@^1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vscode-oniguruma@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/vscode-oniguruma/-/vscode-oniguruma-1.7.0.tgz#439bfad8fe71abd7798338d1cd3dc53a8beea94b"
+  integrity sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==
 
 vscode-ripgrep@1.9.0:
   version "1.9.0"
