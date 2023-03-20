@@ -153,7 +153,7 @@ class WASMTreeSitterLanguageMode {
       .then(language => {
         this.rootLanguage = language;
         this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
-        this.getOrCreateParserForLanguage(language);
+        return this.getOrCreateParserForLanguage(language);
       })
       .then(() => this.rootLanguageLayer.update(null))
       .then(() => this.emitter.emit('did-tokenize'));
@@ -221,7 +221,6 @@ class WASMTreeSitterLanguageMode {
 
   bufferDidFinishTransaction({ changes }) {
     if (!this.rootLanguageLayer) { return; }
-
     for (let i = 0, { length } = changes; i < length; i++) {
       const { oldRange, newRange } = changes[i];
       spliceArray(
