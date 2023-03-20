@@ -204,7 +204,7 @@ windows_task:
   install_script:
     - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
   build_script:
-    - cd ppm; npm install
+    - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
   build_binary_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
