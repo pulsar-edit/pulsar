@@ -339,7 +339,6 @@ module.exports = class GrammarRegistry {
 
   grammarMatchesPrefix(grammar, contents) {
     if (contents && grammar.firstLineRegex) {
-      debugger
       let escaped = false;
       let numberOfNewlinesInRegex = 0;
       for (let character of grammar.firstLineRegex.source) {

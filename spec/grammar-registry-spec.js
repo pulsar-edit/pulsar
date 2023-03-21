@@ -5,13 +5,14 @@ const temp = require('temp').track();
 const TextBuffer = require('text-buffer');
 const GrammarRegistry = require('../src/grammar-registry');
 const TreeSitterGrammar = require('../src/tree-sitter-grammar');
-const FirstMate = require('first-mate');
-const { OnigRegExp } = require('oniguruma');
+const SecondMate = require('second-mate');
+const { OnigScanner } = SecondMate;
 
 describe('GrammarRegistry', () => {
   let grammarRegistry;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await SecondMate.ready
     grammarRegistry = new GrammarRegistry({ config: atom.config });
     expect(subscriptionCount(grammarRegistry)).toBe(1);
   });
@@ -102,7 +103,7 @@ describe('GrammarRegistry', () => {
       );
 
       const grammar = grammarRegistry.grammarForId('source.js');
-      expect(grammar instanceof FirstMate.Grammar).toBe(true);
+      expect(grammar instanceof SecondMate.Grammar).toBe(true);
       expect(grammar.scopeName).toBe('source.js');
 
       grammarRegistry.removeGrammar(grammar);
@@ -127,7 +128,7 @@ describe('GrammarRegistry', () => {
 
       grammarRegistry.removeGrammar(grammar);
       expect(
-        grammarRegistry.grammarForId('source.js') instanceof FirstMate.Grammar
+        grammarRegistry.grammarForId('source.js') instanceof SecondMate.Grammar
       ).toBe(true);
     });
   });
@@ -560,7 +561,7 @@ describe('GrammarRegistry', () => {
 
         const grammar = grammarRegistry.selectGrammar('test.js');
         expect(grammar.scopeName).toBe('source.js');
-        expect(grammar instanceof FirstMate.Grammar).toBe(true);
+        expect(grammar instanceof SecondMate.Grammar).toBe(true);
       });
 
       it('favors a tree-sitter grammar over a text-mate grammar when config is set', () => {
@@ -766,7 +767,7 @@ describe('GrammarRegistry', () => {
         grammarRegistry.addGrammar(grammar1);
         const grammar2 = {
           name: 'foo++',
-          contentRegex: new OnigRegExp('.*bar'),
+          contentRegex: new OnigScanner(['.*bar']),
           fileTypes: ['foo']
         };
         grammarRegistry.addGrammar(grammar2);
