@@ -600,26 +600,32 @@ class WASMTreeSitterLanguageMode {
           //
           // But this is the root language layer, so we're going to pretend
           // that our tree's root node spans the entire buffer range.
-          if (where(rootNode, grammar)) {
-            results.push({ node: rootNode, grammar, depth });
-          } else {
-            continue;
-          }
-        } else {
-          continue;
+          results.push({ node: rootNode, grammar, depth });
         }
+        continue;
       }
 
       let node = this.getSyntaxNodeAtPosition(
         range.start,
-        (node, grammar) => {
+        (node, nodeGrammar) => {
           // This node can touch either of our boundaries, but it must be
           // bigger than we are.
+          //
+          // We aren't checking against the predicate yet because passing the
+          // predicate won't end our search. Users will reasonably expect that
+          // returning `true` from the predicate will mean that the predicate
+          // won't run any more. Since the predicate can have side effects, we
+          // should keep this contract. That means throwing all nodes into the
+          // bucket and not sifting through them until later.
+          //
+          // TODO: If we need to optimize performance here, we could compromise
+          // by re-running the predicate at the end even though we already know
+          // it's going to match.
           let breadth = node.endIndex - node.startIndex;
           return node.startIndex <= indexEnd &&
             node.endIndex >= indexEnd &&
             breadth > rangeBreadth &&
-            where(node, grammar);
+            nodeGrammar === grammar;
         }
       );
 
@@ -637,7 +643,13 @@ class WASMTreeSitterLanguageMode {
       );
     });
 
-    return results[0] ?? null;
+    for (let { node, grammar } of results) {
+      if (where(node, grammar)) {
+        return { node, grammar };
+      }
+    }
+
+    return null;
   }
 
   getRangeForSyntaxNodeContainingRange(range, where = FUNCTION_TRUE) {
@@ -683,9 +695,17 @@ class WASMTreeSitterLanguageMode {
       let index = this.buffer.characterIndexForPosition(position);
       let node = rootNode.descendantForIndex(index);
       while (node) {
-        if (where(node, grammar)) {
-          results.push({ node, depth });
-        }
+        // We aren't checking against the predicate yet because passing the
+        // predicate won't end our search. Users will reasonably expect that
+        // returning `true` from the predicate will mean that the predicate
+        // won't run any more. Since the predicate can have side effects, we
+        // should keep this contract. That means throwing all nodes into the
+        // bucket and not sifting through them until later.
+        //
+        // TODO: If we need to optimize performance here, we could compromise
+        // by re-running the predicate at the end even though we already know
+        // it's going to match.
+        results.push({ node, depth, grammar });
         node = node.parent;
       }
     }
@@ -700,7 +720,10 @@ class WASMTreeSitterLanguageMode {
       );
     });
 
-    return results[0]?.node;
+    for (let { node, grammar } of results) {
+      if (where(node, grammar)) { return node; }
+    }
+    return null;
   }
 
   /*
