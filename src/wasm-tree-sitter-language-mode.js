@@ -2564,7 +2564,7 @@ class LanguageLayer {
       // guaranteed to be holding an instance of `Node`. Once we patch it here,
       // we're good to go.
       //
-      ensureRangePropertyIsDefined(tree.rootNode);
+      ensureNodeIsPatched(tree.rootNode);
 
       this.languageMode.emitRangeUpdate(rangeForNode(tree.rootNode));
       if (includedRanges) {
