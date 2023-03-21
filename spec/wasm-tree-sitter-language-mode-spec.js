@@ -1260,6 +1260,57 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
   });
 
+  describe('.suggestedIndentForBufferRow', () => {
+    let editor;
+
+    describe('javascript', () => {
+      beforeEach(async () => {
+        editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await atom.packages.activatePackage('language-javascript');
+        await editor.getBuffer().getLanguageMode().ready;
+      });
+
+      it('bases indentation off of the previous non-blank line', () => {
+        expect(editor.suggestedIndentForBufferRow(0)).toBe(0);
+        expect(editor.suggestedIndentForBufferRow(1)).toBe(1);
+        expect(editor.suggestedIndentForBufferRow(2)).toBe(2);
+        expect(editor.suggestedIndentForBufferRow(5)).toBe(3);
+        expect(editor.suggestedIndentForBufferRow(7)).toBe(2);
+        expect(editor.suggestedIndentForBufferRow(9)).toBe(1);
+        expect(editor.suggestedIndentForBufferRow(11)).toBe(1);
+      });
+
+      it('does not take invisibles into account', () => {
+        editor.update({ showInvisibles: true });
+        expect(editor.suggestedIndentForBufferRow(0)).toBe(0);
+        expect(editor.suggestedIndentForBufferRow(1)).toBe(1);
+        expect(editor.suggestedIndentForBufferRow(2)).toBe(2);
+        expect(editor.suggestedIndentForBufferRow(5)).toBe(3);
+        expect(editor.suggestedIndentForBufferRow(7)).toBe(2);
+        expect(editor.suggestedIndentForBufferRow(9)).toBe(1);
+        expect(editor.suggestedIndentForBufferRow(11)).toBe(1);
+      });
+    });
+
+    describe('css', () => {
+      beforeEach(async () => {
+        editor = await atom.workspace.open('css.css', { autoIndent: true });
+        await atom.packages.activatePackage('language-source');
+        await atom.packages.activatePackage('language-css');
+        await editor.getBuffer().getLanguageMode().ready;
+      });
+
+      it('does not return negative values (regression)', () => {
+        editor.setText('.test {\npadding: 0;\n}');
+        console.log('???');
+        expect(editor.suggestedIndentForBufferRow(2)).toBe(0);
+        editor.setText('@media screen {\n  .test {\n    padding: 0;\n  }\n}');
+        expect(editor.suggestedIndentForBufferRow(3)).toBe(1);
+      });
+    });
+  });
+
+
   describe('folding', () => {
     it('can fold nodes that start and end with specified tokens', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -1506,7 +1557,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       `);
     });
 
-    fit('folds between arbitrary points in the buffer with @fold.start and @fold.end markers', async () => {
+    it('folds between arbitrary points in the buffer with @fold.start and @fold.end markers', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, cGrammarPath, cConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
