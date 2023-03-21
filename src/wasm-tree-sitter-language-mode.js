@@ -1098,6 +1098,8 @@ class WASMTreeSitterLanguageMode {
       (layer) => !!layer.indentsQuery
     );
 
+    if (!controllingLayer) { return undefined; }
+
     let { indentsQuery } = controllingLayer;
     if (!indentsQuery) { return undefined; }
 
