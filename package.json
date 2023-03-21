@@ -134,7 +134,6 @@
     "one-dark-ui": "file:packages/one-dark-ui",
     "one-light-syntax": "file:packages/one-light-syntax",
     "one-light-ui": "file:packages/one-light-ui",
-    "oniguruma": "https://github.com/Aerijo/napi-oniguruma.git",
     "open-on-github": "file:packages/open-on-github",
     "package-generator": "file:packages/package-generator",
     "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
