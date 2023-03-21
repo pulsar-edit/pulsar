@@ -1,7 +1,8 @@
 const Parser = require('web-tree-sitter');
 const { Point, Range, spliceArray } = require('text-buffer');
 const { CompositeDisposable, Emitter } = require('event-kit');
-const ScopeDescriptor = require('./scope-descriptor')
+const ScopeDescriptor = require('./scope-descriptor');
+const ScopeResolver = require('./scope-resolver');
 const Token = require('./token');
 const TokenizedLine = require('./tokenized-line');
 const { matcherForSelector } = require('./selectors');
@@ -936,11 +937,17 @@ class WASMTreeSitterLanguageMode {
   // * bufferRow - A {Number} indicating the buffer row
   //
   // Returns a {Number}.
-  suggestedIndentForBufferRow(row, tabLength, options = {}) {
+  suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
     if (row === 0) { return 0; }
 
+    let options = {
+      skipBlankLines: true,
+      skipDedentCheck: false,
+      ...rawOptions
+    };
+
     let comparisonRow = row - 1;
-    if (options.skipBlankLines !== false) {
+    if (options.skipBlankLines) {
       // Move upward until we find the a line with text on it.
       while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
         comparisonRow--;
@@ -960,6 +967,8 @@ class WASMTreeSitterLanguageMode {
       this.buffer.lineForRow(comparisonRow), tabLength
     );
 
+    // TODO: Maybe the controlling layer should be whichever one both (a) has
+    // an indent query and (b) covers both points we care about.
     let controllingLayer = this.controllingLayerAtPoint(
       comparisonRowEnd,
       (layer) => !!layer.indentsQuery
@@ -1030,7 +1039,7 @@ class WASMTreeSitterLanguageMode {
 
     let dedentDelta = 0;
 
-    if (options.skipDedentCheck !== true) {
+    if (!options.skipDedentCheck) {
       // The second phase tells us whether this line should be dedented from the
       // previous line.
       let dedentCaptures = indentsQuery.captures(
@@ -1078,7 +1087,10 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForEditedBufferRow(row, tabLength) {
-    let scopeResolver = new ScopeResolver(this.buffer);
+    // TODO: Why did I get `ScopeResolver` involved in this? This allows
+    // `indents.scm` files to use tests like `(#set! final true)`, but I don't
+    // know if there's truly a need for that.
+    let scopeResolver = new ScopeResolver(this);
     if (row === 0) { return 0; }
 
     let controllingLayer = this.controllingLayerAtPoint(
