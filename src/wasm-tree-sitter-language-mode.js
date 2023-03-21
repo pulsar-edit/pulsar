@@ -55,7 +55,7 @@ function resolveNodePosition (node, descriptor) {
 
 // Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
 // that we don't break anything that relied on `range` being present.
-function ensureRangePropertyIsDefined(node) {
+function ensureNodeIsPatched(node) {
   let done = node.range && node.range instanceof Range;
   if (done) { return; }
   let proto = Object.getPrototypeOf(node);
@@ -63,7 +63,21 @@ function ensureRangePropertyIsDefined(node) {
   Object.defineProperty(proto, 'range', {
     get () { return rangeForNode(this); }
   });
+
+  // autocomplete-html expects a `closest` function to exist on nodes.
+  Object.defineProperty(proto, 'closest', {
+    value: function closest(types) {
+      if (!Array.isArray(types)) { types = [types]; }
+      let node = this;
+      while (node) {
+        if (types.includes(node.type)) { return node; }
+        node = node.parent;
+      }
+      return null;
+    }
+  });
 }
+
 
 // Compares “informal” points like the ones in a tree-sitter tree; saves us
 // from having to convert them to actual `Point`s.
