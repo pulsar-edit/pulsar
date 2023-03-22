@@ -21,7 +21,7 @@
     "atom": "*"
   },
   "configSchema": {
-    "createInDevMode": {
+    "createOnlyForDevMode": {
       "default": false,
       "type": "boolean",
       "description": "When disabled, generated packages are linked into Pulsar in both normal mode and dev mode. When enabled, generated packages are linked into Pulsar only in dev mode."

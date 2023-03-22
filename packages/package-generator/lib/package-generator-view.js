@@ -119,7 +119,7 @@ class PackageGeneratorView {
 
   linkPackage (packagePath, callback) {
     const args = ['link']
-    if (atom.config.get('package-generator.createInDevMode')) args.push('--dev')
+    if (atom.config.get('package-generator.createOnlyForDevMode')) args.push('--dev')
     args.push(packagePath.toString())
 
     this.runCommand(atom.packages.getApmPath(), args, callback)

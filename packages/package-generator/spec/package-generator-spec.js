@@ -145,9 +145,9 @@ describe('Package Generator', () => {
         })
 
         describe(`when the ${type} is created outside of the packages directory`, () => {
-          describe('when package-generator.createInDevMode is set to false', () => {
+          describe('when package-generator.createOnlyForDevMode is set to false', () => {
             it('calls `apm init` and `apm link`', async () => {
-              atom.config.set('package-generator.createInDevMode', false)
+              atom.config.set('package-generator.createOnlyForDevMode', false)
 
               await generatePackage(false)
               expect(apmExecute.argsForCall[0][0]).toBe(atom.packages.getApmPath())
@@ -157,9 +157,9 @@ describe('Package Generator', () => {
             })
           })
 
-          describe('when package-generator.createInDevMode is set to true', () => {
+          describe('when package-generator.createOnlyForDevMode is set to true', () => {
             it('calls `apm init` and `apm link --dev`', async () => {
-              atom.config.set('package-generator.createInDevMode', true)
+              atom.config.set('package-generator.createOnlyForDevMode', true)
 
               await generatePackage(false)
               expect(apmExecute.argsForCall[0][0]).toBe(atom.packages.getApmPath())
