@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+- The settings-view package now lists a package’s snippets more accurately
+
+
 ## 1.102.0
 
 - Fixed a bug where `pulsar` on Windows could never trigger
