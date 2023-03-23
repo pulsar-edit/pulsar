@@ -3789,10 +3789,9 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-document-register-element@^1.14.10:
+"document-register-element@https://github.com/pulsar-edit/document-register-element.git#1f5868f":
   version "1.14.10"
-  resolved "https://registry.yarnpkg.com/document-register-element/-/document-register-element-1.14.10.tgz#a7bd025e6b73bd827fec2d8e90aba755e99387f5"
-  integrity sha512-w5UA37hEIrs+9pruo2yR5UD13c4UHDlkqqjt4qurnp7QsBI9b1IOi8WXUim+aCqKBsENX3Z/cso7XMOuwJH1Yw==
+  resolved "https://github.com/pulsar-edit/document-register-element.git#1f5868fba7b6c3a337c777a0396c43a080e1fad3"
 
 dom-serializer@^2.0.0:
   version "2.0.0"
