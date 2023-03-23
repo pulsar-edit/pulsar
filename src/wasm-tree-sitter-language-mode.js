@@ -272,106 +272,6 @@ class WASMTreeSitterLanguageMode {
     this.rootLanguageLayer.updateInjections(grammar);
   }
 
-  // _prepareInvalidations() {
-  //   let nodes = this.oldNodeTexts
-  //   let parentScopes = createTree(comparePoints)
-  //
-  //   this.newRanges.forEach(range => {
-  //     const newNodeText = this.boundaries.lt(range.end).value?.definition
-  //     if (newNodeText) nodes.add(newNodeText)
-  //     const parent = findNodeInCurrentScope(
-  //       this.boundaries, range.start, v => v.scope === 'open'
-  //     )
-  //     if (parent) parentScopes = parentScopes.insert(parent.position, parent)
-  //   })
-  //
-  //   parentScopes.forEach((_, val) => {
-  //     const from = val.position, to = val.closeScopeNode.position
-  //     const range = new Range(from, to)
-  //     this._invalidateReferences(range, nodes)
-  //   })
-  //   this.oldNodeTexts = new Set()
-  //   this.newRanges = []
-  // }
-
-  // _invalidateReferences(range, invalidatedNames) {
-  //   const {start, end} = range
-  //   let it = this.boundaries.ge(start)
-  //   while (it.hasNext) {
-  //     const node = it.value.openNode
-  //     if (node && !it.value.definition) {
-  //       const txt = node.text
-  //       if (invalidatedNames.has(txt)) {
-  //         const range = new Range(node.startPosition, node.endPosition)
-  //         this.emitter.emit('did-change-highlighting', range)
-  //       }
-  //     }
-  //     it.next()
-  //     if (comparePoints(it.key, end) >= 0) return
-  //   }
-  // }
-
-  // _updateWithLocals(locals) {
-  //   const size = locals.length
-  //   for (let i = 0; i < size; i++) {
-  //     const {name, node} = locals[i]
-  //     const nextOne = locals[i+1]
-  //
-  //     const duplicatedLocalScope = nextOne &&
-  //       comparePoints(node.startPosition, nextOne.node.startPosition) === 0 &&
-  //       comparePoints(node.endPosition, nextOne.node.endPosition) === 0
-  //     if (duplicatedLocalScope) {
-  //       // Local reference have lower precedence over everything else
-  //       if (name === 'local.reference') continue;
-  //     }
-  //
-  //     let openNode = this._getOrInsert(node.startPosition, node)
-  //     if (!openNode.openNode) openNode.openNode = node
-  //     let closeNode = this._getOrInsert(node.endPosition, node)
-  //     if (!closeNode.closeNode) closeNode.closeNode = node
-  //
-  //     if (name === "local.scope") {
-  //       openNode.scope = "open"
-  //       closeNode.scope = "close"
-  //       openNode.closeScopeNode = closeNode
-  //       closeNode.openScopeNode = openNode
-  //       const parentNode = findNodeInCurrentScope(
-  //         this.boundaries, node.startPosition, v => v.scope === 'open')
-  //       const depth = parentNode?.depth || 0
-  //       openNode.depth = depth + 1
-  //       closeNode.depth = depth + 1
-  //     } else if (name === "local.reference" && !openNode.definition) {
-  //       const varName = node.text
-  //       const varScope = findNodeInCurrentScope(
-  //         this.boundaries, node.startPosition, v => v.definition === varName)
-  //       if (varScope) {
-  //         openNode.openScopeIds = varScope.openScopeIds
-  //         closeNode.closeScopeIds = varScope.closeDefinition.closeScopeIds
-  //       }
-  //     } else if (name === "local.definition") {
-  //       const shouldAddVarToScopes = openNode.openScopeIds.indexOf(VAR_ID) === -1
-  //       if (shouldAddVarToScopes) {
-  //         openNode.openScopeIds = [...openNode.openScopeIds, VAR_ID]
-  //         closeNode.closeScopeIds = [VAR_ID, ...closeNode.closeScopeIds]
-  //       }
-  //
-  //       openNode.definition = node.text
-  //       openNode.closeDefinition = closeNode
-  //     }
-  //   }
-  // }
-
-  // _getOrInsert(key) {
-  //   const existing = this.boundaries.get(key)
-  //   if (existing) {
-  //     return existing
-  //   } else {
-  //     const obj = {openScopeIds: [], closeScopeIds: [], position: key}
-  //     this.boundaries = this.boundaries.insert(key, obj)
-  //     return obj
-  //   }
-  // }
-
   /*
   Section - Highlighting
   */
@@ -939,6 +839,9 @@ class WASMTreeSitterLanguageMode {
   // Returns a {Number}.
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
     if (row === 0) { return 0; }
+    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
+    // need a way to share those tests across different kinds of capture
+    // resolvers.
 
     let options = {
       skipBlankLines: true,
@@ -948,34 +851,41 @@ class WASMTreeSitterLanguageMode {
 
     let comparisonRow = row - 1;
     if (options.skipBlankLines) {
-      // Move upward until we find the a line with text on it.
+      // It usually makes no sense to compare to a blank row, so we'll move
+      // upward until we find the a line with text on it.
       while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
         comparisonRow--;
       }
     }
 
-    // TODO: What's the right place to measure from? If we measure from the
-    // beginning of the new row, the injection's language layer might not know
-    // whether it controls that point. Feels better to measure from the end of
-    // the previous non-whitespace row, but we'll see.
+    // TODO: What's the right place to measure from? Often we're here because
+    // the user just hit Enter, which means we'd run before injection layers
+    // have been re-parsed. Hence the injection's language layer might not know
+    // whether it controls the point at the cursor. So instead we look for the
+    // layer that controls the point at the end of the comparison row. This may
+    // not always be correct, but we'll find out.
     let comparisonRowEnd = new Point(
       comparisonRow,
       this.buffer.lineLengthForRow(comparisonRow)
     );
 
-    const lastLineIndent = this.indentLevelForLine(
+    const comparisonRowIndent = this.indentLevelForLine(
       this.buffer.lineForRow(comparisonRow), tabLength
     );
 
-    // TODO: Maybe the controlling layer should be whichever one both (a) has
-    // an indent query and (b) covers both points we care about.
+    // Find the deepest layer that actually has an indents query. (Layers that
+    // don't define one, such as specialized injection grammars, are telling us
+    // they don't care about indentation. If a grammar wants to _prevent_ a
+    // shallower layer from controlling indentation, it should define an empty
+    // `indents.scm`, perhaps with an explanatory comment.)
     let controllingLayer = this.controllingLayerAtPoint(
       comparisonRowEnd,
       (layer) => !!layer.indentsQuery
     );
 
-    if (!controllingLayer) { return lastLineIndent; }
-    let { indentsQuery } = controllingLayer;
+    if (!controllingLayer) { return comparisonRowIndent; }
+    let { indentsQuery, scopeResolver } = controllingLayer;
+    scopeResolver.reset();
 
     // The tree officially gets re-parsed later in the change lifecycle, on
     // `bufferDidFinishTransaction`. But we need a parse here so that we can
@@ -986,8 +896,8 @@ class WASMTreeSitterLanguageMode {
     // update ranges could be stale. To know the exact range to re-parse we'd
     // need to synchronously parse the root tree and however many intermediate
     // layers' trees in between. That's possible in theory, but it wouldn't be
-    // a lot of fun. I haven't actually seen this break, though, so we'll live
-    // with it for now.
+    // a lot of fun. I haven't actually seen this break, so we'll live with it
+    // for now.
     let indentTree = controllingLayer.forceAnonymousParse(
       controllingLayer.currentNodeRangeSet
     );
@@ -1004,9 +914,11 @@ class WASMTreeSitterLanguageMode {
     let indentDelta = 0;
     for (let capture of indentCaptures) {
       let { node, name } = capture;
+      if (!scopeResolver.store(capture)) { continue; }
 
-      // Ignore anything that ends before the range we care about.
+      // Ignore anything that isn't actually on the row.
       if (node.endPosition.row < comparisonRow) { continue; }
+      if (node.startPosition.row > comparisonRow) { continue; }
 
       // Ignore “phantom” nodes that aren't present in the buffer.
       if (node.text === '') { continue; }
@@ -1024,7 +936,7 @@ class WASMTreeSitterLanguageMode {
         // } else if (foo) {
         //
         // We should still indent the succeeding line because the initial `}`
-        // does not “cancel out” the `{` at the end of the line. On the other
+        // does not cancel out the `{` at the end of the line. On the other
         // hand:
         //
         // } else if (foo) {}
@@ -1035,11 +947,17 @@ class WASMTreeSitterLanguageMode {
         indentDelta--;
       }
     }
+    // `@indent` and `@indent_end` can increase the indent level by one at
+    // most. If a language needs stranger indentation than that, then `@match`
+    // captures can be used to specify an exact level of indentation relative
+    // to another specific node. If a `@match` capture exists, we'll catch it
+    // in the dedent captures phase.
     indentDelta = clamp(indentDelta, 0, 1);
 
     let dedentDelta = 0;
 
     if (!options.skipDedentCheck) {
+      scopeResolver.reset();
       // The second phase tells us whether this line should be dedented from the
       // previous line.
       let dedentCaptures = indentsQuery.captures(
@@ -1049,7 +967,13 @@ class WASMTreeSitterLanguageMode {
       );
 
       let currentRowText = this.buffer.lineForRow(row);
-      dedentCaptures = dedentCaptures.filter(capture => {
+
+      let positionSet = new Set;
+      for (let capture of dedentCaptures) {
+        let { name, node } = capture;
+        let { text } = node;
+        if (!text) { continue; }
+        if (!scopeResolver.store(capture)) { continue; }
         // Imagine you've got:
         //
         // { ^foo, bar } = something
@@ -1062,20 +986,44 @@ class WASMTreeSitterLanguageMode {
         // Thus we don't want to honor a dedent unless it's the first
         // non-whitespace content in the line. We'll use similar logic for
         // `suggestedIndentForEditedBufferRow`.
-        let { text } = capture.node;
-        // Filter out phantom nodes.
-        if (!text) { return false; }
-        return currentRowText.trim().startsWith(text);
-      });
+        if (!currentRowText.trim().startsWith(text)) {
+          continue;
+        }
 
-      dedentDelta = this.getIndentDeltaFromCaptures(
-        dedentCaptures,
-        ['indent_end', 'branch']
-      );
+        // The '@match' capture short-circuits a lot of this logic by pointing
+        // us to a different node and asking us to match the indentation of
+        // whatever row that node starts on.
+        if (name === 'match') {
+          let matchIndentLevel = this.resolveIndentMatchCapture(
+            capture, row, tabLength);
+
+          if (typeof matchIndentLevel === 'number') {
+            scopeResolver.reset();
+            return matchIndentLevel;
+          }
+        }
+
+        if (name !== 'indent_end' && name !== 'branch') {
+          continue;
+        }
+
+        // Only consider a given range once, even if it's marked with both
+        // `indent_end` and `branch`.
+        let key = `${node.startIndex}/${node.endIndex}`;
+        if (positionSet.has(key)) { continue; }
+        positionSet.add(key);
+
+        dedentDelta--;
+      }
+
+      // `@indent_end`/`@branch` captures, no matter how many there are, can
+      // dedent the current line by one level at most. To indent more than
+      // that, one must use a `@match` capture.
       dedentDelta = clamp(dedentDelta, -1, 0);
     }
 
-    return lastLineIndent + indentDelta + dedentDelta;
+    scopeResolver.reset();
+    return comparisonRowIndent + indentDelta + dedentDelta;
   }
 
   // Get the suggested indentation level for a line in the buffer on which the
@@ -1087,12 +1035,14 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForEditedBufferRow(row, tabLength) {
-    // TODO: Why did I get `ScopeResolver` involved in this? This allows
-    // `indents.scm` files to use tests like `(#set! final true)`, but I don't
-    // know if there's truly a need for that.
-    let scopeResolver = new ScopeResolver(this);
     if (row === 0) { return 0; }
+    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
+    // need a way to share those tests across different kinds of capture
+    // resolvers.
 
+    // By the time this function runs, we probably know enough to be sure of
+    // which layer controls the beginning of this row, even if we don't know
+    // which one owns the position at the cursor.
     let controllingLayer = this.controllingLayerAtPoint(
       new Point(row, 0),
       (layer) => !!layer.indentsQuery
@@ -1100,14 +1050,16 @@ class WASMTreeSitterLanguageMode {
 
     if (!controllingLayer) { return undefined; }
 
-    let { indentsQuery } = controllingLayer;
+    let { indentsQuery, scopeResolver } = controllingLayer;
     if (!indentsQuery) { return undefined; }
+    scopeResolver.reset();
 
     // Indents query won't work unless we re-parse the tree. Since we're typing
     // one character at a time, this should not be costly.
     let indentTree = controllingLayer.forceAnonymousParse(
       controllingLayer.currentNodeRangeSet
     );
+
     const indents = indentsQuery.captures(
       indentTree.rootNode,
       { row: row, column: 0 },
@@ -1116,7 +1068,7 @@ class WASMTreeSitterLanguageMode {
 
     let lineText = this.buffer.lineForRow(row).trim();
 
-    const currentLineIndent = this.indentLevelForLine(
+    const currentRowIndent = this.indentLevelForLine(
       this.buffer.lineForRow(row), tabLength);
 
     // This is the indent level that is suggested from context — the level we'd
@@ -1124,7 +1076,10 @@ class WASMTreeSitterLanguageMode {
     // of the current line — even if it's “wrong” — unless typing triggers a
     // dedent. But once a dedent is triggered, we should dedent one level from
     // this value, not from the current line indent.
-    const originalLineIndent = this.suggestedIndentForBufferRow(row, tabLength,
+    //
+    // If more than one level of dedent is needed, a `@match` capture must be
+    // used so that indent level can be expressed in absolute terms.
+    const originalRowIndent = this.suggestedIndentForBufferRow(row, tabLength,
       { skipDedentCheck: true });
 
     for (let indent of indents) {
@@ -1133,12 +1088,21 @@ class WASMTreeSitterLanguageMode {
         continue;
       }
       if (node.startPosition.row !== row) { continue; }
+      if (indent.name === 'match') {
+        let matchIndentLevel = this.resolveIndentMatchCapture(
+          indent, row, tabLength);
+        if (typeof matchIndentLevel === 'number') {
+          scopeResolver.reset();
+          return matchIndentLevel;
+        }
+      }
       if (indent.name !== 'branch') { continue; }
       if (node.text !== lineText) { continue; }
-      return Math.max(0, originalLineIndent - 1);
+      return Math.max(0, originalRowIndent - 1);
     }
 
-    return currentLineIndent;
+    scopeResolver.reset();
+    return currentRowIndent;
   }
 
   // Get the suggested indentation level for a given line of text, if it were
@@ -1148,10 +1112,64 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForLineAtBufferRow(row, line, tabLength) {
+    // TODO: This method's goal is to make sure that text is inserted at the
+    // right indentation level from, say, a clipboard paste. But we can't run a
+    // syntax capture against arbitrary text that isn't in the parse tree.
+    //
+    // But if one were to paste text, then select that exact text and invoke
+    // **Editor: Auto Indent**, the text would be formatted correctly.
+    //
+    // So the better approach for a tree-sitter language mode would probably be
+    // to do this automatically. The only drawback is that we'd either
+    //
+    //   (a) wait until the transaction is finished and the tree is re-parsed,
+    //       which means we'd want to fix the text and then group those changes
+    //       with the previous checkpoint to prevent an extra history
+    //       checkpoint, or
+    //   (b) anonymously re-parse the tree to try to avoid that hassle, which
+    //       could double the amount of time we spend parsing.
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
 
   // Private
+
+  // Given a `@match` capture, attempts to resolve it to an absolute
+  // indentation level.
+  resolveIndentMatchCapture(capture, currentRow, tabLength) {
+    let { node, setProperties: props = {} } = capture;
+
+    // A `@match` capture must specify
+    //
+    //  (#set! matchIndentOf foo)
+    //
+    // where "foo" is a node descriptor. It may optionally specify
+    //
+    //  (#set! offsetIndent X)
+    //
+    // where "X" is a number, positive or negative.
+    //
+    let { matchIndentOf, offsetIndent = "0" } = props;
+    if (!matchIndentOf) { return undefined; }
+    offsetIndent = Number(offsetIndent);
+    if (isNaN(offsetIndent)) { offsetIndent = 0; }
+
+    // Follow a node descriptor to a target node.
+    let targetNode = resolveNodePosition(node, props.matchIndentOf);
+    if (!targetNode) { return undefined; }
+
+    // That node must start on a row earlier than ours.
+    let targetRow = targetNode.startPosition.row;
+    if (targetRow >= currentRow) { return undefined; }
+
+    // We'll match the indentation level of that row…
+    let baseIndent = this.indentLevelForLine(
+      this.buffer.lineForRow(targetRow), tabLength);
+
+    // …with an optional offset applied.
+    let result = baseIndent + offsetIndent;
+
+    return Math.max(result, 0);
+  }
 
   getAllInjectionLayers() {
     let markers =  this.injectionsMarkerLayer.getMarkers();
@@ -1355,7 +1373,7 @@ class FoldResolver {
       this.layer.tree.rootNode, start, end);
 
     while (iterator.key) {
-      if (comparePoints(iterator.key.position, end) > 0) { break; }
+      if (comparePoints(iterator.key.position, end) >= 0) { break; }
       let capture = iterator.value;
       let { name } = capture;
       if (name === 'fold') {
@@ -1534,18 +1552,25 @@ class FoldResolver {
     let defaultOptions = { endAt: 'lastChild.startPosition' };
     let options = { ...defaultOptions, ...props };
 
-    for (let key in options) {
-      if (!FoldResolver.ADJUSTMENTS[key]) { continue; }
-      let value = options[key];
-      end = FoldResolver.ADJUSTMENTS[key](
-        end, node, value, props, this.layer);
+    try {
+      for (let key in options) {
+        if (!FoldResolver.ADJUSTMENTS[key]) { continue; }
+        let value = options[key];
+        end = FoldResolver.ADJUSTMENTS[key](
+          end, node, value, props, this.layer);
+      }
+
+      end = Point.fromObject(end, true);
+      end = this.buffer.clipPosition(end);
+
+      if (end.row <= start.row) { return null; }
+      return new Range(start, end);
+    } catch (error) {
+      // If any of our assumptions are violated, fall back to an end point that we know can't fail: the end of the captured node itself.
+      console.warn("Error resolving fold range:");
+      console.warn(error.message);
+      return new Range(start, node.range.end);
     }
-
-    end = Point.fromObject(end, true);
-    end = this.buffer.clipPosition(end);
-
-    if (end.row <= start.row) { return null; }
-    return new Range(start, end);
   }
 }
 
@@ -1802,19 +1827,6 @@ class HighlightIterator {
     }
     return [];
   }
-
-  // Detect whether or not another more deeply-nested language layer has a
-  // scope boundary at this same position. If so, the current language layer's
-  // scope boundary should not be reported.
-  //
-  // This also will only avoid the scenario where two iterators want to
-  // highlight the _exact same_ boundary. If a root language layer wants to
-  // mark a boundary that isn't present in an injection's boundary list, the
-  // root will be allowed to proceed.
-  //
-  // TODO: This only works for comparing the first two iterators; anything
-  // deeper than that will be ignored. This probably isn't a problem, but we'll
-  // see.
 
   // EXPERIMENT: Rather than the commented-out logic below, let's try something
   // more holistic that is off by default but triggered via an explicit
