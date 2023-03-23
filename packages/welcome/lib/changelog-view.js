@@ -53,40 +53,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Signed Pulsar macOS Binaries
+                Added a new feature to Search for Pulsar's settings
               </li>
               <li>
-                Fixed a bug where `pulsar` on Windows could never trigger
+                Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
               </li>
               <li>
-                Fixed `github` package shelling out to `git` on macOS
+                Updated the instructions and look of the login flow for the `github` package.
               </li>
               <li>
-                Fixed minor bugs found during fixes to tests
+                Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
               </li>
               <li>
-                Improved our testing infastructure to aide in finding and fixing further bugs
-              </li>
-              <li>
-                Updated many dependencies of Pulsar and its core packages
-              </li>
-              <li>
-                New Pulsar Icon on macOS
-              </li>
-              <li>
-                Selected text is styled by default
-              </li>
-              <li>
-                Restored `right-clicked` CSS class on tags
-              </li>
-              <li>
-                Fixed syntax highlighting on C++
-              </li>
-              <li>
-                Updated JavaScript snippets to modern ES6 syntax
-              </li>
-              <li>
-                PPM no longer assumes `master` for git branches
+                Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
               </li>
 
             </ul>
