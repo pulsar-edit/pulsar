@@ -411,9 +411,9 @@ class WASMTreeSitterLanguageMode {
       results.push(...map);
 
       // Make an artificial result for the root layer scope itself.
-      if (layer.tree) {
+      if (layer.tree && layer.languageScope) {
         results.push({
-          name: layer.grammar.scopeName,
+          name: layer.languageScope,
           node: layer.tree.rootNode
         });
       }
@@ -471,6 +471,7 @@ class WASMTreeSitterLanguageMode {
       oldTree,
       { includedRanges }
     );
+
     // if (devMode) { console.timeEnd('Parsing'); }
     return result;
   }
@@ -1961,10 +1962,7 @@ class LayerHighlightIterator {
     //   console.time(timeKey);
     // }
     let [boundaries, openScopes] = this.languageLayer.getSyntaxBoundaries(
-      start,
-      end,
-      { includeOpenScopes: true }
-    );
+      start, end);
 
     // An iterator might have no boundaries to apply but still be able to tell
     // us about a scope that should be open at the beginning of the range.
@@ -2157,7 +2155,25 @@ class LanguageLayer {
     );
     this.foldResolver = new FoldResolver(this.buffer, this);
 
-    this.languageScopeId = this.languageMode.getOrCreateScopeId(this.grammar.scopeName);
+    // What should our language scope name be? Should we even have one?
+    let languageScope;
+    if (depth === 0) {
+      languageScope = this.grammar.scopeName;
+    } else {
+      languageScope = injectionPoint.languageScope;
+      // Honor an explicit `null`, but fall back to the default scope name
+      // otherwise.
+      if (languageScope === undefined) {
+        languageScope = this.grammar.scopeName;
+      }
+    }
+
+    this.languageScope = languageScope;
+    if (languageScope === null) {
+      this.languageScopeId = null;
+    } else {
+      this.languageScopeId = this.languageMode.getOrCreateScopeId(languageScope);
+    }
   }
 
   inspect() {
@@ -2224,29 +2240,52 @@ class LanguageLayer {
 
     const captures = this.syntaxQuery.captures(this.tree.rootNode, from, to);
 
-    let isRootLanguageLayer = this.depth === 0;
+    // let isRootLanguageLayer = this.depth === 0;
     this.scopeResolver.reset();
 
-    // TODO: For injection layers, there's the extent, which covers the range
-    // of whichever node matches the injection point's `type`. And there's the
-    // content, meaning whatever set of nodes is returned from the point's
-    // `content` callback. Neither one is a great representation of the true
-    // range being injected into. We need better logic around when we add an
-    // injection layer's scope to a given range.
-    let languageScopeDiffersFromParent = true;
-    if (this.marker) {
-      // We don't want to duplicate the scope ID when a language injects
-      // _itself_. This happens in C (for `#define`s) and in Rust (for macros),
-      // among others.
-      let parentLayer = this.marker?.parentLanguageLayer;
-      languageScopeDiffersFromParent = this.languageScopeId !== parentLayer.languageScopeId;
-    }
+    // How do we add a layer's root scope? There's no easy answer.
+    //
+    // If we rely on the grammar author to map the tree's root node to the
+    // language's root scope, they could forget to do it, or map a scope that
+    // isn't the same as the one given in the grammar's config file. We'd also
+    // limit the ability of that `highlights.scm` to be used in multiple
+    // contexts — for example, the HTML grammar would always carry around a
+    // `text.html.basic` scope name no matter where we put it.
+    //
+    // If we manage it ourselves, we invite the complexity of _manually_
+    // applying a root scope — plus knowing when it actually _shouldn't_ be
+    // applied, and making sure that `scopeDescriptorForPosition` returns
+    // results that agree with reality.
+    //
+    // Option B is the one we reluctantly choose because it's easier to manage.
+    // Here's roughly how this works:
+    //
+    // * The root language scope on the root layer will always be applied.
+    // * The root language scope on an injection layer will be applied in areas
+    //   where that injection is active, unless we were told otherwise in
+    //   `addInjectionPoint`. That method's `rootLanguageScope` property can
+    //   define another scope name to use instead… or pass `null`, signaling
+    //   that we should skip the root scope altogether. (This is the best
+    //   approach for special-purpose injections like `todo` and `hyperlink`.)
+
+    // if (this.marker) {
+    //   // We don't want to duplicate the scope ID when a language injects
+    //   // _itself_. This happens in C (for `#define`s) and in Rust (for macros),
+    //   // among others.
+    //   let parentLayer = this.marker?.parentLanguageLayer;
+    //   languageScopeDiffersFromParent = this.languageScopeId !== parentLayer.languageScopeId;
+    // }
 
     // Ensure the whole source file (or whole bounds of the injection) is
-    // annotated with the root language scope name. We _do not_ want to leave
+    // annotated with the language's root scope name. We _do not_ want to leave
     // this up to the grammar author; it's too important.
-    if (languageScopeDiffersFromParent && from.isEqual(extent.start) && from.column === 0) {
-      this.scopeResolver.setBoundary(from, this.languageScopeId, 'open');
+    //
+    // TODO: If an injection only sees certain disjoint ranges, its scope name
+    // will still be present over its entire extent. That was a flaw in original
+    // tree-sitter and it's still present now. Not sure there's a good way
+    // around it.
+    if (this.languageScopeId && from.isLessThanOrEqual(extent.start) && from.column === 0) {
+      this.scopeResolver.setBoundary(extent.start, this.languageScopeId, 'open');
     }
 
     for (let capture of captures) {
@@ -2260,12 +2299,15 @@ class LanguageLayer {
       this.scopeResolver.store(capture);
     }
 
-    if (languageScopeDiffersFromParent && to.isEqual(extent.end)) {
-      this.scopeResolver.setBoundary(to, this.languageScopeId, 'close');
+    if (this.languageScopeId && to.isGreaterThanOrEqual(extent.end)) {
+      this.scopeResolver.setBoundary(extent.end, this.languageScopeId, 'close');
     }
 
     let alreadyOpenScopes = [];
-    if (isRootLanguageLayer && from.isGreaterThan(extent.start)) {
+    // If the highlight range starts after this layer's extent, then we should
+    // tell the `HighlightIterator` that the language's root scope is already
+    // open at this point.
+    if (this.languageScopeId && from.isGreaterThan(extent.start)) {
       alreadyOpenScopes.push(this.languageScopeId);
     }
 
@@ -2396,7 +2438,9 @@ class LanguageLayer {
     let relevantScopes = scopes.filter((scope) => {
       let range = rangeForNode(scope);
       return range.containsRange(localRange);
-    }).sort((a, b) => a.compare(b));
+    }).sort((a, b) => {
+      a.range.compare(b.range)
+    });
 
     relevantScopes.push(globalScope);
 
