@@ -2600,6 +2600,21 @@ class LanguageLayer {
 
     this.currentNodeRangeSet = includedRanges;
 
+    // Experiment: Even when no syntax changes have occurred, we should
+    // always re-highlight the most specific node within which the edit
+    // occurred. This is needed because a node's scope can change based on
+    // its contents.
+    if (affectedRange) {
+      let node = this.getSyntaxNodeContainingRange(affectedRange);
+      if (node) {
+        // Simple guard here against situations where the most specific node
+        // for this range is the root node. We're not trying to invalidate the
+        // whole tree. If the whole tree truly needs to be invalidated, it'll
+        // get caught by tree-sitter anyway.
+        if (node.parent) { affectedRange = node.range; }
+      }
+    }
+
     if (this.tree) {
       const rangesWithSyntaxChanges = this.tree.getChangedRanges(tree);
       this.tree = tree;
@@ -2620,6 +2635,8 @@ class LanguageLayer {
         } else {
           affectedRange = combinedRangeWithSyntaxChange;
         }
+      } else if (affectedRange) {
+        this.languageMode.emitRangeUpdate(affectedRange);
       }
     } else {
       this.tree = tree;
@@ -2727,6 +2744,32 @@ class LanguageLayer {
     }
 
     return null;
+  }
+
+  // Used to find the most specific node affected by an edited range.
+  getSyntaxNodeContainingRange(range, where = FUNCTION_TRUE) {
+    if (!this.language || !this.tree) { return null; }
+    let { buffer } = this.languageMode;
+
+    if (range.start.isEqual(range.end)) {
+      return this.getSyntaxNodeAtPosition(range.start);
+    }
+
+    let indexStart = buffer.characterIndexForPosition(range.start);
+    let indexEnd = buffer.characterIndexForPosition(range.end);
+
+    let rangeBreadth = indexEnd - indexStart;
+    let node = this.getSyntaxNodeAtPosition(
+      range.start,
+      (node) => {
+        let breadth = node.endIndex - node.startIndex;
+        return node.startIndex <= indexEnd &&
+          node.endIndex >= indexEnd &&
+          breadth >= rangeBreadth;
+      }
+    );
+
+    return node ?? null;
   }
 
   _populateInjections (range, nodeRangeSet) {

@@ -17,7 +17,7 @@ function resolve (modulePath) {
   return require.resolve(`${PATH}/${modulePath}`)
 }
 
-const cGrammarPath = resolve('language-c/grammars/tree-sitter-2-c.cson');
+const cGrammarPath = resolve('language-c/grammars/modern-tree-sitter-c.cson');
 const pythonGrammarPath = resolve(
   'language-python/grammars/tree-sitter-2-python.cson'
 );
@@ -275,6 +275,80 @@ describe('WASMTreeSitterLanguageMode', () => {
         [{ text: ')', scopes: [] }]
       ]);
     });
+
+    it('always updates the range of the current node in the tree', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      jasmine.useRealClock();
+
+      await grammar.setQueryForTest('syntaxQuery', `
+        ((template_string) @lorem
+          (#match? @lorem "lorem"))
+        ((template_string) @ipsum
+          (#not-match? @ipsum "lorem"))
+      `);
+
+      buffer.setText(dedent`\`
+
+
+        lore
+
+
+      \``);
+
+
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expectTokensToEqual(editor, [
+        [
+          { text: '`', scopes: ['ipsum'] },
+        ],
+        [
+          { text: '', scopes: [] }
+        ],
+        [
+          { text: '', scopes: [] }
+        ],
+        [
+          { text: '  ', scopes: ['ipsum', 'leading-whitespace'] },
+          { text: 'lore', scopes: ['ipsum'] }
+        ],
+        [{ text: '', scopes: [] }],
+        [{ text: '', scopes: [] }],
+        [
+          { text: '`', scopes: ['ipsum'] },
+        ]
+      ]);
+
+      editor.setCursorBufferPosition([3, 6]);
+      editor.insertText('m');
+
+      // TODO: Any way around this?
+      await wait(0);
+
+      expectTokensToEqual(editor, [
+        [
+          { text: '`', scopes: ['lorem'] },
+        ],
+        [
+          { text: '', scopes: [] }
+        ],
+        [
+          { text: '', scopes: [] }
+        ],
+        [
+          { text: '  ', scopes: ['lorem', 'leading-whitespace'] },
+          { text: 'lorem', scopes: ['lorem'] }
+        ],
+        [{ text: '', scopes: [] }],
+        [{ text: '', scopes: [] }],
+        [
+          { text: '`', scopes: ['lorem'] },
+        ]
+      ]);
+    })
 
     it('handles edits after tokens that end between CR and LF characters (regression)', async () => {
       jasmine.useRealClock();
