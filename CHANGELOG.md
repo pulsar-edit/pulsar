@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+- Fixed some issues with some packages with WebComponents v0 (tablr package
+should work now) by internalizing and patching document-register-element
+
 ## 1.103.0
 
 - Added a new feature to Search for Pulsar's settings
