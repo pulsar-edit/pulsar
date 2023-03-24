@@ -1376,7 +1376,6 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       it('does not return negative values (regression)', () => {
         editor.setText('.test {\npadding: 0;\n}');
-        console.log('???');
         expect(editor.suggestedIndentForBufferRow(2)).toBe(0);
         editor.setText('@media screen {\n  .test {\n    padding: 0;\n  }\n}');
         expect(editor.suggestedIndentForBufferRow(3)).toBe(1);
