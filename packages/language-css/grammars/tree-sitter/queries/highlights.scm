@@ -37,13 +37,15 @@
 ; here so that it doesn't get scoped like an HTML tag name in a selector.
 
 ; Scope the entire `::after` range as one unit.
-(pseudo_element_selector
-  "::" @entity.other.attribute-name.pseudo-element.css
-  (#set! endAt nextSibling.endPosition))
+((pseudo_element_selector)
+  @entity.other.attribute-name.pseudo-element.css
+  (#set! startAt lastChild.previousSibling.startPosition)
+  (#set! endAt lastChild.endPosition))
 
 ; Claim this range and block it from being scoped as a tag name.
 (pseudo_element_selector
   (tag_name) @_IGNORE_
+  (#set! onlyIfLast true)
   (#set! final true))
 
 ; COMMENTS
@@ -61,7 +63,7 @@
 ; SELECTORS
 ; =========
 
-(selectors "," @punctuation.separator.list.comma.css)
+; (selectors "," @punctuation.separator.list.comma.css)
 
 ; The "div" in `div.foo {`.
 (tag_name) @entity.name.tag.css
