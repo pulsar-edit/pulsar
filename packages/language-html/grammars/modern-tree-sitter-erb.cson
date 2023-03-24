@@ -1,4 +1,4 @@
-name: 'ERB (WASM)'
+name: 'ERB'
 scopeName: 'text.html.erb'
 type: 'tree-sitter-2'
 parser: 'tree-sitter-embedded-template'
