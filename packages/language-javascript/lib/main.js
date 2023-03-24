@@ -67,19 +67,46 @@ exports.activate = function() {
       }
     });
 
-    atom.grammars.addInjectionPoint(scopeName, {
-      type: 'comment',
-      language: () => 'todo',
-      content: (comment) => comment
-    });
+    // Experiment: better to have one layer with lots of nodes, or lots of
+    // layers each managing one node?
+    // atom.grammars.addInjectionPoint(scopeName, {
+    //   type: 'comment',
+    //   language: () => 'todo',
+    //   content: (node) => node,
+    //   languageScope: null
+    // });
+    //
+    // for (let type of ['template_string', 'string_fragment', 'comment']) {
+    //   atom.grammars.addInjectionPoint(scopeName, {
+    //     type,
+    //     language: () => 'hyperlink',
+    //     content: (node) => node,
+    //     languageScope: null
+    //   });
+    // }
 
-    atom.grammars.addInjectionPoint(scopeName, {
-      type: 'comment',
-      language: () => 'hyperlink',
-      content: (comment) => comment
-    });
+    // atom.grammars.addInjectionPoint(scopeName, {
+    //   type: 'program',
+    //   language: () => 'todo',
+    //   content: (node) => {
+    //     return node.descendantsOfType('comment');
+    //   },
+    //   languageScope: null
+    // });
+    //
+    // atom.grammars.addInjectionPoint(scopeName, {
+    //   type: 'program',
+    //   language: () => 'hyperlink',
+    //   content: (node) => {
+    //     return node.descendantsOfType([
+    //       'template_string',
+    //       'string_fragment',
+    //       'comment'
+    //     ]);
+    //   },
+    //   languageScope: null
+    // });
   }
-
 };
 
 const CSS_REGEX = /\bstyled\b|\bcss\b/i;
