@@ -13,6 +13,6 @@
   ")"
   "elif"
   "else"
-] @indent_end @branch
+] @dedent
 
-(compound_statement "}" @indent_end @branch)
+(compound_statement "}" @dedent)

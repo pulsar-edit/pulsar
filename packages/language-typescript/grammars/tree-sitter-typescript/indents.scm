@@ -2,12 +2,12 @@
 (switch_statement
   body: (switch_body "}" @match
     (#set! onlyIfLast true))
-  (#set! matchIndentOf parent.parent))
+  (#set! matchIndentOf parent.parent.startPosition))
 
 ; 'case' and 'default' need to be indented one level more than their containing
 ; `switch`.
   (["case" "default"] @match
-    (#set! matchIndentOf parent.parent)
+    (#set! matchIndentOf parent.parent.startPosition)
     (#set! offsetIndent 1))
 
 [
@@ -20,7 +20,7 @@
   "}"
   ")"
   "]"
-] @indent_end @branch
+] @dedent
 
 
 ["case" "default"] @indent

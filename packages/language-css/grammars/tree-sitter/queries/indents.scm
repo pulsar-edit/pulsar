@@ -5,8 +5,4 @@
 
 [
   "}"
-] @indent_end
-
-[
-  "}"
-] @branch
+] @dedent
