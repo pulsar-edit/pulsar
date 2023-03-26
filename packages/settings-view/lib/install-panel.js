@@ -18,7 +18,6 @@ export default class InstallPanel {
     this.settingsView = settingsView
     this.packageManager = packageManager
     this.disposables = new CompositeDisposable()
-    this.client = this.packageManager.getClient()
     this.ppm = atom.ppm;
     this.atomIoURL = 'https://web.pulsar-edit.dev/'
 
@@ -219,7 +218,7 @@ export default class InstallPanel {
     options[this.searchType] = true
 
     try {
-      const packages = (await this.client.search(query, options)) || []
+      const packages = (await this.ppm.search(query, options)) || []
       this.refs.resultsContainer.innerHTML = ''
       this.refs.searchMessage.style.display = 'none'
       if (packages.length === 0) {
@@ -280,34 +279,27 @@ export default class InstallPanel {
     }
 
     if (loadThemes) {
-      this.client.featuredThemes((error, themes) => {
+
+      this.ppm.getFeaturedThemes((error, themes) => {
         if (error) {
-          handle(error)
-        } else {
-          this.refs.loadingMessage.style.display = 'none'
-          this.refs.featuredHeading.textContent = 'Featured Themes'
-          this.addPackageViews(this.refs.featuredContainer, themes)
+          handle(error);
         }
-      })
+        this.refs.loadingMessage.style.display = 'none';
+        this.refs.featuredHeading.textContent = 'Featured Themes';
+        this.addPackageViews(this.refs.featuredContainer, themes);
+      });
+
     } else {
-      this.ppm.getFeaturedPackages()
-        .then((packages) => {
-          this.refs.loadingMessage.style.display = 'none';
-          this.refs.featuredHeading.textContent = 'Featured Packages';
-          this.addPackageViews(this.refs.featuredContainer, packages);
-        })
-        .catch((err) => {
-          handle(err);
-        });
-      //this.client.featuredPackages((error, packages) => {
-      //  if (error) {
-      //    handle(error)
-      //  } else {
-      //    this.refs.loadingMessage.style.display = 'none'
-      //    this.refs.featuredHeading.textContent = 'Featured Packages'
-      //    this.addPackageViews(this.refs.featuredContainer, packages)
-      //  }
-      //})
+
+      this.ppm.getFeaturedPackages((error, packages) => {
+        if (error) {
+          handle(error);
+        }
+        this.refs.loadingMessage.style.display = 'none';
+        this.refs.featuredHeading.textContent = 'Featured Packages';
+        this.addPackageViews(this.refs.featuredContainer, packages);
+      });
+
     }
   }
 

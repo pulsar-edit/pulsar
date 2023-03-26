@@ -21,6 +21,7 @@ export default class PackageCard {
     // of malformed package metadata are handled here and in ::content but belt
     // and suspenders, you know
     this.client = this.packageManager.getClient()
+    this.ppm = atom.ppm;
     this.type = this.pack.theme ? 'theme' : 'package'
     this.name = this.pack.name
     this.onSettingsView = options.onSettingsView
@@ -283,7 +284,7 @@ export default class PackageCard {
       }
     })
 
-    this.client.package(this.pack.name, (err, data) => {
+    this.ppm.package(this.pack.name, (err, data) => {
       // We don't need to actually handle the error here, we can just skip
       // showing the download count if there's a problem.
       if (!err) {

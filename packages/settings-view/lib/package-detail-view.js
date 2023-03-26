@@ -139,7 +139,7 @@ export default class PackageDetailView {
 
   fetchPackage () {
     this.showLoadingMessage()
-    this.packageManager.getClient().package(this.pack.name, (err, packageData) => {
+    atom.ppm.package(this.pack.name, (err, packageData) => {
       if (err || !packageData || !packageData.name) {
         this.hideLoadingMessage()
         this.showErrorMessage()
