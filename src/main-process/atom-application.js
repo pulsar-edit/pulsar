@@ -156,6 +156,7 @@ module.exports = class AtomApplication extends EventEmitter {
     if (
       !socketPath ||
       options.test ||
+      options.ppm ||
       (process.platform !== 'win32' && !fs.existsSync(socketPath))
     ) {
       return createApplication(options);
@@ -303,7 +304,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let optionsForWindowsToOpen = [];
     let shouldReopenPreviousWindows = false;
 
-    if (options.test || options.benchmark || options.benchmarkTest) {
+    if (options.test || options.benchmark || options.benchmarkTest || options.ppm) {
       optionsForWindowsToOpen.push(options);
     } else if (options.newWindow) {
       shouldReopenPreviousWindows = false;
@@ -347,6 +348,7 @@ module.exports = class AtomApplication extends EventEmitter {
       benchmark,
       benchmarkTest,
       test,
+      ppm,
       pidToKillWhenClosed,
       devMode,
       safeMode,
@@ -375,6 +377,8 @@ module.exports = class AtomApplication extends EventEmitter {
         timeout,
         env
       });
+    } else if (ppm) {
+      return this.runBundledPPM(options);
     } else if (benchmark || benchmarkTest) {
       // We are keeping these startup options so we can print a removal message.
       // Printing a message saying benchmarks are removed will help avoid
@@ -1691,6 +1695,20 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     return this.packages;
+  }
+
+  runBundledPPM(options) {
+    const PPM = require('../ppm');
+    const ppm = new PPM();
+    ppm.cliClient(options)
+      .then((res) => {
+        console.log(res);
+        process.exit(0);
+      })
+      .catch((err) => {
+        console.log(err);
+        process.exit(1);
+      });
   }
 
   // Opens up a new {AtomWindow} to run specs within.

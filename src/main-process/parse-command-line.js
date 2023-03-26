@@ -132,6 +132,12 @@ module.exports = function parseCommandLine(processArgs) {
       'package',
       'Delegate all commands to Pulsar\'s package management. Run with --package for more details'
     );
+  options
+    .boolean('ppm')
+    .describe(
+      'PPM',
+      'Use Pulsar\s bunlded PPM.'
+    );
   options.boolean('uri-handler');
   options
     .version(
@@ -180,6 +186,7 @@ module.exports = function parseCommandLine(processArgs) {
   const benchmark = args['benchmark'];
   const benchmarkTest = args['benchmark-test'];
   const test = args['test'];
+  const ppm = args['ppm'];
   const mainProcess = args['main-process'];
   const timeout = args['timeout'];
   const newWindow = args['new-window'];
@@ -241,6 +248,7 @@ module.exports = function parseCommandLine(processArgs) {
     urlsToOpen,
     executedFrom,
     test,
+    ppm,
     version,
     pidToKillWhenClosed,
     devMode,

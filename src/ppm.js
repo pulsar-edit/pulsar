@@ -63,6 +63,12 @@ module.exports = class PPM {
     return { message: `Requesting packages failed: ${err.response.body?.message}` };
   }
 
+  cliClient(options) {
+    return new Promise((resolve, reject) => {
+      reject("Bundled PPM CLI Client!");
+    });
+  }
+
   getFeaturedPackages(callback) {
     return new Promise((resolve, reject) => {
       // TODO check if cached
