@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "0.72.1",
   "description": "A tidy way to display notifications.",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/pulsar-edit/notifications",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
