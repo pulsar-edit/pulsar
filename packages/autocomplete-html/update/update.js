@@ -94,7 +94,29 @@ async function update() {
   // Now to write our file
   fs.writeFileSync("./completions.json", JSON.stringify(completion, null, 2));
 
+  // Now to check if our attributes contains all of the global values that we saw.
+  const missingGlobals = confirmGlobals(curatedAttributes, GLOBAL_ATTRIBUTES);
+
+  if (missingGlobals.length > 0) {
+    console.log(missingGlobals);
+    console.log("Above are the globals found during updating that do not exist in Curated Attributes.");
+    console.log(`Total Missing Global Attributes: ${missingGlobals.length}`);
+  }
+
   console.log("Updated all `autocomplete-html` completions.");
+}
+
+function confirmGlobals(have, want) {
+  // have is an object, meanwhile want's is an array
+  let result = [];
+
+  for (const w of want) {
+    if (typeof have[w] !== "object") {
+      result.push(w);
+    }
+  }
+
+  return result;
 }
 
 function buildHtmlElementsArray(elements) {
@@ -146,11 +168,15 @@ function resolveElementInterfaceAttrs(element, domProperties) {
     if (domProperties[inter]) {
       // First add all immediate props
       for (const prop in domProperties[inter].props) {
-        attrs.push(prop);
-
-        // Then add any needed values to our global attributes
-        if (domProperties[inter].props[prop].global && !GLOBAL_ATTRIBUTES.includes(prop)) {
-          GLOBAL_ATTRIBUTES.push(prop);
+        if (!domProperties[inter].props[prop].global && inter !== "GlobalEventHandlers") {
+          // Seems that according to the previous completions.json
+          // We don't want to include any global values in our individual attributes
+          attrs.push(prop);
+        } else {
+          // We don't want global attributes on our actual completions. But do want them tracked
+          if (!GLOBAL_ATTRIBUTES.includes(prop)) {
+            GLOBAL_ATTRIBUTES.push(prop);
+          }
         }
       }
       // Now resolve any additional interfaces, by adding them to our existing array
