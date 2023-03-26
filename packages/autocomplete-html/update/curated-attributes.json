@@ -291,7 +291,25 @@
   "onabort": {
     "global": "true"
   },
+  "onauxclick": {
+    "global": "true"
+  },
+  "onbeforematch": {
+    "global": "true"
+  },
   "onblur": {
+    "global": "true"
+  },
+  "oncancel": {
+    "global": "true"
+  },
+  "onclose": {
+    "global": "true"
+  },
+  "oncontextlost": {
+    "global": "true"
+  },
+  "oncontextrestored": {
     "global": "true"
   },
   "oncanplay": {
@@ -351,6 +369,9 @@
   "onfocus": {
     "global": "true"
   },
+  "onformdata": {
+    "global": "true"
+  },
   "oninput": {
     "global": "true"
   },
@@ -396,6 +417,12 @@
   "onmousewheel": {
     "global": "true"
   },
+  "onmouseenter": {
+    "global": "true"
+  },
+  "onmouseleave": {
+    "global": "true"
+  },
   "onpause": {
     "global": "true"
   },
@@ -417,6 +444,9 @@
   "onreset": {
     "global": "true"
   },
+  "onresize": {
+    "global": "true"
+  },
   "onscroll": {
     "global": "true"
   },
@@ -429,7 +459,13 @@
   "onselect": {
     "global": "true"
   },
+  "onsecuritypolicyviolation": {
+    "global": "true"
+  },
   "onshow": {
+    "global": "true"
+  },
+  "onslotchange": {
     "global": "true"
   },
   "onstalled": {
@@ -444,10 +480,61 @@
   "ontimeupdate": {
     "global": "true"
   },
+  "ontoggle": {
+    "global": "true"
+  },
   "onvolumechange": {
     "global": "true"
   },
   "onwaiting": {
+    "global": "true"
+  },
+  "onwebkitanimationend": {
+    "global": "true"
+  },
+  "onwebkitanimationiteration": {
+    "global": "true"
+  },
+  "onwebkitanimationstart": {
+    "global": "true"
+  },
+  "onwebkittransitionend": {
+    "global": "true"
+  },
+  "onwheel": {
+    "global": "true"
+  },
+  "ongotpointercapture": {
+    "global": "true"
+  },
+  "onlostpointercapture": {
+    "global": "true"
+  },
+  "onpointerdown": {
+    "global": "true"
+  },
+  "onpointermove": {
+    "global": "true"
+  },
+  "onpointerrawupdate": {
+    "global": "true"
+  },
+  "onpointerup": {
+    "global": "true"
+  },
+  "onpointercancel": {
+    "global": "true"
+  },
+  "onpointerover": {
+    "global": "true"
+  },
+  "onpointerout": {
+    "global": "true"
+  },
+  "onpointerenter": {
+    "global": "true"
+  },
+  "onpointerleave": {
     "global": "true"
   },
   "aria-autocomplete": {
@@ -1231,6 +1318,10 @@
       "hard",
       "soft"
     ]
+  },
+  "nonce": {
+    "global": "true",
+    "description": "A content attribute defining a cryptographic 'number used once'."
   },
   "xml:lang": {},
   "xmlns": {}
