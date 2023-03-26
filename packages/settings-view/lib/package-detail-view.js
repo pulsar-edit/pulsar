@@ -91,7 +91,7 @@ export default class PackageDetailView {
 
     const learnMoreButtonClickHandler = (event) => {
       event.preventDefault()
-      shell.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`)
+      shell.openExternal(`${atom.ppm.webURL}packages/${this.pack.name}`)
     }
     this.refs.learnMoreButton.addEventListener('click', learnMoreButtonClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.learnMoreButton.removeEventListener('click', learnMoreButtonClickHandler) }))

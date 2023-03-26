@@ -19,7 +19,7 @@ export default class InstallPanel {
     this.packageManager = packageManager
     this.disposables = new CompositeDisposable()
     this.ppm = atom.ppm;
-    this.atomIoURL = 'https://web.pulsar-edit.dev/'
+    this.atomIoURL = this.ppm.webURL;
 
     etch.initialize(this)
 
@@ -92,7 +92,7 @@ export default class InstallPanel {
             <div className='text native-key-bindings' tabIndex='-1'>
               <span className='icon icon-question' />
               <span ref='publishedToText'>Packages are published to </span>
-              <a className='link' onclick={this.didClickOpenAtomIo.bind(this)}>web.pulsar-edit.dev</a>
+              <a className='link' onclick={this.didClickOpenAtomIo.bind(this)}>{this.atomIoURL.replace("https://", "")}</a>
               <span> and are installed to {path.join(process.env.ATOM_HOME, 'packages')}</span>
             </div>
 
@@ -131,7 +131,7 @@ export default class InstallPanel {
       this.refs.searchPackagesButton.classList.remove('selected')
       this.refs.searchEditor.setPlaceholderText('Search themes')
       this.refs.publishedToText.textContent = 'Themes are published to '
-      this.atomIoURL = 'https://pulsar-edit.dev/themes'
+      this.atomIoURL = `${atom.ppm.webURL}themes`
       this.loadFeaturedPackages(true)
     } else if (searchType === 'package') {
       this.searchType = 'packages'
@@ -139,7 +139,7 @@ export default class InstallPanel {
       this.refs.searchThemesButton.classList.remove('selected')
       this.refs.searchEditor.setPlaceholderText('Search packages')
       this.refs.publishedToText.textContent = 'Packages are published to '
-      this.atomIoURL = 'https://web.pulsar-edit.dev/packages'
+      this.atomIoURL = `${atom.ppm.webURL}packages`
       this.loadFeaturedPackages()
     }
   }

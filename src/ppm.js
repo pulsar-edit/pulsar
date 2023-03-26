@@ -3,7 +3,8 @@ const superagent = require("superagent");
 module.exports = class PPM {
   constructor() {
     // TODO: Allow this to be configurable
-    this.apiURL = "https://api.pulsar-edit.dev";
+    this.apiURL = "https://api.pulsar-edit.dev/";
+    this.webURL = "https://web.pulsar-edit.dev/";
   }
 
   request(path, opts = { header: {}, query: {} }) {
@@ -72,7 +73,7 @@ module.exports = class PPM {
   getFeaturedPackages(callback) {
     return new Promise((resolve, reject) => {
       // TODO check if cached
-      this.request("/api/packages/featured")
+      this.request("api/packages/featured")
         .then((data) => {
 
           let packages = this._formatPackageList(data);
@@ -96,7 +97,7 @@ module.exports = class PPM {
   getFeaturedThemes(callback) {
     return new Promise((resolve, reject) => {
       // TODO check if cached
-      this.request("/api/themes/featured")
+      this.request("api/themes/featured")
         .then((data) => {
           let packages = this._formatPackageList(data);
 
@@ -128,7 +129,7 @@ module.exports = class PPM {
         params.filter = 'package';
       }
 
-      this.request("/api/packages/search", {
+      this.request("api/packages/search", {
         query: params
       })
         .then((data) => {
@@ -155,7 +156,7 @@ module.exports = class PPM {
     return new Promise((resolve, reject) => {
       let packagePath = `packages/${name}`;
       // TODO Cached
-      this.request(`/api/packages/${name}`)
+      this.request(`api/packages/${name}`)
         .then((data) => {
           // Doesn't look like settings-view needs any handling of the raw package data
           if (typeof callback === "function") {
