@@ -13887,6 +13887,18 @@
     "async": {
       "type": "flag"
     },
+    "autocapitalize": {
+      "attribOption": [
+        "off",
+        "none",
+        "on",
+        "sentences",
+        "words",
+        "characters"
+      ],
+      "global": "true",
+      "description": "Controls whether and how text input is automatically capitalized."
+    },
     "autocomplete": {
       "attribOption": [
         "additional-name",
