@@ -1114,6 +1114,14 @@
       "_top"
     ]
   },
+  "translate": {
+    "attribOption": [
+      "no",
+      "yes"
+    ],
+    "global": "true",
+    "description": "Used to specify whether an element's translatable attribute values and its text node children should be translated."
+  },
   "truespeed": {
     "type": "flag"
   },
