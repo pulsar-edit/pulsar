@@ -164,6 +164,8 @@ class WASMTreeSitterLanguageMode {
 
     this.parsersByLanguage = new Map();
 
+    this.resolveNextTransactionPromise();
+
     this.ready = this.grammar.getLanguage()
       .then(language => {
         this.rootLanguage = language;
@@ -210,7 +212,6 @@ class WASMTreeSitterLanguageMode {
     if (!this.rootLanguageLayer) { return; }
 
     let { oldRange, newRange, oldText, newText } = change;
-    // this.newRanges.push(change.newRange);
 
     const startIndex = this.buffer.characterIndexForPosition(
       change.newRange.start
@@ -226,6 +227,13 @@ class WASMTreeSitterLanguageMode {
       oldEndPosition: oldRange.end,
       newEndPosition: newRange.end
     };
+
+    if (!this.treeIsDirty) {
+      // This is the first change after the last transaction finished, so we
+      // need to create a new promise that will resolve when the next
+      // transaction is finished.
+      this.refreshNextTransactionPromise();
+    }
 
     this.rootLanguageLayer.handleTextChange(edit, oldText, newText);
 
@@ -254,6 +262,11 @@ class WASMTreeSitterLanguageMode {
       for (let { newRange } of changes) {
         this.prefillFoldCache(newRange);
       }
+
+      // At this point, all trees are safely re-parsed, including those of
+      // injection layers. So we can proceed with any actions that were waiting
+      // on a clean tree.
+      this.resolveNextTransactionPromise(changes.length);
     });
   }
 
@@ -265,6 +278,39 @@ class WASMTreeSitterLanguageMode {
     }
     this.prefillFoldCache(range);
     this.emitter.emit('did-change-highlighting', range);
+  }
+
+  // Resolve the promise that was created when we reacted to the first change
+  // in a given transaction. We resolve it with the number of changes in the
+  // transaction so that we can react differently to batches of changes than to
+  // single changes.
+  resolveNextTransactionPromise (changeCount) {
+    if (this.resolveNextTransaction) {
+      this.resolveNextTransaction(changeCount);
+      this.resolveNextTransaction = null;
+    }
+  }
+
+  // Create a promise that will resolve when the next transaction is done and
+  // all its side effects are handled. When this promise resolves, all parse
+  // trees will be clean and up to date. This promise cannot reject — only
+  // resolve.
+  //
+  // If another transaction begins before all parse trees are ready, we'll
+  // ensure that the old promise resolves along with the new one.
+  refreshNextTransactionPromise() {
+    let oldResolve = null;
+    if (this.resolveNextTransaction) {
+      // We're creating a new promise before the old one is done, so let's
+      // chain them.
+      oldResolve = this.resolveNextTransaction;
+    }
+    this.nextTransaction = new Promise((resolve) => {
+      this.resolveNextTransaction = (changes) => {
+        if (oldResolve) { oldResolve(changes); }
+        resolve(changes);
+      };
+    });
   }
 
   prefillFoldCache (range) {
@@ -864,14 +910,13 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
-    if (row === 0) { return 0; }
-    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
-    // need a way to share those tests across different kinds of capture
-    // resolvers.
+    let root = this.rootLanguageLayer;
+    if (!root || !root.tree || row === 0) { return 0; }
 
     let options = {
       skipBlankLines: true,
       skipDedentCheck: false,
+      preserveLeadingWhitespace: false,
       ...rawOptions
     };
 
@@ -884,6 +929,18 @@ class WASMTreeSitterLanguageMode {
       }
     }
 
+    let existingIndent = 0;
+    if (options.preserveLeadingWhitespace) {
+      existingIndent = this.indentLevelForLine(
+        this.buffer.lineForRow(row),
+        tabLength
+      );
+    }
+
+    let comparisonRowIndent = this.indentLevelForLine(
+      this.buffer.lineForRow(comparisonRow), tabLength
+    );
+
     // TODO: What's the right place to measure from? Often we're here because
     // the user just hit Enter, which means we'd run before injection layers
     // have been re-parsed. Hence the injection's language layer might not know
@@ -893,10 +950,6 @@ class WASMTreeSitterLanguageMode {
     let comparisonRowEnd = new Point(
       comparisonRow,
       this.buffer.lineLengthForRow(comparisonRow)
-    );
-
-    const comparisonRowIndent = this.indentLevelForLine(
-      this.buffer.lineForRow(comparisonRow), tabLength
     );
 
     // Find the deepest layer that actually has an indents query. (Layers that
@@ -909,14 +962,21 @@ class WASMTreeSitterLanguageMode {
       (layer) => !!layer.indentsQuery
     );
 
-    if (!controllingLayer) { return comparisonRowIndent; }
+    if (!controllingLayer) {
+      return comparisonRowIndent - existingIndent;
+    }
+
     let { indentsQuery, scopeResolver } = controllingLayer;
+
+    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
+    // need a way to share those tests across different kinds of capture
+    // resolvers.
     scopeResolver.reset();
 
-    // The tree officially gets re-parsed later in the change lifecycle, on
-    // `bufferDidFinishTransaction`. But we need a parse here so that we can
-    // get accurate captures. This will tend not to be costly because — usually
-    // — the only change since the last parse will have been a carriage return.
+    // If we aren't running at the end of a transaction, the tree will be
+    // dirty, and we'll need a parse here so that we can get accurate captures.
+    // This will tend not to be costly because — usually — the only change
+    // since the last parse will have been a carriage return.
     //
     // TODO: This is imperfect on injection layers because the last known
     // update ranges could be stale. To know the exact range to re-parse we'd
@@ -924,38 +984,38 @@ class WASMTreeSitterLanguageMode {
     // layers' trees in between. That's possible in theory, but it wouldn't be
     // a lot of fun. I haven't actually seen this break, so we'll live with it
     // for now.
-    let indentTree = options.tree;
-    if (!indentTree) {
-      indentTree = controllingLayer.forceAnonymousParse(
-        controllingLayer.currentNodeRangeSet
-      );
-    }
+    let indentTree = options.tree || controllingLayer.getOrParseTree();
 
-    // Capture in two phases. The first phase covers any captures that can
-    // direct the next line to be indented.
+    // Capture in two phases. The first phase covers any captures from the
+    // comparison row that can cause the _following_ row to be indented.
     let indentCaptures = indentsQuery.captures(
       indentTree.rootNode,
       { row: comparisonRow, column: 0 },
       { row: row, column: 0 }
     );
 
-    let seenIndentCapture = false;
+    let indentCapturePosition = null;
     let indentDelta = 0;
     let dedentNextDelta = 0;
+
     for (let capture of indentCaptures) {
       let { node, name, setProperties: props = {} } = capture;
-
       // Ignore “phantom” nodes that aren't present in the buffer.
-      if (node.text === '' && !props.allowEmpty) { continue; }
+      if (node.text === '' && !props.allowEmpty) {
+        continue;
+      }
 
       // Ignore anything that isn't actually on the row.
       if (node.endPosition.row < comparisonRow) { continue; }
       if (node.startPosition.row > comparisonRow) { continue; }
 
+      // Ignore anything that fails a scope test.
       if (!scopeResolver.store(capture)) { continue; }
 
       if (name === 'indent') {
-        seenIndentCapture = true;
+        if (indentCapturePosition === null) {
+          indentCapturePosition = node.endPosition;
+        }
         indentDelta++;
       } else if (name === 'dedent.next') {
         // This isn't often needed, but it's a way for the current line to
@@ -979,24 +1039,53 @@ class WASMTreeSitterLanguageMode {
         //
         // The second `}` _does_ cancel out the first occurrence of `{` because
         // it comes later.
-        if (!seenIndentCapture) { continue; }
+        if (!indentCapturePosition || comparePoints(node.startPosition, indentCapturePosition) < 0) {
+          // This capture either happened before the first indent capture on
+          // the row or is _the same node_ as the indent capture, in which case
+          // we should construe the dedent as happening _before_ the indent.
+          //
+          // For example: the "elsif" node in Ruby triggers a dedent on its own
+          // line, but also signals an indent on the next line. The dedent
+          // shouldn't cancel out the indent.
+          continue;
+        }
         indentDelta--;
       }
     }
-    // `@indent` and `@dedent` can increase the indent level by one at
-    // most. If a language needs stranger indentation than that, then `@match`
-    // captures can be used to specify an exact level of indentation relative
-    // to another specific node. If a `@match` capture exists, we'll catch it
-    // in the dedent captures phase.
+
+    // `@indent` and `@dedent` can increase the next line's indent level by one
+    // at most, and can't decrease the next line's indent level at all on their
+    // own.
+    //
+    // Why? There are few coding patterns in the wild that would cause us to
+    // indent more than one level based on tokens found on the _previous_ line.
+    // And there are also few scenarios in which we'd want to dedent a certain
+    // line before we even know the content of that line.
+    //
+    // Hence we distill the results above into a net indentation level change
+    // of either 1 or 0, depending on whether we saw more `@indent`s than
+    // `@dedent`s.
+    //
+    // If there's a genuine need to dedent the current row based solely on the
+    // content of the comparison row, then `dedent.next` can be used.
+    //
+    // And a language needs to indent more than one level from one line to the
+    // next, then `@match` captures can be used to specify an exact level of
+    // indentation relative to another specific node. If a `@match` capture
+    // exists, we'll catch it in the dedent captures phase, and these heuristics
+    // will be ignored.
     indentDelta = clamp(indentDelta, 0, 1);
+
+    // Process `@dedent.next` captures as a last step; they act as a strong
+    // hint about the next line's indentation.
     indentDelta -= dedentNextDelta;
 
     let dedentDelta = 0;
 
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
-      // The second phase tells us whether this line should be dedented from the
-      // previous line.
+      // The second phase covers any captures on the current line that can
+      // cause the current line to be indented or dedented.
       let dedentCaptures = indentsQuery.captures(
         indentTree.rootNode,
         { row: row, column: 0 },
@@ -1007,17 +1096,19 @@ class WASMTreeSitterLanguageMode {
 
       let positionSet = new Set;
       for (let capture of dedentCaptures) {
-        let { name, node } = capture;
+        let { name, node, setProperties: props = {} } = capture;
         let { text } = node;
 
         // Ignore “phantom” nodes that aren't present in the buffer.
-        if (!text) { continue; }
+        if (text === '' && !props.allowEmpty) { continue; }
 
         // Ignore anything that isn't actually on the row.
         if (node.endPosition.row < row) { continue; }
         if (node.startPosition.row > row) { continue; }
 
+        // Ignore anything that fails a scope test.
         if (!scopeResolver.store(capture)) { continue; }
+
         // Imagine you've got:
         //
         // { ^foo, bar } = something
@@ -1027,12 +1118,10 @@ class WASMTreeSitterLanguageMode {
         // line, even though there's a closing brace on the new line that would
         // otherwise mark a dedent.
         //
-        // Thus we don't want to honor a dedent unless it's the first
-        // non-whitespace content in the line. We'll use similar logic for
-        // `suggestedIndentForEditedBufferRow`.
-        if (!currentRowText.trim().startsWith(text)) {
-          continue;
-        }
+        // Thus we don't want to honor a `@dedent` or `@match` capture unless
+        // it's the first non-whitespace content in the line. We'll use similar
+        // logic for `suggestedIndentForEditedBufferRow`.
+        if (!currentRowText.trim().startsWith(text)) { continue; }
 
         // The '@match' capture short-circuits a lot of this logic by pointing
         // us to a different node and asking us to match the indentation of
@@ -1043,20 +1132,19 @@ class WASMTreeSitterLanguageMode {
 
           if (typeof matchIndentLevel === 'number') {
             scopeResolver.reset();
-            return matchIndentLevel;
+            return matchIndentLevel - existingIndent;
           }
         }
 
-        if (name !== 'dedent') {
-          continue;
-        }
+        // Only `@dedent` or `@match` captures can change this line's
+        // indentation.
+        if (name !== 'dedent') { continue; }
 
         // Only consider a given range once, even if it's marked with multiple
         // captures.
         let key = `${node.startIndex}/${node.endIndex}`;
         if (positionSet.has(key)) { continue; }
         positionSet.add(key);
-
         dedentDelta--;
       }
 
@@ -1067,7 +1155,9 @@ class WASMTreeSitterLanguageMode {
     }
 
     scopeResolver.reset();
-    return comparisonRowIndent + indentDelta + dedentDelta;
+    let finalIndent = comparisonRowIndent + indentDelta + dedentDelta;
+
+    return finalIndent - existingIndent;
   }
 
   // Get the suggested indentation level for a line in the buffer on which the
@@ -1080,10 +1170,6 @@ class WASMTreeSitterLanguageMode {
   // Returns a {Number}.
   suggestedIndentForEditedBufferRow(row, tabLength, options = {}) {
     if (row === 0) { return 0; }
-    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
-    // need a way to share those tests across different kinds of capture
-    // resolvers.
-
     // By the time this function runs, we probably know enough to be sure of
     // which layer controls the beginning of this row, even if we don't know
     // which one owns the position at the cursor.
@@ -1096,16 +1182,15 @@ class WASMTreeSitterLanguageMode {
 
     let { indentsQuery, scopeResolver } = controllingLayer;
     if (!indentsQuery) { return undefined; }
+
+    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
+    // need a way to share those tests across different kinds of capture
+    // resolvers.
     scopeResolver.reset();
 
-    // Indents query won't work unless we re-parse the tree. Since we're typing
-    // one character at a time, this should not be costly.
-    let indentTree = options.tree;
-    if (!indentTree) {
-      indentTree = controllingLayer.forceAnonymousParse(
-        controllingLayer.currentNodeRangeSet
-      );
-    }
+    // Ideally, we're running when the tree is clean, but if not, we must
+    // re-parse the tree in order to make an accurate indents query.
+    let indentTree = options.tree || controllingLayer.getOrParseTree();
 
     const indents = indentsQuery.captures(
       indentTree.rootNode,
@@ -1119,39 +1204,60 @@ class WASMTreeSitterLanguageMode {
       this.buffer.lineForRow(row), tabLength);
 
     // This is the indent level that is suggested from context — the level we'd
-    // have if this line were completely blank. We won't alter the indent level
-    // of the current line — even if it's “wrong” — unless typing triggers a
+    // have if this row were completely blank. We won't alter the indent level
+    // of the current row — even if it's “wrong” — unless typing triggers a
     // dedent. But once a dedent is triggered, we should dedent one level from
-    // this value, not from the current line indent.
+    // this value, not from the current row indent.
     //
     // If more than one level of dedent is needed, a `@match` capture must be
     // used so that indent level can be expressed in absolute terms.
     const originalRowIndent = this.suggestedIndentForBufferRow(row, tabLength, {
-      skipBlankLines: false,
+      skipBlankLines: true,
       skipDedentCheck: true,
       tree: indentTree
     });
 
+    let seenDedent = false;
     for (let indent of indents) {
       let { node } = indent;
-      if (!scopeResolver.store(indent, null)) {
-        continue;
-      }
+      // Ignore captures that aren't on this row.
       if (node.startPosition.row !== row) { continue; }
+      // Ignore captures that fail their scope tests.
+      if (!scopeResolver.store(indent)) { continue; }
+
+      // For all captures — even `@match` captures — we get one bite at the
+      // apple, and it's when the text of the capture is the only
+      // non-whitespace text on the line.
+      //
+      // Otherwise, this capture will assert itself after every keystroke, and
+      // the user has no way to opt out of the correction.
+      if (node.text !== lineText) { continue; }
+
+      // `@match` is authoritative; honor the first one we see and ignore other
+      // captures.
       if (indent.name === 'match') {
-        let matchIndentLevel = this.resolveIndentMatchCapture(
-          indent, row, tabLength);
+        let matchIndentLevel = this.resolveIndentMatchCapture(indent, row, tabLength);
         if (typeof matchIndentLevel === 'number') {
           scopeResolver.reset();
           return matchIndentLevel;
         }
       }
+
+      // The first dedent we see is treated as a
       if (indent.name !== 'dedent') { continue; }
-      if (node.text !== lineText) { continue; }
-      return Math.max(0, originalRowIndent - 1);
+
+      // Even after we've seen a `@dedent`, we allow the loop to finish,
+      // because we'd prefer a `@match` capture over this `@dedent` capture
+      // even if it happened to come later in the loop.
+      seenDedent = true;
     }
 
     scopeResolver.reset();
+
+    if (seenDedent) {
+      return Math.max(0, originalRowIndent - 1);
+    }
+
     return currentRowIndent;
   }
 
@@ -1172,12 +1278,13 @@ class WASMTreeSitterLanguageMode {
     // So the better approach for a tree-sitter language mode would probably be
     // to do this automatically. The only drawback is that we'd either
     //
-    //   (a) wait until the transaction is finished and the tree is re-parsed,
-    //       which means we'd want to fix the text and then group those changes
-    //       with the previous checkpoint to prevent an extra history
-    //       checkpoint, or
-    //   (b) anonymously re-parse the tree to try to avoid that hassle, which
-    //       could double the amount of time we spend parsing.
+    // (a) wait until the transaction is finished and the tree is re-parsed,
+    //     which means we'd want to fix the text and then group those changes
+    //     with the previous checkpoint to prevent an extra history
+    //     checkpoint, or
+    // (b) anonymously re-parse the tree to try to avoid that hassle, which
+    //     could double the amount of time we spend parsing.
+    //
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
 
@@ -1579,6 +1686,7 @@ class FoldResolver {
 
   resolveRangeForSimpleFold(capture) {
     let { node, setProperties: props } = capture;
+    if (node.type === 'ERROR') { return null; }
     let start = new Point(node.startPosition.row, Infinity);
     let end = node.endPosition;
 
@@ -2384,6 +2492,7 @@ class LanguageLayer {
 
     if (this.tree) {
       this.tree.edit(edit);
+      this.treeIsDirty = true;
       if (this.editedRange) {
         if (startPosition.isLessThan(this.editedRange.start)) {
           this.editedRange.start = startPosition;
@@ -2600,6 +2709,7 @@ class LanguageLayer {
     // added or updated, so we only care about it if it could possibly affect
     // an injection of ours.
     if (!grammar?.injectionRegex) { return; }
+    if (!this.tree) { return; }
 
     // We don't need to consume the grammar itself; we'll just call
     // `_populateInjections` here because the callback signals that this
@@ -2647,9 +2757,17 @@ class LanguageLayer {
       }
     }
 
-    if (this.tree) {
-      const rangesWithSyntaxChanges = this.tree.getChangedRanges(tree);
+    if (this.lastSyntaxTree) {
+      const rangesWithSyntaxChanges = this.lastSyntaxTree.getChangedRanges(tree);
+
+      // TODO: The tree-sitter playground deletes the old tree when it's about
+      // to be replaced, but this seems to cause sporadic errors for us.
+      // this.lastSyntaxTree.delete();
+      this.lastSyntaxTree = tree;
+
+      // this.tree.delete();
       this.tree = tree;
+      this.treeIsDirty = false;
 
       if (rangesWithSyntaxChanges.length > 0) {
         for (const range of rangesWithSyntaxChanges) {
@@ -2672,6 +2790,10 @@ class LanguageLayer {
       }
     } else {
       this.tree = tree;
+      this.treeIsDirty = false;
+      // Store a reference to this tree so we can compare it with the next
+      // transaction's tree later on.
+      this.lastSyntaxTree = tree;
 
       // Like legacy tree-sitter, we're patching syntax nodes so that they have
       // a `range` property that returns a `Range`. We're doing this for
@@ -2701,8 +2823,20 @@ class LanguageLayer {
     }
   }
 
-  forceAnonymousParse() {
-    return this.languageMode.parse(this.language, this.tree, this.currentNodeRangeSet);
+  getOrParseTree() {
+    if (!this.treeIsDirty) { return this.tree; }
+
+    // Eventually we'll take this out, but for now it serves as an indicator of
+    // how often we have to manually re-parse in between transactions —
+    // something we'd like to do as little as possible.
+    console.warn('Re-parsing tree!');
+    this.tree = this.languageMode.parse(
+      this.language,
+      this.tree,
+      this.currentNodeRangeSet
+    );
+    this.treeIsDirty = false;
+    return this.tree;
   }
 
   getText() {
@@ -2712,12 +2846,6 @@ class LanguageLayer {
     } else {
       return buffer.getTextInRange(this.marker.getRange());
     }
-  }
-
-  getFolds() {
-    if (!this.foldsQuery) { return []; }
-    let foldsTree = this.forceAnonymousParse();
-    return this.foldsQuery.captures(foldsTree.rootNode);
   }
 
   // Given a point, return all syntax captures that are active at that point.
@@ -3015,6 +3143,7 @@ class NodeRangeSet {
     }
   }
 }
+
 
 // Like a map, but expects each key to have multiple values.
 class Index extends Map {
