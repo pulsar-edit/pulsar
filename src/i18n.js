@@ -70,7 +70,7 @@ class I18n {
         .map(p => p.substring(0, p.length - extlen))
         .map(p => ({
           value: p,
-          description: `${new Intl.DisplayNames([p], { type: "language" }).of(p)} (${p})`
+          description: `${new Intl.DisplayNames(p, { type: "language" }).of(p)} (${p})`
         }))
     });
 
