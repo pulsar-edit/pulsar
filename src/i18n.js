@@ -28,7 +28,7 @@ class I18n {
 
     /**
      * {
-     *   [ns (package id or core)]: {
+     *   [ns (package id)]: {
      *     [language id]: {
      *       string objects without core ns
      *     }
@@ -78,7 +78,7 @@ class I18n {
       enum: dircontents.map(p => p.substring(0, p.length - extlen))
         .map(p => ({
           value: p,
-          description: new Intl.DisplayNames([p], { type: "language" }).of(p)
+          description: `${new Intl.DisplayNames([p], { type: "language" }).of(p)} (${p})`
         }))
     });
 
