@@ -17,17 +17,6 @@ class I18n {
 
     /**
      * {
-     *   [language id]: {
-     *     string objects without core ns
-     *   }
-     * }
-     *
-     * @type {object}
-     */
-    this.coreStrings = {};
-
-    /**
-     * {
      *   [ns (package id)]: {
      *     [language id]: {
      *       string objects without core ns
@@ -37,7 +26,7 @@ class I18n {
      *
      * @type {object}
      */
-    this.registeredStrings = {};
+    this.registeredStrings = { core: {} };
 
     this.cachedFormatters = {};
 
@@ -153,13 +142,13 @@ class I18n {
    * @return undefined if it can't be found
    */
   getCoreLanguage(lang) {
-    const loaded = this.coreStrings[lang];
+    const loaded = this.registeredStrings.core[lang]
     if (loaded) return loaded;
 
     const fetched = this.fetchCoreLanguageFile(lang);
     if (!fetched) return undefined;
 
-    this.coreStrings[lang] = fetched;
+    this.registeredStrings.core[lang] = fetched;
     return fetched;
   }
 
