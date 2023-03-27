@@ -313,7 +313,13 @@ class AtomEnvironment {
     );
     this.autoUpdater.initialize();
 
-    this.i18n.initialize({ resourcePath });
+    this.i18n.initialize({
+      configDirPath: this.configDirPath,
+      devMode,
+      packages: this.packages,
+      resourcePath,
+      safeMode
+    });
 
     this.protocolHandlerInstaller.initialize(this.config, this.notifications);
 
