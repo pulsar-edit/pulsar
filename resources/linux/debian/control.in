@@ -7,6 +7,6 @@ Section: devel
 Priority: optional
 Architecture: <%= arch %>
 Installed-Size: <%= installedSize %>
-Maintainer: GitHub <atom@github.com>
+Maintainer: Pulsar-Edit <admin@pulsar-edit.dev>
 Description: <%= description %>
  Pulsar is a free and open source text editor that is modern, approachable, and hackable to the core.
