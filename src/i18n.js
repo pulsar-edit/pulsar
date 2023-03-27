@@ -1,6 +1,6 @@
 const { CompositeDisposable } = require('atom');
 const { splitKeyPath } = require("key-path-helpers");
-const fs = require("fs");
+const fs = require("fs-plus");
 const path = require("path");
 const { default: IntlMessageFormat } = require("intl-messageformat");
 
@@ -14,6 +14,8 @@ class I18n {
     this.notificationManager = notificationManager;
     this.config = config;
     this.initialized = false;
+    /** @type {Array<string>} */
+    this.packageDirPaths = [];
 
     /**
      * {
@@ -63,12 +65,25 @@ class I18n {
     }
   }
 
-  initialize({ resourcePath }) {
+  initialize({ configDirPath, devMode, packages, resourcePath, safeMode }) {
+    /** @type {string} */
+    this.configDirPath = configDirPath;
+    this.packages = packages;
     /** @type {string} */
     this.resourcePath = resourcePath;
 
+    // stolen from PackageManager::initialize
+    this.devMode = devMode;
+    if (configDirPath != null && !safeMode) {
+      if (devMode) {
+        this.packageDirPaths.push(path.join(configDirPath, 'dev', 'packages'));
+        this.packageDirPaths.push(path.join(resourcePath, 'packages'));
+      }
+      this.packageDirPaths.push(path.join(configDirPath, 'packages'));
+    }
+
     const ext = ".json";
-    const extlen = extlen.length;
+    const extlen = ext.length;
     const dirpath = path.join(resourcePath, "i18n");
     const dircontents = fs.readdirSync(dirpath);
 
@@ -182,7 +197,6 @@ class I18n {
    * @return undefined if it can't be found
    */
   fetchCoreLanguageFile(lang) {
-    // TODO implement this
     let filepath = path.join(this.resourcePath, "i18n", `${lang}.json`);
     let contents = JSON.parse(fs.readFileSync(filepath));
 
@@ -194,8 +208,19 @@ class I18n {
    * @return undefined if it can't be found
    */
   fetchPkgLanguageFile(ns, lang) {
-    // TODO implement this
-    throw new Error("not implemented yet");
+    // TODO this could probably be optimised
+    let packages = this.packages.getAvailablePackages();
+    // let package = packages.find(p => p.name === ns);
+    let foundPackage = packages.find(p => p.name === ns);
+
+    const i18nDir = path.join(foundPackage.path, "i18n");
+    const langfile = path.join(i18nDir, `${lang}.json`);
+
+    if (!(fs.isDirectorySync(i18nDir) && fs.existsSync(langfile))) return;
+
+    let contents = JSON.parse(fs.readFileSync(langfile));
+
+    return contents;
   }
 
   /**
@@ -213,9 +238,6 @@ class I18n {
 
 module.exports = I18n;
 
-/**
- * @param {() => void} cb
- */
 function walkStrings(strings, cb, accum = []) {
   Object.entries(strings).forEach(([k, v]) => {
     if (typeof v === "string") cb([...accum, k], v, true);
