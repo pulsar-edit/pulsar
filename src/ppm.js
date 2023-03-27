@@ -1,13 +1,32 @@
 const superagent = require("superagent");
 
 module.exports = class PPM {
-  constructor() {
+  constructor(opts) {
     // TODO: Allow this to be configurable
     this.apiURL = "https://api.pulsar-edit.dev/";
     this.webURL = "https://web.pulsar-edit.dev/";
+    this.userAgent;
 
     // 5 Hour Expiry on Cache
     this.cacheExpiry = 1000 * 60 * 60 * 5;
+    this.useCache = opts.useCache ?? true;
+    this.headless = opts.headless ?? false;
+
+    if (this.headless && this.useCache) {
+      this.useCache = false; // Just in case it isn't set excplicitly, we can't 
+      // use the cache when in headless mode.
+    }
+
+    this._determineUserAgent();
+  }
+
+  _determineUserAgent() {
+    if (!this.headless) {
+      this.userAgent = navigator.userAgent;
+    } else {
+      // We are running headless and don't have access to the user agent.
+      this.userAgent = "Pulsar/BundledPPM"; // This will be set later on
+    }
   }
 
   request(path, opts = { header: {}, query: {} }) {
@@ -21,7 +40,7 @@ module.exports = class PPM {
       superagent
         .get(`${this.apiURL}${path}`)
         .set({
-          "User-Agent": navigator.userAgent
+          "User-Agent": this.userAgent
         })
         .set(opts.header)
         .query(opts.query)
@@ -64,10 +83,14 @@ module.exports = class PPM {
       return { message: `${err.req.host} is temporarily unavailable, please try again later.` };
     }
 
-    return { message: `Requesting packages failed: ${err.response.body?.message}` };
+    return { message: `Requesting packages failed: ${err.response?.body?.message}` };
   }
 
   _fetchFromCache(path) {
+    if (!this.useCache) {
+      return false;
+    }
+
     let cached = localStorage.getItem(this._cacheKeyForPath(path));
     if (cached) {
       cached = JSON.parse(cached);
@@ -81,6 +104,10 @@ module.exports = class PPM {
   }
 
   _deepCache(path, data) {
+    if (!this.useCache) {
+      return;
+    }
+
     let cache = {
       data: data,
       createdOn: Date.now()
@@ -100,8 +127,34 @@ module.exports = class PPM {
   }
 
   cliClient(options) {
+    // So the options we receive are the default supported ones with Pulsar.
+    // Either we do major reworking of how args are handled, or we do this hacky here.
+    // Since we can't use `--themes` natively, since that would require them to be
+    // passed down significantly within the program, we will just destructure everything
+    // from the `pathsToOpen` array natively supported.
+    // Such as pulsar --ppm featured themes
+    // Rather than ppm featured --themes
+
+    // Lets now set our user agent, since we can access the version within options
+    this.userAgent = `Pulsar/BundledPPM-${options.version}`;
     return new Promise((resolve, reject) => {
-      reject("The Bundled PPM Client is not totally supported yet.");
+      if (options.pathsToOpen.includes("featured")) {
+        // We will now only consider handling featured items
+        if (options.pathsToOpen.includes("themes")) {
+          this.getFeaturedThemes((error, packages) => {
+            if (error) {
+              reject(error);
+            }
+            resolve(packages);
+          });
+        } else {
+          // Default to packages
+          this.getFeaturedThemes((res) => {
+            resolve(res);
+          });
+        }
+      }
+      //reject("The Bundled PPM Client is not totally supported yet.");
     });
   }
 

@@ -1699,7 +1699,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
   runBundledPPM(options) {
     const PPM = require('../ppm');
-    const ppm = new PPM();
+    // The caching uses the browsers localStorage
+    // Which can't be accessed when running via the CLI
+    const ppm = new PPM({ useCache: false, headless: true });
     ppm.cliClient(options)
       .then((res) => {
         console.log(res);
