@@ -102,7 +102,9 @@ class I18n {
    *   and throws an error if the path isn't right.
    */
   tSingleLanguage(lang, path, opts) {
-    const ns = path.unshift();
+    path = [...path];
+
+    const ns = path.shift();
     if (!ns) throw new Error(`key path seems invalid: [${path.map(p => `"${p}"`).join(", ")}]`);
 
     const languageObj = this.getLanguageObj(ns, lang);
@@ -110,7 +112,7 @@ class I18n {
 
     const str = optionalTravelDownObjectPath(languageObj, path);
     if (str) {
-      return this.format(str, opts);
+      return this.format(path, str, lang, opts);
     } else {
       return undefined;
     }
@@ -146,7 +148,7 @@ class I18n {
    * @return undefined if it can't be found
    */
   getPkgLanguage(ns, lang) {
-    const loaded = loaded = this.registeredStrings[ns]?.[lang];
+    const loaded = this.registeredStrings[ns]?.[lang];
     if (loaded) return loaded;
 
     const fetched = this.fetchPkgLanguageFile(ns, lang);
@@ -206,14 +208,14 @@ function walkStrings(strings, cb, accum = []) {
 }
 
 function travelDownObjectPath(obj, path) {
-  for (const pathFragment in path) {
+  for (const pathFragment of path) {
     obj = obj[pathFragment];
   }
   return obj;
 }
 
 function optionalTravelDownObjectPath(obj, path) {
-  for (const pathFragment in path) {
+  for (const pathFragment of path) {
     obj = obj[pathFragment];
     if (!obj) return undefined;
   }
