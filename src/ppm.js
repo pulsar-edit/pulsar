@@ -1,4 +1,5 @@
 const superagent = require("superagent");
+const { shell } = require("electron");
 
 module.exports = class PPM {
   constructor(opts) {
@@ -9,11 +10,11 @@ module.exports = class PPM {
 
     // 5 Hour Expiry on Cache
     this.cacheExpiry = 1000 * 60 * 60 * 5;
-    this.useCache = opts.useCache ?? true;
-    this.headless = opts.headless ?? false;
+    this.useCache = opts?.useCache ?? true;
+    this.headless = opts?.headless ?? false;
 
     if (this.headless && this.useCache) {
-      this.useCache = false; // Just in case it isn't set excplicitly, we can't 
+      this.useCache = false; // Just in case it isn't set excplicitly, we can't
       // use the cache when in headless mode.
     }
 
@@ -29,7 +30,7 @@ module.exports = class PPM {
     }
   }
 
-  request(path, opts = { header: {}, query: {} }) {
+  _request(path, opts = { header: {}, query: {} }) {
     if (typeof opts.header !== "object") {
       opts.header = {};
     }
@@ -82,7 +83,7 @@ module.exports = class PPM {
     if (err.statusCode === 503) {
       return { message: `${err.req.host} is temporarily unavailable, please try again later.` };
     }
-
+    console.log(err);
     return { message: `Requesting packages failed: ${err.response?.body?.message}` };
   }
 
@@ -126,6 +127,36 @@ module.exports = class PPM {
     return `ppm-cache:${path}`;
   }
 
+  _getRepository(pack) {
+    let repo = pack.repository?.url ?? pack.repository;
+    return repo.replace(/\.git$/, "");
+  }
+
+  _dynamicReturn(opts) {
+    // Since we want to keep support for invoking this API in so many different
+    // ways, returning can be messy and gross looking. So this function
+    // is a small helper that can simplify writing a return, even if a
+    // little obscurity is added
+
+    // opts can be:
+    // callback: is the function to use to callback
+    // function: Is the `resolve` or `reject`
+    // resolve: The `resolve` of the promise
+    // err: Is the error data to return
+    // data: Is the successful data to return
+    if (typeof opts.callback === "function") {
+      // TODO: I had some worries about a promise being rejected
+      // when in the context of an anonymous arrow function, as I was worried it
+      // wouldn't be caught properly. I'll keep an eye on it,
+      // but if needed we would add apts.resolve, and specificly resolve on callback returns
+      opts.function(opts.callback(opts.err, opts.data));
+    }
+
+    let returnData = opts.err ?? opts.data;
+    opts.function(returnData);
+
+  }
+
   cliClient(options) {
     // So the options we receive are the default supported ones with Pulsar.
     // Either we do major reworking of how args are handled, or we do this hacky here.
@@ -154,6 +185,7 @@ module.exports = class PPM {
           });
         }
       }
+
       //reject("The Bundled PPM Client is not totally supported yet.");
     });
   }
@@ -164,13 +196,17 @@ module.exports = class PPM {
 
       if (featuredCache) {
         // If the value is anything but false, we successfully retreived a cache
-        if (typeof callback === "function") {
-          resolve(callback(null, featuredCache));
-        }
-        resolve(featuredCache);
+
+        return this._dynamicReturn({
+          function: resolve,
+          callback: callback,
+          err: null,
+          data: featuredCache
+        });
+
       }
 
-      this.request("api/packages/featured")
+      this._request("api/packages/featured")
         .then((data) => {
 
           let packages = this._formatPackageList(data);
@@ -178,18 +214,22 @@ module.exports = class PPM {
           // Then cache the data we just got
           this._deepCache("packages/featured", packages);
 
-          if (typeof callback === "function") {
-            resolve(callback(null, packages));
-          }
+          return this._dynamicReturn({
+            function: resolve,
+            callback: callback,
+            err: null,
+            data: packages
+          });
 
-          resolve(packages);
         })
         .catch((err) => {
-          if (typeof callback === "function") {
-            reject(callback(this._formatError(err), null));
-          }
+          return this._dynamicReturn({
+            function: reject,
+            callback: callback,
+            err: err,
+            data: null
+          });
 
-          reject(this._formatError(err));
         });
     });
   }
@@ -200,31 +240,38 @@ module.exports = class PPM {
 
       if (featuredCache) {
         // If the value is anything but false, we successfully retreived a cache
-        if (typeof callback === "function") {
-          resolve(callback(null, featuredCache));
-        }
-        resolve(featuredCache);
+
+        return this._dynamicReturn({
+          function: resolve,
+          callback: callback,
+          err: null,
+          data: featuredCache,
+        });
       }
 
-      this.request("api/themes/featured")
+      this._request("api/themes/featured")
         .then((data) => {
           let packages = this._formatPackageList(data);
 
           // Then cache the data we just got
           this._deepCache("themes/featured", packages);
 
-          if (typeof callback === "function") {
-            resolve(callback(null, packages));
-          }
+          return this._dynamicReturn({
+            function: resolve,
+            callback: callback,
+            err: null,
+            data: packages,
+          });
 
-          resolve(packages);
         })
         .catch((err) => {
-          if (typeof callback === "function") {
-            reject(callback(this._formatError(err), null));
-          }
+          return this._dynamicReturn({
+            function: reject,
+            callback: callback,
+            err: this._formatError(err),
+            data: null
+          });
 
-          reject(this._formatError(err));
         });
     });
   }
@@ -242,25 +289,31 @@ module.exports = class PPM {
         params.filter = 'package';
       }
 
-      this.request("api/packages/search", {
+      this._request("api/packages/search", {
         query: params
       })
         .then((data) => {
           let packages = this._formatPackageList(data);
 
-          if (typeof callback === "function") {
-            resolve(callback(null, packages));
-          }
-          resolve(packages);
+          return this._dynamicReturn({
+            function: resolve,
+            callback: callback,
+            err: null,
+            data: packages
+          });
+
         })
         .catch((err) => {
           let error = new Error(`Searching for \u201C${query}\u201D failed.\n`);
           error.stderr = `API returned: ${err.response?.body?.message}`;
 
-          if (typeof callback === "function") {
-            reject(callback(error, null));
-          }
-          reject(error);
+          return this._dynamicReturn({
+            function: reject,
+            callback: callback,
+            err: error,
+            data: null
+          });
+
         });
     });
   }
@@ -271,28 +324,37 @@ module.exports = class PPM {
 
       if (packageCache) {
         // If this value is anything but false, we got cached data
-        if (typeof callback === "function") {
-          resolve(callback(null, packageCache));
-        }
-        resolve(packageCache);
+        return this._dynamicReturn({
+          function: resolve,
+          callback: callback,
+          err: null,
+          data: packageCache,
+        });
+
       }
 
-      this.request(`api/packages/${name}`)
+      this._request(`api/packages/${name}`)
         .then((data) => {
           // Doesn't look like settings-view needs any handling of the raw package data
           // Then to cache this data
-          this._deepCache(`packages/${name}`, packages);
+          this._deepCache(`packages/${name}`, data);
 
-          if (typeof callback === "function") {
-            resolve(callback(null, data));
-          }
-          resolve(data);
+          return this._dynamicReturn({
+            function: resolve,
+            callback: callback,
+            err: null,
+            data: data,
+          });
+
         })
         .catch((err) => {
-          if (typeof callback === "function") {
-            reject(callback(null, this._formatError(err)));
-          }
-          reject(this._formatError(err));
+          return this._dynamicReturn({
+            function: reject,
+            callback: callback,
+            err: this._formatError(err),
+            data: null
+          });
+
         });
     });
   }
@@ -301,6 +363,82 @@ module.exports = class PPM {
     return new Promise((resolve, reject) => {
       // TODO cached
       // TODO rest of this
+    });
+  }
+
+  docs(packageName, options = {}, callback) {
+    // options: { print: true } can be used to return the URL, rather than open it.
+    return new Promise((resolve, reject) => {
+      let errMsg = `Package ${packageName} does not contain a repository URL.`;
+      let packageCache = this._fetchFromCache(`packages/${packageName}`);
+
+      if (packageCache) {
+        let repo = this._getRepository(packageCache);
+
+        if (typeof repo !== "string") {
+          // The repo is invalid
+          return this._dynamicReturn({
+            function: reject,
+            callback: callback,
+            err: errMsg,
+            data: null
+          });
+        }
+
+        if (options.print) {
+
+          return this._dynamicReturn({
+            function: resolve,
+            callback: callback,
+            err: null,
+            data: repo
+          });
+
+        }
+        // Open URL
+        shell.openExternal(repo);
+        resolve();
+
+      }
+      // We don't have cached data, retrieve it instead
+      // TODO: We could use async within our promise, to simplify this callback hell
+      this.package(packageName, (error, packageData) => {
+        if (error) {
+          return this._dynamicReturn({
+            function: reject,
+            callback: callback,
+            err: errMsg,
+            data: null
+          });
+
+        } else {
+          let repo = this._getRepository(packageData);
+
+          if (typeof repo !== "string") {
+            // We failed to get the repo from the string
+            return this._dynamicReturn({
+              function: reject,
+              callback: callback,
+              err: errMsg,
+              data: null
+            });
+          }
+
+          if (options.print) {
+            return this._dynamicReturn({
+              function: resolve,
+              callback: callback,
+              err: null,
+              data: repo
+            });
+
+          }
+          // Open URL
+          shell.openExternal(repo);
+          resolve();
+        }
+
+      });
     });
   }
 

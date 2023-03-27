@@ -65,8 +65,8 @@ class AtomEnvironment {
     this.id = params.id != null ? params.id : nextId++;
 
     /** @type {PPM} */
-    this.ppm = new PPM();
-    
+    this.ppm = new PPM({ useCache: true, headless: false });
+
     /** @type {Clipboard} */
     this.clipboard = params.clipboard;
     this.updateProcessEnv = params.updateProcessEnv || updateProcessEnv;
