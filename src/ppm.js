@@ -1,6 +1,12 @@
 const superagent = require("superagent");
 const { shell } = require("electron");
 
+/**
+  * @class PPM
+  * @classdesc A Bundled Version of PPM (Pulsar Package Manager) available on
+  * the `atom.ppm` global API. Aimed at mirroring, and eventually replacing the
+  * PPM repo.
+*/
 module.exports = class PPM {
   constructor(opts) {
     // TODO: Allow this to be configurable
@@ -21,6 +27,12 @@ module.exports = class PPM {
     this._determineUserAgent();
   }
 
+  /**
+    * @name _determineUserAgent
+    * @private
+    * @memberof PPM
+    * @desc Returns a valid user agent for the running environment.
+  */
   _determineUserAgent() {
     if (!this.headless) {
       this.userAgent = navigator.userAgent;
@@ -30,6 +42,20 @@ module.exports = class PPM {
     }
   }
 
+  /**
+    * @name _request
+    * @private
+    * @memberof PPM
+    * @desc Handles making any and all web requests within the PPM class.
+    * @param {string} path - The URL string following the `this.apiURL` to make the request to.
+    * @param {object} [opts] - Any additional options to set.
+    * @param {object} [opts.header] - Any options to set to the header. Directly
+    * implements `superagent`
+    * @param {object} [opts.query] - Any options to set as the `query` function.
+    * Directly implements `superagent`
+    * @returns {object} A promise, which resolves with the `body` object or `err` object.
+    * @see {@link https://ladjs.github.io/superagent/}
+  */
   _request(path, opts = { header: {}, query: {} }) {
     if (typeof opts.header !== "object") {
       opts.header = {};
@@ -58,6 +84,14 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name _formatPackageList
+    * @private
+    * @memberof PPM
+    * @desc Formats an array of packages, to be usable within `settings-view`
+    * @param {array} data - The array of packages, as taken directly from the API.
+    * @returns {array} A formated array of packages.
+  */
   _formatPackageList(data) {
     // Now this data is normally processed by PPM to be slightly modified,
     // While I may not like all of these filtering methods, for the time being I'll
@@ -76,6 +110,14 @@ module.exports = class PPM {
     return packages;
   }
 
+  /**
+    * @name _formatError
+    * @private
+    * @memberof PPM
+    * @desc Formats an error for easy consumption in `settings-view`
+    * @param {object} err - An error object from `this._request()`
+    * @returns {object} An object that can be directly consumed by `settings-view`.
+  */
   _formatError(err) {
     // Again this mirrors what PPM currently does, even if I don't like it
     // Also the `settings-view` package expects having a message object
@@ -83,10 +125,17 @@ module.exports = class PPM {
     if (err.statusCode === 503) {
       return { message: `${err.req.host} is temporarily unavailable, please try again later.` };
     }
-    console.log(err);
     return { message: `Requesting packages failed: ${err.response?.body?.message}` };
   }
 
+  /**
+    * @name _fetchFromCache
+    * @private
+    * @memberof PPM
+    * @desc Retreives items from the `localStorage` cache if available.
+    * @params {string} path - The cache path of the item to retrieve.
+    * @returns {object|false} The JavaScript object of the data cached. Or false if unavailable.
+  */
   _fetchFromCache(path) {
     if (!this.useCache) {
       return false;
@@ -104,6 +153,14 @@ module.exports = class PPM {
     }
   }
 
+  /**
+    * @name _deepCache
+    * @private
+    * @memberof PPM
+    * @desc Sets items into the `localStorage` cache.
+    * @params {string} path - The cache path of the item.
+    * @params {object} data - The data to cache.
+  */
   _deepCache(path, data) {
     if (!this.useCache) {
       return;
@@ -123,27 +180,50 @@ module.exports = class PPM {
     return;
   }
 
+  /**
+    * @name _cacheKeyForPath
+    * @private
+    * @memberof PPM
+    * @desc Creates a valid PPM scoped cache path. To avoid conflicts with other caches.
+    * @params {string} path - The path of the item cache.
+    * @returns {string} Returns the namespaces cache path.
+  */
   _cacheKeyForPath(path) {
     return `ppm-cache:${path}`;
   }
 
+  /**
+    * @name _getRepository
+    * @private
+    * @memberof PPM
+    * @desc Returns the normalized URL to a repository.
+    * @params {object} pack - The package object as returned from the API.
+    * @returns {string} The normalized URL.
+  */
   _getRepository(pack) {
     let repo = pack.repository?.url ?? pack.repository;
     return repo.replace(/\.git$/, "");
   }
 
+  /**
+    * @name _dynamicReturn
+    * @private
+    * @memberof PPM
+    * @desc Avoid repetative return patterns when handling callbacks and promises as once.
+    * @params {object} opts - The options needed to work.
+    * @params {function} opts.callback - The callback function.
+    * @params {function} opts.function - The `resolve()` or `reject()` function
+    * of the promise to invoke.
+    * @params {object} opts.err - The error to pass when returning an error.
+    * Must be set, but if no error is being returned set it to `null`
+    * @params {object} opts.data - The data to return on success.
+  */
   _dynamicReturn(opts) {
     // Since we want to keep support for invoking this API in so many different
     // ways, returning can be messy and gross looking. So this function
     // is a small helper that can simplify writing a return, even if a
     // little obscurity is added
 
-    // opts can be:
-    // callback: is the function to use to callback
-    // function: Is the `resolve` or `reject`
-    // resolve: The `resolve` of the promise
-    // err: Is the error data to return
-    // data: Is the successful data to return
     if (typeof opts.callback === "function") {
       // TODO: I had some worries about a promise being rejected
       // when in the context of an anonymous arrow function, as I was worried it
@@ -157,6 +237,13 @@ module.exports = class PPM {
 
   }
 
+  /**
+    * @name cliClient
+    * @private
+    * @memberof PPM
+    * @desc The CLI Client of the bundled PPM. For use when invoked via the CLI.
+    * @todo WIP
+  */
   cliClient(options) {
     // So the options we receive are the default supported ones with Pulsar.
     // Either we do major reworking of how args are handled, or we do this hacky here.
@@ -190,6 +277,13 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name getFeaturedPackages
+    * @memberof PPM
+    * @desc Returns the featured packages from cache or remote API.
+    * @params {function} [callback] - The callback to invoke.
+    * @returns {object[]} An array of package objects.
+  */
   getFeaturedPackages(callback) {
     return new Promise((resolve, reject) => {
       let featuredCache = this._fetchFromCache("packages/featured");
@@ -234,6 +328,13 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name getFeaturedThemes
+    * @memberof PPM
+    * @desc Returns the featured themes from cache or remote API.
+    * @params {function} [callback] - The callback to invoke.
+    * @returns {object[]} An array of pacakge objects.
+  */
   getFeaturedThemes(callback) {
     return new Promise((resolve, reject) => {
       let featuredCache = this._fetchFromCache("themes/featured");
@@ -276,6 +377,15 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name search
+    * @memberof PPM
+    * @desc Preforms a search on the remote API.
+    * @params {string} query - The search string.
+    * @params {object} options - The options to provide during search.
+    * @params {function} [callback] The callback to invoke.
+    * @returns {object[]} An array of package objects.
+  */
   search(query, options, callback) {
     return new Promise((resolve, reject) => {
       let params = {
@@ -289,6 +399,7 @@ module.exports = class PPM {
         params.filter = 'package';
       }
 
+      // TODO filter by package or themes
       this._request("api/packages/search", {
         query: params
       })
@@ -318,6 +429,14 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name package
+    * @memberof PPM
+    * @desc Returns the details of a pacakge from the API.
+    * @params {string} name - The name of the package.
+    * @params {function} [callback] - The callback to invoke.
+    * @returns {object} The package object.
+  */
   package(name, callback) {
     return new Promise((resolve, reject) => {
       let packageCache = this._fetchFromCache(`packages/${name}`);
@@ -359,6 +478,13 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name avatar
+    * @private
+    * @memberof PPM
+    * @desc Retrieves the file path to a users avatar.
+    * @todo WIP
+  */
   avatar(login, callback) {
     return new Promise((resolve, reject) => {
       // TODO cached
@@ -366,6 +492,17 @@ module.exports = class PPM {
     });
   }
 
+  /**
+    * @name docs
+    * @memberof PPM
+    * @desc Either returns the URL to a packages homepage, or opens it in the
+    * default browser.
+    * @params {string} packageName - The name of the package
+    * @params {object} [options] - Options to configure this behavior
+    * @params {boolean} [options.print] - `true` returns the string URL to the
+    * packages homepage, while `false` or unset will open this URL in the browser.
+    * @returns {string} The URL to the homepage, (only when `opts.print=true`)
+  */
   docs(packageName, options = {}, callback) {
     // options: { print: true } can be used to return the URL, rather than open it.
     return new Promise((resolve, reject) => {
