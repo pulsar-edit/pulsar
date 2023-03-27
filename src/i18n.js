@@ -67,7 +67,8 @@ class I18n {
     /** @type {string} */
     this.resourcePath = resourcePath;
 
-    const extlen = ".json".length;
+    const ext = ".json";
+    const extlen = extlen.length;
     const dirpath = path.join(resourcePath, "i18n");
     const dircontents = fs.readdirSync(dirpath);
 
@@ -75,7 +76,8 @@ class I18n {
       type: "string",
       order: 1,
       default: "en",
-      enum: dircontents.map(p => p.substring(0, p.length - extlen))
+      enum: dircontents.filter(p => p.endsWith(ext))
+        .map(p => p.substring(0, p.length - extlen))
         .map(p => ({
           value: p,
           description: `${new Intl.DisplayNames([p], { type: "language" }).of(p)} (${p})`
