@@ -10,8 +10,9 @@ class I18n {
    *   notificationManager: import("./notification-manager");
    * }}
    */
-  constructor({ notificationManager }) {
+  constructor({ notificationManager, config }) {
     this.notificationManager = notificationManager;
+    this.config = config;
     this.initialized = false;
 
     /**
@@ -65,6 +66,22 @@ class I18n {
   initialize({ resourcePath }) {
     /** @type {string} */
     this.resourcePath = resourcePath;
+
+    const extlen = ".json".length;
+    const dirpath = path.join(resourcePath, "i18n");
+    const dircontents = fs.readdirSync(dirpath);
+
+    this.config.setSchema("core.languageSettings.primaryLanguage", {
+      type: "string",
+      order: 1,
+      default: "en",
+      enum: dircontents.map(p => p.substring(0, p.length - extlen))
+        .map(p => ({
+          value: p,
+          description: new Intl.DisplayNames([p], { type: "language" }).of(p)
+        }))
+    });
+
     this.updateConfigs();
     this.initialized = true;
   }

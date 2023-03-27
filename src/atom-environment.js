@@ -203,7 +203,8 @@ class AtomEnvironment {
     });
 
     this.i18n = new I18n({
-      notificationManager: this.notifications
+      notificationManager: this.notifications,
+      config: this.config
     });
 
     if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
