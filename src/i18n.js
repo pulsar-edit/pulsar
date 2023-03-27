@@ -80,9 +80,9 @@ class I18n {
 
   updateConfigs() {
     /** @type {string} */
-    this.primaryLanguage = atom.config.get("core.languageSettings.primaryLanguage");
+    this.primaryLanguage = this.config.get("core.languageSettings.primaryLanguage");
     /** @type {Array<string>} */
-    this.fallbackLanguages = atom.config.get("core.languageSettings.fallbackLanguages");
+    this.fallbackLanguages = this.config.get("core.languageSettings.fallbackLanguages");
   }
 
   registerStrings(packageId, strings) {
