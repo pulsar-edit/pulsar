@@ -3,6 +3,7 @@
 
 import etch from 'etch';
 import path from 'path';
+import { t } from "./main";
 
 export default class WelcomeView {
   constructor(props) {
@@ -126,7 +127,7 @@ export default class WelcomeView {
   }
 
   getTitle() {
-    return 'Welcome';
+    return t("title");
   }
 
   isEqual(other) {
