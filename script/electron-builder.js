@@ -43,6 +43,7 @@ const Platform = builder.Platform
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
 const svgIcon = 'resources/app-icons/beta.svg'
+const icnsIcon = 'resources/app-icons/beta.icns'
 
 let options = {
   "appId": "dev.pulsar-edit.pulsar",
@@ -138,6 +139,9 @@ let options = {
     }, {
       "from": pngIcon,
       "to": "pulsar.png"
+    }, {
+      "from": "LICENSE.md",
+      "to": "LICENSE.md"
     },
   ],
   compression: "normal",
@@ -168,16 +172,19 @@ let options = {
         // Extra SVG icon included in the resources folder to give a chance to
         // Linux packagers to add a scalable desktop icon under
         // /usr/share/icons/hicolor/scalable
-        // (used only by desktops to show it on bar/switcher and app menus).  
+        // (used only by desktops to show it on bar/switcher and app menus).
         "from": svgIcon,
         "to": "pulsar.svg"
       },
     ],
   },
   "mac": {
-    "icon": pngIcon,
+    "icon": icnsIcon,
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
+    "hardenedRuntime": true,
+    "entitlements": "resources/mac/entitlements.plist",
+    "entitlementsInherit": "resources/mac/entitlements.plist",
     "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
       "CFBundleExecutable": "Pulsar",
@@ -191,12 +198,23 @@ let options = {
       ]
     },
   },
+  "dmg": {
+    "sign": false
+  },
   "win": {
     "icon": icoIcon,
     "extraResources": [
       {
         "from": icoIcon,
         "to": "pulsar.ico"
+      },
+      {
+        "from": "resources/win/pulsar.cmd",
+        "to": "pulsar.cmd"
+      },
+      {
+        "from": "resources/win/pulsar.js",
+        "to": "pulsar.js"
       },
     ],
     "target": [
@@ -215,6 +233,7 @@ let options = {
   },
   "extraMetadata": {
   },
+  "afterSign": "script/mac-notarise.js",
   "asarUnpack": [
     "node_modules/github/bin/*",
     "node_modules/github/lib/*", // Resolves Error in console

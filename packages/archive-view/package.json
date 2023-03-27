@@ -4,10 +4,10 @@
   "description": "View the files and folders inside archive files",
   "main": "./lib/archive-editor",
   "dependencies": {
-    "etch": "0.9.0",
+    "etch": "^0.14.1",
     "humanize-plus": "~1.8.2",
     "ls-archive": "1.3.4",
-    "temp": "~0.8.1"
+    "temp": "^0.9.4"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",

@@ -53,40 +53,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a bug where macOS menus like "Open" don't do anything.
+                Added a new feature to Search for Pulsar's settings
               </li>
               <li>
-                Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
+                Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
               </li>
               <li>
-                Fixed a bug where devtools won't open.
+                Updated the instructions and look of the login flow for the `github` package.
               </li>
               <li>
-                Fixed a bug where the editor refused to open with the message "GPU process isn't usable. Goodbye"
+                Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
               </li>
               <li>
-                Fixed logo artifacts on Linux.
-              </li>
-              <li>
-                Fixed Windows Taskbar Icon being 'Cut in Half'
-              </li>
-              <li>
-                Fixed commands like `--version`, `--package` or `--help` did not show outputs.
-              </li>
-              <li>
-                Fixed additional flags not being sent to `--package`.
-              </li>
-              <li>
-                Small improvement on the binary size.
-              </li>
-              <li>
-                Fixed "install command line tools" on Mac and Windows.
-              </li>
-              <li>
-                Cached queries for featured packages (featured packages will load faster, and fewer errors on the settings-view regarding package info).
-              </li>
-              <li>
-                Added warning when `settings-view` is disabled, describing how to re-enable it.
+                Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
               </li>
 
             </ul>

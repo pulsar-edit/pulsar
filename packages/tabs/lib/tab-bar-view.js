@@ -575,7 +575,11 @@ class TabBarView {
     if (!tab) { return; }
 
     if ((event.button === 2) || ((event.button === 0) && (event.ctrlKey === true))) {
+      if (this.rightClickedTab) {
+        this.rightClickedTab.element.classList.remove('right-clicked');
+      }
       this.rightClickedTab = tab;
+      this.rightClickedTab.element.classList.add('right-clicked');
       return event.preventDefault();
     } else if (event.button === 1) {
       // This prevents Chromium from activating "scroll mode" when
