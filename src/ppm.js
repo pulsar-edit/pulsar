@@ -5,6 +5,9 @@ module.exports = class PPM {
     // TODO: Allow this to be configurable
     this.apiURL = "https://api.pulsar-edit.dev/";
     this.webURL = "https://web.pulsar-edit.dev/";
+
+    // 5 Hour Expiry on Cache
+    this.cacheExpiry = 1000 * 60 * 60 * 5;
   }
 
   request(path, opts = { header: {}, query: {} }) {
@@ -64,19 +67,63 @@ module.exports = class PPM {
     return { message: `Requesting packages failed: ${err.response.body?.message}` };
   }
 
+  _fetchFromCache(path) {
+    let cached = localStorage.getItem(this._cacheKeyForPath(path));
+    if (cached) {
+      cached = JSON.parse(cached);
+    }
+
+    if (cached && (!navigator.onLine || cached.createdOn < this.cacheExpiry)) {
+      return cached.data;
+    } else {
+      return false;
+    }
+  }
+
+  _deepCache(path, data) {
+    let cache = {
+      data: data,
+      createdOn: Date.now()
+    };
+
+    localStorage.setItem(this._cacheKeyForPath(path), JSON.stringify(cache));
+    if (Array.isArray(data)) {
+      data.forEach((child) => {
+        this._deepCache(`packages/${child.name}`, child);
+      });
+    }
+    return;
+  }
+
+  _cacheKeyForPath(path) {
+    return `ppm-cache:${path}`;
+  }
+
   cliClient(options) {
     return new Promise((resolve, reject) => {
-      reject("Bundled PPM CLI Client!");
+      reject("The Bundled PPM Client is not totally supported yet.");
     });
   }
 
   getFeaturedPackages(callback) {
     return new Promise((resolve, reject) => {
-      // TODO check if cached
+      let featuredCache = this._fetchFromCache("packages/featured");
+
+      if (featuredCache) {
+        // If the value is anything but false, we successfully retreived a cache
+        if (typeof callback === "function") {
+          resolve(callback(null, featuredCache));
+        }
+        resolve(featuredCache);
+      }
+
       this.request("api/packages/featured")
         .then((data) => {
 
           let packages = this._formatPackageList(data);
+
+          // Then cache the data we just got
+          this._deepCache("packages/featured", packages);
 
           if (typeof callback === "function") {
             resolve(callback(null, packages));
@@ -96,14 +143,27 @@ module.exports = class PPM {
 
   getFeaturedThemes(callback) {
     return new Promise((resolve, reject) => {
-      // TODO check if cached
+      let featuredCache = this._fetchFromCache("themes/featured");
+
+      if (featuredCache) {
+        // If the value is anything but false, we successfully retreived a cache
+        if (typeof callback === "function") {
+          resolve(callback(null, featuredCache));
+        }
+        resolve(featuredCache);
+      }
+
       this.request("api/themes/featured")
         .then((data) => {
           let packages = this._formatPackageList(data);
 
+          // Then cache the data we just got
+          this._deepCache("themes/featured", packages);
+
           if (typeof callback === "function") {
             resolve(callback(null, packages));
           }
+
           resolve(packages);
         })
         .catch((err) => {
@@ -154,11 +214,22 @@ module.exports = class PPM {
 
   package(name, callback) {
     return new Promise((resolve, reject) => {
-      let packagePath = `packages/${name}`;
-      // TODO Cached
+      let packageCache = this._fetchFromCache(`packages/${name}`);
+
+      if (packageCache) {
+        // If this value is anything but false, we got cached data
+        if (typeof callback === "function") {
+          resolve(callback(null, packageCache));
+        }
+        resolve(packageCache);
+      }
+
       this.request(`api/packages/${name}`)
         .then((data) => {
           // Doesn't look like settings-view needs any handling of the raw package data
+          // Then to cache this data
+          this._deepCache(`packages/${name}`, packages);
+
           if (typeof callback === "function") {
             resolve(callback(null, data));
           }
