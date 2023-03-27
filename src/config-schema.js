@@ -377,6 +377,49 @@ const configSchema = {
             description: 'Use sRGB color profile'
           }
         ]
+      },
+      languageSettings: {
+        type: "object",
+        description: "These settings currently require a full restart of Pulsar to take effect.",
+        properties: {
+          primaryLanguage: {
+            type: "string",
+            order: 1,
+            default: "en",
+            enum: [
+              // TODO, this should probably be moved to i18n.js, and list the files in the
+              // i18n dir to find available languages, and use Intl.DisplayNames() to
+              // get the localised name
+              // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/DisplayNames
+              { value: "en", description: "English" },
+              { value: "en-US", description: "English (US)" },
+              { value: "nl-NL", description: "Nederlands (Nederland)" }
+            ]
+          },
+          fallbackLanguages: {
+            type: "array",
+            order: 2,
+            description: "List of fallback languages, if something can't be found in the primary language. Note; `en` is always the last fallback language, to ensure that things at least show up.",
+            default: [],
+            items: {
+              // Array enum is meh, if you pause for the briefest moment and you
+              // didn't stop at a valid enum value, the entry you just typed gets yeeted
+              type: "string"
+            }
+          },
+          includeNonRegionalSpecificLanguagesAsFallback: {
+            type: "boolean",
+            order: 3,
+            description: "Whether or not to include Non-regional specific as fallback. For example, if a string is not available in `en-US`, but is available in `en`, it would use that as a fallback.",
+            default: false
+          },
+          prioritiseUserSpecifiedLanguages: {
+            type: "boolean",
+            order: 4,
+            description: "If the setting `Include Non Regional Specific Languages As Fallback` is true, whether or not to prioritise languages that the user specified. For example, if you specify `en-GB` as your default language, `nl-NL` as a fallback, the hierarchy when this is true would be `en-GB, nl-NL, en, nl`, with fallbacks put at the end of the list; otherwise it would be `en-GB, en, nl-NL, nl`, with non-regional-specific languages placed right after the languages they fall back for.",
+            default: true
+          }
+        }
       }
     }
   },

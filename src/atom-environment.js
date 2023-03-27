@@ -46,6 +46,7 @@ const TextEditorRegistry = require('./text-editor-registry');
 const AutoUpdateManager = require('./auto-update-manager');
 const StartupTime = require('./startup-time');
 const getReleaseChannel = require('./get-release-channel');
+const I18n = require("./i18n");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -201,6 +202,10 @@ class AtomEnvironment {
       applicationDelegate: this.applicationDelegate
     });
 
+    this.i18n = new I18n({
+      notificationManager: this.notifications
+    });
+
     if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
       this.keymaps.loadBundledKeymaps();
     }
@@ -306,6 +311,8 @@ class AtomEnvironment {
       CoreURIHandlers.create(this)
     );
     this.autoUpdater.initialize();
+
+    this.i18n.initialize({ resourcePath });
 
     this.protocolHandlerInstaller.initialize(this.config, this.notifications);
 
