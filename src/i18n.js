@@ -14,8 +14,6 @@ class I18n {
     this.notificationManager = notificationManager;
     this.config = config;
     this.initialized = false;
-    /** @type {Array<string>} */
-    this.packageDirPaths = [];
 
     /**
      * {
@@ -65,22 +63,10 @@ class I18n {
     }
   }
 
-  initialize({ configDirPath, devMode, packages, resourcePath, safeMode }) {
-    /** @type {string} */
-    this.configDirPath = configDirPath;
+  initialize({ packages, resourcePath }) {
     this.packages = packages;
     /** @type {string} */
     this.resourcePath = resourcePath;
-
-    // stolen from PackageManager::initialize
-    this.devMode = devMode;
-    if (configDirPath != null && !safeMode) {
-      if (devMode) {
-        this.packageDirPaths.push(path.join(configDirPath, 'dev', 'packages'));
-        this.packageDirPaths.push(path.join(resourcePath, 'packages'));
-      }
-      this.packageDirPaths.push(path.join(configDirPath, 'packages'));
-    }
 
     const ext = ".json";
     const extlen = ext.length;
