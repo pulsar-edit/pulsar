@@ -466,6 +466,9 @@ class WASMTreeSitterLanguageMode {
     }
   }
 
+  // TODO: It might be prudent to have this consume `tokenizedLineForRow`, even
+  // though the latter is a deprecated API. It operates closer to the metal and
+  // is less likely to diverge from reality.
   scopeDescriptorForPosition (point) {
     if (!this.rootLanguageLayer) {
       return new ScopeDescriptor({ scopes: [this.grammar.scopeName, 'text'] });
@@ -473,13 +476,27 @@ class WASMTreeSitterLanguageMode {
 
     point = this.normalizePointForPositionQuery(point);
 
-    let results = this.rootLanguageLayer.scopeMapAtPosition(point);
-    let injectionLayers = this.injectionLayersAtPoint(point);
+    let results = [];
+    let layers = this.injectionLayersAtPoint(point);
+    layers.push(this.rootLanguageLayer);
+
+    // Consider deeper layers first.
+    layers.sort((a, b) => b.depth - a.depth);
+
+    let coveredNodeRangeSets = [];
+    let isWithinCoveredRange = (capture) => {
+      let range = capture.node.range;
+      return coveredNodeRangeSets.some(r => r.coversRange(range));
+    };
 
     // Add in results from any applicable injection layers.
-    for (let layer of injectionLayers) {
+    for (let layer of layers) {
+      let coverShallowerScopes = layer.injectionPoint?.coverShallowerScopes;
       let map = layer.scopeMapAtPosition(point);
-      results.push(...map);
+      for (let capture of map) {
+        if (isWithinCoveredRange(capture)) { continue; }
+        results.push(capture);
+      }
 
       // Make an artificial result for the root layer scope itself.
       if (layer.tree && layer.languageScope) {
@@ -487,6 +504,11 @@ class WASMTreeSitterLanguageMode {
           name: layer.languageScope,
           node: layer.tree.rootNode
         });
+      }
+      if (coverShallowerScopes) {
+        // Add this layer's ranges to the set of ranges that should suppress
+        // scope application from earlier layers.
+        coveredNodeRangeSets.push(layer.currentNodeRangeSet);
       }
     }
 
@@ -1551,8 +1573,8 @@ class FoldResolver {
     let start = Point.fromObject({ row, column: 0 });
     let end = Point.fromObject({ row: row + 1, column: 0 });
 
-    let iterator = this.getOrCreateBoundariesIterator(
-      this.layer.tree.rootNode, start, end);
+    let tree = this.layer.getOrParseTree();
+    let iterator = this.getOrCreateBoundariesIterator(tree.rootNode, start, end);
 
     while (iterator.key) {
       if (comparePoints(iterator.key.position, end) >= 0) { break; }
@@ -2116,7 +2138,7 @@ class LayerHighlightIterator {
   //
   // I still don't fully understand the use cases for `detectCoveredScope`,
   // though I assume there are at least a few. I am quite sure, however, that
-  // if we want an injection layer to veto a shallower layer's scope, it needs
+  // if we want an injection layer to veto a shallower layer's scope, it ought
   // to happen in a way that either prevents _both_ boundaries or allows _both_
   // boundaries. I'm not sure how to pull that off at this point, though.
   //
@@ -2132,7 +2154,7 @@ class LayerHighlightIterator {
     if (iterator.depth > this.depth) { return false; }
 
     // …and this iterator's ranges actually include this position.
-    let ranges = this.languageLayer.currentNodeRangeSet;
+    let ranges = this.languageLayer.currentIncludedRanges;
     if (ranges) {
       return ranges.some(range => {
         // return comparePoints(position, range.startPosition) > 0 &&
@@ -2142,7 +2164,8 @@ class LayerHighlightIterator {
     }
 
     // TODO: Despite all this, we may want to allow parent layers to apply
-    // scopes at the very edges of this layer's ranges/extent, or to at least
+    // scopes at the very edges of this layer's ranges/extent; or perhaps to
+    // apply ending scopes at starting positions and vice-versa; or at least to
     // make it a configurable behavior.
   }
 
@@ -2539,6 +2562,12 @@ class LanguageLayer {
   }
 
   handleTextChange(edit) {
+    // Any text change within the layer invalidates our cached fold boundary
+    // tree. This usually isn't a big deal because the language mode's own cache
+    // is able to adjust when content shifts up and down, so typically only the
+    // ranges that actually change will have fold data re-queried.
+    if (this.foldResolver) { this.foldResolver.reset(); }
+
     const {
       startPosition,
       oldEndPosition,
@@ -2565,13 +2594,6 @@ class LanguageLayer {
   }
 
   update(nodeRangeSet) {
-    // Any update within the layer invalidates our cached fold boundary tree.
-    // Updates _outside_ of the layer will not require us to clear this data,
-    // because the base `isFoldableCache` is able to figure out how those
-    // changes affect the buffer and adjust accordingly. Hence there isn't much
-    // of a risk of using stale data in these scenarios.
-    // if (this.foldResolver) { this.foldResolver.reset(); }
-
     // Practically speaking, updates that affect _only this layer_ will happen
     // synchronously, because we've made sure not to call this method until the
     // root grammar's tree-sitter parser has been loaded. But we can't load any
@@ -2795,7 +2817,8 @@ class LanguageLayer {
       includedRanges
     );
 
-    this.currentNodeRangeSet = includedRanges;
+    this.currentNodeRangeSet = nodeRangeSet;
+    this.currentIncludedRanges = includedRanges;
 
     // Experiment: Even when no syntax changes have occurred, we should
     // always re-highlight the most specific node within which the edit
@@ -2888,7 +2911,7 @@ class LanguageLayer {
     this.tree = this.languageMode.parse(
       this.language,
       this.tree,
-      this.currentNodeRangeSet
+      this.currentIncludedRanges
     );
     this.treeIsDirty = false;
     return this.tree;
@@ -3146,6 +3169,13 @@ class NodeRangeSet {
     }
 
     return result;
+  }
+
+  coversRange (candidateRange) {
+    let ranges = this.getRanges().map(r => rangeForNode(r));
+    return ranges.some(range => {
+      return range.containsRange(candidateRange);
+    });
   }
 
   _pushRange(buffer, previousRanges, newRanges, newRange) {

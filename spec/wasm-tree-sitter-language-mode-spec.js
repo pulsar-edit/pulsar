@@ -1072,7 +1072,17 @@ describe('WASMTreeSitterLanguageMode', () => {
       });
 
       it('reports scopes from shallower layers when they are at the start or end of an injection', async () => {
+        jasmine.useRealClock();
         await atom.packages.activatePackage('language-javascript');
+
+        let jsdocGrammar = atom.grammars.grammarForScopeName('source.jsdoc');
+        await jsdocGrammar.setQueryForTest('syntaxQuery', `
+          ((ERROR) @comment.block.js
+            (#set! onlyIfRoot true))
+          (document) @comment.block.js
+
+          (tag_name) @storage.type.class.jsdoc
+        `);
 
         editor.setGrammar(
           atom.grammars.grammarForScopeName('source.js')
@@ -1081,6 +1091,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let languageMode = buffer.getLanguageMode();
         if (languageMode.ready) {
           await languageMode.ready;
+          await wait(0);
         }
         expectTokensToEqual(editor, [
           [
@@ -1098,7 +1109,7 @@ describe('WASMTreeSitterLanguageMode', () => {
             {
               text: '{',
               scopes: [
-                'punctuation brace curly begin js'
+                'punctuation definition begin brace curly js'
               ]
             }
           ],
@@ -1106,7 +1117,7 @@ describe('WASMTreeSitterLanguageMode', () => {
             {
               text: '}',
               scopes: [
-                'punctuation brace curly end js'
+                'punctuation definition end brace curly js'
               ]
             }
           ]
@@ -1130,13 +1141,14 @@ describe('WASMTreeSitterLanguageMode', () => {
               return node.lastChild;
             },
             includeChildren: true,
+            languageScope: null,
             coverShallowerScopes: true
           });
         }
 
         await rustGrammar.setQueryForTest('syntaxQuery', `
           (macro_invocation
-            (identifier) @macro
+            macro: (identifier) @macro
             (#set! final true))
 
           (call_expression
@@ -2129,7 +2141,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('syntaxQuery', `
-        (program) @source.js
         (comment) @comment.block
       `);
 
@@ -2799,6 +2810,9 @@ function expectTokensToEqual(editor, expectedTokenLines) {
       }
       tokenLines[row] = result;
     }
+
+    console.log('EXPECTED:', expectedTokenLines);
+    console.log('ACTUAL:', tokenLines);
 
     for (let row = startRow; row <= lastRow; row++) {
       const tokenLine = tokenLines[row];
