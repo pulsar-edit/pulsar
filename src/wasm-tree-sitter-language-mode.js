@@ -1103,6 +1103,7 @@ class WASMTreeSitterLanguageMode {
       for (let capture of dedentCaptures) {
         let { name, node, setProperties: props = {} } = capture;
         let { text } = node;
+        let rowText = currentRowText.trim();
 
         // Ignore “phantom” nodes that aren't present in the buffer.
         if (text === '' && !props.allowEmpty) { continue; }
@@ -1126,7 +1127,10 @@ class WASMTreeSitterLanguageMode {
         // Thus we don't want to honor a `@dedent` or `@match` capture unless
         // it's the first non-whitespace content in the line. We'll use similar
         // logic for `suggestedIndentForEditedBufferRow`.
-        if (!currentRowText.trim().startsWith(text)) { continue; }
+        //
+        // If a capture is confident it knows what it's doing, it can opt out
+        // of this behavior with `(#set! force true)`.
+        if (!props.force && !rowText.startsWith(text)) { continue; }
 
         // The '@match' capture short-circuits a lot of this logic by pointing
         // us to a different node and asking us to match the indentation of
@@ -1134,7 +1138,6 @@ class WASMTreeSitterLanguageMode {
         if (name === 'match') {
           let matchIndentLevel = this.resolveIndentMatchCapture(
             capture, row, tabLength);
-
           if (typeof matchIndentLevel === 'number') {
             scopeResolver.reset();
             return matchIndentLevel - existingIndent;
@@ -1267,7 +1270,7 @@ class WASMTreeSitterLanguageMode {
 
     let seenDedent = false;
     for (let indent of indents) {
-      let { node } = indent;
+      let { node, setProperties: props = {} } = indent;
       // Ignore captures that aren't on this row.
       if (node.startPosition.row !== row) { continue; }
       // Ignore captures that fail their scope tests.
@@ -1279,7 +1282,12 @@ class WASMTreeSitterLanguageMode {
       //
       // Otherwise, this capture will assert itself after every keystroke, and
       // the user has no way to opt out of the correction.
-      if (node.text !== lineText) { continue; }
+      //
+      // If the capture is confident it knows what it's doing, and is using
+      // some other mechanism to ensure the adjustment will happen exactly
+      // once, it can bypass this behavior with `(#set! force true)`.
+      if (!props.force && node.text !== lineText) { continue; }
+
 
       // `@match` is authoritative; honor the first one we see and ignore other
       // captures.
@@ -1291,7 +1299,6 @@ class WASMTreeSitterLanguageMode {
         }
       }
 
-      // The first dedent we see is treated as a
       if (indent.name !== 'dedent') { continue; }
 
       // Even after we've seen a `@dedent`, we allow the loop to finish,
