@@ -12,6 +12,7 @@
 ] @meta.group.capturing.regexp
 
 [
+  (identity_escape)
   (control_escape)
   (character_class_escape)
 ] @constant.character.escape.backslash.regexp

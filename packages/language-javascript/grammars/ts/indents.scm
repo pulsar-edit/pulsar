@@ -6,9 +6,9 @@
 
 ; 'case' and 'default' need to be indented one level more than their containing
 ; `switch`.
-  (["case" "default"] @match
-    (#set! matchIndentOf parent.parent.startPosition)
-    (#set! offsetIndent 1))
+(["case" "default"] @match
+  (#set! matchIndentOf parent.parent.startPosition)
+  (#set! offsetIndent 1))
 
 
 ; An `if` statement without an opening brace should indent the next line…
@@ -20,6 +20,9 @@
 (if_statement
   condition: (_) @indent
   consequence: (expression_statement) @dedent.next)
+
+(template_substitution "}" @_IGNORE_
+  (#set! final true))
 
 [
   "{"
@@ -39,5 +42,5 @@
 ; JSX
 ; ===
 
-(jsx_opening_element ">" @indent)
-(jsx_closing_element ">" @dedent)
+(jsx_opening_element ">") @indent
+(jsx_closing_element ">") @dedent

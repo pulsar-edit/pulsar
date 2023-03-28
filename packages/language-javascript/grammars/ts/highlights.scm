@@ -81,8 +81,27 @@
 ((object_pattern
   (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js))
 
+; A variable object destructuring with default value:
+; The "foo" in `let { foo = true } = something`
 (object_assignment_pattern
   (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js)
+
+; A variable object alias destructuring:
+; The "bar" and "foo" in `let { bar: foo } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.js
+    value: (identifier) @variable.other.assignment.destructuring.js))
+
+; A variable object alias destructuring with default value:
+; The "bar" and "foo" in `let { bar: foo = true } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.js
+    value: (assignment_pattern
+      left: (identifier) @variable.other.assignment.destructuring.js)))
 
 ; A variable array destructuring:
 ; The "foo" and "bar" in `let [foo, bar] = something`
@@ -438,11 +457,6 @@
   (#match? @constant.other.js "^[A-Z_][A-Z0-9_]*$")
   (#set! shy true))
 
-(object_pattern
-  (pair_pattern
-    key: (_) @entity.other.attribute-name.js
-    value: (identifier) @variable.other.assignment.js))
-
 ; TODO: What do we do with computed object keys?
 ;
 ; { [foo]: "bar" }
@@ -566,6 +580,21 @@
 ; an anonymous node, but it appears not to be implemented that way, so we can't
 ; use "?." to target it.
 (optional_chain) @keyword.operator.accessor.optional-chaining.js
+
+; Optional chaining is illegal…:
+
+; …on the left-hand side of an assignment.
+(assignment_expression
+  left: (_) @_IGNORE_
+    (#set! prohibitsOptionalChaining true))
+
+; …within a `new` expression.
+(new_expression
+  constructor: (_) @_IGNORE_
+    (#set! prohibitsOptionalChaining true))
+
+((optional_chain) @invalid.illegal.optional-chain.js
+  (#set! onlyIfDescendantOfNodeWithData prohibitsOptionalChaining))
 
 
 ; PUNCTUATION

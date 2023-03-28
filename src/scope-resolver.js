@@ -174,7 +174,7 @@ class ScopeResolver {
     for (let key in props) {
       if (!(key in ScopeResolver.TESTS)) { continue; }
       let test = ScopeResolver.TESTS[key];
-      if (!test(existingData, props, node, this.languageLayer)) {
+      if (!test(existingData, props, node, this)) {
         return false;
       }
     }
@@ -327,8 +327,8 @@ ScopeResolver.TESTS = {
     return node.hasError();
   },
 
-  onlyIfInjection(existingData, props, node, layer) {
-    return layer.depth > 0;
+  onlyIfInjection(existingData, props, node, instance) {
+    return instance.languageLayer.depth > 0;
   },
 
   // Passes only if the given node is the first among its siblings.
@@ -439,6 +439,30 @@ ScopeResolver.TESTS = {
     let { onlyIfNotAncestorOfType: type } = props;
     let descendants = node.descendantsOfType(type);
     return descendants.length === 0;
+  },
+
+  onlyIfDescendantOfNodeWithData(existingData, props, node, instance) {
+    let { onlyIfDescendantOfNodeWithData: key } = props;
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      let data = instance.getDataForRange(current);
+      if (data === undefined) { continue; }
+      if (key in data) return true;
+    }
+    return false;
+  },
+
+  onlyIfNotDescendantOfNodeWithData(existingData, props, node, instance) {
+    let { onlyIfNotDescendantOfNodeWithData: key } = props;
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      let data = instance.getDataForRange(current);
+      if (data === undefined) { continue; }
+      if (key in data) return false;
+    }
+    return true;
   }
 };
 
