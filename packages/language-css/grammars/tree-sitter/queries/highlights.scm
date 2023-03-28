@@ -8,19 +8,15 @@
 
 (descendant_selector
   (tag_name) @_IGNORE_
-  (#set! final true)
-)
+  (#set! final true))
 
 (ERROR
   (attribute_name) @_IGNORE_
-  (#set! final true)
-)
-(
-  (ERROR
-    (attribute_name) @invalid.illegal
-  )
-  (#set! final true)
-)
+  (#set! final true))
+
+((ERROR
+  (attribute_name) @invalid.illegal)
+  (#set! final true))
 
 ; WORKAROUND:
 ;
@@ -86,14 +82,17 @@
 
 ;(namespace_name) @entity.other.namespace-prefix.css
 
-; The 'foo'
+; The '.' in `.foo`.
 (class_selector
-  "." @punctuation.definition.entity.css
-  (class_name) @entity.other.attribute-name.class.css)
+  "." @punctuation.definition.entity.css)
 
-(pseudo_class_selector
-  ":" @punctuation.definition.entity.css @entity.other.attribute-name.pseudo-class.css
-  (class_name) @entity.other.attribute-name.pseudo-class.css)
+; The '.foo' in `.foo`.
+((class_selector) @entity.other.attribute-name.class.css
+  (#set! startAt lastChild.previousSibling.startPosition))
+
+((pseudo_class_selector) @entity.other.attribute-name.pseudo-class.css
+  (#set! startAt lastChild.previousSibling.previousSibling.startPosition)
+  (#set! endAt lastChild.previousSibling.endPosition))
 
 (attribute_selector
   "[" @punctuation.definition.entity.begin.bracket.square.css
@@ -244,11 +243,13 @@
 "{" @punctuation.brace.curly.begin.css
 "}" @punctuation.brace.curly.end.css
 ";" @punctuation.terminator.rule.css
-":" @punctuation.separator.key-value.css
 "," @punctuation.separator.list.comma.css
 
 (pseudo_class_selector
   [":" "::"] @punctuation.definition.entity.css)
+
+(":" @punctuation.separator.key-value.css
+  (#set! shy true))
 
 
 ; SECTIONS
