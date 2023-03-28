@@ -920,12 +920,15 @@ class WASMTreeSitterLanguageMode {
       ...rawOptions
     };
 
-    let comparisonRow = row - 1;
-    if (options.skipBlankLines) {
-      // It usually makes no sense to compare to a blank row, so we'll move
-      // upward until we find the a line with text on it.
-      while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
-        comparisonRow--;
+    let comparisonRow = options.comparisonRow;
+    if (comparisonRow === undefined) {
+      comparisonRow = row - 1;
+      if (options.skipBlankLines) {
+        // It usually makes no sense to compare to a blank row, so we'll move
+        // upward until we find the a line with text on it.
+        while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
+          comparisonRow--;
+        }
       }
     }
 
@@ -936,10 +939,12 @@ class WASMTreeSitterLanguageMode {
         tabLength
       );
     }
-
-    let comparisonRowIndent = this.indentLevelForLine(
-      this.buffer.lineForRow(comparisonRow), tabLength
-    );
+    let comparisonRowIndent = options.comparisonRowIndent;
+    if (comparisonRowIndent === undefined) {
+      comparisonRowIndent = this.indentLevelForLine(
+        this.buffer.lineForRow(comparisonRow), tabLength
+      );
+    }
 
     // TODO: What's the right place to measure from? Often we're here because
     // the user just hit Enter, which means we'd run before injection layers
@@ -1157,7 +1162,50 @@ class WASMTreeSitterLanguageMode {
     scopeResolver.reset();
     let finalIndent = comparisonRowIndent + indentDelta + dedentDelta;
 
-    return finalIndent - existingIndent;
+    return Math.max(finalIndent - existingIndent, 0);
+  }
+
+  // Given a range of buffer rows, retrieves the suggested indent for each one
+  // while re-using the same tree. Prevents a tree re-parse after each
+  // individual line adjustment when auto-indenting.
+  suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
+    let root = this.rootLanguageLayer;
+    if (!root || !root.tree) {
+      return new Array(startRow - endRow).map(() => 0);
+    }
+
+    let results = [];
+    let comparisonRow = null;
+    let comparisonRowIndent = null;
+
+    // For line X to know its appropriate indentation level, it needs row X-1,
+    // if it exists, to be indented properly. That's why `TextEditor` wants to
+    // indent each line atomically. Instead, we'll determine the right level
+    // for the first row, then supply the result for the previous row when we
+    // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
+    // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
+    // row itself and find out we haven't actually fixed any of the previous
+    // rows' indentations yet.
+    for (let row = startRow; row <= endRow; row++) {
+      let controllingLayer = this.controllingLayerAtPoint(
+        new Point(row, Infinity),
+        (layer) => !!layer.indentsQuery && !!layer.tree
+      );
+      let tree = controllingLayer.getOrParseTree();
+      let rowOptions = {
+        ...options,
+        tree,
+        comparisonRow: comparisonRow ?? undefined,
+        comparisonRowIndent: comparisonRowIndent ?? undefined
+      };
+      let indent = this.suggestedIndentForBufferRow(
+        row, tabLength, rowOptions);
+      results.push(indent);
+      comparisonRow = row;
+      comparisonRowIndent = indent;
+    }
+
+    return results;
   }
 
   // Get the suggested indentation level for a line in the buffer on which the

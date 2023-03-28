@@ -5603,10 +5603,19 @@ module.exports = class TextEditor {
   // * startRow - The row {Number} to start at
   // * endRow - The row {Number} to end at
   autoIndentBufferRows(startRow, endRow) {
-    let row = startRow;
-    while (row <= endRow) {
-      this.autoIndentBufferRow(row);
-      row++;
+    const languageMode = this.buffer.getLanguageMode();
+    if (languageMode.suggestedIndentForBufferRows) {
+      let indents = languageMode.suggestedIndentForBufferRows(
+        startRow, endRow, this.getTabLength());
+      for (let row = startRow; row <= endRow; row++) {
+        this.setIndentationForBufferRow(row, indents[row - startRow]);
+      }
+    } else {
+      let row = startRow;
+      while (row <= endRow) {
+        this.autoIndentBufferRow(row);
+        row++;
+      }
     }
   }
 
