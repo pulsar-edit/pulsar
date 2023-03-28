@@ -64,7 +64,9 @@ exports.activate = function() {
       },
       content(comment) {
         return comment;
-      }
+      },
+      languageScope: null,
+      coverShallowerScopes: true
     });
 
     // Experiment: better to have one layer with lots of nodes, or lots of

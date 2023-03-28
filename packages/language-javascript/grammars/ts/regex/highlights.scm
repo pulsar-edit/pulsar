@@ -23,13 +23,10 @@
 (character_class) @constant.other.character-class.set.regexp
 
 (character_class
-  "[" @punctuation.definition.character-class.begin.regexp
-)
+  "[" @punctuation.definition.character-class.begin.regexp)
 
 (character_class
-  "]" @punctuation.definition.character-class.end.regexp
-)
+  "]" @punctuation.definition.character-class.end.regexp)
 
 (character_class
-  "^" @keyword.operator.negation.regexp
-)
+  "^" @keyword.operator.negation.regexp)

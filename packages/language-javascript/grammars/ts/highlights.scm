@@ -14,7 +14,7 @@
   (#set! onlyIfLast true))
 
 ; Double-quoted.
-(string "\"" ) @string.quoted.double.js
+(string "\"") @string.quoted.double.js
 
 (string
   "\"" @punctuation.definition.string.begin.js
@@ -133,7 +133,7 @@
     (pair_pattern
       key: (_) @entity.other.attribute-name.js
       value: (identifier) @variable.other.assignment.loop.js)
-        (#set! final true)))
+      (#set! final true)))
 
 ; Single parameter of an arrow function:
 ; The "foo" in `(foo => …)`
@@ -512,6 +512,14 @@
 
 ; All JSX expressions/interpolations within braces.
 (jsx_expression) @meta.embedded.js.jsx
+
+(jsx_opening_element
+  "<" @punctuation.definition.tag.begin.js
+  ">" @punctuation.definition.tag.end.js)
+
+(jsx_closing_element
+  "<" @punctuation.definition.tag.begin.js
+  ">" @punctuation.definition.tag.end.js)
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.js.jsx

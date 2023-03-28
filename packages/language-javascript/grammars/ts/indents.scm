@@ -36,6 +36,9 @@
   "]"
 ] @dedent
 
+(["||" "&&"] @indent
+  (#set! onlyIfLastTextOnRow true))
+
 
 ["case" "default"] @indent
 
