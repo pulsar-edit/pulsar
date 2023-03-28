@@ -82,114 +82,6 @@ describe('ScopeResolver', () => {
     }
   });
 
-  it('rejects scopes for ranges that have already been claimed by another capture with (#set! final true)', async () => {
-    await grammar.setQueryForTest('syntaxQuery', `
-      (comment) @comment
-      (string) @string0
-      ((string) @string1
-        (#set! final true))
-
-      (string) @string2
-      "=" @operator
-    `);
-
-    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-    buffer.setLanguageMode(languageMode);
-    buffer.setText(dedent`
-      // this is a comment
-      const foo = "ahaha";
-    `);
-    await languageMode.ready;
-
-    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
-
-    for (let capture of captures) {
-      let { node, name } = capture;
-      let result = scopeResolver.store(capture);
-      if (name === 'string0') {
-        expect(!!result).toBe(true);
-      }
-      if (name === 'string1') {
-        expect(!!result).toBe(true);
-      }
-      if (name === 'string2') {
-        expect(!!result).toBe(false);
-      }
-    }
-  });
-
-
-  it('rejects scopes for ranges that have already been claimed if set with (#set! shy true)', async () => {
-    await grammar.setQueryForTest('syntaxQuery', `
-      (comment) @comment
-      (string "\\"") @string.double
-      ((string) @string.other (#set! shy true))
-      "=" @operator
-    `);
-
-    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-    buffer.setLanguageMode(languageMode);
-    buffer.setText(dedent`
-      // this is a comment
-      const foo = "ahaha";
-      const bar = 'troz'
-    `);
-    await languageMode.ready;
-
-    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
-
-    let first = true;
-    for (let capture of captures) {
-      let { node, name } = capture;
-      let result = scopeResolver.store(capture);
-      // First string.other should fail; second should succeed.
-      if (name === 'string.other') {
-        let expected = first ? false : true;
-        first = false;
-        expect(!!result).toBe(expected);
-      }
-    }
-  });
-
-  it('rejects scopes for ranges that fail `onlyIfFirst` or `onlyIfLast`', async () => {
-    await grammar.setQueryForTest('syntaxQuery', `
-      ((string_fragment) @impossible.first
-        (#set! onlyIfFirst true))
-      ((string_fragment) @impossible.last
-        (#set! onlyIfLast true))
-      ((string) "'" @punctuation.first
-        (#onlyIfFirst true))
-      ((string) "'" @punctuation.last
-        (#onlyIfLast true))
-    `);
-
-    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-    buffer.setLanguageMode(languageMode);
-    buffer.setText(dedent`
-      // this is a comment
-      const foo = "ahaha";
-      const bar = 'troz'
-    `);
-    await languageMode.ready;
-
-    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
-
-    for (let capture of captures) {
-      let { node, name } = capture;
-      let result = scopeResolver.store(capture);
-      // Impossible for string_fragment to be the first or last child.
-      if (name.startsWith('impossible')) {
-        expect(!!result).toBe(false);
-      }
-
-      if (name === 'punctuation.first') {
-        expect(node.id).toBe(node.parent.lastChild.id);
-      } else if (name === 'punctuation.last') {
-        expect(node.id).toBe(node.parent.firstChild.id);
-      }
-    }
-  });
-
   it('interpolates magic tokens in scope names', async () => {
     await grammar.setQueryForTest('syntaxQuery', `
       (lexical_declaration kind: _ @declaration._TYPE_)
@@ -353,6 +245,269 @@ describe('ScopeResolver', () => {
     expect(
       buffer.getTextInRange(rangeFromDescriptor(matched[0]))
     ).toBe(` TODO`);
+  });
+
+  it('rejects scopes for ranges that have already been claimed by another capture with (#set! final true)', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      (comment) @comment
+      (string) @string0
+      ((string) @string1
+        (#set! final true))
+
+      (string) @string2
+      "=" @operator
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      if (name === 'string0') {
+        expect(!!result).toBe(true);
+      }
+      if (name === 'string1') {
+        expect(!!result).toBe(true);
+      }
+      if (name === 'string2') {
+        expect(!!result).toBe(false);
+      }
+    }
+  });
+
+
+  it('rejects scopes for ranges that have already been claimed if set with (#set! shy true)', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      (comment) @comment
+      (string "\\"") @string.double
+      ((string) @string.other (#set! shy true))
+      "=" @operator
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      const bar = 'troz'
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    let first = true;
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      // First string.other should fail; second should succeed.
+      if (name === 'string.other') {
+        let expected = first ? false : true;
+        first = false;
+        expect(!!result).toBe(expected);
+      }
+    }
+  });
+
+  it('rejects scopes for ranges that fail `onlyIfFirst` or `onlyIfLast`', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      ((string_fragment) @impossible.first
+        (#set! onlyIfFirst true))
+      ((string_fragment) @impossible.last
+        (#set! onlyIfLast true))
+      ((string) "'" @punctuation.first
+        (#onlyIfFirst true))
+      ((string) "'" @punctuation.last
+        (#onlyIfLast true))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      const bar = 'troz'
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      // Impossible for string_fragment to be the first or last child.
+      if (name.startsWith('impossible')) {
+        expect(!!result).toBe(false);
+      }
+
+      if (name === 'punctuation.first') {
+        expect(node.id).toBe(node.parent.lastChild.id);
+      } else if (name === 'punctuation.last') {
+        expect(node.id).toBe(node.parent.firstChild.id);
+      }
+    }
+  });
+
+  it('supports onlyIfFirstOfType and onlyIfLastOfType', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      (formal_parameters (identifier) @first-param
+        (#set! onlyIfFirstOfType identifier))
+      (formal_parameters (identifier) @last-param
+        (#set! onlyIfLastOfType identifier))
+
+      (formal_parameters "," @first-comma
+        (#set! onlyIfFirstOfType ","))
+      (formal_parameters "," @last-comma
+        (#set! onlyIfLastOfType ","))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      function foo (bar, baz, thud, troz) {}
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    let matched = [];
+    for (let capture of captures) {
+      let range = scopeResolver.store(capture);
+      if (range) { matched.push([capture, range]); }
+    }
+
+    expect(matched.length).toBe(4);
+
+    expect(matched.map(pair => {
+      return pair[0].name;
+    })).toEqual(["first-param", "first-comma", "last-comma", "last-param"]);
+  });
+
+  it('supports onlyIfLastTextOnRow', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      ("||" @hanging-logical-operator
+        (#set! onlyIfLastTextOnRow true))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      let x = foo ||
+        bar;
+
+      let y = foo || bar;
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    let matched = [];
+    for (let capture of captures) {
+      let range = scopeResolver.store(capture);
+      if (range) { matched.push(capture); }
+    }
+
+    expect(matched.length).toBe(1);
+    expect(matched[0].node.startPosition.row).toBe(0);
+
+    expect(matched.map(capture => capture.name))
+      .toEqual(["hanging-logical-operator"]);
+  });
+
+  it('supports onlyIfDescendantOfType', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      ("," @comma-inside-function
+        (#set! onlyIfDescendantOfType function_declaration))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      let foo, bar, baz;
+      function foo (one, two, three) {}
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    let matched = [];
+    for (let capture of captures) {
+      let range = scopeResolver.store(capture);
+      if (range) { matched.push(capture); }
+    }
+
+    expect(matched.length).toBe(2);
+    expect(matched.every(cap => {
+      return cap.node.startPosition.row === 1;
+    })).toBe(true);
+  });
+
+  it('supports onlyIfAncestorOfType', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      ((function_declaration) @function-with-semicolons
+        (#set! onlyIfAncestorOfType ";"))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      function foo () {}
+      function bar () {
+        console.log(false);
+      }
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    let matched = [];
+    for (let capture of captures) {
+      let range = scopeResolver.store(capture);
+      if (range) { matched.push(capture); }
+    }
+
+    expect(matched.length).toBe(1);
+    expect(matched[0].node.text.includes("function bar")).toBe(true);
+  });
+
+  it('supports onlyIfDescendantOfNodeWithData', async () => {
+    await grammar.setQueryForTest('syntaxQuery', `
+      ((function_declaration) @_IGNORE_
+        (#match? @_IGNORE_ "foo" )
+        (#set! isSpecialFunction true))
+
+      ("," @special-comma
+        (#set! onlyIfDescendantOfNodeWithData isSpecialFunction))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      function foo (bar, baz, thud) {}
+      function bar (lorem, ipsum, dolor) {}
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    let matched = [];
+    for (let capture of captures) {
+      let range = scopeResolver.store(capture);
+      if (range) { matched.push(capture); }
+    }
+
+    expect(matched.length).toBe(2);
+    expect(matched.every(cap => {
+      return cap.node.startPosition.row === 0 &&
+        cap.node.text === ",";
+    })).toBe(true);
   });
 
 });

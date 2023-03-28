@@ -44,13 +44,17 @@ function resolveNodePosition (node, descriptor) {
   return result[lastPart];
 }
 
-// A data structure for storing scope information during a `HighlightIterator`
-// task. The data is reset in between each task.
+// A data structure for storing scope information while processing capture
+// data. The data is reset in between each task.
 //
 // It also applies the conventions that we've adopted in SCM files
 // (particularly in `highlights.scm`) that let us constrain the conditions
 // under which various scopes get applied. When a given query capture is added,
 // `ScopeResolver` may "reject" it if it fails to pass the given test.
+//
+// `ScopeResolver` also sets boundaries for possible consumption by a
+// `HighlightIterator`. However, it is used to resolve several different kinds
+// of query captures — not just highlights.
 class ScopeResolver {
   constructor(languageLayer, idForScope) {
     this.languageLayer = languageLayer;
@@ -109,13 +113,6 @@ class ScopeResolver {
     return this.rangeData.get(key);
   }
 
-  adjustsCaptureRange(capture) {
-    let { setProperties: props = {} } = capture;
-    let keys = Object.keys(props);
-    if (keys.length === 0) { return false; }
-    return keys.some(k => k in ScopeResolver.ADJUSTMENTS);
-  }
-
   isValidRange(range) {
     let { startPosition, startIndex, endPosition, endIndex } = range;
     if (!(
@@ -129,6 +126,16 @@ class ScopeResolver {
     return true;
   }
 
+  // Detects whether a capture wants to alter its range from the default.
+  adjustsCaptureRange(capture) {
+    let { setProperties: props = {} } = capture;
+    let keys = Object.keys(props);
+    if (keys.length === 0) { return false; }
+    return keys.some(k => k in ScopeResolver.ADJUSTMENTS);
+  }
+
+  // Given a capture and possible predicate data, determines the buffer range
+  // that this capture wants to cover.
   determineCaptureRange(capture) {
     // For our purposes, a "range" is not a `Range` object, but rather an
     // object that has all four of `startPosition`, `endPosition`,
@@ -174,7 +181,8 @@ class ScopeResolver {
     for (let key in props) {
       if (!(key in ScopeResolver.TESTS)) { continue; }
       let test = ScopeResolver.TESTS[key];
-      if (!test(existingData, props, node, this)) {
+      let value = props[key];
+      if (!test(node, value, props, existingData, this)) {
         return false;
       }
     }
@@ -235,7 +243,7 @@ class ScopeResolver {
     return range;
   }
 
-  setBoundary(point, id, which) {
+  setBoundary(point, id, which, { root = false } = {}) {
     let key = this._keyForPoint(point);
 
     if (!this.map.has(key)) {
@@ -245,14 +253,21 @@ class ScopeResolver {
     let bundle = this.map.get(key);
     let idBundle = bundle[which];
 
+    // In general, we want to close scopes in the reverse order of when they
+    // were opened, and captures that match earlier get to open first. But
+    // `root` is a way of opting out of this behavior and asserting that a
+    // scope added later is more important. We use this to add the language's
+    // root scope if needed.
     if (which === 'open') {
       // If an earlier token has already opened at this point, we want to open
       // after it.
-      idBundle.push(id);
+      if (root) { idBundle.unshift(id); }
+      else { idBundle.push(id); }
     } else {
       // If an earlier token has already closed at this point, we want to close
       // before it.
-      idBundle.unshift(id);
+      if (root) { idBundle.push(id); }
+      else { idBundle.unshift(id); }
     }
   }
 
@@ -309,30 +324,30 @@ ScopeResolver.TESTS = {
   // same range. If a capture is the first one to define `final`, then all
   // other captures for that same range are ignored, whether they try to define
   // `final` or not.
-  final (existingData) {
+  final (node, value, props, existingData) {
     return !(existingData && existingData.final);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.
-  shy (existingData) {
+  shy (node, value, props, existingData) {
     return existingData === undefined;
   },
 
   // Passes only if this is an ERROR node.
-  onlyIfError(existingData, props, node) {
+  onlyIfError(node) {
     return node.type === 'ERROR';
   },
 
-  onlyIfHasError(existingData, props, node) {
+  onlyIfHasError(node) {
     return node.hasError();
   },
 
-  onlyIfInjection(existingData, props, node, instance) {
+  onlyIfInjection(node, value, props, existingData, instance) {
     return instance.languageLayer.depth > 0;
   },
 
   // Passes only if the given node is the first among its siblings.
-  onlyIfFirst (existingData, props, node) {
+  onlyIfFirst (node) {
     if (!node.parent) {
       // Root nodes are always first.
       return true;
@@ -344,14 +359,14 @@ ScopeResolver.TESTS = {
   },
 
   // Passes only if the given node is not the first among its siblings.
-  onlyIfNotFirst (existingData, props, node) {
+  onlyIfNotFirst (node) {
     if (!node.parent) { return false; }
 
     return node?.parent?.firstChild?.id !== node.id;
   },
 
   // Passes only if the given node is the last among its siblings.
-  onlyIfLast (existingData, props, node) {
+  onlyIfLast (node) {
     if (!node.parent) {
       // Root nodes are always last.
       return true;
@@ -360,10 +375,45 @@ ScopeResolver.TESTS = {
   },
 
   // Passes only if the given node is not the last among its siblings.
-  onlyIfNotLast (existingData, props, node) {
+  onlyIfNotLast (node) {
     if (!node.parent) { return false; }
 
     return node?.parent?.lastChild?.id !== node.id;
+  },
+
+  onlyIfFirstOfType(node, type) {
+    if (!node.parent) { return true; }
+    if (type === 'true') { type = node.type; }
+    let parent = node.parent;
+    for (let i = 0; i < parent.childCount; i++) {
+      let child = parent.child(i);
+      if (child.id === node.id) { return true; }
+      else if (child.type === type) { return false; }
+    }
+    return false;
+  },
+
+  onlyIfLastOfType(node, type) {
+    if (!node.parent) { return true; }
+    if (type === 'true') { type = node.type; }
+    let parent = node.parent;
+    for (let i = parent.childCount - 1; i >= 0; i--) {
+      let child = parent.child(i);
+      if (child.id === node.id) { return true; }
+      else if (child.type === type) { return false; }
+    }
+  },
+
+  onlyIfLastTextOnRow(node, value, props, existingData, instance) {
+    let { buffer } = instance;
+    let text = buffer.lineForRow(node.endPosition.row);
+    let textAfterNode = text.slice(node.endPosition.column);
+    return !/\S/.test(textAfterNode);
+  },
+
+  onlyIfNotLastTextOnRow(...args) {
+    let isLastTextOnRow = ScopeResolver.TESTS.onlyIfLastTextOnRow(...args);
+    return !isLastTextOnRow;
   },
 
   // Passes if the node's text starts with the provided string. Used to work
@@ -371,10 +421,9 @@ ScopeResolver.TESTS = {
   //
   // NOTE: Prefer a `#match?` predicate in the query. This is needed only in
   // unusual circumstances.
-  onlyIfTextStartsWith(existingData, props, node) {
-    let str = props.onlyIfTextStartsWith;
+  onlyIfTextStartsWith(node, value) {
     let text = node.text;
-    return text.startsWith(str);
+    return text.startsWith(value);
   },
 
   // Passes if the node's text ends with the provided string. Used to work
@@ -382,33 +431,26 @@ ScopeResolver.TESTS = {
   //
   // NOTE: Prefer a `#match?` predicate in the query. This is needed only in
   // unusual circumstances.
-  onlyIfTextEndsWith(existingData, props, node) {
-    let str = props.onlyIfTextEndsWith;
+  onlyIfTextEndsWith(node, value) {
     let text = node.text;
-    return text.endsWith(str);
+    return text.endsWith(value);
   },
 
   // Passes if this is a child of a node of the given type.
-  onlyIfChildOfType(existingData, props, node) {
-    let { onlyIfChildOfType: type } = props;
+  onlyIfChildOfType(node, type) {
     let parent = node.parent;
     if (!parent || parent.type !== type) { return false; }
     return true;
   },
 
   // Passes if this is _not_ a child of a node of the given type.
-  onlyIfNotChildOfType(existingData, props, node) {
-    let { onlyIfNotChildOfType: type } = props;
-    let parent = node.parent;
-    if (!parent || parent.type !== type) {
-      return true;
-    }
-    return false;
+  onlyIfNotChildOfType(...args) {
+    let isChildOfType = ScopeResolver.TESTS.onlyIfChildOfType(...args);
+    return !isChildOfType;
   },
 
   // Passes if this node has a node of the given type in its ancestor chain.
-  onlyIfDescendantOfType(existingData, props, node) {
-    let { onlyIfDescendantOfType: type } = props;
+  onlyIfDescendantOfType(node, type) {
     let current = node;
     while (current.parent) {
       current = current.parent;
@@ -419,30 +461,22 @@ ScopeResolver.TESTS = {
 
   // Passes if this node does not have a node of the given type in its ancestor
   // chain.
-  onlyIfNotDescendantOfType(existingData, props, node) {
-    let { onlyIfNotDescendantOfType: type } = props;
-    let current = node;
-    while (current.parent) {
-      current = current.parent;
-      if (current.type === type) { return false; }
-    }
-    return true;
+  onlyIfNotDescendantOfType(...args) {
+    let isDescendantOfType = ScopeResolver.TESTS.onlyIfDescendantOfType(...args);
+    return !isDescendantOfType;
   },
 
-  onlyIfAncestorOfType(existingData, props, node) {
-    let { onlyIfAncestorOfType: type } = props;
+  onlyIfAncestorOfType(node, type) {
     let descendants = node.descendantsOfType(type);
     return descendants.length > 0;
   },
 
-  onlyIfNotAncestorOfType(existingData, props, node) {
-    let { onlyIfNotAncestorOfType: type } = props;
+  onlyIfNotAncestorOfType(node, type) {
     let descendants = node.descendantsOfType(type);
     return descendants.length === 0;
   },
 
-  onlyIfDescendantOfNodeWithData(existingData, props, node, instance) {
-    let { onlyIfDescendantOfNodeWithData: key } = props;
+  onlyIfDescendantOfNodeWithData(node, key, props, existingData, instance) {
     let current = node;
     while (current.parent) {
       current = current.parent;
@@ -453,16 +487,9 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  onlyIfNotDescendantOfNodeWithData(existingData, props, node, instance) {
-    let { onlyIfNotDescendantOfNodeWithData: key } = props;
-    let current = node;
-    while (current.parent) {
-      current = current.parent;
-      let data = instance.getDataForRange(current);
-      if (data === undefined) { continue; }
-      if (key in data) return false;
-    }
-    return true;
+  onlyIfNotDescendantOfNodeWithData(...args) {
+    let isDescendantOfNodeWithData = ScopeResolver.TESTS.onlyIfDescendantOfNodeWithData(...args);
+    return !isDescendantOfNodeWithData;
   }
 };
 
