@@ -1,5 +1,5 @@
-name: 'Ruby (TS)'
-scopeName: 'source.ruby.ts'
+name: 'Ruby'
+scopeName: 'source.ruby'
 type: 'tree-sitter'
 parser: 'tree-sitter-ruby'
 

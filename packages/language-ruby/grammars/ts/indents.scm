@@ -1,46 +1,51 @@
+
+; Prevent postfix modifiers from triggering indents on the next line.
+(unless_modifier "unless" @_IGNORE_
+  (#set! final true))
+(if_modifier "if" @_IGNORE_
+  (#set! final true))
+(while_modifier "while" @_IGNORE_
+  (#set! final true))
+(until_modifier "until" @_IGNORE_
+  (#set! final true))
+
+
 [
   "class"
-  (singleton_class)
+  ; (singleton_class)
   "def"
-  (singleton_method)
+  ; (singleton_method)
   "module"
   "if"
+  "elsif"
   "else"
   "unless"
-  ; (block)
-  ; (argument_list)
-  (case)
-  (while)
-  (until)
-  (for)
+  "case"
+  "when"
+  "while"
+  "until"
+  "for"
+  ; (for)
   "begin"
   "do"
   "rescue"
-  ; (unless)
+  "ensure"
   "("
   "{"
   "["
 ] @indent
 
-
-
 [
   "end"
   ")"
   "}"
   "]"
-] @indent_end
-
-[
-  "end"
-  ")"
-  "}"
-  "]"
-  (when)
-  (elsif)
-  (else)
+  "when"
+  "elsif"
+  "else"
   "rescue"
-  (ensure)
-] @branch
+  "ensure"
+  ; (ensure)
+] @dedent
 
 (comment) @ignore

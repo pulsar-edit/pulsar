@@ -1,5 +1,3 @@
-; Placeholder
-
 ; CAVEATS:
 ;
 ; * No support for lookbehind as of March 2023 (waiting on
@@ -14,6 +12,7 @@
 ] @meta.group.capturing.regexp
 
 [
+  (identity_escape)
   (control_escape)
   (character_class_escape)
 ] @constant.character.escape.backslash.regexp
