@@ -148,10 +148,16 @@ class AtomEnvironment {
       viewRegistry: this.views
     });
 
+    this.i18n = new I18n({
+      notificationManager: this.notifications,
+      config: this.config
+    });
+
     /** @type {MenuManager} */
     this.menu = new MenuManager({
+      i18n: this.i18n,
       keymapManager: this.keymaps,
-      packageManager: this.packages
+      packageManager: this.packages,
     });
 
     /** @type {ContextMenuManager} */
@@ -200,11 +206,6 @@ class AtomEnvironment {
 
     this.autoUpdater = new AutoUpdateManager({
       applicationDelegate: this.applicationDelegate
-    });
-
-    this.i18n = new I18n({
-      notificationManager: this.notifications,
-      config: this.config
     });
 
     if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
@@ -280,6 +281,18 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
+    this.packages.initialize({
+      devMode,
+      configDirPath: this.configDirPath,
+      resourcePath,
+      safeMode
+    });
+
+    this.i18n.initialize({
+      packages: this.packages,
+      resourcePath
+    });
+
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
 
@@ -293,12 +306,6 @@ class AtomEnvironment {
     this.commands.attach(this.window);
 
     this.styles.initialize({ configDirPath: this.configDirPath });
-    this.packages.initialize({
-      devMode,
-      configDirPath: this.configDirPath,
-      resourcePath,
-      safeMode
-    });
     this.themes.initialize({
       configDirPath: this.configDirPath,
       resourcePath,
@@ -312,11 +319,6 @@ class AtomEnvironment {
       CoreURIHandlers.create(this)
     );
     this.autoUpdater.initialize();
-
-    this.i18n.initialize({
-      packages: this.packages,
-      resourcePath
-    });
 
     this.protocolHandlerInstaller.initialize(this.config, this.notifications);
 
