@@ -1,0 +1,134 @@
+@import "ui-variables";
+
+//
+// This adds some component styles specifically for the Styleguide
+// --------------------------------
+
+.styleguide {
+
+  // Icons ---------------
+
+  [data-name="icons"] {
+    .example-rendered {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+    }
+
+    .example-code {
+      display: none; // remove, doesn't make much sense here
+    }
+
+    .icon {
+      position: relative;
+      flex: 1 0 200px;
+      padding: 10px 0 10px 40px;
+      color: @text-color-subtle;
+      &:before {
+        position: absolute;
+        margin-left: -32px;
+        color: @text-color-highlight;
+        text-align: center;
+      }
+      &:hover {
+        color: @text-color-highlight;
+        &:before {
+          color: @text-color-selected;
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+          margin-top: -8px;
+          margin-left: -40px; // 32px (initial) + 8px (grow)
+        }
+      }
+    }
+
+    // Make the Gist logo bigger
+    .icon-logo-gist {
+      &:before,
+      &:hover:before {
+        font-size: 2.5em;
+        margin-top: -.05em;
+        margin-left: -1.3em;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    // Make the GitHub logo bigger
+    .icon-logo-github {
+      &:before,
+      &:hover:before {
+        font-size: 3em;
+        margin-top: .08em;
+        margin-left: -1.2em;
+      }
+    }
+  }
+
+  // Inputs + controls ---------------
+
+  .input-search,
+  .input-textarea {
+    margin-top: @component-padding;
+  }
+
+  .input-label {
+    display: block;
+    width: -webkit-max-content;
+    margin: 0 1em 1em 0;
+  }
+
+  .input-color,
+  .input-number,
+  .input-select {
+    margin: 0 @component-padding 0 0 !important;
+  }
+
+
+  // Site colors ---------------
+
+  .ui-site-1,
+  .ui-site-2,
+  .ui-site-3,
+  .ui-site-4,
+  .ui-site-5 {
+    height: 10px;
+    width: 100px;
+  }
+
+
+  // Modals ---------------
+
+  atom-panel.modal {
+    // makde them responsive in the styleguide
+    position: relative;
+    max-width: 100%;
+    left: 0;
+    margin: 0;
+  }
+
+
+  // Misc ---------------
+
+  .popover-list {
+    position: relative;
+  }
+
+  .popover-list,
+  .select-list {
+    atom-text-editor[mini] { height: 27px; }
+  }
+
+  .tooltip {
+    position: relative;
+    opacity: 1;
+    display: inline-block;
+    margin-right: @component-padding;
+  }
+
+  [data-name="error-messages"] .example-rendered {
+    min-height: 60px; // don't cut off centered messages
+  }
+
+}

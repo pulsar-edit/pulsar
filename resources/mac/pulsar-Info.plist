@@ -7,7 +7,7 @@
 	<key>CFBundleIconFile</key>
 	<string>pulsar.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.github.pulsar</string>
+	<string>dev.pulsar-edit.pulsar</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

@@ -1,0 +1,11 @@
+{
+    "recurseDepth": 10,
+    "source": {
+        "include": ["src", "packages"],
+        "exclude": ["node_modules"],
+        "excludePattern": "((^|\\/|\\\\)_|node_modules)"
+    },
+    "opts": {
+        "recurse": true
+    }
+}
