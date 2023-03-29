@@ -36,7 +36,7 @@ function merge(menu, item, t, itemSpecificity = Infinity) {
 }
 
 
-function unmerge(menu, item) {
+function unmerge(menu, item, t) {
   item = cloneAndLocaliseMenuItem(item, t);
   const matchingItemIndex = findMatchingItemIndex(menu, item);
   if (matchingItemIndex === -1) {
