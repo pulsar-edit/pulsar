@@ -346,8 +346,12 @@ ScopeResolver.TESTS = {
     return instance.languageLayer.depth > 0;
   },
 
+  onlyIfRoot(node) {
+    return !node.parent;
+  },
+
   // Passes only if the given node is the first among its siblings.
-  onlyIfFirst (node) {
+  onlyIfFirst(node) {
     if (!node.parent) {
       // Root nodes are always first.
       return true;
@@ -359,7 +363,7 @@ ScopeResolver.TESTS = {
   },
 
   // Passes only if the given node is not the first among its siblings.
-  onlyIfNotFirst (node) {
+  onlyIfNotFirst(node) {
     if (!node.parent) { return false; }
 
     return node?.parent?.firstChild?.id !== node.id;
@@ -613,7 +617,7 @@ ScopeResolver.ADJUSTMENTS = {
     if (!match) { return null; }
     let oldStartPosition = { ...node.startPosition };
 
-    let startOffset = match.index + match.length;
+    let startOffset = match.index + match[0].length;
 
     position.startPosition = resolver.adjustPositionByOffset(
       oldStartPosition, startOffset);
@@ -649,7 +653,7 @@ ScopeResolver.ADJUSTMENTS = {
 
     if (!match) { return null; }
     let oldStartPosition = { ...node.startPosition };
-    let endOffset = match.index + match.length;
+    let endOffset = match.index + match[0].length;
 
     position.endPosition = resolver.adjustPositionByOffset(
       oldStartPosition, endOffset);
