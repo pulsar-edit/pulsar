@@ -183,7 +183,7 @@ describe "Perl 6 grammar", ->
         #!/usr/bin/env perl6
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         #! pearl6
@@ -200,11 +200,11 @@ describe "Perl 6 grammar", ->
         #!\t/usr/bin/env --perl6=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises the Perl6 pragma", ->
       line = "use v6;"
-      expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+      expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
     it "recognises Emacs modelines", ->
       modelines = """
@@ -222,7 +222,7 @@ describe "Perl 6 grammar", ->
         "-*- font:x;foo : bar ; mode : pErL6 ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in modelines.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*perl6-*- */
@@ -241,7 +241,7 @@ describe "Perl 6 grammar", ->
       """
 
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -268,7 +268,7 @@ describe "Perl 6 grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=perl6 ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=perl6:
@@ -286,7 +286,7 @@ describe "Perl 6 grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=perl6 ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
 # Local variables:
 # mode: CoffeeScript

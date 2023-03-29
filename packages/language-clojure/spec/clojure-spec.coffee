@@ -295,7 +295,7 @@ describe "Clojure grammar", ->
         #!/usr/bin/env boot
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         \x20#!/usr/sbin/boot
@@ -306,7 +306,7 @@ describe "Clojure grammar", ->
         #!\t/usr/bin/env --boot=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -325,7 +325,7 @@ describe "Clojure grammar", ->
         "-*- font:x;foo : bar ; mode : ClojureScript ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*clojure-*- */
@@ -343,7 +343,7 @@ describe "Clojure grammar", ->
         // -*-font:mode;mode:clojure--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -370,7 +370,7 @@ describe "Clojure grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=clojure ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=clojure:
@@ -388,4 +388,4 @@ describe "Clojure grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=clojure ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

@@ -13,7 +13,7 @@ const NullGrammar = require('./null-grammar');
 const TextMateLanguageMode = require('./text-mate-language-mode');
 const ScopeDescriptor = require('./scope-descriptor');
 
-const TextMateScopeSelector = require('first-mate').ScopeSelector;
+const TextMateScopeSelector = require('second-mate').ScopeSelector;
 const GutterContainer = require('./gutter-container');
 let TextEditorComponent = null;
 let TextEditorElement = null;

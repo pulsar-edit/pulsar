@@ -2659,11 +2659,9 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@https://github.com/pulsar-edit/bracket-matcher.git#c877977":
+"bracket-matcher@file:packages/bracket-matcher":
   version "0.92.0"
-  resolved "https://github.com/pulsar-edit/bracket-matcher.git#c877977ac7e9b7fe43c2100a1880c7ffc119280b"
   dependencies:
-    first-mate "^7.4.1"
     underscore-plus "1.x"
 
 browser-stdout@1.3.1:
@@ -3991,7 +3989,7 @@ electron@12.2.3:
     "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
-emissary@^1, emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2:
+emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4390,7 +4388,7 @@ etch@^0.12.2, etch@^0.12.6:
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.12.8.tgz#c24bc9bd3a6148f62204ce8643d2e899b9ecb9de"
   integrity sha512-dFLRe4wLroVtwzyy1vGlE3BSDZHiL0kZME5XgNGzZIULcYTvVno8vbiIleAesoKJmwWaxDTzG+4eppg2zk14JQ==
 
-event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.2.0, event-kit@^2.4.0, event-kit@^2.5.3:
+event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.4.0, event-kit@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/event-kit/-/event-kit-2.5.3.tgz#d47e4bc116ec0aacd00263791fa1a55eb5e79ba1"
   integrity sha512-b7Qi1JNzY4BfAYfnIRanLk0DOD1gdkWHT4GISIn8Q2tAf3LpU8SP2CMwWaq40imYoKWbtN4ZhbSRxvsnikooZQ==
@@ -4604,19 +4602,6 @@ find-up@^5.0.0:
   dependencies:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
-
-first-mate@7.4.3, first-mate@^7.4.1:
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/first-mate/-/first-mate-7.4.3.tgz#058b9b6d2f43e38a5f0952669338cff2c46ae2dd"
-  integrity sha512-PtZUpaPmcV5KV4Rw5TfwczEnExN+X1o3Q/G82E4iRJ0tW91fm3Yi7pa5t4cBH8r3D6EyoBKvfpG2jKE+TZ0/nw==
-  dependencies:
-    emissary "^1"
-    event-kit "^2.2.0"
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    oniguruma "^7.2.3"
-    season "^6.0.2"
-    underscore-plus "^1"
 
 flat-cache@^3.0.4:
   version "3.0.4"
@@ -5194,7 +5179,7 @@ graphql@14.5.8:
   dependencies:
     iterall "^1.2.2"
 
-grim@2.0.3, grim@^2.0.1, grim@^2.0.2:
+grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/grim/-/grim-2.0.3.tgz#66e575efc4577981d959da0764926b4aaded4b0d"
   integrity sha512-FM20Ump11qYLK9k9DbL8yzVpy+YBieya1JG15OeH8s+KbHq8kL4SdwRtURwIUHniSxb24EoBUpwKfFjGNVi4/Q==
@@ -7422,13 +7407,6 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-oniguruma@^7.2.3:
-  version "7.2.3"
-  resolved "https://registry.yarnpkg.com/oniguruma/-/oniguruma-7.2.3.tgz#e0b0b415302de8cdd6564e57a1a822ac0ab57012"
-  integrity sha512-PZZcE0yfg8Q1IvaJImh21RUTHl8ep0zwwyoE912KqlWVrsGByjjj29sdACcD1BFyX2bLkfuOJeP+POzAGVWtbA==
-  dependencies:
-    nan "^2.14.0"
-
 "open-on-github@file:packages/open-on-github":
   version "1.3.2"
 
@@ -8502,6 +8480,18 @@ season@^6.0.2:
     cson-parser "^1.3.0"
     fs-plus "^3.0.0"
     yargs "^3.23.0"
+
+"second-mate@https://github.com/pulsar-edit/second-mate.git#14aa7bd":
+  version "8.0.0"
+  resolved "https://github.com/pulsar-edit/second-mate.git#14aa7bd94b90c47aa99f000394301b9573b8898b"
+  dependencies:
+    emissary "^1.3.3"
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+    underscore-plus "^1"
+    vscode-oniguruma "^1.7.0"
 
 selector-kit@^0.1:
   version "0.1.0"
@@ -9809,6 +9799,11 @@ verror@^1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vscode-oniguruma@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/vscode-oniguruma/-/vscode-oniguruma-1.7.0.tgz#439bfad8fe71abd7798338d1cd3dc53a8beea94b"
+  integrity sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==
 
 vscode-ripgrep@1.9.0:
   version "1.9.0"

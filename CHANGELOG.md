@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+- Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM
+version). This fixes issues with Electron 21
+
 ## 1.103.0
 
 - Added a new feature to Search for Pulsar's settings
