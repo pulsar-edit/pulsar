@@ -94,15 +94,15 @@ function cloneAndLocaliseMenuItem(item, t) {
     'beforeGroupContaining',
     'afterGroupContaining'
   );
-  if (item.id === null || item.id === undefined) {
-    item.id = normalizeLabel(item.label);
-  }
   if (item.localisedLabel) {
     if (typeof item.localisedLabel === "string") {
       item.label = t(item.localisedLabel) ?? item.label;
     } else {
       item.label = t(item.localisedLabel.key, item.localisedLabel.opts) ?? item.label;
     }
+  }
+  if (item.id === null || item.id === undefined) {
+    item.id = normalizeLabel(item.label);
   }
   if (item.submenu != null) {
     item.submenu = item.submenu.map(submenuItem => cloneAndLocaliseMenuItem(submenuItem, t));
