@@ -54,7 +54,7 @@ function resolveNodePosition (node, descriptor) {
 //
 // `ScopeResolver` also sets boundaries for possible consumption by a
 // `HighlightIterator`. However, it is used to resolve several different kinds
-// of query captures — not just highlights.
+// of query captures — not just highlights.
 class ScopeResolver {
   constructor(languageLayer, idForScope) {
     this.languageLayer = languageLayer;
