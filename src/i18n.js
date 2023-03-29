@@ -48,7 +48,18 @@ class I18n {
       }
 
       // `en` fallback
-      return this.tSingleLanguage("en", path, opts);
+      const en_fallback = this.tSingleLanguage("en", path, opts);
+      if (en_fallback) return en_fallback;
+
+      // key fallback
+      let string_opts = opts
+        ? `: { ${
+          Object.entries(opts)
+            .map(o => `"${o[0]}": "${o[1]}"`)
+            .join(", ")
+          } }`
+        : "";
+      return `${key}${string_opts}`;
     }
   }
 
