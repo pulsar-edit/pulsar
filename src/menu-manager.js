@@ -105,7 +105,7 @@ module.exports = MenuManager = class MenuManager {
       if (item.label == null && item.localisedLabel == null) {
         continue; // TODO: Should we emit a warning here?
       }
-      this.merge(this.template, item, this.i18n.t);
+      this.merge(this.template, item);
     }
     this.update();
     return new Disposable(() => this.remove(items));
@@ -218,12 +218,12 @@ module.exports = MenuManager = class MenuManager {
 
   // Merges an item in a submenu aware way such that new items are always
   // appended to the bottom of existing menus where possible.
-  merge(menu, item, t) {
-    MenuHelpers.merge(menu, item, t);
+  merge(menu, item) {
+    MenuHelpers.merge(menu, item, this.i18n.t);
   }
 
   unmerge(menu, item) {
-    MenuHelpers.unmerge(menu, item);
+    MenuHelpers.unmerge(menu, item, this.i18n.t);
   }
 
   sendToBrowserProcess(template, keystrokesByCommand) {
