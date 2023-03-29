@@ -60,8 +60,8 @@ if (buildMetadata) {
 //
 // See {::add} for more info about adding menu's directly.
 module.exports = MenuManager = class MenuManager {
-  constructor({resourcePath, keymapManager, packageManager}) {
-    this.resourcePath = resourcePath;
+  constructor({i18n, keymapManager, packageManager}) {
+    this.i18n = i18n;
     this.keymapManager = keymapManager;
     this.packageManager = packageManager;
     this.initialized = false;
@@ -101,12 +101,11 @@ module.exports = MenuManager = class MenuManager {
   // added menu items.
   add(items) {
     items = _.deepClone(items);
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.label == null) {
+    for (const item of items) {
+      if (item.label == null && item.localisedLabel == null) {
         continue; // TODO: Should we emit a warning here?
       }
-      this.merge(this.template, item);
+      this.merge(this.template, item, this.i18n.t);
     }
     this.update();
     return new Disposable(() => this.remove(items));
@@ -219,8 +218,8 @@ module.exports = MenuManager = class MenuManager {
 
   // Merges an item in a submenu aware way such that new items are always
   // appended to the bottom of existing menus where possible.
-  merge(menu, item) {
-    MenuHelpers.merge(menu, item);
+  merge(menu, item, t) {
+    MenuHelpers.merge(menu, item, t);
   }
 
   unmerge(menu, item) {
@@ -242,6 +241,7 @@ module.exports = MenuManager = class MenuManager {
   }
 
   sortPackagesMenu() {
+    // TODO this needs to be fixed to support localised labels
     const packagesMenu = _.find(this.template, ({id}) => MenuHelpers.normalizeLabel(id) === 'Packages');
     if (!(packagesMenu && packagesMenu.submenu != null)) {
       return;
@@ -255,5 +255,4 @@ module.exports = MenuManager = class MenuManager {
     });
     return this.update();
   }
-
 };
