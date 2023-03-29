@@ -205,6 +205,7 @@ class ScopeResolver {
 
     name = ScopeResolver.interpolateName(name, node);
 
+    // Find out which range this capture wants.
     let range = this.determineCaptureRange(syntax);
     if (range === null) {
       // This capture specified a range adjustment that turned out not to be
@@ -288,7 +289,6 @@ class ScopeResolver {
 }
 
 
-
 // Scope names can mark themselves with `TEXT` to interpolate the node's text
 // into the capture, or `TYPE` to interpolate the anonymous node's type.
 ScopeResolver.interpolateName = (name, node) => {
@@ -317,7 +317,7 @@ ScopeResolver.interpolateName = (name, node) => {
 // built-in predicates like `#match?` and `#eq?`.
 //
 // NOTE: Syntax queries will always be run through a `ScopeResolver`, but other
-// kinds of queries usually will not.
+// kinds of queries may or may not, depending on purpse.
 //
 ScopeResolver.TESTS = {
   // Passes only if another node has not already declared `final` for the exact
@@ -342,10 +342,12 @@ ScopeResolver.TESTS = {
     return node.hasError();
   },
 
+  // Passes when the node is part of a tree that belongs to an injection layer.
   onlyIfInjection(node, value, props, existingData, instance) {
     return instance.languageLayer.depth > 0;
   },
 
+  // Passes when the node has no parent.
   onlyIfRoot(node) {
     return !node.parent;
   },
@@ -385,9 +387,10 @@ ScopeResolver.TESTS = {
     return node?.parent?.lastChild?.id !== node.id;
   },
 
-  onlyIfFirstOfType(node, type) {
+  // Passes when the node is the first of its type among its siblings.
+  onlyIfFirstOfType(node) {
     if (!node.parent) { return true; }
-    if (type === 'true') { type = node.type; }
+    let type = node.type;
     let parent = node.parent;
     for (let i = 0; i < parent.childCount; i++) {
       let child = parent.child(i);
@@ -397,9 +400,10 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  onlyIfLastOfType(node, type) {
+  // Passes when the node is the last of its type among its siblings.
+  onlyIfLastOfType(node) {
     if (!node.parent) { return true; }
-    if (type === 'true') { type = node.type; }
+    let type = node.type;
     let parent = node.parent;
     for (let i = parent.childCount - 1; i >= 0; i--) {
       let child = parent.child(i);
@@ -408,6 +412,7 @@ ScopeResolver.TESTS = {
     }
   },
 
+  // Passes when the node represents the last non-whitespace content on its row.
   onlyIfLastTextOnRow(node, value, props, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.endPosition.row);
@@ -415,42 +420,10 @@ ScopeResolver.TESTS = {
     return !/\S/.test(textAfterNode);
   },
 
+  // Passes when the node is not the last non-whitespace content on its row.
   onlyIfNotLastTextOnRow(...args) {
     let isLastTextOnRow = ScopeResolver.TESTS.onlyIfLastTextOnRow(...args);
     return !isLastTextOnRow;
-  },
-
-  // Passes if the node's text starts with the provided string. Used to work
-  // around nodes that are too generic.
-  //
-  // NOTE: Prefer a `#match?` predicate in the query. This is needed only in
-  // unusual circumstances.
-  onlyIfTextStartsWith(node, value) {
-    let text = node.text;
-    return text.startsWith(value);
-  },
-
-  // Passes if the node's text ends with the provided string. Used to work
-  // around nodes that are too generic.
-  //
-  // NOTE: Prefer a `#match?` predicate in the query. This is needed only in
-  // unusual circumstances.
-  onlyIfTextEndsWith(node, value) {
-    let text = node.text;
-    return text.endsWith(value);
-  },
-
-  // Passes if this is a child of a node of the given type.
-  onlyIfChildOfType(node, type) {
-    let parent = node.parent;
-    if (!parent || parent.type !== type) { return false; }
-    return true;
-  },
-
-  // Passes if this is _not_ a child of a node of the given type.
-  onlyIfNotChildOfType(...args) {
-    let isChildOfType = ScopeResolver.TESTS.onlyIfChildOfType(...args);
-    return !isChildOfType;
   },
 
   // Passes if this node has a node of the given type in its ancestor chain.
@@ -470,16 +443,19 @@ ScopeResolver.TESTS = {
     return !isDescendantOfType;
   },
 
+  // Passes if this node has at least one descendant of the given type.
   onlyIfAncestorOfType(node, type) {
     let descendants = node.descendantsOfType(type);
     return descendants.length > 0;
   },
 
+  // Passes if this node has zero descendants of the given type.
   onlyIfNotAncestorOfType(node, type) {
     let descendants = node.descendantsOfType(type);
     return descendants.length === 0;
   },
 
+  // Passes if one of this node's ancestors has stored data at a given key.
   onlyIfDescendantOfNodeWithData(node, key, props, existingData, instance) {
     let current = node;
     while (current.parent) {
@@ -491,9 +467,24 @@ ScopeResolver.TESTS = {
     return false;
   },
 
+  // Passes if none of this node's ancestors has stored data at a given key.
   onlyIfNotDescendantOfNodeWithData(...args) {
     let isDescendantOfNodeWithData = ScopeResolver.TESTS.onlyIfDescendantOfNodeWithData(...args);
     return !isDescendantOfNodeWithData;
+  },
+
+  // Passes if this node starts on the same row as the one in the described
+  // position.
+  onlyIfOnSameRowAs(node, descriptor) {
+    let otherNodePosition = resolveNodePosition(node, descriptor);
+    return otherNodePosition.row === node.startPosition.row;
+  },
+
+  // Passes if this node starts on a different row than the one in the
+  // described position.
+  onlyIfNotOnSameRowAs(node, descriptor) {
+    let otherNodePosition = resolveNodePosition(node, descriptor);
+    return otherNodePosition.row !== node.startPosition.row;
   }
 };
 
