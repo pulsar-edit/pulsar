@@ -1,3 +1,31 @@
+; IMPORTS/EXPORTS
+; ===============
+
+; The "Foo" in `import Foo from './bar'`
+(import_clause
+  (identifier) @variable.other.assignment.import.ts)
+
+; The "Foo" in `import { Foo } from './bar'`
+(import_specifier
+  (identifier) @variable.other.assignment.import.ts)
+
+; The "Foo" in `export { Foo }`
+(export_specifier
+  name: (identifier) @variable.other.assignment.export.ts)
+
+; The "default" in `export { Foo as default }`
+(export_specifier
+  alias: (identifier) @keyword.control.default.ts
+  (#eq? @keyword.control.default.ts "default"))
+
+; The "default" in `export default Foo`
+(export_statement
+  "default" @keyword.control.default.ts)
+
+; The "Foo" in `export Foo`
+(export_statement
+  (identifier) @variable.other.assignment.export.ts)
+
 
 ; COMMENTS
 ; ========
