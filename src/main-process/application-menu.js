@@ -106,7 +106,7 @@ module.exports = class ApplicationMenu {
   // Replaces VERSION with the current version.
   substituteVersion(template) {
     let item = this.flattenMenuTemplate(template).find(
-      ({ label }) => label.includes("VERSION")
+      ({ label }) => label?.includes("VERSION")
     );
     // TODO maybe this can be done with the i18n API instead of custom replace?
     if (item) item.label = item.label.replace("VERSION", this.version);
