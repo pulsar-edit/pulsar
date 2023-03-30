@@ -261,23 +261,33 @@ module.exports = class GrammarRegistry {
       const isNewTreeSitter = grammar instanceof WASMTreeSitterGrammar;
       const isOldTreeSitter = grammar instanceof TreeSitterGrammar;
       const isTreeSitter = isNewTreeSitter || isOldTreeSitter;
-      const config = () =>
-        this.config.get('core.languageParser', {
-          scope: new ScopeDescriptor({ scopes: [grammar.scopeName] })
-        })
+      let parserConfig = this.config.get('core.languageParser', {
+        scope: new ScopeDescriptor({ scopes: [grammar.scopeName] })
+      });
 
-      // Prefer either TextMate or Tree-sitter grammars based on the user's settings.
+      // Prefer either TextMate or Tree-sitter grammars based on the user's
+      // settings.
+      //
+      // TODO: This logic is a bit convoluted temporarily as we transition away
+      // from legacy tree-sitter grammars; it can be vastly simplified once the
+      // transition is complete.
       if (isNewTreeSitter) {
-        if( config() === 'wasm-tree-sitter') {
+        if (parserConfig === 'wasm-tree-sitter') {
           score += 0.1;
         } else {
-          score = -Infinity
+          // Never automatically switch to a new Tree-sitter grammar unless the
+          // user has opted into the experimental setting.
+          score = -Infinity;
         }
-      } else if (isTreeSitter) {
-        if ( config() === 'node-tree-sitter' ) {
+      } else if (isOldTreeSitter) {
+        if (parserConfig === 'node-tree-sitter') {
           score += 0.1;
-        } else {
-          return -Infinity;
+        } else if (parserConfig === 'wasm-tree-sitter') {
+          // In experimental new-tree-sitter mode, we still would rather fall
+          // back to an old-tree-sitter grammar than a TM grammar. Bump the
+          // score, but just a bit less than we'd bump it if this were a
+          // new-tree-sitter grammar.
+          score += 0.09;
         }
       }
 
@@ -379,14 +389,14 @@ module.exports = class GrammarRegistry {
     if (!languageId) return null;
     const config = this.config.get('core.languageParser', {
       scope: new ScopeDescriptor({ scopes: [languageId] })
-    })
+    });
 
-    if ( config === 'wasm-tree-sitter') {
+    if (config === 'wasm-tree-sitter') {
       return (
         this.wasmTreeSitterGrammarsById[languageId] ||
         this.textmateRegistry.grammarForScopeName(languageId)
       );
-    } else if ( config === 'node-tree-sitter' ) {
+    } else if (config === 'node-tree-sitter') {
       return (
         this.treeSitterGrammarsById[languageId] ||
         this.textmateRegistry.grammarForScopeName(languageId)
@@ -678,16 +688,21 @@ module.exports = class GrammarRegistry {
   //
   // Returns a non-empty {Array} of {Grammar} instances.
   getGrammars(params) {
-    let tmGrammars = this.textmateRegistry.getGrammars();
-    if (!(params && params.includeTreeSitter)) return tmGrammars;
+    let result = this.textmateRegistry.getGrammars();
+    let includeModernTreeSitterGrammars = atom.config.get('core.languageParser') === 'wasm-tree-sitter';
+    if (!(params && params.includeTreeSitter)) return result;
 
-    const tsGrammars2 = Object.values(this.wasmTreeSitterGrammarsById).filter(
-      g => g.scopeName
-    );
-    const tsGrammars = Object.values(this.treeSitterGrammarsById).filter(
-      g => g.scopeName
-    );
-    return tmGrammars.concat(tsGrammars).concat(tsGrammars2); // NullGrammar is expected to be first
+    const tsGrammars = Object.values(this.treeSitterGrammarsById)
+      .filter(g => g.scopeName);
+    result = result.concat(tsGrammars);
+
+    if (includeModernTreeSitterGrammars) {
+      let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
+        .filter(g => g.scopeName);
+      result = result.concat(modernTsGrammars);
+    }
+
+    return result;
   }
 
   scopeForId(id) {

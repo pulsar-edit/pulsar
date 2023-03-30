@@ -19,7 +19,7 @@ function resolve (modulePath) {
 
 const cGrammarPath = resolve('language-c/grammars/modern-tree-sitter-c.cson');
 const pythonGrammarPath = resolve(
-  'language-python/grammars/tree-sitter-2-python.cson'
+  'language-python/grammars/modern-tree-sitter-python.cson'
 );
 const jsGrammarPath = resolve(
   'language-javascript/grammars/tree-sitter-2-javascript.cson'

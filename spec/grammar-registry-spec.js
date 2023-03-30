@@ -216,6 +216,66 @@ describe('GrammarRegistry', () => {
       expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
     });
 
+    it("updates the buffer's grammar when a more appropriate new-tree-sitter grammar is added for its path and the user has opted into new-tree-sitter", async () => {
+      atom.config.set('core.languageParser', 'wasm-tree-sitter');
+      const buffer = new TextBuffer();
+      expect(buffer.getLanguageMode().getLanguageId()).toBe(null);
+
+      buffer.setPath('test.js');
+      grammarRegistry.maintainLanguageMode(buffer);
+
+      const treeSitterGrammar = grammarRegistry.loadGrammarSync(
+        require.resolve(
+          'language-javascript/grammars/tree-sitter-javascript.cson'
+        )
+      );
+      expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
+
+      // TODO: Why doesn't this path resolution work like the one above?
+      const modernTreeSitterGrammar = grammarRegistry.loadGrammarSync(
+        require.resolve(
+          '../packages/language-javascript/grammars/tree-sitter-2-javascript.cson'
+        )
+      );
+      expect(buffer.getLanguageMode().grammar).toBe(modernTreeSitterGrammar);
+      grammarRegistry.loadGrammarSync(
+        require.resolve('language-javascript/grammars/javascript.cson')
+      );
+      expect(buffer.getLanguageMode().grammar).toBe(modernTreeSitterGrammar);
+    });
+
+    it("updates the buffer's grammar by ignoring a new-tree-sitter grammar if the user has NOT opted into new-tree-sitter", async () => {
+      atom.config.set('core.languageParser', 'node-tree-sitter');
+      const buffer = new TextBuffer();
+      expect(buffer.getLanguageMode().getLanguageId()).toBe(null);
+
+      buffer.setPath('test.js');
+      grammarRegistry.maintainLanguageMode(buffer);
+
+      const textmateGrammar = grammarRegistry.loadGrammarSync(
+        require.resolve('language-javascript/grammars/javascript.cson')
+      );
+      expect(buffer.getLanguageMode().grammar).toBe(textmateGrammar);
+
+      // TODO: Why doesn't this path resolution work like the one above?
+      const modernTreeSitterGrammar = grammarRegistry.loadGrammarSync(
+        require.resolve(
+          '../packages/language-javascript/grammars/tree-sitter-2-javascript.cson'
+        )
+      );
+
+      expect(buffer.getLanguageMode().grammar).toBe(textmateGrammar);
+
+      const treeSitterGrammar = grammarRegistry.loadGrammarSync(
+        require.resolve(
+          'language-javascript/grammars/tree-sitter-javascript.cson'
+        )
+      );
+
+      expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
+    });
+
+
     it('can be overridden by calling .assignLanguageMode', () => {
       const buffer = new TextBuffer();
 
@@ -788,9 +848,11 @@ describe('GrammarRegistry', () => {
       await atom.packages.activatePackage('language-css');
       const grammar = atom.grammars.selectGrammar('foo.css');
       atom.grammars.removeGrammar(grammar);
-      expect(atom.grammars.selectGrammar('foo.css').name).not.toBe(
-        grammar.name
-      );
+      let newGrammar = atom.grammars.selectGrammar('foo.css');
+      expect(
+        grammar.name === newGrammar.name &&
+          grammar.constructor.name === newGrammar.constructor.name
+      ).toBe(false);
     });
   });
 
