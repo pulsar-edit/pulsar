@@ -1,4 +1,5 @@
 const Parser = require('web-tree-sitter');
+const TokenIterator = require('./token-iterator');
 const { Point, Range, spliceArray } = require('text-buffer');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
@@ -122,9 +123,6 @@ const VAR_ID = 257;
 
 class WASMTreeSitterLanguageMode {
   constructor({ buffer, grammar, config, grammars }) {
-    this.lastId = 259;
-    this.scopeNames = new Map([["variable", VAR_ID]]);
-    this.scopeIds = new Map([[VAR_ID, "variable"]]);
     this.buffer = buffer;
     this.grammar = grammar;
     this.config = config;
@@ -136,7 +134,7 @@ class WASMTreeSitterLanguageMode {
       scopes: [grammar.scopeName]
     });
 
-    this.rootScopeId = this.getOrCreateScopeId(this.grammar.scopeName);
+    this.rootScopeId = this.grammar.idForScope(this.grammar.scopeName);
 
     this.emitter = new Emitter();
     this.isFoldableCache = [];
@@ -154,6 +152,7 @@ class WASMTreeSitterLanguageMode {
     this.grammarForLanguageString = this.grammarForLanguageString.bind(this);
 
     this.parsersByLanguage = new Map();
+    this.tokenIterator = new TokenIterator(this);
 
     this.resolveNextTransactionPromise();
 
@@ -354,26 +353,27 @@ class WASMTreeSitterLanguageMode {
   }
 
   classNameForScopeId(scopeId) {
-    const scope = this.scopeIds.get(scopeId);
-    if (scope) {
-      return `syntax--${scope.replace(/\./g, ' syntax--')}`
-    }
+    return this.grammar.classNameForScopeId(scopeId);
   }
 
   scopeNameForScopeId (scopeId) {
-    return this.scopeIds.get(scopeId);
+    return this.grammar.scopeNameForScopeId(scopeId);
   }
 
-  getOrCreateScopeId (name) {
-    let id = this.scopeNames.get(name);
-    if (!id) {
-      this.lastId += 2;
-      id = this.lastId;
-      this.scopeNames.set(name, id);
-      this.scopeIds.set(id, name);
-    }
-    return id;
+  idForScope(name) {
+    return this.grammar.idForScope(name);
   }
+
+  // getOrCreateScopeId (name) {
+  //   let id = this.scopeNames.get(name);
+  //   if (!id) {
+  //     this.lastId += 2;
+  //     id = this.lastId;
+  //     this.scopeNames.set(name, id);
+  //     this.scopeIds.set(id, name);
+  //   }
+  //   return id;
+  // }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
   // tree-sitter node names. Useful for understanding tree-sitter parsing or
@@ -431,6 +431,11 @@ class WASMTreeSitterLanguageMode {
       let node = this.getSyntaxNodeAtPosition(point, selector);
       return node?.range;
     }
+    // Results returned from `scopeMapAtPosition` lack the context to know
+    // whether they've been covered by deeper scopes. Keep a scope descriptor
+    // around so that we can compare results with reality.
+    let scopeDescriptor = this.scopeDescriptorForPosition(point)
+      .getScopesArray();
 
     let match = selector ? matcherForSelector(selector) : FUNCTION_TRUE;
 
@@ -441,77 +446,49 @@ class WASMTreeSitterLanguageMode {
     let layers = this.languageLayersAtPoint(point);
     let results = [];
     for (let layer of layers) {
-      let map = layer.scopeMapAtPosition(point);
-      results.push(...map);
+      let items = layer.scopeMapAtPosition(point);
+      for (let { capture, adjustedRange } of items) {
+        let range = rangeForNode(adjustedRange);
+        if (!range.containsPoint(point)) { continue; }
+        // If this scope name isn't present in the scope descriptor, assume
+        // it's been covered by an injection layer. This isn't perfect but
+        // it'll be good enough for now.
+        if (!scopeDescriptor.includes(capture.name)) { continue; }
+        results.push({ capture, adjustedRange, range });
+      }
     }
 
     // We need the results sorted from smallest to biggest.
     results = results.sort((a, b) => {
-      return nodeBreadth(a.node) - nodeBreadth(b.node);
+      return nodeBreadth(a.adjustedRange) - nodeBreadth(b.adjustedRange);
     });
 
-    for (let { name, node } of results) {
-      if (match(name)) {
-        return new Range(node.startPosition, node.endPosition);
-      }
+    for (let { capture, range } of results) {
+      if (match(capture.name)) { return range; }
     }
   }
 
-  // TODO: It might be prudent to have this consume `tokenizedLineForRow`, even
-  // though the latter is a deprecated API. It operates closer to the metal and
-  // is less likely to diverge from reality.
-  scopeDescriptorForPosition (point) {
+  // Given a point, return all scopes active at that point.
+  scopeDescriptorForPosition(point) {
     if (!this.rootLanguageLayer) {
       return new ScopeDescriptor({ scopes: [this.grammar.scopeName, 'text'] });
     }
-
     point = this.normalizePointForPositionQuery(point);
 
-    let results = [];
-    let layers = this.injectionLayersAtPoint(point);
-    layers.push(this.rootLanguageLayer);
+    // The most accurate way to do this is to reconstruct the results from the
+    // highlight iterator itself.
+    const iterator = this.buildHighlightIterator();
+    const scopes = [];
 
-    // Consider deeper layers first.
-    layers.sort((a, b) => b.depth - a.depth);
-
-    let coveredNodeRangeSets = [];
-    let isWithinCoveredRange = (capture) => {
-      let range = capture.node.range;
-      return coveredNodeRangeSets.some(r => r.coversRange(range));
-    };
-
-    // Add in results from any applicable injection layers.
-    for (let layer of layers) {
-      let coverShallowerScopes = layer.injectionPoint?.coverShallowerScopes;
-      let map = layer.scopeMapAtPosition(point);
-      for (let capture of map) {
-        if (isWithinCoveredRange(capture)) { continue; }
-        results.push(capture);
-      }
-
-      // Make an artificial result for the root layer scope itself.
-      if (layer.tree && layer.languageScope) {
-        results.push({
-          name: layer.languageScope,
-          node: layer.tree.rootNode
-        });
-      }
-      if (coverShallowerScopes) {
-        // Add this layer's ranges to the set of ranges that should suppress
-        // scope application from earlier layers.
-        coveredNodeRangeSets.push(layer.currentNodeRangeSet);
+    // Scopes that were open at the start of this point.
+    for (const scope of iterator.seek(point, point.row + 1)) {
+      scopes.push(this.grammar.scopeNameForScopeId(scope));
+    }
+    if (point.isEqual(iterator.getPosition())) {
+      for (const scope of iterator.getOpenScopeIds()) {
+        scopes.push(this.grammar.scopeNameForScopeId(scope));
       }
     }
-
-    // Order them from biggest to smallest.
-    results = results.sort((a, b) => {
-      return nodeBreadth(b.node) - nodeBreadth(a.node);
-    });
-
-    let scopes = results.map(cap => {
-      return ScopeResolver.interpolateName(cap.name, cap.node)
-    });
-
     if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
       scopes.unshift(this.grammar.scopeName);
     }
@@ -521,6 +498,7 @@ class WASMTreeSitterLanguageMode {
   normalizePointForPositionQuery(point) {
     // Convert bare arrays to points.
     if (Array.isArray(point)) { point = new Point(...point); }
+
     // Convert bare objects to points and ensure we're dealing with a copy.
     if (!('copy' in point)) {
       point = Point.fromObject(point, true);
@@ -1495,7 +1473,7 @@ class WASMTreeSitterLanguageMode {
       tags: [],
       ruleStack: [],
       lineEnding: this.buffer.lineEndingForRow(row),
-      tokenIterator: null,
+      tokenIterator: this.tokenIterator,
       grammar: this.grammar
     });
   }
@@ -2360,7 +2338,7 @@ class LanguageLayer {
     this.tree = null;
     this.scopeResolver = new ScopeResolver(
       this,
-      (name) => this.languageMode.getOrCreateScopeId(name)
+      (name) => this.languageMode.idForScope(name)
     );
     this.foldResolver = new FoldResolver(this.buffer, this);
 
@@ -2381,7 +2359,7 @@ class LanguageLayer {
     if (languageScope === null) {
       this.languageScopeId = null;
     } else {
-      this.languageScopeId = this.languageMode.getOrCreateScopeId(languageScope);
+      this.languageScopeId = this.languageMode.idForScope(languageScope);
     }
   }
 
@@ -2918,7 +2896,7 @@ class LanguageLayer {
   }
 
   // Given a point, return all syntax captures that are active at that point.
-  // Used by `scopeDescriptorForPosition` and `bufferRangeForScopeAtPosition`.
+  // Used by `bufferRangeForScopeAtPosition`.
   scopeMapAtPosition(point) {
     if (!this.language || !this.tree) { return []; }
     let { scopeResolver } = this;
@@ -2932,6 +2910,10 @@ class LanguageLayer {
       { row: point.row, column: point.column + 1 }
     );
 
+    let { start, end } = this.getExtent();
+    let otherCaptures = this.syntaxQuery.captures(
+      this.tree.rootNode, start, end);
+
     let results = [];
     for (let capture of captures) {
       // Storing the capture will return its range (after any potential
@@ -2939,10 +2921,10 @@ class LanguageLayer {
       let range = scopeResolver.store(capture);
       if (!range) { continue; }
 
-      // Since the range might have been adjusted, we wait until after resolution
+      // Since the range might have been adjusted, we wait until after resolution.
       if (comparePoints(range.endPosition, point) === 0) { continue; }
       if (isBetweenPoints(point, range.startPosition, range.endPosition)) {
-        results.push(capture);
+        results.push({ capture, adjustedRange: range });
       }
     }
 
@@ -2950,7 +2932,7 @@ class LanguageLayer {
 
     // Sort from biggest to smallest.
     results = results.sort((a, b) => {
-      return nodeBreadth(b) - nodeBreadth(a);
+      return nodeBreadth(b.adjustedRange) - nodeBreadth(a.adjustedRange);
     });
 
     return results;

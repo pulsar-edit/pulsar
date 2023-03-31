@@ -30,8 +30,14 @@ module.exports = class WASMTreeSitterGrammar {
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
     this.fileTypes = params.fileTypes || [];
-    this.registry = registry
+    this.registry = registry;
     this.name = params.name;
+
+    this.nextScopeId = 256 + 1;
+    this.classNamesById = new Map();
+    this.scopeNamesById = new Map();
+    this.idsByScope = Object.create(null);
+
 
     this.commentStrings = {
       commentStartString: params.comments && params.comments.start,
@@ -40,6 +46,30 @@ module.exports = class WASMTreeSitterGrammar {
 
     this.shouldObserveQueryFiles = atom.inDevMode() && !atom.inSpecMode();
     this.getLanguage();
+  }
+
+  idForScope(scopeName) {
+    if (!scopeName) { return undefined; }
+    let id = this.idsByScope[scopeName];
+    if (!id) {
+      id = this.nextScopeId += 2;
+      const className = scopeName
+        .split('.')
+        .map(s => `syntax--${s}`)
+        .join(' ');
+      this.idsByScope[scopeName] = id;
+      this.classNamesById.set(id, className);
+      this.scopeNamesById.set(id, scopeName);
+    }
+    return id;
+  }
+
+  classNameForScopeId(id) {
+    return this.classNamesById.get(id);
+  }
+
+  scopeNameForScopeId(id) {
+    return this.scopeNamesById.get(id);
   }
 
   getLanguageSync () {
