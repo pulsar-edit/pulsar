@@ -29,10 +29,7 @@ class I18nCacheHelper {
       this.cachedASTs,
       path
     );
-    if (ast && "_AST" in ast) {
-      console.log(`CACHE HIT: ${this.count = (this.count || 0) + 1}`);
-      return ast._AST;
-    }
+    if (ast && "_AST" in ast) return ast._AST;
 
     ast = parse(str, {
       // requiresOtherClause
