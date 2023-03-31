@@ -15,7 +15,7 @@
   (#match? @support.function.builtin.shell "^(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)$")
   (#set! final true))
 
-(command_name) @support.function.other.shell
+(command_name) @support.other.function.shell
 
 
 [
