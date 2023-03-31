@@ -53,8 +53,22 @@ exports.activate = function() {
     },
     content(regex) {
       return regex;
-    }
+    },
+    languageScope: null
   });
+
+  // TODO: Ideal would be to have one `language-todo` injection for the whole
+  // document responsible for highlighting TODOs in all comments, but
+  // performance needs to be better than it is now for that to be possible.
+  // Injecting into individual line comments results in less time parsing
+  // during buffer modification, but _lots_ of language layers.
+  //
+  // Compromise is to test the content first and then only inject a layer for
+  // `language-todo` when we know it'll be needed. All this also applies for
+  // `language-hyperlink`.
+  //
+  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+  const HYPERLINK_PATTERN = /\bhttps?:(?=foo)/
 
   for (const scopeName of ['source.js', 'source.flow', 'source.ts']) {
     atom.grammars.addInjectionPoint(scopeName, {
@@ -71,21 +85,25 @@ exports.activate = function() {
 
     // Experiment: better to have one layer with lots of nodes, or lots of
     // layers each managing one node?
-    // atom.grammars.addInjectionPoint(scopeName, {
-    //   type: 'comment',
-    //   language: () => 'todo',
-    //   content: (node) => node,
-    //   languageScope: null
-    // });
-    //
-    // for (let type of ['template_string', 'string_fragment', 'comment']) {
-    //   atom.grammars.addInjectionPoint(scopeName, {
-    //     type,
-    //     language: () => 'hyperlink',
-    //     content: (node) => node,
-    //     languageScope: null
-    //   });
-    // }
+    atom.grammars.addInjectionPoint(scopeName, {
+      type: 'comment',
+      language: (node) => {
+        return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+      },
+      content: (node) => node,
+      languageScope: null
+    });
+
+    for (let type of ['template_string', 'string_fragment', 'comment']) {
+      atom.grammars.addInjectionPoint(scopeName, {
+        type,
+        language: (node) => {
+          return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
+        },
+        content: (node) => node,
+        languageScope: null
+      });
+    }
 
     // atom.grammars.addInjectionPoint(scopeName, {
     //   type: 'program',
