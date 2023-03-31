@@ -25,8 +25,6 @@ class I18n {
 
     this.cachedFormatters = {};
 
-    // TODO atom.packages.onDidDeactivatePackage
-
     this.t = (key, opts) => {
       const path = splitKeyPath(key);
 
@@ -83,6 +81,13 @@ class I18n {
     });
 
     this.updateConfigs();
+
+    atom.packages.onDidDeactivatePackage(pkg => {
+      if (pkg.name in this.registeredStrings) {
+        delete this.registeredStrings[pkg.name];
+      }
+    });
+
     this.initialized = true;
   }
 
