@@ -3,6 +3,12 @@ const { splitKeyPath } = require("key-path-helpers");
 const fs = require("fs-plus");
 const path = require("path");
 const { default: IntlMessageFormat } = require("intl-messageformat");
+const {
+  I18nCacheHelper,
+  walkStrings,
+  travelDownObjectPath,
+  optionalTravelDownObjectPath
+} = require("./i18n-helpers");
 
 class I18n {
   /**
@@ -15,22 +21,12 @@ class I18n {
     this.config = config;
     this.initialized = false;
 
-    /**
-     * {
-     *   [ns (package id)]: {
-     *     [language id]: {
-     *       string objects without core ns
-     *     }
-     *   }
-     * }
-     *
-     * @type {object}
-     */
+    /** registeredStrings[ns][lang] = string objs */
     this.registeredStrings = { core: {} };
 
     this.cachedFormatters = {};
 
-    // TODO string parse cache (load on init, save on destroy too)
+    this.cacheHelper = new I18nCacheHelper();
 
     // TODO atom.packages.onDidDeactivatePackage
 
@@ -63,7 +59,9 @@ class I18n {
     }
   }
 
-  initialize({ packages, resourcePath }) {
+  initialize({ configDirPath, packages, resourcePath }) {
+    /** @type {string} */
+    this.configDirPath = configDirPath;
     this.packages = packages;
     /** @type {string} */
     this.resourcePath = resourcePath;
@@ -121,18 +119,21 @@ class I18n {
    * @return undefined if the language or string cannot be found,
    *   and throws an error if the path isn't right.
    */
-  tSingleLanguage(lang, path, opts) {
-    path = [...path];
+  // TODO could be improved: nove string fetching logic into fetch function
+  // so the fetch function takes a langobj and a path, and we can then delegate
+  // that to the cache too (don't fetch the string if theres already something in the cache)
+  tSingleLanguage(lang, _path, opts) {
+    let path = [..._path];
 
     const ns = path.shift();
-    if (!ns) throw new Error(`key path seems invalid: [${path.map(p => `"${p}"`).join(", ")}]`);
+    if (!ns) throw new Error(`key path seems invalid: [${_path.map(p => `"${p}"`).join(", ")}]`);
 
     const languageObj = this.getLanguageObj(ns, lang);
     if (!languageObj) return undefined;
 
     const str = optionalTravelDownObjectPath(languageObj, path);
     if (str) {
-      return this.format(path, str, lang, opts);
+      return this.format(ns, path, str, lang, opts);
     } else {
       return undefined;
     }
@@ -213,38 +214,11 @@ class I18n {
    * formats a string with opts,
    * and caches the message formatter for the provided path.
    */
-  format(path, str, locale, opts) {
-    // TODO caching
-    let formatter = new IntlMessageFormat(str, locale, null, {
-      // requiresOtherClause
-    });
+  format(ns, path, str, lang, opts) {
+    let ast = this.cacheHelper.fetchAST(ns, path, str, lang);
+    let formatter = new IntlMessageFormat(ast, lang);
     return formatter.format(opts);
   }
 }
 
 module.exports = I18n;
-
-function walkStrings(strings, cb, accum = []) {
-  Object.entries(strings).forEach(([k, v]) => {
-    if (typeof v === "string") cb([...accum, k], v, true);
-    else if (typeof v === "object") {
-      cb([...accum, k], null, false);
-      walkStrings(v, cb, [...accum, k]);
-    }
-  });
-}
-
-function travelDownObjectPath(obj, path) {
-  for (const pathFragment of path) {
-    obj = obj[pathFragment];
-  }
-  return obj;
-}
-
-function optionalTravelDownObjectPath(obj, path) {
-  for (const pathFragment of path) {
-    obj = obj[pathFragment];
-    if (!obj) return undefined;
-  }
-  return obj;
-}
