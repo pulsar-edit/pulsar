@@ -1,9 +1,10 @@
+const _ = require('underscore-plus');
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("@formatjs/icu-messageformat-parser");
 
 class I18nCacheHelper {
-  constructor({ configDirPath }) {
+  constructor({ configDirPath, i18n }) {
     /**
      * cachedASTs[ns][lang] = string objs
      * (same shape as registeredStrings but with ASTs instead of strings)
@@ -11,8 +12,14 @@ class I18nCacheHelper {
     this.cachedASTs = {};
     /** @type {string} */
     this.configDirPath = configDirPath;
+    this.i18n = i18n;
 
     this.loadCaches();
+
+    this.debouncedCleanAndSave = _.debounce(() => {
+      this.cleanCaches(this.i18n.registeredStrings);
+      this.saveCaches();
+    }, 5_000);
   }
 
   fetchAST(ns, _path, str, lang) {
@@ -34,6 +41,8 @@ class I18nCacheHelper {
     let lastBit = path.pop();
     let cachePath = travelDownOrMakePath(this.cachedASTs, path);
     cachePath[lastBit] = { _AST: ast };
+
+    this.debouncedCleanAndSave();
 
     return ast;
   }

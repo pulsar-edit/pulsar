@@ -63,7 +63,7 @@ class I18n {
     /** @type {string} */
     this.resourcePath = resourcePath;
     /** @type {I18nCacheHelper} */
-    this.cacheHelper = new I18nCacheHelper({ configDirPath });
+    this.cacheHelper = new I18nCacheHelper({ configDirPath, i18n: this });
 
     const ext = ".json";
     const extlen = ext.length;
