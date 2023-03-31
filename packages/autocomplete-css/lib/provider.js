@@ -1,11 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__, or convert again using --optional-chaining
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
 const COMPLETIONS = require('../completions.json');
 
 const firstInlinePropertyNameWithColonPattern = /{\s*(\S+)\s*:/; // .example { display: }
@@ -78,14 +70,14 @@ module.exports = {
     const previousScopesArray = previousScopes.getScopesArray();
 
     return (hasScope(scopes, 'meta.property-list.css') && (prefix.trim() === ":")) ||
-    (hasScope(previousScopesArray, 'meta.property-value.css')) ||
-    (hasScope(scopes, 'meta.property-list.scss') && (prefix.trim() === ":")) ||
-    (hasScope(previousScopesArray, 'meta.property-value.scss')) ||
-    (hasScope(scopes, 'meta.property-list.postcss') && (prefix.trim() === ":")) ||
-    (hasScope(previousScopesArray, 'meta.property-value.postcss')) ||
-    (hasScope(scopes, 'source.sass', true) && (hasScope(scopes, 'meta.property-value.sass') ||
-      (!hasScope(beforePrefixScopesArray, 'entity.name.tag.css') && (prefix.trim() === ":"))
-    ));
+           (hasScope(previousScopesArray, 'meta.property-value.css')) ||
+           (hasScope(scopes, 'meta.property-list.scss') && (prefix.trim() === ":")) ||
+           (hasScope(previousScopesArray, 'meta.property-value.scss')) ||
+           (hasScope(scopes, 'meta.property-list.postcss') && (prefix.trim() === ":")) ||
+           (hasScope(previousScopesArray, 'meta.property-value.postcss')) ||
+           (hasScope(scopes, 'source.sass', true) && (hasScope(scopes, 'meta.property-value.sass') ||
+            (!hasScope(beforePrefixScopesArray, 'entity.name.tag.css') && (prefix.trim() === ":"))
+           ));
   },
 
   isCompletingName({scopeDescriptor, bufferPosition, prefix, editor}) {
@@ -233,7 +225,7 @@ module.exports = {
 
     const completions = [];
     if (this.isPropertyValuePrefix(prefix)) {
-      for (value of Array.from(values)) {
+      for (value of values) {
         if (firstCharsEqual(value, prefix)) {
           completions.push(this.buildPropertyValueCompletion(value, property, addSemicolon));
         }
@@ -242,7 +234,7 @@ module.exports = {
     !hasScope(scopes, 'keyword.other.unit.scss') && // SCSS (TODO: remove in Atom 1.19.0)
     !hasScope(scopes, 'keyword.other.unit.css')) { // Less, Sass (TODO: remove in Atom 1.19.0)
       // Don't complete here: `width: 100%|`
-      for (value of Array.from(values)) {
+      for (value of values) {
         completions.push(this.buildPropertyValueCompletion(value, property, addSemicolon));
       }
     }
@@ -353,7 +345,7 @@ module.exports = {
   getTagCompletions({bufferPosition, editor, prefix}) {
     const completions = [];
     if (prefix) {
-      for (let tag of Array.from(this.tags)) {
+      for (let tag of this.tags) {
         if (firstCharsEqual(tag, prefix)) {
           completions.push(this.buildTagCompletion(tag));
         }
