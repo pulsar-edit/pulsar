@@ -24,34 +24,6 @@ class I18n {
     this.registeredStrings = { core: {} };
 
     this.cachedFormatters = {};
-
-    this.t = (key, opts) => {
-      const path = splitKeyPath(key);
-
-      // primary
-      const str = this.tSingleLanguage(this.primaryLanguage, path, opts);
-      if (str) return str;
-
-      // fallbacks
-      for (const lang of this.fallbackLanguages) {
-        const str = this.tSingleLanguage(lang, path, opts);
-        if (str) return str;
-      }
-
-      // `en` fallback
-      const en_fallback = this.tSingleLanguage("en", path, opts);
-      if (en_fallback) return en_fallback;
-
-      // key fallback
-      let string_opts = opts
-        ? `: { ${
-          Object.entries(opts)
-            .map(o => `"${o[0]}": "${o[1]}"`)
-            .join(", ")
-          } }`
-        : "";
-      return `${key}${string_opts}`;
-    }
   }
 
   initialize({ configDirPath, packages, resourcePath }) {
@@ -87,6 +59,34 @@ class I18n {
         delete this.registeredStrings[pkg.name];
       }
     });
+
+    this.t = (key, opts) => {
+      const path = splitKeyPath(key);
+
+      // primary
+      const str = this.tSingleLanguage(this.primaryLanguage, path, opts);
+      if (str) return str;
+
+      // fallbacks
+      for (const lang of this.fallbackLanguages) {
+        const str = this.tSingleLanguage(lang, path, opts);
+        if (str) return str;
+      }
+
+      // `en` fallback
+      const en_fallback = this.tSingleLanguage("en", path, opts);
+      if (en_fallback) return en_fallback;
+
+      // key fallback
+      let string_opts = opts
+        ? `: { ${
+          Object.entries(opts)
+            .map(o => `"${o[0]}": "${o[1]}"`)
+            .join(", ")
+          } }`
+        : "";
+      return `${key}${string_opts}`;
+    }
 
     this.initialized = true;
   }
