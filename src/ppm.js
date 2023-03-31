@@ -1,4 +1,5 @@
 const superagent = require("superagent");
+const path = require("path");
 const { shell } = require("electron");
 
 /**
@@ -13,6 +14,7 @@ module.exports = class PPM {
     this.apiURL = "https://api.pulsar-edit.dev/";
     this.webURL = "https://web.pulsar-edit.dev/";
     this.userAgent;
+    this.resourcePath;
 
     // 5 Hour Expiry on Cache
     this.cacheExpiry = 1000 * 60 * 60 * 5;
@@ -40,6 +42,16 @@ module.exports = class PPM {
       // We are running headless and don't have access to the user agent.
       this.userAgent = "Pulsar/BundledPPM"; // This will be set later on
     }
+  }
+
+  /**
+    * @name _getNpmBinDir
+    * @private
+    * @memberof PPM
+    * @desc Returns the directory of PPM's bundled NPM directory
+  */
+  _getNpmBinDir() {
+    let defaultPath = path.join(this.resourcePath, "bin");
   }
 
   /**

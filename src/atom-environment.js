@@ -278,6 +278,8 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
+    this.ppm.resourcePath = resourcePath;
+    
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
 
