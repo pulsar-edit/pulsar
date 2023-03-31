@@ -33,6 +33,7 @@
         "reopen-project": "Reopen Project",
         "clear": "Clear Project History"
       },
+      "reopen-last-item": "Reopen Last Item",
       "save": "Save",
       "save-as": "Save As...",
       "save-all": "Save All",
