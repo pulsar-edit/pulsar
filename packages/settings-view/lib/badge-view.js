@@ -2,12 +2,10 @@
 /** @jsx etch.dom */
 
 import etch from 'etch'
-import { Disposable, CompositeDisposable } from 'atom'
 
 export default class BadgeView {
   constructor(badge) {
     this.badge = badge;
-    this.disposables = new CompositeDisposable()
 
     etch.initialize(this)
   }
