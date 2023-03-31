@@ -289,6 +289,7 @@ class AtomEnvironment {
     });
 
     this.i18n.initialize({
+      configDirPath: this.configDirPath,
       packages: this.packages,
       resourcePath
     });
