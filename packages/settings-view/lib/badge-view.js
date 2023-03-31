@@ -97,7 +97,7 @@ export default class BadgeView {
   getClasses () {
     switch(this.badge.type) {
       case "warn":
-        return "badge badge-warn";
+        return "badge badge-error";
         break;
       case "success":
         return "badge badge-success";
