@@ -88,7 +88,6 @@ class I18nCacheHelper {
 
     let cachefile = path.join(cachedir, "strings.json");
     fs.writeFileSync(cachefile, JSON.stringify(this.cachedASTs));
-    // TODO finish this
   }
 
   loadCaches() {
