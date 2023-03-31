@@ -25,8 +25,6 @@ class I18n {
 
     this.cachedFormatters = {};
 
-    this.cacheHelper = new I18nCacheHelper();
-
     // TODO atom.packages.onDidDeactivatePackage
 
     this.t = (key, opts) => {
@@ -64,6 +62,8 @@ class I18n {
     this.packages = packages;
     /** @type {string} */
     this.resourcePath = resourcePath;
+    /** @type {I18nCacheHelper} */
+    this.cacheHelper = new I18nCacheHelper({ configDirPath });
 
     const ext = ".json";
     const extlen = ext.length;

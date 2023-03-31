@@ -1,12 +1,18 @@
+const fs = require("fs");
+const path = require("path");
 const { parse } = require("@formatjs/icu-messageformat-parser");
 
 class I18nCacheHelper {
-  constructor() {
+  constructor({ configDirPath }) {
     /**
      * cachedASTs[ns][lang] = string objs
      * (same shape as registeredStrings but with ASTs instead of strings)
      */
     this.cachedASTs = {};
+    /** @type {string} */
+    this.configDirPath = configDirPath;
+
+    this.loadCaches();
   }
 
   fetchAST(ns, _path, str, lang) {
@@ -16,7 +22,10 @@ class I18nCacheHelper {
       this.cachedASTs,
       path
     );
-    if (ast) return ast.ast;
+    if (ast && "_AST" in ast) {
+      console.log(`CACHE HIT: ${this.count = (this.count || 0) + 1}`);
+      return ast._AST;
+    }
 
     ast = parse(str, {
       // requiresOtherClause
@@ -24,7 +33,7 @@ class I18nCacheHelper {
 
     let lastBit = path.pop();
     let cachePath = travelDownOrMakePath(this.cachedASTs, path);
-    cachePath[lastBit] = new AST(ast);
+    cachePath[lastBit] = { _AST: ast };
 
     return ast;
   }
@@ -47,7 +56,7 @@ class I18nCacheHelper {
         // cached is not AST (plain obj) (good)
         if (
           typeof cachedValue === "object"
-          && !(cachedValue instanceof AST)
+          && !("_AST" in cachedValue)
         ) return this.cleanCaches(registeredValue, cachedValue);
         // cached is AST (bad)
         return delete cachedASTs[k];
@@ -56,18 +65,36 @@ class I18nCacheHelper {
       // path is a string
       if (typeof registeredValue === "string") {
         // cached is AST (good)
-        if (cachedValue instanceof AST) return;
+        if ("_AST" in cachedValue) return;
         // cached is not AST (bad)
         return delete cachedASTs[k];
       }
     });
   }
-}
 
-/** wrapper class, helps to ID ASTs as ASTs */
-class AST {
-  constructor(ast) {
-    this.ast = ast;
+  saveCaches() {
+    let cachedir = path.join(
+      this.configDirPath,
+      "compile-cache",
+      "i18n"
+    );
+    fs.mkdirSync(cachedir, { recursive: true });
+
+    let cachefile = path.join(cachedir, "strings.json");
+    fs.writeFileSync(cachefile, JSON.stringify(this.cachedASTs));
+    // TODO finish this
+  }
+
+  loadCaches() {
+    let cachefile = path.join(
+      this.configDirPath,
+      "compile-cache",
+      "i18n",
+      "strings.json"
+    );
+    if (fs.existsSync(cachefile)) {
+      this.cachedASTs = JSON.parse(fs.readFileSync(cachefile, "utf-8"));
+    }
   }
 }
 
