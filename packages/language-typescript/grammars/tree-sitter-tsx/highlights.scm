@@ -146,12 +146,12 @@
 
 ; The "foo" in `foo.bar`.
 (member_expression
-  object: (identifier) @support.object.other.ts.tsx)
+  object: (identifier) @support.other.object.ts.tsx)
 
 ; The "bar" in `foo.bar.baz`.
 (member_expression
   object: (member_expression
-    property: (property_identifier) @support.object.other.ts.tsx))
+    property: (property_identifier) @support.other.object.ts.tsx))
 
 
 (property_signature
@@ -165,7 +165,7 @@
 
 (call_expression
   function: (member_expression
-    property: (property_identifier) @support.function.method.other.ts.tsx))
+    property: (property_identifier) @support.other.function.method.ts.tsx))
 
 ; VARIABLES
 ; =========
@@ -338,12 +338,12 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.definition.begin.brace.curly.ts.tsx
-"}" @punctuation.definition.end.brace.curly.ts.tsx
-"(" @punctuation.definition.begin.brace.round.ts.tsx
-")" @punctuation.definition.end.brace.round.ts.tsx
-"[" @punctuation.definition.begin.brace.square.ts.tsx
-"]" @punctuation.definition.end.brace.square.ts.tsx
+"{" @punctuation.definition.begin.bracket.curly.ts.tsx
+"}" @punctuation.definition.end.bracket.curly.ts.tsx
+"(" @punctuation.definition.begin.bracket.round.ts.tsx
+")" @punctuation.definition.end.bracket.round.ts.tsx
+"[" @punctuation.definition.begin.bracket.square.ts.tsx
+"]" @punctuation.definition.end.bracket.square.ts.tsx
 
 ";" @punctuation.terminator.statement.ts.tsx
 "," @punctuation.separator.comma.ts.tsx

@@ -104,7 +104,7 @@
 ; =====
 
 (object_creation_expression (type_identifier)
-  @support.class.other.java
+  @support.other.class.java
   (#set! final true))
 
 ; WORKAROUND: This matches often when the user is typing, so we shouldn't
@@ -182,20 +182,20 @@
 (throws "throws" @storage.modifier.throws.java)
 
 (method_invocation (identifier)
-  @support.function.other.java)
+  @support.other.function.java)
 
 (field_access (identifier) @constant.other.java
   (#match? @constant.other.java "^[A-Z][A-Z0-9_\\$]+$")
   (#set! final true))
 
 (field_access
-  object: (identifier) @support.class.other.java
-  (#match? @support.class.other.java "^[A-Z]")
+  object: (identifier) @support.other.class.java
+  (#match? @support.other.class.java "^[A-Z]")
   (#set! final true))
 
 (field_access
-  field: (identifier) @support.class.other.java
-  (#match? @support.class.other.java "^[A-Z]")
+  field: (identifier) @support.other.class.java
+  (#match? @support.other.class.java "^[A-Z]")
   (#set! final true))
 
 
@@ -374,15 +374,32 @@
 "," @punctuation.separator.comma.java
 "->" @punctuation.separator.lambda.java
 
-"{" @punctuation.definition.begin.brace.curly.java
-"}" @punctuation.definition.end.brace.curly.java
-"(" @punctuation.definition.begin.brace.round.java
-")" @punctuation.definition.end.brace.round.java
-"[" @punctuation.definition.begin.brace.square.java
-"]" @punctuation.definition.end.brace.square.java
+(if_statement
+  condition: (parenthesized_expression
+    "(" @punctuation.definition.expression.begin.bracket.round.java
+    ")" @punctuation.definition.expression.end.bracket.round.java
+    (#set! final true)))
 
-(type_arguments "<" @punctuation.definition.begin.brace.angle.java)
-(type_arguments ">" @punctuation.definition.end.brace.angle.java)
+(formal_parameters
+  "(" @punctuation.definition.parameters.begin.bracket.round.java
+  ")" @punctuation.definition.parameters.end.bracket.round.java
+  (#set! final true))
 
-(type_parameters "<" @punctuation.definition.begin.brace.angle.java)
-(type_parameters ">" @punctuation.definition.end.brace.angle.java)
+(argument_list
+  "(" @punctuation.definition.arguments.begin.bracket.round.java
+  ")" @punctuation.definition.arguments.end.bracket.round.java
+  (#set! final true))
+
+
+"{" @punctuation.definition.block.begin.bracket.curly.java
+"}" @punctuation.definition.block.end.bracket.curly.java
+"(" @punctuation.definition.expression.begin.bracket.round.java
+")" @punctuation.definition.expression.end.bracket.round.java
+"[" @punctuation.definition.array.begin.bracket.square.java
+"]" @punctuation.definition.array.end.bracket.square.java
+
+(type_arguments "<" @punctuation.definition.type.begin.bracket.angle.java)
+(type_arguments ">" @punctuation.definition.type.end.bracket.angle.java)
+
+(type_parameters "<" @punctuation.definition.type.begin.bracket.angle.java)
+(type_parameters ">" @punctuation.definition.type.end.bracket.angle.java)

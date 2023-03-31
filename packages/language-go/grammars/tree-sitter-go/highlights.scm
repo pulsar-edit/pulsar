@@ -30,13 +30,34 @@
 ; TYPES
 ; =====
 
-(type_identifier) @storage.type._TYPE_.go
+(type_declaration
+  (type_spec
+    name: (type_identifier) @entity.name.type.go)
+    (#set! final true))
+
+(type_identifier) @storage.other.type.go
 
 [
   "func"
   "import"
   "package"
 ] @keyword._TYPE_.go
+
+"type" @storage.type.go
+
+[
+  "struct"
+] @storage.type._TYPE_.go
+
+(struct_type
+  (field_declaration_list
+    (field_declaration
+      (field_identifier) @entity.other.attribute-name.go)))
+
+(keyed_element
+  (field_identifier) @entity.other.attribute-name.go
+  .
+  ":" @punctuation.separator.key-value.go)
 
 [
   "break"
@@ -56,6 +77,7 @@
   "switch"
 ] @keyword.control._TYPE_.go
 
+
 (function_declaration (identifier) @entity.name.function.go)
 
 (call_expression
@@ -64,25 +86,25 @@
   (#set! final true))
 
 (call_expression
-  (identifier) @support.function.other.go)
+  (identifier) @support.other.function.go)
 
 (call_expression
   (selector_expression
-    field: (field_identifier) @support.function.other.go))
+    field: (field_identifier) @support.other.function.go))
 
 ; OBJECTS
 ; =======
 
 (selector_expression
   operand: (selector_expression
-    operand: (identifier) @support.object.other.go
-    field: (field_identifier) @support.object.other.go))
+    operand: (identifier) @support.other.object.go
+    field: (field_identifier) @support.other.object.go))
 
 ; TODO: If we do this, then we have to do chaining (`a.b.c.Close()`) and that
 ; won't be fun.
 
 (selector_expression
-  operand: (identifier) @support.object.other.go)
+  operand: (identifier) @support.other.object.go)
 
 ; PACKAGES
 ; ========
@@ -232,12 +254,23 @@
 "," @punctuation.separator.comma.go
 ":" @punctuation.separator.colon.go
 
-"{" @punctuation.definition.begin.brace.curly.go
-"}" @punctuation.definition.end.brace.curly.go
-"(" @punctuation.definition.begin.brace.round.go
-")" @punctuation.definition.end.brace.round.go
-"[" @punctuation.definition.begin.brace.square.go
-"]" @punctuation.definition.end.brace.square.go
+(parameter_list
+  "(" @punctuation.definition.parameters.begin.bracket.round.go
+  ")" @punctuation.definition.parameters.end.bracket.round.go
+  (#set! final true))
+
+(composite_literal
+  body: (literal_value
+    "{" @punctuation.definition.struct.begin.bracket.curly.go
+    "}" @punctuation.definition.struct.end.bracket.curly.go
+    (#set! final true)))
+
+"{" @punctuation.definition.begin.bracket.curly.go
+"}" @punctuation.definition.end.bracket.curly.go
+"(" @punctuation.definition.group.begin.bracket.round.go
+")" @punctuation.definition.group.end.bracket.round.go
+"[" @punctuation.definition.begin.bracket.square.go
+"]" @punctuation.definition.end.bracket.square.go
 
 ; META
 ; ====

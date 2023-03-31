@@ -40,7 +40,8 @@
 ; Function calls
 ; --------------
 
-(decorator) @keyword.other.special-method.decorator.python
+(decorator) @support.other.function.decorator.python
+; (decorator) @keyword.other.special-method.decorator.python
 
 (call
   function: (identifier) @support.function.builtin.python
@@ -48,10 +49,10 @@
 
 (call
   function: (attribute
-    attribute: (identifier) @support.function.other.python))
+    attribute: (identifier) @support.other.function.python))
 
 (call
-  function: (identifier) @support.function.other.python)
+  function: (identifier) @support.other.function.python)
 
 
 ; Function definitions
@@ -62,7 +63,7 @@
   (#match? @entity.name.function.magic.python "^__(?:abs|add|and|bool|bytes|call|cmp|coerce|complex|contains|del|delattr|delete|delitem|delslice|dir|div|divmod|enter|eq|exit|float|floordiv|format|ge|get|getattr|getattribute|getitem|getslice|gt|hash|hex|iadd|iand|idiv|ifloordiv|ilshift|imatmul|imod|imul|index|init|instancecheck|int|invert|ior|ipow|irshift|isub|iter|itruediv|ixor|le|len|length_hint|long|lshift|lt|matmul|missing|mod|mul|ne|neg|next|new|nonzero|oct|or|pos|pow|radd|rand|rdiv|rdivmod|repr|reversed|rfloordiv|rlshift|rmatmul|rmod|rmul|ror|round|rpow|rrshift|rshift|rsub|rtruediv|rxor|set|setattr|setitem|setslice|str|sub|subclasscheck|truediv|unicode|xor)__$"))
 
 (attribute
-  attribute: (identifier) @entity.other.attribute-name.python)
+  attribute: (identifier) @support.other.attribute-name.python)
 
 (function_definition
   name: (identifier) @entity.name.function.python)
@@ -92,8 +93,8 @@
 ; STRINGS
 ; =======
 
-((string) @string.quoted.double.block.python
-  (#match? @string.quoted.double.block.python "^\"\"\""))
+((string) @string.quoted.triple.block.python
+  (#match? @string.quoted.triple.block.python "^\"\"\""))
 
 (string
   _ @punctuation.definition.string.begin.python
@@ -114,6 +115,15 @@
 (interpolation
   "{" @punctuation.section.embedded.begin.python
   "}" @punctuation.section.embedded.end.python) @meta.embedded.interpolation.python
+
+
+; SUPPORT
+; =======
+
+((identifier) @support.type.exception.python
+  (#match? @support.type.exception.python "^(BaseException|Exception|TypeError|StopAsyncIteration|StopIteration|ImportError|ModuleNotFoundError|OSError|ConnectionError|BrokenPipeError|ConnectionAbortedError|ConnectionRefusedError|ConnectionResetError|BlockingIOError|ChildProcessError|FileExistsError|FileNotFoundError|IsADirectoryError|NotADirectoryError|InterruptedError|PermissionError|ProcessLookupError|TimeoutError|EOFError|RuntimeError|RecursionError|NotImplementedError|NameError|UnboundLocalError|AttributeError|SyntaxError|IndentationError|TabError|LookupError|IndexError|KeyError|ValueError|UnicodeError|UnicodeEncodeError|UnicodeDecodeError|UnicodeTranslateError|AssertionError|ArithmeticError|FloatingPointError|OverflowError|ZeroDivisionError|SystemError|ReferenceError|BufferError|MemoryError|Warning|UserWarning|DeprecationWarning|PendingDeprecationWarning|SyntaxWarning|RuntimeWarning|FutureWarning|ImportWarning|UnicodeWarning|BytesWarning|ResourceWarning|GeneratorExit|SystemExit|KeyboardInterrupt)$")
+  (#set! final true))
+
 
 
 ; CONSTANTS
@@ -176,6 +186,10 @@
   "match"
 ] @keyword.control._TYPE_.python
 
+[
+  "raise"
+] @keyword.control._TYPE_.python
+
 
 ; VARIABLES
 ; =========
@@ -187,8 +201,7 @@
   (default_parameter
     (identifier) @variable.parameter.function.python))
 
-(
-  (identifier) @variable.language.self.python
+((identifier) @variable.language.self.python
   (#eq? @variable.language.self.python "self")
   (#set! final true))
 
@@ -262,6 +275,33 @@
 ; PUNCTUATION
 ; ===========
 
-; (attribute ".") @punctuation.separator.property.period.python
 (function_definition
-  ":" @punctuation.definition.function.begin.python)
+  ":" @punctuation.definition.function.colon.python
+  (#set! final true))
+
+(parameters
+  "(" @punctuation.definition.parameters.begin.bracket.round.python
+  ")" @punctuation.definition.parameters.end.bracket.round.python
+  (#set! final true))
+
+(parameters
+  "," @punctuation.separator.parameters.comma.python
+  (#set! final true))
+
+(tuple
+  "(" @punctuation.definition.tuple.begin.bracket.round.python
+  ")" @punctuation.definition.tuple.end.bracket.round.python
+  (#set! final true))
+
+(tuple
+  "," @punctuation.separator.tuple.comma.python
+  (#set! final true))
+
+(dictionary
+  "{" @punctuation.definition.dictionary.begin.bracket.curly.python
+  "}" @punctuation.definition.dictionary.end.bracket.curly.python
+  (#set! final true))
+
+(dictionary
+  "," @punctuation.separator.dictionary.comma.python
+  (#set! final true))

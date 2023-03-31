@@ -196,14 +196,12 @@
 ; Generator function definitions:
 ; the "foo" in `function* foo () {`
 (generator_function_declaration
-  name: (identifier) @entity.name.function.generator.definition.js
-)
+  name: (identifier) @entity.name.function.generator.definition.js)
 
 ; Method definitions:
 ; the "foo" in `foo () {` (inside a class body)
 (method_definition
-  name: (property_identifier) @entity.name.function.method.definition.js
-)
+  name: (property_identifier) @entity.name.function.method.definition.js)
 
 ; Function property assignment:
 ; The "foo" in `thing.foo = (arg) => {}`
@@ -239,19 +237,118 @@
 
 (generator_function "*" @storage.modifier.generator.js)
 (generator_function_declaration "*" @storage.modifier.generator.js)
+(method_definition "*" @storage.modifier.generator.js)
 
 
-; FUNCTION CALLS
-; ==============
+; SUPPORT
+; =======
 
-; An invocation of any function.
+; Array methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Array")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(from|isArray|of)$")
+    (#set! final true))
+
+; Date methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Date")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(now|parse|UTC)$")
+    (#set! final true))
+
+; JSON methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "JSON")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(parse|stringify)$")
+    (#set! final true))
+
+; Math methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Math")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(abs|acos|acosh|asin|asinh|atan|atanh|atan2|cbrt|ceil|clz32|cos|cosh|exp|expm1|floor|fround|hypot|imul|log|log1p|log10|log2|max|min|pow|random|round|sign|sin|sinh|sqrt|tan|tanh|trunc)$")
+    (#set! final true))
+
+; Object methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Object")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(assign|create|defineProperty|defineProperties|entries|freeze|fromEntries|getOwnPropertyDescriptor|getOwnPropertyDescriptors|getOwnPropertyNames|getOwnPropertySymbols|getPrototypeOf|is|isExtensible|isFrozen|isSealed|keys|preventExtensions|seal|setPrototypeOf|values)$")
+    (#set! final true))
+
+; Reflect methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Reflect")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(apply|construct|defineProperty|deleteProperty|get|getOwnPropertyDescriptor|getPrototypeOf|has|isExtensible|ownKeys|preventExtensions|set|setPrototypeOf)$")
+    (#set! final true))
+
+; Intl.X instantiations.
+(new_expression
+  constructor: (member_expression
+    object: (identifier) @support.object.builtin.js
+      (#eq? @support.object.builtin.js "Intl")
+    property: (property_identifier) @support.class.builtin.js
+      (#match? @support.class.builtin.js "^(Collator|DateTimeFormat|DisplayNames|ListFormat|Locale|NumberFormat|PluralRules|Segmenter)$"))
+      (#set! final true))
+
+; Built-in class instantiations.
+(new_expression
+  constructor: (identifier) @support.class.instance.js
+    (#match? @support.class.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
+    (#set! final true))
+
+; Built-in constructors that can be invoked without `new`.
 (call_expression
-  function: (identifier) @support.function.other.js)
+  (identifier) @support.function.builtin.js
+  (#match? @support.function.builtin.js "^(AggregateError|Array|ArrayBuffer|Boolean|BigInt|Error|EvalError|Function|Number|Object|Proxy|RangeError|String|Symbol|SyntaxError|URIError)$")
+  (#set! final true))
 
-; An invocation of any method.
+; Built-in functions.
+(call_expression
+  (identifier) @support.function.builtin.js
+  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$"))
+
+; Deprecated built-in functions.
+(call_expression
+  (identifier) @invalid.deprecated.function.js
+  (#match? @invalid.deprecated.function.js "^(escape|unescape)$")
+  (#set! final true))
+
+; Built-in DOM classes.
+((identifier) @support.class.builtin.js
+  (#match? @support.class.builtin.js "^(Document|Element|HTMLElement|HTMLDocument|HTML(Select|BR|HR|LI|Div|Map|Mod|Pre|Area|Base|Body|Data|Font|Form|Head|Html|Link|Menu|Meta|Slot|Span|Time|Audio|DList|Embed|Image|Input|Label|Media|Meter|OList|Param|Quote|Style|Table|Title|Track|UList|Video|Anchor|Button|Canvas|Dialog|IFrame|Legend|Object|Option|Output|Script|Source|Content|Details|Heading|Marquee|Picture|Unknown|DataList|FieldSet|FrameSet|MenuItem|OptGroup|Progress|TableCol|TableRow|Template|TextArea|Paragraph|TableCell|Options|TableCaption|TableSection|FormControls))$")
+  (#set! final true))
+
+; Deprecated built-in DOM classes.
+((identifier) @invalid.deprecated.class.js
+  (#match? @invalid.deprecated.class.js "^(HTMLShadowElement)$")
+  (#set! final true))
+
+; Built-in DOM methods on `document`.
 (call_expression
   function: (member_expression
-    property: (property_identifier) @support.function.other.method.js))
+    object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "document")
+    property: (property_identifier) @support.function.method.builtin.js
+    (#match? @support.function.method.builtin.js "^(adoptNode|append|caretPositionFromPoint|caretRangeFromPoint|createAttribute(?:NS)?|createCDATASection|createComment|createDocumentFragment|createElement(?:NS)?|createEvent|createNodeIterator|createProcessingInstruction|createRange|createTextNode|createTreeWalker|elementFromPoint|elementsFromPoint|exitFullscreen|exitPictureInPicture|exitPointerLock|getAnimations|getElementById|getElementsByClassName|getElementsByTagName(?:NS)?|getSelection|hasStorageAccess|importNode|prepend|querySelector|querySelectorAll|releaseCapture|replaceChildren|requestStorageAccess|createExpression|createNSResolver|evaluate|getElementsByName|hasFocus|write|writeln|open|close)$")
+    (#set! final true)))
+
+; Built-in DOM methods on nodes. These will show up as builtins on _any_ class, but
+; they're distinctive enough that we're OK with that possibility.
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @support.function.method.builtin.js
+    (#match? @support.function.method.builtin.js "^(addEventListener|appendChild|cloneNode|compareDocumentPosition|contains|getElementsByClassName|getElementsByTagName(?:NS)?|getRootNode|hasChildNodes|insertBefore|isDefaultNamespace|isEqualNode|isSameNode|lookupPrefix|lookupNamespaceURI|normalize|querySelector|querySelectorAll|removeChild|replaceChild|removeEventListener)$")
+    (#set! final true)))
 
 
 ; OBJECTS
@@ -259,12 +356,12 @@
 
 ; The "foo" in `foo.bar`.
 (member_expression
-  object: (identifier) @support.object.other.js)
+  object: (identifier) @support.other.object.js)
 
 ; The "bar" in `foo.bar.baz`.
 (member_expression
   object: (member_expression
-    property: (property_identifier) @support.object.other.js))
+    property: (property_identifier) @support.other.property.js))
 
 ; The "foo" in `{ foo: true }`.
 (pair
@@ -275,6 +372,18 @@
 (object
   (shorthand_property_identifier) @entity.other.attribute-name.shorthand.js)
 
+
+; FUNCTION CALLS
+; ==============
+
+; An invocation of any function.
+(call_expression
+  function: (identifier) @support.other.function.js)
+
+; An invocation of any method.
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @support.other.function.method.js))
 
 ; CLASSES
 ; =======
@@ -292,12 +401,9 @@
   "extends" @storage.modifier.extends.js
   (identifier) @entity.other.inherited-class.js)
 
-; The interior of a class body (useful for snippets and commands).
-(class_body) @meta.class.body
-
 ; The "Foo" in `new Foo()`.
 (new_expression
-  constructor: (_) @support.class.instance.js)
+  constructor: (identifier) @support.other.class.instance.js)
 
 ; A class getter:
 ; the "get" in `get foo () {...`
@@ -494,7 +600,7 @@
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
   name: (identifier) @entity.name.tag.js
-  ) @meta.tag.js.jsx
+  ) @meta.tag.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
@@ -508,10 +614,10 @@
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
-  (property_identifier) @entity.other.attribute-name.js.jsx)
+  (property_identifier) @entity.other.attribute-name.js)
 
 ; All JSX expressions/interpolations within braces.
-(jsx_expression) @meta.embedded.js.jsx
+(jsx_expression) @meta.embedded.js
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
@@ -522,7 +628,7 @@
   ">" @punctuation.definition.tag.end.js)
 
 (jsx_self_closing_element
-  "<" @punctuation.definition.tag.begin.js.jsx
+  "<" @punctuation.definition.tag.begin.js
   (#set! final true))
 
 ((jsx_self_closing_element
@@ -608,17 +714,73 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.definition.begin.brace.curly.js
-"}" @punctuation.definition.end.brace.curly.js
-"(" @punctuation.definition.begin.brace.round.js
-")" @punctuation.definition.end.brace.round.js
-"[" @punctuation.definition.begin.brace.square.js
-"]" @punctuation.definition.end.brace.square.js
+(formal_parameters
+  "(" @punctuation.definition.parameters.begin.bracket.round.js
+  ")"@punctuation.definition.parameters.end.bracket.round.js
+  (#set! final true))
+
+(object
+  "{" @punctuation.definition.object.begin.bracket.curly.js
+  "}" @punctuation.definition.object.end.bracket.curly.js
+  (#set! final true))
+
+(arguments
+  "(" @punctuation.definition.arguments.begin.bracket.round.js
+  ")" @punctuation.definition.arguments.end.bracket.round.js
+  (#set! final true))
+
+(computed_property_name
+  "[" @punctuation.definition.computed-property.begin.bracket.square.js
+  "]" @punctuation.definition.computed-property.end.bracket.square.js
+  (#set! final true))
+
+(subscript_expression
+  "[" @punctuation.definition.subscript.begin.bracket.square.js
+  "]" @punctuation.definition.subscript.end.bracket.square.js
+  (#set! final true))
+
+(array
+  "[" @punctuation.definition.array.begin.bracket.square.js
+  "]" @punctuation.definition.array.end.bracket.square.js
+  (#set! final true))
+
+(array_pattern
+  "[" @punctuation.definition.array.begin.bracket.square.js
+  "]" @punctuation.definition.array.end.bracket.square.js
+  (#set! final true))
+
+"{" @punctuation.definition.block.begin.bracket.curly.js
+"}" @punctuation.definition.block.end.bracket.curly.js
+"(" @punctuation.definition.begin.bracket.round.js
+")" @punctuation.definition.end.bracket.round.js
+"[" @punctuation.definition.begin.bracket.square.js
+"]" @punctuation.definition.end.bracket.square.js
+
+(array
+  "," @punctuation.separator.array.comma.js
+  (#set! final true))
+
+(array_pattern
+  "," @punctuation.separator.array.comma.js
+  (#set! final true))
+
+(pair
+  ":" @punctuation.separator.key-value.colon.js
+  (#set! final true))
 
 ";" @punctuation.terminator.statement.js
 "," @punctuation.separator.comma.js
 ":" @punctuation.separator.colon.js
 
+; META
+; ====
+
+(statement_block) @meta.block.js
+
+; The interior of a class body (useful for snippets and commands).
+(class_body) @meta.block.class.js
+
+(formal_parameters) @meta.parameters.js
 
 ; MISC
 ; ====

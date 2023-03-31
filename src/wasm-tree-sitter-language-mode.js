@@ -119,16 +119,7 @@ const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
 
 const VAR_ID = 257;
-// const conversions = new Map([
-//   ['function.method.builtin', 'keyword.other.special-method'],
-//   ['number', 'constant.numeric'],
-//   // 'punctuation.special':
-//   // 'punctuation.bracket':
-//   // 'string':
-//   // 'embedded':
-//   // 'punctuation.bracket':
-//   ['string.special.regex', 'string.regexp']
-// ])
+
 class WASMTreeSitterLanguageMode {
   constructor({ buffer, grammar, config, grammars }) {
     this.lastId = 259;

@@ -174,11 +174,11 @@
 ; The "foo" in `thing->troz->foo(...)`.
 (call_expression
   (field_expression
-    field: (field_identifier) @support.function.other.c)
+    field: (field_identifier) @support.other.function.c)
     (#set! final true))
 
 (call_expression
-  (identifier) @support.function.other.c
+  (identifier) @support.other.function.c
   (#set! final true))
 
 ; NUMBERS
@@ -295,12 +295,28 @@
 "," @punctuation.separator.comma.c
 "->" @punctuation.separator.pointer-access.c
 
-"{" @punctuation.definition.begin.brace.curly.c
-"}" @punctuation.definition.end.brace.curly.c
-"(" @punctuation.definition.begin.brace.round.c
-")" @punctuation.definition.end.brace.round.c
-"[" @punctuation.definition.begin.brace.square.c
-"]" @punctuation.definition.end.brace.square.c
+(parameter_list
+  "(" @punctuation.definition.parameters.begin.bracket.round.c
+  ")" @punctuation.definition.parameters.end.bracket.round.c
+  (#set! final true))
+
+(parenthesized_expression
+  "(" @punctuation.definition.expression.begin.bracket.round.c
+  ")" @punctuation.definition.expression.end.bracket.round.c
+  (#set! final true))
+
+(if_statement
+  condition: (parenthesized_expression
+    "(" @punctuation.definition.expression.begin.bracket.round.c
+    ")" @punctuation.definition.expression.end.bracket.round.c
+    (#set! final true)))
+
+"{" @punctuation.definition.block.begin.bracket.curly.c
+"}" @punctuation.definition.block.end.bracket.curly.c
+"(" @punctuation.definition.begin.bracket.round.c
+")" @punctuation.definition.end.bracket.round.c
+"[" @punctuation.definition.array.begin.bracket.square.c
+"]" @punctuation.definition.array.end.bracket.square.c
 
 ; TODO:
 ;

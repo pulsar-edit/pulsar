@@ -26,13 +26,21 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.definition.begin.brace.curly.json
-"}" @punctuation.definition.end.brace.curly.json
-"[" @punctuation.definition.begin.brace.square.json
-"]" @punctuation.definition.end.brace.square.json
+"{" @punctuation.definition.object.begin.bracket.curly.json
+"}" @punctuation.definition.object.end.bracket.curly.json
+"[" @punctuation.definition.array.begin.bracket.square.json
+"]" @punctuation.definition.array.end.bracket.square.json
+
+(object
+  "," @punctuation.separator.object.comma.json
+  (#set! final true))
+
+(array
+  "," @punctuation.separator.array.comma.json
+  (#set! final true))
 
 "," @punctuation.separator.comma.json
-":" @punctuation.separator.colon.json
+":" @punctuation.separator.key-value.colon.json
 
 ; ERROR HANDLING
 ; ==============

@@ -32,36 +32,36 @@
 ; -----------
 
 ; Wrap the "foo" and "!" of `foo!()`.
-((macro_invocation) @support.function.other.rust
+((macro_invocation) @support.other.function.rust
   (#set! endAt firstChild.nextSibling.endPosition))
 
 (call_expression
-  function: (identifier) @support.function.other.rust)
+  function: (identifier) @support.other.function.rust)
 
 (call_expression
   (scoped_identifier
-    name: (_) @support.function.other.rust))
+    name: (_) @support.other.function.rust))
 
 
 (call_expression
   function: (field_expression
-    field: (field_identifier) @support.function.other.method.rust))
+    field: (field_identifier) @support.other.function.method.rust))
 
 (call_expression
   function: (scoped_identifier
     "::"
-    name: (identifier) @support.function.other.rust))
+    name: (identifier) @support.other.function.rust))
 
 (generic_function
-  function: (identifier) @support.function.other.generic.rust)
+  function: (identifier) @support.other.function.generic.rust)
 
 (generic_function
   function: (scoped_identifier
-    name: (identifier) @support.function.other.generic.rust))
+    name: (identifier) @support.other.function.generic.rust))
 
 (generic_function
   function: (field_expression
-    field: (field_identifier) @support.function.other.method.rust))
+    field: (field_identifier) @support.other.function.method.rust))
 
 ; TYPES
 ; ======
@@ -248,12 +248,12 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.definition.begin.brace.curly.rust
-"}" @punctuation.definition.end.brace.curly.rust
-"(" @punctuation.definition.begin.brace.round.rust
-")" @punctuation.definition.end.brace.round.rust
-"[" @punctuation.definition.begin.brace.square.rust
-"]" @punctuation.definition.end.brace.square.rust
+"{" @punctuation.definition.begin.bracket.curly.rust
+"}" @punctuation.definition.end.bracket.curly.rust
+"(" @punctuation.definition.begin.bracket.round.rust
+")" @punctuation.definition.end.bracket.round.rust
+"[" @punctuation.definition.begin.bracket.square.rust
+"]" @punctuation.definition.end.bracket.square.rust
 
 ":" @punctuation.separator.colon.rust
 
