@@ -22,6 +22,8 @@ const NORMALIZE_PACKAGE_DATA_README_ERROR = 'ERROR: No README data found!'
 export default class PackageDetailView {
   constructor (pack, settingsView, packageManager, snippetsProvider) {
     this.pack = pack
+    this.packMetaData = pack.metadata
+    this.packMetaData.badges = pack.badges
     this.settingsView = settingsView
     this.packageManager = packageManager
     this.snippetsProvider = snippetsProvider
@@ -108,7 +110,7 @@ export default class PackageDetailView {
     if (this.refs.packageCard) {
       this.packageCard = this.refs.packageCard.packageCard
     } else if (!this.packageCard) { // Had to load this from the network
-      this.packageCard = new PackageCard(this.pack.metadata, this.settingsView, this.packageManager, {onSettingsView: true})
+      this.packageCard = new PackageCard(this.packMetaData, this.settingsView, this.packageManager, {onSettingsView: true})
       this.refs.packageCardParent.replaceChild(this.packageCard.element, this.refs.loadingMessage)
     }
 
