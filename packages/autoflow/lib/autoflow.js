@@ -1,11 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
 const _ = require('underscore-plus');
 
 const CharacterPattern = new RegExp(`\
@@ -16,9 +8,9 @@ const CharacterPattern = new RegExp(`\
 
 module.exports = {
   activate() {
-    return this.commandDisposable = atom.commands.add('atom-text-editor', {
+    this.commandDisposable = atom.commands.add('atom-text-editor', {
       'autoflow:reflow-selection': event => {
-        return this.reflowSelection(event.currentTarget.getModel());
+        this.reflowSelection(event.currentTarget.getModel());
       }
     }
     );
@@ -28,7 +20,7 @@ module.exports = {
     if (this.commandDisposable != null) {
       this.commandDisposable.dispose();
     }
-    return this.commandDisposable = null;
+    this.commandDisposable = null;
   },
 
   reflowSelection(editor) {
@@ -71,7 +63,7 @@ module.exports = {
       tabLengthInSpaces = '';
     }
 
-    for (let block of Array.from(paragraphBlocks)) {
+    for (let block of paragraphBlocks) {
       let blockLines = block.split('\n');
 
       // For LaTeX tags surrounding the text, we simply ignore them, and
@@ -112,7 +104,7 @@ module.exports = {
       }
 
       if (linePrefix) {
-        var escapedLinePrefix = _.escapeRegExp(linePrefix);
+        let escapedLinePrefix = _.escapeRegExp(linePrefix);
         blockLines = blockLines.map(blockLine => blockLine.replace(new RegExp(`^${escapedLinePrefix}`), ''));
       }
 
@@ -127,7 +119,7 @@ module.exports = {
         .replace(/^(\s*)-(?!-)/, '$1 ');
 
       let firstLine = true;
-      for (let segment of Array.from(this.segmentText(blockLines.join(' ')))) {
+      for (let segment of this.segmentText(blockLines.join(' '))) {
         if (this.wrapSegment(segment, currentLineLength, wrapColumn)) {
 
           // Independent of line prefix don't mess with it on the first line
