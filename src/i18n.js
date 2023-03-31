@@ -118,9 +118,6 @@ class I18n {
    * @return undefined if the language or string cannot be found,
    *   and throws an error if the path isn't right.
    */
-  // TODO could be improved: nove string fetching logic into fetch function
-  // so the fetch function takes a langobj and a path, and we can then delegate
-  // that to the cache too (don't fetch the string if theres already something in the cache)
   tSingleLanguage(lang, _path, opts) {
     let path = [..._path];
 
