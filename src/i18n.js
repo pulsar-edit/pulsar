@@ -1,4 +1,3 @@
-const { CompositeDisposable } = require('atom');
 const { splitKeyPath } = require("key-path-helpers");
 const fs = require("fs-plus");
 const path = require("path");
