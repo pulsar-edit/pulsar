@@ -5,10 +5,10 @@
       { localisedLabel: 'core.menu.pulsar.about', command: 'application:about' }
       { localisedLabel: 'core.menu.pulsar.view-license', command: 'application:open-license' }
       { localisedLabel: 'core.menu.pulsar.version', enabled: false }
-      { localisedLabel: 'core.menu.pulsar.restart-and-install-update', command: 'application:install-update', visible: false}
-      { localisedLabel: 'core.menu.pulsar.check-for-update', command: 'application:check-for-update', visible: false}
-      { localisedLabel: 'core.menu.pulsar.checking-for-update', enabled: false, visible: false}
-      { localisedLabel: 'core.menu.pulsar.downloading-update', enabled: false, visible: false}
+      { localisedLabel: 'core.menu.pulsar.restart-and-install-update', command: 'application:install-update', visible: false }
+      { localisedLabel: 'core.menu.pulsar.check-for-update', command: 'application:check-for-update', visible: false }
+      { localisedLabel: 'core.menu.pulsar.checking-for-update', enabled: false, visible: false }
+      { localisedLabel: 'core.menu.pulsar.downloading-update', enabled: false, visible: false }
       { type: 'separator' }
       { localisedLabel: 'core.menu.pulsar.preferences', command: 'application:show-settings' }
       { type: 'separator' }
@@ -172,8 +172,8 @@
     submenu: [
       { localisedLabel: 'core.menu.selection.add-above', command: 'editor:add-selection-above' }
       { localisedLabel: 'core.menu.selection.add-below', command: 'editor:add-selection-below' }
-      { localisedLabel: 'core.menu.selection.single', command: 'editor:consolidate-selections'}
-      { localisedLabel: 'core.menu.selection.split-into-lines', command: 'editor:split-selections-into-lines'}
+      { localisedLabel: 'core.menu.selection.single', command: 'editor:consolidate-selections' }
+      { localisedLabel: 'core.menu.selection.split-into-lines', command: 'editor:split-selections-into-lines' }
       { type: 'separator' }
       { localisedLabel: 'core.menu.selection.to-top', command: 'core:select-to-top' }
       { localisedLabel: 'core.menu.selection.to-bottom', command: 'core:select-to-bottom' }
