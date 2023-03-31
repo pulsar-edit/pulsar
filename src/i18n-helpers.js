@@ -2,7 +2,10 @@ const { parse } = require("@formatjs/icu-messageformat-parser");
 
 class I18nCacheHelper {
   constructor() {
-    /** cachedASTs[ns][lang] = string objs */
+    /**
+     * cachedASTs[ns][lang] = string objs
+     * (same shape as registeredStrings but with ASTs instead of strings)
+     */
     this.cachedASTs = {};
   }
 
@@ -13,7 +16,7 @@ class I18nCacheHelper {
       this.cachedASTs,
       path
     );
-    if (ast) return ast;
+    if (ast) return ast.ast;
 
     ast = parse(str, {
       // requiresOtherClause
@@ -21,9 +24,50 @@ class I18nCacheHelper {
 
     let lastBit = path.pop();
     let cachePath = travelDownOrMakePath(this.cachedASTs, path);
-    cachePath[lastBit] = ast;
+    cachePath[lastBit] = new AST(ast);
 
     return ast;
+  }
+
+  /**
+   * go through `this.cachedASTs`, find stuff that doesn't exist in `registeredStrings`,
+   * then yeet them
+   */
+  cleanCaches(registeredStrings, cachedASTs) {
+    if (!cachedASTs) cachedASTs = this.cachedASTs;
+
+    Object.entries(cachedASTs).forEach(([k, cachedValue]) => {
+      let registeredValue = registeredStrings[k];
+
+      // path doesn't exist
+      if (!registeredValue) return delete cachedASTs[k];
+
+      // path is an object
+      if (typeof registeredValue === "object") {
+        // cached is not AST (plain obj) (good)
+        if (
+          typeof cachedValue === "object"
+          && !(cachedValue instanceof AST)
+        ) return this.cleanCaches(registeredValue, cachedValue);
+        // cached is AST (bad)
+        return delete cachedASTs[k];
+      }
+
+      // path is a string
+      if (typeof registeredValue === "string") {
+        // cached is AST (good)
+        if (cachedValue instanceof AST) return;
+        // cached is not AST (bad)
+        return delete cachedASTs[k];
+      }
+    });
+  }
+}
+
+/** wrapper class, helps to ID ASTs as ASTs */
+class AST {
+  constructor(ast) {
+    this.ast = ast;
   }
 }
 
