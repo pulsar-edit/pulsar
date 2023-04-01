@@ -6,7 +6,8 @@ const {
   I18nCacheHelper,
   walkStrings,
   travelDownObjectPath,
-  optionalTravelDownObjectPath
+  optionalTravelDownObjectPath,
+  travelDownOrMakePath
 } = require("./i18n-helpers");
 
 class I18n {
@@ -215,9 +216,18 @@ class I18n {
    * formats a string with opts,
    * and caches the message formatter for the provided path.
    */
-  format(ns, path, str, lang, opts) {
-    let ast = this.cacheHelper.fetchAST(ns, path, str, lang);
+  format(ns, _path, str, lang, opts) {
+    let path = [ns, lang, ..._path];
+
+    let cachedFormatter = optionalTravelDownObjectPath(this.cachedFormatters, path);
+    if (cachedFormatter) return cachedFormatter.format(opts);
+
+    let ast = this.cacheHelper.fetchAST(ns, _path, str, lang);
     let formatter = new IntlMessageFormat(ast, lang);
+
+    let last = path.pop();
+    let cachePath = travelDownOrMakePath(this.cachedFormatters, path);
+    cachePath[last] = formatter;
     return formatter.format(opts);
   }
 }
