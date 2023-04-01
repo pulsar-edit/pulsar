@@ -28,6 +28,8 @@
       "new-window": "New Window",
       "new-file": "New File",
       "open": "Open...",
+      "open-file": "Open File...",
+      "open-folder": "Open Folder...",
       "add-project-folder": "Add Project Folder",
       "project-history": {
         "reopen-project": "Reopen Project",
@@ -98,6 +100,7 @@
     "view": {
       "self": "View",
       "toggle-full-screen": "Toggle Full Screen",
+      "toggle-menu-bar": "Toggle Menu Bar",
       "panes": {
         "self": "Panes",
         "split-up": "Split Up",

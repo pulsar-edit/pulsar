@@ -37,7 +37,7 @@
       { localisedLabel: 'core.menu.file.open', command: 'application:open' }
       { localisedLabel: 'core.menu.file.add-project-folder', command: 'application:add-project-folder' }
       {
-        localisedLabel: 'core.menu.file.project-history.reopen-project',
+        localisedLabel: 'core.menu.file.project-history.reopen-project'
         submenu: [
           { localisedLabel: 'core.menu.file.project-history.clear', command: 'application:clear-project-history' }
           { type: 'separator' }
@@ -84,14 +84,14 @@
         ]
       }
       {
-        localisedLabel: 'core.menu.edit.columns.self',
+        localisedLabel: 'core.menu.edit.columns.self'
         submenu: [
           { localisedLabel: 'core.menu.edit.columns.move-selection-left', command: 'editor:move-selection-left' }
           { localisedLabel: 'core.menu.edit.columns.move-selection-right', command: 'editor:move-selection-right' }
         ]
       }
       {
-        localisedLabel: 'core.menu.edit.text.self',
+        localisedLabel: 'core.menu.edit.text.self'
         submenu: [
           { localisedLabel: 'core.menu.edit.text.upper-case', command: 'editor:upper-case' }
           { localisedLabel: 'core.menu.edit.text.lower-case', command: 'editor:lower-case' }
@@ -105,7 +105,7 @@
         ]
       }
       {
-        localisedLabel: 'core.menu.edit.folding.self',
+        localisedLabel: 'core.menu.edit.folding.self'
         submenu: [
           { localisedLabel: 'core.menu.edit.folding.fold', command: 'editor:fold-current-row' }
           { localisedLabel: 'core.menu.edit.folding.unfold', command: 'editor:unfold-current-row' }
@@ -138,8 +138,8 @@
           { localisedLabel: 'core.menu.view.panes.split-left', command: 'pane:split-left-and-copy-active-item' }
           { localisedLabel: 'core.menu.view.panes.split-right', command: 'pane:split-right-and-copy-active-item' }
           { type: 'separator' }
-          { localisedLabel: 'core.menu.view.panes.focus-next    Focus Next Pane', command: 'window:focus-next-pane' }
-          { localisedLabel: 'core.menu.view.panes.focus-previous    Focus Previous Pane', command: 'window:focus-previous-pane' }
+          { localisedLabel: 'core.menu.view.panes.focus-next', command: 'window:focus-next-pane' }
+          { localisedLabel: 'core.menu.view.panes.focus-previous', command: 'window:focus-previous-pane' }
           { type: 'separator' }
           { localisedLabel: 'core.menu.view.panes.focus-above', command: 'window:focus-pane-above' }
           { localisedLabel: 'core.menu.view.panes.focus-below', command: 'window:focus-pane-below' }
