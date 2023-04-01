@@ -41,16 +41,33 @@ class I18n {
     const dirpath = path.join(resourcePath, "i18n");
     const dircontents = fs.readdirSync(dirpath);
 
-    this.config.setSchema("core.languageSettings.primaryLanguage", {
-      type: "string",
-      order: 1,
-      default: "en",
-      enum: dircontents.filter(p => p.endsWith(ext))
-        .map(p => p.substring(0, p.length - extlen))
-        .map(p => ({
-          value: p,
-          description: `${new Intl.DisplayNames(p, { type: "language" }).of(p)} (${p})`
-        }))
+    this.config.setSchema("core.languageSettings", {
+      type: "object",
+      description: "These settings currently require a full restart of Pulsar to take effect.",
+      properties: {
+        primaryLanguage: {
+          type: "string",
+          order: 1,
+          default: "en",
+          enum: dircontents.filter(p => p.endsWith(ext))
+            .map(p => p.substring(0, p.length - extlen))
+            .map(p => ({
+              value: p,
+              description: `${new Intl.DisplayNames(p, { type: "language" }).of(p)} (${p})`
+            }))
+        },
+        fallbackLanguages: {
+          type: "array",
+          order: 2,
+          description: "List of fallback languages, if something can't be found in the primary language. Note; `en` is always the last fallback language, to ensure that things at least show up.",
+          default: [],
+          items: {
+            // Array enum is meh, if you pause for the briefest moment and you
+            // didn't stop at a valid enum value, the entry you just typed gets yeeted
+            type: "string"
+          }
+        }
+      }
     });
 
     this.updateConfigs();
