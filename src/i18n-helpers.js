@@ -140,5 +140,6 @@ module.exports = {
   I18nCacheHelper,
   walkStrings,
   travelDownObjectPath,
-  optionalTravelDownObjectPath
+  optionalTravelDownObjectPath,
+  travelDownOrMakePath
 };
