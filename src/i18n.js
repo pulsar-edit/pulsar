@@ -100,10 +100,11 @@ class I18n {
   }
 
   registerStrings(packageId, strings) {
+    if (!this.registeredStrings[packageId]) this.registeredStrings[packageId] = {};
+
     walkStrings(strings, (path, string, isString) => {
       let last = path.pop();
 
-      if (!this.registeredStrings[packageId]) this.registeredStrings[packageId] = {};
       let obj = travelDownObjectPath(this.registeredStrings[packageId], path);
 
       if (isString) {
