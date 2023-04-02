@@ -51,7 +51,7 @@ let cConfig = CSON.readFileSync(cGrammarPath);
 let rubyConfig = CSON.readFileSync(rubyGrammarPath);
 let htmlConfig = CSON.readFileSync(htmlGrammarPath);
 
-function wait (ms) {
+function wait(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -794,7 +794,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('updates buffers highlighting when a grammar with injectionRegExp is added', async () => {
+      it('updates a buffer\'s highlighting when a grammar with injectionRegex is added', async () => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
 
@@ -1210,6 +1210,158 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: '();', scopes: [] }
           ]
         ]);
+      });
+
+      it('omits the injected grammar\'s base scope when `languageScope` is `null`', async () => {
+
+        let customJsConfig = { ...jsConfig };
+        let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
+
+        await jsGrammar.setQueryForTest('syntaxQuery', `
+          (comment) @comment
+          (property_identifier) @property
+          (call_expression (identifier) @function)
+          (template_string) @string
+          (template_substitution
+            ["\${" "}"] @interpolation)
+        `);
+
+        let customHtmlConfig = { ...htmlConfig };
+        let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
+
+        await htmlGrammar.setQueryForTest('syntaxQuery', `
+          (fragment) @html
+          (tag_name) @tag
+          (attribute_name) @attr
+        `);
+
+        customHtmlGrammar.addInjectionPoint({
+          ...SCRIPT_TAG_INJECTION_POINT,
+          languageScope: null
+        });
+
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(customJsGrammar);
+        atom.grammars.addGrammar(customHtmlGrammar);
+        buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: customHtmlGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        let descriptor = languageMode.scopeDescriptorForPosition([1, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(false);
+      });
+
+      it('uses a custom base scope on the injected layer when `languageScope` is a string', async () => {
+
+        let customJsConfig = { ...jsConfig };
+        let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
+
+        await jsGrammar.setQueryForTest('syntaxQuery', `
+          (comment) @comment
+          (property_identifier) @property
+          (call_expression (identifier) @function)
+          (template_string) @string
+          (template_substitution
+            ["\${" "}"] @interpolation)
+        `);
+
+        let customHtmlConfig = { ...htmlConfig };
+        let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
+
+        await htmlGrammar.setQueryForTest('syntaxQuery', `
+          (fragment) @html
+          (tag_name) @tag
+          (attribute_name) @attr
+        `);
+
+        customHtmlGrammar.addInjectionPoint({
+          ...SCRIPT_TAG_INJECTION_POINT,
+          languageScope: 'source.js.embedded'
+        });
+
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(customJsGrammar);
+        atom.grammars.addGrammar(customHtmlGrammar);
+        buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: customHtmlGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        let descriptor = languageMode.scopeDescriptorForPosition([1, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(false);
+        expect(
+          descriptor.getScopesArray().includes('source.js.embedded')
+        ).toBe(true);
+      });
+
+      it('uses a custom base scope on the injected layer when `languageScope` is a function', async () => {
+
+        let customJsConfig = { ...jsConfig };
+        let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
+
+        await jsGrammar.setQueryForTest('syntaxQuery', `
+          (comment) @comment
+          (property_identifier) @property
+          (call_expression (identifier) @function)
+          (template_string) @string
+          (template_substitution
+            ["\${" "}"] @interpolation)
+        `);
+
+        let customHtmlConfig = { ...htmlConfig };
+        let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
+
+        await htmlGrammar.setQueryForTest('syntaxQuery', `
+          (fragment) @html
+          (tag_name) @tag
+          (attribute_name) @attr
+        `);
+
+        let timestamp = Date.now();
+
+        customHtmlGrammar.addInjectionPoint({
+          ...SCRIPT_TAG_INJECTION_POINT,
+          languageScope: (grammar) => `${grammar.scopeName}.custom-${timestamp}`
+        });
+
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(customJsGrammar);
+        atom.grammars.addGrammar(customHtmlGrammar);
+        buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: customHtmlGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        let descriptor = languageMode.scopeDescriptorForPosition([1, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(false);
+        expect(
+          descriptor.getScopesArray().includes(`source.js.custom-${timestamp}`)
+        ).toBe(true);
       });
 
       it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async () => {
