@@ -126,6 +126,11 @@ class AtomEnvironment {
     /** @type {StyleManager} */
     this.styles = new StyleManager();
 
+    this.i18n = new I18n({
+      notificationManager: this.notifications,
+      config: this.config
+    });
+
     /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
@@ -136,7 +141,8 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       deserializerManager: this.deserializers,
       viewRegistry: this.views,
-      uriHandlerRegistry: this.uriHandlerRegistry
+      uriHandlerRegistry: this.uriHandlerRegistry,
+      i18n: this.i18n
     });
 
     /** @type {ThemeManager} */
@@ -146,11 +152,6 @@ class AtomEnvironment {
       styleManager: this.styles,
       notificationManager: this.notifications,
       viewRegistry: this.views
-    });
-
-    this.i18n = new I18n({
-      notificationManager: this.notifications,
-      config: this.config
     });
 
     /** @type {MenuManager} */
