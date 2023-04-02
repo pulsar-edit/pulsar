@@ -1,4 +1,5 @@
 const { Point } = require('text-buffer');
+const ScopeDescriptor = require('./scope-descriptor');
 
 // TODO: These utility functions are duplicated between this file and
 // `wasm-tree-sitter-language-mode.js`. Eventually they might need to be moved
@@ -44,6 +45,13 @@ function resolveNodePosition (node, descriptor) {
   return result[lastPart];
 }
 
+function interpretValue (value) {
+  if (value === "true") { return true; }
+  if (value === "false") { return false; }
+  if (/^\d+$/.test(value)) { return Number(value); }
+  return value;
+}
+
 // A data structure for storing scope information while processing capture
 // data. The data is reset in between each task.
 //
@@ -59,10 +67,13 @@ class ScopeResolver {
   constructor(languageLayer, idForScope) {
     this.languageLayer = languageLayer;
     this.buffer = languageLayer.buffer;
+    this.config = languageLayer.languageMode.config;
+    this.grammar = languageLayer.grammar;
     this.idForScope = idForScope ?? (x => x);
     this.map = new Map;
     this.rangeData = new Map;
     this.patternCache = new Map;
+    this.configCache = new Map;
   }
 
   getOrCompilePattern(pattern) {
@@ -72,6 +83,17 @@ class ScopeResolver {
       this.patternCache.set(pattern, regex);
     }
     return regex;
+  }
+
+  getConfig(key) {
+    if (this.configCache.has(key)) {
+      return this.configCache.get(key);
+    }
+    let value = this.config.get(key, {
+      scope: new ScopeDescriptor({ scopes: [this.grammar.scopeName] })
+    });
+    this.configCache.set(key, value);
+    return value;
   }
 
   indexToPosition(index) {
@@ -324,10 +346,10 @@ ScopeResolver.interpolateName = (name, node) => {
 // kinds of queries may or may not, depending on purpse.
 //
 ScopeResolver.TESTS = {
-  // Passes only if another node has not already declared `final` for the exact
-  // same range. If a capture is the first one to define `final`, then all
-  // other captures for that same range are ignored, whether they try to define
-  // `final` or not.
+  // Passes only if another capture has not already declared `final` for the
+  // exact same range. If a capture is the first one to define `final`, then
+  // all other captures for that same range are ignored, whether they try to
+  // define `final` or not.
   final (node, value, props, existingData) {
     return !(existingData && existingData.final);
   },
@@ -337,18 +359,35 @@ ScopeResolver.TESTS = {
     return existingData === undefined;
   },
 
-  // Passes only if this is an ERROR node.
-  onlyIfError(node) {
-    return node.type === 'ERROR';
+  // Passes only if the node is of the given type.
+  onlyIfType(node, nodeType) {
+    return node.type === nodeType;
   },
 
+  // Negates `onlyIfType`.
+  onlyIfNotType(node, nodeType) {
+    return node.type !== nodeType;
+  },
+
+  // Passes only if the node contains any descendant ERROR nodes.
   onlyIfHasError(node) {
     return node.hasError();
   },
 
-  // Passes when the node is part of a tree that belongs to an injection layer.
+  // Negats `onlyIfHasError`.
+  onlyIfNotHasError(node) {
+    return !node.hasError();
+  },
+
+  // Passes when the node's tree belongs to an injection layer, rather than the
+  // buffer's root language layer.
   onlyIfInjection(node, value, props, existingData, instance) {
     return instance.languageLayer.depth > 0;
+  },
+
+  // Negates `onlyIfInjection`.
+  onlyIfNotInjection(node, value, props, existingData, instance) {
+    return instance.languageLayer.depth === 0;
   },
 
   // Passes when the node has no parent.
@@ -356,64 +395,91 @@ ScopeResolver.TESTS = {
     return !node.parent;
   },
 
+  // Negates `onlyIfRoot`.
+  onlyIfNotRoot(node) {
+    return !!node.parent;
+  },
+
   // Passes only if the given node is the first among its siblings.
+  //
+  // Is not guaranteed to pass if descended from an ERROR node.
   onlyIfFirst(node) {
-    if (!node.parent) {
-      // Root nodes are always first.
-      return true;
-    }
+    // Root nodes are always first.
+    if (!node.parent) { return true; }
+
     // We're really paranoid on these because if the parse tree is in an error
     // state, weird things can happen, like a node's parent not having a
     // `firstChild`.
     return node?.parent?.firstChild?.id === node.id;
   },
 
-  // Passes only if the given node is not the first among its siblings.
+  // Negates `onlyIfFirst`.
   onlyIfNotFirst(node) {
     if (!node.parent) { return false; }
-
     return node?.parent?.firstChild?.id !== node.id;
   },
 
   // Passes only if the given node is the last among its siblings.
+  //
+  // Is not guaranteed to pass if descended from an ERROR node.
   onlyIfLast (node) {
-    if (!node.parent) {
-      // Root nodes are always last.
-      return true;
-    }
+    // Root nodes are always last.
+    if (!node.parent) { return true; }
     return node?.parent?.lastChild?.id === node.id;
   },
 
-  // Passes only if the given node is not the last among its siblings.
+  // Negates `onlyIfLast`.
   onlyIfNotLast (node) {
     if (!node.parent) { return false; }
-
     return node?.parent?.lastChild?.id !== node.id;
   },
 
   // Passes when the node is the first of its type among its siblings.
+  //
+  // Is not guaranteed to pass if descended from an ERROR node.
   onlyIfFirstOfType(node) {
     if (!node.parent) { return true; }
     let type = node.type;
     let parent = node.parent;
+    // Lots of optional chaining here to guard against weird states inside ERROR
+    // nodes.
+    if ((parent?.childCount ?? 0) === 0) { return false; }
     for (let i = 0; i < parent.childCount; i++) {
-      let child = parent.child(i);
-      if (child.id === node.id) { return true; }
-      else if (child.type === type) { return false; }
+      let child = parent?.child(i);
+      if (!child) { continue; }
+      if (child?.id === node.id) { return true; }
+      else if (child?.type === type) { return false; }
     }
     return false;
   },
 
+  // Negates `onlyIfFirstOfType`.
+  onlyIfNotFirstOfType(node) {
+    let onlyIfFirstOfType = ScopeResolver.TESTS.onlyIfFirstOfType(node);
+    return !onlyIfFirstOfType;
+  },
+
   // Passes when the node is the last of its type among its siblings.
+  //
+  // Is not guaranteed to pass if descended from an ERROR node.
   onlyIfLastOfType(node) {
     if (!node.parent) { return true; }
     let type = node.type;
     let parent = node.parent;
+    if ((parent?.childCount ?? 0) === 0) { return false; }
     for (let i = parent.childCount - 1; i >= 0; i--) {
-      let child = parent.child(i);
-      if (child.id === node.id) { return true; }
-      else if (child.type === type) { return false; }
+      let child = parent?.child(i);
+      if (!child) { continue; }
+      if (child?.id === node.id) { return true; }
+      else if (child?.type === type) { return false; }
     }
+    return false;
+  },
+
+  // Negates `onlyIfLastOfType`.
+  onlyIfNotLastOfType(node) {
+    let onlyIfLastOfType = ScopeResolver.TESTS.onlyIfLastOfType(node);
+    return !onlyIfLastOfType;
   },
 
   // Passes when the node represents the last non-whitespace content on its row.
@@ -424,7 +490,7 @@ ScopeResolver.TESTS = {
     return !/\S/.test(textAfterNode);
   },
 
-  // Passes when the node is not the last non-whitespace content on its row.
+  // Negates `onlyIfLastTextOnRow`.
   onlyIfNotLastTextOnRow(...args) {
     let isLastTextOnRow = ScopeResolver.TESTS.onlyIfLastTextOnRow(...args);
     return !isLastTextOnRow;
@@ -440,8 +506,7 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Passes if this node does not have a node of the given type in its ancestor
-  // chain.
+  // Negates `onlyIfDescendantOfType`.
   onlyIfNotDescendantOfType(...args) {
     let isDescendantOfType = ScopeResolver.TESTS.onlyIfDescendantOfType(...args);
     return !isDescendantOfType;
@@ -453,23 +518,27 @@ ScopeResolver.TESTS = {
     return descendants.length > 0;
   },
 
-  // Passes if this node has zero descendants of the given type.
+  // Negates `onlyIfAncestorOfType`.
   onlyIfNotAncestorOfType(node, type) {
     let descendants = node.descendantsOfType(type);
     return descendants.length === 0;
   },
 
+  // Passes if this range (after adjustments) has previously had data stored at
+  // the given key.
   onlyIfRangeWithData(node, key, props, existingData) {
     if (existingData === undefined) { return false; }
     return (key in existingData);
   },
 
+  // Negates `onlyIfRangeWithData`.
   onlyIfNotRangeWithData(...args) {
     let isNodeWithData = ScopeResolver.TESTS.onlyIfRangeWithData(...args);
     return !isNodeWithData;
   },
 
-  // Passes if one of this node's ancestors has stored data at a given key.
+  // Passes if one of this node's ancestors has stored data at the given key
+  // for its inherent range (ignoring adjustments).
   onlyIfDescendantOfNodeWithData(node, key, props, existingData, instance) {
     let current = node;
     while (current.parent) {
@@ -481,24 +550,61 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Passes if none of this node's ancestors has stored data at a given key.
+  // Negates `onlyIfDescendantOfNodeWithData`.
   onlyIfNotDescendantOfNodeWithData(...args) {
     let isDescendantOfNodeWithData = ScopeResolver.TESTS.onlyIfDescendantOfNodeWithData(...args);
     return !isDescendantOfNodeWithData;
   },
 
   // Passes if this node starts on the same row as the one in the described
-  // position.
-  onlyIfOnSameRowAs(node, descriptor) {
+  // position. Accepts a node position descriptor.
+  onlyIfStartsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
     return otherNodePosition.row === node.startPosition.row;
   },
 
-  // Passes if this node starts on a different row than the one in the
-  // described position.
-  onlyIfNotOnSameRowAs(node, descriptor) {
+  // Negates `onlyIfStartsOnSameRowAs`.
+  onlyIfNotStartsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
     return otherNodePosition.row !== node.startPosition.row;
+  },
+
+  // Passes if this node ends on the same row as the one in the described
+  // position. Accepts a node position descriptor.
+  onlyIfEndsOnSameRowAs(node, descriptor) {
+    let otherNodePosition = resolveNodePosition(node, descriptor);
+    return otherNodePosition.row === node.endPosition.row;
+  },
+
+  // Negates `onlyIfEndsOnSameRowAs`.
+  onlyIfNotEndsOnSameRowAs(node, descriptor) {
+    let otherNodePosition = resolveNodePosition(node, descriptor);
+    return otherNodePosition.row !== node.endPosition.row;
+  },
+
+  // Passes only when a given config option is present and truthy. Accepts
+  // either (a) a configuration key or (b) a configuration key and value
+  // separated by a space.
+  onlyIfConfig(node, rawValue, props, existingData, instance) {
+    let key, value;
+    if (rawValue.includes(' ')) {
+      let parts = rawValue.split(' ');
+      // Ignore this test if it's invalid.
+      if (parts.length !== 2) { return true; }
+      [key, value] = parts;
+      value = interpretValue(value);
+    } else {
+      key = rawValue;
+      value = null;
+    }
+    let configValue = instance.getConfig(key) ?? false;
+    return value === null ? !!configValue : configValue === value;
+  },
+
+  // Negates `onlyIfConfig`.
+  onlyIfNotConfig(...args) {
+    let onlyIfConfig = ScopeResolver.TESTS.onlyIfConfig(...args);
+    return !onlyIfConfig;
   }
 };
 
