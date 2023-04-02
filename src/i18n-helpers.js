@@ -55,7 +55,10 @@ class I18nCacheHelper {
       let registeredValue = registeredStrings[k];
 
       // path doesn't exist
-      if (!registeredValue) return delete cachedASTs[k];
+      if (!registeredValue) {
+        delete cachedASTs[k];
+        return;
+      }
 
       // path is an object
       if (typeof registeredValue === "object") {
@@ -63,9 +66,13 @@ class I18nCacheHelper {
         if (
           typeof cachedValue === "object"
           && !("_AST" in cachedValue)
-        ) return this.cleanCaches(registeredValue, cachedValue);
+        ) {
+          this.cleanCaches(registeredValue, cachedValue);
+          return;
+        }
         // cached is AST (bad)
-        return delete cachedASTs[k];
+        delete cachedASTs[k];
+        return;
       }
 
       // path is a string
@@ -73,7 +80,8 @@ class I18nCacheHelper {
         // cached is AST (good)
         if ("_AST" in cachedValue) return;
         // cached is not AST (bad)
-        return delete cachedASTs[k];
+        delete cachedASTs[k];
+        return;
       }
     });
   }
