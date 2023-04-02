@@ -96,9 +96,9 @@ function cloneAndLocaliseMenuItem(item, t) {
   );
   if (item.localisedLabel) {
     if (typeof item.localisedLabel === "string") {
-      item.label = t(item.localisedLabel) ?? item.label;
+      item.label = t(item.localisedLabel);
     } else {
-      item.label = t(item.localisedLabel.key, item.localisedLabel.opts) ?? item.label;
+      item.label = t(item.localisedLabel.key, item.localisedLabel.opts);
     }
   }
   if (item.id === null || item.id === undefined) {

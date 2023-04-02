@@ -60,7 +60,7 @@ if (buildMetadata) {
 //
 // See {::add} for more info about adding menu's directly.
 module.exports = MenuManager = class MenuManager {
-  constructor({i18n, keymapManager, packageManager}) {
+  constructor({ i18n, keymapManager, packageManager }) {
     this.i18n = i18n;
     this.keymapManager = keymapManager;
     this.packageManager = packageManager;
@@ -241,8 +241,8 @@ module.exports = MenuManager = class MenuManager {
   }
 
   sortPackagesMenu() {
-    // TODO this needs to be fixed to support localised labels
-    const packagesMenu = _.find(this.template, ({id}) => MenuHelpers.normalizeLabel(id) === 'Packages');
+    let packagesLabel = this.i18n.t("core.menu.packages.self");
+    const packagesMenu = _.find(this.template, ({id}) => MenuHelpers.normalizeLabel(id) === packagesLabel);
     if (!(packagesMenu && packagesMenu.submenu != null)) {
       return;
     }

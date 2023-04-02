@@ -158,7 +158,7 @@ class AtomEnvironment {
     this.menu = new MenuManager({
       i18n: this.i18n,
       keymapManager: this.keymaps,
-      packageManager: this.packages,
+      packageManager: this.packages
     });
 
     /** @type {ContextMenuManager} */

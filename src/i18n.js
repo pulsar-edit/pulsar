@@ -11,11 +11,6 @@ const {
 } = require("./i18n-helpers");
 
 class I18n {
-  /**
-   * @param {{
-   *   notificationManager: import("./notification-manager");
-   * }}
-   */
   constructor({ notificationManager, config }) {
     this.notificationManager = notificationManager;
     this.config = config;
@@ -23,7 +18,6 @@ class I18n {
 
     /** registeredStrings[ns][lang] = string objs */
     this.registeredStrings = { core: {} };
-
     this.cachedFormatters = {};
   }
 
@@ -41,6 +35,13 @@ class I18n {
     const dirpath = path.join(resourcePath, "i18n");
     const dircontents = fs.readdirSync(dirpath);
 
+    let languageTypes = dircontents.filter(p => p.endsWith(ext))
+      .map(p => p.substring(0, p.length - extlen))
+      .map(p => ({
+        value: p,
+        description: `${new Intl.DisplayNames(p, { type: "language" }).of(p)} (${p})`
+      }));
+
     this.config.setSchema("core.languageSettings", {
       type: "object",
       description: "These settings currently require a full restart of Pulsar to take effect.",
@@ -49,12 +50,7 @@ class I18n {
           type: "string",
           order: 1,
           default: "en",
-          enum: dircontents.filter(p => p.endsWith(ext))
-            .map(p => p.substring(0, p.length - extlen))
-            .map(p => ({
-              value: p,
-              description: `${new Intl.DisplayNames(p, { type: "language" }).of(p)} (${p})`
-            }))
+          enum: languageTypes
         },
         fallbackLanguages: {
           type: "array",
@@ -110,9 +106,7 @@ class I18n {
   }
 
   updateConfigs() {
-    /** @type {string} */
     this.primaryLanguage = this.config.get("core.languageSettings.primaryLanguage");
-    /** @type {Array<string>} */
     this.fallbackLanguages = this.config.get("core.languageSettings.fallbackLanguages");
   }
 
@@ -217,7 +211,6 @@ class I18n {
   fetchPkgLanguageFile(ns, lang) {
     // TODO this could probably be optimised
     let packages = this.packages.getAvailablePackages();
-    // let package = packages.find(p => p.name === ns);
     let foundPackage = packages.find(p => p.name === ns);
 
     const i18nDir = path.join(foundPackage.path, "i18n");
