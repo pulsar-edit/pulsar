@@ -105,10 +105,11 @@ class I18nCacheHelper {
 
 function walkStrings(strings, cb, accum = []) {
   Object.entries(strings).forEach(([k, v]) => {
-    if (typeof v === "string") cb([...accum, k], v, true);
+    let path = [...accum, k];
+    if (typeof v === "string") cb(path, v, true);
     else if (typeof v === "object") {
-      cb([...accum, k], null, false);
-      walkStrings(v, cb, [...accum, k]);
+      cb(path, null, false);
+      walkStrings(v, cb, path);
     }
   });
 }
