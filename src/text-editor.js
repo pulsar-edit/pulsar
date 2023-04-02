@@ -1591,6 +1591,13 @@ module.exports = class TextEditor {
         currentTokenScopes.push(this.displayLayer.classNameForTag(tag));
       } else if (this.displayLayer.isCloseTag(tag)) {
         currentTokenScopes.pop();
+      } else if (tag === 0) {
+        // `tag` is not a tag, but rather a description of the number of
+        // characters until the next boundary. In unusual circumstances, `0`
+        // may be emitted here, but that's just an indication that we can
+        // safely ignore this “tag,” because the next boundary will be at the
+        // same position.
+        continue;
       } else {
         tokens.push({
           text: lineText.substr(lineTextIndex, tag),

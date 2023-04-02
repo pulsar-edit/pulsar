@@ -2126,7 +2126,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         'script.tag',
         'source.js',
         'string.quoted',
-        'text.html.basic',
         'property.name'
       ]);
     });
@@ -2176,7 +2175,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('syntaxQuery', `
         (comment) @comment.block
         ((comment) @punctuation.definition.comment.begin
-          (#set! startAndEndAroundFirstMatchOf "^/\\*"))
+          (#set! startAndEndAroundFirstMatchOf "^/\\\\*"))
       `);
 
       buffer.setText('\n/* lorem ipsum dolor sit amet */');

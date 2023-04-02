@@ -2355,6 +2355,9 @@ class LanguageLayer {
       languageScope = injectionPoint.languageScope;
       // Honor an explicit `null`, but fall back to the default scope name
       // otherwise.
+      if (typeof languageScope === 'function') {
+        languageScope = languageScope(this.grammar);
+      }
       if (languageScope === undefined) {
         languageScope = this.grammar.scopeName;
       }
@@ -2433,6 +2436,24 @@ class LanguageLayer {
     const captures = this.syntaxQuery.captures(this.tree.rootNode, from, to);
     this.scopeResolver.reset();
 
+    for (let capture of captures) {
+      let { node } = capture;
+      // Phantom nodes invented by the parse tree. Indentation captures can use
+      // `allowEmpty` to force these to be considered, but for marking scopes,
+      // there's no need for it; it'd just cause us to open and close a scope
+      // in the same position.
+      if (node.text === '') { continue; }
+
+      // Ask the `ScopeResolver` to process each capture in turn. Some captures
+      // will be ignored if they fail certain tests, and some will have their
+      // original range altered.
+      this.scopeResolver.store(capture);
+    }
+
+    // A `HighlightIterator` will want to know which scopes were already open
+    // when this range began.
+    let alreadyOpenScopes = [];
+
     // How do we add a layer's root scope? There's no easy answer.
     //
     // If we rely on the grammar author to map the tree's root node to the
@@ -2447,11 +2468,11 @@ class LanguageLayer {
     // applied, and making sure that `scopeDescriptorForPosition` returns
     // results that agree with reality.
     //
-    // Option B is the one we reluctantly choose because it's easier to manage.
-    // Here's roughly how this works:
+    // Option B is the one we reluctantly choose because it gives us more
+    // control. Here's roughly how this works:
     //
-    // * The root language scope on the root layer will always be applied.
-    // * The root language scope on an injection layer will be applied in areas
+    // * The base language scope on the root layer will always be applied.
+    // * The base language scope on an injection layer will be applied in areas
     //   where that injection is active, unless we were told otherwise in
     //   `addInjectionPoint`. That method's `languageScope` property can
     //   define another scope name to use instead… or pass `null`, signaling
@@ -2463,38 +2484,60 @@ class LanguageLayer {
     //   desired.
 
     // Ensure the whole source file (or whole bounds of the injection) is
-    // annotated with the language's root scope name. We _do not_ want to leave
-    // this up to the grammar author; it's too important.
+    // annotated with the language's base scope name. We _do not_ want to leave
+    // this up to the grammar author; it's too important. Also ensure that the
+    // base scope name of an injection covers the true boundaries of where that
+    // injection is active.
     //
-    // TODO: If an injection only sees certain disjoint ranges, its scope name
-    // will still be present over its entire extent. That was a flaw in original
-    // tree-sitter and it's still present now. Not sure there's a good way
-    // around it.
-    if (this.languageScopeId && from.isLessThanOrEqual(extent.start) && from.column === 0) {
-      this.scopeResolver.setBoundary(extent.start, this.languageScopeId, 'open');
-    }
+    // NOTE: If an injection is active over a number of disjoint ranges, this
+    // may have some surprising effects. For instance, areas where PHP is
+    // injected into HTML…
+    //
+    //    <h1><?php echo "foo" ?></h1>
+    //
+    // …will include `<?php`, `echo`, `"foo"`, and `?>`, but may exclude the
+    // spaces between those tokens. This is a consequence of the design of
+    // a particular tree-sitter parser and may be hard to avoid.
+    let includedRanges = this.depth === 0 ? [extent] :
+      this.currentIncludedRanges;
 
-    for (let capture of captures) {
-      let { node } = capture;
-      // Phantom nodes invented by the parse tree.
-      if (node.text === '') { continue; }
+    if (this.languageScopeId) {
+      for (let range of includedRanges) {
+        if (!(range instanceof Range)) {
+          range = rangeForNode(range);
+        }
 
-      // Ask the `ScopeResolver` to process each capture in turn. Some captures
-      // will be ignored if they fail certain tests, and some will have their
-      // original range altered.
-      this.scopeResolver.store(capture);
-    }
+        // Filter out ranges that have no intersection with ours.
+        if (range.end.isLessThanOrEqual(from)) { continue; }
+        if (range.start.isGreaterThanOrEqual(to)) { continue; }
 
-    if (this.languageScopeId && to.isGreaterThanOrEqual(extent.end)) {
-      this.scopeResolver.setBoundary(extent.end, this.languageScopeId, 'close');
-    }
+        if (range.start.isLessThan(from)) {
+          // If we get this far, we know that the base language scope was open
+          // when our range began.
+          alreadyOpenScopes.push(this.languageScopeId);
+        } else {
+          // Range start must be between `from` and `to`, or else equal `from`
+          // exactly.
+          this.scopeResolver.setBoundary(
+            range.start,
+            this.languageScopeId,
+            'open',
+            { root: true }
+          );
+        }
 
-    let alreadyOpenScopes = [];
-    // If the highlight range starts after this layer's extent, then we should
-    // tell the `HighlightIterator` that the language's root scope is already
-    // open at this point.
-    if (this.languageScopeId && from.isGreaterThan(extent.start)) {
-      alreadyOpenScopes.push(this.languageScopeId);
+        if (range.end.isGreaterThan(to)) {
+          // Do nothing; we don't need to set this boundary.
+        } else {
+          // The range must end somewhere within our range.
+          this.scopeResolver.setBoundary(
+            range.end,
+            this.languageScopeId,
+            'close',
+            { root: true }
+          );
+        }
+      }
     }
 
     // `ScopeResolver` ensures that these points will be iterated in buffer
