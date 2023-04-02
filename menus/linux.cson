@@ -64,7 +64,7 @@
         ]
       }
       {
-       localisedLabel: 'core.menu.edit.text.self'
+        localisedLabel: 'core.menu.edit.text.self'
         submenu: [
           { localisedLabel: 'core.menu.edit.text.upper-case', command: 'editor:upper-case' } # accelerator U
           { localisedLabel: 'core.menu.edit.text.lower-case', command: 'editor:lower-case' } # accelerator L
