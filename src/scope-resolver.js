@@ -278,10 +278,14 @@ class ScopeResolver {
   }
 
   *[Symbol.iterator] () {
-    // The ordering of the keys doesn't matter here because we'll be putting
-    // them into a red-black tree that will be responsible for ordering the
-    // boundaries.
-    for (let key of this.map.keys()) {
+    // Sort the keys before iterating.
+    let keys = [...this.map.keys()];
+    keys.sort((a, b) => {
+      let posA = this._keyToObject(a);
+      let posB = this._keyToObject(b);
+      return comparePoints(posA, posB);
+    });
+    for (let key of keys) {
       let point = this._keyToObject(key);
       yield [point, this.map.get(key)];
     }
@@ -453,6 +457,16 @@ ScopeResolver.TESTS = {
   onlyIfNotAncestorOfType(node, type) {
     let descendants = node.descendantsOfType(type);
     return descendants.length === 0;
+  },
+
+  onlyIfRangeWithData(node, key, props, existingData) {
+    if (existingData === undefined) { return false; }
+    return (key in existingData);
+  },
+
+  onlyIfNotRangeWithData(...args) {
+    let isNodeWithData = ScopeResolver.TESTS.onlyIfRangeWithData(...args);
+    return !isNodeWithData;
   },
 
   // Passes if one of this node's ancestors has stored data at a given key.

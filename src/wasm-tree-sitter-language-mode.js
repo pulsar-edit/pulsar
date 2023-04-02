@@ -119,8 +119,6 @@ function isBetweenPoints (point, a, b) {
 const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
 
-const VAR_ID = 257;
-
 class WASMTreeSitterLanguageMode {
   constructor({ buffer, grammar, config, grammars }) {
     this.buffer = buffer;
@@ -480,13 +478,17 @@ class WASMTreeSitterLanguageMode {
     const iterator = this.buildHighlightIterator();
     const scopes = [];
 
-    // Scopes that were open at the start of this point.
+    // Add scopes that were open already at this point.
     for (const scope of iterator.seek(point, point.row + 1)) {
       scopes.push(this.grammar.scopeNameForScopeId(scope));
     }
     if (point.isEqual(iterator.getPosition())) {
       for (const scope of iterator.getOpenScopeIds()) {
         scopes.push(this.grammar.scopeNameForScopeId(scope));
+      }
+      // Don't count anything that ends at this point.
+      for (const scope of iterator.getCloseScopeIds()) {
+        removeLastOccurrenceOf(scopes, this.grammar.scopeNameForScopeId(scope));
       }
     }
     if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
@@ -1185,15 +1187,18 @@ class WASMTreeSitterLanguageMode {
         new Point(row, Infinity),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
-      let tree = controllingLayer.getOrParseTree();
-      let rowOptions = {
-        ...options,
-        tree,
-        comparisonRow: comparisonRow ?? undefined,
-        comparisonRowIndent: comparisonRowIndent ?? undefined
-      };
-      let indent = this.suggestedIndentForBufferRow(
-        row, tabLength, rowOptions);
+      let indent;
+      if (controllingLayer) {
+        let tree = controllingLayer.getOrParseTree();
+        let rowOptions = {
+          ...options,
+          tree,
+          comparisonRow: comparisonRow ?? undefined,
+          comparisonRowIndent: comparisonRowIndent ?? undefined
+        };
+        indent = this.suggestedIndentForBufferRow(
+          row, tabLength, rowOptions);
+      }
       results.push(indent);
       comparisonRow = row;
       comparisonRowIndent = indent;
@@ -2423,11 +2428,9 @@ class LanguageLayer {
     to = buffer.clipPosition(Point.fromObject(to, true));
 
     let boundaries = createTree(comparePoints);
-    let extent = this.marker ? this.marker.getRange() : this.buffer.getRange();
+    let extent = this.getExtent();
 
     const captures = this.syntaxQuery.captures(this.tree.rootNode, from, to);
-
-    // let isRootLanguageLayer = this.depth === 0;
     this.scopeResolver.reset();
 
     // How do we add a layer's root scope? There's no easy answer.
@@ -2450,18 +2453,14 @@ class LanguageLayer {
     // * The root language scope on the root layer will always be applied.
     // * The root language scope on an injection layer will be applied in areas
     //   where that injection is active, unless we were told otherwise in
-    //   `addInjectionPoint`. That method's `rootLanguageScope` property can
+    //   `addInjectionPoint`. That method's `languageScope` property can
     //   define another scope name to use instead… or pass `null`, signaling
     //   that we should skip the root scope altogether. (This is the best
     //   approach for special-purpose injections like `todo` and `hyperlink`.)
-
-    // if (this.marker) {
-    //   // We don't want to duplicate the scope ID when a language injects
-    //   // _itself_. This happens in C (for `#define`s) and in Rust (for macros),
-    //   // among others.
-    //   let parentLayer = this.marker?.parentLanguageLayer;
-    //   languageScopeDiffersFromParent = this.languageScopeId !== parentLayer.languageScopeId;
-    // }
+    // * A grammar can still opt to place a root scope conditionally based on
+    //   whether it's on an injection layer. This also allows a grammar to
+    //   apply that root scope more selectively in injection contexts if
+    //   desired.
 
     // Ensure the whole source file (or whole bounds of the injection) is
     // annotated with the language's root scope name. We _do not_ want to leave
@@ -2498,6 +2497,8 @@ class LanguageLayer {
       alreadyOpenScopes.push(this.languageScopeId);
     }
 
+    // `ScopeResolver` ensures that these points will be iterated in buffer
+    // order.
     for (let [point, data] of this.scopeResolver) {
       // The boundaries that occur before the start of our range will tell us
       // which scopes should already be open when our range starts.
@@ -2567,7 +2568,7 @@ class LanguageLayer {
     // synchronously, because we've made sure not to call this method until the
     // root grammar's tree-sitter parser has been loaded. But we can't load any
     // potential injection layers' languages because we don't know which ones
-    // we'll need until we parse this layer's tree for the first time.
+    // we'll need _until_ we parse this layer's tree for the first time.
     //
     // Thus the first call to `_populateInjections` will probably go async
     // while we wait for the injections' parsers to load, and the user might
@@ -2766,9 +2767,11 @@ class LanguageLayer {
   async _performUpdate(nodeRangeSet) {
     await this.languageLoaded;
     let includedRanges = null;
+
     if (nodeRangeSet) {
       includedRanges = nodeRangeSet.getRanges(this.languageMode.buffer);
       if (includedRanges.length === 0) {
+        // We have no ranges to inject into. This layer should no longer exist.
         const range = this.marker.getRange();
         this.destroy();
         this.languageMode.emitRangeUpdate(range);
@@ -2795,12 +2798,15 @@ class LanguageLayer {
     // its contents.
     if (affectedRange) {
       let node = this.getSyntaxNodeContainingRange(affectedRange);
-      if (node) {
-        // Simple guard here against situations where the most specific node
-        // for this range is the root node. We're not trying to invalidate the
-        // whole tree. If the whole tree truly needs to be invalidated, it'll
-        // get caught by tree-sitter anyway.
-        if (node.parent) { affectedRange = node.range; }
+      // Simple guard here against situations where the most specific node
+      // for this range is the root node. We're not trying to invalidate the
+      // whole tree. If the whole tree truly needs to be invalidated, it'll
+      // get caught by tree-sitter anyway.
+      //
+      // This can still invalidate _large_ parts of the tree in certain
+      // grammars.
+      if (node && node.parent) {
+        this.languageMode.emitRangeUpdate(node.range);
       }
     }
 
@@ -2808,7 +2814,8 @@ class LanguageLayer {
       const rangesWithSyntaxChanges = this.lastSyntaxTree.getChangedRanges(tree);
 
       // TODO: The tree-sitter playground deletes the old tree when it's about
-      // to be replaced, but this seems to cause sporadic errors for us.
+      // to be replaced, but this seems to cause sporadic errors for us. Not
+      // sure why they can pull it off and we can't.
       // this.lastSyntaxTree.delete();
       this.lastSyntaxTree = tree;
 
@@ -2832,8 +2839,6 @@ class LanguageLayer {
         } else {
           affectedRange = combinedRangeWithSyntaxChange;
         }
-      } else if (affectedRange) {
-        this.languageMode.emitRangeUpdate(affectedRange);
       }
     } else {
       this.tree = tree;
@@ -2877,13 +2882,33 @@ class LanguageLayer {
     // how often we have to manually re-parse in between transactions —
     // something we'd like to do as little as possible.
     console.warn('Re-parsing tree!');
-    this.tree = this.languageMode.parse(
+
+    // TODO: The goal here is that, if a re-parse is needed in between
+    // transactions, we assign the result back to `this.tree` so that we can at
+    // least cut down on the incremental amount of work that the
+    // end-of-transaction parse has to do — it can pick up where we left off.
+    //
+    // But this isn't safe to do for injection layers because
+    // `currentIncludedRanges` is probably stale. It's fresh enough for what we
+    // need when we ask for a tree re-parse — to determine an indentation level
+    // — but not reliable work for a future parse to build upon.
+    //
+    // Re-parsing of an injection layer can only safely happen when we know its
+    // true ranges, and that cannot be determined except through the process
+    // that an injection layer's parent goes through during the
+    // end-of-transaction update. So there probably isn't a way to “fix” this
+    // for injection layers except through cutting down on off-schedule parses.
+    //
+    let tree = this.languageMode.parse(
       this.language,
       this.tree,
       this.currentIncludedRanges
     );
-    this.treeIsDirty = false;
-    return this.tree;
+    if (this.depth === 0) {
+      this.tree = tree;
+      this.treeIsDirty = false;
+    }
+    return tree;
   }
 
   getText() {
@@ -2910,10 +2935,6 @@ class LanguageLayer {
       { row: point.row, column: point.column + 1 }
     );
 
-    let { start, end } = this.getExtent();
-    let otherCaptures = this.syntaxQuery.captures(
-      this.tree.rootNode, start, end);
-
     let results = [];
     for (let capture of captures) {
       // Storing the capture will return its range (after any potential
@@ -2921,7 +2942,8 @@ class LanguageLayer {
       let range = scopeResolver.store(capture);
       if (!range) { continue; }
 
-      // Since the range might have been adjusted, we wait until after resolution.
+      // Since the range might have been adjusted, we wait until after
+      // resolution.
       if (comparePoints(range.endPosition, point) === 0) { continue; }
       if (isBetweenPoints(point, range.startPosition, range.endPosition)) {
         results.push({ capture, adjustedRange: range });
@@ -2985,6 +3007,9 @@ class LanguageLayer {
 
   _populateInjections (range, nodeRangeSet) {
     const promises = [];
+
+    // We won't touch _all_ injections, but we will touch any injection that
+    // could possibly have been affected by this layer's update.
     let existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
       .findMarkers({ intersectsRange: range })
       .filter(marker => marker.parentLanguageLayer === this);
@@ -2999,6 +3024,9 @@ class LanguageLayer {
     }
 
     const markersToUpdate = new Map();
+
+    // Query for all the nodes that could possibly prompt the creation of
+    // injection points.
     const nodes = this.tree.rootNode.descendantsOfType(
       Object.keys(this.grammar.injectionPointsByType),
       range.start,
@@ -3006,16 +3034,22 @@ class LanguageLayer {
     );
 
     let existingInjectionMarkerIndex = 0;
+    let newLanguageLayers = 0;
     for (const node of nodes) {
+      // A given node can be the basis for an arbitrary number of injection
+      // points, but first it has to pass our gauntlet of tests:
       for (const injectionPoint of this.grammar.injectionPointsByType[node.type]) {
+        // Does it give us a language string?
         const languageName = injectionPoint.language(node);
         if (!languageName) { continue; }
 
+        // Does that string match up with a grammar that we recognize?
         const grammar = this.languageMode.grammarForLanguageString(
-          languageName
-        );
+          languageName);
         if (!grammar) { continue; }
 
+        // Does it offer us a node, or array of nodes, which a new injection
+        // layer should use for its content?
         const contentNodes = injectionPoint.content(node);
         if (!contentNodes) { continue; }
 
@@ -3026,6 +3060,23 @@ class LanguageLayer {
 
         let marker;
 
+        // It's surprisingly hard to match up the injection point that we now
+        // know we need… with the one that may already exist that was created
+        // or updated based on the state of the tree from the last keystroke.
+        // There is no continuity between the previous tree and the new tree
+        // that we can rely on. Unless the marker and the base node of the
+        // injection point agree on an exact range, we can't be sure enough to
+        // re-use an existing layer.
+        //
+        // This isn't a huge deal because (a) markers are good at adapting to
+        // changes, so those two things will agree more often than you think;
+        // (b) even when they don't agree, it's not very costly to destroy and
+        // recreate another `LanguageLayer`.
+        //
+        // Since both `existingInjectionMarkers` and `nodes` are guaranteed to
+        // be sorted in buffer order, we can take shortcuts in how we pair them
+        // up.
+        //
         for (
           let i = existingInjectionMarkerIndex,
             n = existingInjectionMarkers.length;
@@ -3035,22 +3086,38 @@ class LanguageLayer {
           const existingMarker = existingInjectionMarkers[i];
           const comparison = existingMarker.getRange().compare(injectionRange);
           if (comparison > 0) {
+            // This marker seems to occur after the range we want to inject
+            // into, meaning there's a good chance it's not ours. And it means
+            // that none of the remaining markers will likely be our candidate,
+            // either; so we should give up and create a new one.
             break;
           } else if (comparison === 0) {
+            // Luckily, the range matches up exactly, so this is almost
+            // certainly a previous version of the same intended injection. It
+            // also means that any markers before this point in the list have
+            // either already matched with candidate injection points or cannot
+            // possibly match up; thus we can ignore them for the rest of the
+            // matching process.
             existingInjectionMarkerIndex = i;
             if (existingMarker.languageLayer.grammar === grammar) {
               marker = existingMarker;
               break;
             }
           } else {
+            // This marker occurs before our range. Since all injection
+            // candidates from this point forward are guaranteed to be of an
+            // equal or later range, there's no chance of this marker matching
+            // any candidates from this point forward. We can ignore it, and
+            // anything before it, in subsequent trips through the loop.
             existingInjectionMarkerIndex = i;
           }
         }
 
         if (!marker) {
+          // If we didn't match up with an existing marker/layer, we'll have to
+          // create them.
           marker = this.languageMode.injectionsMarkerLayer.markRange(
-            injectionRange
-          );
+            injectionRange);
 
           marker.languageLayer = new LanguageLayer(
             marker,
@@ -3061,6 +3128,7 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
+          newLanguageLayers++;
         }
 
         markersToUpdate.set(
@@ -3075,12 +3143,16 @@ class LanguageLayer {
       }
     }
 
+    let staleLanguageLayers = 0;
     for (const marker of existingInjectionMarkers) {
+      // Any markers that didn't get matched up with injection points are now
+      // stale and should be destroyed.
       if (!markersToUpdate.has(marker)) {
         this.languageMode.emitRangeUpdate(
           marker.getRange()
         );
         marker.languageLayer.destroy();
+        staleLanguageLayers++;
       }
     }
 
