@@ -1,3 +1,8 @@
+
+; More accurate indentation matching for all blocks delimited by braces.
+(statement_block "}" @match
+  (#set! matchIndentOf parent.firstChild.startPosition))
+
 ; The closing brace of a switch statement's body should match the indentation of the line where the switch statement starts.
 (switch_statement
   body: (switch_body "}" @match
@@ -18,7 +23,7 @@
 ; …and keep that indent level if the user types a comment before the consequence…
 (if_statement
   consequence: (empty_statement) @match
-  (#set! onlyIfNotOnSameRowAs parent.startPosition)
+  (#set! onlyIfNotStartsOnSameRowAs parent.startPosition)
   (#set! matchIndentOf parent.startPosition)
   (#set! offsetIndent 1))
 
@@ -48,6 +53,15 @@
     (debugger_statement)
   ] @dedent.next)
 
+; Any of these at the end of a line indicate the next line should be indented…
+(["||" "&&"] @indent (#set! onlyIfLastTextOnRow true))
+
+; …and the line after that should be dedented.
+(binary_expression
+  ["||" "&&"]
+    right: (_) @dedent.next)
+
+
 (template_substitution "}" @_IGNORE_
   (#set! final true))
 
@@ -62,9 +76,6 @@
   ")"
   "]"
 ] @dedent
-
-(["||" "&&"] @indent
-  (#set! onlyIfLastTextOnRow true))
 
 
 ["case" "default"] @indent
