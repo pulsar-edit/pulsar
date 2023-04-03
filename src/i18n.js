@@ -68,6 +68,11 @@ class I18n {
 
     this.updateConfigs();
 
+    this.packages.onDidActivatePackage(pkg => {
+      // getting an obj would place it in the cache
+      this.getPkgLanguage(pkg.name, this.primaryLanguage);
+    });
+
     this.packages.onDidDeactivatePackage(pkg => {
       if (pkg.name in this.registeredStrings) {
         delete this.registeredStrings[pkg.name];
@@ -76,20 +81,16 @@ class I18n {
 
     this.t = (key, opts) => {
       const path = splitKeyPath(key);
+      const languagesToTry = [
+        this.primaryLanguage,
+        ...this.fallbackLanguages,
+        "en"
+      ];
 
-      // primary
-      const str = this.tSingleLanguage(this.primaryLanguage, path, opts);
-      if (str) return str;
-
-      // fallbacks
-      for (const lang of this.fallbackLanguages) {
+      for (const lang of languagesToTry) {
         const str = this.tSingleLanguage(lang, path, opts);
-        if (str) return str;
+        if (typeof str === "string") return str;
       }
-
-      // `en` fallback
-      const en_fallback = this.tSingleLanguage("en", path, opts);
-      if (en_fallback) return en_fallback;
 
       // key fallback
       let string_opts = opts
@@ -111,7 +112,7 @@ class I18n {
   }
 
   registerStrings(packageId, strings) {
-    if (!this.registeredStrings[packageId]) this.registeredStrings[packageId] = {};
+    if (!(typeof this.registeredStrings[packageId] === "object")) this.registeredStrings[packageId] = {};
 
     walkStrings(strings, (path, string, isString) => {
       let last = path.pop();
@@ -143,10 +144,10 @@ class I18n {
     if (!ns) throw new Error(`key path seems invalid: [${_path.map(p => `"${p}"`).join(", ")}]`);
 
     const languageObj = this.getLanguageObj(ns, lang);
-    if (!languageObj) return undefined;
+    if (languageObj === undefined) return undefined;
 
     const str = optionalTravelDownObjectPath(languageObj, path);
-    if (str) {
+    if (str !== undefined) {
       return this.format(ns, path, str, lang, opts);
     } else {
       return undefined;
@@ -169,10 +170,10 @@ class I18n {
    */
   getCoreLanguage(lang) {
     const loaded = this.registeredStrings.core[lang]
-    if (loaded) return loaded;
+    if (loaded !== undefined) return loaded;
 
     const fetched = this.fetchCoreLanguageFile(lang);
-    if (!fetched) return undefined;
+    if (fetched === undefined) return undefined;
 
     this.registeredStrings.core[lang] = fetched;
     return fetched;
@@ -184,12 +185,14 @@ class I18n {
    */
   getPkgLanguage(ns, lang) {
     const loaded = this.registeredStrings[ns]?.[lang];
-    if (loaded) return loaded;
+    if (loaded !== undefined) return loaded;
 
     const fetched = this.fetchPkgLanguageFile(ns, lang);
-    if (!fetched) return fetched;
+    if (fetched === undefined) return fetched;
 
-    if (!this.registeredStrings[ns]) this.registeredStrings[ns] = {};
+    if (typeof this.registeredStrings[ns] !== "object" || this.registeredStrings[ns] === null) {
+      this.registeredStrings[ns] = {};
+    }
     this.registeredStrings[ns][lang] = fetched;
   }
 
@@ -231,7 +234,7 @@ class I18n {
     let path = [ns, lang, ..._path];
 
     let cachedFormatter = optionalTravelDownObjectPath(this.cachedFormatters, path);
-    if (cachedFormatter) return cachedFormatter.format(opts);
+    if (cachedFormatter !== undefined) return cachedFormatter.format(opts);
 
     let ast = this.cacheHelper.fetchAST(ns, _path, str, lang);
     let formatter = new IntlMessageFormat(ast, lang);
