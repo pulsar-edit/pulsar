@@ -219,7 +219,10 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      { "target": "portable" },
+      {
+        "target": "portable",
+        "useZip": true
+      },
     ],
   },
   // Windows NSIS Configuration
