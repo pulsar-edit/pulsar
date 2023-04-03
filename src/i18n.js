@@ -68,7 +68,7 @@ class I18n {
 
     this.updateConfigs();
 
-    atom.packages.onDidDeactivatePackage(pkg => {
+    this.packages.onDidDeactivatePackage(pkg => {
       if (pkg.name in this.registeredStrings) {
         delete this.registeredStrings[pkg.name];
       }
