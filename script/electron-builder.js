@@ -219,14 +219,16 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      {
-        "target": "portable",
-        "useZip": true
-      },
+      { "target": "portable" },
     ],
+  },
+  // Windows Portable Config
+  portable: {
+    useZip: true
   },
   // Windows NSIS Configuration
   "nsis": {
+    useZip: true,
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "uninstallDisplayName": "Pulsar",
