@@ -900,6 +900,8 @@ class WASMTreeSitterLanguageMode {
   // Get the suggested indentation level for an existing line in the buffer.
   //
   // * bufferRow - A {Number} indicating the buffer row
+  // * tabLength - A {Number} signifying the length of a tab, in spaces,
+  //   according to the current settings of the buffer.
   //
   // Returns a {Number}.
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
@@ -907,9 +909,11 @@ class WASMTreeSitterLanguageMode {
     if (!root || !root.tree || row === 0) { return 0; }
 
     let options = {
+      allowMatchCapture: true,
       skipBlankLines: true,
       skipDedentCheck: false,
       preserveLeadingWhitespace: false,
+      indentationLevels: null,
       ...rawOptions
     };
 
@@ -1130,7 +1134,7 @@ class WASMTreeSitterLanguageMode {
         // whatever row that node starts on.
         if (name === 'match') {
           let matchIndentLevel = this.resolveIndentMatchCapture(
-            capture, row, tabLength);
+            capture, row, tabLength, options.indentationLevels);
           if (typeof matchIndentLevel === 'number') {
             scopeResolver.reset();
             return matchIndentLevel - existingIndent;
@@ -1164,13 +1168,21 @@ class WASMTreeSitterLanguageMode {
   // Given a range of buffer rows, retrieves the suggested indent for each one
   // while re-using the same tree. Prevents a tree re-parse after each
   // individual line adjustment when auto-indenting.
+  //
+  // * startRow - The row {Number} to start at
+  // * endRow - The row {Number} to end at
+  //
+  // Returns a {Map} whose keys are rows and whose values are desired
+  // indentation levels. May not return the entire range of requested rows, in
+  // which case the caller should auto-indent the remaining rows through
+  // another means.
   suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
     let root = this.rootLanguageLayer;
     if (!root || !root.tree) {
       return new Array(startRow - endRow).map(() => 0);
     }
 
-    let results = [];
+    let results = new Map();
     let comparisonRow = null;
     let comparisonRowIndent = null;
 
@@ -1194,12 +1206,19 @@ class WASMTreeSitterLanguageMode {
           ...options,
           tree,
           comparisonRow: comparisonRow ?? undefined,
-          comparisonRowIndent: comparisonRowIndent ?? undefined
+          comparisonRowIndent: comparisonRowIndent ?? undefined,
+          indentationLevels: results
         };
-        indent = this.suggestedIndentForBufferRow(
-          row, tabLength, rowOptions);
+        indent = this.suggestedIndentForBufferRow(row, tabLength, rowOptions);
+        if (indent === null) {
+          // We could not retrieve the correct indentation level for this row
+          // without re-parsing the tree. We should give up and return what we
+          // have so that `TextEditor` can finish the job through a less
+          // efficient means.
+          return results;
+        }
       }
-      results.push(indent);
+      results.set(row, indent);
       comparisonRow = row;
       comparisonRowIndent = indent;
     }
@@ -1343,7 +1362,7 @@ class WASMTreeSitterLanguageMode {
 
   // Given a `@match` capture, attempts to resolve it to an absolute
   // indentation level.
-  resolveIndentMatchCapture(capture, currentRow, tabLength) {
+  resolveIndentMatchCapture(capture, currentRow, tabLength, indentationLevels = null) {
     let { node, setProperties: props = {} } = capture;
 
     // A `@match` capture must specify
@@ -1370,11 +1389,23 @@ class WASMTreeSitterLanguageMode {
       return undefined;
     }
 
-    // We'll match the indentation level of that row…
-    let baseIndent = this.indentLevelForLine(
-      this.buffer.lineForRow(targetRow), tabLength);
+    let baseIndent;
+    if (indentationLevels) {
+      // If we were given this table of indentation levels, it means we're in a
+      // “batch” mode where we're trying to cut down on the number of tree
+      // re-parses. In this scenario, if the row we want is represented in the
+      // table, we should use the level indicated by the table. If it isn't,
+      // that's a sign that the line is outside of the range being
+      // batch-indented, which would mean that it's safe to look up its level
+      // directly.
+      baseIndent = indentationLevels.get(targetRow);
+    }
+    if (!baseIndent) {
+      baseIndent = this.indentLevelForLine(
+        this.buffer.lineForRow(targetRow), tabLength);
+    }
 
-    // …with an optional offset applied.
+    // An offset can optionally be applied to the target.
     let result = baseIndent + offsetIndent;
 
     return Math.max(result, 0);
@@ -2381,6 +2412,7 @@ class LanguageLayer {
     this.destroyed = true;
     this.marker?.destroy();
     this.foldResolver?.reset();
+    this.scopeResolver?.destroy();
     this.subscriptions.dispose();
 
     for (const marker of this.languageMode.injectionsMarkerLayer.getMarkers()) {
@@ -3077,7 +3109,7 @@ class LanguageLayer {
     );
 
     let existingInjectionMarkerIndex = 0;
-    let newLanguageLayers = 0;
+    // let newLanguageLayers = 0;
     for (const node of nodes) {
       // A given node can be the basis for an arbitrary number of injection
       // points, but first it has to pass our gauntlet of tests:
@@ -3171,7 +3203,7 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
-          newLanguageLayers++;
+          // newLanguageLayers++;
         }
 
         markersToUpdate.set(
@@ -3186,7 +3218,7 @@ class LanguageLayer {
       }
     }
 
-    let staleLanguageLayers = 0;
+    // let staleLanguageLayers = 0;
     for (const marker of existingInjectionMarkers) {
       // Any markers that didn't get matched up with injection points are now
       // stale and should be destroyed.
@@ -3195,7 +3227,7 @@ class LanguageLayer {
           marker.getRange()
         );
         marker.languageLayer.destroy();
-        staleLanguageLayers++;
+        // staleLanguageLayers++;
       }
     }
 

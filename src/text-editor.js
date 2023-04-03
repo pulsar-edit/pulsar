@@ -5611,18 +5611,25 @@ module.exports = class TextEditor {
   // * endRow - The row {Number} to end at
   autoIndentBufferRows(startRow, endRow) {
     const languageMode = this.buffer.getLanguageMode();
+    let lastRowIndented = startRow - 1;
     if (languageMode.suggestedIndentForBufferRows) {
       let indents = languageMode.suggestedIndentForBufferRows(
         startRow, endRow, this.getTabLength());
-      for (let row = startRow; row <= endRow; row++) {
-        this.setIndentationForBufferRow(row, indents[row - startRow]);
+      // The language mode may not be able to indent the whole block
+      // atomically. If not, we'll indent as much as we're able, then fall back
+      // to the costlier approach.
+      if (indents !== null) {
+        for (let [row, indent] of indents) {
+          this.setIndentationForBufferRow(row, indent);
+          lastRowIndented = row;
+        }
+        if (lastRowIndented === endRow) { return; }
       }
-    } else {
-      let row = startRow;
-      while (row <= endRow) {
-        this.autoIndentBufferRow(row);
-        row++;
-      }
+    }
+    let row = lastRowIndented + 1;
+    while (row <= endRow) {
+      this.autoIndentBufferRow(row);
+      row++;
     }
   }
 
