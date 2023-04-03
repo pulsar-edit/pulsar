@@ -36,6 +36,7 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - export BINARY_NAME=`ls binaries/*AppImage`
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -92,6 +93,7 @@ arm_linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - export BINARY_NAME=`ls binaries/*AppImage`
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -133,6 +135,8 @@ silicon_mac_task:
     path: ./binaries/*
   test_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - hdiutil mount binaries/Pulsar*dmg
+    - export BINARY_NAME`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -178,6 +182,8 @@ intel_mac_task:
     path: ./binaries/*
   test_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - hdiutil mount binaries/Pulsar*dmg
+    - export BINARY_NAME`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
