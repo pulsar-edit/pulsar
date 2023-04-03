@@ -16,7 +16,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **autocomplete-atom-api** | [`atom/autocomplete-atom-api`][autocomplete-atom-api] |  |
 | **autocomplete-css** | [`./autocomplete-css`](./autocomplete-css) |  |
 | **autocomplete-html** | [`./autocomplete-html`](./autocomplete-html) |  |
-| **autocomplete-plus** | [`./autocomplete-plus`][./autocomplete-plus] |  |
+| **autocomplete-plus** | [`./autocomplete-plus`](./autocomplete-plus) |  |
 | **autocomplete-snippets** | [`./autocomplete-snippets`](./autocomplete-snippets) |  |
 | **autoflow** | [`./autoflow`](./autoflow) | |
 | **autosave** | [`pulsar-edit/autosave`][autosave] | [#17834](https://github.com/atom/atom/issues/17834) |
@@ -76,7 +76,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **language-yaml** | [`./language-yaml`](./language-yaml) |  |
 | **line-ending-selector** | [`./line-ending-selector`](./line-ending-selector) | |
 | **link** | [`./link`](./link) | |
-| **markdown-preview** | [`./markdown-preview`][./markdown-preview] |  |
+| **markdown-preview** | [`./markdown-preview`](./markdown-preview) |  |
 | **notifications** | [`atom/notifications`][notifications] | [#18277](https://github.com/atom/atom/issues/18277) |
 | **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | |
@@ -90,7 +90,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
 | **spell-check** | [`atom/spell-check`][spell-check] |  |
 | **status-bar** | [`./status-bar`](./status-bar) | |
-| **styleguide** | [`./styleguide`][./styleguide] | |
+| **styleguide** | [`./styleguide`](./styleguide) | |
 | **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
 | **tabs** | [`./tabs`](./tabs) |  |
 | **timecop** | [`pulsar-edit/timecop`][timecop] | [#18272](https://github.com/atom/atom/issues/18272) |
@@ -98,7 +98,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **update-package-dependencies** | [`./update-package-dependencies`](./update-package-dependencies) | |
 | **welcome** | [`./welcome`](./welcome) | |
 | **whitespace** | [`./whitespace`](./whitespace) |  |
-| **wrap-guide** | [`./wrap-guide`][./wrap-guide] | |
+| **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
 [autocomplete-atom-api]: https://github.com/pulsar-edit/autocomplete-atom-api
 [autosave]: https://github.com/pulsar-edit/autosave
