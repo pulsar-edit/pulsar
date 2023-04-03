@@ -3019,16 +3019,166 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
   });
-});
 
-// TODO: This doesn't work anymore with web-tree-sitter. Revisit.
-function nextHighlightingUpdate(languageMode) {
-  return new Promise(resolve => {
-    const subscription = languageMode.onDidChangeHighlighting(() => {
-      subscription.dispose();
-      resolve();
+  describe('indentation', () => {
+    it('interprets @indent and @dedent captures', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        "if" @indent
+        "else" @dedent
+      `);
+
+      buffer.setText('if (foo)');
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.setCursorBufferPosition([0, 8]);
+      editor.insertText('\n', { autoIndentNewline: true });
+
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(1, 2)');
+
+      editor.insertText(
+        'console.log("bar");\n',
+        { autoIndent: true, autoIndentNewline: true }
+      );
+
+      editor.insertText('else', { autoIndent: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 4)');
+    });
+
+    it('allows @dedents to cancel out @indents when appropriate', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        "{" @indent
+        "}" @dedent
+      `);
+
+      buffer.setText('if (foo) { bar(); }');
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.setCursorBufferPosition([0, 19]);
+      editor.insertText('\n', { autoIndentNewline: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(1, 0)');
+
+      // a } that comes before a { should not cancel it out.
+      buffer.setText('} else if (foo) {');
+      editor.setCursorBufferPosition([0, 17]);
+      editor.insertText('\n', { autoIndentNewline: true });
+
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(1, 2)');
+    });
+
+    it('allows @dedent.next to decrease the indent of the next line before any typing takes place', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      // Pretend we're in a universe where lines after comments should be
+      // dedented.
+      await grammar.setQueryForTest('indentsQuery', `
+        (comment) @dedent.next
+      `);
+
+      buffer.setText('  // lorem ipsum');
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.setCursorBufferPosition([0, 14]);
+      editor.insertText('\n', { autoIndentNewline: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(1, 0)');
+    });
+
+    it('resolves @match captures', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      // Pretend we're in a universe where lines after comments should be
+      // dedented.
+      await grammar.setQueryForTest('indentsQuery', `
+        (template_string
+          "\`" @match
+          (#set! onlyIfLast true)
+          (#set! matchIndentOf parent.firstChild.startPosition))
+      `);
+
+      buffer.setText(dedent`
+        \`
+                  this is a ridiculous amount of indentation
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      console.log(buffer.getText());
+
+      editor.setCursorBufferPosition([1, 52]);
+      editor.getLastCursor().moveToEndOfLine();
+      editor.insertText('\n', { autoDecreaseIndent: true, autoIndentNewline: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 10)');
+      editor.insertText('`', { autoIndent: true, autoDecreaseIndent: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 1)');
+    });
+
+    it('prefers a @match capture even if a @dedent matches first', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      // Pretend we're in a universe where lines after comments should be
+      // dedented.
+      await grammar.setQueryForTest('indentsQuery', `
+        (template_string
+          "\`" @dedent @match
+          (#set! onlyIfLast true)
+          (#set! matchIndentOf parent.firstChild.startPosition))
+      `);
+
+      buffer.setText(dedent`
+        \`
+                  this is a ridiculous amount of indentation
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      console.log(buffer.getText());
+
+      editor.setCursorBufferPosition([1, 52]);
+      editor.getLastCursor().moveToEndOfLine();
+      editor.insertText('\n', { autoDecreaseIndent: true, autoIndentNewline: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 10)');
+      editor.insertText('`', { autoIndent: true, autoDecreaseIndent: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 1)');
     });
   });
+});
+
+async function nextHighlightingUpdate(languageMode) {
+  return await languageMode.nextTransaction;
 }
 
 function getDisplayText(editor) {

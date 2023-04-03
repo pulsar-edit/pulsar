@@ -10,7 +10,7 @@ const ScopeDescriptor = require('./scope-descriptor');
 function comparePoints(a, b) {
   const rows = a.row - b.row;
   if (rows === 0) {
-    return a.column - b.column
+    return a.column - b.column;
   } else {
     return rows;
   }
@@ -63,17 +63,21 @@ function interpretValue (value) {
 // `ScopeResolver` also sets boundaries for possible consumption by a
 // `HighlightIterator`. However, it is used to resolve several different kinds
 // of query captures — not just highlights.
+//
 class ScopeResolver {
   constructor(languageLayer, idForScope) {
     this.languageLayer = languageLayer;
     this.buffer = languageLayer.buffer;
-    this.config = languageLayer.languageMode.config;
+    this.config = languageLayer?.languageMode?.config ?? atom.config;
     this.grammar = languageLayer.grammar;
     this.idForScope = idForScope ?? (x => x);
     this.map = new Map;
     this.rangeData = new Map;
     this.patternCache = new Map;
     this.configCache = new Map;
+    this.configSubscription = this.config.onDidChange(() => {
+      this.configCache.clear();
+    });
   }
 
   getOrCompilePattern(pattern) {
@@ -197,7 +201,8 @@ class ScopeResolver {
 
   // Given a syntax capture, test whether we should include its scope in the
   // document.
-  test(existingData, props, node) {
+  test(capture, existingData) {
+    let { node, setProperties: props = {} } = capture;
     if (existingData?.final) { return false; }
 
     for (let key in props) {
@@ -218,17 +223,17 @@ class ScopeResolver {
   //
   // Will return `false` if the scope should not be added for the given range;
   // otherwise will return the computed range.
-  store(syntax) {
+  store(capture) {
     let {
       node,
       name,
       setProperties: props = {}
-    } = syntax;
+    } = capture;
 
     name = ScopeResolver.interpolateName(name, node);
 
     // Find out which range this capture wants.
-    let range = this.determineCaptureRange(syntax);
+    let range = this.determineCaptureRange(capture);
     if (range === null) {
       // This capture specified a range adjustment that turned out not to be
       // valid. We view those adjustments as essential — that is, if the
@@ -239,7 +244,7 @@ class ScopeResolver {
 
     let data = this.getDataForRange(range);
 
-    if (!this.test(data, props, node, name)) {
+    if (!this.test(capture, data)) {
       return false;
     } else {
       this.setDataForRange(range, props);
@@ -247,9 +252,10 @@ class ScopeResolver {
 
     if (name === '_IGNORE_') {
       // "@_IGNORE_" is a magical variable in an SCM file that will not be
-      // applied in the grammar, but allows us to prevent other kinds of scopes
-      // from matching. We purposefully allowed this syntax node to set data
-      // for a given range, but not to apply its scope ID to any boundaries.
+      // applied in the grammar, but which allows us to prevent other kinds of
+      // scopes from matching. We purposefully allowed this syntax node to set
+      // data for a given range, but not to apply its scope ID to any
+      // boundaries.
       return false;
     }
 
@@ -297,6 +303,12 @@ class ScopeResolver {
   reset() {
     this.map.clear();
     this.rangeData.clear();
+  }
+
+  destroy() {
+    this.reset();
+    this.configCache.clear();
+    this.configSubscription.dispose();
   }
 
   *[Symbol.iterator] () {
@@ -610,10 +622,14 @@ ScopeResolver.TESTS = {
 
 // Usually, we want to map a scope to the exact range of a node in the tree,
 // but sometimes that isn't possible. "Adjustments" are pieces of metadata
-// assigned to captures that can transform the range to a subset of
-// the initial range.
+// assigned to captures that can transform the range to a subset of the initial
+// range.
 //
-// Adjustments cannot
+// In order to retain our ability to know what scopes to apply when
+// re-highlighting an arbitrary buffer region, scope adjustments cannot go
+// beyond the bounds of their originally captured node. To have a capture span
+// two siblings, for instance, you must capture the _parent_ node and adjust
+// the range down from there.
 ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to start at the start or end of a different node.
   startAt(node, value, props, range, resolver) {

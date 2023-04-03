@@ -801,7 +801,7 @@ describe('ScopeResolver', () => {
       expect(matched.length).toBe(0);
     });
 
-    fit('supports onlyIfInjection', async () => {
+    it('supports onlyIfInjection', async () => {
       jasmine.useRealClock();
       await grammar.setQueryForTest('syntaxQuery', `
         ((escape_sequence) @regex-escape
