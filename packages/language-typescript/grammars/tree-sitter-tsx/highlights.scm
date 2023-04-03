@@ -225,7 +225,7 @@
 (template_substitution
   "${" @punctuation.definition.template-expression.begin.ts.tsx
   "}" @punctuation.definition.template-expression.end.ts.tsx
-) @meta.embedded.interpolation.ts.tsx
+) @meta.embedded.line.interpolation.ts.tsx
 
 ; CONSTANTS
 ; =========
@@ -373,7 +373,11 @@
   (property_identifier) @entity.other.attribute-name.ts.tsx)
 
 ; All JSX expressions/interpolations within braces.
-(jsx_expression) @meta.embedded.ts.tsx
+((jsx_expression) @meta.embedded.block.ts.tsx
+  (#match? @meta.embedded.block.ts.tsx "\\n")
+  (#set! final true))
+
+(jsx_expression) @meta.embedded.line.ts.tsx
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.ts.tsx

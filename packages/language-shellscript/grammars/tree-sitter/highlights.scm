@@ -70,7 +70,7 @@
 (raw_string) @string.quoted.single.shell
 
 (string
-  (command_substitution) @meta.embedded.subshell.shell)
+  (command_substitution) @meta.embedded.line.subshell.shell)
 
 (heredoc_start) @punctuation.definition.string.begin.heredoc.shell
 (heredoc_body) @string.unquoted.heredoc.shell

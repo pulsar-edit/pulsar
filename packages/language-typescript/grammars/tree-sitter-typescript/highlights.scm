@@ -225,7 +225,7 @@
 (template_substitution
   "${" @punctuation.definition.template-expression.begin.ts
   "}" @punctuation.definition.template-expression.end.ts
-) @meta.embedded.interpolation.ts
+) @meta.embedded.line.interpolation.ts
 
 ; CONSTANTS
 ; =========

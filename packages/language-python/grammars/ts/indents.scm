@@ -1,6 +1,6 @@
 (dictionary
-  ":" @_IGNORE_
-  (#set! final true))
+  (pair ":" @_IGNORE_
+  (#set! final true)))
 
 ":" @indent
 

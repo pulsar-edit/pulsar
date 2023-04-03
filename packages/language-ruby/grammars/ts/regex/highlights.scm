@@ -17,19 +17,39 @@
   (character_class_escape)
 ] @constant.character.escape.backslash.regexp
 
+[
+  (boundary_assertion)
+] @keyword.control.anchor.regexp
+
+[
+  (optional)
+  (lazy)
+] @keyword.operator.quantifier.regexp
+
+((lookahead_assertion) @keyword.operator.lookahead.regexp
+  (#set! startAndEndAroundFirstMatchOf "\\?="))
+
+((lookahead_assertion) @keyword.operator.lookahead.negated.regexp
+  (#set! startAndEndAroundFirstMatchOf "\\?!"))
+
+((non_capturing_group) @keyword.operator.group.non-capturing.regexp
+  (#set! startAndEndAroundFirstMatchOf "\\?:"))
+
+(anonymous_capturing_group
+  "(" @punctuation.definition.group.begin.bracket.round.regexp
+  ")" @punctuation.definition.group.end.bracket.round.regexp
+  (#set! final true))
+
 "|" @keyword.operator.or.regexp
-"*" @keyword.operator.quantifier.regexp
+["*" "+"] @keyword.operator.quantifier.regexp
 
 (character_class) @constant.other.character-class.set.regexp
 
 (character_class
-  "[" @punctuation.definition.character-class.begin.regexp
-)
+  "[" @punctuation.definition.character-class.begin.regexp)
 
 (character_class
-  "]" @punctuation.definition.character-class.end.regexp
-)
+  "]" @punctuation.definition.character-class.end.regexp)
 
 (character_class
-  "^" @keyword.operator.negation.regexp
-)
+  "^" @keyword.operator.negation.regexp)

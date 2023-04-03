@@ -89,6 +89,12 @@
 ((comment) @punctuation.definition.comment.python
   (#set! endAfterFirstMatchOf "^#"))
 
+; DICTIONARIES
+; ============
+
+(dictionary
+  (pair
+    key: (identifier) @entity.other.attribute-name.python))
 
 ; STRINGS
 ; =======
@@ -114,7 +120,7 @@
 
 (interpolation
   "{" @punctuation.section.embedded.begin.python
-  "}" @punctuation.section.embedded.end.python) @meta.embedded.interpolation.python
+  "}" @punctuation.section.embedded.end.python) @meta.embedded.line.interpolation.python
 
 
 ; SUPPORT
@@ -278,6 +284,8 @@
 (function_definition
   ":" @punctuation.definition.function.colon.python
   (#set! final true))
+
+(dictionary (pair ":" @puncutation.separator.key-value.python))
 
 (parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.python

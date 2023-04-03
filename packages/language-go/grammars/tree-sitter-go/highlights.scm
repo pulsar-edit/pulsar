@@ -35,7 +35,7 @@
     name: (type_identifier) @entity.name.type.go)
     (#set! final true))
 
-(type_identifier) @storage.other.type.go
+(type_identifier) @storage.type.other.go
 
 [
   "func"

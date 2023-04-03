@@ -3,6 +3,8 @@ scopeName: 'source.python'
 type: 'tree-sitter-2'
 parser: 'tree-sitter-python'
 
+injectionRegex: '^(py|PY|python|PYTHON)$'
+
 firstLineRegex: [
   # shebang line
   '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'

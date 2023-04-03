@@ -49,7 +49,7 @@ exports.activate = function() {
   atom.grammars.addInjectionPoint('source.js', {
     type: 'regex_pattern',
     language(regex) {
-      return 'regex';
+      return 'js-regex';
     },
     content(regex) {
       return regex;
@@ -68,7 +68,7 @@ exports.activate = function() {
   // `language-hyperlink`.
   //
   const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
-  const HYPERLINK_PATTERN = /\bhttps?:(?=foo)/
+  const HYPERLINK_PATTERN = /\bhttps?:/
 
   for (const scopeName of ['source.js', 'source.flow', 'source.ts']) {
     atom.grammars.addInjectionPoint(scopeName, {

@@ -39,7 +39,7 @@
 (template_substitution
   "${" @punctuation.definition.template-expression.begin.js
   "}" @punctuation.definition.template-expression.end.js
-) @meta.embedded.interpolation.js
+) @meta.embedded.line.interpolation.js
 
 (string
   (escape_sequence) @constant.character.escape.js)
@@ -617,7 +617,12 @@
   (property_identifier) @entity.other.attribute-name.js)
 
 ; All JSX expressions/interpolations within braces.
-(jsx_expression) @meta.embedded.js
+((jsx_expression) @meta.embedded.block.jsx.js
+  (#match? @meta.embedded.block.jsx.js "\\n")
+  (#set! final true))
+
+(jsx_expression) @meta.embedded.line.jsx.js
+
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
