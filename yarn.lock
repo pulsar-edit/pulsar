@@ -2379,8 +2379,11 @@ atom-slick@^2, atom-slick@^2.0.0:
   dependencies:
     underscore-plus "^1.7.0"
 
-"autosave@file:./packages/autosave":
+"autosave@https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6":
   version "0.24.6"
+  resolved "https://codeload.github.com/atom/autosave/legacy.tar.gz/refs/tags/v0.24.6#bbd25c3364cfa5b3c73f9d4d08da93aaac339020"
+  dependencies:
+    fs-plus "^3.0.0"
 
 available-typed-arrays@^1.0.5:
   version "1.0.5"
@@ -2656,10 +2659,9 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@file:./packages/bracket-matcher":
+"bracket-matcher@file:packages/bracket-matcher":
   version "0.92.0"
   dependencies:
-    first-mate "^7.4.1"
     underscore-plus "1.x"
 
 browser-stdout@1.3.1:
@@ -3785,10 +3787,9 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-document-register-element@^1.14.10:
+"document-register-element@https://github.com/pulsar-edit/document-register-element.git#1f5868f":
   version "1.14.10"
-  resolved "https://registry.yarnpkg.com/document-register-element/-/document-register-element-1.14.10.tgz#a7bd025e6b73bd827fec2d8e90aba755e99387f5"
-  integrity sha512-w5UA37hEIrs+9pruo2yR5UD13c4UHDlkqqjt4qurnp7QsBI9b1IOi8WXUim+aCqKBsENX3Z/cso7XMOuwJH1Yw==
+  resolved "https://github.com/pulsar-edit/document-register-element.git#1f5868fba7b6c3a337c777a0396c43a080e1fad3"
 
 dom-serializer@^2.0.0:
   version "2.0.0"
@@ -3987,7 +3988,7 @@ electron@12.2.3:
     "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
-emissary@^1, emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2:
+emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4386,7 +4387,7 @@ etch@^0.12.2, etch@^0.12.6:
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.12.8.tgz#c24bc9bd3a6148f62204ce8643d2e899b9ecb9de"
   integrity sha512-dFLRe4wLroVtwzyy1vGlE3BSDZHiL0kZME5XgNGzZIULcYTvVno8vbiIleAesoKJmwWaxDTzG+4eppg2zk14JQ==
 
-event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.2.0, event-kit@^2.4.0, event-kit@^2.5.3:
+event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.4.0, event-kit@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/event-kit/-/event-kit-2.5.3.tgz#d47e4bc116ec0aacd00263791fa1a55eb5e79ba1"
   integrity sha512-b7Qi1JNzY4BfAYfnIRanLk0DOD1gdkWHT4GISIn8Q2tAf3LpU8SP2CMwWaq40imYoKWbtN4ZhbSRxvsnikooZQ==
@@ -4600,19 +4601,6 @@ find-up@^5.0.0:
   dependencies:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
-
-first-mate@7.4.3, first-mate@^7.4.1:
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/first-mate/-/first-mate-7.4.3.tgz#058b9b6d2f43e38a5f0952669338cff2c46ae2dd"
-  integrity sha512-PtZUpaPmcV5KV4Rw5TfwczEnExN+X1o3Q/G82E4iRJ0tW91fm3Yi7pa5t4cBH8r3D6EyoBKvfpG2jKE+TZ0/nw==
-  dependencies:
-    emissary "^1"
-    event-kit "^2.2.0"
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    oniguruma "^7.2.3"
-    season "^6.0.2"
-    underscore-plus "^1"
 
 flat-cache@^3.0.4:
   version "3.0.4"
@@ -5190,7 +5178,7 @@ graphql@14.5.8:
   dependencies:
     iterall "^1.2.2"
 
-grim@2.0.3, grim@^2.0.1, grim@^2.0.2:
+grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/grim/-/grim-2.0.3.tgz#66e575efc4577981d959da0764926b4aaded4b0d"
   integrity sha512-FM20Ump11qYLK9k9DbL8yzVpy+YBieya1JG15OeH8s+KbHq8kL4SdwRtURwIUHniSxb24EoBUpwKfFjGNVi4/Q==
@@ -6137,8 +6125,9 @@ key-path-helpers@^0.4.0:
   resolved "https://registry.yarnpkg.com/key-path-helpers/-/key-path-helpers-0.4.0.tgz#e87f6a159144adf2692e46f2a4641ce269c09119"
   integrity sha512-WGl1FG6zjyXCU6YrOVrvanyN3iiLFPLr/UmZ/jGiEOd7CXQV83/Ng5aLGK/Erehtr1nxU8dOwnRjseQDGElMQw==
 
-"keybinding-resolver@file:./packages/keybinding-resolver":
+"keybinding-resolver@https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1":
   version "0.39.1"
+  resolved "https://codeload.github.com/atom/keybinding-resolver/legacy.tar.gz/refs/tags/v0.39.1#a1c08beb144cfca145bf19fe0830b2e82514d4cb"
   dependencies:
     etch "0.9.0"
     fs-plus "^3.0.0"
@@ -7417,13 +7406,6 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-oniguruma@^7.2.3:
-  version "7.2.3"
-  resolved "https://registry.yarnpkg.com/oniguruma/-/oniguruma-7.2.3.tgz#e0b0b415302de8cdd6564e57a1a822ac0ab57012"
-  integrity sha512-PZZcE0yfg8Q1IvaJImh21RUTHl8ep0zwwyoE912KqlWVrsGByjjj29sdACcD1BFyX2bLkfuOJeP+POzAGVWtbA==
-  dependencies:
-    nan "^2.14.0"
-
 "open-on-github@file:packages/open-on-github":
   version "1.3.2"
 
@@ -8498,6 +8480,18 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
+"second-mate@https://github.com/pulsar-edit/second-mate.git#14aa7bd":
+  version "8.0.0"
+  resolved "https://github.com/pulsar-edit/second-mate.git#14aa7bd94b90c47aa99f000394301b9573b8898b"
+  dependencies:
+    emissary "^1.3.3"
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+    underscore-plus "^1"
+    vscode-oniguruma "^1.7.0"
+
 selector-kit@^0.1:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/selector-kit/-/selector-kit-0.1.0.tgz#304338fceccea35ec28ffaddb792ab7715633e6f"
@@ -9299,8 +9293,9 @@ through@2, through@2.3.x, through@^2.3.8, through@~2.3, through@~2.3.1:
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
-"timecop@file:./packages/timecop":
+"timecop@https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2":
   version "0.36.2"
+  resolved "https://codeload.github.com/atom/timecop/legacy.tar.gz/refs/tags/v0.36.2#8965f20444701af3b6f86dfa9f144a46e1aaa9d0"
   dependencies:
     dedent "^0.7.0"
     etch "^0.12.6"
@@ -9804,6 +9799,11 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+vscode-oniguruma@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/vscode-oniguruma/-/vscode-oniguruma-1.7.0.tgz#439bfad8fe71abd7798338d1cd3dc53a8beea94b"
+  integrity sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==
+
 vscode-ripgrep@1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.9.0.tgz#d6cdea4d290f3c2919472cdcfe2440d5fb1f99db"
@@ -10001,8 +10001,9 @@ which@^2.0.1, which@^2.0.2:
   dependencies:
     isexe "^2.0.0"
 
-"whitespace@file:./packages/whitespace":
+"whitespace@https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8":
   version "0.37.8"
+  resolved "https://codeload.github.com/atom/whitespace/legacy.tar.gz/refs/tags/v0.37.8#0c0510f8ead296d63a16105024700ec34b2b5d1b"
 
 wide-align@1.1.3:
   version "1.1.3"

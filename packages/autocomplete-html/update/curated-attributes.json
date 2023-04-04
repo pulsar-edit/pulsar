@@ -1,0 +1,1328 @@
+{
+  "accesskey": {
+    "global": "true",
+    "description": "Provides a hint for generating a keyboard shortcut for the current element."
+  },
+  "class": {
+    "global": "true",
+    "type": "cssStyle",
+    "description": "A space-separated list of the classes of the element."
+  },
+  "contenteditable": {
+    "global": "true",
+    "type": "boolean",
+    "description": "An enumerated attribute indicating if the element should be editable by the user."
+  },
+  "contextmenu": {
+    "global": "true",
+    "description": "The id of a menu to use as the contextual menu for this element."
+  },
+  "dir": {
+    "attribOption": [
+      "ltr",
+      "rtl"
+    ],
+    "global": "true",
+    "description": "An enumerated attribute indicates the directionality of the element's text."
+  },
+  "draggable": {
+    "attribOption": [
+      "auto",
+      "false",
+      "true"
+    ],
+    "global": "true",
+    "description": "An enumerated attribute that indicates whether the element can be dragged, using the HTML Drag and Drop API."
+  },
+  "dropzone": {
+    "attribOption": [
+      "copy",
+      "move",
+      "link"
+    ],
+    "global": "true",
+    "description": "An enumerated attribute indicating what types of content can be dropped on an element, using the Drag and Drop API."
+  },
+  "hidden": {
+    "type": "flag",
+    "global": "true",
+    "description": "A Boolean attribute indicating that the element is not yet, or is no longer, relevant."
+  },
+  "id": {
+    "global": "true",
+    "type": "cssId",
+    "description": "Defines a unique identifier (ID) which must be unique in the whole document."
+  },
+  "lang": {
+    "attribOption": [
+      "ab",
+      "aa",
+      "af",
+      "sq",
+      "am",
+      "ar",
+      "an",
+      "hy",
+      "as",
+      "ay",
+      "az",
+      "ba",
+      "eu",
+      "bn",
+      "dz",
+      "bh",
+      "bi",
+      "br",
+      "bg",
+      "my",
+      "be",
+      "km",
+      "ca",
+      "zh",
+      "co",
+      "hr",
+      "cs",
+      "da",
+      "nl",
+      "en",
+      "eo",
+      "et",
+      "fo",
+      "fa",
+      "fi",
+      "fr",
+      "fy",
+      "gl",
+      "gd",
+      "gv",
+      "ka",
+      "de",
+      "el",
+      "kl",
+      "gn",
+      "gu",
+      "ht",
+      "ha",
+      "he",
+      "hi",
+      "hu",
+      "is",
+      "io",
+      "id",
+      "ia",
+      "ie",
+      "iu",
+      "ik",
+      "ga",
+      "it",
+      "ja",
+      "jv",
+      "kn",
+      "ks",
+      "kk",
+      "rw",
+      "ky",
+      "rn",
+      "ko",
+      "ku",
+      "lo",
+      "la",
+      "lv",
+      "li",
+      "ln",
+      "lt",
+      "mk",
+      "mg",
+      "ms",
+      "ml",
+      "mt",
+      "mi",
+      "mr",
+      "mo",
+      "mn",
+      "na",
+      "ne",
+      "no",
+      "oc",
+      "or",
+      "om",
+      "ps",
+      "pl",
+      "pt",
+      "pa",
+      "qu",
+      "rm",
+      "ro",
+      "ru",
+      "sz",
+      "sm",
+      "sg",
+      "sa",
+      "sr",
+      "sh",
+      "st",
+      "tn",
+      "sn",
+      "ii",
+      "sd",
+      "si",
+      "ss",
+      "sk",
+      "sl",
+      "so",
+      "es",
+      "su",
+      "sw",
+      "sv",
+      "tl",
+      "tg",
+      "ta",
+      "tt",
+      "te",
+      "th",
+      "bo",
+      "ti",
+      "to",
+      "ts",
+      "tr",
+      "tk",
+      "tw",
+      "ug",
+      "uk",
+      "ur",
+      "uz",
+      "vi",
+      "vo",
+      "wa",
+      "cy",
+      "wo",
+      "xh",
+      "yi",
+      "yo",
+      "zu"
+    ],
+    "global": "true",
+    "description": "Participates in defining the language of the element, the language that its non-editable elements are written in or the language that the editable elements should be written in."
+  },
+  "role": {
+    "attribOption": [
+      "alert",
+      "alertdialog",
+      "article",
+      "application",
+      "banner",
+      "button",
+      "checkbox",
+      "columnheader",
+      "combobox",
+      "complementary",
+      "contentinfo",
+      "definition",
+      "directory",
+      "dialog",
+      "document",
+      "form",
+      "grid",
+      "gridcell",
+      "group",
+      "heading",
+      "img",
+      "link",
+      "list",
+      "listbox",
+      "listitem",
+      "log",
+      "main",
+      "marquee",
+      "math",
+      "menu",
+      "menubar",
+      "menuitem",
+      "menuitemcheckbox",
+      "menuitemradio",
+      "navigation",
+      "note",
+      "option",
+      "presentation",
+      "progressbar",
+      "radio",
+      "radiogroup",
+      "region",
+      "row",
+      "rowgroup",
+      "rowheader",
+      "scrollbar",
+      "search",
+      "separator",
+      "slider",
+      "spinbutton",
+      "status",
+      "tab",
+      "tablist",
+      "tabpanel",
+      "textbox",
+      "timer",
+      "toolbar",
+      "tooltip",
+      "tree",
+      "treegrid",
+      "treeitem"
+    ],
+    "global": "true"
+  },
+  "spellcheck": {
+    "global": "true",
+    "type": "boolean",
+    "description": "An enumerated attribute defines whether the element may be checked for spelling errors."
+  },
+  "style": {
+    "global": "true",
+    "type": "style",
+    "description": "Contains CSS styling declarations to be applied to the element."
+  },
+  "tabindex": {
+    "global": "true",
+    "description": "Indicates if its element can be focused, and if/where it participates in sequential keyboard navigation (usually with the Tab key, hence the name)."
+  },
+  "title": {
+    "global": "true",
+    "description": "Contains text representing advisory information, related to the element it belongs to."
+  },
+  "onabort": {
+    "global": "true"
+  },
+  "onauxclick": {
+    "global": "true"
+  },
+  "onbeforematch": {
+    "global": "true"
+  },
+  "onblur": {
+    "global": "true"
+  },
+  "oncancel": {
+    "global": "true"
+  },
+  "onclose": {
+    "global": "true"
+  },
+  "oncontextlost": {
+    "global": "true"
+  },
+  "oncontextrestored": {
+    "global": "true"
+  },
+  "oncanplay": {
+    "global": "true"
+  },
+  "oncanplaythrough": {
+    "global": "true"
+  },
+  "onchange": {
+    "global": "true"
+  },
+  "onclick": {
+    "global": "true"
+  },
+  "oncontextmenu": {
+    "global": "true"
+  },
+  "oncuechange": {
+    "global": "true"
+  },
+  "ondblclick": {
+    "global": "true"
+  },
+  "ondrag": {
+    "global": "true"
+  },
+  "ondragend": {
+    "global": "true"
+  },
+  "ondragenter": {
+    "global": "true"
+  },
+  "ondragleave": {
+    "global": "true"
+  },
+  "ondragover": {
+    "global": "true"
+  },
+  "ondragstart": {
+    "global": "true"
+  },
+  "ondrop": {
+    "global": "true"
+  },
+  "ondurationchange": {
+    "global": "true"
+  },
+  "onemptied": {
+    "global": "true"
+  },
+  "onended": {
+    "global": "true"
+  },
+  "onerror": {
+    "global": "true"
+  },
+  "onfocus": {
+    "global": "true"
+  },
+  "onformdata": {
+    "global": "true"
+  },
+  "oninput": {
+    "global": "true"
+  },
+  "oninvalid": {
+    "global": "true"
+  },
+  "onkeydown": {
+    "global": "true"
+  },
+  "onkeypress": {
+    "global": "true"
+  },
+  "onkeyup": {
+    "global": "true"
+  },
+  "onload": {
+    "global": "true"
+  },
+  "onloadeddata": {
+    "global": "true"
+  },
+  "onloadedmetadata": {
+    "global": "true"
+  },
+  "onloadstart": {
+    "global": "true"
+  },
+  "onmousedown": {
+    "global": "true"
+  },
+  "onmousemove": {
+    "global": "true"
+  },
+  "onmouseout": {
+    "global": "true"
+  },
+  "onmouseover": {
+    "global": "true"
+  },
+  "onmouseup": {
+    "global": "true"
+  },
+  "onmousewheel": {
+    "global": "true"
+  },
+  "onmouseenter": {
+    "global": "true"
+  },
+  "onmouseleave": {
+    "global": "true"
+  },
+  "onpause": {
+    "global": "true"
+  },
+  "onplay": {
+    "global": "true"
+  },
+  "onplaying": {
+    "global": "true"
+  },
+  "onprogress": {
+    "global": "true"
+  },
+  "onratechange": {
+    "global": "true"
+  },
+  "onreadystatechange": {
+    "global": "true"
+  },
+  "onreset": {
+    "global": "true"
+  },
+  "onresize": {
+    "global": "true"
+  },
+  "onscroll": {
+    "global": "true"
+  },
+  "onseeked": {
+    "global": "true"
+  },
+  "onseeking": {
+    "global": "true"
+  },
+  "onselect": {
+    "global": "true"
+  },
+  "onsecuritypolicyviolation": {
+    "global": "true"
+  },
+  "onshow": {
+    "global": "true"
+  },
+  "onslotchange": {
+    "global": "true"
+  },
+  "onstalled": {
+    "global": "true"
+  },
+  "onsubmit": {
+    "global": "true"
+  },
+  "onsuspend": {
+    "global": "true"
+  },
+  "ontimeupdate": {
+    "global": "true"
+  },
+  "ontoggle": {
+    "global": "true"
+  },
+  "onvolumechange": {
+    "global": "true"
+  },
+  "onwaiting": {
+    "global": "true"
+  },
+  "onwebkitanimationend": {
+    "global": "true"
+  },
+  "onwebkitanimationiteration": {
+    "global": "true"
+  },
+  "onwebkitanimationstart": {
+    "global": "true"
+  },
+  "onwebkittransitionend": {
+    "global": "true"
+  },
+  "onwheel": {
+    "global": "true"
+  },
+  "ongotpointercapture": {
+    "global": "true"
+  },
+  "onlostpointercapture": {
+    "global": "true"
+  },
+  "onpointerdown": {
+    "global": "true"
+  },
+  "onpointermove": {
+    "global": "true"
+  },
+  "onpointerrawupdate": {
+    "global": "true"
+  },
+  "onpointerup": {
+    "global": "true"
+  },
+  "onpointercancel": {
+    "global": "true"
+  },
+  "onpointerover": {
+    "global": "true"
+  },
+  "onpointerout": {
+    "global": "true"
+  },
+  "onpointerenter": {
+    "global": "true"
+  },
+  "onpointerleave": {
+    "global": "true"
+  },
+  "aria-autocomplete": {
+    "attribOption": [
+      "inline",
+      "list",
+      "both",
+      "none"
+    ]
+  },
+  "aria-activedescendant": {
+    "global": "true"
+  },
+  "aria-atomic": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "global": "true",
+    "type": "boolean"
+  },
+  "aria-busy": {
+    "global": "true",
+    "type": "boolean"
+  },
+  "aria-checked": {
+    "attribOption": [
+      "true",
+      "false",
+      "mixed",
+      "undefined"
+    ]
+  },
+  "aria-controls": {
+    "global": "true"
+  },
+  "aria-describedby": {
+    "global": "true"
+  },
+  "aria-disabled": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "global": "true"
+  },
+  "aria-dropeffect": {
+    "attribOption": [
+      "copy",
+      "move",
+      "link",
+      "execute",
+      "popup",
+      "none"
+    ],
+    "global": "true"
+  },
+  "aria-expanded": {
+    "attribOption": [
+      "true",
+      "false",
+      "undefined"
+    ]
+  },
+  "aria-flowto": {
+    "global": "true"
+  },
+  "aria-grabbed": {
+    "attribOption": [
+      "true",
+      "false",
+      "undefined"
+    ],
+    "global": "true"
+  },
+  "aria-haspopup": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "global": "true",
+    "type": "boolean"
+  },
+  "aria-hidden": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "global": "true",
+    "type": "boolean"
+  },
+  "aria-invalid": {
+    "attribOption": [
+      "grammar",
+      "false",
+      "spelling",
+      "true"
+    ],
+    "global": "true"
+  },
+  "aria-label": {
+    "global": "true"
+  },
+  "aria-labelledby": {
+    "global": "true"
+  },
+  "aria-level": {},
+  "aria-live": {
+    "attribOption": [
+      "off",
+      "polite",
+      "assertive"
+    ],
+    "global": "true"
+  },
+  "aria-multiline": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "type": "boolean"
+  },
+  "aria-multiselectable": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "type": "boolean"
+  },
+  "aria-orientation": {
+    "attribOption": [
+      "vertical",
+      "horizontal"
+    ]
+  },
+  "aria-owns": {
+    "global": "true"
+  },
+  "aria-posinset": {},
+  "aria-pressed": {
+    "attribOption": [
+      "true",
+      "false",
+      "mixed",
+      "undefined"
+    ]
+  },
+  "aria-readonly": {
+    "attribOption": [
+      "true",
+      "false"
+    ]
+  },
+  "aria-relevant": {
+    "attribOption": [
+      "additions",
+      "removals",
+      "text",
+      "all",
+      "additions text"
+    ],
+    "global": "true"
+  },
+  "aria-required": {
+    "attribOption": [
+      "true",
+      "false"
+    ],
+    "type": "boolean"
+  },
+  "aria-selected": {
+    "attribOption": [
+      "true",
+      "false",
+      "undefined"
+    ]
+  },
+  "aria-setsize": {},
+  "aria-sort": {
+    "attribOption": [
+      "ascending",
+      "descending",
+      "none",
+      "other"
+    ]
+  },
+  "aria-valuemax": {},
+  "aria-valuemin": {},
+  "aria-valuenow": {},
+  "aria-valuetext": {},
+  "accept": {
+    "attribOption": [
+      "text/html",
+      "text/plain",
+      "application/msword",
+      "application/msexcel",
+      "application/postscript",
+      "application/x-zip-compressed",
+      "application/pdf",
+      "application/rtf",
+      "video/x-msvideo",
+      "video/quicktime",
+      "video/x-mpeg2",
+      "audio/x-pn/realaudio",
+      "audio/x-mpeg",
+      "audio/x-waw",
+      "audio/x-aiff",
+      "audio/basic",
+      "image/tiff",
+      "image/jpeg",
+      "image/gif",
+      "image/x-png",
+      "image/x-photo-cd",
+      "image/x-MS-bmp",
+      "image/x-rgb",
+      "image/x-portable-pixmap",
+      "image/x-portable-greymap",
+      "image/x-portablebitmap"
+    ]
+  },
+  "accept-charset": {},
+  "action": {},
+  "align": {},
+  "alt": {},
+  "archive": {},
+  "async": {
+    "type": "flag"
+  },
+  "autocapitalize": {
+    "attribOption": [
+      "off",
+      "none",
+      "on",
+      "sentences",
+      "words",
+      "characters"
+    ],
+    "global": "true",
+    "description": "Controls whether and how text input is automatically capitalized."
+  },
+  "autocomplete": {
+    "attribOption": [
+      "additional-name",
+      "address-level1",
+      "address-level2",
+      "address-level3",
+      "address-level4",
+      "address-line1",
+      "address-line2",
+      "address-line3",
+      "bday",
+      "bday-year",
+      "bday-day",
+      "bday-month",
+      "billing",
+      "cc-additional-name",
+      "cc-csc",
+      "cc-exp",
+      "cc-exp-month",
+      "cc-exp-year",
+      "cc-family-name",
+      "cc-given-name",
+      "cc-name",
+      "cc-number",
+      "cc-type",
+      "country",
+      "country-name",
+      "current-password",
+      "email",
+      "family-name",
+      "fax",
+      "given-name",
+      "home",
+      "honorific-prefix",
+      "honorific-suffix",
+      "impp",
+      "language",
+      "mobile",
+      "name",
+      "new-password",
+      "nickname",
+      "off",
+      "on",
+      "organization",
+      "organization-title",
+      "pager",
+      "photo",
+      "postal-code",
+      "sex",
+      "shipping",
+      "street-address",
+      "tel-area-code",
+      "tel",
+      "tel-country-code",
+      "tel-extension",
+      "tel-local",
+      "tel-local-prefix",
+      "tel-local-suffix",
+      "tel-national",
+      "transaction-amount",
+      "transaction-currency",
+      "url",
+      "username",
+      "work"
+    ]
+  },
+  "autofocus": {
+    "type": "flag"
+  },
+  "autoplay": {
+    "type": "flag"
+  },
+  "behavior": {
+    "attribOption": [
+      "scroll",
+      "slide",
+      "alternate"
+    ]
+  },
+  "bgcolor": {
+    "type": "color"
+  },
+  "border": {},
+  "challenge": {},
+  "charset": {
+    "attribOption": [
+      "iso-8859-1",
+      "utf-8",
+      "shift_jis",
+      "euc-jp",
+      "big5",
+      "gb2312",
+      "euc-kr",
+      "din_66003-kr",
+      "ns_4551-1-kr",
+      "sen_850200_b",
+      "csISO2022jp",
+      "hz-gb-2312",
+      "ibm852",
+      "ibm866",
+      "irv",
+      "iso-2022-kr",
+      "iso-8859-2",
+      "iso-8859-3",
+      "iso-8859-4",
+      "iso-8859-5",
+      "iso-8859-6",
+      "iso-8859-7",
+      "iso-8859-8",
+      "iso-8859-9",
+      "koi8-r",
+      "ks_c_5601",
+      "windows-1250",
+      "windows-1251",
+      "windows-1252",
+      "windows-1253",
+      "windows-1254",
+      "windows-1255",
+      "windows-1256",
+      "windows-1257",
+      "windows-1258",
+      "windows-874",
+      "x-euc",
+      "asmo-708",
+      "dos-720",
+      "dos-862",
+      "dos-874",
+      "cp866",
+      "cp1256"
+    ]
+  },
+  "checked": {
+    "type": "flag"
+  },
+  "cite": {},
+  "codebase": {},
+  "codetype": {},
+  "cols": {},
+  "colspan": {},
+  "content": {},
+  "controls": {
+    "type": "flag"
+  },
+  "coords": {},
+  "data": {},
+  "datetime": {},
+  "declare": {
+    "type": "flag"
+  },
+  "default": {
+    "type": "flag"
+  },
+  "defer": {
+    "type": "flag"
+  },
+  "direction": {
+    "attribOption": [
+      "left",
+      "right",
+      "up",
+      "down"
+    ]
+  },
+  "dirname": {},
+  "disabled": {
+    "type": "flag"
+  },
+  "enctype": {
+    "attribOption": [
+      "application/x-www-form-urlencoded",
+      "multipart/form-data",
+      "text/plain"
+    ]
+  },
+  "for": {},
+  "form": {},
+  "formaction": {},
+  "formenctype": {
+    "attribOption": [
+      "application/x-www-form-urlencoded",
+      "multipart/form-data",
+      "text/plain"
+    ]
+  },
+  "formmethod": {
+    "attribOption": [
+      "get",
+      "post"
+    ]
+  },
+  "formnovalidate": {
+    "type": "flag"
+  },
+  "formtarget": {
+    "attribOption": [
+      "_blank",
+      "_parent",
+      "_self",
+      "_top"
+    ]
+  },
+  "headers": {},
+  "height": {},
+  "high": {},
+  "href": {},
+  "hreflang": {},
+  "hspace": {},
+  "http-equiv": {
+    "attribOption": [
+      "content-type",
+      "default-style",
+      "refresh"
+    ]
+  },
+  "icon": {},
+  "ismap": {
+    "type": "flag"
+  },
+  "keytype": {
+    "attribOption": [
+      "dsa",
+      "ec",
+      "rsa"
+    ]
+  },
+  "kind": {
+    "attribOption": [
+      "captions",
+      "chapters",
+      "descriptions",
+      "metadata",
+      "subtitles"
+    ]
+  },
+  "label": {},
+  "list": {},
+  "longdesc": {},
+  "loop": {
+    "type": "flag"
+  },
+  "low": {},
+  "manifest": {},
+  "max": {},
+  "maxlength": {},
+  "media": {
+    "attribOption": [
+      "screen",
+      "tty",
+      "tv",
+      "projection",
+      "handheld",
+      "print",
+      "aural",
+      "braille",
+      "embossed",
+      "speech",
+      "all",
+      "width",
+      "min-width",
+      "max-width",
+      "height",
+      "min-height",
+      "max-height",
+      "device-width",
+      "min-device-width",
+      "max-device-width",
+      "device-height",
+      "min-device-height",
+      "max-device-height",
+      "orientation",
+      "aspect-ratio",
+      "min-aspect-ratio",
+      "max-aspect-ratio",
+      "device-aspect-ratio",
+      "min-device-aspect-ratio",
+      "max-device-aspect-ratio",
+      "color",
+      "min-color",
+      "max-color",
+      "color-index",
+      "min-color-index",
+      "max-color-index",
+      "monochrome",
+      "min-monochrome",
+      "max-monochrome",
+      "resolution",
+      "min-resolution",
+      "max-resolution",
+      "scan",
+      "grid"
+    ],
+    "allowMultipleValues": "true"
+  },
+  "mediagroup": {},
+  "method": {
+    "attribOption": [
+      "get",
+      "post"
+    ]
+  },
+  "min": {},
+  "multiple": {
+    "type": "flag"
+  },
+  "muted": {
+    "type": "flag"
+  },
+  "name": {},
+  "meta/name": {
+    "attribOption": [
+      "application-name",
+      "author",
+      "description",
+      "generator",
+      "keywords"
+    ]
+  },
+  "novalidate": {
+    "type": "flag"
+  },
+  "open": {
+    "type": "flag"
+  },
+  "optimum": {},
+  "pattern": {},
+  "placeholder": {},
+  "poster": {},
+  "preload": {
+    "attribOption": [
+      "auto",
+      "metadata",
+      "none"
+    ]
+  },
+  "pubdate": {},
+  "radiogroup": {},
+  "rel": {
+    "attribOption": [
+      "alternate",
+      "author",
+      "bookmark",
+      "help",
+      "license",
+      "next",
+      "nofollow",
+      "noreferrer",
+      "prefetch",
+      "prev",
+      "search",
+      "sidebar",
+      "tag",
+      "external"
+    ]
+  },
+  "link/rel": {
+    "attribOption": [
+      "alternate",
+      "author",
+      "help",
+      "icon",
+      "license",
+      "next",
+      "pingback",
+      "prefetch",
+      "prev",
+      "search",
+      "sidebar",
+      "stylesheet",
+      "tag"
+    ]
+  },
+  "readonly": {
+    "type": "flag"
+  },
+  "required": {
+    "type": "flag"
+  },
+  "reversed": {
+    "type": "flag"
+  },
+  "rows": {},
+  "rowspan": {},
+  "sandbox": {
+    "attribOption": [
+      "allow-forms",
+      "allow-same-origin",
+      "allow-scripts",
+      "allow-top-navigation"
+    ]
+  },
+  "seamless": {
+    "type": "flag"
+  },
+  "selected": {
+    "type": "flag"
+  },
+  "scope": {
+    "attribOption": [
+      "col",
+      "colgroup",
+      "row",
+      "rowgroup"
+    ]
+  },
+  "scoped": {
+    "type": "boolean"
+  },
+  "scrollamount": {},
+  "scrolldelay": {},
+  "shape": {
+    "attribOption": [
+      "circle",
+      "default",
+      "poly",
+      "rect"
+    ]
+  },
+  "size": {},
+  "sizes": {
+    "attribOption": [
+      "any"
+    ]
+  },
+  "span": {},
+  "src": {},
+  "srcdoc": {},
+  "srclang": {},
+  "standby": {},
+  "start": {},
+  "step": {},
+  "target": {
+    "attribOption": [
+      "_blank",
+      "_parent",
+      "_self",
+      "_top"
+    ]
+  },
+  "translate": {
+    "attribOption": [
+      "no",
+      "yes"
+    ],
+    "global": "true",
+    "description": "Used to specify whether an element's translatable attribute values and its text node children should be translated."
+  },
+  "truespeed": {
+    "type": "flag"
+  },
+  "type": {},
+  "button/type": {
+    "attribOption": [
+      "button",
+      "reset",
+      "submit"
+    ]
+  },
+  "command/type": {
+    "attribOption": [
+      "command",
+      "checkbox",
+      "radio"
+    ]
+  },
+  "link/type": {
+    "attribOption": [
+      "text/css"
+    ]
+  },
+  "menu/type": {
+    "attribOption": [
+      "context",
+      "list",
+      "toolbar"
+    ]
+  },
+  "ol/type": {
+    "attribOption": [
+      "1",
+      "a",
+      "A",
+      "i",
+      "I"
+    ]
+  },
+  "script/type": {
+    "attribOption": [
+      "text/javascript",
+      "text/ecmascript",
+      "text/jscript",
+      "text/livescript",
+      "text/tcl",
+      "text/x-javascript",
+      "text/x-ecmascript",
+      "application/x-javascript",
+      "application/x-ecmascript",
+      "application/javascript",
+      "application/ecmascript",
+      "text/babel",
+      "text/jsx"
+    ]
+  },
+  "style/type": {
+    "attribOption": [
+      "text/css"
+    ]
+  },
+  "input/type": {
+    "attribOption": [
+      "button",
+      "checkbox",
+      "color",
+      "date",
+      "datetime",
+      "datetime-local",
+      "email",
+      "file",
+      "hidden",
+      "image",
+      "month",
+      "number",
+      "password",
+      "radio",
+      "range",
+      "reset",
+      "search",
+      "submit",
+      "tel",
+      "text",
+      "time",
+      "url",
+      "week"
+    ]
+  },
+  "usemap": {},
+  "value": {},
+  "vspace": {},
+  "width": {},
+  "wrap": {
+    "attribOption": [
+      "hard",
+      "soft"
+    ]
+  },
+  "nonce": {
+    "global": "true",
+    "description": "A content attribute defining a cryptographic 'number used once'."
+  },
+  "xml:lang": {},
+  "xmlns": {}
+}
