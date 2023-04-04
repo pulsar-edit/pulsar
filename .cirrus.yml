@@ -1,5 +1,6 @@
 env:
   PYTHON_VERSION: 3.10
+  DEBUG: electron-builder
 
 linux_task:
   alias: linux

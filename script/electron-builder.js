@@ -37,8 +37,6 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 /// END Monkey-Patch
 
 const builder = require("electron-builder")
-const Platform = builder.Platform
-
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
