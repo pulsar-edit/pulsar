@@ -11,6 +11,7 @@ linux_task:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
+                ffmpeg
                 rpm
                 build-essential
                 git
@@ -39,7 +40,7 @@ linux_task:
   test_script:
     - ./binaries/*AppImage --appimage-extract
     - export BINARY_NAME='squashfs-root/pulsar'
-    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+    - Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ~/video/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
       path: ./tests/videos/**
