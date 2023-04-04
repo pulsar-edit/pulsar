@@ -217,12 +217,7 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      {
-        target: "portable",
-        artifactBuildOptions: {
-          compression: 'low'
-        }
-      },
+      { target: "portable" },
     ],
   },
   // Windows NSIS Configuration
