@@ -222,7 +222,6 @@ let options = {
   },
   // Windows NSIS Configuration
   "nsis": {
-    useZip: true,
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "uninstallDisplayName": "Pulsar",
