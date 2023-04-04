@@ -68,9 +68,13 @@ class I18n {
 
     this.updateConfigs();
 
+    // Preload languages (getting an obj would place it in the cache)
+    // TODO reassess preloading the "en" fallback when we have more progress on translations
+    this.getCoreLanguage(this.primaryLanguage);
+    this.getCoreLanguage("en");
     this.packages.onDidActivatePackage(pkg => {
-      // getting an obj would place it in the cache
       this.getPkgLanguage(pkg.name, this.primaryLanguage);
+      this.getPkgLanguage(pkg.name, "en");
     });
 
     this.packages.onDidDeactivatePackage(pkg => {
