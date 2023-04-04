@@ -224,7 +224,7 @@ let options = {
   },
   // Windows Portable Config
   portable: {
-    useZip: true
+    // useZip: true
   },
   // Windows NSIS Configuration
   "nsis": {
