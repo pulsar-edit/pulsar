@@ -22,7 +22,9 @@ firstLineRegex: [
 
 fileTypes: [
   'rb',
+  'ru',
   'rake',
+  'gemspec',
   'Podfile',
   'Brewfile',
   'Rakefile',
