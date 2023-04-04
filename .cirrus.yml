@@ -136,7 +136,7 @@ silicon_mac_task:
   test_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - hdiutil mount binaries/Pulsar*dmg
-    - export BINARY_NAME`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
+    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -183,7 +183,7 @@ intel_mac_task:
   test_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - hdiutil mount binaries/Pulsar*dmg
-    - export BINARY_NAME`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
+    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -195,6 +195,7 @@ intel_mac_task:
 
 windows_task:
   alias: windows
+  timeout_in: 90m
   windows_container:
     image: cirrusci/windowsservercore:visualstudio2022-2022.06.23
   env:
@@ -208,7 +209,7 @@ windows_task:
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   install_script:
-    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
+    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-scripts || echo "There is a reason for so many tries"
   build_script:
     - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
@@ -217,3 +218,13 @@ windows_task:
     - npx yarn dist || npx yarn dist || npx yarn dist
   binary_artifacts:
     path: .\binaries\*
+  test_script:
+    - export BINARY_NAME=`ls binaries/Pulsar\ 1*exe`
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
