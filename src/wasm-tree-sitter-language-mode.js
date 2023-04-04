@@ -182,6 +182,11 @@ class WASMTreeSitterLanguageMode {
     return this.grammar.scopeName;
   }
 
+  getNonWordCharacters(position) {
+    const scope = this.scopeDescriptorForPosition(position);
+    return this.config.get('editor.nonWordCharacters', { scope });
+  }
+
   getRootParser() {
     return this.getOrCreateParserForLanguage(this.rootLanguage);
   }
