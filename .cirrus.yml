@@ -38,6 +38,7 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - rm -R node_modules/electron; yarn install --check-files
     - ./binaries/*AppImage --appimage-extract
     - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
@@ -95,6 +96,7 @@ arm_linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - rm -R node_modules/electron; yarn install --check-files
     - ./binaries/*AppImage --appimage-extract
     - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
@@ -138,6 +140,7 @@ silicon_mac_task:
     path: ./binaries/*
   test_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - rm -R node_modules/electron; yarn install --check-files
     - hdiutil mount binaries/Pulsar*dmg
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
@@ -185,6 +188,7 @@ intel_mac_task:
     path: ./binaries/*
   test_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - rm -R node_modules/electron; yarn install --check-files
     - hdiutil mount binaries/Pulsar*dmg
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
@@ -222,7 +226,8 @@ windows_task:
   binary_artifacts:
     path: .\binaries\*
   test_script:
-    - export BINARY_NAME=`ls binaries/Pulsar\ 1*exe`
+    - ./binaries/*Setup*exe /S /D=c:\pulsar
+    - export BINARY_NAME=c:\pulsar\pulsar.exe
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
