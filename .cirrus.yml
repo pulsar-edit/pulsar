@@ -36,8 +36,7 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
-    - export BINARY_NAME=`ls binaries/*AppImage`
-    - echo -e "Binary Name: $BINARY_NAME"
+    - export BINARY_NAME=`ls binaries/*AppImage --color=no`
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -94,7 +93,7 @@ arm_linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
-    - export BINARY_NAME=`ls binaries/*AppImage`
+    - export BINARY_NAME=`ls binaries/*AppImage --color=no`
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
