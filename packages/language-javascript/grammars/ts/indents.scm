@@ -7,10 +7,10 @@
 (switch_statement
   body: (switch_body "}" @match
     (#set! onlyIfLast true))
-  (#set! matchIndentOf parent.startPosition))
+    (#set! matchIndentOf parent.startPosition))
 
 ; 'case' and 'default' need to be indented one level more than their containing
-; `switch`.
+; `switch`. TODO: Might need to make this configurable.
 (["case" "default"] @match
   (#set! matchIndentOf parent.parent.startPosition)
   (#set! offsetIndent 1))
@@ -59,7 +59,8 @@
 ; …and the line after that should be dedented.
 (binary_expression
   ["||" "&&"]
-    right: (_) @dedent.next)
+    right: (_) @dedent.next
+    (#set! onlyIfNotStartsOnSameRowAs parent.startPosition))
 
 
 (template_substitution "}" @_IGNORE_
