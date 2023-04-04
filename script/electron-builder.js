@@ -218,11 +218,11 @@ let options = {
     "target": [
       { "target": "nsis" },
       { "target": "zip" },
-      {
-        target: "portable",
-        artifactBuildOptions: {
-          compression: 'low'
-        }
+      // {
+      //   target: "portable",
+      //   artifactBuildOptions: {
+      //     compression: 'low'
+      //   }
       },
     ],
   },
