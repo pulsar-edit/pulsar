@@ -492,10 +492,10 @@ describe('ScopeResolver', () => {
       expect(matched[0].node.text.includes("function bar")).toBe(true);
     });
 
-    it('supports onlyIfDescendantOfNodeWithData', async () => {
+    it('supports onlyIfDescendantOfNodeWithData (without value)', async () => {
       await grammar.setQueryForTest('syntaxQuery', `
         ((function_declaration) @_IGNORE_
-          (#match? @_IGNORE_ "foo" )
+          (#match? @_IGNORE_ "foo")
           (#set! isSpecialFunction true))
 
         ("," @special-comma
@@ -517,6 +517,57 @@ describe('ScopeResolver', () => {
         return cap.node.startPosition.row === 0 &&
           cap.node.text === ",";
       })).toBe(true);
+    });
+
+    it('supports onlyIfDescendantOfNodeWithData (with right value)', async () => {
+      await grammar.setQueryForTest('syntaxQuery', `
+        ((function_declaration) @_IGNORE_
+          (#match? @_IGNORE_ "foo" )
+          (#set! isSpecialFunction "troz"))
+
+        ("," @special-comma
+          (#set! onlyIfDescendantOfNodeWithData "isSpecialFunction troz"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        function foo (bar, baz, thud) {}
+        function bar (lorem, ipsum, dolor) {}
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      expect(matched.length).toBe(2);
+      expect(matched.every(cap => {
+        return cap.node.startPosition.row === 0 &&
+          cap.node.text === ",";
+      })).toBe(true);
+    });
+
+    it('supports onlyIfDescendantOfNodeWithData (with wrong value)', async () => {
+      await grammar.setQueryForTest('syntaxQuery', `
+        ((function_declaration) @_IGNORE_
+          (#match? @_IGNORE_ "foo")
+          (#set! isSpecialFunction "troz"))
+
+        ("," @special-comma
+          (#set! onlyIfDescendantOfNodeWithData "isSpecialFunction zort"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        function foo (bar, baz, thud) {}
+        function bar (lorem, ipsum, dolor) {}
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      // Wrong value, so test shouldn't pass.
+      expect(matched.length).toBe(0);
     });
 
     it('supports onlyIfType', async () => {
@@ -613,7 +664,7 @@ describe('ScopeResolver', () => {
       }
     });
 
-    it('supports onlyIfRangeWithData', async () => {
+    it('supports onlyIfRangeWithData (without value)', async () => {
       await grammar.setQueryForTest('syntaxQuery', `
         ((true) @_IGNORE_ (#set! isTrue true))
         ([ (true) (false) ] @optimistic-boolean
@@ -637,6 +688,55 @@ describe('ScopeResolver', () => {
         expect(cap.name).toBe('optimistic-boolean');
         expect(cap.node.text).toBe('true');
       }
+    });
+
+    it('supports onlyIfRangeWithData (with right value)', async () => {
+      await grammar.setQueryForTest('syntaxQuery', `
+        ((true) @_IGNORE_ (#set! isTrue "exactly"))
+        ([ (true) (false) ] @optimistic-boolean
+          (#set! onlyIfRangeWithData "isTrue exactly"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        function foo (bar, baz, thud) {
+          if (true || false) { console.log('logic!'); }
+          return true || false;
+        }
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      expect(matched.length).toBe(2);
+      for (let cap of matched) {
+        expect(cap.name).toBe('optimistic-boolean');
+        expect(cap.node.text).toBe('true');
+      }
+    });
+
+    it('supports onlyIfRangeWithData (with wrong value)', async () => {
+      await grammar.setQueryForTest('syntaxQuery', `
+        ((true) @_IGNORE_ (#set! isTrue "perhaps"))
+        ([ (true) (false) ] @optimistic-boolean
+          (#set! onlyIfRangeWithData "isTrue exactly"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        function foo (bar, baz, thud) {
+          if (true || false) { console.log('logic!'); }
+          return true || false;
+        }
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      // Values don't match, so the test shouldn't pass.
+      expect(matched.length).toBe(0);
     });
 
     it('supports onlyIfStartsOnSameRowAs', async () => {
@@ -693,7 +793,7 @@ describe('ScopeResolver', () => {
       }
     });
 
-    it('supports onlyIfConfig with no arguments', async () => {
+    it('supports onlyIfConfig (with no arguments)', async () => {
       atom.config.set('core.careAboutBooleans', true);
 
       await grammar.setQueryForTest('syntaxQuery', `
@@ -720,7 +820,7 @@ describe('ScopeResolver', () => {
       expect(matched.length).toBe(0);
     });
 
-    it('supports onlyIfConfig with boolean arguments', async () => {
+    it('supports onlyIfConfig (with boolean arguments)', async () => {
       atom.config.set('core.careAboutBooleans', true);
 
       await grammar.setQueryForTest('syntaxQuery', `
@@ -747,7 +847,7 @@ describe('ScopeResolver', () => {
       expect(matched.length).toBe(0);
     });
 
-    it('supports onlyIfConfig with number arguments', async () => {
+    it('supports onlyIfConfig (with number arguments)', async () => {
       atom.config.set('core.careAboutBooleans', 0);
 
       await grammar.setQueryForTest('syntaxQuery', `
@@ -774,7 +874,7 @@ describe('ScopeResolver', () => {
       expect(matched.length).toBe(0);
     });
 
-    it('supports onlyIfConfig with string arguments', async () => {
+    it('supports onlyIfConfig (with string arguments)', async () => {
       atom.config.set('core.careAboutBooleans', "something");
 
       await grammar.setQueryForTest('syntaxQuery', `
