@@ -217,6 +217,7 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
+      { "target": "zip" },
       {
         target: "portable",
         artifactBuildOptions: {
