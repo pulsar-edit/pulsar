@@ -1,9 +1,5 @@
 env:
   PYTHON_VERSION: 3.10
-  npm_config_target: '12.2.3'
-  npm_config_disturl: 'https://electronjs.org/headers'
-  npm_config_runtime: 'electron'
-  npm_config_build_from_source: 'true'
 
 linux_task:
   alias: linux
