@@ -14,7 +14,6 @@ module.exports = class Whitespace {
     this.subscriptions.add(atom.commands.add('atom-workspace', {
       'whitespace:remove-trailing-whitespace': () => {
         let editor = atom.workspace.getActiveTextEditor()
-
         if (editor) {
           this.removeTrailingWhitespace(editor, editor.getGrammar().scopeName)
         }
@@ -35,7 +34,6 @@ module.exports = class Whitespace {
 
         if (editor) {
           this.removeTrailingWhitespace(editor, editor.getGrammar().scopeName)
-          console.log(editor.getPath())
           editor.getPath() ? await editor.save() : atom.workspace.getCenter().getActivePane().saveActiveItemAs()
         }
       },
