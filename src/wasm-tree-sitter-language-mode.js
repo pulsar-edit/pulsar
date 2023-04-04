@@ -135,7 +135,7 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeId = this.grammar.idForScope(this.grammar.scopeName);
 
     this.emitter = new Emitter();
-    this.isFoldableCache = [];
+    this.foldRangeCache = [];
 
     this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
@@ -235,7 +235,7 @@ class WASMTreeSitterLanguageMode {
     for (let i = 0, { length } = changes; i < length; i++) {
       const { oldRange, newRange } = changes[i];
       spliceArray(
-        this.isFoldableCache,
+        this.foldRangeCache,
         newRange.start.row,
         oldRange.end.row - oldRange.start.row,
         { length: newRange.end.row - newRange.start.row }
@@ -262,7 +262,7 @@ class WASMTreeSitterLanguageMode {
     const startRow = range.start.row;
     const endRow = range.end.row;
     for (let row = startRow; row < endRow; row++) {
-      this.isFoldableCache[row] = undefined;
+      this.foldRangeCache[row] = undefined;
     }
     this.prefillFoldCache(range);
     this.emitter.emit('did-change-highlighting', range);
@@ -710,8 +710,17 @@ class WASMTreeSitterLanguageMode {
   Section - Folds
   */
   getFoldableRangeContainingPoint(point) {
+    point = this.buffer.clipPosition(point);
     let fold = this.getFoldRangeForRow(point.row);
-    return fold ?? null;
+    if (fold) { return fold; }
+
+    // Move backwards until we find a fold range containing this row.
+    for (let row = point.row - 1; row >= 0; row--) {
+      let range = this.getFoldRangeForRow(row);
+      if (range && range.containsPoint(point)) { return range; }
+    }
+
+    return null;
   }
 
   getFoldableRanges() {
@@ -785,23 +794,27 @@ class WASMTreeSitterLanguageMode {
   }
 
   isFoldableAtRow(row) {
-    if (this.isFoldableCache[row] != null) {
-      return this.isFoldableCache[row];
+    if (this.foldRangeCache[row] != null) {
+      return !!this.foldRangeCache[row];
     }
 
-    let isFoldable = !!this.getFoldRangeForRow(row);
+    let range = this.getFoldRangeForRow(row);
 
     // Don't bother to cache this result before we're able to load the folds
     // query.
     if (this.tokenized) {
-      // TODO: Cache actual ranges, not just booleans?
-      this.isFoldableCache[row] = isFoldable;
+      this.foldRangeCache[row] = range;
     }
-    return isFoldable;
+    return !!range;
   }
 
-  getFoldRangeForRow(row) {
+  getFoldRangeForRow(row, force = false) {
     if (!this.tokenized) { return null; }
+
+    if (!force) {
+      let range = this.foldRangeCache[row];
+      if (range) { return range; }
+    }
 
     let rowEnd = this.buffer.lineLengthForRow(row);
     let point = new Point(row, rowEnd);
