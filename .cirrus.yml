@@ -38,7 +38,7 @@ linux_task:
     path: ./binaries/*
   test_script:
     - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/AppRun'
+    - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -95,7 +95,7 @@ arm_linux_task:
     path: ./binaries/*
   test_script:
     - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/AppRun'
+    - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:

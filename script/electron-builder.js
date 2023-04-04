@@ -217,13 +217,13 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      { "target": "portable" },
+      {
+        target: "portable",
+        artifactBuildOptions: {
+          compression: 'low'
+        }
+      },
     ],
-  },
-  // Windows Portable Config
-  portable: {
-    useZip: true,
-    unpackDirName: false
   },
   // Windows NSIS Configuration
   "nsis": {
