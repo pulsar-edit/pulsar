@@ -220,7 +220,7 @@ windows_task:
     path: .\binaries\*
   test_script:
     - export BINARY_NAME=`ls binaries/Pulsar\ 1*exe`
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
       path: ./tests/videos/**
