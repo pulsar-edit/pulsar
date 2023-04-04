@@ -217,7 +217,7 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      { target: "portable" },
+      { target: "zip" },
     ],
   },
   // Windows NSIS Configuration
