@@ -16,7 +16,7 @@ async function openAtom(profilePath, videoName) {
   }
   if(env.BINARY_NAME) {
     config.executablePath = env.BINARY_NAME
-    config.args = []
+    config.args = ["--no-sandbox"]
   }
 
   if(process.env.CI) {

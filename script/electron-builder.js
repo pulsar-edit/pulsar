@@ -224,7 +224,8 @@ let options = {
   },
   // Windows Portable Config
   portable: {
-    // useZip: true
+    useZip: true,
+    unpackDirName: false
   },
   // Windows NSIS Configuration
   "nsis": {
@@ -268,7 +269,8 @@ async function main() {
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
     //targets: Platform.LINUX.createTarget(),
-    config: options
+    config: options,
+    verbose: true
   }).then((result) => {
     console.log("Built binaries")
     fs.mkdir('binaries').catch(() => "")
