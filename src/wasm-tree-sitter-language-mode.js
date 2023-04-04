@@ -944,6 +944,16 @@ class WASMTreeSitterLanguageMode {
 
     let existingIndent = 0;
     if (options.preserveLeadingWhitespace) {
+      // When this option is true, the indent level we return will be _added
+      // to_ however much indentation is already present on the line. Whatever
+      // the purpose of this option, we can't just pretend it isn't there,
+      // because it will produce silly outcomes. Instead, let's account for
+      // that level of indentation and try to subtract it from whatever level
+      // we return later on.
+      //
+      // Sadly, if the row is _more_ indented than we need it to be, we won't
+      // be able to dedent it into the correct position. This option probably
+      // needs to be revisited.
       existingIndent = this.indentLevelForLine(
         this.buffer.lineForRow(row),
         tabLength
@@ -978,7 +988,7 @@ class WASMTreeSitterLanguageMode {
     );
 
     if (!controllingLayer) {
-      return comparisonRowIndent - existingIndent;
+      return Math.max(comparisonRowIndent - existingIndent, 0);
     }
 
     let { indentsQuery, scopeResolver } = controllingLayer;
@@ -1150,8 +1160,11 @@ class WASMTreeSitterLanguageMode {
             capture, row, tabLength, options.indentationLevels);
           if (typeof matchIndentLevel === 'number') {
             scopeResolver.reset();
-            return matchIndentLevel - existingIndent;
+            return Math.max(matchIndentLevel - existingIndent, 0);
           }
+        } else  if (name === 'none') {
+          scopeResolver.reset();
+          return 0;
         }
 
         // Only `@dedent` or `@match` captures can change this line's
@@ -1316,7 +1329,6 @@ class WASMTreeSitterLanguageMode {
       // once, it can bypass this behavior with `(#set! force true)`.
       if (!props.force && node.text !== lineText) { continue; }
 
-
       // `@match` is authoritative; honor the first one we see and ignore other
       // captures.
       if (indent.name === 'match') {
@@ -1325,11 +1337,14 @@ class WASMTreeSitterLanguageMode {
           scopeResolver.reset();
           return matchIndentLevel;
         }
+      } else if (indent.name === 'none') {
+        scopeResolver.reset();
+        return 0;
       }
 
       if (indent.name !== 'dedent') { continue; }
 
-      // Even after we've seen a `@dedent`, we allow the loop to finish,
+      // Even after we've seen a `@dedent`, we allow the loop to continue,
       // because we'd prefer a `@match` capture over this `@dedent` capture
       // even if it happened to come later in the loop.
       seenDedent = true;
