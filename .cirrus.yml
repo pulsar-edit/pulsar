@@ -37,6 +37,7 @@ linux_task:
     path: ./binaries/*
   test_script:
     - export BINARY_NAME=`ls binaries/*AppImage`
+    - echo -e "Binary Name: $BINARY_NAME"
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -209,7 +210,7 @@ windows_task:
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   install_script:
-    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-scripts || echo "There is a reason for so many tries"
+    - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-scripts || echo "There is a reason for so many tries"
   build_script:
     - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
