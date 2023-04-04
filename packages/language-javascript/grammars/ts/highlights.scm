@@ -392,8 +392,16 @@
 (class_declaration
   "class" @storage.type.class.js)
 
+; The "class" in `bar = class Foo {`
+(class
+  "class" @storage.type.class.js)
+
 ; The "Foo" in `class Foo {`.
 (class_declaration
+  name: (identifier) @entity.name.type.class.js)
+
+; The "Foo" in `bar = class Foo {`.
+(class
   name: (identifier) @entity.name.type.class.js)
 
 ; The "Bar" in `class Foo extends Bar {`.
@@ -408,12 +416,12 @@
 ; A class getter:
 ; the "get" in `get foo () {...`
 (method_definition
-  "get" @storage.getter.js)
+  "get" @storage.modifier.getter.js)
 
 ; A class setter:
 ; the "set" in `set foo (value) {...`
 (method_definition
-  "set" @storage.setter.js)
+  "set" @storage.modifier.setter.js)
 
 
 ; IMPORTS/EXPORTS
