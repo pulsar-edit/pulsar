@@ -268,9 +268,7 @@ async function main() {
   let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
-    //targets: Platform.LINUX.createTarget(),
-    config: options,
-    verbose: true
+    config: options
   }).then((result) => {
     console.log("Built binaries")
     fs.mkdir('binaries').catch(() => "")
