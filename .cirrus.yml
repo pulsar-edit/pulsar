@@ -228,8 +228,6 @@ windows_task:
   binary_artifacts:
     path: .\binaries\*
   test_script:
-    - mkdir extracted; tar -xf binaries/*zip -C ./extracted/
-    - export BINARY_NAME=./extracted/Pulsar.exe
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
   always:
     videos_artifacts:
