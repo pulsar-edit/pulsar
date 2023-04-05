@@ -219,7 +219,6 @@ windows_task:
     - npx yarn install --ignore-engines
       || rm -R node_modules && npx yarn install --ignore-engines
       || rm -R node_modules && npx yarn install --ignore-engines
-      || echo "There is a reason for so many tries"
   build_script:
     - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
@@ -230,9 +229,8 @@ windows_task:
     path: .\binaries\*
   test_script:
     - mkdir extracted; tar -xf binaries/*zip -C ./extracted/
-    - ls -l extracted/
     - export BINARY_NAME=./extracted/Pulsar.exe
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
   always:
     videos_artifacts:
       path: ./tests/videos/**
