@@ -209,14 +209,17 @@ windows_task:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   prepare_script:
-    - choco install nodejs --version=14.15.0 -y
+    - choco install nodejs --version=16.16.0 -y
     - choco install python --version=3.10.3	-y
     - choco install git visualstudio2019-workload-vctools -y
     - git submodule init
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   install_script:
-    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
+    - npx yarn install --ignore-engines
+      || rm -R node_modules && npx yarn install --ignore-engines
+      || rm -R node_modules && npx yarn install --ignore-engines
+      || echo "There is a reason for so many tries"
   build_script:
     - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
