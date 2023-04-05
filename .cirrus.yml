@@ -226,8 +226,8 @@ windows_task:
   binary_artifacts:
     path: .\binaries\*
   test_script:
-    - ./binaries/*Setup*exe /S /D=c:\pulsar
-    - export BINARY_NAME=c:\pulsar\pulsar.exe
+    - expand binaries/*zip -F:* ./extracted
+    - export BINARY_NAME=./extracted/Pulsar.exe
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
