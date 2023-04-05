@@ -51,8 +51,12 @@ export default class PackageSnippetsView {
             <input id='toggleSnippets' className='input-checkbox' type='checkbox' ref='snippetToggle' />
             <div className='setting-title'>Enable</div>
           </label>
-          <div className='setting-description'>
-            {'Disable this if you want to prevent this package’s snippets from appearing as suggestions or if you want to customize them in your snippets file.'}
+          <div className='setting-description' ref='snippetSettingDescription'>
+            <p>Disable this if you want to prevent this package’s snippets from appearing as suggestions or if you want to customize them in your snippets file.</p>
+
+            <p>To <strong>disable</strong> most snippets and <strong>enable</strong> just a few, use the <kbd>Copy</kbd> button on any snippet you want to enable, then paste the result into your own snippets file.</p>
+
+            <p>To <strong>enable</strong> most snippets and <strong>disable</strong> just a few, use the <kbd>Copy</kbd> button on any snippet you want to disable, paste the result into your own snippets file, and change the body to <code>null</code>.</p>
           </div>
         </div>
 
@@ -60,6 +64,7 @@ export default class PackageSnippetsView {
           <thead>
             <tr>
               <th>Trigger</th>
+              <th ref="headingCommand">Command</th>
               <th>Name</th>
               <th>Scope</th>
               <th>Body</th>
@@ -73,13 +78,12 @@ export default class PackageSnippetsView {
 
   getSnippetProperties () {
     const packageProperties = {}
-    for (const {name, properties, selectorString} of this.snippetsProvider.getSnippets()) {
+    for (const {name, properties} of this.snippetsProvider.getSnippets()) {
       if (name && name.indexOf && name.indexOf(this.packagePath) === 0) {
         const object = properties.snippets != null ? properties.snippets : {}
         for (let key in object) {
           const snippet = object[key]
           if (snippet != null) {
-            snippet.selectorString = selectorString
             if (packageProperties[key] == null) {
               packageProperties[key] = snippet
             }
@@ -116,13 +120,15 @@ export default class PackageSnippetsView {
     this.getSnippets((snippets) => {
       this.refs.snippets.innerHTML = ''
 
+      let anyWithCommand = snippets.some(s => ('command' in s))
+
       if (snippetsDisabled) {
         this.refs.snippets.classList.add('text-subtle')
       } else {
         this.refs.snippets.classList.remove('text-subtle')
       }
 
-      for (let {body, bodyText, name, prefix, selectorString} of snippets) {
+      for (let {body, bodyText, command, name, packageName, prefix, selector} of snippets) {
         if (name == null) {
           name = ''
         }
@@ -135,8 +141,13 @@ export default class PackageSnippetsView {
           body = bodyText || ''
         }
 
-        if (selectorString == null) {
-          selectorString = ''
+        if (selector == null) {
+          selector = ''
+        }
+
+        let commandName = ''
+        if (packageName && command) {
+          commandName = `${packageName}:${command}`
         }
 
         const row = document.createElement('tr')
@@ -146,13 +157,18 @@ export default class PackageSnippetsView {
         prefixTd.textContent = prefix
         row.appendChild(prefixTd)
 
+        const commandTd = document.createElement('td')
+        commandTd.textContent = commandName
+        row.appendChild(commandTd)
+        commandTd.style.display = anyWithCommand ? '' : 'none'
+
         const nameTd = document.createElement('td')
         nameTd.textContent = name
         row.appendChild(nameTd)
 
         const scopeTd = document.createElement('td')
         scopeTd.classList.add('snippet-scope-name')
-        scopeTd.textContent = selectorString
+        scopeTd.textContent = selector
         row.appendChild(scopeTd)
 
         const bodyTd = document.createElement('td')
@@ -160,7 +176,7 @@ export default class PackageSnippetsView {
         row.appendChild(bodyTd)
 
         this.refs.snippets.appendChild(row)
-        this.createButtonsForSnippetRow(bodyTd, {body, prefix, scope: selectorString, name})
+        this.createButtonsForSnippetRow(bodyTd, {body, prefix, scope: selector, name, command})
       }
 
       if (this.refs.snippets.children.length > 0) {
@@ -168,10 +184,14 @@ export default class PackageSnippetsView {
       } else {
         this.element.style.display = 'none'
       }
+
+      // The “Command” column should only be shown if at least one snippet is
+      // mapped to a command name.
+      this.refs.headingCommand.style.display = anyWithCommand ? '' : 'none'
     })
   }
 
-  createButtonsForSnippetRow (td, {scope, body, name, prefix}) {
+  createButtonsForSnippetRow (td, {scope, body, name, prefix, command}) {
     let buttonContainer = document.createElement('div')
     buttonContainer.classList.add('btn-group', 'btn-group-xs')
 
@@ -198,7 +218,7 @@ export default class PackageSnippetsView {
 
     copyButton.addEventListener('click', (event) => {
       event.preventDefault()
-      return this.writeSnippetToClipboard({scope, body, name, prefix})
+      return this.writeSnippetToClipboard({scope, body, name, prefix, command})
     })
 
     buttonContainer.appendChild(viewButton)
@@ -207,24 +227,39 @@ export default class PackageSnippetsView {
     td.appendChild(buttonContainer)
   }
 
-  writeSnippetToClipboard ({scope, body, name, prefix}) {
+  writeSnippetToClipboard ({scope, body, name, prefix, command}) {
     let content
     const extension = path.extname(this.snippetsProvider.getUserSnippetsPath())
     body = body.replace(/\n/g, '\\n').replace(/\t/g, '\\t')
+    // Either `prefix` or `command` will be present, or else both. Only copy
+    // the values that are present.
+    let triggers = []
     if (extension === '.cson') {
+      if (prefix) {
+        triggers.push(`    'prefix': '${prefix}'`)
+      }
+      if (command) {
+        triggers.push(`    'command': '${command}'`)
+      }
       body = body.replace(/'/g, `\\'`)
       content = `
 '${scope}':
   '${name}':
-    'prefix': '${prefix}'
+${triggers.join('\n')}
     'body': '${body}'
 `
     } else {
+      if (prefix) {
+        triggers.push(`    "prefix": "${prefix}"`)
+      }
+      if (command) {
+        triggers.push(`    "command": "${command}"`)
+      }
       body = body.replace(/"/g, `\\"`)
       content = `
   "${scope}": {
     "${name}": {
-      "prefix": "${prefix}",
+${triggers.join(',\n')}
       "body": "${body}"
     }
   }
