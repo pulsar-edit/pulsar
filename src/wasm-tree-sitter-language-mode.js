@@ -135,7 +135,7 @@ class WASMTreeSitterLanguageMode {
     this.rootScopeId = this.grammar.idForScope(this.grammar.scopeName);
 
     this.emitter = new Emitter();
-    this.foldRangeCache = [];
+    this.isFoldableCache = [];
 
     this.tokenized = false;
     this.subscriptions = new CompositeDisposable;
@@ -221,7 +221,7 @@ class WASMTreeSitterLanguageMode {
       newEndPosition: newRange.end
     };
 
-    if (!this.treeIsDirty) {
+    if (!this.rootLanguageLayer.treeIsDirty) {
       // This is the first change after the last transaction finished, so we
       // need to create a new promise that will resolve when the next
       // transaction is finished.
@@ -240,7 +240,7 @@ class WASMTreeSitterLanguageMode {
     for (let i = 0, { length } = changes; i < length; i++) {
       const { oldRange, newRange } = changes[i];
       spliceArray(
-        this.foldRangeCache,
+        this.isFoldableCache,
         newRange.start.row,
         oldRange.end.row - oldRange.start.row,
         { length: newRange.end.row - newRange.start.row }
@@ -256,6 +256,19 @@ class WASMTreeSitterLanguageMode {
         this.prefillFoldCache(newRange);
       }
 
+      let allLayers = this.getAllInjectionLayers();
+      for (let layer of allLayers) {
+        // Either the tree got re-parsed — and it's now up-to-date — or it
+        // didn't, which means that the edits in the tree did not affect the
+        // layer's contents. Either way, the tree is safe to use.
+        layer.treeIsDirty = false;
+
+        // EXPERIMENT: It does not seem useful or necessary to keep
+        // `editedRange` for layers that turned out not to be affected by this
+        // update cycle.
+        layer.editedRange = null;
+      }
+
       // At this point, all trees are safely re-parsed, including those of
       // injection layers. So we can proceed with any actions that were waiting
       // on a clean tree.
@@ -267,7 +280,7 @@ class WASMTreeSitterLanguageMode {
     const startRow = range.start.row;
     const endRow = range.end.row;
     for (let row = startRow; row < endRow; row++) {
-      this.foldRangeCache[row] = undefined;
+      this.isFoldableCache[row] = undefined;
     }
     this.prefillFoldCache(range);
     this.emitter.emit('did-change-highlighting', range);
@@ -366,17 +379,6 @@ class WASMTreeSitterLanguageMode {
   idForScope(name) {
     return this.grammar.idForScope(name);
   }
-
-  // getOrCreateScopeId (name) {
-  //   let id = this.scopeNames.get(name);
-  //   if (!id) {
-  //     this.lastId += 2;
-  //     id = this.lastId;
-  //     this.scopeNames.set(name, id);
-  //     this.scopeIds.set(id, name);
-  //   }
-  //   return id;
-  // }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
   // tree-sitter node names. Useful for understanding tree-sitter parsing or
@@ -799,8 +801,8 @@ class WASMTreeSitterLanguageMode {
   }
 
   isFoldableAtRow(row) {
-    if (this.foldRangeCache[row] != null) {
-      return !!this.foldRangeCache[row];
+    if (this.isFoldableCache[row] != null) {
+      return !!this.isFoldableCache[row];
     }
 
     let range = this.getFoldRangeForRow(row);
@@ -808,18 +810,17 @@ class WASMTreeSitterLanguageMode {
     // Don't bother to cache this result before we're able to load the folds
     // query.
     if (this.tokenized) {
-      this.foldRangeCache[row] = range;
+      // We can easily keep track of _if_ this row is foldable, even if edits
+      // to the buffer end up moving this row around. But we don't bother to
+      // cache the actual _range_ because it'd just get stale once the buffer
+      // is edited. Better to wait and look it up when it's needed.
+      this.isFoldableCache[row] = !!range;
     }
     return !!range;
   }
 
-  getFoldRangeForRow(row, force = false) {
+  getFoldRangeForRow(row) {
     if (!this.tokenized) { return null; }
-
-    if (!force) {
-      let range = this.foldRangeCache[row];
-      if (range) { return range; }
-    }
 
     let rowEnd = this.buffer.lineLengthForRow(row);
     let point = new Point(row, rowEnd);
@@ -2654,6 +2655,11 @@ class LanguageLayer {
 
     if (this.tree) {
       this.tree.edit(edit);
+      // We're tentatively marking this tree as dirty; we won't know if it
+      // needs to be reparsed until the transaction is done. If it doesn't,
+      // that means that the edits didn't encroach on the contents of the
+      // layer, and we'll mark those trees as clean at the end of the
+      // transaction.
       this.treeIsDirty = true;
       if (this.editedRange) {
         if (startPosition.isLessThan(this.editedRange.start)) {
@@ -2951,6 +2957,7 @@ class LanguageLayer {
     } else {
       this.tree = tree;
       this.treeIsDirty = false;
+
       // Store a reference to this tree so we can compare it with the next
       // transaction's tree later on.
       this.lastSyntaxTree = tree;
@@ -2989,7 +2996,7 @@ class LanguageLayer {
     // Eventually we'll take this out, but for now it serves as an indicator of
     // how often we have to manually re-parse in between transactions —
     // something we'd like to do as little as possible.
-    console.warn('Re-parsing tree!');
+    console.warn('Re-parsing tree!', this.inspect(), this.treeIsDirty);
 
     // TODO: The goal here is that, if a re-parse is needed in between
     // transactions, we assign the result back to `this.tree` so that we can at
