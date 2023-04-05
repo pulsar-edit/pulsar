@@ -31,7 +31,7 @@ linux_task:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - yarn build
-    - yarn run build:apm
+    - yarn run build:ppm
   build_binary_script:
     - yarn dist || yarn dist
   binary_artifacts:
@@ -89,7 +89,7 @@ arm_linux_task:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - yarn build
-    - yarn run build:apm
+    - yarn run build:ppm
   build_binary_script:
     - source /etc/profile.d/rvm.sh
     - yarn dist || yarn dist
@@ -132,7 +132,7 @@ silicon_mac_task:
   build_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn build
-    - yarn run build:apm
+    - yarn run build:ppm
   build_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
@@ -180,7 +180,7 @@ intel_mac_task:
   build_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn build
-    - arch -x86_64 yarn run build:apm
+    - arch -x86_64 yarn run build:ppm
   build_binary_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
@@ -220,7 +220,7 @@ windows_task:
       || rm -R node_modules && npx yarn install --ignore-engines
       || rm -R node_modules && npx yarn install --ignore-engines
   build_script:
-    - npx yarn build:apm
+    - npx yarn build:ppm
     - npx yarn build || npx yarn build || npx yarn build
   build_binary_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json

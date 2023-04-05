@@ -3,7 +3,7 @@
 | - | - |
 | post-checkout | This hook executes after a branch checkout, or branch switch has occurred. |
 | post-merge | This hook executes after a branch merge has occurred |
-| update_editor.sh | The actual brains of the hooks. Performs a yarn install, yarn build, yarn build:apm, and syncs all submodules. |
+| update_editor.sh | The actual brains of the hooks. Performs a yarn install, yarn build, yarn build:ppm, and syncs all submodules. |
 
 ### Disclaimer
 These hooks are not guaranteed. These were made out of convenience and presented to the org as an optional tool for usage.

@@ -42,7 +42,7 @@ fi
 
 echo '  Rebuilding PPM'
 if [[ -d "ppm" ]]; then
-    yarn build:apm &> /dev/null
+    yarn build:ppm &> /dev/null
     if [[ $? == 0 ]]; then
         echo '    PPM build completed successfully'
     else
