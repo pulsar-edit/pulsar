@@ -151,7 +151,7 @@ class I18n {
     if (languageObj === undefined) return undefined;
 
     const str = optionalTravelDownObjectPath(languageObj, path);
-    if (str !== undefined) {
+    if (typeof str === "string") {
       return this.format(ns, path, str, lang, opts);
     } else {
       return undefined;
