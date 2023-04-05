@@ -325,12 +325,15 @@
 "." @keyword.operator.accessor.ts
 "?." @keyword.operator.accessor.optional-chaining.ts
 
-(ternary_expression ["?" ":"] @keyword.operator.ternary.ts)
+(ternary_expression
+  ["?" ":"] @keyword.operator.ternary.ts
+  (#set! final true))
 
 ; TODO: Ternary doesn't highlight properly; presumably fixed in
 ; https://github.com/tree-sitter/tree-sitter-typescript/pull/215, but needs
 ; update to v0.20.2.
-(ternary_expression "?" @keyword.operator.ternary.ts)
+((ternary_expression) @keyword.operator.ternary.js
+  (#set! startAndEndAroundFirstMatchOf "\\?"))
 
 (public_field_definition "?" @keyword.operator.optional-type.ts)
 
