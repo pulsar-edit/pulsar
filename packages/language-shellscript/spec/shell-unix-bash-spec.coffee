@@ -361,7 +361,7 @@ describe "Shell script grammar", ->
         #!/usr/bin/env bash
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         \x20#!/usr/sbin/bash
@@ -373,7 +373,7 @@ describe "Shell script grammar", ->
         #!\t/usr/bin/env --bash=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -392,7 +392,7 @@ describe "Shell script grammar", ->
         "-*- font:x;foo : bar ; mode : sH ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*sh-*- */
@@ -410,7 +410,7 @@ describe "Shell script grammar", ->
         // -*-font:mode;mode:sh--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -437,7 +437,7 @@ describe "Shell script grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=sh ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=sh:
@@ -455,4 +455,4 @@ describe "Shell script grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=sh ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

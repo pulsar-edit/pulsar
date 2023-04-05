@@ -60,8 +60,8 @@ if (buildMetadata) {
 //
 // See {::add} for more info about adding menu's directly.
 module.exports = MenuManager = class MenuManager {
-  constructor({resourcePath, keymapManager, packageManager}) {
-    this.resourcePath = resourcePath;
+  constructor({ i18n, keymapManager, packageManager }) {
+    this.i18n = i18n;
     this.keymapManager = keymapManager;
     this.packageManager = packageManager;
     this.initialized = false;
@@ -101,9 +101,8 @@ module.exports = MenuManager = class MenuManager {
   // added menu items.
   add(items) {
     items = _.deepClone(items);
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.label == null) {
+    for (const item of items) {
+      if (item.label == null && item.localisedLabel == null) {
         continue; // TODO: Should we emit a warning here?
       }
       this.merge(this.template, item);
@@ -220,11 +219,11 @@ module.exports = MenuManager = class MenuManager {
   // Merges an item in a submenu aware way such that new items are always
   // appended to the bottom of existing menus where possible.
   merge(menu, item) {
-    MenuHelpers.merge(menu, item);
+    MenuHelpers.merge(menu, item, this.i18n.t);
   }
 
   unmerge(menu, item) {
-    MenuHelpers.unmerge(menu, item);
+    MenuHelpers.unmerge(menu, item, this.i18n.t);
   }
 
   sendToBrowserProcess(template, keystrokesByCommand) {
@@ -242,7 +241,8 @@ module.exports = MenuManager = class MenuManager {
   }
 
   sortPackagesMenu() {
-    const packagesMenu = _.find(this.template, ({id}) => MenuHelpers.normalizeLabel(id) === 'Packages');
+    let packagesLabel = this.i18n.t("core.menu.packages.self");
+    const packagesMenu = _.find(this.template, ({id}) => MenuHelpers.normalizeLabel(id) === packagesLabel);
     if (!(packagesMenu && packagesMenu.submenu != null)) {
       return;
     }
@@ -255,5 +255,4 @@ module.exports = MenuManager = class MenuManager {
     });
     return this.update();
   }
-
 };

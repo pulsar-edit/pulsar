@@ -1438,6 +1438,45 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
+"@formatjs/ecma402-abstract@1.14.3":
+  version "1.14.3"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.14.3.tgz#6428f243538a11126180d121ce8d4b2f17465738"
+  integrity sha512-SlsbRC/RX+/zg4AApWIFNDdkLtFbkq3LNoZWXZCE/nHVKqoIJyaoQyge/I0Y38vLxowUn9KTtXgusLD91+orbg==
+  dependencies:
+    "@formatjs/intl-localematcher" "0.2.32"
+    tslib "^2.4.0"
+
+"@formatjs/fast-memoize@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/fast-memoize/-/fast-memoize-2.0.1.tgz#f15aaa73caad5562899c69bdcad8db82adcd3b0b"
+  integrity sha512-M2GgV+qJn5WJQAYewz7q2Cdl6fobQa69S1AzSM2y0P68ZDbK5cWrJIcPCO395Of1ksftGZoOt4LYCO/j9BKBSA==
+  dependencies:
+    tslib "^2.4.0"
+
+"@formatjs/icu-messageformat-parser@2.3.0", "@formatjs/icu-messageformat-parser@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/icu-messageformat-parser/-/icu-messageformat-parser-2.3.0.tgz#8e8fd577c3e39454ef14bba4963f2e1d5f2cc46c"
+  integrity sha512-xqtlqYAbfJDF4b6e4O828LBNOWXrFcuYadqAbYORlDRwhyJ2bH+xpUBPldZbzRGUN2mxlZ4Ykhm7jvERtmI8NQ==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.14.3"
+    "@formatjs/icu-skeleton-parser" "1.3.18"
+    tslib "^2.4.0"
+
+"@formatjs/icu-skeleton-parser@1.3.18":
+  version "1.3.18"
+  resolved "https://registry.yarnpkg.com/@formatjs/icu-skeleton-parser/-/icu-skeleton-parser-1.3.18.tgz#7aed3d60e718c8ad6b0e64820be44daa1e29eeeb"
+  integrity sha512-ND1ZkZfmLPcHjAH1sVpkpQxA+QYfOX3py3SjKWMUVGDow18gZ0WPqz3F+pJLYQMpS2LnnQ5zYR2jPVYTbRwMpg==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.14.3"
+    tslib "^2.4.0"
+
+"@formatjs/intl-localematcher@0.2.32":
+  version "0.2.32"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.2.32.tgz#00d4d307cd7d514b298e15a11a369b86c8933ec1"
+  integrity sha512-k/MEBstff4sttohyEpXxCmC3MqbUn9VvHGlZ8fauLzkbwXmVrEeyzS+4uhrvAk9DWU9/7otYWxyDox4nT/KVLQ==
+  dependencies:
+    tslib "^2.4.0"
+
 "@gar/promisify@^1.0.1":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
@@ -2659,11 +2698,9 @@ braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"bracket-matcher@https://github.com/pulsar-edit/bracket-matcher.git#c877977":
+"bracket-matcher@file:packages/bracket-matcher":
   version "0.92.0"
-  resolved "https://github.com/pulsar-edit/bracket-matcher.git#c877977ac7e9b7fe43c2100a1880c7ffc119280b"
   dependencies:
-    first-mate "^7.4.1"
     underscore-plus "1.x"
 
 browser-stdout@1.3.1:
@@ -3789,10 +3826,9 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-document-register-element@^1.14.10:
+"document-register-element@https://github.com/pulsar-edit/document-register-element.git#1f5868f":
   version "1.14.10"
-  resolved "https://registry.yarnpkg.com/document-register-element/-/document-register-element-1.14.10.tgz#a7bd025e6b73bd827fec2d8e90aba755e99387f5"
-  integrity sha512-w5UA37hEIrs+9pruo2yR5UD13c4UHDlkqqjt4qurnp7QsBI9b1IOi8WXUim+aCqKBsENX3Z/cso7XMOuwJH1Yw==
+  resolved "https://github.com/pulsar-edit/document-register-element.git#1f5868fba7b6c3a337c777a0396c43a080e1fad3"
 
 dom-serializer@^2.0.0:
   version "2.0.0"
@@ -3991,7 +4027,7 @@ electron@12.2.3:
     "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
-emissary@^1, emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2:
+emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4390,7 +4426,7 @@ etch@^0.12.2, etch@^0.12.6:
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.12.8.tgz#c24bc9bd3a6148f62204ce8643d2e899b9ecb9de"
   integrity sha512-dFLRe4wLroVtwzyy1vGlE3BSDZHiL0kZME5XgNGzZIULcYTvVno8vbiIleAesoKJmwWaxDTzG+4eppg2zk14JQ==
 
-event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.2.0, event-kit@^2.4.0, event-kit@^2.5.3:
+event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.4.0, event-kit@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/event-kit/-/event-kit-2.5.3.tgz#d47e4bc116ec0aacd00263791fa1a55eb5e79ba1"
   integrity sha512-b7Qi1JNzY4BfAYfnIRanLk0DOD1gdkWHT4GISIn8Q2tAf3LpU8SP2CMwWaq40imYoKWbtN4ZhbSRxvsnikooZQ==
@@ -4604,19 +4640,6 @@ find-up@^5.0.0:
   dependencies:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
-
-first-mate@7.4.3, first-mate@^7.4.1:
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/first-mate/-/first-mate-7.4.3.tgz#058b9b6d2f43e38a5f0952669338cff2c46ae2dd"
-  integrity sha512-PtZUpaPmcV5KV4Rw5TfwczEnExN+X1o3Q/G82E4iRJ0tW91fm3Yi7pa5t4cBH8r3D6EyoBKvfpG2jKE+TZ0/nw==
-  dependencies:
-    emissary "^1"
-    event-kit "^2.2.0"
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    oniguruma "^7.2.3"
-    season "^6.0.2"
-    underscore-plus "^1"
 
 flat-cache@^3.0.4:
   version "3.0.4"
@@ -5194,7 +5217,7 @@ graphql@14.5.8:
   dependencies:
     iterall "^1.2.2"
 
-grim@2.0.3, grim@^2.0.1, grim@^2.0.2:
+grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/grim/-/grim-2.0.3.tgz#66e575efc4577981d959da0764926b4aaded4b0d"
   integrity sha512-FM20Ump11qYLK9k9DbL8yzVpy+YBieya1JG15OeH8s+KbHq8kL4SdwRtURwIUHniSxb24EoBUpwKfFjGNVi4/Q==
@@ -5533,6 +5556,16 @@ internal-slot@^1.0.3:
     get-intrinsic "^1.1.0"
     has "^1.0.3"
     side-channel "^1.0.4"
+
+intl-messageformat@^10.3.3:
+  version "10.3.3"
+  resolved "https://registry.yarnpkg.com/intl-messageformat/-/intl-messageformat-10.3.3.tgz#576798d31c9f8d90f9beadaa5a3878b8d30177a2"
+  integrity sha512-un/f07/g2e/3Q8e1ghDKET+el22Bi49M7O/rHxd597R+oLpPOMykSv5s51cABVfu3FZW+fea4hrzf2MHu1W4hw==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.14.3"
+    "@formatjs/fast-memoize" "2.0.1"
+    "@formatjs/icu-messageformat-parser" "2.3.0"
+    tslib "^2.4.0"
 
 invert-kv@^1.0.0:
   version "1.0.0"
@@ -7422,13 +7455,6 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-oniguruma@^7.2.3:
-  version "7.2.3"
-  resolved "https://registry.yarnpkg.com/oniguruma/-/oniguruma-7.2.3.tgz#e0b0b415302de8cdd6564e57a1a822ac0ab57012"
-  integrity sha512-PZZcE0yfg8Q1IvaJImh21RUTHl8ep0zwwyoE912KqlWVrsGByjjj29sdACcD1BFyX2bLkfuOJeP+POzAGVWtbA==
-  dependencies:
-    nan "^2.14.0"
-
 "open-on-github@file:packages/open-on-github":
   version "1.3.2"
 
@@ -8503,6 +8529,18 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
+"second-mate@https://github.com/pulsar-edit/second-mate.git#14aa7bd":
+  version "8.0.0"
+  resolved "https://github.com/pulsar-edit/second-mate.git#14aa7bd94b90c47aa99f000394301b9573b8898b"
+  dependencies:
+    emissary "^1.3.3"
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+    underscore-plus "^1"
+    vscode-oniguruma "^1.7.0"
+
 selector-kit@^0.1:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/selector-kit/-/selector-kit-0.1.0.tgz#304338fceccea35ec28ffaddb792ab7715633e6f"
@@ -9517,6 +9555,11 @@ truncate-utf8-bytes@^1.0.0:
   dependencies:
     utf8-byte-length "^1.0.1"
 
+tslib@^2.4.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.5.0.tgz#42bfed86f5787aeb41d031866c8f402429e0fddf"
+  integrity sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==
+
 tunnel-agent@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"
@@ -9809,6 +9852,11 @@ verror@^1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vscode-oniguruma@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/vscode-oniguruma/-/vscode-oniguruma-1.7.0.tgz#439bfad8fe71abd7798338d1cd3dc53a8beea94b"
+  integrity sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==
 
 vscode-ripgrep@1.9.0:
   version "1.9.0"
