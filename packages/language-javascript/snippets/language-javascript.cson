@@ -28,13 +28,13 @@
     'body': 'else if (${1:true}) {\n\t$2\n}'
   'for':
     'prefix' : 'for'
-    'body' : 'for (var ${2:i} = 0; ${2:i} < ${1:array}.length; ${2:i}++) {\n\t${1:array}[${2:i}]$3\n}'
+    'body' : 'for (let ${2:i} = 0; ${2:i} < ${1:array}.length; ${2:i}++) {\n\t${1:array}[${2:i}]$3\n}'
   'for in':
     'prefix': 'forin'
-    'body': 'for (var ${1:variable} in ${2:object}) {\n\t${3:if (${2:object}.hasOwnProperty(${1:variable})) {\n\t\t$4\n\t\\}}\n}'
+    'body': 'for (const ${1:variable} in ${2:object}) {\n\t${3:if (${2:object}.hasOwnProperty(${1:variable})) {\n\t\t$4\n\t\\}}\n}'
   'for of':
     'prefix': 'forof'
-    'body': 'for (var ${1:variable} of ${2:iterable}) {\n\t$3\n}'
+    'body': 'for (const ${1:variable} of ${2:iterable}) {\n\t$3\n}'
   'forEach':
     'prefix' : 'foreach'
     'body' : 'forEach((${1:item}, ${2:i}) => {\n\t$3\n});\n'

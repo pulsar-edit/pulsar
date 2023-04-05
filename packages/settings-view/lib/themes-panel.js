@@ -97,7 +97,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
             <div className='section-heading icon icon-paintcan'>Choose a Theme</div>
 
             <div className='text native-key-bindings' tabIndex='-1'>
-              <span className='icon icon-question'>You can also style Atom by editing </span>
+              <span className='icon icon-question'>You can also style Pulsar by editing </span>
               <a className='link' onclick={this.didClickOpenUserStyleSheet}>your stylesheet</a>
             </div>
 
@@ -202,7 +202,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
 
     for (let pack of packages.core) {
       if (pack.repository == null) {
-        pack.repository = `https://github.com/atom/${pack.name}`
+        pack.repository = `https://github.com/pulsar-edit/${pack.name}`
       }
     }
 

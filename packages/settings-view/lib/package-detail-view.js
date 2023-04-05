@@ -42,7 +42,7 @@ export default class PackageDetailView {
       event.preventDefault()
       const repoUrl = this.packageManager.getRepositoryUrl(this.pack)
       if (typeof repoUrl === 'string') {
-        if (url.parse(repoUrl).pathname === '/atom/atom') {
+        if (url.parse(repoUrl).pathname === '/pulsar-edit/pulsar') {
           shell.openExternal(`${repoUrl}/tree/master/packages/${this.pack.name}`)
         } else {
           shell.openExternal(repoUrl)

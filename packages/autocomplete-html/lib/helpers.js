@@ -109,7 +109,7 @@ function getTagAttributes (tag) {
 }
 
 function getLocalAttributeDocsURL (attribute, tag) {
-  return `${getTagDocsURL(tag)}#attr-${attribute}`
+  return `${getTagDocsURL(tag)}#attributes`
 }
 
 function getGlobalAttributeDocsURL (attribute) {

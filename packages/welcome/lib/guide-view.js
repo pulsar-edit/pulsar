@@ -19,7 +19,7 @@ export default class GuideView {
     etch.initialize(this);
   }
 
-  update() {}
+  update() { }
 
   render() {
     return (
@@ -44,7 +44,7 @@ export default class GuideView {
                 </p>
                 <p>
                   In {this.brand} you can open individual files or a whole folder as a
-                  project. Opening a folder will ad a tree view, on the left side 
+                  project. Opening a folder will add a tree view, on the left side
                   (by default), listing all the files and folders belonging to your project.
                 </p>
                 <p>
@@ -254,8 +254,7 @@ export default class GuideView {
                 </p>
                 <p>
                   The init script is a bit of JavaScript or CoffeeScript run at
-                  startup. You can use it to quickly change the behaviour of
-                  {this.brand}.
+                  startup. You can use it to quickly change the behaviour of {this.brand}.
                 </p>
                 <p>
                   <button

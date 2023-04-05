@@ -1,0 +1,14 @@
+@import "syntax-variables";
+
+atom-text-editor {
+  .wrap-guide {
+    height: 100%;
+    width: 1px;
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    background-color: @syntax-wrap-guide-color;
+    -webkit-transform: translateZ(0);
+    pointer-events: none;
+  }
+}

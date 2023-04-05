@@ -4,7 +4,11 @@ module.exports = {
     commonjs: true,
     es2021: true,
   },
-  extends: ["eslint:recommended", "plugin:node/recommended"],
+  extends: [
+    "eslint:recommended",
+    "plugin:node/recommended",
+    "plugin:jsdoc/recommended"
+  ],
   overrides: [],
   parserOptions: {
     ecmaVersion: "latest"
@@ -17,6 +21,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    "jsdoc"
+  ],
   globals: {
     atom: "writeable"
   }

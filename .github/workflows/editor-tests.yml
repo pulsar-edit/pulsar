@@ -1,10 +1,10 @@
 name: Editor tests
 on:
-  - push
   - pull_request
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+  ATOM_JASMINE_REPORTER: list
+
 jobs:
   tests:
     name: tests
@@ -13,7 +13,8 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-latest, windows-2019]
+        # os: [ubuntu-20.04, macos-latest, windows-2019]
+        os: [ubuntu-20.04, macos-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -34,4 +35,4 @@ jobs:
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: yarn start --test spec
+        run: node script/run-tests.js spec

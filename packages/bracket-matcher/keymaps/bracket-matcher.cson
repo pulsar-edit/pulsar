@@ -1,0 +1,18 @@
+'atom-text-editor':
+  'ctrl-m': 'bracket-matcher:go-to-matching-bracket'
+  'ctrl-]': 'bracket-matcher:remove-brackets-from-selection'
+
+'.platform-darwin atom-text-editor':
+  'ctrl-cmd-m': 'bracket-matcher:select-inside-brackets'
+  'alt-cmd-.': 'bracket-matcher:close-tag'
+  'ctrl-backspace': 'bracket-matcher:remove-matching-brackets'
+
+'.platform-linux atom-text-editor':
+  'ctrl-alt-,': 'bracket-matcher:select-inside-brackets'
+  'ctrl-alt-.': 'bracket-matcher:close-tag'
+  'ctrl-alt-backspace': 'bracket-matcher:remove-matching-brackets'
+
+'.platform-win32 atom-text-editor':
+  'ctrl-alt-,': 'bracket-matcher:select-inside-brackets'
+  'ctrl-alt-.': 'bracket-matcher:close-tag'
+  'ctrl-alt-backspace': 'bracket-matcher:remove-matching-brackets'

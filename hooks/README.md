@@ -11,8 +11,8 @@ These hooks are not guaranteed. These were made out of convenience and presented
 ### Usage
 There are several ways to apply these hooks:
 - You can manually copy the files over to the `<pulsar-repo-root>/.git/hooks` folder and validate that they are executable - the effect should be immediate. This is the preferred option for Windows.
-- You can use manage_hooks.sh to copy/symlink the hooks you choose. This is the preferred option for Linux/MacOS.
-  - Your mileage may vary on MacOS as it has not been tested outright, but should work in theory.
+- You can use manage_hooks.sh to copy/symlink the hooks you choose. This is the preferred option for Linux/macOS.
+  - Your mileage may vary on macOS as it has not been tested outright, but should work in theory.
 
 ### Instructions
 - Open your favorite terminal

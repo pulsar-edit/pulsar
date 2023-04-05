@@ -19,7 +19,7 @@ export default class InstallPanel {
     this.packageManager = packageManager
     this.disposables = new CompositeDisposable()
     this.client = this.packageManager.getClient()
-    this.atomIoURL = 'https://pulsar-edit.dev/packages'
+    this.atomIoURL = 'https://web.pulsar-edit.dev/'
 
     etch.initialize(this)
 
@@ -44,6 +44,12 @@ export default class InstallPanel {
         }
       })
     )
+    const searchBuffer = this.refs.searchEditor.getBuffer();
+    searchBuffer.debouncedEmitDidStopChangingEvent = (timer => () => {
+      clearTimeout(timer);
+      timer = setTimeout(searchBuffer.emitDidStopChangingEvent.bind(searchBuffer), 700);
+    })();
+    // TODO remove hack to extend stop changing delay
     this.disposables.add(
       this.refs.searchEditor.onDidStopChanging(() => {
         this.performSearch()
@@ -133,7 +139,7 @@ export default class InstallPanel {
       this.refs.searchThemesButton.classList.remove('selected')
       this.refs.searchEditor.setPlaceholderText('Search packages')
       this.refs.publishedToText.textContent = 'Packages are published to '
-      this.atomIoURL = 'https://pulsar-edit.dev/packages'
+      this.atomIoURL = 'https://web.pulsar-edit.dev/packages'
       this.loadFeaturedPackages()
     }
   }

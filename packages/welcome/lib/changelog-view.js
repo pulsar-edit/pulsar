@@ -53,69 +53,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/28">
-                  Bump to Electron 12 and Node 14
-                </a>
+                Added a new feature to Search for Pulsar's settings
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/7">
-                  Added a rebranding API
-                </a>
+                Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/67">
-                  Removed experimental file watchers on the editor and fixes for how the Config File is watched.
-                </a>
+                Updated the instructions and look of the login flow for the `github` package.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/131">
-                  Ability to install packages from Git Repositories
-                </a>
+                Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
               </li>
               <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/68">
-                  Migrated to a new Pulsar Package Repository Backend
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/settings-view/pull/2">
-                  Better error messages when a package fails to install.
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/14">
-                  Bumped Tree-Sitter to 0.20.1 and all grammars to their recent versions
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/101">
-                  Native support for ARM Linux
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/54">
-                  Native Support for Apple Silicon
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/105">
-                  Removed Benchmark Mode
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/40">
-                  Removed all telemetry from the editor.
-                </a>
-              </li>
-              <li>
-                <a href="https://pulsar-edit.dev">
-                  New Pulsar Website
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/pulsar-edit/pulsar/pull/186">
-                  Apple Silicon support for `github` Package v0.36.13
-                </a>
+                Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
               </li>
 
             </ul>

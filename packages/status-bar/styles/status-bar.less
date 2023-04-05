@@ -1,0 +1,114 @@
+@import "ui-variables";
+@import "octicon-mixins";
+
+status-bar {
+  display: block;
+  font-size: 11px;
+  line-height: @component-line-height - 3px;
+  height: @component-line-height + 1px;
+  position: relative;
+  -webkit-user-select: none;
+  cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: -webkit-min-content;
+
+  a, a:hover {
+    color: @text-color;
+  }
+
+  .flexbox-repaint-hack {
+    padding: 0 @component-line-height/2;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  // Use 1/3 of space -> will get cut-off first when narrow
+  .status-bar-left {
+    flex: 1 1 33%;
+  }
+
+  // Use 2/3 of space
+  .status-bar-right {
+    padding-left: @component-padding;
+    .inline-block {
+      margin-right: 0;
+      margin-left: @component-padding*1.5;
+      & > .inline-block {
+        margin-left: 0;
+      }
+    }
+  }
+
+  // Add horizontal overflow scrolling
+  .status-bar-left,
+  .status-bar-right {
+    overflow-x: auto;
+    // prevent badly behaved status bar items from causing vertical scrolling
+    // in the status bar. They can always implement overflow: auto to scroll
+    // within themselves.
+    overflow-y: hidden;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  // Limit inline-blocks from getting too long
+  .inline-block {
+    max-width: 20vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // remove padding from buttons
+  button.inline-block {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  // No width limit for file-info -> will get cut off if too long
+  .inline-block.file-info {
+    max-width: none;
+  }
+
+  .file-info.buffer-modified::after {
+    content: '*';
+  }
+
+  // All icons are smaller than normal (normal is 16px)
+  .icon:before {
+    .icon-size(14px);
+    position: relative;
+    top: 1px;
+    width: auto; // Enable auto-width since not every icon has the same width
+    margin-right: 4px;
+  }
+
+  .icon-diff-ignored:before,
+  .commits-ahead-label:before,
+  .commits-behind-label:before {
+    margin-right: -1px;
+  }
+
+  .hide,
+  .current-path:empty,
+  .cursor-position:empty,
+  .selection-count:empty {
+    display: none;
+  }
+
+  .git-view {
+    display: inline-block;
+  }
+
+  .cursor-position a,
+  .cursor-position a:hover {
+    color: @text-color;
+  }
+}

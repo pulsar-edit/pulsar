@@ -30,6 +30,7 @@ module.exports = class Package {
     this.contextMenuManager = params.contextMenuManager;
     this.deserializerManager = params.deserializerManager;
     this.viewRegistry = params.viewRegistry;
+    this.i18n = params.i18n;
     this.emitter = new Emitter();
 
     this.mainModule = null;
@@ -240,7 +241,10 @@ module.exports = class Package {
         }
         if (typeof this.mainModule.activate === 'function') {
           this.mainModule.activate(
-            this.packageManager.getPackageState(this.name) || {}
+            this.packageManager.getPackageState(this.name) || {},
+            {
+              t: this.i18n.getT(this.name)
+            }
           );
         }
         this.mainActivated = true;
@@ -897,7 +901,7 @@ module.exports = class Package {
         Failed to require the main module of '${
           this.name
         }' because it requires one or more incompatible native modules (${nativeModuleNames}).
-        Run \`apm rebuild\` in the package directory and restart Pulsar to resolve.\
+        Run \`pulsar -p rebuild\` in the package directory and restart Pulsar to resolve.\
       `);
     } else {
       const mainModulePath = this.getMainModulePath();
@@ -1252,7 +1256,7 @@ module.exports = class Package {
   //
   // Returns a {Promise} that resolves with an object containing `code`,
   // `stdout`, and `stderr` properties based on the results of running
-  // `apm rebuild` on the package.
+  // `pulsar -p rebuild` on the package.
   rebuild() {
     return new Promise(resolve =>
       this.runRebuildProcess(result => {

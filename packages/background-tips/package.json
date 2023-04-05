@@ -1,0 +1,15 @@
+{
+  "name": "background-tips",
+  "main": "./lib/background-tips",
+  "version": "0.28.1",
+  "private": true,
+  "description": "Displays tips about Pulsar in the background when there are no editors open.",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.42.0"
+  },
+  "dependencies": {
+    "underscore-plus": "1.x"
+  }
+}

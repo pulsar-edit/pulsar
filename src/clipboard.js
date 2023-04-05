@@ -12,6 +12,17 @@ const { clipboard } = require('electron');
 //
 // console.log(atom.clipboard.read()) // 'hello'
 // ```
+/**
+ * @class Clipboard
+ * @desc Represents the clipboard used for copying and pasting in Pulsar.
+ *
+ * An instance of this class is always available as the `atom.clipboard` global.
+ * @example
+ * // returns 'hello'
+ * atom.clipboard.write('hello');
+ *
+ * console.log(atom.clipboard.read());
+ */
 module.exports = class Clipboard {
   constructor() {
     this.reset();

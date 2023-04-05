@@ -8,6 +8,10 @@
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },
+  "scripts": {
+    "update": "node ./update/update.js",
+    "update:test": "jest ./update/update.test.js"
+  },
   "providedServices": {
     "autocomplete.provider": {
       "versions": {
@@ -16,6 +20,12 @@
     }
   },
   "devDependencies": {
-    "request": "^2.53.0"
+    "@webref/elements": "^2.1.0",
+    "chrome-devtools-frontend": "^1.0.1070764",
+    "content": "github:mdn/content",
+    "esm": "^3.2.25",
+    "jest": "^29.4.3",
+    "joi": "^17.8.3",
+    "ts-import": "^2.0.40"
   }
 }
