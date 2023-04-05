@@ -227,6 +227,7 @@ windows_task:
     path: .\binaries\*
   test_script:
     - expand binaries/*zip -F:* ./extracted
+    - ls -l extracted
     - export BINARY_NAME=./extracted/Pulsar.exe
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
