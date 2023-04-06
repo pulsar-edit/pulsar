@@ -14,6 +14,11 @@ async function openAtom(profilePath, videoName) {
     env: env,
     timeout: 50000
   }
+  if(env.BINARY_NAME) {
+    config.executablePath = env.BINARY_NAME
+    config.args = ["--no-sandbox"]
+  }
+
   if(process.env.CI) {
     config.recordVideo = {
       dir: path.join('tests', 'videos', videoName)
