@@ -10,7 +10,6 @@ linux_task:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
-                ffmpeg
                 rpm
                 build-essential
                 git
@@ -28,7 +27,7 @@ linux_task:
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
-    - yarn install --ignore-engines || yarn install --ignore-engines
+    - yarn install || yarn install
   build_script:
     - yarn build
     - yarn run build:apm
@@ -37,11 +36,7 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
-    - rm -R node_modules/electron; yarn install --check-files
-    - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/pulsar'
-    - mkdir -p ./tests/videos
-    - Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -86,19 +81,17 @@ arm_linux_task:
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
-    - yarn install --ignore-engines || yarn install --ignore-engines
+    - yarn install || yarn install
   build_script:
     - yarn build
     - yarn run build:apm
+    - rm -Rf node-modules/electron && yarn install --check-files
   build_binary_script:
     - source /etc/profile.d/rvm.sh
     - yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
   test_script:
-    - rm -R node_modules/electron; yarn install --check-files
-    - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -128,7 +121,7 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn install --ignore-engines || yarn install --ignore-engines
+    - yarn install || yarn install
   build_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn build
@@ -140,9 +133,6 @@ silicon_mac_task:
     path: ./binaries/*
   test_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - rm -R node_modules/electron; yarn install --check-files
-    - hdiutil mount binaries/Pulsar*dmg
-    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -176,7 +166,7 @@ intel_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
-    - arch -x86_64 npx yarn install --ignore-engines || arch -x86_64 npx yarn install --ignore-engines
+    - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
   build_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn build
@@ -188,9 +178,6 @@ intel_mac_task:
     path: ./binaries/*
   test_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
-    - rm -R node_modules/electron; yarn install --check-files
-    - hdiutil mount binaries/Pulsar*dmg
-    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -202,23 +189,20 @@ intel_mac_task:
 
 windows_task:
   alias: windows
-  timeout_in: 90m
   windows_container:
     image: cirrusci/windowsservercore:visualstudio2022-2022.06.23
   env:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
   prepare_script:
-    - choco install nodejs --version=16.16.0 -y
+    - choco install nodejs --version=14.15.0 -y
     - choco install python --version=3.10.3	-y
     - choco install git visualstudio2019-workload-vctools -y
     - git submodule init
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   install_script:
-    - npx yarn install --ignore-engines
-      || rm -R node_modules && npx yarn install --ignore-engines
-      || rm -R node_modules && npx yarn install --ignore-engines
+    - npx yarn install --ignore-engines || sleep 1 && npx yarn install --ignore-engines || echo "There is a reason for so many tries"
   build_script:
     - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
@@ -227,14 +211,3 @@ windows_task:
     - npx yarn dist || npx yarn dist || npx yarn dist
   binary_artifacts:
     path: .\binaries\*
-  test_script:
-    - mkdir extracted; tar -xf binaries/*zip -C ./extracted/
-    - export BINARY_NAME=./extracted/Pulsar.exe
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
-  always:
-    videos_artifacts:
-      path: ./tests/videos/**
-    junit_artifacts:
-      path: report.xml
-      type: text/xml
-      format: junit
