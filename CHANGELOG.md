@@ -6,6 +6,7 @@
 
 ## [Unreleased]
 
+- The settings-view package now lists a package’s snippets more accurately
 - Fixed some issues with some packages with WebComponents v0 (tablr package
 should work now) by internalizing and patching document-register-element
 - Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM

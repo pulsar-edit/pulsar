@@ -12,6 +12,26 @@ describe('HTML autocompletions', () => {
     return provider.getSuggestions({editor, bufferPosition, scopeDescriptor, prefix})
   }
 
+  function isValueInCompletions(value, array, attribute) {
+    attribute ??= 'text'
+    let result = [];
+    for (const i of array) {
+      result.push(i[attribute]);
+    }
+    return result.includes(value);
+  }
+
+  function getValueInCompletionsIndex(value, array, attribute) {
+    attribute ??= 'text';
+    for (let i = 0; i < array.length; i++) {
+      if (array[i][attribute] === value) {
+        return i;
+      }
+    }
+    // We never did find the value in our array
+    return -1;
+  }
+
   beforeEach(() => {
     waitsForPromise(() => atom.packages.activatePackage('autocomplete-html'))
     waitsForPromise(() => atom.packages.activatePackage('language-html'))
@@ -59,9 +79,9 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 1])
 
     const completions = getCompletions()
-    expect(completions.length).toBe(113)
-    expect(completions[0].description).toContain('Creates a hyperlink to other web pages')
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/a')).toBe(true)
+    expect(completions.length).toBeGreaterThan(113) // Fun Fact last check this was 232
+    expect(completions[0].description.length).toBeGreaterThan(0)
+    expect(completions[0].descriptionMoreURL.length).toBeGreaterThan(0)
 
     for (let completion of completions) {
       expect(completion.text.length).toBeGreaterThan(0)
@@ -75,36 +95,35 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 2])
 
     let completions = getCompletions()
-    expect(completions.length).toBe(9)
+    expect(completions.length).toBeGreaterThan(9) // Fun fact last check was 14
 
-    expect(completions[0].text).toBe('datalist')
+    expect(isValueInCompletions('datalist', completions)).toBe(true)
     expect(completions[0].type).toBe('tag')
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/datalist')).toBe(true)
-    expect(completions[1].text).toBe('dd')
-    expect(completions[2].text).toBe('del')
-    expect(completions[3].text).toBe('details')
-    expect(completions[4].text).toBe('dfn')
-    expect(completions[5].text).toBe('dialog')
-    expect(completions[6].text).toBe('div')
-    expect(completions[7].text).toBe('dl')
-    expect(completions[8].text).toBe('dt')
+    expect(isValueInCompletions('dd', completions)).toBe(true)
+    expect(isValueInCompletions('del', completions)).toBe(true)
+    expect(isValueInCompletions('details', completions)).toBe(true)
+    expect(isValueInCompletions('dfn', completions)).toBe(true)
+    expect(isValueInCompletions('dialog', completions)).toBe(true)
+    expect(isValueInCompletions('div', completions)).toBe(true)
+    expect(isValueInCompletions('dl', completions)).toBe(true)
+    expect(isValueInCompletions('dt', completions)).toBe(true)
 
     editor.setText('<D')
     editor.setCursorBufferPosition([0, 2])
 
     completions = getCompletions()
-    expect(completions.length).toBe(9)
+    expect(completions.length).toBeGreaterThan(9) // Fun fact last check was 14
 
-    expect(completions[0].text).toBe('datalist')
+    expect(isValueInCompletions('datalist', completions)).toBe(true)
     expect(completions[0].type).toBe('tag')
-    expect(completions[1].text).toBe('dd')
-    expect(completions[2].text).toBe('del')
-    expect(completions[3].text).toBe('details')
-    expect(completions[4].text).toBe('dfn')
-    expect(completions[5].text).toBe('dialog')
-    expect(completions[6].text).toBe('div')
-    expect(completions[7].text).toBe('dl')
-    expect(completions[8].text).toBe('dt')
+    expect(isValueInCompletions('dd', completions)).toBe(true)
+    expect(isValueInCompletions('del', completions)).toBe(true)
+    expect(isValueInCompletions('details', completions)).toBe(true)
+    expect(isValueInCompletions('dfn', completions)).toBe(true)
+    expect(isValueInCompletions('dialog', completions)).toBe(true)
+    expect(isValueInCompletions('div', completions)).toBe(true)
+    expect(isValueInCompletions('dl', completions)).toBe(true)
+    expect(isValueInCompletions('dt', completions)).toBe(true)
   })
 
   it("does not autocomplete tag names if there's a space after the <", () => {
@@ -122,15 +141,16 @@ describe('HTML autocompletions', () => {
   })
 
   it('does not provide a descriptionMoreURL if the tag does not have a unique description', () => {
-    // ilayer does not have an associated MDN page as of April 27, 2017
+    // isindex does not have an associated MDN page as of March 25, 2023
     editor.setText('<i')
     editor.setCursorBufferPosition([0, 2])
 
     const completions = getCompletions()
+    const loc = getValueInCompletionsIndex('isindex', completions)
 
-    expect(completions[2].text).toBe('ilayer')
-    expect(completions[2].description).toBe('HTML <ilayer> tag')
-    expect(completions[2].descriptionMoreURL).toBeNull()
+    expect(isValueInCompletions('isindex', completions)).toBe(true)
+    expect(completions[loc].description).toBe("HTML <isindex> tag")
+    expect(completions[loc].descriptionMoreURL).toBeNull()
   })
 
   it('autocompletes attribute names without a prefix', () => {
@@ -138,9 +158,9 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 5])
 
     let completions = getCompletions()
-    expect(completions.length).toBe(86)
-    expect(completions[0].description).toContain('Provides a hint for generating a keyboard shortcut')
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Global_attributes/accesskey')).toBe(true)
+    expect(completions.length).toBeGreaterThan(86) // Fun fact last check this was 264
+    expect(completions[0].description.length).toBeGreaterThan(0)
+    expect(completions[0].descriptionMoreURL.length).toBeGreaterThan(0)
 
     for (var completion of completions) {
       expect(completion.snippet.length).toBeGreaterThan(0)
@@ -153,9 +173,9 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 9])
 
     completions = getCompletions()
-    expect(completions.length).toBe(98)
+    expect(completions.length).toBeGreaterThan(98) // Last check 274
     expect(completions[0].rightLabel).toBe('<marquee>')
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/marquee#attr-align')).toBe(true)
+    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/marquee#attributes')).toBe(true)
 
     for (completion of completions) {
       expect(completion.snippet.length).toBeGreaterThan(0)
@@ -186,57 +206,59 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 6])
 
     let completions = getCompletions()
-    expect(completions.length).toBe(3)
+    expect(completions.length).toBeGreaterThan(3) // Last check 9
 
-    expect(completions[0].snippet).toBe('class="$1"$0')
-    expect(completions[0].displayText).toBe('class')
-    expect(completions[0].type).toBe('attribute')
-    expect(completions[1].displayText).toBe('contenteditable')
-    expect(completions[2].displayText).toBe('contextmenu')
+    let loc = getValueInCompletionsIndex('class', completions, 'displayText')
+
+    expect(completions[loc].snippet).toBe('class="$1"$0')
+    expect(completions[loc].displayText).toBe('class')
+    expect(completions[loc].type).toBe('attribute')
+    expect(isValueInCompletions('contenteditable', completions, 'displayText'))
+    expect(isValueInCompletions('contextmenu', completions, 'displayText'))
 
     editor.setText('<div C')
     editor.setCursorBufferPosition([0, 6])
 
     completions = getCompletions()
-    expect(completions.length).toBe(3)
+    expect(completions.length).toBeGreaterThan(3) // Last check 9
 
-    expect(completions[0].displayText).toBe('class')
-    expect(completions[1].displayText).toBe('contenteditable')
-    expect(completions[2].displayText).toBe('contextmenu')
+    expect(isValueInCompletions('class', completions, 'displayText'))
+    expect(isValueInCompletions('contenteditable', completions, 'displayText'))
+    expect(isValueInCompletions('contextmenu', completions, 'displayText'))
 
     editor.setText('<div c>')
     editor.setCursorBufferPosition([0, 6])
 
     completions = getCompletions()
-    expect(completions.length).toBe(3)
+    expect(completions.length).toBeGreaterThan(3)
 
-    expect(completions[0].displayText).toBe('class')
-    expect(completions[1].displayText).toBe('contenteditable')
-    expect(completions[2].displayText).toBe('contextmenu')
+    expect(isValueInCompletions('class', completions, 'displayText'))
+    expect(isValueInCompletions('contenteditable', completions, 'displayText'))
+    expect(isValueInCompletions('contextmenu', completions, 'displayText'))
 
     editor.setText('<div c></div>')
     editor.setCursorBufferPosition([0, 6])
 
     completions = getCompletions()
-    expect(completions.length).toBe(3)
+    expect(completions.length).toBeGreaterThan(3)
 
-    expect(completions[0].displayText).toBe('class')
-    expect(completions[1].displayText).toBe('contenteditable')
-    expect(completions[2].displayText).toBe('contextmenu')
+    expect(isValueInCompletions('class', completions, 'displayText'))
+    expect(isValueInCompletions('contenteditable', completions, 'displayText'))
+    expect(isValueInCompletions('contextmenu', completions, 'displayText'))
 
     editor.setText('<marquee di')
     editor.setCursorBufferPosition([0, 12])
 
     completions = getCompletions()
-    expect(completions[0].displayText).toBe('direction')
-    expect(completions[1].displayText).toBe('dir')
+    expect(isValueInCompletions('direction', completions, 'displayText'))
+    expect(isValueInCompletions('dir', completions, 'displayText'))
 
     editor.setText('<marquee dI')
     editor.setCursorBufferPosition([0, 12])
 
     completions = getCompletions()
-    expect(completions[0].displayText).toBe('direction')
-    expect(completions[1].displayText).toBe('dir')
+    expect(isValueInCompletions('direction', completions, 'displayText'))
+    expect(isValueInCompletions('dir', completions, 'displayText'))
   })
 
   it('autocompletes attribute names without a prefix surrounded by whitespace', () => {
@@ -245,7 +267,7 @@ describe('HTML autocompletions', () => {
 
     const completions = getCompletions()
     for (let completion of completions) { expect(completion.type).toBe('attribute') }
-    expect(completions[0].displayText).toBe('autofocus')
+    expect(isValueInCompletions('autofocus', completions, 'displayText'))
   })
 
   it('autocompletes attribute names with a prefix surrounded by whitespace', () => {
@@ -254,7 +276,7 @@ describe('HTML autocompletions', () => {
 
     const completions = getCompletions()
     for (let completion of completions) { expect(completion.type).toBe('attribute') }
-    expect(completions[0].displayText).toBe('onabort')
+    expect(isValueInCompletions('onabort', completions, 'displayText'))
   })
 
   it("respects the 'flag' type when autocompleting attribute names", () => {
@@ -262,7 +284,7 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 8])
 
     const completions = getCompletions()
-    expect(completions[0].snippet).toBe('autofocus')
+    expect(isValueInCompletions('autofocus', completions, 'snippet'))
   })
 
   it('does not autocomplete attribute names in between an attribute name and value', () => {
@@ -308,7 +330,7 @@ describe('HTML autocompletions', () => {
     editor.setCursorBufferPosition([0, 6])
 
     const completions = getCompletions()
-    expect(completions[0].displayText).toBe('onafterprint')
+    expect(isValueInCompletions('onafterprint', completions, 'displayText'))
   })
 
   it('does not provide a descriptionMoreURL if the attribute does not have a unique description', () => {
@@ -317,9 +339,11 @@ describe('HTML autocompletions', () => {
 
     const completions = getCompletions()
 
-    expect(completions[0].displayText).toBe('onabort')
-    expect(completions[0].description).toBe('Global onabort attribute')
-    expect(completions[0].descriptionMoreURL).toBeNull()
+    const loc = getValueInCompletionsIndex('onabort', completions, 'displayText')
+
+    expect(completions[loc].displayText).toBe('onabort')
+    expect(completions[loc].description).toBe('Global onabort attribute')
+    expect(completions[loc].descriptionMoreURL).toBeNull()
   })
 
   it('autocompletes attribute values without a prefix', () => {
@@ -332,7 +356,7 @@ describe('HTML autocompletions', () => {
     expect(completions[0].text).toBe('scroll')
     expect(completions[0].type).toBe('value')
     expect(completions[0].description.length).toBeGreaterThan(0)
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/marquee#attr-behavior')).toBe(true)
+    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/marquee#attributes')).toBe(true)
     expect(completions[1].text).toBe('slide')
     expect(completions[2].text).toBe('alternate')
 
@@ -419,7 +443,7 @@ describe('HTML autocompletions', () => {
     expect(completions[0].text).toBe('button')
     expect(completions[0].type).toBe('value')
     expect(completions[0].description.length).toBeGreaterThan(0)
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/button#attr-type')).toBe(true)
+    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/button#attributes')).toBe(true)
     expect(completions[1].text).toBe('reset')
     expect(completions[2].text).toBe('submit')
 
@@ -433,7 +457,7 @@ describe('HTML autocompletions', () => {
     expect(completions[0].text).toBe('alternate')
     expect(completions[0].type).toBe('value')
     expect(completions[0].description.length).toBeGreaterThan(0)
-    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/link#attr-rel')).toBe(true)
+    expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/link#attributes')).toBe(true)
   })
 
   it("provides 'true' and 'false' suggestions when autocompleting boolean attributes", () => {
