@@ -46,6 +46,7 @@ const TextEditorRegistry = require('./text-editor-registry');
 const AutoUpdateManager = require('./auto-update-manager');
 const StartupTime = require('./startup-time');
 const getReleaseChannel = require('./get-release-channel');
+const I18n = require("./i18n");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -125,6 +126,11 @@ class AtomEnvironment {
     /** @type {StyleManager} */
     this.styles = new StyleManager();
 
+    this.i18n = new I18n({
+      notificationManager: this.notifications,
+      config: this.config
+    });
+
     /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
@@ -135,7 +141,8 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       deserializerManager: this.deserializers,
       viewRegistry: this.views,
-      uriHandlerRegistry: this.uriHandlerRegistry
+      uriHandlerRegistry: this.uriHandlerRegistry,
+      i18n: this.i18n
     });
 
     /** @type {ThemeManager} */
@@ -149,6 +156,7 @@ class AtomEnvironment {
 
     /** @type {MenuManager} */
     this.menu = new MenuManager({
+      i18n: this.i18n,
       keymapManager: this.keymaps,
       packageManager: this.packages
     });
@@ -274,6 +282,19 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
+    this.packages.initialize({
+      devMode,
+      configDirPath: this.configDirPath,
+      resourcePath,
+      safeMode
+    });
+
+    this.i18n.initialize({
+      configDirPath: this.configDirPath,
+      packages: this.packages,
+      resourcePath
+    });
+
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
 
@@ -287,12 +308,6 @@ class AtomEnvironment {
     this.commands.attach(this.window);
 
     this.styles.initialize({ configDirPath: this.configDirPath });
-    this.packages.initialize({
-      devMode,
-      configDirPath: this.configDirPath,
-      resourcePath,
-      safeMode
-    });
     this.themes.initialize({
       configDirPath: this.configDirPath,
       resourcePath,

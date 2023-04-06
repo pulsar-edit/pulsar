@@ -12,8 +12,8 @@ function addItemToMenu(item, menu) {
   }
 }
 
-function merge(menu, item, itemSpecificity = Infinity) {
-  item = cloneMenuItem(item);
+function merge(menu, item, t, itemSpecificity = Infinity) {
+  item = cloneAndLocaliseMenuItem(item, t);
   ItemSpecificities.set(item, itemSpecificity);
   const matchingItemIndex = findMatchingItemIndex(menu, item);
 
@@ -25,7 +25,7 @@ function merge(menu, item, itemSpecificity = Infinity) {
   const matchingItem = menu[matchingItemIndex];
   if (item.submenu != null) {
     for (let submenuItem of item.submenu) {
-      merge(matchingItem.submenu, submenuItem, itemSpecificity);
+      merge(matchingItem.submenu, submenuItem, t, itemSpecificity);
     }
   } else if (
     itemSpecificity &&
@@ -35,8 +35,9 @@ function merge(menu, item, itemSpecificity = Infinity) {
   }
 }
 
-function unmerge(menu, item) {
-  item = cloneMenuItem(item);
+
+function unmerge(menu, item, t) {
+  item = cloneAndLocaliseMenuItem(item, t);
   const matchingItemIndex = findMatchingItemIndex(menu, item);
   if (matchingItemIndex === -1) {
     return;
@@ -74,11 +75,12 @@ function normalizeLabel(label) {
   return process.platform === 'darwin' ? label : label.replace(/&/g, '');
 }
 
-function cloneMenuItem(item) {
+function cloneAndLocaliseMenuItem(item, t) {
   item = _.pick(
     item,
     'type',
     'label',
+    'localisedLabel',
     'id',
     'enabled',
     'visible',
@@ -92,11 +94,18 @@ function cloneMenuItem(item) {
     'beforeGroupContaining',
     'afterGroupContaining'
   );
+  if (item.localisedLabel) {
+    if (typeof item.localisedLabel === "string") {
+      item.label = t(item.localisedLabel);
+    } else {
+      item.label = t(item.localisedLabel.key, item.localisedLabel.opts);
+    }
+  }
   if (item.id === null || item.id === undefined) {
     item.id = normalizeLabel(item.label);
   }
   if (item.submenu != null) {
-    item.submenu = item.submenu.map(submenuItem => cloneMenuItem(submenuItem));
+    item.submenu = item.submenu.map(submenuItem => cloneAndLocaliseMenuItem(submenuItem, t));
   }
   return item;
 }
@@ -133,6 +142,6 @@ module.exports = {
   merge,
   unmerge,
   normalizeLabel,
-  cloneMenuItem,
+  cloneAndLocaliseMenuItem,
   acceleratorForKeystroke
 };
