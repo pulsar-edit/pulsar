@@ -601,8 +601,8 @@ describe 'TextMate HTML grammar', ->
 
   describe 'firstLineMatch', ->
     it 'recognises HTML5 doctypes', ->
-      expect(grammar.firstLineRegex.scanner.findNextMatchSync('<!DOCTYPE html>')).not.toBeNull()
-      expect(grammar.firstLineRegex.scanner.findNextMatchSync('<!doctype HTML>')).not.toBeNull()
+      expect(grammar.firstLineRegex.findNextMatchSync('<!DOCTYPE html>')).not.toBeNull()
+      expect(grammar.firstLineRegex.findNextMatchSync('<!doctype HTML>')).not.toBeNull()
 
     it 'recognises Emacs modelines', ->
       valid = '''
@@ -621,7 +621,7 @@ describe 'TextMate HTML grammar', ->
         "-*- font:x;foo : bar ; mode : HtML ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         /* --*html-*- */
@@ -640,7 +640,7 @@ describe 'TextMate HTML grammar', ->
         // -*-font:mode;mode:html--*-
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it 'recognises Vim modelines', ->
       valid = '''
@@ -667,7 +667,7 @@ describe 'TextMate HTML grammar', ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=html ts=4
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         ex: se filetype=html:
@@ -685,7 +685,7 @@ describe 'TextMate HTML grammar', ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=HTML ts=4
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
   describe 'tags', ->
     it 'tokenizes style tags as such', ->
