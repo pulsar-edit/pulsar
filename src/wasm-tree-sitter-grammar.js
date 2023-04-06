@@ -8,30 +8,30 @@ const parserInitPromise = Parser.init();
 
 module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
+    this.registry = registry;
+    this.name = params.name;
     this.scopeName = params.scopeName;
-    this.grammarFilePath = grammarPath;
-    this.queryPaths = params.treeSitter;
-    const dirName = path.dirname(grammarPath);
 
+    this.contentRegex = buildRegex(params.contentRegex);
+    this.firstLineRegex = buildRegex(params.firstLineRegex);
     this.injectionRegex = buildRegex(
       params.injectionRegex || params.injectionRegExp
     );
     this.injectionPointsByType = {};
 
+    this.grammarFilePath = grammarPath;
+    this.queryPaths = params.treeSitter;
+    const dirName = path.dirname(grammarPath);
+
     this.emitter = new Emitter;
     this.subscriptions = new CompositeDisposable;
-    this._queryFileWatchers = [];
 
     this.queryCache = new Map();
     this.promisesForQueryFiles = new Map();
     this.promisesForQueries = new Map();
 
-    this.treeSitterGrammarPath = path.join(dirName, params.treeSitter.grammar)
-    this.contentRegex = buildRegex(params.contentRegex);
-    this.firstLineRegex = buildRegex(params.firstLineRegex);
+    this.treeSitterGrammarPath = path.join(dirName, params.treeSitter.grammar);
     this.fileTypes = params.fileTypes || [];
-    this.registry = registry;
-    this.name = params.name;
 
     this.nextScopeId = 256 + 1;
     this.classNamesById = new Map();
@@ -45,6 +45,10 @@ module.exports = class WASMTreeSitterGrammar {
 
     this.shouldObserveQueryFiles = atom.inDevMode() && !atom.inSpecMode();
     this.getLanguage();
+
+    for (const injectionPoint of params.injectionPoints ?? []) {
+      this.addInjectionPoint(injectionPoint);
+    }
   }
 
   idForScope(scopeName) {
@@ -329,6 +333,26 @@ module.exports = class WASMTreeSitterGrammar {
   inspect() {
     return `WASMTreeSitterGrammar {scopeName: ${this.scopeName}}`;
   }
+
+  /*
+  Section - Backward compatibility shims
+  */
+  /* eslint-disable no-unused-vars */
+  onDidUpdate(callback) {
+    // do nothing
+  }
+
+  tokenizeLines(text, compatibilityMode = true) {
+    return text.split('\n').map(line => this.tokenizeLine(line, null, false));
+  }
+
+  tokenizeLine(line, ruleStack, firstLine) {
+    return {
+      value: line,
+      scopes: [this.scopeName]
+    };
+  }
+  /* eslint-enable no-unused-vars */
 }
 
 function buildRegex(value) {

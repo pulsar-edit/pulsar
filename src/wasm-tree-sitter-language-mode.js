@@ -1903,25 +1903,6 @@ class NullLayerHighlightIterator {
   }
 }
 
-// function findNodeInCurrentScope(boundaries, position, filter) {
-//   let iterator = boundaries.ge(position)
-//   while (iterator.hasPrev) {
-//     iterator.prev()
-//     const value = iterator.value
-//     if (filter(value)) return value
-//
-//     if (value.scope === 'close') {
-//       // If we have a closing scope, there's an "inner scope" that we will
-//       // ignore, and move the iterator BEFORE the inner scope position
-//       iterator = boundaries.lt(value.openScopeNode.position)
-//     } else if (value.scope === 'open') {
-//       // But, if we find an "open" scope, we check depth. If it's `1`, we
-//       // got into the last nested scope we were inside, so it's time to quit
-//       if (value.depth === 1) return
-//     }
-//   }
-// }
-
 // An iterator for marking boundaries in the buffer to apply syntax
 // highlighting.
 //
