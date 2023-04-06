@@ -53,7 +53,6 @@ let options = {
     "package.json",
     "dot-atom/**/*",
     "exports/**/*",
-    "i18n/**/*",
     "resources/**/*",
     "src/**/*",
     "static/**/*",

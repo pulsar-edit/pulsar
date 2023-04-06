@@ -12,8 +12,8 @@ function addItemToMenu(item, menu) {
   }
 }
 
-function merge(menu, item, t, itemSpecificity = Infinity) {
-  item = cloneAndLocaliseMenuItem(item, t);
+function merge(menu, item, itemSpecificity = Infinity) {
+  item = cloneMenuItem(item);
   ItemSpecificities.set(item, itemSpecificity);
   const matchingItemIndex = findMatchingItemIndex(menu, item);
 
@@ -25,7 +25,7 @@ function merge(menu, item, t, itemSpecificity = Infinity) {
   const matchingItem = menu[matchingItemIndex];
   if (item.submenu != null) {
     for (let submenuItem of item.submenu) {
-      merge(matchingItem.submenu, submenuItem, t, itemSpecificity);
+      merge(matchingItem.submenu, submenuItem, itemSpecificity);
     }
   } else if (
     itemSpecificity &&
@@ -35,9 +35,8 @@ function merge(menu, item, t, itemSpecificity = Infinity) {
   }
 }
 
-
-function unmerge(menu, item, t) {
-  item = cloneAndLocaliseMenuItem(item, t);
+function unmerge(menu, item) {
+  item = cloneMenuItem(item);
   const matchingItemIndex = findMatchingItemIndex(menu, item);
   if (matchingItemIndex === -1) {
     return;
@@ -75,12 +74,11 @@ function normalizeLabel(label) {
   return process.platform === 'darwin' ? label : label.replace(/&/g, '');
 }
 
-function cloneAndLocaliseMenuItem(item, t) {
+function cloneMenuItem(item) {
   item = _.pick(
     item,
     'type',
     'label',
-    'localisedLabel',
     'id',
     'enabled',
     'visible',
@@ -94,18 +92,11 @@ function cloneAndLocaliseMenuItem(item, t) {
     'beforeGroupContaining',
     'afterGroupContaining'
   );
-  if (item.localisedLabel) {
-    if (typeof item.localisedLabel === "string") {
-      item.label = t(item.localisedLabel);
-    } else {
-      item.label = t(item.localisedLabel.key, item.localisedLabel.opts);
-    }
-  }
   if (item.id === null || item.id === undefined) {
     item.id = normalizeLabel(item.label);
   }
   if (item.submenu != null) {
-    item.submenu = item.submenu.map(submenuItem => cloneAndLocaliseMenuItem(submenuItem, t));
+    item.submenu = item.submenu.map(submenuItem => cloneMenuItem(submenuItem));
   }
   return item;
 }
@@ -142,6 +133,6 @@ module.exports = {
   merge,
   unmerge,
   normalizeLabel,
-  cloneAndLocaliseMenuItem,
+  cloneMenuItem,
   acceleratorForKeystroke
 };

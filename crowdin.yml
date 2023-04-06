@@ -1,9 +1,0 @@
-preserve_hierarchy: true
-commit_message: "[skip ci] Translations from Crowdin"
-append_commit_message: false
-
-files:
-- source: /i18n/en.json
-  translation: /i18n/%locale%.json
-- source: /packages/**/i18n/en.json
-  translation: /packages/**/i18n/%locale%.json

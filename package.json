@@ -27,7 +27,6 @@
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
-    "@formatjs/icu-messageformat-parser": "^2.3.0",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
     "async": "3.2.4",
@@ -82,7 +81,6 @@
     "grim": "2.0.3",
     "image-view": "file:packages/image-view",
     "incompatible-packages": "file:packages/incompatible-packages",
-    "intl-messageformat": "^10.3.3",
     "jasmine-json": "~0.0",
     "jasmine-reporters": "1.1.0",
     "jasmine-tagged": "^1.1.4",
