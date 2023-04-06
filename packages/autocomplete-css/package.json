@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "@webref/css": "^6.3.4",
-    "content": "github:mdn/content",
-    "request": "^2.53.0"
+    "content": "github:mdn/content"
   }
 }
