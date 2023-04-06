@@ -38,8 +38,7 @@ module.exports = class PackageManager {
       grammarRegistry: this.grammarRegistry,
       deserializerManager: this.deserializerManager,
       viewRegistry: this.viewRegistry,
-      uriHandlerRegistry: this.uriHandlerRegistry,
-      i18n: this.i18n
+      uriHandlerRegistry: this.uriHandlerRegistry
     } = params);
 
     this.emitter = new Emitter();
@@ -588,8 +587,7 @@ module.exports = class PackageManager {
       menuManager: this.menuManager,
       contextMenuManager: this.contextMenuManager,
       deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry,
-      i18n: this.i18n
+      viewRegistry: this.viewRegistry
     };
 
     pack = metadata.theme ? new ThemePackage(options) : new Package(options);
@@ -694,8 +692,7 @@ module.exports = class PackageManager {
       menuManager: this.menuManager,
       contextMenuManager: this.contextMenuManager,
       deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry,
-      i18n: this.i18n
+      viewRegistry: this.viewRegistry
     };
 
     const pack = metadata.theme
