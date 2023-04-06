@@ -5,8 +5,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
 jobs:
-  setup:
-    name: Build Editor
+  test:
+    name: run tests
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
@@ -47,6 +47,8 @@ jobs:
 
           const packages = fs.readdirSync("packages");
 
+          const xvfb = cp.spawn("Xvfb", [":1"]);
+
           const results = packages.map(package => {
             let result;
 
@@ -55,7 +57,7 @@ jobs:
             console.log(`::group::tests for ${package}`);
             try {
               cp.execSync(
-                `Xvfb :1 & cd node_modules/${package} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi`,
+                `cd node_modules/${package} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi`,
                 { stdio: "inherit" }
               );
               result = [package, true];
@@ -74,3 +76,10 @@ jobs:
               console.log(`::error title=tests for ${package}::failed`);
             }
           });
+
+          xvfb.kill("SIGINT");
+
+          if (!results.every(v => v[1])) {
+            let failed = results.filter(v => !v[1]).join(", ");
+            core.setFailed(`one or more tests failed: ${failed}`);
+          }
