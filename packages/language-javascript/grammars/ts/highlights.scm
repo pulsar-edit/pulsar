@@ -358,10 +358,9 @@
 (member_expression
   object: (identifier) @support.other.object.js)
 
-; The "bar" in `foo.bar.baz`.
+; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
 (member_expression
-  object: (member_expression
-    property: (property_identifier) @support.other.property.js))
+  property: (property_identifier) @support.other.property.js)
 
 ; The "foo" in `{ foo: true }`.
 (pair

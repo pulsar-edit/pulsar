@@ -31,7 +31,7 @@
 (if_statement
   condition: (parenthesized_expression ")" @indent
   (#set! onlyIfLastTextOnRow true)))
-
+; (as should a braceless `else`…)
 ("else" @indent
   (#set! onlyIfLastTextOnRow true))
 
@@ -83,6 +83,9 @@
 
 ; HANGING INDENT ON SPLIT LINES
 ; =============================
+
+; TODO: We might want to make this configurable behavior with the
+; `onlyIfConfig` scope test.
 
 ; Any of these at the end of a line indicate the next line should be indented…
 (["||" "&&" "?"] @indent
