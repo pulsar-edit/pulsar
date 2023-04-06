@@ -65,21 +65,14 @@ jobs:
               result = [package, false];
             }
             console.log("::endgroup::");
+            if (!result[1]) console.log(`::error title=${package}::tests for ${package} failed`);
 
             return result;
           }).filter(v => v);
 
-          results.forEach(([package, passed]) => {
-            if (passed) {
-              console.log(`::notice title=tests for ${package}::passed`);
-            } else {
-              console.log(`::error title=tests for ${package}::failed`);
-            }
-          });
-
           xvfb.kill("SIGINT");
 
           if (!results.every(v => v[1])) {
-            let failed = results.filter(v => !v[1]).join(", ");
+            let failed = results.filter(v => !v[1]).map(p => p[0]).join(", ");
             core.setFailed(`one or more tests failed: ${failed}`);
           }
