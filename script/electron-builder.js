@@ -37,6 +37,8 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 /// END Monkey-Patch
 
 const builder = require("electron-builder")
+const Platform = builder.Platform
+
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
@@ -217,7 +219,7 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      { target: "zip" },
+      { "target": "portable" },
     ],
   },
   // Windows NSIS Configuration
@@ -260,6 +262,7 @@ async function main() {
   let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
+    //targets: Platform.LINUX.createTarget(),
     config: options
   }).then((result) => {
     console.log("Built binaries")
