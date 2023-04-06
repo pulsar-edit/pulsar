@@ -2648,7 +2648,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           injectionRegex: '^(js-regex-for-test)$'
         }
 
-        const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, jsRegexConfig);
+        const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
 
         await regexGrammar.setQueryForTest('syntaxQuery', `
           (pattern) @string.regexp
@@ -3125,8 +3125,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
-
-      console.log(buffer.getText());
 
       editor.setCursorBufferPosition([1, 52]);
       editor.getLastCursor().moveToEndOfLine();
