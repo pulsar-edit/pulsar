@@ -39,37 +39,38 @@ jobs:
       run: sudo apt-get install -y xvfb
 
     - name: run tests
-      shell: node {0}
-      run: |
-        const cp = require("child_process");
-        const fs = require("fs");
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const cp = require("child_process");
+          const fs = require("fs");
 
-        const packages = fs.readdirSync("packages");
+          const packages = fs.readdirSync("packages");
 
-        const results = packages.map(package => {
-          let result;
+          const results = packages.map(package => {
+            let result;
 
-          if (!fs.existsSync(`node_modules/${package}/soec`)) return false;
+            if (!fs.existsSync(`node_modules/${package}/spec`)) return false;
 
-          console.log(`::group::tests for ${package}`);
-          try {
-            cp.execSync(
-              `Xvfb :1 & cd node_modules/${package} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi`,
-              { stdio: "inherit" }
-            );
-            result = [package, true];
-          } catch (err) {
-            result = [package, false];
-          }
-          console.log("::endgroup::");
+            console.log(`::group::tests for ${package}`);
+            try {
+              cp.execSync(
+                `Xvfb :1 & cd node_modules/${package} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi`,
+                { stdio: "inherit" }
+              );
+              result = [package, true];
+            } catch (err) {
+              result = [package, false];
+            }
+            console.log("::endgroup::");
 
-          return result;
-        }).filter(v => v);
+            return result;
+          }).filter(v => v);
 
-        results.forEach(([package, passed]) => {
-          if (passed) {
-            console.log(`::notice title=tests for ${package}::passed`);
-          } else {
-            console.log(`::error title=tests for ${package}::failed`);
-          }
-        });
+          results.forEach(([package, passed]) => {
+            if (passed) {
+              console.log(`::notice title=tests for ${package}::passed`);
+            } else {
+              console.log(`::error title=tests for ${package}::failed`);
+            }
+          });
