@@ -77,9 +77,3 @@
 ; Because of the preceding rule, if this matches and passes all tests, the
 ; value must be unquoted.
 (attribute_value) @string.unquoted.html
-
-; INJECTED
-; ========
-
-; ((fragment) @meta.embedded.html
-;   (#set! onlyIfInjected true))
