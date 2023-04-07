@@ -19,26 +19,37 @@ exports.activate = function() {
     }
   });
 
+  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+  const HYPERLINK_PATTERN = /\bhttps?:/
+
   atom.grammars.addInjectionPoint('text.html.basic', {
     type: 'comment',
-    language: () => 'todo',
-    content: (node) => node
+    language: (node) => {
+      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
   });
 
   atom.grammars.addInjectionPoint('text.html.basic', {
     type: 'comment',
-    language: () => 'hyperlink',
-    content: (node) => node
+    language: (node) => {
+      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
   });
 
   atom.grammars.addInjectionPoint('text.html.basic', {
     type: 'attribute_value',
-    language: () => 'hyperlink',
-    content: (node) => node
+    language: (node) => {
+      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
   });
 
   // TODO: Inject hyperlink grammar into plain text?
-
 
   // EMBEDDED
 
