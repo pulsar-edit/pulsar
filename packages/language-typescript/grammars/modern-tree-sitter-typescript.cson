@@ -1,6 +1,6 @@
 name: 'TypeScript'
 scopeName: 'source.ts'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-typescript/typescript'
 
 fileTypes: ['ts']

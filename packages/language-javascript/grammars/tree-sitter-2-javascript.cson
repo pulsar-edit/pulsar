@@ -1,6 +1,6 @@
 name: 'JavaScript'
 scopeName: 'source.js'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-javascript'
 
 injectionRegex: '^(js|javascript)$'

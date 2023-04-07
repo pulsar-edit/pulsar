@@ -1,6 +1,6 @@
 name: 'JavaScript RegExp'
 scopeName: 'source.regexp.js'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-regex'
 
 injectionRegex: '^(js-regex)$'

@@ -1,6 +1,6 @@
 name: 'HTML'
 scopeName: 'text.html.basic'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-html'
 
 injectionRegex: '(HTML|html|Html)$'

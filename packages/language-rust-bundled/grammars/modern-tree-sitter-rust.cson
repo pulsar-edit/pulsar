@@ -1,6 +1,6 @@
 name: 'Rust'
 scopeName: 'source.rust'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-rust'
 
 injectionRegex: '^(rust|RUST)$'

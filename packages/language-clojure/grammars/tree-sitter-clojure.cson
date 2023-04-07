@@ -1,6 +1,6 @@
 'name': 'Clojure'
 'scopeName': 'source.clojure'
-'type': 'tree-sitter-2'
+'type': 'modern-tree-sitter'
 'fileTypes': [
   'boot'
   'clj'

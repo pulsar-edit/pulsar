@@ -1,5 +1,5 @@
 scopeName: 'source.regexp'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-regex'
 
 # TODO: Decide whether to have one regex grammar that's shared among grammars

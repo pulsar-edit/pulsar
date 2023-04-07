@@ -1,6 +1,6 @@
 # name: 'Hyperlink'
 scopeName: 'text.hyperlink'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-hyperlink'
 
 injectionRegex: 'hyperlink'

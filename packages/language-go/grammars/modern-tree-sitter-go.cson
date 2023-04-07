@@ -1,6 +1,6 @@
 name: 'Go'
 scopeName: 'source.go'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-go'
 
 fileTypes: [

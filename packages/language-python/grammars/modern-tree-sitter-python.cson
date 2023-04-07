@@ -1,6 +1,6 @@
 name: 'Python'
 scopeName: 'source.python'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-python'
 
 injectionRegex: '^(py|PY|python|PYTHON)$'

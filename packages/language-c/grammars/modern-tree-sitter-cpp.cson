@@ -1,6 +1,6 @@
 name: 'C++'
 scopeName: 'source.cpp'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-cpp'
 
 injectionRegex: '^(cpp|CPP|cc|CC)$'

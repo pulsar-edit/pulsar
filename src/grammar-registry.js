@@ -693,10 +693,10 @@ module.exports = class GrammarRegistry {
       grammarPath,
       CSON.readFileSync(grammarPath) || {}
     );
-}
+  }
 
   createGrammar(grammarPath, params) {
-    if (params.type === 'tree-sitter-2') {
+    if (params.type === 'modern-tree-sitter') {
       return new WASMTreeSitterGrammar(this, grammarPath, params)
     } else if (params.type === 'tree-sitter') {
       return new TreeSitterGrammar(this, grammarPath, params);
