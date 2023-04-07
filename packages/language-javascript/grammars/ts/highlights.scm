@@ -59,22 +59,25 @@
 
 ["var" "const" "let"] @storage.type._TYPE_.js
 
-(variable_declarator
-  name: (identifier) @variable.other.assignment.js)
-
 ; A simple variable declaration:
 ; The "foo" in `let foo = true`
-(assignment_expression
-  left: (identifier) @variable.other.assignment.js)
+(variable_declarator
+  name: (identifier) @variable.other.assignment.js)
 
 ; A reassignment of a variable declared earlier:
 ; The "foo" in `foo = true`
 (assignment_expression
-  left: (member_expression
-    property: (property_identifier)) @variable.other.asssignment.property.js)
+  left: (identifier) @variable.other.assignment.js)
 
 ; A variable object destructuring:
 ; The "foo" in `let { foo } = something`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier)) @variable.other.assignment.property.js)
+
+(augmented_assignment_expression
+  left: (identifier) @variable.other.assignment.js)
+
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
@@ -351,6 +354,20 @@
     (#set! final true)))
 
 
+; FUNCTION CALLS
+; ==============
+
+; An invocation of any function.
+(call_expression
+  function: (identifier) @support.other.function.js)
+
+; An invocation of any method.
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @support.other.function.method.js
+    (#set! final true)))
+
+
 ; OBJECTS
 ; =======
 
@@ -371,18 +388,6 @@
 (object
   (shorthand_property_identifier) @entity.other.attribute-name.shorthand.js)
 
-
-; FUNCTION CALLS
-; ==============
-
-; An invocation of any function.
-(call_expression
-  function: (identifier) @support.other.function.js)
-
-; An invocation of any method.
-(call_expression
-  function: (member_expression
-    property: (property_identifier) @support.other.function.method.js))
 
 ; CLASSES
 ; =======
@@ -542,13 +547,13 @@
   (super)
 ] @variable.language._TYPE_.js
 
-((identifier) @support.builtin._TEXT_.js
-  (#match? @support.builtin._TEXT_.js "^(arguments|module|console|window|document)$")
+((identifier) @support.object.builtin._TEXT_.js
+  (#match? @support.object.builtin._TEXT_.js "^(arguments|module|console|window|document)$")
   (#is-not? local)
   (#set! final true))
 
-((identifier) @support.function.builtin.js
-  (#eq? @support.function.builtin.js "require")
+((identifier) @support.function.builtin.require.js
+  (#eq? @support.function.builtin.require.js "require")
   (#is-not? local)
   (#set! final true))
 
@@ -629,7 +634,6 @@
   (#set! final true))
 
 (jsx_expression) @meta.embedded.line.jsx.js
-
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
