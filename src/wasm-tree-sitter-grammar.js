@@ -304,6 +304,34 @@ module.exports = class WASMTreeSitterGrammar {
   //   node that was given, but could also be a specific child or descendant of
   //   that node, or potentially any other node in the tree.
   //
+  // Understands the following optional keys:
+  //
+  // * `includeChildren` (boolean): Whether the injection range should include
+  //   the ranges of this node's children. Defaults to `false`, meaning that
+  //   the range of each of this node's children will be "subtracted" from the
+  //   injection range, and the remainder will be parsed as if those ranges of
+  //   the buffer do not exist.
+  // * `includeAdjacentWhitespace` (boolean): Whether the injection range
+  //   should include whitespace that occurs between content nodes. Defaults to
+  //   `false`. When `true`, if two injection ranges are separated from one
+  //   another by only whitespace, that whitespace will be added to the
+  //   injection range, and the ranges will be consolidated.
+  // * `newlinesBetween` (boolean): Whether the injection range should include
+  //   any newline characters that may exist in between injection ranges.
+  //   Defaults to `false`. Grammars like ERB and EJS need this so that they do
+  //   not interpret two different embedded code sections on different lines as
+  //   occurring on the same line.
+  // * `coverShallowerScopes` (boolean): Whether the injection should prevent
+  //   the parent grammar (and any of its ancestors) from applying scope
+  //   boundaries within its injection range(s). Defalts to `false`.
+  // * `languageScope` (string | function | null): The base language scope that
+  //   should be used by this injection. Defaults to the grammar's own
+  //   `scopeName` property. Set this to a string to override the default scope
+  //   name, or `null` to omit a base scope name altogether. Set this to a
+  //   function if the scope name to be applied varies based on the grammar;
+  //   the function will be called with a grammar instance as its only
+  //   argument.
+  //
   // NOTE: Packages will call `atom.grammars.addInjectionPoint` with a given
   // scope name, and that call will be delegated to any tree-sitter grammars
   // that match that scope name, whether they're legacy-tree-sitter or

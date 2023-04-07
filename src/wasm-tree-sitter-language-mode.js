@@ -1886,7 +1886,7 @@ class NullLanguageModeHighlightIterator {
 
 class NullLayerHighlightIterator {
   seek() {
-    return null;
+    return [false, new OpenScopeMap];
   }
   compare() {
     return 1;
@@ -1928,7 +1928,7 @@ class HighlightIterator {
     this.end = end;
     this.iterators = [];
 
-    const injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
+    let injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
       {
         intersectsRange: new Range(
           start,
@@ -1937,26 +1937,87 @@ class HighlightIterator {
       }
     );
 
+    injectionMarkers.sort((a, b) => {
+      // Shallower injections get visited first.
+      return a.languageLayer.depth - b.languageLayer.depth;
+    });
+
     const iterator = this.languageMode.rootLanguageLayer.buildHighlightIterator();
 
-    let openScopes = [];
+    // We need to know which open scopes were contributed by which language
+    // layer so that we know which ones to “cover” if we see an injection with
+    // the `coverShallowerScopes` option.
+    //
+    // What's worse is that we need to know _where_ each of those open scopes
+    // would've been added, because that open scope shouldn't truly be added
+    // _if_ it would've been suppressed by a deeper layer.
+    let openScopesByLayer = new Map();
+
     // The contract of `LayerHighlightIterator#seek` is different from the
-    // contract of `HighlightIterator#seek`. Instead of having it return an
-    // array of open scopes at the given point, we give it an array that it can
-    // push items into if needed; but its return value is a boolean that tells
-    // us whether we should use this iterator at all. It will return `true` if
-    // it needs to mark anything in the specified range, and `false` otherwise.
-    let result = iterator.seek(start, endRow, openScopes);
+    // contract of `HighlightIterator#seek`. Instead of an array of open
+    // scopes, we have it return an two-item array.
+    //
+    // The first item is a boolean that indicates whether the iterator needs to
+    // mark anything _within_ the range that will be highlighted. If not, it
+    // doesn't need to go into the list of iterators.
+    //
+    // The second item is an `OpenScopeMap` (rather than just an array of
+    // already open scopes) that retains information about where each open
+    // scope was opened, because we'll need that information in a moment.
+    //
+    let [result, openScopes] = iterator.seek(start, endRow);
+
+    // An iterator can contribute to the list of already open scopes even if it
+    // has no boundaries to mark within the range of this highlighting job.
+    openScopesByLayer.set(iterator, openScopes);
+
     if (result) {
       this.iterators.push(iterator);
     }
 
+    // The logic that we use for `coverShallowerScopes` needs to be respected
+    // here. As we build these iterators, if we find that any of them cover
+    // their parent iterator at this position, we need to revisit the list of
+    // open scopes, removing any that aren't their layer's base language scope.
     for (const marker of injectionMarkers) {
       const iterator = marker.languageLayer.buildHighlightIterator();
-      let result = iterator.seek(start, endRow, openScopes);
-      if (result) {
-        this.iterators.push(iterator);
+      let [result, openScopes] = iterator.seek(start, endRow);
+
+      // Just as with the root layer, any injection layer may need to add to
+      // the list of open scopes whether or not they need to mark anything
+      // within this range.
+      if (result) { this.iterators.push(iterator); }
+
+      if (iterator?.languageLayer?.injectionPoint?.coverShallowerScopes) {
+        // The procedure we follow for covering scopes in the _middle_ of a
+        // highlighting task needs to be emulated when deciding which scopes
+        // are already open at the _start_ of the task. This layer wants to
+        // cover shallower scopes, so we need to re-assess our list of already
+        // open scopes to see if any of them _would've_ been covered at the
+        // point when they were opened.
+        let ranges = iterator.languageLayer.getRanges();
+        for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
+          // It's possible, though uncommon, for injections to overlap, because
+          // there's no mechanism that prevents it. Since we sorted the layers
+          // by depth earlier, this iterator won't have a lower depth than the
+          // previous one. But it may have _the same_ depth, so we need to
+          // account for that.
+          if (earlierIterator.depth >= iterator.depth) { continue; }
+
+          // For each of the open scopes that an earlier iterator gave us, we
+          // need to look at the point at which that scope would've been added.
+          // If that point falls within the purview of our newer iterator, then
+          // we should suppress those scopes unless they're the layer's base
+          // language scope.
+          let languageScopeId = earlierIterator.languageLayer.languageScopeId;
+          for (let [point, scopes] of earlierOpenScopes) {
+            let pointIsCoveredByNewIterator = ranges.some(r => r.containsPoint(point));
+            if (!pointIsCoveredByNewIterator) { continue; }
+            earlierOpenScopes.set(point, scopes.filter(id => id === languageScopeId));
+          }
+        }
       }
+      openScopesByLayer.set(iterator, openScopes);
     }
 
     // Sort the iterators so that the last one in the array is the earliest
@@ -1964,6 +2025,16 @@ class HighlightIterator {
     this.iterators.sort((a, b) => b.compare(a));
 
     this.detectCoveredScope();
+
+    // Our nightmare is over, and we can flatten this data structure into a
+    // simple list of open scopes.
+    openScopes = [];
+
+    for (let layerOpenScopeMap of openScopesByLayer.values()) {
+      for (let layerOpenScopes of layerOpenScopeMap.values()) {
+        openScopes.push(...layerOpenScopes);
+      }
+    }
 
     return openScopes;
   }
@@ -2028,8 +2099,14 @@ class HighlightIterator {
       //   )
       // );
     }
-    if (iterator && !this.currentScopeIsCovered) {
-      return iterator.getCloseScopeIds();
+    if (iterator) {
+      if (this.currentScopeIsCovered) {
+        return iterator.getOpenScopeIds().filter(id => {
+          return iterator.languageLayer.languageScopeId === id;
+        });
+      } else {
+        return iterator.getCloseScopeIds();
+      }
     }
     return [];
   }
@@ -2060,8 +2137,14 @@ class HighlightIterator {
       //   )
       // );
     }
-    if (iterator && !this.currentScopeIsCovered) {
-      return iterator.getOpenScopeIds();
+    if (iterator) {
+      if (this.currentScopeIsCovered) {
+        return iterator.getOpenScopeIds().filter(id => {
+          return iterator.languageLayer.languageScopeId === id;
+        });
+      } else {
+        return iterator.getOpenScopeIds();
+      }
     }
     return [];
   }
@@ -2189,8 +2272,7 @@ class LayerHighlightIterator {
     // make it a configurable behavior.
   }
 
-  seek(start, endRow, previousOpenScopes) {
-
+  seek(start, endRow) {
     let end = this._getEndPosition(endRow);
     // let isDevMode = atom.inDevMode();
 
@@ -2202,17 +2284,15 @@ class LayerHighlightIterator {
     let [boundaries, openScopes] = this.languageLayer.getSyntaxBoundaries(
       start, end);
 
-    // An iterator might have no boundaries to apply but still be able to tell
-    // us about a scope that should be open at the beginning of the range.
-    previousOpenScopes.push(...openScopes);
-
     this.iterator = boundaries?.begin;
-    if (!this.iterator?.key) { return false; }
+    if (!this.iterator?.key) {
+      return [false, openScopes];
+    }
 
     this.start = Point.fromObject(start, true);
     this.end = end;
     // if (isDevMode) { console.timeEnd(timeKey); }
-    return true;
+    return [true, openScopes];
   }
 
   isAtInjectionBoundary () {
@@ -2466,6 +2546,14 @@ class LanguageLayer {
     return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
   }
 
+  getRanges() {
+    if (this.currentIncludedRanges) {
+      return this.currentIncludedRanges.map(r => rangeForNode(r));
+    } else {
+      return [this.getExtent()];
+    }
+  }
+
   // Run a highlights query for the given range and process the raw captures
   // through a `ScopeResolver`.
   getSyntaxBoundaries(from, to) {
@@ -2498,8 +2586,11 @@ class LanguageLayer {
     }
 
     // A `HighlightIterator` will want to know which scopes were already open
-    // when this range began.
-    let alreadyOpenScopes = [];
+    // when this range began. Sadly, we also have to keep track of the point in
+    // the buffer at which each of those scopes would've been added, because
+    // it's possible that later we'll find out that a deeper iterator has
+    // suppressed the application of that scope boundary at that position.
+    let alreadyOpenScopes = new OpenScopeMap();
 
     // How do we add a layer's root scope? There's no easy answer.
     //
@@ -2544,7 +2635,8 @@ class LanguageLayer {
     //
     // …will include `<?php`, `echo`, `"foo"`, and `?>`, but may exclude the
     // spaces between those tokens. This is a consequence of the design of
-    // a particular tree-sitter parser and may be hard to avoid.
+    // a particular tree-sitter parser and should be mitigated with the
+    // `includeAdjacentWhitespace` option of `addInjectionPoint`.
     let includedRanges = this.depth === 0 ? [extent] :
       this.currentIncludedRanges;
 
@@ -2561,7 +2653,7 @@ class LanguageLayer {
         if (range.start.isLessThan(from)) {
           // If we get this far, we know that the base language scope was open
           // when our range began.
-          alreadyOpenScopes.push(this.languageScopeId);
+          alreadyOpenScopes.set(range.start, [this.languageScopeId]);
         } else {
           // Range start must be between `from` and `to`, or else equal `from`
           // exactly.
@@ -2593,9 +2685,9 @@ class LanguageLayer {
       // The boundaries that occur before the start of our range will tell us
       // which scopes should already be open when our range starts.
       if (point.isLessThan(from)) {
-        alreadyOpenScopes.push(...data.open);
+        alreadyOpenScopes.set(point, data.open);
         for (let c of data.close) {
-          removeLastOccurrenceOf(alreadyOpenScopes, c);
+          alreadyOpenScopes.removeLastOccurrenceOf(c);
         }
         continue;
       } else if (point.isGreaterThan(to)) {
@@ -3232,8 +3324,7 @@ class LanguageLayer {
           new NodeRangeSet(
             nodeRangeSet,
             injectionNodes,
-            injectionPoint.newlinesBetween,
-            injectionPoint.includeChildren
+            injectionPoint
           )
         );
       }
@@ -3267,16 +3358,17 @@ class LanguageLayer {
 // parent that are of a particular type. A `NodeRangeSet` is how that strange
 // subset is expressed.
 class NodeRangeSet {
-  constructor(previous, nodes, newlinesBetween, includeChildren) {
+  constructor(previous, nodes, injectionPoint) {
     this.previous = previous;
     this.nodes = nodes;
-    this.newlinesBetween = newlinesBetween;
-    this.includeChildren = includeChildren;
+    this.newlinesBetween = injectionPoint.newlinesBetween;
+    this.includeAdjacentWhitespace = injectionPoint.includeAdjacentWhitespace;
+    this.includeChildren = injectionPoint.includeChildren;
   }
 
   getRanges(buffer) {
     const previousRanges = this.previous && this.previous.getRanges(buffer);
-    const result = [];
+    let result = [];
 
     for (const node of this.nodes) {
       let position = node.startPosition, index = node.startIndex;
@@ -3309,7 +3401,70 @@ class NodeRangeSet {
       }
     }
 
-    return result;
+    let whitespaceRanges = [];
+    if (this.includeAdjacentWhitespace && result.length > 1) {
+      // Look at the region between each pair of results. If it's entirely
+      // whitespace, include it in the range.
+      for (let i = 1; i < result.length; i++) {
+        let current = result[i], previous = result[i - 1];
+        if (current.startIndex === previous.endIndex) { continue; }
+        let pseudoRange = {
+          startPosition: previous.endPosition,
+          startIndex: previous.endIndex,
+          endPosition: current.startPosition,
+          endIndex: current.startIndex
+        };
+        let rangeText = buffer.getTextInRange(rangeForNode(pseudoRange));
+        if (!/\S/.test(rangeText)) {
+          whitespaceRanges.push(pseudoRange);
+        }
+      }
+      result.push(...whitespaceRanges);
+      result = result.sort((a, b) => {
+        return a.startIndex - b.startIndex ||
+          a.endIndex - b.endIndex;
+      });
+    }
+    return this._consolidateRanges(result);
+  }
+
+  // Combine adjacent ranges to minimize the number of boundaries.
+  _consolidateRanges(ranges) {
+    if (ranges.length === 1) { return ranges; }
+    let consolidated = [];
+    let candidate;
+    let lastIndex = ranges.length - 1;
+    for (let i = 0; i < ranges.length; i++) {
+      let range = ranges[i];
+      if (!candidate) {
+        candidate = range;
+        continue;
+      }
+      if (candidate.endIndex === range.startIndex) {
+        // Keep enlarging the last node for as long as subsequent nodes are
+        // adjacent to it.
+        candidate = {
+          startIndex: candidate.startIndex,
+          startPosition: candidate.startPosition,
+          endIndex: range.endIndex,
+          endPosition: range.endPosition
+        };
+        if (i === lastIndex) {
+          consolidated.push(candidate);
+        }
+      } else {
+        // We found a disjoint range, so push our candidate into the result set
+        // and promote a new candidate (unless we're at the end).
+        consolidated.push(candidate);
+        if (i === lastIndex) {
+          consolidated.push(range);
+        } else {
+          candidate = range;
+        }
+      }
+    }
+
+    return consolidated;
   }
 
   coversRange (candidateRange) {
@@ -3370,6 +3525,35 @@ class NodeRangeSet {
   }
 }
 
+class OpenScopeMap extends Map {
+  constructor() {
+    super();
+  }
+
+  getScopesArray() {
+    let results = [];
+    let keys = [...this.keys()];
+    keys.sort(comparePoints);
+    for (let key of keys) {
+      let value = this.get(key);
+      results.push(...value);
+    }
+    return results;
+  }
+
+  removeLastOccurrenceOf(scopeId) {
+    let keys = [...this.keys()];
+    keys.reverse();
+    for (let key of keys) {
+      let value = this.get(key);
+      if (value.includes(scopeId)) {
+        removeLastOccurrenceOf(value, scopeId);
+        return true;
+      }
+    }
+    return false;
+  }
+}
 
 // Like a map, but expects each key to have multiple values.
 class Index extends Map {
