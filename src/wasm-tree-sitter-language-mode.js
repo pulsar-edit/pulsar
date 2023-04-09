@@ -2444,6 +2444,7 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
     this.injectionPoint = injectionPoint;
+    this.temporaryTrees = [];
 
     this.subscriptions = new CompositeDisposable;
 
@@ -3017,15 +3018,26 @@ class LanguageLayer {
     if (this.lastSyntaxTree) {
       const rangesWithSyntaxChanges = this.lastSyntaxTree.getChangedRanges(tree);
 
-      // TODO: The tree-sitter playground deletes the old tree when it's about
-      // to be replaced, but this seems to cause sporadic errors for us. Not
-      // sure why they can pull it off and we can't.
-      // this.lastSyntaxTree.delete();
+      let oldSyntaxTree = this.lastSyntaxTree;
       this.lastSyntaxTree = tree;
 
       // this.tree.delete();
+      let oldTree = this.tree;
       this.tree = tree;
       this.treeIsDirty = false;
+
+      if (oldTree) {
+        oldTree.delete();
+      }
+
+      if (oldSyntaxTree) {
+        oldSyntaxTree.delete();
+      }
+
+      while (this.temporaryTrees.length > 0) {
+        let tree = this.temporaryTrees.pop();
+        tree.delete();
+      }
 
       if (rangesWithSyntaxChanges.length > 0) {
         for (const range of rangesWithSyntaxChanges) {
@@ -3112,6 +3124,10 @@ class LanguageLayer {
     if (this.depth === 0) {
       this.tree = tree;
       this.treeIsDirty = false;
+    } else {
+      // Keep track of any off-schedule trees we generate so that we can GC
+      // them when the next transaction is done.
+      this.temporaryTrees.push(tree);
     }
     return tree;
   }
