@@ -1,17 +1,6 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let WrapGuideElement;
 const {CompositeDisposable} = require('atom');
 
-module.exports =
-(WrapGuideElement = class WrapGuideElement {
+module.exports = class WrapGuideElement {
   constructor(editor, editorElement) {
     this.editor = editor;
     this.editorElement = editorElement;
@@ -41,7 +30,7 @@ module.exports =
     this.subscriptions.add(atom.config.onDidChange('editor.fontSize', () => {
       // Wait for editor to finish updating before updating wrap guide
       // TODO: Use async/await once this file is converted to JS
-      return this.editorElement.getComponent().getNextUpdatePromise().then(() => updateGuideCallback());
+      this.editorElement.getComponent().getNextUpdatePromise().then(() => updateGuideCallback());
     })
     );
 
@@ -50,19 +39,19 @@ module.exports =
     this.subscriptions.add(this.editor.onDidChangeGrammar(() => {
       this.configSubscriptions.dispose();
       this.handleConfigEvents();
-      return updateGuideCallback();
+      updateGuideCallback();
     })
     );
 
     this.subscriptions.add(this.editor.onDidDestroy(() => {
       this.subscriptions.dispose();
-      return this.configSubscriptions.dispose();
+      this.configSubscriptions.dispose();
     })
     );
 
-    return this.subscriptions.add(this.editorElement.onDidAttach(() => {
+    this.subscriptions.add(this.editorElement.onDidAttach(() => {
       this.attachToLines();
-      return updateGuideCallback();
+      updateGuideCallback();
     })
     );
   }
@@ -176,8 +165,10 @@ module.exports =
     const columns = this.getGuidesColumns(this.editor.getPath(), this.editor.getGrammar().scopeName);
     return (() => {
       const result = [];
-      for (let column of Array.from(columns)) {
-        if (!(column < 0)) { result.push(this.appendGuide(column)); } else {
+      for (let column of columns) {
+        if (!(column < 0)) {
+          result.push(this.appendGuide(column));
+        } else {
           result.push(undefined);
         }
       }
@@ -193,4 +184,4 @@ module.exports =
     guide.style.left = `${Math.round(columnWidth)}px`;
     return this.element.appendChild(guide);
   }
-});
+};
