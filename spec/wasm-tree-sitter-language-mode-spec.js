@@ -2399,7 +2399,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       // Wait for injections.
-      await wait(1000);
+      await wait(100);
 
       let injectionLayers = languageMode.getAllInjectionLayers();
       expect(injectionLayers.length).toBe(1);
@@ -2410,6 +2410,73 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(scopes.includes('regex-outer')).toBe(true);
       expect(scopes.includes('regex-inner')).toBe(false);
     });
+
+    it('arranges scopes in the proper order when scopes from several layers were already open at a given point', async () => {
+      jasmine.useRealClock();
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      let tempJsRegexConfig = {
+        ...jsRegexConfig,
+        injectionRegex: '^(js-regex-for-test)$'
+      };
+
+      const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
+
+      await regexGrammar.setQueryForTest('syntaxQuery', `
+        (pattern) @string.regexp
+      `);
+
+      jsGrammar.addInjectionPoint({
+        type: 'regex_pattern',
+        language(regex) {
+          return 'js-regex-for-test';
+        },
+        content(regex) {
+          return regex;
+        },
+        includeChildren: true,
+        languageScope: null
+      });
+
+      await jsGrammar.setQueryForTest('syntaxQuery', `
+        ((regex_pattern) @gadfly
+          (#set! startAndEndAroundFirstMatchOf "lor\\\\?em"))
+        (regex) @regex-outer
+        (regex_pattern) @regex-inner
+      `);
+
+      atom.grammars.addGrammar(regexGrammar);
+      atom.grammars.addGrammar(jsGrammar);
+
+      buffer.setText(dedent`
+        let foo = /patt.lor?em.ern/;
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: jsGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+      // Wait for injections.
+      await wait(100);
+
+      let injectionLayers = languageMode.getAllInjectionLayers();
+      expect(injectionLayers.length).toBe(1);
+
+      let descriptor = languageMode.scopeDescriptorForPosition(new Point(0, 19));
+      let scopes = descriptor.getScopesArray();
+      expect(scopes).toEqual([
+        "source.js",
+        "regex-outer",
+        "regex-inner",
+        "string.regexp",
+        "gadfly"
+      ]);
+    });
+
   });
 
   describe('.syntaxTreeScopeDescriptorForPosition', () => {

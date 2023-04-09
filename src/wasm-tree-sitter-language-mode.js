@@ -2026,17 +2026,34 @@ class HighlightIterator {
 
     this.detectCoveredScope();
 
-    // Our nightmare is over, and we can flatten this data structure into a
-    // simple list of open scopes.
-    openScopes = [];
+    // Our nightmare is almost over, but one chore remains. The ordering of
+    // already open scopes should be consistent; scopes added earlier in the
+    // buffer should appear in the list before scopes added later. This ensures
+    // that, e.g., `scopeDescriptorForPosition` returns scopes in the proper
+    // hierarchy.
+    let sortedOpenScopes = [];
 
-    for (let layerOpenScopeMap of openScopesByLayer.values()) {
-      for (let layerOpenScopes of layerOpenScopeMap.values()) {
-        openScopes.push(...layerOpenScopes);
+    // First we'll gather all the point/scope-list pairs into a flat list…
+    let unsortedScopeBundles = [];
+    for (let [iterator, layerOpenScopeMap] of openScopesByLayer) {
+      for (let [point, scopes] of layerOpenScopeMap) {
+        unsortedScopeBundles.push({ point, scopes, iterator });
       }
     }
 
-    return openScopes;
+    // …then sort them by buffer position, with shallower layers first in case
+    // of ties.
+    unsortedScopeBundles.sort((a, b) => {
+      return a.point.compare(b.point) ||
+        a.iterator.depth - b.iterator.depth;
+    });
+
+    // Now we can flatten all the scopes themselves, preserving order.
+    for (let { scopes } of unsortedScopeBundles) {
+      sortedOpenScopes.push(...scopes);
+    }
+
+    return sortedOpenScopes;
   }
 
   moveToSuccessor () {
