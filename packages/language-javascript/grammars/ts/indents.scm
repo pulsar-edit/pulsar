@@ -54,6 +54,9 @@
     (throw_statement)
     (debugger_statement)
   ] @match
+  ; When an opening curly brace is unpaired, it might get interpreted as part
+  ; of an `expression_statement`, for some reason.
+  (#not-match? @match "^\\s*{")
   (#set! matchIndentOf parent.startPosition)
   (#set! offsetIndent 1))
 
@@ -67,7 +70,10 @@
     (break_statement)
     (throw_statement)
     (debugger_statement)
-  ] @dedent.next)
+  ] @dedent.next
+  ; When an opening curly brace is unpaired, it might get interpreted as part
+  ; of an `expression_statement`, for some reason.
+  (#not-match? @dedent.next "^\\s*{"))
 
 (else_clause
   [
