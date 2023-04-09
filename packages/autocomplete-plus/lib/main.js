@@ -67,6 +67,11 @@ module.exports = {
     return this.consumeProvider(providers, 4)
   },
 
+  // 5.0.0 API – Make autocomplete play nicer with LSP using the same API
+  consumeProvider_5 (providers) {
+    return this.consumeProvider(providers, 5)
+  },
+
   consumeProvider (providers, apiVersion = 3) {
     if (!providers) {
       return
