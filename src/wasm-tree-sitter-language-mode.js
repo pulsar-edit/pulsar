@@ -34,6 +34,15 @@ function nodeBreadth(node) {
   return node.endIndex - node.startIndex;
 }
 
+function rangeToTreeSitterRangeSpec(range, buffer) {
+  let startIndex = buffer.characterIndexForPosition(range.start);
+  let endIndex = buffer.characterIndexForPosition(range.end);
+  let startPosition = { row: range.start.row, column: range.start.column };
+  let endPosition = { row: range.end.row, column: range.end.column };
+
+  return { startIndex, startPosition, endIndex, endPosition };
+}
+
 function resolveNodeDescriptor (node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
@@ -1995,7 +2004,7 @@ class HighlightIterator {
         // cover shallower scopes, so we need to re-assess our list of already
         // open scopes to see if any of them _would've_ been covered at the
         // point when they were opened.
-        let ranges = iterator.languageLayer.getRanges();
+        let ranges = iterator.languageLayer.getCurrentRanges();
         for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
           // It's possible, though uncommon, for injections to overlap, because
           // there's no mechanism that prevents it. Since we sorted the layers
@@ -2274,13 +2283,9 @@ class LayerHighlightIterator {
     if (iterator.depth > this.depth) { return false; }
 
     // …and this iterator's ranges actually include this position.
-    let ranges = this.languageLayer.currentIncludedRanges;
+    let ranges = this.languageLayer.getCurrentRanges();
     if (ranges) {
-      return ranges.some(range => {
-        // return comparePoints(position, range.startPosition) > 0 &&
-        //   comparePoints(position, range.endPosition) < 0;
-        return isBetweenPoints(position, range.startPosition, range.endPosition);
-      });
+      return ranges.some(range => range.containsPoint(position));
     }
 
     // TODO: Despite all this, we may want to allow parent layers to apply
@@ -2448,6 +2453,8 @@ class LanguageLayer {
 
     this.subscriptions = new CompositeDisposable;
 
+    this.currentRangesLayer = this.buffer.addMarkerLayer();
+
     this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
       this.language = language;
       // TODO: Currently, we require a syntax query, but we might want to
@@ -2524,6 +2531,7 @@ class LanguageLayer {
     this.tree = null;
     this.destroyed = true;
     this.marker?.destroy();
+    this.currentRangesLayer?.destroy();
     this.foldResolver?.reset();
     this.scopeResolver?.destroy();
     this.subscriptions.dispose();
@@ -2562,14 +2570,6 @@ class LanguageLayer {
 
   getExtent() {
     return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
-  }
-
-  getRanges() {
-    if (this.currentIncludedRanges) {
-      return this.currentIncludedRanges.map(r => rangeForNode(r));
-    } else {
-      return [this.getExtent()];
-    }
   }
 
   // Run a highlights query for the given range and process the raw captures
@@ -2655,15 +2655,10 @@ class LanguageLayer {
     // spaces between those tokens. This is a consequence of the design of
     // a particular tree-sitter parser and should be mitigated with the
     // `includeAdjacentWhitespace` option of `addInjectionPoint`.
-    let includedRanges = this.depth === 0 ? [extent] :
-      this.currentIncludedRanges;
+    let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
 
     if (this.languageScopeId) {
       for (let range of includedRanges) {
-        if (!(range instanceof Range)) {
-          range = rangeForNode(range);
-        }
-
         // Filter out ranges that have no intersection with ours.
         if (range.end.isLessThanOrEqual(from)) { continue; }
         if (range.start.isGreaterThanOrEqual(to)) { continue; }
@@ -2994,8 +2989,9 @@ class LanguageLayer {
       includedRanges
     );
 
-    this.currentNodeRangeSet = nodeRangeSet;
-    this.currentIncludedRanges = includedRanges;
+    if (includedRanges) {
+      this.setCurrentRanges(includedRanges);
+    }
 
     // Experiment: Even when no syntax changes have occurred, we should
     // always re-highlight the most specific node within which the edit
@@ -3092,34 +3088,73 @@ class LanguageLayer {
     }
   }
 
+  setCurrentRanges(includedRanges) {
+    if (this.depth === 0) { return; }
+    let oldRangeMarkers = this.currentRangesLayer.getMarkers();
+    for (let marker of oldRangeMarkers) {
+      marker.destroy();
+    }
+
+    // These are the “official” ranges, received right after the parent layer's
+    // tree parse. We'll get a new set of official ranges at the end of the
+    // next transaction, but until then, we should try our best to adapt to
+    // buffer changes, and to allow each range to shift or grow or shrink so
+    // that off-schedule parses are more likely to be accurate.
+    for (let range of includedRanges) {
+      range = rangeForNode(range);
+      this.currentRangesLayer.markRange(range);
+    }
+  }
+
+  getCurrentRanges() {
+    let markers = this.currentRangesLayer?.getMarkers();
+    if (!markers || markers.length === 0) { return null; }
+    return markers.map(m => m.getRange());
+  }
+
   getOrParseTree() {
     if (!this.treeIsDirty) { return this.tree; }
 
     // Eventually we'll take this out, but for now it serves as an indicator of
     // how often we have to manually re-parse in between transactions —
     // something we'd like to do as little as possible.
-    console.warn('Re-parsing tree!', this.inspect(), this.treeIsDirty);
+    if (atom.inDevMode()) {
+      console.warn('Re-parsing tree!', this.inspect(), this.treeIsDirty);
+    }
 
-    // TODO: The goal here is that, if a re-parse is needed in between
-    // transactions, we assign the result back to `this.tree` so that we can at
-    // least cut down on the incremental amount of work that the
-    // end-of-transaction parse has to do — it can pick up where we left off.
+    let ranges = null;
+    if (this.depth > 0) {
+      ranges = this.getCurrentRanges().map(r => {
+        return rangeToTreeSitterRangeSpec(r, this.buffer);
+      });
+    }
+
+    // The goal here is that, if a re-parse is needed in between transactions,
+    // we assign the result back to `this.tree` so that we can at least cut
+    // down on the incremental amount of work that the end-of-transaction parse
+    // has to do — it can pick up where we left off. So for the root language
+    // layer, this represents more of a shifting of work than a duplication.
     //
-    // But this isn't safe to do for injection layers because
-    // `currentIncludedRanges` is probably stale. It's fresh enough for what we
-    // need when we ask for a tree re-parse — to determine an indentation level
-    // — but not reliable work for a future parse to build upon.
+    // But this isn't safe to do for injection layers because `ranges` may be
+    // stale, despite our efforts to keep them fresh through markers. The
+    // stakes are low enough for indents that we can attempt a tree parse and
+    // act on the results even if we're not certain they're accurate — but when
+    // we do another scheduled incremental parse, we have to be 100% sure that
+    // we're working from an accurate tree.
     //
     // Re-parsing of an injection layer can only safely happen when we know its
     // true ranges, and that cannot be determined except through the process
     // that an injection layer's parent goes through during the
-    // end-of-transaction update. So there probably isn't a way to “fix” this
-    // for injection layers except through cutting down on off-schedule parses.
+    // end-of-transaction update, unless we're willing to do an off-schedule
+    // parse of _all_ language layers in this layer's ancestry. That's not
+    // completely out of the question for the future — but, failing that, there
+    // probably isn't a way to “fix” this for injection layers except through
+    // cutting down on off-schedule parses.
     //
     let tree = this.languageMode.parse(
       this.language,
       this.tree,
-      this.currentIncludedRanges
+      ranges
     );
     if (this.depth === 0) {
       this.tree = tree;
