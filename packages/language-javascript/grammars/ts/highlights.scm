@@ -138,6 +138,10 @@
       value: (identifier) @variable.other.assignment.loop.js)
       (#set! final true)))
 
+; The "error" in `} catch (error) {`
+(catch_clause
+  parameter: (identifier) @variable.other.assignment.catch.js)
+
 ; Single parameter of an arrow function:
 ; The "foo" in `(foo => …)`
 (arrow_function parameter: (identifier) @variable.parameter.js)
