@@ -322,7 +322,8 @@
 ; Built-in functions.
 (call_expression
   (identifier) @support.function.builtin.js
-  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$"))
+  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
+  (#set! final true))
 
 ; Deprecated built-in functions.
 (call_expression
