@@ -4593,18 +4593,9 @@ getpass@^0.1.1:
   dependencies:
     atom-select-list "^0.7.0"
 
-git-utils@5.7.1:
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.1.tgz#f26e95f8cc05b475b2b8b09151b68f3788c8a173"
-  integrity sha512-+mWdJDq9emWoq6GzzrGEB7SIBmAk0lNNv2wgNkgwTVZUkAFkWvgRsJ+Kvs3d1QQD6WG6vczti2WLpjmh2Twtlw==
-  dependencies:
-    fs-plus "^3.0.0"
-    nan "^2.14.0"
-
-git-utils@^5.6.0:
+git-utils@^5.6.0, "git-utils@https://github.com/pulsar-edit/git-utils.git#f4e8c37":
   version "5.7.3"
-  resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.3.tgz#3b53983204678313b305bbf278c07dc015ba2155"
-  integrity sha512-in1hjFfmzY86gKBt+YMTaVyCGtX2WTnN0uPj37bI5HsrnU2oj8OFcWOEzOI5PxQXPMxFxtvRebOHAOGB8M125w==
+  resolved "https://github.com/pulsar-edit/git-utils.git#f4e8c37e2d3117dcf1b8f7b2d98d28c396567f8b"
   dependencies:
     fs-plus "^3.0.0"
     nan "^2.14.2"
@@ -6630,6 +6621,10 @@ node-addon-api@^3.1.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
   integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
 
+"node-addon-api@git+https://github.com/nodejs/node-addon-api.git":
+  version "6.0.0"
+  resolved "git+https://github.com/nodejs/node-addon-api.git#5adb896782ce3658422990ddb857e695070d1fc4"
+
 node-api-version@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/node-api-version/-/node-api-version-0.1.4.tgz#1ed46a485e462d55d66b5aa1fe2821720dedf080"
@@ -7202,7 +7197,7 @@ prebuild-install@^5.0.0, prebuild-install@^5.3.3:
     tunnel-agent "^0.6.0"
     which-pm-runs "^1.0.0"
 
-prebuild-install@^6.0.0, prebuild-install@^6.0.1:
+prebuild-install@^6.0.0:
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-6.1.4.tgz#ae3c0142ad611d58570b89af4986088a4937e00f"
   integrity sha512-Z4vpywnK1lBg+zdPCVCsKq0xO66eEV9rWo2zrROGGiRS4JtueBOdlB1FnY8lcy7JsUud/Q3ijUxyWN26Ika0vQ==
@@ -8743,13 +8738,13 @@ tree-sitter-typescript@0.20.1:
   dependencies:
     nan "^2.14.0"
 
-tree-sitter@0.20.0:
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/tree-sitter/-/tree-sitter-0.20.0.tgz#b24f4d0ce6b9fdd9e99101907c954c5d938cb82d"
-  integrity sha512-tqTdtD1T2cN4aEES0sZCjKTQrc9Ls8H/iYlzpskhGy8yCwNPKBIbK9YuuCg/AxACr8RAY4wMoeCigM1X/A79yg==
+"tree-sitter@https://github.com/pulsar-edit/node-tree-sitter.git#c304335":
+  version "0.15.13"
+  resolved "https://github.com/pulsar-edit/node-tree-sitter.git#c304335a6fcaa4830a9330f6293686e0a66d2481"
   dependencies:
     nan "^2.14.0"
-    prebuild-install "^6.0.1"
+    node-addon-api "git+https://github.com/nodejs/node-addon-api.git"
+    prebuild-install "^5.0.0"
 
 "tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
   version "0.229.1"
