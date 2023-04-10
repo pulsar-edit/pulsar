@@ -155,7 +155,7 @@
     "spell-check": "https://codeload.github.com/atom/spell-check/legacy.tar.gz/refs/tags/v0.77.1",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
-    "superstring": "^2.4.4",
+    "superstring": "https://github.com/pulsar-edit/superstring-wasm.git#312d1fb",
     "symbols-view": "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4",
     "tabs": "file:packages/tabs",
     "temp": "0.9.4",
