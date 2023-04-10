@@ -181,8 +181,6 @@ let options = {
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
     "hardenedRuntime": true,
-    "entitlements": "resources/mac/entitlements.plist",
-    "entitlementsInherit": "resources/mac/entitlements.plist",
     "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
       "CFBundleExecutable": "Pulsar",
@@ -238,6 +236,28 @@ let options = {
     "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
   ]
+
+}
+
+/**
+ The below optional entitlements is needed for the following reasons:
+  - `allow-jit` needs to be applied on silicon builds for WASM to work:
+      https://github.com/pulsar-edit/pulsar/pull/454
+  - But setting `allow-jit` on Intel decreases performance of `fork()` operations
+    e.g. `require('child_process').spanw(...)`
+  - This monkey patch will no longer be needed when we can bump Electron
+    and get `libuv` `v1.42.0` as this issue is fixed upstream there
+  - See: https://github.com/microsoft/vscode/issues/105446
+*/
+if (process.env.CIRRUS_TASK_NAME === "silicon_mac_task") {
+
+  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
+
+} else if (process.env.CIRRUS_TASK_NAME === "intel_mac_task") {
+
+  options.mac.entitlements = "resources/mac/entitlements.intel.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
 
 }
 
