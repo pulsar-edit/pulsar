@@ -10,18 +10,8 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-go",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-go.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/language-go/issues"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "dependencies": {
     "tree-sitter-go": "0.19.1"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
   }
 }

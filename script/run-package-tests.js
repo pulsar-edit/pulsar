@@ -1,7 +1,7 @@
-const cp = require('child_process')
 const fs = require('fs')
 const path = require('path')
 const packJson = require('../package.json')
+const runAllSpecs = require('./run-tests')
 
 module.exports = function(filter) {
   let packagePath = []
@@ -16,12 +16,5 @@ module.exports = function(filter) {
     }
   }
 
-  // console.log('yarn', 'start', '--test', ...packagePath)
-  const res = cp.spawnSync('yarn', ['start', '--test', ...packagePath], {
-    cwd: process.cwd(),
-    detached: true,
-    stdio: "inherit"
-  })
-
-  process.exit(res.status)
+  runAllSpecs(packagePath)
 }

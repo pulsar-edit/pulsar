@@ -1,0 +1,19 @@
+{
+  "name": "keybinding-resolver",
+  "main": "./lib/main",
+  "version": "0.39.1",
+  "description": "Show what commands a keybinding resolves to",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": ">=1.17.0"
+  },
+  "deserializers": {
+    "keybinding-resolver/KeyBindingResolverView": "deserializeKeyBindingResolverView"
+  },
+  "dependencies": {
+    "etch": "0.9.0",
+    "fs-plus": "^3.0.0",
+    "temp": "^0.9.0"
+  }
+}

@@ -1,7 +1,3 @@
-if (typeof snapshotResult !== 'undefined') {
-  snapshotResult.setGlobals(global, process, global, {}, console, require);
-}
-
 const startTime = Date.now();
 const StartupTime = require('../startup-time');
 StartupTime.setStartTime();
@@ -43,9 +39,10 @@ if (args.resourcePath) {
 } else {
   const stableResourcePath = path.dirname(path.dirname(__dirname));
   const defaultRepositoryPath = path.join(
+    // Setting the path for the app
     app.getPath('home'),
     'github',
-    'atom'
+    'pulsar'
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {
@@ -58,7 +55,7 @@ if (args.resourcePath) {
     devResourcePath = stableResourcePath;
   }
 
-  if (args.dev || args.test || args.benchmark || args.benchmarkTest) {
+  if (args.dev || args.test) {
     resourcePath = devResourcePath;
   } else {
     resourcePath = stableResourcePath;

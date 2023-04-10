@@ -10,15 +10,8 @@
     "node": "*"
   },
   "main": "lib/main",
-  "homepage": "https://atom.io/packages/language-typescript",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-typescript.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-typescript/issues"
-  },
   "dependencies": {
     "tree-sitter-typescript": "0.20.1"
   }

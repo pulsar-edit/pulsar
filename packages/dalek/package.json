@@ -3,7 +3,6 @@
   "main": "./lib/main",
   "version": "0.2.2",
   "description": "EXTERMINATEs built-in packages installed in ~/.pulsar/packages",
-  "keywords": [],
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "atomTestRunner": "./test/runner",
@@ -15,15 +14,6 @@
   },
   "devDependencies": {
     "atom-mocha-test-runner": "^1.0.0",
-    "sinon": "9.0.3",
-    "standard": "^8.6.0"
-  },
-  "standard": {
-    "env": {
-      "jasmine": true
-    },
-    "globals": [
-      "atom"
-    ]
+    "sinon": "9.0.3"
   }
 }

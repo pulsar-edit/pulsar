@@ -1,0 +1,129 @@
+@import "ui-variables";
+@import "syntax-variables";
+
+@styleguide-spacing: @component-padding *1.5;
+@styleguide-bg: darken(@base-background-color, 2%);
+
+.styleguide {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.styleguide-controls {
+  position: absolute;
+  right: @component-padding;
+  top: @component-padding;
+  z-index: 100;
+}
+
+.styleguide-header {
+  padding: @styleguide-spacing;
+  border-bottom: 1px solid @base-border-color;
+  h1 {
+    font-size: 2em;
+    margin: 0 0 .5em 0;
+    color: @text-color-highlight;
+  }
+  p {
+    font-size: 1.2em;
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.styleguide-sections {
+  flex: 1;
+  overflow: auto;
+
+  & > section {
+    background-color: @styleguide-bg;
+    padding: 0;
+    border-bottom: 1px solid @base-border-color;
+    border-top: none;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.collapsed {
+      background-color: @base-background-color;
+      > .section-heading {
+        display: block;
+        margin: 0;
+        padding-bottom: @styleguide-spacing;
+        color: @text-color;
+        &:hover {
+          color: @text-color-highlight;
+          background-color: @background-color-highlight;
+        }
+        &:active {
+          background-color: @base-background-color;
+        }
+      }
+      > * {
+        display: none
+      }
+    }
+  }
+
+  .section-heading.section-heading {
+    padding: @styleguide-spacing @styleguide-spacing 0 @styleguide-spacing;
+    cursor: pointer;
+    font-weight: normal;
+    font-size: 1.8em;
+    color: @text-color-highlight;
+  }
+
+  section > h2 {
+    font-size: 1.5em;
+    line-height: 1.2;
+    margin: 1em @styleguide-spacing 0 @styleguide-spacing;
+    color: @text-color-highlight;
+  }
+
+  section > p {
+    font-size: 1.1em;
+    margin: .5em @styleguide-spacing 1em @styleguide-spacing;
+  }
+}
+
+// Example -------------------------------
+
+.styleguide .example {
+  @example-background: @base-background-color;
+
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: @component-border-radius;
+  padding: @component-padding / 2;
+
+  .example-rendered,
+  .example-code {
+    position: relative;
+    flex: 1 1 300px;
+    min-width: 0;
+    margin: @component-padding / 2;
+    border-radius: @component-border-radius;
+    border: 1px solid @tool-panel-border-color;
+  }
+
+  .example-rendered {
+    padding: @component-padding;
+    background: @example-background;
+    overflow: hidden;
+  }
+
+  .example-code {
+    background-color: @syntax-background-color;
+    pre {
+      border: none;
+      background-color: inherit;
+    }
+  }
+}

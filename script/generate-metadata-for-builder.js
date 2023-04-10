@@ -20,6 +20,8 @@ function buildBundledPackagesMetadata(packageJSON) {
     const packagePath = path.join('node_modules', packageName);
     const packageMetadataPath = path.join(packagePath, 'package.json');
     const packageMetadata = JSON.parse(fs.readFileSync(packageMetadataPath, 'utf8'));
+    const packageReadmePath = path.join(packagePath, 'README.md');
+    packageMetadata.readme = fs.readFileSync(packageReadmePath, 'utf8').toString();
     normalizePackageData(
       packageMetadata,
       msg => {
@@ -45,7 +47,6 @@ function buildBundledPackagesMetadata(packageJSON) {
     delete packageMetadata['_from'];
     delete packageMetadata['_id'];
     delete packageMetadata['dist'];
-    delete packageMetadata['readme'];
     delete packageMetadata['readmeFilename'];
 
     const packageModuleCache = packageMetadata._atomModuleCache || {};

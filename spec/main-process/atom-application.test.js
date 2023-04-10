@@ -767,8 +767,9 @@ describe('AtomApplication', function() {
 
       await scenario.open(parseCommandLine(['a/1.md']));
 
-      // Test and benchmark StubWindows are visible as empty editor windows here
-      await scenario.assert('[_ _] [_ 1.md] [_ _] [_ _]');
+      // Test StubWindows are visible as empty editor windows here.
+      // (Benchmark mode has been removed, and will no-longer open new windows.)
+      await scenario.assert('[_ _] [_ 1.md] [_ _]');
     });
   });
 

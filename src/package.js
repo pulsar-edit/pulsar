@@ -897,7 +897,7 @@ module.exports = class Package {
         Failed to require the main module of '${
           this.name
         }' because it requires one or more incompatible native modules (${nativeModuleNames}).
-        Run \`apm rebuild\` in the package directory and restart Pulsar to resolve.\
+        Run \`pulsar -p rebuild\` in the package directory and restart Pulsar to resolve.\
       `);
     } else {
       const mainModulePath = this.getMainModulePath();
@@ -1252,7 +1252,7 @@ module.exports = class Package {
   //
   // Returns a {Promise} that resolves with an object containing `code`,
   // `stdout`, and `stderr` properties based on the results of running
-  // `apm rebuild` on the package.
+  // `pulsar -p rebuild` on the package.
   rebuild() {
     return new Promise(resolve =>
       this.runRebuildProcess(result => {

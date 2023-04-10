@@ -10,22 +10,14 @@
     "atom": "*",
     "node": "*"
   },
-  "homepage": "http://atom.github.io/language-html",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-html.git"
-  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-html/issues"
-  },
   "dependencies": {
     "atom-grammar-test": "^0.6.3",
     "tree-sitter-embedded-template": "0.19.0",
     "tree-sitter-html": "0.19.0"
   },
   "devDependencies": {
-    "coffeelint": "^1.10.1",
     "dedent": "^0.7.0"
   }
 }

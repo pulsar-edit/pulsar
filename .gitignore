@@ -18,4 +18,6 @@ docs/includes
 spec/fixtures/evil-files/
 !spec/fixtures/packages/package-with-incompatible-native-module-loaded-conditionally/node_modules/
 out/
+dist/
+binaries/
 /electron/

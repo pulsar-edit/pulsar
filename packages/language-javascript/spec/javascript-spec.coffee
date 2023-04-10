@@ -838,14 +838,9 @@ describe "JavaScript grammar", ->
       expect(tokens[14]).toEqual value: '`', scopes: ['source.js', 'string.quoted.template.js', 'punctuation.definition.string.end.js']
 
   describe "HTML template strings", ->
-    # TODO: Remove after Atom 1.21 is released
     [tagScope, entityScope] = []
-    if parseFloat(atom.getVersion()) <= 1.21
-      tagScope = 'meta.tag.inline.any.html'
-      entityScope = 'entity.name.tag.inline.any.html'
-    else
-      tagScope = 'meta.tag.inline.b.html'
-      entityScope = 'entity.name.tag.inline.b.html'
+    tagScope = 'meta.tag.inline.b.html'
+    entityScope = 'entity.name.tag.inline.b.html'
 
     beforeEach ->
       waitsForPromise ->
@@ -2405,7 +2400,7 @@ describe "JavaScript grammar", ->
         #!/usr/bin/env node
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         \x20#!/usr/sbin/node
@@ -2416,7 +2411,7 @@ describe "JavaScript grammar", ->
         #!\t/usr/bin/env --node=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -2435,7 +2430,7 @@ describe "JavaScript grammar", ->
         "-*- font:x;foo : bar ; mode : jS ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*js-*- */
@@ -2453,7 +2448,7 @@ describe "JavaScript grammar", ->
         // -*-font:mode;mode:js--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -2480,7 +2475,7 @@ describe "JavaScript grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=javascript ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=javascript:
@@ -2498,4 +2493,4 @@ describe "JavaScript grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=javascript ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

@@ -1,12 +1,16 @@
+env:
+  PYTHON_VERSION: 3.10
+
 linux_task:
   alias: linux
   container:
-    image: node:lts-slim
+    image: node:16-slim
     memory: 8G
-  install_deps_script:
+  prepare_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
+                ffmpeg
                 rpm
                 build-essential
                 git
@@ -23,7 +27,9 @@ linux_task:
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - yarn install || yarn install
+  install_script:
+    - yarn install --ignore-engines || yarn install --ignore-engines
+  build_script:
     - yarn build
     - yarn run build:apm
   build_binary_script:
@@ -31,6 +37,68 @@ linux_task:
   binary_artifacts:
     path: ./binaries/*
   test_script:
+    - rm -R node_modules/electron; yarn install --check-files
+    - ./binaries/*AppImage --appimage-extract
+    - export BINARY_NAME='squashfs-root/pulsar'
+    - mkdir -p ./tests/videos
+    - Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
+
+arm_linux_task:
+  alias: linux
+  arm_container:
+    image: node:16-slim
+    memory: 8G
+  env:
+    USE_SYSTEM_FPM: 'true'
+  prepare_script:
+    - apt-get update
+    - export DEBIAN_FRONTEND="noninteractive"
+    - apt-get install -y
+                gnupg2
+                procps
+                curl
+                rpm
+                build-essential
+                git
+                libsecret-1-dev
+                fakeroot
+                libx11-dev
+                libxkbfile-dev
+                libgdk-pixbuf2.0-dev
+                libgtk-3-dev
+                libxss-dev
+                libasound2-dev
+                libnss3
+                xvfb
+    - gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+    - \curl -sSL https://get.rvm.io | bash -s stable
+    - source /etc/profile.d/rvm.sh
+    - rvm install ruby
+    - gem install fpm
+    - git submodule init
+    - git submodule update
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
+    - yarn install --ignore-engines || yarn install --ignore-engines
+  build_script:
+    - yarn build
+    - yarn run build:apm
+  build_binary_script:
+    - source /etc/profile.d/rvm.sh
+    - yarn dist || yarn dist
+  binary_artifacts:
+    path: ./binaries/*
+  test_script:
+    - rm -R node_modules/electron; yarn install --check-files
+    - ./binaries/*AppImage --appimage-extract
+    - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -40,27 +108,41 @@ linux_task:
       type: text/xml
       format: junit
 
-macos_task:
+silicon_mac_task:
   alias: mac
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-base:latest
+    image: ghcr.io/cirruslabs/macos-monterey-xcode:14
     memory: 8G
-  install_deps_script:
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-    - brew install node@16 yarn git python
+  env:
+    CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
+    CSC_KEY_PASSWORD: ENCRYPTED[82bb72653d39578035ed1860ab4978703d50bd326d925a146ff08782f987ceb37ac2d8dbace52dec2b0e2ef92debf097]
+    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
+  prepare_script:
+    - brew install node@16 yarn git python@$PYTHON_VERSION
     - git submodule init
     - git submodule update
-    - ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
+    - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn install || yarn install
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - yarn install --ignore-engines || yarn install --ignore-engines
+  build_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn build
     - yarn run build:apm
-  build_arm_binary_script:
+  build_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
-  arm_binary_artifacts:
+  binary_artifacts:
     path: ./binaries/*
   test_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - rm -R node_modules/electron; yarn install --check-files
+    - hdiutil mount binaries/Pulsar*dmg
+    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
     videos_artifacts:
@@ -69,52 +151,90 @@ macos_task:
       path: report.xml
       type: text/xml
       format: junit
-  build_x86_dependencies_script:
-    - echo A | softwareupdate --install-rosetta
-    - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    - export PATH="/usr/local/bin:$PATH"
-    - arch -x86_64 brew install node@16 yarn git python
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin/python3:$PATH"
-    - yarn install || yarn install
-    - ln -s /usr/local/opt/python3 /usr/local/bin/python
-    - arch -x86_64 npx yarn install || arch -x86_64 npx yarn install
-    - arch -x86_64 npx yarn build
-    - arch -x86_64 npx yarn run build:apm
-  dist_x86_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+
+intel_mac_task:
+  alias: mac
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-monterey-xcode:14
+    memory: 8G
+  env:
+    CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
+    CSC_KEY_PASSWORD: ENCRYPTED[82bb72653d39578035ed1860ab4978703d50bd326d925a146ff08782f987ceb37ac2d8dbace52dec2b0e2ef92debf097]
+    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
+  prepare_script:
     - sudo rm -rf /Library/Developer/CommandLineTools
+    - echo A | softwareupdate --install-rosetta
     - arch -x86_64 xcode-select --install
+    - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
+    - ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
+    - git submodule init
+    - git submodule update
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+  install_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - arch -x86_64 npx yarn install --ignore-engines || arch -x86_64 npx yarn install --ignore-engines
+  build_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - arch -x86_64 npx yarn build
+    - arch -x86_64 yarn run build:apm
+  build_binary_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
-  x86_binary_artifacts:
+  binary_artifacts:
     path: ./binaries/*
+  test_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - rm -R node_modules/electron; yarn install --check-files
+    - hdiutil mount binaries/Pulsar*dmg
+    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit
 
 windows_task:
   alias: windows
+  timeout_in: 90m
   windows_container:
     image: cirrusci/windowsservercore:visualstudio2022-2022.06.23
   env:
     CIRRUS_SHELL: bash
     PATH: C:\Python310\Scripts\;C:\Python310\;%PATH%;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Users\User\AppData\Roaming\npm;C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\
-  install_deps_script:
-    - choco install nodejs --version=14.15.0 -y
-    - choco install python git visualstudio2019-workload-vctools -y
+  prepare_script:
+    - choco install nodejs --version=16.16.0 -y
+    - choco install python --version=3.10.3	-y
+    - choco install git visualstudio2019-workload-vctools -y
     - git submodule init
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
-  build_apm_script:
-    - cd ppm; npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
-  install_without_scripts_script:
-    - npx yarn install --ignore-scripts --ignore-engines || sleep 1 && npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn cache clean; npx yarn install --ignore-engines --ignore-scripts || sleep 2 && npx yarn install --ignore-engines --ignore-scripts || echo "Giving up"
-  rebuild_for_electron_script:
+  install_script:
+    - npx yarn install --ignore-engines
+      || rm -R node_modules && npx yarn install --ignore-engines
+      || rm -R node_modules && npx yarn install --ignore-engines
+  build_script:
+    - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
-  # install_only_electron_script:
-  #   - rm -R node_modules/electron
-  #   - npx yarn install --ignore-engines || npx yarn install --ignore-engines || npx yarn cache clean; npx yarn install --ignore-engines || npx yarn install --ignore-engines
-    # - npx playwright test --reporter=list
-  videos_artifacts:
-    path: tests\videos\**
   build_binary_script:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - npx yarn dist || npx yarn dist || npx yarn dist
   binary_artifacts:
     path: .\binaries\*
+  test_script:
+    - mkdir extracted; tar -xf binaries/*zip -C ./extracted/
+    - export BINARY_NAME=./extracted/Pulsar.exe
+    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
+  always:
+    videos_artifacts:
+      path: ./tests/videos/**
+    junit_artifacts:
+      path: report.xml
+      type: text/xml
+      format: junit

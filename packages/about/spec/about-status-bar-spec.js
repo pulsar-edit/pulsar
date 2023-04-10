@@ -60,7 +60,7 @@ describe('the status bar', () => {
         });
       });
 
-      it('continues to show the squirrel until Atom is updated to the new version', async () => {
+      it('continues to show the squirrel until Pulsar is updated to the new version', async () => {
         MockUpdater.finishDownloadingUpdate('42.0.0');
         expect(workspaceElement).toContain('.about-release-notes');
 
@@ -81,7 +81,7 @@ describe('the status bar', () => {
         expect(workspaceElement).not.toContain('.about-release-notes');
       });
 
-      it('does not show the view if Atom is updated to a newer version than notified', async () => {
+      it('does not show the view if Pulsar is updated to a newer version than notified', async () => {
         MockUpdater.finishDownloadingUpdate('42.0.0');
 
         await atom.packages.deactivatePackage('about');
@@ -125,7 +125,7 @@ describe('the status bar', () => {
         });
       });
 
-      it('continues to show the squirrel until Atom is updated to the new version', async () => {
+      it('continues to show the squirrel until Pulsar is updated to the new version', async () => {
         MockUpdater.finishDownloadingUpdate('42.0.0');
         expect(workspaceElement).toContain('.about-release-notes');
 
@@ -146,7 +146,7 @@ describe('the status bar', () => {
         expect(workspaceElement).not.toContain('.about-release-notes');
       });
 
-      it('does not show the view if Atom is updated to a newer version than notified', async () => {
+      it('does not show the view if Pulsar is updated to a newer version than notified', async () => {
         MockUpdater.finishDownloadingUpdate('42.0.0');
 
         await atom.packages.deactivatePackage('about');

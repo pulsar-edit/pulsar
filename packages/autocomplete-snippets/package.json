@@ -1,0 +1,25 @@
+{
+  "name": "autocomplete-snippets",
+  "main": "./lib/autocomplete-snippets",
+  "version": "1.12.1",
+  "description": "Adds snippets to autocomplete+ suggestions",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "provide"
+      }
+    }
+  },
+  "consumedServices": {
+    "snippets": {
+      "versions": {
+        "0.1.0": "consumeSnippets"
+      }
+    }
+  }
+}

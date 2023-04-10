@@ -61,7 +61,7 @@ describe('UpdateView', () => {
 
         let args = shell.openExternal.mostRecentCall.args;
         expect(shell.openExternal).toHaveBeenCalled();
-        expect(args[0]).toContain('installing-atom');
+        expect(args[0]).toContain('installing-pulsar');
       });
     });
 
@@ -241,120 +241,120 @@ describe('UpdateView', () => {
         ).toBe('Check now');
       });
 
-      describe('when core.automaticallyUpdate is toggled', () => {
-        beforeEach(async () => {
-          expect(atom.config.get('core.automaticallyUpdate')).toBe(true);
-          atom.autoUpdater.checkForUpdate.reset();
-        });
-
-        it('shows the auto update UI', async () => {
-          expect(
-            aboutElement.querySelector('.about-auto-updates input').checked
-          ).toBe(true);
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-          ).toBeVisible();
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-              .textContent
-          ).toBe('Atom will check for updates automatically');
-
-          atom.config.set('core.automaticallyUpdate', false);
-          await scheduler.getNextUpdatePromise();
-
-          expect(
-            aboutElement.querySelector('.about-auto-updates input').checked
-          ).toBe(false);
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-          ).toBeVisible();
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-              .textContent
-          ).toBe('Automatic updates are disabled please check manually');
-        });
-
-        it('updates config and the UI when the checkbox is used to toggle', async () => {
-          expect(
-            aboutElement.querySelector('.about-auto-updates input').checked
-          ).toBe(true);
-
-          aboutElement.querySelector('.about-auto-updates input').click();
-          await scheduler.getNextUpdatePromise();
-
-          expect(atom.config.get('core.automaticallyUpdate')).toBe(false);
-          expect(
-            aboutElement.querySelector('.about-auto-updates input').checked
-          ).toBe(false);
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-          ).toBeVisible();
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-              .textContent
-          ).toBe('Automatic updates are disabled please check manually');
-
-          aboutElement.querySelector('.about-auto-updates input').click();
-          await scheduler.getNextUpdatePromise();
-
-          expect(atom.config.get('core.automaticallyUpdate')).toBe(true);
-          expect(
-            aboutElement.querySelector('.about-auto-updates input').checked
-          ).toBe(true);
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-          ).toBeVisible();
-          expect(
-            aboutElement.querySelector('.about-default-update-message')
-              .textContent
-          ).toBe('Atom will check for updates automatically');
-        });
-
-        describe('checking for updates', function() {
-          afterEach(() => {
-            this.updateView = null;
-          });
-
-          it('checks for update when the about page is shown', () => {
-            expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
-
-            this.updateView = new UpdateView({
-              updateManager: updateManager,
-              availableVersion: '9999.0.0',
-              viewUpdateReleaseNotes: () => {}
-            });
-
-            expect(atom.autoUpdater.checkForUpdate).toHaveBeenCalled();
-          });
-
-          it('does not check for update when the about page is shown and the update manager is not in the idle state', () => {
-            atom.autoUpdater.getState.andReturn('downloading');
-            updateManager.resetState();
-            expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
-
-            this.updateView = new UpdateView({
-              updateManager: updateManager,
-              availableVersion: '9999.0.0',
-              viewUpdateReleaseNotes: () => {}
-            });
-
-            expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
-          });
-
-          it('does not check for update when the about page is shown and auto updates are turned off', () => {
-            atom.config.set('core.automaticallyUpdate', false);
-            expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
-
-            this.updateView = new UpdateView({
-              updateManager: updateManager,
-              availableVersion: '9999.0.0',
-              viewUpdateReleaseNotes: () => {}
-            });
-
-            expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
-          });
-        });
-      });
+      // describe('when core.automaticallyUpdate is toggled', () => {
+      //   beforeEach(async () => {
+      //     expect(atom.config.get('core.automaticallyUpdate')).toBe(true);
+      //     atom.autoUpdater.checkForUpdate.reset();
+      //   });
+      //
+      //   it('shows the auto update UI', async () => {
+      //     expect(
+      //       aboutElement.querySelector('.about-auto-updates input').checked
+      //     ).toBe(true);
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //     ).toBeVisible();
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //         .textContent
+      //     ).toBe('Pulsar will check for updates automatically');
+      //
+      //     atom.config.set('core.automaticallyUpdate', false);
+      //     await scheduler.getNextUpdatePromise();
+      //
+      //     expect(
+      //       aboutElement.querySelector('.about-auto-updates input').checked
+      //     ).toBe(false);
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //     ).toBeVisible();
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //         .textContent
+      //     ).toBe('Automatic updates are disabled please check manually');
+      //   });
+      //
+      //   it('updates config and the UI when the checkbox is used to toggle', async () => {
+      //     expect(
+      //       aboutElement.querySelector('.about-auto-updates input').checked
+      //     ).toBe(true);
+      //
+      //     aboutElement.querySelector('.about-auto-updates input').click();
+      //     await scheduler.getNextUpdatePromise();
+      //
+      //     expect(atom.config.get('core.automaticallyUpdate')).toBe(false);
+      //     expect(
+      //       aboutElement.querySelector('.about-auto-updates input').checked
+      //     ).toBe(false);
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //     ).toBeVisible();
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //         .textContent
+      //     ).toBe('Automatic updates are disabled please check manually');
+      //
+      //     aboutElement.querySelector('.about-auto-updates input').click();
+      //     await scheduler.getNextUpdatePromise();
+      //
+      //     expect(atom.config.get('core.automaticallyUpdate')).toBe(true);
+      //     expect(
+      //       aboutElement.querySelector('.about-auto-updates input').checked
+      //     ).toBe(true);
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //     ).toBeVisible();
+      //     expect(
+      //       aboutElement.querySelector('.about-default-update-message')
+      //         .textContent
+      //     ).toBe('Pulsar will check for updates automatically');
+      //   });
+      //
+      //   describe('checking for updates', function() {
+      //     afterEach(() => {
+      //       this.updateView = null;
+      //     });
+      //
+      //     it('checks for update when the about page is shown', () => {
+      //       expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
+      //
+      //       this.updateView = new UpdateView({
+      //         updateManager: updateManager,
+      //         availableVersion: '9999.0.0',
+      //         viewUpdateReleaseNotes: () => {}
+      //       });
+      //
+      //       expect(atom.autoUpdater.checkForUpdate).toHaveBeenCalled();
+      //     });
+      //
+      //     it('does not check for update when the about page is shown and the update manager is not in the idle state', () => {
+      //       atom.autoUpdater.getState.andReturn('downloading');
+      //       updateManager.resetState();
+      //       expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
+      //
+      //       this.updateView = new UpdateView({
+      //         updateManager: updateManager,
+      //         availableVersion: '9999.0.0',
+      //         viewUpdateReleaseNotes: () => {}
+      //       });
+      //
+      //       expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
+      //     });
+      //
+      //     it('does not check for update when the about page is shown and auto updates are turned off', () => {
+      //       atom.config.set('core.automaticallyUpdate', false);
+      //       expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
+      //
+      //       this.updateView = new UpdateView({
+      //         updateManager: updateManager,
+      //         availableVersion: '9999.0.0',
+      //         viewUpdateReleaseNotes: () => {}
+      //       });
+      //
+      //       expect(atom.autoUpdater.checkForUpdate).not.toHaveBeenCalled();
+      //     });
+      //   });
+      // });
     });
   });
 

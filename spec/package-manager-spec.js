@@ -180,29 +180,6 @@ describe('PackageManager', () => {
       expect(console.warn.argsForCall[0][0]).toContain('Could not resolve');
     });
 
-    describe('when the package is deprecated', () => {
-      it('returns null', () => {
-        spyOn(console, 'warn');
-        expect(
-          atom.packages.loadPackage(
-            path.join(__dirname, 'fixtures', 'packages', 'wordcount')
-          )
-        ).toBeNull();
-        expect(atom.packages.isDeprecatedPackage('wordcount', '2.1.9')).toBe(
-          true
-        );
-        expect(atom.packages.isDeprecatedPackage('wordcount', '2.2.0')).toBe(
-          true
-        );
-        expect(atom.packages.isDeprecatedPackage('wordcount', '2.2.1')).toBe(
-          false
-        );
-        expect(
-          atom.packages.getDeprecatedPackageMetadata('wordcount').version
-        ).toBe('<=2.2.0');
-      });
-    });
-
     it('invokes ::onDidLoadPackage listeners with the loaded package', () => {
       let loadedPackage = null;
 

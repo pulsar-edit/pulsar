@@ -5,7 +5,7 @@ const TokenizedLine = require('./tokenized-line');
 const TokenIterator = require('./token-iterator');
 const ScopeDescriptor = require('./scope-descriptor');
 const NullGrammar = require('./null-grammar');
-const { OnigRegExp } = require('oniguruma');
+const { OnigScanner } = require('second-mate');
 const {
   toFirstMateScopeId,
   fromFirstMateScopeId
@@ -144,7 +144,7 @@ class TextMateLanguageMode {
     );
     if (!decreaseIndentRegex) return;
 
-    if (!decreaseIndentRegex.testSync(line)) return;
+    if (!decreaseIndentRegex.findNextMatchSync(line)) return;
 
     const precedingRow = this.buffer.previousNonBlankRow(bufferRow);
     if (precedingRow == null) return;
@@ -156,14 +156,14 @@ class TextMateLanguageMode {
       scopeDescriptor
     );
     if (increaseIndentRegex) {
-      if (!increaseIndentRegex.testSync(precedingLine)) desiredIndentLevel -= 1;
+      if (!increaseIndentRegex.findNextMatchSync(precedingLine)) desiredIndentLevel -= 1;
     }
 
     const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(
       scopeDescriptor
     );
     if (decreaseNextIndentRegex) {
-      if (decreaseNextIndentRegex.testSync(precedingLine))
+      if (decreaseNextIndentRegex.findNextMatchSync(precedingLine))
         desiredIndentLevel -= 1;
     }
 
@@ -203,17 +203,17 @@ class TextMateLanguageMode {
     if (!increaseIndentRegex) return desiredIndentLevel;
 
     if (!this.isRowCommented(precedingRow)) {
-      if (increaseIndentRegex && increaseIndentRegex.testSync(precedingLine))
+      if (increaseIndentRegex && increaseIndentRegex.findNextMatchSync(precedingLine))
         desiredIndentLevel += 1;
       if (
         decreaseNextIndentRegex &&
-        decreaseNextIndentRegex.testSync(precedingLine)
+        decreaseNextIndentRegex.findNextMatchSync(precedingLine)
       )
         desiredIndentLevel -= 1;
     }
 
     if (!this.buffer.isRowBlank(precedingRow)) {
-      if (decreaseIndentRegex && decreaseIndentRegex.testSync(line))
+      if (decreaseIndentRegex && decreaseIndentRegex.findNextMatchSync(line))
         desiredIndentLevel -= 1;
     }
 
@@ -812,7 +812,7 @@ class TextMateLanguageMode {
       if (indentation < startIndentLevel) {
         break;
       } else if (indentation === startIndentLevel) {
-        if (foldEndRegex && foldEndRegex.searchSync(line)) foldEndRow = nextRow;
+        if (foldEndRegex && foldEndRegex.findNextMatchSync(line)) foldEndRow = nextRow;
         break;
       }
       foldEndRow = nextRow;
@@ -848,7 +848,7 @@ class TextMateLanguageMode {
   regexForPattern(pattern) {
     if (pattern) {
       if (!this.regexesByPattern[pattern]) {
-        this.regexesByPattern[pattern] = new OnigRegExp(pattern);
+        this.regexesByPattern[pattern] = new OnigScanner([pattern]);
       }
       return this.regexesByPattern[pattern];
     }

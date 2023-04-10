@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-console.warn(
-  '`script/bootstrap` is deprecated. Use `node script/bootstrap.js` instead'
-);
-require('./bootstrap.js');

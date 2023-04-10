@@ -1,0 +1,6 @@
+{
+  "name": "package-with-readme",
+  "version": "1.0.0",
+  "repository": "https://github.com/example/package-with-readme",
+  "main": "main"
+}

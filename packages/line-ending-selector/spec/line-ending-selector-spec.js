@@ -1,5 +1,6 @@
 const helpers = require('../lib/helpers');
 const { TextEditor } = require('atom');
+const path = require('path');
 
 describe('line ending selector', () => {
   let lineEndingTile;
@@ -30,7 +31,7 @@ describe('line ending selector', () => {
 
     beforeEach(() => {
       waitsForPromise(() => {
-        return atom.workspace.open('mixed-endings.md').then(e => {
+        return atom.workspace.open(path.join(__dirname, 'fixtures', 'mixed-endings.md')).then(e => {
           editor = e;
           editorElement = atom.views.getView(editor);
           jasmine.attachToDOM(editorElement);
@@ -143,7 +144,7 @@ describe('line ending selector', () => {
     describe('when a file is opened that contains only CRLF line endings', () => {
       it('displays "CRLF" as the line ending', () => {
         waitsFor(done => {
-          atom.workspace.open('windows-endings.md').then(() => {
+          atom.workspace.open(path.join(__dirname, 'fixtures', 'windows-endings.md')).then(() => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('CRLF');
               done();
@@ -156,7 +157,7 @@ describe('line ending selector', () => {
     describe('when a file is opened that contains only LF line endings', () => {
       it('displays "LF" as the line ending', () => {
         waitsFor(done => {
-          atom.workspace.open('unix-endings.md').then(editor => {
+          atom.workspace.open(path.join(__dirname, 'fixtures', 'unix-endings.md')).then(editor => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('LF');
               expect(editor.getBuffer().getPreferredLineEnding()).toBe(null);
@@ -170,7 +171,7 @@ describe('line ending selector', () => {
     describe('when a file is opened that contains mixed line endings', () => {
       it('displays "Mixed" as the line ending', () => {
         waitsFor(done => {
-          atom.workspace.open('mixed-endings.md').then(() => {
+          atom.workspace.open(path.join(__dirname, 'fixtures', 'mixed-endings.md')).then(() => {
             lineEndingTile.onDidChange(() => {
               expect(lineEndingTile.element.textContent).toBe('Mixed');
               done();
@@ -188,7 +189,7 @@ describe('line ending selector', () => {
 
         waitsFor(done =>
           atom.workspace
-            .open('unix-endings.md')
+            .open(path.join(__dirname, 'fixtures', 'unix-endings.md'))
             .then(() => lineEndingTile.onDidChange(done))
         );
       });
@@ -274,7 +275,7 @@ describe('line ending selector', () => {
     describe('closing the last text editor', () => {
       it('displays no line ending in the status bar', () => {
         waitsForPromise(() => {
-          return atom.workspace.open('unix-endings.md').then(() => {
+          return atom.workspace.open(path.join(__dirname, 'fixtures', 'unix-endings.md')).then(() => {
             atom.workspace.getActivePane().destroy();
             expect(lineEndingTile.element.textContent).toBe('');
           });
@@ -287,7 +288,7 @@ describe('line ending selector', () => {
 
       beforeEach(() => {
         waitsFor(done => {
-          atom.workspace.open('unix-endings.md').then(e => {
+          atom.workspace.open(path.join(__dirname, 'fixtures', 'unix-endings.md')).then(e => {
             editor = e;
             lineEndingTile.onDidChange(done);
           });

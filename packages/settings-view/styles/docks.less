@@ -1,0 +1,154 @@
+@import "ui-variables";
+
+// Dock overrides
+// Allows settings to be used in left/right dock
+
+atom-dock.left .settings-view,
+atom-dock.right .settings-view {
+  flex-direction: column;
+
+  &.pane-item {
+    background-color: @tool-panel-background-color;
+  }
+
+  .config-menu {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: @component-padding/2;
+    min-width: 0;
+    max-width: none;
+    border: none;
+    border-bottom: 1px solid @base-border-color;
+    background-color: inherit;
+    overflow-x: initial;
+
+    .nav {
+      display: contents; // hide from DOM
+
+      & > li > a {
+        padding: 0 .5em;
+        border-radius: @component-border-radius;
+      }
+
+      .icon:before {
+        display: none;
+      }
+    }
+
+    .button-area {
+      display: contents; // hide from DOM
+
+      .icon-link-external {
+        font-size: 0;
+        width: auto;
+        margin: 0 @component-padding/2;
+        padding: @component-padding/4 @component-padding/2;
+        overflow: hidden;
+        &:before {
+          font-size: 16px;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .panels .panels-item {
+    min-width: 100px;
+  }
+
+  .section,
+  .section:first-child, .settings-view .section:last-child {
+    padding: @component-padding*1.5;
+  }
+
+  .sub-section:not(.collapsed) .package-container {
+    padding-bottom: 0;
+  }
+
+  section .section-heading,
+  .section .section-heading {
+    font-size: 1.25em;
+  }
+
+  .sub-section .sub-section-heading {
+    font-size: 1.15em;
+
+    &.has-items::before {
+      margin-right: 0;
+      font-size: 1.15em;
+    }
+  }
+
+  .setting-title {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: @text-color-highlight;
+  }
+
+  .form-control {
+    font-size: 1.1em;
+  }
+
+  .package-card {
+    padding: @component-padding;
+    font-size: inherit;
+    background-color: mix(@tool-panel-background-color, @base-background-color, 25%);
+
+    &:hover {
+      background-color: mix(@tool-panel-background-color, @base-background-color, 75%);
+    }
+
+    .package-name {
+      font-size: inherit;
+      font-weight: 600;
+    }
+
+    .package-version {
+      font-size: .9em;
+      color: @text-color-subtle;
+      font-weight: 400;
+    }
+
+    .meta {
+      display: block;
+    }
+
+    .meta-user .avatar {
+      width: 20px;
+      height: 20px;
+    }
+    .meta-user .author {
+      margin-left: .5em;
+    }
+
+    .btn-toolbar {
+      .btn-group {
+        display: flex;
+        float: none;
+        .btn {
+          flex: 1 1 auto;
+          overflow: hidden;
+          &.status-indicator {
+            flex: none;
+            border: none;
+          }
+        }
+      }
+    }
+
+  }
+
+  .themes-panel {
+    .themes-picker-item {
+      margin-top: @component-padding*1.5;
+    }
+    .theme-description {
+      margin: @component-padding/2 0;
+    }
+  }
+
+
+}

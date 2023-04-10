@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-console.warn(
-  '`script/postprocess-junit-results` is deprecated. Use `node script/postprocess-junit-results.js` instead'
-);
-require('./postprocess-junit-results.js');

@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-console.warn(
-  '`script/verify-snapshot-script` is deprecated. Use `node script/verify-snapshot-script.js` instead'
-);
-require('./verify-snapshot-script.js');

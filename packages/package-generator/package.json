@@ -1,0 +1,39 @@
+{
+  "name": "package-generator",
+  "version": "1.3.0",
+  "main": "./lib/main",
+  "description": "Generates and opens a new sample package, language, or syntax theme.",
+  "license": "MIT",
+  "activationCommands": {
+    "atom-workspace": [
+      "package-generator:generate-package",
+      "package-generator:generate-language-package",
+      "package-generator:generate-syntax-theme"
+    ]
+  },
+  "dependencies": {
+    "fs-plus": "^3.0.0",
+    "temp": "^0.8.1",
+    "underscore-plus": "^1.0.0"
+  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": "*"
+  },
+  "configSchema": {
+    "createInDevMode": {
+      "default": false,
+      "type": "boolean",
+      "description": "When disabled, generated packages are linked into Pulsar in both normal mode and dev mode. When enabled, generated packages are linked into Pulsar only in dev mode."
+    },
+    "packageSyntax": {
+      "default": "javascript",
+      "type": "string",
+      "enum": [
+        "coffeescript",
+        "javascript"
+      ],
+      "description": "The syntax to generate packages with."
+    }
+  }
+}
