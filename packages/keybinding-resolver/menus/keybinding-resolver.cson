@@ -1,0 +1,11 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Keybinding Resolver'
+      'submenu': [
+        { 'label': 'Toggle', 'command': 'key-binding-resolver:toggle' }
+      ]
+    ]
+  }
+]
