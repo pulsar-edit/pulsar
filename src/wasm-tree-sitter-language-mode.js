@@ -272,9 +272,8 @@ class WASMTreeSitterLanguageMode {
         // layer's contents. Either way, the tree is safe to use.
         layer.treeIsDirty = false;
 
-        // EXPERIMENT: It does not seem useful or necessary to keep
-        // `editedRange` for layers that turned out not to be affected by this
-        // update cycle.
+        // If this layer didn't get updated, then it didn't need to, and the
+        // edits made in the last transaction are no longer relevant.
         layer.editedRange = null;
       }
 
@@ -299,7 +298,7 @@ class WASMTreeSitterLanguageMode {
   // in a given transaction. We resolve it with the number of changes in the
   // transaction so that we can react differently to batches of changes than to
   // single changes.
-  resolveNextTransactionPromise (changeCount) {
+  resolveNextTransactionPromise(changeCount) {
     if (this.resolveNextTransaction) {
       this.resolveNextTransaction(changeCount);
       this.resolveNextTransaction = null;
@@ -328,7 +327,7 @@ class WASMTreeSitterLanguageMode {
     });
   }
 
-  prefillFoldCache (range) {
+  prefillFoldCache(range) {
     this.rootLanguageLayer?.foldResolver.prefillFoldCache(range);
 
     let markers = this.injectionsMarkerLayer.findMarkers({
@@ -544,8 +543,8 @@ class WASMTreeSitterLanguageMode {
     // let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     let text = this.buffer.getText();
-    // TODO: Is there a better way to feed the parser the contents of the file?
     // if (devMode) { console.time('Parsing'); }
+    // TODO: Is there a better way to feed the parser the contents of the file?
     const result = parser.parse(
       text,
       oldTree,
