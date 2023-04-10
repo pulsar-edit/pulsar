@@ -225,7 +225,7 @@ export default class GitDiffView {
     if (this.buffer.getLength() < MAX_BUFFER_LENGTH_TO_DIFF) {
       // Before we redraw the diffs, tear down the old markers.
       if (this.diffs)
-        for (const diff of this.diffs) this.markers.get(diff).destroy();
+        for (const diff of this.diffs) this.markers.get(diff)?.destroy();
 
       this.markers.clear();
 
@@ -258,6 +258,9 @@ export default class GitDiffView {
   }
 
   markRange(startRow, endRow, klass) {
+    if (this.editor.getBuffer().isDestroyed())
+      return;
+
     const marker = this.editor.markBufferRange([[startRow, 0], [endRow, 0]], {
       invalidate: 'never'
     });
