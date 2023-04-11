@@ -178,14 +178,6 @@
 ((string) @string.quoted.triple.block.format.python
   (#match? @string.quoted.triple.block.format.python "^fr?\"\"\""))
 
-(string
-  _ @punctuation.definition.string.begin.python
-  (#set! onlyIfFirst true))
-
-(string
-  _ @punctuation.definition.string.end.python
-  (#set! onlyIfLast true))
-
 ((string) @string.quoted.double.single-line.python
   (#match? @string.quoted.double.single-line.python "^\"(?!\")"))
 
@@ -204,8 +196,13 @@
   "{" @punctuation.section.embedded.begin.python
   "}" @punctuation.section.embedded.end.python) @meta.embedded.line.interpolation.python
 
-((string prefix: _ @_IGNORE_) @string.regexp.python
-  (#match? @_IGNORE_ "^r"))
+(string
+  _ @punctuation.definition.string.begin.python
+  (#set! onlyIfFirst true))
+
+(string
+  _ @punctuation.definition.string.end.python
+  (#set! onlyIfLast true))
 
 (string prefix: _ @storage.type.string.python
   (#match? @storage.type.string.python "^[fruU]+")
