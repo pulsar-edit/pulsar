@@ -249,16 +249,12 @@ let options = {
     and get `libuv` `v1.42.0` as this issue is fixed upstream there
   - See: https://github.com/microsoft/vscode/issues/105446
 */
-if (process.env.CIRRUS_TASK_NAME === "silicon_mac_task") {
-
-  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
-  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
-
-} else if (process.env.CIRRUS_TASK_NAME === "intel_mac_task") {
-
+if (process.arch === "x64") {
   options.mac.entitlements = "resources/mac/entitlements.intel.plist";
   options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
-
+} else {
+  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
 }
 
 function whatToBuild() {
