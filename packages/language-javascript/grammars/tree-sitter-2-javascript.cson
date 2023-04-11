@@ -1,0 +1,30 @@
+name: 'JavaScript'
+scopeName: 'source.js'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-javascript'
+
+injectionRegex: '^(js|javascript)$'
+treeSitter:
+  grammar: 'ts/grammar.wasm'
+  syntaxQuery: 'ts/highlights.scm'
+  localsQuery: 'ts/locals.scm'
+  foldsQuery: 'ts/folds.scm'
+  indentsQuery: 'ts/indents.scm'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(node)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=(js|javascript)'
+]
+
+fileTypes: [
+  'js',
+  'cjs',
+  'mjs',
+  'jsx'
+]
+
+comments:
+  start: '// '

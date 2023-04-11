@@ -1,0 +1,20 @@
+name: 'HTML'
+scopeName: 'text.html.basic'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-html'
+
+injectionRegex: '(HTML|html|Html)$'
+
+treeSitter:
+  grammar: 'tree-sitter-html/tree-sitter-html.wasm'
+  syntaxQuery: 'tree-sitter-html/highlights.scm'
+  foldsQuery: 'tree-sitter-html/folds.scm'
+  indentsQuery: 'tree-sitter-html/indents.scm'
+
+fileTypes: [
+  'html'
+]
+
+comments:
+  start: '<!--'
+  end: '-->'

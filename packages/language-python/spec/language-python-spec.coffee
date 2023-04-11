@@ -5,7 +5,7 @@ describe 'Python settings', ->
     editor.destroy()
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set('core.languageParser', 'textmate')
 
     waitsForPromise ->
       atom.workspace.open().then (o) ->

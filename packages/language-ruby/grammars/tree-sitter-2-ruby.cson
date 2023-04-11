@@ -1,0 +1,33 @@
+name: 'Ruby'
+scopeName: 'source.ruby'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-ruby'
+
+injectionRegex: 'rb|ruby|RB|RUBY'
+
+treeSitter:
+  grammar: 'ts/grammar.wasm'
+  syntaxQuery: 'ts/highlights.scm'
+  localsQuery: 'ts/locals.scm'
+  foldsQuery: 'ts/folds.scm'
+  indentsQuery: 'ts/indents.scm'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(\w*ruby|rake)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=ruby'
+]
+
+fileTypes: [
+  'rb',
+  'rake',
+  'Podfile',
+  'Brewfile',
+  'Rakefile',
+  'Gemfile'
+]
+
+comments:
+  start: '# '

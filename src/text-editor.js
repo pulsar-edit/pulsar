@@ -1591,6 +1591,13 @@ module.exports = class TextEditor {
         currentTokenScopes.push(this.displayLayer.classNameForTag(tag));
       } else if (this.displayLayer.isCloseTag(tag)) {
         currentTokenScopes.pop();
+      } else if (tag === 0) {
+        // `tag` is not a tag, but rather a description of the number of
+        // characters until the next boundary. In unusual circumstances, `0`
+        // may be emitted here, but that's just an indication that we can
+        // safely ignore this “tag,” because the next boundary will be at the
+        // same position.
+        continue;
       } else {
         tokens.push({
           text: lineText.substr(lineTextIndex, tag),
@@ -5603,7 +5610,23 @@ module.exports = class TextEditor {
   // * startRow - The row {Number} to start at
   // * endRow - The row {Number} to end at
   autoIndentBufferRows(startRow, endRow) {
-    let row = startRow;
+    const languageMode = this.buffer.getLanguageMode();
+    let lastRowIndented = startRow - 1;
+    if (languageMode.suggestedIndentForBufferRows) {
+      let indents = languageMode.suggestedIndentForBufferRows(
+        startRow, endRow, this.getTabLength());
+      // The language mode may not be able to indent the whole block
+      // atomically. If not, we'll indent as much as we're able, then fall back
+      // to the costlier approach.
+      if (indents !== null) {
+        for (let [row, indent] of indents) {
+          this.setIndentationForBufferRow(row, indent);
+          lastRowIndented = row;
+        }
+        if (lastRowIndented === endRow) { return; }
+      }
+    }
+    let row = lastRowIndented + 1;
     while (row <= endRow) {
       this.autoIndentBufferRow(row);
       row++;

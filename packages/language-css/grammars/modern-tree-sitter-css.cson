@@ -1,0 +1,16 @@
+name: 'CSS'
+scopeName: 'source.css'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-css'
+
+fileTypes: [
+  'css'
+]
+
+treeSitter:
+  grammar: 'tree-sitter/tree-sitter-css.wasm'
+  syntaxQuery: 'tree-sitter/queries/highlights.scm'
+  foldsQuery: 'tree-sitter/queries/folds.scm'
+  indentsQuery: 'tree-sitter/queries/indents.scm'
+
+injectionRegex: '^(css|CSS)$'
