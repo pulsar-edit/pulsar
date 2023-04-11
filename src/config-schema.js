@@ -359,14 +359,11 @@ const configSchema = {
       },
       languageParser: {
         type: 'string',
-        default: 'node-tree-sitter',
+        default: 'wasm-tree-sitter',
         description: 'Which parser should be preferred for supported languages',
         enum: [
           {
             value: 'textmate', description: 'TextMate grammars (regex-based)'
-          },
-          {
-            value: 'node-tree-sitter', description: 'Tree-sitter (legacy)'
           },
           {
             value: 'wasm-tree-sitter', description: 'Tree-sitter (modern; experimental)'
