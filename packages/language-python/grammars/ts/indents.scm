@@ -2,6 +2,9 @@
   (pair ":" @_IGNORE_
   (#set! final true)))
 
+((lambda ":" @_IGNORE_)
+  (#set! final true))
+
 ":" @indent
 
 ; When typing out "else" after an "if" statement, tree-sitter-python won't
