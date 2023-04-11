@@ -161,7 +161,7 @@
     "symbols-view": "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4",
     "tabs": "file:packages/tabs",
     "temp": "0.9.4",
-    "text-buffer": "^13.18.6",
+    "text-buffer": "https://github.com/pulsar-edit/text-buffer.git#c0c7cf3e3",
     "timecop": "file:./packages/timecop",
     "tree-view": "https://github.com/pulsar-edit/tree-view.git#4274c7a",
     "typescript-simple": "8.0.6",
