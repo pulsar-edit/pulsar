@@ -24,6 +24,7 @@
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
+    "@electron/remote": "2.0.8",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
     "async": "3.2.4",

@@ -1,3 +1,6 @@
+const electronRemote = require('@electron/remote/main')
+electronRemote.initialize()
+
 const {
   BrowserWindow,
   app,
