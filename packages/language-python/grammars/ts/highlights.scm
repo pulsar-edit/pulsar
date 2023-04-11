@@ -6,6 +6,8 @@
 ;   because `tree-sitter-python` doesn't parse them at all. Would need a
 ;   special-purpose tree-sitter parser in an injection.
 ;
+; * The TM grammar highlighted any strings that looked like SQL; this could
+;   be supported via an injection.
 
 ; SUPPORT
 ; =======
@@ -173,22 +175,22 @@
 ; name unless someone requests that feature.
 
 ((string) @string.quoted.triple.block.python
-  (#match? @string.quoted.triple.block.python "^\"\"\""))
+  (#match? @string.quoted.triple.block.python "^[bBrRuU]*\"\"\""))
 
 ((string) @string.quoted.triple.block.format.python
-  (#match? @string.quoted.triple.block.format.python "^fr?\"\"\""))
+  (#match? @string.quoted.triple.block.format.python "^[fF][rR]?\"\"\""))
 
 ((string) @string.quoted.double.single-line.python
-  (#match? @string.quoted.double.single-line.python "^\"(?!\")"))
+  (#match? @string.quoted.double.single-line.python "^[bBrRuU]*\"(?!\")"))
 
 ((string) @string.quoted.double.single-line.format.python
-  (#match? @string.quoted.double.single-line.format.python "^fr?\""))
+  (#match? @string.quoted.double.single-line.format.python "^[fF][rR]?\""))
 
 ((string) @string.quoted.single.single-line.python
-  (#match? @string.quoted.single.single-line.python "^\'"))
+  (#match? @string.quoted.single.single-line.python "^[bBrRuU*]\'"))
 
 ((string) @string.quoted.single.single-line.format.python
-  (#match? @string.quoted.single.single-line.format.python "^fr?\'"))
+  (#match? @string.quoted.single.single-line.format.python "^[fF][rR]?\'"))
 
 (string_content (escape_sequence) @constant.character.escape.python)
 
@@ -205,8 +207,8 @@
   (#set! onlyIfLast true))
 
 (string prefix: _ @storage.type.string.python
-  (#match? @storage.type.string.python "^[fruU]+")
-  (#set! endAfterFirstMatchOf "^[fruU]+"))
+  (#match? @storage.type.string.python "^[bBfFrRuU]+")
+  (#set! endAfterFirstMatchOf "^[bBfFrRuU]+"))
 
 
 ; CONSTANTS
