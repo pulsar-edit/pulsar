@@ -1,6 +1,6 @@
 fs = require 'fs-plus'
 path = require 'path'
-{remote} = require 'electron'
+remote = require('@electron/remote')
 
 glob = require 'glob'
 request = require 'request'
