@@ -2,12 +2,11 @@
 ; CAVEATS
 ; =======
 ;
-; * No highlighting of HTML entities (parser doesn't recognize them). Could
-;   write a parser and add via injection, but it should still be added to
-;   `tree-sitter-html`.
+; * To recognize HTML entities, we're temporarily using a fork until
+; tree-sitter-html#50 lands. That gets us entity recognition in text, but not
+; in attribute values. We could fix that by writing a small parser to inject
+; into attribute values, but we could also just hold off for now.
 ;
-;   Apparently fixed in tree-sitter-html#45 but needs tests before it can be
-;   landed.
 
 (doctype) @meta.tag.doctype.html
 
@@ -15,9 +14,6 @@
   "<!" @punctuation.definition.tag.begin.html
   "doctype" @entity.name.tag.doctype.html
   ">" @punctuation.definition.tag.end.html) @meta.tag.doctype.html
-
-; ((doctype) @string.unquoted.html
-;   (#set! startAndEndAroundFirstMatchOf "html"))
 
 ; COMMENTS
 ; ========
@@ -64,6 +60,7 @@
   (#match? @entity.name.tag.inline._TEXT_.html "^(a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var|A|ABBR|ACRONYM|AREA|B|BASE|BASEFONT|BDO|BIG|BR|BUTTON|CAPTION|CITE|CODE|COL|COLGROUP|DEL|DFN|EM|FONT|HEAD|HTML|I|IMG|INPUT|INS|ISINDEX|KBD|LABEL|LEGEND|LI|LINK|MAP|META|NOSCRIPT|OPTGROUP|OPTION|PARAM|Q|S|SAMP|SCRIPT|SELECT|SMALL|SPAN|STRIKE|STRONG|STYLE|SUB|SUP|TABLE|TBODY|TD|TEXTAREA|TFOOT|TH|THEAD|TITLE|TR|TT|U|VAR)$")
   (#set! final true))
 
+
 ; ELEMENTS
 ; ========
 
@@ -74,6 +71,7 @@
   "<" @punctuation.definition.tag.begin.html
   ">" @punctuation.definition.tag.end.html)
 
+; Fallback for any tag that didn't get scoped in the Support section above.
 (start_tag
   (tag_name) @entity.name.tag.html)
 
@@ -125,3 +123,9 @@
 ; Because of the preceding rule, if this matches and passes all tests, the
 ; value must be unquoted.
 (attribute_value) @string.unquoted.html
+
+
+; MISC
+; ====
+
+(entity) @constant.character.entity.html

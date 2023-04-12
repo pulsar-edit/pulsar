@@ -6,15 +6,20 @@ parser: 'tree-sitter-html'
 injectionRegex: '(HTML|html|Html)$'
 
 treeSitter:
+  # Built from
+  # https://github.com/savetheclocktower/tree-sitter-html/tree/add-entities-with-tests
+  # which adds support for HTML entities. When tree-sitter-html#50 lands, we can go back to the official builds.
   grammar: 'tree-sitter-html/tree-sitter-html.wasm'
   syntaxQuery: 'tree-sitter-html/highlights.scm'
   foldsQuery: 'tree-sitter-html/folds.scm'
   indentsQuery: 'tree-sitter-html/indents.scm'
 
 fileTypes: [
+  'htm'
   'html'
+  'shtml'
 ]
 
 comments:
-  start: '<!--'
-  end: '-->'
+  start: '<!-- '
+  end: ' -->'
