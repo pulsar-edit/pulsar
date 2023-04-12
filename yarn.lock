@@ -2132,9 +2132,9 @@ atom-grammar-test@^0.6.3, atom-grammar-test@^0.6.4:
     chevrotain "^0.18.0"
     escape-string-regexp "^1.0.5"
 
-"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#449b401":
+"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#162ebf3":
   version "8.2.15"
-  resolved "https://github.com/pulsar-edit/atom-keymap.git#449b401a8da83a1b1b316b95ad7e7ff8a0a39412"
+  resolved "https://github.com/pulsar-edit/atom-keymap.git#162ebf3a10860f53865fdceab08420e28246aad8"
   dependencies:
     clear-cut "^2"
     event-kit "^1.0.0"
