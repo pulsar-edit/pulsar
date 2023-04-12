@@ -102,22 +102,24 @@
 ; Declarations and assignments
 ; ----------------------------
 
+; The "x" in `int x`;
 (declaration
-  (identifier) @variable.declaration.c)
+  declarator: (identifier) @variable.declaration.c)
+
+; The "x" in `int x = y`;
+(init_declarator
+  declarator: (identifier) @variable.declaration.c)
 
 (field_declaration
   (field_identifier) @variable.declaration.c)
 
 (field_declaration
   (pointer_declarator
-  	(field_identifier) @variable.declaration.c))
+    (field_identifier) @variable.declaration.c))
 
 (field_declaration
   (array_declarator
-  	(field_identifier) @variable.declaration.c))
-
-(init_declarator
-  (identifier) @variable.declaration.c)
+    (field_identifier) @variable.declaration.c))
 
 (init_declarator
   (pointer_declarator

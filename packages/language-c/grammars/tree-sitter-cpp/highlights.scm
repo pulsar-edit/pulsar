@@ -162,8 +162,13 @@
 ; Declarations and assignments
 ; ----------------------------
 
+; The "x" in `int x`;
 (declaration
-  (identifier) @variable.declaration.cpp)
+  declarator: (identifier) @variable.declaration.cpp)
+
+; The "x" in `int x = y`;
+(init_declarator
+  declarator: (identifier) @variable.declaration.cpp)
 
 (field_declaration
   (field_identifier) @variable.declaration.cpp)
@@ -177,14 +182,12 @@
   	(field_identifier) @variable.declaration.cpp))
 
 (init_declarator
-  (identifier) @variable.declaration.cpp)
-
-(init_declarator
   (pointer_declarator
     (identifier) @variable.declaration.cpp))
 
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
+
 
 ; Function parameters
 ; -------------------
