@@ -1,3 +1,11 @@
+; TODO
+; ====
+; 
+; * numbers: hex, octal, binary, and log versions of each
+; * long integers
+; * complex numbers
+; * how to scope import identifiers?
+
 
 ; CAVEATS
 ; =======
