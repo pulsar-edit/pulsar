@@ -3016,7 +3016,6 @@ class LanguageLayer {
       let oldSyntaxTree = this.lastSyntaxTree;
       this.lastSyntaxTree = tree;
 
-      // this.tree.delete();
       let oldTree = this.tree;
       this.tree = tree;
       this.treeIsDirty = false;

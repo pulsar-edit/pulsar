@@ -79,6 +79,7 @@ class ScopeResolver {
     this.idForScope = idForScope ?? (x => x);
     this.map = new Map;
     this.rangeData = new Map;
+    this.pointKeyCache = new Map;
     this.patternCache = new Map;
     this.configCache = new Map;
     this.configSubscription = this.config.onDidChange(() => {
@@ -121,18 +122,27 @@ class ScopeResolver {
     return this.buffer.clipPosition(newPosition);
   }
 
+  // We want to index scope data on buffer position, but each `Point` (or
+  // ad-hoc point object) is a different object. We could normalize them to a
+  // string and use the string as the map key, but we'd have to convert them
+  // back to `Point`s later on, so let's just do it now.
+  //
+  // Here we make it so that every point that describes the same buffer
+  // position is keyed on the same `Point` instance.
   _keyForPoint(point) {
-    return `${point.row},${point.column}`
+    let { row, column } = point;
+    let key = `${row},${column}`;
+    let normalized = this.pointKeyCache.get(key);
+    if (!normalized) {
+      normalized = new Point(Number(row), Number(column));
+      this.pointKeyCache.set(key, normalized);
+    }
+    return normalized;
   }
 
   _keyForRange(range) {
     let { startIndex, endIndex } = range;
     return `${startIndex}/${endIndex}`;
-  }
-
-  _keyToObject(key) {
-    let [row, column] = key.split(',');
-    return new Point(Number(row), Number(column));
   }
 
   setDataForRange(range, props) {
@@ -322,21 +332,21 @@ class ScopeResolver {
 
   destroy() {
     this.reset();
+    this.patternCache.clear();
+    this.pointKeyCache.clear();
     this.configCache.clear();
     this.configSubscription.dispose();
   }
 
   *[Symbol.iterator] () {
-    // Sort the keys before iterating.
+    // Iterate in buffer position order.
     let keys = [...this.map.keys()];
-    keys.sort((a, b) => {
-      let posA = this._keyToObject(a);
-      let posB = this._keyToObject(b);
-      return comparePoints(posA, posB);
-    });
+    keys.sort((a, b) => a.compare(b));
+
     for (let key of keys) {
-      let point = this._keyToObject(key);
-      yield [point, this.map.get(key)];
+      // We don't expect that `key` will be modified, but if it _were_
+      // modified, it would really ruin our day. Better to make a copy.
+      yield [key.copy(), this.map.get(key)];
     }
   }
 }
@@ -370,7 +380,7 @@ ScopeResolver.interpolateName = (name, node) => {
 // built-in predicates like `#match?` and `#eq?`.
 //
 // NOTE: Syntax queries will always be run through a `ScopeResolver`, but other
-// kinds of queries may or may not, depending on purpse.
+// kinds of queries may or may not, depending on purpose.
 //
 ScopeResolver.TESTS = {
   // Passes only if another capture has not already declared `final` for the
@@ -401,7 +411,7 @@ ScopeResolver.TESTS = {
     return node.hasError();
   },
 
-  // Negats `onlyIfHasError`.
+  // Negates `onlyIfHasError`.
   onlyIfNotHasError(node) {
     return !node.hasError();
   },
@@ -652,6 +662,7 @@ ScopeResolver.TESTS = {
 // beyond the bounds of their originally captured node. To have a capture span
 // two siblings, for instance, you must capture the _parent_ node and adjust
 // the range down from there.
+// 
 ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to start at the start or end of a different node.
   startAt(node, value, props, range, resolver) {
