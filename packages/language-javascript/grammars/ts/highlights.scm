@@ -309,8 +309,8 @@
 
 ; Built-in class instantiations.
 (new_expression
-  constructor: (identifier) @support.class.instance.js
-    (#match? @support.class.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
+  constructor: (identifier) @support.class.builtin.instance.js
+    (#match? @support.class.builtin.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
     (#set! final true))
 
 ; Built-in constructors that can be invoked without `new`.
@@ -323,6 +323,27 @@
 (call_expression
   (identifier) @support.function.builtin.js
   (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
+  (#set! final true))
+
+; All “well-known” symbols (as they are referred to in the spec).
+(member_expression
+  object: (identifier) @support.class.builtin.js
+  property: (property_identifier) @support.property.builtin.js
+  (#eq? @support.class.builtin.js "Symbol")
+  (#match? @support.property.builtin.js "^(asyncIterator|hasInstance|isConcatSpreadable|iterator|match|matchAll|replace|search|split|species|toPrimitive|toStringTag|unscopables)$")
+  (#set! final true))
+
+; Static methods of `Symbol`.
+(member_expression
+  object: (identifier) @support.class.builtin.js
+    (#eq? @support.class.builtin.js "Symbol")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(for|keyFor)$")
+    (#set! final true))
+
+; Other built-in objects.
+((identifier) @support.class.builtin.js
+  (#match? @support.class.builtin.js "^(Symbol)$")
   (#set! final true))
 
 ; Deprecated built-in functions.
@@ -383,6 +404,12 @@
 ; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
 (member_expression
   property: (property_identifier) @support.other.property.js)
+
+; The "BAR" in `foo.BAR` should also be scoped as a constant.
+(member_expression
+  property: (property_identifier) @constant.other.property.js
+  (#match? @constant.other.property.js "^[_A-Z]+"))
+
 
 ; The "foo" in `{ foo: true }`.
 (pair
@@ -801,7 +828,16 @@
 ; The interior of a class body (useful for snippets and commands).
 (class_body) @meta.block.class.js
 
-(formal_parameters) @meta.parameters.js
+; The inside of a parameter definition list.
+((formal_parameters) @meta.parameters.js
+  (#set! startAt firstChild.endPosition)
+  (#set! endAt lastChild.startPosition))
+
+; The inside of an object literal.
+((object) @meta.object.js
+  (#set! startAt firstChild.endPosition)
+  (#set! endAt lastChild.startPosition))
+
 
 ; MISC
 ; ====
@@ -821,3 +857,8 @@
 ; ((sequence_expression
 ;   left: (identifier) @variable.parameter.js)
 ;   right: (arrow_function))
+
+; TODO: Any identifier not yet scoped might as well be scoped as a variable,
+; but that's an opinionated choice. We might want to make this configurable.
+; ((identifier) @variable.other.other.js
+;   (#set! shy true))
