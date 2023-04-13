@@ -77,7 +77,7 @@ class ScopeResolver {
     this.config = languageLayer?.languageMode?.config ?? atom.config;
     this.grammar = languageLayer.grammar;
     this.idForScope = idForScope ?? (x => x);
-    this.map = new Map;
+    this.boundaries = new Map;
     this.rangeData = new Map;
     this.pointKeyCache = new Map;
     this.patternCache = new Map;
@@ -135,7 +135,7 @@ class ScopeResolver {
     let normalized = this.pointKeyCache.get(key);
     if (!normalized) {
       normalized = new Point(Number(row), Number(column));
-      this.pointKeyCache.set(key, normalized);
+      this.pointKeyCache.set(key, normalized.freeze());
     }
     return normalized;
   }
@@ -300,11 +300,11 @@ class ScopeResolver {
   setBoundary(point, id, which, { root = false } = {}) {
     let key = this._keyForPoint(point);
 
-    if (!this.map.has(key)) {
-      this.map.set(key, { open: [], close: [] })
+      if (!this.boundaries.has(key)) {
+      this.boundaries.set(key, { open: [], close: [] })
     }
 
-    let bundle = this.map.get(key);
+    let bundle = this.boundaries.get(key);
     let idBundle = bundle[which];
 
     // In general, we want to close scopes in the reverse order of when they
@@ -326,7 +326,7 @@ class ScopeResolver {
   }
 
   reset() {
-    this.map.clear();
+    this.boundaries.clear();
     this.rangeData.clear();
   }
 
@@ -340,13 +340,11 @@ class ScopeResolver {
 
   *[Symbol.iterator] () {
     // Iterate in buffer position order.
-    let keys = [...this.map.keys()];
+    let keys = [...this.boundaries.keys()];
     keys.sort((a, b) => a.compare(b));
 
     for (let key of keys) {
-      // We don't expect that `key` will be modified, but if it _were_
-      // modified, it would really ruin our day. Better to make a copy.
-      yield [key.copy(), this.map.get(key)];
+      yield [key, this.boundaries.get(key)];
     }
   }
 }
@@ -662,7 +660,7 @@ ScopeResolver.TESTS = {
 // beyond the bounds of their originally captured node. To have a capture span
 // two siblings, for instance, you must capture the _parent_ node and adjust
 // the range down from there.
-// 
+//
 ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to start at the start or end of a different node.
   startAt(node, value, props, range, resolver) {
