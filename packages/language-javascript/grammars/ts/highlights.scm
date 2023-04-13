@@ -401,6 +401,11 @@
 (member_expression
   object: (identifier) @support.other.object.js)
 
+; The "FOO" in `FOO.bar` should also be scoped as a constant.
+(member_expression
+  object: (identifier) @constant.other.object.js
+  (#match? @constant.other.object.js "^[_A-Z]+$"))
+
 ; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
 (member_expression
   property: (property_identifier) @support.other.property.js)
@@ -408,8 +413,7 @@
 ; The "BAR" in `foo.BAR` should also be scoped as a constant.
 (member_expression
   property: (property_identifier) @constant.other.property.js
-  (#match? @constant.other.property.js "^[_A-Z]+"))
-
+  (#match? @constant.other.property.js "^[_A-Z]+$"))
 
 ; The "foo" in `{ foo: true }`.
 (pair
@@ -513,6 +517,10 @@
   (#match? @punctuation.definition.comment.end.js "\\*/$")
   (#set! startAndEndAroundFirstMatchOf "\\*/$"))
 
+(hash_bang_line) @comment.line.shebang.js
+((hash_bang_line) @punctuation.definition.comment.js
+  (#set! endAfterFirstMatchOf "^#!"))
+
 
 ; KEYWORDS
 ; ========
@@ -583,6 +591,17 @@
   (#match? @support.object.builtin._TEXT_.js "^(arguments|module|console|window|document)$")
   (#is-not? local)
   (#set! final true))
+
+((identifier) @support.object.builtin.filename.js
+  (#eq? @support.object.builtin.filename.js "__filename")
+  (#is-not? local)
+  (#set! final true))
+
+((identifier) @support.object.builtin.dirname.js
+  (#eq? @support.object.builtin.dirname.js "__dirname")
+  (#is-not? local)
+  (#set! final true))
+
 
 ((identifier) @support.function.builtin.require.js
   (#eq? @support.function.builtin.require.js "require")
