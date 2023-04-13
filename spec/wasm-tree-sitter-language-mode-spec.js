@@ -1033,7 +1033,8 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: ' ', scopes: [] },
             { text: '// js comment ', scopes: ['comment'] },
             { text: '%>', scopes: ['directive'] },
-            { text: ' b', scopes: ['html'] }
+            { text: ' ', scopes: [] },
+            { text: 'b', scopes: ['html'] }
           ],
           [
             { text: '<%', scopes: ['directive'] },
@@ -2946,8 +2947,8 @@ describe('WASMTreeSitterLanguageMode', () => {
       );
 
       const htmlCommentStrings = {
-        commentStartString: '<!--',
-        commentEndString: '-->'
+        commentStartString: '<!-- ',
+        commentEndString: ' -->'
       };
       const jsCommentStrings = {
         commentStartString: '// ',
@@ -3082,7 +3083,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.selectLargerSyntaxNode();
       expect(editor.getSelectedText()).toBe('<b>c${def()}e${f}g</b>');
       editor.selectLargerSyntaxNode();
-      expect(editor.getSelectedText()).toBe(' <b>c${def()}e${f}g</b> ');
+      expect(editor.getSelectedText()).toBe('<b>c${def()}e${f}g</b> ');
       editor.selectLargerSyntaxNode();
       expect(editor.getSelectedText()).toBe('` <b>c${def()}e${f}g</b> `');
       editor.selectLargerSyntaxNode();
