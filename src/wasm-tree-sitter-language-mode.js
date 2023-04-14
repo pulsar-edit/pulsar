@@ -125,11 +125,13 @@ function isBetweenPoints (point, a, b) {
     comparePoints(point, greater) <= 0;
 }
 
+let nextId = 0;
 const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
 
 class WASMTreeSitterLanguageMode {
   constructor({ buffer, grammar, config, grammars }) {
+    this.id = nextId++;
     this.buffer = buffer;
     this.grammar = grammar;
     this.config = config;
@@ -3154,14 +3156,17 @@ class LanguageLayer {
       this.tree,
       ranges
     );
-    if (this.depth === 0) {
-      this.tree = tree;
-      this.treeIsDirty = false;
-    } else {
-      // Keep track of any off-schedule trees we generate so that we can GC
-      // them when the next transaction is done.
-      this.temporaryTrees.push(tree);
-    }
+
+    // Keep track of any off-schedule trees we generate so that we can GC them
+    // when the next transaction is done.
+    //
+    // NOTE: We thought we could re-use this work at the end of the transaction
+    // and save ourselves some time, but that seems to interfere with
+    // `getChangedRanges` — we'd be doing an incremental parse from Tree B to
+    // Tree C, but then comparing Tree C to Tree A when detecting range
+    // changes. This should work in theory, but reports a bunch of false
+    // positives in practice.
+    this.temporaryTrees.push(tree);
     return tree;
   }
 
