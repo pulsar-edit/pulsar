@@ -2742,6 +2742,13 @@ class LanguageLayer {
 
     if (this.tree) {
       this.tree.edit(edit);
+      if (this.lastSyntaxTree && this.tree !== this.lastSyntaxTree) {
+        // This happens after an off-schedule parse that we've decided we can
+        // re-use at the end of the current transaction. But when that happens,
+        // we'll call `getChangedRanges` between `lastSyntaxTree` and the new
+        // tree, so `lastSyntaxTree` needs to receive the same tree edits.
+        this.lastSyntaxTree.edit(edit);
+      }
       // We're tentatively marking this tree as dirty; we won't know if it
       // needs to be reparsed until the transaction is done. If it doesn't,
       // that means that the edits didn't encroach on the contents of the
@@ -3157,16 +3164,14 @@ class LanguageLayer {
       ranges
     );
 
-    // Keep track of any off-schedule trees we generate so that we can GC them
-    // when the next transaction is done.
-    //
-    // NOTE: We thought we could re-use this work at the end of the transaction
-    // and save ourselves some time, but that seems to interfere with
-    // `getChangedRanges` — we'd be doing an incremental parse from Tree B to
-    // Tree C, but then comparing Tree C to Tree A when detecting range
-    // changes. This should work in theory, but reports a bunch of false
-    // positives in practice.
-    this.temporaryTrees.push(tree);
+    if (this.depth === 0) {
+      this.tree = tree;
+      this.treeIsDirty = false;
+    } else {
+      // Keep track of any off-schedule trees we generate so that we can GC them
+      // when the next transaction is done.
+      this.temporaryTrees.push(tree);
+    }
     return tree;
   }
 
