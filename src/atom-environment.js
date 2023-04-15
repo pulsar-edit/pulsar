@@ -201,10 +201,6 @@ class AtomEnvironment {
       applicationDelegate: this.applicationDelegate
     });
 
-    if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
-      this.keymaps.loadBundledKeymaps();
-    }
-
     this.registerDefaultCommands();
     this.registerDefaultOpeners();
     this.registerDefaultDeserializers();
