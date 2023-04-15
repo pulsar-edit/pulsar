@@ -28,7 +28,7 @@ version). This fixes issues with Electron 21
 - Added: Create i18n API [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/446)
 - Added: Add Automated updating of `autocomplete-html` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/405)
 - Fixed: docs: fix markdown links in packages README [@oakmac](https://github.com/pulsar-edit/pulsar/pull/450)
-- Fixed: Path document register element [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/438)
+- Fixed: Patch document register element [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/438)
 - Added: Using "second-mate" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/435)
 - Fixed: Fix spacing of PHP's "for ..." snippet [@machitgarha](https://github.com/pulsar-edit/pulsar/pull/440)
 - Update: Update resources metadata [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/414)
