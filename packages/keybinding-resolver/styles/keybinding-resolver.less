@@ -1,0 +1,64 @@
+@import "ui-variables";
+@import "octicon-mixins";
+
+.key-binding-resolver {
+  overflow: auto;
+
+  .panel-heading {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .panel-body {
+    padding: 0 @component-padding;
+  }
+
+  table {
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid @base-border-color;
+    }
+
+    .used {
+      color: @text-color-success;
+    }
+
+    .unused {
+      color: @text-color;
+    }
+
+    .unmatched {
+      color: @text-color-subtle;
+    }
+
+    // move icon so text is aligned when wrapped
+    .command {
+      padding-left: @component-icon-size;
+      &:before {
+        position: absolute;
+        margin-left: -@component-icon-size;
+      }
+    }
+
+    .used .command,
+    .unused .command {
+      .octicon(check);
+    }
+
+    .unmatched .command {
+      .octicon(x);
+    }
+
+    .command,
+    .selector,
+    .source {
+      min-width: 10em;
+      word-break: break-word; // wrap long path names
+    }
+
+    .source {
+      cursor: pointer;
+    }
+  }
+}
