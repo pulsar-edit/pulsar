@@ -15,50 +15,52 @@ export default class BadgeView {
     const classes = this.getClasses();
     const badge = this.badge;
 
-    if (this.hasLink() && this.hasText()) {
-      // Link and Text
+    if (this.hasLink()) {
+      if (this.hasText()) {
+        // Link and Text
 
-      return (
-        <a href={badge.link}>
+        return (
+          <a href={badge.link}>
+            <span class={classes}>
+              <i class={icons}></i>
+              {badge.title}: <span class="badge-expandable">...</span><span class="badge-text"> {badge.text}</span>
+            </span>
+          </a>
+        );
+      } else {
+        // Link no text
+
+        return (
+          <a href={badge.link}>
+            <span class={classes}>
+              <i class={icons}></i>
+              {badge.title}
+            </span>
+          </a>
+        );
+      }
+    } else {
+      if (this.hasText()) {
+        // No Link, has Text
+
+        return (
           <span class={classes}>
             <i class={icons}></i>
             {badge.title}: <span class="badge-expandable">...</span><span class="badge-text"> {badge.text}</span>
           </span>
-        </a>
-      );
+        );
+      } else {
+        // No Link, no text
 
-    } else if (this.hasLink() && !this.hasText()) {
-      // Link no text
-
-      return (
-        <a href={badge.link}>
+        return (
           <span class={classes}>
             <i class={icons}></i>
             {badge.title}
           </span>
-        </a>
-      );
-
-    } else if (!this.hasLink() && this.hasText()) {
-      // No Link, has text
-      return (
-        <span class={classes}>
-          <i class={icons}></i>
-          {badge.title}: <span class="badge-expandable">...</span><span class="badge-text"> {badge.text}</span>
-        </span>
-      );
-
-    } else if (!this.hasLink() && !this.hasText()) {
-      // No Link, no text
-
-      return (
-        <span class={classes}>
-          <i class={icons}></i>
-          {badge.title}
-        </span>
-      );
-
+        );
+      }
     }
+    
   }
 
   hasLink () {
