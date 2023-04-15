@@ -6,11 +6,53 @@
 
 ## [Unreleased]
 
+## 1.104.0
+
 - The settings-view package now lists a package’s snippets more accurately
 - Fixed some issues with some packages with WebComponents v0 (tablr package
 should work now) by internalizing and patching document-register-element
 - Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM
 version). This fixes issues with Electron 21
+- Ensured new WASM packages will work on Apple Silicon
+- Completions for HTML will now be as bleeding edge as possible.
+
+### Pulsar
+- Removed: remove weird duplicate accented fixture file (hopefully?) [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/488)
+- Added: Add optional entitlements monkey-patch [@confused-Tecie](https://github.com/pulsar-edit/pulsar/pull/483)
+- Added: Decaf `wrap-guide` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/443)
+- Added: Additional Bundling of Core Packages [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/424)
+- Added: add allow-jit entitlement (fixes Apple Silicon builds) [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/454)
+- Removed: Revert "Create i18n API" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/471)
+- Added: Build first, and test later [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/463)
+- Update: [settings-view] Update package snippets view to reflect new features [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/406)
+- Added: Create i18n API [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/446)
+- Added: Add Automated updating of `autocomplete-html` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/405)
+- Fixed: docs: fix markdown links in packages README [@oakmac](https://github.com/pulsar-edit/pulsar/pull/450)
+- Fixed: Path document register element [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/438)
+- Added: Using "second-mate" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/435)
+- Fixed: Fix spacing of PHP's "for ..." snippet [@machitgarha](https://github.com/pulsar-edit/pulsar/pull/440)
+- Update: Update resources metadata [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/414)
+- Fixed: Cirrus: Windows: install ppm deps with Yarn [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/434)
+- Added: made cirrus build scripts consistent [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/239)
+- Update: Update package.json author [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/432)
+
+### second-mate
+- Added: Migrate to vscode-oniguruma [@mauricioszabo](https://github.com/pulsar-edit/second-mate/pull/1)
+
+### autosave
+- Removed: removed fs-plus dependency [@Sertonix](https://github.com/pulsar-edit/autosave/pull/2)
+- Update: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/autosave/pull/1)
+
+### bracket-matcher
+- Fixed: Fixing test that need to run locally [@mauricioszabo](https://github.com/pulsar-edit/bracket-matcher/pull/3)
+- Update: cleanup .md and rename repo url [@Sertonix](https://github.com/pulsar-edit/bracket-matcher/pull/2)
+- Update: Rename A[a]tom -> P[p]ulsar [@Spiker985](https://github.com/pulsar-edit/bracket-matcher/pull/1)
+
+### timecop
+- Update: cleanup and rename [@Sertonix](https://github.com/pulsar-edit/timecop/pull/1)
+
+### keybinding-resolver
+- Update: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/keybinding-resolver/pull/1)
 
 ## 1.103.0
 
