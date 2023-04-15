@@ -1,6 +1,6 @@
 # name: 'TODO'
 scopeName: 'text.todo'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-todo'
 
 injectionRegex: '^(todo|TODO)$'

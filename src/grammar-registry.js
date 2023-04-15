@@ -490,23 +490,30 @@ module.exports = class GrammarRegistry {
   //     returns a {String} that will be tested against other grammars' `injectionRegex` in
   //     order to determine what language should be embedded.
   //   * `content` A {Function} that is called with syntax nodes of the specified `type` and
-  //     returns another syntax node or array of syntax nodes that contain the embedded source code.
+  //     returns another syntax node or array of syntax nodes that contain the embedded source
+  //     code. Depending on the settings below, the content node(s) will be converted into a
+  //     series of buffer ranges; when this injection is parsed, anything not inside those
+  //     ranges will be invisible to the parser.
   //   * `includeChildren` A {Boolean} that indicates whether the children (and, in fact, all
-  //     descendants) of the nodes returned by `content` should be included in the injection.
-  //     Defaults to `false`.
+  //     descendants) of the nodes returned by `content` should be included in the injection's
+  //     buffer range(s). Defaults to `false`.
   //   * `newlinesBetween` A {Boolean} that indicates whether each node returned from `content`
   //     should be separated by at least one newline character so that the parser understands
   //     them to be logically separated. Embedded languages like ERB and EJS need this. Defaults
   //     to {false}.
   //   * `languageScope` A {String} or {Function} that returns the desired scope name to apply
-  //     to the region(s) of the injection. Defaults to the injected grammar's own language scope
-  //     — e.g., `source.js` for the JavaScript grammar. Set to `null` if the language scope
+  //     to each of the injection's buffer ranges. Defaults to the injected grammar's own language
+  //     scope — e.g., `source.js` for the JavaScript grammar. Set to `null` if the language scope
   //     should be omitted. If a {Function}, will be called with the grammar instance as an
-  //     argument.
+  //     argument, and should return either a {String} or `null`.
   //   * `coverShallowerScopes` A {Boolean} that indicates whether this injection should prevent
   //     shallower layers (including the layer that created this injection) from adding scopes
-  //     within any of this injection's own ranges. Useful for injecting languages into
+  //     within any of this injection's buffer ranges. Useful for injecting languages into
   //     themselves — for instance, injecting Rust into Rust macro definitions.
+  //   * `includeAdjacentWhitespace` A {Boolean} that indicates whether the injection's buffer
+  //     range(s) should include whitespace that occurs between two adjacent ranges. Defaults to
+  //     `false`. When `true`, if two consecutive injection buffer ranges are separated _only_ by
+  //     whitespace, those ranges will be consolidated into one range along with that whitespace.
   //
   addInjectionPoint(grammarId, injectionPoint, { only = null } = {}) {
     let grammarsToDispose = [];
@@ -647,10 +654,10 @@ module.exports = class GrammarRegistry {
       grammarPath,
       CSON.readFileSync(grammarPath) || {}
     );
-}
+  }
 
   createGrammar(grammarPath, params) {
-    if (params.type === 'tree-sitter-2') {
+    if (params.type === 'modern-tree-sitter') {
       return new WASMTreeSitterGrammar(this, grammarPath, params)
     } else {
       if (

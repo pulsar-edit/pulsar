@@ -1,6 +1,6 @@
 name: 'JSON'
 scopeName: 'source.json'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-json'
 
 injectionRegex: "^(json|JSON)$"

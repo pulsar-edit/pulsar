@@ -34,6 +34,15 @@ function nodeBreadth(node) {
   return node.endIndex - node.startIndex;
 }
 
+function rangeToTreeSitterRangeSpec(range, buffer) {
+  let startIndex = buffer.characterIndexForPosition(range.start);
+  let endIndex = buffer.characterIndexForPosition(range.end);
+  let startPosition = { row: range.start.row, column: range.start.column };
+  let endPosition = { row: range.end.row, column: range.end.column };
+
+  return { startIndex, startPosition, endIndex, endPosition };
+}
+
 function resolveNodeDescriptor (node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
@@ -116,11 +125,13 @@ function isBetweenPoints (point, a, b) {
     comparePoints(point, greater) <= 0;
 }
 
+let nextId = 0;
 const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
 
 class WASMTreeSitterLanguageMode {
   constructor({ buffer, grammar, config, grammars }) {
+    this.id = nextId++;
     this.buffer = buffer;
     this.grammar = grammar;
     this.config = config;
@@ -182,6 +193,11 @@ class WASMTreeSitterLanguageMode {
     return this.grammar.scopeName;
   }
 
+  getNonWordCharacters(position) {
+    const scope = this.scopeDescriptorForPosition(position);
+    return this.config.get('editor.nonWordCharacters', { scope });
+  }
+
   getRootParser() {
     return this.getOrCreateParserForLanguage(this.rootLanguage);
   }
@@ -216,7 +232,7 @@ class WASMTreeSitterLanguageMode {
       newEndPosition: newRange.end
     };
 
-    if (!this.treeIsDirty) {
+    if (!this.rootLanguageLayer.treeIsDirty) {
       // This is the first change after the last transaction finished, so we
       // need to create a new promise that will resolve when the next
       // transaction is finished.
@@ -251,6 +267,18 @@ class WASMTreeSitterLanguageMode {
         this.prefillFoldCache(newRange);
       }
 
+      let allLayers = this.getAllInjectionLayers();
+      for (let layer of allLayers) {
+        // Either the tree got re-parsed — and it's now up-to-date — or it
+        // didn't, which means that the edits in the tree did not affect the
+        // layer's contents. Either way, the tree is safe to use.
+        layer.treeIsDirty = false;
+
+        // If this layer didn't get updated, then it didn't need to, and the
+        // edits made in the last transaction are no longer relevant.
+        layer.editedRange = null;
+      }
+
       // At this point, all trees are safely re-parsed, including those of
       // injection layers. So we can proceed with any actions that were waiting
       // on a clean tree.
@@ -272,7 +300,7 @@ class WASMTreeSitterLanguageMode {
   // in a given transaction. We resolve it with the number of changes in the
   // transaction so that we can react differently to batches of changes than to
   // single changes.
-  resolveNextTransactionPromise (changeCount) {
+  resolveNextTransactionPromise(changeCount) {
     if (this.resolveNextTransaction) {
       this.resolveNextTransaction(changeCount);
       this.resolveNextTransaction = null;
@@ -301,7 +329,7 @@ class WASMTreeSitterLanguageMode {
     });
   }
 
-  prefillFoldCache (range) {
+  prefillFoldCache(range) {
     this.rootLanguageLayer?.foldResolver.prefillFoldCache(range);
 
     let markers = this.injectionsMarkerLayer.findMarkers({
@@ -361,17 +389,6 @@ class WASMTreeSitterLanguageMode {
   idForScope(name) {
     return this.grammar.idForScope(name);
   }
-
-  // getOrCreateScopeId (name) {
-  //   let id = this.scopeNames.get(name);
-  //   if (!id) {
-  //     this.lastId += 2;
-  //     id = this.lastId;
-  //     this.scopeNames.set(name, id);
-  //     this.scopeIds.set(id, name);
-  //   }
-  //   return id;
-  // }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
   // tree-sitter node names. Useful for understanding tree-sitter parsing or
@@ -528,8 +545,8 @@ class WASMTreeSitterLanguageMode {
     // let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     let text = this.buffer.getText();
-    // TODO: Is there a better way to feed the parser the contents of the file?
     // if (devMode) { console.time('Parsing'); }
+    // TODO: Is there a better way to feed the parser the contents of the file?
     const result = parser.parse(
       text,
       oldTree,
@@ -710,8 +727,17 @@ class WASMTreeSitterLanguageMode {
   Section - Folds
   */
   getFoldableRangeContainingPoint(point) {
+    point = this.buffer.clipPosition(point);
     let fold = this.getFoldRangeForRow(point.row);
-    return fold ?? null;
+    if (fold) { return fold; }
+
+    // Move backwards until we find a fold range containing this row.
+    for (let row = point.row - 1; row >= 0; row--) {
+      let range = this.getFoldRangeForRow(row);
+      if (range && range.containsPoint(point)) { return range; }
+    }
+
+    return null;
   }
 
   getFoldableRanges() {
@@ -786,18 +812,21 @@ class WASMTreeSitterLanguageMode {
 
   isFoldableAtRow(row) {
     if (this.isFoldableCache[row] != null) {
-      return this.isFoldableCache[row];
+      return !!this.isFoldableCache[row];
     }
 
-    let isFoldable = !!this.getFoldRangeForRow(row);
+    let range = this.getFoldRangeForRow(row);
 
     // Don't bother to cache this result before we're able to load the folds
     // query.
     if (this.tokenized) {
-      // TODO: Cache actual ranges, not just booleans?
-      this.isFoldableCache[row] = isFoldable;
+      // We can easily keep track of _if_ this row is foldable, even if edits
+      // to the buffer end up moving this row around. But we don't bother to
+      // cache the actual _range_ because it'd just get stale once the buffer
+      // is edited. Better to wait and look it up when it's needed.
+      this.isFoldableCache[row] = !!range;
     }
-    return isFoldable;
+    return !!range;
   }
 
   getFoldRangeForRow(row) {
@@ -931,6 +960,16 @@ class WASMTreeSitterLanguageMode {
 
     let existingIndent = 0;
     if (options.preserveLeadingWhitespace) {
+      // When this option is true, the indent level we return will be _added
+      // to_ however much indentation is already present on the line. Whatever
+      // the purpose of this option, we can't just pretend it isn't there,
+      // because it will produce silly outcomes. Instead, let's account for
+      // that level of indentation and try to subtract it from whatever level
+      // we return later on.
+      //
+      // Sadly, if the row is _more_ indented than we need it to be, we won't
+      // be able to dedent it into the correct position. This option probably
+      // needs to be revisited.
       existingIndent = this.indentLevelForLine(
         this.buffer.lineForRow(row),
         tabLength
@@ -965,7 +1004,7 @@ class WASMTreeSitterLanguageMode {
     );
 
     if (!controllingLayer) {
-      return comparisonRowIndent - existingIndent;
+      return Math.max(comparisonRowIndent - existingIndent, 0);
     }
 
     let { indentsQuery, scopeResolver } = controllingLayer;
@@ -1137,8 +1176,11 @@ class WASMTreeSitterLanguageMode {
             capture, row, tabLength, options.indentationLevels);
           if (typeof matchIndentLevel === 'number') {
             scopeResolver.reset();
-            return matchIndentLevel - existingIndent;
+            return Math.max(matchIndentLevel - existingIndent, 0);
           }
+        } else  if (name === 'none') {
+          scopeResolver.reset();
+          return 0;
         }
 
         // Only `@dedent` or `@match` captures can change this line's
@@ -1303,7 +1345,6 @@ class WASMTreeSitterLanguageMode {
       // once, it can bypass this behavior with `(#set! force true)`.
       if (!props.force && node.text !== lineText) { continue; }
 
-
       // `@match` is authoritative; honor the first one we see and ignore other
       // captures.
       if (indent.name === 'match') {
@@ -1312,11 +1353,14 @@ class WASMTreeSitterLanguageMode {
           scopeResolver.reset();
           return matchIndentLevel;
         }
+      } else if (indent.name === 'none') {
+        scopeResolver.reset();
+        return 0;
       }
 
       if (indent.name !== 'dedent') { continue; }
 
-      // Even after we've seen a `@dedent`, we allow the loop to finish,
+      // Even after we've seen a `@dedent`, we allow the loop to continue,
       // because we'd prefer a `@match` capture over this `@dedent` capture
       // even if it happened to come later in the loop.
       seenDedent = true;
@@ -1852,7 +1896,7 @@ class NullLanguageModeHighlightIterator {
 
 class NullLayerHighlightIterator {
   seek() {
-    return null;
+    return [false, new OpenScopeMap];
   }
   compare() {
     return 1;
@@ -1868,25 +1912,6 @@ class NullLayerHighlightIterator {
     return [];
   }
 }
-
-// function findNodeInCurrentScope(boundaries, position, filter) {
-//   let iterator = boundaries.ge(position)
-//   while (iterator.hasPrev) {
-//     iterator.prev()
-//     const value = iterator.value
-//     if (filter(value)) return value
-//
-//     if (value.scope === 'close') {
-//       // If we have a closing scope, there's an "inner scope" that we will
-//       // ignore, and move the iterator BEFORE the inner scope position
-//       iterator = boundaries.lt(value.openScopeNode.position)
-//     } else if (value.scope === 'open') {
-//       // But, if we find an "open" scope, we check depth. If it's `1`, we
-//       // got into the last nested scope we were inside, so it's time to quit
-//       if (value.depth === 1) return
-//     }
-//   }
-// }
 
 // An iterator for marking boundaries in the buffer to apply syntax
 // highlighting.
@@ -1913,7 +1938,7 @@ class HighlightIterator {
     this.end = end;
     this.iterators = [];
 
-    const injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
+    let injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
       {
         intersectsRange: new Range(
           start,
@@ -1922,26 +1947,87 @@ class HighlightIterator {
       }
     );
 
+    injectionMarkers.sort((a, b) => {
+      // Shallower injections get visited first.
+      return a.languageLayer.depth - b.languageLayer.depth;
+    });
+
     const iterator = this.languageMode.rootLanguageLayer.buildHighlightIterator();
 
-    let openScopes = [];
+    // We need to know which open scopes were contributed by which language
+    // layer so that we know which ones to “cover” if we see an injection with
+    // the `coverShallowerScopes` option.
+    //
+    // What's worse is that we need to know _where_ each of those open scopes
+    // would've been added, because that open scope shouldn't truly be added
+    // _if_ it would've been suppressed by a deeper layer.
+    let openScopesByLayer = new Map();
+
     // The contract of `LayerHighlightIterator#seek` is different from the
-    // contract of `HighlightIterator#seek`. Instead of having it return an
-    // array of open scopes at the given point, we give it an array that it can
-    // push items into if needed; but its return value is a boolean that tells
-    // us whether we should use this iterator at all. It will return `true` if
-    // it needs to mark anything in the specified range, and `false` otherwise.
-    let result = iterator.seek(start, endRow, openScopes);
+    // contract of `HighlightIterator#seek`. Instead of an array of open
+    // scopes, we have it return an two-item array.
+    //
+    // The first item is a boolean that indicates whether the iterator needs to
+    // mark anything _within_ the range that will be highlighted. If not, it
+    // doesn't need to go into the list of iterators.
+    //
+    // The second item is an `OpenScopeMap` (rather than just an array of
+    // already open scopes) that retains information about where each open
+    // scope was opened, because we'll need that information in a moment.
+    //
+    let [result, openScopes] = iterator.seek(start, endRow);
+
+    // An iterator can contribute to the list of already open scopes even if it
+    // has no boundaries to mark within the range of this highlighting job.
+    openScopesByLayer.set(iterator, openScopes);
+
     if (result) {
       this.iterators.push(iterator);
     }
 
+    // The logic that we use for `coverShallowerScopes` needs to be respected
+    // here. As we build these iterators, if we find that any of them cover
+    // their parent iterator at this position, we need to revisit the list of
+    // open scopes, removing any that aren't their layer's base language scope.
     for (const marker of injectionMarkers) {
       const iterator = marker.languageLayer.buildHighlightIterator();
-      let result = iterator.seek(start, endRow, openScopes);
-      if (result) {
-        this.iterators.push(iterator);
+      let [result, openScopes] = iterator.seek(start, endRow);
+
+      // Just as with the root layer, any injection layer may need to add to
+      // the list of open scopes whether or not they need to mark anything
+      // within this range.
+      if (result) { this.iterators.push(iterator); }
+
+      if (iterator?.languageLayer?.injectionPoint?.coverShallowerScopes) {
+        // The procedure we follow for covering scopes in the _middle_ of a
+        // highlighting task needs to be emulated when deciding which scopes
+        // are already open at the _start_ of the task. This layer wants to
+        // cover shallower scopes, so we need to re-assess our list of already
+        // open scopes to see if any of them _would've_ been covered at the
+        // point when they were opened.
+        let ranges = iterator.languageLayer.getCurrentRanges();
+        for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
+          // It's possible, though uncommon, for injections to overlap, because
+          // there's no mechanism that prevents it. Since we sorted the layers
+          // by depth earlier, this iterator won't have a lower depth than the
+          // previous one. But it may have _the same_ depth, so we need to
+          // account for that.
+          if (earlierIterator.depth >= iterator.depth) { continue; }
+
+          // For each of the open scopes that an earlier iterator gave us, we
+          // need to look at the point at which that scope would've been added.
+          // If that point falls within the purview of our newer iterator, then
+          // we should suppress those scopes unless they're the layer's base
+          // language scope.
+          let languageScopeId = earlierIterator.languageLayer.languageScopeId;
+          for (let [point, scopes] of earlierOpenScopes) {
+            let pointIsCoveredByNewIterator = ranges.some(r => r.containsPoint(point));
+            if (!pointIsCoveredByNewIterator) { continue; }
+            earlierOpenScopes.set(point, scopes.filter(id => id === languageScopeId));
+          }
+        }
       }
+      openScopesByLayer.set(iterator, openScopes);
     }
 
     // Sort the iterators so that the last one in the array is the earliest
@@ -1950,7 +2036,34 @@ class HighlightIterator {
 
     this.detectCoveredScope();
 
-    return openScopes;
+    // Our nightmare is almost over, but one chore remains. The ordering of
+    // already open scopes should be consistent; scopes added earlier in the
+    // buffer should appear in the list before scopes added later. This ensures
+    // that, e.g., `scopeDescriptorForPosition` returns scopes in the proper
+    // hierarchy.
+    let sortedOpenScopes = [];
+
+    // First we'll gather all the point/scope-list pairs into a flat list…
+    let unsortedScopeBundles = [];
+    for (let [iterator, layerOpenScopeMap] of openScopesByLayer) {
+      for (let [point, scopes] of layerOpenScopeMap) {
+        unsortedScopeBundles.push({ point, scopes, iterator });
+      }
+    }
+
+    // …then sort them by buffer position, with shallower layers first in case
+    // of ties.
+    unsortedScopeBundles.sort((a, b) => {
+      return a.point.compare(b.point) ||
+        a.iterator.depth - b.iterator.depth;
+    });
+
+    // Now we can flatten all the scopes themselves, preserving order.
+    for (let { scopes } of unsortedScopeBundles) {
+      sortedOpenScopes.push(...scopes);
+    }
+
+    return sortedOpenScopes;
   }
 
   moveToSuccessor () {
@@ -2013,8 +2126,14 @@ class HighlightIterator {
       //   )
       // );
     }
-    if (iterator && !this.currentScopeIsCovered) {
-      return iterator.getCloseScopeIds();
+    if (iterator) {
+      if (this.currentScopeIsCovered) {
+        return iterator.getOpenScopeIds().filter(id => {
+          return iterator.languageLayer.languageScopeId === id;
+        });
+      } else {
+        return iterator.getCloseScopeIds();
+      }
     }
     return [];
   }
@@ -2045,8 +2164,14 @@ class HighlightIterator {
       //   )
       // );
     }
-    if (iterator && !this.currentScopeIsCovered) {
-      return iterator.getOpenScopeIds();
+    if (iterator) {
+      if (this.currentScopeIsCovered) {
+        return iterator.getOpenScopeIds().filter(id => {
+          return iterator.languageLayer.languageScopeId === id;
+        });
+      } else {
+        return iterator.getOpenScopeIds();
+      }
     }
     return [];
   }
@@ -2159,13 +2284,9 @@ class LayerHighlightIterator {
     if (iterator.depth > this.depth) { return false; }
 
     // …and this iterator's ranges actually include this position.
-    let ranges = this.languageLayer.currentIncludedRanges;
+    let ranges = this.languageLayer.getCurrentRanges();
     if (ranges) {
-      return ranges.some(range => {
-        // return comparePoints(position, range.startPosition) > 0 &&
-        //   comparePoints(position, range.endPosition) < 0;
-        return isBetweenPoints(position, range.startPosition, range.endPosition);
-      });
+      return ranges.some(range => range.containsPoint(position));
     }
 
     // TODO: Despite all this, we may want to allow parent layers to apply
@@ -2174,8 +2295,7 @@ class LayerHighlightIterator {
     // make it a configurable behavior.
   }
 
-  seek(start, endRow, previousOpenScopes) {
-
+  seek(start, endRow) {
     let end = this._getEndPosition(endRow);
     // let isDevMode = atom.inDevMode();
 
@@ -2187,17 +2307,15 @@ class LayerHighlightIterator {
     let [boundaries, openScopes] = this.languageLayer.getSyntaxBoundaries(
       start, end);
 
-    // An iterator might have no boundaries to apply but still be able to tell
-    // us about a scope that should be open at the beginning of the range.
-    previousOpenScopes.push(...openScopes);
-
     this.iterator = boundaries?.begin;
-    if (!this.iterator?.key) { return false; }
+    if (!this.iterator?.key) {
+      return [false, openScopes];
+    }
 
     this.start = Point.fromObject(start, true);
     this.end = end;
     // if (isDevMode) { console.timeEnd(timeKey); }
-    return true;
+    return [true, openScopes];
   }
 
   isAtInjectionBoundary () {
@@ -2332,8 +2450,11 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
     this.injectionPoint = injectionPoint;
+    this.temporaryTrees = [];
 
     this.subscriptions = new CompositeDisposable;
+
+    this.currentRangesLayer = this.buffer.addMarkerLayer();
 
     this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
       this.language = language;
@@ -2411,6 +2532,7 @@ class LanguageLayer {
     this.tree = null;
     this.destroyed = true;
     this.marker?.destroy();
+    this.currentRangesLayer?.destroy();
     this.foldResolver?.reset();
     this.scopeResolver?.destroy();
     this.subscriptions.dispose();
@@ -2483,8 +2605,11 @@ class LanguageLayer {
     }
 
     // A `HighlightIterator` will want to know which scopes were already open
-    // when this range began.
-    let alreadyOpenScopes = [];
+    // when this range began. Sadly, we also have to keep track of the point in
+    // the buffer at which each of those scopes would've been added, because
+    // it's possible that later we'll find out that a deeper iterator has
+    // suppressed the application of that scope boundary at that position.
+    let alreadyOpenScopes = new OpenScopeMap();
 
     // How do we add a layer's root scope? There's no easy answer.
     //
@@ -2529,16 +2654,12 @@ class LanguageLayer {
     //
     // …will include `<?php`, `echo`, `"foo"`, and `?>`, but may exclude the
     // spaces between those tokens. This is a consequence of the design of
-    // a particular tree-sitter parser and may be hard to avoid.
-    let includedRanges = this.depth === 0 ? [extent] :
-      this.currentIncludedRanges;
+    // a particular tree-sitter parser and should be mitigated with the
+    // `includeAdjacentWhitespace` option of `addInjectionPoint`.
+    let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
 
     if (this.languageScopeId) {
       for (let range of includedRanges) {
-        if (!(range instanceof Range)) {
-          range = rangeForNode(range);
-        }
-
         // Filter out ranges that have no intersection with ours.
         if (range.end.isLessThanOrEqual(from)) { continue; }
         if (range.start.isGreaterThanOrEqual(to)) { continue; }
@@ -2546,7 +2667,7 @@ class LanguageLayer {
         if (range.start.isLessThan(from)) {
           // If we get this far, we know that the base language scope was open
           // when our range began.
-          alreadyOpenScopes.push(this.languageScopeId);
+          alreadyOpenScopes.set(range.start, [this.languageScopeId]);
         } else {
           // Range start must be between `from` and `to`, or else equal `from`
           // exactly.
@@ -2578,9 +2699,9 @@ class LanguageLayer {
       // The boundaries that occur before the start of our range will tell us
       // which scopes should already be open when our range starts.
       if (point.isLessThan(from)) {
-        alreadyOpenScopes.push(...data.open);
+        alreadyOpenScopes.set(point, data.open);
         for (let c of data.close) {
-          removeLastOccurrenceOf(alreadyOpenScopes, c);
+          alreadyOpenScopes.removeLastOccurrenceOf(c);
         }
         continue;
       } else if (point.isGreaterThan(to)) {
@@ -2621,6 +2742,18 @@ class LanguageLayer {
 
     if (this.tree) {
       this.tree.edit(edit);
+      if (this.lastSyntaxTree && this.tree !== this.lastSyntaxTree) {
+        // This happens after an off-schedule parse that we've decided we can
+        // re-use at the end of the current transaction. But when that happens,
+        // we'll call `getChangedRanges` between `lastSyntaxTree` and the new
+        // tree, so `lastSyntaxTree` needs to receive the same tree edits.
+        this.lastSyntaxTree.edit(edit);
+      }
+      // We're tentatively marking this tree as dirty; we won't know if it
+      // needs to be reparsed until the transaction is done. If it doesn't,
+      // that means that the edits didn't encroach on the contents of the
+      // layer, and we'll mark those trees as clean at the end of the
+      // transaction.
       this.treeIsDirty = true;
       if (this.editedRange) {
         if (startPosition.isLessThan(this.editedRange.start)) {
@@ -2864,8 +2997,9 @@ class LanguageLayer {
       includedRanges
     );
 
-    this.currentNodeRangeSet = nodeRangeSet;
-    this.currentIncludedRanges = includedRanges;
+    if (includedRanges) {
+      this.setCurrentRanges(includedRanges);
+    }
 
     // Experiment: Even when no syntax changes have occurred, we should
     // always re-highlight the most specific node within which the edit
@@ -2888,15 +3022,25 @@ class LanguageLayer {
     if (this.lastSyntaxTree) {
       const rangesWithSyntaxChanges = this.lastSyntaxTree.getChangedRanges(tree);
 
-      // TODO: The tree-sitter playground deletes the old tree when it's about
-      // to be replaced, but this seems to cause sporadic errors for us. Not
-      // sure why they can pull it off and we can't.
-      // this.lastSyntaxTree.delete();
+      let oldSyntaxTree = this.lastSyntaxTree;
       this.lastSyntaxTree = tree;
 
-      // this.tree.delete();
+      let oldTree = this.tree;
       this.tree = tree;
       this.treeIsDirty = false;
+
+      if (oldTree) {
+        oldTree.delete();
+      }
+
+      if (oldSyntaxTree) {
+        oldSyntaxTree.delete();
+      }
+
+      while (this.temporaryTrees.length > 0) {
+        let tree = this.temporaryTrees.pop();
+        tree.delete();
+      }
 
       if (rangesWithSyntaxChanges.length > 0) {
         for (const range of rangesWithSyntaxChanges) {
@@ -2918,6 +3062,7 @@ class LanguageLayer {
     } else {
       this.tree = tree;
       this.treeIsDirty = false;
+
       // Store a reference to this tree so we can compare it with the next
       // transaction's tree later on.
       this.lastSyntaxTree = tree;
@@ -2950,38 +3095,82 @@ class LanguageLayer {
     }
   }
 
+  setCurrentRanges(includedRanges) {
+    if (this.depth === 0) { return; }
+    let oldRangeMarkers = this.currentRangesLayer.getMarkers();
+    for (let marker of oldRangeMarkers) {
+      marker.destroy();
+    }
+
+    // These are the “official” ranges, received right after the parent layer's
+    // tree parse. We'll get a new set of official ranges at the end of the
+    // next transaction, but until then, we should try our best to adapt to
+    // buffer changes, and to allow each range to shift or grow or shrink so
+    // that off-schedule parses are more likely to be accurate.
+    for (let range of includedRanges) {
+      range = rangeForNode(range);
+      this.currentRangesLayer.markRange(range);
+    }
+  }
+
+  getCurrentRanges() {
+    let markers = this.currentRangesLayer?.getMarkers();
+    if (!markers || markers.length === 0) { return null; }
+    return markers.map(m => m.getRange());
+  }
+
   getOrParseTree() {
     if (!this.treeIsDirty) { return this.tree; }
 
     // Eventually we'll take this out, but for now it serves as an indicator of
     // how often we have to manually re-parse in between transactions —
     // something we'd like to do as little as possible.
-    console.warn('Re-parsing tree!');
+    if (atom.inDevMode()) {
+      console.warn('Re-parsing tree!', this.inspect(), this.treeIsDirty);
+    }
 
-    // TODO: The goal here is that, if a re-parse is needed in between
-    // transactions, we assign the result back to `this.tree` so that we can at
-    // least cut down on the incremental amount of work that the
-    // end-of-transaction parse has to do — it can pick up where we left off.
+    let ranges = null;
+    if (this.depth > 0) {
+      ranges = this.getCurrentRanges().map(r => {
+        return rangeToTreeSitterRangeSpec(r, this.buffer);
+      });
+    }
+
+    // The goal here is that, if a re-parse is needed in between transactions,
+    // we assign the result back to `this.tree` so that we can at least cut
+    // down on the incremental amount of work that the end-of-transaction parse
+    // has to do — it can pick up where we left off. So for the root language
+    // layer, this represents more of a shifting of work than a duplication.
     //
-    // But this isn't safe to do for injection layers because
-    // `currentIncludedRanges` is probably stale. It's fresh enough for what we
-    // need when we ask for a tree re-parse — to determine an indentation level
-    // — but not reliable work for a future parse to build upon.
+    // But this isn't safe to do for injection layers because `ranges` may be
+    // stale, despite our efforts to keep them fresh through markers. The
+    // stakes are low enough for indents that we can attempt a tree parse and
+    // act on the results even if we're not certain they're accurate — but when
+    // we do another scheduled incremental parse, we have to be 100% sure that
+    // we're working from an accurate tree.
     //
     // Re-parsing of an injection layer can only safely happen when we know its
     // true ranges, and that cannot be determined except through the process
     // that an injection layer's parent goes through during the
-    // end-of-transaction update. So there probably isn't a way to “fix” this
-    // for injection layers except through cutting down on off-schedule parses.
+    // end-of-transaction update, unless we're willing to do an off-schedule
+    // parse of _all_ language layers in this layer's ancestry. That's not
+    // completely out of the question for the future — but, failing that, there
+    // probably isn't a way to “fix” this for injection layers except through
+    // cutting down on off-schedule parses.
     //
     let tree = this.languageMode.parse(
       this.language,
       this.tree,
-      this.currentIncludedRanges
+      ranges
     );
+
     if (this.depth === 0) {
       this.tree = tree;
       this.treeIsDirty = false;
+    } else {
+      // Keep track of any off-schedule trees we generate so that we can GC them
+      // when the next transaction is done.
+      this.temporaryTrees.push(tree);
     }
     return tree;
   }
@@ -3211,8 +3400,7 @@ class LanguageLayer {
           new NodeRangeSet(
             nodeRangeSet,
             injectionNodes,
-            injectionPoint.newlinesBetween,
-            injectionPoint.includeChildren
+            injectionPoint
           )
         );
       }
@@ -3246,16 +3434,17 @@ class LanguageLayer {
 // parent that are of a particular type. A `NodeRangeSet` is how that strange
 // subset is expressed.
 class NodeRangeSet {
-  constructor(previous, nodes, newlinesBetween, includeChildren) {
+  constructor(previous, nodes, injectionPoint) {
     this.previous = previous;
     this.nodes = nodes;
-    this.newlinesBetween = newlinesBetween;
-    this.includeChildren = includeChildren;
+    this.newlinesBetween = injectionPoint.newlinesBetween;
+    this.includeAdjacentWhitespace = injectionPoint.includeAdjacentWhitespace;
+    this.includeChildren = injectionPoint.includeChildren;
   }
 
   getRanges(buffer) {
     const previousRanges = this.previous && this.previous.getRanges(buffer);
-    const result = [];
+    let result = [];
 
     for (const node of this.nodes) {
       let position = node.startPosition, index = node.startIndex;
@@ -3288,7 +3477,70 @@ class NodeRangeSet {
       }
     }
 
-    return result;
+    let whitespaceRanges = [];
+    if (this.includeAdjacentWhitespace && result.length > 1) {
+      // Look at the region between each pair of results. If it's entirely
+      // whitespace, include it in the range.
+      for (let i = 1; i < result.length; i++) {
+        let current = result[i], previous = result[i - 1];
+        if (current.startIndex === previous.endIndex) { continue; }
+        let pseudoRange = {
+          startPosition: previous.endPosition,
+          startIndex: previous.endIndex,
+          endPosition: current.startPosition,
+          endIndex: current.startIndex
+        };
+        let rangeText = buffer.getTextInRange(rangeForNode(pseudoRange));
+        if (!/\S/.test(rangeText)) {
+          whitespaceRanges.push(pseudoRange);
+        }
+      }
+      result.push(...whitespaceRanges);
+      result = result.sort((a, b) => {
+        return a.startIndex - b.startIndex ||
+          a.endIndex - b.endIndex;
+      });
+    }
+    return this._consolidateRanges(result);
+  }
+
+  // Combine adjacent ranges to minimize the number of boundaries.
+  _consolidateRanges(ranges) {
+    if (ranges.length === 1) { return ranges; }
+    let consolidated = [];
+    let candidate;
+    let lastIndex = ranges.length - 1;
+    for (let i = 0; i < ranges.length; i++) {
+      let range = ranges[i];
+      if (!candidate) {
+        candidate = range;
+        continue;
+      }
+      if (candidate.endIndex === range.startIndex) {
+        // Keep enlarging the last node for as long as subsequent nodes are
+        // adjacent to it.
+        candidate = {
+          startIndex: candidate.startIndex,
+          startPosition: candidate.startPosition,
+          endIndex: range.endIndex,
+          endPosition: range.endPosition
+        };
+        if (i === lastIndex) {
+          consolidated.push(candidate);
+        }
+      } else {
+        // We found a disjoint range, so push our candidate into the result set
+        // and promote a new candidate (unless we're at the end).
+        consolidated.push(candidate);
+        if (i === lastIndex) {
+          consolidated.push(range);
+        } else {
+          candidate = range;
+        }
+      }
+    }
+
+    return consolidated;
   }
 
   coversRange (candidateRange) {
@@ -3349,6 +3601,35 @@ class NodeRangeSet {
   }
 }
 
+class OpenScopeMap extends Map {
+  constructor() {
+    super();
+  }
+
+  getScopesArray() {
+    let results = [];
+    let keys = [...this.keys()];
+    keys.sort(comparePoints);
+    for (let key of keys) {
+      let value = this.get(key);
+      results.push(...value);
+    }
+    return results;
+  }
+
+  removeLastOccurrenceOf(scopeId) {
+    let keys = [...this.keys()];
+    keys.reverse();
+    for (let key of keys) {
+      let value = this.get(key);
+      if (value.includes(scopeId)) {
+        removeLastOccurrenceOf(value, scopeId);
+        return true;
+      }
+    }
+    return false;
+  }
+}
 
 // Like a map, but expects each key to have multiple values.
 class Index extends Map {

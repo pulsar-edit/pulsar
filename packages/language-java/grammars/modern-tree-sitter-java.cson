@@ -1,6 +1,6 @@
 name: 'Java'
 scopeName: 'source.java'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-java'
 
 fileTypes: [

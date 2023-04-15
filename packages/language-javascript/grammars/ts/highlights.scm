@@ -59,22 +59,25 @@
 
 ["var" "const" "let"] @storage.type._TYPE_.js
 
-(variable_declarator
-  name: (identifier) @variable.other.assignment.js)
-
 ; A simple variable declaration:
 ; The "foo" in `let foo = true`
-(assignment_expression
-  left: (identifier) @variable.other.assignment.js)
+(variable_declarator
+  name: (identifier) @variable.other.assignment.js)
 
 ; A reassignment of a variable declared earlier:
 ; The "foo" in `foo = true`
 (assignment_expression
-  left: (member_expression
-    property: (property_identifier)) @variable.other.asssignment.property.js)
+  left: (identifier) @variable.other.assignment.js)
 
 ; A variable object destructuring:
 ; The "foo" in `let { foo } = something`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier)) @variable.other.assignment.property.js)
+
+(augmented_assignment_expression
+  left: (identifier) @variable.other.assignment.js)
+
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
@@ -134,6 +137,10 @@
       key: (_) @entity.other.attribute-name.js
       value: (identifier) @variable.other.assignment.loop.js)
       (#set! final true)))
+
+; The "error" in `} catch (error) {`
+(catch_clause
+  parameter: (identifier) @variable.other.assignment.catch.js)
 
 ; Single parameter of an arrow function:
 ; The "foo" in `(foo => …)`
@@ -302,8 +309,8 @@
 
 ; Built-in class instantiations.
 (new_expression
-  constructor: (identifier) @support.class.instance.js
-    (#match? @support.class.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
+  constructor: (identifier) @support.class.builtin.instance.js
+    (#match? @support.class.builtin.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
     (#set! final true))
 
 ; Built-in constructors that can be invoked without `new`.
@@ -315,7 +322,29 @@
 ; Built-in functions.
 (call_expression
   (identifier) @support.function.builtin.js
-  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$"))
+  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
+  (#set! final true))
+
+; All “well-known” symbols (as they are referred to in the spec).
+(member_expression
+  object: (identifier) @support.class.builtin.js
+  property: (property_identifier) @support.property.builtin.js
+  (#eq? @support.class.builtin.js "Symbol")
+  (#match? @support.property.builtin.js "^(asyncIterator|hasInstance|isConcatSpreadable|iterator|match|matchAll|replace|search|split|species|toPrimitive|toStringTag|unscopables)$")
+  (#set! final true))
+
+; Static methods of `Symbol`.
+(member_expression
+  object: (identifier) @support.class.builtin.js
+    (#eq? @support.class.builtin.js "Symbol")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(for|keyFor)$")
+    (#set! final true))
+
+; Other built-in objects.
+((identifier) @support.class.builtin.js
+  (#match? @support.class.builtin.js "^(Symbol)$")
+  (#set! final true))
 
 ; Deprecated built-in functions.
 (call_expression
@@ -351,6 +380,20 @@
     (#set! final true)))
 
 
+; FUNCTION CALLS
+; ==============
+
+; An invocation of any function.
+(call_expression
+  function: (identifier) @support.other.function.js)
+
+; An invocation of any method.
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @support.other.function.method.js
+    (#set! final true)))
+
+
 ; OBJECTS
 ; =======
 
@@ -358,10 +401,19 @@
 (member_expression
   object: (identifier) @support.other.object.js)
 
-; The "bar" in `foo.bar.baz`.
+; The "FOO" in `FOO.bar` should also be scoped as a constant.
 (member_expression
-  object: (member_expression
-    property: (property_identifier) @support.other.property.js))
+  object: (identifier) @constant.other.object.js
+  (#match? @constant.other.object.js "^[_A-Z]+$"))
+
+; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
+(member_expression
+  property: (property_identifier) @support.other.property.js)
+
+; The "BAR" in `foo.BAR` should also be scoped as a constant.
+(member_expression
+  property: (property_identifier) @constant.other.property.js
+  (#match? @constant.other.property.js "^[_A-Z]+$"))
 
 ; The "foo" in `{ foo: true }`.
 (pair
@@ -373,18 +425,6 @@
   (shorthand_property_identifier) @entity.other.attribute-name.shorthand.js)
 
 
-; FUNCTION CALLS
-; ==============
-
-; An invocation of any function.
-(call_expression
-  function: (identifier) @support.other.function.js)
-
-; An invocation of any method.
-(call_expression
-  function: (member_expression
-    property: (property_identifier) @support.other.function.method.js))
-
 ; CLASSES
 ; =======
 
@@ -392,8 +432,16 @@
 (class_declaration
   "class" @storage.type.class.js)
 
+; The "class" in `bar = class Foo {`
+(class
+  "class" @storage.type.class.js)
+
 ; The "Foo" in `class Foo {`.
 (class_declaration
+  name: (identifier) @entity.name.type.class.js)
+
+; The "Foo" in `bar = class Foo {`.
+(class
   name: (identifier) @entity.name.type.class.js)
 
 ; The "Bar" in `class Foo extends Bar {`.
@@ -408,12 +456,12 @@
 ; A class getter:
 ; the "get" in `get foo () {...`
 (method_definition
-  "get" @storage.getter.js)
+  "get" @storage.modifier.getter.js)
 
 ; A class setter:
 ; the "set" in `set foo (value) {...`
 (method_definition
-  "set" @storage.setter.js)
+  "set" @storage.modifier.setter.js)
 
 
 ; IMPORTS/EXPORTS
@@ -468,6 +516,10 @@
 ((comment) @punctuation.definition.comment.end.js
   (#match? @punctuation.definition.comment.end.js "\\*/$")
   (#set! startAndEndAroundFirstMatchOf "\\*/$"))
+
+(hash_bang_line) @comment.line.shebang.js
+((hash_bang_line) @punctuation.definition.comment.js
+  (#set! endAfterFirstMatchOf "^#!"))
 
 
 ; KEYWORDS
@@ -535,13 +587,24 @@
   (super)
 ] @variable.language._TYPE_.js
 
-((identifier) @support.builtin._TEXT_.js
-  (#match? @support.builtin._TEXT_.js "^(arguments|module|console|window|document)$")
+((identifier) @support.object.builtin._TEXT_.js
+  (#match? @support.object.builtin._TEXT_.js "^(arguments|module|console|window|document)$")
   (#is-not? local)
   (#set! final true))
 
-((identifier) @support.function.builtin.js
-  (#eq? @support.function.builtin.js "require")
+((identifier) @support.object.builtin.filename.js
+  (#eq? @support.object.builtin.filename.js "__filename")
+  (#is-not? local)
+  (#set! final true))
+
+((identifier) @support.object.builtin.dirname.js
+  (#eq? @support.object.builtin.dirname.js "__dirname")
+  (#is-not? local)
+  (#set! final true))
+
+
+((identifier) @support.function.builtin.require.js
+  (#eq? @support.function.builtin.require.js "require")
   (#is-not? local)
   (#set! final true))
 
@@ -622,7 +685,6 @@
   (#set! final true))
 
 (jsx_expression) @meta.embedded.line.jsx.js
-
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
@@ -785,7 +847,16 @@
 ; The interior of a class body (useful for snippets and commands).
 (class_body) @meta.block.class.js
 
-(formal_parameters) @meta.parameters.js
+; The inside of a parameter definition list.
+((formal_parameters) @meta.parameters.js
+  (#set! startAt firstChild.endPosition)
+  (#set! endAt lastChild.startPosition))
+
+; The inside of an object literal.
+((object) @meta.object.js
+  (#set! startAt firstChild.endPosition)
+  (#set! endAt lastChild.startPosition))
+
 
 ; MISC
 ; ====
@@ -805,3 +876,8 @@
 ; ((sequence_expression
 ;   left: (identifier) @variable.parameter.js)
 ;   right: (arrow_function))
+
+; TODO: Any identifier not yet scoped might as well be scoped as a variable,
+; but that's an opinionated choice. We might want to make this configurable.
+; ((identifier) @variable.other.other.js
+;   (#set! shy true))

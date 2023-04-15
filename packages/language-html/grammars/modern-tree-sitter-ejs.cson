@@ -1,6 +1,6 @@
 name: 'EJS'
 scopeName: 'text.html.ejs'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-embedded-template'
 
 fileTypes: [

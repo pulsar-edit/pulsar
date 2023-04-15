@@ -16,14 +16,6 @@ function comparePoints(a, b) {
   }
 }
 
-function isBetweenPoints (point, a, b) {
-  let comp = comparePoints(a, b);
-  let lesser = comp > 0 ? b : a;
-  let greater = comp > 0 ? a : b;
-  return comparePoints(point, lesser) >= 0 &&
-    comparePoints(point, greater) <= 0;
-}
-
 function resolveNodeDescriptor (node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
@@ -41,15 +33,29 @@ function resolveNodePosition (node, descriptor) {
   let result = parts.length === 0 ?
     node :
     resolveNodeDescriptor(node, parts.join('.'));
-
+  if (!result) { return null; }
   return result[lastPart];
 }
 
-function interpretValue (value) {
+function interpretPredicateValue (value) {
   if (value === "true") { return true; }
   if (value === "false") { return false; }
   if (/^\d+$/.test(value)) { return Number(value); }
   return value;
+}
+
+function interpretPossibleKeyValuePair (rawValue, coerceValue = false) {
+  if (!rawValue.includes(' ')) { return [rawValue, null]; }
+
+  // Split on the first space. Everything after the first space is the value.
+  let parts = rawValue.split(' ');
+  let key = parts.shift(), value = parts.join(' ');
+
+  // We only want to interpret the value if we're comparing it to a config
+  // value; otherwise we want to compare strings to strings.
+  if (coerceValue) value = interpretPredicateValue(value);
+
+  return [key, value];
 }
 
 // A data structure for storing scope information while processing capture
@@ -71,8 +77,9 @@ class ScopeResolver {
     this.config = languageLayer?.languageMode?.config ?? atom.config;
     this.grammar = languageLayer.grammar;
     this.idForScope = idForScope ?? (x => x);
-    this.map = new Map;
+    this.boundaries = new Map;
     this.rangeData = new Map;
+    this.pointKeyCache = new Map;
     this.patternCache = new Map;
     this.configCache = new Map;
     this.configSubscription = this.config.onDidChange(() => {
@@ -115,18 +122,27 @@ class ScopeResolver {
     return this.buffer.clipPosition(newPosition);
   }
 
+  // We want to index scope data on buffer position, but each `Point` (or
+  // ad-hoc point object) is a different object. We could normalize them to a
+  // string and use the string as the map key, but we'd have to convert them
+  // back to `Point`s later on, so let's just do it now.
+  //
+  // Here we make it so that every point that describes the same buffer
+  // position is keyed on the same `Point` instance.
   _keyForPoint(point) {
-    return `${point.row},${point.column}`
+    let { row, column } = point;
+    let key = `${row},${column}`;
+    let normalized = this.pointKeyCache.get(key);
+    if (!normalized) {
+      normalized = new Point(Number(row), Number(column));
+      this.pointKeyCache.set(key, normalized.freeze());
+    }
+    return normalized;
   }
 
   _keyForRange(range) {
     let { startIndex, endIndex } = range;
     return `${startIndex}/${endIndex}`;
-  }
-
-  _keyToObject(key) {
-    let [row, column] = key.split(',');
-    return new Point(Number(row), Number(column));
   }
 
   setDataForRange(range, props) {
@@ -160,6 +176,11 @@ class ScopeResolver {
     return keys.some(k => k in ScopeResolver.ADJUSTMENTS);
   }
 
+  rangeExceedsBoundsOfCapture(range, capture) {
+    return range.startIndex < capture.node.startIndex ||
+      range.endIndex > capture.node.endIndex;
+  }
+
   // Given a capture and possible predicate data, determines the buffer range
   // that this capture wants to cover.
   determineCaptureRange(capture) {
@@ -191,6 +212,10 @@ class ScopeResolver {
         // capture.
         if (range === null) { return null; }
       }
+    }
+
+    if (this.rangeExceedsBoundsOfCapture(range, capture)) {
+      throw new Error('Cannot extend past original range of capture');
     }
 
     // Any invalidity in the returned range means we shouldn't store this
@@ -275,11 +300,11 @@ class ScopeResolver {
   setBoundary(point, id, which, { root = false } = {}) {
     let key = this._keyForPoint(point);
 
-    if (!this.map.has(key)) {
-      this.map.set(key, { open: [], close: [] })
+      if (!this.boundaries.has(key)) {
+      this.boundaries.set(key, { open: [], close: [] })
     }
 
-    let bundle = this.map.get(key);
+    let bundle = this.boundaries.get(key);
     let idBundle = bundle[which];
 
     // In general, we want to close scopes in the reverse order of when they
@@ -301,27 +326,25 @@ class ScopeResolver {
   }
 
   reset() {
-    this.map.clear();
+    this.boundaries.clear();
     this.rangeData.clear();
   }
 
   destroy() {
     this.reset();
+    this.patternCache.clear();
+    this.pointKeyCache.clear();
     this.configCache.clear();
     this.configSubscription.dispose();
   }
 
   *[Symbol.iterator] () {
-    // Sort the keys before iterating.
-    let keys = [...this.map.keys()];
-    keys.sort((a, b) => {
-      let posA = this._keyToObject(a);
-      let posB = this._keyToObject(b);
-      return comparePoints(posA, posB);
-    });
+    // Iterate in buffer position order.
+    let keys = [...this.boundaries.keys()];
+    keys.sort((a, b) => a.compare(b));
+
     for (let key of keys) {
-      let point = this._keyToObject(key);
-      yield [point, this.map.get(key)];
+      yield [key, this.boundaries.get(key)];
     }
   }
 }
@@ -355,7 +378,7 @@ ScopeResolver.interpolateName = (name, node) => {
 // built-in predicates like `#match?` and `#eq?`.
 //
 // NOTE: Syntax queries will always be run through a `ScopeResolver`, but other
-// kinds of queries may or may not, depending on purpse.
+// kinds of queries may or may not, depending on purpose.
 //
 ScopeResolver.TESTS = {
   // Passes only if another capture has not already declared `final` for the
@@ -386,7 +409,7 @@ ScopeResolver.TESTS = {
     return node.hasError();
   },
 
-  // Negats `onlyIfHasError`.
+  // Negates `onlyIfHasError`.
   onlyIfNotHasError(node) {
     return !node.hasError();
   },
@@ -453,8 +476,8 @@ ScopeResolver.TESTS = {
     if (!node.parent) { return true; }
     let type = node.type;
     let parent = node.parent;
-    // Lots of optional chaining here to guard against weird states inside ERROR
-    // nodes.
+    // Lots of optional chaining here to guard against weird states inside
+    // ERROR nodes.
     if ((parent?.childCount ?? 0) === 0) { return false; }
     for (let i = 0; i < parent.childCount; i++) {
       let child = parent?.child(i);
@@ -538,9 +561,16 @@ ScopeResolver.TESTS = {
 
   // Passes if this range (after adjustments) has previously had data stored at
   // the given key.
-  onlyIfRangeWithData(node, key, props, existingData) {
+  onlyIfRangeWithData(node, rawValue, props, existingData) {
     if (existingData === undefined) { return false; }
-    return (key in existingData);
+    let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
+
+    // Invalid predicates should be ignored.
+    if (!key) { return true; }
+
+    return (value !== null) ?
+      existingData[key] === value :
+      (key in existingData);
   },
 
   // Negates `onlyIfRangeWithData`.
@@ -551,13 +581,19 @@ ScopeResolver.TESTS = {
 
   // Passes if one of this node's ancestors has stored data at the given key
   // for its inherent range (ignoring adjustments).
-  onlyIfDescendantOfNodeWithData(node, key, props, existingData, instance) {
+  onlyIfDescendantOfNodeWithData(node, rawValue, props, existingData, instance) {
     let current = node;
+    let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
+
+    // Invalid predicates should be ignored.
+    if (!key) { return true; }
+
     while (current.parent) {
       current = current.parent;
       let data = instance.getDataForRange(current);
       if (data === undefined) { continue; }
-      if (key in data) return true;
+      let passes = (value !== null) ? data[key] === value : (key in data);
+      if (passes) { return true; }
     }
     return false;
   },
@@ -598,17 +634,11 @@ ScopeResolver.TESTS = {
   // either (a) a configuration key or (b) a configuration key and value
   // separated by a space.
   onlyIfConfig(node, rawValue, props, existingData, instance) {
-    let key, value;
-    if (rawValue.includes(' ')) {
-      let parts = rawValue.split(' ');
-      // Ignore this test if it's invalid.
-      if (parts.length !== 2) { return true; }
-      [key, value] = parts;
-      value = interpretValue(value);
-    } else {
-      key = rawValue;
-      value = null;
-    }
+    let [key, value] = interpretPossibleKeyValuePair(rawValue, true);
+
+    // Invalid predicates should be ignored.
+    if (!key) { return true; }
+
     let configValue = instance.getConfig(key) ?? false;
     return value === null ? !!configValue : configValue === value;
   },
@@ -630,13 +660,13 @@ ScopeResolver.TESTS = {
 // beyond the bounds of their originally captured node. To have a capture span
 // two siblings, for instance, you must capture the _parent_ node and adjust
 // the range down from there.
+//
 ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to start at the start or end of a different node.
   startAt(node, value, props, range, resolver) {
     let start = resolveNodePosition(node, value);
-    if (!isBetweenPoints(start, node.startPosition, node.endPosition)) {
-      throw new Error('Cannot extend past original range of capture');
-    }
+    if (!start) { return null; }
+
     range.startPosition = start;
     range.startIndex = resolver.positionToIndex(range.startPosition);
     return range;
@@ -645,9 +675,8 @@ ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to end at the start or end of a different node.
   endAt (node, value, props, range, resolver) {
     let end = resolveNodePosition(node, value);
-    if (!isBetweenPoints(end, node.startPosition, node.endPosition)) {
-      throw new Error('Cannot extend past original range of capture');
-    }
+    if (!end) { return null; }
+
     range.endPosition = end;
     range.endIndex = resolver.positionToIndex(range.endPosition);
     return range;
@@ -662,10 +691,6 @@ ScopeResolver.ADJUSTMENTS = {
 
     let offsetPosition = resolver.adjustPositionByOffset(startPosition, offset);
     let offsetIndex = resolver.positionToIndex(offsetPosition);
-
-    if (!isBetweenPoints(offsetPosition, node.startPosition, node.endPosition)) {
-      throw new Error('Cannot extend past original range of capture');
-    }
 
     range.startPosition = offsetPosition;
     range.startIndex = offsetIndex;
@@ -682,10 +707,6 @@ ScopeResolver.ADJUSTMENTS = {
 
     let offsetPosition = resolver.adjustPositionByOffset(endPosition, offset);
     let offsetIndex = resolver.positionToIndex(offsetPosition);
-
-    if (!isBetweenPoints(offsetPosition, node.startPosition, node.endPosition)) {
-      throw new Error('Cannot extend past original range of capture');
-    }
 
     range.endPosition = offsetPosition;
     range.endIndex = offsetIndex;

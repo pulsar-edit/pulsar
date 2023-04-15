@@ -19,6 +19,9 @@
   "bugs": {
     "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
+  "engines": {
+    "node": ">=14"
+  },
   "license": "MIT",
   "electronVersion": "24.0.0",
   "dependencies": {

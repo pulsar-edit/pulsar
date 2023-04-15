@@ -1,6 +1,6 @@
 name: 'Shell Script'
 scopeName: 'source.shell'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-bash'
 
 fileTypes: [

@@ -1,6 +1,6 @@
 name: 'ERB'
 scopeName: 'text.html.erb'
-type: 'tree-sitter-2'
+type: 'modern-tree-sitter'
 parser: 'tree-sitter-embedded-template'
 
 fileTypes: [
