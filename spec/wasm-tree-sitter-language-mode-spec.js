@@ -1551,15 +1551,18 @@ describe('WASMTreeSitterLanguageMode', () => {
         await editor.getBuffer().getLanguageMode().ready;
       });
 
-      it('does not return negative values (regression)', () => {
+      it('does not return negative values (regression)', async () => {
+        jasmine.useRealClock();
         editor.setText('.test {\npadding: 0;\n}');
+        await wait(0);
         expect(editor.suggestedIndentForBufferRow(2)).toBe(0);
+
         editor.setText('@media screen {\n  .test {\n    padding: 0;\n  }\n}');
+        await wait(0);
         expect(editor.suggestedIndentForBufferRow(3)).toBe(1);
       });
     });
   });
-
 
   describe('folding', () => {
     it('can fold nodes that start and end with specified tokens', async () => {
@@ -3154,6 +3157,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
   describe('indentation', () => {
     it('interprets @indent and @dedent captures', async () => {
+      jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('indentsQuery', `
@@ -3161,7 +3165,8 @@ describe('WASMTreeSitterLanguageMode', () => {
         "else" @dedent
       `);
 
-      buffer.setText('if (foo)');
+      const originalText = 'if (foo)';
+      buffer.setText(originalText);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
       buffer.setLanguageMode(languageMode);
@@ -3169,6 +3174,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       editor.setCursorBufferPosition([0, 8]);
       editor.insertText('\n', { autoIndentNewline: true });
+      await wait(0);
 
       expect(
         editor.getLastCursor().getBufferPosition().toString()
@@ -3180,12 +3186,21 @@ describe('WASMTreeSitterLanguageMode', () => {
       );
 
       editor.insertText('else', { autoIndent: true });
+      await wait(0);
+
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 4)');
+
+      editor.undo();
+      editor.undo();
+      editor.undo();
+
+      expect(buffer.getText()).toEqual(originalText);
     });
 
     it('allows @dedents to cancel out @indents when appropriate', async () => {
+      jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('indentsQuery', `
@@ -3201,6 +3216,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       editor.setCursorBufferPosition([0, 19]);
       editor.insertText('\n', { autoIndentNewline: true });
+      await wait(0);
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(1, 0)');
@@ -3209,6 +3225,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setText('} else if (foo) {');
       editor.setCursorBufferPosition([0, 17]);
       editor.insertText('\n', { autoIndentNewline: true });
+      await wait(0);
 
       expect(
         editor.getLastCursor().getBufferPosition().toString()
@@ -3238,10 +3255,9 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('resolves @match captures', async () => {
+      jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      // Pretend we're in a universe where lines after comments should be
-      // dedented.
       await grammar.setQueryForTest('indentsQuery', `
         (template_string
           "\`" @match
@@ -3261,20 +3277,22 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.setCursorBufferPosition([1, 52]);
       editor.getLastCursor().moveToEndOfLine();
       editor.insertText('\n', { autoDecreaseIndent: true, autoIndentNewline: true });
+      await wait(0);
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 10)');
+
       editor.insertText('`', { autoIndent: true, autoDecreaseIndent: true });
+      await wait(0);
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 1)');
     });
 
     it('prefers a @match capture even if a @dedent matches first', async () => {
+      jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      // Pretend we're in a universe where lines after comments should be
-      // dedented.
       await grammar.setQueryForTest('indentsQuery', `
         (template_string
           "\`" @dedent @match
@@ -3294,14 +3312,258 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.setCursorBufferPosition([1, 52]);
       editor.getLastCursor().moveToEndOfLine();
       editor.insertText('\n', { autoDecreaseIndent: true, autoIndentNewline: true });
+      await wait(0);
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 10)');
+
       editor.insertText('`', { autoIndent: true, autoDecreaseIndent: true });
+      await wait(0);
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 1)');
     });
+
+    it('auto-indents correctly when text is pasted', async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      expect(editor.getUndoGroupingInterval()).toBe(300);
+
+      // Pretend we're in a universe where a line comment should cause the next
+      // line to be indented, but only in a class body.
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+        ((comment) @indent
+          (#set! onlyIfDescendantOfType class_body))
+      `);
+
+      let textToPaste = `// this is a comment\n// and this is another`;
+      buffer.setText(textToPaste);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+
+      // Don't rely on this method to give us an accurate answer.
+      spyOn(
+        languageMode,
+        'suggestedIndentForLineAtBufferRow'
+      ).andReturn(9);
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.selectAll();
+      editor.cutSelectedText();
+
+      let emptyClassText = dedent`
+        class Example {
+
+        }
+      `;
+
+      buffer.setText(emptyClassText);
+      await wait(0);
+
+      editor.setCursorBufferPosition([1, 2]);
+      editor.pasteText({ autoIndent: true });
+      await wait(0);
+
+      expect(editor.lineTextForBufferRow(1)).toEqual(
+        `  // this is a comment`
+      );
+
+      expect(editor.lineTextForBufferRow(2)).toEqual(
+        `    // and this is another`
+      );
+
+      editor.undo();
+      await wait(0);
+
+      expect(editor.getText()).toEqual(emptyClassText);
+    });
+
+    // This test is known to fail (and expected to fail) without async-indent enabled.
+    it('auto-indents correctly if any change in a transaction wants auto-indentation', async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      editor.updateAutoIndent(true);
+
+      // Pretend we're in a universe where a line comment should cause the next
+      // line to be indented, but only in a class body.
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+        ((comment) @indent
+          (#set! onlyIfDescendantOfType class_body))
+      `);
+
+      let emptyClassText = dedent`
+        class Example {
+
+        }
+      `;
+
+      buffer.setText(emptyClassText);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.setCursorBufferPosition([1, 0]);
+      editor.transact(() => {
+        editor.insertText('// this is a comment', { autoIndent: true });
+        editor.insertNewline();
+        editor.insertText('// and this is another', { autoIndent: true });
+        editor.insertNewline();
+      });
+
+      await wait(0);
+
+      expect(editor.lineTextForBufferRow(1)).toEqual(
+        `  // this is a comment`
+      );
+
+      expect(editor.lineTextForBufferRow(2)).toEqual(
+        `    // and this is another`
+      );
+
+      editor.undo();
+      await wait(0);
+
+      expect(editor.getText()).toEqual(emptyClassText);
+    });
+
+    it('does not auto-indent if no change in a transaction wants auto-indentation', async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      // Pretend we're in a universe where a line comment should cause the next
+      // line to be indented, but only in a class body.
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+        ((comment) @indent
+          (#set! onlyIfDescendantOfType class_body))
+      `);
+
+      let emptyClassText = dedent`
+        class Example {
+
+        }
+      `;
+
+      buffer.setText(emptyClassText);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+
+      editor.setCursorBufferPosition([1, 0]);
+      editor.transact(() => {
+        editor.insertText('// this is a comment', { autoIndent: false });
+        editor.insertNewline();
+        editor.insertText('// and this is another', { autoIndent: false });
+        editor.insertNewline();
+      });
+      await wait(0);
+
+      expect(editor.lineTextForBufferRow(1)).toEqual(
+        `// this is a comment`
+      );
+
+      expect(editor.lineTextForBufferRow(2)).toEqual(
+        `// and this is another`
+      );
+
+      editor.undo();
+      await wait(0);
+
+      expect(editor.getText()).toEqual(emptyClassText);
+    });
+
+    it('auto-dedents exactly once and not after each new insertion on a line', async () => {
+      jasmine.useRealClock();
+      editor.updateAutoIndent(true);
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+      let emptyClassText = dedent`
+        class Example {
+          if (foo) {
+
+        }
+      `;
+
+      buffer.setText(emptyClassText);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+
+      editor.setCursorBufferPosition([2, 4]);
+      editor.insertText('}', { autoIndent: true });
+
+      await wait(0);
+      expect(editor.lineTextForBufferRow(2)).toEqual(`  }`);
+
+      editor.indentSelectedRows();
+      editor.insertText(' ', { autoIndent: true });
+      await languageMode.atTransactionEnd();
+      expect(editor.lineTextForBufferRow(2)).toEqual(`    } `);
+    });
+
+    it('maintains indent level through multiple newlines', async () => {
+      jasmine.useRealClock();
+      editor.updateAutoIndent(true);
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+        let emptyClassText = dedent`
+          class Example {
+
+          }
+        `;
+
+        buffer.setText(emptyClassText);
+
+        const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+
+        editor.setCursorBufferPosition([1, 0]);
+        editor.indent();
+        await languageMode.atTransactionEnd();
+        editor.insertText('// this is a comment', { autoIndent: true });
+        await languageMode.atTransactionEnd();
+        expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
+
+        editor.insertNewline();
+        await languageMode.atTransactionEnd();
+        await wait(0);
+        expect(editor.lineTextForBufferRow(2)).toEqual('  ');
+
+        editor.insertNewline();
+        await languageMode.atTransactionEnd();
+        await wait(0);
+        expect(editor.lineTextForBufferRow(3)).toEqual('  ');
+
+        editor.insertNewline();
+        await languageMode.atTransactionEnd();
+        await wait(0);
+        expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+    });
+
   });
 });
 

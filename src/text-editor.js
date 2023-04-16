@@ -1726,7 +1726,8 @@ module.exports = class TextEditor {
   // * `text` A {String} representing the text to insert.
   // * `options` (optional) See {Selection::insertText}.
   //
-  // Returns a {Range} when the text has been inserted. Returns a {Boolean} `false` when the text has not been inserted.
+  // Returns a {Range} when the text has been inserted. Returns a {Boolean} `false` when the text
+  // has not been inserted.
   insertText(text, options = {}) {
     if (!this.ensureWritable('insertText', options)) return;
     if (!this.emitWillInsertTextEvent(text)) return false;
@@ -1750,6 +1751,10 @@ module.exports = class TextEditor {
       return range;
     }, groupingInterval);
     if (groupLastChanges) this.buffer.groupLastChanges();
+
+    if (options.autoIndent || options.autoIndentNewline || options.autoDecreaseIndent) {
+      this.scheduleIndentAdjustment();
+    }
     return result;
   }
 
@@ -4692,6 +4697,7 @@ module.exports = class TextEditor {
       metadata
     } = this.constructor.clipboard.readWithMetadata();
     if (!this.emitWillInsertTextEvent(clipboardText)) return false;
+    let languageMode = this.buffer.getLanguageMode();
 
     if (!metadata) metadata = {};
     if (options.autoIndent == null)
@@ -4731,6 +4737,37 @@ module.exports = class TextEditor {
       }
 
       this.emitter.emit('did-insert-text', { text, range });
+
+      if (languageMode.atTransactionEnd && options.autoIndent) {
+        // The `autoIndent` option as passed to `Selection#insertText` has no
+        // effect in `WASMTreeSitterLanguageMode` because it asks what the
+        // right indent level would be for the given text _before_ inserting
+        // it, and that question can't be answered because the text isn't part
+        // of the buffer yet and can't be parsed. And because it calls
+        // `suggestedIndentForLineAtBufferRow` directly, it won't trigger
+        // `scheduleIndentAdjustment` like the methods in this class.
+        //
+        // The good news is that we can wait until the transaction's done;
+        // we'll know the extent of the buffer involved in the paste, so we can
+        // auto-indent those rows once they're in the buffer and reflected in
+        // the parse tree. This also lets us defer the `did-insert-text` event
+        // until the auto-indent happens, so that the event metadata is more
+        // accurate.
+        //
+        languageMode.atTransactionEnd().then(({ range }) => {
+          let marker = this.markBufferRange(range);
+          this.transact(() => (
+            this.autoIndentBufferRows(range.start.row, range.end.row)
+          ));
+          this.buffer.groupLastChanges();
+
+          range = marker.getBufferRange();
+          text = this.buffer.getTextInRange(range);
+          this.emitter.emit('did-insert-text', { text, range });
+        });
+      } else {
+        this.emitter.emit('did-insert-text', { text, range });
+      }
     });
   }
 
@@ -5602,7 +5639,24 @@ module.exports = class TextEditor {
   // * options - An options {Object} to pass through to {TextEditor::setIndentationForBufferRow}.
   autoIndentBufferRow(bufferRow, options) {
     const indentLevel = this.suggestedIndentForBufferRow(bufferRow, options);
-    return this.setIndentationForBufferRow(bufferRow, indentLevel, options);
+    if (indentLevel?.then) {
+      // The language mode may go async if it can't answer our question
+      // immediately. If it fulfills with a number, that's our indent level. If
+      // it fulfills with `undefined`, it means it couldn't give us an answer
+      // because of further changes in the same transaction, meaning we should
+      // schedule an auto-indent for the entire range affected by the
+      // transaction.
+      indentLevel.then(indentLevel => {
+        if (typeof indentLevel === 'number') {
+          this.setIndentationForBufferRow(bufferRow, indentLevel, options);
+          this.buffer.groupLastChanges();
+        } else if (indentLevel === undefined) {
+          this.scheduleIndentAdjustment(true);
+        }
+      });
+    } else {
+      return this.setIndentationForBufferRow(bufferRow, indentLevel, options);
+    }
   }
 
   // Indents all the rows between two buffer row numbers.
@@ -5613,8 +5667,16 @@ module.exports = class TextEditor {
     const languageMode = this.buffer.getLanguageMode();
     let lastRowIndented = startRow - 1;
     if (languageMode.suggestedIndentForBufferRows) {
+
+      // In tree-sitter mode, we are fortunate that this command will only ever
+      // be called at the ends of transactions, when the parse tree is clean.
+      // But that's also why we should try to auto-indent this whole range
+      // atomically. Compared to the naive version below, on a hypothetical
+      // ten-line range, this will result in only one tree re-parse (after
+      // we're done) rather than ten.
       let indents = languageMode.suggestedIndentForBufferRows(
         startRow, endRow, this.getTabLength());
+
       // The language mode may not be able to indent the whole block
       // atomically. If not, we'll indent as much as we're able, then fall back
       // to the costlier approach.
@@ -5635,14 +5697,50 @@ module.exports = class TextEditor {
 
   autoDecreaseIndentForBufferRow(bufferRow) {
     const languageMode = this.buffer.getLanguageMode();
-    const indentLevel =
-      languageMode.suggestedIndentForEditedBufferRow &&
-      languageMode.suggestedIndentForEditedBufferRow(
-        bufferRow,
-        this.getTabLength()
-      );
-    if (indentLevel != null)
-      this.setIndentationForBufferRow(bufferRow, indentLevel);
+    if (!languageMode.suggestedIndentForEditedBufferRow) { return; }
+    let indentLevel = languageMode.suggestedIndentForEditedBufferRow(
+      bufferRow,
+      this.getTabLength()
+    );
+    if (indentLevel?.then) {
+      indentLevel.then(indentLevel => {
+        if (typeof indentLevel === 'number') {
+          this.setIndentationForBufferRow(bufferRow, indentLevel);
+          this.buffer.groupLastChanges();
+        }
+        // Unlike `autoIndent`, if `suggestedIndentForEditedBufferRow` doesn't
+        // return a number, we should ignore it. Otherwise we run the risk of
+        // dedenting something that the user doesn't want dedented.
+      });
+    } else {
+      if (indentLevel != null)
+        this.setIndentationForBufferRow(bufferRow, indentLevel);
+    }
+  }
+
+  // Called at the end of a multi-change transaction when an auto-indent action
+  // was supposed to happen during that transaction. May be called multiple
+  // times, but will result in a maximum of one post-transaction adjustment.
+  scheduleIndentAdjustment(force = false) {
+    // Ensure that we schedule only one indent adjustment per
+    // between-transaction interval.
+    if (this.autoIndentAtTransactionEndPromise) return;
+
+    let languageMode = this.buffer.getLanguageMode();
+    if (!languageMode.atTransactionEnd) return;
+    let promise = languageMode.atTransactionEnd().then(
+      ({ range, autoIndentRequests }) => {
+        if (autoIndentRequests === 0 && !force) { return; }
+        this.transact(() => (
+          this.autoIndentBufferRows(range.start.row, range.end.row)
+        ));
+        this.buffer.groupLastChanges();
+      }
+    );
+
+    this.autoIndentAtTransactionEndPromise = promise.finally(() => {
+      this.autoIndentAtTransactionEndPromise = null;
+    });
   }
 
   toggleLineCommentForBufferRow(row) {
