@@ -39,6 +39,15 @@ jobs:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
 
+    - name: Cache dependencies
+      id: cache-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: dependencies-${{ github.sha }}
+
   test:
     name: Package
     needs: setup
