@@ -157,10 +157,22 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16
+
+    - name: Restore dependencies from Cache
+      id: restore-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: dependencies-${{ github.sha }}
+
     - name: Install Dependencies
+      if: steps.restore-dependencies.outputs.cache-hit != 'true'
       run: yarn install || yarn install
 
     - name: Build Dependencies
+      if: steps.restore-dependencies.outputs.cache-hit != 'true'
       run: yarn build || yarn build
 
     - name: Restore pulsar from Cache
