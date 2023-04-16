@@ -22,6 +22,12 @@ const NORMALIZE_PACKAGE_DATA_README_ERROR = 'ERROR: No README data found!'
 export default class PackageDetailView {
   constructor (pack, settingsView, packageManager, snippetsProvider) {
     this.pack = pack
+    if (Array.isArray(pack.badges)) {
+      // Badges are only available on the object when loading their data from the
+      // API server. Once local the badge data is lost.
+      // Plus we want to modify the original item to ensure further changes can take effect properly
+      pack.metadata.badges = pack.badges;
+    }
     this.settingsView = settingsView
     this.packageManager = packageManager
     this.snippetsProvider = snippetsProvider

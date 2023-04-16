@@ -219,8 +219,8 @@ class AtomIoClient
             if body.filter
               resolve(
                 body.filter (pkg) -> pkg.releases?.latest?
-                    .map ({readme, metadata, downloads, stargazers_count, repository}) ->
-                      Object.assign metadata, {readme, downloads, stargazers_count, repository: repository.url}
+                    .map ({readme, metadata, downloads, stargazers_count, repository, badges}) ->
+                      Object.assign metadata, {readme, downloads, stargazers_count, badges, repository: repository.url}
               )
             else
             error = new Error("Searching for \u201C#{query}\u201D failed.\n")
