@@ -10,7 +10,7 @@ describe "Language-C", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set('core.languageParser', 'textmate')
 
     waitsForPromise ->
       atom.packages.activatePackage('language-c')

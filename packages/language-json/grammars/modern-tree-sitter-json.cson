@@ -1,0 +1,43 @@
+name: 'JSON'
+scopeName: 'source.json'
+type: 'tree-sitter-2'
+parser: 'tree-sitter-json'
+
+injectionRegex: "^(json|JSON)$"
+
+treeSitter:
+  grammar: 'tree-sitter/tree-sitter-json.wasm'
+  syntaxQuery: 'tree-sitter/queries/highlights.scm'
+  indentsQuery: 'tree-sitter/queries/indents.scm'
+  foldsQuery: 'tree-sitter/queries/folds.scm'
+
+fileTypes: [
+  'avsc'
+  'babelrc'
+  'bowerrc'
+  'composer.lock'
+  'geojson'
+  'gltf'
+  'htmlhintrc'
+  'ipynb'
+  'jscsrc'
+  'jshintrc'
+  'jslintrc'
+  'json'
+  'jsonl'
+  'jsonld'
+  'languagebabel'
+  'ldj'
+  'ldjson'
+  'Pipfile.lock'
+  'schema'
+  'stylintrc'
+  'template'
+  'tern-config'
+  'tern-project'
+  'tfstate'
+  'tfstate.backup'
+  'topojson'
+  'webapp'
+  'webmanifest'
+]

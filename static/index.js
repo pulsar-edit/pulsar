@@ -4,6 +4,7 @@
   const startWindowTime = Date.now();
 
   const electron = require('electron');
+  const remote = require('@electron/remote');
   const path = require('path');
   const Module = require('module');
   const getWindowLoadSettings = require('../src/get-window-load-settings');
@@ -12,7 +13,7 @@
   const entryPointDirPath = __dirname;
   let blobStore = null;
 
-  const startupMarkers = electron.remote.getCurrentWindow().startupMarkers;
+  const startupMarkers = remote.getCurrentWindow().startupMarkers;
 
   if (startupMarkers) {
     StartupTime.importData(startupMarkers);
@@ -23,7 +24,10 @@
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
-      await require('second-mate').ready
+      await Promise.all([
+        require('second-mate').ready,
+        require('superstring').superstring
+      ])
 
       process.on('unhandledRejection', function(error, promise) {
         console.error(
@@ -75,7 +79,7 @@
   }
 
   function handleSetupError(error) {
-    const currentWindow = electron.remote.getCurrentWindow();
+    const currentWindow = remote.getCurrentWindow();
     currentWindow.setSize(800, 600);
     currentWindow.center();
     currentWindow.show();
@@ -136,7 +140,7 @@
       });
     }
 
-    const webContents = electron.remote.getCurrentWindow().webContents;
+    const webContents = remote.getCurrentWindow().webContents;
     if (webContents.devToolsWebContents) {
       profile();
     } else {

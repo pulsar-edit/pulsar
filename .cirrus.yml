@@ -216,9 +216,9 @@ windows_task:
     - git submodule update
     - npm config set python 'C:\Python310\python.exe'
   install_script:
-    - npx yarn install --ignore-engines
-      || rm -R node_modules && npx yarn install --ignore-engines
-      || rm -R node_modules && npx yarn install --ignore-engines
+    - npx yarn install --ignore-engines --verbose
+      || bash -c 'rm -R node_modules ; npx yarn install --ignore-engines'
+      || bash -c 'rm -R node_modules ; npx yarn install --ignore-engines'
   build_script:
     - npx yarn build:apm
     - npx yarn build || npx yarn build || npx yarn build
