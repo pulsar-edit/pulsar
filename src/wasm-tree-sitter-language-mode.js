@@ -2663,8 +2663,24 @@ class LanguageLayer {
   }
 
   destroy() {
-    this.tree = null;
+    if (this.destroyed) { return; }
     this.destroyed = true;
+
+    // Clean up all tree-sitter trees.
+    let temporaryTrees = this.temporaryTrees ?? [];
+    let trees = new Set([this.tree, this.lastSyntaxTree, ...temporaryTrees]);
+    trees = [...trees];
+
+    this.tree = null;
+    this.lastSyntaxTree = null;
+    this.temporaryTrees = null;
+
+    while (trees.length > 0) {
+      let tree = trees.pop();
+      if (!tree) { continue; }
+      tree.delete();
+    }
+
     this.marker?.destroy();
     this.currentRangesLayer?.destroy();
     this.foldResolver?.reset();
