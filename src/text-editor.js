@@ -5704,13 +5704,14 @@ module.exports = class TextEditor {
     );
     if (indentLevel?.then) {
       indentLevel.then(indentLevel => {
+        // We have a stricter contract than `autoIndentBufferRow`: if
+        // `suggestedIndentForEditedBufferRow` doesn't return a number, we
+        // should ignore it. Otherwise we run the risk of dedenting something
+        // that the user doesn't want dedented.
         if (typeof indentLevel === 'number') {
           this.setIndentationForBufferRow(bufferRow, indentLevel);
           this.buffer.groupLastChanges();
         }
-        // Unlike `autoIndent`, if `suggestedIndentForEditedBufferRow` doesn't
-        // return a number, we should ignore it. Otherwise we run the risk of
-        // dedenting something that the user doesn't want dedented.
       });
     } else {
       if (indentLevel != null)
@@ -5723,23 +5724,36 @@ module.exports = class TextEditor {
   // times, but will result in a maximum of one post-transaction adjustment.
   scheduleIndentAdjustment(force = false) {
     // Ensure that we schedule only one indent adjustment per
-    // between-transaction interval.
-    if (this.autoIndentAtTransactionEndPromise) return;
+    // between-transaction interval. It might have already been done, in which
+    // case we don't even need to try to schedule it.
+    if (this.didAdjustIndent) return;
+
+    // If we're forcing this to run, replace the existing promise, because
+    // there's no guarantee that the existing promise won't bail early.
+    if (this.autoIndentAtTransactionEndPromise && !force) return;
 
     let languageMode = this.buffer.getLanguageMode();
     if (!languageMode.atTransactionEnd) return;
+
     let promise = languageMode.atTransactionEnd().then(
       ({ range, autoIndentRequests }) => {
+        if (this.didAdjustIndent) return;
+        // When `force` is not `true`, will only try to auto-indent this
+        // transaction's range if the language mode reports that one of its
+        // suggested-indent methods was called during the transaction.
         if (autoIndentRequests === 0 && !force) { return; }
+
         this.transact(() => (
           this.autoIndentBufferRows(range.start.row, range.end.row)
         ));
         this.buffer.groupLastChanges();
+        this.didAdjustIndent = true;
       }
     );
 
     this.autoIndentAtTransactionEndPromise = promise.finally(() => {
       this.autoIndentAtTransactionEndPromise = null;
+      this.didAdjustIndent = false;
     });
   }
 

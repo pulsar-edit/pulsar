@@ -3156,6 +3156,11 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('indentation', () => {
+    beforeEach(async () => {
+      await atom.packages.activatePackage('whitespace');
+      atom.config.set('whitespace.removeTrailingWhitespace', false);
+    });
+
     it('interprets @indent and @dedent captures', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -3505,7 +3510,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
-
       editor.setCursorBufferPosition([2, 4]);
       editor.insertText('}', { autoIndent: true });
 
@@ -3518,9 +3522,10 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.lineTextForBufferRow(2)).toEqual(`    } `);
     });
 
-    it('maintains indent level through multiple newlines', async () => {
+    it('maintains indent level through multiple newlines (removeTrailingWhitespace: true)', async () => {
       jasmine.useRealClock();
       editor.updateAutoIndent(true);
+      atom.config.set('whitespace.removeTrailingWhitespace', true);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('indentsQuery', `
@@ -3540,6 +3545,51 @@ describe('WASMTreeSitterLanguageMode', () => {
         buffer.setLanguageMode(languageMode);
         await languageMode.ready;
 
+        editor.setCursorBufferPosition([1, 0]);
+        editor.indent();
+        await languageMode.atTransactionEnd();
+        editor.insertText('// this is a comment', { autoIndent: true });
+        await languageMode.atTransactionEnd();
+        expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
+
+        editor.insertNewline();
+        await languageMode.atTransactionEnd();
+        await wait(0);
+        expect(editor.lineTextForBufferRow(2)).toEqual('  ');
+
+        editor.insertNewline();
+        await languageMode.atTransactionEnd();
+        await wait(0);
+        expect(editor.lineTextForBufferRow(3)).toEqual('  ');
+
+        editor.insertNewline();
+        await languageMode.atTransactionEnd();
+        await wait(0);
+        expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+    });
+
+    it('maintains indent level through multiple newlines (removeTrailingWhitespace: false)', async () => {
+      jasmine.useRealClock();
+      editor.updateAutoIndent(true);
+      atom.config.set('whitespace.removeTrailingWhitespace', false);
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+        `);
+
+        let emptyClassText = dedent`
+        class Example {
+
+        }
+        `;
+
+        buffer.setText(emptyClassText);
+
+        const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
 
         editor.setCursorBufferPosition([1, 0]);
         editor.indent();
