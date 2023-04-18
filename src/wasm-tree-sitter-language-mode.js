@@ -991,10 +991,10 @@ class WASMTreeSitterLanguageMode {
   // * tabLength - A {Number} signifying the length of a tab, in spaces,
   //   according to the current settings of the buffer.
   //
-  // Returns a {Number}.
+  // Returns a {Number}, or {null} if this method cannot make a suggestion.
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
     let root = this.rootLanguageLayer;
-    if (!root || !root.tree || row === 0) { return 0; }
+    if (!root || !root.tree || row === 0) { return null; }
 
     let options = {
       allowMatchCapture: true,
@@ -1060,9 +1060,7 @@ class WASMTreeSitterLanguageMode {
       (layer) => !!layer.indentsQuery
     );
 
-    if (!controllingLayer) {
-      return Math.max(comparisonRowIndent - existingIndent, 0);
-    }
+    if (!controllingLayer) { return null; }
 
     let { indentsQuery, scopeResolver } = controllingLayer;
 
@@ -1315,7 +1313,11 @@ class WASMTreeSitterLanguageMode {
   suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
     let root = this.rootLanguageLayer;
     if (!root || !root.tree) {
-      return new Array(startRow - endRow).map(() => 0);
+      let results = new Map();
+      for (let row = startRow; row <= endRow; row++) {
+        results.set(row, null);
+      }
+      return results;
     }
 
     let results = new Map();
@@ -1353,6 +1355,10 @@ class WASMTreeSitterLanguageMode {
           // efficient means.
           return results;
         }
+      } else {
+        // We could not retrieve the correct indentation level for this row
+        // because it isn't governed by any layer that has an indents query.
+        return results;
       }
       results.set(row, indent);
       comparisonRow = row;

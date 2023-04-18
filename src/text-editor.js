@@ -5654,7 +5654,7 @@ module.exports = class TextEditor {
           this.scheduleIndentAdjustment(true);
         }
       });
-    } else {
+    } else if (typeof indentLevel === 'number') {
       return this.setIndentationForBufferRow(bufferRow, indentLevel, options);
     }
   }
