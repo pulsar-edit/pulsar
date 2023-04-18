@@ -9567,17 +9567,16 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript-simple@8.0.6:
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/typescript-simple/-/typescript-simple-8.0.6.tgz#567143bc6882012c045a60efc38a239a986f1af8"
-  integrity sha512-BZp2NFHLPTcT/lklpgCDkbPt5CJQE4Lwh9dPzJ01Qsi8FQPdLQJvHCpophpQmaBuVKlxlAeH+AkyNHPdcAFmLA==
+"typescript-simple@github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7":
+  version "9.0.0"
+  resolved "https://codeload.github.com/pulsar-edit/typescript-simple/tar.gz/ccb03e558217030e8f261339281f1d69147934f7"
   dependencies:
-    typescript "^2.2.1"
+    typescript "^5.0.3"
 
-typescript@^2.2.1:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
-  integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
+typescript@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.3.tgz#fe976f0c826a88d0a382007681cbb2da44afdedf"
+  integrity sha512-xv8mOEDnigb/tN9PSMTwSEqAnUvkoXMQlicOb0IUVDBSQCgBSaAAROUZYy2IcUy5qU6XajK5jjjO7TMWqBTKZA==
 
 typical@^2.4.2, typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
