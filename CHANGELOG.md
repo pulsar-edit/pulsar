@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+- Removed a cache for native modules - fix bugs where an user rebuilds a native
+module outside of Pulsar, but Pulsar refuses to load anyway
+
 ## 1.104.0
 
 - The settings-view package now lists a package’s snippets more accurately
