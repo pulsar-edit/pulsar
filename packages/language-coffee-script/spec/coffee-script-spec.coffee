@@ -1393,7 +1393,7 @@ describe "CoffeeScript grammar", ->
         #!/usr/bin/env coffee
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         \x20#!/usr/sbin/coffee
@@ -1404,7 +1404,7 @@ describe "CoffeeScript grammar", ->
         #!\t/usr/bin/env --coffee=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -1423,7 +1423,7 @@ describe "CoffeeScript grammar", ->
         "-*- font:x;foo : bar ; mode : Coffee ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*coffee-*- */
@@ -1441,7 +1441,7 @@ describe "CoffeeScript grammar", ->
         // -*-font:mode;mode:coffee--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -1468,7 +1468,7 @@ describe "CoffeeScript grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=cOFFEe ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=coffee:
@@ -1486,4 +1486,4 @@ describe "CoffeeScript grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=coffee ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

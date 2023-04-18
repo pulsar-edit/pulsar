@@ -122,7 +122,7 @@ attrName="attrValue">
         "-*- font:x;foo : bar ; mode : xMl ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*XML-*- */
@@ -140,7 +140,7 @@ attrName="attrValue">
         // -*-font:mode;mode:xml--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -167,7 +167,7 @@ attrName="attrValue">
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=xml ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=xml:
@@ -185,7 +185,7 @@ attrName="attrValue">
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=xml ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises a valid XML declaration", ->
       valid = """
@@ -196,7 +196,7 @@ attrName="attrValue">
         <?xml version="1.0" encoding='UTF-8' standalone='no' ?>
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         <?XML version="1.0"?>
@@ -209,4 +209,4 @@ attrName="attrValue">
         <?xml version="1.0">
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

@@ -1,0 +1,67 @@
+{
+  "name": "bracket-matcher",
+  "version": "0.92.0",
+  "main": "./lib/main",
+  "description": "Highlight the matching bracket for the `(){}[]` character under the cursor. Move the cursor to the matching bracket with `ctrl-m`.",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "underscore-plus": "1.x"
+  },
+  "configSchema": {
+    "autocompleteCharacters": {
+      "description": "Autocompleted characters treated as matching pairs, such as `()`, and `{}`.",
+      "type": "array",
+      "default": [
+        "()",
+        "[]",
+        "{}",
+        "\"\"",
+        "''",
+        "``",
+        "“”",
+        "‘’",
+        "«»",
+        "‹›"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "pairsWithExtraNewline": {
+      "description": "Automatically add a newline between the pair when enter is pressed.",
+      "type": "array",
+      "default": [
+        "()",
+        "[]",
+        "{}"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "autocompleteBrackets": {
+      "type": "boolean",
+      "default": true,
+      "description": "Autocomplete bracket and quote characters, such as `(` and `)`, and `\"`."
+    },
+    "wrapSelectionsInBrackets": {
+      "type": "boolean",
+      "default": true,
+      "description": "Wrap selected text in brackets or quotes when the editor contains selections and the opening bracket or quote is typed."
+    },
+    "highlightMatchingLineNumber": {
+      "type": "boolean",
+      "default": false,
+      "description": "Highlight the line number of the matching bracket."
+    },
+    "alwaysSkipClosingPairs": {
+      "type": "boolean",
+      "default": false,
+      "description": "Always skip closing pairs in front of the cursor."
+    }
+  }
+}

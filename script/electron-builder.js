@@ -37,8 +37,6 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 /// END Monkey-Patch
 
 const builder = require("electron-builder")
-const Platform = builder.Platform
-
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
@@ -183,8 +181,6 @@ let options = {
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
     "hardenedRuntime": true,
-    "entitlements": "resources/mac/entitlements.plist",
-    "entitlementsInherit": "resources/mac/entitlements.plist",
     "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
       "CFBundleExecutable": "Pulsar",
@@ -219,7 +215,7 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      { "target": "portable" },
+      { target: "zip" },
     ],
   },
   // Windows NSIS Configuration
@@ -243,6 +239,24 @@ let options = {
 
 }
 
+/**
+ The below optional entitlements is needed for the following reasons:
+  - `allow-jit` needs to be applied on silicon builds for WASM to work:
+      https://github.com/pulsar-edit/pulsar/pull/454
+  - But setting `allow-jit` on Intel decreases performance of `fork()` operations
+    e.g. `require('child_process').spanw(...)`
+  - This monkey patch will no longer be needed when we can bump Electron
+    and get `libuv` `v1.42.0` as this issue is fixed upstream there
+  - See: https://github.com/microsoft/vscode/issues/105446
+*/
+if (process.arch === "x64") {
+  options.mac.entitlements = "resources/mac/entitlements.intel.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
+} else {
+  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
+}
+
 function whatToBuild() {
   const argvStartingWith = process.argv.findIndex(e => e.match('electron-builder.js'))
   const what = process.argv[argvStartingWith + 1]
@@ -262,7 +276,6 @@ async function main() {
   let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
-    //targets: Platform.LINUX.createTarget(),
     config: options
   }).then((result) => {
     console.log("Built binaries")

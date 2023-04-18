@@ -3508,7 +3508,7 @@ describe 'CSS grammar', ->
         "-*- font:x;foo : bar ; mode : cSS ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*css-*- */
@@ -3526,7 +3526,7 @@ describe 'CSS grammar', ->
         // -*-font:mode;mode:css--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -3553,7 +3553,7 @@ describe 'CSS grammar', ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=css ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=css:
@@ -3571,7 +3571,7 @@ describe 'CSS grammar', ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=CSS ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
   describe "Missing supported properties regressions", ->
     it "recognises place-items property as supported", ->

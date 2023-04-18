@@ -4,9 +4,9 @@
  "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
 <policyconfig>
   <vendor>Pulsar</vendor>
-  <action id="atom.pkexec.dd">
-    <description gettext-domain="atom">Admin privileges required</description>
-    <message gettext-domain="atom">Please enter your password to save this file</message>
+  <action id="pulsar.pkexec.dd">
+    <description gettext-domain="pulsar">Admin privileges required</description>
+    <message gettext-domain="pulsar">Please enter your password to save this file</message>
     <annotate key="org.freedesktop.policykit.exec.path">/bin/dd</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
     <defaults>
