@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+
 ## 1.104.0
 
 - The settings-view package now lists a package’s snippets more accurately
