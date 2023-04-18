@@ -1237,9 +1237,7 @@ module.exports = class Package {
         this.compatible = true;
       } else if (this.getMainModulePath()) {
         this.incompatibleModules = this.getIncompatibleNativeModules();
-        this.compatible =
-          this.incompatibleModules.length === 0 &&
-          this.getBuildFailureOutput() == null;
+        this.compatible = this.incompatibleModules.length === 0;
       } else {
         this.compatible = true;
       }
