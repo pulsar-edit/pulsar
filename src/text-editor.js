@@ -4738,14 +4738,15 @@ module.exports = class TextEditor {
 
       this.emitter.emit('did-insert-text', { text, range });
 
-      if (languageMode.atTransactionEnd && options.autoIndent) {
+      if (
+        languageMode.atTransactionEnd &&
+        (options.autoIndent || options.preserveTrailingLineIndentation)
+      ) {
         // The `autoIndent` option as passed to `Selection#insertText` has no
         // effect in `WASMTreeSitterLanguageMode` because it asks what the
         // right indent level would be for the given text _before_ inserting
         // it, and that question can't be answered because the text isn't part
-        // of the buffer yet and can't be parsed. And because it calls
-        // `suggestedIndentForLineAtBufferRow` directly, it won't trigger
-        // `scheduleIndentAdjustment` like the methods in this class.
+        // of the buffer yet and can't be parsed.
         //
         // The good news is that we can wait until the transaction's done;
         // we'll know the extent of the buffer involved in the paste, so we can
@@ -4754,10 +4755,16 @@ module.exports = class TextEditor {
         // until the auto-indent happens, so that the event metadata is more
         // accurate.
         //
+        // We can also use this technique to format text as required by the
+        // `editor:paste-without-reformatting` command. Instead of
+        // getting the suggested indent level for each row of the pasted text,
+        // we get the suggested indent level of the first row, then alter each
+        // succeeding row's level by the same amount.
+        //
         languageMode.atTransactionEnd().then(({ range }) => {
           let marker = this.markBufferRange(range);
           this.transact(() => (
-            this.autoIndentBufferRows(range.start.row, range.end.row)
+            this.autoIndentBufferRows(range.start.row, range.end.row, options)
           ));
           this.buffer.groupLastChanges();
 
@@ -5663,11 +5670,10 @@ module.exports = class TextEditor {
   //
   // * startRow - The row {Number} to start at
   // * endRow - The row {Number} to end at
-  autoIndentBufferRows(startRow, endRow) {
+  autoIndentBufferRows(startRow, endRow, options) {
     const languageMode = this.buffer.getLanguageMode();
     let lastRowIndented = startRow - 1;
     if (languageMode.suggestedIndentForBufferRows) {
-
       // In tree-sitter mode, we are fortunate that this command will only ever
       // be called at the ends of transactions, when the parse tree is clean.
       // But that's also why we should try to auto-indent this whole range
@@ -5675,7 +5681,7 @@ module.exports = class TextEditor {
       // ten-line range, this will result in only one tree re-parse (after
       // we're done) rather than ten.
       let indents = languageMode.suggestedIndentForBufferRows(
-        startRow, endRow, this.getTabLength());
+        startRow, endRow, this.getTabLength(), options);
 
       // The language mode may not be able to indent the whole block
       // atomically. If not, we'll indent as much as we're able, then fall back
@@ -5686,6 +5692,15 @@ module.exports = class TextEditor {
           lastRowIndented = row;
         }
         if (lastRowIndented === endRow) { return; }
+      }
+
+      if (options.preserveTrailingLineIndentation) {
+        // With this option enabled, if we reach this point, it means that
+        // `indents` is `null`, or somehow gave us an incomplete set of indent
+        // levels. In either case, we don't want to fall back to a row-by-row
+        // auto-indent, because we were just using this mode to batch-adjust
+        // the rows to preserve relative indentation.
+        return;
       }
     }
     let row = lastRowIndented + 1;
@@ -5737,11 +5752,11 @@ module.exports = class TextEditor {
 
     let promise = languageMode.atTransactionEnd().then(
       ({ range, autoIndentRequests }) => {
-        if (this.didAdjustIndent) return;
+        if (!range || this.didAdjustIndent) return;
         // When `force` is not `true`, will only try to auto-indent this
         // transaction's range if the language mode reports that one of its
         // suggested-indent methods was called during the transaction.
-        if (autoIndentRequests === 0 && !force) { return; }
+        if (autoIndentRequests === 0 && !force) return;
 
         this.transact(() => (
           this.autoIndentBufferRows(range.start.row, range.end.row)

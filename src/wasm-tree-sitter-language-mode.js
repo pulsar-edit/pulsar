@@ -271,7 +271,7 @@ class WASMTreeSitterLanguageMode {
     }
 
     this.rootLanguageLayer.update(null).then(() => {
-      this.lastTransactionEditedRange = this.rootLanguageLayer.lastTransactionEditedRange;
+      this.lastTransactionEditedRange = this.rootLanguageLayer?.lastTransactionEditedRange;
       this.lastTransactionChangeCount = this.transactionChangeCount;
       this.lastTransactionAutoIndentRequests = this.autoIndentRequests;
 
@@ -994,7 +994,8 @@ class WASMTreeSitterLanguageMode {
   // Returns a {Number}, or {null} if this method cannot make a suggestion.
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
     let root = this.rootLanguageLayer;
-    if (!root || !root.tree || row === 0) { return null; }
+    if (row === 0) { return 0; }
+    if (!root || !root.tree) { return null; }
 
     let options = {
       allowMatchCapture: true,
@@ -1309,7 +1310,8 @@ class WASMTreeSitterLanguageMode {
   // Returns a {Map} whose keys are rows and whose values are desired
   // indentation levels. May not return the entire range of requested rows, in
   // which case the caller should auto-indent the remaining rows through
-  // another means.
+  // another means. May also return {null} to signify that no auto-indent
+  // should be attempted at all for the given range.
   suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
     let root = this.rootLanguageLayer;
     if (!root || !root.tree) {
@@ -1324,19 +1326,68 @@ class WASMTreeSitterLanguageMode {
     let comparisonRow = null;
     let comparisonRowIndent = null;
 
-    // For line X to know its appropriate indentation level, it needs row X-1,
-    // if it exists, to be indented properly. That's why `TextEditor` wants to
-    // indent each line atomically. Instead, we'll determine the right level
-    // for the first row, then supply the result for the previous row when we
-    // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
-    // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
-    // row itself and find out we haven't actually fixed any of the previous
-    // rows' indentations yet.
+    let { preserveTrailingLineIndentation = false } = options;
+    let indentDelta;
+
     for (let row = startRow; row <= endRow; row++) {
       let controllingLayer = this.controllingLayerAtPoint(
         new Point(row, Infinity),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
+
+      if (preserveTrailingLineIndentation) {
+        // In this mode, we're not trying to auto-indent every line; instead,
+        // we're trying to auto-indent the _first_ line of a region of text
+        // that's just been pasted, while trying to preserve the relative
+        // levels of indentation within the pasted region. So if the
+        // auto-indent of the first line increases its indent by one level,
+        // all other lines should also be increased by one level — without even
+        // consulting their own suggested indent levels.
+        if (row === startRow) {
+          // The only time we consult the indents query is for the first row,
+          // so we're not going to insist that the _entire range_ fall under
+          // the control of a layer with an indents query — just the row we
+          // need.
+          if (!controllingLayer) { return null; }
+          let tree = controllingLayer.getOrParseTree();
+
+          let firstLineCurrentIndent = this.indentLevelForLine(
+            this.buffer.lineForRow(startRow), tabLength);
+
+          let firstLineIdealIndent = this.suggestedIndentForBufferRow(
+            row,
+            tabLength,
+            { ...options, tree }
+          );
+
+          if (firstLineIdealIndent == null) {
+            // If we decline to suggest an indent level for the first line,
+            // then there's no change to be made here. Keep the whole region
+            // the way it is.
+            return null;
+          } else {
+            indentDelta = firstLineIdealIndent - firstLineCurrentIndent;
+            results.set(row, firstLineIdealIndent);
+          }
+          continue;
+        }
+
+        // All rows other than the first are easy — just apply the delta.
+        let actualIndent = this.indentLevelForLine(
+          this.buffer.lineForRow(row), tabLength);
+
+        results.set(row, actualIndent + indentDelta);
+        continue;
+      }
+
+      // For line X to know its appropriate indentation level, it needs row X-1,
+      // if it exists, to be indented properly. That's why `TextEditor` wants to
+      // indent each line atomically. Instead, we'll determine the right level
+      // for the first row, then supply the result for the previous row when we
+      // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
+      // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
+      // row itself and find out we haven't actually fixed any of the previous
+      // rows' indentations yet.
       let indent;
       if (controllingLayer) {
         let tree = controllingLayer.getOrParseTree();
@@ -2471,28 +2522,34 @@ class LayerHighlightIterator {
   }
 
   getOpenScopeIds () {
-    // console.log(
-    //   this.name,
-    //   this.depth,
-    //   'OPENING',
-    //   this.getPosition().toString(),
-    //   this._inspectScopes(
-    //     this.iterator.value.openScopeIds
-    //   )
-    // );
-    return [...this.iterator.value.openScopeIds];
+    let openScopeIds = this.iterator.value.openScopeIds;
+    // if (openScopeIds.length > 0) {
+    //   console.log(
+    //     this.name,
+    //     this.depth,
+    //     'OPENING',
+    //     this.getPosition().toString(),
+    //     this._inspectScopes(
+    //       this.iterator.value.openScopeIds
+    //     )
+    //   );
+    // }
+    return [...openScopeIds];
   }
 
   getCloseScopeIds () {
-    // console.log(
-    //   this.name,
-    //   'CLOSING',
-    //   this.getPosition().toString(),
-    //   this._inspectScopes(
-    //     this.iterator.value.closeScopeIds
-    //   )
-    // );
-    return [...this.iterator.value.closeScopeIds];
+    let closeScopeIds = this.iterator.value.closeScopeIds;
+    // if (closeScopeIds.length > 0) {
+    //   console.log(
+    //     this.name,
+    //     'CLOSING',
+    //     this.getPosition().toString(),
+    //     this._inspectScopes(
+    //       this.iterator.value.closeScopeIds
+    //     )
+    //   );
+    // }
+    return [...closeScopeIds];
   }
 
   getPosition () {
@@ -3185,13 +3242,8 @@ class LanguageLayer {
       this.tree = tree;
       this.treeIsDirty = false;
 
-      if (oldTree) {
-        oldTree.delete();
-      }
-
-      if (oldSyntaxTree) {
-        oldSyntaxTree.delete();
-      }
+      oldTree?.delete();
+      oldSyntaxTree?.delete();
 
       while (this.temporaryTrees.length > 0) {
         let tree = this.temporaryTrees.pop();
@@ -3435,6 +3487,8 @@ class LanguageLayer {
       .filter(marker => marker.parentLanguageLayer === this);
 
     if (existingInjectionMarkers.length > 0) {
+      // Enlarge our range to contain all of the injection zones in the
+      // affected buffer range.
       range = range.union(
         new Range(
           existingInjectionMarkers[0].getRange().start,
@@ -3567,9 +3621,7 @@ class LanguageLayer {
       // Any markers that didn't get matched up with injection points are now
       // stale and should be destroyed.
       if (!markersToUpdate.has(marker)) {
-        this.languageMode.emitRangeUpdate(
-          marker.getRange()
-        );
+        this.languageMode.emitRangeUpdate(marker.getRange());
         marker.languageLayer.destroy();
         // staleLanguageLayers++;
       }
