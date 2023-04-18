@@ -1267,10 +1267,6 @@ module.exports = class Package {
             result.stderr
           );
         }
-        global.localStorage.setItem(
-          this.getIncompatibleNativeModulesStorageKey(),
-          '[]'
-        );
         resolve(result);
       })
     );
@@ -1308,13 +1304,6 @@ module.exports = class Package {
     }:build-error`;
   }
 
-  getIncompatibleNativeModulesStorageKey() {
-    const electronVersion = process.versions.electron;
-    return `installed-packages:${this.name}:${
-      this.metadata.version
-    }:electron-${electronVersion}:incompatible-native-modules`;
-  }
-
   getCanDeferMainModuleRequireStorageKey() {
     return `installed-packages:${this.name}:${
       this.metadata.version
@@ -1327,15 +1316,6 @@ module.exports = class Package {
   // This information is cached in local storage on a per package/version basis
   // to minimize the impact on startup time.
   getIncompatibleNativeModules() {
-    if (!this.packageManager.devMode) {
-      try {
-        const arrayAsString = global.localStorage.getItem(
-          this.getIncompatibleNativeModulesStorageKey()
-        );
-        if (arrayAsString) return JSON.parse(arrayAsString);
-      } catch (error1) {}
-    }
-
     const incompatibleNativeModules = [];
     const nativeModulePaths = this.getNativeModuleDependencyPathsMap();
     for (const [nativeModulePath, nodeFilesPaths] of nativeModulePaths) {
@@ -1357,11 +1337,6 @@ module.exports = class Package {
         });
       }
     }
-
-    global.localStorage.setItem(
-      this.getIncompatibleNativeModulesStorageKey(),
-      JSON.stringify(incompatibleNativeModules)
-    );
 
     return incompatibleNativeModules;
   }
