@@ -53,19 +53,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new feature to Search for Pulsar's settings
+                The settings-view package now lists a package's snippets more accurately.
               </li>
               <li>
-                Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
+                Fixed some issues with some packages with WebComponents v0 (tablr package should work now) by internalizing and patching document-register-element.
               </li>
               <li>
-                Updated the instructions and look of the login flow for the `github` package.
+                Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM Version). This fixes issues with Electron 21.
               </li>
               <li>
-                Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
+                Ensured new WASM packages will work on Apple Silicon.
               </li>
               <li>
-                Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
+                Completions for HTML will now be as bleeding edge as possible.
               </li>
 
             </ul>
