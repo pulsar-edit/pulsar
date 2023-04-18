@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Removed `nslog` dependency
+
 ## 1.104.0
 
 - The settings-view package now lists a package’s snippets more accurately
