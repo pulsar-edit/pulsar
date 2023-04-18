@@ -1,6 +1,7 @@
 const Parser = require('web-tree-sitter');
 const TokenIterator = require('./token-iterator');
 const { Point, Range, spliceArray } = require('text-buffer');
+const { Patch } = require('superstring');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const ScopeResolver = require('./scope-resolver');
@@ -11,8 +12,16 @@ const { matcherForSelector } = require('./selectors');
 const createTree = require('./rb-tree');
 
 const FEATURE_ASYNC_INDENT = true;
+const FEATURE_ASYNC_PARSE = false;
+
+const PARSE_JOB_LIMIT_MICROS = 3000;
+const PARSERS_IN_USE = new Set();
 
 const FUNCTION_TRUE = () => true;
+
+function isParseTimeout (err) {
+  return err.message.includes('Parsing failed');
+}
 
 function last(array) {
   return array[array.length - 1];
@@ -56,7 +65,7 @@ function resolveNodeDescriptor (node, descriptor) {
   return result;
 }
 
-function resolveNodePosition (node, descriptor) {
+function resolveNodePosition(node, descriptor) {
   let parts = descriptor.split('.');
   let lastPart = parts.pop();
   let result = parts.length === 0 ?
@@ -161,7 +170,7 @@ class WASMTreeSitterLanguageMode {
 
     this.grammarForLanguageString = this.grammarForLanguageString.bind(this);
 
-    this.parsersByLanguage = new Map();
+    this.parsersByLanguage = new Index();
     this.tokenIterator = new TokenIterator(this);
 
     this.autoIndentRequests = 0;
@@ -206,12 +215,17 @@ class WASMTreeSitterLanguageMode {
   }
 
   getOrCreateParserForLanguage(language) {
-    let existing = this.parsersByLanguage.get(language);
-    if (existing) { return existing; }
+    let pool = this.parsersByLanguage.get(language);
+    let parser;
+    if (pool) {
+      parser = pool.find(p => !PARSERS_IN_USE.has(p));
+    }
 
-    let parser = new Parser();
-    parser.setLanguage(language);
-    this.parsersByLanguage.set(language, parser);
+    if (!parser) {
+      parser = new Parser();
+      parser.setLanguage(language);
+      this.parsersByLanguage.add(language, parser);
+    }
     return parser;
   }
 
@@ -564,42 +578,57 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
-  // parseAsync (language, oldTree, includedRanges) {
-  //   let parser = this.getOrCreateParserForLanguage(language);
-  //   parser.setTimeoutMicros(PARSE_JOB_LIMIT_MICROS);
-  //   PARSERS_IN_USE.add(parser);
-  //   let text = this.buffer.getText();
-  //   let tag = String(Math.random());
-  //   return new Promise((resolve) => {
-  //     let tree;
-  //     let started = false;
-  //     const parse = () => {
-  //       try {
-  //         if (!started) {
-  //           console.time(`Parsing ${tag}`);
-  //           started = true;
-  //         }
-  //         parser.setTimeoutMicros(PARSE_JOB_LIMIT_MICROS);
-  //         tree = parser.parse(
-  //           text,
-  //           oldTree,
-  //           { includedRanges }
-  //         );
-  //       } catch (err) {
-  //         requestAnimationFrame(parse);
-  //         return;
-  //       }
-  //       console.timeEnd(`Parsing ${tag}`);
-  //       PARSERS_IN_USE.delete(parser);
-  //       resolve(tree);
-  //     };
-  //     parse();
-  //   });
-  // }
+  parseAsync (language, oldTree, includedRanges, { tag = null } = {}) {
+    let parser = this.getOrCreateParserForLanguage(language);
+    parser.setTimeoutMicros(PARSE_JOB_LIMIT_MICROS);
+    PARSERS_IN_USE.add(parser);
+
+    let text = this.buffer.getText();
+    let tree;
+    // eslint-disable-next-line no-unused-vars
+    let batchCount = 0;
+
+    const cleanup = () => {
+      if (tag) { console.timeEnd(tag); }
+      PARSERS_IN_USE.delete(parser);
+    };
+
+    if (tag) { console.time(tag); }
+    try {
+      // Attempt a synchronous parse.
+      tree = parser.parse(text, oldTree, { includedRanges });
+    } catch (err) {
+      if (!isParseTimeout(err)) { throw err; }
+
+      // The parse couldn't be completed in the alloted time, so we'll go async
+      // and return a promise.
+      return new Promise((resolve, reject) => {
+        const parseJob = () => {
+          try {
+            batchCount++;
+            tree = parser.parse(text, oldTree, { includedRanges });
+          } catch (err) {
+            if (!isParseTimeout(err)) { return reject(err); }
+            setImmediate(parseJob);
+            return;
+          }
+
+          cleanup(true);
+          resolve(tree);
+        };
+        setImmediate(parseJob);
+      });
+    }
+
+    // If we get this far, the synchronous parse was a success.
+    cleanup();
+    return tree;
+  }
 
   parse (language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
+    parser.setTimeoutMicros(null);
 
     let text = this.buffer.getText();
     if (devMode && tag) { console.time(tag); }
@@ -1813,7 +1842,7 @@ class FoldResolver {
     let start = Point.fromObject({ row, column: 0 });
     let end = Point.fromObject({ row: row + 1, column: 0 });
 
-    let tree = this.layer.getOrParseTree();
+    let tree = this.layer.getOrParseTree(false);
     let iterator = this.getOrCreateBoundariesIterator(tree.rootNode, start, end);
 
     while (iterator.key) {
@@ -2118,6 +2147,9 @@ class HighlightIterator {
   }
 
   seek(start, endRow) {
+    if (!(start instanceof Point)) {
+      start = Point.fromObject(start, true);
+    }
     let { buffer, rootLanguageLayer } = this.languageMode;
     if (!rootLanguageLayer) { return []; }
 
@@ -2262,6 +2294,7 @@ class HighlightIterator {
     // act.
     let leader = last(this.iterators);
     if (!leader) { return; }
+
     if (leader.moveToSuccessor()) {
       // It was able to move to a successor, so now we have to "file" it into
       // the right place in `this.iterators` so that the sorting is correct.
@@ -2597,8 +2630,9 @@ class LayerHighlightIterator {
   }
 
   moveToSuccessor () {
-    if (!this.iterator.hasNext) { return false; }
-    if (this.done) { return false; }
+    if (!this.iterator.hasNext || this.done) {
+      return false;
+    }
     this.iterator.next();
     this.done = this.isDone();
     return true;
@@ -2647,7 +2681,11 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
     this.injectionPoint = injectionPoint;
+
+    this.tree = null;
+    this.lastSyntaxTree = null;
     this.temporaryTrees = [];
+    this.patchSinceCurrentParseStarted = null;
 
     this.subscriptions = new CompositeDisposable;
 
@@ -2869,6 +2907,7 @@ class LanguageLayer {
     // spaces between those tokens. This is a consequence of the design of
     // a particular tree-sitter parser and should be mitigated with the
     // `includeAdjacentWhitespace` option of `addInjectionPoint`.
+    //
     let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
 
     if (this.languageScopeId) {
@@ -2940,7 +2979,7 @@ class LanguageLayer {
     }
   }
 
-  handleTextChange(edit) {
+  handleTextChange(edit, oldText, newText) {
     // Any text change within the layer invalidates our cached fold boundary
     // tree. This usually isn't a big deal because the language mode's own cache
     // is able to adjust when content shifts up and down, so typically only the
@@ -2982,21 +3021,46 @@ class LanguageLayer {
         this.editedRange = new Range(startPosition, newEndPosition);
       }
     }
+
+    if (this.patchSinceCurrentParseStarted) {
+      this.patchSinceCurrentParseStarted.splice(
+        startPosition,
+        oldEndPosition.traversalFrom(startPosition),
+        newEndPosition.traversalFrom(startPosition),
+        oldText,
+        newText
+      )
+    }
   }
 
-  update(nodeRangeSet) {
-    // Practically speaking, updates that affect _only this layer_ will happen
-    // synchronously, because we've made sure not to call this method until the
-    // root grammar's tree-sitter parser has been loaded. But we can't load any
-    // potential injection layers' languages because we don't know which ones
-    // we'll need _until_ we parse this layer's tree for the first time.
-    //
-    // Thus the first call to `_populateInjections` will probably go async
-    // while we wait for the injections' parsers to load, and the user might
-    // notice the delay. But once that happens, all subsequent updates _should_
-    // be synchronous, except for a case where a change in the buffer causes us
-    // to need a new kind of injection whose parser hasn't yet been loaded.
-    return this._performUpdate(nodeRangeSet);
+  async update(nodeRangeSet) {
+    if (!FEATURE_ASYNC_PARSE) {
+      // Practically speaking, updates that affect _only this layer_ will happen
+      // synchronously, because we've made sure not to call this method until the
+      // root grammar's tree-sitter parser has been loaded. But we can't load any
+      // potential injection layers' languages because we don't know which ones
+      // we'll need _until_ we parse this layer's tree for the first time.
+      //
+      // Thus the first call to `_populateInjections` will probably go async
+      // while we wait for the injections' parsers to load, and the user might
+      // notice the delay. But once that happens, all subsequent updates _should_
+      // be synchronous, except for a case where a change in the buffer causes us
+      // to need a new kind of injection whose parser hasn't yet been loaded.
+      return this._performUpdate(nodeRangeSet);
+    }
+
+    if (!this.currentParsePromise) {
+      while (
+        !this.destroyed &&
+        (!this.tree || this.tree.rootNode.hasChanges())
+      ) {
+        let params = { async: false };
+        this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
+        if (!params.async) break;
+        await this.currentParsePromise;
+      }
+      this.currentParsePromise = null;
+    }
   }
 
   getLocalReferencesAtPoint(point) {
@@ -3024,6 +3088,7 @@ class LanguageLayer {
   // EXPERIMENTAL: Given a local reference node, tries to find the node that
   // defines it.
   findDefinitionForLocalReference(node, captures = null) {
+    if (!this.localsQuery) { return []; }
     let name = node.text;
     if (!name) { return []; }
     let localRange = rangeForNode(node);
@@ -3183,7 +3248,7 @@ class LanguageLayer {
     this._populateInjections(MAX_RANGE, null);
   }
 
-  async _performUpdate(nodeRangeSet) {
+  async _performUpdate(nodeRangeSet, params = {}) {
     await this.languageLoaded;
     let includedRanges = null;
 
@@ -3198,13 +3263,45 @@ class LanguageLayer {
       }
     }
 
+    this.patchSinceCurrentParseStarted = new Patch();
     let language = this.grammar.getLanguageSync();
-    let tree = this.languageMode.parse(
-      language,
-      this.tree,
-      includedRanges,
-      // { tag: `Parsing ${this.inspect()}` }
-    );
+    let tree;
+    if (FEATURE_ASYNC_PARSE) {
+      tree = this.languageMode.parseAsync(
+        language,
+        this.tree,
+        includedRanges,
+        { tag: `Parsing ${this.inspect()}` }
+      );
+
+      if (tree.then) {
+        params.async = true;
+        tree = await tree;
+      }
+    } else {
+      tree = this.languageMode.parse(
+        language,
+        this.tree,
+        includedRanges,
+        { tag: `Parsing ${this.inspect()}` }
+      );
+    }
+
+    let changes = this.patchSinceCurrentParseStarted.getChanges();
+    this.patchSinceCurrentParseStarted = null;
+
+    for (let change of changes) {
+      let newExtent = Point.fromObject(change.newEnd).traversalFrom(change.newStart);
+      tree.edit(
+        this._treeEditForBufferChange(
+          change.newStart,
+          change.oldEnd,
+          Point.fromObject(change.oldStart).traverse(newExtent),
+          change.oldText,
+          change.newText
+        )
+      );
+    }
 
     if (includedRanges) {
       this.setCurrentRanges(includedRanges);
@@ -3299,7 +3396,11 @@ class LanguageLayer {
     }
 
     if (affectedRange) {
-      await this._populateInjections(affectedRange, nodeRangeSet);
+      let injectionPromise = this._populateInjections(affectedRange, nodeRangeSet);
+      if (injectionPromise) {
+        params.async = true;
+        return injectionPromise;
+      }
     }
   }
 
@@ -3369,7 +3470,8 @@ class LanguageLayer {
     let tree = this.languageMode.parse(
       this.language,
       this.tree,
-      ranges
+      ranges,
+      { tag: `Re-parsing ${this.inspect()}` }
     );
 
     if (this.depth === 0) {
@@ -3634,6 +3736,18 @@ class LanguageLayer {
     }
 
     return Promise.all(promises);
+  }
+
+  _treeEditForBufferChange(start, oldEnd, newEnd, oldText, newText) {
+    let startIndex = this.buffer.characterIndexForPosition(start);
+    return {
+      startIndex,
+      oldEndIndex: startIndex + oldText.length,
+      newEndIndex: startIndex + newText.length,
+      startPosition: start,
+      oldEndPosition: oldEnd,
+      newEndPosition: newEnd
+    };
   }
 }
 
