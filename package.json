@@ -279,7 +279,7 @@
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
     "@playwright/test": "1.22.2",
-    "electron": "12.2.3",
+    "electron": "18.3.7",
     "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
     "eslint": "^8.33.0",
