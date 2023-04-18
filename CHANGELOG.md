@@ -7,6 +7,7 @@
 ## [Unreleased]
 
 - Removed `nslog` dependency
+- Fixed an error where the GitHub package tried to interact with a diff view after it was closed
 
 ## 1.104.0
 

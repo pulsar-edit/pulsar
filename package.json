@@ -162,7 +162,7 @@
     "timecop": "file:./packages/timecop",
     "tree-sitter": "0.20.0",
     "tree-view": "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1",
-    "typescript-simple": "8.0.6",
+    "typescript-simple": "github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7",
     "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
