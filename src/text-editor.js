@@ -5670,7 +5670,7 @@ module.exports = class TextEditor {
   //
   // * startRow - The row {Number} to start at
   // * endRow - The row {Number} to end at
-  autoIndentBufferRows(startRow, endRow, options) {
+  autoIndentBufferRows(startRow, endRow, options = {}) {
     const languageMode = this.buffer.getLanguageMode();
     let lastRowIndented = startRow - 1;
     if (languageMode.suggestedIndentForBufferRows) {
