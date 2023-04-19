@@ -443,6 +443,8 @@ class WASMTreeSitterLanguageMode {
   // affects an injection of ours.
   updateForInjection(grammar) {
     if (!this.rootLanguageLayer) { return; }
+    if (!grammar.injectionRegex && !grammar.injectionRegExp) { return; }
+    if (grammar.type !== 'modern-tree-sitter') { return; }
     this.rootLanguageLayer.updateInjections(grammar);
   }
 

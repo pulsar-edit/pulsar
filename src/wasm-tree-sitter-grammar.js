@@ -10,6 +10,7 @@ module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.registry = registry;
     this.name = params.name;
+    this.type = 'modern-tree-sitter';
     this.scopeName = params.scopeName;
 
     this.contentRegex = buildRegex(params.contentRegex);
