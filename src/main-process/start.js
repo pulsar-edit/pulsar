@@ -61,7 +61,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
     );
-    console.log = previousConsoleLog;
     app.on('ready', function() {
       const testRunner = require(path.join(
         args.resourcePath,
