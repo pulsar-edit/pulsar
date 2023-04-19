@@ -3446,12 +3446,6 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
 
-      // Don't rely on this method to give us an accurate answer.
-      spyOn(
-        languageMode,
-        'suggestedIndentForLineAtBufferRow'
-      ).andReturn(9);
-
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
@@ -3509,12 +3503,6 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
 
-      // Don't rely on this method to give us an accurate answer.
-      spyOn(
-        languageMode,
-        'suggestedIndentForLineAtBufferRow'
-      ).andReturn(9);
-
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
@@ -3541,6 +3529,63 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.lineTextForBufferRow(2)).toEqual(
         `    // and this is another`
+      );
+
+      expect(editor.lineTextForBufferRow(3)).toEqual(
+        `}`
+      );
+
+      editor.undo();
+      await wait(0);
+
+      expect(editor.getText()).toEqual(emptyClassText);
+    });
+
+    it('preserves relative indentation across pasted text (when the pasted text ends in a newline)', async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      expect(editor.getUndoGroupingInterval()).toBe(300);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+      let textToPaste = `// this is a comment\n  // and this is another\n`;
+      buffer.setText(textToPaste);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+      await wait(0);
+
+      editor.selectAll();
+      editor.cutSelectedText();
+
+      let emptyClassText = dedent`
+        class Example {
+        }
+      `;
+
+      buffer.setText(emptyClassText);
+      await wait(0);
+
+      editor.setCursorBufferPosition([1, 0]);
+      editor.pasteText({ autoIndent: true });
+      await wait(0);
+
+      expect(editor.lineTextForBufferRow(1)).toEqual(
+        `  // this is a comment`
+      );
+
+      expect(editor.lineTextForBufferRow(2)).toEqual(
+        `    // and this is another`
+      );
+
+      expect(editor.lineTextForBufferRow(3)).toEqual(
+        `}`
       );
 
       editor.undo();

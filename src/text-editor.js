@@ -4760,14 +4760,21 @@ module.exports = class TextEditor {
         //
         languageMode.atTransactionEnd().then(({ range }) => {
           let marker = this.markBufferRange(range);
-          this.transact(() => (
-            this.autoIndentBufferRows(
-              range.start.row,
-              range.end.row,
-              { ...options, isPastedText: true }
-            )
-          ));
-          this.buffer.groupLastChanges();
+          let endRow = range.end.row;
+          // A range that ends on column 0 of a given row doesn't actually
+          // touch that row.
+          if (range.end.column === 0) endRow--;
+          let checkpoint = this.buffer.createCheckpoint();
+          this.autoIndentBufferRows(
+            range.start.row,
+            endRow,
+            { ...options, isPastedText: true }
+          );
+          // Detect whether the buffer actually changed. If it did, fold that
+          // change into the previous history entry.
+          if (this.buffer.getChangesSinceCheckpoint(checkpoint).length > 0) {
+            this.buffer.groupLastChanges();
+          }
 
           range = marker.getBufferRange();
           text = this.buffer.getTextInRange(range);
