@@ -3686,6 +3686,13 @@ class LanguageLayer {
       );
     }
 
+    // Now that we've enlarged the range, we might have more existing injection
+    // markers to consider. But check for containment rather than intersection
+    // so that we don't have to enlarge it again.
+    existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
+      .findMarkers({ startsInRange: range, endsInRange: range })
+      .filter(marker => marker.parentLanguageLayer === this);
+
     const markersToUpdate = new Map();
 
     // Query for all the nodes that could possibly prompt the creation of
@@ -3697,7 +3704,7 @@ class LanguageLayer {
     );
 
     let existingInjectionMarkerIndex = 0;
-    // let newLanguageLayers = 0;
+    let newLanguageLayers = 0;
     for (const node of nodes) {
       // A given node can be the basis for an arbitrary number of injection
       // points, but first it has to pass our gauntlet of tests:
@@ -3791,7 +3798,7 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
-          // newLanguageLayers++;
+          newLanguageLayers++;
         }
 
         markersToUpdate.set(
@@ -3805,14 +3812,14 @@ class LanguageLayer {
       }
     }
 
-    // let staleLanguageLayers = 0;
+    let staleLanguageLayers = 0;
     for (const marker of existingInjectionMarkers) {
       // Any markers that didn't get matched up with injection points are now
       // stale and should be destroyed.
       if (!markersToUpdate.has(marker)) {
         this.languageMode.emitRangeUpdate(marker.getRange());
         marker.languageLayer.destroy();
-        // staleLanguageLayers++;
+        staleLanguageLayers++;
       }
     }
 
