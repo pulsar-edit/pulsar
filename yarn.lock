@@ -6793,13 +6793,6 @@ nsfw@2.2.2:
   dependencies:
     node-addon-api "*"
 
-nslog@^3.0.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/nslog/-/nslog-3.2.0.tgz#508c3b8c953b57432af061bf951a8bc01e13fc43"
-  integrity sha512-3J5XPvodzhRpy0S7DIuxzQ16e70XZ8gS7MTvA70PiEFG9iZBv8XFABsyZDphO/62b/kEPkgPpoAbQvZprqLhOQ==
-  dependencies:
-    nan "^2.14.0"
-
 nth-check@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/nth-check/-/nth-check-2.1.1.tgz#c9eab428effce36cd6b92c924bdb000ef1f1ed1d"
@@ -7766,9 +7759,9 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-"scandal@https://github.com/pulsar-edit/scandal.git#abfe4c4":
+"scandal@https://github.com/pulsar-edit/scandal.git#176eee2":
   version "3.2.0"
-  resolved "https://github.com/pulsar-edit/scandal.git#abfe4c4e354bfe129d69bb6d6d3e76f2b17ca4e2"
+  resolved "https://github.com/pulsar-edit/scandal.git#176eee28de83bdcb7f43a3c8074369d724759cf8"
   dependencies:
     argparse "^1.0.2"
     git-utils "https://github.com/pulsar-edit/git-utils.git#f4e8c37"
@@ -8720,17 +8713,16 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript-simple@8.0.6:
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/typescript-simple/-/typescript-simple-8.0.6.tgz#567143bc6882012c045a60efc38a239a986f1af8"
-  integrity sha512-BZp2NFHLPTcT/lklpgCDkbPt5CJQE4Lwh9dPzJ01Qsi8FQPdLQJvHCpophpQmaBuVKlxlAeH+AkyNHPdcAFmLA==
+"typescript-simple@github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7":
+  version "9.0.0"
+  resolved "https://codeload.github.com/pulsar-edit/typescript-simple/tar.gz/ccb03e558217030e8f261339281f1d69147934f7"
   dependencies:
-    typescript "^2.2.1"
+    typescript "^5.0.3"
 
-typescript@^2.2.1:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
-  integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
+typescript@^5.0.3:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
+  integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
 typical@^2.4.2, typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
