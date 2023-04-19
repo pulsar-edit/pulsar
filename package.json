@@ -165,14 +165,8 @@
     "temp": "0.9.4",
     "text-buffer": "https://github.com/pulsar-edit/text-buffer.git#c0c7cf3e3",
     "timecop": "file:./packages/timecop",
-<<<<<<< HEAD
     "tree-view": "https://github.com/pulsar-edit/tree-view.git#4274c7a",
-    "typescript-simple": "8.0.6",
-=======
-    "tree-sitter": "0.20.0",
-    "tree-view": "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1",
     "typescript-simple": "github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7",
->>>>>>> clocktower/tree-sitter-hell
     "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
