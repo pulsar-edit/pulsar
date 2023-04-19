@@ -4738,10 +4738,7 @@ module.exports = class TextEditor {
 
       this.emitter.emit('did-insert-text', { text, range });
 
-      if (
-        languageMode.atTransactionEnd &&
-        (options.autoIndent || options.preserveTrailingLineIndentation)
-      ) {
+      if (languageMode.atTransactionEnd && options.autoIndent) {
         // The `autoIndent` option as passed to `Selection#insertText` has no
         // effect in `WASMTreeSitterLanguageMode` because it asks what the
         // right indent level would be for the given text _before_ inserting
@@ -4764,7 +4761,11 @@ module.exports = class TextEditor {
         languageMode.atTransactionEnd().then(({ range }) => {
           let marker = this.markBufferRange(range);
           this.transact(() => (
-            this.autoIndentBufferRows(range.start.row, range.end.row, options)
+            this.autoIndentBufferRows(
+              range.start.row,
+              range.end.row,
+              { ...options, isPastedText: true }
+            )
           ));
           this.buffer.groupLastChanges();
 
@@ -5687,14 +5688,16 @@ module.exports = class TextEditor {
       // atomically. If not, we'll indent as much as we're able, then fall back
       // to the costlier approach.
       if (indents !== null) {
-        for (let [row, indent] of indents) {
-          this.setIndentationForBufferRow(row, indent);
-          lastRowIndented = row;
-        }
+        this.transact(() => {
+          for (let [row, indent] of indents) {
+            this.setIndentationForBufferRow(row, indent);
+            lastRowIndented = row;
+          }
+        });
         if (lastRowIndented === endRow) { return; }
       }
 
-      if (options.preserveTrailingLineIndentation) {
+      if (options.isPastedText) {
         // With this option enabled, if we reach this point, it means that
         // `indents` is `null`, or somehow gave us an incomplete set of indent
         // levels. In either case, we don't want to fall back to a row-by-row
