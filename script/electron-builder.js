@@ -89,6 +89,7 @@ let options = {
     "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
     "!**/{.jshintrc,.pairs,.lint,.lintignore,.eslintrc,.jshintignore}",
     "!**/{.coffeelintignore,.editorconfig,.nycrc,.coffeelint.json,.vscode,coffeelint.json}",
+    "!**/{Jenkinsfile,AUTHORS,CODE_OF_CONDUCT.md,eslintrc.json}",
 
     // Common File Exclusions
     "!**/{.DS_Store,.hg,.svn,CVS,RCS,SCCS}",
