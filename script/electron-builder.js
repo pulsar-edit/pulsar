@@ -126,6 +126,19 @@ let options = {
       // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
       // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
       // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
+    // Extranious exclusions to reduce install size.
+    "!**/node_modules/second-mate/src",
+    "!**/node_modules/second-mate/Gruntfile.js",
+    "!**/node_modules/document-register-element/bower.json",
+    "!**/node_modules/document-register-element/index.html",
+    "!**/node_modules/document-register-element/Makefile",
+    "!**/node_modules/document-register-element/testrunner.js",
+    "!**/node_modules/document-register-element/src",
+    "!**/node_modules/document-register-element/template",
+    "!**/node_modules/autocomplete-css/cssValueDefinitionSyntaxExtractor.js",
+    "!**/node_modules/autocomplete-css/manual-property-desc.json",
+    "!**/node_modules/autocomplete-css/update.js",
+    "!**/node_modules/autocomplete-html/update"
   ],
   "extraResources": [
     {
