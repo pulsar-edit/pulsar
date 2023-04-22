@@ -13,7 +13,7 @@ const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 
 let PATH = path.resolve( path.join(__dirname, '..', 'packages') );
-function resolve (modulePath) {
+function resolve(modulePath) {
   return require.resolve(`${PATH}/${modulePath}`)
 }
 
@@ -3774,6 +3774,53 @@ describe('WASMTreeSitterLanguageMode', () => {
         await languageMode.atTransactionEnd();
         await wait(0);
         expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+    });
+
+    it('does not attempt to adjust indent on pasted text without a newline', async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      expect(editor.getUndoGroupingInterval()).toBe(300);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+      // let textToPaste = `// this is a comment\n  // and this is another`;
+      let textToPaste = `a comment`;
+      buffer.setText(textToPaste);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+      await wait(0);
+
+      editor.selectAll();
+      editor.cutSelectedText();
+
+      let emptyClassText = dedent`
+        class Example {
+              // this is…
+        }
+      `;
+
+      buffer.setText(emptyClassText);
+      await wait(0);
+
+      editor.setCursorBufferPosition([1, 18]);
+      editor.pasteText({ autoIndent: true });
+      await wait(0);
+
+      expect(editor.lineTextForBufferRow(1)).toEqual(
+        `      // this is…a comment`
+      );
+
+      editor.undo();
+      await wait(0);
+
+      expect(editor.getText()).toEqual(emptyClassText);
     });
 
     it('maintains indent level through multiple newlines (removeTrailingWhitespace: false)', async () => {

@@ -4738,7 +4738,7 @@ module.exports = class TextEditor {
 
       this.emitter.emit('did-insert-text', { text, range });
 
-      if (languageMode.atTransactionEnd && options.autoIndent) {
+      if (languageMode.atTransactionEnd && options.autoIndent && text.includes('\n')) {
         // The `autoIndent` option as passed to `Selection#insertText` has no
         // effect in `WASMTreeSitterLanguageMode` because it asks what the
         // right indent level would be for the given text _before_ inserting
