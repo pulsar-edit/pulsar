@@ -1898,7 +1898,7 @@ class FoldResolver {
     let start = Point.fromObject({ row, column: 0 });
     let end = Point.fromObject({ row: row + 1, column: 0 });
 
-    let tree = this.layer.getOrParseTree(false);
+    let tree = this.layer.getOrParseTree({ force: false });
     let iterator = this.getOrCreateBoundariesIterator(tree.rootNode, start, end);
 
     while (iterator.key) {
@@ -2231,7 +2231,7 @@ class HighlightIterator {
       return a.languageLayer.depth - b.languageLayer.depth;
     });
 
-    const iterator = this.languageMode.rootLanguageLayer.buildHighlightIterator();
+    const iterator = rootLanguageLayer.buildHighlightIterator();
 
     // We need to know which open scopes were contributed by which language
     // layer so that we know which ones to “cover” if we see an injection with
@@ -2255,6 +2255,17 @@ class HighlightIterator {
     // scope was opened, because we'll need that information in a moment.
     //
     let [result, openScopes] = iterator.seek(start, endRow);
+
+    if (rootLanguageLayer.tree.rootNode.hasChanges()) {
+      // The tree is dirty. We should keep going — if we stop now, then the
+      // user will see a flash of unhighlighted text over this whole range. But
+      // we should also schedule a re-highlight at the end of the transaction,
+      // once the tree will be clean again.
+      let range = new Range(start, iterator._getEndPosition(endRow));
+      this.languageMode.atTransactionEnd().then(() => {
+        this.languageMode.emitRangeUpdate(range);
+      });
+    }
 
     // An iterator can contribute to the list of already open scopes even if it
     // has no boundaries to mark within the range of this highlighting job.
@@ -2502,7 +2513,7 @@ class HighlightIterator {
 
   logPosition() {
     let iterator = last(this.iterators);
-    iterator.logPosition();
+    iterator?.logPosition();
   }
 }
 
@@ -3517,7 +3528,7 @@ class LanguageLayer {
     return markers.map(m => m.getRange());
   }
 
-  getOrParseTree(force = true) {
+  getOrParseTree({ force = true, anonymous = false } = {}) {
     if (!this.treeIsDirty || !force) { return this.tree; }
 
     // Eventually we'll take this out, but for now it serves as an indicator of
@@ -3563,7 +3574,7 @@ class LanguageLayer {
       { tag: `Re-parsing ${this.inspect()}` }
     );
 
-    if (this.depth === 0) {
+    if (this.depth === 0 && !anonymous) {
       this.tree = tree;
       this.treeIsDirty = false;
     } else {
