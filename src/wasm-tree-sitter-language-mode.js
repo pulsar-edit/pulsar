@@ -19,7 +19,7 @@ const PARSERS_IN_USE = new Set();
 
 const FUNCTION_TRUE = () => true;
 
-function isParseTimeout (err) {
+function isParseTimeout(err) {
   return err.message.includes('Parsing failed');
 }
 
@@ -31,7 +31,7 @@ function removeLastOccurrenceOf(array, item) {
   return array.splice(array.lastIndexOf(item), 1);
 }
 
-function clamp (value, min, max) {
+function clamp(value, min, max) {
   if (value < min) { return min; }
   if (value > max) { return max; }
   return value;
@@ -54,7 +54,7 @@ function rangeToTreeSitterRangeSpec(range, buffer) {
   return { startIndex, startPosition, endIndex, endPosition };
 }
 
-function resolveNodeDescriptor (node, descriptor) {
+function resolveNodeDescriptor(node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
   while (result !== null && parts.length > 0) {
@@ -83,7 +83,7 @@ function ensureNodeIsPatched(node) {
   let proto = Object.getPrototypeOf(node);
 
   Object.defineProperty(proto, 'range', {
-    get () { return rangeForNode(this); }
+    get() { return rangeForNode(this); }
   });
 
   // autocomplete-html expects a `closest` function to exist on nodes.
@@ -471,7 +471,7 @@ class WASMTreeSitterLanguageMode {
     return this.grammar.classNameForScopeId(scopeId);
   }
 
-  scopeNameForScopeId (scopeId) {
+  scopeNameForScopeId(scopeId) {
     return this.grammar.scopeNameForScopeId(scopeId);
   }
 
@@ -630,7 +630,7 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
-  parseAsync (language, oldTree, includedRanges, { tag = null } = {}) {
+  parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.setTimeoutMicros(this.syncTimeoutMicros);
@@ -685,7 +685,7 @@ class WASMTreeSitterLanguageMode {
     return tree;
   }
 
-  parse (language, oldTree, includedRanges, { tag = null } = {}) {
+  parse(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.setTimeoutMicros(null);
@@ -700,7 +700,7 @@ class WASMTreeSitterLanguageMode {
     return result;
   }
 
-  get tree () {
+  get tree() {
     return this.rootLanguageLayer?.tree
   }
 
@@ -2120,14 +2120,14 @@ class FoldResolver {
 FoldResolver.ADJUSTMENTS = {
   // Use a node position descriptor to describe where the fold should end.
   // Overrides the default descriptor of `lastChild.startPosition`.
-  endAt (end, node, value) {
+  endAt(end, node, value) {
     end = resolveNodePosition(node, value);
     return end;
   },
 
   // Adjust the end point by a fixed number of characters in either direction.
   // Will cross rows if necessary.
-  offsetEnd (end, node, value, props, layer) {
+  offsetEnd(end, node, value, props, layer) {
     let { languageMode } = layer;
     value = Number(value);
     if (isNaN(value)) { return end; }
@@ -2136,7 +2136,7 @@ FoldResolver.ADJUSTMENTS = {
 
   // Adjust the column of the fold's end point. Use `0` to end the fold at the
   // start of the line.
-  adjustEndColumn (end, node, value, props, layer) {
+  adjustEndColumn(end, node, value, props, layer) {
     let column = Number(value);
     if (isNaN(column)) { return end; }
     let newEnd = Point.fromObject({ column, row: end.row });
@@ -2146,7 +2146,7 @@ FoldResolver.ADJUSTMENTS = {
   // Adjust the end point to be immediately before the current line begins.
   // Useful if the end line also contains the start of a fold and thus should
   // stay on a separate screen line.
-  adjustToEndOfPreviousRow (end) {
+  adjustToEndOfPreviousRow(end) {
     return new Point(end.row - 1, Infinity);
   }
 };
@@ -2344,7 +2344,7 @@ class HighlightIterator {
     return sortedOpenScopes;
   }
 
-  moveToSuccessor () {
+  moveToSuccessor() {
     // `this.iterators` is _always_ sorted from farthest position to nearest
     // position, so the last item in the collection is always the next one to
     // act.
@@ -2371,7 +2371,7 @@ class HighlightIterator {
     this.detectCoveredScope();
   }
 
-  getPosition () {
+  getPosition() {
     let iterator = last(this.iterators || []);
     if (iterator) {
       // this.logPosition();
@@ -2509,7 +2509,7 @@ class HighlightIterator {
 // Iterates through everything that a `LanguageLayer` is responsible for,
 // marking boundaries for scope insertion.
 class LayerHighlightIterator {
-  constructor (languageLayer) {
+  constructor(languageLayer) {
     this.languageLayer = languageLayer;
     this.name = languageLayer.grammar.scopeName;
     this.depth = languageLayer.depth;
@@ -2521,7 +2521,7 @@ class LayerHighlightIterator {
 
   // If this isn't the root language layer, we need to make sure this iterator
   // doesn't try to go past its marker boundary.
-  _getEndPosition (endRow) {
+  _getEndPosition(endRow) {
     let { marker } = this.languageLayer;
     let { buffer } = this.languageLayer.languageMode;
     let naiveEndPoint = new Point(
@@ -2598,19 +2598,19 @@ class LayerHighlightIterator {
     return [true, openScopes];
   }
 
-  isAtInjectionBoundary () {
+  isAtInjectionBoundary() {
     let position = Point.fromObject(this.iterator.key);
     return position.isEqual(this.start) || position.isEqual(this.end);
   }
 
-  _inspectScopes (ids) {
+  _inspectScopes(ids) {
     if (Array.isArray(ids)) {
       return ids.map(id => this._inspectScopes(id)).join(', ')
     }
     return this.languageLayer.languageMode.scopeNameForScopeId(ids);
   }
 
-  getOpenScopeIds () {
+  getOpenScopeIds() {
     let openScopeIds = this.iterator.value.openScopeIds;
     // if (openScopeIds.length > 0) {
     //   console.log(
@@ -2626,7 +2626,7 @@ class LayerHighlightIterator {
     return [...openScopeIds];
   }
 
-  getCloseScopeIds () {
+  getCloseScopeIds() {
     let closeScopeIds = this.iterator.value.closeScopeIds;
     // if (closeScopeIds.length > 0) {
     //   console.log(
@@ -2641,11 +2641,11 @@ class LayerHighlightIterator {
     return [...closeScopeIds];
   }
 
-  getPosition () {
+  getPosition() {
     return this.iterator.key || Point.INFINITY;
   }
 
-  logPosition () {
+  logPosition() {
     let pos = this.getPosition();
 
     let { languageMode } = this.languageLayer;
@@ -2685,7 +2685,7 @@ class LayerHighlightIterator {
     return this.languageLayer.depth - other.languageLayer.depth;
   }
 
-  moveToSuccessor () {
+  moveToSuccessor() {
     if (!this.iterator.hasNext || this.done) {
       return false;
     }
@@ -2694,7 +2694,7 @@ class LayerHighlightIterator {
     return true;
   }
 
-  peekAtSuccessor () {
+  peekAtSuccessor() {
     if (!this.iterator.hasNext) { return null; }
     this.iterator.next();
     let key = this.iterator.key;
@@ -2712,7 +2712,7 @@ class LayerHighlightIterator {
 }
 
 class GrammarLoadError extends Error {
-  constructor (grammar, queryType) {
+  constructor(grammar, queryType) {
     super(`Grammar ${grammar.scopeName} failed to load its ${queryType}. Please fix this error or contact the maintainer.`);
     this.name = 'GrammarLoadError';
   }
@@ -3668,7 +3668,7 @@ class LanguageLayer {
     return node ?? null;
   }
 
-  _populateInjections (range, nodeRangeSet) {
+  _populateInjections(range, nodeRangeSet) {
     const promises = [];
 
     // We won't touch _all_ injections, but we will touch any injection that
@@ -3961,7 +3961,7 @@ class NodeRangeSet {
     return consolidated;
   }
 
-  coversRange (candidateRange) {
+  coversRange(candidateRange) {
     let ranges = this.getRanges().map(r => rangeForNode(r));
     return ranges.some(range => {
       return range.containsRange(candidateRange);
