@@ -3968,14 +3968,14 @@ const HTML_TEMPLATE_LITERAL_INJECTION_POINT = {
   type: 'call_expression',
   language(node) {
     if (
-      node.lastChild.type === 'template_string' &&
-      node.firstChild.type === 'identifier'
+      node.lastChild?.type === 'template_string' &&
+      node.firstChild?.type === 'identifier'
     ) {
-      return node.firstChild.text;
+      return node.firstChild?.text;
     }
   },
   content(node) {
-    return node.lastChild;
+    return node?.lastChild;
   }
 };
 
@@ -3985,14 +3985,14 @@ const SCRIPT_TAG_INJECTION_POINT = {
     return 'javascript';
   },
   content(node) {
-    return node.child(1);
+    return node?.child(1);
   }
 };
 
 const JSDOC_INJECTION_POINT = {
   type: 'comment',
   language(comment) {
-    if (comment.text.startsWith('/**')) return 'jsdoc';
+    if (comment.text?.startsWith('/**')) return 'jsdoc';
   },
   content(comment) {
     return comment;
