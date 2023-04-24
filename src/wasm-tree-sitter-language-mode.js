@@ -1736,11 +1736,20 @@ class WASMTreeSitterLanguageMode {
     return markers.map(m => m.languageLayer);
   }
 
-  getAllLanguageLayers() {
-    return [
+  getAllLanguageLayers(where = null) {
+    let layers = [
       this.rootLanguageLayer,
       ...this.getAllInjectionLayers()
     ];
+    if (!where) return layers;
+
+    let results = [];
+    for (let layer of layers) {
+      if (!where(layer)) continue;
+      results.push(layer);
+    }
+
+    return results;
   }
 
   injectionLayersAtPoint(point) {
