@@ -3881,7 +3881,7 @@ module.exports = class TextEditor {
     });
   }
 
-  // Extended: Undo the effect a preceding call to {::selectLargerSyntaxNode}.
+  // Extended: Undo the effect of a preceding call to {::selectLargerSyntaxNode}.
   selectSmallerSyntaxNode() {
     this.expandSelectionsForward(selection => {
       if (selection._rangeStack) {
