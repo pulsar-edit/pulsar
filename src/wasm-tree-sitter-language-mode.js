@@ -2265,7 +2265,7 @@ class HighlightIterator {
     //
     let [result, openScopes] = iterator.seek(start, endRow);
 
-    if (rootLanguageLayer.tree.rootNode.hasChanges()) {
+    if (rootLanguageLayer?.tree?.rootNode.hasChanges()) {
       // The tree is dirty. We should keep going — if we stop now, then the
       // user will see a flash of unhighlighted text over this whole range. But
       // we should also schedule a re-highlight at the end of the transaction,
@@ -2316,7 +2316,7 @@ class HighlightIterator {
           // For each of the open scopes that an earlier iterator gave us, we
           // need to look at the point at which that scope would've been added.
           // If that point falls within the purview of our newer iterator, then
-          // we should suppress those scopes unless they're the layer's base
+          // we should suppress that scope unless it's the layer's base
           // language scope.
           let languageScopeId = earlierIterator.languageLayer.languageScopeId;
           for (let [point, scopes] of earlierOpenScopes) {
