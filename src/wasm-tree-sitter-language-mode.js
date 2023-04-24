@@ -2771,7 +2771,7 @@ class LanguageLayer {
     }).then(() => {
       // All other queries are optional. Regular expression language layers,
       // for instance, don't really have a need for any of these.
-      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
+      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery', 'tagsQuery'];
       let promises = [];
 
       for (let queryType of otherQueries) {
