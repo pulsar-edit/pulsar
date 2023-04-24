@@ -2476,9 +2476,8 @@ class HighlightIterator {
     return [];
   }
 
-  // EXPERIMENT: Rather than the commented-out logic below, let's try something
-  // more holistic that is off by default but triggered via an explicit
-  // `coverShallowerScopes` option in `atom.grammars.addInjectionPoint`.
+  // Detect whether the iterator that's about to act has its scopes covered by
+  // a different iterator asserting a `coverShallowerScopes` option.
   detectCoveredScope() {
     const layerCount = this.iterators.length;
     if (layerCount > 1) {
@@ -2495,26 +2494,6 @@ class HighlightIterator {
         this.currentScopeIsCovered = true;
         return;
       }
-      // const first = this.iterators[layerCount - 1];
-      // const next = this.iterators[layerCount - 2];
-      //
-      // // In the tree-sitter EJS grammar I encountered a situation where an EJS
-      // // scope was incorrectly being shadowed because `source.js` wanted to
-      // // _close_ a scope on the same boundary that `text.html.ejs` wanted to
-      // // _open_ one. This is one (clumsy) way to prevent that outcome.
-      // let bothOpeningScopes = first.getOpenScopeIds().length > 0 && next.getOpenScopeIds().length > 0;
-      // let bothClosingScopes = first.getCloseScopeIds().length > 0 && next.getCloseScopeIds().length > 0;
-      //
-      // if (
-      //   comparePoints(next.getPosition(), first.getPosition()) === 0 &&
-      //   next.isClosingScopes() === first.isClosingScopes() &&
-      //   next.depth > first.depth &&
-      //   !next.isAtInjectionBoundary() &&
-      //   (bothOpeningScopes || bothClosingScopes)
-      // ) {
-      //   this.currentScopeIsCovered = true;
-      //   return;
-      // }
     }
 
     this.currentScopeIsCovered = false;
@@ -2737,6 +2716,7 @@ class GrammarLoadError extends Error {
     this.name = 'GrammarLoadError';
   }
 }
+
 
 // Manages all aspects of a given language's parsing duties over a given region
 // of the buffer.
