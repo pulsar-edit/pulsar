@@ -169,7 +169,7 @@ export default class StyleguideView {
           </StyleguideSection>
 
           <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='icons' title='Icons'>
-            <p>Atom comes bundled with the Octicons. It lets you easily add icons to your packages.</p>
+            <p>Pulsar comes bundled with the Octicons. It lets you easily add icons to your packages.</p>
             <p>Currently version <code>18.3.0</code> is available. In addition some older icons from version <code>2.1.2</code> are still kept for backwards compatibility, and all icons from version <code>4.4.0</code> are kept for backwards compatibility. Make sure to use the <code>icon icon-</code> prefix in front of an icon name. See the <a href='https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#iconography'>documentation</a> for more details.</p>
 
             <h2>Octicons</h2>
