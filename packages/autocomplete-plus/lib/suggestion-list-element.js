@@ -7,7 +7,7 @@ const createDOMPurify = require('dompurify')
 
 const createSuggestionFrag = () => {
   const frag = document.createDocumentFragment()
-  const children = ['icon-container', 'left-label', 'word-container', 'right-label']
+  const children = ['icon--container', 'left-label', 'word-container', 'right-label']
   children.forEach(c => {
     let el = document.createElement('span')
     el.className = c
