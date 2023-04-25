@@ -2759,14 +2759,14 @@ class LanguageLayer {
     // off this promise. We can `await this.languageLoaded` later on.
     this.languageLoaded = this.grammar.getLanguage().then(language => {
       this.language = language;
-      // TODO: Currently, we require a syntax query, but we might want to
+      // TODO: Currently, we require a highlights query, but we might want to
       // rethink this. There are use cases for treating the root layer merely
       // as a way to delegate to injections, in which case syntax highlighting
       // wouldn't be needed.
-      return this.grammar.getQuery('syntaxQuery').then(syntaxQuery => {
-        this.syntaxQuery = syntaxQuery;
+      return this.grammar.getQuery('highlightsQuery').then(highlightsQuery => {
+        this.highlightsQuery = highlightsQuery;
       }).catch(() => {
-        throw new GrammarLoadError(grammar, 'syntaxQuery');
+        throw new GrammarLoadError(grammar, 'highlightsQuery');
       });
     }).then(() => {
       // All other queries are optional. Regular expression language layers,
@@ -2907,7 +2907,7 @@ class LanguageLayer {
   // through a `ScopeResolver`.
   getSyntaxBoundaries(from, to) {
     let { buffer } = this.languageMode;
-    if (!(this.language && this.tree && this.syntaxQuery)) {
+    if (!(this.language && this.tree && this.highlightsQuery)) {
       return [[], new OpenScopeMap()];
     }
 
@@ -2917,7 +2917,7 @@ class LanguageLayer {
     let boundaries = createTree(comparePoints);
     let extent = this.getExtent();
 
-    const captures = this.syntaxQuery.captures(this.tree.rootNode, from, to);
+    const captures = this.highlightsQuery.captures(this.tree.rootNode, from, to);
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -3592,7 +3592,7 @@ class LanguageLayer {
 
     // If the cursor is resting before column X, we want all scopes that cover
     // the character in column X.
-    let captures = this.syntaxQuery.captures(
+    let captures = this.highlightsQuery.captures(
       this.tree.rootNode,
       point,
       { row: point.row, column: point.column + 1 }

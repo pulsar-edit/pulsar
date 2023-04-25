@@ -7,7 +7,7 @@ injectionRegex: "^(json|JSON)$"
 
 treeSitter:
   grammar: 'tree-sitter/tree-sitter-json.wasm'
-  syntaxQuery: 'tree-sitter/queries/highlights.scm'
+  highlightsQuery: 'tree-sitter/queries/highlights.scm'
   indentsQuery: 'tree-sitter/queries/indents.scm'
   foldsQuery: 'tree-sitter/queries/folds.scm'
 
@@ -16,6 +16,7 @@ fileTypes: [
   'babelrc'
   'bowerrc'
   'composer.lock'
+  'eslintrc'
   'geojson'
   'gltf'
   'htmlhintrc'

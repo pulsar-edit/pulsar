@@ -10,4 +10,4 @@ injectionRegex: '^(rb-regex)$'
 
 treeSitter:
   grammar: 'ts/regex/tree-sitter-regex.wasm'
-  syntaxQuery: 'ts/regex/highlights.scm'
+  highlightsQuery: 'ts/regex/highlights.scm'

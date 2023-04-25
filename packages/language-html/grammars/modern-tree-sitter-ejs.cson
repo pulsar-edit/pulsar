@@ -12,6 +12,6 @@ injectionRegex: '^(ejs|EJS)$'
 
 treeSitter:
   grammar: 'tree-sitter-embedded-template/tree-sitter-embedded-template.wasm'
-  syntaxQuery: 'tree-sitter-embedded-template/ejs/highlights.scm'
+  highlightsQuery: 'tree-sitter-embedded-template/ejs/highlights.scm'
   foldsQuery: 'tree-sitter-embedded-template/ejs/folds.scm'
   indentsQuery: 'tree-sitter-embedded-template/ejs/indents.scm'

@@ -12,6 +12,7 @@ comments:
 
 treeSitter:
   grammar: 'tree-sitter-tsx/tree-sitter-tsx.wasm'
-  syntaxQuery: 'tree-sitter-tsx/highlights.scm'
+  highlightsQuery: 'tree-sitter-tsx/highlights.scm'
   indentsQuery: 'tree-sitter-tsx/indents.scm'
   foldsQuery: 'tree-sitter-tsx/folds.scm'
+  tagsQuery: 'tree-sitter-tsx/tags.scm'

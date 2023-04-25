@@ -7,6 +7,6 @@ injectionRegex: '^jsdoc$'
 
 treeSitter:
   grammar: 'ts/jsdoc/tree-sitter-jsdoc.wasm'
-  syntaxQuery: 'ts/jsdoc/highlights.scm'
+  highlightsQuery: 'ts/jsdoc/highlights.scm'
   foldsQuery: 'ts/jsdoc/folds.scm'
   indentsQuery: 'ts/jsdoc/indents.scm'

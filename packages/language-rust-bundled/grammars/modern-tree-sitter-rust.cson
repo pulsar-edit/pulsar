@@ -14,6 +14,6 @@ comments:
 
 treeSitter:
   grammar: 'tree-sitter-rust/tree-sitter-rust.wasm'
-  syntaxQuery: 'tree-sitter-rust/queries/highlights.scm'
+  highlightsQuery: 'tree-sitter-rust/queries/highlights.scm'
   foldsQuery: 'tree-sitter-rust/queries/folds.scm'
   indentsQuery: 'tree-sitter-rust/queries/indents.scm'

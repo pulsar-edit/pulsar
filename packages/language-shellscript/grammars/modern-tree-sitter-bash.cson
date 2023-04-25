@@ -22,7 +22,7 @@ injectionRegex: '(^(bash|BASH)$|sh^|SH^)'
 
 treeSitter:
   grammar: 'tree-sitter/tree-sitter-bash.wasm'
-  syntaxQuery: 'tree-sitter/highlights.scm'
+  highlightsQuery: 'tree-sitter/highlights.scm'
   foldsQuery: 'tree-sitter/folds.scm'
   indentsQuery: 'tree-sitter/indents.scm'
 

@@ -33,7 +33,7 @@ const jsRegexGrammarPath = resolve(
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);
 
 async function getAllCaptures(grammar, languageMode, layer = null) {
-  let query = await grammar.getQuery('syntaxQuery');
+  let query = await grammar.getQuery('highlightsQuery');
   layer = layer ?? languageMode.rootLanguageLayer;
   let scopeResolver = new ScopeResolver(
     layer,
@@ -82,7 +82,7 @@ describe('ScopeResolver', () => {
   });
 
   it('resolves all scopes in absence of any tests or adjustments', async () => {
-    await grammar.setQueryForTest('syntaxQuery', `
+    await grammar.setQueryForTest('highlightsQuery', `
       (comment) @comment
       (string) @string
       "=" @operator
@@ -107,7 +107,7 @@ describe('ScopeResolver', () => {
   });
 
   it('interpolates magic tokens in scope names', async () => {
-    await grammar.setQueryForTest('syntaxQuery', `
+    await grammar.setQueryForTest('highlightsQuery', `
       (lexical_declaration kind: _ @declaration._TYPE_)
     `);
 
@@ -135,7 +135,7 @@ describe('ScopeResolver', () => {
 
   describe('adjustments', () => {
     it('adjusts ranges with (#set! startAt)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
       ((try_statement) @try.plus.brace
         (#set! endAt
           firstChild.nextSibling.firstChild.endPosition))
@@ -158,7 +158,7 @@ describe('ScopeResolver', () => {
     });
 
     it('adjusts ranges with (#set! endAt)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((object) @object.interior
           (#set! startAt firstChild.endPosition)
           (#set! endAt lastChild.startPosition))
@@ -184,7 +184,7 @@ describe('ScopeResolver', () => {
 
     it('adjusts ranges with (#set! offset(Start|End))', async () => {
       // Same result as the previous test, but with a different technique.
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((object) @object.interior
           (#set! offsetStart 1)
           (#set! offsetEnd -1))
@@ -208,7 +208,7 @@ describe('ScopeResolver', () => {
     });
 
     it('prevents adjustments outside the original capture', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((comment) @too-early
           (#set! startAt previousSibling.startPosition))
         ((comment) @too-late
@@ -241,7 +241,7 @@ describe('ScopeResolver', () => {
     });
 
     it("adjusts a range around a regex match with `startAndEndAroundFirstMatchOf`", async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
       ((comment) @todo
         (#set! startAndEndAroundFirstMatchOf "\\\\sTODO(?=:)"))
       `);
@@ -276,7 +276,7 @@ describe('ScopeResolver', () => {
   describe('tests', () => {
 
     it('rejects scopes for ranges that have already been claimed by another capture with (#set! final true)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
         ((string) @string1
@@ -312,7 +312,7 @@ describe('ScopeResolver', () => {
     });
 
     it('rejects scopes for ranges that have already been claimed if set with (#set! shy true)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string "\\"") @string.double
         ((string) @string.other (#set! shy true))
@@ -344,7 +344,7 @@ describe('ScopeResolver', () => {
     });
 
     it('rejects scopes for ranges that fail onlyIfFirst or onlyIfLast', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((string_fragment) @impossible.first
           (#set! onlyIfFirst true))
         ((string_fragment) @impossible.last
@@ -383,7 +383,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfFirstOfType and onlyIfLastOfType', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters (identifier) @first-param
           (#set! onlyIfFirstOfType identifier))
         (formal_parameters (identifier) @last-param
@@ -418,7 +418,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfLastTextOnRow', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ("||" @hanging-logical-operator
           (#set! onlyIfLastTextOnRow true))
       `);
@@ -449,7 +449,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfDescendantOfType', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ("," @comma-inside-function
           (#set! onlyIfDescendantOfType function_declaration))
       `);
@@ -471,7 +471,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfAncestorOfType', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @function-with-semicolons
           (#set! onlyIfAncestorOfType ";"))
       `);
@@ -493,7 +493,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfDescendantOfNodeWithData (without value)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @_IGNORE_
           (#match? @_IGNORE_ "foo")
           (#set! isSpecialFunction true))
@@ -520,7 +520,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfDescendantOfNodeWithData (with right value)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @_IGNORE_
           (#match? @_IGNORE_ "foo" )
           (#set! isSpecialFunction "troz"))
@@ -547,7 +547,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfDescendantOfNodeWithData (with wrong value)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @_IGNORE_
           (#match? @_IGNORE_ "foo")
           (#set! isSpecialFunction "troz"))
@@ -571,7 +571,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfType', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters _ @function-comma
           (#set! onlyIfType ","))
       `);
@@ -592,7 +592,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfHasError', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((statement_block) @messed-up-statement-block
           (#set! onlyIfHasError true))
       `);
@@ -615,7 +615,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfRoot', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((_) @is-root
           (#set! onlyIfRoot true))
       `);
@@ -639,7 +639,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfLastTextOnRow', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ("||" @orphaned-operator
           (#set! onlyIfLastTextOnRow true))
       `);
@@ -665,7 +665,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfRangeWithData (without value)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue true))
         ([ (true) (false) ] @optimistic-boolean
           (#set! onlyIfRangeWithData isTrue))
@@ -691,7 +691,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfRangeWithData (with right value)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue "exactly"))
         ([ (true) (false) ] @optimistic-boolean
           (#set! onlyIfRangeWithData "isTrue exactly"))
@@ -717,7 +717,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfRangeWithData (with wrong value)', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue "perhaps"))
         ([ (true) (false) ] @optimistic-boolean
           (#set! onlyIfRangeWithData "isTrue exactly"))
@@ -740,7 +740,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfStartsOnSameRowAs', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((false) @non-hanging-false
           (#set! onlyIfStartsOnSameRowAs parent.startPosition))
       `);
@@ -767,7 +767,7 @@ describe('ScopeResolver', () => {
     });
 
     it('supports onlyIfEndsOnSameRowAs', async () => {
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((true) @non-hanging-true
           (#set! onlyIfEndsOnSameRowAs parent.endPosition))
       `);
@@ -796,7 +796,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfConfig (with no arguments)', async () => {
       atom.config.set('core.careAboutBooleans', true);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
           (#set! onlyIfConfig core.careAboutBooleans))
       `);
@@ -823,7 +823,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfConfig (with boolean arguments)', async () => {
       atom.config.set('core.careAboutBooleans', true);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
           (#set! onlyIfConfig "core.careAboutBooleans true"))
       `);
@@ -850,7 +850,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfConfig (with number arguments)', async () => {
       atom.config.set('core.careAboutBooleans', 0);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
         (#set! onlyIfConfig "core.careAboutBooleans 0"))
       `);
@@ -877,7 +877,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfConfig (with string arguments)', async () => {
       atom.config.set('core.careAboutBooleans', "something");
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
         (#set! onlyIfConfig "core.careAboutBooleans something"))
       `);
@@ -903,13 +903,13 @@ describe('ScopeResolver', () => {
 
     it('supports onlyIfInjection', async () => {
       jasmine.useRealClock();
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((escape_sequence) @regex-escape
           (#set! onlyIfInjection true))
       `);
 
       let regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, jsRegexConfig);
-      await regexGrammar.setQueryForTest('syntaxQuery', `
+      await regexGrammar.setQueryForTest('highlightsQuery', `
         ((control_escape) @regex-escape
           (#set! onlyIfInjection true))
       `);

@@ -167,26 +167,168 @@
   function: (member_expression
     property: (property_identifier) @support.other.function.method.ts))
 
+; Named function expressions:
+; the "foo" in `let bar = function foo () {`
+(function
+  name: (identifier) @entity.name.function.definition.ts)
+
+; Function definitions:
+; the "foo" in `function foo () {`
+(function_declaration
+  name: (identifier) @entity.name.function.definition.ts)
+
+; Named generator function expressions:
+; the "foo" in `let bar = function* foo () {`
+(generator_function
+  name: (identifier) @entity.name.function.generator.definition.ts)
+
+; Generator function definitions:
+; the "foo" in `function* foo () {`
+(generator_function_declaration
+  name: (identifier) @entity.name.function.generator.definition.ts)
+
+; Method definitions:
+; the "foo" in `foo () {` (inside a class body)
+(method_definition
+  name: (property_identifier) @entity.name.function.method.definition.ts)
+
+; Function property assignment:
+; The "foo" in `thing.foo = (arg) => {}`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @entity.name.function.definition.ts
+    (#set! final true))
+  right: [(arrow_function) (function)])
+
+; Function variable assignment:
+; The "foo" in `let foo = function () {`
+(variable_declarator
+  name: (identifier) @entity.name.function.definition.ts
+  value: [(function) (arrow_function)])
+
+; Function variable reassignment:
+; The "foo" in `foo = function () {`
+(assignment_expression
+  left: (identifier) @function
+  right: [(function) (arrow_function)])
+
+; Object key-value pair function:
+; The "foo" in `{ foo: function () {} }`
+(pair
+  key: (property_identifier) @entity.name.function.method.definition.ts
+  value: [(function) (arrow_function)])
+
+(function "function" @storage.type.function.ts)
+(function_declaration "function" @storage.type.function.ts)
+
+(generator_function "function" @storage.type.function.ts)
+(generator_function_declaration "function" @storage.type.function.ts)
+
+(generator_function "*" @storage.modifier.generator.ts)
+(generator_function_declaration "*" @storage.modifier.generator.ts)
+(method_definition "*" @storage.modifier.generator.ts)
+
+
 ; VARIABLES
 ; =========
 
 (this) @variable.language.this.ts
 
+(required_parameter
+  pattern: (identifier) @variable.parameter.ts)
+
+(required_parameter
+  pattern: (object_pattern
+    (shorthand_property_identifier_pattern) @variable.parameter.destructuring.ts)
+    (#set! final true))
+
+["var" "const" "let"] @storage.type._TYPE_.ts
+
+; A simple variable declaration:
+; The "foo" in `let foo = true`
 (variable_declarator
   name: (identifier) @variable.other.assignment.ts)
 
-(required_parameter
-  pattern: (_) @variable.parameter.ts)
+; A reassignment of a variable declared earlier:
+; The "foo" in `foo = true`
+(assignment_expression
+  left: (identifier) @variable.other.assignment.ts)
 
-(arrow_function
-  parameter: (identifier) @variable.parameter.arrow.ts)
+; The "foo" in `foo += 1`.
+(augmented_assignment_expression
+  left: (identifier) @variable.other.assignment.ts)
 
+; The "foo" in `foo++`.
+(update_expression
+  argument: (identifier) @variable.other.assignment.ts)
+
+; `object_pattern` appears to only be encountered in assignment expressions, so
+; this won't match other uses of object/prop shorthand.
+((object_pattern
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.ts))
+
+; A variable object destructuring with default value:
+; The "foo" in `let { foo = true } = something`
+(object_assignment_pattern
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.ts)
+
+; A variable object alias destructuring:
+; The "bar" and "foo" in `let { bar: foo } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.ts
+    value: (identifier) @variable.other.assignment.destructuring.ts))
+
+; A variable object alias destructuring with default value:
+; The "bar" and "foo" in `let { bar: foo = true } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.ts
+    value: (assignment_pattern
+      left: (identifier) @variable.other.assignment.destructuring.ts)))
+
+; A variable array destructuring:
+; The "foo" and "bar" in `let [foo, bar] = something`
+(variable_declarator
+  (array_pattern
+    (identifier) @variable.other.assignment.destructuring.ts))
+
+; A variable declaration in a for…(in|of) loop:
+; The "foo" in `for (let foo of bar) {`
+(for_in_statement
+  left: (identifier) @variable.other.assignment.loop.ts)
+
+; A variable array destructuring in a for…(in|of) loop:
+; The "foo" and "bar" in `for (let [foo, bar] of baz)`
 (for_in_statement
   left: (array_pattern
     (identifier) @variable.other.assignment.loop.ts))
 
+; A variable object destructuring in a for…(in|of) loop:
+; The "foo" and "bar" in `for (let { foo, bar } of baz)`
 (for_in_statement
-  left: (identifier) @variable.other.assignment.loop.ts)
+  left: (object_pattern
+    (shorthand_property_identifier_pattern) @variable.other.assignment.loop.ts))
+
+; A variable object destructuring in a for…(in|of) loop:
+; The "foo" in `for (let { bar: foo } of baz)`
+(for_in_statement
+  left: (object_pattern
+    (pair_pattern
+      key: (_) @entity.other.attribute-name.ts
+      value: (identifier) @variable.other.assignment.loop.ts)
+      (#set! final true)))
+
+; The "error" in `} catch (error) {`
+(catch_clause
+  parameter: (identifier) @variable.other.assignment.catch.ts)
+
+; Single parameter of an arrow function:
+; The "foo" in `(foo => …)`
+(arrow_function parameter: (identifier) @variable.parameter.ts)
+
 
 ; NUMBERS
 ; =======
@@ -313,6 +455,8 @@
   "<"
 ] @keyword.operator.comparison.ts
 
+["++" "--"] @keyword.operator.increment.ts
+
 [
   "&&"
   "||"
@@ -332,7 +476,7 @@
 ; TODO: Ternary doesn't highlight properly; presumably fixed in
 ; https://github.com/tree-sitter/tree-sitter-typescript/pull/215, but needs
 ; update to v0.20.2.
-((ternary_expression) @keyword.operator.ternary.js
+((ternary_expression) @keyword.operator.ternary.ts
   (#set! startAndEndAroundFirstMatchOf "\\?"))
 
 (public_field_definition "?" @keyword.operator.optional-type.ts)

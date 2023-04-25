@@ -6,4 +6,4 @@ parser: 'tree-sitter-hyperlink'
 injectionRegex: 'hyperlink'
 treeSitter:
   grammar: 'ts/tree-sitter-hyperlink.wasm'
-  syntaxQuery: 'ts/highlights.scm'
+  highlightsQuery: 'ts/highlights.scm'

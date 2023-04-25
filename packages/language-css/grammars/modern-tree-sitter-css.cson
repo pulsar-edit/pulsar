@@ -9,7 +9,7 @@ fileTypes: [
 
 treeSitter:
   grammar: 'tree-sitter/tree-sitter-css.wasm'
-  syntaxQuery: 'tree-sitter/queries/highlights.scm'
+  highlightsQuery: 'tree-sitter/queries/highlights.scm'
   foldsQuery: 'tree-sitter/queries/folds.scm'
   indentsQuery: 'tree-sitter/queries/indents.scm'
 

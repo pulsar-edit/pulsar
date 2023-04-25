@@ -160,33 +160,177 @@
 ; FUNCTIONS
 ; =========
 
-(method_definition
-  name: (property_identifier) @entity.name.function.method.ts.tsx)
+; Named function expressions:
+; the "foo" in `let bar = function foo () {`
+(function
+  name: (identifier) @entity.name.function.definition.ts.tsx)
 
-(call_expression
-  function: (member_expression
-    property: (property_identifier) @support.other.function.method.ts.tsx))
+; Function definitions:
+; the "foo" in `function foo () {`
+(function_declaration
+  name: (identifier) @entity.name.function.definition.ts.tsx)
+
+; Named generator function expressions:
+; the "foo" in `let bar = function* foo () {`
+(generator_function
+  name: (identifier) @entity.name.function.generator.definition.ts.tsx)
+
+; Generator function definitions:
+; the "foo" in `function* foo () {`
+(generator_function_declaration
+  name: (identifier) @entity.name.function.generator.definition.ts.tsx)
+
+; Method definitions:
+; the "foo" in `foo () {` (inside a class body)
+(method_definition
+  name: (property_identifier) @entity.name.function.method.definition.ts.tsx)
+
+; Function property assignment:
+; The "foo" in `thing.foo = (arg) => {}`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @entity.name.function.definition.ts.tsx
+    (#set! final true))
+  right: [(arrow_function) (function)])
+
+; Function variable assignment:
+; The "foo" in `let foo = function () {`
+(variable_declarator
+  name: (identifier) @entity.name.function.definition.ts.tsx
+  value: [(function) (arrow_function)])
+
+; Function variable reassignment:
+; The "foo" in `foo = function () {`
+(assignment_expression
+  left: (identifier) @function
+  right: [(function) (arrow_function)])
+
+; Object key-value pair function:
+; The "foo" in `{ foo: function () {} }`
+(pair
+  key: (property_identifier) @entity.name.function.method.definition.ts.tsx
+  value: [(function) (arrow_function)])
+
+(function "function" @storage.type.function.ts.tsx)
+(function_declaration "function" @storage.type.function.ts.tsx)
+
+(generator_function "function" @storage.type.function.ts.tsx)
+(generator_function_declaration "function" @storage.type.function.ts.tsx)
+
+(generator_function "*" @storage.modifier.generator.ts.tsx)
+(generator_function_declaration "*" @storage.modifier.generator.ts.tsx)
+(method_definition "*" @storage.modifier.generator.ts.tsx)
+
 
 ; VARIABLES
 ; =========
 
 (this) @variable.language.this.ts.tsx
 
+(required_parameter
+  pattern: (_) @variable.parameter.ts)
+
+(required_parameter
+  pattern: (object_pattern
+    (shorthand_property_identifier_pattern) @variable.parameter.destructuring.ts)
+    (#set! final true))
+
+(update_expression
+  argument: (identifier) @variable.other.assignment.js)
+
+["var" "const" "let"] @storage.type._TYPE_.ts.tsx
+
+; A simple variable declaration:
+; The "foo" in `let foo = true`
 (variable_declarator
   name: (identifier) @variable.other.assignment.ts.tsx)
 
-(required_parameter
-  pattern: (_) @variable.parameter.ts.tsx)
+; A reassignment of a variable declared earlier:
+; The "foo" in `foo = true`
+(assignment_expression
+  left: (identifier) @variable.other.assignment.ts.tsx)
 
-(arrow_function
-  parameter: (identifier) @variable.parameter.arrow.ts.tsx)
+; A variable object destructuring:
+; The "foo" in `let { foo } = something`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier)) @variable.other.assignment.property.ts.tsx)
 
+; The "foo" in `foo += 1`.
+(augmented_assignment_expression
+  left: (identifier) @variable.other.assignment.ts.tsx)
+
+; The "foo" in `foo++`.
+(update_expression
+  argument: (identifier) @variable.other.assignment.ts.tsx)
+
+; `object_pattern` appears to only be encountered in assignment expressions, so
+; this won't match other uses of object/prop shorthand.
+((object_pattern
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.ts.tsx))
+
+; A variable object destructuring with default value:
+; The "foo" in `let { foo = true } = something`
+(object_assignment_pattern
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.ts.tsx)
+
+; A variable object alias destructuring:
+; The "bar" and "foo" in `let { bar: foo } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.ts.tsx
+    value: (identifier) @variable.other.assignment.destructuring.ts.tsx))
+
+; A variable object alias destructuring with default value:
+; The "bar" and "foo" in `let { bar: foo = true } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.ts.tsx
+    value: (assignment_pattern
+      left: (identifier) @variable.other.assignment.destructuring.ts.tsx)))
+
+; A variable array destructuring:
+; The "foo" and "bar" in `let [foo, bar] = something`
+(variable_declarator
+  (array_pattern
+    (identifier) @variable.other.assignment.destructuring.ts.tsx))
+
+; A variable declaration in a for…(in|of) loop:
+; The "foo" in `for (let foo of bar) {`
+(for_in_statement
+  left: (identifier) @variable.other.assignment.loop.ts.tsx)
+
+; A variable array destructuring in a for…(in|of) loop:
+; The "foo" and "bar" in `for (let [foo, bar] of baz)`
 (for_in_statement
   left: (array_pattern
     (identifier) @variable.other.assignment.loop.ts.tsx))
 
+; A variable object destructuring in a for…(in|of) loop:
+; The "foo" and "bar" in `for (let { foo, bar } of baz)`
 (for_in_statement
-  left: (identifier) @variable.other.assignment.loop.ts.tsx)
+  left: (object_pattern
+    (shorthand_property_identifier_pattern) @variable.other.assignment.loop.ts.tsx))
+
+; A variable object destructuring in a for…(in|of) loop:
+; The "foo" in `for (let { bar: foo } of baz)`
+(for_in_statement
+  left: (object_pattern
+    (pair_pattern
+      key: (_) @entity.other.attribute-name.ts.tsx
+      value: (identifier) @variable.other.assignment.loop.ts.tsx)
+      (#set! final true)))
+
+; The "error" in `} catch (error) {`
+(catch_clause
+  parameter: (identifier) @variable.other.assignment.catch.ts.tsx)
+
+; Single parameter of an arrow function:
+; The "foo" in `(foo => …)`
+(arrow_function parameter: (identifier) @variable.parameter.ts.tsx)
+
 
 ; NUMBERS
 ; =======
@@ -312,6 +456,8 @@
   ">"
   "<"
 ] @keyword.operator.comparison.ts.tsx
+
+["++" "--"] @keyword.operator.increment.ts.tsx
 
 [
   "&&"

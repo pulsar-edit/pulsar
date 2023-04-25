@@ -77,7 +77,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (member_expression object: (identifier) @support)
 
         (call_expression
@@ -125,7 +125,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (member_expression object: (identifier) @support)
 
         (call_expression
@@ -174,7 +174,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (member_expression object: (_) @variable)
 
         (call_expression
@@ -203,7 +203,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, cGrammarPath, cConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (primitive_type) @storage
         (declaration declarator: (identifier) @variable)
         (function_declarator declarator: (identifier) @entity)
@@ -255,7 +255,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (call_expression (identifier) @function)
         (property_identifier) @member
       `);
@@ -295,7 +295,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((template_string) @lorem
           (#match? @lorem "lorem"))
         ((template_string) @ipsum
@@ -371,7 +371,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string
         (property_identifier) @property
@@ -416,7 +416,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (template_string) @string
         ["\${" "}"] @interpolation
       `);
@@ -450,7 +450,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (call_expression (identifier) @function)
       `);
@@ -488,7 +488,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         ((identifier) @global
           (#match? @global "^(exports|document|window|global)$"))
 
@@ -527,7 +527,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, rubyGrammarPath, rubyConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (bare_string) @string
         (interpolation) @embedded
         ["#{" "}"] @punctuation
@@ -562,7 +562,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-        await grammar.setQueryForTest('syntaxQuery', `
+        await grammar.setQueryForTest('highlightsQuery', `
           (identifier) @variable
         `);
 
@@ -642,7 +642,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-        await grammar.setQueryForTest('syntaxQuery', `
+        await grammar.setQueryForTest('highlightsQuery', `
           (call_expression
             (member_expression
               (property_identifier) @method)
@@ -702,7 +702,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let tempJsConfig = { ...jsConfig };
         jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, tempJsConfig);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           (comment) @comment
           (property_identifier) @property
           (call_expression (identifier) @function)
@@ -717,7 +717,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let tempHtmlConfig = { ...htmlConfig };
         htmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, tempHtmlConfig);
 
-        await htmlGrammar.setQueryForTest('syntaxQuery', `
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
           (fragment) @html
           (tag_name) @tag
           (attribute_name) @attr
@@ -905,7 +905,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           CSON.readFileSync(ejsGrammarPath)
         );
 
-        await ejsGrammar.setQueryForTest('syntaxQuery', `
+        await ejsGrammar.setQueryForTest('highlightsQuery', `
           ["<%=" "%>"] @directive
         `);
 
@@ -1038,7 +1038,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           CSON.readFileSync(ejsGrammarPath)
         );
 
-        await ejsGrammar.setQueryForTest('syntaxQuery', `
+        await ejsGrammar.setQueryForTest('highlightsQuery', `
           ["<%" "%>"] @directive
         `);
 
@@ -1094,7 +1094,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           CSON.readFileSync(jsdocGrammarPath)
         );
 
-        jsdocGrammar.setQueryForTest('syntaxQuery', '');
+        jsdocGrammar.setQueryForTest('highlightsQuery', '');
 
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(jsdocGrammar);
@@ -1124,7 +1124,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         await atom.packages.activatePackage('language-javascript');
 
         let jsdocGrammar = atom.grammars.grammarForScopeName('source.jsdoc');
-        await jsdocGrammar.setQueryForTest('syntaxQuery', `
+        await jsdocGrammar.setQueryForTest('highlightsQuery', `
           ((ERROR) @comment.block.js
             (#set! onlyIfRoot true))
           (document) @comment.block.js
@@ -1133,7 +1133,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         `);
 
         let jsGrammar = atom.grammars.grammarForScopeName('source.js');
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           ["{" "}"] @punctuation.brace
         `);
 
@@ -1197,7 +1197,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           });
         }
 
-        await rustGrammar.setQueryForTest('syntaxQuery', `
+        await rustGrammar.setQueryForTest('highlightsQuery', `
           (macro_invocation
             macro: (identifier) @macro
             (#set! final true))
@@ -1259,7 +1259,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           (comment) @comment
           (property_identifier) @property
           (call_expression (identifier) @function)
@@ -1271,7 +1271,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlConfig = { ...htmlConfig };
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
-        await htmlGrammar.setQueryForTest('syntaxQuery', `
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
           (fragment) @html
           (tag_name) @tag
           (attribute_name) @attr
@@ -1307,7 +1307,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           (comment) @comment
           (property_identifier) @property
           (call_expression (identifier) @function)
@@ -1319,7 +1319,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlConfig = { ...htmlConfig };
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
-        await htmlGrammar.setQueryForTest('syntaxQuery', `
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
           (fragment) @html
           (tag_name) @tag
           (attribute_name) @attr
@@ -1358,7 +1358,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           (comment) @comment
           (property_identifier) @property
           (call_expression (identifier) @function)
@@ -1370,7 +1370,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlConfig = { ...htmlConfig };
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
-        await htmlGrammar.setQueryForTest('syntaxQuery', `
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
           (fragment) @html
           (tag_name) @tag
           (attribute_name) @attr
@@ -2228,7 +2228,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('returns a scope descriptor representing the given position in the syntax tree', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (property_identifier) @property.name
         (comment) @comment.block
       `);
@@ -2273,7 +2273,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('includes nodes in injected syntax trees', async () => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await jsGrammar.setQueryForTest('syntaxQuery', `
+      await jsGrammar.setQueryForTest('highlightsQuery', `
         (template_string) @string.quoted
         (property_identifier) @property.name
       `);
@@ -2286,7 +2286,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlConfig
       );
 
-      await htmlGrammar.setQueryForTest('syntaxQuery', `
+      await htmlGrammar.setQueryForTest('highlightsQuery', `
         (script_element) @script.tag
       `);
       htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
@@ -2330,7 +2330,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('includes the root scope name even when the given position is in trailing whitespace at EOF', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (property_identifier) @property.name
       `);
 
@@ -2348,7 +2348,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('works when the given position is between tokens', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment.block
       `);
 
@@ -2369,7 +2369,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('works when a scope range has been adjusted', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment.block
         ((comment) @punctuation.definition.comment.begin
           (#set! startAndEndAroundFirstMatchOf "^/\\\\*"))
@@ -2403,7 +2403,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
 
-      await regexGrammar.setQueryForTest('syntaxQuery', `
+      await regexGrammar.setQueryForTest('highlightsQuery', `
         (pattern) @string.regexp
         (optional "?" @keyword.operator.optional)
       `);
@@ -2421,7 +2421,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         coverShallowerScopes: true
       });
 
-      await jsGrammar.setQueryForTest('syntaxQuery', `
+      await jsGrammar.setQueryForTest('highlightsQuery', `
         ((regex) @gadfly
           (#set! startAndEndAroundFirstMatchOf "lor\\\\?em"))
         (regex) @regex-outer
@@ -2467,7 +2467,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
 
-      await regexGrammar.setQueryForTest('syntaxQuery', `
+      await regexGrammar.setQueryForTest('highlightsQuery', `
         (pattern) @string.regexp
       `);
 
@@ -2483,7 +2483,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         languageScope: null
       });
 
-      await jsGrammar.setQueryForTest('syntaxQuery', `
+      await jsGrammar.setQueryForTest('highlightsQuery', `
         ((regex_pattern) @gadfly
           (#set! startAndEndAroundFirstMatchOf "lor\\\\?em"))
         (regex) @regex-outer
@@ -2648,7 +2648,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           (property_identifier) @property
         `);
 
@@ -2698,7 +2698,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       it('returns the range of the smallest matching node at position', async () => {
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-        await grammar.setQueryForTest('syntaxQuery', `
+        await grammar.setQueryForTest('highlightsQuery', `
           (property_identifier) @variable.other.object.property
           (template_string) @string.quoted.template
         `);
@@ -2720,7 +2720,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       it('includes nodes in injected syntax trees', async () => {
         const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           (property_identifier) @variable.other.object.property
         `);
 
@@ -2731,7 +2731,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         );
 
         htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
-        await htmlGrammar.setQueryForTest('syntaxQuery', `
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
           (element) @meta.element.html
         `);
 
@@ -2778,7 +2778,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           ((regex) @keyword.operator.optional
             (#set! startAndEndAroundFirstMatchOf "\\\\?"))
           (regex) @string.regexp.js
@@ -2826,7 +2826,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
 
-        await regexGrammar.setQueryForTest('syntaxQuery', `
+        await regexGrammar.setQueryForTest('highlightsQuery', `
           (pattern) @string.regexp
         `);
 
@@ -2842,7 +2842,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           coverShallowerScopes: true
         });
 
-        await jsGrammar.setQueryForTest('syntaxQuery', `
+        await jsGrammar.setQueryForTest('highlightsQuery', `
           ((regex) @keyword.operator.optional
             (#set! startAndEndAroundFirstMatchOf "\\\\?"))
           ((regex_pattern) @string.regexp.js)
@@ -2876,7 +2876,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
 
-        await jsGrammar.setQueryForTest('syntaxQuery', ';');
+        await jsGrammar.setQueryForTest('highlightsQuery', ';');
 
         const htmlGrammar = new WASMTreeSitterGrammar(
           atom.grammars,
@@ -2885,7 +2885,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         );
 
         htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
-        await htmlGrammar.setQueryForTest('syntaxQuery', ';');
+        await htmlGrammar.setQueryForTest('highlightsQuery', ';');
 
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
@@ -3030,7 +3030,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('expands and contracts the selection based on the syntax tree', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (program) @source
       `);
 
@@ -3079,7 +3079,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('handles injected languages', async () => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await jsGrammar.setQueryForTest('syntaxQuery', `
+      await jsGrammar.setQueryForTest('highlightsQuery', `
         (property_identifier) @property
         (call_expression (identifier) @function)
         (template_string) @string
@@ -3094,7 +3094,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlGrammarPath,
         htmlConfig
       );
-      await htmlGrammar.setQueryForTest('syntaxQuery', `
+      await htmlGrammar.setQueryForTest('highlightsQuery', `
         (fragment) @html
         (tag_name) @tag
         (attribute_name) @attr
@@ -3139,7 +3139,7 @@ describe('WASMTreeSitterLanguageMode', () => {
     it('returns a shimmed TokenizedLine with tokens', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('syntaxQuery', `
+      await grammar.setQueryForTest('highlightsQuery', `
         (program) @source
 
         (call_expression

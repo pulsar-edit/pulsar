@@ -6,10 +6,11 @@ parser: 'tree-sitter-javascript'
 injectionRegex: '^(js|javascript)$'
 treeSitter:
   grammar: 'ts/grammar.wasm'
-  syntaxQuery: 'ts/highlights.scm'
+  highlightsQuery: 'ts/highlights.scm'
   localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
   indentsQuery: 'ts/indents.scm'
+  tagsQuery: 'ts/tags.scm'
 
 firstLineRegex: [
   # shebang line
