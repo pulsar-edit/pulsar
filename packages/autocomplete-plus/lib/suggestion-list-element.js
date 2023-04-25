@@ -468,8 +468,8 @@ module.exports = class SuggestionListElement {
     if (index === this.selectedIndex) { this.selectedLi = li }
 
     const iconContainer = document.createElement('span')
-    iconContainer.className = 'icon-container'
-    li.replaceChild(iconContainer, li.querySelector('.icon-container'))
+    iconContainer.className = 'icon--container'
+    li.replaceChild(iconContainer, li.querySelector('.icon--container'))
 
     const sanitizedType = isString(type) ? type : ''
     const sanitizedIconHTML = isString(iconHTML) ? iconHTML : undefined
