@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Parser = require('web-tree-sitter');
+const Parser = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
 
