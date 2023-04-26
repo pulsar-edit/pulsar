@@ -3414,7 +3414,9 @@ class LanguageLayer {
       // This can still invalidate _large_ parts of the tree in certain
       // grammars.
       if (node && node.parent) {
-        this.languageMode.emitRangeUpdate(node.range);
+        if(comparePoints(node.range.start, this.tree.rootNode.range.start) !== 0) {
+          this.languageMode.emitRangeUpdate(node.range);
+        }
       }
     }
 
