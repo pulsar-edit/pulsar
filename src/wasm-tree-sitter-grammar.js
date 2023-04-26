@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Parser = require('web-tree-sitter');
+const Parser = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
 
@@ -10,6 +10,7 @@ module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.registry = registry;
     this.name = params.name;
+    this.type = 'modern-tree-sitter';
     this.scopeName = params.scopeName;
 
     this.contentRegex = buildRegex(params.contentRegex);
@@ -98,8 +99,8 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   async loadQueryFiles(grammarPath, queryPaths) {
-    if (!('syntaxQuery' in queryPaths)) {
-      throw new Error(`Syntax query must be present`);
+    if (!('highlightsQuery' in queryPaths)) {
+      throw new Error(`Highlights query must be present`);
     }
 
     if (this._loadQueryFilesPromise) {
@@ -259,7 +260,7 @@ module.exports = class WASMTreeSitterGrammar {
   //
   // - `filePath`: The path to the query file on disk.
   // - `queryType`: The type of query file, as denoted by its configuration key
-  //     in the grammar file. One of `syntaxQuery`, `indentsQuery`,
+  //     in the grammar file. One of `highlightsQuery`, `indentsQuery`,
   //     `foldsQuery`, or `localsQuery`.
   onDidChangeQueryFile(callback) {
     return this.emitter.on('did-change-query-file', callback);
@@ -338,7 +339,7 @@ module.exports = class WASMTreeSitterGrammar {
   // modern-tree-sitter. But modern-tree-sitter grammars cannot be injected
   // into by legacy-tree-sitter-grammars, and vice versa.
   //
-  addInjectionPoint (injectionPoint) {
+  addInjectionPoint(injectionPoint) {
     let { type } = injectionPoint;
     let injectionPoints = this.injectionPointsByType[type];
     if (!injectionPoints) {

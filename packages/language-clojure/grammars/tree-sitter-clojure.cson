@@ -37,7 +37,7 @@
 '''
 treeSitter:
   grammar: 'ts/grammar.wasm'
-  syntaxQuery: 'ts/highlights.scm'
+  highlightsQuery: 'ts/highlights.scm'
   # localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
   indentsQuery: 'ts/indents.scm'

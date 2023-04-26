@@ -1,6 +1,6 @@
 ; TODO
 ; ====
-; 
+;
 ; * numbers: hex, octal, binary, and log versions of each
 ; * long integers
 ; * complex numbers
@@ -195,7 +195,7 @@
   (#match? @string.quoted.double.single-line.format.python "^[fF][rR]?\""))
 
 ((string) @string.quoted.single.single-line.python
-  (#match? @string.quoted.single.single-line.python "^[bBrRuU*]\'"))
+  (#match? @string.quoted.single.single-line.python "^[bBrRuU]*\'"))
 
 ((string) @string.quoted.single.single-line.format.python
   (#match? @string.quoted.single.single-line.format.python "^[fF][rR]?\'"))

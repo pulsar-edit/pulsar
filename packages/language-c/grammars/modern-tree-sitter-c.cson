@@ -7,7 +7,7 @@ injectionRegex: '^(c|C)$'
 
 treeSitter:
   grammar: 'tree-sitter-c/tree-sitter-c.wasm'
-  syntaxQuery: 'tree-sitter-c/highlights.scm'
+  highlightsQuery: 'tree-sitter-c/highlights.scm'
   localsQuery: 'tree-sitter-c/locals.scm'
   foldsQuery: 'tree-sitter-c/folds.scm'
   indentsQuery: 'tree-sitter-c/indents.scm'

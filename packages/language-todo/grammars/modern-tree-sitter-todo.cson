@@ -6,4 +6,4 @@ parser: 'tree-sitter-todo'
 injectionRegex: '^(todo|TODO)$'
 treeSitter:
   grammar: 'ts/tree-sitter-todo.wasm'
-  syntaxQuery: 'ts/highlights.scm'
+  highlightsQuery: 'ts/highlights.scm'

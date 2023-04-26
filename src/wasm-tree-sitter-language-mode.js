@@ -1,6 +1,7 @@
-const Parser = require('web-tree-sitter');
+const Parser = require('./web-tree-sitter');
 const TokenIterator = require('./token-iterator');
 const { Point, Range, spliceArray } = require('text-buffer');
+const { Patch } = require('superstring');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const ScopeResolver = require('./scope-resolver');
@@ -10,7 +11,17 @@ const { matcherForSelector } = require('./selectors');
 
 const createTree = require('./rb-tree');
 
+const FEATURE_ASYNC_INDENT = true;
+const FEATURE_ASYNC_PARSE = true;
+
+const PARSE_JOB_LIMIT_MICROS = 3000;
+const PARSERS_IN_USE = new Set();
+
 const FUNCTION_TRUE = () => true;
+
+function isParseTimeout(err) {
+  return err.message.includes('Parsing failed');
+}
 
 function last(array) {
   return array[array.length - 1];
@@ -20,7 +31,7 @@ function removeLastOccurrenceOf(array, item) {
   return array.splice(array.lastIndexOf(item), 1);
 }
 
-function clamp (value, min, max) {
+function clamp(value, min, max) {
   if (value < min) { return min; }
   if (value > max) { return max; }
   return value;
@@ -43,7 +54,7 @@ function rangeToTreeSitterRangeSpec(range, buffer) {
   return { startIndex, startPosition, endIndex, endPosition };
 }
 
-function resolveNodeDescriptor (node, descriptor) {
+function resolveNodeDescriptor(node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
   while (result !== null && parts.length > 0) {
@@ -54,7 +65,7 @@ function resolveNodeDescriptor (node, descriptor) {
   return result;
 }
 
-function resolveNodePosition (node, descriptor) {
+function resolveNodePosition(node, descriptor) {
   let parts = descriptor.split('.');
   let lastPart = parts.pop();
   let result = parts.length === 0 ?
@@ -72,7 +83,7 @@ function ensureNodeIsPatched(node) {
   let proto = Object.getPrototypeOf(node);
 
   Object.defineProperty(proto, 'range', {
-    get () { return rangeForNode(this); }
+    get() { return rangeForNode(this); }
   });
 
   // autocomplete-html expects a `closest` function to exist on nodes.
@@ -89,13 +100,12 @@ function ensureNodeIsPatched(node) {
   });
 }
 
-
 // Compares “informal” points like the ones in a tree-sitter tree; saves us
 // from having to convert them to actual `Point`s.
 function comparePoints(a, b) {
   const rows = a.row - b.row;
   if (rows === 0) {
-    return a.column - b.column
+    return a.column - b.column;
   } else {
     return rows;
   }
@@ -104,7 +114,7 @@ function comparePoints(a, b) {
 // Acts like `comparePoints`, but treats starting and ending boundaries
 // differently, making it so that ending boundaries are visited before starting
 // boundaries.
-function compareBoundaries (a, b) {
+function compareBoundaries(a, b) {
   if (!a.position) {
     a = { position: a, boundary: 'end' };
   }
@@ -117,7 +127,7 @@ function compareBoundaries (a, b) {
   return a.boundary === 'end' ? -1 : 1;
 }
 
-function isBetweenPoints (point, a, b) {
+function isBetweenPoints(point, a, b) {
   let comp = comparePoints(a, b);
   let lesser = comp > 0 ? b : a;
   let greater = comp > 0 ? a : b;
@@ -125,32 +135,36 @@ function isBetweenPoints (point, a, b) {
     comparePoints(point, greater) <= 0;
 }
 
-let nextId = 0;
+// eslint-disable-next-line no-unused-vars
+let totalBufferChanges = 0;
+let nextTransactionId = 1;
+let nextLanguageModeId = 0;
 const COMMENT_MATCHER = matcherForSelector('comment');
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
 
 class WASMTreeSitterLanguageMode {
-  constructor({ buffer, grammar, config, grammars }) {
-    this.id = nextId++;
+  constructor({ buffer, grammar, config, grammars, syncTimeoutMicros }) {
+    this.id = nextLanguageModeId++;
     this.buffer = buffer;
     this.grammar = grammar;
     this.config = config;
     this.grammarRegistry = grammars;
+
+    this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
 
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [grammar.scopeName]
     });
-
     this.rootScopeId = this.grammar.idForScope(this.grammar.scopeName);
 
     this.emitter = new Emitter();
     this.isFoldableCache = [];
 
     this.tokenized = false;
-    this.subscriptions = new CompositeDisposable;
 
+    this.subscriptions = new CompositeDisposable;
     this.subscriptions.add(
       this.onDidTokenize(() => this.tokenized = true)
     );
@@ -160,9 +174,18 @@ class WASMTreeSitterLanguageMode {
 
     this.grammarForLanguageString = this.grammarForLanguageString.bind(this);
 
-    this.parsersByLanguage = new Map();
+    this.parsersByLanguage = new Index();
     this.tokenIterator = new TokenIterator(this);
 
+    this.autoIndentRequests = 0;
+
+    // For our purposes, the “transaction” life cycle exposed by this promise
+    // is a lot like the buffer's own concept of transactions, with one
+    // exception: if transaction 2 finishes before transaction 1 is done
+    // parsing, then the transaction 1 life cycle “adopts” all the changes of
+    // transaction 2. That means that the `atTransactionEnd` method won't
+    // resolve until the tree is clean and all outstanding updates are
+    // performed and injections are populated.
     this.resolveNextTransactionPromise();
 
     this.ready = this.grammar.getLanguage()
@@ -171,7 +194,7 @@ class WASMTreeSitterLanguageMode {
         this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
         return this.getOrCreateParserForLanguage(language);
       })
-      .then(() => this.rootLanguageLayer.update(null))
+      .then(() => this.rootLanguageLayer.update(null, { id: 0 }))
       .then(() => this.emitter.emit('did-tokenize'));
   }
 
@@ -203,12 +226,17 @@ class WASMTreeSitterLanguageMode {
   }
 
   getOrCreateParserForLanguage(language) {
-    let existing = this.parsersByLanguage.get(language);
-    if (existing) { return existing; }
+    let pool = this.parsersByLanguage.get(language);
+    let parser;
+    if (pool) {
+      parser = pool.find(p => !PARSERS_IN_USE.has(p));
+    }
 
-    let parser = new Parser();
-    parser.setLanguage(language);
-    this.parsersByLanguage.set(language, parser);
+    if (!parser) {
+      parser = new Parser();
+      parser.setLanguage(language);
+      this.parsersByLanguage.add(language, parser);
+    }
     return parser;
   }
 
@@ -232,11 +260,22 @@ class WASMTreeSitterLanguageMode {
       newEndPosition: newRange.end
     };
 
-    if (!this.rootLanguageLayer.treeIsDirty) {
+    if (!this.resolveNextTransaction) {
       // This is the first change after the last transaction finished, so we
       // need to create a new promise that will resolve when the next
       // transaction is finished.
+      totalBufferChanges++;
+      this.transactionChangeCount = 1;
       this.refreshNextTransactionPromise();
+      this.didAutoIndentAfterTransaction = false;
+    } else {
+      // We have a different definition of "changes" than what we get from
+      // `bufferDidFinishTransaction`. Even when multiple calls to `insertText`
+      // happen within a transaction, `TextBuffer` will attempt to consolidate
+      // them into a single "change" — but what we care about is how many
+      // atomic operations have taken place. So we keep track on our own.
+      this.transactionChangeCount++;
+      totalBufferChanges++;
     }
 
     this.rootLanguageLayer.handleTextChange(edit, oldText, newText);
@@ -247,6 +286,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   bufferDidFinishTransaction({ changes }) {
+    let id = nextTransactionId++;
     if (!this.rootLanguageLayer) { return; }
     for (let i = 0, { length } = changes; i < length; i++) {
       const { oldRange, newRange } = changes[i];
@@ -258,7 +298,13 @@ class WASMTreeSitterLanguageMode {
       );
     }
 
-    this.rootLanguageLayer.update(null).then(() => {
+    this.rootLanguageLayer.update(null, { id }).then(shouldEndTransaction => {
+      if (shouldEndTransaction) {
+        this.lastTransactionEditedRange = this.rootLanguageLayer?.lastTransactionEditedRange;
+        this.lastTransactionChangeCount = this.transactionChangeCount;
+        this.lastTransactionAutoIndentRequests = this.autoIndentRequests;
+      }
+
       // The editor is going to ask if a number of on-screen lines are now
       // foldable. This would ordinarly trigger a number of `folds.scm` queries
       // — one per line. But since we know they're coming, we can run a single
@@ -271,7 +317,9 @@ class WASMTreeSitterLanguageMode {
       for (let layer of allLayers) {
         // Either the tree got re-parsed — and it's now up-to-date — or it
         // didn't, which means that the edits in the tree did not affect the
-        // layer's contents. Either way, the tree is safe to use.
+        // layer's contents. Either way, the tree is safe to use. (This is part
+        // of why we keep a separate boolean instead of checking the tree
+        // directly — we have a looser definition of "clean.")
         layer.treeIsDirty = false;
 
         // If this layer didn't get updated, then it didn't need to, and the
@@ -282,7 +330,11 @@ class WASMTreeSitterLanguageMode {
       // At this point, all trees are safely re-parsed, including those of
       // injection layers. So we can proceed with any actions that were waiting
       // on a clean tree.
-      this.resolveNextTransactionPromise(changes.length);
+      if (shouldEndTransaction) {
+        this.resolveNextTransactionPromise();
+        this.transactionChangeCount = 0;
+        this.autoIndentRequests = 0;
+      }
     });
   }
 
@@ -300,10 +352,23 @@ class WASMTreeSitterLanguageMode {
   // in a given transaction. We resolve it with the number of changes in the
   // transaction so that we can react differently to batches of changes than to
   // single changes.
-  resolveNextTransactionPromise(changeCount) {
+  resolveNextTransactionPromise() {
     if (this.resolveNextTransaction) {
-      this.resolveNextTransaction(changeCount);
+      this.resolveNextTransaction();
       this.resolveNextTransaction = null;
+    }
+
+    // These transaction IDs are useful to have around, but we don't want them
+    // to grow indefinitely. If we reach this point, then all outstanding
+    // transactions are settled, and it's safe to reset our numbering scheme.
+    if (nextTransactionId > 100) {
+      nextTransactionId = 1;
+    }
+
+    if (!this.nextTransaction) {
+      // No edits have happened yet, so we should put this here as a
+      // placeholder until the user edits the buffer for the first time.
+      this.nextTransaction = Promise.resolve();
     }
   }
 
@@ -311,26 +376,48 @@ class WASMTreeSitterLanguageMode {
   // all its side effects are handled. When this promise resolves, all parse
   // trees will be clean and up to date. This promise cannot reject — only
   // resolve.
-  //
-  // If another transaction begins before all parse trees are ready, we'll
-  // ensure that the old promise resolves along with the new one.
   refreshNextTransactionPromise() {
-    let oldResolve = null;
-    if (this.resolveNextTransaction) {
-      // We're creating a new promise before the old one is done, so let's
-      // chain them.
-      oldResolve = this.resolveNextTransaction;
-    }
+    if (this.resolveNextTransaction) { return false; }
     this.nextTransaction = new Promise((resolve) => {
       this.resolveNextTransaction = (changes) => {
-        if (oldResolve) { oldResolve(changes); }
         resolve(changes);
       };
     });
+    return true;
+  }
+
+  // Resolves the next time that all tree-sitter trees are clean — or
+  // immediately, if they're clean at the time of invocation.
+  //
+  // Resolves with metadata about the previous transaction that may be useful
+  // for the caller to know:
+  //
+  // * How many atomic changes have been made since the last clean tree.
+  // * The range that represents the extent of the changes made since the last
+  //   clean tree.
+  // * How many times Pulsar requested auto-indent actions that this language
+  //   mode couldn't fulfill (see `suggestedIndentForLineAtBufferRow`).
+  //
+  async atTransactionEnd() {
+    if (this.atTransactionEndPromise) {
+      return this.atTransactionEndPromise;
+    }
+    let prerequisite = this.nextTransaction || Promise.resolve();
+    this.atTransactionEndPromise = prerequisite.then(() => {
+      let result = {
+        changeCount: this.lastTransactionChangeCount ?? 0,
+        range: this.lastTransactionEditedRange ?? null,
+        autoIndentRequests: this.lastTransactionAutoIndentRequests ?? 0
+      };
+      return result;
+    }).finally(() => {
+      this.atTransactionEndPromise = null;
+    });
+    return this.atTransactionEndPromise;
   }
 
   prefillFoldCache(range) {
-    this.rootLanguageLayer?.foldResolver.prefillFoldCache(range);
+    this.rootLanguageLayer?.foldResolver?.prefillFoldCache(range);
 
     let markers = this.injectionsMarkerLayer.findMarkers({
       intersectsRange: range
@@ -356,6 +443,8 @@ class WASMTreeSitterLanguageMode {
   // affects an injection of ours.
   updateForInjection(grammar) {
     if (!this.rootLanguageLayer) { return; }
+    if (!grammar.injectionRegex && !grammar.injectionRegExp) { return; }
+    if (grammar.type !== 'modern-tree-sitter') { return; }
     this.rootLanguageLayer.updateInjections(grammar);
   }
 
@@ -382,7 +471,7 @@ class WASMTreeSitterLanguageMode {
     return this.grammar.classNameForScopeId(scopeId);
   }
 
-  scopeNameForScopeId (scopeId) {
+  scopeNameForScopeId(scopeId) {
     return this.grammar.scopeNameForScopeId(scopeId);
   }
 
@@ -541,24 +630,79 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
-  parse (language, oldTree, includedRanges) {
-    // let devMode = atom.inDevMode();
+  parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
+    let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
-    let text = this.buffer.getText();
-    // if (devMode) { console.time('Parsing'); }
-    // TODO: Is there a better way to feed the parser the contents of the file?
-    const result = parser.parse(
-      text,
-      oldTree,
-      { includedRanges }
-    );
+    parser.setTimeoutMicros(this.syncTimeoutMicros);
+    PARSERS_IN_USE.add(parser);
 
-    // if (devMode) { console.timeEnd('Parsing'); }
+    let text = this.buffer.getText();
+    let tree;
+    // eslint-disable-next-line no-unused-vars
+    let batchCount = 0;
+
+    const cleanup = () => {
+      if (devMode && tag) { console.timeEnd(tag); }
+      parser.setTimeoutMicros(null);
+      PARSERS_IN_USE.delete(parser);
+    };
+
+    if (devMode && tag) {
+      console.time(tag);
+      if (batchCount > 0) {
+        console.log(`(async: ${batchCount} batches)`);
+      }
+    }
+
+    try {
+      // Attempt a synchronous parse.
+      tree = parser.parse(text, oldTree, { includedRanges });
+    } catch (err) {
+      if (!isParseTimeout(err)) { throw err; }
+
+      // The parse couldn't be completed in the allotted time, so we'll go
+      // async and return a promise.
+      return new Promise((resolve, reject) => {
+        const parseJob = () => {
+          try {
+            batchCount++;
+            tree = parser.parse(text, oldTree, { includedRanges });
+          } catch (err) {
+            if (!isParseTimeout(err)) { return reject(err); }
+            setImmediate(parseJob);
+            return;
+          }
+
+          cleanup();
+          resolve(tree);
+        };
+        setImmediate(parseJob);
+      });
+    }
+
+    // If we get this far, the synchronous parse was a success.
+    cleanup();
+    return tree;
+  }
+
+  parse(language, oldTree, includedRanges, { tag = null } = {}) {
+    let devMode = atom.inDevMode();
+    let parser = this.getOrCreateParserForLanguage(language);
+    parser.setTimeoutMicros(null);
+
+    let text = this.buffer.getText();
+    if (devMode && tag) { console.time(tag); }
+
+    // TODO: Is there a better way to feed the parser the contents of the file?
+    const result = parser.parse(text, oldTree, { includedRanges });
+
+    if (devMode && tag) { console.timeEnd(tag); }
     return result;
   }
 
-  get tree () {
-    return this.rootLanguageLayer?.tree }
+  get tree() {
+    return this.rootLanguageLayer?.tree
+  }
 
   /*
   Section - Syntax Tree APIs
@@ -932,10 +1076,11 @@ class WASMTreeSitterLanguageMode {
   // * tabLength - A {Number} signifying the length of a tab, in spaces,
   //   according to the current settings of the buffer.
   //
-  // Returns a {Number}.
+  // Returns a {Number}, or {null} if this method cannot make a suggestion.
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
     let root = this.rootLanguageLayer;
-    if (!root || !root.tree || row === 0) { return 0; }
+    if (row === 0) { return 0; }
+    if (!root || !root.tree || !root.ready) { return null; }
 
     let options = {
       allowMatchCapture: true,
@@ -943,6 +1088,7 @@ class WASMTreeSitterLanguageMode {
       skipDedentCheck: false,
       preserveLeadingWhitespace: false,
       indentationLevels: null,
+      forceTreeParse: false,
       ...rawOptions
     };
 
@@ -951,7 +1097,7 @@ class WASMTreeSitterLanguageMode {
       comparisonRow = row - 1;
       if (options.skipBlankLines) {
         // It usually makes no sense to compare to a blank row, so we'll move
-        // upward until we find the a line with text on it.
+        // upward until we find a line with text on it.
         while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
           comparisonRow--;
         }
@@ -971,15 +1117,12 @@ class WASMTreeSitterLanguageMode {
       // be able to dedent it into the correct position. This option probably
       // needs to be revisited.
       existingIndent = this.indentLevelForLine(
-        this.buffer.lineForRow(row),
-        tabLength
-      );
+        this.buffer.lineForRow(row), tabLength);
     }
     let comparisonRowIndent = options.comparisonRowIndent;
     if (comparisonRowIndent === undefined) {
       comparisonRowIndent = this.indentLevelForLine(
-        this.buffer.lineForRow(comparisonRow), tabLength
-      );
+        this.buffer.lineForRow(comparisonRow), tabLength);
     }
 
     // TODO: What's the right place to measure from? Often we're here because
@@ -1003,9 +1146,7 @@ class WASMTreeSitterLanguageMode {
       (layer) => !!layer.indentsQuery
     );
 
-    if (!controllingLayer) {
-      return Math.max(comparisonRowIndent - existingIndent, 0);
-    }
+    if (!controllingLayer) { return null; }
 
     let { indentsQuery, scopeResolver } = controllingLayer;
 
@@ -1025,7 +1166,47 @@ class WASMTreeSitterLanguageMode {
     // layers' trees in between. That's possible in theory, but it wouldn't be
     // a lot of fun. I haven't actually seen this break, so we'll live with it
     // for now.
-    let indentTree = options.tree || controllingLayer.getOrParseTree();
+    let indentTree = options.tree;
+
+    if (!indentTree) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
+        indentTree = controllingLayer.getOrParseTree();
+      } else {
+        // TODO: For async, we might need an approach where we suggest a
+        // preliminary indent level and then follow up later with a more
+        // accurate one. It's a bit disorienting that the editor falls back to
+        // an indent level of `0` when a newline is inserted.
+
+        // We can't answer this yet because we don't yet have a new syntax
+        // tree. Return a promise that will fulfill once we can determine the
+        // right indent level.
+        return this.atTransactionEnd().then(({ changeCount }) => {
+          if (changeCount > 1) {
+            // There were multiple changes in this transaction, so it's not
+            // safe to assume that the original row still needs its indentation
+            // adjusted. The row could've been shifted up or down by other
+            // edits, or it could've been deleted entirely.
+            //
+            // Instead, we return `undefined` here, and the `TextEditor` will
+            // understand that its only recourse is to auto-indent the whole
+            // extent of the transaction instead.
+            return undefined;
+          }
+          // Otherwise, it's safe to auto-indent this line alone, because it
+          // was the only change in this transaction. But we've retained the
+          // original values for `comparisonRow` and `comparisonRowIndent`
+          // because that's the proper basis from which to determine the given
+          // row's indent level.
+          let result = this.suggestedIndentForBufferRow(row, tabLength, {
+            ...rawOptions,
+            comparisonRow: comparisonRow,
+            comparisonRowIndent: comparisonRowIndent,
+            tree: controllingLayer.tree
+          });
+          return result;
+        });
+      }
+    }
 
     // Capture in two phases. The first phase covers any captures from the
     // comparison row that can cause the _following_ row to be indented.
@@ -1041,6 +1222,7 @@ class WASMTreeSitterLanguageMode {
 
     for (let capture of indentCaptures) {
       let { node, name, setProperties: props = {} } = capture;
+
       // Ignore “phantom” nodes that aren't present in the buffer.
       if (node.text === '' && !props.allowEmpty) {
         continue;
@@ -1108,13 +1290,14 @@ class WASMTreeSitterLanguageMode {
     // `@dedent`s.
     //
     // If there's a genuine need to dedent the current row based solely on the
-    // content of the comparison row, then `dedent.next` can be used.
+    // content of the comparison row, then `@dedent.next` can be used.
     //
-    // And a language needs to indent more than one level from one line to the
-    // next, then `@match` captures can be used to specify an exact level of
-    // indentation relative to another specific node. If a `@match` capture
-    // exists, we'll catch it in the dedent captures phase, and these heuristics
-    // will be ignored.
+    // And if a language needs to indent more than one level from one line to
+    // the next, then `@match` captures can be used to specify an exact level
+    // of indentation relative to another specific node. If a `@match` capture
+    // exists, we'll catch it in the dedent captures phase, and these
+    // heuristics will be ignored.
+    //
     indentDelta = clamp(indentDelta, 0, 1);
 
     // Process `@dedent.next` captures as a last step; they act as a strong
@@ -1125,6 +1308,7 @@ class WASMTreeSitterLanguageMode {
 
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
+
       // The second phase covers any captures on the current line that can
       // cause the current line to be indented or dedented.
       let dedentCaptures = indentsQuery.captures(
@@ -1134,12 +1318,11 @@ class WASMTreeSitterLanguageMode {
       );
 
       let currentRowText = this.buffer.lineForRow(row);
-
+      currentRowText = currentRowText.trim();
       let positionSet = new Set;
       for (let capture of dedentCaptures) {
         let { name, node, setProperties: props = {} } = capture;
         let { text } = node;
-        let rowText = currentRowText.trim();
 
         // Ignore “phantom” nodes that aren't present in the buffer.
         if (text === '' && !props.allowEmpty) { continue; }
@@ -1166,7 +1349,7 @@ class WASMTreeSitterLanguageMode {
         //
         // If a capture is confident it knows what it's doing, it can opt out
         // of this behavior with `(#set! force true)`.
-        if (!props.force && !rowText.startsWith(text)) { continue; }
+        if (!props.force && !currentRowText.startsWith(text)) { continue; }
 
         // The '@match' capture short-circuits a lot of this logic by pointing
         // us to a different node and asking us to match the indentation of
@@ -1178,7 +1361,7 @@ class WASMTreeSitterLanguageMode {
             scopeResolver.reset();
             return Math.max(matchIndentLevel - existingIndent, 0);
           }
-        } else  if (name === 'none') {
+        } else if (name === 'none') {
           scopeResolver.reset();
           return 0;
         }
@@ -1203,6 +1386,7 @@ class WASMTreeSitterLanguageMode {
 
     scopeResolver.reset();
     let finalIndent = comparisonRowIndent + indentDelta + dedentDelta;
+    // console.log('score:', comparisonRowIndent, '+', indentDelta, '-', ((dedentDelta < 0) ? -dedentDelta : dedentDelta), '=', finalIndent);
 
     return Math.max(finalIndent - existingIndent, 0);
   }
@@ -1217,30 +1401,89 @@ class WASMTreeSitterLanguageMode {
   // Returns a {Map} whose keys are rows and whose values are desired
   // indentation levels. May not return the entire range of requested rows, in
   // which case the caller should auto-indent the remaining rows through
-  // another means.
+  // another means. May also return {null} to signify that no auto-indent
+  // should be attempted at all for the given range.
   suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
     let root = this.rootLanguageLayer;
     if (!root || !root.tree) {
-      return new Array(startRow - endRow).map(() => 0);
+      let results = new Map();
+      for (let row = startRow; row <= endRow; row++) {
+        results.set(row, null);
+      }
+      return results;
     }
 
     let results = new Map();
     let comparisonRow = null;
     let comparisonRowIndent = null;
 
-    // For line X to know its appropriate indentation level, it needs row X-1,
-    // if it exists, to be indented properly. That's why `TextEditor` wants to
-    // indent each line atomically. Instead, we'll determine the right level
-    // for the first row, then supply the result for the previous row when we
-    // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
-    // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
-    // row itself and find out we haven't actually fixed any of the previous
-    // rows' indentations yet.
+    let { isPastedText = false } = options;
+    let indentDelta;
+
     for (let row = startRow; row <= endRow; row++) {
       let controllingLayer = this.controllingLayerAtPoint(
         new Point(row, Infinity),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
+
+      if (isPastedText) {
+        // In this mode, we're not trying to auto-indent every line; instead,
+        // we're trying to auto-indent the _first_ line of a region of text
+        // that's just been pasted, while trying to preserve the relative
+        // levels of indentation within the pasted region. So if the
+        // auto-indent of the first line increases its indent by one level,
+        // all other lines should also be increased by one level — without even
+        // consulting their own suggested indent levels.
+        if (row === startRow) {
+          // The only time we consult the indents query is for the first row,
+          // so we're not going to insist that the _entire range_ fall under
+          // the control of a layer with an indents query — just the row we
+          // need.
+          if (!controllingLayer) { return null; }
+          let tree = controllingLayer.getOrParseTree();
+
+          let firstLineCurrentIndent = this.indentLevelForLine(
+            this.buffer.lineForRow(startRow), tabLength);
+
+          let firstLineIdealIndent = this.suggestedIndentForBufferRow(
+            row,
+            tabLength,
+            { ...options, tree }
+          );
+
+          if (firstLineIdealIndent == null) {
+            // If we decline to suggest an indent level for the first line,
+            // then there's no change to be made here. Keep the whole region
+            // the way it is.
+            return null;
+          } else {
+            indentDelta = firstLineIdealIndent - firstLineCurrentIndent;
+            if (indentDelta === 0) {
+              // If the first row doesn't have to be adjusted, neither do any
+              // others.
+              return null;
+            }
+            results.set(row, firstLineIdealIndent);
+          }
+          continue;
+        }
+
+        // All rows other than the first are easy — just apply the delta.
+        let actualIndent = this.indentLevelForLine(
+          this.buffer.lineForRow(row), tabLength);
+
+        results.set(row, actualIndent + indentDelta);
+        continue;
+      }
+
+      // For line X to know its appropriate indentation level, it needs row X-1,
+      // if it exists, to be indented properly. That's why `TextEditor` wants to
+      // indent each line atomically. Instead, we'll determine the right level
+      // for the first row, then supply the result for the previous row when we
+      // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
+      // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
+      // row itself and find out we haven't actually fixed any of the previous
+      // rows' indentations yet.
       let indent;
       if (controllingLayer) {
         let tree = controllingLayer.getOrParseTree();
@@ -1259,6 +1502,10 @@ class WASMTreeSitterLanguageMode {
           // efficient means.
           return results;
         }
+      } else {
+        // We could not retrieve the correct indentation level for this row
+        // because it isn't governed by any layer that has an indents query.
+        return results;
       }
       results.set(row, indent);
       comparisonRow = row;
@@ -1296,9 +1543,39 @@ class WASMTreeSitterLanguageMode {
     // resolvers.
     scopeResolver.reset();
 
+    const currentRowIndent = this.indentLevelForLine(
+      this.buffer.lineForRow(row), tabLength);
+
     // Ideally, we're running when the tree is clean, but if not, we must
     // re-parse the tree in order to make an accurate indents query.
-    let indentTree = options.tree || controllingLayer.getOrParseTree();
+    let indentTree = options.tree;
+    if (!indentTree) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
+        indentTree = controllingLayer.getOrParseTree();
+      } else {
+        return this.atTransactionEnd().then(({ changeCount }) => {
+          if (changeCount > 1) {
+            // Unlike `suggestedIndentForBufferRow`, we should not return
+            // `undefined` here and implicitly tell `TextEditor` to handle the
+            // auto-indent itself. If there were several changes in this
+            // transaction, we missed our chance to dedent this row, and should
+            // return `null` to signal that `TextEditor` should do nothing
+            // about it.
+            return null;
+          }
+          let result = this.suggestedIndentForEditedBufferRow(row, tabLength, {
+            ...options,
+            tree: controllingLayer.tree
+          });
+          if (currentRowIndent === result) {
+            // Return `null` here so that `TextEditor` realizes that no work
+            // needs to be done.
+            return null;
+          }
+          return result;
+        });
+      }
+    }
 
     const indents = indentsQuery.captures(
       indentTree.rootNode,
@@ -1307,9 +1584,6 @@ class WASMTreeSitterLanguageMode {
     );
 
     let lineText = this.buffer.lineForRow(row).trim();
-
-    const currentRowIndent = this.indentLevelForLine(
-      this.buffer.lineForRow(row), tabLength);
 
     // This is the indent level that is suggested from context — the level we'd
     // have if this row were completely blank. We won't alter the indent level
@@ -1343,6 +1617,7 @@ class WASMTreeSitterLanguageMode {
       // If the capture is confident it knows what it's doing, and is using
       // some other mechanism to ensure the adjustment will happen exactly
       // once, it can bypass this behavior with `(#set! force true)`.
+      //
       if (!props.force && node.text !== lineText) { continue; }
 
       // `@match` is authoritative; honor the first one we see and ignore other
@@ -1399,6 +1674,7 @@ class WASMTreeSitterLanguageMode {
     // (b) anonymously re-parse the tree to try to avoid that hassle, which
     //     could double the amount of time we spend parsing.
     //
+    this.autoIndentRequests++;
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
 
@@ -1460,11 +1736,20 @@ class WASMTreeSitterLanguageMode {
     return markers.map(m => m.languageLayer);
   }
 
-  getAllLanguageLayers() {
-    return [
+  getAllLanguageLayers(where = null) {
+    let layers = [
       this.rootLanguageLayer,
       ...this.getAllInjectionLayers()
     ];
+    if (!where) return layers;
+
+    let results = [];
+    for (let layer of layers) {
+      if (!where(layer)) continue;
+      results.push(layer);
+    }
+
+    return results;
   }
 
   injectionLayersAtPoint(point) {
@@ -1622,7 +1907,7 @@ class FoldResolver {
     let start = Point.fromObject({ row, column: 0 });
     let end = Point.fromObject({ row: row + 1, column: 0 });
 
-    let tree = this.layer.getOrParseTree();
+    let tree = this.layer.getOrParseTree({ force: false });
     let iterator = this.getOrCreateBoundariesIterator(tree.rootNode, start, end);
 
     while (iterator.key) {
@@ -1844,14 +2129,14 @@ class FoldResolver {
 FoldResolver.ADJUSTMENTS = {
   // Use a node position descriptor to describe where the fold should end.
   // Overrides the default descriptor of `lastChild.startPosition`.
-  endAt (end, node, value) {
+  endAt(end, node, value) {
     end = resolveNodePosition(node, value);
     return end;
   },
 
   // Adjust the end point by a fixed number of characters in either direction.
   // Will cross rows if necessary.
-  offsetEnd (end, node, value, props, layer) {
+  offsetEnd(end, node, value, props, layer) {
     let { languageMode } = layer;
     value = Number(value);
     if (isNaN(value)) { return end; }
@@ -1860,7 +2145,7 @@ FoldResolver.ADJUSTMENTS = {
 
   // Adjust the column of the fold's end point. Use `0` to end the fold at the
   // start of the line.
-  adjustEndColumn (end, node, value, props, layer) {
+  adjustEndColumn(end, node, value, props, layer) {
     let column = Number(value);
     if (isNaN(column)) { return end; }
     let newEnd = Point.fromObject({ column, row: end.row });
@@ -1870,7 +2155,7 @@ FoldResolver.ADJUSTMENTS = {
   // Adjust the end point to be immediately before the current line begins.
   // Useful if the end line also contains the start of a fold and thus should
   // stay on a separate screen line.
-  adjustToEndOfPreviousRow (end) {
+  adjustToEndOfPreviousRow(end) {
     return new Point(end.row - 1, Infinity);
   }
 };
@@ -1927,6 +2212,9 @@ class HighlightIterator {
   }
 
   seek(start, endRow) {
+    if (!(start instanceof Point)) {
+      start = Point.fromObject(start, true);
+    }
     let { buffer, rootLanguageLayer } = this.languageMode;
     if (!rootLanguageLayer) { return []; }
 
@@ -1952,7 +2240,7 @@ class HighlightIterator {
       return a.languageLayer.depth - b.languageLayer.depth;
     });
 
-    const iterator = this.languageMode.rootLanguageLayer.buildHighlightIterator();
+    const iterator = rootLanguageLayer.buildHighlightIterator();
 
     // We need to know which open scopes were contributed by which language
     // layer so that we know which ones to “cover” if we see an injection with
@@ -1976,6 +2264,17 @@ class HighlightIterator {
     // scope was opened, because we'll need that information in a moment.
     //
     let [result, openScopes] = iterator.seek(start, endRow);
+
+    if (rootLanguageLayer?.tree?.rootNode.hasChanges()) {
+      // The tree is dirty. We should keep going — if we stop now, then the
+      // user will see a flash of unhighlighted text over this whole range. But
+      // we should also schedule a re-highlight at the end of the transaction,
+      // once the tree will be clean again.
+      let range = new Range(start, iterator._getEndPosition(endRow));
+      this.languageMode.atTransactionEnd().then(() => {
+        this.languageMode.emitRangeUpdate(range);
+      });
+    }
 
     // An iterator can contribute to the list of already open scopes even if it
     // has no boundaries to mark within the range of this highlighting job.
@@ -2017,7 +2316,7 @@ class HighlightIterator {
           // For each of the open scopes that an earlier iterator gave us, we
           // need to look at the point at which that scope would've been added.
           // If that point falls within the purview of our newer iterator, then
-          // we should suppress those scopes unless they're the layer's base
+          // we should suppress that scope unless it's the layer's base
           // language scope.
           let languageScopeId = earlierIterator.languageLayer.languageScopeId;
           for (let [point, scopes] of earlierOpenScopes) {
@@ -2053,10 +2352,9 @@ class HighlightIterator {
 
     // …then sort them by buffer position, with shallower layers first in case
     // of ties.
-    unsortedScopeBundles.sort((a, b) => {
-      return a.point.compare(b.point) ||
-        a.iterator.depth - b.iterator.depth;
-    });
+    unsortedScopeBundles.sort((a, b) => (
+      a.point.compare(b.point) || a.iterator.depth - b.iterator.depth
+    ));
 
     // Now we can flatten all the scopes themselves, preserving order.
     for (let { scopes } of unsortedScopeBundles) {
@@ -2066,11 +2364,13 @@ class HighlightIterator {
     return sortedOpenScopes;
   }
 
-  moveToSuccessor () {
+  moveToSuccessor() {
     // `this.iterators` is _always_ sorted from farthest position to nearest
     // position, so the last item in the collection is always the next one to
     // act.
     let leader = last(this.iterators);
+    if (!leader) { return; }
+
     if (leader.moveToSuccessor()) {
       // It was able to move to a successor, so now we have to "file" it into
       // the right place in `this.iterators` so that the sorting is correct.
@@ -2091,7 +2391,7 @@ class HighlightIterator {
     this.detectCoveredScope();
   }
 
-  getPosition () {
+  getPosition() {
     let iterator = last(this.iterators || []);
     if (iterator) {
       // this.logPosition();
@@ -2176,9 +2476,8 @@ class HighlightIterator {
     return [];
   }
 
-  // EXPERIMENT: Rather than the commented-out logic below, let's try something
-  // more holistic that is off by default but triggered via an explicit
-  // `coverShallowerScopes` option in `atom.grammars.addInjectionPoint`.
+  // Detect whether the iterator that's about to act has its scopes covered by
+  // a different iterator asserting a `coverShallowerScopes` option.
   detectCoveredScope() {
     const layerCount = this.iterators.length;
     if (layerCount > 1) {
@@ -2195,26 +2494,6 @@ class HighlightIterator {
         this.currentScopeIsCovered = true;
         return;
       }
-      // const first = this.iterators[layerCount - 1];
-      // const next = this.iterators[layerCount - 2];
-      //
-      // // In the tree-sitter EJS grammar I encountered a situation where an EJS
-      // // scope was incorrectly being shadowed because `source.js` wanted to
-      // // _close_ a scope on the same boundary that `text.html.ejs` wanted to
-      // // _open_ one. This is one (clumsy) way to prevent that outcome.
-      // let bothOpeningScopes = first.getOpenScopeIds().length > 0 && next.getOpenScopeIds().length > 0;
-      // let bothClosingScopes = first.getCloseScopeIds().length > 0 && next.getCloseScopeIds().length > 0;
-      //
-      // if (
-      //   comparePoints(next.getPosition(), first.getPosition()) === 0 &&
-      //   next.isClosingScopes() === first.isClosingScopes() &&
-      //   next.depth > first.depth &&
-      //   !next.isAtInjectionBoundary() &&
-      //   (bothOpeningScopes || bothClosingScopes)
-      // ) {
-      //   this.currentScopeIsCovered = true;
-      //   return;
-      // }
     }
 
     this.currentScopeIsCovered = false;
@@ -2222,14 +2501,14 @@ class HighlightIterator {
 
   logPosition() {
     let iterator = last(this.iterators);
-    iterator.logPosition();
+    iterator?.logPosition();
   }
 }
 
 // Iterates through everything that a `LanguageLayer` is responsible for,
 // marking boundaries for scope insertion.
 class LayerHighlightIterator {
-  constructor (languageLayer) {
+  constructor(languageLayer) {
     this.languageLayer = languageLayer;
     this.name = languageLayer.grammar.scopeName;
     this.depth = languageLayer.depth;
@@ -2241,7 +2520,7 @@ class LayerHighlightIterator {
 
   // If this isn't the root language layer, we need to make sure this iterator
   // doesn't try to go past its marker boundary.
-  _getEndPosition (endRow) {
+  _getEndPosition(endRow) {
     let { marker } = this.languageLayer;
     let { buffer } = this.languageLayer.languageMode;
     let naiveEndPoint = new Point(
@@ -2318,48 +2597,54 @@ class LayerHighlightIterator {
     return [true, openScopes];
   }
 
-  isAtInjectionBoundary () {
+  isAtInjectionBoundary() {
     let position = Point.fromObject(this.iterator.key);
     return position.isEqual(this.start) || position.isEqual(this.end);
   }
 
-  _inspectScopes (ids) {
+  _inspectScopes(ids) {
     if (Array.isArray(ids)) {
       return ids.map(id => this._inspectScopes(id)).join(', ')
     }
     return this.languageLayer.languageMode.scopeNameForScopeId(ids);
   }
 
-  getOpenScopeIds () {
-    // console.log(
-    //   this.name,
-    //   this.depth,
-    //   'OPENING',
-    //   this.getPosition().toString(),
-    //   this._inspectScopes(
-    //     this.iterator.value.openScopeIds
-    //   )
-    // );
-    return [...this.iterator.value.openScopeIds];
+  getOpenScopeIds() {
+    let openScopeIds = this.iterator.value.openScopeIds;
+    // if (openScopeIds.length > 0) {
+    //   console.log(
+    //     this.name,
+    //     this.depth,
+    //     'OPENING',
+    //     this.getPosition().toString(),
+    //     this._inspectScopes(
+    //       this.iterator.value.openScopeIds
+    //     )
+    //   );
+    // }
+    return [...openScopeIds];
   }
 
-  getCloseScopeIds () {
-    // console.log(
-    //   this.name,
-    //   'CLOSING',
-    //   this.getPosition().toString(),
-    //   this._inspectScopes(
-    //     this.iterator.value.closeScopeIds
-    //   )
-    // );
-    return [...this.iterator.value.closeScopeIds];
+  getCloseScopeIds() {
+    let closeScopeIds = this.iterator.value.closeScopeIds;
+    // if (closeScopeIds.length > 0) {
+    //   console.log(
+    //     this.name,
+    //     'CLOSING',
+    //     this.getPosition().toString(),
+    //     this._inspectScopes(
+    //       this.iterator.value.closeScopeIds
+    //     )
+    //   );
+    // }
+    return [...closeScopeIds];
   }
 
-  getPosition () {
+  getPosition() {
     return this.iterator.key || Point.INFINITY;
   }
 
-  logPosition () {
+  logPosition() {
     let pos = this.getPosition();
 
     let { languageMode } = this.languageLayer;
@@ -2399,15 +2684,16 @@ class LayerHighlightIterator {
     return this.languageLayer.depth - other.languageLayer.depth;
   }
 
-  moveToSuccessor () {
-    if (!this.iterator.hasNext) { return false; }
-    if (this.done) { return false; }
+  moveToSuccessor() {
+    if (!this.iterator.hasNext || this.done) {
+      return false;
+    }
     this.iterator.next();
     this.done = this.isDone();
     return true;
   }
 
-  peekAtSuccessor () {
+  peekAtSuccessor() {
     if (!this.iterator.hasNext) { return null; }
     this.iterator.next();
     let key = this.iterator.key;
@@ -2423,6 +2709,14 @@ class LayerHighlightIterator {
     return comparePoints(next, this.end) > 0;
   }
 }
+
+class GrammarLoadError extends Error {
+  constructor(grammar, queryType) {
+    super(`Grammar ${grammar.scopeName} failed to load its ${queryType}. Please fix this error or contact the maintainer.`);
+    this.name = 'GrammarLoadError';
+  }
+}
+
 
 // Manages all aspects of a given language's parsing duties over a given region
 // of the buffer.
@@ -2450,77 +2744,97 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
     this.injectionPoint = injectionPoint;
+
+    this.tree = null;
+    this.lastSyntaxTree = null;
     this.temporaryTrees = [];
+    this.patchSinceCurrentParseStarted = null;
 
     this.subscriptions = new CompositeDisposable;
 
     this.currentRangesLayer = this.buffer.addMarkerLayer();
+    this.ready = false;
 
-    this.languageLoaded = this.grammar.getLanguage().then(async (language) => {
+    // A constructor can't go async, so all our async administrative tasks hang
+    // off this promise. We can `await this.languageLoaded` later on.
+    this.languageLoaded = this.grammar.getLanguage().then(language => {
       this.language = language;
-      // TODO: Currently, we require a syntax query, but we might want to
+      // TODO: Currently, we require a highlights query, but we might want to
       // rethink this. There are use cases for treating the root layer merely
       // as a way to delegate to injections, in which case syntax highlighting
       // wouldn't be needed.
-      try {
-        this.syntaxQuery = await this.grammar.getQuery('syntaxQuery');
-      } catch (error) {
-        console.warn(`Grammar ${grammar.scopeName} failed to load its "highlights.scm" file. Please fix this error or contact the maintainer.`);
-        console.error(error);
-      }
-
+      return this.grammar.getQuery('highlightsQuery').then(highlightsQuery => {
+        this.highlightsQuery = highlightsQuery;
+      }).catch(() => {
+        throw new GrammarLoadError(grammar, 'highlightsQuery');
+      });
+    }).then(() => {
       // All other queries are optional. Regular expression language layers,
       // for instance, don't really have a need for any of these.
-      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery'];
+      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery', 'tagsQuery'];
+      let promises = [];
 
       for (let queryType of otherQueries) {
         if (grammar[queryType]) {
-          try {
-            let query = await this.grammar.getQuery(queryType);
+          let promise = this.grammar.getQuery(queryType).then(query => {
             this[queryType] = query;
-          } catch (error) {
-            console.warn(`Grammar ${grammar.scopeName} failed to load its ${queryType}. Please fix this error or contact the maintainer.`);
-          }
+          }).catch(() => {
+            throw GrammarLoadError(grammar, queryType);
+          });
+          promises.push(promise);
         }
       }
-
+      return Promise.all(promises);
+    }).catch((err) => {
+      if (err.name === 'GrammarLoadError') {
+        console.warn(err.message);
+      } else {
+        throw err;
+      }
+    }).then(() => {
       if (atom.inDevMode()) {
         // In dev mode, changes to query files should be applied in real time.
         // This allows someone to save, e.g., `highlights.scm` and immediately
         // see the impact of their change.
         this.observeQueryFileChanges();
       }
-    });
 
-    this.tree = null;
-    this.scopeResolver = new ScopeResolver(
-      this,
-      (name) => this.languageMode.idForScope(name)
-    );
-    this.foldResolver = new FoldResolver(this.buffer, this);
+      this.tree = null;
+      this.scopeResolver = new ScopeResolver(
+        this,
+        (name) => this.languageMode.idForScope(name)
+      );
+      this.foldResolver = new FoldResolver(this.buffer, this);
 
-    // What should our language scope name be? Should we even have one?
-    let languageScope;
-    if (depth === 0) {
-      languageScope = this.grammar.scopeName;
-    } else {
-      languageScope = injectionPoint.languageScope;
-      // Honor an explicit `null`, but fall back to the default scope name
-      // otherwise.
-      if (typeof languageScope === 'function') {
-        languageScope = languageScope(this.grammar);
-      }
-      if (languageScope === undefined) {
+      // What should our language scope name be? Should we even have one?
+      let languageScope;
+      if (depth === 0) {
         languageScope = this.grammar.scopeName;
+      } else {
+        languageScope = injectionPoint.languageScope;
+        // Honor an explicit `null`, but fall back to the default scope name
+        // otherwise.
+        if (typeof languageScope === 'function') {
+          languageScope = languageScope(this.grammar);
+        }
+        if (languageScope === undefined) {
+          languageScope = this.grammar.scopeName;
+        }
       }
-    }
 
-    this.languageScope = languageScope;
-    if (languageScope === null) {
-      this.languageScopeId = null;
-    } else {
-      this.languageScopeId = this.languageMode.idForScope(languageScope);
-    }
+      this.languageScope = languageScope;
+      if (languageScope === null) {
+        this.languageScopeId = null;
+      } else {
+        this.languageScopeId = this.languageMode.idForScope(languageScope);
+      }
+      this.ready = true;
+    });
+  }
+
+  isDirty() {
+    if (!this.tree) { return false; }
+    return this.tree.rootNode.hasChanges();
   }
 
   inspect() {
@@ -2529,8 +2843,24 @@ class LanguageLayer {
   }
 
   destroy() {
-    this.tree = null;
+    if (this.destroyed) { return; }
     this.destroyed = true;
+
+    // Clean up all tree-sitter trees.
+    let temporaryTrees = this.temporaryTrees ?? [];
+    let trees = new Set([this.tree, this.lastSyntaxTree, ...temporaryTrees]);
+    trees = [...trees];
+
+    this.tree = null;
+    this.lastSyntaxTree = null;
+    this.temporaryTrees = null;
+
+    while (trees.length > 0) {
+      let tree = trees.pop();
+      if (!tree) { continue; }
+      tree.delete();
+    }
+
     this.marker?.destroy();
     this.currentRangesLayer?.destroy();
     this.foldResolver?.reset();
@@ -2577,9 +2907,9 @@ class LanguageLayer {
   // through a `ScopeResolver`.
   getSyntaxBoundaries(from, to) {
     let { buffer } = this.languageMode;
-    if (!this.language || !this.tree) { return []; }
-    if (!this.grammar.getLanguageSync()) { return []; }
-    if (!this.syntaxQuery) { return []; }
+    if (!(this.language && this.tree && this.highlightsQuery)) {
+      return [[], new OpenScopeMap()];
+    }
 
     from = buffer.clipPosition(Point.fromObject(from, true));
     to = buffer.clipPosition(Point.fromObject(to, true));
@@ -2587,7 +2917,7 @@ class LanguageLayer {
     let boundaries = createTree(comparePoints);
     let extent = this.getExtent();
 
-    const captures = this.syntaxQuery.captures(this.tree.rootNode, from, to);
+    const captures = this.highlightsQuery.captures(this.tree.rootNode, from, to);
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -2656,6 +2986,7 @@ class LanguageLayer {
     // spaces between those tokens. This is a consequence of the design of
     // a particular tree-sitter parser and should be mitigated with the
     // `includeAdjacentWhitespace` option of `addInjectionPoint`.
+    //
     let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
 
     if (this.languageScopeId) {
@@ -2727,7 +3058,7 @@ class LanguageLayer {
     }
   }
 
-  handleTextChange(edit) {
+  handleTextChange(edit, oldText, newText) {
     // Any text change within the layer invalidates our cached fold boundary
     // tree. This usually isn't a big deal because the language mode's own cache
     // is able to adjust when content shifts up and down, so typically only the
@@ -2769,21 +3100,58 @@ class LanguageLayer {
         this.editedRange = new Range(startPosition, newEndPosition);
       }
     }
+
+    if (this.patchSinceCurrentParseStarted) {
+      this.patchSinceCurrentParseStarted.splice(
+        startPosition,
+        oldEndPosition.traversalFrom(startPosition),
+        newEndPosition.traversalFrom(startPosition),
+        oldText,
+        newText
+      )
+    }
   }
 
-  update(nodeRangeSet) {
-    // Practically speaking, updates that affect _only this layer_ will happen
-    // synchronously, because we've made sure not to call this method until the
-    // root grammar's tree-sitter parser has been loaded. But we can't load any
-    // potential injection layers' languages because we don't know which ones
-    // we'll need _until_ we parse this layer's tree for the first time.
-    //
-    // Thus the first call to `_populateInjections` will probably go async
-    // while we wait for the injections' parsers to load, and the user might
-    // notice the delay. But once that happens, all subsequent updates _should_
-    // be synchronous, except for a case where a change in the buffer causes us
-    // to need a new kind of injection whose parser hasn't yet been loaded.
-    return this._performUpdate(nodeRangeSet);
+  async update(nodeRangeSet, params = {}) {
+    if (!FEATURE_ASYNC_PARSE) {
+      // Practically speaking, updates that affect _only this layer_ will happen
+      // synchronously, because we've made sure not to call this method until the
+      // root grammar's tree-sitter parser has been loaded. But we can't load any
+      // potential injection layers' languages because we don't know which ones
+      // we'll need _until_ we parse this layer's tree for the first time.
+      //
+      // Thus the first call to `_populateInjections` will probably go async
+      // while we wait for the injections' parsers to load, and the user might
+      // notice the delay. But once that happens, all subsequent updates _should_
+      // be synchronous, except for a case where a change in the buffer causes us
+      // to need a new kind of injection whose parser hasn't yet been loaded.
+      if (!this.ready) { await this.languageLoaded; }
+      await this._performUpdate(nodeRangeSet);
+      return true;
+    }
+
+    if (!this.currentParsePromise) {
+      while (
+        !this.destroyed &&
+        (!this.tree || this.tree.rootNode.hasChanges())
+      ) {
+        params = { ...params, async: false };
+        if (!this.ready) {
+          params.async = true;
+          await this.languageLoaded;
+        }
+        this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
+        if (!params.async) break;
+        await this.currentParsePromise;
+      }
+      this.currentParsePromise = null;
+      // `true` means that this update occurs in its own distinct transaction.
+      return true;
+    } else {
+      // `false` means that the previous transaction isn't done, so this
+      // transaction's work will be subsumed into it.
+      return false;
+    }
   }
 
   getLocalReferencesAtPoint(point) {
@@ -2803,9 +3171,7 @@ class LanguageLayer {
     });
 
     let nodes = captures.map(cap => cap.node);
-    nodes = nodes.sort((a, b) => {
-      return rangeForNode(b).compare(rangeForNode(a));
-    });
+    nodes = nodes.sort((a, b) => b.range.compare(a.range));
 
     return nodes;
   }
@@ -2813,6 +3179,7 @@ class LanguageLayer {
   // EXPERIMENTAL: Given a local reference node, tries to find the node that
   // defines it.
   findDefinitionForLocalReference(node, captures = null) {
+    if (!this.localsQuery) { return []; }
     let name = node.text;
     if (!name) { return []; }
     let localRange = rangeForNode(node);
@@ -2972,8 +3339,7 @@ class LanguageLayer {
     this._populateInjections(MAX_RANGE, null);
   }
 
-  async _performUpdate(nodeRangeSet) {
-    await this.languageLoaded;
+  async _performUpdate(nodeRangeSet, params = {}) {
     let includedRanges = null;
 
     if (nodeRangeSet) {
@@ -2987,19 +3353,52 @@ class LanguageLayer {
       }
     }
 
-    let affectedRange = this.editedRange;
-    this.editedRange = null;
-
+    this.patchSinceCurrentParseStarted = new Patch();
     let language = this.grammar.getLanguageSync();
-    let tree = this.languageMode.parse(
-      language,
-      this.tree,
-      includedRanges
-    );
+    let tree;
+    if (FEATURE_ASYNC_PARSE) {
+      tree = this.languageMode.parseAsync(
+        language,
+        this.tree,
+        includedRanges,
+        { tag: `Parsing ${this.inspect()} (async)` }
+      );
+      if (tree.then) {
+        params.async = true;
+        tree = await tree;
+      }
+    } else {
+      tree = this.languageMode.parse(
+        language,
+        this.tree,
+        includedRanges,
+        { tag: `Parsing ${this.inspect()} (sync)` }
+      );
+    }
+
+    let changes = this.patchSinceCurrentParseStarted.getChanges();
+    this.patchSinceCurrentParseStarted = null;
+
+    for (let change of changes) {
+      let newExtent = Point.fromObject(change.newEnd).traversalFrom(change.newStart);
+      tree.edit(
+        this._treeEditForBufferChange(
+          change.newStart,
+          change.oldEnd,
+          Point.fromObject(change.oldStart).traverse(newExtent),
+          change.oldText,
+          change.newText
+        )
+      );
+    }
 
     if (includedRanges) {
       this.setCurrentRanges(includedRanges);
     }
+
+    let affectedRange = this.editedRange;
+    this.lastTransactionEditedRange = this.editedRange;
+    this.editedRange = null;
 
     // Experiment: Even when no syntax changes have occurred, we should
     // always re-highlight the most specific node within which the edit
@@ -3015,7 +3414,9 @@ class LanguageLayer {
       // This can still invalidate _large_ parts of the tree in certain
       // grammars.
       if (node && node.parent) {
-        this.languageMode.emitRangeUpdate(node.range);
+        if(comparePoints(node.range.start, this.tree.rootNode.range.start) !== 0) {
+          this.languageMode.emitRangeUpdate(node.range);
+        }
       }
     }
 
@@ -3029,13 +3430,8 @@ class LanguageLayer {
       this.tree = tree;
       this.treeIsDirty = false;
 
-      if (oldTree) {
-        oldTree.delete();
-      }
-
-      if (oldSyntaxTree) {
-        oldSyntaxTree.delete();
-      }
+      oldTree?.delete();
+      oldSyntaxTree?.delete();
 
       while (this.temporaryTrees.length > 0) {
         let tree = this.temporaryTrees.pop();
@@ -3091,7 +3487,11 @@ class LanguageLayer {
     }
 
     if (affectedRange) {
-      await this._populateInjections(affectedRange, nodeRangeSet);
+      let injectionPromise = this._populateInjections(affectedRange, nodeRangeSet);
+      if (injectionPromise) {
+        params.async = true;
+        return injectionPromise;
+      }
     }
   }
 
@@ -3119,8 +3519,8 @@ class LanguageLayer {
     return markers.map(m => m.getRange());
   }
 
-  getOrParseTree() {
-    if (!this.treeIsDirty) { return this.tree; }
+  getOrParseTree({ force = true, anonymous = false } = {}) {
+    if (!this.treeIsDirty || !force) { return this.tree; }
 
     // Eventually we'll take this out, but for now it serves as an indicator of
     // how often we have to manually re-parse in between transactions —
@@ -3161,10 +3561,11 @@ class LanguageLayer {
     let tree = this.languageMode.parse(
       this.language,
       this.tree,
-      ranges
+      ranges,
+      { tag: `Re-parsing ${this.inspect()}` }
     );
 
-    if (this.depth === 0) {
+    if (this.depth === 0 && !anonymous) {
       this.tree = tree;
       this.treeIsDirty = false;
     } else {
@@ -3193,7 +3594,7 @@ class LanguageLayer {
 
     // If the cursor is resting before column X, we want all scopes that cover
     // the character in column X.
-    let captures = this.syntaxQuery.captures(
+    let captures = this.highlightsQuery.captures(
       this.tree.rootNode,
       point,
       { row: point.row, column: point.column + 1 }
@@ -3269,7 +3670,7 @@ class LanguageLayer {
     return node ?? null;
   }
 
-  _populateInjections (range, nodeRangeSet) {
+  _populateInjections(range, nodeRangeSet) {
     const promises = [];
 
     // We won't touch _all_ injections, but we will touch any injection that
@@ -3279,6 +3680,8 @@ class LanguageLayer {
       .filter(marker => marker.parentLanguageLayer === this);
 
     if (existingInjectionMarkers.length > 0) {
+      // Enlarge our range to contain all of the injection zones in the
+      // affected buffer range.
       range = range.union(
         new Range(
           existingInjectionMarkers[0].getRange().start,
@@ -3286,6 +3689,13 @@ class LanguageLayer {
         )
       );
     }
+
+    // Now that we've enlarged the range, we might have more existing injection
+    // markers to consider. But check for containment rather than intersection
+    // so that we don't have to enlarge it again.
+    existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
+      .findMarkers({ startsInRange: range, endsInRange: range })
+      .filter(marker => marker.parentLanguageLayer === this);
 
     const markersToUpdate = new Map();
 
@@ -3298,7 +3708,7 @@ class LanguageLayer {
     );
 
     let existingInjectionMarkerIndex = 0;
-    // let newLanguageLayers = 0;
+    let newLanguageLayers = 0;
     for (const node of nodes) {
       // A given node can be the basis for an arbitrary number of injection
       // points, but first it has to pass our gauntlet of tests:
@@ -3392,7 +3802,7 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
-          // newLanguageLayers++;
+          newLanguageLayers++;
         }
 
         markersToUpdate.set(
@@ -3406,16 +3816,14 @@ class LanguageLayer {
       }
     }
 
-    // let staleLanguageLayers = 0;
+    let staleLanguageLayers = 0;
     for (const marker of existingInjectionMarkers) {
       // Any markers that didn't get matched up with injection points are now
       // stale and should be destroyed.
       if (!markersToUpdate.has(marker)) {
-        this.languageMode.emitRangeUpdate(
-          marker.getRange()
-        );
+        this.languageMode.emitRangeUpdate(marker.getRange());
         marker.languageLayer.destroy();
-        // staleLanguageLayers++;
+        staleLanguageLayers++;
       }
     }
 
@@ -3426,6 +3834,18 @@ class LanguageLayer {
     }
 
     return Promise.all(promises);
+  }
+
+  _treeEditForBufferChange(start, oldEnd, newEnd, oldText, newText) {
+    let startIndex = this.buffer.characterIndexForPosition(start);
+    return {
+      startIndex,
+      oldEndIndex: startIndex + oldText.length,
+      newEndIndex: startIndex + newText.length,
+      startPosition: start,
+      oldEndPosition: oldEnd,
+      newEndPosition: newEnd
+    };
   }
 }
 
@@ -3543,7 +3963,7 @@ class NodeRangeSet {
     return consolidated;
   }
 
-  coversRange (candidateRange) {
+  coversRange(candidateRange) {
     let ranges = this.getRanges().map(r => rangeForNode(r));
     return ranges.some(range => {
       return range.containsRange(candidateRange);

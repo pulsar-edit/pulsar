@@ -188,6 +188,8 @@
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
 
+(reference_declarator
+  (identifier) @variable.declaration.cpp)
 
 ; Function parameters
 ; -------------------
@@ -306,7 +308,8 @@
 
 
 "sizeof" @keyword.operator.sizeof.cpp
-(pointer_expression "&" @keyword.operator.pointer.c)
+(pointer_expression "&" @keyword.operator.pointer.cpp)
+(reference_declarator "&" @keyword.operator.pointer.cpp)
 
 
 "=" @keyword.operator.assignment.cpp
@@ -358,33 +361,33 @@
 ; PUNCTUATION
 ; ===========
 
-";" @punctuation.terminator.statement.c
+";" @punctuation.terminator.statement.cpp
 
-"," @punctuation.separator.comma.c
-"->" @punctuation.separator.pointer-access.c
+"," @punctuation.separator.comma.cpp
+"->" @keyword.operator.accessor.cpp
 
 (parameter_list
-  "(" @punctuation.definition.parameters.begin.bracket.round.c
-  ")" @punctuation.definition.parameters.end.bracket.round.c
+  "(" @punctuation.definition.parameters.begin.bracket.round.cpp
+  ")" @punctuation.definition.parameters.end.bracket.round.cpp
   (#set! final true))
 
 (parenthesized_expression
-  "(" @punctuation.definition.expression.begin.bracket.round.c
-  ")" @punctuation.definition.expression.end.bracket.round.c
+  "(" @punctuation.definition.expression.begin.bracket.round.cpp
+  ")" @punctuation.definition.expression.end.bracket.round.cpp
   (#set! final true))
 
 (if_statement
   condition: (condition_clause
-    "(" @punctuation.definition.expression.begin.bracket.round.c
-    ")" @punctuation.definition.expression.end.bracket.round.c
+    "(" @punctuation.definition.expression.begin.bracket.round.cpp
+    ")" @punctuation.definition.expression.end.bracket.round.cpp
     (#set! final true)))
 
-"{" @punctuation.definition.block.begin.bracket.curly.c
-"}" @punctuation.definition.block.end.bracket.curly.c
-"(" @punctuation.definition.begin.bracket.round.c
-")" @punctuation.definition.end.bracket.round.c
-"[" @punctuation.definition.array.begin.bracket.square.c
-"]" @punctuation.definition.array.end.bracket.square.c
+"{" @punctuation.definition.block.begin.bracket.curly.cpp
+"}" @punctuation.definition.block.end.bracket.curly.cpp
+"(" @punctuation.definition.begin.bracket.round.cpp
+")" @punctuation.definition.end.bracket.round.cpp
+"[" @punctuation.definition.array.begin.bracket.square.cpp
+"]" @punctuation.definition.array.end.bracket.square.cpp
 
 ; TODO:
 ;

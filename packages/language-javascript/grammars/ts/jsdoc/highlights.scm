@@ -22,7 +22,7 @@
 
 (tag_name) @storage.type.class.jsdoc
 
-((tag (type)) @entity.name.type.instance.jsdoc
+((tag (type)) @entity.other.type.instance.jsdoc
   ; Join the type with its surrounding braces.
   (#set! startAt firstChild.nextSibling.startPosition)
   (#set! endAt firstChild.nextSibling.nextSibling.nextSibling.endPosition))
