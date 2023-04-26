@@ -18,7 +18,7 @@ function wait(ms) {
 }
 
 let PATH = path.resolve( path.join(__dirname, '..', 'packages') );
-function resolve (modulePath) {
+function resolve(modulePath) {
   return require.resolve(`${PATH}/${modulePath}`)
 }
 
@@ -59,11 +59,11 @@ async function getAllMatches(...args) {
   return matches;
 }
 
-function stringForNodeRange (node) {
+function stringForNodeRange(node) {
   return `${node.startIndex}-${node.endIndex}`;
 }
 
-function rangeFromDescriptor (rawRange) {
+function rangeFromDescriptor(rawRange) {
   let { startPosition, endPosition } = rawRange;
   let start = Point.fromObject(startPosition, true);
   let end = Point.fromObject(endPosition, true);
