@@ -15,6 +15,12 @@
   "doctype" @entity.name.tag.doctype.html
   ">" @punctuation.definition.tag.end.html) @meta.tag.doctype.html
 
+(style_element
+  (raw_text) @meta.embedded.block.css.html)
+
+(script_element
+  (raw_text) @meta.embedded.block.js.html)
+
 ; COMMENTS
 ; ========
 
