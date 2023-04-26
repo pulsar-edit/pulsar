@@ -75,9 +75,13 @@
   left: (member_expression
     property: (property_identifier)) @variable.other.assignment.property.js)
 
+; The "foo" in `foo += 1`.
 (augmented_assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
+; The "foo" in `foo++`.
+(update_expression
+  argument: (identifier) @variable.other.assignment.js)
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
@@ -324,6 +328,23 @@
   (identifier) @support.function.builtin.js
   (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
   (#set! final true))
+
+; Built-in `console` functions.
+
+(member_expression
+  object: (identifier) @support.class.builtin.console.js
+    (#eq? @support.class.builtin.console.js "console")
+  property: (property_identifier) @support.function.builtin.console.js
+    (#match? @support.function.builtin.console.js "^(assert|clear|count(Reset)?|debug|dir(xml)?|error|group(End)?info|log|profile(End)?|table|time(End|Log|Stamp)?|trace|warn)$")
+    (#set! final true))
+
+; Static methods of `Promise`.
+(member_expression
+  object: (identifier) @support.class.builtin.js
+    (#eq? @support.class.builtin.js "Promise")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(all|allSettled|any|race|resolve|reject)$")
+    (#set! final true))
 
 ; All “well-known” symbols (as they are referred to in the spec).
 (member_expression
@@ -588,7 +609,7 @@
 ] @variable.language._TYPE_.js
 
 ((identifier) @support.object.builtin._TEXT_.js
-  (#match? @support.object.builtin._TEXT_.js "^(arguments|module|console|window|document)$")
+  (#match? @support.object.builtin._TEXT_.js "^(arguments|module|window|document)$")
   (#is-not? local)
   (#set! final true))
 
@@ -617,6 +638,10 @@
   (true)
   (false)
 ] @constant.language.boolean._TYPE_.js
+
+((identifier) @constant.language.infinity.js
+  (#eq? @constant.language.infinity.js "Infinity")
+  (#set! final true))
 
 (arrow_function
   "=>" @punctuation.function.arrow.js)
@@ -842,10 +867,32 @@
 ; META
 ; ====
 
-(statement_block) @meta.block.js
+; The interiors of functions (useful for snippets and commands).
+(method_definition
+  body: (statement_block) @meta.block.function.js
+  (#set! final true))
+
+(function_declaration
+  body: (statement_block) @meta.block.function.js
+  (#set! final true))
+
+(generator_function_declaration
+  body: (statement_block) @meta.block.function.js
+  (#set! final true))
+
+(function
+  body: (statement_block) @meta.block.function.js
+  (#set! final true))
+
+(generator_function
+  body: (statement_block) @meta.block.function.js
+  (#set! final true))
 
 ; The interior of a class body (useful for snippets and commands).
 (class_body) @meta.block.class.js
+
+; All other sorts of blocks.
+(statement_block) @meta.block.js
 
 ; The inside of a parameter definition list.
 ((formal_parameters) @meta.parameters.js
@@ -860,6 +907,12 @@
 
 ; MISC
 ; ====
+
+; A label. Rare, but it can be used to prefix any statement and to control
+; which loop is affected in `continue` or `break` statements. Svelte uses them
+; for another purpose.
+(statement_identifier) @entity.name.label.js
+
 ;
 ; Inside of the parameters of an arrow function, the highlighting of parameters
 ; can change while the user is typing. For instance, if the user is adding a
