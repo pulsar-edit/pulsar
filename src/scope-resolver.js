@@ -16,7 +16,7 @@ function comparePoints(a, b) {
   }
 }
 
-function resolveNodeDescriptor (node, descriptor) {
+function resolveNodeDescriptor(node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
   while (result !== null && parts.length > 0) {
@@ -27,7 +27,7 @@ function resolveNodeDescriptor (node, descriptor) {
   return result;
 }
 
-function resolveNodePosition (node, descriptor) {
+function resolveNodePosition(node, descriptor) {
   let parts = descriptor.split('.');
   let lastPart = parts.pop();
   let result = parts.length === 0 ?
@@ -37,14 +37,14 @@ function resolveNodePosition (node, descriptor) {
   return result[lastPart];
 }
 
-function interpretPredicateValue (value) {
+function interpretPredicateValue(value) {
   if (value === "true") { return true; }
   if (value === "false") { return false; }
   if (/^\d+$/.test(value)) { return Number(value); }
   return value;
 }
 
-function interpretPossibleKeyValuePair (rawValue, coerceValue = false) {
+function interpretPossibleKeyValuePair(rawValue, coerceValue = false) {
   if (!rawValue.includes(' ')) { return [rawValue, null]; }
 
   // Split on the first space. Everything after the first space is the value.
@@ -120,6 +120,11 @@ class ScopeResolver {
     index += offset;
     let newPosition = this.indexToPosition(index);
     return this.buffer.clipPosition(newPosition);
+  }
+
+  shouldInvalidateOnChange(capture) {
+    return capture.setProperties &&
+      ('invalidateOnChange' in capture.setProperties);
   }
 
   // We want to index scope data on buffer position, but each `Point` (or
@@ -338,7 +343,7 @@ class ScopeResolver {
     this.configSubscription.dispose();
   }
 
-  *[Symbol.iterator] () {
+  *[Symbol.iterator]() {
     // Iterate in buffer position order.
     let keys = [...this.boundaries.keys()];
     keys.sort((a, b) => a.compare(b));
@@ -385,12 +390,12 @@ ScopeResolver.TESTS = {
   // exact same range. If a capture is the first one to define `final`, then
   // all other captures for that same range are ignored, whether they try to
   // define `final` or not.
-  final (node, value, props, existingData) {
+  final(node, value, props, existingData) {
     return !(existingData && existingData.final);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.
-  shy (node, value, props, existingData) {
+  shy(node, value, props, existingData) {
     return existingData === undefined;
   },
 
@@ -457,14 +462,14 @@ ScopeResolver.TESTS = {
   // Passes only if the given node is the last among its siblings.
   //
   // Is not guaranteed to pass if descended from an ERROR node.
-  onlyIfLast (node) {
+  onlyIfLast(node) {
     // Root nodes are always last.
     if (!node.parent) { return true; }
     return node?.parent?.lastChild?.id === node.id;
   },
 
   // Negates `onlyIfLast`.
-  onlyIfNotLast (node) {
+  onlyIfNotLast(node) {
     if (!node.parent) { return false; }
     return node?.parent?.lastChild?.id !== node.id;
   },
@@ -673,7 +678,7 @@ ScopeResolver.ADJUSTMENTS = {
   },
 
   // Alter the given range to end at the start or end of a different node.
-  endAt (node, value, props, range, resolver) {
+  endAt(node, value, props, range, resolver) {
     let end = resolveNodePosition(node, value);
     if (!end) { return null; }
 
