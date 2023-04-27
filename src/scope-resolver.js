@@ -522,7 +522,8 @@ ScopeResolver.TESTS = {
     return !onlyIfLastOfType;
   },
 
-  // Passes when the node represents the last non-whitespace content on its row.
+  // Passes when the node represents the last non-whitespace content on its
+  // row. Considers the node's ending row.
   onlyIfLastTextOnRow(node, value, props, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.endPosition.row);
@@ -537,10 +538,10 @@ ScopeResolver.TESTS = {
   },
 
   // Passes when the node represents the first non-whitespace content on its
-  // row.
+  // row. Considers the node's starting row.
   onlyIfFirstTextOnRow(node, value, props, existingData, instance) {
     let { buffer } = instance;
-    let text = buffer.lineForRow(node.endPosition.row);
+    let text = buffer.lineForRow(node.startPosition.row);
     let textBeforeNode = text.slice(0, node.startPosition.column);
     return !/\S/.test(textBeforeNode);
   },
