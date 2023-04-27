@@ -2,7 +2,8 @@ const dedent = require('dedent');
 
 describe('Language sass', () => {
   beforeEach(async () => {
-    atom.config.set('core.languageParser', 'textmate');
+    atom.config.set('core.useTreeSitterParsers', false);
+;
     await atom.packages.activatePackage('language-sass');
   });
 

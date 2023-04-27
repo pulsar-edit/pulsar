@@ -65,7 +65,8 @@ describe('WASMTreeSitterLanguageMode', () => {
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
-    atom.config.set('core.languageParser', 'wasm-tree-sitter');
+    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
   afterEach(() => {

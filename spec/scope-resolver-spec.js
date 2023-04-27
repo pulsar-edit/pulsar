@@ -78,7 +78,8 @@ describe('ScopeResolver', () => {
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     atom.grammars.addGrammar(grammar);
-    atom.config.set('core.languageParser', 'wasm-tree-sitter');
+    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
   it('resolves all scopes in absence of any tests or adjustments', async () => {

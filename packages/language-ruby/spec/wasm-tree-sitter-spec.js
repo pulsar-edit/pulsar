@@ -6,7 +6,8 @@ describe('WASM Tree-sitter Ruby grammar', () => {
 
   beforeEach(async () => {
     await atom.packages.activatePackage('language-ruby');
-    atom.config.set('core.languageParser', 'wasm-tree-sitter');
+    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
   it('tokenizes symbols', async () => {

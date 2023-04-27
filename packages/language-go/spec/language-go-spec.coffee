@@ -5,7 +5,8 @@ describe 'Go settings', ->
     editor.destroy()
 
   beforeEach ->
-    atom.config.set('core.languageParser', 'textmate')
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.workspace.open().then (o) ->

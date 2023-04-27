@@ -10,7 +10,7 @@ describe('TextMateLanguageMode', () => {
 
   beforeEach(async () => {
     config = atom.config;
-    config.set('core.languageParser', 'textmate');
+    config.set('core.useTreeSitterParsers', false);
     // enable async tokenization
     TextMateLanguageMode.prototype.chunkSize = 5;
     jasmine.unspy(TextMateLanguageMode.prototype, 'tokenizeInBackground');
@@ -20,7 +20,7 @@ describe('TextMateLanguageMode', () => {
   afterEach(() => {
     buffer && buffer.destroy();
     languageMode && languageMode.destroy();
-    config.unset('core.languageParser');
+    config.unset('core.useTreeSitterParsers');
   });
 
   describe('when the editor is constructed with the largeFileMode option set to true', () => {

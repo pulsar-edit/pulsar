@@ -153,15 +153,22 @@ module.exports = class GrammarListView {
   }
 };
 
-function isExperimentalTreeSitterMode () {
-  return atom.config.get('core.languageParser') === 'wasm-tree-sitter';
+function getLanguageModeConfig() {
+  let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
+  let isExperimental = atom.config.get('core.useExperimentalModernTreeSitter');
+  if (!isTreeSitterMode) return 'textmate';
+  return isExperimental ? 'wasm-tree-sitter' : 'node-tree-sitter';
+}
+
+function isExperimentalTreeSitterMode() {
+  return getLanguageModeConfig() === 'wasm-tree-sitter';
 }
 
 function isTreeSitter(grammar) {
   return isOldTreeSitter(grammar) || isModernTreeSitter(grammar);
 }
 
-function isModernTreeSitter (grammar) {
+function isModernTreeSitter(grammar) {
   return grammar.constructor.name === 'WASMTreeSitterGrammar';
 }
 
@@ -174,7 +181,7 @@ function compareGrammarType(a, b) {
 }
 
 function getGrammarScore(grammar) {
-  let languageParser = atom.config.get('core.languageParser');
+  let languageParser = getLanguageModeConfig();
   if (isModernTreeSitter(grammar)) { return -2; }
   if (isOldTreeSitter(grammar)) { return -1; }
   return languageParser === 'textmate' ? -3 : 0;

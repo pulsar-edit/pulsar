@@ -1,6 +1,13 @@
 const path = require('path');
 const SelectListView = require('atom-select-list');
 
+function setConfigForLanguageMode(mode) {
+  let useTreeSitterParsers = mode !== 'textmate';
+  let useExperimentalModernTreeSitter = mode === 'wasm-tree-sitter';
+  atom.config.set('core.useTreeSitterParsers', useTreeSitterParsers);
+  atom.config.set('core.useExperimentalModernTreeSitter', useExperimentalModernTreeSitter);
+}
+
 describe('GrammarSelector', () => {
   let [editor, textGrammar, jsGrammar] = [];
 
@@ -25,7 +32,7 @@ describe('GrammarSelector', () => {
     expect(jsGrammar).toBeTruthy();
     expect(editor.getGrammar()).toBe(jsGrammar);
 
-    atom.config.set('core.languageParser', 'textmate');
+    setConfigForLanguageMode('textmate');
   });
 
   describe('when grammar-selector:show is triggered', () =>
@@ -59,7 +66,7 @@ describe('GrammarSelector', () => {
     }));
 
   describe('when auto-detect is selected', () => {
-    it('restores the auto-detected grammar on the editor (when core.languageParser is textmate)', async () => {
+    it('restores the auto-detected grammar on the editor (when language parser is textmate)', async () => {
       let grammarView = await getGrammarView(editor);
       grammarView.props.didConfirmSelection(textGrammar);
       expect(editor.getGrammar()).toBe(textGrammar);
@@ -70,8 +77,8 @@ describe('GrammarSelector', () => {
       expect(currentGrammar.constructor.name).toBe('Grammar');
     });
 
-    it('restores the auto-detected grammar on the editor (when core.languageParser is node-tree-sitter)', async () => {
-      atom.config.set('core.languageParser', 'node-tree-sitter');
+    it('restores the auto-detected grammar on the editor (when language parser is node-tree-sitter)', async () => {
+      setConfigForLanguageMode('node-tree-sitter');
       let grammarView = await getGrammarView(editor);
       grammarView.props.didConfirmSelection(textGrammar);
       expect(editor.getGrammar()).toBe(textGrammar);
@@ -217,9 +224,9 @@ describe('GrammarSelector', () => {
         }
       });
 
-      it('shows both if false (in proper order when core.languageParser is node-tree-sitter)', async () => {
+      it('shows both if false (in proper order when language parser is node-tree-sitter)', async () => {
         await atom.packages.activatePackage('language-c'); // punctuation making it sort wrong
-        atom.config.set('core.languageParser', 'node-tree-sitter');
+        setConfigForLanguageMode('node-tree-sitter');
         atom.config.set(
           'grammar-selector.hideDuplicateTextMateGrammars',
           false
@@ -248,7 +255,7 @@ describe('GrammarSelector', () => {
         expect(cppCount).toBe(2); // ensure we actually saw both grammars
       });
 
-      it('shows both if false (in proper order when core.languageParser is textmate)', async () => {
+      it('shows both if false (in proper order when language parser is textmate)', async () => {
         await atom.packages.activatePackage('language-c'); // punctuation making it sort wrong
         atom.config.set(
           'grammar-selector.hideDuplicateTextMateGrammars',
@@ -320,9 +327,9 @@ describe('GrammarSelector', () => {
 
   // TODO: These tests will need to be altered when we remove legacy
   // tree-sitter altogether.
-  describe('when core.languageParser is "wasm-tree-sitter"', () => {
+  describe('when language parser is "wasm-tree-sitter"', () => {
     beforeEach(() => {
-      atom.config.set('core.languageParser', 'wasm-tree-sitter');
+      setConfigForLanguageMode('wasm-tree-sitter');
     });
 
     describe('when grammar-selector:show is triggered', () => {
@@ -452,10 +459,8 @@ async function getGrammarView(editor) {
   let timeout = setTimeout(() => {
     throw new Error('Timeout');
   }, 5000);
-  console.log('dispatching…');
   atom.commands.dispatch(editor.getElement(), 'grammar-selector:show');
   await SelectListView.getScheduler().getNextUpdatePromise();
-  console.log('…done.');
   clearTimeout(timeout);
   return atom.workspace.getModalPanels()[0].getItem();
 }

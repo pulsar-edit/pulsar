@@ -9,12 +9,14 @@ describe('Ruby grammars', () => {
   });
 
   it('tokenizes the editor using TextMate parser', async () => {
-    atom.config.set('core.languageParser', 'textmate');
+    atom.config.set('core.useTreeSitterParsers', false);
+
     await runGrammarTests(path.join(__dirname, 'fixtures', 'textmate-grammar.rb'), /#/)
   });
 
   it('tokenizes the editor using node tree-sitter parser', async () => {
-    atom.config.set('core.languageParser', 'wasm-tree-sitter');
+    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set('core.useExperimentalModernTreeSitter', true);
     await runGrammarTests(path.join(__dirname, 'fixtures', 'textmate-grammar.rb'), /#/)
   });
 });
