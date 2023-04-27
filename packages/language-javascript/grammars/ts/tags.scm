@@ -97,3 +97,22 @@
  (binary_expression)
  (call_expression)
 ]))) @definition.constant
+
+
+; JASMINE describe/it blocks
+; ==========================
+
+(call_expression
+  function: (identifier) @_fn
+  arguments: (arguments
+    (string
+      (string_fragment) @name))
+      (#match? @_fn "^(describe|it)$"))
+
+(call_expression
+  function: (identifier) @_fn
+  arguments: (arguments
+    (string
+      (string_fragment) @name))
+      (#match? @_fn "^(fdescribe|fit)$")
+      (#set! symbols.prepend "Focused: "))
