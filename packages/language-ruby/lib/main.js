@@ -15,7 +15,7 @@ exports.activate = function() {
   atom.grammars.addInjectionPoint('source.ruby', {
     type: 'regex',
     language() {
-      return 'regex';
+      return 'rb-regex';
     },
     content(node) {
       return node;
