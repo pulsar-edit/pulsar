@@ -536,6 +536,21 @@ ScopeResolver.TESTS = {
     return !isLastTextOnRow;
   },
 
+  // Passes when the node represents the first non-whitespace content on its
+  // row.
+  onlyIfFirstTextOnRow(node, value, props, existingData, instance) {
+    let { buffer } = instance;
+    let text = buffer.lineForRow(node.endPosition.row);
+    let textBeforeNode = text.slice(0, node.startPosition.column);
+    return !/\S/.test(textBeforeNode);
+  },
+
+  // Negates `onlyIfFirstTextOnRow`.
+  onlyIfNotFirstTextOnRow(...args) {
+    let isFirstTextOnRow = ScopeResolver.TESTS.onlyIfFirstTextOnRow(...args);
+    return !isFirstTextOnRow;
+  },
+
   // Passes if this node has a node of the given type in its ancestor chain.
   onlyIfDescendantOfType(node, type) {
     let current = node;

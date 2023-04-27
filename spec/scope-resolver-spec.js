@@ -449,6 +449,37 @@ describe('ScopeResolver', () => {
         ["hanging-logical-operator"]);
     });
 
+    it('supports onlyIfFirstTextOnRow', async () => {
+      await grammar.setQueryForTest('highlightsQuery', `
+        ("||" @hanging-logical-operator
+          (#set! onlyIfFirstTextOnRow true))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        let x = foo
+          || bar;
+
+        let y = foo || bar;
+      `);
+      await languageMode.ready;
+
+      let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+      let matched = [];
+      for (let capture of captures) {
+        let range = scopeResolver.store(capture);
+        if (range) { matched.push(capture); }
+      }
+
+      expect(matched.length).toBe(1);
+      expect(matched[0].node.startPosition.row).toBe(1);
+
+      expect(matched.map(capture => capture.name)).toEqual(
+        ["hanging-logical-operator"]);
+    });
+
     it('supports onlyIfDescendantOfType', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("," @comma-inside-function
