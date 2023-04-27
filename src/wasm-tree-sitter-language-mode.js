@@ -642,16 +642,18 @@ class WASMTreeSitterLanguageMode {
     let batchCount = 0;
 
     const cleanup = () => {
-      if (devMode && tag) { console.timeEnd(tag); }
+      if (devMode && tag) {
+        console.timeEnd(tag);
+        if (batchCount > 0) {
+          console.log(`(async: ${batchCount} batches)`);
+        }
+      }
       parser.setTimeoutMicros(null);
       PARSERS_IN_USE.delete(parser);
     };
 
     if (devMode && tag) {
       console.time(tag);
-      if (batchCount > 0) {
-        console.log(`(async: ${batchCount} batches)`);
-      }
     }
 
     try {
@@ -1155,31 +1157,20 @@ class WASMTreeSitterLanguageMode {
     // resolvers.
     scopeResolver.reset();
 
-    // If we aren't running at the end of a transaction, the tree will be
-    // dirty, and we'll need a parse here so that we can get accurate captures.
-    // This will tend not to be costly because — usually — the only change
-    // since the last parse will have been a carriage return.
-    //
-    // TODO: This is imperfect on injection layers because the last known
-    // update ranges could be stale. To know the exact range to re-parse we'd
-    // need to synchronously parse the root tree and however many intermediate
-    // layers' trees in between. That's possible in theory, but it wouldn't be
-    // a lot of fun. I haven't actually seen this break, so we'll live with it
-    // for now.
     let indentTree = options.tree;
 
     if (!indentTree) {
       if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
+        // We can't answer this yet because we don't yet have a new syntax
+        // tree. Return a promise that will fulfill once we can determine the
+        // right indent level.
+        //
         // TODO: For async, we might need an approach where we suggest a
         // preliminary indent level and then follow up later with a more
         // accurate one. It's a bit disorienting that the editor falls back to
         // an indent level of `0` when a newline is inserted.
-
-        // We can't answer this yet because we don't yet have a new syntax
-        // tree. Return a promise that will fulfill once we can determine the
-        // right indent level.
         return this.atTransactionEnd().then(({ changeCount }) => {
           if (changeCount > 1) {
             // There were multiple changes in this transaction, so it's not
@@ -1657,23 +1648,9 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForLineAtBufferRow(row, line, tabLength) {
-    // TODO: This method's goal is to make sure that text is inserted at the
-    // right indentation level from, say, a clipboard paste. But we can't run a
-    // syntax capture against arbitrary text that isn't in the parse tree.
-    //
-    // But if one were to paste text, then select that exact text and invoke
-    // **Editor: Auto Indent**, the text would be formatted correctly.
-    //
-    // So the better approach for a tree-sitter language mode would probably be
-    // to do this automatically. The only drawback is that we'd either
-    //
-    // (a) wait until the transaction is finished and the tree is re-parsed,
-    //     which means we'd want to fix the text and then group those changes
-    //     with the previous checkpoint to prevent an extra history
-    //     checkpoint, or
-    // (b) anonymously re-parse the tree to try to avoid that hassle, which
-    //     could double the amount of time we spend parsing.
-    //
+    // We can't answer this question accurately for text that isn't yet in the
+    // tree, so instead we'll just note that this request was made and try to
+    // correct indentation when the transaction is over.
     this.autoIndentRequests++;
     return this.suggestedIndentForBufferRow(row, tabLength);
   }
@@ -2744,6 +2721,9 @@ class LanguageLayer {
     this.grammar = grammar;
     this.depth = depth;
     this.injectionPoint = injectionPoint;
+    this.rangeList = new RangeList();
+
+    this.nodesToInvalidateOnChange = new Set();
 
     this.tree = null;
     this.lastSyntaxTree = null;
@@ -2889,6 +2869,7 @@ class LanguageLayer {
           // Force a re-highlight of this layer's entire region.
           let range = this.getExtent();
           this.languageMode.emitRangeUpdate(range);
+          this.nodesToInvalidateOnChange.clear();
           this._pendingQueryFileChange = false;
         } catch (error) {
           console.error(`Error parsing query file: ${queryType}`);
@@ -2922,6 +2903,19 @@ class LanguageLayer {
 
     for (let capture of captures) {
       let { node } = capture;
+      if (this.scopeResolver.shouldInvalidateOnChange(capture)) {
+        // This node wants to be invalidated in its entirety whenever a change
+        // happens within it. This setting should be added to a query whenever
+        // (a) a certain node's scope name can change just from its contents
+        // changing, and (b) that node can possibly span more than one line.
+        //
+        // Without this setting, we're liable to invalidate only the line that
+        // a change happened on, because we have no other way of knowing how
+        // significant of a change it is. If we were able to do so, we'd set
+        // this property automatically on any capture that (a) involved a
+        // `#match?` predicate, and (b) started and ended on different lines.
+        this.nodesToInvalidateOnChange.add(node.id);
+      }
       // Phantom nodes invented by the parse tree. Indentation captures can use
       // `allowEmpty` to force these to be considered, but for marking scopes,
       // there's no need for it; it'd just cause us to open and close a scope
@@ -3341,6 +3335,7 @@ class LanguageLayer {
 
   async _performUpdate(nodeRangeSet, params = {}) {
     let includedRanges = null;
+    this.rangeList.clear();
 
     if (nodeRangeSet) {
       includedRanges = nodeRangeSet.getRanges(this.languageMode.buffer);
@@ -3361,7 +3356,7 @@ class LanguageLayer {
         language,
         this.tree,
         includedRanges,
-        { tag: `Parsing ${this.inspect()} (async)` }
+        // { tag: `Parsing ${this.inspect()} (async) ${params.id}` }
       );
       if (tree.then) {
         params.async = true;
@@ -3372,7 +3367,7 @@ class LanguageLayer {
         language,
         this.tree,
         includedRanges,
-        { tag: `Parsing ${this.inspect()} (sync)` }
+        // { tag: `Parsing ${this.inspect()} (sync) ${params.id}` }
       );
     }
 
@@ -3400,23 +3395,31 @@ class LanguageLayer {
     this.lastTransactionEditedRange = this.editedRange;
     this.editedRange = null;
 
-    // Experiment: Even when no syntax changes have occurred, we should
-    // always re-highlight the most specific node within which the edit
-    // occurred. This is needed because a node's scope can change based on
-    // its contents.
+    // Look for a node that was marked with `invalidateOnChange`. If we find
+    // one, we should invalidate that node's entire buffer region.
     if (affectedRange) {
-      let node = this.getSyntaxNodeContainingRange(affectedRange);
-      // Simple guard here against situations where the most specific node
-      // for this range is the root node. We're not trying to invalidate the
-      // whole tree. If the whole tree truly needs to be invalidated, it'll
-      // get caught by tree-sitter anyway.
-      //
-      // This can still invalidate _large_ parts of the tree in certain
-      // grammars.
-      if (node && node.parent) {
-        this.languageMode.emitRangeUpdate(node.range);
+      let node = this.getSyntaxNodeContainingRange(
+        affectedRange,
+        n => this.nodesToInvalidateOnChange.has(n.id)
+      );
+
+      if (node) {
+        // One of this node's ancestors might also be in our invalidation list,
+        // so we'll traverse upwards to see if we should invalidate a larger
+        // node instead.
+        let ancestor = node.parent;
+        while (ancestor) {
+          if (this.nodesToInvalidateOnChange.has(ancestor.id)) {
+            node = ancestor;
+          }
+          ancestor = ancestor.parent;
+        }
+
+        this.rangeList.add(node.range);
       }
     }
+
+    this.nodesToInvalidateOnChange.clear();
 
     if (this.lastSyntaxTree) {
       const rangesWithSyntaxChanges = this.lastSyntaxTree.getChangedRanges(tree);
@@ -3438,7 +3441,7 @@ class LanguageLayer {
 
       if (rangesWithSyntaxChanges.length > 0) {
         for (const range of rangesWithSyntaxChanges) {
-          this.languageMode.emitRangeUpdate(rangeForNode(range));
+          this.rangeList.add(rangeForNode(range));
         }
 
         const combinedRangeWithSyntaxChange = new Range(
@@ -3447,7 +3450,7 @@ class LanguageLayer {
         );
 
         if (affectedRange) {
-          this.languageMode.emitRangeUpdate(affectedRange);
+          this.rangeList.add(affectedRange);
           affectedRange = affectedRange.union(combinedRangeWithSyntaxChange);
         } else {
           affectedRange = combinedRangeWithSyntaxChange;
@@ -3473,7 +3476,7 @@ class LanguageLayer {
       //
       ensureNodeIsPatched(tree.rootNode);
 
-      this.languageMode.emitRangeUpdate(rangeForNode(tree.rootNode));
+      this.rangeList.add(rangeForNode(tree.rootNode));
       if (includedRanges) {
         affectedRange = new Range(
           includedRanges[0].startPosition,
@@ -3482,6 +3485,12 @@ class LanguageLayer {
       } else {
         affectedRange = MAX_RANGE;
       }
+    }
+
+    // Now that we've assembled and coalesced all the ranges that need
+    // invalidating, we'll invalidate them in buffer order.
+    for (let range of this.rangeList) {
+      this.languageMode.emitRangeUpdate(range);
     }
 
     if (affectedRange) {
@@ -3560,7 +3569,7 @@ class LanguageLayer {
       this.language,
       this.tree,
       ranges,
-      { tag: `Re-parsing ${this.inspect()}` }
+      // { tag: `Re-parsing ${this.inspect()}` }
     );
 
     if (this.depth === 0 && !anonymous) {
@@ -3643,12 +3652,12 @@ class LanguageLayer {
   }
 
   // Used to find the most specific node affected by an edited range.
-  getSyntaxNodeContainingRange(range) {
+  getSyntaxNodeContainingRange(range, where = FUNCTION_TRUE) {
     if (!this.language || !this.tree) { return null; }
     let { buffer } = this.languageMode;
 
     if (range.start.isEqual(range.end)) {
-      return this.getSyntaxNodeAtPosition(range.start);
+      return this.getSyntaxNodeAtPosition(range.start, where);
     }
 
     let indexStart = buffer.characterIndexForPosition(range.start);
@@ -3659,9 +3668,10 @@ class LanguageLayer {
       range.start,
       (node) => {
         let breadth = node.endIndex - node.startIndex;
-        return node.startIndex <= indexEnd &&
+        let qualifies = node.startIndex <= indexEnd &&
           node.endIndex >= indexEnd &&
           breadth >= rangeBreadth;
+        return qualifies && where(node);
       }
     );
 
@@ -4062,6 +4072,60 @@ class Index extends Map {
       this.set(key, existing);
     }
     existing.push(...values);
+  }
+}
+
+
+// A class designed to aggregate and normalize a set of ranges. Each time a
+// buffer range is added, it's compared to the existing list; if there are
+// intersections with range already in the list, those intersections are
+// combined into one larger range.
+//
+// Assumes all ranges are instances of `Range` rather than tree-sitter range
+// specs.
+class RangeList {
+  constructor() {
+    this.ranges = [];
+  }
+
+  clear() {
+    this.ranges.length = 0;
+  }
+
+  add(newRange) {
+    let intersecting = [];
+    for (let range of this.ranges) {
+      if (newRange.intersectsWith(range)) {
+        intersecting.push(range);
+      }
+    }
+
+    for (let i = intersecting.length - 1; i >= 0; i--) {
+      let index = this.ranges.indexOf(intersecting[i]);
+      this.ranges.splice(index, 1);
+    }
+    while (intersecting.length > 0) {
+      newRange = newRange.union(intersecting.shift());
+    }
+    this.insertOrdered(newRange);
+  }
+
+  insertOrdered(newRange) {
+    let index = this.ranges.findIndex((r, i) => {
+      return r.start.compare(newRange.start) > 0;
+    });
+    this.ranges.splice(index, 0, newRange);
+  }
+
+  inspect() {
+    let ranges = this.ranges.map(r => r.toString());
+    return `[RangeList: ${ranges.join(', ')}]`;
+  }
+
+  *[Symbol.iterator]() {
+    for (let range of this.ranges) {
+      yield range;
+    }
   }
 }
 

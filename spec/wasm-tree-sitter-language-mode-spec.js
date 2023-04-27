@@ -291,15 +291,17 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('always updates the range of the current node in the tree', async () => {
+    it('updates the range of the current node in the tree when invalidateOnChange is set', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
         ((template_string) @lorem
-          (#match? @lorem "lorem"))
+          (#match? @lorem "lorem")
+          (#set! invalidateOnChange true))
         ((template_string) @ipsum
-          (#not-match? @ipsum "lorem"))
+          (#not-match? @ipsum "lorem")
+          (#set! invalidateOnChange true))
       `);
 
       buffer.setText(dedent`\`
@@ -343,6 +345,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // TODO: Any way around this?
       await languageMode.nextTransaction;
+      await wait(0);
 
       expectTokensToEqual(editor, [
         [

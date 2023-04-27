@@ -11,7 +11,8 @@
 
 ((comment) @comment.block.documentation.javadoc.java
   (#match? @comment.block.documentation.javadoc.java "^/\\*\\*")
-  (#set! final true))
+  (#set! final true)
+  (#set! invalidateOnChange true))
 
 ; ((comment) @punctuation.definition.comment.begin.java
 ;   (#match? @punctuation.definition.comment.begin.java "^/\\*\\*")
@@ -20,7 +21,8 @@
 
 
 ((comment) @comment.block.java
-  (#match? @comment.block.java "^/\\*"))
+  (#match? @comment.block.java "^/\\*")
+  (#set! invalidateOnChange true))
 
 ((comment) @punctuation.definition.comment.begin.java
   (#match? @punctuation.definition.comment.begin.java "^/\\*")
