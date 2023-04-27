@@ -24,23 +24,33 @@ exports.activate = function() {
     // coverShallowerScopes: false
   });
 
-  // TODO: Uncomment when performance is improved on these tree-sitter grammars.
+  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+  const HYPERLINK_PATTERN = /\bhttps?:/
 
-  // atom.grammars.addInjectionPoint('source.ruby', {
-  //   type: 'comment',
-  //   language: () => 'todo',
-  //   content: (node) => node
-  // });
-  //
-  // atom.grammars.addInjectionPoint('source.ruby', {
-  //   type: 'comment',
-  //   language: () => 'hyperlink',
-  //   content: (node) => node
-  // });
-  //
-  // atom.grammars.addInjectionPoint('source.ruby', {
-  //   type: 'string_content',
-  //   language: () => 'hyperlink',
-  //   content: (node) => node
-  // });
+  atom.grammars.addInjectionPoint('source.ruby', {
+    type: 'comment',
+    language: (node) => {
+      return TODO_PATTERN.test(node.text) ? 'todo' : null;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  atom.grammars.addInjectionPoint('source.ruby', {
+    type: 'comment',
+    language: (node) => {
+      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : null;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  atom.grammars.addInjectionPoint('source.ruby', {
+    type: 'string_content',
+    language: (node) => {
+      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : null;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
 };
