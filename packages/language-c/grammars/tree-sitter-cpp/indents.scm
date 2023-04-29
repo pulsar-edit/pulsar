@@ -20,13 +20,13 @@
 ; we might have to make this configurable somehow.
 (switch_statement
   body: (compound_statement "}" @match
-    (#set! onlyIfLast true))
-  (#set! matchIndentOf parent.startPosition))
+    (#set! test.onlyIfLast true))
+  (#set! indent.matchIndentOf parent.startPosition))
 
 ; 'case' and 'default' need to be indented one level more than their containing
 ; `switch`.
 (["case" "default"] @match
-  (#set! matchIndentOf parent.parent.startPosition)
-  (#set! offsetIndent 1))
+  (#set! indent.matchIndentOf parent.parent.startPosition)
+  (#set! indent.offsetIndent 1))
 
 ["case" "default"] @indent

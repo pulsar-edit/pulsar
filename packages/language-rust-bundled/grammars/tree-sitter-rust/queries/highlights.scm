@@ -3,13 +3,13 @@
 
 (line_comment) @comment.line.double-slash.rust
 ((line_comment) @punctuation.definition.comment.rust
-  (#set! endAfterFirstMatchOf "^//"))
+  (#set! adjust.endAfterFirstMatchOf "^//"))
 
 (block_comment) @comment.block.rust
 ((block_comment) @punctuation.definition.begin.comment.rust
-  (#set! endAfterFirstMatchOf "^/\\*"))
+  (#set! adjust.endAfterFirstMatchOf "^/\\*"))
 ((block_comment) @punctuation.definition.end.comment.rust
-  (#set! startBeforeFirstMatchOf "\\*/$"))
+  (#set! adjust.startBeforeFirstMatchOf "\\*/$"))
 
 
 ; FUNCTIONS
@@ -33,7 +33,7 @@
 
 ; Wrap the "foo" and "!" of `foo!()`.
 ((macro_invocation) @support.other.function.rust
-  (#set! endAt firstChild.nextSibling.endPosition))
+  (#set! adjust.endAt firstChild.nextSibling.endPosition))
 
 (call_expression
   function: (identifier) @support.other.function.rust)
@@ -120,7 +120,7 @@
 
 ((identifier) @constant.other.rust
   (#match? @constant.other.rust "^[A-Z_][A-Z\\d_]+$")
-  (#set! final true))
+  (#set! test.final true))
 
 (boolean_literal) @constant.language.boolean._TEXT_.rust
 (escape_sequence) @constant.character.escape.rust

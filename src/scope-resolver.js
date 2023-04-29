@@ -124,7 +124,7 @@ class ScopeResolver {
 
   shouldInvalidateOnChange(capture) {
     return capture.setProperties &&
-      ('invalidateOnChange' in capture.setProperties);
+      ('highlight.invalidateOnChange' in capture.setProperties);
   }
 
   // We want to index scope data on buffer position, but each `Point` (or
@@ -178,12 +178,48 @@ class ScopeResolver {
     let { setProperties: props = {} } = capture;
     let keys = Object.keys(props);
     if (keys.length === 0) { return false; }
-    return keys.some(k => k in ScopeResolver.ADJUSTMENTS);
+    return keys.some(k => this.capturePropertyIsAdjustment(k));
   }
 
   rangeExceedsBoundsOfCapture(range, capture) {
     return range.startIndex < capture.node.startIndex ||
       range.endIndex > capture.node.endIndex;
+  }
+
+  normalizeAdjustmentProperty(prop) {
+    if (prop.startsWith('adjust.')) {
+      prop = prop.replace(/^adjust\./, '');
+    }
+    return prop;
+  }
+
+  capturePropertyIsAdjustment(prop) {
+    prop = this.normalizeAdjustmentProperty(prop);
+    return prop in ScopeResolver.ADJUSTMENTS;
+  }
+
+  applyAdjustment(prop, ...args) {
+    prop = this.normalizeAdjustmentProperty(prop);
+    return ScopeResolver.ADJUSTMENTS[prop](...args);
+  }
+
+  normalizeTestProperty(prop) {
+    if (prop.startsWith('test.')) {
+      prop = prop.replace(/^test\./, '');
+    }
+    return prop;
+  }
+
+  capturePropertyIsTest(prop) {
+    prop = this.normalizeTestProperty(prop);
+    return prop in ScopeResolver.TESTS;
+  }
+
+  applyTest(prop, ...args) {
+    // console.log('testing prop:', prop);
+    prop = this.normalizeTestProperty(prop);
+    // console.log('now prop:', prop);
+    return ScopeResolver.TESTS[prop](...args);
   }
 
   // Given a capture and possible predicate data, determines the buffer range
@@ -204,14 +240,13 @@ class ScopeResolver {
     };
 
     for (let key in props) {
-      if (key in ScopeResolver.ADJUSTMENTS) {
+      if (this.capturePropertyIsAdjustment(key)) {
         let value = props[key];
 
         // Transform the range successively. Later adjustments can optionally
         // act on earlier adjustments, or they can ignore the current position
         // and inspect the original node instead.
-        range = ScopeResolver.ADJUSTMENTS[key](
-          capture.node, value, props, range, this);
+        range = this.applyAdjustment(key, capture.node, value, props, range, this);
 
         // If any single adjustment returns `null`, we shouldn't store this
         // capture.
@@ -233,13 +268,12 @@ class ScopeResolver {
   // document.
   test(capture, existingData) {
     let { node, setProperties: props = {} } = capture;
-    if (existingData?.final) { return false; }
+    if (existingData?.final || existingData?.['test.final']) { return false; }
 
     for (let key in props) {
-      if (!(key in ScopeResolver.TESTS)) { continue; }
-      let test = ScopeResolver.TESTS[key];
+      if (!this.capturePropertyIsTest(key)) { continue; }
       let value = props[key];
-      if (!test(node, value, props, existingData, this)) {
+      if (!this.applyTest(key, node, value, props, existingData, this)) {
         return false;
       }
     }
@@ -364,7 +398,9 @@ ScopeResolver.interpolateName = (name, node) => {
    !node.text.includes(' ')) {
     name = name.replace('_TEXT_', node.text);
   }
-  name = name.replace('_TYPE_', node.type);
+  if (name.includes('_TYPE_')) {
+    name = name.replace('_TYPE_', node.type);
+  }
   return name;
 };
 
@@ -391,7 +427,8 @@ ScopeResolver.TESTS = {
   // all other captures for that same range are ignored, whether they try to
   // define `final` or not.
   final(node, value, props, existingData) {
-    return !(existingData && existingData.final);
+    let final = existingData?.final || existingData?.['test.final'];
+    return !(existingData && final);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.

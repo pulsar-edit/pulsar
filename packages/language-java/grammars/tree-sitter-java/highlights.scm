@@ -6,31 +6,25 @@
 
 ((comment) @punctuation.definition.comment.java
   (#match? @punctuation.definition.comment.java "^//")
-  (#set! startAndEndAroundFirstMatchOf "^//"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^//"))
 
 
 ((comment) @comment.block.documentation.javadoc.java
   (#match? @comment.block.documentation.javadoc.java "^/\\*\\*")
-  (#set! final true)
-  (#set! invalidateOnChange true))
-
-; ((comment) @punctuation.definition.comment.begin.java
-;   (#match? @punctuation.definition.comment.begin.java "^/\\*\\*")
-;   (#set! startAndEndAroundFirstMatchOf "^/\\*\\*")
-;   (#set! final true))
-
+  (#set! test.final true)
+  (#set! highlight.invalidateOnChange true))
 
 ((comment) @comment.block.java
   (#match? @comment.block.java "^/\\*")
-  (#set! invalidateOnChange true))
+  (#set! highlight.invalidateOnChange true))
 
 ((comment) @punctuation.definition.comment.begin.java
-  (#match? @punctuation.definition.comment.begin.java "^/\\*")
-  (#set! startAndEndAroundFirstMatchOf "^/\\*"))
+  (#match? @punctuation.definition.comment.begin.java "^/\\*\\*?")
+  (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*"))
 
 ((comment) @punctuation.definition.comment.end.java
   (#match? @punctuation.definition.comment.end.java "\\*/$")
-  (#set! startAndEndAroundFirstMatchOf "\\*/$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\*/$"))
 
 ; OBJECTS
 ; =======
@@ -42,7 +36,7 @@
 (superclass
   "extends" @storage.modifier.extends.java
   (type_identifier) @entity.other.inherited-class.java
-  (#set! final true))
+  (#set! test.final true))
 
 (class_declaration body: (_) @meta.class.body.java)
 
@@ -71,14 +65,14 @@
 (extends_interfaces
   (interface_type_list
     (type_identifier) @entity.other.inherited-class.java)
-    (#set! final true))
+    (#set! test.final true))
 
 (super_interfaces "implements" @storage.modifier.implements.java)
 
 (super_interfaces
   (interface_type_list
     (type_identifier) @entity.other.inherited-class.java)
-    (#set! final true))
+    (#set! test.final true))
 
 (static_initializer "static" @storage.modifier.static.java)
 
@@ -91,14 +85,14 @@
 
 ; Cover both the '@' and the 'Foo' in `@Foo`.
 ((marker_annotation) @storage.type.annotation.java @support.type.annotation.java
-  (#set! endAt firstChild.nextSibling.endPosition))
+  (#set! adjust.endAt firstChild.nextSibling.endPosition))
 
 (annotation
   "@" @punctuation.definition.annotation.java) @meta.declaration.annotation.java
 
   ; Cover both the '@' and the 'Foo' in `@Foo`.
 ((annotation) @storage.type.annotation.java @support.type.annotation.java
-  (#set! endAt firstChild.nextSibling.endPosition))
+  (#set! adjust.endAt firstChild.nextSibling.endPosition))
 
 (element_value_pair key: (_) @variable.other.annotation.element.java)
 
@@ -107,21 +101,21 @@
 
 (object_creation_expression (type_identifier)
   @support.other.class.java
-  (#set! final true))
+  (#set! test.final true))
 
 ; WORKAROUND: This matches often when the user is typing, so we shouldn't
 ; highlight it until we know for sure what it is.
 (ERROR
   (type_identifier) @_IGNORE_
-  (#set! final true))
+  (#set! test.final true))
 
 ; WORKAROUND: A chain like `System.out.println` shouldn't match at all until
 ; it's out of an ERROR state; this should catch all references no matter how
 ; long the chain is.
 (scoped_type_identifier
   (type_identifier) @_IGNORE
-  (#set! onlyIfDescendantOfType ERROR)
-  (#set! final true))
+  (#set! test.onlyIfDescendantOfType ERROR)
+  (#set! test.final true))
 
 (type_identifier) @storage.type.java
 (type_parameter (identifier) @storage.type.java)
@@ -188,22 +182,22 @@
 
 (field_access (identifier) @constant.other.java
   (#match? @constant.other.java "^[A-Z][A-Z0-9_\\$]+$")
-  (#set! final true))
+  (#set! test.final true))
 
 (field_access
   object: (identifier) @support.other.class.java
   (#match? @support.other.class.java "^[A-Z]")
-  (#set! final true))
+  (#set! test.final true))
 
 (field_access
   field: (identifier) @support.other.class.java
   (#match? @support.other.class.java "^[A-Z]")
-  (#set! final true))
+  (#set! test.final true))
 
 
 (method_invocation (identifier) @constant.other.java
   (#match? @constant.other.java "^[A-Z][A-Z0-9_\\$]+$")
-  (#set! final true))
+  (#set! test.final true))
 
 
 ; VARIABLES
@@ -248,17 +242,17 @@
 (character_literal) @string.quoted.single.java
 
 ((character_literal) @punctuation.definition.string.begin.java
-  (#set! startAndEndAroundFirstMatchOf "^'"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^'"))
 ((character_literal) @punctuation.definition.string.end.java
-  (#set! startAndEndAroundFirstMatchOf "'$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "'$"))
 
 
 (string_literal) @string.quoted.double.java
 
 ((string_literal) @punctuation.definition.string.begin.java
-  (#set! startAndEndAroundFirstMatchOf "^\""))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^\""))
 ((string_literal) @punctuation.definition.string.end.java
-  (#set! startAndEndAroundFirstMatchOf "\"$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\"$"))
 
 ; CAVEAT: Parser doesn't recognize escape sequences in strings.
 
@@ -380,17 +374,17 @@
   condition: (parenthesized_expression
     "(" @punctuation.definition.expression.begin.bracket.round.java
     ")" @punctuation.definition.expression.end.bracket.round.java
-    (#set! final true)))
+    (#set! test.final true)))
 
 (formal_parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.java
   ")" @punctuation.definition.parameters.end.bracket.round.java
-  (#set! final true))
+  (#set! test.final true))
 
 (argument_list
   "(" @punctuation.definition.arguments.begin.bracket.round.java
   ")" @punctuation.definition.arguments.end.bracket.round.java
-  (#set! final true))
+  (#set! test.final true))
 
 
 "{" @punctuation.definition.block.begin.bracket.curly.java

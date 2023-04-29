@@ -35,18 +35,18 @@
 
 ((comment) @punctuation.definition.comment.ts.tsx
   (#match? @comment.line.double-slash.ts.tsx "^//")
-  (#set! startAndEndAroundFirstMatchOf "^//"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^//"))
 
 ((comment) @comment.block.ts.tsx
   (#match? @comment.block.ts.tsx "^/\\*"))
 
 ((comment) @punctuation.definition.comment.begin.ts.tsx
   (#match? @punctuation.definition.comment.begin.ts.tsx "^/\\*")
-  (#set! startAndEndAroundFirstMatchOf "^/\\*"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*"))
 
 ((comment) @punctuation.definition.comment.end.ts.tsx
   (#match? @punctuation.definition.comment.end.ts.tsx "\\*/$")
-  (#set! startAndEndAroundFirstMatchOf "\\*/$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\*/$"))
 
 
 ; PROPERTIES
@@ -54,7 +54,7 @@
 
 ((property_identifier) @constant.other.property.ts.tsx
   (#match? @constant.other.property.ts.tsx "^[\$A-Z_]+$")
-  (#set! final true))
+  (#set! test.final true))
 
 ; (property_identifier) @variable.other.object.property.ts.tsx
 
@@ -128,10 +128,10 @@
 ; (type_annotation)
 
 ((type_identifier) @storage.type.ts.tsx @support.type.ts.tsx
-  (#set! onlyIfDescendantOfType type_annotation))
+  (#set! test.onlyIfDescendantOfType type_annotation))
 
 ((type_identifier) @storage.type.ts.tsx @support.type.ts.tsx
-  (#set! onlyIfDescendantOfType type_arguments))
+  (#set! test.onlyIfDescendantOfType type_arguments))
 
 ; OBJECTS
 ; =======
@@ -190,7 +190,7 @@
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition.ts.tsx
-    (#set! final true))
+    (#set! test.final true))
   right: [(arrow_function) (function)])
 
 ; Function variable assignment:
@@ -233,7 +233,7 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring.ts)
-    (#set! final true))
+    (#set! test.final true))
 
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
@@ -321,7 +321,7 @@
     (pair_pattern
       key: (_) @entity.other.attribute-name.ts.tsx
       value: (identifier) @variable.other.assignment.loop.ts.tsx)
-      (#set! final true)))
+      (#set! test.final true)))
 
 ; The "error" in `} catch (error) {`
 (catch_clause
@@ -343,27 +343,27 @@
 ((string "\"") @string.quoted.double.ts.tsx)
 ((string
   "\"" @punctuation.definition.string.begin.ts.tsx)
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 
 ((string
   "\"" @punctuation.definition.string.end.ts.tsx)
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 ((string "'") @string.quoted.single.ts.tsx)
 ((string
   "'" @punctuation.definition.string.begin.ts.tsx)
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 
 ((string
   "'" @punctuation.definition.string.end.ts.tsx)
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 (template_string) @string.quoted.template.ts.tsx
 
 ((template_string "`" @punctuation.definition.string.begin.ts.tsx)
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 ((template_string "`" @punctuation.definition.string.end.ts.tsx)
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 ; Interpolations inside of template strings.
 (template_substitution
@@ -511,7 +511,7 @@
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
   "/" @punctuation.definition.tag.end.ts.tsx
-  (#set! final true)
+  (#set! test.final true)
   name: (identifier) @entity.name.tag.ts.tsx)
 
 ; The "bar" in `<Foo bar={true} />`.
@@ -521,17 +521,17 @@
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.ts.tsx
   (#match? @meta.embedded.block.ts.tsx "\\n")
-  (#set! final true))
+  (#set! test.final true))
 
 (jsx_expression) @meta.embedded.line.ts.tsx
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.ts.tsx
-  (#set! final true))
+  (#set! test.final true))
 
 ((jsx_self_closing_element
   ; The "/>" in `<Foo />`, extended to cover both anonymous nodes at once.
   "/") @punctuation.definition.tag.end.ts.tsx
-  (#set! startAt lastChild.previousSibling.startPosition)
-  (#set! endAt lastChild.endPosition)
-  (#set! final true))
+  (#set! adjust.startAt lastChild.previousSibling.startPosition)
+  (#set! adjust.endAt lastChild.endPosition)
+  (#set! test.final true))

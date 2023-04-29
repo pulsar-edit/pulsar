@@ -135,10 +135,10 @@ describe('ScopeResolver', () => {
   });
 
   describe('adjustments', () => {
-    it('adjusts ranges with (#set! startAt)', async () => {
+    it('adjusts ranges with (#set! adjust.startAt)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
       ((try_statement) @try.plus.brace
-        (#set! endAt
+        (#set! adjust.endAt
           firstChild.nextSibling.firstChild.endPosition))
       `);
 
@@ -158,11 +158,11 @@ describe('ScopeResolver', () => {
         .toBe('try {');
     });
 
-    it('adjusts ranges with (#set! endAt)', async () => {
+    it('adjusts ranges with (#set! adjust.endAt)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((object) @object.interior
-          (#set! startAt firstChild.endPosition)
-          (#set! endAt lastChild.startPosition))
+          (#set! adjust.startAt firstChild.endPosition)
+          (#set! adjust.endAt lastChild.startPosition))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -183,12 +183,12 @@ describe('ScopeResolver', () => {
       ).toBe(`from: 'x', to: 'y'`);
     });
 
-    it('adjusts ranges with (#set! offset(Start|End))', async () => {
+    it('adjusts ranges with (#set! adjust.offset(Start|End))', async () => {
       // Same result as the previous test, but with a different technique.
       await grammar.setQueryForTest('highlightsQuery', `
         ((object) @object.interior
-          (#set! offsetStart 1)
-          (#set! offsetEnd -1))
+          (#set! adjust.offsetStart 1)
+          (#set! adjust.offsetEnd -1))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -211,13 +211,13 @@ describe('ScopeResolver', () => {
     it('prevents adjustments outside the original capture', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((comment) @too-early
-          (#set! startAt previousSibling.startPosition))
+          (#set! adjust.startAt previousSibling.startPosition))
         ((comment) @too-late
-          (#set! endAt nextSibling.endPosition))
+          (#set! adjust.endAt nextSibling.endPosition))
         ((comment) @offset-too-early
-          (#set! offsetStart -10))
+          (#set! adjust.offsetStart -10))
         ((comment) @offset-too-late
-          (#set! offsetEnd 10))
+          (#set! adjust.offsetEnd 10))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -241,10 +241,10 @@ describe('ScopeResolver', () => {
       }
     });
 
-    it("adjusts a range around a regex match with `startAndEndAroundFirstMatchOf`", async () => {
+    it("adjusts a range around a regex match with `adjust.startAndEndAroundFirstMatchOf`", async () => {
       await grammar.setQueryForTest('highlightsQuery', `
       ((comment) @todo
-        (#set! startAndEndAroundFirstMatchOf "\\\\sTODO(?=:)"))
+        (#set! adjust.startAndEndAroundFirstMatchOf "\\\\sTODO(?=:)"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -276,12 +276,12 @@ describe('ScopeResolver', () => {
 
   describe('tests', () => {
 
-    it('rejects scopes for ranges that have already been claimed by another capture with (#set! final true)', async () => {
+    it('rejects scopes for ranges that have already been claimed by another capture with (#set! test.final true)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
         ((string) @string1
-          (#set! final true))
+          (#set! test.final true))
 
         (string) @string2
         "=" @operator
@@ -312,11 +312,47 @@ describe('ScopeResolver', () => {
       }
     });
 
-    it('rejects scopes for ranges that have already been claimed if set with (#set! shy true)', async () => {
+    it('rejects scopes for ranges that have already been claimed by another capture with (#set! test.final true)', async () => {
+      await grammar.setQueryForTest('highlightsQuery', `
+        (comment) @comment
+        (string) @string0
+        ((string) @string1
+        (#set! test.final true))
+
+        (string) @string2
+        "=" @operator
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        // this is a comment
+        const foo = "ahaha";
+      `);
+      await languageMode.ready;
+
+      let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+      for (let capture of captures) {
+        let { node, name } = capture;
+        let result = scopeResolver.store(capture);
+        if (name === 'string0') {
+          expect(!!result).toBe(true);
+        }
+        if (name === 'string1') {
+          expect(!!result).toBe(true);
+        }
+        if (name === 'string2') {
+          expect(!!result).toBe(false);
+        }
+      }
+    });
+
+    it('rejects scopes for ranges that have already been claimed if set with (#set! test.shy true)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string "\\"") @string.double
-        ((string) @string.other (#set! shy true))
+        ((string) @string.other (#set! test.shy true))
         "=" @operator
       `);
 
@@ -347,9 +383,9 @@ describe('ScopeResolver', () => {
     it('rejects scopes for ranges that fail onlyIfFirst or onlyIfLast', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((string_fragment) @impossible.first
-          (#set! onlyIfFirst true))
+          (#set! test.onlyIfFirst true))
         ((string_fragment) @impossible.last
-          (#set! onlyIfLast true))
+          (#set! test.onlyIfLast true))
         ((string) "'" @punctuation.first
           (#onlyIfFirst true))
         ((string) "'" @punctuation.last
@@ -386,14 +422,14 @@ describe('ScopeResolver', () => {
     it('supports onlyIfFirstOfType and onlyIfLastOfType', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters (identifier) @first-param
-          (#set! onlyIfFirstOfType identifier))
+          (#set! test.onlyIfFirstOfType identifier))
         (formal_parameters (identifier) @last-param
-          (#set! onlyIfLastOfType identifier))
+          (#set! test.onlyIfLastOfType identifier))
 
         (formal_parameters "," @first-comma
-          (#set! onlyIfFirstOfType ","))
+          (#set! test.onlyIfFirstOfType ","))
         (formal_parameters "," @last-comma
-          (#set! onlyIfLastOfType ","))
+          (#set! test.onlyIfLastOfType ","))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -421,7 +457,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfLastTextOnRow', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("||" @hanging-logical-operator
-          (#set! onlyIfLastTextOnRow true))
+          (#set! test.onlyIfLastTextOnRow true))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -452,7 +488,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfFirstTextOnRow', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("||" @hanging-logical-operator
-          (#set! onlyIfFirstTextOnRow true))
+          (#set! test.onlyIfFirstTextOnRow true))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -483,7 +519,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfDescendantOfType', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("," @comma-inside-function
-          (#set! onlyIfDescendantOfType function_declaration))
+          (#set! test.onlyIfDescendantOfType function_declaration))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -505,7 +541,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfAncestorOfType', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @function-with-semicolons
-          (#set! onlyIfAncestorOfType ";"))
+          (#set! test.onlyIfAncestorOfType ";"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -531,7 +567,7 @@ describe('ScopeResolver', () => {
           (#set! isSpecialFunction true))
 
         ("," @special-comma
-          (#set! onlyIfDescendantOfNodeWithData isSpecialFunction))
+          (#set! test.onlyIfDescendantOfNodeWithData isSpecialFunction))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -558,7 +594,7 @@ describe('ScopeResolver', () => {
           (#set! isSpecialFunction "troz"))
 
         ("," @special-comma
-          (#set! onlyIfDescendantOfNodeWithData "isSpecialFunction troz"))
+          (#set! test.onlyIfDescendantOfNodeWithData "isSpecialFunction troz"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -585,7 +621,7 @@ describe('ScopeResolver', () => {
           (#set! isSpecialFunction "troz"))
 
         ("," @special-comma
-          (#set! onlyIfDescendantOfNodeWithData "isSpecialFunction zort"))
+          (#set! test.onlyIfDescendantOfNodeWithData "isSpecialFunction zort"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -605,7 +641,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfType', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters _ @function-comma
-          (#set! onlyIfType ","))
+          (#set! test.onlyIfType ","))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -626,7 +662,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfHasError', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((statement_block) @messed-up-statement-block
-          (#set! onlyIfHasError true))
+          (#set! test.onlyIfHasError true))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -649,7 +685,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfRoot', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((_) @is-root
-          (#set! onlyIfRoot true))
+          (#set! test.onlyIfRoot true))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -673,7 +709,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfLastTextOnRow', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("||" @orphaned-operator
-          (#set! onlyIfLastTextOnRow true))
+          (#set! test.onlyIfLastTextOnRow true))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -700,7 +736,7 @@ describe('ScopeResolver', () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue true))
         ([ (true) (false) ] @optimistic-boolean
-          (#set! onlyIfRangeWithData isTrue))
+          (#set! test.onlyIfRangeWithData isTrue))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -726,7 +762,7 @@ describe('ScopeResolver', () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue "exactly"))
         ([ (true) (false) ] @optimistic-boolean
-          (#set! onlyIfRangeWithData "isTrue exactly"))
+          (#set! test.onlyIfRangeWithData "isTrue exactly"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -752,7 +788,7 @@ describe('ScopeResolver', () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue "perhaps"))
         ([ (true) (false) ] @optimistic-boolean
-          (#set! onlyIfRangeWithData "isTrue exactly"))
+          (#set! test.onlyIfRangeWithData "isTrue exactly"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -774,7 +810,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfStartsOnSameRowAs', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((false) @non-hanging-false
-          (#set! onlyIfStartsOnSameRowAs parent.startPosition))
+          (#set! test.onlyIfStartsOnSameRowAs parent.startPosition))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -801,7 +837,7 @@ describe('ScopeResolver', () => {
     it('supports onlyIfEndsOnSameRowAs', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @non-hanging-true
-          (#set! onlyIfEndsOnSameRowAs parent.endPosition))
+          (#set! test.onlyIfEndsOnSameRowAs parent.endPosition))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
@@ -830,7 +866,7 @@ describe('ScopeResolver', () => {
 
       await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
-          (#set! onlyIfConfig core.careAboutBooleans))
+          (#set! test.onlyIfConfig core.careAboutBooleans))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer, config: atom.config });
@@ -857,7 +893,7 @@ describe('ScopeResolver', () => {
 
       await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
-          (#set! onlyIfConfig "core.careAboutBooleans true"))
+          (#set! test.onlyIfConfig "core.careAboutBooleans true"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer, config: atom.config });
@@ -884,7 +920,7 @@ describe('ScopeResolver', () => {
 
       await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
-        (#set! onlyIfConfig "core.careAboutBooleans 0"))
+        (#set! test.onlyIfConfig "core.careAboutBooleans 0"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer, config: atom.config });
@@ -911,7 +947,7 @@ describe('ScopeResolver', () => {
 
       await grammar.setQueryForTest('highlightsQuery', `
         ([(true) (false)] @boolean
-        (#set! onlyIfConfig "core.careAboutBooleans something"))
+        (#set! test.onlyIfConfig "core.careAboutBooleans something"))
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer, config: atom.config });
@@ -937,13 +973,13 @@ describe('ScopeResolver', () => {
       jasmine.useRealClock();
       await grammar.setQueryForTest('highlightsQuery', `
         ((escape_sequence) @regex-escape
-          (#set! onlyIfInjection true))
+          (#set! test.onlyIfInjection true))
       `);
 
       let regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, jsRegexConfig);
       await regexGrammar.setQueryForTest('highlightsQuery', `
         ((control_escape) @regex-escape
-          (#set! onlyIfInjection true))
+          (#set! test.onlyIfInjection true))
       `);
 
       atom.grammars.addGrammar(regexGrammar);

@@ -1215,7 +1215,7 @@ class WASMTreeSitterLanguageMode {
       let { node, name, setProperties: props = {} } = capture;
 
       // Ignore “phantom” nodes that aren't present in the buffer.
-      if (node.text === '' && !props.allowEmpty) {
+      if (node.text === '' && !props['indent.allowEmpty']) {
         continue;
       }
 
@@ -1316,7 +1316,7 @@ class WASMTreeSitterLanguageMode {
         let { text } = node;
 
         // Ignore “phantom” nodes that aren't present in the buffer.
-        if (text === '' && !props.allowEmpty) { continue; }
+        if (text === '' && !props['indent.allowEmpty']) { continue; }
 
         // Ignore anything that isn't actually on the row.
         if (node.endPosition.row < row) { continue; }
@@ -1339,8 +1339,8 @@ class WASMTreeSitterLanguageMode {
         // logic for `suggestedIndentForEditedBufferRow`.
         //
         // If a capture is confident it knows what it's doing, it can opt out
-        // of this behavior with `(#set! force true)`.
-        if (!props.force && !currentRowText.startsWith(text)) { continue; }
+        // of this behavior with `(#set! indent.force true)`.
+        if (!props['indent.force'] && !currentRowText.startsWith(text)) { continue; }
 
         // The '@match' capture short-circuits a lot of this logic by pointing
         // us to a different node and asking us to match the indentation of
@@ -1607,9 +1607,9 @@ class WASMTreeSitterLanguageMode {
       //
       // If the capture is confident it knows what it's doing, and is using
       // some other mechanism to ensure the adjustment will happen exactly
-      // once, it can bypass this behavior with `(#set! force true)`.
+      // once, it can bypass this behavior with `(#set! indent.force true)`.
       //
-      if (!props.force && node.text !== lineText) { continue; }
+      if (!props['indent.force'] && node.text !== lineText) { continue; }
 
       // `@match` is authoritative; honor the first one we see and ignore other
       // captures.
@@ -1664,21 +1664,21 @@ class WASMTreeSitterLanguageMode {
 
     // A `@match` capture must specify
     //
-    //  (#set! matchIndentOf foo)
+    //  (#set! indent.matchIndentOf foo)
     //
     // where "foo" is a node descriptor. It may optionally specify
     //
-    //  (#set! offsetIndent X)
+    //  (#set! indent.offsetIndent X)
     //
     // where "X" is a number, positive or negative.
     //
-    let { matchIndentOf, offsetIndent = "0" } = props;
-    if (!matchIndentOf) { return undefined; }
+    if (!props['indent.matchIndentOf']) { return undefined; }
+    let offsetIndent = props['indent.offsetIndent'] ?? "0";
     offsetIndent = Number(offsetIndent);
     if (isNaN(offsetIndent)) { offsetIndent = 0; }
 
     // Follow a node descriptor to a target node.
-    let targetPosition = resolveNodePosition(node, props.matchIndentOf);
+    let targetPosition = resolveNodePosition(node, props['indent.matchIndentOf']);
 
     // That node must start on a row earlier than ours.
     let targetRow = targetPosition?.row;
@@ -1843,7 +1843,7 @@ class WASMTreeSitterLanguageMode {
 // * A “simple” fold is one with a capture name of `@fold` in a folds query. It
 //   can be described with only one capture. It starts at the end of the row
 //   that the captured node starts on, and ends at a configurable position
-//   controlled by the `endAt` adjustment (which defaults to
+//   controlled by the `fold.endAt` adjustment (which defaults to
 //   `lastChild.startPosition`).
 //
 //   Simple folds should be used whenever you're able to predict the end of a
@@ -2072,21 +2072,37 @@ class FoldResolver {
     }
   }
 
+  normalizeFoldProperty(prop) {
+    if (prop.startsWith('fold.')) {
+      prop = prop.replace(/^fold./, '');
+    }
+    return prop;
+  }
+
+  capturePropertyIsFoldAdjustment(prop) {
+    prop = this.normalizeFoldProperty(prop);
+    return prop in FoldResolver.ADJUSTMENTS;
+  }
+
+  applyFoldAdjustment(prop, ...args) {
+    prop = this.normalizeFoldProperty(prop);
+    return FoldResolver.ADJUSTMENTS[prop](...args);
+  }
+
   resolveRangeForSimpleFold(capture) {
     let { node, setProperties: props } = capture;
     if (node.type === 'ERROR') { return null; }
     let start = new Point(node.startPosition.row, Infinity);
     let end = node.endPosition;
 
-    let defaultOptions = { endAt: 'lastChild.startPosition' };
+    let defaultOptions = { 'fold.endAt': 'lastChild.startPosition' };
     let options = { ...defaultOptions, ...props };
 
     try {
       for (let key in options) {
-        if (!FoldResolver.ADJUSTMENTS[key]) { continue; }
+        if (!this.capturePropertyIsFoldAdjustment(key)) { continue; }
         let value = options[key];
-        end = FoldResolver.ADJUSTMENTS[key](
-          end, node, value, props, this.layer);
+        end = this.applyFoldAdjustment(key, end, node, value, props, this.layer);
       }
 
       end = Point.fromObject(end, true);
