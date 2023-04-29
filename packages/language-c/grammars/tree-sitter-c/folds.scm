@@ -10,7 +10,7 @@
 ; fold doesn't interfere with our ability to collapse the `else` fold.
 (if_statement
   consequence: (compound_statement) @fold
-  (#set! adjustToEndOfPreviousRow true))
+  (#set! fold.adjustToEndOfPreviousRow true))
 
 [
  (field_declaration_list)

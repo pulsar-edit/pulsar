@@ -9,7 +9,7 @@
 ] @fold
 
 ((arguments) @fold
-  (#set! adjustToEndOfPreviousRow true))
+  (#set! fold.adjustToEndOfPreviousRow true))
 
 
 ; When we've got
@@ -24,12 +24,12 @@
 ; fold doesn't interfere with our ability to collapse the `else` fold.
 ((if_statement
   consequence: (statement_block) @fold)
-  (#set! adjustToEndOfPreviousRow true))
+  (#set! fold.adjustToEndOfPreviousRow true))
 
 (else_clause (statement_block) @fold)
 
 (statement_block) @fold
 
 ((comment) @fold
-  (#set! endAt endPosition)
-  (#set! adjustEndColumn 0))
+  (#set! fold.endAt endPosition)
+  (#set! fold.adjustEndColumn 0))

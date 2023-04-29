@@ -32,8 +32,8 @@
   ] @fold
   ; No delimiter to preserve, so we want to fold all the way to this node's
   ; ending position.
-  (#set! endAt endPosition))
+  (#set! fold.endAt endPosition))
 
 ((if_statement) @fold
   ; End at the end of the first (or only) consequence block.
-  (#set! endAt firstNamedChild.nextNamedSibling.endPosition))
+  (#set! fold.endAt firstNamedChild.nextNamedSibling.endPosition))
