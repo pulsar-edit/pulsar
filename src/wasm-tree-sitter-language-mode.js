@@ -2775,7 +2775,7 @@ class LanguageLayer {
           let promise = this.grammar.getQuery(queryType).then(query => {
             this[queryType] = query;
           }).catch(() => {
-            throw GrammarLoadError(grammar, queryType);
+            throw new GrammarLoadError(grammar, queryType);
           });
           promises.push(promise);
         }
