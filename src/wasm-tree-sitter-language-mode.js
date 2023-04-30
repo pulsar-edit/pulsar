@@ -445,7 +445,12 @@ class WASMTreeSitterLanguageMode {
     if (!this.rootLanguageLayer) { return; }
     if (!grammar.injectionRegex && !grammar.injectionRegExp) { return; }
     if (grammar.type !== 'modern-tree-sitter') { return; }
-    this.rootLanguageLayer.updateInjections(grammar);
+
+    let layers = this.getAllLanguageLayers();
+    for (let layer of layers) {
+      if (!layer.tree) continue;
+      layer._populateInjections(MAX_RANGE, null);
+    }
   }
 
   /*
@@ -3336,19 +3341,6 @@ class LanguageLayer {
     return { scopes, definitions, references };
   }
 
-  updateInjections(grammar) {
-    // This method is called when a random grammar in the registry has been
-    // added or updated, so we only care about it if it could possibly affect
-    // an injection of ours.
-    if (!grammar?.injectionRegex) { return; }
-    if (!this.tree) { return; }
-
-    // We don't need to consume the grammar itself; we'll just call
-    // `_populateInjections` here because the callback signals that this
-    // layer's list of injection points might have changed.
-    this._populateInjections(MAX_RANGE, null);
-  }
-
   async _performUpdate(nodeRangeSet, params = {}) {
     let includedRanges = null;
     this.rangeList.clear();
@@ -3695,6 +3687,7 @@ class LanguageLayer {
   }
 
   _populateInjections(range, nodeRangeSet) {
+    if (!this.tree) { return; }
     const promises = [];
 
     // We won't touch _all_ injections, but we will touch any injection that
