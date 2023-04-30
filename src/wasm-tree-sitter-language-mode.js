@@ -14,6 +14,8 @@ const createTree = require('./rb-tree');
 const FEATURE_ASYNC_INDENT = true;
 const FEATURE_ASYNC_PARSE = true;
 
+const LINE_LENGTH_LIMIT_FOR_HIGHLIGHTING = 10000;
+
 const PARSE_JOB_LIMIT_MICROS = 3000;
 const PARSERS_IN_USE = new Set();
 
@@ -1204,6 +1206,8 @@ class WASMTreeSitterLanguageMode {
       }
     }
 
+    let positionSet = new Set;
+
     // Capture in two phases. The first phase covers any captures from the
     // comparison row that can cause the _following_ row to be indented.
     let indentCaptures = indentsQuery.captures(
@@ -1230,6 +1234,12 @@ class WASMTreeSitterLanguageMode {
 
       // Ignore anything that fails a scope test.
       if (!scopeResolver.store(capture)) { continue; }
+
+      // Only consider a given combination of capture name and buffer range
+      // once, even if it's captured more than once in `indents.scm`.
+      let key = `${name}/${node.startIndex}/${node.endIndex}`;
+      if (positionSet.has(key)) { continue; }
+      positionSet.add(key);
 
       if (name === 'indent') {
         if (indentCapturePosition === null) {
@@ -1298,7 +1308,7 @@ class WASMTreeSitterLanguageMode {
 
     // Process `@dedent.next` captures as a last step; they act as a strong
     // hint about the next line's indentation.
-    indentDelta -= dedentNextDelta;
+    indentDelta -= clamp(dedentNextDelta, 0, 1);
 
     let dedentDelta = 0;
 
@@ -1315,7 +1325,8 @@ class WASMTreeSitterLanguageMode {
 
       let currentRowText = this.buffer.lineForRow(row);
       currentRowText = currentRowText.trim();
-      let positionSet = new Set;
+      positionSet.clear();
+
       for (let capture of dedentCaptures) {
         let { name, node, setProperties: props = {} } = capture;
         let { text } = node;
@@ -1373,6 +1384,7 @@ class WASMTreeSitterLanguageMode {
         positionSet.add(key);
         dedentDelta--;
       }
+
 
       // `@indent`/`@dedent` captures, no matter how many there are, can
       // dedent the current line by one level at most. To indent more than
@@ -1439,7 +1451,7 @@ class WASMTreeSitterLanguageMode {
           let tree = controllingLayer.getOrParseTree();
 
           let firstLineCurrentIndent = this.indentLevelForLine(
-            this.buffer.lineForRow(startRow), tabLength);
+            this.buffer.lineForRow(row), tabLength);
 
           let firstLineIdealIndent = this.suggestedIndentForBufferRow(
             row,
@@ -2196,6 +2208,8 @@ class NullLayerHighlightIterator {
   }
 }
 
+let lastIteratorId = 0;
+
 // An iterator for marking boundaries in the buffer to apply syntax
 // highlighting.
 //
@@ -2205,8 +2219,13 @@ class NullLayerHighlightIterator {
 // advanced next.
 class HighlightIterator {
   constructor(languageMode) {
+    this.id = lastIteratorId++;
     this.languageMode = languageMode;
     this.iterators = null;
+  }
+
+  inspect() {
+    return `[HighlightIterator id=${this.id} iterators=${this.iterators?.length ?? 0}]`;
   }
 
   seek(start, endRow) {
@@ -2223,6 +2242,10 @@ class HighlightIterator {
 
     this.end = end;
     this.iterators = [];
+
+    if (Math.max(start.column, end.column) > LINE_LENGTH_LIMIT_FOR_HIGHLIGHTING) {
+      return [];
+    }
 
     let injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
       {
@@ -2638,6 +2661,16 @@ class LayerHighlightIterator {
     return [...closeScopeIds];
   }
 
+  opensScopes() {
+    let scopes = this.getOpenScopeIds();
+    return scopes.length > 0;
+  }
+
+  closesScopes() {
+    let scopes = this.getCloseScopeIds();
+    return scopes.length > 0;
+  }
+
   getPosition() {
     return this.iterator.key || Point.INFINITY;
   }
@@ -2665,21 +2698,30 @@ class LayerHighlightIterator {
 
     // Failing that, favor iterators that need to close scopes over those that
     // don't.
-    let ours = this.getCloseScopeIds();
-    let theirs = other.getCloseScopeIds();
-
-    if (ours.length > 0 && theirs.length === 0) {
+    if (this.closesScopes() && !other.closesScopes()) {
       return -1;
-    } else if (theirs > 0 && ours.length === 0) {
+    } else if (other.closesScopes() && !this.closesScopes()) {
       return 1;
     }
 
-    // Failing that, favor the shallower layer.
-    //
-    // TODO: Is this universally true? Feels like we should favor the shallower
-    // layer when both are opening scopes, and favor the deeper layer when both
-    // are closing scopes.
-    return this.languageLayer.depth - other.languageLayer.depth;
+    let bothOpening = this.opensScopes() && other.opensScopes();
+    let bothClosing = this.closesScopes() && other.closesScopes();
+
+    if (bothClosing) {
+      // When both iterators are closing scopes, the deeper layer should act
+      // first.
+      return other.languageLayer.depth - this.languageLayer.depth;
+    } else {
+      // When both iterators are opening scopes — or if there's a mix of
+      // opening and closing — the shallower layer should act first.
+      return this.languageLayer.depth - other.languageLayer.depth;
+    }
+
+    // TODO: We need to move to a system where every point in the iterator
+    // _either_ closes scopes _or_ opens them, with the former visited before
+    // the latter. Otherwise there's no correct way to sort them when two
+    // different layers have the same position and both want to close _and_
+    // open scopes.
   }
 
   moveToSuccessor() {
@@ -2840,7 +2882,7 @@ class LanguageLayer {
 
   inspect() {
     let { scopeName } = this.grammar;
-    return `[LanguageLayer ${scopeName || '(anonymous)'} depth=${this.depth}]`;
+    return `[LanguageLayer ${scopeName || '(anonymous)'} depth=${this.depth} file=${this.buffer.getPath()}]`;
   }
 
   destroy() {
@@ -3021,7 +3063,7 @@ class LanguageLayer {
             range.start,
             this.languageScopeId,
             'open',
-            { root: true }
+            { root: true, length: Infinity }
           );
         }
 
@@ -3033,7 +3075,7 @@ class LanguageLayer {
             range.end,
             this.languageScopeId,
             'close',
-            { root: true }
+            { root: true, length: Infinity }
           );
         }
       }
