@@ -8,6 +8,7 @@
 
 - Removed `nslog` dependency
 - Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+- Fixed RPM installation failure when Atom was installed on the same machine
 
 ## 1.104.0
 
