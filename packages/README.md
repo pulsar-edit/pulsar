@@ -94,7 +94,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
 | **tabs** | [`./tabs`](./tabs) |  |
 | **timecop** | [`./timecop`](./timecop) | |
-| **tree-view** | [`pulsar-edit/tree-view`][tree-view] |  |
+| **tree-view** | [`./tree-view`](./tree-view) |  |
 | **update-package-dependencies** | [`./update-package-dependencies`](./update-package-dependencies) | |
 | **welcome** | [`./welcome`](./welcome) | |
 | **whitespace** | [`./whitespace`](./whitespace) |  |
@@ -108,4 +108,3 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 [snippets]: https://github.com/pulsar-edit/snippets
 [spell-check]: https://github.com/pulsar-edit/spell-check
 [symbols-view]: https://github.com/pulsar-edit/symbols-view
-[tree-view]: https://github.com/pulsar-edit/tree-view
