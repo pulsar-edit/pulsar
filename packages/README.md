@@ -13,7 +13,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **atom-dark-ui** | [`./atom-dark-ui`](./atom-dark-ui) | |
 | **atom-light-syntax** | [`./atom-light-syntax`](./atom-light-syntax) | |
 | **atom-light-ui** | [`./atom-light-ui`](./atom-light-ui) | |
-| **autocomplete-atom-api** | [`atom/autocomplete-atom-api`][autocomplete-atom-api] |  |
+| **autocomplete-atom-api** | [`./autocomplete-atom-api`](./autocomplete-atom-api) |  |
 | **autocomplete-css** | [`./autocomplete-css`](./autocomplete-css) |  |
 | **autocomplete-html** | [`./autocomplete-html`](./autocomplete-html) |  |
 | **autocomplete-plus** | [`./autocomplete-plus`](./autocomplete-plus) |  |
@@ -100,7 +100,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **whitespace** | [`./whitespace`](./whitespace) |  |
 | **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
-[autocomplete-atom-api]: https://github.com/pulsar-edit/autocomplete-atom-api
 [find-and-replace]: https://github.com/pulsar-edit/find-and-replace
 [fuzzy-finder]: https://github.com/pulsar-edit/fuzzy-finder
 [github]: https://github.com/pulsar-edit/github

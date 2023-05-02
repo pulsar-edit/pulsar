@@ -2347,9 +2347,8 @@ atom-slick@^2, atom-slick@^2.0.0:
   resolved "https://registry.yarnpkg.com/atom-slick/-/atom-slick-2.0.0.tgz#ff0dbe15be2c4eda268b9d30d76e2517e0b7d3ca"
   integrity sha512-yKl/4ZHeP3v6gtncnX6pAPFNv3gQNNYlXMk1QYP5gYB6xq2xqkFXbpwQo3IixGUZMf+DHilAmHOrS21QKLLi9g==
 
-"autocomplete-atom-api@https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7":
+"autocomplete-atom-api@file:packages/autocomplete-atom-api":
   version "0.10.7"
-  resolved "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7#c9d51fa721d543ccfc1b2189101155e81db6b97d"
 
 "autocomplete-css@file:packages/autocomplete-css":
   version "0.17.5"
