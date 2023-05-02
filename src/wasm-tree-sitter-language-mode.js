@@ -749,7 +749,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   getSyntaxNodeAndGrammarContainingRange(range, where = FUNCTION_TRUE) {
-    if (!this.rootLanguageLayer) { return null; }
+    if (!this.rootLanguageLayer) { return { node: null, grammar: null }; }
 
     let layersAtStart = this.languageLayersAtPoint(range.start);
     let layersAtEnd = this.languageLayersAtPoint(range.end);
@@ -825,7 +825,7 @@ class WASMTreeSitterLanguageMode {
       }
     }
 
-    return null;
+    return { node: null, grammar: null };
   }
 
   getRangeForSyntaxNodeContainingRange(range, where = FUNCTION_TRUE) {
