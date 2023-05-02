@@ -1,4 +1,4 @@
-const fs = require('fs-plus')
+const fs = require('fs')
 const {Task} = require('atom')
 
 module.exports = {

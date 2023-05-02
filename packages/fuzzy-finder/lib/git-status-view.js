@@ -1,4 +1,4 @@
-const fs = require('fs-plus')
+const fs = require('fs')
 const path = require('path')
 
 const FuzzyFinderView = require('./fuzzy-finder-view')
@@ -15,7 +15,7 @@ class GitStatusView extends FuzzyFinderView {
           const workingDirectory = repo.getWorkingDirectory()
           for (let filePath in repo.statuses) {
             filePath = path.join(workingDirectory, filePath)
-            if (fs.isFileSync(filePath)) {
+            if (fs.lstatSync(filePath).isFile()) {
               paths.push(filePath)
             }
           }
