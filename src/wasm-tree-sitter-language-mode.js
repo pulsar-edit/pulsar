@@ -285,6 +285,7 @@ class WASMTreeSitterLanguageMode {
     for (const marker of this.injectionsMarkerLayer.getMarkers()) {
       marker.languageLayer.handleTextChange(edit, oldText, newText);
     }
+    this.cachedBufferText = this.buffer.getText();
   }
 
   bufferDidFinishTransaction({ changes }) {
@@ -637,13 +638,40 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
+  getOrCreateParseCallback() {
+    // When you edit a tree, the positions of nodes in the tree are adjusted
+    // accordingly. But if you had passed a string into `parse`, all those
+    // nodes' `text` properties will now fail to reflect reality, because
+    // they're doing those lookups on a stale string. This makes it unsafe to
+    // perform captures on a dirty tree, because lots of `#match?` predicates
+    // will fail incorrectly.
+    //
+    // Instead, we can pass a callback that will look up the relevant ranges of
+    // text as needed. This callback works exactly like the default callback
+    // within web-tree-sitter, except that we'll update the text as the buffer
+    // changes. This lets us safely perform captures against dirty trees.
+    //
+    // In practice, captures against dirty trees will only happen on injection
+    // layers, and only when the edits that have been made since the last clean
+    // parse _could not possibly_ have affected the tree because they happened
+    // nowhere near the injection layer's extent. This lets us get away with
+    // deferring the re-parsing of such layers until much later.
+    this.cachedBufferText = this.buffer.getText();
+    this.parseCallback ??= (index, _, endIndex) => {
+      // `cachedBufferText` is recomputed whenever the buffer changes.
+      return this.cachedBufferText.slice(index, endIndex);
+    };
+    return this.parseCallback;
+  }
+
   parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
+    parser.reset();
     parser.setTimeoutMicros(this.syncTimeoutMicros);
     PARSERS_IN_USE.add(parser);
 
-    let text = this.buffer.getText();
+    let callback = this.getOrCreateParseCallback();
     let tree;
     // eslint-disable-next-line no-unused-vars
     let batchCount = 0;
@@ -659,13 +687,11 @@ class WASMTreeSitterLanguageMode {
       PARSERS_IN_USE.delete(parser);
     };
 
-    if (devMode && tag) {
-      console.time(tag);
-    }
+    if (devMode && tag) { console.time(tag); }
 
     try {
       // Attempt a synchronous parse.
-      tree = parser.parse(text, oldTree, { includedRanges });
+      tree = parser.parse(callback, oldTree, { includedRanges });
     } catch (err) {
       if (!isParseTimeout(err)) { throw err; }
 
@@ -675,7 +701,7 @@ class WASMTreeSitterLanguageMode {
         const parseJob = () => {
           try {
             batchCount++;
-            tree = parser.parse(text, oldTree, { includedRanges });
+            tree = parser.parse(callback, oldTree, { includedRanges });
           } catch (err) {
             if (!isParseTimeout(err)) { return reject(err); }
             setImmediate(parseJob);
@@ -697,13 +723,13 @@ class WASMTreeSitterLanguageMode {
   parse(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
+    parser.reset();
     parser.setTimeoutMicros(null);
 
-    let text = this.buffer.getText();
+    let callback = this.getOrCreateParseCallback();
     if (devMode && tag) { console.time(tag); }
 
-    // TODO: Is there a better way to feed the parser the contents of the file?
-    const result = parser.parse(text, oldTree, { includedRanges });
+    const result = parser.parse(callback, oldTree, { includedRanges });
 
     if (devMode && tag) { console.timeEnd(tag); }
     return result;
@@ -3198,7 +3224,7 @@ class LanguageLayer {
           await this.languageLoaded;
         }
         this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
-        if (!params.async) break;
+        if (!params.async) { break; }
         await this.currentParsePromise;
       }
       this.currentParsePromise = null;
