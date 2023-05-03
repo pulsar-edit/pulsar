@@ -115,19 +115,11 @@ describe('FuzzyFinder', () => {
     )
   }
 
-  const testPermutations = [
-    [ false, 'standard' ],
-    [ true, 'standard' ],
-    [ false, 'alternate' ],
-    [ false, 'fast' ]
-  ]
-
-  for (const [useRipGrep, scoringSystem] of testPermutations) {
-    describe(`file-finder behavior (ripgrep=${useRipGrep}, scoringSystem=${scoringSystem})`, () => {
+  for (const useRipGrep of [true, false]) {
+    describe(`file-finder behavior (ripgrep=${useRipGrep})`, () => {
       beforeEach(async () => {
         projectView = fuzzyFinder.createProjectView()
 
-        atom.config.set('fuzzy-finder.scoringSystem', scoringSystem)
         atom.config.set('fuzzy-finder.useRipGrep', useRipGrep)
         sinon.stub(os, 'cpus').returns({length: 1})
 
@@ -1739,39 +1731,6 @@ describe('FuzzyFinder', () => {
               {ec: 'time-to-crawl', el: useRipGrep ? 'ripgrep' : 'fs', ev: 5}
             )
           })
-
-          // We're not logging events when using the standard scoring system (since that one
-          // is not controlled by the fuzzy-finder).
-          if (scoringSystem !== 'standard') {
-            it('logs the filtering time', async () => {
-              const reporterStub = {
-                addTiming: sinon.spy()
-              }
-
-              disposable = fuzzyFinderPackage.consumeMetricsReporter(reporterStub)
-
-              await projectView.toggle()
-              await waitForPathsToDisplay(projectView)
-
-              // After setting the reporter it may receive some old events from previous tests
-              // that we want to discard.
-              reporterStub.addTiming.resetHistory()
-
-              projectView.selectListView.refs.queryEditor.setText('anything')
-              await getOrScheduleUpdatePromise()
-
-              expect(reporterStub.addTiming.lastCall.args[0]).toEqual('fuzzy-finder-v1')
-              expect(reporterStub.addTiming.lastCall.args[2]).toEqual(
-                {ec: 'time-to-filter', el: scoringSystem, ev: 5}
-              )
-
-              // Check that events are throttled
-              await projectView.selectListView.refs.queryEditor.setText('anything else')
-              await getOrScheduleUpdatePromise()
-
-              expect(reporterStub.addTiming.getCalls().length).toBe(1)
-            })
-          }
         })
       })
 
