@@ -60,16 +60,6 @@
       "default": false,
       "description": "Remember the typed query when closing the fuzzy finder and use that as the starting query next time the fuzzy finder is opened."
     },
-    "scoringSystem": {
-      "type": "string",
-      "default": "fast",
-      "description": "Scoring system to use. \"standard\" is the system used by other modals in Atom. \"alternate\" is an improved scoring system. \"fast\" is a much faster system, specially suitable for large projects. Default: \"fast\"",
-      "enum": [
-        "standard",
-        "alternate",
-        "fast"
-      ]
-    },
     "useRipGrep": {
       "type": "boolean",
       "default": true,
