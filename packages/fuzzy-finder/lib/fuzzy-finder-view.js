@@ -1,6 +1,5 @@
 const {Point, CompositeDisposable} = require('atom')
 const fs = require('fs')
-const fuzzaldrinPlus = require('fuzzaldrin-plus')
 const NativeFuzzy = require('@pulsar-edit/fuzzy-native')
 
 const path = require('path')
