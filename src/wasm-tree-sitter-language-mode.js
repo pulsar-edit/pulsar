@@ -285,7 +285,7 @@ class WASMTreeSitterLanguageMode {
     for (const marker of this.injectionsMarkerLayer.getMarkers()) {
       marker.languageLayer.handleTextChange(edit, oldText, newText);
     }
-    this.cachedBufferText = this.buffer.getText();
+    this.cachedCurrentBufferText = this.buffer.getText();
   }
 
   bufferDidFinishTransaction({ changes }) {
@@ -402,6 +402,7 @@ class WASMTreeSitterLanguageMode {
   //   mode couldn't fulfill (see `suggestedIndentForLineAtBufferRow`).
   //
   async atTransactionEnd() {
+    if (!this.tokenized) { return this.ready; }
     if (this.atTransactionEndPromise) {
       return this.atTransactionEndPromise;
     }
@@ -638,7 +639,13 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
-  getOrCreateParseCallback() {
+  parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
+    let devMode = atom.inDevMode();
+    let parser = this.getOrCreateParserForLanguage(language);
+    parser.reset();
+    parser.setTimeoutMicros(this.syncTimeoutMicros);
+    PARSERS_IN_USE.add(parser);
+
     // When you edit a tree, the positions of nodes in the tree are adjusted
     // accordingly. But if you had passed a string into `parse`, all those
     // nodes' `text` properties will now fail to reflect reality, because
@@ -656,27 +663,28 @@ class WASMTreeSitterLanguageMode {
     // parse _could not possibly_ have affected the tree because they happened
     // nowhere near the injection layer's extent. This lets us get away with
     // deferring the re-parsing of such layers until much later.
-    this.cachedBufferText = this.buffer.getText();
-    this.parseCallback ??= (index, _, endIndex) => {
-      // `cachedBufferText` is recomputed whenever the buffer changes.
-      return this.cachedBufferText.slice(index, endIndex);
+    //
+    // There's one catch, though: the buffer text being parsed should not
+    // change _during the parse job_. Since parsing can go async, we must keep
+    // the value constant until the parse is done, at which point we can
+    // consult the latest version of the buffer text for the purpose of
+    // accurate captures.
+    let parseDone = false;
+    let text = this.buffer.getText();
+    this.cachedCurrentBufferText = text;
+    let callback = (index, _, endIndex) => {
+      // Stick with a frozen copy of the text at parse time… until parsing is
+      // done, at which point we should use the latest buffer text.
+      let currentText = parseDone ? this.cachedCurrentBufferText : text;
+      return currentText.slice(index, endIndex);
     };
-    return this.parseCallback;
-  }
 
-  parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
-    let devMode = atom.inDevMode();
-    let parser = this.getOrCreateParserForLanguage(language);
-    parser.reset();
-    parser.setTimeoutMicros(this.syncTimeoutMicros);
-    PARSERS_IN_USE.add(parser);
-
-    let callback = this.getOrCreateParseCallback();
     let tree;
     // eslint-disable-next-line no-unused-vars
     let batchCount = 0;
 
     const cleanup = () => {
+      parseDone = true;
       if (devMode && tag) {
         console.timeEnd(tag);
         if (batchCount > 0) {
