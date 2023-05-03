@@ -6,19 +6,18 @@
   "repository": "https://github.com/pulsar-edit/fuzzy-finder",
   "license": "MIT",
   "dependencies": {
-    "async": "0.2.6",
     "atom-select-list": "^0.7.0",
     "fs-plus": "^3.0.0",
     "fuzzaldrin-plus": "^0.6.0",
-    "humanize-plus": "~1.8.2",
     "minimatch": "~3.0.3",
-    "temp": "~0.8.1",
     "underscore-plus": "^1.7.0",
-    "vscode-ripgrep": "^1.2.5",
-    "wrench": "^1.5"
+    "vscode-ripgrep": "^1.2.5"
   },
   "devDependencies": {
-    "sinon": "9.0.3"
+    "async": "0.2.6",
+    "temp": "~0.8.1",
+    "sinon": "9.0.3",
+    "wrench": "^1.5"
   },
   "engines": {
     "atom": "*"
