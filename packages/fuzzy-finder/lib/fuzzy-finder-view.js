@@ -1,7 +1,7 @@
 const {Point, CompositeDisposable} = require('atom')
 const fs = require('fs')
 const fuzzaldrinPlus = require('fuzzaldrin-plus')
-const {ObjectArrayFilterer} = require('zadeh')
+const NativeFuzzy = require('@pulsar-edit/fuzzy-native')
 
 const path = require('path')
 const SelectListView = require('atom-select-list')
@@ -16,6 +16,7 @@ module.exports = class FuzzyFinderView {
     this.previousQueryWasLineJump = false
     this.items = []
     this.metricsReporter = metricsReporter
+    this.filterFn = this.filterFn.bind(this)
 
     this.selectListView = new SelectListView({
       items: this.items,
@@ -67,7 +68,6 @@ module.exports = class FuzzyFinderView {
             emptyMessage: emptyMessage,
             errorMessage: errorMessage
           })
-          this.setFilter([])
         } else if (this.previousQueryWasLineJump) {
           this.previousQueryWasLineJump = false
           this.selectListView.update({
@@ -75,13 +75,17 @@ module.exports = class FuzzyFinderView {
             emptyMessage: this.getEmptyMessage(),
             errorMessage: null
           })
-          this.setFilter(this.items)
         }
       },
       elementForItem: ({filePath, label, ownerGitHubUsername}) => {
         const filterQuery = this.selectListView.getFilterQuery()
 
-        let matches = fuzzaldrinPlus.match(label, filterQuery)
+        this.nativeFuzzyForResults.setCandidates([0], [label])
+        const items = this.nativeFuzzyForResults.match(
+          filterQuery,
+          {maxResults: 1, recordMatchIndexes: true}
+        )
+        const matches = items.length ? items[0].matchIndexes : []
         const repository = repositoryForPath(filePath)
 
         return new FuzzyFinderItem({
@@ -121,7 +125,17 @@ module.exports = class FuzzyFinderView {
       }
     })
 
-    this.setFilter(this.items)
+    if (!this.nativeFuzzy) {
+      this.nativeFuzzy = new NativeFuzzy.Matcher(
+        indexArray(this.items.length),
+        this.items.map(el => el.label)
+      )
+      // We need a separate instance of the fuzzy finder to calculate the
+      // matched paths only for the returned results. This speeds up considerably
+      // the filtering of items.
+      this.nativeFuzzyForResults = new NativeFuzzy.Matcher([], [])
+    }
+    this.selectListView.update({ filter: this.filterFn })
   }
 
   get element () {
@@ -277,6 +291,10 @@ module.exports = class FuzzyFinderView {
 
   setItems (items) {
     this.items = items
+    this.nativeFuzzy.setCandidates(
+      indexArray(this.items.length),
+      this.items.map(item => item.label)
+    )
 
     if (this.isQueryALineJump()) {
       this.selectListView.update({
@@ -285,7 +303,6 @@ module.exports = class FuzzyFinderView {
         loadingMessage: null,
         loadingBadge: null
       })
-      this.setFilter([])
     } else {
       this.selectListView.update({
         items: this.items,
@@ -293,7 +310,6 @@ module.exports = class FuzzyFinderView {
         loadingMessage: null,
         loadingBadge: null
       })
-      this.setFilter(this.items)
     }
   }
 
@@ -321,12 +337,10 @@ module.exports = class FuzzyFinderView {
     return {uri: filePath, filePath, label}
   }
 
-  setFilter(items) {
-    const objectFilterer = new ObjectArrayFilterer(items, 'label')
-    const filterFn = (_, query) => {
-      return objectFilterer.filter(query)
-    }
-    this.selectListView.update({ filter: filterFn })
+  filterFn(items, query) {
+    if (!query) return items
+    return this.nativeFuzzy.match(query, {maxResults: MAX_RESULTS})
+      .map(({id}) => this.items[id])
   }
 }
 

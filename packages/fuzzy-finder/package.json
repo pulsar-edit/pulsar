@@ -6,13 +6,13 @@
   "repository": "https://github.com/pulsar-edit/fuzzy-finder",
   "license": "MIT",
   "dependencies": {
+    "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f",
     "atom-select-list": "^0.7.0",
     "fs-plus": "^3.0.0",
     "fuzzaldrin-plus": "^0.6.0",
     "minimatch": "~3.0.3",
     "underscore-plus": "^1.7.0",
-    "vscode-ripgrep": "^1.2.5",
-    "zadeh": "3.0.0-beta.4"
+    "vscode-ripgrep": "^1.2.5"
   },
   "devDependencies": {
     "async": "0.2.6",
