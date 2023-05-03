@@ -1,7 +1,6 @@
 const {Point, CompositeDisposable} = require('atom')
-const fs = require('fs-plus')
+const fs = require('fs')
 const fuzzaldrinPlus = require('fuzzaldrin-plus')
-const SCORING_SYSTEMS = require('./scoring-systems')
 
 const path = require('path')
 const SelectListView = require('atom-select-list')
@@ -152,7 +151,7 @@ module.exports = class FuzzyFinderView {
       this.moveToCaretPosition(caretPosition)
     } else if (!uri) {
       this.cancel()
-    } else if (fs.isDirectorySync(uri)) {
+    } else if (fs.lstatSync(uri).isDirectory()) {
       this.selectListView.update({errorMessage: 'Selected path is a directory'})
       setTimeout(() => { this.selectListView.update({errorMessage: null}) }, 2000)
     } else {
