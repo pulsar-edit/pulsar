@@ -11,7 +11,8 @@
     "fuzzaldrin-plus": "^0.6.0",
     "minimatch": "~3.0.3",
     "underscore-plus": "^1.7.0",
-    "vscode-ripgrep": "^1.2.5"
+    "vscode-ripgrep": "^1.2.5",
+    "zadeh": "3.0.0-beta.4"
   },
   "devDependencies": {
     "async": "0.2.6",

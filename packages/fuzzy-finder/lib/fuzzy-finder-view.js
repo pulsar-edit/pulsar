@@ -1,6 +1,7 @@
 const {Point, CompositeDisposable} = require('atom')
 const fs = require('fs')
 const fuzzaldrinPlus = require('fuzzaldrin-plus')
+const {ObjectArrayFilterer} = require('zadeh')
 
 const path = require('path')
 const SelectListView = require('atom-select-list')
@@ -14,7 +15,6 @@ module.exports = class FuzzyFinderView {
   constructor (metricsReporter) {
     this.previousQueryWasLineJump = false
     this.items = []
-    this.filterFn = this.filterFn.bind(this)
     this.metricsReporter = metricsReporter
 
     this.selectListView = new SelectListView({
@@ -67,6 +67,7 @@ module.exports = class FuzzyFinderView {
             emptyMessage: emptyMessage,
             errorMessage: errorMessage
           })
+          this.setFilter([])
         } else if (this.previousQueryWasLineJump) {
           this.previousQueryWasLineJump = false
           this.selectListView.update({
@@ -74,6 +75,7 @@ module.exports = class FuzzyFinderView {
             emptyMessage: this.getEmptyMessage(),
             errorMessage: null
           })
+          this.setFilter(this.items)
         }
       },
       elementForItem: ({filePath, label, ownerGitHubUsername}) => {
@@ -119,7 +121,7 @@ module.exports = class FuzzyFinderView {
       }
     })
 
-    this.selectListView.update({ filter: this.filterFn })
+    this.setFilter(this.items)
   }
 
   get element () {
@@ -283,6 +285,7 @@ module.exports = class FuzzyFinderView {
         loadingMessage: null,
         loadingBadge: null
       })
+      this.setFilter([])
     } else {
       this.selectListView.update({
         items: this.items,
@@ -290,6 +293,7 @@ module.exports = class FuzzyFinderView {
         loadingMessage: null,
         loadingBadge: null
       })
+      this.setFilter(this.items)
     }
   }
 
@@ -317,17 +321,12 @@ module.exports = class FuzzyFinderView {
     return {uri: filePath, filePath, label}
   }
 
-  filterFn (items, query) {
-    if (!query) {
-      return items
+  setFilter(items) {
+    const objectFilterer = new ObjectArrayFilterer(items, 'label')
+    const filterFn = (_, query) => {
+      return objectFilterer.filter(query)
     }
-
-    const startTime = performance.now()
-    let results = fuzzaldrinPlus.filter(items, query, {key: 'label'})
-    const duration = Math.round(performance.now() - startTime)
-    this.metricsReporter.sendFilterEvent(duration, items.length, 'fuzzaldrin-plus')
-
-    return results
+    this.selectListView.update({ filter: filterFn })
   }
 }
 
