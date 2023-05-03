@@ -3707,10 +3707,10 @@ electron-to-chromium@^1.4.284:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.358.tgz#301afde62c1bbe36aeec3155b11f7db1c5b01c78"
   integrity sha512-dbqpWy662dGVwq27q8i6+t5FPcQiFPs/VExXJ+/T9Xp9KUV0b5bvG+B/i07FNNr7PgcN3GhZQCZoYJ9EUfnIOg==
 
-electron@24.0.0:
-  version "24.0.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-24.0.0.tgz#d50f92d1b21176ebf732c57d2b0902739913ad6e"
-  integrity sha512-QmL8L53fQ+xOAp8m2mSGNewhDvJqQttCxrcesf0cqndKQDsIq4QvR35wGJqHg7MyPQKcBErLhZj9QvRheO5qnA==
+electron@24.1.3:
+  version "24.1.3"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-24.1.3.tgz#4c16501db715cc5e60bf0c0cb91efd7b70aebefc"
+  integrity sha512-lHFRf2CgeOxPLje4BayzaLz1e/SbNejUU4NDarFjBlcYfuH4ceGevYRVjyDZJLbSGdhmM2dLraeku30LGEigCg==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^18.11.18"
@@ -7759,9 +7759,9 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-"scandal@https://github.com/pulsar-edit/scandal.git#abfe4c4":
+"scandal@https://github.com/pulsar-edit/scandal.git#176eee2":
   version "3.2.0"
-  resolved "https://github.com/pulsar-edit/scandal.git#abfe4c4e354bfe129d69bb6d6d3e76f2b17ca4e2"
+  resolved "https://github.com/pulsar-edit/scandal.git#176eee28de83bdcb7f43a3c8074369d724759cf8"
   dependencies:
     argparse "^1.0.2"
     git-utils "https://github.com/pulsar-edit/git-utils.git#f4e8c37"
@@ -8713,10 +8713,9 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript-simple@8.0.6:
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/typescript-simple/-/typescript-simple-8.0.6.tgz#567143bc6882012c045a60efc38a239a986f1af8"
-  integrity sha512-BZp2NFHLPTcT/lklpgCDkbPt5CJQE4Lwh9dPzJ01Qsi8FQPdLQJvHCpophpQmaBuVKlxlAeH+AkyNHPdcAFmLA==
+"typescript-simple@github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7":
+  version "9.0.0"
+  resolved "https://codeload.github.com/pulsar-edit/typescript-simple/tar.gz/ccb03e558217030e8f261339281f1d69147934f7"
   dependencies:
     typescript "^5.0.3"
 
