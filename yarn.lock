@@ -4808,10 +4808,10 @@ fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
     "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    fuzzaldrin-plus "^0.6.0"
     minimatch "~3.0.3"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
+    wrench "^1.5"
 
 gauge@^4.0.3:
   version "4.0.4"
@@ -10073,6 +10073,11 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
+
+wrench@^1.5:
+  version "1.5.9"
+  resolved "https://registry.yarnpkg.com/wrench/-/wrench-1.5.9.tgz#411691c63a9b2531b1700267279bdeca23b2142a"
+  integrity sha512-QH+8W9n0UGDAxnRDOkQzG1N277GTaBgMDNdckluqnAY773njfs1gfo867IbMMbGjOZZof+zlRIUeQ9XN8VUHUQ==
 
 write-file-atomic@^3.0.0:
   version "3.0.3"
