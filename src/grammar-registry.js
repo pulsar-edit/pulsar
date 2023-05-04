@@ -43,14 +43,17 @@ module.exports = class GrammarRegistry {
     this.textmateRegistry.onDidAddGrammar(grammarAddedOrUpdated);
     this.textmateRegistry.onDidUpdateGrammar(grammarAddedOrUpdated);
 
+    let onLanguageModeChange = () => {
+      this.grammarScoresByBuffer.forEach((score, buffer) => {
+        if (!this.languageOverridesByBufferId.has(buffer.id)) {
+          this.autoAssignLanguageMode(buffer);
+        }
+      });
+    };
+
     this.subscriptions.add(
-      this.config.onDidChange('core.languageMode', () => {
-        this.grammarScoresByBuffer.forEach((score, buffer) => {
-          if (!this.languageOverridesByBufferId.has(buffer.id)) {
-            this.autoAssignLanguageMode(buffer);
-          }
-        });
-      })
+      this.config.onDidChange('core.useTreeSitterParsers', onLanguageModeChange),
+      this.config.onDidChange('core.useExperimentalModernTreeSitter', onLanguageModeChange)
     );
   }
 
@@ -236,6 +239,16 @@ module.exports = class GrammarRegistry {
     return { grammar: bestMatch, score: highestScore };
   }
 
+  getLanguageParserForScope(scope) {
+    let useTreeSitterParsers = this.config.get('core.useTreeSitterParsers', { scope });
+
+    if (!useTreeSitterParsers) {
+      return 'textmate';
+    } else {
+      return 'wasm-tree-sitter'
+    }
+  }
+
   // Extended: Returns a {Number} representing how well the grammar matches the
   // `filePath` and `contents`.
   getGrammarScore(grammar, filePath, contents) {
@@ -250,10 +263,9 @@ module.exports = class GrammarRegistry {
 
     // If multiple grammars match by one of the above criteria, break ties.
     if (score > 0) {
-      const isTreeSitter = grammar instanceof WASMTreeSitterGrammar;
-      let parserConfig = this.config.get('core.languageParser', {
-        scope: new ScopeDescriptor({ scopes: [grammar.scopeName] })
-      });
+      const isOldTreeSitter = grammar instanceof TreeSitterGrammar;
+      let scope = new ScopeDescriptor({ scopes: [grammar.scopeName] });
+      let parserConfig = this.getLanguageParserForScope(scope);
 
       // Prefer either TextMate or Tree-sitter grammars based on the user's
       // settings.
@@ -367,9 +379,9 @@ module.exports = class GrammarRegistry {
 
   grammarForId(languageId) {
     if (!languageId) return null;
-    const config = this.config.get('core.languageParser', {
-      scope: new ScopeDescriptor({ scopes: [languageId] })
-    });
+    const config = this.getLanguageParserForScope(
+      new ScopeDescriptor({ scopes: [languageId] })
+    );
 
     if (config === 'wasm-tree-sitter') {
       return (
@@ -681,8 +693,10 @@ module.exports = class GrammarRegistry {
   // Returns a non-empty {Array} of {Grammar} instances.
   getGrammars(params) {
     let result = this.textmateRegistry.getGrammars();
-    let includeModernTreeSitterGrammars = atom.config.get('core.languageParser') === 'wasm-tree-sitter';
     if (!(params && params.includeTreeSitter)) return result;
+
+    let includeModernTreeSitterGrammars =
+      atom.config.get('core.useExperimentalModernTreeSitter') === true;
 
     const tsGrammars = Object.values(this.treeSitterGrammarsById)
       .filter(g => g.scopeName);

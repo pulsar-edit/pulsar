@@ -11,13 +11,13 @@
 ; fold doesn't interfere with our ability to collapse the `else` fold.
 (if_expression
   consequence: (block) @fold
-  (#set! adjustToEndOfPreviousRow true)
+  (#set! fold.adjustToEndOfPreviousRow true)
   alternative: (else_clause))
 
 (else_clause
   (if_expression
     consequence: (block) @fold)
-    (#set! adjustToEndOfPreviousRow true))
+    (#set! fold.adjustToEndOfPreviousRow true))
 
 (match_block) @fold
 (block) @fold

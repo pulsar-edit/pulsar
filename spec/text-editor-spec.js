@@ -6821,7 +6821,8 @@ describe('TextEditor', () => {
 
   describe("when the buffer's language mode changes", () => {
     beforeEach(() => {
-      atom.config.set('core.languageParser', 'textmate');
+      atom.config.set('core.useTreeSitterParsers', false);
+;
     });
 
     it('notifies onDidTokenize observers when retokenization is finished', async () => {
@@ -7378,7 +7379,8 @@ describe('TextEditor', () => {
 
   describe("when the editor's grammar has an injection selector", () => {
     beforeEach(async () => {
-      atom.config.set('core.languageParser', 'textmate');
+      atom.config.set('core.useTreeSitterParsers', false);
+;
       await atom.packages.activatePackage('language-text');
       await atom.packages.activatePackage('language-javascript');
     });
@@ -8180,7 +8182,8 @@ describe('TextEditor', () => {
 
   describe('.syntaxTreeScopeDescriptorForBufferPosition(position)', () => {
     it('returns the result of scopeDescriptorForBufferPosition() when textmate language mode is used', async () => {
-      atom.config.set('core.languageParser', 'textmate');
+      atom.config.set('core.useTreeSitterParsers', false);
+;
       editor = await atom.workspace.open('sample.js', { autoIndent: false });
       await atom.packages.activatePackage('language-javascript');
 

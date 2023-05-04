@@ -11,5 +11,5 @@
 
 
 ((comment) @fold
-  (#set! endAt endPosition)
-  (#set! offsetEnd -3))
+  (#set! fold.endAt endPosition)
+  (#set! fold.offsetEnd -3))

@@ -8,11 +8,11 @@
 
 ((comment) @comment.line.double-slash.go
   (#match? @comment.line.double-slash.go "^\/\/")
-  (#set! final true))
+  (#set! test.final true))
 
 ((comment) @punctuation.definition.comment.go
   (#match? @punctuation.definition.comment.go "^\/\/")
-  (#set! startAndEndAroundFirstMatchOf "^\/\/"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^\/\/"))
 
 
 ((comment) @comment.block.go
@@ -20,11 +20,11 @@
 
 ((comment) @punctuation.definition.comment.begin.go
   (#match? @punctuation.definition.comment.begin.go "^\\/\\*")
-  (#set! startAndEndAroundFirstMatchOf "^\\/\\*"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^\\/\\*"))
 
 ((comment) @punctuation.definition.comment.end.go
   (#match? @punctuation.definition.comment.end.go "\\*\\/$")
-  (#set! startAndEndAroundFirstMatchOf "\\*\\/$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\*\\/$"))
 
 
 ; TYPES
@@ -33,7 +33,7 @@
 (type_declaration
   (type_spec
     name: (type_identifier) @entity.name.type.go)
-    (#set! final true))
+    (#set! test.final true))
 
 (type_identifier) @storage.type.other.go
 
@@ -83,7 +83,7 @@
 (call_expression
   (identifier) @support.function.builtin.go
   (#match? @support.function.builtin.go "^(?:append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)$")
-  (#set! final true))
+  (#set! test.final true))
 
 (call_expression
   (identifier) @support.other.function.go)
@@ -111,7 +111,7 @@
 
 (package_clause
   (package_identifier) @entity.name.package.go
-  (#set! final true))
+  (#set! test.final true))
 
 (package_identifier) @support.object.package.go
 
@@ -121,11 +121,11 @@
 ((interpreted_string_literal "\"") @string.quoted.double.go)
 (interpreted_string_literal
   "\"" @punctuation.definition.string.begin.go
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 
 (interpreted_string_literal
   "\"" @punctuation.definition.string.end.go
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 (escape_sequence) @constant.character.escape.go
 
@@ -134,10 +134,10 @@
 (raw_string_literal) @string.quoted.raw.go
 ((raw_string_literal)
   @punctuation.definition.string.begin.go
-  (#set! startAndEndAroundFirstMatchOf "^`"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^`"))
 ((raw_string_literal)
   @punctuation.definition.string.end.go
-  (#set! startAndEndAroundFirstMatchOf "`$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "`$"))
 
 
 ; NUMBERS
@@ -257,13 +257,13 @@
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.go
   ")" @punctuation.definition.parameters.end.bracket.round.go
-  (#set! final true))
+  (#set! test.final true))
 
 (composite_literal
   body: (literal_value
     "{" @punctuation.definition.struct.begin.bracket.curly.go
     "}" @punctuation.definition.struct.end.bracket.curly.go
-    (#set! final true)))
+    (#set! test.final true)))
 
 "{" @punctuation.definition.begin.bracket.curly.go
 "}" @punctuation.definition.end.bracket.curly.go
@@ -277,7 +277,7 @@
 
 (function_declaration
   (block) @meta.block.function.go
-  (#set! final true))
+  (#set! test.final true))
 
 (block) @meta.block.go
 

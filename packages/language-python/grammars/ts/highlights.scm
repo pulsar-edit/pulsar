@@ -22,14 +22,14 @@
 
 ((identifier) @support.type.exception.python
   (#match? @support.type.exception.python "^(BaseException|Exception|TypeError|StopAsyncIteration|StopIteration|ImportError|ModuleNotFoundError|OSError|ConnectionError|BrokenPipeError|ConnectionAbortedError|ConnectionRefusedError|ConnectionResetError|BlockingIOError|ChildProcessError|FileExistsError|FileNotFoundError|IsADirectoryError|NotADirectoryError|InterruptedError|PermissionError|ProcessLookupError|TimeoutError|EOFError|RuntimeError|RecursionError|NotImplementedError|NameError|UnboundLocalError|AttributeError|SyntaxError|IndentationError|TabError|LookupError|IndexError|KeyError|ValueError|UnicodeError|UnicodeEncodeError|UnicodeDecodeError|UnicodeTranslateError|AssertionError|ArithmeticError|FloatingPointError|OverflowError|ZeroDivisionError|SystemError|ReferenceError|BufferError|MemoryError|Warning|UserWarning|DeprecationWarning|PendingDeprecationWarning|SyntaxWarning|RuntimeWarning|FutureWarning|ImportWarning|UnicodeWarning|BytesWarning|ResourceWarning|GeneratorExit|SystemExit|KeyboardInterrupt)$")
-  (#set! final true))
+  (#set! test.final true))
 
 ; These methods have magic interpretation by python and are generally called
 ; indirectly through syntactic constructs.
 ((identifier) @support.function.magic.python
   (#match? @support.function.magic.python "^__(abs|add|and|bool|bytes|call|cmp|coerce|complex|contains|del|delattr|delete|delitem|delslice|dir|div|divmod|enter|eq|exit|float|floordiv|format|ge|get|getattr|getattribute|getitem|getslice|gt|hash|hex|iadd|iand|idiv|ifloordiv|ilshift|imatmul|imod|imul|index|init|instancecheck|int|invert|ior|ipow|irshift|isub|iter|itruediv|ixor|le|len|length_hint|long|lshift|lt|matmul|missing|mod|mul|ne|neg|next|new|nonzero|oct|or|pos|pow|radd|rand|rdiv|rdivmod|repr|reversed|rfloordiv|rlshift|rmatmul|rmod|rmul|ror|round|rpow|rrshift|rshift|rsub|rtruediv|rxor|set|setattr|setitem|setslice|str|sub|subclasscheck|truediv|unicode|xor)__$")
-  (#set! onlyIfDescendantOfType call)
-  (#set! final true))
+  (#set! test.onlyIfDescendantOfType call)
+  (#set! test.final true))
 
 ; Magic variables which a class/module may have.
 ((identifier) @support.variable.magic.python
@@ -38,30 +38,30 @@
 (call
   function: (identifier) @support.type.constructor.python
   (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
-  (#set! final true))
+  (#set! test.final true))
 
 (call
   function: (attribute
     attribute: (identifier) @support.type.constructor.python)
     (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
-    (#set! final true))
+    (#set! test.final true))
 
 (call
   (identifier) @support.function.builtin.python
   (#match? @support.function.builtin.python "^(__import__|abs|all|any|ascii|bin|bool|bytearray|bytes|callable|chr|classmethod|compile|complex|delattr|dict|dir|divmod|enumerate|eval|exec|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|isinstance|issubclass|iter|len|list|locals|map|max|memoryview|min|next|object|oct|open|ord|pow|print|property|range|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|vars|zip|file|long|raw_input|reduce|reload|unichr|unicode|xrange|apply|buffer|coerce|intern|execfile)$")
-  (#set! final true))
+  (#set! test.final true))
 
 ; `NotImplemented` is a constant, but is not recognized as such by the parser.
 ((identifier) @constant.language.not-implemented.python
   (#eq? @constant.language.not-implemented.python "NotImplemented")
-  (#set! final true))
+  (#set! test.final true))
 
 ; `Ellipsis` is also a constant, and though there don't seem to be any use
 ; cases for using it directly instead of `...`, we should at least mark it as a
 ; constant because that's how it'll be interpreted by Python.
 ((identifier) @constant.language.ellipsis.python
   (#eq? @constant.language.ellipsis.python "Ellipsis")
-  (#set! final true))
+  (#set! test.final true))
 
 
 ; CLASSES
@@ -107,19 +107,19 @@
 
 ; The "@" and "foo" together in a decorator with arguments, like `@foo(True)`.
 ((decorator "@" (call function: (identifier))) @support.other.function.decorator.python
-  (#set! endAt firstNamedChild.firstNamedChild.endPosition))
+  (#set! adjust.endAt firstNamedChild.firstNamedChild.endPosition))
 
 ; Claim the "foo" in `@foo(True)` so it doesn't get scoped like an ordinary
 ; function call.
 (decorator
   (call
     function: (identifier) @_IGNORE_
-    (#set! final true)))
+    (#set! test.final true)))
 
 (call
   function: (attribute
     attribute: (identifier) @support.other.function.python)
-    (#set! final true))
+    (#set! test.final true))
 
 (call
   function: (identifier) @support.other.function.python)
@@ -161,7 +161,7 @@
 
 (comment) @comment.line.number-sign.python
 ((comment) @punctuation.definition.comment.python
-  (#set! endAfterFirstMatchOf "^#"))
+  (#set! adjust.endAfterFirstMatchOf "^#"))
 
 ; DICTIONARIES
 ; ============
@@ -208,15 +208,15 @@
 
 (string
   _ @punctuation.definition.string.begin.python
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 
 (string
   _ @punctuation.definition.string.end.python
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 (string prefix: _ @storage.type.string.python
   (#match? @storage.type.string.python "^[bBfFrRuU]+")
-  (#set! endAfterFirstMatchOf "^[bBfFrRuU]+"))
+  (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuU]+"))
 
 
 ; CONSTANTS
@@ -302,11 +302,11 @@
 ; `self` and `cls` are just conventions, but they are _strong_ conventions.
 ((identifier) @variable.language.self.python
   (#eq? @variable.language.self.python "self")
-  (#set! final true))
+  (#set! test.final true))
 
 ((identifier) @variable.language.cls.python
   (#eq? @variable.language.cls.python "cls")
-  (#set! final true))
+  (#set! test.final true))
 
 (keyword_argument
   name: (identifier) @variable.parameter.function.python)
@@ -336,7 +336,7 @@
 ; =========
 
 (list_splat_pattern "*" @keyword.operator.splat.python
-  (#set! final true))
+  (#set! test.final true))
 
 "=" @keyword.operator.assignment.python
 
@@ -389,7 +389,7 @@
 (call
   (identifier) @keyword.other._TEXT_.python
   (#match? @keyword.other._TEXT_.python "^(exec|print)$")
-  (#set! final true))
+  (#set! test.final true))
 
 (print_statement "print" @keyword.other.print.python)
 
@@ -412,42 +412,42 @@
 
 (function_definition
   ":" @punctuation.definition.function.colon.python
-  (#set! final true))
+  (#set! test.final true))
 
 (dictionary (pair ":" @puncutation.separator.key-value.python))
 
 (parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.python
   ")" @punctuation.definition.parameters.end.bracket.round.python
-  (#set! final true))
+  (#set! test.final true))
 
 (parameters
   "," @punctuation.separator.parameters.comma.python
-  (#set! final true))
+  (#set! test.final true))
 
 (argument_list
   "(" @punctuation.definition.arguments.begin.bracket.round.python
   ")" @punctuation.definition.arguments.end.bracket.round.python
-  (#set! final true))
+  (#set! test.final true))
 
 (argument_list
   "," @punctuation.separator.arguments.comma.python
-  (#set! final true))
+  (#set! test.final true))
 
 (tuple
   "(" @punctuation.definition.tuple.begin.bracket.round.python
   ")" @punctuation.definition.tuple.end.bracket.round.python
-  (#set! final true))
+  (#set! test.final true))
 
 (tuple
   "," @punctuation.separator.tuple.comma.python
-  (#set! final true))
+  (#set! test.final true))
 
 (dictionary
   "{" @punctuation.definition.dictionary.begin.bracket.curly.python
   "}" @punctuation.definition.dictionary.end.bracket.curly.python
-  (#set! final true))
+  (#set! test.final true))
 
 (dictionary
   "," @punctuation.separator.dictionary.comma.python
-  (#set! final true))
+  (#set! test.final true))

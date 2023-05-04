@@ -11,6 +11,7 @@ treeSitter:
   localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
   indentsQuery: 'ts/indents.scm'
+  tagsQuery: 'ts/tags.scm'
 
 firstLineRegex: [
   # shebang line

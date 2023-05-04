@@ -3,11 +3,11 @@
 
 (string
   "\"" @punctuation.definition.string.begin.json
-    (#set! onlyIfFirst true))
+    (#set! test.onlyIfFirst true))
 
 (string
   "\"" @punctuation.definition.string.end.json
-    (#set! onlyIfLast true))
+    (#set! test.onlyIfLast true))
 
 (string) @string.quoted.double.json
 
@@ -33,11 +33,11 @@
 
 (object
   "," @punctuation.separator.object.comma.json
-  (#set! final true))
+  (#set! test.final true))
 
 (array
   "," @punctuation.separator.array.comma.json
-  (#set! final true))
+  (#set! test.final true))
 
 "," @punctuation.separator.comma.json
 ":" @punctuation.separator.key-value.colon.json

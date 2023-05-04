@@ -6,7 +6,8 @@ describe 'Tree-sitter based Java grammar', ->
   buffer = null
 
   beforeEach ->
-    atom.config.set('core.languageParser', 'node-tree-sitter')
+    atom.config.set('core.useTreeSitterParsers', true)
+    atom.config.set('core.useExperimentalModernTreeSitter', false)
 
     waitsForPromise ->
       atom.packages.activatePackage('language-java')

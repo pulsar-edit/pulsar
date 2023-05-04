@@ -8,15 +8,15 @@
 
 (descendant_selector
   (tag_name) @_IGNORE_
-  (#set! final true))
+  (#set! test.final true))
 
 (ERROR
   (attribute_name) @_IGNORE_
-  (#set! final true))
+  (#set! test.final true))
 
 ((ERROR
   (attribute_name) @invalid.illegal)
-  (#set! final true))
+  (#set! test.final true))
 
 ; WORKAROUND:
 ;
@@ -35,14 +35,14 @@
 ; Scope the entire `::after` range as one unit.
 ((pseudo_element_selector)
   @entity.other.attribute-name.pseudo-element.css
-  (#set! startAt lastChild.previousSibling.startPosition)
-  (#set! endAt lastChild.endPosition))
+  (#set! adjust.startAt lastChild.previousSibling.startPosition)
+  (#set! adjust.endAt lastChild.endPosition))
 
 ; Claim this range and block it from being scoped as a tag name.
 (pseudo_element_selector
   (tag_name) @_IGNORE_
-  (#set! onlyIfLast true)
-  (#set! final true))
+  (#set! test.onlyIfLast true)
+  (#set! test.final true))
 
 ; COMMENTS
 ; ========
@@ -51,9 +51,9 @@
 
 ; Scope the block-comment delimiters (`/*` and `*/`).
 ((comment) @punctuation.definition.comment.begin.css
-  (#set! startAndEndAroundFirstMatchOf "^/\\*"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*"))
 ((comment) @punctuation.definition.comment.end.css
-  (#set! startAndEndAroundFirstMatchOf "\\*/$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\*/$"))
 
 
 ; SELECTORS
@@ -88,18 +88,18 @@
 
 ; The '.foo' in `.foo`.
 ((class_selector) @entity.other.attribute-name.class.css
-  (#set! startAt lastChild.previousSibling.startPosition))
+  (#set! adjust.startAt lastChild.previousSibling.startPosition))
 
 ; Pseudo-classes without arguments: the ":first-of-type" in `li:first-of-type`.
 ((pseudo_class_selector (class_name) (arguments) .) @entity.other.attribute-name.pseudo-class.css
-  (#set! startAt lastChild.previousSibling.previousSibling.startPosition)
-  (#set! endAt lastChild.previousSibling.endPosition)
-  (#set! final true))
+  (#set! adjust.startAt lastChild.previousSibling.previousSibling.startPosition)
+  (#set! adjust.endAt lastChild.previousSibling.endPosition)
+  (#set! test.final true))
 
 ; Pseudo-classes with arguments: the ":nth-of-type" in `li:nth-of-type(2n-1)`.
 ((pseudo_class_selector (class_name) .) @entity.other.attribute-name.pseudo-class.css
-  (#set! startAt lastChild.previousSibling.startPosition)
-  (#set! endAt lastChild.endPosition))
+  (#set! adjust.startAt lastChild.previousSibling.startPosition)
+  (#set! adjust.endAt lastChild.endPosition))
 
 (arguments
   "(" @punctuation.definition.arguments.begin.bracket.round.css
@@ -120,7 +120,7 @@
 (declaration
   (property_name) @variable.other.assignment.css
   (#match? @variable.other.assignment.css "^--" )
-  (#set! final true))
+  (#set! test.final true))
 
 ; PROPERTIES
 ; ==========
@@ -146,10 +146,10 @@
   (#match? @string.quoted.single.css "'$"))
 
 ((string_value) @puncutation.definition.string.begin.css
-  (#set! startAndEndAroundFirstMatchOf "^[\"']"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^[\"']"))
 
 ((string_value) @puncutation.definition.string.end.css
-  (#set! startAndEndAroundFirstMatchOf "[\"']$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "[\"']$"))
 
 
 ; Property value constants
@@ -233,7 +233,7 @@
 ; The parser is permissive and supports at-rule keywords that don't currently
 ; exist, so we'll set a fallback scope for those.
 ((at_keyword) @keyword.control.at-rule.other.css
-  (#set! shy true))
+  (#set! test.shy true))
 
 [(to) (from)] @keyword.control._TYPE_.css
 (important) @keyword.control.important.css
@@ -262,12 +262,12 @@
   [":" "::"] @punctuation.definition.entity.css)
 
 (":" @punctuation.separator.key-value.css
-  (#set! shy true))
+  (#set! test.shy true))
 
 
 ; SECTIONS
 ; ========
 (rule_set (block) @meta.block.inside-selector.css)
 ((block) @meta.block.css
-  (#set! shy true))
+  (#set! test.shy true))
 (selectors) @meta.selector.css

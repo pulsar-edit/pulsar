@@ -27,18 +27,18 @@
 ] @keyword.operator.quantifier.regexp
 
 ((lookahead_assertion) @keyword.operator.lookahead.regexp
-  (#set! startAndEndAroundFirstMatchOf "\\?="))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\?="))
 
 ((lookahead_assertion) @keyword.operator.lookahead.negated.regexp
-  (#set! startAndEndAroundFirstMatchOf "\\?!"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\?!"))
 
 ((non_capturing_group) @keyword.operator.group.non-capturing.regexp
-  (#set! startAndEndAroundFirstMatchOf "\\?:"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\?:"))
 
 (anonymous_capturing_group
   "(" @punctuation.definition.group.begin.bracket.round.regexp
   ")" @punctuation.definition.group.end.bracket.round.regexp
-  (#set! final true))
+  (#set! test.final true))
 
 "|" @keyword.operator.or.regexp
 ["*" "+"] @keyword.operator.quantifier.regexp

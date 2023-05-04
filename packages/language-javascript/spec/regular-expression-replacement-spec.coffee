@@ -2,7 +2,8 @@ describe "Regular Expression Replacement grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.languageParser', 'textmate')
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.packages.activatePackage("language-javascript")

@@ -4,13 +4,13 @@ Tree-sitter parsers often use external C scanners, and those scanners sometimes 
 
 For this reason, Pulsar builds a custom web-tree-sitter. Every time someone tries to integrate a new tree-sitter parser into a Pulsar grammar, they might find that the parser relies on some stdlib function we haven’t included yet — in which case they can let us know and we’ll be able to update our web-tree-sitter build so that it can export that function.
 
-Pulsar will need to this until [tree-sitter#949](https://github.com/tree-sitter/tree-sitter/issues/949) is addressed in some way.
+Pulsar will need to do this until [tree-sitter#949](https://github.com/tree-sitter/tree-sitter/issues/949) is addressed in some way.
 
 ## Check out the modified branch for the version we’re targeting
 
-At time of writing, Pulsar was targeting web-tree-sitter version 0.20.7, so a branch exists [on our fork](https://github.com/pulsar-edit/tree-sitter/tree/0-20-7-modified) called `0-20-7-modified`. That branch contains a modified `exports.json` file and a modified script for building web-tree-sitter.
+At time of writing, Pulsar was targeting web-tree-sitter version 0.20.7, so a branch exists [on our fork](https://github.com/pulsar-edit/tree-sitter/tree/v0-20-7-modified) called `v0-20-7-modified`. That branch contains a modified `exports.json` file and a modified script for building web-tree-sitter.
 
-When we target a newer version of web-tree-sitter, a similar branch should be created against that tag. The commits that were applied on the existing modified branch should be able to be cherry-picked onto the new one rather easily.
+When we target a newer version of web-tree-sitter, a similar branch should be created against the corresponding upstream tag. The commits that were applied on the previous modified branch should be able to be cherry-picked onto the new one rather easily.
 
 ## Add whatever methods are needed to `exports.json`
 

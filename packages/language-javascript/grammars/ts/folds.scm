@@ -9,7 +9,7 @@
 ] @fold
 
 ((arguments) @fold
-  (#set! adjustToEndOfPreviousRow true))
+  (#set! fold.adjustToEndOfPreviousRow true))
 
 
 ; When we've got
@@ -24,15 +24,15 @@
 ; fold doesn't interfere with our ability to collapse the `else` fold.
 ((if_statement
   consequence: (statement_block) @fold)
-  (#set! adjustToEndOfPreviousRow true))
+  (#set! fold.adjustToEndOfPreviousRow true))
 
 (else_clause (statement_block) @fold)
 
 (statement_block) @fold
 
 ((comment) @fold
-  (#set! endAt endPosition)
-  (#set! adjustEndColumn 0))
+  (#set! fold.endAt endPosition)
+  (#set! fold.adjustEndColumn 0))
 
 
 ; When you have…
@@ -48,8 +48,8 @@
 ;
 (jsx_element
   (jsx_opening_element ">" @fold)
-  (#set! endAt parent.parent.lastChild.startPosition)
-  (#set! adjustToEndOfPreviousRow true)
+  (#set! fold.endAt parent.parent.lastChild.startPosition)
+  (#set! fold.adjustToEndOfPreviousRow true)
 )
 
 ; When you have…
@@ -66,8 +66,8 @@
 ;
 (jsx_element
   (jsx_opening_element) @fold
-  (#set! endAt lastChild.previousSibling.endPosition))
+  (#set! fold.endAt lastChild.previousSibling.endPosition))
 
 ((jsx_self_closing_element) @fold
   ; Exclude both the slash and angle bracket `/>` from the fold.
-  (#set! endAt lastChild.previousSibling.startPosition))
+  (#set! fold.endAt lastChild.previousSibling.startPosition))

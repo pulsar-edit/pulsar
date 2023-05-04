@@ -1,6 +1,6 @@
 ((comment) @fold
-  (#set! endAt endPosition)
-  (#set! adjustToEndOfPreviousRow true))
+  (#set! fold.endAt endPosition)
+  (#set! fold.adjustToEndOfPreviousRow true))
 
 [
   (class_body)

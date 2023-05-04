@@ -35,18 +35,18 @@
 
 ((comment) @punctuation.definition.comment.ts
   (#match? @comment.line.double-slash.ts "^//")
-  (#set! startAndEndAroundFirstMatchOf "^//"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^//"))
 
 ((comment) @comment.block.ts
   (#match? @comment.block.ts "^/\\*"))
 
 ((comment) @punctuation.definition.comment.begin.ts
   (#match? @punctuation.definition.comment.begin.ts "^/\\*")
-  (#set! startAndEndAroundFirstMatchOf "^/\\*"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*"))
 
 ((comment) @punctuation.definition.comment.end.ts
   (#match? @punctuation.definition.comment.end.ts "\\*/$")
-  (#set! startAndEndAroundFirstMatchOf "\\*/$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\*/$"))
 
 
 ; PROPERTIES
@@ -54,7 +54,7 @@
 
 ((property_identifier) @constant.other.property.ts
   (#match? @constant.other.property.ts "^[\$A-Z_]+$")
-  (#set! final true))
+  (#set! test.final true))
 
 ; (property_identifier) @variable.other.object.property.ts
 
@@ -128,10 +128,10 @@
 ; (type_annotation)
 
 ((type_identifier) @storage.type.ts @support.type.ts
-  (#set! onlyIfDescendantOfType type_annotation))
+  (#set! test.onlyIfDescendantOfType type_annotation))
 
 ((type_identifier) @storage.type.ts @support.type.ts
-  (#set! onlyIfDescendantOfType type_arguments))
+  (#set! test.onlyIfDescendantOfType type_arguments))
 
 ; OBJECTS
 ; =======
@@ -197,7 +197,7 @@
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition.ts
-    (#set! final true))
+    (#set! test.final true))
   right: [(arrow_function) (function)])
 
 ; Function variable assignment:
@@ -240,7 +240,7 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring.ts)
-    (#set! final true))
+    (#set! test.final true))
 
 ["var" "const" "let"] @storage.type._TYPE_.ts
 
@@ -319,7 +319,7 @@
     (pair_pattern
       key: (_) @entity.other.attribute-name.ts
       value: (identifier) @variable.other.assignment.loop.ts)
-      (#set! final true)))
+      (#set! test.final true)))
 
 ; The "error" in `} catch (error) {`
 (catch_clause
@@ -341,27 +341,27 @@
 ((string "\"") @string.quoted.double.ts)
 ((string
   "\"" @punctuation.definition.string.begin.ts)
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 
 ((string
   "\"" @punctuation.definition.string.end.ts)
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 ((string "'") @string.quoted.single.ts)
 ((string
   "'" @punctuation.definition.string.begin.ts)
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 
 ((string
   "'" @punctuation.definition.string.end.ts)
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 (template_string) @string.quoted.template.ts
 
 ((template_string "`" @punctuation.definition.string.begin.ts)
-  (#set! onlyIfFirst true))
+  (#set! test.onlyIfFirst true))
 ((template_string "`" @punctuation.definition.string.end.ts)
-  (#set! onlyIfLast true))
+  (#set! test.onlyIfLast true))
 
 ; Interpolations inside of template strings.
 (template_substitution
@@ -471,13 +471,13 @@
 
 (ternary_expression
   ["?" ":"] @keyword.operator.ternary.ts
-  (#set! final true))
+  (#set! test.final true))
 
 ; TODO: Ternary doesn't highlight properly; presumably fixed in
 ; https://github.com/tree-sitter/tree-sitter-typescript/pull/215, but needs
 ; update to v0.20.2.
 ((ternary_expression) @keyword.operator.ternary.ts
-  (#set! startAndEndAroundFirstMatchOf "\\?"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "\\?"))
 
 (public_field_definition "?" @keyword.operator.optional-type.ts)
 

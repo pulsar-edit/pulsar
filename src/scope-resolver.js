@@ -16,7 +16,7 @@ function comparePoints(a, b) {
   }
 }
 
-function resolveNodeDescriptor (node, descriptor) {
+function resolveNodeDescriptor(node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
   while (result !== null && parts.length > 0) {
@@ -27,7 +27,7 @@ function resolveNodeDescriptor (node, descriptor) {
   return result;
 }
 
-function resolveNodePosition (node, descriptor) {
+function resolveNodePosition(node, descriptor) {
   let parts = descriptor.split('.');
   let lastPart = parts.pop();
   let result = parts.length === 0 ?
@@ -37,14 +37,14 @@ function resolveNodePosition (node, descriptor) {
   return result[lastPart];
 }
 
-function interpretPredicateValue (value) {
+function interpretPredicateValue(value) {
   if (value === "true") { return true; }
   if (value === "false") { return false; }
   if (/^\d+$/.test(value)) { return Number(value); }
   return value;
 }
 
-function interpretPossibleKeyValuePair (rawValue, coerceValue = false) {
+function interpretPossibleKeyValuePair(rawValue, coerceValue = false) {
   if (!rawValue.includes(' ')) { return [rawValue, null]; }
 
   // Split on the first space. Everything after the first space is the value.
@@ -122,6 +122,11 @@ class ScopeResolver {
     return this.buffer.clipPosition(newPosition);
   }
 
+  shouldInvalidateOnChange(capture) {
+    return capture.setProperties &&
+      ('highlight.invalidateOnChange' in capture.setProperties);
+  }
+
   // We want to index scope data on buffer position, but each `Point` (or
   // ad-hoc point object) is a different object. We could normalize them to a
   // string and use the string as the map key, but we'd have to convert them
@@ -173,12 +178,48 @@ class ScopeResolver {
     let { setProperties: props = {} } = capture;
     let keys = Object.keys(props);
     if (keys.length === 0) { return false; }
-    return keys.some(k => k in ScopeResolver.ADJUSTMENTS);
+    return keys.some(k => this.capturePropertyIsAdjustment(k));
   }
 
   rangeExceedsBoundsOfCapture(range, capture) {
     return range.startIndex < capture.node.startIndex ||
       range.endIndex > capture.node.endIndex;
+  }
+
+  normalizeAdjustmentProperty(prop) {
+    if (prop.startsWith('adjust.')) {
+      prop = prop.replace(/^adjust\./, '');
+    }
+    return prop;
+  }
+
+  capturePropertyIsAdjustment(prop) {
+    prop = this.normalizeAdjustmentProperty(prop);
+    return prop in ScopeResolver.ADJUSTMENTS;
+  }
+
+  applyAdjustment(prop, ...args) {
+    prop = this.normalizeAdjustmentProperty(prop);
+    return ScopeResolver.ADJUSTMENTS[prop](...args);
+  }
+
+  normalizeTestProperty(prop) {
+    if (prop.startsWith('test.')) {
+      prop = prop.replace(/^test\./, '');
+    }
+    return prop;
+  }
+
+  capturePropertyIsTest(prop) {
+    prop = this.normalizeTestProperty(prop);
+    return prop in ScopeResolver.TESTS;
+  }
+
+  applyTest(prop, ...args) {
+    // console.log('testing prop:', prop);
+    prop = this.normalizeTestProperty(prop);
+    // console.log('now prop:', prop);
+    return ScopeResolver.TESTS[prop](...args);
   }
 
   // Given a capture and possible predicate data, determines the buffer range
@@ -199,14 +240,13 @@ class ScopeResolver {
     };
 
     for (let key in props) {
-      if (key in ScopeResolver.ADJUSTMENTS) {
+      if (this.capturePropertyIsAdjustment(key)) {
         let value = props[key];
 
         // Transform the range successively. Later adjustments can optionally
         // act on earlier adjustments, or they can ignore the current position
         // and inspect the original node instead.
-        range = ScopeResolver.ADJUSTMENTS[key](
-          capture.node, value, props, range, this);
+        range = this.applyAdjustment(key, capture.node, value, props, range, this);
 
         // If any single adjustment returns `null`, we shouldn't store this
         // capture.
@@ -228,13 +268,12 @@ class ScopeResolver {
   // document.
   test(capture, existingData) {
     let { node, setProperties: props = {} } = capture;
-    if (existingData?.final) { return false; }
+    if (existingData?.final || existingData?.['test.final']) { return false; }
 
     for (let key in props) {
-      if (!(key in ScopeResolver.TESTS)) { continue; }
-      let test = ScopeResolver.TESTS[key];
+      if (!this.capturePropertyIsTest(key)) { continue; }
       let value = props[key];
-      if (!test(node, value, props, existingData, this)) {
+      if (!this.applyTest(key, node, value, props, existingData, this)) {
         return false;
       }
     }
@@ -338,7 +377,7 @@ class ScopeResolver {
     this.configSubscription.dispose();
   }
 
-  *[Symbol.iterator] () {
+  *[Symbol.iterator]() {
     // Iterate in buffer position order.
     let keys = [...this.boundaries.keys()];
     keys.sort((a, b) => a.compare(b));
@@ -359,7 +398,9 @@ ScopeResolver.interpolateName = (name, node) => {
    !node.text.includes(' ')) {
     name = name.replace('_TEXT_', node.text);
   }
-  name = name.replace('_TYPE_', node.type);
+  if (name.includes('_TYPE_')) {
+    name = name.replace('_TYPE_', node.type);
+  }
   return name;
 };
 
@@ -385,12 +426,13 @@ ScopeResolver.TESTS = {
   // exact same range. If a capture is the first one to define `final`, then
   // all other captures for that same range are ignored, whether they try to
   // define `final` or not.
-  final (node, value, props, existingData) {
-    return !(existingData && existingData.final);
+  final(node, value, props, existingData) {
+    let final = existingData?.final || existingData?.['test.final'];
+    return !(existingData && final);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.
-  shy (node, value, props, existingData) {
+  shy(node, value, props, existingData) {
     return existingData === undefined;
   },
 
@@ -457,14 +499,14 @@ ScopeResolver.TESTS = {
   // Passes only if the given node is the last among its siblings.
   //
   // Is not guaranteed to pass if descended from an ERROR node.
-  onlyIfLast (node) {
+  onlyIfLast(node) {
     // Root nodes are always last.
     if (!node.parent) { return true; }
     return node?.parent?.lastChild?.id === node.id;
   },
 
   // Negates `onlyIfLast`.
-  onlyIfNotLast (node) {
+  onlyIfNotLast(node) {
     if (!node.parent) { return false; }
     return node?.parent?.lastChild?.id !== node.id;
   },
@@ -517,7 +559,8 @@ ScopeResolver.TESTS = {
     return !onlyIfLastOfType;
   },
 
-  // Passes when the node represents the last non-whitespace content on its row.
+  // Passes when the node represents the last non-whitespace content on its
+  // row. Considers the node's ending row.
   onlyIfLastTextOnRow(node, value, props, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.endPosition.row);
@@ -529,6 +572,21 @@ ScopeResolver.TESTS = {
   onlyIfNotLastTextOnRow(...args) {
     let isLastTextOnRow = ScopeResolver.TESTS.onlyIfLastTextOnRow(...args);
     return !isLastTextOnRow;
+  },
+
+  // Passes when the node represents the first non-whitespace content on its
+  // row. Considers the node's starting row.
+  onlyIfFirstTextOnRow(node, value, props, existingData, instance) {
+    let { buffer } = instance;
+    let text = buffer.lineForRow(node.startPosition.row);
+    let textBeforeNode = text.slice(0, node.startPosition.column);
+    return !/\S/.test(textBeforeNode);
+  },
+
+  // Negates `onlyIfFirstTextOnRow`.
+  onlyIfNotFirstTextOnRow(...args) {
+    let isFirstTextOnRow = ScopeResolver.TESTS.onlyIfFirstTextOnRow(...args);
+    return !isFirstTextOnRow;
   },
 
   // Passes if this node has a node of the given type in its ancestor chain.
@@ -673,7 +731,7 @@ ScopeResolver.ADJUSTMENTS = {
   },
 
   // Alter the given range to end at the start or end of a different node.
-  endAt (node, value, props, range, resolver) {
+  endAt(node, value, props, range, resolver) {
     let end = resolveNodePosition(node, value);
     if (!end) { return null; }
 

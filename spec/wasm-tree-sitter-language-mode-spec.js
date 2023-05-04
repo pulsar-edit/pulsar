@@ -65,7 +65,8 @@ describe('WASMTreeSitterLanguageMode', () => {
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
-    atom.config.set('core.languageParser', 'wasm-tree-sitter');
+    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
   afterEach(() => {
@@ -291,15 +292,17 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('always updates the range of the current node in the tree', async () => {
+    it('updates the range of the current node in the tree when highlight.invalidateOnChange is set', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
         ((template_string) @lorem
-          (#match? @lorem "lorem"))
+          (#match? @lorem "lorem")
+          (#set! highlight.invalidateOnChange true))
         ((template_string) @ipsum
-          (#not-match? @ipsum "lorem"))
+          (#not-match? @ipsum "lorem")
+          (#set! highlight.invalidateOnChange true))
       `);
 
       buffer.setText(dedent`\`
@@ -343,6 +346,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // TODO: Any way around this?
       await languageMode.nextTransaction;
+      await wait(0);
 
       expectTokensToEqual(editor, [
         [
@@ -494,13 +498,13 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         ((identifier) @constant
           (#match? @constant "^[A-Z_]+$")
-          (#set! final true))
+          (#set! test.final true))
 
         ((identifier) @constructor
           (#match? @constructor "^[A-Z]"))
 
         ((identifier) @variable
-          (#set! shy true))
+          (#set! test.shy true))
       `);
       buffer.setText(`exports.object = Class(SOME_CONSTANT, x)`);
 
@@ -646,10 +650,10 @@ describe('WASMTreeSitterLanguageMode', () => {
           (call_expression
             (member_expression
               (property_identifier) @method)
-              (#set! final true))
+              (#set! test.final true))
 
           ((property_identifier) @property
-            (#set! final true))
+            (#set! test.final true))
 
           (call_expression (identifier) @function)
         `);
@@ -1126,7 +1130,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let jsdocGrammar = atom.grammars.grammarForScopeName('source.jsdoc');
         await jsdocGrammar.setQueryForTest('highlightsQuery', `
           ((ERROR) @comment.block.js
-            (#set! onlyIfRoot true))
+            (#set! test.onlyIfRoot true))
           (document) @comment.block.js
 
           (tag_name) @storage.type.class.jsdoc
@@ -1200,18 +1204,18 @@ describe('WASMTreeSitterLanguageMode', () => {
         await rustGrammar.setQueryForTest('highlightsQuery', `
           (macro_invocation
             macro: (identifier) @macro
-            (#set! final true))
+            (#set! test.final true))
 
           (call_expression
             (field_expression
               (field_identifier) @function)
-              (#set! final true))
+              (#set! test.final true))
 
           ((field_identifier) @property
-            (#set! final true))
+            (#set! test.final true))
 
           ((identifier) @variable
-            (#set! shy true))
+            (#set! test.shy true))
         `);
 
         atom.grammars.addGrammar(rustGrammar);
@@ -1687,26 +1691,12 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       ((if_statement
         consequence: (statement_block) @fold)
-        (#set! offsetEnd -1))
+        (#set! fold.offsetEnd -1))
 
       (else_clause (statement_block) @fold)
 
       (statement_block) @fold
       `);
-
-      // {
-      //   parser: 'tree-sitter-javascript',
-      //   folds: [
-      //     {
-      //       start: { type: '{', index: 0 },
-      //       end: { type: '}', index: -1 }
-      //     },
-      //     {
-      //       start: { type: '(', index: 0 },
-      //       end: { type: ')', index: -1 }
-      //     }
-      //   ]
-      // });
 
       buffer.setText(dedent`
         if (a) {
@@ -1755,16 +1745,16 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('foldsQuery', `
       (jsx_element
         (jsx_opening_element ">" @fold)
-        (#set! endAt parent.parent.lastChild.startPosition)
-        (#set! offsetEnd -1)
+        (#set! fold.endAt parent.parent.lastChild.startPosition)
+        (#set! fold.offsetEnd -1)
       )
 
       (jsx_element
         (jsx_opening_element) @fold
-        (#set! endAt lastChild.previousSibling.endPosition))
+        (#set! fold.endAt lastChild.previousSibling.endPosition))
 
       ((jsx_self_closing_element) @fold
-        (#set! endAt lastChild.previousSibling.startPosition))
+        (#set! fold.endAt lastChild.previousSibling.startPosition))
       `);
 
       buffer.setText(dedent`
@@ -1813,8 +1803,8 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       await grammar.setQueryForTest('foldsQuery', `
       ((comment) @fold
-        (#set! endAt endPosition)
-        (#set! adjustEndColumn 0))
+        (#set! fold.endAt endPosition)
+        (#set! fold.adjustEndColumn 0))
       `);
 
       buffer.setText(dedent`
@@ -1983,16 +1973,16 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('foldsQuery', `
         ((if
           alternative: [(elsif) (else)]) @fold
-          (#set! endAt firstNamedChild.nextNamedSibling.nextNamedSibling.startPosition)
-          (#set! offsetEnd -1))
+          (#set! fold.endAt firstNamedChild.nextNamedSibling.nextNamedSibling.startPosition)
+          (#set! fold.offsetEnd -1))
 
         ((elsif
           consequence: [(then) (elsif)]) @fold
-          (#set! endAt firstNamedChild.nextNamedSibling.nextNamedSibling.startPosition)
-          (#set! offsetEnd -1))
+          (#set! fold.endAt firstNamedChild.nextNamedSibling.nextNamedSibling.startPosition)
+          (#set! fold.offsetEnd -1))
 
         ((else) @fold
-          (#set! endAt endPosition))
+          (#set! fold.endAt endPosition))
 
         (if) @fold
       `);
@@ -2120,7 +2110,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           (dictionary)
 
           (string)
-        ] @fold (#set! endAt endPosition))
+        ] @fold (#set! fold.endAt endPosition))
 
         `);
 
@@ -2167,8 +2157,8 @@ describe('WASMTreeSitterLanguageMode', () => {
       await jsGrammar.setQueryForTest('foldsQuery', `
         (template_string) @fold
         ((arguments) @fold
-          (#set! adjustEndColumn 0)
-          (#set! offsetEnd -1))
+          (#set! fold.adjustEndColumn 0)
+          (#set! fold.offsetEnd -1))
       `);
 
       jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
@@ -2372,7 +2362,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment.block
         ((comment) @punctuation.definition.comment.begin
-          (#set! startAndEndAroundFirstMatchOf "^/\\\\*"))
+          (#set! adjust.startAndEndAroundFirstMatchOf "^/\\\\*"))
       `);
 
       buffer.setText('\n/* lorem ipsum dolor sit amet */');
@@ -2423,7 +2413,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       await jsGrammar.setQueryForTest('highlightsQuery', `
         ((regex) @gadfly
-          (#set! startAndEndAroundFirstMatchOf "lor\\\\?em"))
+          (#set! adjust.startAndEndAroundFirstMatchOf "lor\\\\?em"))
         (regex) @regex-outer
         (regex_pattern) @regex-inner
       `);
@@ -2485,7 +2475,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       await jsGrammar.setQueryForTest('highlightsQuery', `
         ((regex_pattern) @gadfly
-          (#set! startAndEndAroundFirstMatchOf "lor\\\\?em"))
+          (#set! adjust.startAndEndAroundFirstMatchOf "lor\\\\?em"))
         (regex) @regex-outer
         (regex_pattern) @regex-inner
       `);
@@ -2780,11 +2770,11 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         await jsGrammar.setQueryForTest('highlightsQuery', `
           ((regex) @keyword.operator.optional
-            (#set! startAndEndAroundFirstMatchOf "\\\\?"))
+            (#set! adjust.startAndEndAroundFirstMatchOf "\\\\?"))
           (regex) @string.regexp.js
           ((comment) @comment.block.js)
           ((comment) @punctuation.definition.comment.begin.js
-            (#set! endAfterFirstMatchOf "^/\\\\*"))
+            (#set! adjust.endAfterFirstMatchOf "^/\\\\*"))
         `);
 
         atom.grammars.addGrammar(jsGrammar);
@@ -2844,7 +2834,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         await jsGrammar.setQueryForTest('highlightsQuery', `
           ((regex) @keyword.operator.optional
-            (#set! startAndEndAroundFirstMatchOf "\\\\?"))
+            (#set! adjust.startAndEndAroundFirstMatchOf "\\\\?"))
           ((regex_pattern) @string.regexp.js)
         `);
 
@@ -3145,14 +3135,14 @@ describe('WASMTreeSitterLanguageMode', () => {
         (call_expression
           (member_expression
             (property_identifier) @method)
-            (#set! final true))
+            (#set! test.final true))
 
         (call_expression
             (identifier) @function
-            (#set! final true))
+            (#set! test.final true))
 
         ((property_identifier) @property
-          (#set! final true))
+          (#set! test.final true))
         (identifier) @variable
       `);
 
@@ -3309,8 +3299,8 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('indentsQuery', `
         (template_string
           "\`" @match
-          (#set! onlyIfLast true)
-          (#set! matchIndentOf parent.firstChild.startPosition))
+          (#set! test.onlyIfLast true)
+          (#set! indent.matchIndentOf parent.firstChild.startPosition))
       `);
 
       buffer.setText(dedent`
@@ -3345,8 +3335,8 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('indentsQuery', `
         (template_string
           "\`" @dedent @match
-          (#set! onlyIfLast true)
-          (#set! matchIndentOf parent.firstChild.startPosition))
+          (#set! test.onlyIfLast true)
+          (#set! indent.matchIndentOf parent.firstChild.startPosition))
       `);
 
       buffer.setText(dedent`
@@ -3606,7 +3596,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         ["{"] @indent
         ["}"] @dedent
         ((comment) @indent
-          (#set! onlyIfDescendantOfType class_body))
+          (#set! test.onlyIfDescendantOfType class_body))
       `);
 
       let emptyClassText = dedent`
@@ -3656,7 +3646,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         ["{"] @indent
         ["}"] @dedent
         ((comment) @indent
-          (#set! onlyIfDescendantOfType class_body))
+          (#set! test.onlyIfDescendantOfType class_body))
       `);
 
       let emptyClassText = dedent`
