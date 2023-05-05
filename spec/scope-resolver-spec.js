@@ -659,6 +659,24 @@ describe('ScopeResolver', () => {
       })).toBe(true);
     });
 
+    it('supports onlyIfType with multiple types', async () => {
+      await grammar.setQueryForTest('highlightsQuery', `
+        (formal_parameters _ @thing
+          (#set! test.onlyIfType ", identifier"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        function foo (bar, baz, thud) {}
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      expect(matched.length).toBe(5);
+    });
+
     it('supports onlyIfHasError', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((statement_block) @messed-up-statement-block

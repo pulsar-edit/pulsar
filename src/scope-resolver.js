@@ -436,14 +436,18 @@ ScopeResolver.TESTS = {
     return existingData === undefined;
   },
 
-  // Passes only if the node is of the given type.
+  // Passes only if the node is of the given type. Can accept multiple
+  // space-separated types.
   onlyIfType(node, nodeType) {
-    return node.type === nodeType;
+    if (!nodeType.includes(' ')) { return node.type === nodeType }
+    let nodeTypes = nodeType.split(/\s+/);
+    return nodeTypes.some(t => t === node.type);
   },
 
   // Negates `onlyIfType`.
-  onlyIfNotType(node, nodeType) {
-    return node.type !== nodeType;
+  onlyIfNotType(...args) {
+    let isType = ScopeResolver.TESTS.onlyIfType(...args);
+    return !isType;
   },
 
   // Passes only if the node contains any descendant ERROR nodes.
