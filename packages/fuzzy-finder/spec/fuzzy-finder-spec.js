@@ -29,10 +29,20 @@ function getOrScheduleUpdatePromise () {
   return new Promise((resolve) => etch.getScheduler().updateDocument(resolve))
 }
 
+const genPromiseToCheck = fn => new Promise(resolve => {
+  const interval = setInterval(() => { if(fn()) resolve() }, 100)
+  setTimeout(() => clearInterval(interval), 4000)
+})
+
 describe('FuzzyFinder', () => {
   let disposable, reporterStub
   let rootDir1, rootDir2
   let fuzzyFinder, projectView, bufferView, gitStatusView, workspaceElement, fixturesPath
+  const filesPromise = () => genPromiseToCheck( () =>
+    gitStatusView?.element?.querySelectorAll('.file')?.length ||
+    bufferView?.element?.querySelectorAll('.file')?.length ||
+    projectView?.element?.querySelectorAll('.file')?.length
+  )
 
   beforeEach(async () => {
     reporterStub = {
@@ -99,7 +109,7 @@ describe('FuzzyFinder', () => {
     for (let dirPath of dirPaths) {
       wrench.readdirSyncRecursive(dirPath).filter((filePath) => {
         const fullPath = path.join(dirPath, filePath)
-        if (fs.isFileSync(fullPath)) {
+        if (fs.statSync(fullPath).isFile()) {
           fn(filePath)
         }
       })
@@ -535,21 +545,26 @@ describe('FuzzyFinder', () => {
             it('lists the paths of the current items, sorted by most recently opened but with the current item last', async () => {
               await atom.workspace.open('sample-with-tabs.coffee')
 
-              await bufferView.toggle()
-
+              bufferView.toggle()
+              await filesPromise()
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-              expect(Array.from(bufferView.element.querySelectorAll('li > div.file')).map(e => e.textContent)).toEqual(['sample.txt', 'sample.js', 'sample-with-tabs.coffee'])
+              expect([...bufferView.element.querySelectorAll('li > div.file')]
+                .map(e => e.textContent))
+                .toEqual(['sample.txt', 'sample.js', 'sample-with-tabs.coffee'])
 
               await bufferView.toggle()
-
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(false)
 
               await atom.workspace.open('sample.txt')
-
-              await bufferView.toggle()
-
+              bufferView.toggle()
+              await genPromiseToCheck(() =>
+                bufferView?.element?.querySelector('li > div.file')
+                  ?.innerText?.match(/sample-with-tabs/)
+              )
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-              expect(Array.from(bufferView.element.querySelectorAll('li > div.file')).map(e => e.textContent)).toEqual(['sample-with-tabs.coffee', 'sample.js', 'sample.txt'])
+              expect([...bufferView.element.querySelectorAll('li > div.file')]
+                .map(e => e.textContent))
+                .toEqual(['sample-with-tabs.coffee', 'sample.js', 'sample.txt'])
               expect(bufferView.element.querySelector('li')).toHaveClass('selected')
             })
 
@@ -605,8 +620,8 @@ describe('FuzzyFinder', () => {
 
               atom.workspace.getActivePane().splitRight({copyActiveItem: true})
 
-              await bufferView.toggle()
-
+              bufferView.toggle()
+              await filesPromise()
               expect(Array.from(bufferView.element.querySelectorAll('li > div.file')).map(e => e.textContent)).toEqual(['sample.js'])
             })
           )
@@ -1282,6 +1297,7 @@ describe('FuzzyFinder', () => {
             }
           ])
 
+          await filesPromise()
           const resultView = bufferView.element.querySelector('li')
           const primaryMatches = resultView.querySelectorAll('.primary-line .character-match')
           const secondaryMatches = resultView.querySelectorAll('.secondary-line .character-match')
@@ -1517,7 +1533,7 @@ describe('FuzzyFinder', () => {
 
         beforeEach(() => {
           projectPath = atom.project.getDirectories()[0].resolve('git/working-dir')
-          fs.moveSync(path.join(projectPath, 'git.git'), path.join(projectPath, '.git'))
+          fs.renameSync(path.join(projectPath, 'git.git'), path.join(projectPath, '.git'))
           atom.project.setPaths([rootDir2, projectPath])
 
           gitDirectory = atom.project.getDirectories()[1]
@@ -1550,6 +1566,7 @@ describe('FuzzyFinder', () => {
             expect(atom.workspace.panelForItem(gitStatusView)).toBeNull()
             await gitStatusView.toggle()
 
+            await filesPromise()
             expect(atom.workspace.panelForItem(gitStatusView).isVisible()).toBe(true)
             expect(gitStatusView.element.querySelectorAll('.file').length).toBe(4)
             expect(gitStatusView.element.querySelectorAll('.status.status-modified').length).toBe(1)
@@ -1576,8 +1593,8 @@ describe('FuzzyFinder', () => {
             it('displays the modified icon', async () => {
               gitRepository.getPathStatus(editor.getPath())
 
-              await bufferView.toggle()
-
+              bufferView.toggle()
+              await filesPromise()
               expect(bufferView.element.querySelectorAll('.status.status-modified').length).toBe(1)
               expect(bufferView.element.querySelector('.status.status-modified').closest('li').querySelector('.file').textContent).toBe('a.txt')
             })
@@ -1589,8 +1606,8 @@ describe('FuzzyFinder', () => {
 
               gitRepository.getPathStatus(editor.getPath())
 
-              await bufferView.toggle()
-
+              bufferView.toggle()
+              await filesPromise()
               expect(bufferView.element.querySelectorAll('.status.status-added').length).toBe(1)
               expect(bufferView.element.querySelector('.status.status-added').closest('li').querySelector('.file').textContent).toBe('newsample.js')
             })
