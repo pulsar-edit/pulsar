@@ -570,15 +570,10 @@ describe('FuzzyFinder', () => {
 
             it('serializes the list of paths and their last opened time', async () => {
               await atom.workspace.open('sample-with-tabs.coffee')
-
               await bufferView.toggle()
-
               await atom.workspace.open('sample.js')
-
               await bufferView.toggle()
-
               await atom.workspace.open()
-
               await atom.packages.deactivatePackage('fuzzy-finder')
 
               let states = _.map(atom.packages.getPackageState('fuzzy-finder'), (path, time) => [path, time])
@@ -586,7 +581,6 @@ describe('FuzzyFinder', () => {
               states = _.sortBy(states, (path, time) => -time)
 
               const paths = ['sample-with-tabs.coffee', 'sample.txt', 'sample.js']
-
               for (let [time, bufferPath] of states) {
                 expect(_.last(bufferPath.split(path.sep))).toBe(paths.shift())
                 expect(time).toBeGreaterThan(50000)
