@@ -734,12 +734,17 @@ class WASMTreeSitterLanguageMode {
     parser.reset();
     parser.setTimeoutMicros(null);
 
-    let callback = this.getOrCreateParseCallback();
+    let text = this.buffer.getText();
+    this.cachedCurrentBufferText = text;
+    let callback = (index, _, endIndex) => {
+      let currentText = this.cachedCurrentBufferText;
+      return currentText.slice(index, endIndex);
+    };
+
     if (devMode && tag) { console.time(tag); }
-
     const result = parser.parse(callback, oldTree, { includedRanges });
-
     if (devMode && tag) { console.timeEnd(tag); }
+
     return result;
   }
 
