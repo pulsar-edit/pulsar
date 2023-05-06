@@ -7,12 +7,12 @@ const dedent = require('dedent');
 const {TextBuffer} = require('atom');
 const ResultsPaneView = require('../lib/project/results-pane');
 const etch = require('etch');
-const {conditionPromise} = require('./async-spec-helpers');
+const { genPromiseToCheck } = require('./helpers')
 
 for (const ripgrep of [false, true]) {
 describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
   const {stoppedChangingDelay} = TextBuffer.prototype;
-  let activationPromise, searchPromise, editor, editorElement, findView,
+  let activationPromise, editor, editorElement, findView,
       projectFindView, workspaceElement;
 
   function getAtomPanel() {
@@ -31,12 +31,14 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
   }
 
   function waitForSearchResults() {
-    return conditionPromise(
+    return genPromiseToCheck(
       () => projectFindView.refs.descriptionLabel.textContent.includes('results found')
     )
   }
 
   beforeEach(() => {
+    jasmine.unspy(global, 'setTimeout')
+    jasmine.unspy(Date, 'now');
     atom.config.set('find-and-replace.useRipgrep', ripgrep)
     workspaceElement = atom.views.getView(atom.workspace);
     atom.config.set('core.excludeVcsIgnoredPaths', false);
@@ -46,11 +48,14 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
     activationPromise = atom.packages.activatePackage("find-and-replace").then(function({mainModule}) {
       mainModule.createViews();
       ({findView, projectFindView} = mainModule);
-      const spy = spyOn(projectFindView, 'search').andCallFake((options) => {
-        return searchPromise = spy.originalValue.call(projectFindView, options);
-      });
     });
   });
+
+  function resultsPromise() {
+    return genPromiseToCheck( () =>
+      getExistingResultsPane()?.refs?.resultsView?.refs?.resultsView
+    );
+  }
 
   describe("when project-find:show is triggered", () => {
     it("attaches ProjectFindView to the root view", async () => {
@@ -282,8 +287,6 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
     describe("when the find string contains an escaped char", () => {
       beforeEach(() => {
-        jasmine.useRealClock()
-
         let projectPath = temp.mkdirSync("atom");
         fs.writeFileSync(path.join(projectPath, "tabs.txt"), "\t\n\\\t\n\\\\t");
         atom.project.setPaths([projectPath]);
@@ -296,9 +299,10 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.findEditor.setText('\\t');
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
+          await genPromiseToCheck(() => resultsView.refs.listView.element.querySelector(".match-row") );
           expect(resultsView.element).toBeVisible();
           expect(resultsView.refs.listView.element.querySelectorAll(".match-row")).toHaveLength(2);
         })
@@ -309,10 +313,11 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.findEditor.setText('\\t');
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
           expect(resultsView.element).toBeVisible();
+          await genPromiseToCheck(() => resultsView.refs.listView.element.querySelector(".match-row") );
           expect(resultsView.refs.listView.element.querySelectorAll(".match-row")).toHaveLength(1);
         });
 
@@ -320,10 +325,11 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.findEditor.setText('\\');
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
           expect(resultsView.element).toBeVisible();
+          await genPromiseToCheck(() => resultsView.refs.listView.element.querySelector(".match-row") );
           expect(resultsView.refs.listView.element.querySelectorAll(".match-row")).toHaveLength(2);
           expect(resultsView.refs.listView.element.querySelectorAll(".match.highlight-info")).toHaveLength(3);
         });
@@ -332,9 +338,10 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.findEditor.setText('\\\\t');
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
+          await genPromiseToCheck(() => resultsView.refs.listView.element.querySelector(".match-row") );
           expect(resultsView.element).toBeVisible();
           expect(resultsView.refs.listView.element.querySelectorAll(".match-row")).toHaveLength(1);
         });
@@ -358,7 +365,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       it("closes the panel after search", async () => {
         projectFindView.findEditor.setText('something');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(getAtomPanel()).not.toBeVisible();
       });
@@ -366,7 +373,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       it("leaves the panel open after an empty search", async () => {
         projectFindView.findEditor.setText('');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(getAtomPanel()).toBeVisible();
       });
@@ -374,7 +381,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       it("closes the panel after a no-op search", async () => {
         projectFindView.findEditor.setText('something');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         atom.commands.dispatch(workspaceElement, 'project-find:show');
         await activationPromise;
@@ -382,7 +389,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         expect(getAtomPanel()).toBeVisible();
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(getAtomPanel()).not.toBeVisible();
       });
@@ -398,7 +405,6 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       beforeEach(() => {
         workspaceElement.style.height = '1000px';
         atom.commands.dispatch(editorElement, 'project-find:show');
-        jasmine.useRealClock()
       });
 
       it("splits when option is right", async () => {
@@ -407,7 +413,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.getCenter().getActivePane()).not.toBe(initialPane);
       });
@@ -418,7 +424,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.getCenter().getActivePane()).not.toBe(initialPane);
       });
@@ -428,7 +434,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.getCenter().getActivePane()).toBe(initialPane);
       });
@@ -438,7 +444,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await genPromiseToCheck( () =>
+          atom.workspace.getCenter().getActivePane().getItems()[0]?.refs?.resultsView
+        );
 
         const resultsPaneView1 = atom.views.getView(getExistingResultsPane());
         const pane1 = atom.workspace.getCenter().getActivePane();
@@ -452,10 +460,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         expect(resultsPaneView1).not.toBe(resultsPaneView2);
         simulateResizeEvent(resultsView2.element);
 
-        await etch.update(resultsView1);
-        await etch.update(resultsView2);
-        await waitForSearchResults();
-
+        await genPromiseToCheck(() => resultsView.refs.listView.element.querySelector(".match-row") );
         const resultCount = resultsPaneView1.querySelectorAll('.match-row').length;
         expect(resultCount).toBeGreaterThan(0);
         expect(resultsPaneView2.querySelectorAll('.match-row')).toHaveLength(resultCount);
@@ -467,7 +472,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         const resultsPaneView1 = atom.views.getView(getExistingResultsPane());
         const pane1 = atom.workspace.getCenter().getActivePane();
@@ -531,7 +536,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         expect(projectFindView.refs.descriptionLabel.textContent).toContain('Searching...');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.descriptionLabel.textContent).toContain('13 results found in 2 files');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
@@ -544,7 +549,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('[');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.descriptionLabel).toHaveClass('text-error');
         expect(projectFindView.refs.descriptionLabel.textContent).toContain('Invalid regular expression');
@@ -558,7 +563,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.descriptionLabel).not.toHaveClass('text-error');
         expect(projectFindView.refs.descriptionLabel.textContent).toContain('items');
@@ -574,7 +579,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
       it("escapes regex patterns by default", async () => {
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.scan.argsForCall[0][0]).toEqual(/i\(\\w\)ems\+/gim);
       });
@@ -584,7 +589,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('[');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.descriptionLabel).toHaveClass('text-error');
       });
@@ -601,14 +606,14 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       describe("when search has been run", () => {
         beforeEach(async () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
         });
 
         it("toggles regex option via an event and finds files matching the pattern", async () => {
           expect(projectFindView.refs.regexOptionButton).not.toHaveClass('selected');
           atom.commands.dispatch(projectFindView.element, 'project-find:toggle-regex-option');
 
-          await searchPromise;
+          await resultsPromise();
 
           expect(projectFindView.refs.regexOptionButton).toHaveClass('selected');
           expect(atom.workspace.scan.mostRecentCall.args[0]).toEqual(/i(\w)ems+/gim);
@@ -618,7 +623,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           expect(projectFindView.refs.regexOptionButton).not.toHaveClass('selected');
           projectFindView.refs.regexOptionButton.click();
 
-          await searchPromise;
+          await resultsPromise();
 
           expect(projectFindView.refs.regexOptionButton).toHaveClass('selected');
           expect(atom.workspace.scan.mostRecentCall.args[0]).toEqual(/i(\w)ems+/gim);
@@ -633,7 +638,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('ITEMS');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
       });
 
       it("runs a case insensitive search by default", () => expect(atom.workspace.scan.argsForCall[0][0]).toEqual(/ITEMS/gim));
@@ -642,7 +647,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         expect(projectFindView.refs.caseOptionButton).not.toHaveClass('selected');
 
         atom.commands.dispatch(projectFindView.element, 'project-find:toggle-case-option');
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.caseOptionButton).toHaveClass('selected');
         expect(atom.workspace.scan.mostRecentCall.args[0]).toEqual(/ITEMS/gm);
@@ -652,7 +657,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         expect(projectFindView.refs.caseOptionButton).not.toHaveClass('selected');
 
         projectFindView.refs.caseOptionButton.click();
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.caseOptionButton).toHaveClass('selected');
         expect(atom.workspace.scan.mostRecentCall.args[0]).toEqual(/ITEMS/gm);
@@ -666,7 +671,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('wholeword');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
       });
 
       it("does not run whole word search by default", () => {
@@ -677,7 +682,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         expect(projectFindView.refs.wholeWordOptionButton).not.toHaveClass('selected');
         atom.commands.dispatch(projectFindView.element, 'project-find:toggle-whole-word-option');
 
-        await searchPromise;
+        await resultsPromise();
         expect(projectFindView.refs.wholeWordOptionButton).toHaveClass('selected');
         expect(atom.workspace.scan.mostRecentCall.args[0]).toEqual(/\bwholeword\b/gim);
       });
@@ -686,7 +691,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         expect(projectFindView.refs.wholeWordOptionButton).not.toHaveClass('selected');
 
         projectFindView.refs.wholeWordOptionButton.click();
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.wholeWordOptionButton).toHaveClass('selected');
         expect(atom.workspace.scan.mostRecentCall.args[0]).toEqual(/\bwholeword\b/gim);
@@ -694,15 +699,11 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
     });
 
     describe("when project-find:confirm is triggered", () => {
-      beforeEach(() => {
-        jasmine.useRealClock()
-      });
-
       it("displays the results and no errors", async () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
 
-        await searchPromise;
+        await resultsPromise();
         await waitForSearchResults();
 
         const resultsView = getResultsView();
@@ -715,7 +716,6 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
     describe("when core:confirm is triggered", () => {
       beforeEach(() => {
         atom.commands.dispatch(workspaceElement, 'project-find:show')
-        jasmine.useRealClock()
       });
 
       describe("when the there search field is empty", () => {
@@ -732,25 +732,25 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('thisdoesnotmatch');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         spyOn(atom.workspace, 'scan');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.scan).not.toHaveBeenCalled();
         atom.workspace.scan.reset();
         window.dispatchEvent(new FocusEvent("focus"));
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.scan).toHaveBeenCalled();
         atom.workspace.scan.reset();
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(atom.workspace.scan).not.toHaveBeenCalled();
       });
@@ -762,7 +762,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         it("displays the results and no errors", async () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
           const resultsPaneView = getExistingResultsPane();
@@ -780,7 +780,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.pathsEditor.setText('*.js');
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           expect(atom.workspace.scan.argsForCall[0][1].paths).toEqual(['*.js']);
         });
@@ -789,7 +789,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           const editor = await atom.workspace.open('sample.js')
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
           const listView = resultsView.refs.listView;
@@ -807,9 +807,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
           editor.setText('there is one "items" in this file');
           await etch.getScheduler().getNextUpdatePromise()
-          await searchPromise;
+          await resultsPromise();
 
-          await conditionPromise(
+          await genPromiseToCheck(
             () => resultsPaneView.refs.previewCount.textContent === "8 results found in 2 files for items"
           )
 
@@ -819,14 +819,14 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           await resultsView.moveDown()
           atom.commands.dispatch(resultsView.element, 'core:confirm');
           await waitForSearchResults();
-          await conditionPromise(
+          await genPromiseToCheck(
             () => editor.getSelectedText() === "items"
           )
 
           editor.setText('no matches in this file');
           await waitForSearchResults();
 
-          await conditionPromise(
+          await genPromiseToCheck(
             () => resultsPaneView.refs.previewCount.textContent === "7 results found in 1 file for items"
           )
         });
@@ -835,7 +835,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           const editor = await atom.workspace.open('../sample.js')
 
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
           const resultsPaneView = getExistingResultsPane();
@@ -863,7 +863,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         it("displays no errors and no results", async () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           const resultsView = getResultsView();
           expect(projectFindView.refs.errorMessages).not.toBeVisible();
@@ -1029,7 +1029,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         expect(errorList).toBeVisible();
         expect(errorList.querySelectorAll("li")).toHaveLength(2);
@@ -1100,7 +1100,6 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       });
 
       it('highlights the search results in the selected file', async () => {
-        jasmine.useRealClock();
         // Process here is to
         // * open samplejs
         // * run a search that has sample js results
@@ -1113,7 +1112,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         projectFindView.findEditor.setText('item');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
         await waitForSearchResults();
 
         const resultsView = getResultsView();
@@ -1143,7 +1142,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         // Now we toggle the whole-word option to make sure it is updated in the buffer find
         atom.commands.dispatch(projectFindView.element, 'project-find:toggle-whole-word-option');
-        await searchPromise;
+        await resultsPromise();
 
         // project/sample.js has 0 results for whole word `item`
         expect(getResultDecorations('find-result')).toHaveLength(0);
@@ -1159,7 +1158,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         atom.commands.dispatch(editorElement, 'project-find:show');
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
       });
       it("opens new search results in new panel", async () => {
@@ -1167,7 +1166,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         result_pane.dontOverrideTab();
         projectFindView.findEditor.setText('items2');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
         expect(result_pane).not.toBe(getExistingResultsPane());
       });
     });
@@ -1212,7 +1211,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           atom.commands.dispatch(projectFindView.element, 'project-find:toggle-regex-option');
           projectFindView.findEditor.setText('a');
           atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-          await searchPromise;
+          await resultsPromise();
         });
 
         it("finds the escape char", async () => {
@@ -1238,7 +1237,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         beforeEach(async () => {
           projectFindView.findEditor.setText('a');
           atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-          await searchPromise;
+          await resultsPromise();
         });
 
         it("finds the escape char", async () => {
@@ -1262,13 +1261,13 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       it("is disabled when a search returns no results", async () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.replaceAllButton).not.toHaveClass('disabled');
 
         projectFindView.findEditor.setText('nopenotinthefile');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(projectFindView.refs.replaceAllButton).toHaveClass('disabled');
       });
@@ -1277,7 +1276,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
 
-        await searchPromise;
+        await resultsPromise();
 
         disposable = projectFindView.replaceTooltipSubscriptions;
         spyOn(disposable, 'dispose');
@@ -1316,7 +1315,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       it("runs the search, and replaces all the matches", async () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         projectFindView.replaceEditor.setText('sunshine');
         projectFindView.refs.replaceAllButton.click();
@@ -1338,7 +1337,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         it("runs the search after the replace", async () => {
           projectFindView.findEditor.setText('items');
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           projectFindView.replaceEditor.setText('items-123');
           projectFindView.refs.replaceAllButton.click();
@@ -1384,7 +1383,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.findEditor.setText('nopenotinthefile');
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-          await searchPromise;
+          await resultsPromise();
         });
 
         it("doesnt replace anything", () => {
@@ -1408,7 +1407,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           projectFindView.findEditor.setText('items');
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-          await searchPromise;
+          await resultsPromise();
         });
 
         it("messages the user when the search text has changed since that last search", () => {
@@ -1476,7 +1475,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           atom.commands.dispatch(projectFindView.element, 'project-find:toggle-regex-option');
           projectFindView.findEditor.setText(';$');
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await searchPromise;
+          await resultsPromise();
 
           spyOn(atom, 'confirm').andReturn(0);
           projectFindView.replaceEditor.setText('sunshine');
@@ -1499,7 +1498,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         spyOn(atom, 'confirm').andReturn(0);
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-        await searchPromise;
+        await resultsPromise();
       });
 
       it("displays the errors in the results pane", async () => {
@@ -1578,7 +1577,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
       });
 
       it("doesn't open another panel even if the active pane is vertically split", async () => {
@@ -1586,7 +1585,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(workspaceElement.querySelectorAll('.preview-pane').length).toBe(1);
       });
@@ -1604,7 +1603,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
       });
 
       it("doesn't open another panel even if the active pane is horizontally split", async () => {
@@ -1612,7 +1611,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         expect(workspaceElement.querySelectorAll('.preview-pane').length).toBe(1);
       });
