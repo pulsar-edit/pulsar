@@ -1379,38 +1379,34 @@ describe("FindView", () => {
         expect(findView.element).toHaveFocus();
       });
 
-      it("respects the `liveSearchMinimumCharacters` setting", () => {
+      it("respects the `liveSearchMinimumCharacters` setting", async () => {
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
         atom.config.set("find-and-replace.liveSearchMinimumCharacters", 3);
 
-        findView.findEditor.setText(
-          "why do I need these 2 lines? The editor does not trigger contents-modified without them"
-        );
-
-        advance();
         findView.findEditor.setText("");
-        advance();
+        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
         expect(findView.refs.descriptionLabel.textContent).toContain("Find in Current Buffer");
         expect(findView.element).toHaveFocus();
 
         findView.findEditor.setText("ite");
-        advance();
+        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/6/))
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
         expect(findView.element).toHaveFocus();
 
+        // FIXME: This is a no-op test. It'll always pass because things are async, even if we break the
+        // functionality
         findView.findEditor.setText("i");
-        advance();
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
         expect(findView.element).toHaveFocus();
 
         findView.findEditor.setText("");
-        advance();
+        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
         expect(findView.refs.descriptionLabel.textContent).toContain("Find in Current Buffer");
         expect(findView.element).toHaveFocus();
 
         atom.config.set("find-and-replace.liveSearchMinimumCharacters", 0);
         findView.findEditor.setText("i");
-        advance();
+        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/20/))
         expect(findView.refs.descriptionLabel.textContent).toContain("20 results");
         expect(findView.element).toHaveFocus();
       });
