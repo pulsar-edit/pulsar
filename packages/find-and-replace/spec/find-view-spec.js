@@ -1,6 +1,5 @@
 /** @babel */
 
-// const {it, fit, ffit, afterEach, beforeEach, conditionPromise} = require('./helpers') // eslint-disable-line no-unused-vars
 const path = require("path");
 
 const genPromiseToCheck = fn => new Promise(resolve => {
@@ -1414,18 +1413,19 @@ describe("FindView", () => {
       it("doesn't live search on a regex that matches empty string", () => {
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
 
+        // FIXME: This is a no-op test. It'll always pass because things are async, even if we break the
+        // functionality
         atom.commands.dispatch(findView.findEditor.element, "find-and-replace:toggle-regex-option");
         findView.findEditor.setText("asdf|");
-        advance();
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
       });
 
-      it("doesn't live search on a invalid regex", () => {
+      it("doesn't live search on a invalid regex", async () => {
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
 
         atom.commands.dispatch(findView.findEditor.element, "find-and-replace:toggle-regex-option");
         findView.findEditor.setText("\\(.*)");
-        advance();
+        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Invalid/));
         expect(findView.refs.descriptionLabel).toHaveClass("text-error");
         expect(findView.refs.descriptionLabel.textContent).toContain("Invalid regular expression");
       });
@@ -1740,17 +1740,15 @@ describe("FindView", () => {
           findView.findEditor.element.focus();
         });
 
-        it("does not add live searches to the history", () => {
+        it("does not add live searches to the history", async () => {
           expect(findView.refs.descriptionLabel.textContent).toContain("1 result");
 
-          findView.findEditor.setText("FIXME: necessary search for some reason??");
-          advance();
           findView.findEditor.setText("nope");
-          advance();
+          await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/nope/))
           expect(findView.refs.descriptionLabel.textContent).toContain("nope");
 
           findView.findEditor.setText("zero");
-          advance();
+          await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/zero/))
           expect(findView.refs.descriptionLabel.textContent).toContain("zero");
 
           atom.commands.dispatch(findView.findEditor.element, "core:move-up");
