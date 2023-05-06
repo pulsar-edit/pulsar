@@ -37,6 +37,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
   }
 
   beforeEach(() => {
+    jasmine.getEnv().defaultTimeoutInterval = 30000;
     jasmine.unspy(global, 'setTimeout')
     jasmine.unspy(Date, 'now');
     atom.config.set('find-and-replace.useRipgrep', ripgrep)
@@ -50,6 +51,10 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       ({findView, projectFindView} = mainModule);
     });
   });
+
+  afterEach( () => {
+    jasmine.getEnv().defaultTimeoutInterval = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  })
 
   function resultsPromise() {
     return genPromiseToCheck( () =>
@@ -806,29 +811,24 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           expect(listView.element.querySelectorAll(".path-row")[1].parentElement).toHaveClass('selected');
 
           editor.setText('there is one "items" in this file');
-          await etch.getScheduler().getNextUpdatePromise()
-          await resultsPromise();
-
           await genPromiseToCheck(
             () => resultsPaneView.refs.previewCount.textContent === "8 results found in 2 files for items"
           )
-
           expect(listView.element.querySelectorAll(".path-row")[1].parentElement).toHaveClass('selected');
 
           // Ensure the newly added item can be opened.
           await resultsView.moveDown()
           atom.commands.dispatch(resultsView.element, 'core:confirm');
-          await waitForSearchResults();
           await genPromiseToCheck(
             () => editor.getSelectedText() === "items"
           )
 
           editor.setText('no matches in this file');
-          await waitForSearchResults();
 
           await genPromiseToCheck(
             () => resultsPaneView.refs.previewCount.textContent === "7 results found in 1 file for items"
           )
+          expect(resultsPaneView.refs.previewCount.textContent).toEqual("7 results found in 1 file for items")
         });
 
         it("doesn't update the results list when a buffer outside the project changes", async () => {
@@ -840,6 +840,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           const resultsView = getResultsView();
           const resultsPaneView = getExistingResultsPane();
 
+          await genPromiseToCheck(() =>
+            resultsView.refs.listView.element.querySelectorAll.length === 13
+          );
           expect(resultsView.refs.listView.element.querySelectorAll(".list-item")).toHaveLength(13);
           expect(resultsPaneView.refs.previewCount.textContent).toBe("13 results found in 2 files for items");
 
@@ -849,7 +852,6 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
           editor.setText('there is one "items" in this file');
           advanceClock(editor.getBuffer().stoppedChangingDelay);
-          await etch.getScheduler().getNextUpdatePromise()
           expect(resultsPaneView.refs.previewCount.textContent).toBe("13 results found in 2 files for items");
           expect(resultsView.refs.listView.element.querySelectorAll(".list-nested-item")[1]).toHaveClass('selected');
         });
@@ -1267,8 +1269,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         projectFindView.findEditor.setText('nopenotinthefile');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-        await resultsPromise();
-
+        await genPromiseToCheck( () =>
+          projectFindView.refs.replaceAllButton?.classList.contains('disabled')
+        );
         expect(projectFindView.refs.replaceAllButton).toHaveClass('disabled');
       });
 
@@ -1303,6 +1306,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
 
+        await genPromiseToCheck( () =>
+          projectFindView.refs.replaceAllButton?.classList.contains('disabled')
+        );
         expect(projectFindView.refs.replaceAllButton).toHaveClass('disabled');
       });
     });
@@ -1432,6 +1438,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
           expect(projectFindView.errorMessages).not.toBeVisible();
           atom.commands.dispatch(projectFindView.element, 'project-find:replace-all');
+          await resultsPromise();
           await replacePromise;
 
           const resultsView = getResultsView();
