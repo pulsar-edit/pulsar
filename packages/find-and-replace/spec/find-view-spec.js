@@ -1363,13 +1363,7 @@ describe("FindView", () => {
       it("updates the search results", async () => {
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
 
-        findView.findEditor.setText(
-          "why do I need these 2 lines? The editor does not trigger contents-modified without them"
-        );
-
-        // advance();
         findView.findEditor.setText("");
-        // advance();
         await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
         expect(findView.refs.descriptionLabel.textContent).toContain("Find in Current Buffer");
         expect(findView.element).toHaveFocus();
