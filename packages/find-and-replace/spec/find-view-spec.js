@@ -2,13 +2,7 @@
 
 const path = require("path");
 
-const genPromiseToCheck = fn => new Promise(resolve => {
-  const interval = setInterval(() => { if(fn()) resolve() }, 100)
-  setTimeout(() => {
-    resolve()
-    clearInterval(interval)
-  }, 4000)
-})
+const { genPromiseToCheck } = require('./helpers')
 
 describe("FindView", () => {
   let workspaceElement, editorView, editor, findView, activationPromise;
