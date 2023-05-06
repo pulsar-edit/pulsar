@@ -1627,7 +1627,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       atom.config.set('find-and-replace.useRegex', true);
 
       atom.commands.dispatch(workspaceElement, 'project-find:show');
-      await activationPromise;
+      await resultsPromise();
 
       expect(projectFindView.model.getFindOptions().useRegex).toBe(true);
       expect(projectFindView.findEditor.getGrammar().scopeName).toBe('source.js.regexp');
@@ -1637,7 +1637,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
     describe("when panel is active", () => {
       beforeEach(async () => {
         atom.commands.dispatch(workspaceElement, 'project-find:show');
-        await activationPromise;
+        await resultsPromise();
       });
 
       it("does not use regexp grammar when in non-regex mode", () => {
