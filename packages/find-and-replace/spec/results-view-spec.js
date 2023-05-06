@@ -9,6 +9,9 @@ const ResultsPaneView = require('../lib/project/results-pane');
 const getIconServices = require('../lib/get-icon-services');
 const DefaultFileIcons = require('../lib/default-file-icons');
 const {Disposable} = require('atom')
+const { genPromiseToCheck } = require('./helpers')
+
+const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
 global.beforeEach(function() {
   this.addMatchers({
@@ -20,7 +23,7 @@ global.beforeEach(function() {
 });
 
 describe('ResultsView', () => {
-  let projectFindView, resultsView, searchPromise, workspaceElement;
+  let projectFindView, resultsView, workspaceElement;
 
   function getResultsPane() {
     let pane = atom.workspace.paneForURI(ResultsPaneView.URI);
@@ -70,6 +73,9 @@ describe('ResultsView', () => {
   }
 
   beforeEach(async () => {
+    jasmine.getEnv().defaultTimeoutInterval = 30000;
+    jasmine.unspy(global, 'setTimeout')
+    jasmine.unspy(Date, 'now');
     workspaceElement = atom.views.getView(atom.workspace);
     workspaceElement.style.height = '1000px';
     jasmine.attachToDOM(workspaceElement);
@@ -80,9 +86,6 @@ describe('ResultsView', () => {
     let activationPromise = atom.packages.activatePackage("find-and-replace").then(function({mainModule}) {
       mainModule.createViews();
       ({projectFindView} = mainModule);
-      const spy = spyOn(projectFindView, 'confirm').andCallFake(() => {
-        return searchPromise = spy.originalValue.call(projectFindView)
-      });
     });
 
     atom.commands.dispatch(workspaceElement, 'project-find:show');
@@ -90,12 +93,22 @@ describe('ResultsView', () => {
     await activationPromise;
   });
 
+  afterEach( () => {
+    jasmine.getEnv().defaultTimeoutInterval = origTimeout;
+  })
+
+  function resultsPromise() {
+    return genPromiseToCheck( () =>
+      getResultsPane()?.refs?.resultsView?.refs?.listView?.element?.querySelector('.path-name')
+    );
+  }
+
   describe("when the result is for a long line", () => {
     it("renders the context around the match", async () => {
       projectFindView.findEditor.setText('ghijkl');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
 
+      await resultsPromise();
       resultsView = getResultsView();
       expect(resultsView.refs.listView.element.querySelector('.path-name').textContent).toBe("one-long-line.coffee");
       expect(resultsView.refs.listView.element.querySelectorAll('.preview').length).toBe(1);
@@ -112,7 +125,7 @@ describe('ResultsView', () => {
     it("includes the basename of the project path that contains the match", async () => {
       projectFindView.findEditor.setText('ghijkl');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       expect(resultsView.refs.listView.element.querySelector('.path-name').textContent).toBe(path.join("project", "one-long-line.coffee"));
@@ -130,7 +143,7 @@ describe('ResultsView', () => {
     it("renders the replacement when doing a search and there is a replacement pattern", async () => {
       projectFindView.replaceEditor.setText('cats');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       expect(resultsView.refs.listView.element.querySelector('.path-name').textContent).toBe("one-long-line.coffee");
@@ -141,7 +154,7 @@ describe('ResultsView', () => {
 
     it("renders the replacement when changing the text in the replacement field", async () => {
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       expect(resultsView.refs.listView.element.querySelector('.match').textContent).toBe('ghijkl');
@@ -150,18 +163,18 @@ describe('ResultsView', () => {
       expect(resultsView.refs.listView.element.querySelector('.replacement')).toBeHidden();
 
       projectFindView.replaceEditor.setText('cats');
-      advanceClock(modifiedDelay);
-      await etch.update(resultsView);
-
+      await genPromiseToCheck( () =>
+        resultsView.refs.listView.element.querySelector('.match')?.classList.contains('highlight-error')
+      );
       expect(resultsView.refs.listView.element.querySelector('.match').textContent).toBe('ghijkl');
       expect(resultsView.refs.listView.element.querySelector('.match')).toHaveClass('highlight-error');
       expect(resultsView.refs.listView.element.querySelector('.replacement').textContent).toBe('cats');
       expect(resultsView.refs.listView.element.querySelector('.replacement')).toBeVisible();
 
       projectFindView.replaceEditor.setText('');
-      advanceClock(modifiedDelay);
-      await etch.update(resultsView);
-
+      await genPromiseToCheck( () =>
+        resultsView.refs.listView.element.querySelector('.match')?.classList.contains('highlight-info')
+      );
       expect(resultsView.refs.listView.element.querySelector('.match').textContent).toBe('ghijkl');
       expect(resultsView.refs.listView.element.querySelector('.match')).toHaveClass('highlight-info');
       expect(resultsView.refs.listView.element.querySelector('.replacement')).toBeHidden();
@@ -172,7 +185,7 @@ describe('ResultsView', () => {
       projectFindView.findEditor.setText('function ?(\\([^)]*\\))');
       projectFindView.replaceEditor.setText('$1 =>')
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       const listElement = resultsView.refs.listView.element;
@@ -190,7 +203,7 @@ describe('ResultsView', () => {
       projectFindView.findEditor.setText(' ');
       projectFindView.confirm();
 
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       const {listView} = resultsView.refs;
@@ -295,7 +308,7 @@ describe('ResultsView', () => {
       workspaceElement.style.height = '300px';
       projectFindView.findEditor.setText('so');
       projectFindView.confirm();
-      await searchPromise;
+      await resultsPromise();
       resultsView = getResultsView();
     });
 
@@ -333,7 +346,7 @@ describe('ResultsView', () => {
     it('preserves the selected file when collapsing all results', async () => {
       projectFindView.findEditor.setText('items');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
 
@@ -371,24 +384,24 @@ describe('ResultsView', () => {
     it('re-expands all results when running a new search', async () => {
       projectFindView.findEditor.setText('items');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
-
       await resultsView.collapseResult();
       expect(resultsView.element.querySelector('.collapsed')).not.toBe(null);
 
       projectFindView.findEditor.setText('sort');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
-
+      await genPromiseToCheck( () =>
+        !resultsView.element.querySelector('.collapsed')
+      );
       expect(resultsView.element.querySelector('.collapsed')).toBe(null);
     });
 
     it('preserves the collapsed state of the right files when results are removed', async () => {
       projectFindView.findEditor.setText('push');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
       resultsView = getResultsView();
 
       // collapse the first result
@@ -408,7 +421,7 @@ describe('ResultsView', () => {
     it('preserves the collapsed state of the right files when results are added', async () => {
       projectFindView.findEditor.setText('push');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
       resultsView = getResultsView();
 
       // remove the first result
@@ -434,7 +447,7 @@ describe('ResultsView', () => {
     it("does not contract result when right clicked", async () => {
       projectFindView.findEditor.setText('items');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
 
@@ -446,7 +459,7 @@ describe('ResultsView', () => {
     it("does not expand result when right clicked", async () => {
       projectFindView.findEditor.setText('items');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       resultsView.collapseAllResults();
@@ -463,7 +476,7 @@ describe('ResultsView', () => {
 
       projectFindView.findEditor.setText('items');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
       resultsView.selectFirstResult();
@@ -551,8 +564,6 @@ describe('ResultsView', () => {
 
       projectFindView.findEditor.setText('1');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
-
       resultsView.moveToBottom();
 
       const pathNode = resultsView.element.querySelector('.selected');
@@ -599,7 +610,7 @@ describe('ResultsView', () => {
 
       projectFindView.findEditor.setText('items');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
 
@@ -647,7 +658,7 @@ describe('ResultsView', () => {
       beforeEach(async () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
         resultsView = getResultsView();
       });
 
@@ -676,8 +687,10 @@ describe('ResultsView', () => {
       it("expands the selected results view", async () => {
         clickOn(resultsView.refs.listView.element.querySelector('.path-row').parentElement);
 
-        await resultsView.expandResult();
-
+        resultsView.expandResult();
+        await genPromiseToCheck( () =>
+          resultsView?.element?.querySelector('.selected')?.classList?.contains('match-row')
+        );
         let selectedItem = resultsView.element.querySelector('.selected');
         expect(selectedItem).toHaveClass('match-row');
         expect(selectedItem).toBe(resultsView.refs.listView.element.querySelector('.match-row'));
@@ -685,7 +698,12 @@ describe('ResultsView', () => {
 
       it("expands all results if 'Expand All' button is pressed", async () => {
         await resultsView.expandAllResults();
-        await etch.update(resultsView.refs.listView);
+        await genPromiseToCheck( () => {
+          const classes = resultsView?.refs?.listView?.element?.querySelectorAll('.path-row')?.classList
+          if(classes) {
+            return !classes.contains('collapsed')
+          }
+        });
         for (let item of Array.from(resultsView.refs.listView.element.querySelectorAll('.path-row'))) {
           expect(item.parentElement).not.toHaveClass('collapsed');
         }
@@ -804,7 +822,7 @@ describe('ResultsView', () => {
 
         projectFindView.findEditor.setText('i');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await searchPromise;
+        await resultsPromise();
 
         resultsView = getResultsView();
         let fileIconClasses = Array.from(resultsView.refs.listView.element.querySelectorAll('.path-row .icon')).map(el => el.className);
@@ -816,7 +834,7 @@ describe('ResultsView', () => {
         projectFindView.findEditor.setText('e');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await searchPromise;
+        await resultsPromise();
         resultsView = getResultsView();
         fileIconClasses = Array.from(resultsView.refs.listView.element.querySelectorAll('.path-row .icon')).map(el => el.className);
         expect(fileIconClasses).not.toContain('first-icon-class second-icon-class icon');
@@ -826,8 +844,6 @@ describe('ResultsView', () => {
     })
 
     describe('file-icons.element-icons', () => {
-      beforeEach(() => jasmine.useRealClock())
-
       it('has no default handler', () => {
         expect(getIconServices().elementIcons).toBe(null)
       })
@@ -853,7 +869,7 @@ describe('ResultsView', () => {
           expect(getIconServices().elementIcons).toBe(provider)
           projectFindView.findEditor.setText('i');
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          return searchPromise
+          return resultsPromise()
         })
 
         waitsForPromise(() => delayFor(35))
@@ -870,7 +886,7 @@ describe('ResultsView', () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm')
         })
 
-        waitsForPromise(() => searchPromise)
+        waitsForPromise(() => resultsPromise())
 
         waitsForPromise(() => delayFor(35))
 
@@ -889,7 +905,7 @@ describe('ResultsView', () => {
     it('resets the results message', async () => {
       projectFindView.findEditor.setText('a');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsPane = getResultsPane();
       await etch.update(resultsPane);
@@ -911,7 +927,7 @@ describe('ResultsView', () => {
 
       projectFindView.findEditor.setText('items.');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
     });
@@ -983,7 +999,7 @@ describe('ResultsView', () => {
     beforeEach(async () => {
       projectFindView.findEditor.setText('push');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await searchPromise;
+      await resultsPromise();
 
       resultsView = getResultsView();
     });
