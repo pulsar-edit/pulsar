@@ -838,7 +838,8 @@ describe('ResultsView', () => {
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
         await genPromiseToCheck( () =>
-          !resultsView.element.querySelector('.first-icon-class.second-icon-class')
+          !resultsView.element.querySelector('.first-icon-class.second-icon-class') &&
+            resultsView.element.querySelector('.icon-file-text.icon')
         );
         fileIconClasses = Array.from(resultsView.refs.listView.element.querySelectorAll('.path-row .icon')).map(el => el.className);
         expect(fileIconClasses).not.toContain('first-icon-class second-icon-class icon');
