@@ -1242,6 +1242,27 @@ module.exports = class Workspace extends Model {
       if (uri) {
         this.incoming.delete(uri);
       }
+
+      // After emitting the open event, lets trigger any packages activation commands
+      let activationHookItem;
+
+      if (item instanceof TextEditor) {
+        // This is a TextEditor opening, meaning a file
+        activationHookItem = item.buffer.file.getBaseName();
+      } else {
+        if (typeof item.getURI === "function") {
+          activationHookItem = item.getURI();
+        } else if (typeof item.getUri === "function") {
+          activationHookItem = item.getUri();
+        } else {
+          activationHookItem = "";
+        }
+      }
+
+      this.packageManager.triggerActivationHook(
+        `${activationHookItem}:opened`
+      );
+
     } finally {
       resolveItem();
     }
