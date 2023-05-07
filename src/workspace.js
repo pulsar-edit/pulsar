@@ -1248,7 +1248,7 @@ module.exports = class Workspace extends Model {
 
       if (item instanceof TextEditor) {
         // This is a TextEditor opening, meaning a file
-        activationHookItem = item.buffer.file.getBaseName();
+        activationHookItem = item.getTitle();
       } else {
         if (typeof item.getURI === "function") {
           activationHookItem = item.getURI();
