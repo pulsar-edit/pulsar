@@ -95,7 +95,7 @@ describe("ResultsModel", () => {
 
       advanceClock(editor.buffer.stoppedChangingDelay)
       editor.getBuffer().destroy()
-      result = resultsModel.getResult(editor.getPath())
+      const result = resultsModel.getResult(editor.getPath())
       expect(result.matches[0].lineText).toBe("  var sort = function(items) {")
     });
   });
