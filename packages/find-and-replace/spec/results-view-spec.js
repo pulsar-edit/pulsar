@@ -316,19 +316,24 @@ describe('ResultsView', () => {
       const {listView} = resultsView.refs;
       expect(listView.element.querySelectorAll('li').length).toBeLessThan(resultsView.model.getPathCount() + resultsView.model.getMatchCount());
 
-      await resultsView.moveToBottom();
+      resultsView.moveToBottom();
+      await genPromiseToCheck( () => listView.element.querySelector('.match-row.selected'));
       expect(_.last(listView.element.querySelectorAll('.match-row'))).toHaveClass('selected');
       expect(listView.element.scrollTop).not.toBe(0);
 
-      await resultsView.moveToTop();
+      resultsView.moveToTop();
+      await genPromiseToCheck( () => listView.element.querySelector('.path-row.selected'));
       expect(listView.element.querySelector('.path-row').parentElement).toHaveClass('selected');
       expect(listView.element.scrollTop).toBe(0);
     });
 
     it("selects the path when when core:move-to-bottom is triggered and last item is collapsed", async () => {
-      await resultsView.moveToBottom();
-      await resultsView.collapseResult();
-      await resultsView.moveToBottom();
+      resultsView.moveToBottom();
+      resultsView.collapseResult();
+      resultsView.moveToBottom();
+      await genPromiseToCheck( () =>
+        resultsView.refs.listView.element.querySelector('.path-row.selected')
+      );
 
       expect(_.last(resultsView.refs.listView.element.querySelectorAll('.path-row')).parentElement).toHaveClass('selected');
     });
