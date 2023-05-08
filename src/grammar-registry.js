@@ -53,7 +53,6 @@ module.exports = class GrammarRegistry {
 
     this.subscriptions.add(
       this.config.onDidChange('core.useTreeSitterParsers', onLanguageModeChange),
-      this.config.onDidChange('core.useExperimentalModernTreeSitter', onLanguageModeChange)
     );
   }
 
@@ -263,7 +262,7 @@ module.exports = class GrammarRegistry {
 
     // If multiple grammars match by one of the above criteria, break ties.
     if (score > 0) {
-      const isOldTreeSitter = grammar instanceof TreeSitterGrammar;
+      const isTreeSitter = grammar instanceof WASMTreeSitterGrammar;
       let scope = new ScopeDescriptor({ scopes: [grammar.scopeName] });
       let parserConfig = this.getLanguageParserForScope(scope);
 
@@ -695,18 +694,13 @@ module.exports = class GrammarRegistry {
     let result = this.textmateRegistry.getGrammars();
     if (!(params && params.includeTreeSitter)) return result;
 
-    let includeModernTreeSitterGrammars =
-      atom.config.get('core.useExperimentalModernTreeSitter') === true;
-
     const tsGrammars = Object.values(this.treeSitterGrammarsById)
       .filter(g => g.scopeName);
     result = result.concat(tsGrammars);
 
-    if (includeModernTreeSitterGrammars) {
-      let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
-        .filter(g => g.scopeName);
-      result = result.concat(modernTsGrammars);
-    }
+    let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
+      .filter(g => g.scopeName);
+    result = result.concat(modernTsGrammars);
 
     return result;
   }
