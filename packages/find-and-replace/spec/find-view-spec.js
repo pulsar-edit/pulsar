@@ -1137,7 +1137,7 @@ describe("FindView", () => {
           return
         }
 
-        editor.setText("\n\nbeforeafter\n\n");
+        editor.setText("\n\nbefore😄after\n\n");
         atom.commands.dispatch(findView.findEditor.element, "find-and-replace:toggle-regex-option");
         findView.findEditor.setText("before.after");
         atom.commands.dispatch(findView.findEditor.element, "core:confirm");
