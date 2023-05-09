@@ -158,6 +158,16 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#assert">assert</a></dt>
 <dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
+<dt><a href="#_">_</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
 </dl>
 
 ## Functions
@@ -166,6 +176,8 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
+<dd></dd>
+<dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
 <dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
@@ -522,6 +534,31 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## assert
 **Kind**: global constant  
 **Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
+<a name="_"></a>
+
+## \_
+**Kind**: global constant  
+**Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
 <a name="beforeEach"></a>
 
 ## beforeEach()
@@ -530,6 +567,11 @@ This file aims to run some short simple tests against `update.js`. Focusing
 <a name="beforeEach"></a>
 
 ## beforeEach()
+**Kind**: global function  
+**Babel**:   
+<a name="conditionPromise"></a>
+
+## conditionPromise()
 **Kind**: global function  
 **Babel**:   
 <a name="conditionPromise"></a>
