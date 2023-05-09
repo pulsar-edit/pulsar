@@ -9477,9 +9477,8 @@ tree-sitter@0.20.0:
     nan "^2.14.0"
     prebuild-install "^6.0.1"
 
-"tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
+"tree-view@file:packages/tree-view":
   version "0.229.1"
-  resolved "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1#f95938fe9aefbcdfed186d6285c3b014e435eee8"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
