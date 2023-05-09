@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Using some modules that are context-aware (remove some warnings, makes upgrading
+to newer Electron easier).
 - Removed a cache for native modules - fix bugs where an user rebuilds a native
 module outside of Pulsar, but Pulsar refuses to load anyway
 - Removed `nslog` dependency
