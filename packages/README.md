@@ -32,7 +32,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **encoding-selector** | [`./encoding-selector`](./encoding-selector) | |
 | **exception-reporting** | [`./exception-reporting`](./exception-reporting) | |
 | **find-and-replace** | [`pulsar-edit/find-and-replace`][find-and-replace] |  |
-| **fuzzy-finder** | [`pulsar-edit/fuzzy-finder`][fuzzy-finder] |  |
+| **fuzzy-finder** | [`./fuzzy-finder`][fuzzy-finder] |  |
 | **github** | [`pulsar-edit/github`][github] |  |
 | **git-diff** | [`./git-diff`](./git-diff) | |
 | **go-to-line** | [`./go-to-line`](./go-to-line) | |
