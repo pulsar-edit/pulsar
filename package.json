@@ -147,7 +147,7 @@
     "scoped-property-store": "^0.17.0",
     "scrollbar-style": "^4.0.1",
     "season": "^6.0.2",
-    "second-mate": "https://github.com/pulsar-edit/second-mate.git#14aa7bd",
+    "second-mate": "https://github.com/pulsar-edit/second-mate.git#9686771",
     "semver": "7.3.8",
     "service-hub": "^0.7.4",
     "settings-view": "file:packages/settings-view",
