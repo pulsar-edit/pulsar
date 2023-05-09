@@ -6,8 +6,11 @@
 
 ## [Unreleased]
 
+- Removed a cache for native modules - fix bugs where an user rebuilds a native
+module outside of Pulsar, but Pulsar refuses to load anyway
 - Removed `nslog` dependency
 - Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+- Fixed RPM installation failure when Atom was installed on the same machine
 
 ## 1.104.0
 
