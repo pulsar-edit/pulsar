@@ -31,7 +31,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **dev-live-reload** | [`./dev-live-reload`](./dev-live-reload) | |
 | **encoding-selector** | [`./encoding-selector`](./encoding-selector) | |
 | **exception-reporting** | [`./exception-reporting`](./exception-reporting) | |
-| **find-and-replace** | [`pulsar-edit/find-and-replace`][find-and-replace] |  |
+| **find-and-replace** | [`./find-and-replace`][find-and-replace] |  |
 | **fuzzy-finder** | [`pulsar-edit/fuzzy-finder`][fuzzy-finder] |  |
 | **github** | [`pulsar-edit/github`][github] |  |
 | **git-diff** | [`./git-diff`](./git-diff) | |
@@ -100,8 +100,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **whitespace** | [`./whitespace`](./whitespace) |  |
 | **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
-[find-and-replace]: https://github.com/pulsar-edit/find-and-replace
-[fuzzy-finder]: https://github.com/pulsar-edit/fuzzy-finder
 [github]: https://github.com/pulsar-edit/github
 [keybinding-resolver]: https://github.com/pulsar-edit/keybinding-resolver
 [notifications]: https://github.com/pulsar-edit/notifications
