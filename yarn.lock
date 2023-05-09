@@ -4547,9 +4547,8 @@ fill-range@^7.0.1:
   dependencies:
     to-regex-range "^5.0.1"
 
-"find-and-replace@https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz":
-  version "0.220.1"
-  resolved "https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz#d7a0f56511e38ee72a89895a795bbbcab4a1a405"
+"find-and-replace@file:packages/find-and-replace":
+  version "0.219.8"
   dependencies:
     binary-search "^1.3.3"
     etch "0.9.3"
@@ -9465,9 +9464,8 @@ tree-sitter@0.20.0:
     nan "^2.14.0"
     prebuild-install "^6.0.1"
 
-"tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
+"tree-view@file:packages/tree-view":
   version "0.229.1"
-  resolved "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1#f95938fe9aefbcdfed186d6285c3b014e435eee8"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"

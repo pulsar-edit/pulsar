@@ -31,7 +31,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **dev-live-reload** | [`./dev-live-reload`](./dev-live-reload) | |
 | **encoding-selector** | [`./encoding-selector`](./encoding-selector) | |
 | **exception-reporting** | [`./exception-reporting`](./exception-reporting) | |
-| **find-and-replace** | [`pulsar-edit/find-and-replace`][find-and-replace] |  |
+| **find-and-replace** | [`./find-and-replace`][find-and-replace] |  |
 | **fuzzy-finder** | [`./fuzzy-finder`][fuzzy-finder] |  |
 | **github** | [`pulsar-edit/github`][github] |  |
 | **git-diff** | [`./git-diff`](./git-diff) | |
@@ -94,18 +94,14 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
 | **tabs** | [`./tabs`](./tabs) |  |
 | **timecop** | [`./timecop`](./timecop) | |
-| **tree-view** | [`pulsar-edit/tree-view`][tree-view] |  |
+| **tree-view** | [`./tree-view`](./tree-view) |  |
 | **update-package-dependencies** | [`./update-package-dependencies`](./update-package-dependencies) | |
 | **welcome** | [`./welcome`](./welcome) | |
 | **whitespace** | [`./whitespace`](./whitespace) |  |
 | **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
-[find-and-replace]: https://github.com/pulsar-edit/find-and-replace
-[fuzzy-finder]: https://github.com/pulsar-edit/fuzzy-finder
 [github]: https://github.com/pulsar-edit/github
-[keybinding-resolver]: https://github.com/pulsar-edit/keybinding-resolver
 [notifications]: https://github.com/pulsar-edit/notifications
 [snippets]: https://github.com/pulsar-edit/snippets
 [spell-check]: https://github.com/pulsar-edit/spell-check
 [symbols-view]: https://github.com/pulsar-edit/symbols-view
-[tree-view]: https://github.com/pulsar-edit/tree-view
