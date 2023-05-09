@@ -29,13 +29,6 @@
   dependencies:
     "@babel/core" "7.x"
 
-"@atom/fuzzy-native@^1.1.2":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@atom/fuzzy-native/-/fuzzy-native-1.2.1.tgz#2a773bfa230da99e65c6708218b09bbd78293191"
-  integrity sha512-ABUIbeQqfoA4WUK+PAsspM9jLaGlj0wjyIc9CIi1OMAHv71/vqrpJHPX2fHWiREEXYxwh/CBCshhkOWESbnNnQ==
-  dependencies:
-    nan "^2.14.2"
-
 "@atom/source-map-support@^0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@atom/source-map-support/-/source-map-support-0.3.4.tgz#55ccbe0e64b2c742c5b333f357f9a93161145cfd"
@@ -1583,6 +1576,12 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
+"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
+  version "1.2.1"
+  resolved "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5fe348bc0a38bbec1de86d43940893010c8"
+  dependencies:
+    nan "2.17.0"
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -2255,11 +2254,6 @@ async-exit-hook@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/async-exit-hook/-/async-exit-hook-2.0.1.tgz#8bd8b024b0ec9b1c01cccb9af9db29bd717dfaf3"
   integrity sha512-NW2cX8m1Q7KPA7a5M2ULQeZ2wR5qI5PAbw5L0UOMxdioVk9PMZ0h1TmyZEkPYrCvYjDlFICusOu1dlEKAAeXBw==
-
-async@0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.2.6.tgz#ad3f373d9249ae324881565582bc90e152abbd68"
-  integrity sha512-LTdAJ0KBRK5o4BlBlUoGvfGNOMON+NLbONgDZk80SX0G8LQZyjN+74nNADIpQ/+rxun6+fYm7z4vIzAB51UKUA==
 
 async@3.2.4, async@^3.2.0, async@^3.2.3:
   version "3.2.4"
@@ -4802,24 +4796,18 @@ fuzzaldrin-plus@^0.6.0:
   resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
   integrity sha512-srIDThJHkdp3aPwJpR/HNzYZCRJwm07b/igxseoHSB7qR8e/gQp4F6lMGknE3TQI1Aq14TiFf/wzrHOp9LY/EA==
 
-fuzzaldrin@^2.0, fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
+fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
 
-"fuzzy-finder@https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3":
+"fuzzy-finder@file:packages/fuzzy-finder":
   version "1.14.3"
-  resolved "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3#7cd40191b8930bb49039a860ab868f554f90f41d"
   dependencies:
-    "@atom/fuzzy-native" "^1.1.2"
-    async "0.2.6"
+    "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    fuzzaldrin "^2.0"
-    fuzzaldrin-plus "^0.6.0"
-    humanize-plus "~1.8.2"
     minimatch "~3.0.3"
-    temp "~0.8.1"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -7030,7 +7018,7 @@ nan@2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
-nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
+nan@2.17.0, nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
   integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
