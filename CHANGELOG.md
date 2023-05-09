@@ -6,6 +6,7 @@
 
 ## [Unreleased]
 
+- Bumped to latest version of `second-mate`, fixing a memory usage issue in `vscode-oniguruma`
 - Removed a cache for native modules - fix bugs where an user rebuilds a native
 module outside of Pulsar, but Pulsar refuses to load anyway
 - Removed `nslog` dependency
