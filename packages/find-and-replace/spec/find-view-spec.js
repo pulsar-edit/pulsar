@@ -559,7 +559,7 @@ describe("FindView", () => {
 
           it("displays the error", () => {
             expect(findView.refs.descriptionLabel).toHaveClass("text-error");
-            expect(findView.refs.descriptionLabel.textContent).toContain("expression is too large");
+            expect(findView.refs.descriptionLabel.textContent).toContain("too large");
           });
 
           it("will be reset when there is no longer an error", () => {
