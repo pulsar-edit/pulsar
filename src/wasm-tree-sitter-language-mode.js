@@ -1194,7 +1194,12 @@ class WASMTreeSitterLanguageMode {
       (layer) => !!layer.indentsQuery
     );
 
-    if (!controllingLayer) { return null; }
+    if (!controllingLayer) {
+      // There's no layer with an indents query to help us out. The default
+      // behavior in this situation with any grammar — even plain text — is to
+      // match the previous line's indentation.
+      return comparisonRowIndent - existingIndent;
+    }
 
     let { indentsQuery, scopeResolver } = controllingLayer;
 
