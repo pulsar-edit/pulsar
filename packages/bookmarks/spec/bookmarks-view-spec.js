@@ -1,5 +1,5 @@
 describe('Bookmarks package', () => {
-  let [workspaceElement, editorElement, editor, bookmarks] = []
+  let workspaceElement, editorElement, editor, bookmarks, provider
 
   const bookmarkedRangesForEditor = editor => {
     const decorationsById = editor.decorationsStateForScreenRowRange(0, editor.getLastScreenRow())
@@ -18,6 +18,7 @@ describe('Bookmarks package', () => {
     await atom.workspace.open('sample.js')
 
     bookmarks = (await atom.packages.activatePackage('bookmarks')).mainModule
+    provider = bookmarks.bookmarksProvider
 
     jasmine.attachToDOM(workspaceElement)
     editor = atom.workspace.getActiveTextEditor()
@@ -32,17 +33,28 @@ describe('Bookmarks package', () => {
         expect(bookmarkedRangesForEditor(editor)).toEqual([])
         atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
         expect(bookmarkedRangesForEditor(editor)).toEqual([[[3, 10], [3, 10]]])
+
+        let marks = provider.getBookmarksForEditor(editor)
+        expect(marks.length).toBe(1)
+        expect(marks.map(m => m.getScreenRange())).toEqual(bookmarkedRangesForEditor(editor))
       })
 
       it('removes marker when toggled', () => {
+        let callback = jasmine.createSpy()
+
+        let instance = provider.getInstanceForEditor(editor)
+        instance.onDidChangeBookmarks(callback)
+
         editor.setCursorBufferPosition([3, 10])
         expect(bookmarkedRangesForEditor(editor).length).toBe(0)
 
         atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
         expect(bookmarkedRangesForEditor(editor).length).toBe(1)
+        expect(callback.callCount).toBe(1)
 
         atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
         expect(bookmarkedRangesForEditor(editor).length).toBe(0)
+        expect(callback.callCount).toBe(2)
       })
     })
 
@@ -53,6 +65,8 @@ describe('Bookmarks package', () => {
         expect(bookmarkedRangesForEditor(editor)).toEqual([])
         atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
         expect(bookmarkedRangesForEditor(editor)).toEqual([[[3, 10], [3, 10]], [[6, 11], [6, 11]]])
+        let instance = provider.getInstanceForEditor(editor)
+        expect(instance.getAllBookmarks().length).toBe(2)
       })
 
       it('removes multiple markers when toggled', () => {
@@ -215,27 +229,39 @@ describe('Bookmarks package', () => {
     })
 
     it('clears all bookmarks', () => {
+      let callback = jasmine.createSpy()
+      let instance = provider.getInstanceForEditor(editor)
+      instance.onDidChangeBookmarks(callback)
+
       editor.setCursorBufferPosition([3, 10])
       atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
+      expect(callback.callCount).toBe(1)
 
       editor.setCursorBufferPosition([5, 0])
       atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
+      expect(callback.callCount).toBe(2)
 
       atom.commands.dispatch(editorElement, 'bookmarks:clear-bookmarks')
       expect(getBookmarkedLineNodes(editorElement).length).toBe(0)
+      expect(callback.callCount).toBe(3)
     })
   })
 
   describe('when a bookmark is invalidated', () => {
     it('creates a marker when toggled', () => {
+      let callback = jasmine.createSpy()
+      let instance = provider.getInstanceForEditor(editor)
+      instance.onDidChangeBookmarks(callback)
       editor.setCursorBufferPosition([3, 10])
       expect(bookmarkedRangesForEditor(editor).length).toBe(0)
 
       atom.commands.dispatch(editorElement, 'bookmarks:toggle-bookmark')
       expect(bookmarkedRangesForEditor(editor).length).toBe(1)
+      expect(callback.callCount).toBe(1)
 
       editor.setText('')
       expect(bookmarkedRangesForEditor(editor).length).toBe(0)
+      expect(callback.callCount).toBe(2)
     })
   })
 
