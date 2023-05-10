@@ -29,13 +29,6 @@
   dependencies:
     "@babel/core" "7.x"
 
-"@atom/fuzzy-native@^1.1.2":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@atom/fuzzy-native/-/fuzzy-native-1.2.1.tgz#2a773bfa230da99e65c6708218b09bbd78293191"
-  integrity sha512-ABUIbeQqfoA4WUK+PAsspM9jLaGlj0wjyIc9CIi1OMAHv71/vqrpJHPX2fHWiREEXYxwh/CBCshhkOWESbnNnQ==
-  dependencies:
-    nan "^2.14.2"
-
 "@atom/source-map-support@^0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@atom/source-map-support/-/source-map-support-0.3.4.tgz#55ccbe0e64b2c742c5b333f357f9a93161145cfd"
@@ -1622,6 +1615,12 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
+"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
+  version "1.2.1"
+  resolved "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5fe348bc0a38bbec1de86d43940893010c8"
+  dependencies:
+    nan "2.17.0"
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -1813,9 +1812,9 @@
   integrity sha512-CRpX21/kGdzjOpFsZSkcrXMGIBWMGNIHXXBVFSH+ggkftxg+XYP20TESbh+zFvFj3EQOl5byk0HTRn1IL6hbqg==
 
 "@types/node@^14.6.2":
-  version "14.18.33"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.33.tgz#8c29a0036771569662e4635790ffa9e057db379b"
-  integrity sha512-qelS/Ra6sacc4loe/3MSjXNL1dNQ/GjxNHVzuChwMfmk7HuycRLVQN2qNY3XahK+fZc5E2szqQSKUyAF0E+2bg==
+  version "14.18.42"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.42.tgz#fa39b2dc8e0eba61bdf51c66502f84e23b66e114"
+  integrity sha512-xefu+RBie4xWlK8hwAzGh3npDz/4VhF6icY/shU+zv/1fNn+ZVG7T7CRwe9LId9sAYRPxI+59QBPuKL3WpyGRg==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -2295,11 +2294,6 @@ async-exit-hook@^2.0.1:
   resolved "https://registry.yarnpkg.com/async-exit-hook/-/async-exit-hook-2.0.1.tgz#8bd8b024b0ec9b1c01cccb9af9db29bd717dfaf3"
   integrity sha512-NW2cX8m1Q7KPA7a5M2ULQeZ2wR5qI5PAbw5L0UOMxdioVk9PMZ0h1TmyZEkPYrCvYjDlFICusOu1dlEKAAeXBw==
 
-async@0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.2.6.tgz#ad3f373d9249ae324881565582bc90e152abbd68"
-  integrity sha512-LTdAJ0KBRK5o4BlBlUoGvfGNOMON+NLbONgDZk80SX0G8LQZyjN+74nNADIpQ/+rxun6+fYm7z4vIzAB51UKUA==
-
 async@3.2.4, async@^3.2.0, async@^3.2.3:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
@@ -2386,9 +2380,8 @@ atom-slick@^2, atom-slick@^2.0.0:
   resolved "https://registry.yarnpkg.com/atom-slick/-/atom-slick-2.0.0.tgz#ff0dbe15be2c4eda268b9d30d76e2517e0b7d3ca"
   integrity sha512-yKl/4ZHeP3v6gtncnX6pAPFNv3gQNNYlXMk1QYP5gYB6xq2xqkFXbpwQo3IixGUZMf+DHilAmHOrS21QKLLi9g==
 
-"autocomplete-atom-api@https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7":
+"autocomplete-atom-api@file:packages/autocomplete-atom-api":
   version "0.10.7"
-  resolved "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7#c9d51fa721d543ccfc1b2189101155e81db6b97d"
 
 "autocomplete-css@file:packages/autocomplete-css":
   version "0.17.5"
@@ -4593,9 +4586,8 @@ fill-range@^7.0.1:
   dependencies:
     to-regex-range "^5.0.1"
 
-"find-and-replace@https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz":
-  version "0.220.1"
-  resolved "https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz#d7a0f56511e38ee72a89895a795bbbcab4a1a405"
+"find-and-replace@file:packages/find-and-replace":
+  version "0.219.8"
   dependencies:
     binary-search "^1.3.3"
     etch "0.9.3"
@@ -4843,24 +4835,18 @@ fuzzaldrin-plus@^0.6.0:
   resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
   integrity sha512-srIDThJHkdp3aPwJpR/HNzYZCRJwm07b/igxseoHSB7qR8e/gQp4F6lMGknE3TQI1Aq14TiFf/wzrHOp9LY/EA==
 
-fuzzaldrin@^2.0, fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
+fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
 
-"fuzzy-finder@https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3":
+"fuzzy-finder@file:packages/fuzzy-finder":
   version "1.14.3"
-  resolved "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3#7cd40191b8930bb49039a860ab868f554f90f41d"
   dependencies:
-    "@atom/fuzzy-native" "^1.1.2"
-    async "0.2.6"
+    "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    fuzzaldrin "^2.0"
-    fuzzaldrin-plus "^0.6.0"
-    humanize-plus "~1.8.2"
     minimatch "~3.0.3"
-    temp "~0.8.1"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -5050,15 +5036,16 @@ glob@3.x:
     inherits "2"
     minimatch "0.3"
 
-glob@4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-4.3.1.tgz#9d09096f89b4d30949e784e83f312af3ca04ec14"
-  integrity sha512-Zl/Xzacx5EtwM4dI2GX6HVr51L4wtykFzA/ZY4vV+SwxOVGA2n6cju3q8vea2Xy1zeaHLeRhgEtqxoDVTvkMoQ==
+glob@5.0.15:
+  version "5.0.15"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-5.0.15.tgz#1bc936b9e02f4a603fcc222ecf7633d30b8b93b1"
+  integrity sha512-c9IPMazfRITpmAAKi22dK1VKxGDX9ehhqfABDriL/lzO92xcUKEJPQHrVA/2YHSNFB4iFlykVmWvwo48nr3OxA==
   dependencies:
     inflight "^1.0.4"
     inherits "2"
-    minimatch "^2.0.1"
+    minimatch "2 || 3"
     once "^1.3.0"
+    path-is-absolute "^1.0.0"
 
 glob@7.1.3:
   version "7.1.3"
@@ -6829,6 +6816,13 @@ minimatch@0.x:
     lru-cache "2"
     sigmund "~1.0.0"
 
+"minimatch@2 || 3", minimatch@^3.0.3, minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
+  integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
+  dependencies:
+    brace-expansion "^1.1.7"
+
 minimatch@3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
@@ -6836,19 +6830,12 @@ minimatch@3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^2.0.1, minimatch@^2.0.9:
+minimatch@^2.0.9:
   version "2.0.10"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-2.0.10.tgz#8d087c39c6b38c001b97fca7ce6d0e1e80afbac7"
   integrity sha512-jQo6o1qSVLEWaw3l+bwYA2X0uLuK2KjNh2wjgO7Q/9UJnXr1Q3yQKR8BI0/Bt/rPg75e6SMW4hW/6cBHVTZUjA==
   dependencies:
     brace-expansion "^1.0.0"
-
-minimatch@^3.0.3, minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
-  integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
-  dependencies:
-    brace-expansion "^1.1.7"
 
 minimatch@^5.0.0, minimatch@^5.0.1, minimatch@^5.1.0:
   version "5.1.0"
@@ -7080,7 +7067,7 @@ nan@2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
-nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
+nan@2.17.0, nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
   integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
@@ -7327,13 +7314,6 @@ nsfw@2.2.2:
   integrity sha512-a2xt1Nx8Sz+E8eA5Ehgb3UONlrk1s5TpeoVh1XiqS0AI0wI94B7x4qoh6C11rNNX4fPOc3iC/wh4mcY9GWOgOQ==
   dependencies:
     node-addon-api "*"
-
-nslog@^3.0.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/nslog/-/nslog-3.2.0.tgz#508c3b8c953b57432af061bf951a8bc01e13fc43"
-  integrity sha512-3J5XPvodzhRpy0S7DIuxzQ16e70XZ8gS7MTvA70PiEFG9iZBv8XFABsyZDphO/62b/kEPkgPpoAbQvZprqLhOQ==
-  dependencies:
-    nan "^2.14.0"
 
 nth-check@^2.0.1:
   version "2.1.1"
@@ -8525,9 +8505,9 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
-"second-mate@https://github.com/pulsar-edit/second-mate.git#14aa7bd":
+"second-mate@https://github.com/pulsar-edit/second-mate.git#9686771":
   version "8.0.0"
-  resolved "https://github.com/pulsar-edit/second-mate.git#14aa7bd94b90c47aa99f000394301b9573b8898b"
+  resolved "https://github.com/pulsar-edit/second-mate.git#9686771b4aa3159fe042528d60fcac3af3e1c655"
   dependencies:
     emissary "^1.3.3"
     event-kit "^2.5.3"
@@ -8627,7 +8607,7 @@ setimmediate@^1.0.5:
     etch "0.9.0"
     fs-plus "^3.0.0"
     fuzzaldrin "^2.1"
-    glob "4.3.1"
+    glob "5.0.15"
     hosted-git-info "^2.8.9"
     marked "^4.0.10"
     request "^2.83.0"
@@ -9533,9 +9513,8 @@ tree-sitter@0.20.0:
     nan "^2.14.0"
     prebuild-install "^6.0.1"
 
-"tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
+"tree-view@file:packages/tree-view":
   version "0.229.1"
-  resolved "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1#f95938fe9aefbcdfed186d6285c3b014e435eee8"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
@@ -9621,17 +9600,16 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript-simple@8.0.6:
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/typescript-simple/-/typescript-simple-8.0.6.tgz#567143bc6882012c045a60efc38a239a986f1af8"
-  integrity sha512-BZp2NFHLPTcT/lklpgCDkbPt5CJQE4Lwh9dPzJ01Qsi8FQPdLQJvHCpophpQmaBuVKlxlAeH+AkyNHPdcAFmLA==
+"typescript-simple@github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7":
+  version "9.0.0"
+  resolved "https://codeload.github.com/pulsar-edit/typescript-simple/tar.gz/ccb03e558217030e8f261339281f1d69147934f7"
   dependencies:
-    typescript "^2.2.1"
+    typescript "^5.0.3"
 
-typescript@^2.2.1:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
-  integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
+typescript@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.3.tgz#fe976f0c826a88d0a382007681cbb2da44afdedf"
+  integrity sha512-xv8mOEDnigb/tN9PSMTwSEqAnUvkoXMQlicOb0IUVDBSQCgBSaAAROUZYy2IcUy5qU6XajK5jjjO7TMWqBTKZA==
 
 typical@^2.4.2, typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
