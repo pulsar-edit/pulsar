@@ -1790,21 +1790,35 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
+  // Given a {Point}, returns all injected {LanguageLayer}s whose content
+  // range(s) include that point. Does not include the root language layer.
+  //
+  // Will ignore any layer whose content ranges do not include the point, even if
+  // the point is within its extent.
   injectionLayersAtPoint(point) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
       containsPosition: point
     });
 
-    injectionMarkers = injectionMarkers.sort((a, b) => {
-      return a.getRange().compare(b.getRange());
+    injectionMarkers = injectionMarkers.filter(im => {
+      return im.languageLayer.containsPoint(point);
+    });
+
+    injectionMarkers.sort((a, b) => {
+      return a.getRange().compare(b.getRange()) ||
+        b.depth - a.depth;
     });
 
     return injectionMarkers.map(m => m.languageLayer);
   }
 
+  // Given a {Point}, returns all {LanguageLayer}s whose content range(s)
+  // include that point.
+  //
+  // Will ignore any layer whose content ranges do not include the point, even if
+  // the point is within its extent.
   languageLayersAtPoint(point) {
     let injectionLayers = this.injectionLayersAtPoint(point);
-    injectionLayers = injectionLayers.sort((a, b) => b.depth - a.depth);
     return [
       this.rootLanguageLayer,
       ...injectionLayers
@@ -1813,11 +1827,11 @@ class WASMTreeSitterLanguageMode {
 
   // Returns the deepest language layer at a given point, or optionally the
   // deepest layer to fulfill a criterion.
+  //
+  // Will ignore any layer whose content ranges do not include the point, even if
+  // the point is within its extent.
   controllingLayerAtPoint(point, where = FUNCTION_TRUE) {
     let layers = this.languageLayersAtPoint(point);
-    // Sort deeper layers first.
-    layers.sort((a, b) => b.depth - a.depth);
-
     return layers.find(layer => where(layer)) ?? null;
   }
 
@@ -3618,6 +3632,11 @@ class LanguageLayer {
     let markers = this.currentRangesLayer?.getMarkers();
     if (!markers || markers.length === 0) { return null; }
     return markers.map(m => m.getRange());
+  }
+
+  containsPoint(point) {
+    let ranges = this.getCurrentRanges() ?? [this.getExtent()];
+    return ranges.some(r => r.containsPoint(point));
   }
 
   getOrParseTree({ force = true, anonymous = false } = {}) {
