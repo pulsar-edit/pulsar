@@ -3,7 +3,7 @@
 const TextEditor = require('./text-editor');
 const PaneContainer = require('./pane-container');
 
-// Essential: Represents the workspace at the center of the entire window.
+/** Essential: Represents the workspace at the center of the entire window. */
 module.exports = class WorkspaceCenter {
   constructor(params) {
     params.location = 'center';
@@ -64,15 +64,20 @@ module.exports = class WorkspaceCenter {
     return this.onDidAddTextEditor(({ textEditor }) => callback(textEditor));
   }
 
-  // Essential: Invoke the given callback with all current and future panes items
-  // in the workspace center.
-  //
-  // * `callback` {Function} to be called with current and future pane items.
-  //   * `item` An item that is present in {::getPaneItems} at the time of
-  //      subscription or that is added at some later time.
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  /**
+   * Essential: Invoke the given callback with all current and future panes items
+   * in the workspace center.
+   * @params {WorkspaceCenter~observePaneItemsCallback} callback -
+   * Function to be called with current and future pane items.
+   * @returns {Disposable} Returns a Disposable on which `.dispose()` can be called
+   * to unsubscribe.
+   */
   observePaneItems(callback) {
+    /**
+     * @callback observePaneItemsCallback
+     * @param {object} item - An item that is present in {::getPaneItems} at the
+     * time of subscription or that is added at some later time.
+     */
     return this.paneContainer.observePaneItems(callback);
   }
 
@@ -233,54 +238,58 @@ module.exports = class WorkspaceCenter {
     return this.paneContainer.onDidDestroyPaneItem(callback);
   }
 
-  // Extended: Invoke the given callback when a text editor is added to the
-  // workspace center.
-  //
-  // * `callback` {Function} to be called when panes are added.
-  //   * `event` {Object} with the following keys:
-  //     * `textEditor` {TextEditor} that was added.
-  //     * `pane` {Pane} containing the added text editor.
-  //     * `index` {Number} indicating the index of the added text editor in its
-  //        pane.
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  /**
+   * Extended: Invoke the given callback when a text editor is added to the
+   * workspace center.
+   * @params {WorkspaceCenter~onDidAddTextEditorCB} callback - Function to be
+   * called when panes are added.
+   * @returns {Disposable} on which `.dispose()` can be called to unsubscribe.
+   */
   onDidAddTextEditor(callback) {
     return this.onDidAddPaneItem(({ item, pane, index }) => {
       if (item instanceof TextEditor) {
+        /**
+         * @callback onDidAddTextEditorCB
+         * @params {object} event - Object with following keys:
+         * @params {TextEditor} event.textEditor - The TextEditor that was added.
+         * @params {Pane} event.pane - Pane containing the added text editor.
+         * @params {integer} event.index - Number indicating the index of the added text
+         * editor in it's pane.
+         */
         callback({ textEditor: item, pane, index });
       }
     });
   }
 
-  /*
-  Section: Pane Items
-  */
-
-  // Essential: Get all pane items in the workspace center.
-  //
-  // Returns an {Array} of items.
+  /**
+   * Essential: Get all pane items in the workspace center.
+   * @returns {array} Returns an array of items.
+   */
   getPaneItems() {
     return this.paneContainer.getPaneItems();
   }
 
-  // Essential: Get the active {Pane}'s active item.
-  //
-  // Returns an pane item {Object}.
+  /**
+   * Essential: Get the active {Pane}'s active item.
+   * @returns {object} A Pane Item
+   */
   getActivePaneItem() {
     return this.paneContainer.getActivePaneItem();
   }
 
-  // Essential: Get all text editors in the workspace center.
-  //
-  // Returns an {Array} of {TextEditor}s.
+  /**
+   * Essential: Get all text editors in the workspace center.
+   * @returns {TextEditor[]}
+   */
   getTextEditors() {
     return this.getPaneItems().filter(item => item instanceof TextEditor);
   }
 
-  // Essential: Get the active item if it is an {TextEditor}.
-  //
-  // Returns an {TextEditor} or `undefined` if the current active item is not an
-  // {TextEditor}.
+  /**
+   * Essential: Get the active item if it is an {TextEditor}.
+   * @returns {TextEditor|undefined} Returns TextEditor or `undefined` if the
+   * current active item is not an {TextEditor}
+   */
   getActiveTextEditor() {
     const activeItem = this.getActivePaneItem();
     if (activeItem instanceof TextEditor) {
@@ -288,7 +297,7 @@ module.exports = class WorkspaceCenter {
     }
   }
 
-  // Save all pane items.
+  /** Save all pane items. */
   saveAll() {
     this.paneContainer.saveAll();
   }
@@ -297,30 +306,28 @@ module.exports = class WorkspaceCenter {
     return this.paneContainer.confirmClose(options);
   }
 
-  /*
-  Section: Panes
-  */
-
-  // Extended: Get all panes in the workspace center.
-  //
-  // Returns an {Array} of {Pane}s.
+  /**
+   * Extended: Get all panes in the workspace center.
+   * @returns {Pane[]}
+   */
   getPanes() {
     return this.paneContainer.getPanes();
   }
 
-  // Extended: Get the active {Pane}.
-  //
-  // Returns a {Pane}.
+  /**
+   * Extended: Get the active {Pane}.
+   * @returns {Pane}
+   */
   getActivePane() {
     return this.paneContainer.getActivePane();
   }
 
-  // Extended: Make the next pane active.
+  /** Extended: Make the next pane active. */
   activateNextPane() {
     return this.paneContainer.activateNextPane();
   }
 
-  // Extended: Make the previous pane active.
+  /** Extended: Make the previous pane active. */
   activatePreviousPane() {
     return this.paneContainer.activatePreviousPane();
   }
@@ -333,7 +340,7 @@ module.exports = class WorkspaceCenter {
     return this.paneContainer.paneForItem(item);
   }
 
-  // Destroy (close) the active pane.
+  /** Destroy (close) the active pane. */
   destroyActivePane() {
     const activePane = this.getActivePane();
     if (activePane != null) {
