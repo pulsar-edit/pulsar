@@ -1658,7 +1658,7 @@ describe('Workspace', () => {
 
       atom.packages.triggerDeferredActivationHooks();
       atom.packages.onDidTriggerActivationHook(
-        'sample.js:opened',
+        'sample.js:file-name-opened',
         packageUsed
       );
 
