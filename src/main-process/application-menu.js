@@ -2,10 +2,13 @@ const { app, Menu } = require('electron');
 const _ = require('underscore-plus');
 const MenuHelpers = require('../menu-helpers');
 
-// Used to manage the global application menu.
-//
-// It's created by {AtomApplication} upon instantiation and used to add, remove
-// and maintain the state of all menu items.
+/**
+  * @class ApplicationMenu
+  * @classdesc Used to manage the global application menu.
+  *
+  * It's created by {AtomApplication} upon instantiation and used to add, remove
+  * and maintain the state of all menu items.
+  */
 module.exports = class ApplicationMenu {
   constructor(version, autoUpdateManager) {
     this.version = version;
@@ -17,12 +20,16 @@ module.exports = class ApplicationMenu {
     );
   }
 
-  // Public: Updates the entire menu with the given keybindings.
-  //
-  // window - The BrowserWindow this menu template is associated with.
-  // template - The Object which describes the menu to display.
-  // keystrokesByCommand - An Object where the keys are commands and the values
-  //                       are Arrays containing the keystroke.
+  /**
+    * @name update
+    * @memberof ApplicationMenu
+    * @desc Public: Updates the entire menu with the given keybindings.
+    * @param {BrowserWindow} window - The BrowserWindow this menu template is
+    * associated with.
+    * @param {object} template - The Object which describes the menu to display.
+    * @param {object} keystrokesByCommand - An Object where the keys are commands
+    * and the values are Arrays containing the keystroke.
+    */
   update(window, template, keystrokesByCommand) {
     this.translateTemplate(template, keystrokesByCommand);
     this.substituteVersion(template);
@@ -61,11 +68,15 @@ module.exports = class ApplicationMenu {
     this.enableWindowSpecificItems(true);
   }
 
-  // Flattens the given menu and submenu items into an single Array.
-  //
-  // menu - A complete menu configuration object for atom-shell's menu API.
-  //
-  // Returns an Array of native menu items.
+  /**
+    * @name flattenMenuItems
+    * @memberof ApplicationMenu
+    * @private
+    * @desc Flattens the given menu and submenu items into an single Array.
+    * @param {object} menu - A complete menu configuration object for atom-shell's
+    * menu API.
+    * @returns {array} Returns an Array of native menu items.
+    */
   flattenMenuItems(menu) {
     const object = menu.items || {};
     let items = [];
@@ -78,11 +89,14 @@ module.exports = class ApplicationMenu {
     return items;
   }
 
-  // Flattens the given menu template into an single Array.
-  //
-  // template - An object describing the menu item.
-  //
-  // Returns an Array of native menu items.
+  /**
+    * @name flattenMenuTemplate
+    * @memberof ApplicationMenu
+    * @private
+    * @desc Flattens the given menu template into an single Array.
+    * @param {object} template - An object describing the menu item.
+    * @returns {array} Returns an Array of native menu items.
+    */
   flattenMenuTemplate(template) {
     let items = [];
     for (let item of template) {
@@ -93,10 +107,13 @@ module.exports = class ApplicationMenu {
     return items;
   }
 
-  // Public: Used to make all window related menu items are active.
-  //
-  // enable - If true enables all window specific items, if false disables all
-  //          window specific items.
+  /**
+    * @name enableWindowSpecificItems
+    * @memberof ApplicationMenu
+    * @desc Public: Used to make all window related menu items are active.
+    * @param {boolean} enable - If true enables all window specific items,
+    * if false disables all window specific items.
+    */
   enableWindowSpecificItems(enable) {
     for (let item of this.flattenMenuItems(this.menu)) {
       if (item.metadata && item.metadata.windowSpecific) item.enabled = enable;
@@ -158,9 +175,13 @@ module.exports = class ApplicationMenu {
     }
   }
 
-  // Default list of menu items.
-  //
-  // Returns an Array of menu item Objects.
+  /**
+    * @name getDefaultTemplate
+    * @memberof ApplicationMenu
+    * @private
+    * @desc Default list of menu items.
+    * @returns {array} Returns an Array of menu item Objects.
+    */
   getDefaultTemplate() {
     return [
       {
@@ -216,14 +237,18 @@ module.exports = class ApplicationMenu {
       .find(window => window.isFocused());
   }
 
-  // Combines a menu template with the appropriate keystroke.
-  //
-  // template - An Object conforming to atom-shell's menu api but lacking
-  //            accelerator and click properties.
-  // keystrokesByCommand - An Object where the keys are commands and the values
-  //                       are Arrays containing the keystroke.
-  //
-  // Returns a complete menu configuration object for atom-shell's menu API.
+  /**
+    * @name translateTemplate
+    * @memberof ApplicationMenu
+    * @private
+    * @desc Combines a menu template with the appropriate keystroke.
+    * @param {object} template - An Object conforming to atom-shell's menu api
+    * but lacking accelerator and click properties.
+    * @param {object} keystrokesByCommand - An Object where the keys are commands
+    * and the values are Arrays containing the keystroke.
+    * @returns {object} Returns a complete menu configuration object for
+    * atom-shell's menu API.
+    */
   translateTemplate(template, keystrokesByCommand) {
     template.forEach(item => {
       if (item.metadata == null) item.metadata = {};
