@@ -1,4 +1,6 @@
 /**
+  @ignore
+  (^^ ignore used above because this is mistakenly included into Pulsar's Docs)
   This file will manage the updating of `autocomplete-html` `completions.json`
   We will partially utilize `@webref/elements` `.listAll()` function that returns
   a full list of HTML Elements along with a defined `interface`.
