@@ -129,11 +129,14 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
-// The application's singleton class.
-//
-// It's the entry point into the Pulsar application and maintains the global state
-// of the application.
-//
+/**
+  * @class AtomApplication
+  * @private
+  * @extends EventEmitter
+  * @classdesc The application's singleton class.
+  * It's the entry point into the Pulsar application and maintains the global
+  * state of the application.
+  */
 module.exports = class AtomApplication extends EventEmitter {
   // Public: The entry point into the Pulsar application.
   static open(options) {
@@ -1086,12 +1089,15 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Public: Executes the given command.
-  //
-  // If it isn't handled globally, delegate to the currently focused window.
-  //
-  // command - The string representing the command.
-  // args - The optional arguments to pass along.
+  /**
+   * @name sendCommand
+   * @memberof AtomApplication
+   * @private
+   * @desc Public: Executes the given command.
+   * If it isn't handled globally, delegate to the currently focused window.
+   * @params {string} command - The string representing the command.
+   * @params {object} args - The optional arguments to pass along.
+   */
   sendCommand(command, ...args) {
     if (!this.emit(command, ...args)) {
       const focusedWindow = this.focusedWindow();
@@ -1103,11 +1109,15 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Public: Executes the given command on the given window.
-  //
-  // command - The string representing the command.
-  // atomWindow - The {AtomWindow} to send the command to.
-  // args - The optional arguments to pass along.
+  /**
+   * @name sendCommandToWindow
+   * @memberof AtomApplication
+   * @private
+   * @desc Public: Executes the given command on the given window.
+   * @params {string} command - The string representing the command.
+   * @params {AtomWindow} atomWindow - The {AtomWindow} to send the command to.
+   * @params {object} args - The optional arguments to pass along.
+   */
   sendCommandToWindow(command, atomWindow, ...args) {
     if (!this.emit(command, ...args)) {
       if (atomWindow) {
@@ -1148,13 +1158,16 @@ module.exports = class AtomApplication extends EventEmitter {
     return true;
   }
 
-  // Public: Open the given path in the focused window when the event is
-  // triggered.
-  //
-  // A new window will be created if there is no currently focused window.
-  //
-  // eventName - The event to listen for.
-  // pathToOpen - The path to open when the event is triggered.
+  /**
+   * @name openPathOnEvent
+   * @memberof AtomApplication
+   * @private
+   * @desc Public: Open the given path in the focused window when the event is
+   * triggered.
+   * A new window will be created if there is no currently focused window.
+   * @params {event} eventName - The event to listen for.
+   * @params {string} pathToOpen - The path to open when the event is triggered.
+   */
   openPathOnEvent(eventName, pathToOpen) {
     this.on(eventName, () => {
       const window = this.focusedWindow();
@@ -1218,17 +1231,24 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Public: Opens a single path, in an existing window if possible.
-  //
-  // options -
-  //   :pathToOpen - The file path to open
-  //   :pidToKillWhenClosed - The integer of the pid to kill
-  //   :newWindow - Boolean of whether this should be opened in a new window.
-  //   :devMode - Boolean to control the opened window's dev mode.
-  //   :safeMode - Boolean to control the opened window's safe mode.
-  //   :profileStartup - Boolean to control creating a profile of the startup time.
-  //   :window - {AtomWindow} to open file paths in.
-  //   :addToLastWindow - Boolean of whether this should be opened in last focused window.
+  /**
+   * @name openPath
+   * @memberof AtomApplication
+   * @private
+   * @desc Public: Opens a single path, in an existing window if possible.
+   * @params {object} options
+   * @params {string} options.pathToOpen - The file path to open
+   * @params {integer} options.pidToKillWhenClosed - The integer of the pid to kill
+   * @params {boolean} options.newWindow - Boolean of whether this should be opened
+   * in a new window.
+   * @params {boolean} options.devMode - Boolean to control the opened window's dev mode.
+   * @params {boolean} options.safeMode - Boolean to control the opened window's safe mode.
+   * @params {boolean} options.profileStartup - Boolean to control creating a profile
+   * of the startup time.
+   * @params {AtomWindow} options.window - AtomWindow to open file paths in.
+   * @params {boolean} options.addToLastWindow - Boolean of whether this should be
+   * opened in the last focused window.
+   */
   openPath({
     pathToOpen,
     pidToKillWhenClosed,
