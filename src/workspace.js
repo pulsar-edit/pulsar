@@ -1260,11 +1260,11 @@ module.exports = class Workspace extends Model {
         } else {
           activationHookItem = "";
           activationHookText = "";
-          // We are purposefully redeclaring the text here, to fall gracefully
+          // We are purposefully redeclaring the text here, to fail gracefully
         }
       }
 
-      if (activationHookText.length > 1 && activationHookItem.length > 1) {
+      if (activationHookText?.length > 1 && activationHookItem?.length > 1) {
         this.packageManager.triggerActivationHook(
           `${activationHookItem}:${activationHookText}`
         );
