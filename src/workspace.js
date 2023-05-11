@@ -1245,23 +1245,30 @@ module.exports = class Workspace extends Model {
 
       // After emitting the open event, lets trigger any packages activation commands
       let activationHookItem;
+      let activationHookText;
 
       if (item instanceof TextEditor) {
         // This is a TextEditor opening, meaning a file
         activationHookItem = item.getTitle();
+        activationHookText = "file-name-opened";
       } else {
+        activationHookText = "uri-opened";
         if (typeof item.getURI === "function") {
           activationHookItem = item.getURI();
         } else if (typeof item.getUri === "function") {
           activationHookItem = item.getUri();
         } else {
           activationHookItem = "";
+          activationHookText = "";
+          // We are purposefully redeclaring the text here, to fall gracefully
         }
       }
 
-      this.packageManager.triggerActivationHook(
-        `${activationHookItem}:opened`
-      );
+      if (activationHookText.length > 1 && activationHookItem.length > 1) {
+        this.packageManager.triggerActivationHook(
+          `${activationHookItem}:${activationHookText}`
+        );
+      }
 
     } finally {
       resolveItem();
