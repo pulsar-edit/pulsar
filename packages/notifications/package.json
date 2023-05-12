@@ -1,9 +1,9 @@
 {
   "name": "notifications",
   "main": "./lib/main",
-  "version": "0.72.1",
+  "version": "0.73.0",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "description": "A tidy way to display Pulsar notifications.",
-  "repository": "https://github.com/atom/notifications",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
