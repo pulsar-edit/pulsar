@@ -209,15 +209,6 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 </dl>
 
-## Typedefs
-
-<dl>
-<dt><a href="#observePaneItemsCallback">observePaneItemsCallback</a> : <code>function</code></dt>
-<dd></dd>
-<dt><a href="#onDidAddTextEditorCB">onDidAddTextEditorCB</a> : <code>function</code></dt>
-<dd></dd>
-</dl>
-
 <a name="AtomEnvironment"></a>
 
 ## AtomEnvironment
@@ -657,21 +648,3 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## beforeEach()
 **Kind**: global function  
 **Babel**:   
-<a name="observePaneItemsCallback"></a>
-
-## observePaneItemsCallback : <code>function</code>
-**Kind**: global typedef  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| item | <code>object</code> | An item that is present in {::getPaneItems} at the time of subscription or that is added at some later time. |
-
-<a name="onDidAddTextEditorCB"></a>
-
-## onDidAddTextEditorCB : <code>function</code>
-**Kind**: global typedef  
-**Params**: <code>object</code> event - Object with following keys:  
-**Params**: <code>TextEditor</code> event.textEditor - The TextEditor that was added.  
-**Params**: <code>Pane</code> event.pane - Pane containing the added text editor.  
-**Params**: <code>integer</code> event.index - Number indicating the index of the added text
-editor in it's pane.  
