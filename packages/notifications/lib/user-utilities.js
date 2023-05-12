@@ -166,7 +166,7 @@ module.exports = {
         if (r.ok) {
           return r.json();
         } else {
-          return Promise.reject(r.statusCode);
+          return Promise.reject(new Error(`Fetching updates resulted in status ${r.status}`));
         }
       });
   },
