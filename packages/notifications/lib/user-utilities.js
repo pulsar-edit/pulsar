@@ -138,7 +138,7 @@ module.exports = {
     });
   },
 
-  getLatestAtomData() {
+  getLatestPulsarData() {
     const githubHeaders = new Headers({
       accept: 'application/vnd.github.v3+json',
       contentType: "application/json"
@@ -147,10 +147,10 @@ module.exports = {
       .then(function(r) { if (r.ok) { return r.json(); } else { return Promise.reject(r.statusCode); } });
   },
 
-  checkAtomUpToDate() {
-    return this.getLatestAtomData().then(function(latestAtomData) {
+  checkPulsarUpToDate() {
+    return this.getLatestPulsarData().then(function(latestPulsarData) {
       const installedVersion = __guard__(atom.getVersion(), x => x.replace(/-.*$/, ''));
-      const latestVersion = latestAtomData.name;
+      const latestVersion = latestPulsarData.name;
       const upToDate = (installedVersion != null) && semver.gte(installedVersion, latestVersion);
       return {upToDate, latestVersion, installedVersion};});
   },
@@ -160,7 +160,7 @@ module.exports = {
     return (pack != null ? pack.metadata.version : undefined);
   },
 
-  getPackageVersionShippedWithAtom(packageName) {
+  getPackageVersionShippedWithPulsar(packageName) {
     return require(path.join(atom.getLoadSettings().resourcePath, 'package.json')).packageDependencies[packageName];
   },
 
@@ -179,17 +179,17 @@ module.exports = {
       const installedVersion = this.getPackageVersion(packageName);
       let upToDate = (installedVersion != null) && semver.gte(installedVersion, latestPackageData.releases.latest);
       const latestVersion = latestPackageData.releases.latest;
-      const versionShippedWithAtom = this.getPackageVersionShippedWithAtom(packageName);
+      const versionShippedWithPulsar = this.getPackageVersionShippedWithPulsar(packageName);
 
-      if (isCore = (versionShippedWithAtom != null)) {
+      if (isCore = (versionShippedWithPulsar != null)) {
         // A core package is out of date if the version which is being used
         // is lower than the version which normally ships with the version
-        // of Atom which is running. This will happen when there's a locally
-        // installed version of the package with a lower version than Atom's.
-        upToDate = (installedVersion != null) && semver.gte(installedVersion, versionShippedWithAtom);
+        // of Pulsar which is running. This will happen when there's a locally
+        // installed version of the package with a lower version than Pulsar's.
+        upToDate = (installedVersion != null) && semver.gte(installedVersion, versionShippedWithPulsar);
       }
 
-      return {isCore, upToDate, latestVersion, installedVersion, versionShippedWithAtom};
+      return {isCore, upToDate, latestVersion, installedVersion, versionShippedWithPulsar};
   });
   }
 };

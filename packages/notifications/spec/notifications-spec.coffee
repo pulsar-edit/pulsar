@@ -24,7 +24,7 @@ describe "Notifications", ->
   describe "when there are notifications before activation", ->
     beforeEach ->
       waitsForPromise ->
-        # Wrapped in Promise.resolve so this test continues to work on earlier versions of Atom
+        # Wrapped in Promise.resolve so this test continues to work on earlier versions of Pulsar
         Promise.resolve(atom.packages.deactivatePackage('notifications'))
 
     it "displays all non displayed notifications", ->
@@ -304,7 +304,7 @@ describe "Notifications", ->
           atom.onWillThrowError(handler)
 
           # Fake an unhandled error with a call stack located outside of the source
-          # of Atom or an Atom package
+          # of Pulsar or an Pulsar package
           fs.readFile(__dirname, ->
             err = new Error()
             err.stack = 'FakeError: foo is not bar\n    at blah.fakeFunc (directory/fakefile.js:1:25)'
@@ -348,12 +348,12 @@ describe "Notifications", ->
         beforeEach ->
           stack = """
             TypeError: undefined is not a function
-              at Object.module.exports.Pane.promptToSaveItem [as defaultSavePrompt] (/Applications/Atom.app/Contents/Resources/app/src/pane.js:490:23)
+              at Object.module.exports.Pane.promptToSaveItem [as defaultSavePrompt] (/Applications/Pulsar.app/Contents/Resources/app/src/pane.js:490:23)
               at Pane.promptToSaveItem (/Users/someguy/.atom/packages/save-session/lib/save-prompt.coffee:21:15)
-              at Pane.module.exports.Pane.destroyItem (/Applications/Atom.app/Contents/Resources/app/src/pane.js:442:18)
-              at HTMLDivElement.<anonymous> (/Applications/Atom.app/Contents/Resources/app/node_modules/tabs/lib/tab-bar-view.js:174:22)
-              at space-pen-ul.jQuery.event.dispatch (/Applications/Atom.app/Contents/Resources/app/node_modules/archive-view/node_modules/atom-space-pen-views/node_modules/space-pen/vendor/jquery.js:4676:9)
-              at space-pen-ul.elemData.handle (/Applications/Atom.app/Contents/Resources/app/node_modules/archive-view/node_modules/atom-space-pen-views/node_modules/space-pen/vendor/jquery.js:4360:46)
+              at Pane.module.exports.Pane.destroyItem (/Applications/Pulsar.app/Contents/Resources/app/src/pane.js:442:18)
+              at HTMLDivElement.<anonymous> (/Applications/Pulsar.app/Contents/Resources/app/node_modules/tabs/lib/tab-bar-view.js:174:22)
+              at space-pen-ul.jQuery.event.dispatch (/Applications/Pulsar.app/Contents/Resources/app/node_modules/archive-view/node_modules/atom-space-pen-views/node_modules/space-pen/vendor/jquery.js:4676:9)
+              at space-pen-ul.elemData.handle (/Applications/Pulsar.app/Contents/Resources/app/node_modules/archive-view/node_modules/atom-space-pen-views/node_modules/space-pen/vendor/jquery.js:4360:46)
           """
           detail = 'ok'
 
@@ -364,7 +364,7 @@ describe "Notifications", ->
           spyOn(fs, 'realpathSync').andCallFake (p) -> p
           spyOn(fatalError.issue, 'getPackagePathsByPackageName').andCallFake ->
             'save-session': '/Users/someguy/.atom/packages/save-session'
-            'tabs': '/Applications/Atom.app/Contents/Resources/app/node_modules/tabs'
+            'tabs': '/Applications/Pulsar.app/Contents/Resources/app/node_modules/tabs'
 
         it "chooses the first package in the trace", ->
           expect(fatalError.issue.getPackageName()).toBe 'save-session'
@@ -398,7 +398,7 @@ describe "Notifications", ->
 
             expect(issueTitle).toContain '$ATOM_HOME'
             expect(issueTitle).not.toContain process.env.ATOM_HOME
-            expect(issueBody).toMatch /Atom\*\*: [0-9].[0-9]+.[0-9]+/ig
+            expect(issueBody).toMatch /Pulsar\*\*: [0-9].[0-9]+.[0-9]+/ig
             expect(issueBody).not.toMatch /Unknown/ig
             expect(issueBody).toContain 'ReferenceError: a is not defined'
             expect(issueBody).toContain 'Thrown From**: [notifications](https://github.com/atom/notifications) package '
@@ -468,9 +468,9 @@ describe "Notifications", ->
             ReferenceError: path is not defined
               at Object.module.exports.LinkedPackage.wow (#{path.join(fs.realpathSync(packageDir), 'linked-package.coffee')}:29:15)
               at atom-workspace.subscriptions.add.atom.commands.add.linked-package:wow (#{path.join(packageDir, 'linked-package.coffee')}:18:102)
-              at CommandRegistry.module.exports.CommandRegistry.handleCommandEvent (/Applications/Atom.app/Contents/Resources/app/src/command-registry.js:238:29)
-              at /Applications/Atom.app/Contents/Resources/app/src/command-registry.js:3:61
-              at CommandPaletteView.module.exports.CommandPaletteView.confirmed (/Applications/Atom.app/Contents/Resources/app/node_modules/command-palette/lib/command-palette-view.js:159:32)
+              at CommandRegistry.module.exports.CommandRegistry.handleCommandEvent (/Applications/Pulsar.app/Contents/Resources/app/src/command-registry.js:238:29)
+              at /Applications/Pulsar.app/Contents/Resources/app/src/command-registry.js:3:61
+              at CommandPaletteView.module.exports.CommandPaletteView.confirmed (/Applications/Pulsar.app/Contents/Resources/app/node_modules/command-palette/lib/command-palette-view.js:159:32)
           """
           detail = "At #{path.join(packageDir, 'linked-package.coffee')}:41"
           message = "Uncaught ReferenceError: path is not defined"
@@ -540,7 +540,7 @@ describe "Notifications", ->
             }
           """
 
-          stack = "TypeError: Cannot read property 'prototype' of undefined\n  at __extends (<anonymous>:1:1)\n  at Object.defineProperty.value [as .coffee] (/Applications/Atom.app/Contents/Resources/app.asar/src/compile-cache.js:169:21)"
+          stack = "TypeError: Cannot read property 'prototype' of undefined\n  at __extends (<anonymous>:1:1)\n  at Object.defineProperty.value [as .coffee] (/Applications/Pulsar.app/Contents/Resources/app.asar/src/compile-cache.js:169:21)"
           detail = "TypeError: Cannot read property 'prototype' of undefined"
           message = "Failed to load the broken-load package"
           atom.notifications.addFatalError(message, {stack, detail, packageName: 'broken-load', dismissable: true})
@@ -621,7 +621,7 @@ describe "Notifications", ->
             }
           """
 
-          stack = "TypeError: Cannot read property 'command' of undefined\n  at Object.module.exports.activate (<anonymous>:7:23)\n  at Package.module.exports.Package.activateNow (/Applications/Atom.app/Contents/Resources/app.asar/src/package.js:232:19)"
+          stack = "TypeError: Cannot read property 'command' of undefined\n  at Object.module.exports.activate (<anonymous>:7:23)\n  at Package.module.exports.Package.activateNow (/Applications/Pulsar.app/Contents/Resources/app.asar/src/package.js:232:19)"
           detail = "TypeError: Cannot read property 'command' of undefined"
           message = "Failed to activate the broken-activation package"
           atom.notifications.addFatalError(message, {stack, detail, packageName: 'broken-activation', dismissable: true})
@@ -688,14 +688,14 @@ describe "Notifications", ->
           expect(fatalError).toBeDefined()
           expect(fatalError).toHaveClass 'has-close'
           expect(fatalError.innerHTML).toContain 'ReferenceError: a is not defined'
-          expect(fatalError.innerHTML).toContain 'bug in Atom'
+          expect(fatalError.innerHTML).toContain 'bug in Pulsar'
           expect(fatalError.issue.getPackageName()).toBeUndefined()
 
           button = fatalError.querySelector('.btn')
           expect(button.textContent).toContain 'Create issue on atom/atom'
 
           expect(issueBody).toContain 'ReferenceError: a is not defined'
-          expect(issueBody).toContain '**Thrown From**: Atom Core'
+          expect(issueBody).toContain '**Thrown From**: Pulsar Core'
 
         it "contains the commands that the user run in the issue body", ->
           expect(issueBody).toContain 'some-package:a-command'
@@ -732,7 +732,7 @@ describe "Notifications", ->
           spyOn(atom, 'inDevMode').andReturn false
 
         describe "when the message is longer than 100 characters", ->
-          message = "Uncaught Error: Cannot find module 'dialog'Error: Cannot find module 'dialog' at Function.Module._resolveFilename (module.js:351:15) at Function.Module._load (module.js:293:25) at Module.require (module.js:380:17) at EventEmitter.<anonymous> (/Applications/Atom.app/Contents/Resources/atom/browser/lib/rpc-server.js:128:79) at EventEmitter.emit (events.js:119:17) at EventEmitter.<anonymous> (/Applications/Atom.app/Contents/Resources/atom/browser/api/lib/web-contents.js:99:23) at EventEmitter.emit (events.js:119:17)"
+          message = "Uncaught Error: Cannot find module 'dialog'Error: Cannot find module 'dialog' at Function.Module._resolveFilename (module.js:351:15) at Function.Module._load (module.js:293:25) at Module.require (module.js:380:17) at EventEmitter.<anonymous> (/Applications/Pulsar.app/Contents/Resources/atom/browser/lib/rpc-server.js:128:79) at EventEmitter.emit (events.js:119:17) at EventEmitter.<anonymous> (/Applications/Pulsar.app/Contents/Resources/atom/browser/api/lib/web-contents.js:99:23) at EventEmitter.emit (events.js:119:17)"
           expectedIssueTitle = "Uncaught Error: Cannot find module 'dialog'Error: Cannot find module 'dialog' at Function.Module...."
 
           beforeEach ->
@@ -812,11 +812,11 @@ describe "Notifications", ->
                 repository: url: 'https://github.com/atom/notifications'
                 releases: latest: '0.11.0'
 
-          describe "when the locally installed version is lower than Atom's version", ->
+          describe "when the locally installed version is lower than Pulsar's version", ->
             beforeEach ->
-              versionShippedWithAtom = '0.10.0'
+              versionShippedWithPulsar = '0.10.0'
               UserUtilities = require '../lib/user-utilities'
-              spyOn(UserUtilities, 'getPackageVersionShippedWithAtom').andCallFake -> versionShippedWithAtom
+              spyOn(UserUtilities, 'getPackageVersionShippedWithPulsar').andCallFake -> versionShippedWithPulsar
 
               generateException()
               fatalError = notificationContainer.querySelector('atom-notification.fatal')
@@ -829,14 +829,14 @@ describe "Notifications", ->
 
             it "tells the user that the package is a locally installed core package and out of date", ->
               fatalNotification = fatalError.querySelector('.fatal-notification')
-              expect(fatalNotification.textContent).toContain 'Locally installed core Atom package'
+              expect(fatalNotification.textContent).toContain 'Locally installed core Pulsar package'
               expect(fatalNotification.textContent).toContain 'is out of date'
 
-          describe "when the locally installed version matches Atom's version", ->
+          describe "when the locally installed version matches Pulsar's version", ->
             beforeEach ->
-              versionShippedWithAtom = '0.9.0'
+              versionShippedWithPulsar = '0.9.0'
               UserUtilities = require '../lib/user-utilities'
-              spyOn(UserUtilities, 'getPackageVersionShippedWithAtom').andCallFake -> versionShippedWithAtom
+              spyOn(UserUtilities, 'getPackageVersionShippedWithPulsar').andCallFake -> versionShippedWithPulsar
 
               generateException()
               fatalError = notificationContainer.querySelector('atom-notification.fatal')
@@ -848,7 +848,7 @@ describe "Notifications", ->
               button = fatalError.querySelector('.btn')
               expect(button.textContent).toContain 'Create issue'
 
-      describe "when Atom is out of date", ->
+      describe "when Pulsar is out of date", ->
         beforeEach ->
           installedVersion = '0.179.0'
           spyOn(atom, 'getVersion').andCallFake -> installedVersion
@@ -868,9 +868,9 @@ describe "Notifications", ->
           button = fatalError.querySelector('.btn-issue')
           expect(button).not.toExist()
 
-        it "tells the user that Atom is out of date", ->
+        it "tells the user that Pulsar is out of date", ->
           fatalNotification = fatalError.querySelector('.fatal-notification')
-          expect(fatalNotification.textContent).toContain 'Atom is out of date'
+          expect(fatalNotification.textContent).toContain 'Pulsar is out of date'
 
         it "provides a link to the latest released version", ->
           fatalNotification = fatalError.querySelector('.fatal-notification')
@@ -957,7 +957,7 @@ describe "Notifications", ->
               a + 1
             catch e
               e.code = 'ENOENT'
-              message = 'Error: spawn /opt/atom/Atom Helper (deleted) ENOENT'
+              message = 'Error: spawn /opt/atom/Pulsar Helper (deleted) ENOENT'
               window.onerror.call(window, message, 'abc', 2, 3, e)
 
           it "displays a fatal error", ->

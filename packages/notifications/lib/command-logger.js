@@ -25,7 +25,7 @@ const ignoredCommands = {
 // Ten minutes in milliseconds.
 const tenMinutes = 10 * 60 * 1000;
 
-// Public: Handles logging all of the Atom commands for the automatic repro steps feature.
+// Public: Handles logging all of the Pulsar commands for the automatic repro steps feature.
 //
 // It uses an array as a circular data structure to log only the most recent commands.
 module.exports =

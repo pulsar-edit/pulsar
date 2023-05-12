@@ -2,7 +2,7 @@
   "name": "notifications",
   "main": "./lib/main",
   "version": "0.72.1",
-  "description": "A tidy way to display Atom notifications.",
+  "description": "A tidy way to display Pulsar notifications.",
   "repository": "https://github.com/atom/notifications",
   "license": "MIT",
   "engines": {
@@ -24,7 +24,7 @@
     "showErrorsInDevMode": {
       "type": "boolean",
       "default": false,
-      "description": "Show notifications for uncaught exceptions even if Atom is running in dev mode. If this config setting is disabled, uncaught exceptions will trigger the dev tools to open and be logged in the console tab."
+      "description": "Show notifications for uncaught exceptions even if Pulsar is running in dev mode. If this config setting is disabled, uncaught exceptions will trigger the dev tools to open and be logged in the console tab."
     },
     "defaultTimeout": {
       "type": "integer",

@@ -1,4 +1,4 @@
-##### Atom and all repositories under Atom will be archived on December 15, 2022. Learn more in our [official announcement](https://github.blog/2022-06-08-sunsetting-atom/)
+##### Pulsar and all repositories under Pulsar will be archived on December 15, 2022. Learn more in our [official announcement](https://github.blog/2022-06-08-sunsetting-atom/)
  # Notifications package
 [![CI](https://github.com/atom/notifications/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/notifications/actions/workflows/ci.yml)
 
@@ -6,5 +6,5 @@
 
 ### Docs
 
-Notifications are available for use in your Atom packages via the `atom.notifications` `NotificationManager` object. See
+Notifications are available for use in your Pulsar packages via the `atom.notifications` `NotificationManager` object. See
 https://atom.io/docs/api/latest/NotificationManager and https://atom.io/docs/api/latest/Notification for documentation.

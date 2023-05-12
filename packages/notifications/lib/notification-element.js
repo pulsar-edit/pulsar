@@ -212,7 +212,7 @@ module.exports =
 
         const promises = [];
         promises.push(this.issue.findSimilarIssues());
-        promises.push(UserUtilities.checkAtomUpToDate());
+        promises.push(UserUtilities.checkPulsarUpToDate());
         if (packageName != null) { promises.push(UserUtilities.checkPackageUpToDate(packageName)); }
 
         return Promise.all(promises).then(allData => {
@@ -244,7 +244,7 @@ Upgrading to the latest version may fix this issue.\
             fatalNotification.innerHTML += `\
 <br><br>
 Locally installed core Pulsar package <code>${packageName}</code> is out of date: ${packageCheck.installedVersion} installed locally;
-${packageCheck.versionShippedWithAtom} included with the version of Pulsar you're running.
+${packageCheck.versionShippedWithPulsar} included with the version of Pulsar you're running.
 Removing the locally installed version may fix this issue.\
 `;
 
