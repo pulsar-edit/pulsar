@@ -263,7 +263,7 @@ Use: <code>apm unlink ${packagePath}</code>\
             fatalNotification.innerHTML += `\
 Pulsar is out of date: ${atomCheck.installedVersion} installed;
 ${atomCheck.latestVersion} latest.
-Upgrading to the <a href='https://github.com/atom/atom/releases/tag/v${atomCheck.latestVersion}'>latest version</a> may fix this issue.\
+Upgrading to the <a href='https://github.com/pulsar-edit/pulsar/releases/tag/v${atomCheck.latestVersion}'>latest version</a> may fix this issue.\
 `;
           } else {
             fatalNotification.innerHTML += " You can help by creating an issue. Please explain what actions triggered this error.";
