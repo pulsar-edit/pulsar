@@ -2,7 +2,6 @@
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__, or convert again using --optional-chaining
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
@@ -138,21 +137,13 @@ module.exports = {
     });
   },
 
-  getLatestPulsarData() {
-    const githubHeaders = new Headers({
-      accept: 'application/vnd.github.v3+json',
-      contentType: "application/json"
-    });
-    return fetch('https://atom.io/api/updates', {headers: githubHeaders})
-      .then(function(r) { if (r.ok) { return r.json(); } else { return Promise.reject(r.statusCode); } });
-  },
-
   checkPulsarUpToDate() {
-    return this.getLatestPulsarData().then(function(latestPulsarData) {
-      const installedVersion = __guard__(atom.getVersion(), x => x.replace(/-.*$/, ''));
-      const latestVersion = latestPulsarData.name;
-      const upToDate = (installedVersion != null) && semver.gte(installedVersion, latestVersion);
-      return {upToDate, latestVersion, installedVersion};});
+    const installedVersion = atom.getVersion().replace(/-.*$/, '');
+    return {
+      upToDate: true,
+      latestVersion: installedVersion,
+      installedVersion
+    }
   },
 
   getPackageVersion(packageName) {
@@ -166,11 +157,18 @@ module.exports = {
 
   getLatestPackageData(packageName) {
     const githubHeaders = new Headers({
-      accept: 'application/vnd.github.v3+json',
+      accept: 'application/json',
       contentType: "application/json"
     });
-    return fetch(`https://atom.io/api/packages/${packageName}`, {headers: githubHeaders})
-      .then(function(r) { if (r.ok) { return r.json(); } else { return Promise.reject(r.statusCode); } });
+    const apiURL = process.env.ATOM_API_URL || 'https://api.pulsar-edit.dev/api';
+    return fetch(`${apiURL}/${packageName}`, {headers: githubHeaders})
+      .then(r => {
+        if (r.ok) {
+          return r.json();
+        } else {
+          return Promise.reject(r.statusCode);
+        }
+      });
   },
 
   checkPackageUpToDate(packageName) {
@@ -193,7 +191,3 @@ module.exports = {
   });
   }
 };
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}

@@ -207,13 +207,15 @@ module.exports =
         if ((packageName != null) && (repoUrl != null)) {
           issueButton.textContent = `Create issue on the ${packageName} package`;
         } else {
-          issueButton.textContent = "Create issue on atom/atom";
+          issueButton.textContent = "Create issue on pulsar-edit/pulsar";
         }
 
         const promises = [];
         promises.push(this.issue.findSimilarIssues());
         promises.push(UserUtilities.checkPulsarUpToDate());
-        if (packageName != null) { promises.push(UserUtilities.checkPackageUpToDate(packageName)); }
+        if (packageName != null) {
+          promises.push(UserUtilities.checkPackageUpToDate(packageName));
+        }
 
         return Promise.all(promises).then(allData => {
           let issue;

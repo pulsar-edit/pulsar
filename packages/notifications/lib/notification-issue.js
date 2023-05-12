@@ -2,7 +2,6 @@
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__, or convert again using --optional-chaining
  * DS202: Simplify dynamic range loops
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
@@ -19,8 +18,7 @@ const TITLE_CHAR_LIMIT = 100; // Truncate issue title to 100 characters (includi
 
 const FileURLRegExp = new RegExp('file://\w*/(.*)');
 
-module.exports =
-(NotificationIssue = class NotificationIssue {
+module.exports = class NotificationIssue {
   constructor(notification) {
     this.normalizedStackPaths = this.normalizedStackPaths.bind(this);
     this.notification = notification;
@@ -28,7 +26,7 @@ module.exports =
 
   findSimilarIssues() {
     let repoUrl = this.getRepoUrl();
-    if (repoUrl == null) { repoUrl = 'atom/atom'; }
+    if (repoUrl == null) { repoUrl = 'pulsar-edit/pulsar'; }
     const repo = repoUrl.replace(/http(s)?:\/\/(\d+\.)?github.com\//gi, '');
     const issueTitle = this.getIssueTitle();
     const query = `${issueTitle} repo:${repo}`;
@@ -51,7 +49,8 @@ module.exports =
 
           if ((issues.open != null) || (issues.closed != null)) { return issues; }
         }
-        return null;}).catch(e => null);
+        return null;
+      }).catch(_ => null);
   }
 
   getIssueUrlForSystem() {
@@ -108,7 +107,9 @@ module.exports =
         const options = this.notification.getOptions();
         const repoUrl = this.getRepoUrl();
         const packageName = this.getPackageName();
-        if (packageName != null) { packageVersion = __guard__(__guard__(atom.packages.getLoadedPackage(packageName), x1 => x1.metadata), x => x.version); }
+        if (packageName != null) {
+          packageVersion = atom.packages.getLoadedPackage(packageName)?.metadata?.version;
+        }
         const copyText = '';
         const systemUser = process.env.USER;
         let rootUserStatus = '';
@@ -214,13 +215,13 @@ ${copyText}\
   getRepoUrl() {
     const packageName = this.getPackageName();
     if (packageName == null) { return; }
-    let repo = __guard__(__guard__(atom.packages.getLoadedPackage(packageName), x1 => x1.metadata), x => x.repository);
+    let repo = atom.packages.getLoadedPackage(packageName)?.metadata?.repository;
     let repoUrl = (repo != null ? repo.url : undefined) != null ? (repo != null ? repo.url : undefined) : repo;
     if (!repoUrl) {
       let packagePath;
       if (packagePath = atom.packages.resolvePackagePath(packageName)) {
         try {
-          repo = __guard__(JSON.parse(fs.readFileSync(path.join(packagePath, 'package.json'))), x2 => x2.repository);
+          repo = JSON.parse(fs.readFileSync(path.join(packagePath, 'package.json')))?.repository;
           repoUrl = (repo != null ? repo.url : undefined) != null ? (repo != null ? repo.url : undefined) : repo;
         } catch (error) {}
       }
@@ -307,7 +308,7 @@ ${copyText}\
     }
     return packagePathsByPackageName;
   }
-});
+}
 
 function __guard__(value, transform) {
   return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
