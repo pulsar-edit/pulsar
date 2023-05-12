@@ -68,7 +68,9 @@ module.exports = class NotificationIssue {
   getIssueUrl() {
     return this.getIssueBody().then(issueBody => {
       let repoUrl = this.getRepoUrl();
-      if (repoUrl == null) { repoUrl = 'https://github.com/atom/atom'; }
+      if (repoUrl == null) {
+        repoUrl = 'https://github.com/pulsar-edit/pulsar'; 
+      }
       return `${repoUrl}/issues/new?title=${this.encodeURI(this.getIssueTitle())}&body=${this.encodeURI(issueBody)}`;
     });
   }
