@@ -20,17 +20,11 @@ module.exports =
     spyOn(window, 'fetch') unless window.fetch.isSpy
 
     fetch.andCallFake (url) ->
-      if url.indexOf('is.gd') > -1
-        return textPromise options?.shortenerResponse ? 'http://is.gd/cats'
-
-      if url.indexOf('atom.io/api/packages') > -1
+      if url.indexOf('api.pulsar-edit.dev/api') > -1
         return jsonPromise(options?.packageResponse ? {
-          repository: url: 'https://github.com/atom/notifications'
+          repository: url: 'https://github.com/pulsar-edit/notifications'
           releases: latest: '0.0.0'
         })
-
-      if url.indexOf('atom.io/api/updates') > -1
-        return(jsonPromise options?.atomResponse ? {name: atom.getVersion()})
 
       if options?.issuesErrorResponse?
         return Promise.reject(options?.issuesErrorResponse)

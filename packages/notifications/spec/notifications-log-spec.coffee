@@ -171,6 +171,8 @@ describe "Notifications Log", ->
                   state: 'open'
                 }
               ]
+          spyOn(NotificationIssue.prototype, 'getPackageName').andCallFake -> "somepackage"
+          spyOn(NotificationIssue.prototype, 'getRepoUrl').andCallFake -> "https://github.com/someguy/somepackage"
           generateException()
           fatalError = notificationsLogContainer.querySelector('.notifications-log-item.fatal')
           waitsForPromise ->
