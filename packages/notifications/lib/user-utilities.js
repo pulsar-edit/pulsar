@@ -175,8 +175,8 @@ module.exports = {
     return this.getLatestPackageData(packageName).then(latestPackageData => {
       let isCore;
       const installedVersion = this.getPackageVersion(packageName);
-      let upToDate = (installedVersion != null) && semver.gte(installedVersion, latestPackageData.releases.latest);
-      const latestVersion = latestPackageData.releases.latest;
+      let upToDate = (installedVersion != null) && semver.gte(installedVersion, latestPackageData?.releases?.latest);
+      const latestVersion = latestPackageData?.releases?.latest;
       const versionShippedWithPulsar = this.getPackageVersionShippedWithPulsar(packageName);
 
       if (isCore = (versionShippedWithPulsar != null)) {
