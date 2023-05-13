@@ -1,15 +1,21 @@
 let ParsedColor = null;
 
-// Essential: A simple color class returned from {Config::get} when the value
-// at the key path is of type 'color'.
+/**
+ * @class Color
+ * @classdesc Essential: A simple color class returned from {Config::get} when
+ * the value at the key path is of type 'color'.
+ */
 module.exports = class Color {
-  // Essential: Parse a {String} or {Object} into a {Color}.
-  //
-  // * `value` A {String} such as `'white'`, `#ff00ff`, or
-  //   `'rgba(255, 15, 60, .75)'` or an {Object} with `red`, `green`, `blue`,
-  //   and `alpha` properties.
-  //
-  // Returns a {Color} or `null` if it cannot be parsed.
+  /**
+   * @name parse
+   * @memberof Color
+   * @static
+   * @desc Essential: Parse a {String} or {Object} into a {Color}.
+   * @param {string|object} value - A {String} such as `'white'`, `#ff00ff`, or
+   * `'rgba(255, 15, 60, .75)'` or an {Object} with `red`, `green`, `blue`,
+   * and `alpha` properties.
+   * @returns {Color|null} Returns a color, or `null` if it cannot be parsed.
+   */
   static parse(value) {
     switch (typeof value) {
       case 'string':
@@ -81,14 +87,22 @@ module.exports = class Color {
     return this._alpha;
   }
 
-  // Essential: Returns a {String} in the form `'#abcdef'`.
+  /**
+   * @name toHexString
+   * @memberof Color
+   * @desc Essential: Returns a {String} in the form `'#abcdef'`.
+   */
   toHexString() {
     return `#${numberToHexString(this.red)}${numberToHexString(
       this.green
     )}${numberToHexString(this.blue)}`;
   }
 
-  // Essential: Returns a {String} in the form `'rgba(25, 50, 75, .9)'`.
+  /**
+   * @name toRGBAString
+   * @memberof Color
+   * @desc Essential: Returns a {String} in the form `'rgba(25, 50, 75, .9)'`.
+   */
   toRGBAString() {
     return `rgba(${this.red}, ${this.green}, ${this.blue}, ${this.alpha})`;
   }
