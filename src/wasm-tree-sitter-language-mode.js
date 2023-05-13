@@ -1832,6 +1832,8 @@ class WASMTreeSitterLanguageMode {
   // the point is within its extent.
   controllingLayerAtPoint(point, where = FUNCTION_TRUE) {
     let layers = this.languageLayersAtPoint(point);
+    // Deeper layers go first.
+    layers.sort((a, b) => b.depth - a.depth);
     return layers.find(layer => where(layer)) ?? null;
   }
 
