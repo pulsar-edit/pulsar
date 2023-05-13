@@ -109,7 +109,7 @@ class AtomEnvironment {
     });
 
 
-    /** @type {ToolTipManager} */
+    /** @type {TooltipManager} */
     this.tooltips = new TooltipManager({
       keymapManager: this.keymaps,
       viewRegistry: this.views
