@@ -33,11 +33,13 @@ module.exports = class Clipboard {
     this.signatureForMetadata = null;
   }
 
-  // Creates an `md5` hash of some text.
-  //
-  // * `text` A {String} to hash.
-  //
-  // Returns a hashed {String}.
+  /**
+   * @name md5
+   * @memberof Clipboard
+   * @desc Creates an `md5` hash of some text.
+   * @param {string} text - A string to hash.
+   * @returns {string} A hashed string.
+   */
   md5(text) {
     return crypto
       .createHash('md5')
@@ -45,13 +47,14 @@ module.exports = class Clipboard {
       .digest('hex');
   }
 
-  // Public: Write the given text to the clipboard.
-  //
-  // The metadata associated with the text is available by calling
-  // {::readWithMetadata}.
-  //
-  // * `text` The {String} to store.
-  // * `metadata` (optional) The additional info to associate with the text.
+  /**
+   * @name write
+   * @memberof Clipboard
+   * @desc Public: Write the given text to the clipboard.
+   * The metadata associated with the text is available by calling {::readWithMetadata}.
+   * @param {string} text - The string to store.
+   * @param {*} [metadata] - THe additional info to associate with the text.
+   */
   write(text, metadata) {
     text = text.replace(/\r?\n/g, process.platform === 'win32' ? '\r\n' : '\n');
 
@@ -60,31 +63,44 @@ module.exports = class Clipboard {
     clipboard.writeText(text);
   }
 
-  // Public: Read the text from the clipboard.
-  //
-  // Returns a {String}.
+  /**
+   * @name read
+   * @memberof Clipboard
+   * @desc Public: Read the text from the clipboard.
+   * @returns {string}
+   */
   read() {
     return clipboard.readText();
   }
 
-  // Public: Write the given text to the macOS find pasteboard
+  /**
+   * @name writeFindText
+   * @memberof Clipboard
+   * @desc Public: Write the given text to the macOS find pasteboard.
+   */
   writeFindText(text) {
     clipboard.writeFindText(text);
   }
 
-  // Public: Read the text from the macOS find pasteboard.
-  //
-  // Returns a {String}.
+  /**
+   * @name readFindText
+   * @memberof Clipboard
+   * @desc Public: Read the text from the macOS find pasteboard.
+   * @returns {string}
+   */
   readFindText() {
     return clipboard.readFindText();
   }
 
-  // Public: Read the text from the clipboard and return both the text and the
-  // associated metadata.
-  //
-  // Returns an {Object} with the following keys:
-  // * `text` The {String} clipboard text.
-  // * `metadata` The metadata stored by an earlier call to {::write}.
+  /**
+   * @name readWithMetadata
+   * @memberof Clipboard
+   * @desc Public: Read the text from the clipboard and return both the text and
+   * the associated metadata.
+   * @returns {object} An object containing the following keys:
+   *    * `text` The {string} clipboard text.
+   *    * `metadata` The metadata stored by an earlier call to {::write}.
+   */
   readWithMetadata() {
     const text = this.read();
     if (this.signatureForMetadata === this.md5(text)) {
