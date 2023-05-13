@@ -4,6 +4,8 @@ const { Disposable } = require('event-kit');
 const AnyConstructor = Symbol('any-constructor');
 
 /**
+ * @class ViewRegistry
+ * @classdesc
  * Essential: `ViewRegistry` handles the association between model and view
  * types in Pulsar. We call this association a View Provider. As in, for a given
  * model, this class can provide a view via {::getView}, as long as the
@@ -40,6 +42,9 @@ module.exports = class ViewRegistry {
   }
 
   /**
+   * @name addViewProvider
+   * @memberof ViewRegistry
+   * @desc
    * Essential: Add a provider that will be used to construct views in the
    * workspace's view layer based on model objects in its model layer.
    *
@@ -97,6 +102,9 @@ module.exports = class ViewRegistry {
   }
 
   /**
+   * @name getView
+   * @memberof ViewRegistry
+   * @desc
    * Essential: Get the view associated with an object in the workspace.
    *
    * If you're just *using* the workspace, you shouldn't need to access the view

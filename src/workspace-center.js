@@ -3,7 +3,11 @@
 const TextEditor = require('./text-editor');
 const PaneContainer = require('./pane-container');
 
-/** Essential: Represents the workspace at the center of the entire window. */
+/**
+ * @class WorkspaceCenter
+ * @classdesc Essential: Represents the workspace at the center of the entire
+ * window.
+ */
 module.exports = class WorkspaceCenter {
   constructor(params) {
     params.location = 'center';
@@ -65,9 +69,11 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Essential: Invoke the given callback with all current and future panes items
-   * in the workspace center.
-   * @params {WorkspaceCenter~observePaneItemsCallback} callback -
+   * @name observePaneItems
+   * @memberof WorkspaceCenter
+   * @desc Essential: Invoke the given callback with all current and future panes
+   * items in the workspace center.
+   * @param {WorkspaceCenter.observePaneItemsCallback} callback -
    * Function to be called with current and future pane items.
    * @returns {Disposable} Returns a Disposable on which `.dispose()` can be called
    * to unsubscribe.
@@ -75,6 +81,7 @@ module.exports = class WorkspaceCenter {
   observePaneItems(callback) {
     /**
      * @callback observePaneItemsCallback
+     * @memberof WorkspaceCenter
      * @param {object} item - An item that is present in {::getPaneItems} at the
      * time of subscription or that is added at some later time.
      */
@@ -224,24 +231,33 @@ module.exports = class WorkspaceCenter {
     return this.paneContainer.onWillDestroyPaneItem(callback);
   }
 
-  // Extended: Invoke the given callback when a pane item is destroyed.
-  //
-  // * `callback` {Function} to be called when pane items are destroyed.
-  //   * `event` {Object} with the following keys:
-  //     * `item` The destroyed item.
-  //     * `pane` {Pane} containing the destroyed item.
-  //     * `index` {Number} indicating the index of the destroyed item in its
-  //       pane.
-  //
-  // Returns a {Disposable} on which `.dispose` can be called to unsubscribe.
+  /**
+   * @name onDidDestroyPaneItem
+   * @memberof WorkspaceCenter
+   * @desc Extended: Invoke the given callback when a pane item is destroyed.
+   * @param {WorkspaceCenter.onDidDestroyPaneItemCallback} callback - Function to
+   * be called when pane items are destroyed.
+   * @returns {Disposable} On which `.dispose()` can be called to unsubscribe.
+   */
   onDidDestroyPaneItem(callback) {
+    /**
+     * @callback onDidDestroyPaneItemCallback
+     * @memberof WorkspaceCenter
+     * @param {object} event - Object with the following keys:
+     * @param {*} event.item - The destroyed item.
+     * @param {Pane} event.pane - Containing the destroyed item.
+     * @param {integer} event.index - Indicating the index of the destroyed item
+     * in its pane.
+     */
     return this.paneContainer.onDidDestroyPaneItem(callback);
   }
 
   /**
-   * Extended: Invoke the given callback when a text editor is added to the
+   * @name onDidAddTextEditor
+   * @memberof WorkspaceCenter
+   * @desc Extended: Invoke the given callback when a text editor is added to the
    * workspace center.
-   * @params {WorkspaceCenter~onDidAddTextEditorCB} callback - Function to be
+   * @param {WorkspaceCenter.onDidAddTextEditorCallback} callback - Function to be
    * called when panes are added.
    * @returns {Disposable} on which `.dispose()` can be called to unsubscribe.
    */
@@ -249,11 +265,12 @@ module.exports = class WorkspaceCenter {
     return this.onDidAddPaneItem(({ item, pane, index }) => {
       if (item instanceof TextEditor) {
         /**
-         * @callback onDidAddTextEditorCB
-         * @params {object} event - Object with following keys:
-         * @params {TextEditor} event.textEditor - The TextEditor that was added.
-         * @params {Pane} event.pane - Pane containing the added text editor.
-         * @params {integer} event.index - Number indicating the index of the added text
+         * @callback onDidAddTextEditorCallback
+         * @memberof WorkspaceCenter
+         * @param {object} event - Object with following keys:
+         * @param {TextEditor} event.textEditor - The TextEditor that was added.
+         * @param {Pane} event.pane - Pane containing the added text editor.
+         * @param {integer} event.index - Number indicating the index of the added text
          * editor in it's pane.
          */
         callback({ textEditor: item, pane, index });
@@ -262,7 +279,9 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Essential: Get all pane items in the workspace center.
+   * @name getPaneItems
+   * @memberof WorkspaceCenter
+   * @desc Essential: Get all pane items in the workspace center.
    * @returns {array} Returns an array of items.
    */
   getPaneItems() {
@@ -270,7 +289,9 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Essential: Get the active {Pane}'s active item.
+   * @name getActivePaneItem
+   * @memberof WorkspaceCenter
+   * @desc Essential: Get the active {Pane}'s active item.
    * @returns {object} A Pane Item
    */
   getActivePaneItem() {
@@ -278,7 +299,9 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Essential: Get all text editors in the workspace center.
+   * @name getTextEditors
+   * @memberof WorkspaceCenter
+   * @desc Essential: Get all text editors in the workspace center.
    * @returns {TextEditor[]}
    */
   getTextEditors() {
@@ -286,7 +309,9 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Essential: Get the active item if it is an {TextEditor}.
+   * @name getActiveTextEditor
+   * @memberof WorkspaceCenter
+   * @desc Essential: Get the active item if it is an {TextEditor}.
    * @returns {TextEditor|undefined} Returns TextEditor or `undefined` if the
    * current active item is not an {TextEditor}
    */
@@ -297,7 +322,11 @@ module.exports = class WorkspaceCenter {
     }
   }
 
-  /** Save all pane items. */
+  /**
+   * @name saveAll
+   * @memberof WorkspaceCenter
+   * @desc Save all pane items.
+   */
   saveAll() {
     this.paneContainer.saveAll();
   }
@@ -307,7 +336,9 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Extended: Get all panes in the workspace center.
+   * @name getPanes
+   * @memberof WorkspaceCenter
+   * @desc Extended: Get all panes in the workspace center.
    * @returns {Pane[]}
    */
   getPanes() {
@@ -315,19 +346,29 @@ module.exports = class WorkspaceCenter {
   }
 
   /**
-   * Extended: Get the active {Pane}.
+   * @name getActivePane
+   * @memberof WorkspaceCenter
+   * @desc Extended: Get the active {Pane}.
    * @returns {Pane}
    */
   getActivePane() {
     return this.paneContainer.getActivePane();
   }
 
-  /** Extended: Make the next pane active. */
+  /**
+   * @name activateNextPane
+   * @memberof WorkspaceCenter
+   * @desc Extended: Make the next pane active.
+   */
   activateNextPane() {
     return this.paneContainer.activateNextPane();
   }
 
-  /** Extended: Make the previous pane active. */
+  /**
+   * @name activatePreviousPane
+   * @memberof WorkspaceCenter
+   * @desc Extended: Make the previous pane active.
+   */
   activatePreviousPane() {
     return this.paneContainer.activatePreviousPane();
   }
@@ -340,7 +381,11 @@ module.exports = class WorkspaceCenter {
     return this.paneContainer.paneForItem(item);
   }
 
-  /** Destroy (close) the active pane. */
+  /**
+   * @name destroyActivePane
+   * @memberof WorkspaceCenter
+   * @desc Destroy (close) the active pane.
+   */
   destroyActivePane() {
     const activePane = this.getActivePane();
     if (activePane != null) {

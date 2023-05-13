@@ -1,8 +1,10 @@
 /**
- * Public: Measure how long a function takes to run.
- * @params {string} description - A string description that will be logged to the
+ * @global
+ * @function measure
+ * @desc Public: Measure how long a function takes to run.
+ * @param {string} description - A string description that will be logged to the
  * console when the function completes.
- * @params {function} fn - A function to measure the duration of.
+ * @param {function} fn - A function to measure the duration of.
  * @returns {*} Returns the value returned by the given function.
  */
 window.measure = function(description, fn) {
@@ -14,10 +16,12 @@ window.measure = function(description, fn) {
 };
 
 /**
- * Public: Create a dev tools profile for a function.
- * @params {string} description - A string description that will be available in
+ * @global
+ * @function profile
+ * @desc Public: Create a dev tools profile for a function.
+ * @param {string} description - A string description that will be available in
  * the profiles tab of the dev tools.
- * @params {function} fn - A Function to profile.
+ * @param {function} fn - A Function to profile.
  * @returns {*} Returns the value returned by the given function.
  */
 window.profile = function(description, fn) {
