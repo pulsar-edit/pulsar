@@ -138,7 +138,12 @@ ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   * state of the application.
   */
 module.exports = class AtomApplication extends EventEmitter {
-  // Public: The entry point into the Pulsar application.
+  /**
+   * @name open
+   * @memberof AtomApplication
+   * @static
+   * @desc Public: The entry point into the Pulsar Application
+   */
   static open(options) {
     StartupTime.addMarker('main-process:atom-application:open');
 
@@ -426,12 +431,20 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Public: Create a new {AtomWindow} bound to this application.
+  /**
+   * @name createWindow
+   * @memberof AtomApplication
+   * @desc Public: Create a new {AtomWindow} bound to this application.
+   */
   createWindow(settings) {
     return new AtomWindow(this, this.fileRecoveryService, settings);
   }
 
-  // Public: Removes the {AtomWindow} from the global window list.
+  /**
+   * @name removeWindow
+   * @memberof AtomApplication
+   * @desc Public: Removes the {AtomWindow} from the global window list.
+   */
   removeWindow(window) {
     this.windowStack.removeWindow(window);
     if (this.getAllWindows().length === 0 && process.platform !== 'darwin') {
@@ -441,7 +454,11 @@ module.exports = class AtomApplication extends EventEmitter {
     if (!window.isSpec) this.saveCurrentWindowOptions(true);
   }
 
-  // Public: Adds the {AtomWindow} to the global window list.
+  /**
+   * @name addWindow
+   * @memberof AtomApplication
+   * @desc Public: Adds the {AtomWindow} to the global window list.
+   */
   addWindow(window) {
     this.windowStack.addWindow(window);
     if (this.applicationMenu)
@@ -475,11 +492,15 @@ module.exports = class AtomApplication extends EventEmitter {
     return this.windowStack.getLastFocusedWindow(predicate);
   }
 
-  // Creates server to listen for additional atom application launches.
-  //
-  // You can run the atom command multiple times, but after the first launch
-  // the other launches will just pass their information to this server and then
-  // close immediately.
+  /**
+   * @name listenForArgumentsFromNewProcess
+   * @memberof AtomApplication
+   * @async
+   * @desc Creates server to listen for additional atom application launches.
+   * You can run the atom command multiple times, but after the first launch
+   * the other launches will just pass their information to this server and then
+   * close immediately.
+   */
   async listenForArgumentsFromNewProcess() {
     this.socketSecretPromise = createSocketSecret(this.version);
     this.socketSecret = await this.socketSecretPromise;
@@ -550,7 +571,11 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Registers basic application commands, non-idempotent.
+  /**
+   * @name handleEvents
+   * @memberof AtomApplication
+   * @desc Registers basic application commands, non-idempotent.
+   */
   handleEvents() {
     const createOpenSettings = ({ event, sameWindow }) => {
       const targetWindow = event
@@ -1095,8 +1120,8 @@ module.exports = class AtomApplication extends EventEmitter {
    * @private
    * @desc Public: Executes the given command.
    * If it isn't handled globally, delegate to the currently focused window.
-   * @params {string} command - The string representing the command.
-   * @params {object} args - The optional arguments to pass along.
+   * @param {string} command - The string representing the command.
+   * @param {object} args - The optional arguments to pass along.
    */
   sendCommand(command, ...args) {
     if (!this.emit(command, ...args)) {
@@ -1114,9 +1139,9 @@ module.exports = class AtomApplication extends EventEmitter {
    * @memberof AtomApplication
    * @private
    * @desc Public: Executes the given command on the given window.
-   * @params {string} command - The string representing the command.
-   * @params {AtomWindow} atomWindow - The {AtomWindow} to send the command to.
-   * @params {object} args - The optional arguments to pass along.
+   * @param {string} command - The string representing the command.
+   * @param {AtomWindow} atomWindow - The {AtomWindow} to send the command to.
+   * @param {object} args - The optional arguments to pass along.
    */
   sendCommandToWindow(command, atomWindow, ...args) {
     if (!this.emit(command, ...args)) {
@@ -1128,8 +1153,13 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Translates the command into macOS action and sends it to application's first
-  // responder.
+  /**
+   * @name sendCommandToFirstResponder
+   * @memberof AtomApplication
+   * @desc Translates the command into macOS action and sends it to application's
+   * first responder.
+   * @param {*} command - TBD
+   */
   sendCommandToFirstResponder(command) {
     if (process.platform !== 'darwin') return false;
 
@@ -1165,8 +1195,8 @@ module.exports = class AtomApplication extends EventEmitter {
    * @desc Public: Open the given path in the focused window when the event is
    * triggered.
    * A new window will be created if there is no currently focused window.
-   * @params {event} eventName - The event to listen for.
-   * @params {string} pathToOpen - The path to open when the event is triggered.
+   * @param {event} eventName - The event to listen for.
+   * @param {string} pathToOpen - The path to open when the event is triggered.
    */
   openPathOnEvent(eventName, pathToOpen) {
     this.on(eventName, () => {
@@ -1203,12 +1233,20 @@ module.exports = class AtomApplication extends EventEmitter {
     );
   }
 
-  // Public: Returns the currently focused {AtomWindow} or undefined if none.
+  /**
+   * @name focusedWindow
+   * @memberof AtomApplication
+   * @desc Public: Returns the currently focused {AtomWindow} or undefined if none.
+   */
   focusedWindow() {
     return this.getAllWindows().find(window => window.isFocused());
   }
 
-  // Get the platform-specific window offset for new windows.
+  /**
+   * @name getWindowOffsetForCurrentPlatform
+   * @memberof AtomApplication
+   * @desc Get the platform-specific window offset for new windows.
+   */
   getWindowOffsetForCurrentPlatform() {
     const offsetByPlatform = {
       darwin: 22,
@@ -1217,8 +1255,12 @@ module.exports = class AtomApplication extends EventEmitter {
     return offsetByPlatform[process.platform] || 0;
   }
 
-  // Get the dimensions for opening a new window by cascading as appropriate to
-  // the platform.
+  /**
+   * @name getDimensionsForNewWindow
+   * @memberof AtomApplication
+   * @desc Get the dimensions for opening a new window by cascading as
+   * appropriate to the platform.
+   */
   getDimensionsForNewWindow() {
     const window = this.focusedWindow() || this.getLastFocusedWindow();
     if (!window || window.isMaximized()) return;
@@ -1236,17 +1278,17 @@ module.exports = class AtomApplication extends EventEmitter {
    * @memberof AtomApplication
    * @private
    * @desc Public: Opens a single path, in an existing window if possible.
-   * @params {object} options
-   * @params {string} options.pathToOpen - The file path to open
-   * @params {integer} options.pidToKillWhenClosed - The integer of the pid to kill
-   * @params {boolean} options.newWindow - Boolean of whether this should be opened
+   * @param {object} options
+   * @param {string} options.pathToOpen - The file path to open
+   * @param {integer} options.pidToKillWhenClosed - The integer of the pid to kill
+   * @param {boolean} options.newWindow - Boolean of whether this should be opened
    * in a new window.
-   * @params {boolean} options.devMode - Boolean to control the opened window's dev mode.
-   * @params {boolean} options.safeMode - Boolean to control the opened window's safe mode.
-   * @params {boolean} options.profileStartup - Boolean to control creating a profile
+   * @param {boolean} options.devMode - Boolean to control the opened window's dev mode.
+   * @param {boolean} options.safeMode - Boolean to control the opened window's safe mode.
+   * @param {boolean} options.profileStartup - Boolean to control creating a profile
    * of the startup time.
-   * @params {AtomWindow} options.window - AtomWindow to open file paths in.
-   * @params {boolean} options.addToLastWindow - Boolean of whether this should be
+   * @param {AtomWindow} options.window - AtomWindow to open file paths in.
+   * @param {boolean} options.addToLastWindow - Boolean of whether this should be
    * opened in the last focused window.
    */
   openPath({
@@ -1275,18 +1317,27 @@ module.exports = class AtomApplication extends EventEmitter {
     });
   }
 
-  // Public: Opens multiple paths, in existing windows if possible.
-  //
-  // options -
-  //   :pathsToOpen - The array of file paths to open
-  //   :foldersToOpen - An array of additional paths to open that must be existing directories
-  //   :pidToKillWhenClosed - The integer of the pid to kill
-  //   :newWindow - Boolean of whether this should be opened in a new window.
-  //   :devMode - Boolean to control the opened window's dev mode.
-  //   :safeMode - Boolean to control the opened window's safe mode.
-  //   :windowDimensions - Object with height and width keys.
-  //   :window - {AtomWindow} to open file paths in.
-  //   :addToLastWindow - Boolean of whether this should be opened in last focused window.
+  /**
+   * @name openPaths
+   * @memberof AtomApplication
+   * @async
+   * @desc Public: Opens multiple paths, in existing windows if possible.
+   * @param {object} options
+   * @param {string[]} options.pathsToOpen - The array of file paths to open
+   * @param {string[]} options.foldersToOpen - An array of additional paths to
+   * open that must be existing directories
+   * @param {integer} options.pidToKillWhenClosed - The integer of the pid to kill
+   * @param {boolean} options.newWindow - Boolean of whether this should be opened
+   * in a new window.
+   * @param {boolean} options.devMode - Boolean to control the opened window's dev
+   * mode.
+   * @param {boolean} options.safeMode - Boolean to control the opened window's
+   * safe mode.
+   * @param {object} options.windowDimensions - Object with height and width keys.
+   * @param {AtomWindow} options.window - AtomWindow to open file paths in.
+   * @param {boolean} options.addToLastWindow - Boolean of whether this should be
+   * opened in last focused window.
+   */
   async openPaths({
     pathsToOpen,
     foldersToOpen,
@@ -1457,7 +1508,11 @@ module.exports = class AtomApplication extends EventEmitter {
     return openedWindow;
   }
 
-  // Kill all processes associated with opened windows.
+  /**
+   * @name killAllProcesses
+   * @memberof AtomApplication
+   * @desc Kill all processes associated with opened windows.
+   */
   killAllProcesses() {
     for (let window of this.waitSessionsByWindow.keys()) {
       this.killProcessesForWindow(window);
@@ -1486,7 +1541,12 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Kill the process with the given pid.
+  /**
+   * @name killProcess
+   * @memberof AtomApplication
+   * @desc Kill the process with the given pid.
+   * @param {integer} pid - PID of process to kill.
+   */
   killProcess(pid) {
     try {
       const parsedPid = parseInt(pid);
@@ -1573,16 +1633,20 @@ module.exports = class AtomApplication extends EventEmitter {
     }
   }
 
-  // Open an atom:// url.
-  //
-  // The host of the URL being opened is assumed to be the package name
-  // responsible for opening the URL.  A new window will be created with
-  // that package's `urlMain` as the bootstrap script.
-  //
-  // options -
-  //   :urlToOpen - The atom:// url to open.
-  //   :devMode - Boolean to control the opened window's dev mode.
-  //   :safeMode - Boolean to control the opened window's safe mode.
+  /**
+   * @name openUrl
+   * @memberof AtomApplication
+   * @desc Open an atom:// url.
+   * The host of the URL being opened is assumed to be the package name
+   * responsible for opening the URL.  A new window will be created with
+   * that package's `urlMain` as the bootstrap script.
+   * @param {object} options
+   * @param {string} options.urlToOpen - The atom:// url to open.
+   * @param {boolean} options.devMode - Boolean to control the opened window's
+   * dev mode.
+   * @param {boolean} options.safeMode - Boolean to control the opened window's
+   * safe mode.
+   */
   openUrl({ urlToOpen, devMode, safeMode, env }) {
     const parsedUrl = url.parse(urlToOpen, true);
     if (parsedUrl.protocol !== 'atom:') return;
@@ -1713,15 +1777,18 @@ module.exports = class AtomApplication extends EventEmitter {
     return this.packages;
   }
 
-  // Opens up a new {AtomWindow} to run specs within.
-  //
-  // options -
-  //   :headless - A Boolean that, if true, will close the window upon
-  //                   completion.
-  //   :resourcePath - The path to include specs from.
-  //   :specPath - The directory to load specs from.
-  //   :safeMode - A Boolean that, if true, won't run specs from ~/.pulsar/packages
-  //               and ~/.pulsar/dev/packages, defaults to false.
+  /**
+   * @name runTests
+   * @memberof AtomApplication
+   * @desc Opens up a new {AtomWindow} to run specs within.
+   * @param {object} options
+   * @param {boolean} options.headless - A boolean that, if true, will close the
+   * window upon completion.
+   * @param {string} options.resourcePath - The path to include specs from.
+   * @param {string} options.specPath - The directory to load specs from.
+   * @param {boolean} options.safeMode=false - A boolean that, if true, won't run specs
+   * from ~/.pulsar/packages and ~/.pulsar/dev/packages, defaults to false.
+   */
   runTests({
     headless,
     resourcePath,
@@ -1900,21 +1967,23 @@ module.exports = class AtomApplication extends EventEmitter {
     return result;
   }
 
-  // Opens a native dialog to prompt the user for a path.
-  //
-  // Once paths are selected, they're opened in a new or existing {AtomWindow}s.
-  //
-  // options -
-  //   :type - A String which specifies the type of the dialog, could be 'file',
-  //           'folder' or 'all'. The 'all' is only available on macOS.
-  //   :devMode - A Boolean which controls whether any newly opened windows
-  //              should be in dev mode or not.
-  //   :safeMode - A Boolean which controls whether any newly opened windows
-  //               should be in safe mode or not.
-  //   :window - An {AtomWindow} to use for opening selected file paths as long as
-  //             all are files.
-  //   :path - An optional String which controls the default path to which the
-  //           file dialog opens.
+  /**
+   * @name promptForPathToOpen
+   * @memberof AtomApplication
+   * @desc Opens a native dialog to prompt the user for a path.
+   * Once paths are selected, they're opened in a new or existing {AtomWindow}s.
+   * @param {object} options
+   * @param {string} options.type - A String which specifies the type of the
+   * dialog, could be 'file', 'folder' or 'all'. The 'all' is only available on macOS.
+   * @param {boolean} options.devMode - A Boolean which controls whether any
+   * newly opened windows should be in dev mode or not.
+   * @param {boolean} options.safeMode - A Boolean which controls whether any
+   * newly opened windows should be in safe mode or not.
+   * @param {AtomWindow} options.window - An {AtomWindow} to use for opening
+   * selected file paths as long as all are files.
+   * @param {string} options.path - An optional String which controls the
+   * default path to which the file dialog opens.
+   */
   promptForPathToOpen(type, { devMode, safeMode, window }, path = null) {
     return this.promptForPath(
       type,
