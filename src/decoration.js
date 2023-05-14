@@ -42,17 +42,28 @@ const normalizeDecorationProperties = function(decoration, decorationParams) {
 //
 // You should only use {Decoration::destroy} when you still need or do not own
 // the marker.
+/**
+ * @class Decoration
+ * @classdesc
+ * Essential: Represents a decoration that follows a {DisplayMarker}. A decoration
+ * is basically a visual representation of a marker. It allows you to add CSS
+ * classes to line numbers in the gutter, lines, and add selection-line regions
+ * around marked ranges of text.
+ */
 module.exports = class Decoration {
-  // Private: Check if the `decorationProperties.type` matches `type`
-  //
-  // * `decorationProperties` {Object} eg. `{type: 'line-number', class: 'my-new-class'}`
-  // * `type` {String} type like `'line-number'`, `'line'`, etc. `type` can also
-  //   be an {Array} of {String}s, where it will return true if the decoration's
-  //   type matches any in the array.
-  //
-  // Returns {Boolean}
-  // Note: 'line-number' is a special subtype of the 'gutter' type. I.e., a
-  // 'line-number' is a 'gutter', but a 'gutter' is not a 'line-number'.
+  /**
+   * @private
+   * @name isType
+   * @memberof Decoration
+   * @desc Private: Check if the `decorationProperties.type` matches `type`
+   * Note: 'line-number' is a special subtype of the 'gutter' type.
+   * I.e., a 'line-number' is a 'gutter' is not a 'line-number'.
+   * @param {object} decorationProperties - eg. `{type: 'line-number', class: 'my-new-class'}`
+   * @param {string|string[]} decorationProperties.type - Like `'line-number'`, `'line'`,
+   * etc. `type` can alos be an array of strings, where it will return true if
+   * the decoration's type matches any in the array.
+   * @returns boolean
+   */
   static isType(decorationProperties, type) {
     // 'line-number' is a special case of 'gutter'.
     if (Array.isArray(decorationProperties.type)) {
@@ -93,10 +104,13 @@ module.exports = class Decoration {
     );
   }
 
-  // Essential: Destroy this marker decoration.
-  //
-  // You can also destroy the marker if you own it, which will destroy this
-  // decoration.
+  /**
+   * @name destroy
+   * @memberof Decoration
+   * @desc Essential: Destroy this marker decoration.
+   * You can also destroy the marker if you own it, which will destroy this
+   * decoration.
+   */
   destroy() {
     if (this.destroyed) {
       return;
@@ -117,23 +131,32 @@ module.exports = class Decoration {
   Section: Event Subscription
   */
 
-  // Essential: When the {Decoration} is updated via {Decoration::update}.
-  //
-  // * `callback` {Function}
-  //   * `event` {Object}
-  //     * `oldProperties` {Object} the old parameters the decoration used to have
-  //     * `newProperties` {Object} the new parameters the decoration now has
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  /**
+   * @name onDidChangeProperties
+   * @memberof Decoration
+   * @desc Essential: When the {Decoration} is updated via {Decoration::update}.
+   * @param {function} callback
+   * @returns {Disposable} On which `.dispose()` can be called to unsubscribe.
+   */
   onDidChangeProperties(callback) {
+    /**
+     * @callback
+     * @param {object} event
+     * @param {object} event.oldProperties - THe old parameters the decoration
+     * used to have.
+     * @param {object} event.newProperties - The new parameters the decoration
+     * now has.
+     */
     return this.emitter.on('did-change-properties', callback);
   }
 
-  // Essential: Invoke the given callback when the {Decoration} is destroyed
-  //
-  // * `callback` {Function}
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  /**
+   * @name onDidDestroy
+   * @memberof Decoration
+   * @desc Essential: Invoke the given callback when the {Decoration} is destroyed
+   * @param {function} callback
+   * @returns {Disposable} On which `.dipose()` can be called to unsubscribe.
+   */
   onDidDestroy(callback) {
     return this.emitter.once('did-destroy', callback);
   }
@@ -142,23 +165,33 @@ module.exports = class Decoration {
   Section: Decoration Details
   */
 
-  // Essential: An id unique across all {Decoration} objects
+  /**
+   * @name getId
+   * @memberof Decoration
+   * @desc Essential: An id unique across all {Decoration} objects
+   */
   getId() {
     return this.id;
   }
 
-  // Essential: Returns the marker associated with this {Decoration}
+  /**
+   * @name getMarker
+   * @memberof Decoration
+   * @desc Essential: Returns the marker associated with this {Decoration}
+   */
   getMarker() {
     return this.marker;
   }
 
-  // Public: Check if this decoration is of type `type`
-  //
-  // * `type` {String} type like `'line-number'`, `'line'`, etc. `type` can also
-  //   be an {Array} of {String}s, where it will return true if the decoration's
-  //   type matches any in the array.
-  //
-  // Returns {Boolean}
+  /**
+   * @name isType
+   * @memberof Decoration
+   * @desc Public: Check if this decoration is of type `type`
+   * @param {string|string[]} type - Like `'line-number'`, `'line'`, etc. `type` can also
+   * be an array of strings, where it will return true if the decoration's
+   * type matches any in the array.
+   * @returns {boolean}
+   */
   isType(type) {
     return Decoration.isType(this.properties, type);
   }
@@ -167,20 +200,24 @@ module.exports = class Decoration {
   Section: Properties
   */
 
-  // Essential: Returns the {Decoration}'s properties.
+  /**
+   * @name getProperties
+   * @memberof Decoration
+   * @desc Essential: Returns the {Decoration}'s properties.
+   */
   getProperties() {
     return this.properties;
   }
 
-  // Essential: Update the marker with new Properties. Allows you to change the decoration's class.
-  //
-  // ## Examples
-  //
-  // ```coffee
-  // decoration.setProperties({type: 'line-number', class: 'my-new-class'})
-  // ```
-  //
-  // * `newProperties` {Object} eg. `{type: 'line-number', class: 'my-new-class'}`
+  /**
+   * @name setProperties
+   * @memberof Decoration
+   * @desc Essential: Update the marker with new Properties. Allows you to
+   * change the decoration's class.
+   * @param {object} newProperties - eg. `{type: 'line-number', class: 'my-new-class'}`
+   * @example
+   * decoration.setProperties({type: 'line-number', class: 'my-new-class'})
+   */
   setProperties(newProperties) {
     if (this.destroyed) {
       return;
