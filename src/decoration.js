@@ -20,28 +20,6 @@ const normalizeDecorationProperties = function(decoration, decorationParams) {
   return decorationParams;
 };
 
-// Essential: Represents a decoration that follows a {DisplayMarker}. A decoration is
-// basically a visual representation of a marker. It allows you to add CSS
-// classes to line numbers in the gutter, lines, and add selection-line regions
-// around marked ranges of text.
-//
-// {Decoration} objects are not meant to be created directly, but created with
-// {TextEditor::decorateMarker}. eg.
-//
-// ```coffee
-// range = editor.getSelectedBufferRange() # any range you like
-// marker = editor.markBufferRange(range)
-// decoration = editor.decorateMarker(marker, {type: 'line', class: 'my-line-class'})
-// ```
-//
-// Best practice for destroying the decoration is by destroying the {DisplayMarker}.
-//
-// ```coffee
-// marker.destroy()
-// ```
-//
-// You should only use {Decoration::destroy} when you still need or do not own
-// the marker.
 /**
  * @class Decoration
  * @classdesc
@@ -49,6 +27,7 @@ const normalizeDecorationProperties = function(decoration, decorationParams) {
  * is basically a visual representation of a marker. It allows you to add CSS
  * classes to line numbers in the gutter, lines, and add selection-line regions
  * around marked ranges of text.
+ * @see {@link https://github.com/pulsar-edit/pulsar/blob/master/docs/jsdoc-tutorials/decoration.md ToolTipManager Tutorial}
  */
 module.exports = class Decoration {
   /**
