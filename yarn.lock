@@ -2294,18 +2294,16 @@ atom-grammar-test@^0.6.3, atom-grammar-test@^0.6.4:
     chevrotain "^0.18.0"
     escape-string-regexp "^1.0.5"
 
-atom-keymap@8.2.15:
+"atom-keymap@https://github.com/pulsar-edit/atom-keymap.git#162ebf3":
   version "8.2.15"
-  resolved "https://registry.yarnpkg.com/atom-keymap/-/atom-keymap-8.2.15.tgz#e191c8b3104a8f41af35b4d8841308116226f5ce"
-  integrity sha512-oYDDhro613LsRRlk8gfgOu3/uWWrhQ2gEDm4DEK/B8Rrg6ajBBKmAeNWWVDSNzwr+dysatOEBBWbIAor84ijgg==
+  resolved "https://github.com/pulsar-edit/atom-keymap.git#162ebf3a10860f53865fdceab08420e28246aad8"
   dependencies:
     clear-cut "^2"
-    emissary "^1.1.0"
     event-kit "^1.0.0"
     fs-plus "^3.0.0"
     grim "^1.2.1"
     keyboard-layout "2.0.17"
-    pathwatcher "^8.0.0"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
     property-accessors "^1"
     season "^6.0.2"
 
@@ -3978,7 +3976,7 @@ electron@12.2.3:
     "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
-emissary@^1.0.0, emissary@^1.1.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
+emissary@^1.0.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4919,10 +4917,9 @@ git-utils@5.7.1:
     fs-plus "^3.0.0"
     nan "^2.14.0"
 
-git-utils@^5.6.0:
+"git-utils@https://github.com/pulsar-edit/git-utils.git#f4e8c37":
   version "5.7.3"
-  resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.3.tgz#3b53983204678313b305bbf278c07dc015ba2155"
-  integrity sha512-in1hjFfmzY86gKBt+YMTaVyCGtX2WTnN0uPj37bI5HsrnU2oj8OFcWOEzOI5PxQXPMxFxtvRebOHAOGB8M125w==
+  resolved "https://github.com/pulsar-edit/git-utils.git#f4e8c37e2d3117dcf1b8f7b2d98d28c396567f8b"
   dependencies:
     fs-plus "^3.0.0"
     nan "^2.14.2"
@@ -7590,10 +7587,9 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-pathwatcher@^8.0.0, pathwatcher@^8.1.0, pathwatcher@^8.1.2:
+pathwatcher@^8.1.0, "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f":
   version "8.1.2"
-  resolved "https://registry.yarnpkg.com/pathwatcher/-/pathwatcher-8.1.2.tgz#86eca6a16493dfb29347b88c91627b45720ab5b9"
-  integrity sha512-3izRU4DDQ9qVeASauP4Hlp49OhKPcedRYke9iHa0Jh1I+XlC9wYng/NycHh41k5F8wGndA23YYDCtO3KLAFPMg==
+  resolved "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1"
   dependencies:
     async "~0.2.10"
     emissary "^1.3.2"
@@ -8407,13 +8403,12 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-scandal@^3.2.0:
+"scandal@https://github.com/pulsar-edit/scandal.git#176eee2":
   version "3.2.0"
-  resolved "https://registry.yarnpkg.com/scandal/-/scandal-3.2.0.tgz#29e75f8050fc53b6e6c00c61b7711b874356fb03"
-  integrity sha512-kXICe3ygxwyyO3Ur+k49UzQlu8yrdQgzD03eMgV8sMWDom9q4qpEvZuQRUcbyAujC1TpISPRUPoirOIO1bRxcQ==
+  resolved "https://github.com/pulsar-edit/scandal.git#176eee28de83bdcb7f43a3c8074369d724759cf8"
   dependencies:
     argparse "^1.0.2"
-    git-utils "^5.6.0"
+    git-utils "https://github.com/pulsar-edit/git-utils.git#f4e8c37"
     isbinaryfile "^2.0.4"
     minimatch "^2.0.9"
     split "^1.0.0"
@@ -9468,7 +9463,7 @@ tree-sitter@0.20.0:
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
-    pathwatcher "^8.1.0"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
     temp "~0.9.0"
     underscore-plus "^1.0.0"
 

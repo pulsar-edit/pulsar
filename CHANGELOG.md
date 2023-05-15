@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Using some modules that are context-aware (remove some warnings, makes upgrading
+to newer Electron easier).
 - Rebranded notifications, using our backend to find new versions of package,
 and our github repository to find issues on Pulsar. Also fixed the "view issue"
 and "create issue" buttons that were not working
