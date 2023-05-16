@@ -144,6 +144,9 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'window:run-package-specs': function() {
       return this.runPackageSpecs();
     },
+    'window:run-package-tests': function() {
+      return this.runPackageTests();
+    },
     'window:toggle-left-dock': function() {
       return this.getModel().getLeftDock().toggle();
     },

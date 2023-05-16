@@ -210,6 +210,7 @@ module.exports = class Workspace extends Model {
 
     this.scandalDirectorySearcher = new DefaultDirectorySearcher();
     this.ripgrepDirectorySearcher = new RipgrepDirectorySearcher();
+    console.log("PACKAGE?", this.packageManager)
     this.consumeServices(this.packageManager);
 
     this.paneContainers = {

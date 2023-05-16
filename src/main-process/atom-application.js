@@ -365,7 +365,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     if (test) {
-      return this.runTests({
+      return this.runTestsLegacy({
         headless: true,
         devMode,
         resourcePath: this.resourcePath,
@@ -899,6 +899,24 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.on(
         ipcMain,
         'run-package-specs',
+        (event, packageSpecPath, options = {}) => {
+          this.runTestsLegacy(
+            Object.assign(
+              {
+                resourcePath: this.devResourcePath,
+                pathsToOpen: [packageSpecPath],
+                headless: false
+              },
+              options
+            )
+          );
+        }
+      )
+    );
+    this.disposable.add(
+      ipcHelpers.on(
+        ipcMain,
+        'run-package-tests',
         (event, packageSpecPath, options = {}) => {
           this.runTests(
             Object.assign(
@@ -1700,9 +1718,78 @@ module.exports = class AtomApplication extends EventEmitter {
   //                   completion.
   //   :resourcePath - The path to include specs from.
   //   :specPath - The directory to load specs from.
+  runTests({
+    headless,
+    resourcePath,
+    executedFrom,
+    pathsToOpen,
+    logFile,
+    env
+  }) {
+    const testPaths = [];
+    if (pathsToOpen != null) {
+      for (let pathToOpen of pathsToOpen) {
+        testPaths.push(path.resolve(executedFrom, fs.normalize(pathToOpen)));
+      }
+    }
+    if (testPaths.length === 0) {
+      process.stderr.write('Error: Specify at least one test path\n\n');
+      process.exit(1);
+    }
+
+    const windowInitializationScript = path.join(
+      __dirname, "..", "initialize-new-test-window"
+    );
+    // {
+    //   windowInitializationScript: '/home/mauricio/projects/pulsar_repos/pulsar/src/initialize-test-window.js',
+    //   resourcePath: '/home/mauricio/projects/pulsar_repos/pulsar',
+    //   headless: false,
+    //   isSpec: true,
+    //   devMode: true,
+    //   testRunnerPath: '/home/mauricio/projects/pulsar_repos/pulsar/spec/jasmine-test-runner.js',
+    //   legacyTestRunnerPath: '/home/mauricio/projects/pulsar_repos/pulsar/spec/jasmine-test-runner.js',
+    //   testPaths: [ '/home/mauricio/projects/pulsar_repos/pulsar/spec' ],
+    //   logFile: undefined,
+    //   safeMode: false,
+    //   env: undefined
+    // }
+
+    // WAAA {
+    //   windowInitializationScript: '/home/mauricio/projects/pulsar_repos/pulsar/src/initialize-new-test-window',
+    //   resourcePath: '/home/mauricio/projects/pulsar_repos/pulsar',
+    //   headless: false,
+    //   isSpec: true,
+    //   devMode: true,
+    //   testPaths: [ '/home/mauricio/projects/pulsar_repos/pulsar/spec' ],
+    //   logFile: undefined,
+    //   env: undefined
+    // }
+
+    const window = this.createWindow({
+      windowInitializationScript,
+      resourcePath,
+      headless,
+      isSpec: true,
+      devMode: true,
+      testPaths,
+      logFile,
+      env
+    });
+    this.addWindow(window);
+    if (env) window.replaceEnvironment(env);
+    return window;
+  }
+
+  // Opens up a new {AtomWindow} to run specs within.
+  //
+  // options -
+  //   :headless - A Boolean that, if true, will close the window upon
+  //                   completion.
+  //   :resourcePath - The path to include specs from.
+  //   :specPath - The directory to load specs from.
   //   :safeMode - A Boolean that, if true, won't run specs from ~/.pulsar/packages
   //               and ~/.pulsar/dev/packages, defaults to false.
-  runTests({
+  runTestsLegacy({
     headless,
     resourcePath,
     executedFrom,
@@ -1757,6 +1844,19 @@ module.exports = class AtomApplication extends EventEmitter {
     if (safeMode == null) {
       safeMode = false;
     }
+    console.log("AW", {
+      windowInitializationScript,
+      resourcePath,
+      headless,
+      isSpec,
+      devMode,
+      testRunnerPath,
+      legacyTestRunnerPath,
+      testPaths,
+      logFile,
+      safeMode,
+      env
+    })
     const window = this.createWindow({
       windowInitializationScript,
       resourcePath,

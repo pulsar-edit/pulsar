@@ -446,6 +446,29 @@ class WorkspaceElement extends HTMLElement {
       ipcRenderer.send('run-package-specs', specPath, options);
     }
   }
+
+  runPackageTests(options = {}) {
+    const activePaneItem = this.model.getActivePaneItem();
+    const activePath =
+      activePaneItem && typeof activePaneItem.getPath === 'function'
+        ? activePaneItem.getPath()
+        : null;
+    let projectPath;
+    if (activePath != null) {
+      [projectPath] = this.project.relativizePath(activePath);
+    } else {
+      [projectPath] = this.project.getPaths();
+    }
+    if (projectPath) {
+      let specPath = path.join(projectPath, 'spec');
+      const testPath = path.join(projectPath, 'test');
+      if (!fs.existsSync(specPath) && fs.existsSync(testPath)) {
+        specPath = testPath;
+      }
+
+      ipcRenderer.send('run-package-tests', specPath, options);
+    }
+  }
 }
 
 function isTab(element) {
