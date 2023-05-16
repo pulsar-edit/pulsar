@@ -9,7 +9,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "dompurify": "^1.0.3",
+    "dompurify": "^2.0.17",
     "fs-plus": "^3.0.0",
     "marked": "^0.3.6",
     "moment": "^2.19.3",
