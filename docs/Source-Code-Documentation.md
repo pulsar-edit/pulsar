@@ -98,11 +98,75 @@
     &quot;warnings&quot;: []
   }</p>
 </dd>
+<dt><a href="#chromiumElementsShim">chromiumElementsShim</a></dt>
+<dd><p>This file will manage the updating of <code>autocomplete-html</code> <code>completions.json</code>
+  We will partially utilize <code>@webref/elements</code> <code>.listAll()</code> function that returns
+  a full list of HTML Elements along with a defined <code>interface</code>.
+  To use this <code>interface</code> in any meaningful way, we will utilize the dataset
+  of Attributes that apply to each <code>interface</code> from Chromiums DevTools resource
+  <code>https://github.com/ChromeDevTools/devtools-frontend</code>.
+  Finally from here we will utilize <code>https://github.com/mdn/content</code> to parse
+  the Markdown docs of MDN&#39;s website to retreive descriptions for each element.</p>
+<p>  Now for a summary of our <code>completions.json</code> file we aim to generate.
+  There are two top level elements, <code>tags</code> and <code>attributes</code>, both objects.
+  Within <code>tags</code> we expect the following:
+  &quot;tags&quot;: {
+    &quot;a&quot;: {
+      &quot;attributes&quot;: [ &quot;href&quot;, &quot;hreflang&quot;, &quot;media&quot;, &quot;rel&quot;, &quot;target&quot;, &quot;type&quot; ],
+      &quot;description&quot;: &quot;.....&quot;
+    }
+  };</p>
+<p>  When an entry contains no <code>attributes</code> there is no empty array, the element
+  simply doesn&#39;t exist.</p>
+<p>  The <code>attributes</code> object contains keys of different elements that themselves
+  are objects that can contain several valid keys.</p>
+<ul>
+<li>global: Seems to be used exclusively for Global Attributes. Is a boolean
+    which when false, the key does not appear.</li>
+<li>type: A ?type? for the attribute. It&#39;s meaning is not immediately known.
+  Nor a way to reliabley programatically collect it. Some discovered values:</li>
+</ul>
+<p>cssStyle: Exclusively used for <code>class</code> attribute
+boolean: Attributes that only accept <code>true</code> or <code>false</code>
+flag: For attributes that don&#39;t require or accept values. eg autoplay
+cssId: Exclusively used for the <code>id</code> attribute
+color: Exclusively used for the <code>bgcolor</code> attribute
+style: Exclusively used for the <code>style</code> attribute</p>
+<ul>
+<li>description: A text description of the attribute</li>
+<li>attribOption: A string array of valid values that can exist within the attribute.
+          Such as the case with <code>rel</code> where only so many valid options exist.</li>
+</ul>
+<p>  Although with our data sources mentioned above, we are able to collect nearly
+  all the data needed. Except the <code>type</code> that is defined within our
+  <code>completions.json</code> as well as the <code>attribOption</code> within our completions.</p>
+<p>  Studying these closer reveals that all attributes listing with our <code>completions.json</code>
+  do not appear elsewhere, and are nearly all global attributes.</p>
+<p>  In this case since there is no sane way to collect this data, we will leave this
+  list as a manually maintained section of our <code>completions.json</code>.
+  This does mean that <code>curated-attributes.json</code> is a static document that
+  will require manual updating in the future. Or most ideally, will find a way
+  to automatically generate the needed data.</p>
+</dd>
+<dt><a href="#update">update</a></dt>
+<dd><p>This file aims to run some short simple tests against <code>update.js</code>. Focusing
+ mainly on the Regex used within <code>sanitizeDescription()</code></p>
+</dd>
 <dt><a href="#fs">fs</a></dt>
 <dd></dd>
 <dt><a href="#dalek">dalek</a></dt>
 <dd></dd>
 <dt><a href="#assert">assert</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
+<dd></dd>
+<dt><a href="#_">_</a></dt>
+<dd></dd>
+<dt><a href="#path">path</a></dt>
 <dd></dd>
 </dl>
 
@@ -115,6 +179,8 @@
 <dd></dd>
 <dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
+<dt><a href="#conditionPromise">conditionPromise()</a></dt>
+<dd></dd>
 <dt><a href="#destroy">destroy()</a></dt>
 <dd></dd>
 <dt><a href="#destroyChildren">destroyChildren()</a></dt>
@@ -124,6 +190,12 @@
 <dt><a href="#subscribeToRepository">subscribeToRepository()</a></dt>
 <dd></dd>
 <dt><a href="#updateDiffs">updateDiffs()</a></dt>
+<dd></dd>
+<dt><a href="#beforeEach">beforeEach()</a></dt>
+<dd></dd>
+<dt><a href="#beforeEach">beforeEach()</a></dt>
+<dd></dd>
+<dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
@@ -385,6 +457,68 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
   }
 
 **Kind**: global constant  
+<a name="chromiumElementsShim"></a>
+
+## chromiumElementsShim
+This file will manage the updating of `autocomplete-html` `completions.json`
+  We will partially utilize `@webref/elements` `.listAll()` function that returns
+  a full list of HTML Elements along with a defined `interface`.
+  To use this `interface` in any meaningful way, we will utilize the dataset
+  of Attributes that apply to each `interface` from Chromiums DevTools resource
+  `https://github.com/ChromeDevTools/devtools-frontend`.
+  Finally from here we will utilize `https://github.com/mdn/content` to parse
+  the Markdown docs of MDN's website to retreive descriptions for each element.
+
+  Now for a summary of our `completions.json` file we aim to generate.
+  There are two top level elements, `tags` and `attributes`, both objects.
+  Within `tags` we expect the following:
+  "tags": {
+    "a": {
+      "attributes": [ "href", "hreflang", "media", "rel", "target", "type" ],
+      "description": "....."
+    }
+  };
+
+  When an entry contains no `attributes` there is no empty array, the element
+  simply doesn't exist.
+
+  The `attributes` object contains keys of different elements that themselves
+  are objects that can contain several valid keys.
+  - global: Seems to be used exclusively for Global Attributes. Is a boolean
+            which when false, the key does not appear.
+  - type: A ?type? for the attribute. It's meaning is not immediately known.
+          Nor a way to reliabley programatically collect it. Some discovered values:
+cssStyle: Exclusively used for `class` attribute
+boolean: Attributes that only accept `true` or `false`
+flag: For attributes that don't require or accept values. eg autoplay
+cssId: Exclusively used for the `id` attribute
+color: Exclusively used for the `bgcolor` attribute
+style: Exclusively used for the `style` attribute
+  - description: A text description of the attribute
+  - attribOption: A string array of valid values that can exist within the attribute.
+                  Such as the case with `rel` where only so many valid options exist.
+
+  Although with our data sources mentioned above, we are able to collect nearly
+  all the data needed. Except the `type` that is defined within our
+  `completions.json` as well as the `attribOption` within our completions.
+
+  Studying these closer reveals that all attributes listing with our `completions.json`
+  do not appear elsewhere, and are nearly all global attributes.
+
+  In this case since there is no sane way to collect this data, we will leave this
+  list as a manually maintained section of our `completions.json`.
+  This does mean that `curated-attributes.json` is a static document that
+  will require manual updating in the future. Or most ideally, will find a way
+  to automatically generate the needed data.
+
+**Kind**: global constant  
+<a name="update"></a>
+
+## update
+This file aims to run some short simple tests against `update.js`. Focusing
+ mainly on the Regex used within `sanitizeDescription()`
+
+**Kind**: global constant  
 <a name="fs"></a>
 
 ## fs
@@ -400,6 +534,31 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
 ## assert
 **Kind**: global constant  
 **Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
+<a name="_"></a>
+
+## \_
+**Kind**: global constant  
+**Babel**:   
+<a name="path"></a>
+
+## path
+**Kind**: global constant  
+**Babel**:   
 <a name="beforeEach"></a>
 
 ## beforeEach()
@@ -408,6 +567,11 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
 <a name="beforeEach"></a>
 
 ## beforeEach()
+**Kind**: global function  
+**Babel**:   
+<a name="conditionPromise"></a>
+
+## conditionPromise()
 **Kind**: global function  
 **Babel**:   
 <a name="conditionPromise"></a>
@@ -452,6 +616,21 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
 **Describe**: Uses text markers in the target editor to visualize
   git modifications, additions, and deletions. The current algorithm
   just redraws the markers each call.  
+<a name="beforeEach"></a>
+
+## beforeEach()
+**Kind**: global function  
+**Babel**:   
+<a name="beforeEach"></a>
+
+## beforeEach()
+**Kind**: global function  
+**Babel**:   
+<a name="beforeEach"></a>
+
+## beforeEach()
+**Kind**: global function  
+**Babel**:   
 <a name="beforeEach"></a>
 
 ## beforeEach()

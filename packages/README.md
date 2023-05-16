@@ -13,33 +13,33 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **atom-dark-ui** | [`./atom-dark-ui`](./atom-dark-ui) | |
 | **atom-light-syntax** | [`./atom-light-syntax`](./atom-light-syntax) | |
 | **atom-light-ui** | [`./atom-light-ui`](./atom-light-ui) | |
-| **autocomplete-atom-api** | [`atom/autocomplete-atom-api`][autocomplete-atom-api] |  |
+| **autocomplete-atom-api** | [`./autocomplete-atom-api`](./autocomplete-atom-api) |  |
 | **autocomplete-css** | [`./autocomplete-css`](./autocomplete-css) |  |
 | **autocomplete-html** | [`./autocomplete-html`](./autocomplete-html) |  |
-| **autocomplete-plus** | [`./autocomplete-plus`][./autocomplete-plus] |  |
+| **autocomplete-plus** | [`./autocomplete-plus`](./autocomplete-plus) |  |
 | **autocomplete-snippets** | [`./autocomplete-snippets`](./autocomplete-snippets) |  |
 | **autoflow** | [`./autoflow`](./autoflow) | |
-| **autosave** | [`pulsar-edit/autosave`][autosave] | [#17834](https://github.com/atom/atom/issues/17834) |
+| **autosave** | [`./autosave`](./autosave) | |
 | **background-tips** | [`./background-tips`](./background-tips) | |
 | **base16-tomorrow-dark-theme** | [`./base16-tomorrow-dark-theme`](./base16-tomorrow-dark-theme) | |
 | **base16-tomorrow-light-theme** | [`./base16-tomorrow-light-theme`](./base16-tomorrow-light-theme) | |
 | **bookmarks** | [`./bookmarks`](./bookmarks) | |
-| **bracket-matcher** | [`atom/bracket-matcher`][bracket-matcher] |  |
+| **bracket-matcher** | [`./bracket-matcher`](./bracket-matcher) |  |
 | **command-palette** | [`./command-palette`](./command-palette) |  |
 | **dalek** | [`./dalek`](./dalek) | |
 | **deprecation-cop** | [`./deprecation-cop`](./deprecation-cop) | |
 | **dev-live-reload** | [`./dev-live-reload`](./dev-live-reload) | |
 | **encoding-selector** | [`./encoding-selector`](./encoding-selector) | |
 | **exception-reporting** | [`./exception-reporting`](./exception-reporting) | |
-| **find-and-replace** | [`pulsar-edit/find-and-replace`][find-and-replace] |  |
-| **fuzzy-finder** | [`pulsar-edit/fuzzy-finder`][fuzzy-finder] |  |
+| **find-and-replace** | [`./find-and-replace`][find-and-replace] |  |
+| **fuzzy-finder** | [`./fuzzy-finder`][fuzzy-finder] |  |
 | **github** | [`pulsar-edit/github`][github] |  |
 | **git-diff** | [`./git-diff`](./git-diff) | |
 | **go-to-line** | [`./go-to-line`](./go-to-line) | |
 | **grammar-selector** | [`./grammar-selector`](./grammar-selector) | |
 | **image-view** | [`./image-view`](./image-view) | |
 | **incompatible-packages** | [`./incompatible-packages`](./incompatible-packages) | |
-| **keybinding-resolver** | [`atom/keybinding-resolver`][keybinding-resolver] | [#18275](https://github.com/atom/atom/issues/18275) |
+| **keybinding-resolver** | [`./keybinding-resolver`](./keybinding-resolver) | |
 | **language-c** | [`./language-c`](./language-c) |  |
 | **language-clojure** | [`./language-clojure`](./language-clojure) |  |
 | **language-coffee-script** | [`./language-coffee-script`](./language-coffee-script) |  |
@@ -76,7 +76,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **language-yaml** | [`./language-yaml`](./language-yaml) |  |
 | **line-ending-selector** | [`./line-ending-selector`](./line-ending-selector) | |
 | **link** | [`./link`](./link) | |
-| **markdown-preview** | [`./markdown-preview`][./markdown-preview] |  |
+| **markdown-preview** | [`./markdown-preview`](./markdown-preview) |  |
 | **notifications** | [`atom/notifications`][notifications] | [#18277](https://github.com/atom/atom/issues/18277) |
 | **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | |
@@ -90,26 +90,18 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
 | **spell-check** | [`atom/spell-check`][spell-check] |  |
 | **status-bar** | [`./status-bar`](./status-bar) | |
-| **styleguide** | [`./styleguide`][./styleguide] | |
+| **styleguide** | [`./styleguide`](./styleguide) | |
 | **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
 | **tabs** | [`./tabs`](./tabs) |  |
-| **timecop** | [`pulsar-edit/timecop`][timecop] | [#18272](https://github.com/atom/atom/issues/18272) |
-| **tree-view** | [`pulsar-edit/tree-view`][tree-view] |  |
+| **timecop** | [`./timecop`](./timecop) | |
+| **tree-view** | [`./tree-view`](./tree-view) |  |
 | **update-package-dependencies** | [`./update-package-dependencies`](./update-package-dependencies) | |
 | **welcome** | [`./welcome`](./welcome) | |
 | **whitespace** | [`./whitespace`](./whitespace) |  |
-| **wrap-guide** | [`./wrap-guide`][./wrap-guide] | |
+| **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
-[autocomplete-atom-api]: https://github.com/pulsar-edit/autocomplete-atom-api
-[autosave]: https://github.com/pulsar-edit/autosave
-[bracket-matcher]: https://github.com/pulsar-edit/bracket-matcher
-[find-and-replace]: https://github.com/pulsar-edit/find-and-replace
-[fuzzy-finder]: https://github.com/pulsar-edit/fuzzy-finder
 [github]: https://github.com/pulsar-edit/github
-[keybinding-resolver]: https://github.com/pulsar-edit/keybinding-resolver
 [notifications]: https://github.com/pulsar-edit/notifications
 [snippets]: https://github.com/pulsar-edit/snippets
 [spell-check]: https://github.com/pulsar-edit/spell-check
 [symbols-view]: https://github.com/pulsar-edit/symbols-view
-[timecop]: https://github.com/pulsar-edit/timecop
-[tree-view]: https://github.com/pulsar-edit/tree-view

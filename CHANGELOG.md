@@ -6,6 +6,104 @@
 
 ## [Unreleased]
 
+## 1.105.0
+
+- Rebranded notifications, using our backend to find new versions of package,
+and our github repository to find issues on Pulsar. Also fixed the "view issue"
+and "create issue" buttons that were not working
+- Bumped to latest version of `second-mate`, fixing a memory usage issue in `vscode-oniguruma`
+- Removed a cache for native modules - fix bugs where an user rebuilds a native
+module outside of Pulsar, but Pulsar refuses to load anyway
+- Removed `nslog` dependency
+- Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+- Fixed RPM installation failure when Atom was installed on the same machine
+- Added a new set of Package `activationHooks`, `...:uri-opened` lets a package activate when any URI is opened within Pulsar, and `...:file-name-opened` lets a package activate when any specific filename is opened within Pulsar.
+
+### Pulsar
+- Added: Add new `...:uri-opened` && `...:file-name-opened` Package Activation Hook [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/518)
+- Fixed: Properly localize Download/Stargazer Counts within `settings-view` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/526)
+- Added: Add bookmarks service for consumption by other packages [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/525)
+- Added: Bundle notifications [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/529)
+- Fixed: Fix Ripgrep download issues in CirrusCI [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/530)
+- Removed: Revert Incorrect Commit [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/528)
+- Fixed: Making CI green, hopefully [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/523)
+- Bumped: Bump `second-mate` to 96866771 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/524)
+- Removed: Remove cache of incompatible native packages [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/493)
+- Added: Simplify and bundle fuzzy-finder [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/515)
+- Added: Bundle find and replace [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/517)
+- Added: Bundle tree view [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/513)
+- Added: Bundle `autocomplete-atom-api` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/476)
+- Added: Add FPM option to stop rpm buildid clash [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/505)
+- Bumped: chore(deps): update dependency minimist [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/502)
+- Fixed: Disable Failing Tests [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/477)
+- Bumped: chore(deps): update dependency ajv to 6.12.3 [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/501)
+- Bumped: chore(deps): update dependency async to 3.2.2 [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/495)
+- Added: Add "icon only" class to settings view icon [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/456)
+- Bumped: chore(deps): update dependency minimatch [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/496)
+ - Removed: Remove `nslog` dependency [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/494)
+- Added: Setup Renovate [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/469)
+- Fixed: Don't mark diff ranges on a destroyed buffer [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/481)
+- Added: First Architectural Design Records [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/480)
+- Bumped: use pular's `typscript-simple` fork, which bumps `typescript` to 5.0.3 [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/458)
+- Added: CI: cache and restore dependencies, plus skip rebuilding all over the place (saves a lot of time) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/492)
+
+### notifications
+- Fixed: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/notifications/pull/1)
+- Added: reject promise with Error instance [@Sertonix](https://github.com/pulsar-edit/notifications/pull/2)
+- Added: Add our Testing Action [@confused-Techie](https://github.com/pulsar-edit/notifications/pull/3)
+- Fixed: Change atom strings to pulsar [@mdibella-dev](https://github.com/pulsar-edit/notifications/pull/4)
+- Bumped: Bump to v3.2 of action-pulsar-dependency [@confused-Techie](https://github.com/pulsar-edit/notifications/pull/5)
+- Fixed: Fix all Tests [@confused-Techie](https://github.com/pulsar-edit/notifications/pull/6)
+
+## 1.104.0
+
+- The settings-view package now lists a package’s snippets more accurately
+- Fixed some issues with some packages with WebComponents v0 (tablr package
+should work now) by internalizing and patching document-register-element
+- Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM
+version). This fixes issues with Electron 21
+- Ensured new WASM packages will work on Apple Silicon
+- Completions for HTML will now be as bleeding edge as possible.
+
+### Pulsar
+- Added: `settings-view` Support for Badges [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/451)
+- Removed: remove weird duplicate accented fixture file (hopefully?) [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/488)
+- Added: Add optional entitlements monkey-patch [@confused-Tecie](https://github.com/pulsar-edit/pulsar/pull/483)
+- Added: Decaf `wrap-guide` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/443)
+- Added: Additional Bundling of Core Packages [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/424)
+- Added: add allow-jit entitlement (fixes Apple Silicon builds) [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/454)
+- Removed: Revert "Create i18n API" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/471)
+- Added: Build first, and test later [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/463)
+- Update: [settings-view] Update package snippets view to reflect new features [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/406)
+- Added: Create i18n API [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/446)
+- Added: Add Automated updating of `autocomplete-html` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/405)
+- Fixed: docs: fix markdown links in packages README [@oakmac](https://github.com/pulsar-edit/pulsar/pull/450)
+- Fixed: Patch document register element [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/438)
+- Added: Using "second-mate" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/435)
+- Fixed: Fix spacing of PHP's "for ..." snippet [@machitgarha](https://github.com/pulsar-edit/pulsar/pull/440)
+- Update: Update resources metadata [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/414)
+- Fixed: Cirrus: Windows: install ppm deps with Yarn [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/434)
+- Added: made cirrus build scripts consistent [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/239)
+- Update: Update package.json author [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/432)
+
+### second-mate
+- Added: Migrate to vscode-oniguruma [@mauricioszabo](https://github.com/pulsar-edit/second-mate/pull/1)
+
+### autosave
+- Removed: removed fs-plus dependency [@Sertonix](https://github.com/pulsar-edit/autosave/pull/2)
+- Update: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/autosave/pull/1)
+
+### bracket-matcher
+- Fixed: Fixing test that need to run locally [@mauricioszabo](https://github.com/pulsar-edit/bracket-matcher/pull/3)
+- Update: cleanup .md and rename repo url [@Sertonix](https://github.com/pulsar-edit/bracket-matcher/pull/2)
+- Update: Rename A[a]tom -> P[p]ulsar [@Spiker985](https://github.com/pulsar-edit/bracket-matcher/pull/1)
+
+### timecop
+- Update: cleanup and rename [@Sertonix](https://github.com/pulsar-edit/timecop/pull/1)
+
+### keybinding-resolver
+- Update: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/keybinding-resolver/pull/1)
+
 ## 1.103.0
 
 - Added a new feature to Search for Pulsar's settings

@@ -2513,7 +2513,7 @@ describe "JavaScript grammar", ->
         #!/usr/bin/env node
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         \x20#!/usr/sbin/node
@@ -2524,7 +2524,7 @@ describe "JavaScript grammar", ->
         #!\t/usr/bin/env --node=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -2543,7 +2543,7 @@ describe "JavaScript grammar", ->
         "-*- font:x;foo : bar ; mode : jS ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*js-*- */
@@ -2561,7 +2561,7 @@ describe "JavaScript grammar", ->
         // -*-font:mode;mode:js--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -2588,7 +2588,7 @@ describe "JavaScript grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=javascript ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=javascript:
@@ -2606,4 +2606,4 @@ describe "JavaScript grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=javascript ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

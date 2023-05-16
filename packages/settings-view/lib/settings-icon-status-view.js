@@ -11,7 +11,7 @@ export default class SettingsIconStatusView {
     this.element.classList.add('settings-icon', 'inline-block')
 
     const iconPackage = document.createElement('span')
-    iconPackage.classList.add('icon', 'icon-gear')
+    iconPackage.classList.add('icon', 'icon-gear', 'is-icon-only')
     this.element.appendChild(iconPackage)
 
     const clickHandler = () => {

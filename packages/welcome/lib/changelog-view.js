@@ -53,19 +53,30 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new feature to Search for Pulsar's settings
+                Rebranded notifications, using our backend to find new versions of package,
+                and our github repository to find issues on Pulsar. Also fixed the "view issue"
+                and "create issue" buttons that were not working
               </li>
               <li>
-                Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
+                Bumped to latest version of `second-mate`, fixing a memory usage issue in `vscode-oniguruma`
               </li>
               <li>
-                Updated the instructions and look of the login flow for the `github` package.
+                Removed a cache for native modules - fix bugs where an user rebuilds a native
+                module outside of Pulsar, but Pulsar refuses to load anyway
               </li>
               <li>
-                Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
+                Removed `nslog` dependency
               </li>
               <li>
-                Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
+                Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+              </li>
+              <li>
+                Fixed RPM installation failure when Atom was installed on the same machine
+              </li>
+              <li>
+                Added a new set of Package `activationHooks`, `...:uri-opened` lets a package activate when any URI
+                is opened within Pulsar, and `...:file-name-opened` lets a package activate when any specific filename
+                is opened within Pulsar.
               </li>
 
             </ul>

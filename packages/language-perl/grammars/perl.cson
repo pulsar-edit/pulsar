@@ -722,9 +722,6 @@
     'name': 'meta.class.perl'
   }
   {
-    'include: "#sub'
-  }
-  {
     'captures':
       '1':
         'name': 'entity.name.function.perl'

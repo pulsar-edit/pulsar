@@ -161,11 +161,11 @@ describe 'PHP in HTML', ->
         <?php namespace foo;
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       # Do not allow matching XML declaration until the grammar scoring system takes into account
       # the length of the first line match so that longer matches get the priority over shorter matches.
-      expect(grammar.firstLineRegex.scanner.findNextMatchSync('<?xml version="1.0" encoding="UTF-8"?>')).toBeNull()
+      expect(grammar.firstLineRegex.findNextMatchSync('<?xml version="1.0" encoding="UTF-8"?>')).toBeNull()
 
     it 'recognises interpreter directives', ->
       valid = '''
@@ -184,7 +184,7 @@ describe 'PHP in HTML', ->
         #!/usr/bin/env php
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         \x20#!/usr/sbin/php
@@ -196,7 +196,7 @@ describe 'PHP in HTML', ->
         #!\t/usr/bin/env --php=bar
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it 'recognises Emacs modelines', ->
       valid = '''
@@ -215,7 +215,7 @@ describe 'PHP in HTML', ->
         "-*- font:x;foo : bar ; mode : php ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         /* --*php-*- */
@@ -233,7 +233,7 @@ describe 'PHP in HTML', ->
         // -*-font:mode;mode:php--*-
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it 'recognises Vim modelines', ->
       valid = '''
@@ -260,7 +260,7 @@ describe 'PHP in HTML', ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=phtml ts=4
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         ex: se filetype=php:
@@ -278,7 +278,7 @@ describe 'PHP in HTML', ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=php ts=4
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it 'should tokenize <?php use Some\\Name ?>', ->
       lines = grammar.tokenizeLines '''

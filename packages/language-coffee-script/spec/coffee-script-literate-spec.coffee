@@ -29,7 +29,7 @@ describe "CoffeeScript (Literate) grammar", ->
         #!/usr/local/bin/env coffee --literate -w
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         #!/usr/local/bin/coffee --no-head -literate -w
@@ -37,7 +37,7 @@ describe "CoffeeScript (Literate) grammar", ->
         #!/usr/local/bin/env coffee --illiterate -w=l
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -56,7 +56,7 @@ describe "CoffeeScript (Literate) grammar", ->
         "-*- font:x;foo : bar ; mode : LiTcOFFEe ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*litcoffee-*- */
@@ -74,7 +74,7 @@ describe "CoffeeScript (Literate) grammar", ->
         // -*-font:mode;mode:litcoffee--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -101,7 +101,7 @@ describe "CoffeeScript (Literate) grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=litcoffee ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=litcoffee:
@@ -119,4 +119,4 @@ describe "CoffeeScript (Literate) grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=litcoffee ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
