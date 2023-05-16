@@ -15,6 +15,7 @@ module outside of Pulsar, but Pulsar refuses to load anyway
 - Removed `nslog` dependency
 - Fixed an error where the GitHub package tried to interact with a diff view after it was closed
 - Fixed RPM installation failure when Atom was installed on the same machine
+- Added a new set of Package `activationHooks`, `...:uri-opened` lets a package activate when any URI is opened within Pulsar, and `...:file-name-opened` lets a package activate when any specific filename is opened within Pulsar.
 
 ## 1.104.0
 
