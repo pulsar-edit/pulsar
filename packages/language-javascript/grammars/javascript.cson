@@ -309,7 +309,7 @@
               '1':
                 'patterns': [
                   {
-                    'include': '#period_or_optional_method'
+                    'include': '#period_or_illegal_optional_method'
                   }
                 ]
               '2':
@@ -577,7 +577,7 @@
               '1':
                 'patterns': [
                   {
-                    'include': '#period_or_optional_method'
+                    'include': '#period_or_illegal_optional_method'
                   }
                 ]
               '2':
@@ -2298,6 +2298,17 @@
       {
         'match': '\\?\\.'
         'name': 'invalid.illegal.meta.delimiter.property.optional.js'
+      }
+    ]
+  'period_or_illegal_optional_method':
+    'patterns': [
+      {
+        'match': '\\.'
+        'name': 'meta.delimiter.method.period.js'
+      }
+      {
+        'match': '\\?\\.'
+        'name': 'invalid.illegal.meta.delimiter.method.optional.js'
       }
     ]
   'period_or_optional_property':
