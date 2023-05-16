@@ -1966,6 +1966,22 @@ describe "JavaScript grammar", ->
       expect(tokens[4]).toEqual value: '?.', scopes: ['source.js', 'meta.delimiter.property.optional.js']
       expect(tokens[5]).toEqual value: 'b', scopes: ['source.js', 'variable.other.property.js']
 
+    it "detects some illegal uses of the optional chaining operator", ->
+      {tokens} = grammar.tokenizeLine('new a?.b')
+      expect(tokens[1]).toEqual value: 'a', scopes: ['source.js', 'meta.class.instance.constructor.js', 'entity.name.type.instance.js']
+      expect(tokens[2]).toEqual value: '?.', scopes: ['source.js', 'meta.class.instance.constructor.js', 'entity.name.type.instance.js', 'invalid.illegal.meta.delimiter.property.period.js']
+      expect(tokens[3]).toEqual value: 'b', scopes: ['source.js', 'meta.class.instance.constructor.js', 'entity.name.type.instance.js']
+
+      {tokens} = grammar.tokenizeLine('a?.b = function c () {}')
+      expect(tokens[0]).toEqual value: 'a', scopes: ['source.js', 'variable.other.object.js']
+      expect(tokens[1]).toEqual value: '?.', scopes: ['source.js', 'meta.function.js', 'invalid.illegal.meta.delimiter.method.period.js']
+      expect(tokens[2]).toEqual value: 'b', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']
+      expect(tokens[4]).toEqual value: '=', scopes: ['source.js', 'meta.function.js', 'keyword.operator.assignment.js']
+
+      {tokens} = grammar.tokenizeLine('a?.b = _ => 2')
+      expect(tokens[0]).toEqual value: 'a', scopes: ['source.js', 'variable.other.object.js']
+      expect(tokens[1]).toEqual value: '?.', scopes: ['source.js', 'meta.function.arrow.js', 'invalid.illegal.meta.delimiter.method.period.js']
+      expect(tokens[2]).toEqual value: 'b', scopes: ['source.js', 'meta.function.arrow.js', 'entity.name.function.js']
 
   describe "strings and functions", ->
     it "doesn't confuse them", ->
