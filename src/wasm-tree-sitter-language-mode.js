@@ -1790,18 +1790,12 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
-  // Given a {Point}, returns all injected {LanguageLayer}s whose content
-  // range(s) include that point. Does not include the root language layer.
+  // Given a {Point}, returns all injected {LanguageLayer}s whose extent
+  // includes that point. Does not include the root language layer.
   //
-  // Will ignore any layer whose content ranges do not include the point, even if
-  // the point is within its extent.
   injectionLayersAtPoint(point) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
       containsPosition: point
-    });
-
-    injectionMarkers = injectionMarkers.filter(im => {
-      return im.languageLayer.containsPoint(point);
     });
 
     injectionMarkers.sort((a, b) => {
@@ -1812,11 +1806,9 @@ class WASMTreeSitterLanguageMode {
     return injectionMarkers.map(m => m.languageLayer);
   }
 
-  // Given a {Point}, returns all {LanguageLayer}s whose content range(s)
-  // include that point.
+  // Given a {Point}, returns all {LanguageLayer}s whose extent includes that
+  // point.
   //
-  // Will ignore any layer whose content ranges do not include the point, even if
-  // the point is within its extent.
   languageLayersAtPoint(point) {
     let injectionLayers = this.injectionLayersAtPoint(point);
     return [
@@ -1832,6 +1824,8 @@ class WASMTreeSitterLanguageMode {
   // the point is within its extent.
   controllingLayerAtPoint(point, where = FUNCTION_TRUE) {
     let layers = this.languageLayersAtPoint(point);
+    layers = layers.filter(l => l.containsPoint(point));
+
     // Deeper layers go first.
     layers.sort((a, b) => b.depth - a.depth);
     return layers.find(layer => where(layer)) ?? null;
