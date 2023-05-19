@@ -1609,6 +1609,47 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
   });
 
+  describe('.suggestedIndentForBufferRows', () => {
+    it('works correctly when straddling an injection boundary', async () => {
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      // `suggestedIndentForBufferRows` should use the HTML grammar to
+      // determine the indent level of `let foo` rather than the JS grammar.
+      buffer.setText(dedent`
+        <script>
+          let foo;
+        </script>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let map = languageMode.suggestedIndentForBufferRows(1, 1, editor.getTabLength());
+
+      expect(map.get(1)).toBe(1);
+    });
+  });
+
   describe('folding', () => {
     it('can fold nodes that start and end with specified tokens', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);

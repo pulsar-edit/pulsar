@@ -1473,8 +1473,12 @@ class WASMTreeSitterLanguageMode {
     let indentDelta;
 
     for (let row = startRow; row <= endRow; row++) {
+      // If this row were being indented by `suggestedIndentForBufferRow`, it'd
+      // look at the end of the previous row to find the controlling layer,
+      // because we start at the previous row to find the suggested indent for
+      // the current row.
       let controllingLayer = this.controllingLayerAtPoint(
-        new Point(row, Infinity),
+        new Point(row - 1, Infinity),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
 
