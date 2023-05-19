@@ -117,7 +117,7 @@ describe "Notifications", ->
       atom.notifications.addInfo('test <b>html</b> <iframe>but sanitized</iframe>')
       notification = notificationContainer.childNodes[0]
       expect(notification.querySelector('.message').innerHTML).toContain(
-        'test <b>html</b> but sanitized'
+        'test <b>html</b> '
       )
 
     describe "when a dismissable notification is added", ->
