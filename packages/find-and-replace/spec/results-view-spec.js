@@ -909,12 +909,17 @@ describe('ResultsView', () => {
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
       await resultsPromise();
 
-      let resultsPane = getResultsPane();
+      const resultsPane = getResultsPane();
+      await genPromiseToCheck( () =>
+        resultsPane?.refs?.previewCount?.textContent.match(/3 files/)
+      );
       expect(resultsPane.refs.previewCount.textContent).toContain('3 files');
 
       projectFindView.findEditor.setText('');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await etch.update(resultsPane);
+      await genPromiseToCheck( () =>
+        resultsPane.refs.previewCount.textContent.match(/Project/)
+      );
       expect(resultsPane.refs.previewCount.textContent).toContain('Project search results');
     })
   });
