@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out.
+
 ## 1.105.0
 
 - Rebranded notifications, using our backend to find new versions of package,

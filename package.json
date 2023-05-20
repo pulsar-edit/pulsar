@@ -19,6 +19,9 @@
   "bugs": {
     "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
+  "engines": {
+    "node": ">=14"
+  },
   "license": "MIT",
   "electronVersion": "12.2.3",
   "dependencies": {
@@ -66,6 +69,7 @@
     "fs-admin": "0.19.0",
     "fs-plus": "^3.1.1",
     "fstream": "1.0.12",
+    "functional-red-black-tree": "^1.0.1",
     "fuzzy-finder": "file:packages/fuzzy-finder",
     "git-diff": "file:packages/git-diff",
     "git-utils": "5.7.1",
@@ -166,6 +170,7 @@
     "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
+    "web-tree-sitter": "^0.20.7",
     "welcome": "file:packages/welcome",
     "whitespace": "file:./packages/whitespace",
     "winreg": "^1.2.1",

@@ -2,7 +2,8 @@ describe "TextMate HTML (Ruby - ERB) grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.packages.activatePackage("language-ruby")
