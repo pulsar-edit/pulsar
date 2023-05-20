@@ -151,7 +151,7 @@ let options = {
     afterInstall: "script/post-install.sh",
     afterRemove: "script/post-uninstall.sh",
     compression: 'xz',
-    fpm: ['--rpm-rpmbuild-define=_build_id_links none']
+    fpm: ['--rpm-rpmbuild-define=_build_id_links none', '--after-upgrade=script/post-install.sh']
   },
   "linux": {
     // Giving a single PNG icon to electron-builder prevents the correct
