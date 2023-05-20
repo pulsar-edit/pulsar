@@ -358,10 +358,10 @@ export default class SettingsView {
   }
 
   getTitle () {
-    if (process.platform === 'darwin') {
-      return "Preferences";
+    if (process.platform === 'win32') {
+      return "Settings";
     } else {
-      return 'Settings'
+      return 'Preferences'
     }
   }
 
