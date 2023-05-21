@@ -104,7 +104,7 @@ async function update(params) {
   };
 
   // Now to write out our updated file
-  fs.writeFileSync("completions.json", JSON.stringify(completions, null, 2));
+  fs.writeFileSync("../completions.json", JSON.stringify(completions, null, 2));
 
   // Now to determine how many properties have empty descriptions.
 
@@ -189,7 +189,7 @@ async function getDescriptionOfProp(name) {
   // specs and may not be worth mentioning standalone.
   let file;
   let filePath = [ "css", "svg/attribute", "svg/element" ].map(path =>
-    `./node_modules/content/files/en-us/web/${path}/${name}/index.md`
+    `../node_modules/content/files/en-us/web/${path}/${name}/index.md`
   ).find(f => fs.existsSync(f));
 
   if (filePath) {
@@ -327,7 +327,7 @@ async function getTagsHTML() {
 
   let tags = [];
 
-  let files = fs.readdirSync("./node_modules/content/files/en-us/web/html/element");
+  let files = fs.readdirSync("../node_modules/content/files/en-us/web/html/element");
 
   files.forEach(file => {
     if (file != "index.md") {
@@ -346,7 +346,7 @@ async function getPseudoSelectors() {
   // For now since there is no best determined way to collect all modern psudoselectors
   // We will just grab the existing list for our existing `completions.json`
 
-  let existingCompletions = require("./completions.json");
+  let existingCompletions = require("../completions.json");
 
   return existingCompletions.pseudoSelectors;
 }
