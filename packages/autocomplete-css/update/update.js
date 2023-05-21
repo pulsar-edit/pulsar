@@ -105,10 +105,8 @@ async function update(params) {
   };
 
   // Now lets sort the properties according to length
-  console.log("LengthSort...");
   completions.properties = lengthSort(completions.properties);
   // Then lets sort properties by popularity
-  console.log("PopularSort...");
   completions.properties = await popularSort(completions.properties);
 
   // Now to write out our updated file
