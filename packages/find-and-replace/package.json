@@ -48,7 +48,7 @@
       "type": "boolean",
       "default": true,
       "description": "Shows the 'Find' tab in the top menu bar for easy access."
-    }
+    },
     "focusEditorAfterSearch": {
       "type": "boolean",
       "default": false,
