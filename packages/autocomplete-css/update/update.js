@@ -104,10 +104,8 @@ async function update(params) {
     pseudoSelectors: pseudoSelectors
   };
 
-  // Now lets sort the properties according to length
-  completions.properties = lengthSort(completions.properties);
-  // Then lets sort properties by popularity
-  completions.properties = await popularSort(completions.properties);
+  completions.properties = sortByLength(completions.properties);
+  completions.properties = await sortByPopularity(completions.properties);
 
   // Now to write out our updated file
   fs.writeFileSync("./completions.json", JSON.stringify(completions, null, 2));
@@ -140,7 +138,7 @@ async function update(params) {
   };
 }
 
-function lengthSort(obj) {
+function sortByLength(obj) {
   let keys = Object.keys(obj);
 
   keys.sort((a, b) => {
@@ -163,7 +161,7 @@ function lengthSort(obj) {
   return newObj;
 }
 
-async function popularSort(obj) {
+async function sortByPopularity(obj) {
   try {
     const res = await superagent.get("https://chromestatus.com/data/csspopularity");
     if (res.status !== 200) {
