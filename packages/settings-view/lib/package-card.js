@@ -299,8 +299,9 @@ export default class PackageCard {
           this.refs.downloadIcon.classList.add('icon-git-branch')
           this.refs.downloadCount.textContent = this.pack.apmInstallSource.sha.substr(0, 8)
         } else {
-          this.refs.stargazerCount.textContent = data.stargazers_count ? data.stargazers_count.toLocaleString() : ''
-          this.refs.downloadCount.textContent = data.downloads ? data.downloads.toLocaleString() : ''
+
+          this.refs.stargazerCount.textContent = data.stargazers_count ? parseInt(data.stargazers_count).toLocaleString() : ''
+          this.refs.downloadCount.textContent = data.downloads ? parseInt(data.downloads).toLocaleString() : ''
         }
       }
     })

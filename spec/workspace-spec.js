@@ -1652,6 +1652,24 @@ describe('Workspace', () => {
     });
   });
 
+  describe('the file opened hook', () => {
+    it('fires when opening a file', async () => {
+      const packageUsed = jasmine.createSpy('my-fake-package');
+
+      atom.packages.triggerDeferredActivationHooks();
+      atom.packages.onDidTriggerActivationHook(
+        'sample.js:file-name-opened',
+        packageUsed
+      );
+
+      expect(packageUsed).not.toHaveBeenCalled();
+      const editor = await atom.workspace.open('sample.js', {
+        autoIndent: false
+      });
+      expect(packageUsed).toHaveBeenCalled();
+    })
+  });
+
   describe('::reopenItem()', () => {
     it("opens the uri associated with the last closed pane that isn't currently open", () => {
       const pane = workspace.getActivePane();

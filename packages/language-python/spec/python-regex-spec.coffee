@@ -2,7 +2,8 @@ describe 'Python regular expression grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.packages.activatePackage('language-python')

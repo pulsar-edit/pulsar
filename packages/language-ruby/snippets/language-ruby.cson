@@ -328,22 +328,22 @@
 '.text.html.erb':
   'erb_render_block':
     'prefix': '='
-    'body': '<%= $1 %>'
+    'body': '<%= ${1:foo} %>'
   'erb_render_block_after_tag':
     'prefix': '\>='
-    'body': '\><%= $1 %>'
+    'body': '\><%= ${1:foo} %>'
   'erb_render_block_after_quote':
     'prefix': '\"='
-    'body': '\"<%= $1 %>'
+    'body': '\"<%= ${1:foo} %>'
   'erb_exec_block':
     'prefix': '-'
-    'body': '<% $1 %>'
+    'body': '<% ${1:foo} %>'
   'erb_exec_block_after_tag':
     'prefix': '\>-'
-    'body': '\><% $1 %>'
+    'body': '\><% ${1:foo} %>'
   'erb_exec_block_after_quote':
     'prefix': '\"-'
-    'body': '\"<% $1 %>'
+    'body': '\"<% ${1:foo} %>'
 
 '.string.quoted.double.ruby:not(.string .source), .string.quoted.double.ruby:not(.string .source)':
   'Interpolated Code':

@@ -1,0 +1,18 @@
+name: 'TypeScript (React)'
+scopeName: 'source.tsx'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-typescript/tsx'
+
+fileTypes: ['tsx']
+
+injectionRegex: '^(tsx|TSX)$'
+
+comments:
+  start: '// '
+
+treeSitter:
+  grammar: 'tree-sitter-tsx/tree-sitter-tsx.wasm'
+  highlightsQuery: 'tree-sitter-tsx/highlights.scm'
+  indentsQuery: 'tree-sitter-tsx/indents.scm'
+  foldsQuery: 'tree-sitter-tsx/folds.scm'
+  tagsQuery: 'tree-sitter-tsx/tags.scm'
