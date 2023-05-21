@@ -124,7 +124,7 @@ export default class SettingsView {
     if (atom.config.get("settings-view.enableSettingsSearch")) {
       this.addCorePanel('Search', 'search', () => new SearchSettingsPanel(this))
     }
-
+    
     this.addCorePanel('Core', 'settings', () => new GeneralPanel())
     this.addCorePanel('Editor', 'code', () => new EditorPanel())
     if (atom.config.getSchema('core.uriHandlerRegistration').type !== 'any') {
