@@ -28,6 +28,10 @@ module.exports = class ApplicationDelegate {
     return ipcRenderer.send('open', params);
   }
 
+  setWindowTheme(params) {
+    return ipcRenderer.send('setWindowTheme', params);
+  }
+
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
     ipcRenderer.on(responseChannel, function(event, path) {
