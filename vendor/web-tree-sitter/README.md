@@ -24,7 +24,7 @@ in an appropriate place in `exports.json`, then rebuild web-tree-sitter so that 
 
 If a third-party tree-sitter grammar needs something more esoteric, our default position should be to add it to the build. If the export results in a major change in file size or — somehow — performance, then the change can be discussed.
 
-## Run `scripts/build-wasm` from the root
+## Run `script/build-wasm` from the root
 
 To build web-tree-sitter for a particular version, make sure you’re using the appropriate version of Emscripten. [This document](https://github.com/sogaiu/ts-questions/blob/master/questions/which-version-of-emscripten-should-be-used-for-the-playground/README.md) is useful at matching up tree-sitter versions with Emscripten versions.
 

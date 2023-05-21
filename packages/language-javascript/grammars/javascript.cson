@@ -1,3 +1,7 @@
+# "?." means "?." or "."
+# Even though sometimes it doesn't seem like using the chaining operator would make any sense, it's still supported.
+# Example: Math?.PI
+# Negative look-behinds for "." should cover "?."
 'scopeName': 'source.js'
 'fileTypes': [
   'js'
@@ -284,8 +288,8 @@
     ]
   }
   {
-    # [.]foo = function...
-    'begin': '(?=(\\.)?[a-zA-Z_$][\\w$]*\\s*=\\s*(\\basync\\b\\s*)?\\bfunction\\b)'
+    # [?.]foo = function...
+    'begin': '(?=(\\?\\.|\\.)?[a-zA-Z_$][\\w$]*\\s*=\\s*(\\basync\\b\\s*)?\\bfunction\\b)'
     'end': '(?<=})'
     'patterns': [
       {
@@ -300,10 +304,14 @@
         'name': 'meta.function.js'
         'patterns': [
           {
-            'match': '(\\.)?([a-zA-Z_$][\\w$]*)\\s*(=)\\s*'
+            'match': '(\\?\\.|\\.)?([a-zA-Z_$][\\w$]*)\\s*(=)\\s*'
             'captures':
               '1':
-                'name': 'meta.delimiter.method.period.js'
+                'patterns': [
+                  {
+                    'include': '#period_or_illegal_optional_method'
+                  }
+                ]
               '2':
                 'name': 'entity.name.function.js'
               '3':
@@ -533,10 +541,10 @@
     ]
   }
   {
-    # [.]foo = ... => ...
+    # [?.]foo = ... => ...
     'begin': '''(?x)
       (?=
-        (\\.)?[a-zA-Z_$][\\w$]*
+        (\\?\\.|\\.)?[a-zA-Z_$][\\w$]*
         \\s*(=)\\s*
         ((\\(([^\\(\\)]*)?\\))|[\\w$]+)
         \\s*=>
@@ -546,8 +554,8 @@
       (?<=})|
       ((?!
         \\s*{|
-        \\G(\\.)?[a-zA-Z_$][\\w$]*\\s*(=)\\s*\\(|
-        \\G(\\.)?[a-zA-Z_$][\\w$]*\\s*(=)\\s*[\\w$]+|
+        \\G(\\?\\.|\\.)?[a-zA-Z_$][\\w$]*\\s*(=)\\s*\\(|
+        \\G(\\?\\.|\\.)?[a-zA-Z_$][\\w$]*\\s*(=)\\s*[\\w$]+|
         \\s*/\\*|\\s*//
       )(?=\\s*\\S))
     '''
@@ -564,10 +572,14 @@
         'name': 'meta.function.arrow.js'
         'patterns': [
           {
-            'match': '\\G(\\.)?([a-zA-Z_$][\\w$]*)\\s*(=)'
+            'match': '\\G(\\?\\.|\\.)?([a-zA-Z_$][\\w$]*)\\s*(=)'
             'captures':
               '1':
-                'name': 'meta.delimiter.method.period.js'
+                'patterns': [
+                  {
+                    'include': '#period_or_illegal_optional_method'
+                  }
+                ]
               '2':
                 'name': 'entity.name.function.js'
               '3':
@@ -720,7 +732,7 @@
     'name': 'meta.class.js'
   }
   {
-    'match': '(new)\\s+([\\w$]+[\\w.$]*)'
+    'match': '(new)\\s+([\\w$]+(?:\\??\\.[\\w$]*)*)'
     'name': 'meta.class.instance.constructor.js'
     'captures':
       '1':
@@ -729,8 +741,7 @@
         'name': 'entity.name.type.instance.js'
         'patterns': [
           {
-            'match': '\\.'
-            'name': 'meta.delimiter.property.period.js'
+            'include': '#period_or_illegal_optional_property'
           }
         ]
   }
@@ -743,8 +754,10 @@
         'name': 'entity.name.type.object.console.js'
     'end': '''(?x)
       (?<=\\)) | (?=
-        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\.)\\s*
-          (assert|clear|debug|error|info|log|profile|profileEnd|time|timeEnd|warn)
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*
+          (assert|clear|count|countReset|debug|dir|dirxml|error|group|groupCollapsed|
+           groupEnd|info|log|profile|profileEnd|table|time|timeEnd|timeLog|trace|
+           timeStamp|warn)
           \\s*\\(
         )) \\s*\\S
       )
@@ -754,12 +767,55 @@
         'include': '#comments'
       }
       {
-        'begin': '\\s*(\\.)\\s*(\\w+)\\s*(?=\\()'
+        'begin': '\\s*(\\?\\.|\\.)\\s*(\\w+)\\s*(?=\\()'
         'beginCaptures':
           '1':
-            'name': 'meta.delimiter.method.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
           '2':
             'name': 'support.function.console.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  }
+  {
+    # JSON
+    'begin': '(?<![\\w$])JSON(?![\\w$]|\\s*:)'
+    'beginCaptures':
+      '0':
+        'name': 'support.class.json.js'
+    'end': '''(?x)
+      (?<=\\)) | (?=
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*
+          (parse|stringify)
+          \\s*\\(
+        )) \\s*\\S
+      )
+    '''
+    'patterns': [
+      {
+        'include': '#comments'
+      }
+      {
+        'begin': '\\s*(\\?\\.|\\.)\\s*(\\w+)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
+          '2':
+            'name': 'support.function.json.js'
         'end': '(?<=\\))'
         'name': 'meta.method-call.js'
         'patterns': [
@@ -779,7 +835,7 @@
     'end': '''(?x)
       (?<=E|LN10|LN2|LOG10E|LOG2E|PI|SQRT1_2|SQRT2|\\)
       ) | (?=
-        (?! (\\s*//)|(\\s*/\\*)|(\\s*\\.\\s* (
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s* (
           ((abs|acos|acosh|asin|asinh|atan|atan2|atanh|cbrt|ceil|clz32|cos|cosh|exp|
           expm1|floor|fround|hypot|imul|log|log10|log1p|log2|max|min|pow|random|
           round|sign|sin|sinh|sqrt|tan|tanh|trunc)\\s*\\(
@@ -793,10 +849,14 @@
       }
       {
         # Math.random()
-        'begin': '\\s*(\\.)\\s*(\\w+)\\s*(?=\\()'
+        'begin': '\\s*(\\?\\.|\\.)\\s*(\\w+)\\s*(?=\\()'
         'beginCaptures':
           '1':
-            'name': 'meta.delimiter.method.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
           '2':
             'name': 'support.function.math.js'
         'end': '(?<=\\))'
@@ -809,10 +869,14 @@
       }
       {
         # Math.PI
-        'match': '\\s*(\\.)\\s*(\\w+)\\b'
+        'match': '\\s*(\\?\\.|\\.)\\s*(\\w+)\\b'
         'captures':
           '1':
-            'name': 'meta.delimiter.property.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_property'
+              }
+            ]
           '2':
             'name': 'support.constant.property.math.js'
       }
@@ -826,7 +890,7 @@
         'name': 'support.class.promise.js'
     'end': '''(?x)
       (?<=\\)) | (?=
-        (?! (\\s*//)|(\\s*/\\*)|(\\s*\\.\\s*(all|race|reject|resolve)\\s*\\() )\\s*\\S
+        (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\?\\.|\\.)\\s*(all|allSettled|any|race|reject|resolve)\\s*\\() )\\s*\\S
       )
     '''
     'patterns': [
@@ -835,10 +899,14 @@
       }
       {
         # Promise.all()
-        'begin': '\\s*(\\.)\\s*(\\w+)\\s*(?=\\()'
+        'begin': '\\s*(\\?\\.|\\.)\\s*(\\w+)\\s*(?=\\()'
         'beginCaptures':
           '1':
-            'name': 'meta.delimiter.method.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
           '2':
             'name': 'support.function.promise.js'
         'end': '(?<=\\))'
@@ -941,6 +1009,7 @@
     'name': 'meta.control.yield.js'
   }
   {
+    # This is "..." so don't need to check "?."
     'match': '(?:(?<=\\.{3})|(?<!\\.))\\b(await)(?!\\s*:)\\b'
     'name': 'keyword.control.js'
   }
@@ -955,6 +1024,8 @@
     'match': '(?<!\\.)\\b(delete|in|of|instanceof|new|typeof|void)(?!\\s*:)\\b'
     'name': 'keyword.operator.$1.js'
   }
+  # By default, three dots = spread
+  # `keyword.operator.rest.js` is only done in specific cases in functions
   {
     'match': '\\.\\.\\.'
     'name': 'keyword.operator.spread.js'
@@ -973,23 +1044,28 @@
   }
   {
     'match': '''(?x) (?<!\\$) \\b
-      (AggregateError|Array|ArrayBuffer|Atomics|Boolean|DataView|Date|Error|EvalError|Float32Array|Float64Array
-      |Function|Generator|GeneratorFunction|Int16Array|Int32Array|Int8Array|InternalError|Intl|JSON|Map|Number
+      (AggregateError|Array|ArrayBuffer|AsyncFunction|AsyncGeneratorFunction|Atomics|BigInt|BigInt64Array
+      |BigUInt64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array
+      |Function|Generator|GeneratorFunction|Int16Array|Int32Array|Int8Array|InternalError|Intl|Map|Number
       |Object|Proxy|RangeError|ReferenceError|Reflect|RegExp|Set|SharedArrayBuffer|SIMD|String|Symbol|SyntaxError
-      |TypeError|Uint16Array|Uint32Array|Uint8Array|Uint8ClampedArray|URIError|WeakMap|WeakSet)
+      |TypedArray|TypeError|Uint16Array|Uint32Array|Uint8Array|Uint8ClampedArray|URIError|WeakMap|WeakRef|WeakSet)
       \\b
     '''
     'name': 'support.class.js'
   }
   {
-    'match': '''(?x) (\\.) \\s* (?:
+    'match': '''(?x) (\\?\\.|\\.) \\s* (?:
         (constructor|length|prototype) |
         (EPSILON|MAX_SAFE_INTEGER|MAX_VALUE|MIN_SAFE_INTEGER|MIN_VALUE|NEGATIVE_INFINITY|POSITIVE_INFINITY)
       )\\b
     '''
     'captures':
       '1':
-        'name': 'meta.delimiter.property.period.js'
+        'patterns': [
+          {
+            'include': '#period_or_optional_property'
+          }
+        ]
       '2':
         'name': 'support.variable.property.js'
       '3':
@@ -1067,7 +1143,7 @@
         'name': 'support.class.dom.js'
   }
   {
-    'match': '''(?x) (\\.) \\s*
+    'match': '''(?x) (\\?\\.|\\.) \\s*
       (?:
         (ATTRIBUTE_NODE|CDATA_SECTION_NODE|COMMENT_NODE|DOCUMENT_FRAGMENT_NODE|DOCUMENT_NODE|DOCUMENT_TYPE_NODE
         |DOMSTRING_SIZE_ERR|ELEMENT_NODE|ENTITY_NODE|ENTITY_REFERENCE_NODE|HIERARCHY_REQUEST_ERR|INDEX_SIZE_ERR
@@ -1105,7 +1181,11 @@
     '''
     'captures':
       '1':
-        'name': 'meta.delimiter.property.period.js'
+        'patterns': [
+          {
+            'include': '#period_or_optional_property'
+          }
+        ]
       '2':
         'name': 'support.constant.dom.js'
       '3':
@@ -1138,7 +1218,7 @@
     ]
   }
   {
-    'begin': '\\?'
+    'begin': '(?<!\\?)\\?(?!\\.|\\?)'
     'beginCaptures':
       '0':
         'name': 'keyword.operator.ternary.js'
@@ -1190,10 +1270,6 @@
     'name': 'meta.delimiter.object.comma.js'
   }
   {
-    'match': '\\.'
-    'name': 'meta.delimiter.method.period.js'
-  }
-  {
     # Allows the special return snippet to fire.
     'match': '({)(})'
     'captures':
@@ -1233,6 +1309,7 @@
     ]
   }
   {
+    # This is inconsistent with the () and {}, however the current tests *rely* on this
     'match': '\\[|\\]'
     'name': 'meta.brace.square.js'
   }
@@ -1314,13 +1391,25 @@
   'operators':
     'patterns': [
       {
-        'match': '%=|\\+=|-=|\\*=|(?<!\\()/='
+        # %= **= *= /= += -=
+        'match': '%=|\\*\\*=|\\*=|(?<!\\()/=|\\+=|-='
         'name': 'keyword.operator.assignment.compound.js'
       }
       {
-        'match': '&=|\\^=|<<=|>>=|>>>=|\\|='
+        # &&= ||= ??=
+        'match': '&&=|\\|\\|=|\\?\\?='
+        'name': 'keyword.operator.assignment.compound.logical.js'
+      }
+      {
+        'match': '&=|\\^=|\\|='
         'name': 'keyword.operator.assignment.compound.bitwise.js'
       }
+      {
+        'match': '<<=|>>=|>>>='
+        'name': 'keyword.operator.assignment.compound.bitwise.shift.js'
+      }
+      # Bitwise shift to match >> instead of >
+      # Then comparison to match != instead of !
       {
         'match': '<<|>>>|>>'
         'name': 'keyword.operator.bitwise.shift.js'
@@ -1330,7 +1419,8 @@
         'name': 'keyword.operator.comparison.js'
       }
       {
-        'match': '&&|!!|!|\\|\\|'
+        # One of: && !! ! || ??
+        'match': '&&|!!|!|\\|\\||\\?\\?'
         'name': 'keyword.operator.logical.js'
       }
       {
@@ -1350,7 +1440,7 @@
         'name': 'keyword.operator.increment.js'
       }
       {
-        'match': '%|\\*|/|-|\\+'
+        'match': '%|\\*\\*|\\*|/|-|\\+'
         'name': 'keyword.operator.js'
       }
     ]
@@ -1447,11 +1537,17 @@
         ]
       }
       {
-        'begin': '(Relay\\.QL|gql)\\s*(`)'
+        'begin': '(Relay(\\?\\.|\\.)QL|gql)\\s*(`)'
         'beginCaptures':
           '1':
             'name': 'entity.name.function.js'
           '2':
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
+          '3':
             'name': 'punctuation.definition.string.begin.js'
         'end': '`'
         'endCaptures':
@@ -1559,7 +1655,38 @@
             'match': '(\\.\\.\\.)([a-zA-Z_$][\\w$]*)'
             'captures':
               '1':
-                'name': 'keyword.operator.spread.js'
+                'name': 'keyword.operator.rest.js'
+              '2':
+                'name': 'variable.parameter.rest.function.js'
+          }
+          {
+            'include': '$self'
+          }
+          {
+            'match': '[a-zA-Z_$][\\w$]*'
+            'name': 'variable.parameter.function.js'
+          }
+        ]
+      }
+      {
+        # Or starting with optional chaining
+        'begin': '(\\?\\.)(\\()'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.method.optional.js'
+          '2':
+            'name': 'punctuation.definition.parameters.begin.bracket.round.js'
+        'end': '\\)'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.parameters.end.bracket.round.js'
+        'name': 'meta.parameters.js'
+        'patterns': [
+          {
+            'match': '(\\.\\.\\.)([a-zA-Z_$][\\w$]*)'
+            'captures':
+              '1':
+                'name': 'keyword.operator.rest.js'
               '2':
                 'name': 'variable.parameter.rest.function.js'
           }
@@ -1662,104 +1789,19 @@
   'method_calls':
     'patterns': [
       {
-        # .methodCall(arg1, "arg2", [...])
-        'begin': '(\\.)\\s*([\\w$]+)\\s*(?=\\()'
+        # [?].methodCall(arg1, "arg2", [...])
+        'begin': '(\\?\\.|\\.)\\s*([\\w$]+)\\s*(?=\\()'
         'beginCaptures':
           '1':
-            'name': 'meta.delimiter.method.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
           '2':
             'patterns': [
               {
-                'match': '''(?x)
-                  \\bon(Rowsinserted|Rowsdelete|Rowenter|Rowexit|Resize|Resizestart|Resizeend|Reset|
-                  Readystatechange|Mouseout|Mouseover|Mousedown|Mouseup|Mousemove|
-                  Before(cut|deactivate|unload|update|paste|print|editfocus|activate)|
-                  Blur|Scrolltop|Submit|Select|Selectstart|Selectionchange|Hover|Help|
-                  Change|Contextmenu|Controlselect|Cut|Cellchange|Clock|Close|Deactivate|
-                  Datasetchanged|Datasetcomplete|Dataavailable|Drop|Drag|Dragstart|Dragover|
-                  Dragdrop|Dragenter|Dragend|Dragleave|Dblclick|Unload|Paste|Propertychange|Error|
-                  Errorupdate|Keydown|Keyup|Keypress|Focus|Load|Activate|Afterupdate|Afterprint|Abort)\\b
-                '''
-                'name': 'support.function.event-handler.js'
-              }
-              {
-                'match': '''(?x)
-                  \\b(catch|finally|then|shift|showModelessDialog|showModalDialog|showHelp|scroll|scrollX|scrollByPages|
-                  scrollByLines|scrollY|scrollTo|stop|strike|sizeToContent|sidebar|signText|sort|
-                  sup|sub|substr|substring|splice|split|send|set(Milliseconds|Seconds|Minutes|Hours|
-                  Month|Year|FullYear|Date|UTC(Milliseconds|Seconds|Minutes|Hours|Month|FullYear|Date)|
-                  Time|Hotkeys|Cursor|ZOptions|Active|Resizable|RequestHeader)|search|slice|
-                  savePreferences|small|home|handleEvent|navigate|char|charCodeAt|charAt|concat|
-                  contextual|confirm|compile|clear|captureEvents|call|createStyleSheet|createPopup|
-                  createEventObject|to(GMTString|UTCString|String|Source|UpperCase|LowerCase|LocaleString)|
-                  test|taint|taintEnabled|indexOf|italics|disableExternalCapture|dump|detachEvent|unshift|
-                  untaint|unwatch|updateCommands|join|javaEnabled|pop|push|plugins.refresh|paddings|parse|stringify|
-                  print|prompt|preference|enableExternalCapture|exec|execScript|valueOf|UTC|find|file|
-                  fileModifiedDate|fileSize|fileCreatedDate|fileUpdatedDate|fixed|fontsize|fontcolor|
-                  forward|fromCharCode|watch|link|load|lastIndexOf|anchor|attachEvent|atob|apply|alert|
-                  abort|routeEvents|resize|resizeBy|resizeTo|recalc|returnValue|replace|reverse|reload|
-                  releaseCapture|releaseEvents|go|get(Milliseconds|Seconds|Minutes|Hours|Month|Day|Year|FullYear|
-                  Time|Date|TimezoneOffset|UTC(Milliseconds|Seconds|Minutes|Hours|Day|Month|FullYear|Date)|
-                  Attention|Selection|ResponseHeader|AllResponseHeaders)|moveBy|moveBelow|moveTo|
-                  moveToAbsolute|moveAbove|mergeAttributes|match|margins|btoa|big|bold|borderWidths|blink|back)\\b
-                '''
-                'name': 'support.function.js'
-              }
-              {
-                'match': '''(?x)
-                  \\b(acceptNode|add|addEventListener|addTextTrack|adoptNode|after|animate|append|
-                  appendChild|appendData|before|blur|canPlayType|captureStream|
-                  caretPositionFromPoint|caretRangeFromPoint|checkValidity|clear|click|
-                  cloneContents|cloneNode|cloneRange|close|closest|collapse|
-                  compareBoundaryPoints|compareDocumentPosition|comparePoint|contains|
-                  convertPointFromNode|convertQuadFromNode|convertRectFromNode|createAttribute|
-                  createAttributeNS|createCaption|createCDATASection|createComment|
-                  createContextualFragment|createDocument|createDocumentFragment|
-                  createDocumentType|createElement|createElementNS|createEntityReference|
-                  createEvent|createExpression|createHTMLDocument|createNodeIterator|
-                  createNSResolver|createProcessingInstruction|createRange|createShadowRoot|
-                  createTBody|createTextNode|createTFoot|createTHead|createTreeWalker|delete|
-                  deleteCaption|deleteCell|deleteContents|deleteData|deleteRow|deleteTFoot|
-                  deleteTHead|detach|disconnect|dispatchEvent|elementFromPoint|elementsFromPoint|
-                  enableStyleSheetsForSet|entries|evaluate|execCommand|exitFullscreen|
-                  exitPointerLock|expand|extractContents|fastSeek|firstChild|focus|forEach|get|
-                  getAll|getAnimations|getAttribute|getAttributeNames|getAttributeNode|
-                  getAttributeNodeNS|getAttributeNS|getBoundingClientRect|getBoxQuads|
-                  getClientRects|getContext|getDestinationInsertionPoints|getElementById|
-                  getElementsByClassName|getElementsByName|getElementsByTagName|
-                  getElementsByTagNameNS|getItem|getNamedItem|getSelection|getStartDate|
-                  getVideoPlaybackQuality|has|hasAttribute|hasAttributeNS|hasAttributes|
-                  hasChildNodes|hasFeature|hasFocus|importNode|initEvent|insertAdjacentElement|
-                  insertAdjacentHTML|insertAdjacentText|insertBefore|insertCell|insertData|
-                  insertNode|insertRow|intersectsNode|isDefaultNamespace|isEqualNode|
-                  isPointInRange|isSameNode|item|key|keys|lastChild|load|lookupNamespaceURI|
-                  lookupPrefix|matches|move|moveAttribute|moveAttributeNode|moveChild|
-                  moveNamedItem|namedItem|nextNode|nextSibling|normalize|observe|open|
-                  parentNode|pause|play|postMessage|prepend|preventDefault|previousNode|
-                  previousSibling|probablySupportsContext|queryCommandEnabled|
-                  queryCommandIndeterm|queryCommandState|queryCommandSupported|queryCommandValue|
-                  querySelector|querySelectorAll|registerContentHandler|registerElement|
-                  registerProtocolHandler|releaseCapture|releaseEvents|remove|removeAttribute|
-                  removeAttributeNode|removeAttributeNS|removeChild|removeEventListener|
-                  removeItem|replace|replaceChild|replaceData|replaceWith|reportValidity|
-                  requestFullscreen|requestPointerLock|reset|scroll|scrollBy|scrollIntoView|
-                  scrollTo|seekToNextFrame|select|selectNode|selectNodeContents|set|setAttribute|
-                  setAttributeNode|setAttributeNodeNS|setAttributeNS|setCapture|
-                  setCustomValidity|setEnd|setEndAfter|setEndBefore|setItem|setNamedItem|
-                  setRangeText|setSelectionRange|setSinkId|setStart|setStartAfter|setStartBefore|
-                  slice|splitText|stepDown|stepUp|stopImmediatePropagation|stopPropagation|
-                  submit|substringData|supports|surroundContents|takeRecords|terminate|toBlob|
-                  toDataURL|toggle|toString|values|write|writeln)\\b
-                '''
-                'name': 'support.function.dom.js'
-              }
-              {
-                'match': "[a-zA-Z_$][\\w$]*"
-                'name': 'entity.name.function.js'
-              }
-              {
-                'match': '\\d[\\w$]*'
-                'name': 'invalid.illegal.identifier.js'
+                'include': '#method_names'
               }
             ]
         'end': '(?<=\\))'
@@ -1769,6 +1811,142 @@
             'include': '#arguments'
           }
         ]
+      }
+      {
+        # [?].methodCall?.(arg1, "arg2", [...])
+        'begin': '(\\?\\.|\\.)\\s*([\\w$]+)\\s*(\\?\\.)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'include': '#period_or_optional_method'
+              }
+            ]
+          '2':
+            'patterns': [
+              {
+                'include': '#method_names'
+              }
+            ]
+          '3':
+            'name': 'meta.delimiter.method.optional.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+      {
+        # [array]?.(arg1, "arg2", [...])
+        # The array itself is not in the method-call scope, maybe later
+        'begin': '(?<=\\])\\s*(\\?\\.)\\s*(?=\\()'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.method.optional.js'
+        'end': '(?<=\\))'
+        'name': 'meta.method-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
+    ]
+  'method_names':
+    'patterns': [
+      {
+        'match': '''(?x)
+          \\bon(Rowsinserted|Rowsdelete|Rowenter|Rowexit|Resize|Resizestart|Resizeend|Reset|
+          Readystatechange|Mouseout|Mouseover|Mousedown|Mouseup|Mousemove|
+          Before(cut|deactivate|unload|update|paste|print|editfocus|activate)|
+          Blur|Scrolltop|Submit|Select|Selectstart|Selectionchange|Hover|Help|
+          Change|Contextmenu|Controlselect|Cut|Cellchange|Clock|Close|Deactivate|
+          Datasetchanged|Datasetcomplete|Dataavailable|Drop|Drag|Dragstart|Dragover|
+          Dragdrop|Dragenter|Dragend|Dragleave|Dblclick|Unload|Paste|Propertychange|Error|
+          Errorupdate|Keydown|Keyup|Keypress|Focus|Load|Activate|Afterupdate|Afterprint|Abort)\\b
+        '''
+        'name': 'support.function.event-handler.js'
+      }
+      {
+        'match': '''(?x)
+          \\b(catch|finally|then|shift|showModelessDialog|showModalDialog|showHelp|scroll|scrollX|scrollByPages|
+          scrollByLines|scrollY|scrollTo|stop|strike|sizeToContent|sidebar|signText|sort|
+          sup|sub|substr|substring|splice|split|send|set(Milliseconds|Seconds|Minutes|Hours|
+          Month|Year|FullYear|Date|UTC(Milliseconds|Seconds|Minutes|Hours|Month|FullYear|Date)|
+          Time|Hotkeys|Cursor|ZOptions|Active|Resizable|RequestHeader)|search|slice|
+          savePreferences|small|home|handleEvent|navigate|char|charCodeAt|charAt|concat|
+          contextual|confirm|compile|clear|captureEvents|call|createStyleSheet|createPopup|
+          createEventObject|to(GMTString|UTCString|String|Source|UpperCase|LowerCase|LocaleString)|
+          test|taint|taintEnabled|indexOf|italics|disableExternalCapture|dump|detachEvent|unshift|
+          untaint|unwatch|updateCommands|join|javaEnabled|pop|push|plugins.refresh|paddings|parse|stringify|
+          print|prompt|preference|enableExternalCapture|exec|execScript|valueOf|UTC|find|file|
+          fileModifiedDate|fileSize|fileCreatedDate|fileUpdatedDate|fixed|fontsize|fontcolor|
+          forward|fromCharCode|watch|link|load|lastIndexOf|anchor|attachEvent|atob|apply|alert|
+          abort|routeEvents|resize|resizeBy|resizeTo|recalc|returnValue|replace|reverse|reload|
+          releaseCapture|releaseEvents|go|get(Milliseconds|Seconds|Minutes|Hours|Month|Day|Year|FullYear|
+          Time|Date|TimezoneOffset|UTC(Milliseconds|Seconds|Minutes|Hours|Day|Month|FullYear|Date)|
+          Attention|Selection|ResponseHeader|AllResponseHeaders)|moveBy|moveBelow|moveTo|
+          moveToAbsolute|moveAbove|mergeAttributes|match|margins|btoa|big|bold|borderWidths|blink|back)\\b
+        '''
+        'name': 'support.function.js'
+      }
+      {
+        'match': '''(?x)
+          \\b(acceptNode|add|addEventListener|addTextTrack|adoptNode|after|animate|append|
+          appendChild|appendData|before|blur|canPlayType|captureStream|
+          caretPositionFromPoint|caretRangeFromPoint|checkValidity|clear|click|
+          cloneContents|cloneNode|cloneRange|close|closest|collapse|
+          compareBoundaryPoints|compareDocumentPosition|comparePoint|contains|
+          convertPointFromNode|convertQuadFromNode|convertRectFromNode|createAttribute|
+          createAttributeNS|createCaption|createCDATASection|createComment|
+          createContextualFragment|createDocument|createDocumentFragment|
+          createDocumentType|createElement|createElementNS|createEntityReference|
+          createEvent|createExpression|createHTMLDocument|createNodeIterator|
+          createNSResolver|createProcessingInstruction|createRange|createShadowRoot|
+          createTBody|createTextNode|createTFoot|createTHead|createTreeWalker|delete|
+          deleteCaption|deleteCell|deleteContents|deleteData|deleteRow|deleteTFoot|
+          deleteTHead|detach|disconnect|dispatchEvent|elementFromPoint|elementsFromPoint|
+          enableStyleSheetsForSet|entries|evaluate|execCommand|exitFullscreen|
+          exitPointerLock|expand|extractContents|fastSeek|firstChild|focus|forEach|get|
+          getAll|getAnimations|getAttribute|getAttributeNames|getAttributeNode|
+          getAttributeNodeNS|getAttributeNS|getBoundingClientRect|getBoxQuads|
+          getClientRects|getContext|getDestinationInsertionPoints|getElementById|
+          getElementsByClassName|getElementsByName|getElementsByTagName|
+          getElementsByTagNameNS|getItem|getNamedItem|getSelection|getStartDate|
+          getVideoPlaybackQuality|has|hasAttribute|hasAttributeNS|hasAttributes|
+          hasChildNodes|hasFeature|hasFocus|importNode|initEvent|insertAdjacentElement|
+          insertAdjacentHTML|insertAdjacentText|insertBefore|insertCell|insertData|
+          insertNode|insertRow|intersectsNode|isDefaultNamespace|isEqualNode|
+          isPointInRange|isSameNode|item|key|keys|lastChild|load|lookupNamespaceURI|
+          lookupPrefix|matches|move|moveAttribute|moveAttributeNode|moveChild|
+          moveNamedItem|namedItem|nextNode|nextSibling|normalize|observe|open|
+          parentNode|pause|play|postMessage|prepend|preventDefault|previousNode|
+          previousSibling|probablySupportsContext|queryCommandEnabled|
+          queryCommandIndeterm|queryCommandState|queryCommandSupported|queryCommandValue|
+          querySelector|querySelectorAll|registerContentHandler|registerElement|
+          registerProtocolHandler|releaseCapture|releaseEvents|remove|removeAttribute|
+          removeAttributeNode|removeAttributeNS|removeChild|removeEventListener|
+          removeItem|replace|replaceChild|replaceData|replaceWith|reportValidity|
+          requestFullscreen|requestPointerLock|reset|scroll|scrollBy|scrollIntoView|
+          scrollTo|seekToNextFrame|select|selectNode|selectNodeContents|set|setAttribute|
+          setAttributeNode|setAttributeNodeNS|setAttributeNS|setCapture|
+          setCustomValidity|setEnd|setEndAfter|setEndBefore|setItem|setNamedItem|
+          setRangeText|setSelectionRange|setSinkId|setStart|setStartAfter|setStartBefore|
+          slice|splitText|stepDown|stepUp|stopImmediatePropagation|stopPropagation|
+          submit|substringData|supports|surroundContents|takeRecords|terminate|toBlob|
+          toDataURL|toggle|toString|values|write|writeln)\\b
+        '''
+        'name': 'support.function.dom.js'
+      }
+      {
+        'match': "[a-zA-Z_$][\\w$]*"
+        'name': 'entity.name.function.js'
+      }
+      {
+        'match': '\\d[\\w$]*'
+        'name': 'invalid.illegal.identifier.js'
       }
     ]
   'function_calls':
@@ -1804,64 +1982,149 @@
           }
         ]
       }
+      {
+        # functionCall?.(arg1, "arg2", [...])
+        'begin': '([\\w$]+)\\s*(\\?\\.)(?=\\()'
+        'beginCaptures':
+          '1':
+            'patterns': [
+              {
+                'match': '''(?x)
+                  \\b(isNaN|isFinite|eval|uneval|parseInt|parseFloat|decodeURI|
+                  decodeURIComponent|encodeURI|encodeURIComponent|escape|unescape|
+                  require|set(Interval|Timeout)|clear(Interval|Timeout))\\b
+                '''
+                'name': 'support.function.js'
+              }
+              {
+                'match': "[a-zA-Z_$][\\w$]*"
+                'name': 'entity.name.function.js'
+              }
+              {
+                'match': '\\d[\\w$]*'
+                'name': 'invalid.illegal.identifier.js'
+              }
+            ]
+          '2':
+            'name': 'meta.delimiter.method.optional.js'
+        'end': '(?<=\\))'
+        'name': 'meta.function-call.js'
+        'patterns': [
+          {
+            'include': '#arguments'
+          }
+        ]
+      }
     ]
   'objects':
     'patterns': [
+      # "Obj." is already enough to prove objectness,
+      # however "Obj.[8]" is impossible, and
+      # "Obj?.()" is a function
       {
         # OBJ in OBJ.prop, OBJ.methodCall()
-        'match': '[A-Z][A-Z0-9_$]*(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'match': '[A-Z][A-Z0-9_$]*(?=\\s*\\??\\.\\s*[a-zA-Z_$]\\w*)'
         'name': 'constant.other.object.js'
       }
       {
         # obj in obj.prop, obj.methodCall()
-        'match': '[a-zA-Z_$][\\w$]*(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'match': '[a-zA-Z_$][\\w$]*(?=\\s*\\??\\.\\s*[a-zA-Z_$]\\w*)'
+        'name': 'variable.other.object.js'
+      }
+      {
+        # OBJ in OBJ[8], OBJ?.[8]
+        'match': '[A-Z][A-Z0-9_$]*(?=\\s*(\\?\\.)?\\s*\\[)'
+        'name': 'constant.other.object.js'
+      }
+      {
+        # obj in obj[8], obj?.[8]
+        'match': '[a-zA-Z_$][\\w$]*(?=\\s*(\\?\\.)?\\s*\\[)'
         'name': 'variable.other.object.js'
       }
     ]
   'properties':
     'patterns': [
+      # object.prop includes object?.prop
+      {
+        # Specifically ?.[], for example divArray?.[8]
+        'begin': '(\\?\\.)\\s*(\\[)'
+        'beginCaptures':
+          '1':
+            'name': 'meta.delimiter.property.optional.js'
+          '2':
+            'name': 'meta.brace.square.js'
+        'end': '\\]'
+        'endCaptures':
+          '0':
+            'name': 'meta.brace.square.js'
+        'patterns': [
+          {
+            'include': '$self'
+          }
+        ]
+      }
       {
         # PROP1 in obj.PROP1.prop2, func().PROP1.prop2
-        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'match': '(\\?\\.|\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)(?=\\s*(\\?\\.|\\.)\\s*[a-zA-Z_$]\\w*)'
         'captures':
           '1':
-            'name': 'meta.delimiter.property.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_property'
+              }
+            ]
           '2':
             'name': 'constant.other.object.property.js'
       }
       {
         # prop1 in obj.prop1.prop2, func().prop1.prop2
-        'match': '(\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)'
+        'match': '(\\?\\.|\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)(?=\\s*(\\?\\.|\\.)\\s*[a-zA-Z_$]\\w*)'
         'captures':
           '1':
-            'name': 'meta.delimiter.property.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_property'
+              }
+            ]
           '2':
             'name': 'variable.other.object.property.js'
       }
       {
         # PROP in obj.PROP, func().PROP
-        'match': '(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)'
+        'match': '(\\?\\.|\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)'
         'captures':
           '1':
-            'name': 'meta.delimiter.property.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_property'
+              }
+            ]
           '2':
             'name': 'constant.other.property.js'
       }
       {
         # prop in obj.prop, func().prop
-        'match': '(\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)'
+        'match': '(\\?\\.|\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)'
         'captures':
           '1':
-            'name': 'meta.delimiter.property.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_property'
+              }
+            ]
           '2':
             'name': 'variable.other.property.js'
       }
       {
         # 123illegal in obj.123illegal, func().123illegal
-        'match': '(\\.)\\s*([0-9][\\w$]*)'
+        'match': '(\\?\\.|\\.)\\s*([0-9][\\w$]*)'
         'captures':
           '1':
-            'name': 'meta.delimiter.property.period.js'
+            'patterns': [
+              {
+                'include': '#period_or_optional_property'
+              }
+            ]
           '2':
             'name': 'invalid.illegal.identifier.js'
       }
@@ -2024,5 +2287,49 @@
             'patterns': [
               'include': '$self'
             ]
+      }
+    ]
+  'period_or_illegal_optional_property':
+    'patterns': [
+      {
+        'match': '\\.'
+        'name': 'meta.delimiter.property.period.js'
+      }
+      {
+        'match': '\\?\\.'
+        'name': 'invalid.illegal.meta.delimiter.property.optional.js'
+      }
+    ]
+  'period_or_illegal_optional_method':
+    'patterns': [
+      {
+        'match': '\\.'
+        'name': 'meta.delimiter.method.period.js'
+      }
+      {
+        'match': '\\?\\.'
+        'name': 'invalid.illegal.meta.delimiter.method.optional.js'
+      }
+    ]
+  'period_or_optional_property':
+    'patterns': [
+      {
+        'match': '\\.'
+        'name': 'meta.delimiter.property.period.js'
+      }
+      {
+        'match': '\\?\\.'
+        'name': 'meta.delimiter.property.optional.js'
+      }
+    ]
+  'period_or_optional_method':
+    'patterns': [
+      {
+        'match': '\\.'
+        'name': 'meta.delimiter.method.period.js'
+      }
+      {
+        'match': '\\?\\.'
+        'name': 'meta.delimiter.method.optional.js'
       }
     ]

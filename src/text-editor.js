@@ -4736,8 +4736,6 @@ module.exports = class TextEditor {
         range = selection.insertText(text, options);
       }
 
-      this.emitter.emit('did-insert-text', { text, range });
-
       if (languageMode.atTransactionEnd && options.autoIndent && text.includes('\n')) {
         // The `autoIndent` option as passed to `Selection#insertText` has no
         // effect in `WASMTreeSitterLanguageMode` because it asks what the

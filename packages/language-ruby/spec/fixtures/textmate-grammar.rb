@@ -86,16 +86,16 @@ a.b
 # ^ constant.other.symbol.hashkey
 #   ^ punctuation.definition.constant.hashkey
 {:foo => 1}
-# <- punctuation.brace.curly.begin
+# <- punctuation.section.scope.begin
 # ^ constant.other.symbol.hashkey
 #     ^ punctuation.separator.key-value
-#         ^ punctuation.brace.curly.end
+#         ^ punctuation.section.scope.end
 
 a { |x| x }
 # ^ punctuation.section.scope.begin.ruby
 #   ^ punctuation.separator.variable
 #     ^ punctuation.separator.variable
-#         ^ punctuation.section.scope.begin.end
+#         ^ punctuation.section.scope.end
 
 class << A::B
 # <- keyword.control.class

@@ -2,9 +2,10 @@ const {CompositeDisposable} = require('atom')
 
 const Bookmarks = require('./bookmarks')
 const BookmarksView = require('./bookmarks-view')
+const BookmarksProvider = require('./bookmarks-provider')
 
 module.exports = {
-  activate (bookmarksByEditorId) {
+  activate(bookmarksByEditorId) {
     this.bookmarksView = null
     this.editorsBookmarks = []
     this.disposables = new CompositeDisposable()
@@ -44,7 +45,7 @@ module.exports = {
     })
   },
 
-  deactivate () {
+  deactivate() {
     if (this.bookmarksView != null) {
       this.bookmarksView.destroy()
       this.bookmarksView = null
@@ -56,11 +57,16 @@ module.exports = {
     this.disposables.dispose()
   },
 
-  serialize () {
+  serialize() {
     const bookmarksByEditorId = {}
     for (let bookmarks of this.editorsBookmarks) {
       bookmarksByEditorId[bookmarks.editor.id] = bookmarks.serialize()
     }
     return bookmarksByEditorId
+  },
+
+  provideBookmarks() {
+    this.bookmarksProvider ??= new BookmarksProvider(this)
+    return this.bookmarksProvider
   }
 }

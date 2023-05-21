@@ -734,12 +734,17 @@ class WASMTreeSitterLanguageMode {
     parser.reset();
     parser.setTimeoutMicros(null);
 
-    let callback = this.getOrCreateParseCallback();
+    let text = this.buffer.getText();
+    this.cachedCurrentBufferText = text;
+    let callback = (index, _, endIndex) => {
+      let currentText = this.cachedCurrentBufferText;
+      return currentText.slice(index, endIndex);
+    };
+
     if (devMode && tag) { console.time(tag); }
-
     const result = parser.parse(callback, oldTree, { includedRanges });
-
     if (devMode && tag) { console.timeEnd(tag); }
+
     return result;
   }
 
@@ -1189,7 +1194,12 @@ class WASMTreeSitterLanguageMode {
       (layer) => !!layer.indentsQuery
     );
 
-    if (!controllingLayer) { return null; }
+    if (!controllingLayer) {
+      // There's no layer with an indents query to help us out. The default
+      // behavior in this situation with any grammar — even plain text — is to
+      // match the previous line's indentation.
+      return comparisonRowIndent - existingIndent;
+    }
 
     let { indentsQuery, scopeResolver } = controllingLayer;
 
@@ -1463,8 +1473,12 @@ class WASMTreeSitterLanguageMode {
     let indentDelta;
 
     for (let row = startRow; row <= endRow; row++) {
+      // If this row were being indented by `suggestedIndentForBufferRow`, it'd
+      // look at the end of the previous row to find the controlling layer,
+      // because we start at the previous row to find the suggested indent for
+      // the current row.
       let controllingLayer = this.controllingLayerAtPoint(
-        new Point(row, Infinity),
+        new Point(row - 1, Infinity),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
 
@@ -1780,21 +1794,27 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
+  // Given a {Point}, returns all injected {LanguageLayer}s whose extent
+  // includes that point. Does not include the root language layer.
+  //
   injectionLayersAtPoint(point) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
       containsPosition: point
     });
 
-    injectionMarkers = injectionMarkers.sort((a, b) => {
-      return a.getRange().compare(b.getRange());
+    injectionMarkers.sort((a, b) => {
+      return a.getRange().compare(b.getRange()) ||
+        b.depth - a.depth;
     });
 
     return injectionMarkers.map(m => m.languageLayer);
   }
 
+  // Given a {Point}, returns all {LanguageLayer}s whose extent includes that
+  // point.
+  //
   languageLayersAtPoint(point) {
     let injectionLayers = this.injectionLayersAtPoint(point);
-    injectionLayers = injectionLayers.sort((a, b) => b.depth - a.depth);
     return [
       this.rootLanguageLayer,
       ...injectionLayers
@@ -1803,11 +1823,15 @@ class WASMTreeSitterLanguageMode {
 
   // Returns the deepest language layer at a given point, or optionally the
   // deepest layer to fulfill a criterion.
+  //
+  // Will ignore any layer whose content ranges do not include the point, even if
+  // the point is within its extent.
   controllingLayerAtPoint(point, where = FUNCTION_TRUE) {
     let layers = this.languageLayersAtPoint(point);
-    // Sort deeper layers first.
-    layers.sort((a, b) => b.depth - a.depth);
+    layers = layers.filter(l => l.containsPoint(point));
 
+    // Deeper layers go first.
+    layers.sort((a, b) => b.depth - a.depth);
     return layers.find(layer => where(layer)) ?? null;
   }
 
@@ -3608,6 +3632,11 @@ class LanguageLayer {
     let markers = this.currentRangesLayer?.getMarkers();
     if (!markers || markers.length === 0) { return null; }
     return markers.map(m => m.getRange());
+  }
+
+  containsPoint(point) {
+    let ranges = this.getCurrentRanges() ?? [this.getExtent()];
+    return ranges.some(r => r.containsPoint(point));
   }
 
   getOrParseTree({ force = true, anonymous = false } = {}) {

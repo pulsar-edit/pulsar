@@ -1,3 +1,5 @@
+CHANGELOG.* merge=union
+
 # Specs depend on character counts, if we don't specify the line endings the
 # fixtures will vary depending on platform
 spec/fixtures/**/*.js text eol=lf
