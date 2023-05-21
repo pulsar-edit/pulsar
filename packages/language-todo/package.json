@@ -4,18 +4,8 @@
   "description": "TODO/FIXME highlighting support in Atom",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=14"
   },
-  "homepage": "http://atom.github.io/language-todo",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/language-todo.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/atom/language-todo/issues"
-  },
-  "devDependencies": {
-    "coffeelint": "^1.10.1"
-  }
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT"
 }

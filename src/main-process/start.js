@@ -1,5 +1,4 @@
 const { app } = require('electron');
-const nslog = require('nslog');
 const path = require('path');
 const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
@@ -43,11 +42,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   const args = parseCommandLine(process.argv.slice(1));
 
-  // This must happen after parseCommandLine() because yargs uses console.log
-  // to display the usage message.
-  const previousConsoleLog = console.log;
-  console.log = nslog;
-
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
@@ -67,7 +61,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
     );
-    console.log = previousConsoleLog;
     app.on('ready', function() {
       const testRunner = require(path.join(
         args.resourcePath,
@@ -79,7 +72,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   }
 
   const releaseChannel = getReleaseChannel(app.getVersion());
-  let appUserModelId = 'com.squirrel.atom.' + process.arch;
+  let appUserModelId = 'dev.pulsar-edit.pulsar.' + process.arch;
 
   // If the release channel is not stable, we append it to the app user model id.
   // This allows having the different release channels as separate items in the taskbar.

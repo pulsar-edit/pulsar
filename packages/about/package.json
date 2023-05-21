@@ -4,21 +4,14 @@
   "main": "./lib/main",
   "version": "1.9.1",
   "description": "View useful information about your Pulsar installation.",
-  "keywords": [],
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "scripts": {
-    "lint": "standard"
-  },
   "engines": {
     "atom": ">=1.7 <2.0.0"
   },
   "dependencies": {
-    "etch": "0.9.0",
-    "semver": "^5.5.0"
-  },
-  "devDependencies": {
-    "standard": "^11.0.0"
+    "etch": "^0.14.1",
+    "semver": "^7.3.8"
   },
   "consumedServices": {
     "status-bar": {
@@ -29,16 +22,5 @@
   },
   "deserializers": {
     "AboutView": "deserializeAboutView"
-  },
-  "standard": {
-    "env": [
-      "browser",
-      "node",
-      "atomtest",
-      "jasmine"
-    ],
-    "globals": [
-      "atom"
-    ]
   }
 }

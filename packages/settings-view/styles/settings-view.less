@@ -1,0 +1,764 @@
+@import "octicon-mixins";
+@import "octicon-utf-codes";
+@import "ui-variables";
+
+@section-padding: 2 * @component-padding;
+@breadcrumb-padding: 2 * @component-padding;
+
+.settings-view {
+  display: flex;
+
+  .breadcrumb {
+    margin-bottom: 0;
+    padding: 0 @breadcrumb-padding;
+    font-size: 1.125em;
+    line-height: 3rem;
+    color: @text-color-subtle;
+    list-style: none;
+    border-bottom: 1px solid @base-border-color;
+    background-color: @base-background-color;
+
+    + .section {
+      border-top: none;
+    }
+
+    > li {
+      display: inline-block;
+      a {
+        color: @text-color;
+      }
+
+      + li:before {
+        content: "/"; // Unicode space added since inline-block means non-collapsing white-space
+        padding: 0 .75em ;
+      }
+    }
+
+    > .active a {
+      font-weight: 600;
+      color: @text-color-highlight;
+    }
+
+  }
+
+  .text {
+    color: @text-color;
+  }
+
+  .alert-type(@tx; @bg) {
+    @alert-background-color: mix(@bg, @base-background-color, 10%);
+    color: contrast(@alert-background-color, darken(@tx, 20%), lighten(@tx, 20%) );
+    border-color: darken(@alert-background-color, 10%);
+    background-color: @alert-background-color;
+
+    .alert-link {
+      color: inherit;
+      text-decoration: underline;
+    }
+  }
+
+  .alert-info     { .alert-type(@text-color-info;    @background-color-info); }
+  .alert-success  { .alert-type(@text-color-success; @background-color-success); }
+  .alert-warning  { .alert-type(@text-color-warning; @background-color-warning); }
+  .alert-error,
+  .alert-danger   { .alert-type(@text-color-error;   @background-color-error); }
+
+
+  .error-message {
+    .alert {
+      margin-bottom: 0;
+    }
+
+    .close {
+      top: -6px; // magic number... for now
+    }
+
+    .error-details {
+      .alert-type(@text-color-error;   @background-color-error);
+    }
+
+    .error-link {
+      color: inherit;
+      text-decoration: underline;
+      margin-left: @component-padding/2;
+    }
+  }
+
+  select.form-control {
+    color: @text-color;
+    border-color: @button-border-color;
+    background-color: @button-background-color;
+    &:hover,
+    &:focus {
+      box-shadow: none;
+      background-color: @button-background-color-hover;
+    }
+  }
+
+  .select-container {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .themes-picker-item .btn {
+    margin-left: 2px;
+    &::before {
+      margin-right: 0;
+      text-align: left;
+    }
+  }
+
+  .checkbox {
+    padding-left: 2.25em;
+    label {
+      padding-left: 0;
+      display: block;
+    }
+    .setting-title {
+      display: inline-block;
+    }
+  }
+  input[type="checkbox"] {
+    margin: 0 .75em 0 -2.25em;
+  }
+
+  .color {
+    padding-left: 5em;
+    .setting-title {
+      margin-top: .15em;
+    }
+    .setting-description {
+      margin-top: -0.5em;
+    }
+  }
+  input[type="color"] {
+    float: left;
+    margin: 0 0 0 -5em;
+    padding: 0;
+    width: 4em;
+    height: 1.6em;
+    border-radius: 4px;
+    border: 1px solid @base-border-color;
+    background: darken(@base-background-color, 2%);
+    &::-webkit-color-swatch-wrapper {
+      padding: 2px;
+      margin: 0;
+      border-radius: inherit;
+    }
+    &::-webkit-color-swatch {
+      border-radius: 2px;
+      border: 1px solid hsla(0,0%,0%,.1);
+    }
+  }
+
+  .editor-container {
+    margin: @component-padding*2 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    &.settings-filter {
+      margin-bottom: 36px;
+    }
+  }
+
+  .section {
+    padding: @section-padding;
+    border-top: 1px solid @base-border-color;
+    &:first-child,
+    &:last-child {
+      padding: @section-padding;
+    }
+    &.section:empty {
+      padding: 0;
+      border-top: none;
+    }
+
+    atom-text-editor[mini] {
+      opacity: .75;
+      .selection .region {
+        background-color: contrast(@input-background-color, lighten(@input-background-color, 8%), darken(@input-background-color, 8%) );
+      }
+    }
+
+    atom-text-editor[mini].is-focused {
+      opacity: 1;
+      .selection .region {
+      background-color: contrast(@input-background-color, lighten(@input-background-color, 12%), darken(@input-background-color, 12%) );
+      }
+    }
+  }
+
+  div > .package-detail section.section.settings-panel {
+      border-top: 1px solid @base-border-color;
+  }
+
+  .section-container {
+    width: 100%;
+    max-width: 800px;
+
+    &.updates-container {
+      .package-container {
+        > .row {
+          margin-left: -@component-padding;
+          margin-right: -@component-padding;
+        }
+      }
+      .native-key-bindings, .alert-info {
+        margin-bottom: 15px;
+      }
+    }
+  }
+
+  section .section-heading,
+  .section .section-heading {
+    margin-bottom: @component-padding*2;
+    color: @text-color-highlight;
+    font-size: 1.75em;
+    font-weight: bold;
+    line-height: 1;
+    -webkit-user-select: none;
+    cursor: default;
+  }
+
+  .sub-section-heading.icon:before,
+  .section-heading.icon:before {
+    margin-right: @component-padding*.8;
+  }
+
+  .section-heading-count {
+    margin-left: .5em;
+  }
+
+  .section-body {
+    margin-top: 20px;
+  }
+
+  .sub-section {
+
+    .sub-section-heading {
+      position: sticky;
+      top: -1px; // -1px fixes a rounding issue on retina screens
+      z-index: 1;
+      margin: 0;
+      padding: @component-padding 0;
+      font-size: 1.4em;
+      font-weight: bold;
+      line-height: 1;
+      color: @text-color-highlight;
+      background-color: @base-background-color;
+      -webkit-user-select: none;
+
+      &.has-items {
+        cursor: pointer;
+
+        &::before {
+          .icon(20px);
+          content: @chevron-down;
+          color: @text-color-subtle;
+        }
+
+        &:hover:after {
+          color: @text-color-highlight;
+        }
+      }
+    }
+
+    .sub-section-body {
+      margin-top: @component-padding;
+      margin-bottom: @component-padding*3;
+      margin-left: 6px;
+      padding-left: 14px;
+      border-left: 1px solid @base-border-color;
+    }
+
+    &.collapsed {
+      .sub-section-heading.has-items:before {
+        content: @chevron-right;
+      }
+      .package-container .package-card,
+      .sub-section-body {
+        display: none !important;
+      }
+    }
+  }
+
+  .control-label {
+    -webkit-user-select: none;
+    cursor: default;
+  }
+
+  .setting-title {
+    font-size: 1.2em;
+    -webkit-user-select: none;
+  }
+
+  .setting-description {
+    color: @text-color-subtle;
+    -webkit-user-select: none;
+    cursor: default;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .link {
+    color: @text-color-info;
+
+    &:hover, &:focus {
+      color: lighten(@text-color-info, 4%);
+    }
+  }
+
+  .config-menu {
+    flex: 1.6;
+    min-width: 180px;
+    max-width: 240px;
+    -webkit-user-select: none;
+    user-select: none;
+    padding-top: @component-padding;
+    background-color: lighten(@base-background-color, 2%);
+    border-right: 1px solid @base-border-color;
+    overflow-x: auto;
+
+    .icon:before {
+      text-align: center;
+    }
+
+    .panels-packages{
+      flex-grow: 1;
+      overflow: auto;
+      height: 0;
+
+      li + li {
+        margin-top: 0;
+      }
+
+      li > a {
+        border-radius: 1px !important;
+        padding: 12px 14px;
+        font-weight: bold;
+        line-height: 16px;
+        opacity: .85;
+        transition: opacity .1s ease-in;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0, 7%);
+
+        &:hover {
+          opacity: 1;
+          box-shadow: inset 0 -1px 0 rgba(0,0,0, 7%) !important;
+        }
+      }
+
+      li:first-child {margin-top:2px;}
+      li:last-child {margin-bottom: 10px;}
+
+      li.active a, li.active a:hover {
+        opacity: 1;
+        box-shadow: 0 0 0 1px darken(#3c76dd, 10%) !important;
+
+        .package-author, .package-version {
+          color: #fff;
+          opacity: .6;
+        }
+      }
+
+      .package-version {
+        line-height: 16px;
+        margin-left: 5px;
+        font-weight: normal;
+        color: #999;
+      }
+
+      .package-author {
+        font-weight: normal;
+        display: block;
+        color: #999;
+      }
+    }
+
+    .button-area {
+      margin: 15px; // same as nav
+      > .btn {
+        width: 100%;
+      }
+    }
+
+    .nav > li {
+      margin-top: 0;
+      > a {
+        border-radius: 0;
+        white-space: nowrap;
+
+        &:hover {
+          color: @text-color-highlight;
+          background-color: @background-color-highlight;
+        }
+      }
+    }
+
+    .nav > li.active > a {
+      color: @text-color-selected;
+      background-color: @background-color-selected;
+    }
+  }
+
+  .panels {
+    flex: 8.4;
+    flex-flow: column;
+    display: flex;
+    position: relative;
+    min-width: 0;
+
+   .panels-item {
+      flex: 1;
+      min-width: 372px; // magic number: fit the Settings, Uninstall and Disable button
+      overflow: auto;
+    }
+  }
+
+  .settings-panel {
+    label {
+      color: @text-color;
+    }
+
+    .control-group + .control-group {
+      margin-top:  1.5em;
+    }
+
+    .control-group .editor-container {
+      margin: 0;
+    }
+
+    .grammar-filetypes {
+      margin-top: @component-padding;
+    }
+
+    .input-radio-group .input-label {
+      margin-right: 1em;
+    }
+  }
+
+  .package-detail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .package-keymap-table,
+    .package-grammars-table,
+    .package-snippets-table {
+      padding-top: @component-padding;
+      padding-left: @component-padding;
+
+      td {
+        white-space: nowrap;
+      }
+
+      .snippet-prefix {
+        font-family: monospace;
+      }
+    }
+
+    .package-snippets-table {
+      max-width: 100%;
+    }
+
+    .update-message {
+      padding-right: @component-padding;
+    }
+
+    .link {
+      width: -webkit-fit-content; // prevents hover area being full-width
+    }
+
+    .link,
+    .text {
+      margin: 0 15px @component-padding 15px;
+    }
+
+    .update-link,
+    .repo-link {
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .themes-panel {
+    .control-group {
+      margin-top:  @component-padding*3;
+    }
+    .themes-picker {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -@component-padding;
+    }
+    .themes-picker-item {
+      flex: 1;
+      min-width: 320px; // Enough for the UI Theme description
+      padding: 0 @component-padding;
+      .controls {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .packages {
+    display: flex;
+    flex-flow: column;
+
+    .themes-label {
+      font-size: 1.25em;
+      font-weight: bold;
+    }
+
+    .theme-chooser {
+      padding-top: @component-padding*2;
+    }
+
+    .theme-description {
+      -webkit-user-select: none;
+      cursor: default;
+    }
+
+    .package-container {
+      width: 100%;
+    }
+
+    .search-container {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -@component-padding/2;
+      padding-top: @component-padding*1.5;
+
+
+      .editor-container {
+        flex: 1;
+        min-width: 130px;
+        margin: @component-padding/2;
+      }
+
+      .btn-group {
+        margin: @component-padding/2;
+        padding-left: 1px; // Counter balance since btns have margin-left: -1px
+      }
+    }
+
+    .search-message {
+      margin: @component-padding 0 0;
+    }
+
+    .error-message {
+      padding: @component-padding 0;
+    }
+
+  }
+
+  .btn-retry {
+    margin-left: @component-padding;
+  }
+
+  .readme {
+    margin-top: @component-padding;
+  }
+
+  .panel-heading .label {
+    margin-left: @component-padding;
+  }
+
+  .loading-area {
+    span {
+      &::before {
+        font-size: 1.1em;
+        width: 1.1em;
+        height: 1.1em;
+      }
+    }
+  }
+
+  .error-view {
+    margin: @component-padding 0 @component-padding 0;
+  }
+
+  .packages-panel {
+    .nav {
+      .badge {
+        margin-left: @component-icon-padding;
+      }
+    }
+  }
+
+  .copy-icon {
+    cursor: pointer;
+    padding-right: 2px;
+
+    &:hover {
+      color: #2a6496;
+    }
+  }
+
+  .table {
+    table {
+      width: 100%;
+      table-layout: initial;
+    }
+
+    th {
+      padding: @component-padding - 2px @component-padding;
+      padding-left: 0;
+    }
+
+    td {
+      height: @component-line-height;
+    }
+
+    td, th {
+      padding-left: 1%;
+      padding-right: 1%;
+      white-space: nowrap;
+      overflow: hidden;
+      border-color: @base-border-color;
+    }
+
+    col.keystroke {
+      width: (15% - 2%);
+    }
+
+    col.command {
+      width: (40% - 2%);
+    }
+
+    col.source {
+      width: (10% - 2%);
+    }
+
+    col.selector {
+      width: (35%  - 2%);
+    }
+  }
+
+  .compile-tools-heading {
+    font-weight: bold;
+  }
+
+  .compile-tools-message {
+    padding-top: @component-padding;
+
+    code {
+      text-shadow: none;
+      border-width: 1px;
+      border-style: solid;
+    }
+  }
+
+  .uri-history {
+    width: 100%;
+
+    th {
+      white-space: nowrap;
+    }
+
+    td, th {
+      padding: 0 @component-padding @component-padding/2 0;
+    }
+  }
+}
+
+@media all and (max-width: 800px) {
+  .thumbnail .btn-toolbar {
+    .btn {
+      width: 100%;
+      margin: 2px 0;
+    }
+  }
+}
+
+// A tooltip that shows the body of a snippet should treat whitespace literally
+// and should align to the left so that indentation is clearer.
+.snippet-body-tooltip .tooltip-inner {
+  font-family: monospace;
+  white-space: pre !important;
+  text-align: left;
+}
+
+.package-updates-status-view:hover {
+  text-decoration: underline;
+}
+
+.available-updates-status {
+  padding-left: 2px;
+}
+
+
+// Overrides
+// TODO: Refactor + cleanup
+
+.settings-view {
+
+  .container {
+    padding: 0;
+    > .row {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  .updates-heading-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .update-all-button:last-child {
+    margin-left: @component-padding/2;
+  }
+
+  .keybinding-panel .is-user {
+    color: @text-color-selected;
+    background-color: @background-color-selected;
+  }
+
+  .btn-wrap-group .btn {
+    margin: 0 @component-padding/2 @component-padding/2 0;
+  }
+}
+
+.clearfix {
+  &::before {
+    display: table;
+    content: "";
+  }
+
+  &::after {
+    display: table;
+    clear: both;
+    content: "";
+  }
+}
+
+// Reset Bootstrap media queries,
+// since it breaks when resizing the treeview or in multiple panes
+
+@media (min-width: 768px) {
+  .container {
+    width: auto;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: auto;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: auto;
+  }
+  .col-lg-8 {
+    width: 100%;
+  }
+}

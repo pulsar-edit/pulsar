@@ -1,0 +1,25 @@
+{
+  "name": "autosave",
+  "main": "./lib/autosave",
+  "version": "0.24.6",
+  "private": true,
+  "description": "Save editors when they lose focus or are closed",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": ">0.27.0"
+  },
+  "providedServices": {
+    "autosave": {
+      "description": "A configuration object to control what is autosaved",
+      "versions": {
+        "1.0.0": "provideService"
+      }
+    }
+  },
+  "configSchema": {
+    "enabled": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

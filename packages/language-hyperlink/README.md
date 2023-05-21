@@ -1,10 +1,9 @@
-# Hyperlink colorization in Atom
-[![CI](https://github.com/atom/language-hyperlink/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/language-hyperlink/actions/workflows/ci.yml)
+# Hyperlink colorization in Pulsar
 
 Adds syntax highlighting to hyperlinks embedded in strings, comments, and plain
-text in Atom.
+text in Pulsar.
 
-Originally [converted](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate)
+Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [Hyperlink Helper TextMate bundle](https://github.com/textmate/hyperlink-helper.tmbundle).
 
 Contributions are greatly appreciated. Please fork this repository and open a

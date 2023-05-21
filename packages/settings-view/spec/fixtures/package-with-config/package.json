@@ -1,0 +1,6 @@
+{
+  "name": "package-with-config",
+  "version": "1.0.0",
+  "repository": "https://github.com/example/package-with-config",
+  "main": "main"
+}

@@ -1,0 +1,23 @@
+'menu': [
+  {
+    'label': 'Edit'
+    'submenu': [
+      {
+        'label': 'Bookmark'
+        'submenu': [
+          { 'label': 'View All', 'command': 'bookmarks:view-all' }
+          { 'label': 'Toggle Bookmark', 'command': 'bookmarks:toggle-bookmark' }
+          { 'label': 'Jump to Next Bookmark', 'command': 'bookmarks:jump-to-next-bookmark' }
+          { 'label': 'Jump to Previous Bookmark', 'command': 'bookmarks:jump-to-previous-bookmark' }
+          { 'label': 'Select to Next Bookmark', 'command': 'bookmarks:select-to-next-bookmark' }
+          { 'label': 'Select to Previous Bookmark', 'command': 'bookmarks:select-to-previous-bookmark' }
+        ]
+      }
+    ]
+  }
+]
+'context-menu': {
+  'atom-text-editor': [
+    { 'label': 'Toggle bookmark', 'command': 'bookmarks:toggle-bookmark' }
+  ]
+}

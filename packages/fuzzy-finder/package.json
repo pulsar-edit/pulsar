@@ -1,0 +1,74 @@
+{
+  "name": "fuzzy-finder",
+  "version": "1.14.3",
+  "main": "./lib/main",
+  "description": "Open an editor to a file in the project with `cmd-t`.",
+  "repository": "https://github.com/pulsar-edit/fuzzy-finder",
+  "license": "MIT",
+  "dependencies": {
+    "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f",
+    "atom-select-list": "^0.7.0",
+    "fs-plus": "^3.0.0",
+    "minimatch": "~3.0.3",
+    "underscore-plus": "^1.7.0",
+    "vscode-ripgrep": "^1.2.5",
+    "wrench": "^1.5"
+  },
+  "devDependencies": {
+    "async": "0.2.6",
+    "temp": "~0.8.1",
+    "sinon": "9.0.3"
+  },
+  "engines": {
+    "atom": "*"
+  },
+  "consumedServices": {
+    "teletype": {
+      "versions": {
+        "0.0.1": "consumeTeletype"
+      }
+    },
+    "atom.file-icons": {
+      "versions": {
+        "1.0.0": "consumeFileIcons"
+      }
+    },
+    "file-icons.element-icons": {
+      "versions": {
+        "1.0.0": "consumeElementIcons"
+      }
+    },
+    "metrics-reporter": {
+      "versions": {
+        "^1.1.0": "consumeMetricsReporter"
+      }
+    }
+  },
+  "configSchema": {
+    "ignoredNames": {
+      "type": "array",
+      "default": [],
+      "description": "List of string glob patterns. Files and directories matching these patterns will be ignored. This list is merged with the list defined by the core `Ignored Names` config setting. Example: `.git, ._*, Thumbs.db`."
+    },
+    "searchAllPanes": {
+      "type": "boolean",
+      "default": false,
+      "description": "Search all panes when opening files. If disabled, only the active pane is searched. Holding `shift` inverts this setting."
+    },
+    "preserveLastSearch": {
+      "type": "boolean",
+      "default": false,
+      "description": "Remember the typed query when closing the fuzzy finder and use that as the starting query next time the fuzzy finder is opened."
+    },
+    "useRipGrep": {
+      "type": "boolean",
+      "default": true,
+      "description": "Use the substantially faster `ripgrep` crawler."
+    },
+    "prefillFromSelection": {
+      "type": "boolean",
+      "default": false,
+      "description": "Prefills search query with selected in current editor text"
+    }
+  }
+}

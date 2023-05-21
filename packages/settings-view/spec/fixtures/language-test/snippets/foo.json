@@ -1,0 +1,8 @@
+{
+  ".source.a, .source.aa": {
+    "FOO": {
+      "prefix": "f",
+      "body": "foo!"
+    }
+  }
+}

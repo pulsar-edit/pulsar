@@ -1,0 +1,23 @@
+{
+  "name": "bookmarks",
+  "version": "0.46.0",
+  "main": "./lib/main",
+  "description": "Can mark lines, then jump back to them",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": "*"
+  },
+  "dependencies": {
+    "atom-select-list": "^0.7.0"
+  },
+
+  "providedServices": {
+    "bookmarks": {
+      "description": "Provides a list of bookmarks to any package that wants to know about them.",
+      "versions": {
+        "1.0.0": "provideBookmarks"
+      }
+    }
+  }
+}

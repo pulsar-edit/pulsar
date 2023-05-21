@@ -2,7 +2,8 @@ describe "TextMate Ruby grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.packages.activatePackage("language-ruby")
@@ -964,7 +965,7 @@ describe "TextMate Ruby grammar", ->
         #!/usr/bin/env ruby
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         \x20#!/usr/sbin/ruby
@@ -975,7 +976,7 @@ describe "TextMate Ruby grammar", ->
         #!\t/usr/bin/env --ruby=bar
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Emacs modelines", ->
       valid = """
@@ -994,7 +995,7 @@ describe "TextMate Ruby grammar", ->
         "-*- font:x;foo : bar ; mode : RUBY ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         /* --*ruby-*- */
@@ -1012,7 +1013,7 @@ describe "TextMate Ruby grammar", ->
         // -*-font:mode;mode:ruby--*-
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it "recognises Vim modelines", ->
       valid = """
@@ -1039,7 +1040,7 @@ describe "TextMate Ruby grammar", ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=ruby ts=4
       """
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = """
         ex: se filetype=ruby:
@@ -1057,4 +1058,4 @@ describe "TextMate Ruby grammar", ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=ruby ts=4
       """
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()

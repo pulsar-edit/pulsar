@@ -1,14 +1,11 @@
 # Git editing support in Pulsar
-[![macOS Build Status](https://travis-ci.org/atom/language-git.svg?branch=master)](https://travis-ci.org/atom/language-git)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/481319gyrr1feo8b/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-git/branch/master)
-[![Dependency Status](https://david-dm.org/atom/language-git.svg)](https://david-dm.org/atom/language-git)
 
 Adds syntax highlighting to Git commit, merge, and rebase messages edited in Pulsar.
 
 You can configure Pulsar to be your Git editor with the following command:
 
 ```sh
-git config --global core.editor "atom --wait"
+git config --global core.editor "pulsar --wait"
 ```
 
 ## Commit message highlighting
@@ -22,11 +19,11 @@ This package uses warning and error highlighting to help bring attention to some
 
 ## Diff highlighting
 
-If [language-diff](https://atom.io/packages/language-diff) is installed, the
+If [language-diff](https://web.pulsar-edit.dev/packages/language-diff) is installed, the
 diff part of `git commit --verbose` messages is highlighted as well.
 
 ## Background
 
-Originally [converted](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate) from the [Git TextMate bundle](https://github.com/textmate/git.tmbundle).
+Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Git TextMate bundle](https://github.com/textmate/git.tmbundle).
 
 Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.

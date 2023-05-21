@@ -5,7 +5,8 @@ describe "Python grammar", ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.packages.activatePackage("language-python")
@@ -14,8 +15,8 @@ describe "Python grammar", ->
       grammar = atom.grammars.grammarForScopeName("source.python")
 
   it "recognises shebang on firstline", ->
-    expect(grammar.firstLineRegex.scanner.findNextMatchSync("#!/usr/bin/env python")).not.toBeNull()
-    expect(grammar.firstLineRegex.scanner.findNextMatchSync("#! /usr/bin/env python")).not.toBeNull()
+    expect(grammar.firstLineRegex.findNextMatchSync("#!/usr/bin/env python")).not.toBeNull()
+    expect(grammar.firstLineRegex.findNextMatchSync("#! /usr/bin/env python")).not.toBeNull()
 
   it "parses the grammar", ->
     expect(grammar).toBeDefined()

@@ -1,0 +1,37 @@
+menu: [
+  {
+    label: 'File'
+    submenu: [
+      {label: 'Close All Tabs', command: 'tabs:close-all-tabs'}
+    ]
+  }
+]
+
+'context-menu':
+  '.tab': [
+    {label: 'Close Tab', command: 'tabs:close-tab'}
+    {label: 'Close Other Tabs', command: 'tabs:close-other-tabs'}
+    {label: 'Close Tabs to the Right', command: 'tabs:close-tabs-to-right'}
+    {label: 'Close Tabs to the Left', command: 'tabs:close-tabs-to-left'}
+    {label: 'Close Saved Tabs', command: 'tabs:close-saved-tabs'}
+    {label: 'Close All Tabs', command: 'tabs:close-all-tabs'}
+
+    {type: 'separator'}
+
+    {label: 'Split Up', command: 'tabs:split-up'}
+    {label: 'Split Down', command: 'tabs:split-down'}
+    {label: 'Split Left', command: 'tabs:split-left'}
+    {label: 'Split Right', command: 'tabs:split-right'}
+
+  ]
+  '.tab.texteditor': [
+    {type: 'separator'}
+    {label: 'Open In New Window', command: 'tabs:open-in-new-window'}
+    {type: 'separator'}
+  ]
+  '.tab.pending-tab': [
+    {label: 'Keep Pending Tab', command: 'tabs:keep-pending-tab'}
+  ]
+  '.tab-bar': [
+    {label: 'Reopen Closed Tab', command: 'pane:reopen-closed-item'}
+  ]

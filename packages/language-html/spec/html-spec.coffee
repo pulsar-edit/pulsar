@@ -5,7 +5,8 @@ describe 'TextMate HTML grammar', ->
   grammar = null
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.packages.activatePackage('language-html')
@@ -181,11 +182,8 @@ describe 'TextMate HTML grammar', ->
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
       expect(lines[1][0]).toEqual value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html']
-      # TODO: Remove when Atom 1.21 reaches stable
-      if parseFloat(atom.getVersion()) <= 1.20
-        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
-      else
-        expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+
+      expect(lines[1][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
       expect(lines[2][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it 'tokenizes multiline tags', ->
@@ -197,11 +195,8 @@ describe 'TextMate HTML grammar', ->
       '''
 
       expect(lines[0][0]).toEqual value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
-      # TODO: Remove when Atom 1.21 reaches stable
-      if parseFloat(atom.getVersion()) <= 1.20
-        expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'storage.type.function.coffee']
-      else
-        expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
+
+      expect(lines[2][1]).toEqual value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']
       expect(lines[3][0]).toEqual value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']
 
     it 'recognizes closing script tags in comments', ->
@@ -607,8 +602,8 @@ describe 'TextMate HTML grammar', ->
 
   describe 'firstLineMatch', ->
     it 'recognises HTML5 doctypes', ->
-      expect(grammar.firstLineRegex.scanner.findNextMatchSync('<!DOCTYPE html>')).not.toBeNull()
-      expect(grammar.firstLineRegex.scanner.findNextMatchSync('<!doctype HTML>')).not.toBeNull()
+      expect(grammar.firstLineRegex.findNextMatchSync('<!DOCTYPE html>')).not.toBeNull()
+      expect(grammar.firstLineRegex.findNextMatchSync('<!doctype HTML>')).not.toBeNull()
 
     it 'recognises Emacs modelines', ->
       valid = '''
@@ -627,7 +622,7 @@ describe 'TextMate HTML grammar', ->
         "-*- font:x;foo : bar ; mode : HtML ; bar : foo ; foooooo:baaaaar;fo:ba-*-";
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         /* --*html-*- */
@@ -646,7 +641,7 @@ describe 'TextMate HTML grammar', ->
         // -*-font:mode;mode:html--*-
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
     it 'recognises Vim modelines', ->
       valid = '''
@@ -673,7 +668,7 @@ describe 'TextMate HTML grammar', ->
         # vim:noexpandtab titlestring=hi\|there\\\\ ft=html ts=4
       '''
       for line in valid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).not.toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull()
 
       invalid = '''
         ex: se filetype=html:
@@ -691,7 +686,7 @@ describe 'TextMate HTML grammar', ->
         # vim:noexpandtab titlestring=hi\\|there\\\\\\ ft=HTML ts=4
       '''
       for line in invalid.split /\n/
-        expect(grammar.firstLineRegex.scanner.findNextMatchSync(line)).toBeNull()
+        expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull()
 
   describe 'tags', ->
     it 'tokenizes style tags as such', ->

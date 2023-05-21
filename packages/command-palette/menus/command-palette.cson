@@ -1,0 +1,25 @@
+'menu': [
+  {
+    'label': 'View'
+    'submenu': [
+      {
+        'label': 'Toggle Command Palette'
+        'command': 'command-palette:toggle'
+      }
+    ]
+  }
+  {
+    'label': 'Packages'
+    'submenu': [
+      {
+        'label': 'Command Palette',
+        'submenu': [
+          {
+            'label': 'Toggle'
+            'command': 'command-palette:toggle'
+          }
+        ]
+      }
+    ]
+  }
+]

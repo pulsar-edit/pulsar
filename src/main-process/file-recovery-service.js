@@ -2,7 +2,6 @@ const { dialog } = require('electron');
 const crypto = require('crypto');
 const Path = require('path');
 const fs = require('fs-plus');
-const mkdirp = require('mkdirp');
 
 module.exports = class FileRecoveryService {
   constructor(recoveryDirectory) {
@@ -168,7 +167,7 @@ async function tryStatFile(path) {
 
 async function copyFile(source, destination, mode) {
   return new Promise((resolve, reject) => {
-    mkdirp(Path.dirname(destination), error => {
+    fs.mkdir(Path.dirname(destination), {recursive:true}, error => {
       if (error) return reject(error);
       const readStream = fs.createReadStream(source);
       readStream.on('error', reject).once('open', () => {
