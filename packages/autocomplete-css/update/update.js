@@ -105,8 +105,8 @@ async function update(params) {
   };
 
   // Now lets sort the properties according to length
-  console.log("BubbleSort...");
-  completions.properties = bubbleSort(completions.properties);
+  console.log("LengthSort...");
+  completions.properties = lengthSort(completions.properties);
   // Then lets sort properties by popularity
   console.log("PopularSort...");
   completions.properties = await popularSort(completions.properties);
@@ -142,7 +142,7 @@ async function update(params) {
   };
 }
 
-function bubbleSort(obj) {
+function lengthSort(obj) {
   let keys = Object.keys(obj);
 
   keys.sort((a, b) => {
