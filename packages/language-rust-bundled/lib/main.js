@@ -8,7 +8,9 @@ exports.activate = function() {
       content(node) {
         return node.lastChild;
       },
-      includeChildren: true
+      includeChildren: true,
+      languageScope: null,
+      coverShallowerScopes: true
     });
   }
 };

@@ -29,13 +29,6 @@
   dependencies:
     "@babel/core" "7.x"
 
-"@atom/fuzzy-native@^1.1.2":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@atom/fuzzy-native/-/fuzzy-native-1.2.1.tgz#2a773bfa230da99e65c6708218b09bbd78293191"
-  integrity sha512-ABUIbeQqfoA4WUK+PAsspM9jLaGlj0wjyIc9CIi1OMAHv71/vqrpJHPX2fHWiREEXYxwh/CBCshhkOWESbnNnQ==
-  dependencies:
-    nan "^2.14.2"
-
 "@atom/source-map-support@^0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@atom/source-map-support/-/source-map-support-0.3.4.tgz#55ccbe0e64b2c742c5b333f357f9a93161145cfd"
@@ -1583,6 +1576,12 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
+"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
+  version "1.2.1"
+  resolved "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5fe348bc0a38bbec1de86d43940893010c8"
+  dependencies:
+    nan "2.17.0"
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -1774,9 +1773,9 @@
   integrity sha512-CRpX21/kGdzjOpFsZSkcrXMGIBWMGNIHXXBVFSH+ggkftxg+XYP20TESbh+zFvFj3EQOl5byk0HTRn1IL6hbqg==
 
 "@types/node@^14.6.2":
-  version "14.18.33"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.33.tgz#8c29a0036771569662e4635790ffa9e057db379b"
-  integrity sha512-qelS/Ra6sacc4loe/3MSjXNL1dNQ/GjxNHVzuChwMfmk7HuycRLVQN2qNY3XahK+fZc5E2szqQSKUyAF0E+2bg==
+  version "14.18.42"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.42.tgz#fa39b2dc8e0eba61bdf51c66502f84e23b66e114"
+  integrity sha512-xefu+RBie4xWlK8hwAzGh3npDz/4VhF6icY/shU+zv/1fNn+ZVG7T7CRwe9LId9sAYRPxI+59QBPuKL3WpyGRg==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -2256,11 +2255,6 @@ async-exit-hook@^2.0.1:
   resolved "https://registry.yarnpkg.com/async-exit-hook/-/async-exit-hook-2.0.1.tgz#8bd8b024b0ec9b1c01cccb9af9db29bd717dfaf3"
   integrity sha512-NW2cX8m1Q7KPA7a5M2ULQeZ2wR5qI5PAbw5L0UOMxdioVk9PMZ0h1TmyZEkPYrCvYjDlFICusOu1dlEKAAeXBw==
 
-async@0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.2.6.tgz#ad3f373d9249ae324881565582bc90e152abbd68"
-  integrity sha512-LTdAJ0KBRK5o4BlBlUoGvfGNOMON+NLbONgDZk80SX0G8LQZyjN+74nNADIpQ/+rxun6+fYm7z4vIzAB51UKUA==
-
 async@3.2.4, async@^3.2.0, async@^3.2.3:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
@@ -2347,9 +2341,8 @@ atom-slick@^2, atom-slick@^2.0.0:
   resolved "https://registry.yarnpkg.com/atom-slick/-/atom-slick-2.0.0.tgz#ff0dbe15be2c4eda268b9d30d76e2517e0b7d3ca"
   integrity sha512-yKl/4ZHeP3v6gtncnX6pAPFNv3gQNNYlXMk1QYP5gYB6xq2xqkFXbpwQo3IixGUZMf+DHilAmHOrS21QKLLi9g==
 
-"autocomplete-atom-api@https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7":
+"autocomplete-atom-api@file:packages/autocomplete-atom-api":
   version "0.10.7"
-  resolved "https://codeload.github.com/atom/autocomplete-atom-api/legacy.tar.gz/refs/tags/v0.10.7#c9d51fa721d543ccfc1b2189101155e81db6b97d"
 
 "autocomplete-css@file:packages/autocomplete-css":
   version "0.17.5"
@@ -3814,10 +3807,10 @@ dompurify@2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.17.tgz#505ffa126a580603df4007e034bdc9b6b738668e"
   integrity sha512-nNwwJfW55r8akD8MSFz6k75bzyT2y6JEa1O3JrZFBf+Y5R9JXXU4OsRl0B9hKoPgHTw2b7ER5yJ5Md97MMUJPg==
 
-dompurify@^1.0.3:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.11.tgz#fe0f4a40d147f7cebbe31a50a1357539cfc1eb4d"
-  integrity sha512-XywCTXZtc/qCX3iprD1pIklRVk/uhl8BKpkTxr+ZyMVUzSUg7wkQXRBp/euJ5J5moa1QvfpvaPQVP71z1O59dQ==
+dompurify@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.3.tgz#4b115d15a091ddc96f232bcef668550a2f6f1430"
+  integrity sha512-axQ9zieHLnAnHh0sfAamKYiqXMJAVwu+LM/alQ7WDagoWessyWvMSFyW65CqF3owufNu8HBcE4cM2Vflu7YWcQ==
 
 dompurify@^2.0.17:
   version "2.4.1"
@@ -4554,9 +4547,8 @@ fill-range@^7.0.1:
   dependencies:
     to-regex-range "^5.0.1"
 
-"find-and-replace@https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz":
-  version "0.220.1"
-  resolved "https://github.com/atom-community/find-and-replace/archive/refs/tags/v0.220.1.tar.gz#d7a0f56511e38ee72a89895a795bbbcab4a1a405"
+"find-and-replace@file:packages/find-and-replace":
+  version "0.219.8"
   dependencies:
     binary-search "^1.3.3"
     etch "0.9.3"
@@ -4794,6 +4786,11 @@ function.prototype.name@^1.1.5:
     es-abstract "^1.19.0"
     functions-have-names "^1.2.2"
 
+functional-red-black-tree@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
+  integrity sha512-dsKNQNdj6xA3T+QlADDA7mOSlX0qiMINjn0cgr+eGHGsbSHzTabcIogz2+p/iqP1Xs6EP/sS2SbqH+brGTbq0g==
+
 functions-have-names@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
@@ -4804,24 +4801,18 @@ fuzzaldrin-plus@^0.6.0:
   resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
   integrity sha512-srIDThJHkdp3aPwJpR/HNzYZCRJwm07b/igxseoHSB7qR8e/gQp4F6lMGknE3TQI1Aq14TiFf/wzrHOp9LY/EA==
 
-fuzzaldrin@^2.0, fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
+fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
 
-"fuzzy-finder@https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3":
+"fuzzy-finder@file:packages/fuzzy-finder":
   version "1.14.3"
-  resolved "https://codeload.github.com/atom/fuzzy-finder/legacy.tar.gz/refs/tags/v1.14.3#7cd40191b8930bb49039a860ab868f554f90f41d"
   dependencies:
-    "@atom/fuzzy-native" "^1.1.2"
-    async "0.2.6"
+    "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    fuzzaldrin "^2.0"
-    fuzzaldrin-plus "^0.6.0"
-    humanize-plus "~1.8.2"
     minimatch "~3.0.3"
-    temp "~0.8.1"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -6263,6 +6254,7 @@ ky@0.30.0:
 "language-ruby@file:packages/language-ruby":
   version "0.73.0"
   dependencies:
+    tree-sitter-regex "^0.19.0"
     tree-sitter-ruby "^0.19.0"
 
 "language-rust-bundled@file:packages/language-rust-bundled":
@@ -7032,7 +7024,7 @@ nan@2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
-nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
+nan@2.17.0, nan@^2.10.0, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.14.1, nan@^2.14.2:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
   integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
@@ -7233,11 +7225,10 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-"notifications@https://codeload.github.com/atom/notifications/legacy.tar.gz/refs/tags/v0.72.1":
-  version "0.72.1"
-  resolved "https://codeload.github.com/atom/notifications/legacy.tar.gz/refs/tags/v0.72.1#4e5a155624b1189bdcc3416a9f736ed1e030b56e"
+"notifications@file:./packages/notifications":
+  version "0.73.0"
   dependencies:
-    dompurify "^1.0.3"
+    dompurify "3.0.3"
     fs-plus "^3.0.0"
     marked "^0.3.6"
     moment "^2.19.3"
@@ -7703,10 +7694,10 @@ postcss-selector-parser@6.0.4:
     uniq "^1.0.1"
     util-deprecate "^1.0.2"
 
-postcss@8.2.10:
-  version "8.2.10"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.10.tgz#ca7a042aa8aff494b334d0ff3e9e77079f6f702b"
-  integrity sha512-b/h7CPV7QEdrqIxtAf2j31U5ef05uBDuvoXv6L51Q4rcS1jdlXAVKJv+atCFdUXYl9dyTHGyoMzIepwowRJjFw==
+postcss@8.2.13:
+  version "8.2.13"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.13.tgz#dbe043e26e3c068e45113b1ed6375d2d37e2129f"
+  integrity sha512-FCE5xLH+hjbzRdpbRb1IMCvPv9yZx2QnDarBEYSN0N0HYk+TcXsEhwdFcFb+SRWOKzKGErhIEbBK2ogyLdTtfQ==
   dependencies:
     colorette "^1.2.2"
     nanoid "^3.1.22"
@@ -8470,9 +8461,9 @@ season@^6.0.2:
     fs-plus "^3.0.0"
     yargs "^3.23.0"
 
-"second-mate@https://github.com/pulsar-edit/second-mate.git#14aa7bd":
+"second-mate@https://github.com/pulsar-edit/second-mate.git#9686771":
   version "8.0.0"
-  resolved "https://github.com/pulsar-edit/second-mate.git#14aa7bd94b90c47aa99f000394301b9573b8898b"
+  resolved "https://github.com/pulsar-edit/second-mate.git#9686771b4aa3159fe042528d60fcac3af3e1c655"
   dependencies:
     emissary "^1.3.3"
     event-kit "^2.5.3"
@@ -9441,7 +9432,7 @@ tree-sitter-python@0.19.0:
   dependencies:
     nan "^2.14.0"
 
-tree-sitter-regex@0.19.0:
+tree-sitter-regex@0.19.0, tree-sitter-regex@^0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/tree-sitter-regex/-/tree-sitter-regex-0.19.0.tgz#b4b3f44dc742684881a7c05635e075d90ff5414d"
   integrity sha512-hKaGO6ect2MuGwY+PU89JJdkgwRRseDgVNiRaZTLXQyW8vAsZLOb/tkphY9NF9U+ZOeLATotKwG+rLykYYWXyA==
@@ -9478,9 +9469,8 @@ tree-sitter@0.20.0:
     nan "^2.14.0"
     prebuild-install "^6.0.1"
 
-"tree-view@https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1":
+"tree-view@file:packages/tree-view":
   version "0.229.1"
-  resolved "https://codeload.github.com/atom/tree-view/legacy.tar.gz/refs/tags/v0.229.1#f95938fe9aefbcdfed186d6285c3b014e435eee8"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
@@ -9839,6 +9829,11 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
+
+web-tree-sitter@^0.20.7:
+  version "0.20.7"
+  resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.20.7.tgz#b0ddb78e8244221a3100f432c7e162516cd9cd09"
+  integrity sha512-flC9JJmTII9uAeeYpWF8hxDJ7bfY+leldQryetll8Nv4WgI+MXc6h7TiyAZASWl9uC9TvmfdgOjZn1DAQecb3A==
 
 webdriver@7.20.8:
   version "7.20.8"

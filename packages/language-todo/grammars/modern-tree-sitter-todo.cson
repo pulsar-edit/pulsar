@@ -1,0 +1,9 @@
+# name: 'TODO'
+scopeName: 'text.todo'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-todo'
+
+injectionRegex: '^(todo|TODO)$'
+treeSitter:
+  grammar: 'ts/tree-sitter-todo.wasm'
+  highlightsQuery: 'ts/highlights.scm'
