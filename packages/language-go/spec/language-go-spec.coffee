@@ -5,7 +5,8 @@ describe 'Go settings', ->
     editor.destroy()
 
   beforeEach ->
-    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set 'core.useTreeSitterParsers', false
+
 
     waitsForPromise ->
       atom.workspace.open().then (o) ->
@@ -18,45 +19,45 @@ describe 'Go settings', ->
   it 'matches lines correctly using the increaseIndentPattern', ->
     increaseIndentRegex = languageMode.increaseIndentRegexForScopeDescriptor(['source.go'])
 
-    expect(increaseIndentRegex.testSync('  case true:')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  default:')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('func something() {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  if true {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  else {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  switch {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  switch true {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  select {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  select true {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  for v := range val {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  for i := 0; i < 10; i++ {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  for i := 0; i < 10; i++ {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  type something struct {')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  fmt.Printf("some%s",')).toBeTruthy()
-    expect(increaseIndentRegex.testSync('  aSlice := []string{}{')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  case true:')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  default:')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('func something() {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  if true {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  else {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  switch {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  switch true {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  select {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  select true {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  for v := range val {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  for i := 0; i < 10; i++ {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  for i := 0; i < 10; i++ {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  type something struct {')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  fmt.Printf("some%s",')).toBeTruthy()
+    expect(increaseIndentRegex.findNextMatchSync('  aSlice := []string{}{')).toBeTruthy()
 
   it 'matches lines correctly using the decreaseIndentPattern', ->
     decreaseIndentRegex = languageMode.decreaseIndentRegexForScopeDescriptor(['source.go'])
 
-    expect(decreaseIndentRegex.testSync('  case true:')).toBeTruthy()
-    expect(decreaseIndentRegex.testSync('  default:')).toBeTruthy()
-    expect(decreaseIndentRegex.testSync('  }')).toBeTruthy()
-    expect(decreaseIndentRegex.testSync('  },')).toBeTruthy()
-    expect(decreaseIndentRegex.testSync('  )')).toBeTruthy()
-    expect(decreaseIndentRegex.testSync('  ),')).toBeTruthy()
+    expect(decreaseIndentRegex.findNextMatchSync('  case true:')).toBeTruthy()
+    expect(decreaseIndentRegex.findNextMatchSync('  default:')).toBeTruthy()
+    expect(decreaseIndentRegex.findNextMatchSync('  }')).toBeTruthy()
+    expect(decreaseIndentRegex.findNextMatchSync('  },')).toBeTruthy()
+    expect(decreaseIndentRegex.findNextMatchSync('  )')).toBeTruthy()
+    expect(decreaseIndentRegex.findNextMatchSync('  ),')).toBeTruthy()
 
   it 'matches lines correctly using the decreaseNextIndentPattern', ->
     decreaseNextIndentRegex = languageMode.decreaseNextIndentRegexForScopeDescriptor(['source.go'])
 
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"))')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println("something")),')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"), "x"),')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println(fmt.Sprint("something"))),')).toBeTruthy()
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println(fmt.Sprint("something"), "x")),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println("something"))')).toBeTruthy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println("something")),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println("something"), "x"),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println(fmt.Sprint("something"))),')).toBeTruthy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println(fmt.Sprint("something"), "x")),')).toBeTruthy()
 
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println("something")')).toBeFalsy()
-    expect(decreaseNextIndentRegex.testSync('  fmt.Println("something"),')).toBeFalsy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println("something")')).toBeFalsy()
+    expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println("something"),')).toBeFalsy()
 
     # a line with many (), testing for catastrophic backtracking.
     # see https://github.com/atom/language-go/issues/78
     longLine = 'first.second().third().fourth().fifth().sixth().seventh().eighth().ninth().tenth()'
-    expect(decreaseNextIndentRegex.testSync(longLine)).toBeFalsy()
+    expect(decreaseNextIndentRegex.findNextMatchSync(longLine)).toBeFalsy()

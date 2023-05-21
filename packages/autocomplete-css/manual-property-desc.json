@@ -1,0 +1,898 @@
+{
+  "-webkit-align-items": {
+    "desc": "Legacy Alias of align-items.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-align-content": {
+    "desc": "Legacy Alias of align-content.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-align-self": {
+    "desc": "Legacy Alias of align-self.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-name": {
+    "desc": "Legacy Alias of animation-name.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-duration": {
+    "desc": "Legacy Alias of animation-duration.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-timing-function": {
+    "desc": "Legacy Alias of animation-timing-function.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-iteration-count": {
+    "desc": "Legacy Alias of animation-iteration-count.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-direction": {
+    "desc": "Legacy Alias of animation-direction.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-play-state": {
+    "desc": "Legacy Alias of animation-play-state.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-delay": {
+    "desc": "Legacy Alias of animation-delay.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation-fill-mode": {
+    "desc": "Legacy Alias of animation-fill-mode.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-animation": {
+    "desc": "Legacy Alias of animation.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-backface-visibility": {
+    "desc": "Legacy Alias of backface-visibility.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-background-clip": {
+    "desc": "Legacy Alias of background-clip.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-background-origin": {
+    "desc": "Legacy Alias of background-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-background-size": {
+    "desc": "Improper implementation of a legacy alias for background-size.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-bottom-left-radius": {
+    "desc": "Legacy Alias of border-bottom-left-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-bottom-right-radius": {
+    "desc": "Legacy Alias of border-bottom-right-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-top-left-radius": {
+    "desc": "Legacy Alias of border-top-left-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-top-right-radius": {
+    "desc": "Legacy Alias of border-top-right-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-border-radius": {
+    "desc": "Legacy Alias of border-radius.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-box-shadow": {
+    "desc": "Legacy Alias of box-shadow.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-box-sizing": {
+    "desc": "Legacy Alias of box-sizing.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex": {
+    "desc": "Legacy Alias of flex.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-basis": {
+    "desc": "Legacy Alias of flex-basis.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-direction": {
+    "desc": "Legacy Alias of flex-direction.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-flow": {
+    "desc": "Legacy Alias of flex-flow.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-grow": {
+    "desc": "Legacy Alias of flex-grow.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-shrink": {
+    "desc": "Legacy Alias of flex-shrink.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-flex-wrap": {
+    "desc": "Legacy Alias of flex-wrap.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-filter": {
+    "desc": "Legacy Alias of filter.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-justify-content": {
+    "desc": "Legacy Alias of justify-content.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask": {
+    "desc": "Legacy Alias of mask.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-outset": {
+    "desc": "Legacy Alias of mask-border-outset.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-repeat": {
+    "desc": "Legacy Alias of mask-border-repeat.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-slice": {
+    "desc": "Legacy Alias of mask-border-slice.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-source": {
+    "desc": "Legacy Alias of mask-border-source.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-box-image-width": {
+    "desc": "Legacy Alias of mask-border-width.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-clip": {
+    "desc": "Legacy Alias of mask-clip.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-image": {
+    "desc": "Legacy Alias of mask-image.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-origin": {
+    "desc": "Legacy Alias of mask-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-position": {
+    "desc": "Legacy Alias of mask-position.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-repeat": {
+    "desc": "Legacy Alias of mask-repeat.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-mask-size": {
+    "desc": "Legacy Alias of mask-size.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-order": {
+    "desc": "Legacy Alias of order.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-perspective": {
+    "desc": "Legacy Alias of perspective.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-perspective-origin": {
+    "desc": "Legacy Alias of perspective-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transform-origin": {
+    "desc": "Legacy Alias of transform-origin.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transform-style": {
+    "desc": "Legacy Alias of transform-style.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transform": {
+    "desc": "Legacy Alias of transform.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-delay": {
+    "desc": "Legacy Alias of transition-delay.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-duration": {
+    "desc": "Legacy Alias of transition-duration.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-property": {
+    "desc": "Legacy Alias of transition-property.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition-timing-function": {
+    "desc": "Legacy Alias of transition-timing-function.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-transition": {
+    "desc": "Legacy Alias of transition.",
+    "spec": "https://compat.spec.whatwg.org/#css-simple-aliases"
+  },
+  "-webkit-appearance": {
+    "desc": "Legacy Name Alias of appearance.",
+    "spec": "https://drafts.csswg.org/css-ui/#appearance-switching"
+  },
+  "-webkit-user-select": {
+    "desc": "Alias shorthand property of user-select.",
+    "spec": "https://drafts.csswg.org/css-ui/#propdef--webkit-user-select"
+  },
+  "-webkit-text-size-adjust": {
+    "desc": "Vendor Prefixed Legacy Name Alias. (-vendorPrefix-)text-size-adjust",
+    "spec": "https://compat.spec.whatwg.org/#css-prefixed-aliases"
+  },
+  "-webkit-box-align": {
+    "desc": "Vendor prefixed property mapping to align-items.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-flex": {
+    "desc": "Vendor prefixed property mapping to flex-grow.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-ordinal-group": {
+    "desc": "Vendor prefixed property mapping to order.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-orient": {
+    "desc": "Vendor prefixed property mapping to flex-direction.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "-webkit-box-pack": {
+    "desc": "Vendor prefixed property mapping to justify-content.",
+    "spec": "https://compat.spec.whatwg.org/#css-property-mappings"
+  },
+  "fill-break": {
+    "desc": "This property specifies how the geometry of a fragmented box is treated for fills.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-break"
+  },
+  "fill-image": {
+    "desc": "This property sets the fill images of an element. Images are drawn with the first specified one on top (closest to the user) and each subsequent image behind the previous one.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-image"
+  },
+  "fill-origin": {
+    "desc": "This property specifies the coordinate system of the fill, setting the fill positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-origin"
+  },
+  "fill-position": {
+    "desc": "If fill images have been specified, this property specifies their initial position (after any resizing) within their corresponding fill positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-position"
+  },
+  "fill-size": {
+    "desc": "Specifies the size of the fill images. Values are interpreted identically to background-size, mutatis mutandi.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-size"
+  },
+  "fill-repeat": {
+    "desc": "Specifies how fill images are tiled after they have been sized and positioned.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-repeat"
+  },
+  "stroke-align": {
+    "desc": "This property allows the author to align a stroke along the outline.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-align"
+  },
+  "stroke-break": {
+    "desc": "This property specifies how the geometry of a fragmented box is treated for strokes.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-break"
+  },
+  "stroke-dash-corner": {
+    "desc": "The stroke-dash-corner property controls whether a dash is always painted at the vertices of a stroked shape.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#propdef-stroke-dash-corner"
+  },
+  "stroke-dash-justify": {
+    "desc": "The stroke-dash-justify property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along each of an element's subpaths.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#propdef-stroke-dash-justify"
+  },
+  "stroke-color": {
+    "desc": "This property sets the stroke colors of an element.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-color"
+  },
+  "stroke-image": {
+    "desc": "This property sets the stroke images of an element.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-image"
+  },
+  "stroke-origin": {
+    "desc": "This property specifies the coordinate system of the stroke, setting the stroke positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-origin"
+  },
+  "stroke-position": {
+    "desc": "If stroke images have been specified, this property specifies their initial position (after any resizing) within their corresponding stroke positioning area.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-position"
+  },
+  "stroke-size": {
+    "desc": "Specifies the size of the stroke images.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-size"
+  },
+  "stroke-repeat": {
+    "desc": "Specifies how stroke fill images are tiled after they have been sized and positioned.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#stroke-repeat"
+  },
+  "shape-subtract": {
+    "desc": "The shape-subtract property allows one to exclude part of the content area from the wrapping area. The excluded area is the addition of all the areas defined in a list of CSS basic shapes and/or SVG shapes.",
+    "spec": "https://svgwg.org/svg2-draft/text.html#TextShapeSubtract"
+  },
+  "stroke-alignment": {
+    "desc": "This property allows the author to align a stroke along the outline of the current object.",
+    "spec": "https://svgwg.org/specs/strokes/#SpecifyingStrokeAlignment"
+  },
+  "stroke-dashcorner": {
+    "desc": "The stroke-dashcorner property controls whether a dash is always painted at the vertices of a stroked shape.",
+    "spec": "https://svgwg.org/specs/strokes/#StrokeDashcornerProperty"
+  },
+  "stroke-dashadjust": {
+    "desc": "The stroke-dashadjust property specifies whether and how a stroke's dash pattern will be adjusted so that it is repeated a whole number of times along an element's subpaths.",
+    "spec": "https://svgwg.org/specs/strokes/#StrokeDashadjustProperty"
+  },
+  "grid-row-gap": {
+    "desc": "Shorthand for the row-gap property.",
+    "spec": "https://drafts.csswg.org/css-align-3/#gap-legacy"
+  },
+  "grid-column-gap": {
+    "desc": "Shorthand for the column-gap property.",
+    "spec": "https://drafts.csswg.org/css-align-3/#gap-legacy"
+  },
+  "grid-gap": {
+    "desc": "Shorthand for the gap property.",
+    "spec": "https://drafts.csswg.org/css-align-3/#gap-legacy"
+  },
+  "anchor-scroll": {
+    "desc": "The anchor-scroll property allows an author to compensate for none aligned positioned elements and their anchor without losing the performance benefits of the separate scrolling thread.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#scroll"
+  },
+  "anchor-name": {
+    "desc": "Allows anchor functions to refer to an anchor element by name.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#determining"
+  },
+  "anchor-default": {
+    "desc": "The anchor-default property defines the default anchor specifier for all anchor functions on the element.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#anchor-default"
+  },
+  "position-fallback": {
+    "desc": "Provides blocks of style rules to try out. The first that doesn't cause the element to overflow its containing block is taken as the winner.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#fallback-property"
+  },
+  "background-position-inline": {
+    "desc": "This property specifies the background position's inline-axis component.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#background-position-longhands"
+  },
+  "background-position-block": {
+    "desc": "This property specifies the background position's block-axis component.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#propdef-background-position-block"
+  },
+  "corner-shape": {
+    "desc": "The corner-shape property specifies a reinterpretation of the radii to define other corner shapes.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#corner-shaping"
+  },
+  "corners": {
+    "desc": "The corners shorthand sets corner-shape and border-radius in the same declaration.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#corners-shorthand"
+  },
+  "border-limit": {
+    "desc": "Specifies which part of the border is rendered.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-limit"
+  },
+  "border-clip": {
+    "desc": "Shorthand for border-clip-top, border-clip-right, border-clip-bottom, and border-clip-left.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-top": {
+    "desc": "Splits the top border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-right": {
+    "desc": "Splits the right border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-bottom": {
+    "desc": "Splits the bottom border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "border-clip-left": {
+    "desc": "Splits the left border into parts along the border edge.",
+    "spec": "https://drafts.csswg.org/css-backgrounds-4/#border-clip"
+  },
+  "voice-family": {
+    "desc": "The voice-family property specifies a prioritized list of component values that are separated by commas to indicate that they are alternatives.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-family"
+  },
+  "voice-rate": {
+    "desc": "The voice-rate property manipulates the rate of generated synthetic speech in terms of words per minute.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-rate"
+  },
+  "voice-pitch": {
+    "desc": "The voice-pitch property specifies the 'baseline' pitch of the generated speech output, which depends on the user 'voice-family' instance, and varies across speech synthesis processors.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-pitch"
+  },
+  "voice-range": {
+    "desc": "The voice-range property specifies the variability in the 'baseline' pitch.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-range"
+  },
+  "voice-stress": {
+    "desc": "The voice-stress property manipulates the strength of emphasis, which is normally applied using a combination of pitch change, timing changes, loudness and other acoustic differences.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#voice-props-voice-stress"
+  },
+  "voice-duration": {
+    "desc": "The voice-duration property specifies how long it should take to render the selected element's content.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#mixing-props-voice-duration"
+  },
+  "voice-volume": {
+    "desc": "The voice-volume property allows authors to control the amplitude of the audio waveform generated by the speech synthesizer, and is also used to adjust the relative volume level of audio cues within the aural box model of the selected element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#mixing-props-voice-volume"
+  },
+  "voice-balance": {
+    "desc": "The voice-balance property controls the spatial distribution of audio output across a lateral sound stage: one extremity is on the left, the other extremity is on the right hand side, relative to the listener’s position.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#mixing-props-voice-balance"
+  },
+  "speak": {
+    "desc": "The speak property determines whether or not to render text aurally.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#speaking-props-speak"
+  },
+  "speak-as": {
+    "desc": "The speak-as property determines in what manner text gets rendered aurally, based upon a predefined list of possibilities.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#speaking-props-speak-as"
+  },
+  "pause-before": {
+    "desc": "The pause-before property specifies a prosodic boundary (silence with a specific duration) that occurs before the speech synthesis rendition of the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#pause-props-pause-before-after"
+  },
+  "pause-after": {
+    "desc": "The pause-after property specifies a prosodic boundary (silence with a specific duration) that occurs after the speech synthesis rendition of the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#pause-props-pause-before-after"
+  },
+  "pause": {
+    "desc": "The pause property is a shorthand property for pause-before and pause-after.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#pause-props-pause"
+  },
+  "rest-before": {
+    "desc": "The rest-before property specifies a prosodic boundary (silence with a specific duration) that occurs before the speech synthesis rendition of an element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#rest-props-rest-before-after"
+  },
+  "rest-after": {
+    "desc": "The rest-after property specifies a prosodic boundary (silence with a specific duration) that occurs after the speech synthesis rendition of an element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#rest-props-rest-before-after"
+  },
+  "rest": {
+    "desc": "The rest property is a shorthand for rest-before and rest-after.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#rest-props-rest"
+  },
+  "cue-before": {
+    "desc": "The cue-before property specifies auditory icons to be played before the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#cue-props-cue-before-after"
+  },
+  "cue-after": {
+    "desc": "The cue-after property specifies auditory icons to be played after the element.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#cue-props-cue-before-after"
+  },
+  "cue": {
+    "desc": "The cue property is a shorthand for cue-before and cue-after.",
+    "spec": "https://drafts.csswg.org/css-speech-1/#cue-props-cue"
+  },
+  "word-boundary-detection": {
+    "desc": "This property allows the author to decide whether and how the user agent must analyse the content to determine where word boundaries are, and to insert virtual word boundaries accordingly.",
+    "spec": "https://drafts.csswg.org/css-text-4/#word-boundary-detection"
+  },
+  "word-boundary-expansion": {
+    "desc": "This property allows transforming certain word-separating characters into other word-separating characters, to accommodate variant typesetting styles.",
+    "spec": "https://drafts.csswg.org/css-text-4/#word-boundary-expansion"
+  },
+  "text-space-trim": {
+    "desc": "This property allows authors to specify trimming behavior at the beginning and end of a box.",
+    "spec": "https://drafts.csswg.org/css-text-4/#white-space-trim"
+  },
+  "hyphenate-limit-zone": {
+    "desc": "This property specifies the maximum amount of unfilled space (before justification) that may be left in the line box before hyphenation is triggered to pull part of a word from the next line back up into the current line.",
+    "spec": "https://drafts.csswg.org/css-text-4/#hyphenate-size-limits"
+  },
+  "hyphenate-limit-lines": {
+    "desc": "This property indicates the maximum number of successive hyphenated lines in an element. The no-limit value means that there is no limit.",
+    "spec": "https://drafts.csswg.org/css-text-4/#hyphenate-line-limits"
+  },
+  "hyphenate-limit-last": {
+    "desc": "This property indicates hyphenation behavior at the end of elements, column, pages, and spreads.",
+    "spec": "https://drafts.csswg.org/css-text-4/#hyphenate-line-limits"
+  },
+  "word-wrap": {
+    "desc": "This property specifies whether the UA may break at otherwise disallowed points within a line to prevent overflow, when an otherwise-unbreakable string is too long to fit within the line box.",
+    "spec": "https://drafts.csswg.org/css-text-4/#overflow-wrap-property"
+  },
+  "text-wrap": {
+    "desc": "This property specifies the mode for text wrapping.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-wrap"
+  },
+  "wrap-before": {
+    "desc": "The wrap-before property specifies modifications to break opportunities in line breaking.",
+    "spec": "https://drafts.csswg.org/css-text-4/#wrap-before"
+  },
+  "wrap-after": {
+    "desc": "The wrap-after property specifies modifications to break opportunities in line breaking.",
+    "spec": "https://drafts.csswg.org/css-text-4/#wrap-before"
+  },
+  "wrap-inside": {
+    "desc": "Specifies the line breaking behavior within a box. As determed by the line-breaking rules in effect.",
+    "spec": "https://drafts.csswg.org/css-text-4/#wrap-inside"
+  },
+  "text-align-all": {
+    "desc": "This longhand of the text-align shorthand property specifies the inline alignment of all lines of inline content in the block container, except for last lines overridden by a non-auto value of text-align-last.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-align-all-property"
+  },
+  "text-group-align": {
+    "desc": "This property aligns the contents of the line boxes as a group while maintaining their text alignment.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-group-align-property"
+  },
+  "line-padding": {
+    "desc": "Adjusts spacing only at the start/end of a line.",
+    "spec": "https://drafts.csswg.org/css-text-4/#line-padding-property"
+  },
+  "text-spacing": {
+    "desc": "This property is a shorthand for setting text-spacing-trim and text-autospace in a single declaration.",
+    "spec": "https://drafts.csswg.org/css-text-4/#text-spacing-property"
+  },
+  "animation-range-end": {
+    "desc": "Shifts the end time of the animation (i.e. where keyframes mapped to 100% progress are attached when the iteration count is 1) to the specified position on the timeline.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#valdef-animation-range-start-timeline-range-name-percentage"
+  },
+  "animation-range-start": {
+    "desc": "Shifts the start time of the animation (i.e. where keyframes mapped to 0% progress are attached when the iteration count is 1) to the specified position on the timeline.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-animation-range-start"
+  },
+  "animation-range": {
+    "desc": "The animation-range property is a shorthand that sets animation-range-start and animation-range-end together in a single declaration.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-animation-range"
+  },
+  "view-timeline": {
+    "desc": "This property is a shorthand for setting view-timeline-name and view-timeline-axis in a single declaration. It does not set view-timeline-inset.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline"
+  },
+  "view-timeline-inset": {
+    "desc": "Specifies an inset (positive) or outset (negative) adjustment of the scrollport when determining whether the box is in view when setting the bounds of the corresponding view progress timeline.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline-inset"
+  },
+  "view-timeline-axis": {
+    "desc": "Specifies an axis for each named view progress timeline associated with this scroll container.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline-axis"
+  },
+  "view-timeline-name": {
+    "desc": "Specifies names for any view progress timelines associated with this element’s principal box.",
+    "spec": "https://drafts.csswg.org/scroll-animations-1/#propdef-view-timeline-name"
+  },
+  "fill-color": {
+    "desc": "This property sets the fill color of an element. This color is drawn behind any fill images.",
+    "spec": "https://drafts.fxtf.org/fill-stroke-3/#fill-color"
+  },
+  "view-transition-name": {
+    "desc": "The view-transition-name property 'names' an element as participating in a view transition.",
+    "spec": "https://drafts.csswg.org/css-view-transitions-1/#view-transition-name-prop"
+  },
+  "input-security": {
+    "desc": "For the purpose of this specification, a sensitive text input is a text input whose purpose is to accept sensitive input, as defined by the host language.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#input-security"
+  },
+  "nav-left": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "nav-down": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "nav-right": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "nav-up": {
+    "desc": "User agents for devices with directional navigation keys respond by navigating the focus according to four respective nav-* directional navigation properties (nav-up, nav-right, nav-down, nav-left).",
+    "spec": "https://drafts.csswg.org/css-ui-4/#nav-dir"
+  },
+  "caret": {
+    "desc": "This property is a shorthand for setting caret-color and caret-shape in one declaration.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#caret"
+  },
+  "caret-shape": {
+    "desc": "This property allows authors to specify the desired shape of the text insertion caret.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#caret-shape"
+  },
+  "text-emphasis-skip": {
+    "desc": "This property describes for which characters marks are drawn.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-emphasis-skip"
+  },
+  "text-decoration-skip-spaces": {
+    "desc": "This property specifies whether text decoration skips any spaces.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-spaces-property"
+  },
+  "text-decoration-skip-box": {
+    "desc": "This property specifies what parts of the element’s box area any text decoration affecting the element must skip over.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-box-property"
+  },
+  "text-decoration-skip-self": {
+    "desc": "This property specifies whether any text decoration lines drawn by its ancestors are propagated to or drawn across the element.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-self-property"
+  },
+  "text-decoration-trim": {
+    "desc": "This property adjusts the start and end points of line decorations, allowing the author to shorten, lengthen, or shift the decoration with respect to the text.",
+    "spec": "https://drafts.csswg.org/css-text-decor-4/#text-decoration-skip-inset-property"
+  },
+  "text-space-collapse": {
+    "desc": "Previous name of 'white-space-collapse'",
+    "spec": "https://drafts.csswg.org/css-text-4/#changes"
+  },
+  "min-intrinsic-sizing": {
+    "desc": "This property defines whether the min-content contribution of a non-replaced box is “compressed” under certain circumstances.",
+    "spec": "https://www.w3.org/TR/css-sizing-4/#intrinsic-contribution-override"
+  },
+  "shape-padding": {
+    "desc": "The shape-padding property adds padding to a shape-inside. This defines a new shape where every point is the specified distance from the shape-inside.",
+    "spec": "https://drafts.csswg.org/css-shapes-2/#propdef-shape-padding"
+  },
+  "shape-inside": {
+    "desc": "The shape-inside property adds one or more exclusion areas to the element’s wrapping context.",
+    "spec": "https://drafts.csswg.org/css-shapes-2/#shape-inside-property"
+  },
+  "scroll-start": {
+    "desc": "This property is a shorthand property that sets all of the scroll-start-* longhands in one declaration.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start"
+  },
+  "scroll-start-target": {
+    "desc": "This property is a shorthand property that sets all of the scroll-start-target-* longhands in one declaration.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-target"
+  },
+  "scroll-start-x": {
+    "desc": "Defines the scroll starting point in the block axis.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-physical"
+  },
+  "scroll-start-y": {
+    "desc": "Defines the scroll starting point in the inline axis.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-physical"
+  },
+  "scroll-start-inline": {
+    "desc": "Defines the flow for 'scroll-start' longhands.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-logical"
+  },
+  "scroll-start-block": {
+    "desc": "Defines the flow for 'scroll-start' longhands.",
+    "spec": "https://drafts.csswg.org/css-scroll-snap-2/#scroll-start-longhands-logical"
+  },
+  "ruby-overhang": {
+    "desc": "The ruby-overhang property controls whether ruby annotations may overlap adjacent text outside the ruby container.",
+    "spec": "https://drafts.csswg.org/css-ruby-1/#ruby-overhang"
+  },
+  "ruby-merge": {
+    "desc": "This property controls how ruby annotation boxes should be rendered when there are more than one in a ruby container box: whether each pair should be kept separate, the annotations should be merged and rendered as a group, or the separation should be determined based on the space available.",
+    "spec": "https://drafts.csswg.org/css-ruby-1/#collapsed-ruby"
+  },
+  "border-boundary": {
+    "desc": "When the border-boundary property on an element is set to 'parent', additional borders of the element could be drawn where the element’s area and the borders of its parent are met.",
+    "spec": "https://drafts.csswg.org/css-round-display-1/#border-boundary-property"
+  },
+  "block-step": {
+    "desc": "This shorthand property allows for setting block-step-size, block-step-insert, block-step-align, and block-step-round in one declaration.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step"
+  },
+  "block-step-round": {
+    "desc": "This property specifies whether adjustments due to block-step-size insert positive or negative space.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-round"
+  },
+  "block-step-align": {
+    "desc": "This property specifies whether extra spacing derived from applying block-step-size is inserted before, inserted after, or split between both sides of the box.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-align"
+  },
+  "block-step-insert": {
+    "desc": "This property specifies whether extra spacing derived from applying block-step-size is inserted inside (like padding) or outside (like margin) the box’s border.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-insert"
+  },
+  "block-step-size": {
+    "desc": "This property defines the step unit for a block-level box’s block size.",
+    "spec": "https://www.w3.org/TR/css-rhythm-1/#block-step-size"
+  },
+  "region-fragment": {
+    "desc": "The region-fragment property controls the behavior of the last usable region associated with a named flow.",
+    "spec": "https://drafts.csswg.org/css-regions-1/#propdef-region-fragment"
+  },
+  "flow-from": {
+    "desc": "The flow-from property makes a block container a region and associates it with a named flow.",
+    "spec": "https://drafts.csswg.org/css-regions-1/#flow-from"
+  },
+  "flow-into": {
+    "desc": "The ‘flow-into’ property can place an element or its contents into a named flow.",
+    "spec": "https://drafts.csswg.org/css-regions-1/#the-flow-into-property"
+  },
+  "page": {
+    "desc": "The page property is used to specify a particular type of page (called a named page) on which an element must be displayed.",
+    "spec": "https://www.w3.org/TR/css-page-3/#using-named-pages"
+  },
+  "float-offset": {
+    "desc": "This property pushes a page float in direction opposite of the where it has been floated with float.",
+    "spec": "https://drafts.csswg.org/css-page-floats-3/#the-float_offset-property"
+  },
+  "float-defer": {
+    "desc": "This property specifies whether the initial float reference of a page float is the fragmentation container in which the float anchor is placed after previous page floats have been placed, or in another one.",
+    "spec": "https://drafts.csswg.org/css-page-floats-3/#float-defer-property"
+  },
+  "float-reference": {
+    "desc": "The floats are aligning to the start or end of a float reference, specified by the float-reference attribute.",
+    "spec": "https://drafts.csswg.org/css-page-floats-3/#float-reference-property"
+  },
+  "max-lines": {
+    "desc": "A property that forces a fragment to break after a specified number of lines.",
+    "spec": "https://www.w3.org/TR/css-overflow-4/#max-lines"
+  },
+  "continue": {
+    "desc": "The continue property gives authors the ability to request that content that does not fit inside an element be fragmented, and provides alternatives for where the remaining content should continue.",
+    "spec": "https://www.w3.org/TR/css-overflow-4/#continue"
+  },
+  "line-clamp": {
+    "desc": "The line-clamp property is a shorthand for the max-lines, block-ellipsis, and continue properties.",
+    "spec": "https://www.w3.org/TR/css-overflow-3/#line-clamp"
+  },
+  "block-ellipsis": {
+    "desc": "This property allows inserting content into the last line box before a (forced or unforced) region break to indicate the continuity of truncated/interrupted content.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#block-ellipsis"
+  },
+  "overflow-clip-margin-block": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-block"
+  },
+  "overflow-clip-margin-inline": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-inline"
+  },
+  "overflow-clip-margin-inline-end": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-inline-end"
+  },
+  "overflow-clip-margin-block-end": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-block-end"
+  },
+  "overflow-clip-margin-inline-start": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-inline-start"
+  },
+  "overflow-clip-margin-block-start": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-block-start"
+  },
+  "overflow-clip-margin-left": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-left"
+  },
+  "overflow-clip-margin-bottom": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-bottom"
+  },
+  "overflow-clip-margin-right": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-right"
+  },
+  "overflow-clip-margin-top": {
+    "desc": "Defines the overflow clip edge of a box.",
+    "spec": "https://drafts.csswg.org/css-overflow-4/#propdef-overflow-clip-margin-top"
+  },
+  "spatial-navigation-function": {
+    "desc": "The default algorithm of spatial navigation specified in the § 8 Processing Model may need the fine tune depending on the layout types.",
+    "spec": "https://www.w3.org/TR/css-nav-1/#css-property-spatialnavigationfunction"
+  },
+  "spatial-navigation-action": {
+    "desc": "When the focus is inside of a scroll container and the user triggers spatial navigation, it is somewhat ambiguous whether they are requesting that the focus be moved in that direction, or whether the document should be scrolled in that direction.",
+    "spec": "https://www.w3.org/TR/css-nav-1/#css-property-spatialnavigationaction"
+  },
+  "spatial-navigation-contain": {
+    "desc": "Creates an additional spatial navigation container.",
+    "spec": "https://www.w3.org/TR/css-nav-1/#container"
+  },
+  "marker-side": {
+    "desc": "The marker-side property specifies whether an outside marker box is positioned based on the directionality of the list item itself (i.e. its originating element) or the directionality of the list container (i.e. the originating element’s parent).",
+    "spec": "https://www.w3.org/TR/css-lists-3/#marker-side"
+  },
+  "link-parameters": {
+    "desc": "The link-parameters property is one way to set link parameters on the element itself, and on all external CSS resources specified on the element.",
+    "spec": "https://drafts.csswg.org/css-link-params-1/#link-param-prop"
+  },
+  "box-snap": {
+    "desc": "Specifies how the block is snapped to the baseline grid.",
+    "spec": "https://www.w3.org/TR/css-line-grid-1/#box-snap"
+  },
+  "line-snap": {
+    "desc": "This property applies to all the line boxes directly contained by the element, and, when not none, causes each line box to shift (usually downward, possibly by zero) until it snaps to the line grid specified by line-grid.",
+    "spec": "https://www.w3.org/TR/css-line-grid-1/#line-snap"
+  },
+  "line-grid": {
+    "desc": "Specifies whether this box creates a new baseline grid for its descendants or uses the same baseline grid as its parent.",
+    "spec": "https://www.w3.org/TR/css-line-grid-1/#line-grid"
+  },
+  "initial-letter-wrap": {
+    "desc": "This property specifies whether lines impacted by an initial letter are shortened to fit the rectangular shape of the initial letter box or the contour of its glyph outline.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#initial-letter-wrapping"
+  },
+  "inline-sizing": {
+    "desc": "This property specifies how the logical height of the content area of an inline box is measured in relation to its contents.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#line-fill"
+  },
+  "leading-trim": {
+    "desc": "On inline boxes, specifies whether to trim the content box to match its corresponding text-edge metric.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#propdef-leading-trim"
+  },
+  "text-edge": {
+    "desc": "Inline boxes, whose primary purpose is to contain text, are sized in the block axis based on their font metrics.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#propdef-text-edge"
+  },
+  "baseline-source": {
+    "desc": "When an inline-level box has more than one possible source for baseline information (such as for a multi-line inline block or inline flex container) this property specifies whether the first baseline set or last baseline set is preferred for alignment, indicating the box’s baseline alignment preference.",
+    "spec": "https://www.w3.org/TR/css-inline-3/#baseline-source"
+  },
+  "object-view-box": {
+    "desc": "The object-view-box property specifies a 'view box' over an element, which allows zooming or panning over the element’s contents.",
+    "spec": "https://drafts.csswg.org/css-images-5/#the-object-view-box"
+  },
+  "string-set": {
+    "desc": "The string-set property contains one or more pairs, each consisting of an custom identifier (the name of the named string) followed by a content-list describing how to construct the value of the named string.",
+    "spec": "https://drafts.csswg.org/css-gcpm-3/#setting-named-strings-the-string-set-pro"
+  },
+  "bookmark-level": {
+    "desc": "The bookmark-level property determines if a bookmark is created, and at what level.",
+    "spec": "https://drafts.csswg.org/css-content-3/#propdef-bookmark-level"
+  },
+  "bookmark-label": {
+    "desc": "Sets the text content of the bookmark label.",
+    "spec": "https://drafts.csswg.org/css-content-3/#bookmark-label"
+  },
+  "bookmark-state": {
+    "desc": "The bookmark-state may be open or closed.",
+    "spec": "https://drafts.csswg.org/css-content-3/#bookmark-state"
+  },
+  "footnote-policy": {
+    "desc": "The footnote-policy property allows authors some influence over the rendering of difficult pages.",
+    "spec": "https://drafts.csswg.org/css-gcpm-3/#footnote-policy"
+  },
+  "footnote-display": {
+    "desc": "The footnote-display property determines whether a footnote is displayed as a block element or inline element.",
+    "spec": "https://drafts.csswg.org/css-gcpm-3/#footnote-types"
+  },
+  "reading-order": {
+    "desc": "The reading-order property controls the order in which elements are rendered to speech or are navigated to when using (linear) sequention navigation methods.",
+    "spec": "https://drafts.csswg.org/css-display-4/#reading-order"
+  },
+  "layout-order": {
+    "desc": "By allowing the layout to be rearranged without affecting the underlying document source order, the layout-order property lets authors keep a document’s reading and interaction order matched to the visual perception order in cases where it does not match the layout order.",
+    "spec": "https://drafts.csswg.org/css-display-4/#layout-order"
+  },
+  "font-synthesis-weight": {
+    "desc": "This property controls whether user agents are allowed to synthesize bold font faces when a font family lacks bold faces.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-weightThis property controls whether user agents are allowed to synthesize bold font faces when a font family lacks bold faces."
+  },
+  "font-synthesis-style": {
+    "desc": "This property controls whether user agents are allowed to synthesize oblique font faces when a font family lacks oblique faces.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-style"
+  },
+  "font-synthesis-small-caps": {
+    "desc": "This property controls whether user agents are allowed to synthesize small caps font faces when a font family lacks small caps faces.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-small-caps"
+  },
+  "margin-break": {
+    "desc": "Controls whether the box’s block-axis margins are discarded or kept at a fragmentation break.",
+    "spec": "https://www.w3.org/TR/css-break-4/#break-margins"
+  },
+  "color-adjust": {
+    "desc": "The color-adjust shorthand allows an author to set all of the performance-motivated color adjustment properties in one declaration.",
+    "spec": "https://www.w3.org/TR/css-color-adjust-1/#color-adjust"
+  },
+  "wrap-flow": {
+    "desc": "An element becomes an exclusion when its wrap-flow property has a computed value other than auto.",
+    "spec": "https://drafts.csswg.org/css-exclusions-1/#wrap-flow-property"
+  },
+  "wrap-through": {
+    "desc": "Setting the wrap-through property to none prevents an element from inheriting its parent wrapping context.",
+    "spec": "https://drafts.csswg.org/css-exclusions-1/#wrap-through-property"
+  },
+  "copy-into": {
+    "desc": "The copy-into property contains one or more pairs, each consisting of a custom identifier followed by a content-level keyword describing how to construct the value of the named content fragment.",
+    "spec": "https://drafts.csswg.org/css-gcpm-4/#copy-into-heading"
+  }
+}

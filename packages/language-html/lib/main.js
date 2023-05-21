@@ -19,9 +19,43 @@ exports.activate = function() {
     }
   });
 
+  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+  const HYPERLINK_PATTERN = /\bhttps?:/
+
+  atom.grammars.addInjectionPoint('text.html.basic', {
+    type: 'comment',
+    language: (node) => {
+      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  atom.grammars.addInjectionPoint('text.html.basic', {
+    type: 'comment',
+    language: (node) => {
+      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  atom.grammars.addInjectionPoint('text.html.basic', {
+    type: 'attribute_value',
+    language: (node) => {
+      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  // TODO: Inject hyperlink grammar into plain text?
+
+  // EMBEDDED
+
   atom.grammars.addInjectionPoint('text.html.ejs', {
     type: 'template',
-    language(node) {
+    language() {
       return 'javascript';
     },
     content(node) {
@@ -32,7 +66,7 @@ exports.activate = function() {
 
   atom.grammars.addInjectionPoint('text.html.ejs', {
     type: 'template',
-    language(node) {
+    language() {
       return 'html';
     },
     content(node) {
@@ -42,7 +76,7 @@ exports.activate = function() {
 
   atom.grammars.addInjectionPoint('text.html.erb', {
     type: 'template',
-    language(node) {
+    language() {
       return 'ruby';
     },
     content(node) {
@@ -53,7 +87,7 @@ exports.activate = function() {
 
   atom.grammars.addInjectionPoint('text.html.erb', {
     type: 'template',
-    language(node) {
+    language() {
       return 'html';
     },
     content(node) {

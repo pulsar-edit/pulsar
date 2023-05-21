@@ -53,40 +53,30 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a bug where macOS menus like "Open" don't do anything.
+                Rebranded notifications, using our backend to find new versions of package,
+                and our github repository to find issues on Pulsar. Also fixed the "view issue"
+                and "create issue" buttons that were not working
               </li>
               <li>
-                Fixed a bug where macOS wouldn't open files by dragging them onto the dock.
+                Bumped to latest version of `second-mate`, fixing a memory usage issue in `vscode-oniguruma`
               </li>
               <li>
-                Fixed a bug where devtools won't open.
+                Removed a cache for native modules - fix bugs where an user rebuilds a native
+                module outside of Pulsar, but Pulsar refuses to load anyway
               </li>
               <li>
-                Fixed a bug where the editor refused to open with the message "GPU process isn't usable. Goodbye"
+                Removed `nslog` dependency
               </li>
               <li>
-                Fixed logo artifacts on Linux.
+                Fixed an error where the GitHub package tried to interact with a diff view after it was closed
               </li>
               <li>
-                Fixed Windows Taskbar Icon being 'Cut in Half'
+                Fixed RPM installation failure when Atom was installed on the same machine
               </li>
               <li>
-                Fixed commands like `--version`, `--package` or `--help` did not show outputs.
-              </li>
-              <li>
-                Fixed additional flags not being sent to `--package`.
-              </li>
-              <li>
-                Small improvement on the binary size.
-              </li>
-              <li>
-                Fixed "install command line tools" on Mac and Windows.
-              </li>
-              <li>
-                Cached queries for featured packages (featured packages will load faster, and fewer errors on the settings-view regarding package info).
-              </li>
-              <li>
-                Added warning when `settings-view` is disabled, describing how to re-enable it.
+                Added a new set of Package `activationHooks`, `...:uri-opened` lets a package activate when any URI
+                is opened within Pulsar, and `...:file-name-opened` lets a package activate when any specific filename
+                is opened within Pulsar.
               </li>
 
             </ul>

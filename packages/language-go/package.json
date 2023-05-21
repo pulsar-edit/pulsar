@@ -8,7 +8,7 @@
   "license": "MIT",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=14"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "dependencies": {

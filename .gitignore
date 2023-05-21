@@ -8,6 +8,8 @@ Thumbs.db
 .nvm-version
 .vscode
 .python-version
+.envrc
+.tool-versions
 node_modules
 *.log
 /tags

@@ -26,11 +26,12 @@
 
 <br>
 
-*A Community-led Hyper-Hackable Text Editor, built on **[Electron]**,*  
-*and based on everything we love about our favorite editors.*
+*A Community-led Hyper-Hackable Text Editor,*
+*Forked from [Atom], built on [Electron].*
 
-*We designed it to be deeply customizable, but still*  
+*Designed to be deeply customizable, but still*
 *approachable using the default configuration.*
+
 
 <br>
 <br>
@@ -44,6 +45,7 @@
 [OpenCollective]: https://opencollective.com/pulsar-edit
 [Discussions]: https://github.com/orgs/pulsar-edit/discussions
 [Electron]: https://github.com/electron/electron
+[Atom]: https://github.blog/2022-06-08-sunsetting-atom/
 [Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
 [Crowdin]: https://crowdin.pulsar-edit.dev
 [Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar/master

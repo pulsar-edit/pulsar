@@ -19,10 +19,11 @@
   }
   StartupTime.addMarker('window:start', startWindowTime);
 
-  window.onload = function() {
+  window.onload = async function() {
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
+      await require('second-mate').ready
 
       process.on('unhandledRejection', function(error, promise) {
         console.error(

@@ -1,6 +1,6 @@
 '.source.css':
   'core':
-    'useTreeSitterParsers': false
+    'languageParser': 'textmate'
   'editor':
     'commentStart': '/*'
     'commentEnd': '*/'

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.pulsar_edit.Pulsar</id>
+  <name>Pulsar</name>
+  <developer_name>Pulsar Edit</developer_name>
+  <summary>A Community-led Hyper-Hackable Text Editor</summary>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <url type="homepage">https://pulsar-edit.dev</url>
+  <url type="bugtracker">https://github.com/pulsar-edit/pulsar/issues/</url>
+  <update_contact>admin@pulsar-edit.dev</update_contact>
+  <description>
+    <p>Pulsar aims to not only reach feature parity with the original Atom, but to bring Pulsar into the 21st century by updating the underlying architecture, and supporting modern features.</p>
+  </description>
+  <screenshots>
+    <screenshot>
+      <image type="source">https://raw.githubusercontent.com/pulsar-edit/pulsar/master/resources/readme.png</image>
+    </screenshot>
+  </screenshots>
+  <kudos>
+    <kudo>HiDpiIcon</kudo>
+  </kudos>
+  <content_rating type="oars-1.1" />
+</component>

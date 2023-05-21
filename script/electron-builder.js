@@ -37,8 +37,6 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 /// END Monkey-Patch
 
 const builder = require("electron-builder")
-const Platform = builder.Platform
-
 
 const pngIcon = 'resources/app-icons/beta.png'
 const icoIcon = 'resources/app-icons/beta.ico'
@@ -152,7 +150,8 @@ let options = {
   rpm: {
     afterInstall: "script/post-install.sh",
     afterRemove: "script/post-uninstall.sh",
-    compression: 'xz'
+    compression: 'xz',
+    fpm: ['--rpm-rpmbuild-define=_build_id_links none']
   },
   "linux": {
     // Giving a single PNG icon to electron-builder prevents the correct
@@ -182,6 +181,7 @@ let options = {
     "icon": icnsIcon,
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
+    "hardenedRuntime": true,
     "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
       "CFBundleExecutable": "Pulsar",
@@ -194,6 +194,9 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
+  },
+  "dmg": {
+    "sign": false
   },
   "win": {
     "icon": icoIcon,
@@ -213,7 +216,7 @@ let options = {
     ],
     "target": [
       { "target": "nsis" },
-      { "target": "portable" },
+      { target: "zip" },
     ],
   },
   // Windows NSIS Configuration
@@ -227,6 +230,7 @@ let options = {
   },
   "extraMetadata": {
   },
+  "afterSign": "script/mac-notarise.js",
   "asarUnpack": [
     "node_modules/github/bin/*",
     "node_modules/github/lib/*", // Resolves Error in console
@@ -234,6 +238,24 @@ let options = {
     "**/node_modules/spellchecker/**", // Matching Atom Glob
   ]
 
+}
+
+/**
+ The below optional entitlements is needed for the following reasons:
+  - `allow-jit` needs to be applied on silicon builds for WASM to work:
+      https://github.com/pulsar-edit/pulsar/pull/454
+  - But setting `allow-jit` on Intel decreases performance of `fork()` operations
+    e.g. `require('child_process').spanw(...)`
+  - This monkey patch will no longer be needed when we can bump Electron
+    and get `libuv` `v1.42.0` as this issue is fixed upstream there
+  - See: https://github.com/microsoft/vscode/issues/105446
+*/
+if (process.arch === "x64") {
+  options.mac.entitlements = "resources/mac/entitlements.intel.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
+} else {
+  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
 }
 
 function whatToBuild() {
@@ -255,7 +277,6 @@ async function main() {
   let options = whatToBuild()
   options.extraMetadata = generateMetadata(JSON.parse(package))
   builder.build({
-    //targets: Platform.LINUX.createTarget(),
     config: options
   }).then((result) => {
     console.log("Built binaries")

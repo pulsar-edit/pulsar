@@ -1,0 +1,19 @@
+{
+  "name": "styleguide",
+  "main": "./lib/styleguide",
+  "version": "0.49.12",
+  "description": "A visual styleguide of the Pulsars's UI components.",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "dependencies": {
+    "atom-select-list": "^0.7.0",
+    "dedent": "^0.7.0",
+    "etch": "0.9.0"
+  },
+  "deserializers": {
+    "StyleguideView": "createStyleguideView"
+  },
+  "engines": {
+    "atom": "*"
+  }
+}
