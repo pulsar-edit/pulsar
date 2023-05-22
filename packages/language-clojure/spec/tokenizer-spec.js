@@ -14,6 +14,11 @@ describe('Clojure grammars', () => {
     await atom.packages.activatePackage('language-clojure');
   });
 
+  it('tokenizes the editor using TextMate parser', async () => {
+    setConfigForLanguageMode('textmate');
+    await runGrammarTests(path.join(__dirname, 'fixtures', 'textmate-tokens.clj'), /;/)
+  });
+
   it('tokenizes the editor using modern tree-sitter parser', async () => {
     setConfigForLanguageMode('modern-tree-sitter');
     atom.config.set('language-clojure.dismissTag', true);
