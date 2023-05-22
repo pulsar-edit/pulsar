@@ -7,5 +7,22 @@
     "node": "*"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
-  "license": "MIT"
+  "license": "MIT",
+  "configSchema": {
+    "dismissTag": {
+      "type": "boolean",
+      "default": true,
+      "description": "Highlights forms after #_ as comments"
+    },
+    "commentTag": {
+      "type": "boolean",
+      "default": false,
+      "description": "Highlights forms like (comment ...) as comments"
+    },
+    "markDeprecations": {
+      "type": "boolean",
+      "default": true,
+      "description": "Marks deprecations like `use`"
+    }
+  }
 }
