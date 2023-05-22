@@ -2,7 +2,7 @@
 (list_lit
  "(" @punctuation.section.list.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")
  ")" @punctuation.section.list.end)
-@meta.vector
+@meta.list
 
 (vec_lit
  "[" @punctuation.section.vector.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")
@@ -17,14 +17,14 @@
 (set_lit
  ("#" "{") @punctuation.section.set.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")
  "}" @punctuation.section.set.end)
-@meta.map
+@meta.set
 
 ((regex_lit) @string.regexp (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((sym_lit) @meta.symbol (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((kwd_lit) @constant.keyword (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((str_lit) @string.quoted.double (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((num_lit) @constant.numeric (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
-((nil_lit) @constant.numeric (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
+((nil_lit) @constant.language (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((bool_lit) @constant.language (#set! test.onlyIfNotDescendantOfNodeWithData clojure.dismissTag))
 (comment) @comment.line.semicolon
 ((dis_expr)
