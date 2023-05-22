@@ -2,6 +2,7 @@
   "name": "language-clojure",
   "version": "0.22.8",
   "description": "Clojure language support in Atom",
+  "main": "lib/main",
   "engines": {
     "atom": "*",
     "node": "*"
