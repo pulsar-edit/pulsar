@@ -1,9 +1,3 @@
-(quoting_lit
-  value: (list_lit
-          "(" @punctuation.section.expression.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")
-          .
-          (sym_lit) @meta.symbol (#set! final "true")))
-
 ;; Collections
 (anon_fn_lit
  "(" @punctuation.section.expression.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")
@@ -74,6 +68,7 @@
  (sym_lit) @meta.definition.global @entity.global
  ")" @punctuation.section.expression.end)
 
+((regex_lit) @string.regexp (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((sym_lit) @meta.symbol (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((kwd_lit) @constant.keyword (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
 ((str_lit) @string.quoted.double (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag"))
