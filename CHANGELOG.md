@@ -6,6 +6,7 @@
 
 ## [Unreleased]
 
+- Fixed default tokenization of heredocs in Ruby (should be tokenized as string)
 - Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out.
 
 ## 1.105.0
