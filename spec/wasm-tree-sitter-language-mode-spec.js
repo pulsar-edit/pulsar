@@ -2358,6 +2358,61 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
 
+    fit('reports scopes correctly at boundaries where more than one layer adds a scope', async () => {
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await jsGrammar.setQueryForTest('highlightsQuery', `
+        (template_string) @string.quoted
+        ((template_string) @string-insides
+          (#set! adjust.startAfterFirstMatchOf "^\`")
+          (#set! adjust.endBeforeFirstMatchOf "\`$"))
+        "\`" @punctuation
+        (property_identifier) @property.name
+      `);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      await htmlGrammar.setQueryForTest('highlightsQuery', `
+        (start_tag) @tag
+      `);
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      buffer.setText(dedent`
+        html\`<span>\${person.name}</span>\`
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: jsGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      const position = buffer.findSync('html`').end;
+      expect(
+        languageMode
+          .scopeDescriptorForPosition(position)
+          .getScopesArray()
+      ).toEqual([
+        'source.js',
+        'string.quoted',
+        'string-insides',
+        'text.html.basic',
+        'tag'
+      ]);
+    });
+
     it('includes the root scope name even when the given position is in trailing whitespace at EOF', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
