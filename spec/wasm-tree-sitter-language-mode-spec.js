@@ -2358,7 +2358,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
 
-    fit('reports scopes correctly at boundaries where more than one layer adds a scope', async () => {
+    it('reports scopes correctly at boundaries where more than one layer adds a scope', async () => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await jsGrammar.setQueryForTest('highlightsQuery', `
