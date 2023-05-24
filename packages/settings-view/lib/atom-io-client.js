@@ -1,22 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS201: Simplify complex destructure assignments
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let AtomIoClient;
 const fs = require('fs-plus');
 const path = require('path');
 const {remote} = require('electron');
-
 const glob = require('glob');
 const request = require('request');
 
-module.exports =
-(AtomIoClient = class AtomIoClient {
+module.exports = class AtomIoClient {
   constructor(packageManager, baseURL) {
     this.packageManager = packageManager;
     this.baseURL = baseURL;
@@ -29,7 +17,7 @@ module.exports =
 
   // Public: Get an avatar image from the filesystem, fetching it first if necessary
   avatar(login, callback) {
-    return this.cachedAvatar(login, (err, cached) => {
+    this.cachedAvatar(login, (err, cached) => {
       let stale;
       if (cached) { stale = (Date.now() - parseInt(cached.split('-').pop())) > this.expiry; }
       if (cached && (!stale || !this.online())) {
@@ -75,7 +63,7 @@ module.exports =
   getFeatured(loadThemes, callback) {
     // apm already does this, might as well use it instead of request i guess? The
     // downside is that I need to repeat caching logic here.
-    return this.packageManager.getFeatured(loadThemes)
+    this.packageManager.getFeatured(loadThemes)
       .then(packages => {
         // copypasta from below
         const key = loadThemes ? 'themes/featured' : 'packages/featured';
@@ -95,7 +83,7 @@ module.exports =
       gzip: true
     };
 
-    return request(options, (err, res, body) => {
+    request(options, (err, res, body) => {
       if (err) { return callback(err); }
 
       try {
@@ -158,7 +146,7 @@ module.exports =
   }
 
   cachedAvatar(login, callback) {
-    return glob(this.avatarGlob(login), (err, files) => {
+    glob(this.avatarGlob(login), (err, files) => {
       if (err) { return callback(err); }
       files.sort().reverse();
       for (let imagePath of Array.from(files)) {
@@ -211,7 +199,7 @@ module.exports =
   expireAvatarCache() {
     const deleteAvatar = child => {
       const avatarPath = path.join(this.getCachePath(), child);
-      return fs.unlink(avatarPath, function(error) {
+      fs.unlink(avatarPath, function(error) {
         if (error && (error.code !== 'ENOENT')) { // Ignore cache paths that don't exist
           return console.warn(`Error deleting avatar (${error.code}): ${avatarPath}`);
         }
@@ -230,19 +218,17 @@ module.exports =
         files[key].push(`${key}-${stamp}`);
       }
 
-      return (() => {
-        const result = [];
-        for (key in files) {
-          const children = files[key];
-          children.sort();
-          children.pop(); // keep
-          // Right now a bunch of clients might be instantiated at once, so
-          // we can just ignore attempts to unlink files that have already been removed
-          // - this should be fixed with a singleton client
-          result.push(children.forEach(deleteAvatar));
-        }
-        return result;
-      })();
+      const result = [];
+      for (key in files) {
+        const children = files[key];
+        children.sort();
+        children.pop(); // keep
+        // Right now a bunch of clients might be instantiated at once, so
+        // we can just ignore attempts to unlink files that have already been removed
+        // - this should be fixed with a singleton client
+        result.push(children.forEach(deleteAvatar));
+      }
+      return result;
     });
   }
 
@@ -267,7 +253,7 @@ module.exports =
     };
 
     return new Promise((resolve, reject) => {
-      return request(options, (err, res, textBody) => {
+      request(options, (err, res, textBody) => {
         let error;
         if (err) {
           error = new Error(`Searching for \u201C${query}\u201D failed.`);
@@ -302,4 +288,4 @@ module.exports =
   parseJSON(s) {
     return JSON.parse(s);
   }
-});
+};
