@@ -299,11 +299,11 @@ module.exports = class PackageManager {
 
   getFeatured(loadThemes) {
     return new Promise((resolve, reject) => {
-      this.loadFeatured(!!loadThemes, function(error, result) {
+      return this.loadFeatured(!!loadThemes, function(error, result) {
         if (error) {
-          reject(error);
+          return reject(error);
         } else {
-          resolve(result);
+          return resolve(result);
         }
       });
     });
