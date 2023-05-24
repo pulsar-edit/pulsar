@@ -7,7 +7,7 @@ const Client = require('./atom-io-client');
 module.exports = class PackageManager {
   constructor() {
     // Millisecond expiry for cached loadOutdated, etc. values
-    this.prototype.CACHE_EXPIRY = 1000*60*10;
+    this.CACHE_EXPIRY = 1000*60*10;
     this.setProxyServers = this.setProxyServers.bind(this);
     this.setProxyServersAsync = this.setProxyServersAsync.bind(this);
     this.packagePromises = [];
