@@ -107,12 +107,12 @@
   arguments: (arguments
     (string
       (string_fragment) @name))
-      (#match? @_fn "^(describe|it)$"))
+      (#match? @_fn "^(f+describe|f+it)$")
+      (#set! symbol.prepend "Focused: "))
 
 (call_expression
   function: (identifier) @_fn
   arguments: (arguments
     (string
       (string_fragment) @name))
-      (#match? @_fn "^(fdescribe|fit)$")
-      (#set! symbols.prepend "Focused: "))
+      (#match? @_fn "^(describe|it)$"))
