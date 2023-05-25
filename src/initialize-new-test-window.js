@@ -3,6 +3,7 @@ const { requireModule } = require('./module-utils');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm')
+const {glob} = require('glob');
 
 module.exports = async function({ blobStore }) {
   const { remote } = require('electron');
@@ -157,6 +158,7 @@ module.exports = async function({ blobStore }) {
 
 
     prepareUI();
+    runAllTests(testPaths);
   //   // const statusCode = await testRunner({
   //   //   logFile,
   //   //   headless,
@@ -181,17 +183,25 @@ module.exports = async function({ blobStore }) {
 }
 
 function prepareUI() {
-  // Requires mocha under the context of the new window
-  vm.runInThisContext('const Mocha = require("mocha")')
-  const Reporter = require('./mocha-test-runner/reporter')
-  Reporter.setMocha(Mocha)
+  const div = document.createElement('div');
+  div.style.display = 'flex';
+  div.style.width = '100%'
+  div.style.height = '100%'
 
-  let mocha = new Mocha()
-  mocha.addFile(
-    '/home/mauricio/projects/pulsar_repos/star-ring/test/star-linter-test.js'
-  )
-  mocha.reporter(Reporter)
-  mocha.run()
+  const testPanel = document.createElement('atom-panel');
+  testPanel.classList.add('padded', 'tool-panel');
+  div.append(testPanel);
+
+  const testDiv = document.createElement('div');
+  testDiv.classList.add('tests', 'padded', 'block');
+  testPanel.append(testDiv);
+
+  const workspace = atom.views.getView(atom.workspace);
+  workspace.style.width = '100%'
+  workspace.style.height = '100%'
+  div.append(workspace);
+  document.body.append(div);
+  // Requires mocha under the context of the new window
 
   // const Workspace = require('./workspace');
   // const w = new Workspace()
@@ -202,4 +212,30 @@ function prepareUI() {
   //     })
   // const workspace = document.createElement('atom-workspace')
   // document.body.append
+}
+
+let mocha
+async function runAllTests(testPaths) {
+  vm.runInThisContext('const Mocha = require("mocha")')
+  const Reporter = require('./mocha-test-runner/reporter')
+  Reporter.setMocha(Mocha)
+
+  mocha?.unloadFiles()
+  mocha = new Mocha();
+  mocha.reporter(Reporter);
+
+  const promises = testPaths.map(async (path) => {
+    const files = await glob(
+      `${path}/**/*{spec,test}.{js,coffee,ts,cjs,jsx,mjs}`,
+      { ignore: 'node_modules/**' }
+    );
+    files.forEach(file => mocha.addFile(file));
+  })
+  // // glob.glob(`${paths[0]}/**/*{spec,test}.{js,coffee,ts,cjs,jsx,mjs}`, { ignore: 'node_modules/**' }, (_, e) => console.log("files", e))
+  //
+  // mocha.addFile(
+  //   '/home/mauricio/projects/pulsar_repos/star-ring/test/star-linter-test.js'
+  // )
+  await Promise.all(promises)
+  mocha.run();
 }
