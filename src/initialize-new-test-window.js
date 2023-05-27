@@ -1,5 +1,5 @@
 const ipcHelpers = require('./ipc-helpers');
-const { requireModule } = require('./module-utils');
+const { addAtomExport } = require('./module-utils');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm')
@@ -84,14 +84,7 @@ module.exports = async function({ blobStore, globalAtom }) {
 
     window.addEventListener('keydown', handleKeydown, { capture: true });
 
-    // Add 'exports' to module search path.
-    const exportsPath = path.join(
-      getWindowLoadSettings().resourcePath,
-      'exports'
-    );
-    // require('module').globalPaths.push(exportsPath);
-    process.env.NODE_PATH = exportsPath; // Set NODE_PATH env variable since tasks may need it.
-
+    addAtomExport();
     updateProcessEnv(env);
 
     // Set up optional transpilation for packages under test if any

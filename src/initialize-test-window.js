@@ -1,5 +1,5 @@
 const ipcHelpers = require('./ipc-helpers');
-const { requireModule } = require('./module-utils');
+const { addAtomExport, requireModule } = require('./module-utils');
 
 function cloneObject(object) {
   const clone = {};
@@ -88,12 +88,7 @@ module.exports = async function({ blobStore }) {
     window.addEventListener('keydown', handleKeydown, { capture: true });
 
     // Add 'exports' to module search path.
-    const exportsPath = path.join(
-      getWindowLoadSettings().resourcePath,
-      'exports'
-    );
-    require('module').globalPaths.push(exportsPath);
-    process.env.NODE_PATH = exportsPath; // Set NODE_PATH env variable since tasks may need it.
+    addAtomExport();
 
     updateProcessEnv(env);
 
