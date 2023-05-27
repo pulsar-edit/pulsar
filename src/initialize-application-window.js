@@ -32,7 +32,7 @@ module.exports = function({ blobStore }) {
   const { ipcRenderer } = require('electron');
   const { resourcePath, devMode } = getWindowLoadSettings();
   require('./electron-shims');
-  addAtomExport();
+  addAtomExport(global.atom);
 
   // Make React faster
   if (!devMode && process.env.NODE_ENV == null) {

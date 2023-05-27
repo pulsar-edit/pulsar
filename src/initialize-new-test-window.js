@@ -9,8 +9,6 @@ module.exports = async function({ blobStore, globalAtom }) {
   const { remote } = require('electron');
   const getWindowLoadSettings = require('./get-window-load-settings');
 
-  console.log("WATTT????")
-
   const exitWithStatusCode = function(status) {
     remote.app.emit('will-quit');
     remote.process.exit(status);
@@ -84,9 +82,6 @@ module.exports = async function({ blobStore, globalAtom }) {
 
     window.addEventListener('keydown', handleKeydown, { capture: true });
 
-    addAtomExport();
-    updateProcessEnv(env);
-
     // Set up optional transpilation for packages under test if any
     const FindParentDir = require('find-parent-dir');
     const packageRoot = FindParentDir.sync(testPaths[0], 'package.json');
@@ -133,6 +128,11 @@ module.exports = async function({ blobStore, globalAtom }) {
     window.atom = buildAtomEnvironment({
       applicationDelegate, window, document,
       configDirPath: process.env.ATOM_HOME
+    })
+    addAtomExport(window.atom);
+    updateProcessEnv(env);
+    atom.packages.serviceHub.provide('pulsar.api', '0.1.0', {
+      moduleName: '@pulsar/test', exports: require('./mocha-test-runner/helpers')
     })
 
     // Set load paths for the package's test runner

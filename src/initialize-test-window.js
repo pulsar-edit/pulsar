@@ -87,9 +87,7 @@ module.exports = async function({ blobStore }) {
 
     window.addEventListener('keydown', handleKeydown, { capture: true });
 
-    // Add 'exports' to module search path.
-    addAtomExport();
-
+    addAtomExport(atom);
     updateProcessEnv(env);
 
     // Set up optional transpilation for packages under test if any
