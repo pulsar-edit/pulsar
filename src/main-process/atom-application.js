@@ -1309,11 +1309,18 @@ module.exports = class AtomApplication extends EventEmitter {
     clearWindowState = Boolean(clearWindowState);
 
     const locationsToOpen = await Promise.all(
-      pathsToOpen.map(pathToOpen =>
-        this.parsePathToOpen(pathToOpen, executedFrom, {
-          hasWaitSession: pidToKillWhenClosed != null
-        })
-      )
+      pathsToOpen.map(pathToOpen => {
+        const extra = { hasWaitSession: pidToKillWhenClosed != null }
+        if(typeof(pathToOpen) === 'object') {
+          return this.parsePathToOpen(
+            pathToOpen.pathToOpen,
+            executedFrom,
+            Object.assign(extra, pathToOpen)
+          )
+        } else {
+          return this.parsePathToOpen(pathToOpen, executedFrom, extra)
+        }
+      })
     );
 
     for (const folderToOpen of foldersToOpen) {
