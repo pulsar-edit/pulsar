@@ -5,7 +5,7 @@ const path = require('path');
 const vm = require('vm')
 const {glob} = require('glob');
 
-module.exports = async function({ blobStore }) {
+module.exports = async function({ blobStore, globalAtom }) {
   const { remote } = require('electron');
   const getWindowLoadSettings = require('./get-window-load-settings');
 
@@ -138,7 +138,8 @@ module.exports = async function({ blobStore }) {
     applicationDelegate.setRepresentedFilename = function() {};
     applicationDelegate.setWindowDocumentEdited = function() {};
     window.atom = buildAtomEnvironment({
-      applicationDelegate, window, document
+      applicationDelegate, window, document,
+      configDirPath: process.env.ATOM_HOME
     })
 
     // Set load paths for the package's test runner
@@ -182,6 +183,7 @@ module.exports = async function({ blobStore }) {
   }
 }
 
+let testDiv
 function prepareUI() {
   const div = document.createElement('div');
   div.style.display = 'flex';
@@ -192,8 +194,10 @@ function prepareUI() {
   testPanel.classList.add('padded', 'tool-panel');
   div.append(testPanel);
 
-  const testDiv = document.createElement('div');
+  testDiv = document.createElement('div');
   testDiv.classList.add('tests', 'padded', 'block');
+  testDiv.style.height = '100%'
+  testDiv.style.overflow = 'auto'
   testPanel.append(testDiv);
 
   const workspace = atom.views.getView(atom.workspace);
@@ -201,22 +205,14 @@ function prepareUI() {
   workspace.style.height = '100%'
   div.append(workspace);
   document.body.append(div);
-  // Requires mocha under the context of the new window
-
-  // const Workspace = require('./workspace');
-  // const w = new Workspace()
-  // p = new PanelContainer({
-  //       viewRegistry: atom.workspace.viewRegistry,
-  //       location: 'right',
-  //       dock: d
-  //     })
-  // const workspace = document.createElement('atom-workspace')
-  // document.body.append
 }
 
+const atomExported = require('atom')
 let mocha
+let watchers = []
+
 async function runAllTests(testPaths) {
-  vm.runInThisContext('const Mocha = require("mocha")')
+  vm.runInThisContext('var Mocha = require("mocha")')
   const Reporter = require('./mocha-test-runner/reporter')
   Reporter.setMocha(Mocha)
 
@@ -224,18 +220,31 @@ async function runAllTests(testPaths) {
   mocha = new Mocha();
   mocha.reporter(Reporter);
 
-  const promises = testPaths.map(async (path) => {
+  const promises = testPaths.flatMap(async path => {
     const files = await glob(
       `${path}/**/*{spec,test}.{js,coffee,ts,cjs,jsx,mjs}`,
       { ignore: 'node_modules/**' }
     );
-    files.forEach(file => mocha.addFile(file));
+    return files.map(file => {
+      mocha.addFile(file)
+      return atomExported.watchPath(file, {}, () => {
+        runTests([file])
+      });
+    });
   })
-  // // glob.glob(`${paths[0]}/**/*{spec,test}.{js,coffee,ts,cjs,jsx,mjs}`, { ignore: 'node_modules/**' }, (_, e) => console.log("files", e))
-  //
-  // mocha.addFile(
-  //   '/home/mauricio/projects/pulsar_repos/star-ring/test/star-linter-test.js'
-  // )
-  await Promise.all(promises)
+  watchers = await Promise.all(promises)
+  mocha.run();
+}
+
+async function runTests(testFiles) {
+  const Reporter = require('./mocha-test-runner/reporter')
+  Reporter.setMocha(Mocha)
+
+  mocha?.unloadFiles()
+  mocha = new Mocha();
+  mocha.reporter(Reporter);
+  testFiles.forEach(file => mocha.addFile(file))
+
+  testDiv.innerHTML = ''
   mocha.run();
 }

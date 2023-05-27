@@ -1,4 +1,5 @@
 const diffElements = require('diff');
+const { ipcRenderer } = require('electron');
 
 class Reporter {
   static setMocha(Mocha) {
@@ -38,42 +39,72 @@ class Reporter {
         // console.log("End", a)
       })
       .on(EVENT_TEST_PASS, test => {
-        // Test#fullTitle() returns the suite name(s)
-        // prepended to the test title
+        const panel = document.createElement('atom-panel')
+        panel.style.border = '1px solid'
+        panel.classList.add('inset-panel', 'padded')
         const div = document.createElement('div')
-        div.classList.add('badge', 'badge-success');
+        div.classList.add('badge', 'badge-success', 'padded');
         div.innerText = test.fullTitle()
-        divs[divs.length - 1].appendChild(div)
+        panel.appendChild(div)
+        divs[divs.length - 1].appendChild(panel)
       })
 
       .on(EVENT_TEST_FAIL, (test, err) => {
-        const div = document.createElement('div')
-        div.classList.add('badge', 'badge-error');
-        div.innerText = test.fullTitle()
-        // console.log("ERROR", arguments, test, err)
+        const panel = createElem('atom-panel', "", {classes: ['inset-panel', 'padded']})
+        panel.style.border = '1px solid'
+        createElem('button', test.fullTitle(), {
+          classes: ['btn', 'btn-error', 'inline-block-tight'],
+          parent: panel
+        })
+        createElem('div', err.message, { classes: ['text-error'], parent: panel})
+        createElem('div', "DIFF:", {parent: panel})
+        // const div = document.createElement('button')
+        // div.classList.add('btn', 'btn-error', 'inline-block-tight');
+        // div.innerText = test.fullTitle()
+        // panel.appendChild(div)
+        // panel.append(err.message)
+        console.log("ERR", err)
 
         const diff = document.createElement('div')
         diff.classList.add('inset-panel', 'padded', 'block')
-        diffElements.diffJson(err.expected, err.actual).forEach(patch => {
-          // const span = document.createElement('span')
-          const test = document.createElement('div')
-          test.style['white-space'] = 'pre'
-          if(patch.added) {
-            // span.classList.add('inline-block', 'status-added', 'icon', 'icon-diff-added')
-            test.classList.add('status-added')
-          } else if(patch.removed) {
-            // span.classList.add('inline-block', 'status-removed', 'icon', 'icon-diff-removed')
-            test.classList.add('status-removed')
-          } else {
-            // span.classList.add('inline-block', 'status-ignored', 'icon', 'icon-diff-ignored')
-            test.classList.add('status-ignored')
-          }
-          // test.appendChild(span)
-          test.append(patch.value)
-          diff.appendChild(test)
+        if(err.expected && err.actual) {
+          diffElements.diffJson(err.expected, err.actual).forEach(patch => {
+            const test = createElem('div', patch.value, {parent: diff})
+            test.style['white-space'] = 'pre'
+            if(patch.added) {
+              test.classList.add('status-added')
+            } else if(patch.removed) {
+              test.classList.add('status-removed')
+            } else {
+              test.classList.add('status-ignored')
+            }
+          })
+        }
+        // panel.appendChild(diff)
+        const stackTrace = createElem('div', '', {
+          classes: ['block', 'padded'],
+          parent: panel
         })
-        divs[divs.length - 1].appendChild(div)
-        divs[divs.length - 1].appendChild(diff)
+        stackTrace.style.display = 'flex';
+        stackTrace.style['flex-direction'] = 'column';
+        err.rawStack.forEach(stack => {
+          const row = `${stack.getFileName()}:${stack.getLineNumber()}:${stack.getColumnNumber()}`
+          const a = createElem('a', row, {
+            classes: ['inline-block', 'text-warning'],
+            parent: stackTrace
+          })
+          a.onclick = (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            ipcRenderer.send('open', {pathsToOpen: [{
+                pathToOpen: stack.getFileName(),
+                initialLine: stack.getLineNumber() - 1,
+                initialColumn: stack.getColumnNumber() - 1
+              }]
+            })
+          };
+        })
+        divs[divs.length - 1].appendChild(panel)
       })
       .once(EVENT_RUN_END, () => {
         console.log(`end: ${stats.passes}/${stats.passes + stats.failures} ok`);
@@ -94,3 +125,12 @@ class Reporter {
 }
 
 module.exports = Reporter;
+
+function createElem(element, text, opts) {
+  const {classes, parent} = opts || {}
+  const elem = document.createElement(element)
+  elem.innerText = text
+  if(classes) elem.classList.add(...classes)
+  if(parent) parent.appendChild(elem)
+  return elem
+}
