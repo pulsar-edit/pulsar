@@ -52,22 +52,27 @@ class Reporter {
       .on(EVENT_TEST_FAIL, (test, err) => {
         const panel = createElem('atom-panel', "", {classes: ['inset-panel', 'padded']})
         panel.style.border = '1px solid'
-        createElem('button', test.fullTitle(), {
+        const button = createElem('button', test.fullTitle(), {
           classes: ['btn', 'btn-error', 'inline-block-tight'],
           parent: panel
         })
-        createElem('div', err.message, { classes: ['text-error'], parent: panel})
-        createElem('div', "DIFF:", {parent: panel})
-        // const div = document.createElement('button')
-        // div.classList.add('btn', 'btn-error', 'inline-block-tight');
-        // div.innerText = test.fullTitle()
-        // panel.appendChild(div)
-        // panel.append(err.message)
-        console.log("ERR", err)
 
-        const diff = document.createElement('div')
-        diff.classList.add('inset-panel', 'padded', 'block')
+        const details = createElem('atom-panel', "", {
+          classes: ['inset-panel', 'padded'], parent: panel
+        })
+        button.onclick = (evt) => {
+          evt.preventDefault()
+          details.style.display = details.style.display === 'none' ? 'block' : 'none'
+        }
+        createElem('div', err.message, { classes: ['text-error'], parent: details})
+
         if(err.expected && err.actual) {
+          createElem('div', "DIFF:", {parent: details})
+          const diff = createElem('div', '', {
+            classes: ['inset-panel', 'padded', 'block'],
+            parent: details
+          })
+
           diffElements.diffJson(err.expected, err.actual).forEach(patch => {
             const test = createElem('div', patch.value, {parent: diff})
             test.style['white-space'] = 'pre'
@@ -80,10 +85,9 @@ class Reporter {
             }
           })
         }
-        // panel.appendChild(diff)
         const stackTrace = createElem('div', '', {
           classes: ['block', 'padded'],
-          parent: panel
+          parent: details
         })
         stackTrace.style.display = 'flex';
         stackTrace.style['flex-direction'] = 'column';
