@@ -36,10 +36,12 @@
   (#set! test.onlyIfLast true))
 
 ; Interpolations inside of template strings.
+(template_substitution) @meta.embedded.line.interpolation.js
+
 (template_substitution
-  "${" @punctuation.definition.template-expression.begin.js
-  "}" @punctuation.definition.template-expression.end.js
-) @meta.embedded.line.interpolation.js
+  "${" @punctuation.section.embedded.begin.js
+  "}" @punctuation.section.embedded.end.js
+  (#set! final true))
 
 (string
   (escape_sequence) @constant.character.escape.js)
