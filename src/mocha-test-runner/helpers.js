@@ -1,5 +1,15 @@
-function findElement(selector, parent = document) {
-  return promiseToCheck( () => parent.querySelector(selector) );
+function findElement(selector, options = {}) {
+  let {parent, text} = options;
+  parent ||= atom.views.getView(atom.workspace);
+  return promiseToCheck( () => {
+    let elements = [...parent.querySelectorAll(selector)]
+    if(typeof(text) === 'string') {
+      elements = elements.filter(e => e.innerText === text)
+    } else if(text instanceof RegExp) {
+      elements = elements.filter(e => e.innerText.match(text))
+    }
+    return elements[0]
+  })
 }
 
 function promiseToCheck(fn, waitTime = 2000) {
