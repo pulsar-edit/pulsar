@@ -8,6 +8,8 @@
 
 - Fixed bug that happens on some systems when trying to launch Pulsar using the Cinnamon desktop environment
 - Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out
+- Improved the Clojure language support by migrating it to tree-sitter and support block comments, quoting, and other advanced features on modern tree-sitter implementation
+- Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out.
 
 ## 1.105.0
 
