@@ -297,9 +297,7 @@ class AtomEnvironment {
     this.keymaps.configDirPath = this.configDirPath;
     this.keymaps.resourcePath = resourcePath;
     this.keymaps.devMode = devMode;
-    if (!this.keymaps.canLoadBundledKeymapsFromMemory()) {
-      this.keymaps.loadBundledKeymaps();
-    }
+    this.keymaps.loadBundledKeymaps();
 
     this.commands.attach(this.window);
 

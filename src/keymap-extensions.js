@@ -4,10 +4,7 @@ const KeymapManager = require('atom-keymap');
 const CSON = require('season');
 
 const buildMetadata = require('../package.json');
-var bundledKeymaps;
-if (buildMetadata != null) {
-  bundledKeymaps = buildMetadata._atomKeymaps;
-}
+var bundledKeymaps = buildMetadata._atomKeymaps;
 
 KeymapManager.prototype.onDidLoadBundledKeymaps = function(callback) {
   return this.emitter.on('did-load-bundled-keymaps', callback);
