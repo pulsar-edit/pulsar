@@ -1,11 +1,13 @@
 const ipcHelpers = require('./ipc-helpers');
+const atomExported = require('atom')
 const { addAtomExport } = require('./module-utils');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm')
 const {glob} = require('glob');
 
-module.exports = async function({ blobStore, globalAtom }) {
+// FIXME - blobStore can be removed if we migrate away from IndexedDB
+module.exports = async function({ blobStore}) {
   const { remote } = require('electron');
   const getWindowLoadSettings = require('./get-window-load-settings');
 
@@ -28,6 +30,7 @@ module.exports = async function({ blobStore, globalAtom }) {
       headless,
       logFile,
       testPaths,
+      projectRoots,
       env
     } = getWindowLoadSettings();
 
@@ -116,10 +119,22 @@ module.exports = async function({ blobStore, globalAtom }) {
     vm.runInThisContext('var Mocha = require("mocha")')
     const hooks = mochaHooks({rootDiv, Mocha, blobStore})
     runAllTests({hooks, testPaths});
+    listenToPaths(projectRoots, {hooks, testPaths});
   } catch (error) {
     console.error(error.stack)
     throw error;
   }
+}
+
+const underscore = require('underscore');
+function listenToPaths(projectRoots, options) {
+  const debouncedRun = underscore.debounce(runAllTests, 500);
+  projectRoots.forEach(path => {
+    atomExported.watchPath(path, {}, () => {
+      testDiv.innerHTML = ""
+      debouncedRun(options)
+    });
+  });
 }
 
 let testDiv
@@ -160,7 +175,6 @@ function mochaHooks({rootDiv, Mocha, blobStore}) {
   }
 }
 
-const atomExported = require('atom')
 let mocha
 let watchers = []
 
