@@ -18,10 +18,6 @@ module.exports = async function({ blobStore, globalAtom }) {
     const path = require('path');
     const { ipcRenderer } = require('electron');
     const CompileCache = require('./compile-cache');
-    const AtomEnvironment = require('../src/atom-environment');
-    const ApplicationDelegate = require('../src/application-delegate');
-    const Clipboard = require('../src/clipboard');
-    const TextEditor = require('../src/text-editor');
     const { updateProcessEnv } = require('./update-process-env');
     require('./electron-shims');
 
@@ -99,42 +95,10 @@ module.exports = async function({ blobStore, globalAtom }) {
 
     document.title = 'Test Suite';
 
-    const clipboard = new Clipboard();
-    TextEditor.setClipboard(clipboard);
-    TextEditor.viewForItem = item => atom.views.getView(item);
-
     // const testRunner = requireModule(testRunnerPath);
     const buildDefaultApplicationDelegate = () => new ApplicationDelegate();
-    const buildAtomEnvironment = function(params) {
-      // params = Object.create(params);
-      if (!params.hasOwnProperty('clipboard')) {
-        params.clipboard = clipboard;
-      }
-      if (!params.hasOwnProperty('blobStore')) {
-        params.blobStore = blobStore;
-      }
-      if (!params.hasOwnProperty('onlyLoadBaseStyleSheets')) {
-        params.onlyLoadBaseStyleSheets = true;
-      }
-      const atomEnvironment = new AtomEnvironment(params);
-      atomEnvironment.initialize(params);
-      TextEditor.setScheduler(atomEnvironment.views);
-      return atomEnvironment;
-    };
-
-    const applicationDelegate = new ApplicationDelegate();
-    applicationDelegate.setRepresentedFilename = function() {};
-    applicationDelegate.setWindowDocumentEdited = function() {};
-    window.atom = buildAtomEnvironment({
-      applicationDelegate, window, document,
-      configDirPath: process.env.ATOM_HOME
-    })
-    addAtomExport(window.atom);
+    genAtomGlobal(blobStore)
     updateProcessEnv(env);
-    atom.packages.serviceHub.provide('pulsar.api', '0.1.0', {
-      moduleName: '@pulsar/test', exports: require('./mocha-test-runner/helpers')
-    })
-
     // Set load paths for the package's test runner
     let loadPaths = vm.runInThisContext('module.paths')
     testPaths.forEach(testPath => {
@@ -148,31 +112,11 @@ module.exports = async function({ blobStore, globalAtom }) {
       }
     })
 
-    // }, 2000)
-
-
-    prepareUI();
-    runAllTests(testPaths);
-  //   // const statusCode = await testRunner({
-  //   //   logFile,
-  //   //   headless,
-  //   //   testPaths,
-  //   //   buildAtomEnvironment,
-  //   //   buildDefaultApplicationDelegate,
-  //   //   legacyTestRunner
-  //   // });
-  //
-  //   // if (getWindowLoadSettings().headless) {
-  //   //   exitWithStatusCode(statusCode);
-  //   // }
+    const rootDiv = prepareUI();
+    runAllTests({rootDiv, blobStore, testPaths});
   } catch (error) {
-  //   // if (getWindowLoadSettings().headless) {
-  //   //   console.error(error.stack || error);
-  //   //   exitWithStatusCode(1);
-  //   // } else {
-      console.error(error.stack)
-      throw error;
-    // }
+    console.error(error.stack)
+    throw error;
   }
 }
 
@@ -198,13 +142,14 @@ function prepareUI() {
   workspace.style.height = '100%'
   div.append(workspace);
   document.body.append(div);
+  return div
 }
 
 const atomExported = require('atom')
 let mocha
 let watchers = []
 
-async function runAllTests(testPaths) {
+async function runAllTests({rootDiv, blobStore, testPaths}) {
   vm.runInThisContext('var Mocha = require("mocha")')
   const Reporter = require('./mocha-test-runner/reporter')
   Reporter.setMocha(Mocha)
@@ -221,7 +166,7 @@ async function runAllTests(testPaths) {
     return files.map(file => {
       mocha.addFile(file)
       return atomExported.watchPath(file, {}, () => {
-        runTests([file])
+        runTests(rootDiv, blobStore, [file])
       });
     });
   })
@@ -229,7 +174,14 @@ async function runAllTests(testPaths) {
   mocha.run();
 }
 
-async function runTests(testFiles) {
+async function runTests(rootDiv, blobStore, testFiles) {
+  atom.views.getView(atom.workspace).remove();
+  genAtomGlobal(blobStore)
+  const workspace = atom.views.getView(atom.workspace)
+  workspace.style.width = '100%'
+  workspace.style.height = '100%'
+  rootDiv.append(workspace);
+
   const Reporter = require('./mocha-test-runner/reporter')
   Reporter.setMocha(Mocha)
 
@@ -240,4 +192,45 @@ async function runTests(testFiles) {
 
   testDiv.innerHTML = ''
   mocha.run();
+}
+
+function genAtomGlobal(blobStore) {
+  delete window.atom
+
+  const TextEditor = require('../src/text-editor');
+  const Clipboard = require('../src/clipboard');
+  const clipboard = new Clipboard();
+  TextEditor.setClipboard(clipboard);
+  TextEditor.viewForItem = item => atom.views.getView(item);
+
+  const ApplicationDelegate = require('../src/application-delegate');
+  const AtomEnvironment = require('../src/atom-environment');
+  const buildAtomEnvironment = function(params) {
+    // params = Object.create(params);
+    if (!params.hasOwnProperty('clipboard')) {
+      params.clipboard = clipboard;
+    }
+    if (!params.hasOwnProperty('blobStore')) {
+      params.blobStore = blobStore;
+    }
+    if (!params.hasOwnProperty('onlyLoadBaseStyleSheets')) {
+      params.onlyLoadBaseStyleSheets = true;
+    }
+    const atomEnvironment = new AtomEnvironment(params);
+    atomEnvironment.initialize(params);
+    TextEditor.setScheduler(atomEnvironment.views);
+    return atomEnvironment;
+  };
+
+  const applicationDelegate = new ApplicationDelegate();
+  applicationDelegate.setRepresentedFilename = function() {};
+  applicationDelegate.setWindowDocumentEdited = function() {};
+  window.atom = buildAtomEnvironment({
+    applicationDelegate, window, document,
+    configDirPath: process.env.ATOM_HOME
+  })
+  addAtomExport(window.atom);
+  atom.packages.serviceHub.provide('pulsar.api', '0.1.0', {
+    moduleName: '@pulsar/test', exports: require('./mocha-test-runner/helpers')
+  })
 }
