@@ -95,7 +95,6 @@ module.exports = async function({ blobStore, globalAtom }) {
 
     document.title = 'Test Suite';
 
-    // const testRunner = requireModule(testRunnerPath);
     const buildDefaultApplicationDelegate = () => new ApplicationDelegate();
     genAtomGlobal(blobStore)
     updateProcessEnv(env);
@@ -113,7 +112,10 @@ module.exports = async function({ blobStore, globalAtom }) {
     })
 
     const rootDiv = prepareUI();
-    runAllTests({rootDiv, blobStore, testPaths});
+    // Require Mocha from the package's dependencies
+    vm.runInThisContext('var Mocha = require("mocha")')
+    const hooks = mochaHooks({rootDiv, Mocha, blobStore})
+    runAllTests({hooks, testPaths});
   } catch (error) {
     console.error(error.stack)
     throw error;
@@ -145,11 +147,24 @@ function prepareUI() {
   return div
 }
 
+function mochaHooks({rootDiv, Mocha, blobStore}) {
+  return {
+    beforeEach: [() => {
+      atom.views.getView(atom.workspace)?.remove();
+      genAtomGlobal(blobStore)
+      const workspace = atom.views.getView(atom.workspace)
+      workspace.style.width = '100%'
+      workspace.style.height = '100%'
+      rootDiv.append(workspace);
+    }]
+  }
+}
+
 const atomExported = require('atom')
 let mocha
 let watchers = []
 
-async function runAllTests({rootDiv, blobStore, testPaths}) {
+async function runAllTests({hooks, testPaths}) {
   vm.runInThisContext('var Mocha = require("mocha")')
   const Reporter = require('./mocha-test-runner/reporter')
   Reporter.setMocha(Mocha)
@@ -157,6 +172,7 @@ async function runAllTests({rootDiv, blobStore, testPaths}) {
   mocha?.unloadFiles()
   mocha = new Mocha();
   mocha.reporter(Reporter);
+  mocha.rootHooks(hooks)
 
   const promises = testPaths.flatMap(async path => {
     const files = await glob(
@@ -166,7 +182,7 @@ async function runAllTests({rootDiv, blobStore, testPaths}) {
     return files.map(file => {
       mocha.addFile(file)
       return atomExported.watchPath(file, {}, () => {
-        runTests(rootDiv, blobStore, [file])
+        runTests(hooks, [file])
       });
     });
   })
@@ -174,20 +190,14 @@ async function runAllTests({rootDiv, blobStore, testPaths}) {
   mocha.run();
 }
 
-async function runTests(rootDiv, blobStore, testFiles) {
-  atom.views.getView(atom.workspace).remove();
-  genAtomGlobal(blobStore)
-  const workspace = atom.views.getView(atom.workspace)
-  workspace.style.width = '100%'
-  workspace.style.height = '100%'
-  rootDiv.append(workspace);
-
+async function runTests(hooks, testFiles) {
   const Reporter = require('./mocha-test-runner/reporter')
   Reporter.setMocha(Mocha)
 
   mocha?.unloadFiles()
   mocha = new Mocha();
   mocha.reporter(Reporter);
+  mocha.rootHooks(hooks)
   testFiles.forEach(file => mocha.addFile(file))
 
   testDiv.innerHTML = ''
