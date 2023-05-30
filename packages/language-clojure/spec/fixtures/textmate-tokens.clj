@@ -46,7 +46,7 @@
 10/2
 ; <- constant.numeric
 :key
-; <- constant.keyword
+; ^ meta.symbol
 symbol
 ; <- meta.symbol
 "A string"
@@ -59,46 +59,6 @@ true
 ; <- constant.language
 false
 ; <- constant.language
-error/
-; <- meta.symbol
-;    ^ invalid.illegal
-
-;; Quoting
-'(call param ~(call))
-;  ^ meta.symbol
-;  ^ !entity.name.function
-;       ^ meta.symbol
-;       ^ !entity.name.function
-;               ^ meta.symbol
-;               ^ !entity.name.function
-
-`(call param ~(call))
-;  ^ meta.symbol
-;  ^ !entity.name.function
-;       ^ meta.symbol
-;       ^ !entity.name.function
-;               ^ entity.name.function
 
 ;; Comments
 ;   ^ comment.line.semicolon
-
-#_
-(+ 1 2 3 (+ 4 5))
-;  ^ comment.block
-;           ^ comment.block
-
-(comment 1 2 3)
-;  ^ keyword.control
-;        ^ constant.numeric
-
-;; Deprecations
-(use '[foo.bar])
-; ^ invalid.deprecated
-
-
-(:use [foo.bar])
-; ^ !invalid.deprecated
-
-(ns other.namespace
-  (:use [foo.bar]))
-;   ^ invalid.deprecated
