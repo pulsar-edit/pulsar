@@ -63,14 +63,13 @@ var render = function (text, filePath) {
   }
 
   marked.setOptions({
-    sanitize: false,
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
     renderer
   })
 
   const { __content, ...vars } = yamlFrontMatter.loadFront(text)
 
-  let html = marked(renderYamlTable(vars) + __content)
+  let html = marked.parse(renderYamlTable(vars) + __content)
 
   // emoji-images is too aggressive, so replace images in monospace tags with the actual emoji text.
   const $ = cheerio.load(emoji(html, emojiFolder, 20))
