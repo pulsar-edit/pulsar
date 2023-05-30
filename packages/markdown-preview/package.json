@@ -13,7 +13,7 @@
     "dompurify": "^2.0.17",
     "emoji-images": "^0.1.1",
     "fs-plus": "^3.0.0",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "underscore-plus": "^1.0.0",
     "yaml-front-matter": "^4.0.0"
   },

@@ -11,7 +11,7 @@
   "dependencies": {
     "dompurify": "3.0.3",
     "fs-plus": "^3.0.0",
-    "marked": "^0.3.6",
+    "marked": "^4.0.10",
     "moment": "^2.19.3",
     "semver": "^4.3.2",
     "stacktrace-parser": "^0.1.3",
