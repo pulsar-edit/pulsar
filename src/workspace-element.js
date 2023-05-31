@@ -448,25 +448,16 @@ class WorkspaceElement extends HTMLElement {
   }
 
   runPackageTests(options = {}) {
-    const activePaneItem = this.model.getActivePaneItem();
-    const activePath =
-      activePaneItem && typeof activePaneItem.getPath === 'function'
-        ? activePaneItem.getPath()
-        : null;
-    let projectPath;
-    if (activePath != null) {
-      [projectPath] = this.project.relativizePath(activePath);
-    } else {
-      [projectPath] = this.project.getPaths();
-    }
-    if (projectPath) {
-      let specPath = path.join(projectPath, 'spec');
-      const testPath = path.join(projectPath, 'test');
-      if (!fs.existsSync(specPath) && fs.existsSync(testPath)) {
-        specPath = testPath;
-      }
+    const projectRoots = atom.project.getPaths();
+    if (projectRoots.length > 0) {
+      const testPaths = projectRoots.flatMap(p => {
+        const newPaths = [ path.join(p, 'spec'), path.join(p, 'test') ];
+        return newPaths.filter(fs.existsSync);
+      })
 
-      ipcRenderer.send('run-package-tests', specPath, options);
+      ipcRenderer.send('run-package-tests', Object.assign(
+        {testPaths, projectRoots}, options
+      ));
     }
   }
 }
