@@ -26,12 +26,17 @@ class Reporter {
         console.log('start');
       })
       .on(EVENT_SUITE_BEGIN, evt => {
-        const header = document.createElement(`h${divs.length + 1}`)
+        if(evt.root) return;
+        const level = divs.length + 1;
+        const header = document.createElement(`h${level}`)
         header.innerText = evt.title
-        testDiv.appendChild(header)
         const div = document.createElement('div')
+        div.appendChild(header)
+        if(level === 1) {
+          div.dataset['file'] = evt.file
+        }
         divs.push(div)
-        testDiv.appendChild(div)
+        testDiv.prepend(div)
       })
       .on(EVENT_SUITE_END, (a) => {
         divs.pop()
