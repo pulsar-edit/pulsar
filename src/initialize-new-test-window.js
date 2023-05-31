@@ -128,13 +128,37 @@ module.exports = async function({ blobStore}) {
 
 const underscore = require('underscore');
 function listenToPaths(projectRoots, options) {
-  const debouncedRun = underscore.debounce(runAllTests, 500);
+  let runEverything = false
+  let filesToRun = new Set()
+  const runSpecificTests = () => {
+    if(runEverything) {
+      runAllTests(options);
+    } else {
+      console.log("WAT", options.hooks, filesToRun)
+      runTests(options.hooks, [...filesToRun]);
+    }
+    filesToRun = new Set()
+    runEverything = false
+  }
+  const debouncedRun = underscore.debounce(runSpecificTests, 500);
   projectRoots.forEach(path => {
-    atomExported.watchPath(path, {}, () => {
-      testDiv.innerHTML = ""
+    atomExported.watchPath(path, {}, paths => {
+      paths.forEach(watched => {
+        if(watched.action === 'deleted') {
+          return
+        } else if(!runEverything && testFiles.has(watched.path)) {
+          filesToRun.add(watched.path)
+        } else {
+          runEverything = true
+        }
+      })
+      console.log("PATH", path)
       debouncedRun(options)
     });
   });
+      // return atomExported.watchPath(file, {}, () => {
+      //   runTests(hooks, [file])
+      // });
 }
 
 let testDiv
@@ -176,9 +200,10 @@ function mochaHooks({rootDiv, Mocha, blobStore}) {
 }
 
 let mocha
-let watchers = []
+let testFiles
 
 async function runAllTests({hooks, testPaths}) {
+  testDiv.innerHTML = ""
   vm.runInThisContext('var Mocha = require("mocha")')
   const Reporter = require('./mocha-test-runner/reporter')
   Reporter.setMocha(Mocha)
@@ -188,19 +213,18 @@ async function runAllTests({hooks, testPaths}) {
   mocha.reporter(Reporter);
   mocha.rootHooks(hooks)
 
-  const promises = testPaths.flatMap(async path => {
+  testFiles = new Set();
+  const promises = testPaths.map(async path => {
     const files = await glob(
       `${path}/**/*{spec,test}.{js,coffee,ts,cjs,jsx,mjs}`,
       { ignore: 'node_modules/**' }
     );
-    return files.map(file => {
+    files.forEach(file => {
+      testFiles.add(file)
       mocha.addFile(file)
-      return atomExported.watchPath(file, {}, () => {
-        runTests(hooks, [file])
-      });
     });
   })
-  watchers = await Promise.all(promises)
+  await Promise.all(promises)
   mocha.run();
 }
 
@@ -212,9 +236,11 @@ async function runTests(hooks, testFiles) {
   mocha = new Mocha();
   mocha.reporter(Reporter);
   mocha.rootHooks(hooks)
-  testFiles.forEach(file => mocha.addFile(file))
-
-  testDiv.innerHTML = ''
+  testFiles.forEach(file => {
+    const oldRun = document.querySelector(`div[data-file="${file}"]`)
+    oldRun?.remove();
+    mocha.addFile(file)
+  })
   mocha.run();
 }
 
