@@ -917,12 +917,11 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.on(
         ipcMain,
         'run-package-tests',
-        (event, packageSpecPath, options = {}) => {
+        (event, options = {}) => {
           this.runTests(
             Object.assign(
               {
                 resourcePath: this.devResourcePath,
-                pathsToOpen: [packageSpecPath],
                 headless: false
               },
               options
@@ -1723,22 +1722,18 @@ module.exports = class AtomApplication extends EventEmitter {
   // options -
   //   :headless - A Boolean that, if true, will close the window upon
   //                   completion.
-  //   :resourcePath - The path to include specs from.
+  //   :projectPaths - All paths of the "project" we're testing
+  //   :testPaths - Test paths (spec or test)
   //   :specPath - The directory to load specs from.
   runTests({
     headless,
     resourcePath,
     executedFrom,
-    pathsToOpen,
+    projectRoots,
+    testPaths,
     logFile,
     env
   }) {
-    const testPaths = [];
-    if (pathsToOpen != null) {
-      for (let pathToOpen of pathsToOpen) {
-        testPaths.push(path.resolve(executedFrom, fs.normalize(pathToOpen)));
-      }
-    }
     if (testPaths.length === 0) {
       process.stderr.write('Error: Specify at least one test path\n\n');
       process.exit(1);
@@ -1747,30 +1742,6 @@ module.exports = class AtomApplication extends EventEmitter {
     const windowInitializationScript = path.join(
       __dirname, "..", "initialize-new-test-window"
     );
-    // {
-    //   windowInitializationScript: '/home/mauricio/projects/pulsar_repos/pulsar/src/initialize-test-window.js',
-    //   resourcePath: '/home/mauricio/projects/pulsar_repos/pulsar',
-    //   headless: false,
-    //   isSpec: true,
-    //   devMode: true,
-    //   testRunnerPath: '/home/mauricio/projects/pulsar_repos/pulsar/spec/jasmine-test-runner.js',
-    //   legacyTestRunnerPath: '/home/mauricio/projects/pulsar_repos/pulsar/spec/jasmine-test-runner.js',
-    //   testPaths: [ '/home/mauricio/projects/pulsar_repos/pulsar/spec' ],
-    //   logFile: undefined,
-    //   safeMode: false,
-    //   env: undefined
-    // }
-
-    // WAAA {
-    //   windowInitializationScript: '/home/mauricio/projects/pulsar_repos/pulsar/src/initialize-new-test-window',
-    //   resourcePath: '/home/mauricio/projects/pulsar_repos/pulsar',
-    //   headless: false,
-    //   isSpec: true,
-    //   devMode: true,
-    //   testPaths: [ '/home/mauricio/projects/pulsar_repos/pulsar/spec' ],
-    //   logFile: undefined,
-    //   env: undefined
-    // }
 
     const window = this.createWindow({
       windowInitializationScript,
@@ -1778,6 +1749,7 @@ module.exports = class AtomApplication extends EventEmitter {
       headless,
       isSpec: true,
       devMode: true,
+      projectRoots,
       testPaths,
       logFile,
       env
@@ -1851,19 +1823,6 @@ module.exports = class AtomApplication extends EventEmitter {
     if (safeMode == null) {
       safeMode = false;
     }
-    console.log("AW", {
-      windowInitializationScript,
-      resourcePath,
-      headless,
-      isSpec,
-      devMode,
-      testRunnerPath,
-      legacyTestRunnerPath,
-      testPaths,
-      logFile,
-      safeMode,
-      env
-    })
     const window = this.createWindow({
       windowInitializationScript,
       resourcePath,
