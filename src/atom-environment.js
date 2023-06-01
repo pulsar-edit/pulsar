@@ -346,6 +346,8 @@ class AtomEnvironment {
         this.history.loadState()
       )
     );
+
+    this.packages.preloadPackages();
   }
 
   /**
