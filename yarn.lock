@@ -3846,10 +3846,10 @@ dompurify@2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.17.tgz#505ffa126a580603df4007e034bdc9b6b738668e"
   integrity sha512-nNwwJfW55r8akD8MSFz6k75bzyT2y6JEa1O3JrZFBf+Y5R9JXXU4OsRl0B9hKoPgHTw2b7ER5yJ5Md97MMUJPg==
 
-dompurify@^1.0.3:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-1.0.11.tgz#fe0f4a40d147f7cebbe31a50a1357539cfc1eb4d"
-  integrity sha512-XywCTXZtc/qCX3iprD1pIklRVk/uhl8BKpkTxr+ZyMVUzSUg7wkQXRBp/euJ5J5moa1QvfpvaPQVP71z1O59dQ==
+dompurify@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.3.tgz#4b115d15a091ddc96f232bcef668550a2f6f1430"
+  integrity sha512-axQ9zieHLnAnHh0sfAamKYiqXMJAVwu+LM/alQ7WDagoWessyWvMSFyW65CqF3owufNu8HBcE4cM2Vflu7YWcQ==
 
 dompurify@^2.0.17:
   version "2.4.1"
@@ -4824,6 +4824,11 @@ function.prototype.name@^1.1.5:
     define-properties "^1.1.3"
     es-abstract "^1.19.0"
     functions-have-names "^1.2.2"
+
+functional-red-black-tree@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
+  integrity sha512-dsKNQNdj6xA3T+QlADDA7mOSlX0qiMINjn0cgr+eGHGsbSHzTabcIogz2+p/iqP1Xs6EP/sS2SbqH+brGTbq0g==
 
 functions-have-names@^1.2.2:
   version "1.2.3"
@@ -6298,6 +6303,7 @@ ky@0.30.0:
 "language-ruby@file:packages/language-ruby":
   version "0.73.0"
   dependencies:
+    tree-sitter-regex "^0.19.0"
     tree-sitter-ruby "^0.19.0"
 
 "language-rust-bundled@file:packages/language-rust-bundled":
@@ -7268,11 +7274,10 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-"notifications@https://codeload.github.com/atom/notifications/legacy.tar.gz/refs/tags/v0.72.1":
-  version "0.72.1"
-  resolved "https://codeload.github.com/atom/notifications/legacy.tar.gz/refs/tags/v0.72.1#4e5a155624b1189bdcc3416a9f736ed1e030b56e"
+"notifications@file:./packages/notifications":
+  version "0.73.0"
   dependencies:
-    dompurify "^1.0.3"
+    dompurify "3.0.3"
     fs-plus "^3.0.0"
     marked "^0.3.6"
     moment "^2.19.3"
@@ -7738,10 +7743,10 @@ postcss-selector-parser@6.0.4:
     uniq "^1.0.1"
     util-deprecate "^1.0.2"
 
-postcss@8.2.10:
-  version "8.2.10"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.10.tgz#ca7a042aa8aff494b334d0ff3e9e77079f6f702b"
-  integrity sha512-b/h7CPV7QEdrqIxtAf2j31U5ef05uBDuvoXv6L51Q4rcS1jdlXAVKJv+atCFdUXYl9dyTHGyoMzIepwowRJjFw==
+postcss@8.2.13:
+  version "8.2.13"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.2.13.tgz#dbe043e26e3c068e45113b1ed6375d2d37e2129f"
+  integrity sha512-FCE5xLH+hjbzRdpbRb1IMCvPv9yZx2QnDarBEYSN0N0HYk+TcXsEhwdFcFb+SRWOKzKGErhIEbBK2ogyLdTtfQ==
   dependencies:
     colorette "^1.2.2"
     nanoid "^3.1.22"
@@ -9476,7 +9481,7 @@ tree-sitter-python@0.19.0:
   dependencies:
     nan "^2.14.0"
 
-tree-sitter-regex@0.19.0:
+tree-sitter-regex@0.19.0, tree-sitter-regex@^0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/tree-sitter-regex/-/tree-sitter-regex-0.19.0.tgz#b4b3f44dc742684881a7c05635e075d90ff5414d"
   integrity sha512-hKaGO6ect2MuGwY+PU89JJdkgwRRseDgVNiRaZTLXQyW8vAsZLOb/tkphY9NF9U+ZOeLATotKwG+rLykYYWXyA==
@@ -9878,6 +9883,11 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
+
+web-tree-sitter@^0.20.7:
+  version "0.20.7"
+  resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.20.7.tgz#b0ddb78e8244221a3100f432c7e162516cd9cd09"
+  integrity sha512-flC9JJmTII9uAeeYpWF8hxDJ7bfY+leldQryetll8Nv4WgI+MXc6h7TiyAZASWl9uC9TvmfdgOjZn1DAQecb3A==
 
 webdriver@7.20.8:
   version "7.20.8"

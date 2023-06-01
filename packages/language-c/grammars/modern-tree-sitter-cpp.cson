@@ -1,0 +1,13 @@
+name: 'C++'
+scopeName: 'source.cpp'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-cpp'
+
+injectionRegex: '^(cpp|CPP|cc|CC)$'
+
+treeSitter:
+  grammar: 'tree-sitter-cpp/tree-sitter-cpp.wasm'
+  highlightsQuery: 'tree-sitter-cpp/highlights.scm'
+  localsQuery: 'tree-sitter-cpp/locals.scm'
+  foldsQuery: 'tree-sitter-cpp/folds.scm'
+  indentsQuery: 'tree-sitter-cpp/indents.scm'

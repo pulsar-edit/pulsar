@@ -1,0 +1,17 @@
+name: 'ERB'
+scopeName: 'text.html.erb'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-embedded-template'
+
+fileTypes: [
+  'erb'
+  'html.erb'
+]
+
+injectionRegex: '^(erb|ERB)$'
+
+treeSitter:
+  grammar: 'tree-sitter-embedded-template/tree-sitter-embedded-template.wasm'
+  highlightsQuery: 'tree-sitter-embedded-template/erb/highlights.scm'
+  foldsQuery: 'tree-sitter-embedded-template/erb/folds.scm'
+  indentsQuery: 'tree-sitter-embedded-template/erb/indents.scm'

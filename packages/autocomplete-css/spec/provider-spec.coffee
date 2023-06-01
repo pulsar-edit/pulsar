@@ -51,6 +51,7 @@ describe "CSS property name and value autocompletions", ->
   beforeEach ->
     waitsForPromise -> atom.packages.activatePackage('autocomplete-css')
     waitsForPromise -> atom.packages.activatePackage('language-css') # Used in all CSS languages
+    atom.config.set 'core.useTreeSitterParsers', false
 
     runs ->
       provider = atom.packages.getActivePackage('autocomplete-css').mainModule.getProvider()

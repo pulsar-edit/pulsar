@@ -1,0 +1,18 @@
+name: 'TypeScript'
+scopeName: 'source.ts'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-typescript/typescript'
+
+fileTypes: ['ts']
+
+injectionRegex: '^(typescript|TYPESCRIPT|ts|TS)$'
+
+comments:
+  start: '// '
+
+treeSitter:
+  grammar: 'tree-sitter-typescript/tree-sitter-typescript.wasm'
+  highlightsQuery: 'tree-sitter-typescript/highlights.scm'
+  indentsQuery: 'tree-sitter-typescript/indents.scm'
+  foldsQuery: 'tree-sitter-typescript/folds.scm'
+  tagsQuery: 'tree-sitter-typescript/tags.scm'
