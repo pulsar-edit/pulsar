@@ -1,6 +1,9 @@
-'name': 'Clojure'
-'scopeName': 'source.clojure'
-'type': 'modern-tree-sitter'
+name: 'Clojure'
+scopeName: 'source.clojure'
+type: 'modern-tree-sitter'
+injectionRegExp: '^source-clojure$'
+parser: 'tree-sitter-clojure'
+
 'fileTypes': [
   'boot'
   'clj'
@@ -10,7 +13,6 @@
   'cljs.hl'
   'cljx'
   'clojure'
-  'edn'
   'org'
   'bb'
   'joke'
