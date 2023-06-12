@@ -40,6 +40,4 @@ parser: 'tree-sitter-clojure'
 treeSitter:
   grammar: 'ts/grammar.wasm'
   highlightsQuery: 'ts/highlights.scm'
-  # localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
-  indentsQuery: 'ts/indents.scm'

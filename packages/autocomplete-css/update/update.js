@@ -87,6 +87,7 @@
 
 const css = require("@webref/css");
 const fs = require("fs");
+const superagent = require("superagent");
 const CSSParser = require("./cssValueDefinitionSyntaxExtractor.js");
 const manualPropertyDesc = require("./manual-property-desc.json");
 
@@ -103,8 +104,11 @@ async function update(params) {
     pseudoSelectors: pseudoSelectors
   };
 
+  completions.properties = sortByLength(completions.properties);
+  completions.properties = await sortByPopularity(completions.properties);
+
   // Now to write out our updated file
-  fs.writeFileSync("completions.json", JSON.stringify(completions, null, 2));
+  fs.writeFileSync("./completions.json", JSON.stringify(completions, null, 2));
 
   // Now to determine how many properties have empty descriptions.
 
@@ -132,6 +136,65 @@ async function update(params) {
     console.log("It is not required to fix the above empty completions issue.");
     console.log("Use `node update.js --show-empty` to show the empty property names.");
   };
+}
+
+function sortByLength(obj) {
+  let keys = Object.keys(obj);
+
+  keys.sort((a, b) => {
+    if (a.length > b.length) {
+      return 1;
+    } else if (a.length < b.length) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+
+  let newObj = {};
+
+  // Now rebuild the object according to our new keys
+  for (i in keys) {
+    newObj[keys[i]] = obj[keys[i]];
+  }
+
+  return newObj;
+}
+
+async function sortByPopularity(obj) {
+  try {
+    const res = await superagent.get("https://chromestatus.com/data/csspopularity");
+    if (res.status !== 200) {
+      console.error(res);
+      process.exit(1);
+    }
+
+    let newObj = {};
+
+    for (prop in res.body) {
+      let property = res.body[prop].property_name;
+
+      if (typeof obj[property] === "object") {
+        newObj[property] = obj[property];
+      }
+    }
+
+    if (Object.keys(obj).length === Object.keys(newObj).length) {
+      return newObj;
+    }
+
+    for (prop in obj) {
+      if (typeof newObj[prop] !== "object") {
+        newObj[prop] = obj[prop];
+      }
+    }
+
+    return newObj;
+
+  } catch(err) {
+    console.error(err);
+    process.exit(1);
+  }
 }
 
 async function buildProperties(css) {
@@ -346,7 +409,7 @@ async function getPseudoSelectors() {
   // For now since there is no best determined way to collect all modern psudoselectors
   // We will just grab the existing list for our existing `completions.json`
 
-  let existingCompletions = require("./completions.json");
+  let existingCompletions = require("../completions.json");
 
   return existingCompletions.pseudoSelectors;
 }

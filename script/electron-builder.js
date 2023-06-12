@@ -227,6 +227,11 @@ let options = {
     "runAfterFinish": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
+    "guid": "0949b555-c22c-56b7-873a-a960bdefa81f"
+    // The GUID is generated from Electron-Builder based on our AppID
+    // Hardcoding it here means it will always be used as generated from
+    // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
+    // A PR to GitHub Desktop must be made with the updated value
   },
   "extraMetadata": {
   },
