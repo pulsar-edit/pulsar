@@ -587,6 +587,112 @@ class AtomEnvironment {
     return this.appVersion;
   }
 
+  /**
+   * @memberof AtomEnvironment
+   * Determines if the current Pulsar version is greater than the provided
+   * semver string.
+   * @param {string} value - The provided version string to check against.
+   * Can be any valid semver, or even just the Major and Minor versions ie. "1.2"
+   * @param {boolean} [orEqual=false] - Instructs the function to return true if the
+   * values are equal. Don't ever set this value manually, instead use
+   * `.isVersionGreaterOrEqual()`.
+   * @returns {boolean} 'true' if the current Pulsar version is greater than the
+   * provided semver, 'false' is the provided semver is greater than the current
+   * Pulsar version, or equal to it.
+   */
+  isVersionGreater(value, orEqual = false) {
+    let semverReg = /^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?/;
+    // Returns Semver numbers, with optional third position. Ignoring pre-release, and build metadata
+
+    let appVerArray = this.getVersion().match(semverReg) ?? [];
+    let valVerArray = value.match(semverReg) ?? [];
+
+    if (valVerArray.length === 0 || appVerArray.length === 0) {
+      // Couldn't parse the version, return false
+      return false;
+    }
+
+    for (let i = 1; i < valVerArray.length; i++) {
+      // i is initialized as 1, since first array value is full string
+      if (parseInt(appVerArray[i]) > parseInt(valVerArray[i])) {
+        return true;
+      }
+    }
+    // If all checks in the loop have passed, then the values are equal
+    if (orEqual) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * @memberof AtomEnvironment
+   * Determines if the current Pulsar version is greater than or equal to the
+   * provided semver string. Implements `.isVersionGreater()`.
+   * @param {string} value - THe provided version string to check against.
+   * Can be any valid semver, or even just the Major and Minor versions ie. "1.2"
+   * @returns {boolean} 'true' if the current Pulsar version is greater than or
+   * equal to the provided semver, 'false' otherwise.
+   */
+  isVersionGreaterOrEqual(value) {
+    return this.isVersionGreater(value, true);
+  }
+
+  /**
+   * @memberof AtomEnvironment
+   * Determines if the current Pulsar version is less than the provided semver
+   * string.
+   * @param {string} value - The provided version string to check against.
+   * Can be any valid semver, or even just the Major and Minor versions ie. "1.2"
+   * @param {boolean} [orEqual=false] - Instructs the function to return true if the
+   * values are equal. Don't ever set this value manually, instead use
+   * `.isVersionLesserOrEqual()`.
+   * @returns {boolean} 'true' if the current Pulsar version is lesser than the
+   * provided semver, 'false' if the provided semver is greater than the current
+   * Pulsar version, or equal to it.
+   */
+  isVersionLesser(value, orEqual = false) {
+    let semverReg = /^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?/;
+    // Returns Semver numbers, with optional third position. Ignoring pre-release, and build metadata
+
+    let appVerArray = this.getVersion().match(semverReg) ?? [];
+    let valVerArray = value.match(semverReg) ?? [];
+
+    if (valVerArray.length === 0 || appVerArray.length === 0) {
+      // Couldn't parse the version, return false
+      return false;
+    }
+
+    for (let i = 1; i < valVerArray.length; i++) {
+      // i is initialized as 1, since first array value is full string
+      if (parseInt(appVerArray[i]) < parseInt(valVerArray[i])) {
+        return true;
+      } else if (parseInt(appVerArray[i]) != parseInt(valVerArray[i])) {
+        return false;
+      }
+    }
+    // If all checks in the loop have passed, then the values are equal
+    if (orEqual) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * @memberof AtomEnvironment
+   * Determines if the current Pulsar version is less than or equal to the
+   * provided semver string. Implements `.isVersionLesser()`.
+   * @param {string} value - The provided version string to check against.
+   * Can be any valid semver, or even just the Major and Minor versions ie. "1.2"
+   * @returns {boolean} 'true' if the current Pulsar version is lesser than or
+   * equal to the provided semver, 'false' otherwise.
+   */
+  isVersionLesserOrEqual(value) {
+    return this.isVersionLesser(value, true);
+  }
+
   // Public: Gets the release channel of the Pulsar application.
   //
   // Returns the release channel as a {String}. Will return a specific release channel
