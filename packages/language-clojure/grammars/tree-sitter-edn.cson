@@ -10,6 +10,4 @@ fileTypes: [
 treeSitter:
   grammar: 'ts/grammar.wasm'
   highlightsQuery: 'ts/edn-highlights.scm'
-  # localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
-  indentsQuery: 'ts/indents.scm'
