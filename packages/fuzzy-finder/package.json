@@ -11,7 +11,7 @@
     "fs-plus": "^3.0.0",
     "minimatch": "~3.0.3",
     "underscore-plus": "^1.7.0",
-    "vscode-ripgrep": "^1.2.5",
+    "@vscode/ripgrep": "^1.2.5",
     "wrench": "^1.5"
   },
   "devDependencies": {

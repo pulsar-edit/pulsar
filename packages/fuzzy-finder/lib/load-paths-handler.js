@@ -7,7 +7,7 @@ const path = require('path')
 const {GitRepository} = require('atom')
 const {Minimatch} = require('minimatch')
 const childProcess = require('child_process')
-const { rgPath } = require('vscode-ripgrep')
+const { rgPath } = require('@vscode/ripgrep')
 
 const PathsChunkSize = 100
 

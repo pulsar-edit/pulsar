@@ -1831,6 +1831,14 @@
   dependencies:
     "@types/node" "*"
 
+"@vscode/ripgrep@^1.2.5":
+  version "1.15.4"
+  resolved "https://registry.yarnpkg.com/@vscode/ripgrep/-/ripgrep-1.15.4.tgz#ca8946b5580bbea1e706ed8d3b1eed5f0d551ab6"
+  integrity sha512-+EPIS2aoD95MFLrgGHd/D2fck42aMRV2cBrT7BiNvKBeSyCTybSaTJ+PGQf6zV/95AhaXHHYqYPVRk3DZoGU9w==
+  dependencies:
+    https-proxy-agent "^5.0.0"
+    proxy-from-env "^1.1.0"
+
 "@wdio/config@7.20.8":
   version "7.20.8"
   resolved "https://registry.yarnpkg.com/@wdio/config/-/config-7.20.8.tgz#0cec7a822e7bdbb63169b6da38d56bf6030b520c"
@@ -4810,11 +4818,11 @@ fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
   version "1.14.3"
   dependencies:
     "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
+    "@vscode/ripgrep" "^1.2.5"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
     minimatch "~3.0.3"
     underscore-plus "^1.7.0"
-    vscode-ripgrep "^1.2.5"
     wrench "^1.5"
 
 gauge@^4.0.3:
@@ -9786,14 +9794,6 @@ vscode-ripgrep@1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.9.0.tgz#d6cdea4d290f3c2919472cdcfe2440d5fb1f99db"
   integrity sha512-7jyAC/NNfvMPZgCVkyqIn0STYJ7wIk3PF2qA2cX1sEutx1g/e2VtgKAodXnfpreJq4993JT/BSIigOv/0lBSzg==
-  dependencies:
-    https-proxy-agent "^4.0.0"
-    proxy-from-env "^1.1.0"
-
-vscode-ripgrep@^1.2.5:
-  version "1.13.2"
-  resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.13.2.tgz#8ccebc33f14d54442c4b11962aead163c55b506e"
-  integrity sha512-RlK9U87EokgHfiOjDQ38ipQQX936gWOcWPQaJpYf+kAkz1PQ1pK2n7nhiscdOmLu6XGjTs7pWFJ/ckonpN7twQ==
   dependencies:
     https-proxy-agent "^4.0.0"
     proxy-from-env "^1.1.0"
