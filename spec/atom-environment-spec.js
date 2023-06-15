@@ -48,60 +48,13 @@ describe('AtomEnvironment', () => {
     });
   });
 
-  describe('.isVersionGreater()', () => {
-    it('returns false if pulsar version is lesser than provided version string', () => {
+  describe('.versionSatisfies()', () => {
+    it('returns appropriately for provided range', () => {
       let testPulsarVersion = '0.1.0';
       spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
-      expect(atom.isVersionGreater('0.2.0')).toBe(false);
-      testPulsarVersion = '1.105.0';
-      expect(atom.isVersionGreater('1.105.1')).toBe(false);
-      expect(atom.isVersionGreater('1.106')).toBe(false);
-    });
-    it('returns true if pulsar version is greater than provided version string', () => {
-      let testPulsarVersion = '1.105.0';
-      spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
-      expect(atom.isVersionGreater('0.2.0')).toBe(true);
-      expect(atom.isVersionGreater('0.2')).toBe(true);
-      expect(atom.isVersionGreater('1.104.9')).toBe(true);
-      testPulsarVersion = '1.36.0';
-      expect(atom.isVersionGreater('0.36.0')).toBe(true);
-      expect(atom.isVersionGreater('1.35')).toBe(true);
-    });
-  });
-
-  describe('.isVersionGreaterOrEqual()', () => {
-    // Tests of this function are purposefully sparse, as it is just a
-    // reimplmentation  of `.isVersionGreater()`
-    it('returns true if pulsar version is equal to provided version string', () => {
-      let testPulsarVersion = '1.105.0';
-      spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
-      expect(atom.isVersionGreaterOrEqual('1.105.0')).toBe(true);
-    });
-  });
-
-  describe('.isVersionLesser()', () => {
-    it('returns false if pulsar version is greater than provided version string', () => {
-      let testPulsarVersion = '1.105.0';
-      spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
-      expect(atom.isVersionLesser('0.105.0')).toBe(false);
-      expect(atom.isVersionLesser('1.104.1')).toBe(false);
-    });
-    it('returns true if pulsar version is lesser than provided version string', () => {
-      let testPulsarVersion = '1.105.0';
-      spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
-      expect(atom.isVersionLesser('1.105.1')).toBe(true);
-      expect(atom.isVersionLesser('1.106')).toBe(true);
-      expect(atom.isVersionLesser('2.0')).toBe(true);
-    });
-  });
-
-  describe('.isVersionLesserOrEqual()', () => {
-    // Tests of this function are purposefully sparse, as it is just a
-    // reimplmentation  of `.isVerisonLesser()`
-    it('returns true if pulsar version is equal to provided version string', () => {
-      let testPulsarVersion = '1.105.0';
-      spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
-      expect(atom.isVersionLesserOrEqual('1.105.0')).toBe(true);
+      expect(atom.versionSatisfies('>0.2.0')).toBe(false);
+      expect(atom.versionSatisfies('>=0.x.x <=2.x.x')).toBe(true);
+      expect(atom.versionSatisfies('^0.1.x')).toBe(true);
     });
   });
 
