@@ -6,11 +6,32 @@
 
 ## [Unreleased]
 
+## 1.106.0
+
 - Fixed bug that happens on some systems when trying to launch Pulsar using the Cinnamon desktop environment
 - Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out
 - Bugfix: fixed Clojure indentation on tree-sitter
 - Improved the Clojure language support by migrating it to tree-sitter and support block comments, quoting, and other advanced features on modern tree-sitter implementation
-- Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out.
+- Fixed a bug that could cause images to not appear the first time opening them
+- `autocomplete-css` Completions are now sorted in a way that may match what users expect
+
+### Pulsar
+- Removed: Mostly remove `request` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/474)
+- Fixed: Fix: Image doesn't appear at first open [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/579)
+- Removed: Remove specific cinnamon condition [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/563)
+- Fixed: Fix of Clojure's indentation rules by removing query file [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/584)
+- Fixed: Update links in settings page [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/570)
+- Added: [autocomplete-css] Sort `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/552)
+- Fixed: Fixes on "comment block" for Clojure grammar [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/573)
+- Added: Hardcode NSIS GUID [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/566)
+- Fixed: Make yarn sane [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/567)
+- Fixed: Huge improvement on Clojure highlighting [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/553)
+- Removed: Removed unused_require method [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/561)
+- Bumped: Update dependency underscore to 1.12.1 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/504)
+- Added: Add modern tree-sitter support behind an experimental flag [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/472)
+- Added: Make CHANGELOG easier to merge and update dompurify [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/537)
+- Added: js operators [@icecream17](https://github.com/pulsar-edit/pulsar/pull/79)
+- Bumped: Update dependency postcss to v8.2.13 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/514)
 
 ## 1.105.0
 
