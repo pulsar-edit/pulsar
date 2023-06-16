@@ -14,8 +14,10 @@
 - Improved the Clojure language support by migrating it to tree-sitter and support block comments, quoting, and other advanced features on modern tree-sitter implementation
 - Fixed a bug that could cause images to not appear the first time opening them
 - `autocomplete-css` Completions are now sorted in a way that may match what users expect
+- Added a "Logout" option in the `github` package
 
 ### Pulsar
+- Updated: deps: Bump github to v0.36.16-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/592)
 - Removed: Mostly remove `request` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/474)
 - Fixed: Fix: Image doesn't appear at first open [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/579)
 - Removed: Remove specific cinnamon condition [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/563)
@@ -32,6 +34,10 @@
 - Added: Make CHANGELOG easier to merge and update dompurify [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/537)
 - Added: js operators [@icecream17](https://github.com/pulsar-edit/pulsar/pull/79)
 - Bumped: Update dependency postcss to v8.2.13 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/514)
+
+### github
+- Added: Add logout menu option [@Daeraxa](https://github.com/pulsar-edit/github/pull/27)
+- Updated: ci: Bump action dependencies [@Spiker985](https://github.com/pulsar-edit/github/pull/19)
 
 ## 1.105.0
 

@@ -74,6 +74,9 @@ export default class ChangeLogView {
               <li>
                 `autocomplete-css` Completions are now sorted in a way that may match what users expect
               </li>
+              <li>
+                Added a "Logout" option in the `github` package
+              </li>
 
             </ul>
 
