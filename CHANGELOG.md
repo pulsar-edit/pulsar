@@ -14,7 +14,7 @@
 - Improved the Clojure language support by migrating it to tree-sitter and support block comments, quoting, and other advanced features on modern tree-sitter implementation
 - Fixed a bug that could cause images to not appear the first time opening them
 - `autocomplete-css` Completions are now sorted in a way that may match what users expect
-- Added a "Logout" option in the `github` package
+- Added a "Log Out" menu item for the `github` package
 
 ### Pulsar
 - Updated: deps: Bump github to v0.36.16-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/592)
