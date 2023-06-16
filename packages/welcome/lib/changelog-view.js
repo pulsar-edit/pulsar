@@ -53,30 +53,29 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Rebranded notifications, using our backend to find new versions of package,
-                and our github repository to find issues on Pulsar. Also fixed the "view issue"
-                and "create issue" buttons that were not working
+                Fixed bug that happens on some systems when trying to launch Pulsar
+                using the Cinnamon desktop environment
               </li>
               <li>
-                Bumped to latest version of `second-mate`, fixing a memory usage issue in `vscode-oniguruma`
+                Added a modern implementation of Tree-sitter grammars behind an experimental flag.
+                Enable the "Use Modern Tree-Sitter Implementation" in the Core settings
+                to try it out
               </li>
               <li>
-                Removed a cache for native modules - fix bugs where an user rebuilds a native
-                module outside of Pulsar, but Pulsar refuses to load anyway
+                Bugfix: fixed Clojure indentation on tree-sitter
               </li>
               <li>
-                Removed `nslog` dependency
+                Improved the Clojure language support by migrating it to tree-sitter and support block comments,
+                quoting, and other advanced features on modern tree-sitter implementation
               </li>
               <li>
-                Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+                Fixed a bug that could cause images to not appear the first time opening them
               </li>
               <li>
-                Fixed RPM installation failure when Atom was installed on the same machine
+                `autocomplete-css` Completions are now sorted in a way that may match what users expect
               </li>
               <li>
-                Added a new set of Package `activationHooks`, `...:uri-opened` lets a package activate when any URI
-                is opened within Pulsar, and `...:file-name-opened` lets a package activate when any specific filename
-                is opened within Pulsar.
+                Added a "Log Out" menu item for the `github` package
               </li>
 
             </ul>
