@@ -6,61 +6,18 @@ env:
 arm_linux_task:
   alias: linux
   arm_container:
-    image: node:16-bookworm-slim
+    image: node:18-slim
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
   prepare_script:
     - apt-get update
-    - export DEBIAN_FRONTEND="noninteractive"
-    - apt-get install -y
-                gnupg2
-                procps
-                curl
-                rpm
-                build-essential
-                git
-                libsecret-1-dev
-                fakeroot
-                libx11-dev
-                libxkbfile-dev
-                libgdk-pixbuf2.0-dev
-                libgtk-3-dev
-                libxss-dev
-                libasound2-dev
-                libnss3
-                xvfb
-    - rm -rf ./python3_10/
-    - mkdir python3_10
-    - cd python3_10
-    - curl -O http://http.us.debian.org/debian/pool/main/p/python3.10/python3.10-minimal_3.10.12-1_arm64.deb
-                -O http://http.us.debian.org/debian/pool/main/p/python3.10/libpython3.10-minimal_3.10.12-1_arm64.deb
-                -O http://http.us.debian.org/debian/pool/main/p/python3.10/libpython3.10-stdlib_3.10.12-1_arm64.deb
-                -O http://http.us.debian.org/debian/pool/main/p/python3.10/python3.10_3.10.12-1_arm64.deb
-                -O http://http.us.debian.org/debian/pool/main/m/mpdecimal/libmpdec3_2.5.1-2_arm64.deb
-    - apt-get install -y ./*python*.deb ./libmpdec3*.deb
-    - cd ..
-    - git submodule init
-    - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-  install_script:
-    - yarn install --ignore-engines || yarn install --ignore-engines
-  build_script:
-    - yarn build
-    - yarn run build:apm
-  build_binary_script:
-    - yarn dist || yarn dist
-  binary_artifacts:
-    path: ./binaries/*
-  test_script:
-    - rm -R node_modules/electron; yarn install --check-files
-    - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/pulsar'
-    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
-  always:
-    videos_artifacts:
-      path: ./tests/videos/**
-    junit_artifacts:
-      path: report.xml
-      type: text/xml
-      format: junit
+    - mkdir test_fetching_ripgrep
+    - cd test_fetching_ripgrep
+    - npm init -y
+    - npm install @vscode/ripgrep
+    - npm ci
+    - npm ci
+    - npm ci
+    - npm ci
+    - npm ci
