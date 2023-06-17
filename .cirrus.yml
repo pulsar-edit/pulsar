@@ -37,7 +37,8 @@ arm_linux_task:
                 -O http://http.us.debian.org/debian/pool/main/p/python3.10/libpython3.10-minimal_3.10.12-1_arm64.deb
                 -O http://http.us.debian.org/debian/pool/main/p/python3.10/libpython3.10-stdlib_3.10.12-1_arm64.deb
                 -O http://http.us.debian.org/debian/pool/main/p/python3.10/python3.10_3.10.12-1_arm64.deb
-    - apt-get install -y ./*python*.deb
+                -O http://http.us.debian.org/debian/pool/main/m/mpdecimal/libmpdec3_2.5.1-2_arm64.deb
+    - apt-get install -y ./*python*.deb ./libmpdec3*.deb
     - cd ..
     - git submodule init
     - git submodule update
