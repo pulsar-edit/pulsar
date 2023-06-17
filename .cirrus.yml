@@ -11,7 +11,6 @@ arm_linux_task:
   env:
     USE_SYSTEM_FPM: 'true'
   prepare_script:
-    - apt-get update
     - mkdir test_fetching_ripgrep
     - cd test_fetching_ripgrep
     - npm init -y
