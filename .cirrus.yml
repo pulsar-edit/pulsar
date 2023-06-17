@@ -13,6 +13,7 @@ arm_linux_task:
   prepare_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
+    - apt-cache policy python3
     - apt-get install -y
                 gnupg2
                 procps
