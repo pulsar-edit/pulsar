@@ -13,7 +13,6 @@ arm_linux_task:
   prepare_script:
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
-    - apt-cache policy python3
     - apt-get install -y
                 gnupg2
                 procps
@@ -31,7 +30,15 @@ arm_linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
-                python3=3.10.6-3
+    - rm -rf ./python3_10/
+    - mkdir python3_10
+    - cd python3_10
+    - curl -O http://http.us.debian.org/debian/pool/main/p/python3.10/python3.10-minimal_3.10.12-1_arm64.deb
+                -O http://http.us.debian.org/debian/pool/main/p/python3.10/libpython3.10-minimal_3.10.12-1_arm64.deb
+                -O http://http.us.debian.org/debian/pool/main/p/python3.10/libpython3.10-stdlib_3.10.12-1_arm64.deb
+                -O http://http.us.debian.org/debian/pool/main/p/python3.10/python3.10_3.10.12-1_arm64.deb
+    - apt-get install -y ./*python*.deb
+    - cd ..
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
