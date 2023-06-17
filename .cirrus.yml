@@ -79,6 +79,7 @@ arm_linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
+                python3=3.10.6-3
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
