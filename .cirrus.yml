@@ -13,15 +13,15 @@ arm_linux_task:
   prepare_script:
     - mkdir test_fetching_ripgrep
     - cd test_fetching_ripgrep
-    - npm init -y
-    - npm install @vscode/ripgrep; cat /root/.npm/_logs/*.log
+    - npm init -y --verbose
+    - npm install --verbose --foreground-scripts @vscode/ripgrep; cat /root/.npm/_logs/*.log
     - npm cache clean --force
-    - npm ci; cat /root/.npm/_logs/*.log
+    - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
-    - npm ci; cat /root/.npm/_logs/*.log
+    - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
-    - npm ci; cat /root/.npm/_logs/*.log
+    - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
-    - npm ci; cat /root/.npm/_logs/*.log
+    - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
-    - npm ci; cat /root/.npm/_logs/*.log
+    - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
