@@ -15,9 +15,14 @@ arm_linux_task:
     - mkdir test_fetching_ripgrep
     - cd test_fetching_ripgrep
     - npm init -y
-    - npm install @vscode/ripgrep
-    - npm ci
-    - npm ci
-    - npm ci
-    - npm ci
-    - npm ci
+    - npm install @vscode/ripgrep; cat /root/.npm/_logs/*.log
+    - npm cache clean --force
+    - npm ci; cat /root/.npm/_logs/*.log
+    - npm cache clean --force
+    - npm ci; cat /root/.npm/_logs/*.log
+    - npm cache clean --force
+    - npm ci; cat /root/.npm/_logs/*.log
+    - npm cache clean --force
+    - npm ci; cat /root/.npm/_logs/*.log
+    - npm cache clean --force
+    - npm ci; cat /root/.npm/_logs/*.log
