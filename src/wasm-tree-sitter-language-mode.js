@@ -1036,7 +1036,7 @@ class WASMTreeSitterLanguageMode {
     // Prefer deeper layers over shallower ones.
     for (let layer of layers) {
       let { depth } = layer;
-      let candidateFold = layer.foldResolver.getFoldRangeForRow(row);
+      let candidateFold = layer.foldResolver?.getFoldRangeForRow(row);
       if (!candidateFold) { continue; }
       if (!leadingCandidate || depth > leadingCandidate.depth) {
         leadingCandidate = { fold: candidateFold, depth };
