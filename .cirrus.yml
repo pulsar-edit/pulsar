@@ -16,12 +16,17 @@ arm_linux_task:
     - npm init -y --verbose
     - npm install --verbose --foreground-scripts vscode-ripgrep; cat /root/.npm/_logs/*.log
     - npm cache clean --force
+    - rm -rfv /tmp/vscode-ripgrep-cache*/
     - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
+    - rm -rfv /tmp/vscode-ripgrep-cache*/
     - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
+    - rm -rfv /tmp/vscode-ripgrep-cache*/
     - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
+    - rm -rfv /tmp/vscode-ripgrep-cache*/
     - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
     - npm cache clean --force
+    - rm -rfv /tmp/vscode-ripgrep-cache*/
     - npm ci --verbose --foreground-scripts; cat /root/.npm/_logs/*.log
