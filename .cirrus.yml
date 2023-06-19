@@ -94,7 +94,7 @@ arm_linux_task:
     - yarn run build:apm
   build_binary_script:
     - source /etc/profile.d/rvm.sh
-    - yarn dist || yarn dist || yarn dist || yarn dist || yarn dist || yarn dist
+    - yarn dist || yarn dist || yarn dist || yarn dist || yarn dist || yarn dist`
   binary_artifacts:
     path: ./binaries/*
   test_script:
