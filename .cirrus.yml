@@ -55,7 +55,7 @@ linux_task:
 arm_linux_task:
   alias: linux
   arm_container:
-    image: node
+    image: node:16-slim
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
@@ -79,22 +79,22 @@ arm_linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
-    - gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-    - \curl -sSL https://get.rvm.io | bash -s stable
+    - gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB || gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB || gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+    - \curl -sSL https://get.rvm.io | bash -s stable || \curl -sSL https://get.rvm.io | bash -s stable || \curl -sSL https://get.rvm.io | bash -s stable || \curl -sSL https://get.rvm.io | bash -s stable
     - source /etc/profile.d/rvm.sh
-    - rvm install ruby
-    - gem install fpm
-    - git submodule init
-    - git submodule update
+    - rvm install ruby || rvm install ruby || rvm install ruby || rvm install ruby || rvm install ruby
+    - gem install fpm || gem install fpm || gem install fpm || gem install fpm
+    - git submodule init || git submodule init || git submodule init || git submodule init
+    - git submodule update || git submodule update || git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
-    - yarn install --ignore-engines || yarn install --ignore-engines
+    - yarn install --ignore-engines || yarn install --ignore-engines || yarn install --ignore-engines || yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - yarn build
     - yarn run build:apm
   build_binary_script:
     - source /etc/profile.d/rvm.sh
-    - yarn dist || yarn dist
+    - yarn dist || yarn dist || yarn dist || yarn dist || yarn dist || yarn dist
   binary_artifacts:
     path: ./binaries/*
   test_script:
