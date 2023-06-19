@@ -55,7 +55,7 @@ linux_task:
 arm_linux_task:
   alias: linux
   arm_container:
-    image: node:16-slim
+    image: node:16
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
