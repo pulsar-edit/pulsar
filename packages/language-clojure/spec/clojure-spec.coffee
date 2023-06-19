@@ -2,6 +2,9 @@ describe "Clojure grammar", ->
   grammar = null
 
   beforeEach ->
+    atom.config.set('core.useTreeSitterParsers', false)
+    atom.config.set('core.useExperimentalModernTreeSitter', false)
+
     waitsForPromise ->
       atom.packages.activatePackage("language-clojure")
 
