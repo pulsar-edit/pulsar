@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "finden-filum": "^1.0.5",
     "fs-plus": "^3.0.0",
     "minimatch": "~0.3.0",
     "pathwatcher": "^8.1.0",

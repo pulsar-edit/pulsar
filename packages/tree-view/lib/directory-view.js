@@ -143,6 +143,7 @@ class DirectoryView {
     } else {
       this.expand(isRecursive)
     }
+    this.updateIcon()
   }
 
   expand (isRecursive) {

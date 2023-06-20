@@ -59,8 +59,10 @@ class IconServices {
       let iconClass
       if (view.directory.symlink) {
         iconClass = 'icon-file-symlink-directory'
+      } else if (view.isExpanded) {
+        iconClass = 'icon-file-directory-open-fill'
       } else {
-        iconClass = 'icon-file-directory'
+        iconClass = 'icon-file-directory-fill'
         if (view.directory.isRoot) {
           const repo = repoForPath(view.directory.path)
           if (repo && repo.isProjectAtRoot()) iconClass = 'icon-repo'
