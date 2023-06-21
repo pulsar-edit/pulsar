@@ -447,7 +447,7 @@
   (#set! test.final true))
 
 (singleton_class
-  "<<" @keyword.operator.assigment.ruby)
+  "<<" @keyword.operator.assignment.ruby)
 
 (binary
   "|" @keyword.operator.bitwise.ruby)
