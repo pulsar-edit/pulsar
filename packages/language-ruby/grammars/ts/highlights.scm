@@ -324,7 +324,6 @@
   (bare_string)
   (heredoc_body)
   (heredoc_beginning)
-  (heredoc_content)
 ] @string.unquoted.ruby
 
 ((heredoc_body) @meta.embedded
