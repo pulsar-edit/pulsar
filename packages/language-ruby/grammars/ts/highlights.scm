@@ -90,8 +90,7 @@
 
 ; "Foo" in `Foo::Bar`.
 (scope_resolution
-  scope: (constant) @support.other.namespace.ruby
-  (#set! test.final "true"))
+  scope: (constant) @support.other.namespace.ruby)
 
 ; "::" in `Foo::Bar`.
 (scope_resolution
@@ -100,8 +99,7 @@
 
 ; "Bar" in `Foo::Bar`.
 (scope_resolution
-  name: (constant) @support.other.class.ruby
-  (#set! test.final "true"))
+  name: (constant) @support.other.class.ruby)
 
 
 
@@ -144,6 +142,8 @@
 
 (assignment
   left: (identifier) @variable.other.assignment.ruby)
+
+(constant) @support.constant.ruby
 
 (element_reference
   (constant) @support.class.ruby
