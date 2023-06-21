@@ -160,3 +160,20 @@ a.b
 # <- punctuation.definition.begin.regexp
 #  ^ string.regexp
 #     ^ punctuation.definition.end.regexp
+
+
+# HEREDOCs
+<<~RUBY
+# <- string.unquoted
+  :keyword
+  #  ^ constant.other.symbol
+RUBY
+# <- string.unquoted
+
+<<SOMESTRING
+  :keyword
+  #  ^ !constant.other.symbol
+  #  ^ constant.other.symbol
+  # Making two conflicting assetions because we're inside a string now
+SOMESTRING
+# <- string.unquoted
