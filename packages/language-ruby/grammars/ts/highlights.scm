@@ -470,7 +470,7 @@
   "+="
   "-="
   "<<"
-] @keyword.operator.assigment.ruby
+] @keyword.operator.assignment.ruby
 
 [
   "||"
