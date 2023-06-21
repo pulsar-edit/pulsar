@@ -2358,7 +2358,7 @@ atom-slick@^2, atom-slick@^2.0.0:
     fuzzaldrin "^2.1.0"
     fuzzaldrin-plus "^0.6.0"
     grim "^2.0.1"
-    marked "^4.0.10"
+    marked "5.0.3"
     minimatch "^3.0.3"
     selector-kit "^0.1"
     stable "^0.1.5"
@@ -3652,7 +3652,7 @@ depd@^1.1.2:
     etch "0.9.0"
     fs-plus "^3.0.0"
     grim "^2.0.1"
-    marked "^4.0.10"
+    marked "5.0.3"
     underscore-plus "^1.7.0"
 
 detect-libc@^1.0.3:
@@ -6660,7 +6660,7 @@ markdown-it@^12.3.2:
     dompurify "^2.0.17"
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
-    marked "^0.7.0"
+    marked "5.0.3"
     underscore-plus "^1.0.0"
     yaml-front-matter "^4.0.0"
 
@@ -6669,15 +6669,10 @@ marked@0.8.0:
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.8.0.tgz#ec5c0c9b93878dc52dd54be8d0e524097bd81a99"
   integrity sha512-MyUe+T/Pw4TZufHkzAfDj6HarCBWia2y27/bhuYkTaiUnfDYFnCP3KUN+9oM7Wi6JA2rymtVYbQu3spE0GCmxQ==
 
-marked@^0.3.6:
-  version "0.3.19"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
-  integrity sha512-ea2eGWOqNxPcXv8dyERdSr/6FmzvWwzjMxpfGB/sbMccXoct+xY+YukPD+QTUZwyvK7BZwcr4m21WBOW41pAkg==
-
-marked@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
-  integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
+marked@5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-5.0.3.tgz#a8d0d457d7bce3606db3e32bb0797490cec2fa19"
+  integrity sha512-KUONa43Uk74uUNWMxh6lfaNYmSAsRMiDAaX8QBCCRVXzEufR0zX6T33vrGbvTnQLL02ungDM3KSzZtO+chJaHg==
 
 marked@^4.0.10:
   version "4.2.2"
@@ -7230,7 +7225,7 @@ normalize-url@^6.0.1:
   dependencies:
     dompurify "3.0.3"
     fs-plus "^3.0.0"
-    marked "^0.3.6"
+    marked "5.0.3"
     moment "^2.19.3"
     semver "^4.3.2"
     stacktrace-parser "^0.1.3"
@@ -8565,7 +8560,7 @@ setimmediate@^1.0.5:
     fuzzaldrin "^2.1"
     glob "5.0.15"
     hosted-git-info "^2.8.9"
-    marked "^4.0.10"
+    marked "5.0.3"
     request "^2.83.0"
     season "^6.0.2"
     semver "^5.3.0"
@@ -8664,9 +8659,9 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@github:pulsar-edit/snippets#bb00f909c6c645b173f27346875d8fa0c7af09f7":
+"snippets@github:pulsar-edit/snippets#ba70705":
   version "1.7.0"
-  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/bb00f909c6c645b173f27346875d8fa0c7af09f7"
+  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/ba70705f72b6fbf61a9f6aaa943bac7387cb41c1"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
