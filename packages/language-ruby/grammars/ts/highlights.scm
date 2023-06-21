@@ -143,7 +143,7 @@
 (assignment
   left: (identifier) @variable.other.assignment.ruby)
 
-(constant) @support.constant.ruby
+(constant) @constant.ruby
 
 (element_reference
   (constant) @support.class.ruby
@@ -164,6 +164,7 @@
  (#set! test.final "true"))
 
 (call "." @keyword.operator.accessor.ruby (#set! test.final "true"))
+(call "&." @keyword.operator.accessor.ruby (#set! test.final "true"))
 
 ((identifier) @constant.builtin.ruby
  (#match? @constant.builtin.ruby "^__(FILE|LINE|ENCODING)__$"))
@@ -202,7 +203,10 @@
   (#set! test.final true))
 
 (pair
-  key: (hash_key_symbol)
+  key: (simple_symbol) @constant.other.symbol.hashkey.ruby)
+
+(pair
+  key: (hash_key_symbol) @constant.other.symbol.hashkey.ruby
   ; In `{ foo: 'bar' }` syntax, the `:` both marks the key as a symbol and
   ; separates it from its value.
   ":" @punctuation.definition.constant.hashkey.ruby
@@ -263,16 +267,6 @@
     (string_content)?
     "\"" @punctuation.definition.string.end.ruby)
   @string.quoted.other.interpolated.ruby
-  (#match? @string.quoted.other.interpolated.ruby "^%Q")
-  (#set! test.final true))
-
-
-(
-  (string
-    "\"" @punctuation.definition.string.begin.ruby
-    (string_content)?
-    "\"" @punctuation.definition.string.end.ruby)
-  @string.quoted.other.ruby
   (#set! test.final true))
 
 ; Highlight the interpolation inside of a string.
@@ -496,6 +490,13 @@
 
 ; PUNCTUATION
 ; ===========
+
+(symbol_array
+  "%i(" @punctuation.definition.begin.array.other.ruby
+  ")" @punctuation.definition.end.array.other.ruby)
+(string_array
+  "%w(" @punctuation.definition.begin.array.other.ruby
+  ")" @punctuation.definition.end.array.other.ruby)
 
 "[" @punctuation.definition.begin.array.bracket.square.ruby
 "]" @punctuation.definition.end.array.bracket.square.ruby
