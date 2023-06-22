@@ -87,6 +87,8 @@ class PathOption {
     // So we will pretend a user install is all that matters here
     this.isRegistered = this.isRegistered.bind(this);
     this.register = this.register.bind(this);
+    this.deregister = this.deregister.bind(this);
+    this.getPulsarPath = this.getPulsarPath.bind(this);
   }
 
   isRegistered(callback) {
@@ -109,9 +111,9 @@ class PathOption {
             }
           }
         }
+        callback(isUserInstalled);
       }
     });
-    return isUserInstalled;
   }
 
   register(callback) {
@@ -119,6 +121,7 @@ class PathOption {
       const child = ChildProcess.execFile(
           `${pulsarPath}\\resources\\modifyWindowsPath.ps1`,
           ['-installMode', 'User', '-installdir', `"${pulsarPath}"`, '-remove', '0'],
+          { shell: "powershell.exe" },
           (error, stdout, stderr) =>
           {
         if (error) {
@@ -139,6 +142,7 @@ class PathOption {
           const child = ChildProcess.execFile(
               `${pulsarPath}\\resources\\modifyWindowsPath.ps1`,
               ['-installMode', 'User', '-installdir', `"${pulsarPath}"`, '-remove', '1'],
+              { shell: "powershell.exe" },
               (error, stdout, stderr) =>
               {
             if (error) {
