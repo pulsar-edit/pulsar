@@ -20,6 +20,7 @@ export default class SystemPanel {
     WinShell.fileHandler.isRegistered((i) => { this.refs.fileHandlerCheckbox.checked = i })
     WinShell.fileContextMenu.isRegistered((i) => { this.refs.fileContextMenuCheckbox.checked = i })
     WinShell.folderContextMenu.isRegistered((i) => { this.refs.folderContextMenuCheckbox.checked = i })
+    WinShell.path.isRegistered((i) => { this.refs.addToPathCheckbox.checked = i })
   }
 
   destroy () {
@@ -36,7 +37,7 @@ export default class SystemPanel {
           <div className='settings-panel'>
             <div className='section-container'>
               <div className='block section-heading icon icon-device-desktop'>System Settings</div>
-              <div className='text icon icon-question'>These settings determine how Atom integrates with your operating system.</div>
+              <div className='text icon icon-question'>These settings determine how Pulsar integrates with your operating system.</div>
               <div className='section-body'>
                 <div className='control-group'>
                   <div className='controls'>
@@ -90,6 +91,26 @@ export default class SystemPanel {
                         <div className='setting-title'>Show in folder context menus</div>
                         <div className='setting-description'>
                           Add "Open with {WinShell.appName}" to the File Explorer context menu for folders.
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div className='control-group'>
+                  <div className='controls'>
+                    <div className='checkbox'>
+                      <label for='system.windows.add-to-path'>
+                        <input
+                          ref='addToPathCheckbox'
+                            id='system.windows.add-to-path'
+                            className='input-checkbox'
+                            type='checkbox'
+                            onclick={(e) => {
+                              this.setRegistration(WinShell.path, e.target.checked)
+                            }} />
+                        <div className='setting-title'>Add Pulsar to PATH</div>
+                        <div className='setting-description'>
+                          Add Pulsar to Windows PATH to enable CLI usage.
                         </div>
                       </label>
                     </div>

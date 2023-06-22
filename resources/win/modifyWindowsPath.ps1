@@ -1,17 +1,23 @@
-# This is all handled within a PowerShell file to avoid length limits within NSIS Scripts
-# And to avoid having to include plugins for NSIS, PowerShell can do this natively
+# Modify Windows PATH for Pulsar
+# Sets Pulsar & PPM into PATH, adds 'ATOM_HOME' env var
 
-# -remove 0 is FALSE | -remove 1 is TRUE
+# Example Usage:
+# Pulsar User Installation:
+# .\_.ps1 -installMode User -installdir "$INSTDIR" -remove 0
+# Pulsar Machine Installation:
+# .\_.ps1 -installMode Machine -installdir "$INSTDIR" -remove 0
+# Pulsar User Uninstallation:
+# .\_.ps1 -installMode User -installdir "$INSTDIR" -remove 1
+# Pulsar Machine Uninstallation:
+# .\_.ps1 -installMode Machine -installdir "$INSTDIR" -remove 1
+
 param ($installMode,$installdir,[boolean]$remove=$false)
 
 if (-not $remove) {
   if ($installMode -eq "User" -or $installMode -eq "Machine") {
     [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$installdir\resources;$installdir\resources\app\ppm\bin", $installMode)
-  }
-  # Now only add the ATOM_HOME env var if a user install, since we don't have a plan
-  # on it's location for a machine install
-  if ($installMode -eq "User") {
-    [Environment]::SetEnvironmentVariable("ATOM_HOME", "$env:USERPROFILE\.pulsar", "User")
+    # By using '%USERPROFILE%' this will work either for User installs or Machine
+    [Environment]::SetEnvironmentVariable("ATOM_HOME", "%USERPROFILE%\.pulsar", $installMode)
   }
 } else {
   if ($installMode -eq "User" -or $installMode -eq "Machine") {
@@ -21,8 +27,7 @@ if (-not $remove) {
     $path = ($path.Split(";") | Where-Object { $_ -ne "$installdir\resources\app\ppm\bin" }) -join ";"
     # Set our new path
     [Environment]::SetEnvironmentVariable("Path", $path, $installMode)
+    # Set ATOM_HOME path
+    [Environment]::SetEnvironmentVariable("ATOM_HOME", $null, $installMode)
   } # Else we have been given bad params, and will silently exit
-  if ($installMode -eq "User") {
-    [Environment]::SetEnvironmentVariable("ATOM_HOME", $null, "User")
-  }
 }
