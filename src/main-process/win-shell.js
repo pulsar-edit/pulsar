@@ -75,10 +75,21 @@ class ShellOption {
 }
 
 class PathOption {
-  constructor() {
-    this.HKCUPATH = "\\Environment";
-    this.HKCUInstallReg = "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f";
-    this.HKLMPATH = "\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
+  constructor(installType) {
+    // installType MUST be 'User' or 'Machine'
+    this.HKPATH;
+    this.hive;
+    this.installReg = "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f";
+    this.installMode = installType;
+
+    if (installType === "User") {
+      this.HKPATH = "\\Environment";
+      this.hive = "HKCU";
+    } else if (installType === "Machine") {
+      this.HKPATH = "\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
+      this.hive = "HKLM";
+    }
+
     // Unfortunately, we can only manage the PATH for a per user installation.
     // While the PowerShell script does support setting the PATH for a Machine
     // install, we can't yet check that.
@@ -92,14 +103,14 @@ class PathOption {
   }
 
   isRegistered(callback) {
-    let userInstallRegKey = new Registry({
-      hive: 'HKCU',
-      key: this.HKCUPATH
+    let installRegKey = new Registry({
+      hive: this.hive,
+      key: this.HKPATH
     });
 
-    let isUserInstalled = false;
+    let isInstalled = false;
 
-    userInstallRegKey.values((err, items) => {
+    installRegKey.values((err, items) => {
       if (err) {
         callback(err);
       } else {
@@ -107,11 +118,11 @@ class PathOption {
           if (items[i].name === "Path") {
             let winPath = items[i].value;
             if (winPath.includes("Pulsar\\resources") || winPath.includes("Pulsar\\resources\\app\\ppm\\bin")) {
-              isUserInstalled = true;
+              isInstalled = true;
             }
           }
         }
-        callback(isUserInstalled);
+        callback(isInstalled);
       }
     });
   }
@@ -120,17 +131,19 @@ class PathOption {
     this.getPulsarPath().then((pulsarPath) => {
       const child = ChildProcess.execFile(
           `${pulsarPath}\\resources\\modifyWindowsPath.ps1`,
-          ['-installMode', 'User', '-installdir', `"${pulsarPath}"`, '-remove', '0'],
+          ['-installMode', this.installMode, '-installdir', `"${pulsarPath}"`, '-remove', '0'],
           { shell: "powershell.exe" },
           (error, stdout, stderr) =>
           {
         if (error) {
+          atom.notifications.addError(error.toString());
           callback(error);
         } else {
           return callback();
         }
       });
     }).catch((err) => {
+      atom.notifications.addError(err.toString());
       return callback(err);
     });
   }
@@ -141,17 +154,19 @@ class PathOption {
         this.getPulsarPath().then((pulsarPath) => {
           const child = ChildProcess.execFile(
               `${pulsarPath}\\resources\\modifyWindowsPath.ps1`,
-              ['-installMode', 'User', '-installdir', `"${pulsarPath}"`, '-remove', '1'],
+              ['-installMode', this.installMode, '-installdir', `"${pulsarPath}"`, '-remove', '1'],
               { shell: "powershell.exe" },
               (error, stdout, stderr) =>
               {
             if (error) {
+              atom.notifications.addError(error.toString());
               callback(error);
             } else {
               return callback();
             }
           });
         }).catch((err) => {
+          atom.notifications.addError(err.toString());
           return callback(err);
         });
       } else {
@@ -164,8 +179,8 @@ class PathOption {
     return new Promise((resolve, reject) => {
       let pulsarPath = "";
       let pulsarPathReg = new Registry({
-        hive: "HKCU",
-        key: this.HKCUInstallReg
+        hive: this.hive,
+        key: this.installReg
       }).get("InstallLocation", (err, val) => {
         if (err) {
           reject(err);
@@ -175,12 +190,29 @@ class PathOption {
           if (pulsarPath.length === 0) {
             reject("Unable to find Pulsar Install Path");
           }
-          resolve(pulsarPath);
+
+          // When we are modifying Machine values, we can't accept spaces in the
+          // path. There's likely some combination of escapes to fix this, but
+          // I was unable to find them. For now we will check for the default
+          // Machine install location, and remove the space.
+          let safePulsarPath = pulsarPath.replace("Program Files", "PROGRA~1");
+          resolve(safePulsarPath);
         }
       });
     });
   }
 }
+
+// Function that can inform is Pulsar is running as the administrator on Windows
+exports.runningAsAdmin = (callback) => {
+  const child = ChildProcess.exec("NET SESSION", (error, stdout, stderr) => {
+    if (stderr.length === 0) {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
+};
 
 exports.appName = appName;
 
@@ -211,4 +243,5 @@ exports.folderBackgroundContextMenu = new ShellOption(
   `\\Software\\Classes\\Directory\\background\\shell\\${appName}`,
   JSON.parse(JSON.stringify(contextParts).replace('%1', '%V'))
 );
-exports.path = new PathOption();
+exports.pathUser = new PathOption("User");
+exports.pathMachine = new PathOption("Machine");

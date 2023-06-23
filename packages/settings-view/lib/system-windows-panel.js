@@ -20,7 +20,11 @@ export default class SystemPanel {
     WinShell.fileHandler.isRegistered((i) => { this.refs.fileHandlerCheckbox.checked = i })
     WinShell.fileContextMenu.isRegistered((i) => { this.refs.fileContextMenuCheckbox.checked = i })
     WinShell.folderContextMenu.isRegistered((i) => { this.refs.folderContextMenuCheckbox.checked = i })
-    WinShell.path.isRegistered((i) => { this.refs.addToPathCheckbox.checked = i })
+    WinShell.pathUser.isRegistered((i) => { this.refs.addToPathCheckbox.checked = i })
+    WinShell.pathMachine.isRegistered((i) => { this.refs.addToPathMachineCheckbox.checked = i })
+
+    // Check if Pulsar is running as Admin. To know if the user can modify the machine path
+    WinShell.runningAsAdmin((i) => { this.refs.addToPathMachineCheckbox.disabled = !i })
   }
 
   destroy () {
@@ -102,15 +106,35 @@ export default class SystemPanel {
                       <label for='system.windows.add-to-path'>
                         <input
                           ref='addToPathCheckbox'
-                            id='system.windows.add-to-path'
-                            className='input-checkbox'
-                            type='checkbox'
-                            onclick={(e) => {
-                              this.setRegistration(WinShell.path, e.target.checked)
-                            }} />
+                          id='system.windows.add-to-path'
+                          className='input-checkbox'
+                          type='checkbox'
+                          onclick={(e) => {
+                            this.setRegistration(WinShell.pathUser, e.target.checked)
+                          }} />
                         <div className='setting-title'>Add Pulsar to PATH</div>
                         <div className='setting-description'>
                           Add Pulsar to Windows PATH to enable CLI usage.
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div className='control-group'>
+                  <div className='controls'>
+                    <div className='checkbox'>
+                      <label for='system.windows.add-to-path-machine'>
+                        <input
+                          ref='addToPathMachineCheckbox'
+                          id='system.windows.add-to-path-machine'
+                          className='input-checkbox'
+                          type='checkbox'
+                          onclick={(e) => {
+                            this.setRegistration(WinShell.pathMachine, e.target.checked)
+                          }} />
+                        <div className='setting-title'>Add Pulsar to PATH (Machine Install)</div>
+                        <div className='setting-description'>
+                          Add Pulsar to Windows PATH for Machine Installs. Requires Administrative Privileges.
                         </div>
                       </label>
                     </div>
