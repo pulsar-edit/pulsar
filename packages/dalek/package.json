@@ -7,7 +7,7 @@
   "license": "MIT",
   "atomTestRunner": "./test/runner",
   "engines": {
-    "atom": ">=1.12.7 <1.106.0"
+    "atom": ">=1.12.7 <2.0.0"
   },
   "dependencies": {
     "grim": "^2.0.3"
