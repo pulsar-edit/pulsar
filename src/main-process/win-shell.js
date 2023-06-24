@@ -136,14 +136,13 @@ class PathOption {
           (error, stdout, stderr) =>
           {
         if (error) {
-          atom.notifications.addError(error.toString());
+          atom.notifications.addError(`Error Running Script: ${error.toString()}`);
           callback(error);
         } else {
           return callback();
         }
       });
     }).catch((err) => {
-      atom.notifications.addError(err.toString());
       return callback(err);
     });
   }
@@ -159,14 +158,13 @@ class PathOption {
               (error, stdout, stderr) =>
               {
             if (error) {
-              atom.notifications.addError(error.toString());
+              atom.notifications.addError(`Error Running Script: ${error.toString()}`);
               callback(error);
             } else {
               return callback();
             }
           });
         }).catch((err) => {
-          atom.notifications.addError(err.toString());
           return callback(err);
         });
       } else {

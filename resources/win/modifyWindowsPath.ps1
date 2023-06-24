@@ -57,12 +57,12 @@ if (-not $remove) {
     # the variable, and instead creates the directory of the same name
     # within the current folder. But only when opened via the context menu, terminal
     # is fine.
-    [Environment]::SetEnvironmentVariable("ATOM_HOME", "$env:UserProfile\.pulsar", $installMode)
+    $exitCode = [Environment]::SetEnvironmentVariable("ATOM_HOME", "$env:UserProfile\.pulsar", $installMode)
 
     $prog = 100
     Write-Progress -Activity "Modifying Pulsar ($installdir) on the PATH..." -Status "$prog% Complete:" -PercentComplete $prog
 
-    Exit $?
+    Exit $exitCode
   }
 } else {
   if ($installMode -eq "User" -or $installMode -eq "Machine") {
@@ -89,11 +89,11 @@ if (-not $remove) {
     Write-Progress -Activity "Modifying Pulsar ($installdir) on the PATH..." -Status "$prog% Complete:" -PercentComplete $prog
 
     # Set ATOM_HOME path
-    [Environment]::SetEnvironmentVariable("ATOM_HOME", $null, $installMode)
+    $exitCode = [Environment]::SetEnvironmentVariable("ATOM_HOME", $null, $installMode)
 
     $prog = 100
     Write-Progress -Activity "Modifying Pulsar ($installdir) on the PATH..." -Status "$prog% Complete:" -PercentComplete $prog
 
-    Exit $?
+    Exit $exitCode
   } # Else we have been given bad params, and will silently exit
 }
