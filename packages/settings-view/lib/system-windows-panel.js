@@ -169,7 +169,7 @@ export default class SystemPanel {
                   }} />
                 <div className='setting-title'>Add Pulsar to PATH (Machine Install)</div>
                 <div className='setting-description'>
-                  Add Pulsar to Windows PATH for Machine Installs. Requires Administrative Privileges.
+                  Add Pulsar to Windows PATH for machine installs. Requires administrative privileges.
                 </div>
               </label>
             </div>
