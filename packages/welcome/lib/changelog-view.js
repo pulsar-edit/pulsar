@@ -19,8 +19,14 @@ export default class ChangeLogView {
 
   wasVersionDismissed() {
     const lastVersion = atom.config.get('welcome.lastViewedChangeLog');
-    const curVersion = atom.getVersion().split(".");
-    if (lastVersion[0] < curVersion[0] && lastVersion[1] < curVersion[1] && lastVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
+    let curVersion = atom.getVersion();
+
+    if (lastVersion.split(" ")[0] === curVersion.split(" ")[0]) {
+      return true;
+    }
+
+    curVersion = curVersion.split(".");
+    if (lastVersion[0] <= curVersion[0] && lastVersion[1] <= curVersion[1] && lastVersion[2].split(" ")[0] <= curVersion[2].split(" ")[0]) {
       return false;
     } else {
       return true;
