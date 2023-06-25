@@ -24,6 +24,9 @@
   },
   "license": "MIT",
   "electronVersion": "12.2.3",
+  "resolutions": {
+    "es5-ext": "0.10.53"
+  },
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
