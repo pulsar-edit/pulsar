@@ -323,16 +323,18 @@ module.exports = class PackageManager {
   }
 
   getPackage(packageName) {
-    this.packagePromises[packageName] != null ? this.packagePromises[packageName] : (this.packagePromises[packageName] = new Promise((resolve, reject) => {
-      this.loadPackage(packageName, function(error, result) {
-        if (error) {
-          return reject(error);
-        } else {
-          return resolve(result);
-        }
-      });
-    }));
-  }
+      return this.packagePromises[packageName] != null ?
+        this.packagePromises[packageName] :
+        (this.packagePromises[packageName] = new Promise((resolve, reject) => {
+          this.loadPackage(packageName, function(error, result) {
+            if (error) {
+              return reject(error);
+            } else {
+              return resolve(result);
+            }
+          });
+      }));
+    }
 
   satisfiesVersion(version, metadata) {
     const engine = (metadata.engines != null ? metadata.engines.atom : undefined) != null ? (metadata.engines != null ? metadata.engines.atom : undefined) : '*';
