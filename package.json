@@ -24,6 +24,9 @@
   },
   "license": "MIT",
   "electronVersion": "12.2.3",
+  "resolutions": {
+    "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244"
+  },
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
