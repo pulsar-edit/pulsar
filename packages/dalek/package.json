@@ -10,10 +10,10 @@
     "atom": ">=1.12.7 <2.0.0"
   },
   "dependencies": {
-    "grim": "^2.0.1"
+    "grim": "^2.0.3"
   },
   "devDependencies": {
     "atom-mocha-test-runner": "^1.0.0",
-    "sinon": "9.0.3"
+    "sinon": "^15.2.0"
   }
 }

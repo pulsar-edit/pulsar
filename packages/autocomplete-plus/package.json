@@ -14,7 +14,7 @@
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.6.0",
     "grim": "^2.0.1",
-    "marked": "^4.0.10",
+    "marked": "5.0.3",
     "minimatch": "^3.0.3",
     "selector-kit": "^0.1",
     "stable": "^0.1.5",

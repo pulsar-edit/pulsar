@@ -113,7 +113,9 @@ module.exports =
       if (DOMPurify === null) {
         DOMPurify = createDOMPurify();
       }
-      notificationContainer.innerHTML = DOMPurify.sanitize(marked(this.model.getMessage()));
+      notificationContainer.innerHTML = DOMPurify.sanitize(
+        marked.parse(this.model.getMessage())
+      );
 
       if (detail = this.model.getDetail()) {
         let stack;
@@ -135,7 +137,7 @@ module.exports =
         metaContainer = this.element.querySelector('.meta');
         metaContainer.appendChild(TemplateHelper.render(this.metaTemplate));
         const description = this.element.querySelector('.description');
-        description.innerHTML = marked(metaContent);
+        description.innerHTML = marked.parse(metaContent);
       }
 
       if (options.buttons && (options.buttons.length > 0)) {
