@@ -13,7 +13,7 @@
     "fs-plus": "^3.0.0",
     "marked": "5.0.3",
     "moment": "^2.19.3",
-    "semver": "^4.3.2",
+    "semver": "^7.0.0",
     "stacktrace-parser": "^0.1.3",
     "temp": "^0.8.1"
   },
