@@ -23,11 +23,11 @@
     "node": ">=14"
   },
   "license": "MIT",
-  "electronVersion": "25.0.1",
+  "electronVersion": "25.2.0",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
-    "@electron/remote": "2.0.8",
+    "@electron/remote": "2.0.10",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
     "async": "3.2.4",
@@ -282,7 +282,7 @@
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "3.2.13",
     "@playwright/test": "1.22.2",
-    "electron": "25.0.1",
+    "electron": "25.2.0",
     "electron-builder": "23.3.1",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
@@ -294,7 +294,7 @@
     "webdriverio": "7.20.9"
   },
   "resolutions": {
-    "node-abi": "3.40.0",
+    "node-abi": "3.45.0",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244"
   }
 }
