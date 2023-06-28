@@ -8,7 +8,7 @@
 @tab-max-width: 160px;
 
 .tab-bar {
-  height: @tab-height + @tab-top-padding + @tab-bottom-border-height;
+  height: (@tab-height + @tab-top-padding + @tab-bottom-border-height);
   background: @tab-bar-background-color;
   box-shadow: inset 0 -8px 8px -4px rgba(0,0,0, .15);
   padding: 0 10px 0 25px;
@@ -75,7 +75,7 @@
 
     &.modified:not(:hover) .close-icon {
       right: 0;
-      top: @tab-height/2 - @modified-icon-width/2 + 1px;
+      top: (@tab-height/2 - @modified-icon-width/2 + 1px);
       width: @modified-icon-width;
       height: @modified-icon-width;
     }
@@ -99,13 +99,13 @@
     box-shadow: inset -1px 1px 0 @tab-border-color, 4px -4px 4px rgba(0,0,0,.1);
 
     .close-icon {
-      line-height: @tab-height - 1px;
+      line-height: (@tab-height - 1px);
       color: @text-color;
     }
 
     &, &:before, &:after {
       background-image: -webkit-linear-gradient(top, lighten(@tab-background-color-active, 7%), @tab-background-color-active);
-      height: @tab-height + 1px;
+      height: (@tab-height + 1px);
     }
 
     &:before {
@@ -130,13 +130,13 @@
   }
 
   .placeholder {
-    height: @tab-height + @tab-top-padding + @tab-bottom-border-height;
+    height: (@tab-height + @tab-top-padding + @tab-bottom-border-height);
     pointer-events: none;
     &:before {
       margin-left: -9px; // center between tabs
     }
     &:after {
-      top: @tab-height + @tab-top-padding + @tab-bottom-border-height - 2px;
+      top: (@tab-height + @tab-top-padding + @tab-bottom-border-height - 2px);
       margin-left: -10px; // center between tabs
     }
   }
