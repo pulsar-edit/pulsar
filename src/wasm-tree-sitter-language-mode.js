@@ -3249,10 +3249,7 @@ class LanguageLayer {
     }
 
     if (!this.currentParsePromise) {
-      while (
-        !this.destroyed &&
-        (!this.tree || this.tree.rootNode.hasChanges())
-      ) {
+      do {
         params = { ...params, async: false };
         if (!this.ready) {
           params.async = true;
@@ -3261,7 +3258,11 @@ class LanguageLayer {
         this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
         if (!params.async) { break; }
         await this.currentParsePromise;
-      }
+      } while (
+        !this.destroyed &&
+        (!this.tree || this.tree.rootNode.hasChanges())
+      );
+
       this.currentParsePromise = null;
       // `true` means that this update occurs in its own distinct transaction.
       return true;
