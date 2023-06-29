@@ -1425,15 +1425,13 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@playwright/test@1.31.2":
-  version "1.31.2"
-  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.31.2.tgz#426d8545143a97a6fed250a2a27aa1c8e5e2548e"
-  integrity sha512-BYVutxDI4JeZKV1+ups6dt5WiqKhjBtIYowyZIJ3kBDmJgsuPKsqqKNIMFbUePLSCmp2cZu+BDL427RcNKTRYw==
+"@playwright/test@1.22.2":
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.22.2.tgz#b848f25f8918140c2d0bae8e9227a40198f2dd4a"
+  integrity sha512-cCl96BEBGPtptFz7C2FOSN3PrTnJ3rPpENe+gYCMx4GNNDlN4tmo2D89y13feGKTMMAIVrXfSQ/UmaQKLy1XLA==
   dependencies:
     "@types/node" "*"
-    playwright-core "1.31.2"
-  optionalDependencies:
-    fsevents "2.3.2"
+    playwright-core "1.22.2"
 
 "@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
   version "1.2.1"
@@ -4417,7 +4415,7 @@ fs.realpath@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
 
-fsevents@2.3.2, fsevents@~2.3.2:
+fsevents@~2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
   integrity sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==
@@ -6098,11 +6096,6 @@ loglevel@^1.6.0:
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.8.1.tgz#5c621f83d5b48c54ae93b6156353f555963377b4"
   integrity sha512-tCRIJM51SHjAayKwC+QAg8hT8vg6z7GSgLJKGvzuPb1Wc+hLzqtuVLxp6/HzSPOozuK+8ErAhy7U/sVzw8Dgfg==
 
-loophole@^1:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/loophole/-/loophole-1.1.0.tgz#37949fea453b6256acc725c320ce0c5a7f70a2bd"
-  integrity sha512-zgLykD4MuL9HJRsoeKuGRXz4L9t1C0oDZPjFeUg5MLQyZjxWdxIbPHgRijVGN98DieVWJuo2fi9nEUDcdDbEiQ==
-
 lowercase-keys@^1.0.0, lowercase-keys@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
@@ -7078,10 +7071,10 @@ pause-stream@0.0.11:
   dependencies:
     through "~2.3"
 
-pegjs@~0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.8.0.tgz#976f067da13e5c5b1501c017925668a253811561"
-  integrity sha512-GtAFD5WLxE0LjyhlpKwAnbi3NLJDrYsOvil95UCUQ6pzxlUtUGP/k0FnKGypTpM1WWdmoclfXb0dmMd5UUDkvA==
+pegjs@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.10.0.tgz#cf8bafae6eddff4b5a7efb185269eaaf4610ddbd"
+  integrity sha512-qI5+oFNEGi3L5HAxDwN2LA4Gg7irF70Zs25edhjld9QemOgp0CbvMtbFcMvFtEo1OityPrcCzkQFB8JP/hxgow==
 
 pend@~1.2.0:
   version "1.2.0"
@@ -7120,17 +7113,17 @@ pkg-dir@4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-playwright-core@1.31.2:
-  version "1.31.2"
-  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.31.2.tgz#debf4b215d14cb619adb7e511c164d068075b2ed"
-  integrity sha512-a1dFgCNQw4vCsG7bnojZjDnPewZcw7tZUNFN0ZkcLYKj+mPmXvg4MpaaKZ5SgqPsOmqIf2YsVRkgqiRDxD+fDQ==
+playwright-core@1.22.2:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.22.2.tgz#ed2963d79d71c2a18d5a6fd25b60b9f0a344661a"
+  integrity sha512-w/hc/Ld0RM4pmsNeE6aL/fPNWw8BWit2tg+TfqJ3+p59c6s3B6C8mXvXrIPmfQEobkcFDc+4KirNzOQ+uBSP1Q==
 
-playwright@1.31.2:
-  version "1.31.2"
-  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.31.2.tgz#4252280586c596746122cd1fdf9f8ff6a63fa852"
-  integrity sha512-jpC47n2PKQNtzB7clmBuWh6ftBRS/Bt5EGLigJ9k2QAKcNeYXZkEaDH5gmvb6+AbcE0DO6GnXdbl9ogG6Eh+og==
+playwright@1.22.2:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.22.2.tgz#353a7c29f89ca9600edc7a9a30aed790823c797d"
+  integrity sha512-hUTpg7LytIl3/O4t0AQJS1V6hWsaSY5uZ7w1oCC8r3a1AQN5d6otIdCkiB3cbzgQkcMaRxisinjMFMVqZkybdQ==
   dependencies:
-    playwright-core "1.31.2"
+    playwright-core "1.22.2"
 
 plist@^3.0.1, plist@^3.0.4:
   version "3.0.6"
@@ -7958,14 +7951,13 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@github:pulsar-edit/snippets#ba70705":
+"snippets@github:pulsar-edit/snippets#a054a43":
   version "1.7.0"
-  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/ba70705f72b6fbf61a9f6aaa943bac7387cb41c1"
+  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/a054a4335c5ee6e34c0baabcda4e144b046a4292"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
-    loophole "^1"
-    pegjs "~0.8.0"
+    pegjs "^0.10.0"
     scoped-property-store "^0.17.0"
     season "^6.0.2"
     temp "~0.8.0"
