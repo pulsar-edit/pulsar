@@ -17,7 +17,7 @@
     "husky": "^4.2.5",
     "prettier": "^2.1.1"
   },
-  "repository": "https://github.com/pulsar-edit/spell-check",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": "*"
@@ -37,7 +37,7 @@
         "source.rst",
         "text.restructuredtext"
       ],
-      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/spell-check#readme) for more information on finding the correct scope for a specific language.",
+      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language.",
       "order": 1
     },
     "excludedScopes": {
@@ -46,7 +46,7 @@
         "type": "string"
       },
       "default": [],
-      "description": "List of sub-scopes that will be ignored. Specify the most detailed scope to avoid ignoring otherwise relevant text. The scopes will be parsed as regular expressions. See [the README](https://github.com/pulsar-edit/spell-check#readme) for more information on finding the correct scope for a specific language.",
+      "description": "List of sub-scopes that will be ignored. Specify the most detailed scope to avoid ignoring otherwise relevant text. The scopes will be parsed as regular expressions. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language.",
       "order": 2
     },
     "useSystem": {
