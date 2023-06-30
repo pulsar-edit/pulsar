@@ -4,8 +4,8 @@
 status-bar {
   display: block;
   font-size: 11px;
-  line-height: @component-line-height - 3px;
-  height: @component-line-height + 1px;
+  line-height: (@component-line-height - 3px);
+  height: (@component-line-height + 1px);
   position: relative;
   -webkit-user-select: none;
   cursor: default;
@@ -18,7 +18,7 @@ status-bar {
   }
 
   .flexbox-repaint-hack {
-    padding: 0 @component-line-height/2;
+    padding: 0 (@component-line-height/2);
     position: absolute;
     top: 0;
     right: 0;
@@ -38,7 +38,7 @@ status-bar {
     padding-left: @component-padding;
     .inline-block {
       margin-right: 0;
-      margin-left: @component-padding*1.5;
+      margin-left: (@component-padding*1.5);
       & > .inline-block {
         margin-left: 0;
       }
