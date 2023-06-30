@@ -3,12 +3,13 @@ require "."
 
 class A::B < C
 # <- keyword.control.class
-#     ^ entity.name.type.class
-#      ^ punctuation.separator.namespace
-#        ^ entity.name.type.class
+#     ^ constant
+#     ^ support.other.namespace.ruby
+#      ^ keyword.operator.namespace
+#        ^ constant
+#        ^ support.other.class.ruby
 #          ^ punctuation.separator.inheritance
 #            ^ entity.other.inherited-class
-#            ^ entity.name.type.class
   public
   # <- keyword.other.special-method
   protected
@@ -34,16 +35,16 @@ class A::B < C
 end
 
 thing&.call
-#    ^ punctuation.separator.method
-#      ^ source
+#    ^ keyword.operator.accessor
+#      ^ support.other.function
 
 VAR1 = 100
-# <- variable.other.constant
+# <- constant
 #    ^ keyword.operator.assignment
 #      ^ constant.numeric
 
 _VAR1 = 100_000
-# <- variable.other.constant
+# <- !constant
 #       ^ constant.numeric
 
 # This dot will not be tokenized as a separator
@@ -52,7 +53,7 @@ _VAR1 = 100_000
 
 # But this will
 a.b
-#^ punctuation.separator.method
+#^ keyword.operator.accessor
 
 # These are all also numbers:
 1.23e-4
@@ -78,69 +79,56 @@ a.b
 # <- constant.other.symbol
 :<=>
 # <- constant.other.symbol
+%s(foo)
+# <- constant.other.symbol.delimited
+
+# Yes, these are ALL arrays
 %i(foo)
-# <- punctuation.section.array.begin
+# <- punctuation.definition.begin.array.other
 #  ^ constant.other.symbol
+#     ^ punctuation.definition.end.array.other
+%i!foo!
+# <- punctuation.definition.begin.array.other
+#  ^ constant.other.symbol
+#     ^ punctuation.definition.end.array.other
+
+%w(foo)
+# <- punctuation.definition.begin.array.other
+#  ^ string.unquoted
+#     ^ punctuation.definition.end.array.other
+
+[:foo]
+# <- punctuation.definition.begin.array.bracket.square
+#  ^ constant.other.symbol
+#    ^ punctuation.definition.end.array.bracket.square
+
 {foo: 1}
-# <- punctuation.section.scope.begin
+# <- punctuation.definition.hash.begin.bracket.curly
 # ^ constant.other.symbol.hashkey
+#      ^ punctuation.definition.hash.end.bracket.curly
 {:foo => 1}
 # ^ constant.other.symbol.hashkey
-
-class << A::B
-# <- keyword.control.class
-#     ^ punctuation.definition.variable
-#        ^ entity.name.type.class
-#         ^ punctuation.separator.namespace
-end
-
-def a.b(*args)
-# <- meta.function.method.with-arguments
-# <- keyword.control.def
-#   ^ entity.name.function
-#    ^ entity.name.function
-#    ^ punctuation.separator.method
-#      ^ meta.function.method.with-arguments
-#      ^ punctuation.definition.parameters
-#       ^ storage.type.variable
-#        ^ variable.parameter.function
-#            ^ punctuation.definition.parameters
-end
-# <- keyword.control
 
 # Strings.
 "te\ste"
 # <- punctuation.definition.string.begin
-# ^ string.quoted.other.interpolated
+# ^ string.quoted.double.interpolated
 #  ^ constant.character.escape
-#    ^ string.quoted.other.interpolated
+#    ^ string.quoted.double.interpolated
+'te\ste'
+# <- punctuation.definition.string.begin
+# ^ string.quoted.single
+# ^ !string.quoted.single.interpolated
+#  ^ !constant.character.escape
 
 %(te(s)t)
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
 #       ^ punctuation.definition.string.end
 
 %[te[s]t]
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
-#       ^ punctuation.definition.string.end
-
-%{te{s}t}
-# <- punctuation.definition.string.begin
-# ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
-#       ^ punctuation.definition.string.end
-
-%<te<s>t>
-# <- punctuation.definition.string.begin
-# ^ string.quoted.other.interpolated
-#   ^ punctuation.section.scope
-#    ^ string.quoted.other.interpolated
 #       ^ punctuation.definition.string.end
 
 %~te\~s~
@@ -153,8 +141,6 @@ end
 %Q(te(s)t)
 # <- punctuation.definition.string.begin
 # ^ string.quoted.other.interpolated
-#    ^ punctuation.section.scope
-#     ^ string.quoted.other.interpolated
 #        ^ punctuation.definition.string.end
 
 %x!#{"l" + "s"}!
@@ -166,6 +152,28 @@ end
 #              ^ punctuation.definition.string.end
 
 /test/
-# <- punctuation.section.regexp
+# <- punctuation.definition.begin.regexp
 # ^ string.regexp
-#    ^ punctuation.section.regexp
+#    ^ punctuation.definition.end.regexp
+
+%r(foo)
+# <- punctuation.definition.begin.regexp
+#  ^ string.regexp
+#     ^ punctuation.definition.end.regexp
+
+
+# HEREDOCs
+<<~RUBY
+# <- string.unquoted
+  :keyword
+  #  ^ constant.other.symbol
+RUBY
+# <- string.unquoted
+
+<<SOMESTRING
+  :keyword
+  #  ^ !constant.other.symbol
+  #  ^ constant.other.symbol
+  # Making two conflicting assetions because we're inside a string now
+SOMESTRING
+# <- string.unquoted

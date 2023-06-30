@@ -4,7 +4,7 @@ exports.activate = function() {
   atom.grammars.addInjectionPoint('source.ruby', {
     type: 'heredoc_body',
     language(node) {
-      return node.lastChild.text;
+      return node.lastChild.text?.toLowerCase();
     },
     content(node) {
       return node.descendantsOfType('heredoc_content')
