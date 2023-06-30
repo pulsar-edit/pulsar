@@ -6,6 +6,7 @@ describe "TOML grammar", ->
       atom.packages.activatePackage("language-toml")
 
     runs ->
+      atom.config.set('core.useTreeSitterParsers', false)
       grammar = atom.grammars.grammarForScopeName('source.toml')
 
   it "parses the grammar", ->
