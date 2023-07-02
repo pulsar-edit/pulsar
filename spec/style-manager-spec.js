@@ -143,7 +143,8 @@ describe('StyleManager', () => {
 
     describe('css mathematical expression calc() wrap upgrades', () => {
       const mathStyleManager = new StyleManager();
-      mathStyleManager.configDirPath = null;
+      mathStyleManager.configDirPath = null; // Ensures for testing that we never
+      // go looking for cached files, and will always use the css provided
 
       it('does not upgrade already wrapped math', () => {
         let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
@@ -195,14 +196,32 @@ describe('StyleManager', () => {
 
       it('does not upgrade base64 strings', () => {
         // Regression Check
-        // TODO This test is currently failing, as a math expression is found within this string, and needs to be prevented
-        // The reason for this test: ./static/atom-ui/style/mixins/mixins.less#67
         let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
           "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }",
           {}
         );
         expect(upgradedSheet.source).toEqual(
           "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }"
+        );
+      });
+
+      it('does not modify hsl function where `/` is valid', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { caret-color: hsl(228deg 4% 24% / 0.8); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { caret-color: hsl(228deg 4% 24% / 0.8); }"
+        );
+      });
+
+      it('does not modify acos function, where math is valid', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { transform: rotate(acos(2 * 0.125)); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { transform: rotate(acos(2 * 0.125)); }"
         );
       });
 

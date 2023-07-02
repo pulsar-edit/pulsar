@@ -426,6 +426,18 @@ function transformDeprecatedMathUsage(css, context) {
   const transformedProperties = [];
   let transformedSource;
 
+  // Some CSS keys **do** have very valid usage of `/` that might trigger a false
+  // positive of this regex, without any easy way to detect it as such.
+  // In those cases, it may be safer to ignore the key totally, as some broken
+  // UI because of an outdated community package, is better than breaking valid
+  // less style sheets.
+  const cssKeyIgnoreList = [ "font", "background", "grid-column", "cursor", "aspect-ratio" ];
+  // There are certain functions that may be used within a CSS value, where `/`
+  // or other mathematical expressions are valid, and we do not want to modify.
+  // In those cases, if we find the existance of that function within, then we
+  // stop modifying that value completely.
+  const cssValueIgnoreList = /hsl|abs|acos|asin|atan|atan2|cos|mod|rem|sign|sin|tan|url/g;
+
   const mathExpressionRegex =
   /-*(\d(\.\d)?)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?(\s*([\/\+\*]|(\-\s+))\s*(\d(\.\d)*)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?)+/g;
 
@@ -439,7 +451,11 @@ function transformDeprecatedMathUsage(css, context) {
     transformedSource.walkRules(rule => {
       rule.each(node => {
 
-        if (typeof node.value === "string") {
+        if (
+          typeof node.value === "string" &&
+          !cssKeyIgnoreList.includes(node.prop) &&
+          !cssValueIgnoreList.test(node.value)
+        ) {
           let containsMath = node.value.match(mathExpressionRegex);
 
           if (containsMath !== null) {
