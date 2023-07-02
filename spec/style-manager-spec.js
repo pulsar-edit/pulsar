@@ -142,23 +142,47 @@ describe('StyleManager', () => {
     });
 
     describe('css mathematical expression calc() wrap upgrades', () => {
-      beforeEach(() => {
-        // attach styles element to the DOM to parse CSS rules
-        styleManager.onDidAddStyleElement(styleElement => {
-          jasmine.attachToDOM(styleElement);
-        });
+      const mathStyleManager = new StyleManager();
+      mathStyleManager.configDirPath = null;
+
+      it('does not upgrade already wrapped math', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: calc(10px/2); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2); }");
       });
 
-      it('does not wrap, already wrapped math', () => {
-        styleManager.addStyleSheet(`
-          p { padding: calc(10px/2); }
-        `);
-
-        let styleMap = Array.from(styleManager.getStyleElements()[0].sheet.cssRules).map(
-          r => r.styleMap
+      it('does not upgrade negative numbers', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 0 -1px; }",
+          {}
         );
-        let value = styleMap[0].get('padding').toString();
-        expect(value).toEqual('calc(5px)');
+        expect(upgradedSheet.source).toEqual("p { padding: 0 -1px; }");
+      });
+
+      it('upgrades simple division', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 10px/2; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2); }");
+      });
+
+      it('upgrades multi parameter math', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 0 10px/2 5em; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: 0 calc(10px/2) 5em; }");
+      });
+
+      it('upgrades math with spaces', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 10px / 2; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px / 2); }");
       });
 
     });
