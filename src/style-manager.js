@@ -160,11 +160,9 @@ module.exports = class StyleManager {
       }
     }
 
-    if (params.skipDeprecatedMathUsageTransformation) {
-      styleElement.textContent = source;
-    } else {
+    if (!params.skipDeprecatedMathUsageTransformation) {
       const transformed = this.upgradeDeprecatedMathUsageForStyleSheet(
-        source,
+        styleElement.textContent,
         params.context
       );
       styleElement.textContent = transformed.source;
