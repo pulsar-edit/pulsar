@@ -314,7 +314,8 @@ module.exports = class Package {
           sourcePath,
           priority,
           context,
-          skipDeprecatedSelectorsTransformation: this.bundledPackage
+          skipDeprecatedSelectorsTransformation: this.bundledPackage,
+          skipDeprecatedMathUsageTransformation: this.bundledPackage
         })
       );
     }
