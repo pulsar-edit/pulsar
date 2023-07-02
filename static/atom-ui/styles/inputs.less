@@ -230,7 +230,7 @@ input.input-toggle {
       width: inherit;
       height: inherit;
       border-radius: inherit;
-      border: @component-size/3 solid transparent;
+      border: (@component-size/3) solid transparent;
       background-clip: content-box;
       background-color: @base-background-color;
       transform: scale(0);
@@ -347,7 +347,7 @@ input.input-toggle {
     display: inline-block;
     position: relative;
     font-size: inherit;
-    width: @component-size * 2;
+    width: (@component-size * 2);
     height: @component-size;
     vertical-align: middle;
     border-radius: 2em;
@@ -368,7 +368,7 @@ input.input-toggle {
       width: @component-size;
       height: @component-size;
       border-radius: inherit;
-      border: @component-size/4 solid transparent;
+      border: (@component-size/4) solid transparent;
       background-clip: content-box;
       background-color: @base-background-color;
       transition: transform .2s cubic-bezier(0.5, 0.15, 0.2, 1);
