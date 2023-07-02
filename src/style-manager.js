@@ -442,14 +442,23 @@ function transformDeprecatedMathUsage(css, context) {
         if (typeof node.value === "string") {
           let containsMath = node.value.match(mathExpressionRegex);
 
-          if (containsMath !== null && !node.value.includes(`calc(${containsMath[0]})`)) {
+          if (containsMath !== null) {
             let nodeOriginal = node.value;
-            node.value = node.value.replace(containsMath[0], `calc(${containsMath[0]})`);
-            transformedProperties.push({
-              property: node.prop,
-              valueBefore: nodeOriginal,
-              valueAfter: node.value
-            });
+            let appliedChanges = false;
+            for (let i = 0; i < containsMath.length; i++) {
+              let match = containsMath[i];
+              if (!node.value.includes(`calc(${match})`)) {
+                node.value = node.value.replace(match, `calc(${match})`);
+                appliedChanges = true;
+              }
+            }
+            if (appliedChanges) {
+              transformedProperties.push({
+                property: node.prop,
+                valueBefore: nodeOriginal,
+                valueAfter: node.value
+              });
+            }
           }
         }
 

@@ -185,6 +185,27 @@ describe('StyleManager', () => {
         expect(upgradedSheet.source).toEqual("p { padding: calc(10px / 2); }");
       });
 
+      it('upgrades multiple math expressions in a single line', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 10px/2 10px/3; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2) calc(10px/3); }");
+      });
+
+      it('does not upgrade base64 strings', () => {
+        // Regression Check
+        // TODO This test is currently failing, as a math expression is found within this string, and needs to be prevented
+        // The reason for this test: ./static/atom-ui/style/mixins/mixins.less#67
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }"
+        );
+      });
+
     });
 
     describe('when a sourcePath parameter is specified', () => {
