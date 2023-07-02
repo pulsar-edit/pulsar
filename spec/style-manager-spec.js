@@ -141,6 +141,28 @@ describe('StyleManager', () => {
       });
     });
 
+    describe('css mathematical expression calc() wrap upgrades', () => {
+      beforeEach(() => {
+        // attach styles element to the DOM to parse CSS rules
+        styleManager.onDidAddStyleElement(styleElement => {
+          jasmine.attachToDOM(styleElement);
+        });
+      });
+
+      it('does not wrap, already wrapped math', () => {
+        styleManager.addStyleSheet(`
+          p { padding: calc(10px/2); }
+        `);
+
+        let styleMap = Array.from(styleManager.getStyleElements()[0].sheet.cssRules).map(
+          r => r.styleMap
+        );
+        let value = styleMap[0].get('padding').toString();
+        expect(value).toEqual('calc(5px)');
+      });
+
+    });
+
     describe('when a sourcePath parameter is specified', () => {
       it('ensures a maximum of one style element for the given source path, updating a previous if it exists', () => {
         styleManager.addStyleSheet('a {color: red}', {
