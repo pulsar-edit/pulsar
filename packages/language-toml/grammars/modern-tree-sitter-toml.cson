@@ -1,0 +1,19 @@
+name: 'TOML'
+scopeName: 'source.toml'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-toml'
+
+injectionRegex: '(toml|TOML)$'
+
+treeSitter:
+  grammar: 'tree-sitter-toml/tree-sitter-toml.wasm'
+  highlightsQuery: 'tree-sitter-toml/highlights.scm'
+  foldsQuery: 'tree-sitter-toml/folds.scm'
+  tagsQuery: 'tree-sitter-toml/tags.scm'
+
+fileTypes: [
+  'toml'
+]
+
+comments:
+  start: '# '

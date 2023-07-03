@@ -87,6 +87,13 @@ error/
 ;  ^ comment.block
 ;           ^ comment.block
 
+#_
+(+ '1 '(:foo))
+;   ^ comment.block
+;   ^ !constant.numeric
+;       ^ comment.block
+;       ^ !constant.keyword
+
 (comment 1 2 3)
 ;  ^ keyword.control
 ;        ^ constant.numeric
