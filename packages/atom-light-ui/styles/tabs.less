@@ -8,7 +8,7 @@
 @tab-max-width: 160px;
 
 .tab-bar {
-  height: @tab-height + @tab-top-padding + @tab-bottom-border-height;
+  height: (@tab-height + @tab-top-padding + @tab-bottom-border-height);
   background-image: -webkit-linear-gradient(top, @tab-bar-background-color, lighten(@tab-bar-background-color, 9%));
   box-shadow: inset 0 -8px 8px -4px rgba(0,0,0, .15);
   padding: 0 10px 0 25px;
@@ -77,7 +77,7 @@
 
     &.modified:not(:hover) .close-icon {
       right: 0;
-      top: @tab-height/2 - @modified-icon-width/2 + 1px;
+      top: (@tab-height/2 - @modified-icon-width/2 + 1px);
       width: @modified-icon-width;
       height: @modified-icon-width;
     }
@@ -89,8 +89,8 @@
     .title {
       position: relative;
       z-index: 1;
-      margin-top: -@tab-top-padding - 1px;
-      padding-top: @tab-top-padding + 1px;
+      margin-top: (-@tab-top-padding - 1px);
+      padding-top: (@tab-top-padding + 1px);
       padding-right: 10px;
     }
   }
@@ -100,13 +100,13 @@
     color: @text-color-highlight;
 
     .close-icon {
-      line-height: @tab-height - 1px;
+      line-height: (@tab-height - 1px);
       color: @text-color;
     }
 
     &, &:before, &:after {
       background: @tab-background-color-active;
-      height: @tab-height + 1px;
+      height: (@tab-height + 1px);
       box-shadow: none;
     }
   }
@@ -124,13 +124,13 @@
   }
 
   .placeholder {
-    height: @tab-height + @tab-top-padding + @tab-bottom-border-height;
+    height: (@tab-height + @tab-top-padding + @tab-bottom-border-height);
     pointer-events: none;
     &:before {
       margin-left: -9px; // center between tabs
     }
     &:after {
-      top: @tab-height + @tab-top-padding + @tab-bottom-border-height - 2px;
+      top: (@tab-height + @tab-top-padding + @tab-bottom-border-height - 2px);
       margin-left: -10px; // center between tabs
     }
   }
