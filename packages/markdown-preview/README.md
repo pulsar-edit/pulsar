@@ -19,3 +19,33 @@ To customize even further, the styling can be overridden in your `styles.less` f
   background-color: #444;
 }
 ```
+
+## Syntax Highlighting Language Identifier
+
+While a verbose specification of Markdown, mostly, ensures the content of Markdown will look the same everywhere it's shipped, the same isn't true of code block language identifiers.
+
+That is the string you use to tell the Markdown renderer what code is inside a codeblock of your Markdown document.
+
+Nearly every Markdown rendering system supports different strings to specify your language than each otherl. Markdown-Preview has implemented several valid Language Identifier systems to help ensure that your Markdown will look the same no matter where you publish it!
+
+In the settings, you'll be able to select from a list of different popular Language Identification systems, that can then be used in your code blocks so that they will still be valid when shipping them to whatever platform of your choice.
+
+Currently, Markdown-Preview supports the following:
+
+  * Linguist: Used by GitHub (Previously the default and only language identification system)
+  * Chroma: Used by CodeBerg/Gitea/Hugo/Goldmark
+  * Rouge: Used by GitLab/Jekyll
+  * HighlightJS: Used by Markdown-IT/Pulsar Package Website
+
+
+But of course, not all Markdown content is destined to be shared, Markdown-Preview even lets you specify custom Language Identifiers to be used within your Markdown code blocks.
+
+The setting `Custom Syntax Highlighting Language Identifiers` lets you define a list of custom language identifiers that match up to languages installed on your system.
+
+For example, if you wanted to highlight your code like JavaScript by just using `j` as your Code Block language Identifier, and just us `p` to use Python Syntax Highlighting, you could add the following to this setting:
+
+```
+j: source.js, p: source.python
+```
+
+And that's it, now anytime you use that language identifier it will be highlighted exactly the way you want. Of course your preference of language identification system will still be used, in addition to your custom list.

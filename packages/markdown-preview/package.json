@@ -63,32 +63,32 @@
       "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
     },
     "syntaxHighlightingLanguageIdentifier": {
-      "description": "Syntax Highlighting System to use for code block language identification.",
+      "description": "Syntax Highlighting System to use for code block language identification. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for details.",
       "type": "string",
       "default": "linguist",
       "enum": [
         {
           "value": "linguist",
-          "description": "GitHub Syntax Highlighter"
+          "description": "Linguist: GitHub"
         },
         {
           "value": "chroma",
-          "description": "CodeBerg/Gitea (Goldmark) Syntax Highlighter"
+          "description": "Chroma: CodeBerg/Gitea/Hugo/Goldmark"
         },
         {
           "value": "rouge",
-          "description": "GitLab Syntax Highlighter"
+          "description": "Rouge: GitLab/Jekyll"
         },
         {
           "value": "highlightjs",
-          "description": "Markdown-IT/HighlightJS Syntax Highlighter"
+          "description": "HighlightJS: Markdown-IT"
         }
       ]
     },
     "customSyntaxHighlightingLanguageIdentifiers": {
-      "description": "Custom comma seperated list of Syntax Language Identifiers to map to any language.",
+      "description": "Custom comma seperated list of Syntax Language Identifiers to map to any language. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for usage.",
       "type": "string",
-      "default": "text: text.plain"
+      "default": ""
     }
   }
 }
