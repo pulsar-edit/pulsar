@@ -9,7 +9,7 @@
  *
  * This file can be updated here:
  * https://github.com/alecthomas/chroma/tree/master/lexers
- * Where each Lexer is able to define it's name, and alias' within it's exported
+ * Where each Lexer is able to define its name, and aliases within its exported
  * Config type. Otherwise the name of the lexer file is used.
  */
 
