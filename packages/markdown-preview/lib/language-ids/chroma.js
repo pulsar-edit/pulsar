@@ -1,7 +1,7 @@
 /*
  * This Document defines the Language Identifiers for 'Chroma'
- * That is the string used after a code  block delimiter to define
- * what programming language is within the codeblock.
+ * That is the string used after a code block delimiter to define
+ * what programming language is within the code block.
  *
  * 'Chroma' is the Syntax Highlighting Engine used by CodeBerg/Gitea within
  * the Goldmark Markdown rendering engine.
