@@ -9,7 +9,7 @@
  *
  * This file can be updated here:
  * https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
- * Which helpfull lists the available aliases of each supported language.
+ * Which helpfully lists the available aliases of each supported language.
  */
 
 module.exports = {
