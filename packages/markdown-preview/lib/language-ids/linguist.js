@@ -1,6 +1,6 @@
 /*
  * This Document defines the Language Identifiers for 'Linguist'
- * That is the string used after a code  block delimiter to define
+ * That is the string used after a code block delimiter to define
  * what programming language is within the code block.
  *
  * 'Linguist' is the Syntax Highlighting Engine used by GitHub for
