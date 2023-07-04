@@ -1,9 +1,10 @@
 /*
  * This Document defines the Language Identifiers for 'Rouge'
- * That is the string used after a code  block delimiter to define
- * what programming language is within the codeblock.
+ * That is the string used after a code block delimiter to define
+ * what programming language is within the code block.
  *
- * 'Rogue' is the Syntax Highlighting Engine used by GitLab.
+ * 'Rouge' is the Syntax Highlighting Engine used by GitLab and Jekyll:
+ * https://github.com/rouge-ruby/rouge
  *
  * This file can be updated here:
  * https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/lexers
@@ -11,7 +12,7 @@
  * https://github.com/rouge-ruby/rouge/wiki/List-of-supported-languages-and-lexers
  * The Wiki document does list the main identifier for each language, and may list
  * optional aliases. But like mentioned, this document seems a few years out of date.
- * Otherwise each lexer exports a `tag` and optional `aliases` from it's file.
+ * Otherwise each lexer exports a `tag` and optional `aliases` from its file.
  */
 
 module.exports = {

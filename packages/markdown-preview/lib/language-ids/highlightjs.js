@@ -1,14 +1,15 @@
 /*
  * This Document defines the Language Identifiers for 'highlightjs'
- * That is the string used after a code  block delimiter to define
- * what programming language is within the codeblock.
+ * That is the string used after a code block delimiter to define
+ * what programming language is within the code block.
  *
- * 'highlightjs' is the Syntax Highlighting Engine used widely across the web,
- * and is the default syntax highlighting engine for `markdown-it`.
+ * 'highlightjs' is a Syntax Highlighting Engine used widely across the web,
+ * and is the default syntax highlighting engine for `markdown-it`:
+ * https://highlightjs.org/
  *
  * This file can be updated here:
  * https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
- * Which helpfull lists the available aliases of each supported language.
+ * Which helpfully lists the available aliases of each supported language.
  */
 
 module.exports = {
