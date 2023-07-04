@@ -8,6 +8,7 @@ const { deprecate } = require('grim');
 const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
 const fs = require('fs-plus');
 const { mapSourcePosition } = require('@atom/source-map-support');
+const semver = require("semver");
 const WindowEventHandler = require('./window-event-handler');
 const StateStore = require('./state-store');
 const registerDefaultCommands = require('./register-default-commands');
@@ -585,6 +586,18 @@ class AtomEnvironment {
     if (this.appVersion == null)
       this.appVersion = this.getLoadSettings().appVersion;
     return this.appVersion;
+  }
+
+  /**
+   * @memberof AtomEnvironment
+   * Compares the current Pulsar version against any valid semver range.
+   * @param {string} value - Any valid semver range.
+   * @returns {boolean} True if the current version satisfies the range provided,
+   * false otherwise.
+   * @see {@link https://github.com/npm/node-semver#ranges}
+   */
+  versionSatisfies(value) {
+    return semver.satisfies(this.getVersion(), value);
   }
 
   // Public: Gets the release channel of the Pulsar application.
