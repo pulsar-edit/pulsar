@@ -17,7 +17,7 @@ atom-dock.right .settings-view {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    padding: @component-padding/2;
+    padding: (@component-padding/2);
     min-width: 0;
     max-width: none;
     border: none;
@@ -44,8 +44,8 @@ atom-dock.right .settings-view {
       .icon-link-external {
         font-size: 0;
         width: auto;
-        margin: 0 @component-padding/2;
-        padding: @component-padding/4 @component-padding/2;
+        margin: 0 (@component-padding/2);
+        padding: (@component-padding/4) (@component-padding/2);
         overflow: hidden;
         &:before {
           font-size: 16px;
@@ -61,7 +61,7 @@ atom-dock.right .settings-view {
 
   .section,
   .section:first-child, .settings-view .section:last-child {
-    padding: @component-padding*1.5;
+    padding: (@component-padding*1.5);
   }
 
   .sub-section:not(.collapsed) .package-container {
@@ -143,10 +143,10 @@ atom-dock.right .settings-view {
 
   .themes-panel {
     .themes-picker-item {
-      margin-top: @component-padding*1.5;
+      margin-top: (@component-padding*1.5);
     }
     .theme-description {
-      margin: @component-padding/2 0;
+      margin: (@component-padding/2) 0;
     }
   }
 

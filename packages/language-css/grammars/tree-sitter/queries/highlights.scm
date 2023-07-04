@@ -253,8 +253,15 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.brace.curly.begin.css
-"}" @punctuation.brace.curly.end.css
+(rule_set
+  (block "{" @punctuation.section.property-list.begin.bracket.curly.css)
+  (#set! test.final true))
+(rule_set
+  (block "}" @punctuation.section.property-list.end.bracket.curly.css)
+  (#set! test.final true))
+
+"{" @punctuation.bracket.curly.begin.css
+"}" @punctuation.bracket.curly.end.css
 ";" @punctuation.terminator.rule.css
 "," @punctuation.separator.list.comma.css
 
@@ -267,7 +274,41 @@
 
 ; SECTIONS
 ; ========
+
+; Used by `autocomplete-css`.
 (rule_set (block) @meta.block.inside-selector.css)
 ((block) @meta.block.css
   (#set! test.shy true))
-(selectors) @meta.selector.css
+
+; Used by `autocomplete-css`. Includes everything before the opening brace so
+; that autocompletion of selector segments works even when the selector is not
+; yet valid.
+((rule_set) @meta.selector.css
+  (#set! adjust.endBeforeFirstMatchOf "{"))
+
+
+; META
+; ====
+
+[
+  (plain_value)
+  (integer_value)
+  (string_value)
+] @meta.property-value.css
+
+; `!important` starts out as an ERROR node as it's being typed, but we need it
+; to be recognized as a possible property value for `autocomplete-css` to be
+; able to complete it. This should match only when it comes at the end of a
+; property-value pair.
+(
+  (declaration)
+  .
+  (ERROR) @meta.property-value.css
+  (#match? @meta.property-value.css "^\s?!i")
+  (#set! test.final true))
+
+(
+  (declaration) @meta.property-value.css
+  (#match? @meta.property-value.css ":")
+  (#set! adjust.startAt firstChild.nextSibling.endPosition)
+)

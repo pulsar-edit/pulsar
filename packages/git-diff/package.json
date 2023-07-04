@@ -9,11 +9,11 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-select-list": "^0.7.0"
+    "atom-select-list": "^0.8.1"
   },
   "devDependencies": {
-    "fs-plus": "^3.0.0",
-    "temp": "~0.8.1"
+    "fs-plus": "^3.1.1",
+    "temp": "^0.9.4"
   },
   "configSchema": {
     "showIconsInEditorGutter": {

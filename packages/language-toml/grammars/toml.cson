@@ -95,11 +95,11 @@
   'values':
     'patterns': [
       {
-        'begin': '\\['
+        'begin': '\\[\\s*'
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.array.begin.toml'
-        'end': '\\]'
+        'end': '\\s*\\]'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.toml'
@@ -108,7 +108,7 @@
             'include': '#comment'
           }
           {
-            'match': ','
+            'match': ',\\s*'
             'name': 'punctuation.definition.separator.comma.toml'
           }
           {

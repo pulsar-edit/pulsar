@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing breaking changes to existing Less StyleSheets. Read more about these changes [here](https://github.com/pulsar-edit/less-cache/releases/tag/v2.0.0).
+
 ## 1.106.0
 
 - Fixed bug that happens on some systems when trying to launch Pulsar using the Cinnamon desktop environment

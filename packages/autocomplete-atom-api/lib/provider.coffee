@@ -46,7 +46,8 @@ module.exports =
     editorPath = editor.getPath()
     if editorPath?
       parsedPath = path.parse(editorPath)
-      if path.basename(parsedPath.dir) is '.atom'
+      basename = path.basename(parsedPath.dir)
+      if basename is '.atom' or basename is '.pulsar'
         if parsedPath.base is 'init.coffee' or parsedPath.base is 'init.js'
           return true
     for directory in @packageDirectories ? []

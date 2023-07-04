@@ -30,10 +30,10 @@
   // Size ----------------------
 
   .badge-size( @size: @font-size; ) {
-    @padding: round(@size/4);
+    @padding: round((@size/4));
     font-size: @size;
-    min-width: @size + @padding*2;
-    padding: @padding round(@padding*1.5);
+    min-width: (@size + @padding*2);
+    padding: @padding round((@padding*1.5));
   }
   .badge-size(); // default
 
@@ -47,18 +47,18 @@
   // Best used for larger sizes, since em's can cause rounding errors
   &.badge-flexible {
     @size: .8em;
-    @padding: @size/2;
+    @padding: (@size/2);
     font-size: @size;
-    min-width: @size + @padding*2;
-    padding: @padding @padding*1.5;
+    min-width: (@size + @padding*2);
+    padding: @padding (@padding*1.5);
   }
 
 
   // Icon ----------------------
 
   &.icon {
-    font-size: round(@component-icon-size*0.8);
-    padding: @component-icon-padding @component-icon-padding*2;
+    font-size: round((@component-icon-size*0.8));
+    padding: @component-icon-padding (@component-icon-padding*2);
   }
 
 }
