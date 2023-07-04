@@ -61,6 +61,34 @@
       "type": "boolean",
       "default": false,
       "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
+    },
+    "syntaxHighlightingLanguageIdentifier": {
+      "description": "Syntax Highlighting System to use for code block language identification.",
+      "type": "string",
+      "default": "linguist",
+      "enum": [
+        {
+          "value": "linguist",
+          "description": "GitHub Syntax Highlighter"
+        },
+        {
+          "value": "chroma",
+          "description": "CodeBerg/Gitea (Goldmark) Syntax Highlighter"
+        },
+        {
+          "value": "rouge",
+          "description": "GitLab Syntax Highlighter"
+        },
+        {
+          "value": "highlightjs",
+          "description": "Markdown-IT/HighlightJS Syntax Highlighter"
+        }
+      ]
+    },
+    "customSyntaxHighlightingLanguageIdentifiers": {
+      "description": "Custom comma seperated list of Syntax Language Identifiers to map to any language.",
+      "type": "string",
+      "default": "text: text.plain"
     }
   }
 }

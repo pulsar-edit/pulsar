@@ -1,116 +1,71 @@
-const scopesByFenceName = {
-  bash: 'source.shell',
-  sh: 'source.shell',
-  'shell-script': 'source.shell',
-  zsh: 'source.shell',
-  powershell: 'source.powershell',
-  ps1: 'source.powershell',
-  posh: 'source.powershell',
-  pwsh: 'source.powershell',
-  c: 'source.c',
-  'c++': 'source.cpp',
-  cpp: 'source.cpp',
-  coffee: 'source.coffee',
-  'coffee-script': 'source.coffee',
-  coffeescript: 'source.coffee',
-  cson: 'source.coffee',
-  cs: 'source.cs',
-  csharp: 'source.cs',
-  cake: 'source.cake',
-  cakescript: 'source.csx',
-  css: 'source.css',
-  clojure: 'source.clojure',
-  edn: 'source.edn',
-  sass: 'source.sass',
-  scss: 'source.css.scss',
-  erlang: 'source.erl',
-  go: 'source.go',
-  golang: 'source.go',
-  'go.mod': 'source.mod',
-  'go mod': 'source.mod',
-  'go module': 'source.mod',
-  'go.sum': 'source.sum',
-  'go sum': 'source.sum',
-  'go.work.sum': 'source.sum',
-  'go work sum': 'source.sum',
-  gitconfig: 'source.git-config',
-  gitmodules: 'source.git-config',
-  html: 'text.html.basic',
-  hta: 'text.html.basic',
-  htm: 'text.html.basic',
-  'hmtl.hl': 'text.html.basic',
-  xht: 'text.html.basic',
-  xhmtl: 'text.html.basic',
-  kit: 'text.html.basic',
-  ejs: 'text.html.ejs',
-  ect: 'text.html.ejs',
-  'ejs.t': 'text.html.ejs',
-  jst: 'text.html.ejs',
-  erb: 'text.html.erb',
-  rhtml: 'text.html.erb',
-  'html+ruby': 'text.html.erb',
-  java: 'source.java',
-  jav: 'source.java',
-  jsh: 'source.java',
-  jsp: 'text.html.jsp',
-  tag: 'text.html.jsp',
-  properties: 'source.java-properties',
-  javascript: 'source.js',
-  js: 'source.js',
-  node: 'source.js',
-  json5: 'source.js',
-  json: 'source.json',
-  geojson: 'source.json',
-  jsonl: 'source.json',
-  topojson: 'source.json',
-  less: 'source.css.less',
-  'less-css': 'source.css.less',
-  litcoffee: 'source.litcoffee',
-  mustache: 'text.html.mustache',
-  hbs: 'text.html.handlebars',
-  htmlbars: 'text.html.handlebars',
-  objc: 'source.objc',
-  'objective-c': 'source.objc',
-  'obj-c': 'source.objc',
-  'obj-c++': 'source.objcpp',
-  'objc++': 'source.objcpp',
-  'objectivec++': 'source.objcpp',
-  objectivec: 'source.objc',
-  php: 'text.html.php',
-  inc: 'text.html.php',
-  'html+php': 'text.html.php',
-  py: 'source.python',
-  python: 'source.python',
-  python3: 'source.python',
-  pycon: 'text.python.console',
-  rb: 'source.ruby',
-  ruby: 'source.ruby',
-  jruby: 'source.ruby',
-  macruby: 'source.ruby',
-  rake: 'source.ruby',
-  rb: 'source.ruby',
-  rbx: 'source.ruby',
-  text: 'text.plain',
-  toml: 'source.toml',
-  ts: 'source.ts',
-  typescript: 'source.ts',
-  xml: 'text.xml',
-  rss: 'text.xml',
-  xsd: 'text.xml',
-  wsdl: 'text.xml',
-  xslt: 'text.xml.xsl',
-  xsl: 'text.xml.xsl',
-  yaml: 'source.yaml',
-  yml: 'source.yaml',
-  make: 'source.makefile',
-  cperl: 'source.perl',
-  perl: 'source.perl',
-  sql: 'source.sql'
+const linguist = require("./language-ids/linguist.js");
+const chroma = require("./language-ids/chroma.js");
+const highlightjs = require("./language-ids/highlightjs.js");
+const rouge = require("./langauge-ids/rouge.js");
+
+function getUserLanguageIds() {
+  try {
+    let usersLanguageIDs = atom.config.get("markdown-preview.customSyntaxHighlightingLanguageIdentifiers");
+
+    let obj = {};
+
+    // Bail early if empty
+    if (usersLanguageIDs.length === 0) {
+      return obj;
+    }
+
+    let pairs = usersLanguageIDs.split(",");
+
+    for (let i = 0; i < paris.length; i++) {
+     let split = pairs[i].split(":");
+    obj[split[0].trim()] = split[1].trim();
+    }
+
+    return obj;
+
+  } catch(err) {
+    atom.notifications.addError(`Unable to load Markdown Preview Custom Syntax Highlighting Language Identifiers\n${err.toString()}`);
+    return {};
+  }
+}
+
+function getLanguageIds() {
+
+  let prefferredLanguageID = atom.config.get("markdown-preview.syntaxHighlightingLanguageIdentifier");
+  let usersLangaugeIDs = getUserLanguageIds();
+
+  let languageIds;
+
+  switch(prefferredLanguageID) {
+    case "chroma":
+      languageIds = chroma;
+      break;
+    case "highlightjs":
+      languageIds = highlightjs;
+      break;
+    case "rouge":
+      languageIds = rouge;
+      break;
+    case "linguist":
+    default:
+      languageIds = linguist;
+      break;
+  }
+
+  if (Object.keys(usersLanguageIDs).length > 0) {
+    for (let key in usersLanguageIDs) {
+      languageIds[key] = usersLanguageIDs[key];
+    }
+  }
+
+  return languageIds;
 }
 
 module.exports = {
   scopeForFenceName (fenceName) {
     fenceName = fenceName.toLowerCase()
+
+    let scopesByFenceName = getLangaugeIds();
 
     return scopesByFenceName.hasOwnProperty(fenceName)
       ? scopesByFenceName[fenceName]
