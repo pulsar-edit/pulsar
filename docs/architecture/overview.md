@@ -1,13 +1,4 @@
-```                                                                                                
-  _____       _                
- |  __ \     | |               
- | |__) |   _| |___  __ _ _ __
- |  ___/ | | | / __|/ _` | '__|
- | |   | |_| | \__ \ (_| | |   
- |_|    \__,_|_|___/\__,_|_|                                                                                                            
-```
-
-# Pulsar's High Level Overview
+# Pulsar's High Level Startup Overview
 
 It's no secret that Pulsar since inherited from Atom, is a big and complex application.
 

@@ -6,11 +6,7 @@ Most of the Pulsar/Atom user and developer documentation is contained on the [Pu
 
 While the Pulsar website does not yet have the Pulsar API documentation, this is partially available within [Pulsar API Documentation](./Pulsar-API-Documentation.md) or otherwise the original docs are available from community members [here](https://atom-flight-manual-archive.github.io/).
 
-## General Documentation
-
-Resources about the structure of Pulsar available:
-  * [Overview](./architecture/overview.md)
-  * ['The World'](./architecture/the-world.md)
+There is also general guidance on the internal [stucture and behavior](./architecture/README.md) of Pulsar available.
 
 ## Build documentation
 
