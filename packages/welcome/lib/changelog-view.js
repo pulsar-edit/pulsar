@@ -18,19 +18,10 @@ export default class ChangeLogView {
   }
 
   wasVersionDismissed() {
-    const lastVersion = atom.config.get('welcome.lastViewedChangeLog');
-    let curVersion = atom.getVersion();
-
-    if (lastVersion.split(" ")[0] === curVersion.split(" ")[0]) {
-      return true;
-    }
-
-    curVersion = curVersion.split(".");
-    if (lastVersion[0] <= curVersion[0] && lastVersion[1] <= curVersion[1] && lastVersion[2].split(" ")[0] <= curVersion[2].split(" ")[0]) {
-      return false;
-    } else {
-      return true;
-    }
+    // Use the new `.versionSatisfies()` API to check if our last dismissed version
+    // is the same as the current version. `.versionSatisfies()` compares equality
+    // by default, so no comparator is needed
+    return atom.versionSatisfies(atom.config.get('welcome.lastViewedChangeLog'));
   }
 
   update() {}
