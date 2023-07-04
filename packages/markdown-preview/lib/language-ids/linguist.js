@@ -4,7 +4,8 @@
  * what programming language is within the code block.
  *
  * 'Linguist' is the Syntax Highlighting Engine used by GitHub for
- * GitHub FLavoured Markdown
+ * GitHub FLavoured Markdown:
+ * https://github.com/github-linguist/linguist
  *
  * This file can be updated here:
  * https://github.com/github-linguist/linguist/blob/master/lib/linguist/languages.yml
