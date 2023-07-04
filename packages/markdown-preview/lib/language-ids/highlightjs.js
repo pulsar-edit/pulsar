@@ -1,7 +1,7 @@
 /*
  * This Document defines the Language Identifiers for 'highlightjs'
  * That is the string used after a code block delimiter to define
- * what programming language is within the codeblock.
+ * what programming language is within the code block.
  *
  * 'highlightjs' is the Syntax Highlighting Engine used widely across the web,
  * and is the default syntax highlighting engine for `markdown-it`.
