@@ -3,7 +3,8 @@
  * That is the string used after a code  block delimiter to define
  * what programming language is within the codeblock.
  *
- * 'Rogue' is the Syntax Highlighting Engine used by GitLab.
+ * 'Rouge' is the Syntax Highlighting Engine used by GitLab and Jekyll:
+ * https://github.com/rouge-ruby/rouge
  *
  * This file can be updated here:
  * https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/lexers
