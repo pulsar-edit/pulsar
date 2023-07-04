@@ -3,8 +3,9 @@
  * That is the string used after a code block delimiter to define
  * what programming language is within the code block.
  *
- * 'Chroma' is the Syntax Highlighting Engine used by CodeBerg/Gitea within
- * the Goldmark Markdown rendering engine.
+ * 'Chroma' is the Syntax Highlighting Engine used by Codeberg/Gitea/Hugo within
+ * the Goldmark Markdown rendering engine:
+ * https://github.com/alecthomas/chroma
  *
  * This file can be updated here:
  * https://github.com/alecthomas/chroma/tree/master/lexers
