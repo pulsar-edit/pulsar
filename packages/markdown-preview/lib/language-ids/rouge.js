@@ -12,7 +12,7 @@
  * https://github.com/rouge-ruby/rouge/wiki/List-of-supported-languages-and-lexers
  * The Wiki document does list the main identifier for each language, and may list
  * optional aliases. But like mentioned, this document seems a few years out of date.
- * Otherwise each lexer exports a `tag` and optional `aliases` from it's file.
+ * Otherwise each lexer exports a `tag` and optional `aliases` from its file.
  */
 
 module.exports = {
