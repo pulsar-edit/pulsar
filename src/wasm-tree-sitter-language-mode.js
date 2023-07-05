@@ -420,6 +420,12 @@ class WASMTreeSitterLanguageMode {
     return this.atTransactionEndPromise;
   }
 
+  // Alias for `atTransactionEnd` for packages that used the implementation
+  // details of the legacy tree-sitter system.
+  parseCompletePromise() {
+    return this.atTransactionEnd();
+  }
+
   prefillFoldCache(range) {
     this.rootLanguageLayer?.foldResolver?.prefillFoldCache(range);
 
