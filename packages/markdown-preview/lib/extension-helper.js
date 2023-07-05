@@ -16,7 +16,7 @@ function getUserLanguageIds() {
 
     let pairs = usersLanguageIDs.split(",");
 
-    for (let i = 0; i < paris.length; i++) {
+    for (let i = 0; i < pairs.length; i++) {
      let split = pairs[i].split(":");
     obj[split[0].trim()] = split[1].trim();
     }
@@ -32,7 +32,7 @@ function getUserLanguageIds() {
 function getLanguageIds() {
 
   let preferredLanguageID = atom.config.get("markdown-preview.syntaxHighlightingLanguageIdentifier");
-  let usersLangaugeIDs = getUserLanguageIds();
+  let usersLanguageIDs = getUserLanguageIds();
 
   let languageIds;
 
@@ -65,7 +65,7 @@ module.exports = {
   scopeForFenceName (fenceName) {
     fenceName = fenceName.toLowerCase()
 
-    let scopesByFenceName = getLangaugeIds();
+    let scopesByFenceName = getLanguageIds();
 
     return scopesByFenceName.hasOwnProperty(fenceName)
       ? scopesByFenceName[fenceName]
