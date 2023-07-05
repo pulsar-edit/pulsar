@@ -1,7 +1,3 @@
-const linguist = require("./language-ids/linguist.js");
-const chroma = require("./language-ids/chroma.js");
-const highlightjs = require("./language-ids/highlightjs.js");
-const rouge = require("./language-ids/rouge.js");
 
 function getUserLanguageIds() {
   try {
@@ -37,18 +33,21 @@ function getLanguageIds() {
   let languageIds;
 
   switch(preferredLanguageID) {
+    // Defer require for all language id files. First call for an given one will
+    // be expensive, but due to the module cache, should be fine afterwards
+    // plus only requiring the one needed, should result in less wasted memory
     case "chroma":
-      languageIds = chroma;
+      languageIds = require("./language-ids/chroma.js");
       break;
     case "highlightjs":
-      languageIds = highlightjs;
+      languageIds = require("./language-ids/highlightjs.js");
       break;
     case "rouge":
-      languageIds = rouge;
+      languageIds = require("./language-ids/rouge.js");
       break;
     case "linguist":
     default:
-      languageIds = linguist;
+      languageIds = require("./language-ids/linguist.js");
       break;
   }
 
