@@ -38,7 +38,7 @@ Currently, `Markdown-Preview` supports the following:
   * HighlightJS: Used by Markdown-IT/Pulsar Package Website
 
 
-But of course, not all Markdown content is destined to be shared, Markdown-Preview even lets you specify custom Language Identifiers to be used within your Markdown code blocks.
+Of course, not all Markdown content is destined to be shared, `Markdown-Preview` even lets you specify custom Language Identifiers to be used within your Markdown code blocks.
 
 The setting `Custom Syntax Highlighting Language Identifiers` lets you define a list of custom language identifiers that match up to languages installed on your system.
 
