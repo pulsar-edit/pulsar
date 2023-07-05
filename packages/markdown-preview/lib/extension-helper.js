@@ -1,7 +1,7 @@
 const linguist = require("./language-ids/linguist.js");
 const chroma = require("./language-ids/chroma.js");
 const highlightjs = require("./language-ids/highlightjs.js");
-const rouge = require("./langauge-ids/rouge.js");
+const rouge = require("./language-ids/rouge.js");
 
 function getUserLanguageIds() {
   try {
