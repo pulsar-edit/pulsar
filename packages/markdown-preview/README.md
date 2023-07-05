@@ -40,7 +40,7 @@ Currently, `Markdown-Preview` supports the following:
 
 Of course, not all Markdown content is destined to be shared, `Markdown-Preview` even lets you specify custom Language Identifiers to be used within your Markdown code blocks.
 
-The setting `Custom Syntax Highlighting Language Identifiers` lets you define a list of custom language identifiers that match up to languages installed on your system.
+The setting `Custom Syntax Highlighting Language Identifiers` lets you define a list of custom language identifiers that match up to languages available within your Pulsar installation
 
 For example, if you wanted to highlight your code like JavaScript by just using `j` as your Code Block language Identifier, and just us `p` to use Python Syntax Highlighting, you could add the following to this setting:
 
