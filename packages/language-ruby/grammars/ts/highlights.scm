@@ -88,20 +88,27 @@
     name: (constant) @entity.other.inherited-class.ruby)
     (#set! test.final true))
 
-; "Foo" in `Foo::Bar`.
+; Marks all nodes on the left side of `scope_resolution` with an arbitrary key.
 (scope_resolution
-  scope: (constant) @support.other.namespace.ruby
-  (#set! test.final "true"))
+  scope: (_) @_IGNORE_
+  (#set! isOnLeftSideOfNamespaceChain true))
+
+; Targets all `constant` nodes with the aforementioned key, no matter how deep
+; into a Chain::Of::Namespaces they happen to be.
+; "Foo" and "Bar" in `Foo::Bar::Baz`.
+((constant) @support.other.namespace.ruby
+  (#set! test.onlyIfDescendantOfNodeWithData isOnLeftSideOfNamespaceChain)
+  (#set! test.final true))
 
 ; "::" in `Foo::Bar`.
 (scope_resolution
   "::" @keyword.operator.namespace.ruby
-  (#set! test.final "true"))
+  (#set! test.final true))
 
-; "Bar" in `Foo::Bar`.
+; "Bar" in `Foo::Bar`, regardless of the length of the chain.
 (scope_resolution
   name: (constant) @support.other.class.ruby
-  (#set! test.final "true"))
+  (#set! test.final true))
 
 
 
