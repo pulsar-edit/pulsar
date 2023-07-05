@@ -31,12 +31,12 @@ function getUserLanguageIds() {
 
 function getLanguageIds() {
 
-  let prefferredLanguageID = atom.config.get("markdown-preview.syntaxHighlightingLanguageIdentifier");
+  let preferredLanguageID = atom.config.get("markdown-preview.syntaxHighlightingLanguageIdentifier");
   let usersLangaugeIDs = getUserLanguageIds();
 
   let languageIds;
 
-  switch(prefferredLanguageID) {
+  switch(preferredLanguageID) {
     case "chroma":
       languageIds = chroma;
       break;
