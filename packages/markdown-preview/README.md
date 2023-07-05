@@ -30,7 +30,7 @@ Nearly every Markdown rendering system supports different strings to specify you
 
 In the settings, you can select from a list of different popular Language Identification systems that can then be used in your code blocks. This means that they will still be valid when shipping them to whatever platform of your choice.
 
-Currently, Markdown-Preview supports the following:
+Currently, `Markdown-Preview` supports the following:
 
   * Linguist: Used by GitHub (Previously the default and only language identification system)
   * Chroma: Used by CodeBerg/Gitea/Hugo/Goldmark
