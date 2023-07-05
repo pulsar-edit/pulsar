@@ -26,7 +26,7 @@ While a verbose specification of Markdown, mostly, ensures the content of Markdo
 
 A "code block language identifier" is the string you use to tell the Markdown renderer what code is inside a code block of your Markdown document.
 
-Nearly every Markdown rendering system supports different strings to specify your language than each otherl. Markdown-Preview has implemented several valid Language Identifier systems to help ensure that your Markdown will look the same no matter where you publish it!
+Nearly every Markdown rendering system supports different strings to specify your language than each other. `Markdown-Preview` has implemented several valid Language Identifier systems to help ensure that your Markdown will look the same no matter where you publish it!
 
 In the settings, you'll be able to select from a list of different popular Language Identification systems, that can then be used in your code blocks so that they will still be valid when shipping them to whatever platform of your choice.
 
