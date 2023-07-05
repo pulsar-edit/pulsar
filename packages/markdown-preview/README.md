@@ -24,7 +24,7 @@ To customize even further, the styling can be overridden in your `styles.less` f
 
 While a verbose specification of Markdown, mostly, ensures the content of Markdown will look the same everywhere it's shipped, the same isn't true of code block language identifiers.
 
-That is the string you use to tell the Markdown renderer what code is inside a codeblock of your Markdown document.
+A "code block language identifier" is the string you use to tell the Markdown renderer what code is inside a code block of your Markdown document.
 
 Nearly every Markdown rendering system supports different strings to specify your language than each otherl. Markdown-Preview has implemented several valid Language Identifier systems to help ensure that your Markdown will look the same no matter where you publish it!
 
