@@ -192,7 +192,7 @@ class I18n {
     if (loaded !== undefined) return loaded;
 
     const fetched = this.fetchPkgLanguageFile(ns, lang);
-    if (fetched === undefined) return fetched;
+    if (fetched === undefined) return;
 
     if (typeof this.registeredStrings[ns] !== "object" || this.registeredStrings[ns] === null) {
       this.registeredStrings[ns] = {};
@@ -219,6 +219,8 @@ class I18n {
     // TODO this could probably be optimised
     let packages = this.packages.getAvailablePackages();
     let foundPackage = packages.find(p => p.name === ns);
+
+    if (foundPackage === undefined) return;
 
     const i18nDir = path.join(foundPackage.path, "i18n");
     const langfile = path.join(i18nDir, `${lang}.json`);
