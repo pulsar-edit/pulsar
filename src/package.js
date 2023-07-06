@@ -318,7 +318,10 @@ module.exports = class Package {
           sourcePath,
           priority,
           context,
-          skipDeprecatedSelectorsTransformation: this.bundledPackage
+          skipDeprecatedSelectorsTransformation:
+            this.bundledPackage ? this.bundledPackage : !this.config.get("core.transformDeprecatedStyleSheetSelectors"),
+          skipDeprecatedMathUsageTransformation:
+            this.bundledPackage ? this.bundledPackage : !this.config.get("core.transformDeprecatedStyleSheetMathExpressions")
         })
       );
     }

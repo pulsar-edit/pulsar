@@ -383,6 +383,16 @@ const configSchema = {
             description: 'Use sRGB color profile'
           }
         ]
+      },
+      transformDeprecatedStyleSheetSelectors: {
+        description: 'Whether Pulsar should transform deprecated DOM Selectors in community package style sheets. Increases compatibility, as well as startup time.',
+        type: 'boolean',
+        default: true
+      },
+      transformDeprecatedStyleSheetMathExpressions: {
+        description: 'Whether Pulsar should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.',
+        type: 'boolean',
+        default: true
       }
     }
   },

@@ -68,7 +68,7 @@
   &-card {
     margin: 1em 0;
 
-    border-radius: @component-border-radius*2;
+    border-radius: (@component-border-radius*2);
     border: 1px solid @base-border-color;
     background-color: lighten(@base-background-color, 3%);
   }
@@ -108,8 +108,8 @@
       margin-bottom: 0;
     }
     .btn {
-      margin-top: @component-padding/3;
-      margin-bottom: @component-padding/3;
+      margin-top: (@component-padding/3);
+      margin-bottom: (@component-padding/3);
     }
   }
 

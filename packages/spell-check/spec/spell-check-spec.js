@@ -27,8 +27,8 @@ describe('Spell check', function () {
         await atom.packages.activatePackage('language-text');
         await atom.packages.activatePackage('language-javascript');
         await atom.workspace.open(`${__dirname}${sep}sample.js`);
-        const package = await atom.packages.activatePackage('spell-check');
-        spellCheckModule = package.mainModule;
+        const pack = await atom.packages.activatePackage('spell-check');
+        spellCheckModule = pack.mainModule;
 
         // Disable the grammers so nothing is done until we turn it back on.
         atom.config.set('spell-check.grammars', []);
