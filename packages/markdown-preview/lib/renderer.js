@@ -108,7 +108,7 @@ function renderYamlTable (variables) {
     entries.map(entry => entry[0]),
     entries.map(entry => '--'),
     entries.map((entry) => {
-      if (typeof entry[1] === "object") {
+      if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
         // Remove all newlines, or they ruin formatting of parent table
         return marked.parse(renderYamlTable(entry[1])).replace(/\n/g,"");
       } else {
