@@ -15,7 +15,7 @@
     "fs-plus": "^3.0.0",
     "marked": "5.0.3",
     "underscore-plus": "^1.0.0",
-    "yaml-front-matter": "^4.0.0"
+    "yaml-front-matter": "^4.1.1"
   },
   "devDependencies": {
     "temp": "^0.8.1"
