@@ -132,9 +132,10 @@ module.exports = async function({ blobStore }) {
       if (!params.hasOwnProperty('onlyLoadBaseStyleSheets')) {
         params.onlyLoadBaseStyleSheets = true;
       }
-      window.atom = new AtomEnvironment(params);
-      window.atom.initialize(params);
-      TextEditor.setScheduler(window.atom.views);
+      const atomEnvironment = new AtomEnvironment(params);
+      atomEnvironment.initialize(params);
+      TextEditor.setScheduler(atomEnvironment.views);
+      return atomEnvironment;
     };
 
     const statusCode = await testRunner({
