@@ -1,10 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const fs = require('fs');
 const path = require('path');
 
@@ -14,12 +8,12 @@ describe("CoffeeScript grammar", function() {
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage("language-coffee-script"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.coffee"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.coffee"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("source.coffee");
+    expect(grammar.scopeName).toBe("source.coffee");
   });
 
   it("tokenizes classes", function() {
@@ -48,7 +42,7 @@ describe("CoffeeScript grammar", function() {
     expect(tokens[2]).toEqual({value: "class", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "meta.class.coffee", "storage.type.class.coffee"]});
     expect(tokens[3]).toEqual({value: " ", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "meta.class.coffee"]});
     expect(tokens[4]).toEqual({value: "Foo", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "meta.class.coffee", "entity.name.type.class.coffee"]});
-    return expect(tokens[5]).toEqual({value: ")", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "punctuation.definition.arguments.end.bracket.round.coffee"]});
+    expect(tokens[5]).toEqual({value: ")", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "punctuation.definition.arguments.end.bracket.round.coffee"]});
 });
 
   it("tokenizes named subclasses", function() {
@@ -60,7 +54,7 @@ describe("CoffeeScript grammar", function() {
     expect(tokens[3]).toEqual({value: " ", scopes: ["source.coffee", "meta.class.coffee"]});
     expect(tokens[4]).toEqual({value: "extends", scopes: ["source.coffee", "meta.class.coffee", "keyword.control.inheritance.coffee"]});
     expect(tokens[5]).toEqual({value: " ", scopes: ["source.coffee", "meta.class.coffee"]});
-    return expect(tokens[6]).toEqual({value: "Bar", scopes: ["source.coffee", "meta.class.coffee", "entity.other.inherited-class.coffee"]});
+    expect(tokens[6]).toEqual({value: "Bar", scopes: ["source.coffee", "meta.class.coffee", "entity.other.inherited-class.coffee"]});
 });
 
   it("tokenizes anonymous subclasses", function() {
@@ -70,7 +64,7 @@ describe("CoffeeScript grammar", function() {
     expect(tokens[1]).toEqual({value: " ", scopes: ["source.coffee", "meta.class.coffee"]});
     expect(tokens[2]).toEqual({value: "extends", scopes: ["source.coffee", "meta.class.coffee", "keyword.control.inheritance.coffee"]});
     expect(tokens[3]).toEqual({value: " ", scopes: ["source.coffee", "meta.class.coffee"]});
-    return expect(tokens[4]).toEqual({value: "Foo", scopes: ["source.coffee", "meta.class.coffee", "entity.other.inherited-class.coffee"]});
+    expect(tokens[4]).toEqual({value: "Foo", scopes: ["source.coffee", "meta.class.coffee", "entity.other.inherited-class.coffee"]});
 });
 
   it("tokenizes instantiated anonymous classes", function() {
@@ -78,7 +72,7 @@ describe("CoffeeScript grammar", function() {
 
     expect(tokens[0]).toEqual({value: "new", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "keyword.operator.new.coffee"]});
     expect(tokens[1]).toEqual({value: " ", scopes: ["source.coffee", "meta.class.instance.constructor.coffee"]});
-    return expect(tokens[2]).toEqual({value: "class", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "storage.type.class.coffee"]});
+    expect(tokens[2]).toEqual({value: "class", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "storage.type.class.coffee"]});
 });
 
   it("tokenizes instantiated named classes", function() {
@@ -94,14 +88,14 @@ describe("CoffeeScript grammar", function() {
 
     expect(tokens[0]).toEqual({value: "new", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "keyword.operator.new.coffee"]});
     expect(tokens[1]).toEqual({value: " ", scopes: ["source.coffee", "meta.class.instance.constructor.coffee"]});
-    return expect(tokens[2]).toEqual({value: "Foo", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "entity.name.type.instance.coffee"]});
+    expect(tokens[2]).toEqual({value: "Foo", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "entity.name.type.instance.coffee"]});
 });
 
   it("tokenizes class names that start with `class` correctly", function() {
     const {tokens} = grammar.tokenizeLine("new classTest");
 
     expect(tokens[0]).toEqual({value: "new", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "keyword.operator.new.coffee"]});
-    return expect(tokens[2]).toEqual({value: "classTest", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "entity.name.type.instance.coffee"]});
+    expect(tokens[2]).toEqual({value: "classTest", scopes: ["source.coffee", "meta.class.instance.constructor.coffee", "entity.name.type.instance.coffee"]});
 });
 
   it("tokenizes comments", function() {
@@ -113,7 +107,7 @@ describe("CoffeeScript grammar", function() {
     ({tokens} = grammar.tokenizeLine("\#{Comment}"));
 
     expect(tokens[0]).toEqual({value: "#", scopes: ["source.coffee", "comment.line.number-sign.coffee", "punctuation.definition.comment.coffee"]});
-    return expect(tokens[1]).toEqual({value: "{Comment}", scopes: ["source.coffee", "comment.line.number-sign.coffee"]});
+    expect(tokens[1]).toEqual({value: "{Comment}", scopes: ["source.coffee", "comment.line.number-sign.coffee"]});
 });
 
   it("tokenizes block comments", function() {
@@ -142,7 +136,7 @@ Until here
     expect(tokens[15]).toEqual({value: '###', scopes: ['source.coffee', 'comment.block.coffee', 'punctuation.definition.comment.coffee']});
     expect(tokens[16]).toEqual({value: ': T ', scopes: ['source.coffee', 'comment.block.coffee']});
     expect(tokens[17]).toEqual({value: '###', scopes: ['source.coffee', 'comment.block.coffee', 'punctuation.definition.comment.coffee']});
-    return expect(tokens[19]).toEqual({value: '->', scopes: ['source.coffee', 'meta.function.inline.coffee', 'storage.type.function.coffee']});
+    expect(tokens[19]).toEqual({value: '->', scopes: ['source.coffee', 'meta.function.inline.coffee', 'storage.type.function.coffee']});
 });
 
   it("tokenizes annotations in block comments", function() {
@@ -155,7 +149,7 @@ Until here
 
     expect(lines[1][0]).toEqual({value: '  ', scopes: ["source.coffee", "comment.block.coffee"]});
     expect(lines[1][1]).toEqual({value: '@foo', scopes: ["source.coffee", "comment.block.coffee", "storage.type.annotation.coffee"]});
-    return expect(lines[2][0]).toEqual({value: '@bar', scopes: ["source.coffee", "comment.block.coffee", "storage.type.annotation.coffee"]});
+    expect(lines[2][0]).toEqual({value: '@bar', scopes: ["source.coffee", "comment.block.coffee", "storage.type.annotation.coffee"]});
 });
 
   describe("numbers", function() {
@@ -164,7 +158,7 @@ Until here
       expect(tokens[0]).toEqual({value: '0x1D306', scopes: ['source.coffee', 'constant.numeric.hex.coffee']});
 
       ({tokens} = grammar.tokenizeLine('0X1D306'));
-      return expect(tokens[0]).toEqual({value: '0X1D306', scopes: ['source.coffee', 'constant.numeric.hex.coffee']});
+      expect(tokens[0]).toEqual({value: '0X1D306', scopes: ['source.coffee', 'constant.numeric.hex.coffee']});
   });
 
     it("tokenizes binary literals", function() {
@@ -172,7 +166,7 @@ Until here
       expect(tokens[0]).toEqual({value: '0b011101110111010001100110', scopes: ['source.coffee', 'constant.numeric.binary.coffee']});
 
       ({tokens} = grammar.tokenizeLine('0B011101110111010001100110'));
-      return expect(tokens[0]).toEqual({value: '0B011101110111010001100110', scopes: ['source.coffee', 'constant.numeric.binary.coffee']});
+      expect(tokens[0]).toEqual({value: '0B011101110111010001100110', scopes: ['source.coffee', 'constant.numeric.binary.coffee']});
   });
 
     it("tokenizes octal literals", function() {
@@ -183,7 +177,7 @@ Until here
       expect(tokens[0]).toEqual({value: '0O1411', scopes: ['source.coffee', 'constant.numeric.octal.coffee']});
 
       ({tokens} = grammar.tokenizeLine('0010'));
-      return expect(tokens[0]).toEqual({value: '0010', scopes: ['source.coffee', 'constant.numeric.octal.coffee']});
+      expect(tokens[0]).toEqual({value: '0010', scopes: ['source.coffee', 'constant.numeric.octal.coffee']});
   });
 
     it("tokenizes decimals", function() {
@@ -216,15 +210,15 @@ Until here
       ({tokens} = grammar.tokenizeLine('1.E3'));
       expect(tokens[0]).toEqual({value: '1', scopes: ['source.coffee', 'constant.numeric.decimal.coffee']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.coffee', 'constant.numeric.decimal.coffee', 'punctuation.separator.decimal.period.coffee']});
-      return expect(tokens[2]).toEqual({value: 'E3', scopes: ['source.coffee', 'constant.numeric.decimal.coffee']});
+      expect(tokens[2]).toEqual({value: 'E3', scopes: ['source.coffee', 'constant.numeric.decimal.coffee']});
   });
 
-    return it("does not tokenize numbers that are part of a variable", function() {
+    it("does not tokenize numbers that are part of a variable", function() {
       let {tokens} = grammar.tokenizeLine('hi$1');
       expect(tokens[0]).toEqual({value: 'hi$1', scopes: ['source.coffee']});
 
       ({tokens} = grammar.tokenizeLine('hi_1'));
-      return expect(tokens[0]).toEqual({value: 'hi_1', scopes: ['source.coffee']});
+      expect(tokens[0]).toEqual({value: 'hi_1', scopes: ['source.coffee']});
   });
 });
 
@@ -321,7 +315,7 @@ Until here
     expect(tokens[0]).toEqual({value: "this", scopes: ["source.coffee", "variable.language.this.coffee"]});
     expect(tokens[1]).toEqual({value: " ", scopes: ["source.coffee"]});
     expect(tokens[2]).toEqual({value: "==", scopes: ["source.coffee", "keyword.operator.comparison.coffee"]});
-    return expect(tokens[3]).toEqual({value: " b", scopes: ["source.coffee"]});
+    expect(tokens[3]).toEqual({value: " b", scopes: ["source.coffee"]});
 });
 
   it("tokenizes compound operators properly", function() {
@@ -470,7 +464,7 @@ Until here
       ({tokens} = grammar.tokenizeLine('a.123illegal'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.coffee']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.coffee', 'punctuation.separator.property.period.coffee']});
-      return expect(tokens[2]).toEqual({value: '123illegal', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
+      expect(tokens[2]).toEqual({value: '123illegal', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
   });
 
     it("tokenizes constant properties", function() {
@@ -487,10 +481,10 @@ Until here
       ({tokens} = grammar.tokenizeLine('a.C'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.coffee', 'variable.other.object.coffee']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.coffee', 'punctuation.separator.property.period.coffee']});
-      return expect(tokens[2]).toEqual({value: 'C', scopes: ['source.coffee', 'constant.other.property.coffee']});
+      expect(tokens[2]).toEqual({value: 'C', scopes: ['source.coffee', 'constant.other.property.coffee']});
   });
 
-    return it("tokenizes objects, methods, and properties using :: prototype syntax", function() {
+    it("tokenizes objects, methods, and properties using :: prototype syntax", function() {
       let {tokens} = grammar.tokenizeLine("Foo::");
       expect(tokens[0]).toEqual({value: "Foo", scopes: ["source.coffee", "variable.other.object.coffee"]});
       expect(tokens[1]).toEqual({value: "::", scopes: ["source.coffee", "keyword.operator.prototype.coffee"]});
@@ -549,7 +543,7 @@ Until here
       ({tokens} = grammar.tokenizeLine("Foo::toString()"));
       expect(tokens[0]).toEqual({value: "Foo", scopes: ["source.coffee", "variable.other.object.coffee"]});
       expect(tokens[1]).toEqual({value: "::", scopes: ["source.coffee", "meta.method-call.coffee", "keyword.operator.prototype.coffee"]});
-      return expect(tokens[2]).toEqual({value: "toString", scopes: ["source.coffee", "meta.method-call.coffee", "support.function.coffee"]});
+      expect(tokens[2]).toEqual({value: "toString", scopes: ["source.coffee", "meta.method-call.coffee", "support.function.coffee"]});
   });
 });
 
@@ -565,12 +559,12 @@ Until here
       expect(tokens[0]).toEqual({value: '$this', scopes: ['source.coffee']});
 
       ({tokens} = grammar.tokenizeLine('this$'));
-      return expect(tokens[0]).toEqual({value: 'this$', scopes: ['source.coffee']});
+      expect(tokens[0]).toEqual({value: 'this$', scopes: ['source.coffee']});
   });
 
     it("tokenizes 'super'", function() {
       const {tokens} = grammar.tokenizeLine('super');
-      return expect(tokens[0]).toEqual({value: 'super', scopes: ['source.coffee', 'variable.language.super.coffee']});
+      expect(tokens[0]).toEqual({value: 'super', scopes: ['source.coffee', 'variable.language.super.coffee']});
   });
 
     it("tokenizes 'arguments'", function() {
@@ -581,10 +575,10 @@ Until here
       expect(tokens[0]).toEqual({value: 'arguments', scopes: ['source.coffee', 'variable.language.arguments.coffee']});
 
       ({tokens} = grammar.tokenizeLine('arguments.length'));
-      return expect(tokens[0]).toEqual({value: 'arguments', scopes: ['source.coffee', 'variable.language.arguments.coffee']});
+      expect(tokens[0]).toEqual({value: 'arguments', scopes: ['source.coffee', 'variable.language.arguments.coffee']});
   });
 
-    return it("tokenizes illegal identifiers", function() {
+    it("tokenizes illegal identifiers", function() {
       let {tokens} = grammar.tokenizeLine('0illegal');
       expect(tokens[0]).toEqual({value: '0illegal', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
 
@@ -592,7 +586,7 @@ Until here
       expect(tokens[0]).toEqual({value: '123illegal', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
 
       ({tokens} = grammar.tokenizeLine('123$illegal'));
-      return expect(tokens[0]).toEqual({value: '123$illegal', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
+      expect(tokens[0]).toEqual({value: '123$illegal', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
   });
 });
 
@@ -609,10 +603,10 @@ Until here
 
       ({tokens} = grammar.tokenizeLine('obj?.prop'));
       expect(tokens[0]).toEqual({value: 'obj', scopes: ['source.coffee', 'variable.other.object.coffee']});
-      return expect(tokens[1]).toEqual({value: '?', scopes: ['source.coffee', 'keyword.operator.existential.coffee']});
+      expect(tokens[1]).toEqual({value: '?', scopes: ['source.coffee', 'keyword.operator.existential.coffee']});
   });
 
-    return it("tokenizes illegal objects", function() {
+    it("tokenizes illegal objects", function() {
       let {tokens} = grammar.tokenizeLine('1.prop');
       expect(tokens[0]).toEqual({value: '1', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
 
@@ -620,7 +614,7 @@ Until here
       expect(tokens[0]).toEqual({value: '123', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
 
       ({tokens} = grammar.tokenizeLine('123a.prop'));
-      return expect(tokens[0]).toEqual({value: '123a', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
+      expect(tokens[0]).toEqual({value: '123a', scopes: ['source.coffee', 'invalid.illegal.identifier.coffee']});
   });
 });
 
@@ -632,10 +626,10 @@ Until here
       expect(tokens[2]).toEqual({value: ',', scopes: ['source.coffee', 'punctuation.separator.delimiter.coffee']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.coffee']});
       expect(tokens[9]).toEqual({value: '3', scopes: ['source.coffee', 'constant.numeric.decimal.coffee']});
-      return expect(tokens[10]).toEqual({value: ']', scopes: ['source.coffee', 'punctuation.definition.array.end.bracket.square.coffee']});
+      expect(tokens[10]).toEqual({value: ']', scopes: ['source.coffee', 'punctuation.definition.array.end.bracket.square.coffee']});
   });
 
-    return it("tokenizes inclusive and exclusive slices", function() {
+    it("tokenizes inclusive and exclusive slices", function() {
       let {tokens} = grammar.tokenizeLine('[a..3]');
       expect(tokens[0]).toEqual({value: '[', scopes: ['source.coffee', 'punctuation.definition.array.begin.bracket.square.coffee']});
       expect(tokens[1]).toEqual({value: 'a', scopes: ['source.coffee']});
@@ -648,7 +642,7 @@ Until here
       expect(tokens[1]).toEqual({value: '3', scopes: ['source.coffee', 'constant.numeric.decimal.coffee']});
       expect(tokens[2]).toEqual({value: '...', scopes: ['source.coffee', 'keyword.operator.slice.exclusive.coffee']});
       expect(tokens[3]).toEqual({value: 'b', scopes: ['source.coffee']});
-      return expect(tokens[4]).toEqual({value: ']', scopes: ['source.coffee', 'punctuation.definition.array.end.bracket.square.coffee']});
+      expect(tokens[4]).toEqual({value: ']', scopes: ['source.coffee', 'punctuation.definition.array.end.bracket.square.coffee']});
   });
 });
 
@@ -657,13 +651,13 @@ Until here
     expect(source.search(/{,/)).toEqual(-1);
 
     source = fs.readFileSync(path.resolve(__dirname, '..', 'grammars', 'coffeescript (literate).cson'), 'utf8');
-    return expect(source.search(/{,/)).toEqual(-1);
+    expect(source.search(/{,/)).toEqual(-1);
   });
 
   it("tokenizes embedded JavaScript", function() {
     waitsForPromise(() => atom.packages.activatePackage("language-javascript"));
 
-    return runs(function() {
+    runs(function() {
       let {tokens} = grammar.tokenizeLine("`;`");
       expect(tokens[0]).toEqual({value: "`", scopes: ["source.coffee", "string.quoted.script.coffee", "punctuation.definition.string.begin.coffee"]});
       expect(tokens[1]).toEqual({value: ";", scopes: ["source.coffee", "string.quoted.script.coffee", "source.js.embedded.coffee", "punctuation.terminator.statement.js"]});
@@ -685,7 +679,7 @@ a = 2\
       expect(tokens[1]).toEqual({value: '//', scopes: ["source.coffee", "string.quoted.script.coffee", "source.js.embedded.coffee", "comment.line.double-slash.js", "punctuation.definition.comment.js"]});
       expect(tokens[2]).toEqual({value: ' comment', scopes: ["source.coffee", "string.quoted.script.coffee", "source.js.embedded.coffee", "comment.line.double-slash.js"]});
       expect(tokens[3]).toEqual({value: '`', scopes: ["source.coffee", "string.quoted.script.coffee", "punctuation.definition.string.end.coffee"]});
-      return expect(tokens[5]).toEqual({value: 'a', scopes: ["source.coffee", "variable.assignment.coffee"]});});
+      expect(tokens[5]).toEqual({value: 'a', scopes: ["source.coffee", "variable.assignment.coffee"]});});
 });
 
   describe("function calls", function() {
@@ -801,7 +795,7 @@ a = 2\
 
       ({tokens} = grammar.tokenizeLine("$ @$"));
       expect(tokens[0]).toEqual({value: "$", scopes: ["source.coffee", "meta.function-call.coffee", "entity.name.function.coffee"]});
-      return expect(tokens[2]).toEqual({value: "@$", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "variable.other.readwrite.instance.coffee"]});
+      expect(tokens[2]).toEqual({value: "@$", scopes: ["source.coffee", "meta.function-call.coffee", "meta.arguments.coffee", "variable.other.readwrite.instance.coffee"]});
   });
 
     it("tokenizes function calls when they are arguments", function() {
@@ -817,14 +811,14 @@ a = 2\
       ({tokens} = grammar.tokenizeLine('a b c'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.coffee', 'meta.function-call.coffee', 'entity.name.function.coffee']});
       expect(tokens[2]).toEqual({value: 'b', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'meta.function-call.coffee', 'entity.name.function.coffee']});
-      return expect(tokens[4]).toEqual({value: 'c', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee']});
+      expect(tokens[4]).toEqual({value: 'c', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee']});
   });
 
     it("tokenizes illegal function calls", function() {
       const {tokens} = grammar.tokenizeLine('0illegal()');
       expect(tokens[0]).toEqual({value: '0illegal', scopes: ['source.coffee', 'meta.function-call.coffee', 'invalid.illegal.identifier.coffee']});
       expect(tokens[1]).toEqual({value: '(', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'punctuation.definition.arguments.begin.bracket.round.coffee']});
-      return expect(tokens[2]).toEqual({value: ')', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'punctuation.definition.arguments.end.bracket.round.coffee']});
+      expect(tokens[2]).toEqual({value: ')', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'punctuation.definition.arguments.end.bracket.round.coffee']});
   });
 
     it("tokenizes illegal arguments", function() {
@@ -844,7 +838,7 @@ a = 2\
 
       ({tokens} = grammar.tokenizeLine('a 1a'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.coffee', 'meta.function-call.coffee', 'entity.name.function.coffee']});
-      return expect(tokens[2]).toEqual({value: '1a', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'invalid.illegal.identifier.coffee']});
+      expect(tokens[2]).toEqual({value: '1a', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'invalid.illegal.identifier.coffee']});
   });
 
     it("tokenizes function declaration as an argument", function() {
@@ -856,7 +850,7 @@ a = 2\
       expect(tokens[4]).toEqual({value: ')', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'meta.function.inline.coffee', 'meta.parameters.coffee', 'punctuation.definition.parameters.end.bracket.round.coffee']});
       expect(tokens[8]).toEqual({value: 'return', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'keyword.control.coffee']});
       expect(tokens[9]).toEqual({value: ' p ', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee']});
-      return expect(tokens[10]).toEqual({value: ')', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'punctuation.definition.arguments.end.bracket.round.coffee']});
+      expect(tokens[10]).toEqual({value: ')', scopes: ['source.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'punctuation.definition.arguments.end.bracket.round.coffee']});
   });
 
     it("does not tokenize booleans as function calls", function() {
@@ -868,14 +862,14 @@ a = 2\
       ({tokens} = grammar.tokenizeLine("true if false"));
       expect(tokens[0]).toEqual({value: "true", scopes: ["source.coffee", "constant.language.boolean.true.coffee"]});
       expect(tokens[2]).toEqual({value: "if", scopes: ["source.coffee", "keyword.control.coffee"]});
-      return expect(tokens[4]).toEqual({value: "false", scopes: ["source.coffee", "constant.language.boolean.false.coffee"]});
+      expect(tokens[4]).toEqual({value: "false", scopes: ["source.coffee", "constant.language.boolean.false.coffee"]});
   });
 
-    return it("does not tokenize comparison operators as function calls", function() {
+    it("does not tokenize comparison operators as function calls", function() {
       const {tokens} = grammar.tokenizeLine("if a is b");
       expect(tokens[1]).toEqual({value: " a ", scopes: ["source.coffee"]});
       expect(tokens[2]).toEqual({value: "is", scopes: ["source.coffee", "keyword.operator.comparison.coffee"]});
-      return expect(tokens[3]).toEqual({value: " b", scopes: ["source.coffee"]});
+      expect(tokens[3]).toEqual({value: " b", scopes: ["source.coffee"]});
   });
 });
 
@@ -970,10 +964,10 @@ a = 2\
       expect(tokens[35]).toEqual({value: "=", scopes: ["source.coffee", "meta.function.coffee", "meta.parameters.coffee", "keyword.operator.assignment.coffee"]});
       expect(tokens[37]).toEqual({value: "->", scopes: ["source.coffee", "meta.function.coffee", "meta.parameters.coffee", "meta.function.inline.coffee", "storage.type.function.coffee"]});
       expect(tokens[40]).toEqual({value: ")", scopes: ["source.coffee", "meta.function.coffee", "meta.parameters.coffee", "punctuation.definition.parameters.end.bracket.round.coffee"]});
-      return expect(tokens[42]).toEqual({value: "->", scopes: ["source.coffee", "meta.function.coffee", "storage.type.function.coffee"]});
+      expect(tokens[42]).toEqual({value: "->", scopes: ["source.coffee", "meta.function.coffee", "storage.type.function.coffee"]});
   });
 
-    return it("tokenizes inline functions", function() {
+    it("tokenizes inline functions", function() {
       let {tokens} = grammar.tokenizeLine("-> true");
       expect(tokens[0]).toEqual({value: "->", scopes: ["source.coffee", "meta.function.inline.coffee", "storage.type.function.coffee"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.coffee"]});
@@ -1015,7 +1009,7 @@ a = 2\
       expect(tokens[6]).toEqual({value: " ", scopes: ["source.coffee", "meta.function.inline.coffee", "meta.parameters.coffee"]});
       expect(tokens[7]).toEqual({value: ")", scopes: ["source.coffee", "meta.function.inline.coffee", "meta.parameters.coffee", "punctuation.definition.parameters.end.bracket.round.coffee"]});
       expect(tokens[8]).toEqual({value: "->", scopes: ["source.coffee", "meta.function.inline.coffee", "storage.type.function.coffee"]});
-      return expect(tokens[9]).toEqual({value: " ", scopes: ["source.coffee"]});
+      expect(tokens[9]).toEqual({value: " ", scopes: ["source.coffee"]});
   });
 });
 
@@ -1098,7 +1092,7 @@ a = 2\
     expect(tokens[1]).toEqual({value: '.', scopes: ['source.coffee', 'meta.method-call.coffee', 'punctuation.separator.method.period.coffee']});
     expect(tokens[2]).toEqual({value: 'b', scopes: ['source.coffee', 'meta.method-call.coffee', 'entity.name.function.coffee']});
     expect(tokens[3]).toEqual({value: ' ', scopes: ['source.coffee', 'meta.method-call.coffee']});
-    return expect(tokens[4]).toEqual({value: '@$', scopes: ['source.coffee', 'meta.method-call.coffee', 'meta.arguments.coffee', 'variable.other.readwrite.instance.coffee']});
+    expect(tokens[4]).toEqual({value: '@$', scopes: ['source.coffee', 'meta.method-call.coffee', 'meta.arguments.coffee', 'variable.other.readwrite.instance.coffee']});
 }));
 
   describe("destructuring assignments", function() {
@@ -1124,7 +1118,7 @@ a = 2\
 
       ({tokens} = grammar.tokenizeLine("{'} ='}")); // Make sure this *isn't* tokenized as a destructuring assignment
       expect(tokens[0]).not.toEqual({value: "{", scopes: ["source.coffee", "meta.variable.assignment.destructured.object.coffee", "punctuation.definition.destructuring.begin.bracket.curly.coffee"]});
-      return expect(tokens[0]).toEqual({value: "{", scopes: ["source.coffee", "meta.brace.curly.coffee"]});
+      expect(tokens[0]).toEqual({value: "{", scopes: ["source.coffee", "meta.brace.curly.coffee"]});
   });
 
     it("tokenizes nested destructuring assignments", function() {
@@ -1136,7 +1130,7 @@ a = 2\
       expect(tokens[17]).toEqual({value: "}", scopes: ["source.coffee", "meta.variable.assignment.destructured.object.coffee", "meta.variable.assignment.destructured.object.coffee", "punctuation.definition.destructuring.end.bracket.curly.coffee"]});
       expect(tokens[18]).toEqual({value: "}", scopes: ["source.coffee", "meta.variable.assignment.destructured.object.coffee", "punctuation.definition.destructuring.end.bracket.curly.coffee"]});
       expect(tokens[19]).toEqual({value: " ", scopes: ["source.coffee"]});
-      return expect(tokens[20]).toEqual({value: "=", scopes: ["source.coffee", "keyword.operator.assignment.coffee"]});
+      expect(tokens[20]).toEqual({value: "=", scopes: ["source.coffee", "keyword.operator.assignment.coffee"]});
   });
 
     it("tokenizes multiple nested destructuring assignments", function() {
@@ -1148,13 +1142,13 @@ a = 2\
       expect(tokens[20]).toEqual({value: "}", scopes: ["source.coffee", "meta.variable.assignment.destructured.object.coffee", "meta.variable.assignment.destructured.object.coffee", "punctuation.definition.destructuring.end.bracket.curly.coffee"]});
       expect(tokens[21]).toEqual({value: "}", scopes: ["source.coffee", "meta.variable.assignment.destructured.object.coffee", "punctuation.definition.destructuring.end.bracket.curly.coffee"]});
       expect(tokens[22]).toEqual({value: " ", scopes: ["source.coffee"]});
-      return expect(tokens[23]).toEqual({value: "=", scopes: ["source.coffee", "keyword.operator.assignment.coffee"]});
+      expect(tokens[23]).toEqual({value: "=", scopes: ["source.coffee", "keyword.operator.assignment.coffee"]});
   });
 
-    return it("doesn't tokenize nested brackets as destructuring assignments", function() {
+    it("doesn't tokenize nested brackets as destructuring assignments", function() {
       const {tokens} = grammar.tokenizeLine("[Point(0, 1), [Point(0, 0), Point(0, 1)]]");
       expect(tokens[0]).not.toEqual({value: "[", scopes: ["source.coffee", "meta.variable.assignment.destructured.array.coffee", "punctuation.definition.destructuring.begin.bracket.square.coffee"]});
-      return expect(tokens[0]).toEqual({value: "[", scopes: ["source.coffee", "punctuation.definition.array.begin.bracket.square.coffee"]});
+      expect(tokens[0]).toEqual({value: "[", scopes: ["source.coffee", "punctuation.definition.array.begin.bracket.square.coffee"]});
   });
 });
 
@@ -1163,7 +1157,7 @@ a = 2\
     expect(tokens[0]).toEqual({value: "return", scopes: ["source.coffee", "keyword.control.coffee"]});
     expect(tokens[2]).toEqual({value: "0", scopes: ["source.coffee", "constant.numeric.decimal.coffee"]});
     expect(tokens[4]).toEqual({value: "unless", scopes: ["source.coffee", "keyword.control.coffee"]});
-    return expect(tokens[6]).toEqual({value: "true", scopes: ["source.coffee", "constant.language.boolean.true.coffee"]});
+    expect(tokens[6]).toEqual({value: "true", scopes: ["source.coffee", "constant.language.boolean.true.coffee"]});
 });
 
   describe("for loops", function() {
@@ -1172,7 +1166,7 @@ a = 2\
       expect(tokens[0]).toEqual({value: "for", scopes: ["source.coffee", "keyword.control.coffee"]});
       expect(tokens[1]).toEqual({value: " food ", scopes: ["source.coffee"]});
       expect(tokens[2]).toEqual({value: "in", scopes: ["source.coffee", "keyword.control.coffee"]});
-      return expect(tokens[3]).toEqual({value: " foods", scopes: ["source.coffee"]});
+      expect(tokens[3]).toEqual({value: " foods", scopes: ["source.coffee"]});
   });
 
     it("tokenizes for-of loops", function() {
@@ -1182,7 +1176,7 @@ a = 2\
       expect(tokens[2]).toEqual({value: ",", scopes: ["source.coffee", "punctuation.separator.delimiter.coffee"]});
       expect(tokens[3]).toEqual({value: " type ", scopes: ["source.coffee"]});
       expect(tokens[4]).toEqual({value: "of", scopes: ["source.coffee", "keyword.control.coffee"]});
-      return expect(tokens[5]).toEqual({value: " foods", scopes: ["source.coffee"]});
+      expect(tokens[5]).toEqual({value: " foods", scopes: ["source.coffee"]});
   });
 
     it("tokenizes loops using arrays", function() {
@@ -1192,7 +1186,7 @@ a = 2\
       expect(tokens[2]).toEqual({value: "in", scopes: ["source.coffee", "keyword.control.coffee"]});
       expect(tokens[3]).toEqual({value: " ", scopes: ["source.coffee"]});
       expect(tokens[4]).toEqual({value: "[", scopes: ["source.coffee", "punctuation.definition.array.begin.bracket.square.coffee"]});
-      return expect(tokens[18]).toEqual({value: "]", scopes: ["source.coffee", "punctuation.definition.array.end.bracket.square.coffee"]});
+      expect(tokens[18]).toEqual({value: "]", scopes: ["source.coffee", "punctuation.definition.array.end.bracket.square.coffee"]});
   });
 
     it("tokenizes loops using the optional `when` keyword", function() {
@@ -1202,17 +1196,17 @@ a = 2\
       expect(tokens[4]).toEqual({value: "when", scopes: ["source.coffee", "keyword.control.coffee"]});
       expect(tokens[5]).toEqual({value: " food ", scopes: ["source.coffee"]});
       expect(tokens[6]).toEqual({value: "isnt", scopes: ["source.coffee", "keyword.operator.comparison.coffee"]});
-      return expect(tokens[7]).toEqual({value: " chocolate", scopes: ["source.coffee"]});
+      expect(tokens[7]).toEqual({value: " chocolate", scopes: ["source.coffee"]});
   });
 
-    return it("tokenizes loops using the optional `by` keyword", function() {
+    it("tokenizes loops using the optional `by` keyword", function() {
       const {tokens} = grammar.tokenizeLine("for food in foods by -1");
       expect(tokens[0]).toEqual({value: "for", scopes: ["source.coffee", "keyword.control.coffee"]});
       expect(tokens[3]).toEqual({value: " foods ", scopes: ["source.coffee"]});
       expect(tokens[4]).toEqual({value: "by", scopes: ["source.coffee", "keyword.control.coffee"]});
       expect(tokens[5]).toEqual({value: " ", scopes: ["source.coffee"]});
       expect(tokens[6]).toEqual({value: "-", scopes: ["source.coffee", "keyword.operator.coffee"]});
-      return expect(tokens[7]).toEqual({value: "1", scopes: ["source.coffee", "constant.numeric.decimal.coffee"]});
+      expect(tokens[7]).toEqual({value: "1", scopes: ["source.coffee", "constant.numeric.decimal.coffee"]});
   });
 });
 
@@ -1235,14 +1229,14 @@ a = 2\
       expect(tokens[2]).toEqual({value: " ", scopes: ["source.coffee"]});
       expect(tokens[3]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.begin.coffee"]});
       expect(tokens[4]).toEqual({value: "test", scopes: ["source.coffee", "string.regexp.coffee"]});
-      return expect(tokens[5]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
+      expect(tokens[5]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
   });
 
     it("tokenizes regular expressions containing spaces", function() {
       const {tokens} = grammar.tokenizeLine("/ te st /");
       expect(tokens[0]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.begin.coffee"]});
       expect(tokens[1]).toEqual({value: " te st ", scopes: ["source.coffee", "string.regexp.coffee"]});
-      return expect(tokens[2]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
+      expect(tokens[2]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
   });
 
     it("tokenizes regular expressions containing escaped forward slashes", function() {
@@ -1259,7 +1253,7 @@ a = 2\
       expect(tokens[3]).toEqual({value: "two!", scopes: ["source.coffee", "string.regexp.coffee"]});
       expect(tokens[4]).toEqual({value: "\\/", scopes: ["source.coffee", "string.regexp.coffee", "constant.character.escape.backslash.regexp"]});
       expect(tokens[5]).toEqual({value: "three", scopes: ["source.coffee", "string.regexp.coffee"]});
-      return expect(tokens[6]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
+      expect(tokens[6]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
   });
 
     it("tokenizes regular expressions inside arrays", function() {
@@ -1278,7 +1272,7 @@ a = 2\
       expect(tokens[4]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.begin.coffee"]});
       expect(tokens[5]).toEqual({value: "test", scopes: ["source.coffee", "string.regexp.coffee"]});
       expect(tokens[6]).toEqual({value: "/", scopes: ["source.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
-      return expect(tokens[7]).toEqual({value: "]", scopes: ["source.coffee", "punctuation.definition.array.end.bracket.square.coffee"]});
+      expect(tokens[7]).toEqual({value: "]", scopes: ["source.coffee", "punctuation.definition.array.end.bracket.square.coffee"]});
   });
 
     it("does not tokenize multiple division as regex", function() {
@@ -1291,7 +1285,7 @@ a = 2\
       ({tokens} = grammar.tokenizeLine("a / 2 / (3)"));
       expect(tokens[1]).toEqual({value: "/", scopes: ["source.coffee", "keyword.operator.coffee"]});
       expect(tokens[3]).toEqual({value: "2", scopes: ["source.coffee", "constant.numeric.decimal.coffee"]});
-      return expect(tokens[5]).toEqual({value: "/", scopes: ["source.coffee", "keyword.operator.coffee"]});
+      expect(tokens[5]).toEqual({value: "/", scopes: ["source.coffee", "keyword.operator.coffee"]});
   });
 
     it("does not tokenize comments with URLs in them as regex", function() {
@@ -1299,7 +1293,7 @@ a = 2\
       const {tokens} = grammar.tokenizeLine("canvas.width/2 # https://github.com/atom/language-coffee-script/issues/112");
       expect(tokens[3]).toEqual({value: "/", scopes: ["source.coffee", "keyword.operator.coffee"]});
       expect(tokens[6]).toEqual({value: "#", scopes: ["source.coffee", "comment.line.number-sign.coffee", "punctuation.definition.comment.coffee"]});
-      return expect(tokens[7]).toEqual({value: " https://github.com/atom/language-coffee-script/issues/112", scopes: ["source.coffee", "comment.line.number-sign.coffee"]});
+      expect(tokens[7]).toEqual({value: " https://github.com/atom/language-coffee-script/issues/112", scopes: ["source.coffee", "comment.line.number-sign.coffee"]});
   });
 
     it("stops tokenizing regex at the first non-escaped forwards slash", function() {
@@ -1312,10 +1306,10 @@ a = 2\
       expect(tokens[4]).toEqual({value: "/", scopes: ["source.coffee", "meta.method-call.coffee", "meta.arguments.coffee", "string.regexp.coffee", "punctuation.definition.string.begin.coffee"]});
       expect(tokens[6]).toEqual({value: "\\/", scopes: ["source.coffee", "meta.method-call.coffee", "meta.arguments.coffee", "string.regexp.coffee", "constant.character.escape.backslash.regexp"]});
       expect(tokens[7]).toEqual({value: "/", scopes: ["source.coffee", "meta.method-call.coffee", "meta.arguments.coffee", "string.regexp.coffee", "punctuation.definition.string.end.coffee"]});
-      return expect(tokens[12]).toEqual({value: "/", scopes: ["source.coffee", "meta.method-call.coffee", "meta.arguments.coffee", "string.quoted.single.coffee"]});
+      expect(tokens[12]).toEqual({value: "/", scopes: ["source.coffee", "meta.method-call.coffee", "meta.arguments.coffee", "string.quoted.single.coffee"]});
   });
 
-    return it("tokenises multi-line regular expressions", function() {
+    it("tokenises multi-line regular expressions", function() {
       const {tokens} = grammar.tokenizeLine('/// (XYZ) ///');
       expect(tokens[0]).toEqual({value: '///', scopes: ['source.coffee', 'string.regexp.multiline.coffee', 'punctuation.definition.string.begin.coffee']});
       expect(tokens[2]).toEqual({value: '(', scopes: ['source.coffee', 'string.regexp.multiline.coffee', 'meta.group.regexp', 'punctuation.definition.group.regexp']});
@@ -1333,7 +1327,7 @@ XYZ //
       expect(lines[0][0]).toEqual({value: '///', scopes: ['source.coffee', 'string.regexp.multiline.coffee', 'punctuation.definition.string.begin.coffee']});
       expect(lines[1][0]).toEqual({value: 'XYZ //', scopes: ['source.coffee', 'string.regexp.multiline.coffee']});
       expect(lines[2][0]).toEqual({value: '/~/', scopes: ['source.coffee', 'string.regexp.multiline.coffee']});
-      return expect(lines[3][0]).toEqual({value: '///', scopes: ['source.coffee', 'string.regexp.multiline.coffee', 'punctuation.definition.string.end.coffee']});
+      expect(lines[3][0]).toEqual({value: '///', scopes: ['source.coffee', 'string.regexp.multiline.coffee', 'punctuation.definition.string.end.coffee']});
   });
 });
 
@@ -1354,10 +1348,10 @@ XYZ ''
       expect(lines[0][0]).toEqual({value: "'''", scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee', 'punctuation.definition.string.begin.coffee']});
       expect(lines[1][0]).toEqual({value: "'ABC'", scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee']});
       expect(lines[2][0]).toEqual({value: "XYZ ''", scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee']});
-      return expect(lines[3][0]).toEqual({value: "'''", scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee', 'punctuation.definition.string.end.coffee']});
+      expect(lines[3][0]).toEqual({value: "'''", scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee', 'punctuation.definition.string.end.coffee']});
   });
 
-    return it("tokenises double-quoted here-docs", function() {
+    it("tokenises double-quoted here-docs", function() {
       const {tokens} = grammar.tokenizeLine("'''XYZ'''");
       expect(tokens[0]).toEqual({value: "'''", scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee', 'punctuation.definition.string.begin.coffee']});
       expect(tokens[1]).toEqual({value: 'XYZ', scopes: ['source.coffee', 'string.quoted.single.heredoc.coffee']});
@@ -1373,7 +1367,7 @@ XYZ ""
       expect(lines[0][0]).toEqual({value: '"""', scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee', 'punctuation.definition.string.begin.coffee']});
       expect(lines[1][0]).toEqual({value: '"ABC"', scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee']});
       expect(lines[2][0]).toEqual({value: 'XYZ ""', scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee']});
-      return expect(lines[3][0]).toEqual({value: '"""', scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee', 'punctuation.definition.string.end.coffee']});
+      expect(lines[3][0]).toEqual({value: '"""', scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee', 'punctuation.definition.string.end.coffee']});
   });
 });
 
@@ -1402,10 +1396,10 @@ XYZ ""
       expect(tokens[6]).toEqual({value: 'a', scopes: ['source.coffee', 'string.quoted.double.coffee', 'constant.character.escape.backslash.coffee']});
       expect(tokens[7]).toEqual({value: '\\', scopes: ['source.coffee', 'string.quoted.double.coffee', 'constant.character.escape.backslash.coffee', 'punctuation.definition.escape.backslash.coffee']});
       expect(tokens[8]).toEqual({value: 'b', scopes: ['source.coffee', 'string.quoted.double.coffee', 'constant.character.escape.backslash.coffee']});
-      return expect(tokens[9]).toEqual({value: '"', scopes: ['source.coffee', 'string.quoted.double.coffee', 'punctuation.definition.string.end.coffee']});
+      expect(tokens[9]).toEqual({value: '"', scopes: ['source.coffee', 'string.quoted.double.coffee', 'punctuation.definition.string.end.coffee']});
   });
 
-    return it("tokenises leading backslashes in single-quoted strings", function() {
+    it("tokenises leading backslashes in single-quoted strings", function() {
       let {tokens} = grammar.tokenizeLine("'a\\\\b\\\\\\\\c'");
       expect(tokens[0]).toEqual({value: "'", scopes: ['source.coffee', 'string.quoted.single.coffee', 'punctuation.definition.string.begin.coffee']});
       expect(tokens[1]).toEqual({value: 'a', scopes: ['source.coffee', 'string.quoted.single.coffee']});
@@ -1429,7 +1423,7 @@ XYZ ""
       expect(tokens[6]).toEqual({value: 'a', scopes: ['source.coffee', 'string.quoted.single.coffee', 'constant.character.escape.backslash.coffee']});
       expect(tokens[7]).toEqual({value: '\\', scopes: ['source.coffee', 'string.quoted.single.coffee', 'constant.character.escape.backslash.coffee', 'punctuation.definition.escape.backslash.coffee']});
       expect(tokens[8]).toEqual({value: 'b', scopes: ['source.coffee', 'string.quoted.single.coffee', 'constant.character.escape.backslash.coffee']});
-      return expect(tokens[9]).toEqual({value: "'", scopes: ['source.coffee', 'string.quoted.single.coffee', 'punctuation.definition.string.end.coffee']});
+      expect(tokens[9]).toEqual({value: "'", scopes: ['source.coffee', 'string.quoted.single.coffee', 'punctuation.definition.string.end.coffee']});
   });
 });
 
@@ -1446,7 +1440,7 @@ XYZ ""
       ({tokens} = grammar.tokenizeLine("<div/>"));
       expect(tokens[0]).toEqual({value: '<', scopes: ['source.coffee', 'meta.tag.coffee', 'punctuation.definition.tag.coffee']});
       expect(tokens[1]).toEqual({value: 'div', scopes: ['source.coffee', 'meta.tag.coffee', 'entity.name.tag.coffee' ]});
-      return expect(tokens[2]).toEqual({value: '/>', scopes: ['source.coffee', 'meta.tag.coffee' ]});
+      expect(tokens[2]).toEqual({value: '/>', scopes: ['source.coffee', 'meta.tag.coffee' ]});
   });
 
     it("tokenises HTML tags with attributes", function() {
@@ -1465,10 +1459,10 @@ XYZ ""
       expect(tokens[11]).toEqual({value: '"', scopes: ['source.coffee', 'meta.tag.coffee', 'string.quoted.double.coffee', 'punctuation.definition.string.begin.coffee' ]});
       expect(tokens[12]).toEqual({value: 'myid', scopes: ['source.coffee', 'meta.tag.coffee', 'string.quoted.double.coffee' ]});
       expect(tokens[13]).toEqual({value: '"', scopes: ['source.coffee', 'meta.tag.coffee', 'string.quoted.double.coffee', 'punctuation.definition.string.end.coffee' ]});
-      return expect(tokens[14]).toEqual({value: '>', scopes: ['source.coffee', 'meta.tag.coffee' ]});
+      expect(tokens[14]).toEqual({value: '>', scopes: ['source.coffee', 'meta.tag.coffee' ]});
   });
 
-    return it("tokenises HTML tags with attributes that have expressions", function() {
+    it("tokenises HTML tags with attributes that have expressions", function() {
       const {tokens} = grammar.tokenizeLine("<div on-click={(e)->@handleClick(e)}>");
       expect(tokens[0]).toEqual({value: '<', scopes: ['source.coffee', 'meta.tag.coffee', 'punctuation.definition.tag.coffee']});
       expect(tokens[1]).toEqual({value: 'div', scopes: ['source.coffee', 'meta.tag.coffee', 'entity.name.tag.coffee' ]});
@@ -1486,11 +1480,11 @@ XYZ ""
       expect(tokens[13]).toEqual({value: 'e', scopes: ['source.coffee', 'meta.tag.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee' ]});
       expect(tokens[14]).toEqual({value: ')', scopes: ['source.coffee', 'meta.tag.coffee', 'meta.function-call.coffee', 'meta.arguments.coffee', 'punctuation.definition.arguments.end.bracket.round.coffee' ]});
       expect(tokens[15]).toEqual({value: '}', scopes: ['source.coffee', 'meta.tag.coffee', 'meta.brace.curly.coffee']});
-      return expect(tokens[16]).toEqual({value: '>', scopes: ['source.coffee', 'meta.tag.coffee']});
+      expect(tokens[16]).toEqual({value: '>', scopes: ['source.coffee', 'meta.tag.coffee']});
   });
 });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -1574,7 +1568,7 @@ XYZ ""
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=coffee:

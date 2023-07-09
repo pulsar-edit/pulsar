@@ -1,22 +1,16 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("CoffeeScript (Literate) grammar", function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage("language-coffee-script"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.litcoffee"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.litcoffee"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("source.litcoffee");
+    expect(grammar.scopeName).toBe("source.litcoffee");
   });
 
   it("recognizes a code block after a list", function() {
@@ -27,10 +21,10 @@ describe("CoffeeScript (Literate) grammar", function() {
     1 + 2\
 `
     );
-    return expect(tokens[3][1]).toEqual({value: "1", scopes: ["source.litcoffee", "markup.raw.block.markdown", "constant.numeric.decimal.coffee"]});
+    expect(tokens[3][1]).toEqual({value: "1", scopes: ["source.litcoffee", "markup.raw.block.markdown", "constant.numeric.decimal.coffee"]});
 });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -101,7 +95,7 @@ describe("CoffeeScript (Literate) grammar", function() {
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=litcoffee:
