@@ -1,11 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__, or convert again using --optional-chaining
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
 const COMPLETIONS = require('../completions.json');
 
 const firstInlinePropertyNameWithColonPattern = /{\s*(\S+)\s*:/; // .example { display: }
@@ -49,7 +41,7 @@ module.exports = {
 
     if (!isSass && this.isCompletingTagSelector(request)) {
       const tagCompletions = this.getTagCompletions(request);
-      if (tagCompletions != null ? tagCompletions.length : undefined) {
+      if (tagCompletions?.length) {
         if (completions == null) { completions = []; }
         completions = completions.concat(tagCompletions);
       }
@@ -194,7 +186,8 @@ module.exports = {
 
   getImportantPrefix(editor, bufferPosition) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return __guard__(importantPrefixPattern.exec(line), x => x[1]);
+    let importantPrefixPatternExec = importantPrefixPattern.exec(line);
+    return (typeof importantPrefixPatternExec !== "undefined" && importantPrefixPatternExec !== null) ? importantPrefixPatternExec[1] : undefined;
   },
 
   getPreviousPropertyName(bufferPosition, editor) {
@@ -202,9 +195,13 @@ module.exports = {
     while (row >= 0) {
       let line = editor.lineTextForBufferRow(row);
       if (row === bufferPosition.row) { line = line.substr(0, column); }
-      let propertyName = __guard__(inlinePropertyNameWithColonPattern.exec(line), x => x[1]);
-      if (propertyName == null) { propertyName = __guard__(firstInlinePropertyNameWithColonPattern.exec(line), x1 => x1[1]); }
-      if (propertyName == null) { propertyName = __guard__(propertyNameWithColonPattern.exec(line), x2 => x2[1]); }
+      let propertyName = (typeof inlinePropertyNameWithColonPattern.exec(line) !== "undefined" && inlinePropertyNameWithColonPattern.exec(line) !== null) ? inlinePropertyNameWithColonPattern.exec(line)[1] : undefined;
+      if (propertyName == null) {
+        propertyName = (typeof firstInlinePropertyNameWithColonPattern.exec(line) !== "undefined" && firstInlinePropertyNameWithColonPattern.exec(line) !== null) ? firstInlinePropertyNameWithColonPattern.exec(line)[1] : undefined;
+      }
+      if (propertyName == null) {
+        propertyName = (typeof propertyNameWithColonPattern.exec(line) !== "undefined" && propertyNameWithColonPattern.exec(line) !== null) ? propertyNameWithColonPattern.exec(line)[1] : undefined;
+      }
       if (propertyName) { return propertyName; }
       row--;
     }
@@ -263,7 +260,7 @@ module.exports = {
 
   getPropertyNamePrefix(bufferPosition, editor) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return __guard__(propertyNamePrefixPattern.exec(line), x => x[0]);
+    return (typeof propertyNamePrefixPattern.exec(line) !== "undefined" && propertyNamePrefixPattern.exec(line) !== null) propertyNamePrefixPattern.exec(line)[0] ? undefined;
   },
 
   getPropertyNameCompletions({bufferPosition, editor, scopeDescriptor, activatedManually}) {
@@ -298,7 +295,7 @@ module.exports = {
 
   getPseudoSelectorPrefix(editor, bufferPosition) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return __guard__(line.match(pseudoSelectorPrefixPattern), x => x[0]);
+    return (typeof line.match(pseudoSelectorPrefixPattern) !== "undefined" && line.match(pseudoSelectorPrefixPattern) !== null) line.match(pseudoSelectorPrefixPattern)[0] ? undefined;
   },
 
   getPseudoSelectorCompletions({bufferPosition, editor}) {
@@ -333,7 +330,7 @@ module.exports = {
 
   getTagSelectorPrefix(editor, bufferPosition) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return __guard__(tagSelectorPrefixPattern.exec(line), x => x[2]);
+    return (typeof tagSelectorPrefixPattern.exec(line) !== "undefined" && tagSelectorPrefixPattern.exec(line) !== null) tagSelectorPrefixPattern.exec(line)[2] ? undefined;
   },
 
   getTagCompletions({bufferPosition, editor, prefix}) {
@@ -357,7 +354,7 @@ module.exports = {
   }
 };
 
-var lineEndsWithSemicolon = function(bufferPosition, editor) {
+const lineEndsWithSemicolon = function(bufferPosition, editor) {
   const {row} = bufferPosition;
   const line = editor.lineTextForBufferRow(row);
   return /;\s*$/.test(line);
@@ -367,7 +364,7 @@ var lineEndsWithSemicolon = function(bufferPosition, editor) {
 // given string, or is the given string exactly. Can optionally include a list
 // of final path segments for checking against multiple of css/sass/less/postcss
 // at once.
-var hasScope = function(scopesArray, scope, endsWith = null) {
+const hasScope = function(scopesArray, scope, endsWith = null) {
   if (endsWith && (typeof endsWith === 'string')) {
     endsWith = [endsWith];
   }
@@ -380,8 +377,4 @@ var hasScope = function(scopesArray, scope, endsWith = null) {
   }
 };
 
-var firstCharsEqual = (str1, str2) => str1[0].toLowerCase() === str2[0].toLowerCase();
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}
+const firstCharsEqual = (str1, str2) => str1[0].toLowerCase() === str2[0].toLowerCase();
