@@ -538,6 +538,31 @@ describe('ScopeResolver', () => {
       })).toBe(true);
     });
 
+    it('supports onlyIfDescendantOfType (multiple values)', async () => {
+      await grammar.setQueryForTest('highlightsQuery', `
+        ("," @comma-inside-function
+          (#set! test.onlyIfDescendantOfType "function_declaration generator_function_declaration"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        let foo, bar, baz;
+        function foo (one, two, three) {}
+        function* bar(one, two, three) {}
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      expect(matched.length).toBe(4);
+      expect(matched.every((cap, index) => {
+        let expectedRow = index >= 2 ? 2 : 1;
+        return cap.node.startPosition.row === expectedRow;
+      })).toBe(true);
+    });
+
+
     it('supports onlyIfAncestorOfType', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @function-with-semicolons
@@ -558,6 +583,32 @@ describe('ScopeResolver', () => {
 
       expect(matched.length).toBe(1);
       expect(matched[0].node.text.includes("function bar")).toBe(true);
+    });
+
+    it('supports onlyIfAncestorOfType (multiple values)', async () => {
+      await grammar.setQueryForTest('highlightsQuery', `
+        ((function_declaration) @function-with-semicolons-or-booleans
+          (#set! test.onlyIfAncestorOfType "; false"))
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      buffer.setText(dedent`
+        function foo () {}
+        function bar () {
+          console.log(false);
+        }
+        function baz () {
+          console.log(false)
+        }
+      `);
+      await languageMode.ready;
+
+      let matched = await getAllMatches(grammar, languageMode);
+
+      expect(matched.length).toBe(2);
+      expect(matched[0].node.text.includes("function ba")).toBe(true);
+      expect(matched[1].node.text.includes("function ba")).toBe(true);
     });
 
     it('supports onlyIfDescendantOfNodeWithData (without value)', async () => {

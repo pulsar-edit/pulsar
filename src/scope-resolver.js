@@ -216,9 +216,7 @@ class ScopeResolver {
   }
 
   applyTest(prop, ...args) {
-    // console.log('testing prop:', prop);
     prop = this.normalizeTestProperty(prop);
-    // console.log('now prop:', prop);
     return ScopeResolver.TESTS[prop](...args);
   }
 
@@ -593,12 +591,16 @@ ScopeResolver.TESTS = {
     return !isFirstTextOnRow;
   },
 
-  // Passes if this node has a node of the given type in its ancestor chain.
+  // Passes if this node has any node of the given type(s) in its ancestor
+  // chain.
   onlyIfDescendantOfType(node, type) {
+    let multiple = type.includes(' ');
+    let target = multiple ? type.split(/\s+/) : type;
     let current = node;
     while (current.parent) {
       current = current.parent;
-      if (current.type === type) { return true; }
+      if (multiple && target.includes(current.type)) { return true; }
+      else if (!multiple && target === current.type) { return true; }
     }
     return false;
   },
@@ -609,16 +611,17 @@ ScopeResolver.TESTS = {
     return !isDescendantOfType;
   },
 
-  // Passes if this node has at least one descendant of the given type.
+  // Passes if this node has at least one descendant of the given type(s).
   onlyIfAncestorOfType(node, type) {
-    let descendants = node.descendantsOfType(type);
+    let target = type.includes(' ') ? type.split(/\s+/) : type;
+    let descendants = node.descendantsOfType(target);
     return descendants.length > 0;
   },
 
   // Negates `onlyIfAncestorOfType`.
-  onlyIfNotAncestorOfType(node, type) {
-    let descendants = node.descendantsOfType(type);
-    return descendants.length === 0;
+  onlyIfNotAncestorOfType(...args) {
+    let isAncestorOfType = ScopeResolver.TESTS.onlyIfAncestorOfType(...args);
+    return !isAncestorOfType;
   },
 
   // Passes if this range (after adjustments) has previously had data stored at
