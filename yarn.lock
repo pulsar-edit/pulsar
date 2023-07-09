@@ -2341,15 +2341,15 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "2.42.6"
   dependencies:
     atom-slick "^2.0.0"
-    dompurify "^2.2.6"
+    dompurify "^3.0.4"
     fuzzaldrin "^2.1.0"
     fuzzaldrin-plus "^0.6.0"
     grim "^2.0.1"
-    marked "5.0.3"
+    marked "^5.1.1"
     minimatch "^3.0.3"
-    selector-kit "^0.1"
-    stable "^0.1.5"
-    underscore-plus "^1.6.6"
+    selector-kit "^0.1.0"
+    stable "^0.1.8"
+    underscore-plus "^1.7.0"
 
 "autocomplete-snippets@file:packages/autocomplete-snippets":
   version "1.12.1"
@@ -3794,10 +3794,10 @@ dompurify@^2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.1.tgz#f9cb1a275fde9af6f2d0a2644ef648dd6847b631"
   integrity sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==
 
-dompurify@^2.2.6:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.3.tgz#f4133af0e6a50297fc8874e2eaedc13a3c308c03"
-  integrity sha512-q6QaLcakcRjebxjg8/+NP+h0rPfatOgOzc46Fst9VAA3jF2ApfKBNKMzdP4DYTqtUMXSCd5pRS/8Po/OmoCHZQ==
+dompurify@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.4.tgz#963116d05c94ee42f8353a3690f935475d8cd2f7"
+  integrity sha512-ae0mA+Qiqp6C29pqZX3fQgK+F91+F7wobM/v8DRzDqJdZJELXiFUx4PP4pK/mzUS0xkiSEx3Ncd9gr69jg3YsQ==
 
 domutils@^3.0.1:
   version "3.0.1"
@@ -6621,6 +6621,11 @@ marked@^4.2.3:
   resolved "https://registry.yarnpkg.com/marked/-/marked-4.2.5.tgz#979813dfc1252cc123a79b71b095759a32f42a5d"
   integrity sha512-jPueVhumq7idETHkb203WDD4fMA3yV9emQ5vLwop58lu8bTclMghBWcYAavlDqIEMaisADinV1TooIFCfqOsYQ==
 
+marked@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-5.1.1.tgz#40b3963bb9da225314f746d5012ba7e34942f636"
+  integrity sha512-bTmmGdEINWmOMDjnPWDxGPQ4qkDLeYorpYbEtFOXzOruTwUE671q4Guiuchn4N8h/v6NGd7916kXsm3Iz4iUSg==
+
 marky@^1.2.2:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/marky/-/marky-1.2.5.tgz#55796b688cbd72390d2d399eaaf1832c9413e3c0"
@@ -8371,7 +8376,7 @@ season@^6.0.2:
     underscore-plus "^1"
     vscode-oniguruma "^1.7.0"
 
-selector-kit@^0.1:
+selector-kit@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/selector-kit/-/selector-kit-0.1.0.tgz#304338fceccea35ec28ffaddb792ab7715633e6f"
   integrity sha512-kEXwqTtiflFXHndlRhKdKAw3zPMv4/tXGT13KbWVqIVSZ7qruHrZVHwoqgzGkTWx/lipjjWpIyF5+BeRov30dA==
@@ -8747,7 +8752,7 @@ ssri@^8.0.0, ssri@^8.0.1:
   dependencies:
     minipass "^3.1.1"
 
-stable@^0.1.5:
+stable@^0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/stable/-/stable-0.1.8.tgz#836eb3c8382fe2936feaf544631017ce7d47a3cf"
   integrity sha512-ji9qxRnOVfcuLDySj9qzhGSEFVobyt1kIOSkj1qZzYLzq7Tos/oUUWvotUPQLlrsidqsK6tBH89Bc9kL5zHA6w==
