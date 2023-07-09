@@ -260,7 +260,7 @@ module.exports = {
 
   getPropertyNamePrefix(bufferPosition, editor) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return (typeof propertyNamePrefixPattern.exec(line) !== "undefined" && propertyNamePrefixPattern.exec(line) !== null) propertyNamePrefixPattern.exec(line)[0] ? undefined;
+    return (typeof propertyNamePrefixPattern.exec(line) !== "undefined" && propertyNamePrefixPattern.exec(line) !== null) ? propertyNamePrefixPattern.exec(line)[0] : undefined;
   },
 
   getPropertyNameCompletions({bufferPosition, editor, scopeDescriptor, activatedManually}) {
@@ -295,7 +295,7 @@ module.exports = {
 
   getPseudoSelectorPrefix(editor, bufferPosition) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return (typeof line.match(pseudoSelectorPrefixPattern) !== "undefined" && line.match(pseudoSelectorPrefixPattern) !== null) line.match(pseudoSelectorPrefixPattern)[0] ? undefined;
+    return (typeof line.match(pseudoSelectorPrefixPattern) !== "undefined" && line.match(pseudoSelectorPrefixPattern) !== null) ? line.match(pseudoSelectorPrefixPattern)[0] : undefined;
   },
 
   getPseudoSelectorCompletions({bufferPosition, editor}) {
@@ -330,7 +330,7 @@ module.exports = {
 
   getTagSelectorPrefix(editor, bufferPosition) {
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-    return (typeof tagSelectorPrefixPattern.exec(line) !== "undefined" && tagSelectorPrefixPattern.exec(line) !== null) tagSelectorPrefixPattern.exec(line)[2] ? undefined;
+    return (typeof tagSelectorPrefixPattern.exec(line) !== "undefined" && tagSelectorPrefixPattern.exec(line) !== null) ? tagSelectorPrefixPattern.exec(line)[2] : undefined;
   },
 
   getTagCompletions({bufferPosition, editor, prefix}) {
