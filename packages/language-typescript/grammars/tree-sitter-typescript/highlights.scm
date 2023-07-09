@@ -108,7 +108,12 @@
 ; themes.
 (predefined_type _ @storage.type.ts @support.type.ts)
 
-(literal_type) @storage.type._TEXT_.ts @support.type.ts
+(type_alias_declaration
+  name: (type_identifier) @variable.declaration.type.ts)
+
+((literal_type [(null) (undefined)]) @storage.type._TEXT_.ts)
+((literal_type [(null) (undefined)]) @support.type.ts
+  (#set! test.final true))
 
 [
   "implements"
@@ -121,17 +126,23 @@
   "private"
   "protected"
   "readonly"
+  "satisfies"
   "type"
 ] @storage.modifier._TYPE_.ts
 
+(index_signature
+  name: (identifier) @entity.other.attribute-name.type.ts)
 
-; (type_annotation)
+((type_identifier) @storage.type.ts
+  (#set! test.onlyIfDescendantOfType "type_annotation type_arguments satisfies_expression"))
 
-((type_identifier) @storage.type.ts @support.type.ts
-  (#set! test.onlyIfDescendantOfType type_annotation))
-
-((type_identifier) @storage.type.ts @support.type.ts
-  (#set! test.onlyIfDescendantOfType type_arguments))
+; A capture can satisfy more than one of these criteria, so we need to guard
+; against multiple matches. That's why we use `test.final` here, and why the
+; two capture names are applied in separate captures — otherwise `test.final`
+; would be applied after the first capture.
+((type_identifier) @support.type.ts
+  (#set! test.onlyIfDescendantOfType "type_annotation type_arguments satisfies_expression")
+  (#set! test.final true))
 
 ; OBJECTS
 ; =======
@@ -415,7 +426,7 @@
 ; OPERATORS
 ; =========
 
-["delete" "instanceof"] @keyword.operator.delete.ts
+["delete" "instanceof" "typeof" "keyof"] @keyword.operator._TYPE_.ts
 "new" @keyword.operator.new.ts
 
 "=" @keyword.operator.assignment.ts
@@ -495,3 +506,52 @@
 ";" @punctuation.terminator.statement.ts
 "," @punctuation.separator.comma.ts
 ":" @punctuation.separator.colon.ts
+
+
+; META
+; ====
+
+; The interiors of functions (useful for snippets and commands).
+(method_definition
+  body: (statement_block) @meta.block.function.ts
+  (#set! test.final true))
+
+(function_declaration
+  body: (statement_block) @meta.block.function.ts
+  (#set! test.final true))
+
+(generator_function_declaration
+  body: (statement_block) @meta.block.function.ts
+  (#set! test.final true))
+
+(function
+  body: (statement_block) @meta.block.function.ts
+  (#set! test.final true))
+
+(generator_function
+  body: (statement_block) @meta.block.function.ts
+  (#set! test.final true))
+
+; The interior of a class body (useful for snippets and commands).
+(class_body) @meta.block.class.ts
+
+; All other sorts of blocks.
+(statement_block) @meta.block.ts
+
+; The inside of a parameter definition list.
+((formal_parameters) @meta.parameters.ts
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+; The inside of an object literal.
+((object) @meta.object.ts
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+; MISC
+; ====
+
+; A label. Rare, but it can be used to prefix any statement and to control
+; which loop is affected in `continue` or `break` statements. Svelte uses them
+; for another purpose.
+(statement_identifier) @entity.name.label.ts
