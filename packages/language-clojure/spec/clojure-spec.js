@@ -1,11 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS201: Simplify complex destructure assignments
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("Clojure grammar", function() {
   let grammar = null;
 
@@ -15,51 +8,51 @@ describe("Clojure grammar", function() {
 
     waitsForPromise(() => atom.packages.activatePackage("language-clojure"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.clojure"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.clojure"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeDefined();
-    return expect(grammar.scopeName).toBe("source.clojure");
+    expect(grammar.scopeName).toBe("source.clojure");
   });
 
   it("tokenizes semicolon comments", function() {
     const {tokens} = grammar.tokenizeLine("; clojure");
     expect(tokens[0]).toEqual({value: ";", scopes: ["source.clojure", "comment.line.semicolon.clojure", "punctuation.definition.comment.clojure"]});
-    return expect(tokens[1]).toEqual({value: " clojure", scopes: ["source.clojure", "comment.line.semicolon.clojure"]});
+    expect(tokens[1]).toEqual({value: " clojure", scopes: ["source.clojure", "comment.line.semicolon.clojure"]});
 });
 
   it("does not tokenize escaped semicolons as comments", function() {
     const {tokens} = grammar.tokenizeLine("\\; clojure");
     expect(tokens[0]).toEqual({value: "\\; ", scopes: ["source.clojure"]});
-    return expect(tokens[1]).toEqual({value: "clojure", scopes: ["source.clojure", "meta.symbol.clojure"]});
+    expect(tokens[1]).toEqual({value: "clojure", scopes: ["source.clojure", "meta.symbol.clojure"]});
 });
 
   it("tokenizes shebang comments", function() {
     const {tokens} = grammar.tokenizeLine("#!/usr/bin/env clojure");
     expect(tokens[0]).toEqual({value: "#!", scopes: ["source.clojure", "comment.line.shebang.clojure", "punctuation.definition.comment.shebang.clojure"]});
-    return expect(tokens[1]).toEqual({value: "/usr/bin/env clojure", scopes: ["source.clojure", "comment.line.shebang.clojure"]});
+    expect(tokens[1]).toEqual({value: "/usr/bin/env clojure", scopes: ["source.clojure", "comment.line.shebang.clojure"]});
 });
 
   it("tokenizes strings", function() {
     const {tokens} = grammar.tokenizeLine('"foo bar"');
     expect(tokens[0]).toEqual({value: '"', scopes: ["source.clojure", "string.quoted.double.clojure", "punctuation.definition.string.begin.clojure"]});
     expect(tokens[1]).toEqual({value: 'foo bar', scopes: ["source.clojure", "string.quoted.double.clojure"]});
-    return expect(tokens[2]).toEqual({value: '"', scopes: ["source.clojure", "string.quoted.double.clojure", "punctuation.definition.string.end.clojure"]});
+    expect(tokens[2]).toEqual({value: '"', scopes: ["source.clojure", "string.quoted.double.clojure", "punctuation.definition.string.end.clojure"]});
 });
 
   it("tokenizes character escape sequences", function() {
     const {tokens} = grammar.tokenizeLine('"\\n"');
     expect(tokens[0]).toEqual({value: '"', scopes: ["source.clojure", "string.quoted.double.clojure", "punctuation.definition.string.begin.clojure"]});
     expect(tokens[1]).toEqual({value: '\\n', scopes: ["source.clojure", "string.quoted.double.clojure", "constant.character.escape.clojure"]});
-    return expect(tokens[2]).toEqual({value: '"', scopes: ["source.clojure", "string.quoted.double.clojure", "punctuation.definition.string.end.clojure"]});
+    expect(tokens[2]).toEqual({value: '"', scopes: ["source.clojure", "string.quoted.double.clojure", "punctuation.definition.string.end.clojure"]});
 });
 
   it("tokenizes regexes", function() {
     const {tokens} = grammar.tokenizeLine('#"foo"');
     expect(tokens[0]).toEqual({value: '#"', scopes: ["source.clojure", "string.regexp.clojure", "punctuation.definition.regexp.begin.clojure"]});
     expect(tokens[1]).toEqual({value: 'foo', scopes: ["source.clojure", "string.regexp.clojure"]});
-    return expect(tokens[2]).toEqual({value: '"', scopes: ["source.clojure", "string.regexp.clojure", "punctuation.definition.regexp.end.clojure"]});
+    expect(tokens[2]).toEqual({value: '"', scopes: ["source.clojure", "string.regexp.clojure", "punctuation.definition.regexp.end.clojure"]});
 });
 
   it("tokenizes backslash escape character in regexes", function() {
@@ -69,14 +62,14 @@ describe("Clojure grammar", function() {
     expect(tokens[2]).toEqual({value: '"', scopes: ['source.clojure', 'string.regexp.clojure', "punctuation.definition.regexp.end.clojure"]});
     expect(tokens[4]).toEqual({value: '"', scopes: ['source.clojure', 'string.quoted.double.clojure', 'punctuation.definition.string.begin.clojure']});
     expect(tokens[5]).toEqual({value: "/", scopes: ['source.clojure', 'string.quoted.double.clojure']});
-    return expect(tokens[6]).toEqual({value: '"', scopes: ['source.clojure', 'string.quoted.double.clojure', 'punctuation.definition.string.end.clojure']});
+    expect(tokens[6]).toEqual({value: '"', scopes: ['source.clojure', 'string.quoted.double.clojure', 'punctuation.definition.string.end.clojure']});
 });
 
   it("tokenizes escaped double quote in regexes", function() {
     const {tokens} = grammar.tokenizeLine('#"\\""');
     expect(tokens[0]).toEqual({value: '#"', scopes: ["source.clojure", "string.regexp.clojure", "punctuation.definition.regexp.begin.clojure"]});
     expect(tokens[1]).toEqual({value: '\\"', scopes: ['source.clojure', 'string.regexp.clojure', 'constant.character.escape.clojure']});
-    return expect(tokens[2]).toEqual({value: '"', scopes: ['source.clojure', 'string.regexp.clojure', "punctuation.definition.regexp.end.clojure"]});
+    expect(tokens[2]).toEqual({value: '"', scopes: ['source.clojure', 'string.regexp.clojure', "punctuation.definition.regexp.end.clojure"]});
 });
 
   it("tokenizes numerics", function() {
@@ -130,7 +123,7 @@ describe("Clojure grammar", function() {
 
   it("tokenizes nil", function() {
     const {tokens} = grammar.tokenizeLine("nil");
-    return expect(tokens[0]).toEqual({value: "nil", scopes: ["source.clojure", "constant.language.nil.clojure"]});
+    expect(tokens[0]).toEqual({value: "nil", scopes: ["source.clojure", "constant.language.nil.clojure"]});
 });
 
   it("tokenizes keywords", function() {
@@ -155,7 +148,7 @@ describe("Clojure grammar", function() {
 
     // keywords can start with an uppercase non-ASCII letter
     ({tokens} = grammar.tokenizeLine("(def foo :Öπ)"));
-    return expect(tokens[5]).toEqual({value: ":Öπ", scopes: ["source.clojure", "meta.expression.clojure", "meta.definition.global.clojure", "constant.keyword.clojure"]});
+    expect(tokens[5]).toEqual({value: ":Öπ", scopes: ["source.clojure", "meta.expression.clojure", "meta.definition.global.clojure", "constant.keyword.clojure"]});
 });
 
   it("tokenizes keyfns (keyword control)", function() {
@@ -226,7 +219,7 @@ describe("Clojure grammar", function() {
     expect(tokens[1]).toEqual({value: ":foo", scopes: ["source.clojure", "meta.metadata.map.clojure", "constant.keyword.clojure"]});
     expect(tokens[2]).toEqual({value: " ", scopes: ["source.clojure", "meta.metadata.map.clojure"]});
     expect(tokens[3]).toEqual({value: "true", scopes: ["source.clojure", "meta.metadata.map.clojure", "constant.language.boolean.clojure"]});
-    return expect(tokens[4]).toEqual({value: "}", scopes: ["source.clojure", "meta.metadata.map.clojure", "punctuation.section.metadata.map.end.trailing.clojure"]});
+    expect(tokens[4]).toEqual({value: "}", scopes: ["source.clojure", "meta.metadata.map.clojure", "punctuation.section.metadata.map.end.trailing.clojure"]});
 });
 
   it("tokenizes functions", function() {
@@ -240,7 +233,7 @@ describe("Clojure grammar", function() {
 
     //non-ASCII letters
     ({tokens} = grammar.tokenizeLine("(Öπ 2 20)"));
-    return expect(tokens[1]).toEqual({value: "Öπ", scopes: ["source.clojure", "meta.expression.clojure", "entity.name.function.clojure"]});
+    expect(tokens[1]).toEqual({value: "Öπ", scopes: ["source.clojure", "meta.expression.clojure", "entity.name.function.clojure"]});
 });
 
   it("tokenizes vars", function() {
@@ -251,7 +244,7 @@ describe("Clojure grammar", function() {
     // non-ASCII letters
     ({tokens} = grammar.tokenizeLine("(func #'Öπ)"));
     expect(tokens[2]).toEqual({value: " #", scopes: ["source.clojure", "meta.expression.clojure"]});
-    return expect(tokens[3]).toEqual({value: "'Öπ", scopes: ["source.clojure", "meta.expression.clojure", "meta.var.clojure"]});
+    expect(tokens[3]).toEqual({value: "'Öπ", scopes: ["source.clojure", "meta.expression.clojure", "meta.var.clojure"]});
 });
 
   it("tokenizes symbols", function() {
@@ -264,7 +257,7 @@ describe("Clojure grammar", function() {
 
     // Should not be tokenized as a symbol
     ({tokens} = grammar.tokenizeLine("1foobar"));
-    return expect(tokens[0]).toEqual({value: "1", scopes: ["source.clojure", "constant.numeric.long.clojure"]});
+    expect(tokens[0]).toEqual({value: "1", scopes: ["source.clojure", "constant.numeric.long.clojure"]});
 });
 
   it("tokenizes namespaces", function() {
@@ -277,7 +270,7 @@ describe("Clojure grammar", function() {
     ({tokens} = grammar.tokenizeLine("Öπ/Åä"));
     expect(tokens[0]).toEqual({value: "Öπ", scopes: ["source.clojure", "meta.symbol.namespace.clojure"]});
     expect(tokens[1]).toEqual({value: "/", scopes: ["source.clojure"]});
-    return expect(tokens[2]).toEqual({value: "Åä", scopes: ["source.clojure", "meta.symbol.clojure"]});
+    expect(tokens[2]).toEqual({value: "Åä", scopes: ["source.clojure", "meta.symbol.clojure"]});
 });
 
   const testMetaSection = function(metaScope, puncScope, startsWith, endsWith) {
@@ -327,7 +320,7 @@ describe("Clojure grammar", function() {
 
   it("tokenizes quoted expressions", function() {
     testMetaSection("quoted-expression", "expression", "'(", ")");
-    return testMetaSection("quoted-expression", "expression", "`(", ")");
+    testMetaSection("quoted-expression", "expression", "`(", ")");
   });
 
   it("tokenizes vectors", () => testMetaSection("vector", "vector", "[", "]"));
@@ -346,7 +339,7 @@ describe("Clojure grammar", function() {
     expect(tokens[5]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "meta.expression.clojure", "punctuation.section.expression.end.clojure"]});
     expect(tokens[6]).toEqual({value: " ", scopes: ["source.clojure", "meta.expression.clojure"]});
     expect(tokens[7]).toEqual({value: "baz", scopes: ["source.clojure", "meta.expression.clojure", "meta.symbol.clojure"]});
-    return expect(tokens[8]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "punctuation.section.expression.end.trailing.clojure"]});
+    expect(tokens[8]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "punctuation.section.expression.end.trailing.clojure"]});
 });
 
   it("tokenizes maps used as functions", function() {
@@ -359,7 +352,7 @@ describe("Clojure grammar", function() {
     expect(tokens[5]).toEqual({value: "}", scopes: ["source.clojure", "meta.expression.clojure", "meta.map.clojure", "punctuation.section.map.end.clojure"]});
     expect(tokens[6]).toEqual({value: " ", scopes: ["source.clojure", "meta.expression.clojure"]});
     expect(tokens[7]).toEqual({value: ":foo", scopes: ["source.clojure", "meta.expression.clojure", "constant.keyword.clojure"]});
-    return expect(tokens[8]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "punctuation.section.expression.end.trailing.clojure"]});
+    expect(tokens[8]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "punctuation.section.expression.end.trailing.clojure"]});
 });
 
   it("tokenizes sets used in functions", function() {
@@ -370,10 +363,10 @@ describe("Clojure grammar", function() {
     expect(tokens[3]).toEqual({value: " ", scopes: ["source.clojure", "meta.expression.clojure", "meta.set.clojure"]});
     expect(tokens[4]).toEqual({value: ":bar", scopes: ["source.clojure", "meta.expression.clojure", "meta.set.clojure", "constant.keyword.clojure"]});
     expect(tokens[5]).toEqual({value: "}", scopes: ["source.clojure", "meta.expression.clojure", "meta.set.clojure", "punctuation.section.set.end.trailing.clojure"]});
-    return expect(tokens[6]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "punctuation.section.expression.end.trailing.clojure"]});
+    expect(tokens[6]).toEqual({value: ")", scopes: ["source.clojure", "meta.expression.clojure", "punctuation.section.expression.end.trailing.clojure"]});
 });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -457,7 +450,7 @@ describe("Clojure grammar", function() {
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=clojure:
