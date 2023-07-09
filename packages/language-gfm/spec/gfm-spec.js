@@ -1,26 +1,21 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("GitHub Flavored Markdown grammar", function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage("language-gfm"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.gfm"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.gfm"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeDefined();
-    return expect(grammar.scopeName).toBe("source.gfm");
+    expect(grammar.scopeName).toBe("source.gfm");
   });
 
   it("tokenizes spaces", function() {
     const {tokens} = grammar.tokenizeLine(" ");
-    return expect(tokens[0]).toEqual({value: " ", scopes: ["source.gfm"]});
+    expect(tokens[0]).toEqual({value: " ", scopes: ["source.gfm"]});
 });
 
   it("tokenizes horizontal rules", function() {
@@ -31,7 +26,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[0]).toEqual({value: "---", scopes: ["source.gfm", "comment.hr.gfm"]});
 
     ({tokens} = grammar.tokenizeLine("___"));
-    return expect(tokens[0]).toEqual({value: "___", scopes: ["source.gfm", "comment.hr.gfm"]});
+    expect(tokens[0]).toEqual({value: "___", scopes: ["source.gfm", "comment.hr.gfm"]});
 });
 
   it("tokenizes escaped characters", function() {
@@ -43,7 +38,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     ({tokens} = grammar.tokenizeLine("\\abc"));
     expect(tokens[0]).toEqual({value: "\\a", scopes: ["source.gfm", "constant.character.escape.gfm"]});
-    return expect(tokens[1]).toEqual({value: "bc", scopes: ["source.gfm"]});
+    expect(tokens[1]).toEqual({value: "bc", scopes: ["source.gfm"]});
 });
 
   it("tokenizes ***bold italic*** text", function() {
@@ -60,7 +55,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(firstLineTokens[2]).toEqual({value: "bold", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
     expect(secondLineTokens[0]).toEqual({value: "italic", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
     expect(secondLineTokens[1]).toEqual({value: "***", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
-    return expect(secondLineTokens[2]).toEqual({value: "!", scopes: ["source.gfm"]});
+    expect(secondLineTokens[2]).toEqual({value: "!", scopes: ["source.gfm"]});
 });
 
   it("tokenizes ___bold italic___ text", function() {
@@ -77,7 +72,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(firstLineTokens[2]).toEqual({value: "bold", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
     expect(secondLineTokens[0]).toEqual({value: "italic", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
     expect(secondLineTokens[1]).toEqual({value: "___", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
-    return expect(secondLineTokens[2]).toEqual({value: "!", scopes: ["source.gfm"]});
+    expect(secondLineTokens[2]).toEqual({value: "!", scopes: ["source.gfm"]});
 });
 
   it("tokenizes **bold** text", function() {
@@ -94,7 +89,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[0]).toEqual({value: "not", scopes: ["source.gfm"]});
     expect(tokens[1]).toEqual({value: "**", scopes: ["source.gfm", "markup.bold.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[2]).toEqual({value: "bold", scopes: ["source.gfm", "markup.bold.gfm"]});
-    return expect(tokens[3]).toEqual({value: "**", scopes: ["source.gfm", "markup.bold.gfm", "punctuation.definition.entity.gfm"]});
+    expect(tokens[3]).toEqual({value: "**", scopes: ["source.gfm", "markup.bold.gfm", "punctuation.definition.entity.gfm"]});
 });
 
   it("tokenizes __bold__ text", function() {
@@ -111,7 +106,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(secondLineTokens[0]).toEqual({value: "bold__!", scopes: ["source.gfm"]});
 
     ({tokens} = grammar.tokenizeLine("not__bold__"));
-    return expect(tokens[0]).toEqual({value: "not__bold__", scopes: ["source.gfm"]});
+    expect(tokens[0]).toEqual({value: "not__bold__", scopes: ["source.gfm"]});
 });
 
   it("tokenizes *italic* text", function() {
@@ -138,7 +133,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     const [firstLineTokens, secondLineTokens] = Array.from(grammar.tokenizeLines("this is *not\nitalic*!"));
     expect(firstLineTokens[0]).toEqual({value: "this is *not", scopes: ["source.gfm"]});
-    return expect(secondLineTokens[0]).toEqual({value: "italic*!", scopes: ["source.gfm"]});
+    expect(secondLineTokens[0]).toEqual({value: "italic*!", scopes: ["source.gfm"]});
 });
 
   it("tokenizes _italic_ text", function() {
@@ -160,7 +155,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     const [firstLineTokens, secondLineTokens] = Array.from(grammar.tokenizeLines("this is _not\nitalic_!"));
     expect(firstLineTokens[0]).toEqual({value: "this is _not", scopes: ["source.gfm"]});
-    return expect(secondLineTokens[0]).toEqual({value: "italic_!", scopes: ["source.gfm"]});
+    expect(secondLineTokens[0]).toEqual({value: "italic_!", scopes: ["source.gfm"]});
 });
 
   it("tokenizes ~~strike~~ text", function() {
@@ -178,7 +173,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(secondLineTokens[2]).toEqual({value: "!", scopes: ["source.gfm"]});
 
     ({tokens} = grammar.tokenizeLine("not~~strike~~"));
-    return expect(tokens[0]).toEqual({value: "not~~strike~~", scopes: ["source.gfm"]});
+    expect(tokens[0]).toEqual({value: "not~~strike~~", scopes: ["source.gfm"]});
 });
 
   it("tokenizes headings", function() {
@@ -210,7 +205,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens} = grammar.tokenizeLine("###### Heading 6"));
     expect(tokens[0]).toEqual({value: "######", scopes: ["source.gfm", "markup.heading.heading-6.gfm", "markup.heading.marker.gfm"]});
     expect(tokens[1]).toEqual({value: " ", scopes: ["source.gfm", "markup.heading.heading-6.gfm", "markup.heading.space.gfm"]});
-    return expect(tokens[2]).toEqual({value: "Heading 6", scopes: ["source.gfm", "markup.heading.heading-6.gfm"]});
+    expect(tokens[2]).toEqual({value: "Heading 6", scopes: ["source.gfm", "markup.heading.heading-6.gfm"]});
 });
 
   it("tokenizes matches inside of headers", function() {
@@ -220,7 +215,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[2]).toEqual({value: "Heading ", scopes: ["source.gfm", "markup.heading.heading-1.gfm"]});
     expect(tokens[3]).toEqual({value: ":", scopes: ["source.gfm", "markup.heading.heading-1.gfm", "string.emoji.gfm", "string.emoji.start.gfm"]});
     expect(tokens[4]).toEqual({value: "one", scopes: ["source.gfm", "markup.heading.heading-1.gfm", "string.emoji.gfm", "string.emoji.word.gfm"]});
-    return expect(tokens[5]).toEqual({value: ":", scopes: ["source.gfm", "markup.heading.heading-1.gfm", "string.emoji.gfm", "string.emoji.end.gfm"]});
+    expect(tokens[5]).toEqual({value: ":", scopes: ["source.gfm", "markup.heading.heading-1.gfm", "string.emoji.gfm", "string.emoji.end.gfm"]});
 });
 
   it("tokenizes an :emoji:", function() {
@@ -234,7 +229,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[0]).toEqual({value: "this is :no good:", scopes: ["source.gfm"]});
 
     ({tokens} = grammar.tokenizeLine("http://localhost:8080"));
-    return expect(tokens[0]).toEqual({value: "http://localhost:8080", scopes: ["source.gfm"]});
+    expect(tokens[0]).toEqual({value: "http://localhost:8080", scopes: ["source.gfm"]});
 });
 
   it("tokenizes a ``` code block", function() {
@@ -243,7 +238,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens, ruleStack} = grammar.tokenizeLine("-> 'hello'", ruleStack));
     expect(tokens[0]).toEqual({value: "-> 'hello'", scopes: ["source.gfm", "markup.raw.gfm"]});
     ({tokens} = grammar.tokenizeLine("```", ruleStack));
-    return expect(tokens[0]).toEqual({value: "```", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
+    expect(tokens[0]).toEqual({value: "```", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
 });
 
   it("tokenizes a ~~~ code block", function() {
@@ -252,14 +247,14 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens, ruleStack} = grammar.tokenizeLine("-> 'hello'", ruleStack));
     expect(tokens[0]).toEqual({value: "-> 'hello'", scopes: ["source.gfm", "markup.raw.gfm"]});
     ({tokens} = grammar.tokenizeLine("~~~", ruleStack));
-    return expect(tokens[0]).toEqual({value: "~~~", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
+    expect(tokens[0]).toEqual({value: "~~~", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
 });
 
   it("doesn't tokenise ~`~ as a code block", function() {
     const {tokens} = grammar.tokenizeLine("~`~");
     expect(tokens[0]).toEqual({value: '~', scopes: ['source.gfm']});
     expect(tokens[1]).toEqual({value: '`', scopes: ['source.gfm', 'markup.raw.gfm']});
-    return expect(tokens[2]).toEqual({value: '~', scopes: ['source.gfm', 'markup.raw.gfm']});
+    expect(tokens[2]).toEqual({value: '~', scopes: ['source.gfm', 'markup.raw.gfm']});
 });
 
   it("tokenises code-blocks with borders of differing lengths", function() {
@@ -271,7 +266,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     [firstLineTokens, secondLineTokens, thirdLineTokens] = Array.from(grammar.tokenizeLines("~~~~~~~\nfoo bar\n~~~"));
     expect(firstLineTokens[0]).toEqual({value: '~~~~~~~', scopes: ['source.gfm', 'markup.raw.gfm', 'support.gfm']});
     expect(secondLineTokens[0]).toEqual({value: 'foo bar', scopes: ['source.gfm', 'markup.raw.gfm']});
-    return expect(thirdLineTokens[0]).toEqual({value: '~~~', scopes: ['source.gfm', 'markup.raw.gfm']});
+    expect(thirdLineTokens[0]).toEqual({value: '~~~', scopes: ['source.gfm', 'markup.raw.gfm']});
 });
 
   it("tokenizes a ``` code block with trailing whitespace", function() {
@@ -280,7 +275,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens, ruleStack} = grammar.tokenizeLine("-> 'hello'", ruleStack));
     expect(tokens[0]).toEqual({value: "-> 'hello'", scopes: ["source.gfm", "markup.raw.gfm"]});
     ({tokens} = grammar.tokenizeLine("```  ", ruleStack));
-    return expect(tokens[0]).toEqual({value: "```  ", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
+    expect(tokens[0]).toEqual({value: "```  ", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
 });
 
   it("tokenizes a ~~~ code block with trailing whitespace", function() {
@@ -289,7 +284,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens, ruleStack} = grammar.tokenizeLine("-> 'hello'", ruleStack));
     expect(tokens[0]).toEqual({value: "-> 'hello'", scopes: ["source.gfm", "markup.raw.gfm"]});
     ({tokens} = grammar.tokenizeLine("~~~  ", ruleStack));
-    return expect(tokens[0]).toEqual({value: "~~~  ", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
+    expect(tokens[0]).toEqual({value: "~~~  ", scopes: ["source.gfm", "markup.raw.gfm", "support.gfm"]});
 });
 
   it("tokenises a ``` code block with an unknown language", function() {
@@ -300,7 +295,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[0]).toEqual({value: "-> 'hello'", scopes: ['source.gfm', 'markup.code.other.gfm', 'source.embedded.mylanguage']});
 
     ({tokens} = grammar.tokenizeLine("```", ruleStack));
-    return expect(tokens[0]).toEqual({value: '```', scopes: ['source.gfm', 'markup.code.other.gfm', 'support.gfm']});
+    expect(tokens[0]).toEqual({value: '```', scopes: ['source.gfm', 'markup.code.other.gfm', 'support.gfm']});
 });
 
   it("tokenizes a ``` code block with a known language", function() {
@@ -322,7 +317,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     ({tokens, ruleStack} = grammar.tokenizeLine("```properties  "));
     expect(tokens[0]).toEqual({value: "```properties  ", scopes: ["source.gfm", "markup.code.git-config.gfm",  "support.gfm"]});
-    return expect(ruleStack[1].contentScopeName).toBe("source.embedded.git-config");
+    expect(ruleStack[1].contentScopeName).toBe("source.embedded.git-config");
   });
 
   it("tokenizes a Rmarkdown ``` code block", function() {
@@ -336,7 +331,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     ({tokens, ruleStack} = grammar.tokenizeLine("```{r eval=TRUE,cache=FALSE}"));
     expect(tokens[0]).toEqual({value: "```{r eval=TRUE,cache=FALSE}", scopes: ["source.gfm", "markup.code.r.gfm", "support.gfm"]});
-    return expect(ruleStack[1].contentScopeName).toBe("source.embedded.r");
+    expect(ruleStack[1].contentScopeName).toBe("source.embedded.r");
   });
 
   it("tokenizes a Rmarkdown ``` code block with whitespace", function() {
@@ -350,7 +345,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     ({tokens, ruleStack} = grammar.tokenizeLine("```{r eval = TRUE, cache = FALSE}"));
     expect(tokens[0]).toEqual({value: "```{r eval = TRUE, cache = FALSE}", scopes: ["source.gfm", "markup.code.r.gfm", "support.gfm"]});
-    return expect(ruleStack[1].contentScopeName).toBe("source.embedded.r");
+    expect(ruleStack[1].contentScopeName).toBe("source.embedded.r");
   });
 
   it("tokenizes a ~~~ code block with a language", function() {
@@ -364,7 +359,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     ({tokens, ruleStack} = grammar.tokenizeLine("~~~properties  "));
     expect(tokens[0]).toEqual({value: "~~~properties  ", scopes: ["source.gfm", "markup.code.git-config.gfm", "support.gfm"]});
-    return expect(ruleStack[1].contentScopeName).toBe("source.embedded.git-config");
+    expect(ruleStack[1].contentScopeName).toBe("source.embedded.git-config");
   });
 
   it("tokenizes a ``` code block with a language and trailing whitespace", function() {
@@ -376,7 +371,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens, ruleStack} = grammar.tokenizeLine("```js  "));
     ({tokens} = grammar.tokenizeLine("```  ", ruleStack));
     expect(tokens[0]).toEqual({value: "```  ", scopes: ["source.gfm", "markup.code.js.gfm", "support.gfm"]});
-    return expect(ruleStack[1].contentScopeName).toBe("source.embedded.js");
+    expect(ruleStack[1].contentScopeName).toBe("source.embedded.js");
   });
 
   it("tokenizes a ~~~ code block with a language and trailing whitespace", function() {
@@ -393,7 +388,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens, ruleStack} = grammar.tokenizeLine("~~~ properties  "));
     ({tokens} = grammar.tokenizeLine("~~~  ", ruleStack));
     expect(tokens[0]).toEqual({value: "~~~  ", scopes: ["source.gfm", "markup.code.git-config.gfm", "support.gfm"]});
-    return expect(ruleStack[1].contentScopeName).toBe("source.embedded.git-config");
+    expect(ruleStack[1].contentScopeName).toBe("source.embedded.git-config");
   });
 
   it("tokenizes inline `code` blocks", function() {
@@ -413,7 +408,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens} = grammar.tokenizeLine("``a\\`b``"));
     expect(tokens[0]).toEqual({value: "``", scopes: ["source.gfm", "markup.raw.gfm"]});
     expect(tokens[1]).toEqual({value: "a\\`b", scopes: ["source.gfm", "markup.raw.gfm"]});
-    return expect(tokens[2]).toEqual({value: "``", scopes: ["source.gfm", "markup.raw.gfm"]});
+    expect(tokens[2]).toEqual({value: "``", scopes: ["source.gfm", "markup.raw.gfm"]});
 });
 
   it("tokenizes [links](links)", function() {
@@ -424,7 +419,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[3]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[4]).toEqual({value: "(", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
     expect(tokens[5]).toEqual({value: "website", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[6]).toEqual({value: ")", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[6]).toEqual({value: ")", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes reference [links][links]", function() {
@@ -435,7 +430,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[3]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[4]).toEqual({value: "[", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
     expect(tokens[5]).toEqual({value: "website", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[6]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[6]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes id-less reference [links][]", function() {
@@ -445,7 +440,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[2]).toEqual({value: "this link", scopes: ["source.gfm", "link", "entity.gfm"]});
     expect(tokens[3]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[4]).toEqual({value: "[", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
-    return expect(tokens[5]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[5]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes [link]: footers", function() {
@@ -455,7 +450,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[2]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[3]).toEqual({value: ":", scopes: ["source.gfm", "link", "punctuation.separator.key-value.gfm"]});
     expect(tokens[4]).toEqual({value: " ", scopes: ["source.gfm", "link"]});
-    return expect(tokens[5]).toEqual({value: "http://website", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
+    expect(tokens[5]).toEqual({value: "http://website", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
 });
 
   it("tokenizes [link]: <footers>", function() {
@@ -465,7 +460,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[2]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[3]).toEqual({value: ": <", scopes: ["source.gfm", "link"]});
     expect(tokens[4]).toEqual({value: "http://website", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[5]).toEqual({value: ">", scopes: ["source.gfm", "link"]});
+    expect(tokens[5]).toEqual({value: ">", scopes: ["source.gfm", "link"]});
 });
 
   it("tokenizes [![links](links)](links)", function() {
@@ -480,7 +475,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[7]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[8]).toEqual({value: "(", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
     expect(tokens[9]).toEqual({value: "link", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[10]).toEqual({value: ")", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[10]).toEqual({value: ")", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes [![links](links)][links]", function() {
@@ -495,7 +490,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[7]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[8]).toEqual({value: "[", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
     expect(tokens[9]).toEqual({value: "link", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[10]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[10]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes [![links][links]](links)", function() {
@@ -510,7 +505,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[7]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[8]).toEqual({value: "(", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
     expect(tokens[9]).toEqual({value: "link", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[10]).toEqual({value: ")", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[10]).toEqual({value: ")", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes [![links][links]][links]", function() {
@@ -525,7 +520,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[7]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
     expect(tokens[8]).toEqual({value: "[", scopes: ["source.gfm", "link", "punctuation.definition.begin.gfm"]});
     expect(tokens[9]).toEqual({value: "link", scopes: ["source.gfm", "link", "markup.underline.link.gfm"]});
-    return expect(tokens[10]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
+    expect(tokens[10]).toEqual({value: "]", scopes: ["source.gfm", "link", "punctuation.definition.end.gfm"]});
 });
 
   it("tokenizes mentions", function() {
@@ -605,7 +600,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens} = grammar.tokenizeLine("@person;"));
     expect(tokens[0]).toEqual({value: "@", scopes: ["source.gfm", "variable.mention.gfm"]});
     expect(tokens[1]).toEqual({value: "person", scopes: ["source.gfm", "string.username.gfm"]});
-    return expect(tokens[2]).toEqual({value: ";", scopes: ["source.gfm"]});
+    expect(tokens[2]).toEqual({value: ";", scopes: ["source.gfm"]});
 });
 
   it("tokenizes issue numbers", function() {
@@ -653,7 +648,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     ({tokens} = grammar.tokenizeLine(" #123's"));
     expect(tokens[1]).toEqual({value: "#", scopes: ["source.gfm", "variable.issue.tag.gfm"]});
     expect(tokens[2]).toEqual({value: "123", scopes: ["source.gfm", "string.issue.number.gfm"]});
-    return expect(tokens[3]).toEqual({value: "'s", scopes: ["source.gfm"]});
+    expect(tokens[3]).toEqual({value: "'s", scopes: ["source.gfm"]});
 });
 
   it("tokenizes unordered lists", function() {
@@ -676,7 +671,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[0]).toEqual({value: "  ", scopes: ["source.gfm"]});
     expect(tokens[1]).toEqual({value: "-", scopes: ["source.gfm", "variable.unordered.list.gfm"]});
     expect(tokens[2]).toEqual({value: " ", scopes: ["source.gfm"]});
-    return expect(tokens[3]).toEqual({value: "Item 3", scopes: ["source.gfm"]});
+    expect(tokens[3]).toEqual({value: "Item 3", scopes: ["source.gfm"]});
 });
 
   it("tokenizes ordered lists", function() {
@@ -699,13 +694,13 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[0]).toEqual({value: "  ", scopes: ["source.gfm"]});
     expect(tokens[1]).toEqual({value: "111.", scopes: ["source.gfm", "variable.ordered.list.gfm"]});
     expect(tokens[2]).toEqual({value: " ", scopes: ["source.gfm"]});
-    return expect(tokens[3]).toEqual({value: "Hundred and eleventh item", scopes: ["source.gfm"]});
+    expect(tokens[3]).toEqual({value: "Hundred and eleventh item", scopes: ["source.gfm"]});
 });
 
   it("tokenizes > quoted text", function() {
     const {tokens} = grammar.tokenizeLine("> Quotation :+1:");
     expect(tokens[0]).toEqual({value: ">", scopes: ["source.gfm", "comment.quote.gfm", "support.quote.gfm"]});
-    return expect(tokens[1]).toEqual({value: " Quotation :+1:", scopes: ["source.gfm", "comment.quote.gfm"]});
+    expect(tokens[1]).toEqual({value: " Quotation :+1:", scopes: ["source.gfm", "comment.quote.gfm"]});
 });
 
   it("tokenizes HTML entities", function() {
@@ -730,7 +725,7 @@ describe("GitHub Flavored Markdown grammar", function() {
 
     expect(tokens[12]).toEqual({value: "&", scopes: ["source.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[13]).toEqual({value: "#xb3", scopes: ["source.gfm", "constant.character.entity.gfm"]});
-    return expect(tokens[14]).toEqual({value: ";", scopes: ["source.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
+    expect(tokens[14]).toEqual({value: ";", scopes: ["source.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
 });
 
   it("tokenizes HTML entities in *italic* text", function() {
@@ -762,7 +757,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[9]).toEqual({value: "&", scopes: ["source.gfm", "markup.italic.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[10]).toEqual({value: "#xb3", scopes: ["source.gfm", "markup.italic.gfm", "constant.character.entity.gfm"]});
     expect(tokens[11]).toEqual({value: ";", scopes: ["source.gfm", "markup.italic.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
-    return expect(tokens[12]).toEqual({value: "_", scopes: [ 'source.gfm', 'markup.italic.gfm', 'punctuation.definition.entity.gfm' ]});
+    expect(tokens[12]).toEqual({value: "_", scopes: [ 'source.gfm', 'markup.italic.gfm', 'punctuation.definition.entity.gfm' ]});
 });
 
   it("tokenizes HTML entities in **bold** text", function() {
@@ -794,7 +789,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[9]).toEqual({value: "&", scopes: ["source.gfm", "markup.bold.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[10]).toEqual({value: "#xb3", scopes: ["source.gfm", "markup.bold.gfm", "constant.character.entity.gfm"]});
     expect(tokens[11]).toEqual({value: ";", scopes: ["source.gfm", "markup.bold.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
-    return expect(tokens[12]).toEqual({value: "__", scopes: ["source.gfm", "markup.bold.gfm", "punctuation.definition.entity.gfm"]});
+    expect(tokens[12]).toEqual({value: "__", scopes: ["source.gfm", "markup.bold.gfm", "punctuation.definition.entity.gfm"]});
 });
 
   it("tokenizes HTML entities in ***bold italic*** text", function() {
@@ -826,7 +821,7 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[9]).toEqual({value: "&", scopes: ["source.gfm", "markup.bold.italic.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[10]).toEqual({value: "#xb3", scopes: ["source.gfm", "markup.bold.italic.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[11]).toEqual({value: ";", scopes: ["source.gfm", "markup.bold.italic.gfm", "constant.character.entity.gfm"]});
-    return expect(tokens[12]).toEqual({value: "___", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
+    expect(tokens[12]).toEqual({value: "___", scopes: ["source.gfm", "markup.bold.italic.gfm"]});
 });
 
   it("tokenizes HTML entities in strikethrough text", function() {
@@ -843,14 +838,14 @@ describe("GitHub Flavored Markdown grammar", function() {
     expect(tokens[9]).toEqual({value: "&", scopes: ["source.gfm", "markup.strike.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
     expect(tokens[10]).toEqual({value: "#xb3", scopes: ["source.gfm", "markup.strike.gfm", "constant.character.entity.gfm"]});
     expect(tokens[11]).toEqual({value: ";", scopes: ["source.gfm", "markup.strike.gfm", "constant.character.entity.gfm", "punctuation.definition.entity.gfm"]});
-    return expect(tokens[12]).toEqual({value: "~~", scopes: ["source.gfm", "markup.strike.gfm"]});
+    expect(tokens[12]).toEqual({value: "~~", scopes: ["source.gfm", "markup.strike.gfm"]});
 });
 
   it("tokenizes HTML comments", function() {
     const {tokens} = grammar.tokenizeLine("<!-- a comment -->");
     expect(tokens[0]).toEqual({value: "<!--", scopes: ["source.gfm", "comment.block.gfm", "punctuation.definition.comment.gfm"]});
     expect(tokens[1]).toEqual({value: " a comment ", scopes: ["source.gfm", "comment.block.gfm"]});
-    return expect(tokens[2]).toEqual({value: "-->", scopes: ["source.gfm", "comment.block.gfm", "punctuation.definition.comment.gfm"]});
+    expect(tokens[2]).toEqual({value: "-->", scopes: ["source.gfm", "comment.block.gfm", "punctuation.definition.comment.gfm"]});
 });
 
   it("tokenizes YAML front matter", function() {
@@ -863,13 +858,13 @@ front: matter
 
     expect(firstLineTokens[0]).toEqual({value: "---", scopes: ["source.gfm", "front-matter.yaml.gfm", "comment.hr.gfm"]});
     expect(secondLineTokens[0]).toEqual({value: "front: matter", scopes: ["source.gfm", "front-matter.yaml.gfm"]});
-    return expect(thirdLineTokens[0]).toEqual({value: "---", scopes: ["source.gfm", "front-matter.yaml.gfm", "comment.hr.gfm"]});
+    expect(thirdLineTokens[0]).toEqual({value: "---", scopes: ["source.gfm", "front-matter.yaml.gfm", "comment.hr.gfm"]});
 });
 
   it("tokenizes linebreaks", function() {
     const {tokens} = grammar.tokenizeLine("line  ");
     expect(tokens[0]).toEqual({value: "line", scopes: ["source.gfm"]});
-    return expect(tokens[1]).toEqual({value: "  ", scopes: ["source.gfm", "linebreak.gfm"]});
+    expect(tokens[1]).toEqual({value: "  ", scopes: ["source.gfm", "linebreak.gfm"]});
 });
 
   it("tokenizes tables", function() {
@@ -920,10 +915,10 @@ front: matter
 
     expect(headingTokens[0]).toEqual({value: "#", scopes: ["source.gfm", "markup.heading.heading-1.gfm", "markup.heading.marker.gfm"]});
     expect(headingTokens[1]).toEqual({value: " ", scopes: ["source.gfm", "markup.heading.heading-1.gfm", "markup.heading.space.gfm"]});
-    return expect(headingTokens[2]).toEqual({value: "Heading", scopes: ["source.gfm", "markup.heading.heading-1.gfm"]});
+    expect(headingTokens[2]).toEqual({value: "Heading", scopes: ["source.gfm", "markup.heading.heading-1.gfm"]});
 });
 
-  return it("tokenizes criticmarkup", function() {
+  it("tokenizes criticmarkup", function() {
     const [addToken, delToken, hlToken, subToken] = Array.from(grammar.tokenizeLines(`\
 Add{++ some text++}
 Delete{-- some text--}
@@ -955,6 +950,6 @@ Replace {~~this~>by that~~}\
     expect(subToken[2]).toEqual({value: "this", scopes: ["source.gfm", "markup.changed.critic.gfm.substitution"]});
     expect(subToken[3]).toEqual({value: "~>", scopes: ["source.gfm", "markup.changed.critic.gfm.substitution", "punctuation.definition.changed.critic.gfm.substitution.operator"]});
     expect(subToken[4]).toEqual({value: "by that", scopes: ["source.gfm", "markup.changed.critic.gfm.substitution"]});
-    return expect(subToken[5]).toEqual({value: "~~}", scopes: ["source.gfm", "markup.changed.critic.gfm.substitution", "punctuation.definition.changed.critic.gfm.substitution.marker"]});
+    expect(subToken[5]).toEqual({value: "~~}", scopes: ["source.gfm", "markup.changed.critic.gfm.substitution", "punctuation.definition.changed.critic.gfm.substitution.marker"]});
 });
 });
