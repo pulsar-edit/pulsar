@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('Go settings', function() {
   let [editor, languageMode] = Array.from([]);
 
@@ -18,7 +13,7 @@ describe('Go settings', function() {
       return languageMode = editor.languageMode;
     }));
 
-    return waitsForPromise(() => atom.packages.activatePackage('language-go'));
+    waitsForPromise(() => atom.packages.activatePackage('language-go'));
   });
 
   it('matches lines correctly using the increaseIndentPattern', function() {
@@ -38,7 +33,7 @@ describe('Go settings', function() {
     expect(increaseIndentRegex.findNextMatchSync('  for i := 0; i < 10; i++ {')).toBeTruthy();
     expect(increaseIndentRegex.findNextMatchSync('  type something struct {')).toBeTruthy();
     expect(increaseIndentRegex.findNextMatchSync('  fmt.Printf("some%s",')).toBeTruthy();
-    return expect(increaseIndentRegex.findNextMatchSync('  aSlice := []string{}{')).toBeTruthy();
+    expect(increaseIndentRegex.findNextMatchSync('  aSlice := []string{}{')).toBeTruthy();
   });
 
   it('matches lines correctly using the decreaseIndentPattern', function() {
@@ -49,10 +44,10 @@ describe('Go settings', function() {
     expect(decreaseIndentRegex.findNextMatchSync('  }')).toBeTruthy();
     expect(decreaseIndentRegex.findNextMatchSync('  },')).toBeTruthy();
     expect(decreaseIndentRegex.findNextMatchSync('  )')).toBeTruthy();
-    return expect(decreaseIndentRegex.findNextMatchSync('  ),')).toBeTruthy();
+    expect(decreaseIndentRegex.findNextMatchSync('  ),')).toBeTruthy();
   });
 
-  return it('matches lines correctly using the decreaseNextIndentPattern', function() {
+  it('matches lines correctly using the decreaseNextIndentPattern', function() {
     const decreaseNextIndentRegex = languageMode.decreaseNextIndentRegexForScopeDescriptor(['source.go']);
 
     expect(decreaseNextIndentRegex.findNextMatchSync('  fmt.Println("something"))')).toBeTruthy();
@@ -67,6 +62,6 @@ describe('Go settings', function() {
     // a line with many (), testing for catastrophic backtracking.
     // see https://github.com/atom/language-go/issues/78
     const longLine = 'first.second().third().fourth().fifth().sixth().seventh().eighth().ninth().tenth()';
-    return expect(decreaseNextIndentRegex.findNextMatchSync(longLine)).toBeFalsy();
+    expect(decreaseNextIndentRegex.findNextMatchSync(longLine)).toBeFalsy();
   });
 });

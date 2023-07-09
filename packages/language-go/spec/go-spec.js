@@ -1,10 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('Go grammar', function() {
   let grammar = null;
 
@@ -13,12 +7,12 @@ describe('Go grammar', function() {
 
     waitsForPromise(() => atom.packages.activatePackage('language-go'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.go'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.go'));
   });
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('source.go');
+    expect(grammar.scopeName).toBe('source.go');
   });
 
   it('tokenizes comments', function() {
@@ -34,7 +28,7 @@ describe('Go grammar', function() {
     expect(tokens[1][0].value).toEqual('I am a comment');
     expect(tokens[1][0].scopes).toEqual(['source.go', 'comment.block.go']);
     expect(tokens[2][0].value).toEqual('*/');
-    return expect(tokens[2][0].scopes).toEqual(['source.go', 'comment.block.go', 'punctuation.definition.comment.go']);
+    expect(tokens[2][0].scopes).toEqual(['source.go', 'comment.block.go', 'punctuation.definition.comment.go']);
 });
 
   it('tokenizes comments in imports', function() {
@@ -48,7 +42,7 @@ import (
     );
     expect(lines[1][1]).toEqual({value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']});
     expect(lines[2][5]).toEqual({value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']});
-    return expect(lines[3][1]).toEqual({value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']});
+    expect(lines[3][1]).toEqual({value: '//', scopes: ['source.go', 'comment.line.double-slash.go', 'punctuation.definition.comment.go']});
 });
 
   it('tokenizes strings', function() {
@@ -113,7 +107,7 @@ import (
 
     ({tokens} = grammar.tokenizeLine('"\\""'));
     expect(tokens[1].value).toEqual('\\"');
-    return expect(tokens[1].scopes).toEqual(['source.go', 'string.quoted.double.go', 'constant.character.escape.go']);
+    expect(tokens[1].scopes).toEqual(['source.go', 'string.quoted.double.go', 'constant.character.escape.go']);
 });
 
   it('tokenizes placeholders in raw strings', function() {
@@ -174,7 +168,7 @@ import (
     ({tokens} = grammar.tokenizeLine("'some single quote string'"));
     expect(tokens[0]).toEqual({value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.begin.go']});
     expect(tokens[1]).toEqual({value: 'some single quote string', scopes: ['source.go', 'string.quoted.rune.go', 'invalid.illegal.unknown-rune.go']});
-    return expect(tokens[2]).toEqual({value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.end.go']});
+    expect(tokens[2]).toEqual({value: "'", scopes: ['source.go', 'string.quoted.rune.go', 'punctuation.definition.string.end.go']});
 });
 
   it('tokenizes invalid whitespace around chan annotations', function() {
@@ -503,7 +497,7 @@ import (
     expect(tokens[2]).toEqual({value: '3.0', scopes: ['source.go', 'constant.numeric.floating-point.go']});
     expect(tokens[6]).toEqual({value: '12', scopes: ['source.go', 'constant.numeric.integer.go']});
     expect(tokens[7]).toEqual({value: '>', scopes: ['source.go', 'keyword.operator.comparison.go']});
-    return expect(tokens[8]).toEqual({value: 'bar', scopes: ['source.go']});
+    expect(tokens[8]).toEqual({value: 'bar', scopes: ['source.go']});
 });
 
   it('tokenizes punctuation brackets', function() {
@@ -513,7 +507,7 @@ import (
     expect(tokens[2]).toEqual({value: '[', scopes: ['source.go', 'punctuation.definition.bracket.square.go']});
     expect(tokens[3]).toEqual({value: ']', scopes: ['source.go', 'punctuation.definition.bracket.square.go']});
     expect(tokens[4]).toEqual({value: ')', scopes: ['source.go', 'punctuation.definition.end.bracket.round.go']});
-    return expect(tokens[5]).toEqual({value: '}', scopes: ['source.go', 'punctuation.definition.end.bracket.curly.go']});
+    expect(tokens[5]).toEqual({value: '}', scopes: ['source.go', 'punctuation.definition.end.bracket.curly.go']});
 });
 
   it('tokenizes punctuation delimiters', function() {
@@ -616,13 +610,13 @@ import (
   it('tokenizes invalid package names as such', function() {
     const {tokens} = grammar.tokenizeLine('package 0mypackage');
     expect(tokens[0]).toEqual({value: 'package', scopes: ['source.go', 'keyword.package.go']});
-    return expect(tokens[2]).toEqual({value: '0mypackage', scopes: ['source.go', 'invalid.illegal.identifier.go']});
+    expect(tokens[2]).toEqual({value: '0mypackage', scopes: ['source.go', 'invalid.illegal.identifier.go']});
 });
 
   it('does not treat words that have a trailing package as a package name', function() {
     const {tokens} = grammar.tokenizeLine('func myFunc(Varpackage string)');
     expect(tokens[4]).toEqual({value: 'Varpackage ', scopes: ['source.go']});
-    return expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
+    expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
 });
 
   it('tokenizes type names', function() {
@@ -642,82 +636,82 @@ import (
   it('tokenizes invalid type names as such', function() {
     const {tokens} = grammar.tokenizeLine('type 0mystring string');
     expect(tokens[0]).toEqual({value: 'type', scopes: ['source.go', 'keyword.type.go']});
-    return expect(tokens[2]).toEqual({value: '0mystring', scopes: ['source.go', 'invalid.illegal.identifier.go']});
+    expect(tokens[2]).toEqual({value: '0mystring', scopes: ['source.go', 'invalid.illegal.identifier.go']});
 });
 
   it('does not treat words that have a trailing type as a type name', function() {
     const {tokens} = grammar.tokenizeLine('func myFunc(Vartype string)');
     expect(tokens[4]).toEqual({value: 'Vartype ', scopes: ['source.go']});
-    return expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
+    expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
 });
 
   describe('in variable declarations', function() {
     const testVar = function(token) {
       expect(token.value).toBe('var');
-      return expect(token.scopes).toEqual(['source.go', 'keyword.var.go']);
+      expect(token.scopes).toEqual(['source.go', 'keyword.var.go']);
     };
 
     const testVarAssignment = function(token, name) {
       expect(token.value).toBe(name);
-      return expect(token.scopes).toEqual(['source.go', 'variable.other.assignment.go']);
+      expect(token.scopes).toEqual(['source.go', 'variable.other.assignment.go']);
     };
 
     const testVarDeclaration = function(token, name) {
       expect(token.value).toBe(name);
-      return expect(token.scopes).toEqual(['source.go', 'variable.other.declaration.go']);
+      expect(token.scopes).toEqual(['source.go', 'variable.other.declaration.go']);
     };
 
     const testOp = function(token, op) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', 'keyword.operator.go']);
+      expect(token.scopes).toEqual(['source.go', 'keyword.operator.go']);
     };
 
     const testOpAddress = function(token, op) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', 'keyword.operator.address.go']);
+      expect(token.scopes).toEqual(['source.go', 'keyword.operator.address.go']);
     };
 
     const testOpAssignment = function(token, op) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', 'keyword.operator.assignment.go']);
+      expect(token.scopes).toEqual(['source.go', 'keyword.operator.assignment.go']);
     };
 
     const testOpBracket = function(token, op, type) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', `punctuation.definition.variables.${type}.bracket.round.go`]);
+      expect(token.scopes).toEqual(['source.go', `punctuation.definition.variables.${type}.bracket.round.go`]);
     };
 
     const testOpPunctuation = function(token, op) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', 'punctuation.other.comma.go']);
+      expect(token.scopes).toEqual(['source.go', 'punctuation.other.comma.go']);
     };
 
     const testOpTermination = function(token, op) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', 'punctuation.terminator.go']);
+      expect(token.scopes).toEqual(['source.go', 'punctuation.terminator.go']);
     };
 
     const testNumType = function(token, name) {
       expect(token.value).toBe(name);
-      return expect(token.scopes).toEqual(['source.go', 'storage.type.numeric.go']);
+      expect(token.scopes).toEqual(['source.go', 'storage.type.numeric.go']);
     };
 
     const testStringType = function(token, name) {
       expect(token.value).toBe(name);
-      return expect(token.scopes).toEqual(['source.go', 'storage.type.string.go']);
+      expect(token.scopes).toEqual(['source.go', 'storage.type.string.go']);
     };
 
     const testNum = function(token, value) {
       expect(token.value).toBe(value);
-      return expect(token.scopes).toEqual(['source.go', 'constant.numeric.integer.go']);
+      expect(token.scopes).toEqual(['source.go', 'constant.numeric.integer.go']);
     };
 
     const testString = function(token, value) {
       expect(token.value).toBe(value);
-      return expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go']);
+      expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go']);
     };
 
-    return describe('in var statements', function() {
+    describe('in var statements', function() {
       it('tokenizes a single variable assignment', function() {
         const {tokens} = grammar.tokenizeLine('i = 7');
         testVarAssignment(tokens[0], 'i');
@@ -775,7 +769,7 @@ import (
         expect(tokens[2]).toEqual({value: 'a', scopes: ['source.go', 'variable.other.declaration.go']});
         expect(tokens[3]).toEqual({value: ' b', scopes: ['source.go']});
         expect(tokens[4]).toEqual({value: '.', scopes: ['source.go', 'punctuation.other.period.go']});
-        return expect(tokens[5]).toEqual({value: 'c', scopes: ['source.go']});
+        expect(tokens[5]).toEqual({value: 'c', scopes: ['source.go']});
     });
 
       it('tokenizes a single name and an array type', function() {
@@ -823,7 +817,7 @@ import (
         testVarDeclaration(tokens[2], 'x');
         expect(tokens[4]).toEqual({value: '<-', scopes: ['source.go', 'keyword.operator.channel.go']});
         expect(tokens[5]).toEqual({value: 'chan', scopes: ['source.go', 'keyword.channel.go']});
-        return expect(tokens[7]).toEqual({value: 'bool', scopes: ['source.go', 'storage.type.boolean.go']});
+        expect(tokens[7]).toEqual({value: 'bool', scopes: ['source.go', 'storage.type.boolean.go']});
     });
 
       it('tokenizes a single name and its initialization', function() {
@@ -869,7 +863,7 @@ this should work!\`\
         testStringType(lines[0][4], 'string');
         testOpAssignment(lines[0][6], '=');
         expect(lines[0][8]).toEqual({value: '`', scopes: ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.begin.go']});
-        return expect(lines[1][1]).toEqual({value: '`', scopes: ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']});
+        expect(lines[1][1]).toEqual({value: '`', scopes: ['source.go', 'string.quoted.raw.go', 'punctuation.definition.string.end.go']});
     });
 
       it('tokenizes multiple names and a type', function() {
@@ -890,7 +884,7 @@ this should work!\`\
         expect(tokens[5]).toEqual({value: 'b', scopes: ['source.go', 'variable.other.declaration.go']});
         expect(tokens[6]).toEqual({value: ' c', scopes: ['source.go']});
         expect(tokens[7]).toEqual({value: '.', scopes: ['source.go', 'punctuation.other.period.go']});
-        return expect(tokens[8]).toEqual({value: 'd', scopes: ['source.go']});
+        expect(tokens[8]).toEqual({value: 'd', scopes: ['source.go']});
     });
 
       it('tokenizes multiple names and initialization expressions', function() {
@@ -954,7 +948,7 @@ this should work!\`\
       it('does not treat words that have a trailing var as a variable declaration', function() {
         const {tokens} = grammar.tokenizeLine('func test(envvar string)');
         expect(tokens[4]).toEqual({value: 'envvar ', scopes: ['source.go']});
-        return expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
+        expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
     });
 
       describe('in var statement blocks', function() {
@@ -1033,7 +1027,7 @@ var (
           return testOpBracket(lines[11][0], ')', 'end');
         });
 
-        return it('tokenizes all parts of variable initializations correctly', function() {
+        it('tokenizes all parts of variable initializations correctly', function() {
           const lines = grammar.tokenizeLines(`\
 var (
   m = map[string]int{
@@ -1061,10 +1055,10 @@ var (
       it('tokenizes invalid variable names as such', function() {
         const {tokens} = grammar.tokenizeLine('var 0test = 0');
         testVar(tokens[0]);
-        return expect(tokens[2]).toEqual({value: '0test', scopes: ['source.go', 'invalid.illegal.identifier.go']});
+        expect(tokens[2]).toEqual({value: '0test', scopes: ['source.go', 'invalid.illegal.identifier.go']});
     });
 
-      return describe('in shorthand variable declarations', function() {
+      describe('in shorthand variable declarations', function() {
         it('tokenizes single names', function() {
           let {tokens} = grammar.tokenizeLine('f := func() int { return 7 }');
           testVarAssignment(tokens[0], 'f');
@@ -1075,7 +1069,7 @@ var (
           return testOpAssignment(tokens[2], ':=');
         });
 
-        return it('tokenizes multiple names', function() {
+        it('tokenizes multiple names', function() {
           let {tokens} = grammar.tokenizeLine('i, j := 0, 10');
           testVarAssignment(tokens[0], 'i');
           testOpPunctuation(tokens[1], ',');
@@ -1092,35 +1086,35 @@ var (
     });
   });
 
-  return describe('in imports declarations', function() {
+  describe('in imports declarations', function() {
     const testImport = function(token) {
       expect(token.value).toBe('import');
-      return expect(token.scopes).toEqual(['source.go', 'keyword.import.go']);
+      expect(token.scopes).toEqual(['source.go', 'keyword.import.go']);
     };
 
     const testImportAlias = function(token, name) {
       expect(token.value).toBe(name);
-      return expect(token.scopes).toEqual(['source.go', 'entity.alias.import.go']);
+      expect(token.scopes).toEqual(['source.go', 'entity.alias.import.go']);
     };
 
     const testImportPackage = function(token, name) {
       expect(token.value).toBe(name);
-      return expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go', 'entity.name.import.go']);
+      expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go', 'entity.name.import.go']);
     };
 
     const testOpBracket = function(token, op, type) {
       expect(token.value).toBe(op);
-      return expect(token.scopes).toEqual(['source.go', `punctuation.definition.imports.${type}.bracket.round.go`]);
+      expect(token.scopes).toEqual(['source.go', `punctuation.definition.imports.${type}.bracket.round.go`]);
     };
 
     const testBeginQuoted = function(token) {
       expect(token.value).toBe('"');
-      return expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go', 'punctuation.definition.string.begin.go']);
+      expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go', 'punctuation.definition.string.begin.go']);
     };
 
     const testEndQuoted = function(token) {
       expect(token.value).toBe('"');
-      return expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go', 'punctuation.definition.string.end.go']);
+      expect(token.scopes).toEqual(['source.go', 'string.quoted.double.go', 'punctuation.definition.string.end.go']);
     };
 
     describe('when it is a single line declaration', function() {
@@ -1147,14 +1141,14 @@ var (
         return testEndQuoted(tokens[6]);
     });
 
-      return it('does not treat words that have a trailing import as a import declaration', function() {
+      it('does not treat words that have a trailing import as a import declaration', function() {
         const {tokens} = grammar.tokenizeLine('func myFunc(Varimport string)');
         expect(tokens[4]).toEqual({value: 'Varimport ', scopes: ['source.go']});
-        return expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
+        expect(tokens[5]).toEqual({value: 'string', scopes: ['source.go', 'storage.type.string.go']});
     });
   });
 
-    return describe('when it is a multi line declaration', function() {
+    describe('when it is a multi line declaration', function() {
       it('tokenizes single declarations with a package name', function() {
         const [kwd, decl, closing] = Array.from(grammar.tokenizeLines(`\
 import (
@@ -1205,7 +1199,7 @@ import (
         return testOpBracket(closing[0], ')', 'end');
       });
 
-      return it('tokenizes multiple imports with an alias for a multi-line declaration', function() {
+      it('tokenizes multiple imports with an alias for a multi-line declaration', function() {
         const [kwd, decl, decl2, closing] = Array.from(grammar.tokenizeLines(`\
 import (
   . "github.com/test/package"
