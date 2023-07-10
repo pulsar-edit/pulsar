@@ -49,11 +49,9 @@ export default class WelcomePackage {
     }
 
     if (atom.config.get('welcome.showChangeLog')) {
-      let lastViewedVersion = atom.config.get('welcome.lastViewedChangeLog').split(".");
-      let curVersion = atom.getVersion().split(".");
-      // Usually getVersion Returns something along MAJOR.MINOR.PATCH ARCH
-      // So we will account for that when checking what version they have.
-      if (lastViewedVersion[0] < curVersion[0] && lastViewedVersion[1] < curVersion[1] && lastViewedVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
+      // Use new `.versionSatisfies()` API to see if last viewed changelog is
+      // less than the current Pulsar version
+      if (atom.versionSatisfies(`> ${atom.config.get('welcome.lastViewedChangeLog')}`)) {
         await this.showChangeLog();
       }
     }
