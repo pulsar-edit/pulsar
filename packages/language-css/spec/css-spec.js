@@ -1978,11 +1978,11 @@ winners-list\
       describe('@document', () => it('correctly tokenises @document rules', function() {
         const lines = grammar.tokenizeLines(`\
 @document url(http://www.w3.org/),
-url-prefix(http://www.w3.org/Style/), /* Comment */
-domain(/**/mozilla.org),
-regexp("https:.*") {
-  body{ color: #f00; }
-}\
+  url-prefix(http://www.w3.org/Style/), /* Comment */
+  domain(/**/mozilla.org),
+  regexp("https:.*") {
+    body{ color: #f00; }
+  }\
 `
         );
         expect(lines[0][0]).toEqual({value: '@', scopes: ['source.css', 'meta.at-rule.document.header.css', 'keyword.control.at-rule.document.css', 'punctuation.definition.keyword.css']});
@@ -3726,8 +3726,8 @@ aaaa; color: red;
   describe('Animations', () => it('does not confuse animation names with predefined keywords', function() {
     const tokens = grammar.tokenizeLines(`\
 .animated {
-animation-name: orphan-black;
-animation-name: line-scale;
+  animation-name: orphan-black;
+  animation-name: line-scale;
 }\
 `
     );
@@ -3738,8 +3738,8 @@ animation-name: line-scale;
   describe('Transforms', () => it('tokenizes transform functions', function() {
     const tokens = grammar.tokenizeLines(`\
 .transformed {
-transform: matrix(0, 1.5, -1.5, 0, 0, 100px);
-transform: rotate(90deg) translateX(100px) scale(1.5);
+  transform: matrix(0, 1.5, -1.5, 0, 0, 100px);
+  transform: rotate(90deg) translateX(100px) scale(1.5);
 }\
 `
     );
