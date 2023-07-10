@@ -684,48 +684,48 @@ int something() {
       it("indents allman-style curly braces", () => expectPreservedIndentation(`\
 if (a)
 {
-for (;;)
-{
-  do
+  for (;;)
   {
-    while (b)
+    do
     {
-      c();
+      while (b)
+      {
+        c();
+      }
     }
+    while (d)
   }
-  while (d)
-}
 }\
 `
       ));
 
       it("indents non-allman-style curly braces", () => expectPreservedIndentation(`\
 if (a) {
-for (;;) {
-  do {
-    while (b) {
-      c();
-    }
-  } while (d)
-}
+  for (;;) {
+    do {
+      while (b) {
+        c();
+      }
+    } while (d)
+  }
 }\
 `
       ));
 
       it("indents function arguments", () => expectPreservedIndentation(`\
 a(
-b,
-c(
-  d
-)
+  b,
+  c(
+    d
+  )
 );\
 `
       ));
 
       it("indents array and struct literals", () => expectPreservedIndentation(`\
 some_t a[3] = {
-{ .b = c },
-{ .b = c, .d = {1, 2} },
+  { .b = c },
+  { .b = c, .d = {1, 2} },
 };\
 `
       ));
