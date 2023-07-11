@@ -11,8 +11,18 @@ comments:
   start: '// '
 
 treeSitter:
+  languageSegment: 'ts.tsx'
   grammar: 'tree-sitter-tsx/tree-sitter-tsx.wasm'
-  highlightsQuery: 'tree-sitter-tsx/highlights.scm'
-  indentsQuery: 'tree-sitter-tsx/indents.scm'
-  foldsQuery: 'tree-sitter-tsx/folds.scm'
-  tagsQuery: 'tree-sitter-tsx/tags.scm'
+  highlightsQuery: [
+    'common/highlights.scm'
+    'tree-sitter-tsx/highlights.scm'
+  ]
+  indentsQuery: [
+    'common/indents.scm'
+    'tree-sitter-tsx/indents.scm'
+  ]
+  foldsQuery: [
+    'common/folds.scm'
+    'tree-sitter-tsx/folds.scm'
+  ]
+  tagsQuery: 'common/tags.scm'
