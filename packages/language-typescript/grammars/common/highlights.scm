@@ -521,17 +521,15 @@
 
 ; The "?" in a `isFoo?: boolean` property type annotation.
 (property_signature "?" @keyword.operator.type.optional._LANG_)
+(public_field_definition "?" @keyword.operator.type.optional._LANG_)
 
 "..." @keyword.operator.spread._LANG_
 "." @keyword.operator.accessor._LANG_
 "?." @keyword.operator.accessor.optional-chaining._LANG_
 
+
 (ternary_expression
-  ["?" ":"] @keyword.operator.ternary._LANG_
-  (#set! test.final true))
-
-(public_field_definition "?" @keyword.operator.optional-type._LANG_)
-
+  ["?" ":"] @keyword.operator.ternary._LANG_)
 
 ; PUNCTUATION
 ; ===========
