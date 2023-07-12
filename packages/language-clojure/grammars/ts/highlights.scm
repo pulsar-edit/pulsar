@@ -1,3 +1,6 @@
+;; Metadata
+((meta_lit) @meta.metadata.clojure)
+
 ;; Function calls
 (anon_fn_lit
  "(" @punctuation.section.expression.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")

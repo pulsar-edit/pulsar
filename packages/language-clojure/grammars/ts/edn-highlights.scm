@@ -1,3 +1,6 @@
+;; Metadata
+((meta_lit) @meta.metadata.clojure)
+
 ;; Collections
 (list_lit
  "(" @punctuation.section.list.begin (#set! test.onlyIfNotDescendantOfNodeWithData "clojure.dismissTag")

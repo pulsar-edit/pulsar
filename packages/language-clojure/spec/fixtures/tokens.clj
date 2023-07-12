@@ -109,3 +109,6 @@ error/
 (ns other.namespace
   (:use [foo.bar]))
 ;   ^ invalid.deprecated
+
+(def ^{:private true} something-private 10)
+;       ^ meta.metadata
