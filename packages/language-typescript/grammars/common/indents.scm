@@ -10,6 +10,17 @@
     (#set! indent.matchIndentOf parent.parent.startPosition)
     (#set! indent.offsetIndent 1))
 
-["{" "(" "["] @indent
-["}" ")" "]"] @dedent
+[
+  "{"
+  "("
+  "["
+] @indent
+
+[
+  "}"
+  ")"
+  "]"
+] @dedent
+
+
 ["case" "default"] @indent

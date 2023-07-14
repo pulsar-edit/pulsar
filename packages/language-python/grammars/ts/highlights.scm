@@ -186,19 +186,19 @@
   (#match? @string.quoted.triple.block.python "^[bBrRuU]*\"\"\""))
 
 ((string) @string.quoted.triple.block.format.python
-  (#match? @string.quoted.triple.block.format.python "^[fF][rR]?\"\"\""))
+  (#match? @string.quoted.triple.block.format.python "^[fFrR]*\"\"\""))
 
 ((string) @string.quoted.double.single-line.python
   (#match? @string.quoted.double.single-line.python "^[bBrRuU]*\"(?!\")"))
 
 ((string) @string.quoted.double.single-line.format.python
-  (#match? @string.quoted.double.single-line.format.python "^[fF][rR]?\""))
+  (#match? @string.quoted.double.single-line.format.python "^[fFrR]*\""))
 
 ((string) @string.quoted.single.single-line.python
   (#match? @string.quoted.single.single-line.python "^[bBrRuU]*\'"))
 
 ((string) @string.quoted.single.single-line.format.python
-  (#match? @string.quoted.single.single-line.format.python "^[fF][rR]?\'"))
+  (#match? @string.quoted.single.single-line.format.python "^[fFrR]*?\'"))
 
 (string_content (escape_sequence) @constant.character.escape.python)
 

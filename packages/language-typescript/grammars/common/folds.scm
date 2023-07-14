@@ -1,4 +1,3 @@
-;
 [
   (switch_body)
   (class_body)

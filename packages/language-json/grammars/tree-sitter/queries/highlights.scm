@@ -1,6 +1,9 @@
 ; STRINGS
 ; =======
 
+(pair
+  key: (string) @meta.structure.key.json)
+
 (string
   "\"" @punctuation.definition.string.begin.json
     (#set! test.onlyIfFirst true))
