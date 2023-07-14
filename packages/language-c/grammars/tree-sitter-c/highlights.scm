@@ -287,6 +287,7 @@
 ["||" "&&"] @keyword.operator.logical.c
 
 (field_expression "." @keyword.operator.accessor.dot.c)
+(field_expression "->" @keyword.operator.accessor.c)
 (preproc_params "..." @keyword.operator.ellipsis.c)
 
 ; PUNCTUATION

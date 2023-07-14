@@ -145,10 +145,10 @@
   (#match? @string.quoted.single.css "^'")
   (#match? @string.quoted.single.css "'$"))
 
-((string_value) @puncutation.definition.string.begin.css
+((string_value) @punctuation.definition.string.begin.css
   (#set! adjust.startAndEndAroundFirstMatchOf "^[\"']"))
 
-((string_value) @puncutation.definition.string.end.css
+((string_value) @punctuation.definition.string.end.css
   (#set! adjust.startAndEndAroundFirstMatchOf "[\"']$"))
 
 
