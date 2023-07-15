@@ -50,29 +50,29 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed bug that happens on some systems when trying to launch Pulsar
-                using the Cinnamon desktop environment
+                Fixed a number of issues with the experimental modern Tree-sitter grammar mode
               </li>
               <li>
-                Added a modern implementation of Tree-sitter grammars behind an experimental flag.
-                Enable the "Use Modern Tree-Sitter Implementation" in the Core settings
-                to try it out
+                Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.
               </li>
               <li>
-                Bugfix: fixed Clojure indentation on tree-sitter
+                Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing
+                breaking changes to existing Less Stylesheets. Pulsar will attempt to automatically repair any breaking
+                changes in any package style sheets, while emitting deprecations.
               </li>
               <li>
-                Improved the Clojure language support by migrating it to tree-sitter and support block comments,
-                quoting, and other advanced features on modern tree-sitter implementation
+                Fixed a bug that would render files unable to be clicked with sticky headers enabled on One-Dark
+                and One-Light themes.
               </li>
               <li>
-                Fixed a bug that could cause images to not appear the first time opening them
+                Added a Modern Tree-Sitter TOML Grammar.
               </li>
               <li>
-                `autocomplete-css` Completions are now sorted in a way that may match what users expect
+                Added a new API endpoint within Pulsar of `atom.versionSatisfies()` to allow packages to safely
+                check the version of Pulsar, instead of having to do so themeselves.
               </li>
               <li>
-                Added a "Log Out" menu item for the `github` package
+                An issue in a downstream dependency has been resolved that improperly flagged Pulsar as malicious.
               </li>
 
             </ul>
