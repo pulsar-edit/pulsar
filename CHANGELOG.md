@@ -6,7 +6,44 @@
 
 ## [Unreleased]
 
-- Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing breaking changes to existing Less StyleSheets. Read more about these changes [here](https://github.com/pulsar-edit/less-cache/releases/tag/v2.0.0).
+## 1.107.0
+
+- Several fixes have been applied for the new Modern Tree Sitter, including better compatibility with Tree-Sitter aware community packages, ability to share query files between two different Tree-Sitter parsers in the same package, and the ability for themes to scope JSON keys differently than their values.
+- Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.
+- Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing breaking changes to existing Less StyleSheets. Read more about these changes [here](https://github.com/pulsar-edit/less-cache/releases/tag/v2.0.0). Pulsar will attempt to automatically repair any breaking changes in any package style sheets, while emitting deprecations.
+- Fixed a bug that would render files unable to be clicked with sticky headers enabled on One-Dark and One-Light themes.
+- Added a Modern Tree-Sitter TOML Grammar.
+- Added a new API endpoint within Pulsar of `atom.versionSatisifes()` to allow packages to safely check the version of Pulsar, instead of having to do so themselves.
+- An issue in a downstream dependency has been resolved that improperly flagged Pulsar as malicious.
+
+### Pulsar
+- Added: Improved Windows Install (`PATH`, `ATOM_HOME`, `InstallLocation`) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/604)
+- Fixed: Running PR for Tree-Sitter fixes [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/555)
+- Added: [autocomplete-css]: Manual Decaf of Source [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/631)
+- Fixed: [welcome]: Ensure Changelog Always Shows if enabled, and version hasn't been dismissed [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/607)
+- Bumped: [autocomplete-plus] Maintenance - Deps bumps, remove CoffeeScript files [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/630)
+- Fixed: Fix tree-view sticky headers of one-dark & one-light themes [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/599)
+- Fixed: [spell-check]: Remove usage of reserved word [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/620)
+- Added: [core]: Implement API on `atom.` to compare Pulsar Versions [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/588)
+- Added: [settings-view]: Manual Decaf (source) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/558)
+- Bumped: [core]: Bump `less-cache` to `v2.0.0` Upgrades `less` to `4.1.3` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/611)
+- Added: [core]: Bundle `spell-check` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/614)
+- Bumped: Update dependency semver to v7.5.2 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/609)
+- Added: [modern-tree-sitter] Add TOML tree-sitter grammar [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/617)
+- Fixed: [language-toml]: Allow spaces within Array [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/610)
+- Fixed: Pin `es5-ext` to `pulsar-edit/es5-ext` removing code flagged as malicious [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/608)
+- Bumped: [git-diff] Bump all Deps [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/603)
+- Bumped: Update dependency semver [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/605)
+- Fixed: [autocomplete-css] Get tests passing for new CSS tree-sitter grammar [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/601)
+- Bumped: [dalek] Bump dependencies to latest, fix links [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/602)
+- Bumped: Update dependency marked to v5.0.3 [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/568)
+
+### less-cache
+- Bumped: Bump `1.1.1` => `2.0.0` [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/5)
+- Bumped: Bump `less` `3.12.2` => `4.1.3` [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/4)
+- Added: Repository Cleanup + CoffeeScript tool Removal (Depends on #2) [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/3)
+- Added: Manual decaf of source files [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/2)
+- Added: Implement Repo Tests [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/1)
 
 ## 1.106.0
 
