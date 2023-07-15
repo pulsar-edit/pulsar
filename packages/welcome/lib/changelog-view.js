@@ -50,9 +50,7 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Several fixes have been applied for the new Modern Tree Sitter, including better compatibility
-                with Tree-Sitter aware community packages, ability to share query files between two different Tree-Sitter
-                parsers in the same package, and the ability for themes to scope JSON keys differently than their values.
+                Fixed a number of issues with the experimental modern Tree-sitter grammar mode
               </li>
               <li>
                 Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.

@@ -8,7 +8,7 @@
 
 ## 1.107.0
 
-- Several fixes have been applied for the new Modern Tree Sitter, including better compatibility with Tree-Sitter aware community packages, ability to share query files between two different Tree-Sitter parsers in the same package, and the ability for themes to scope JSON keys differently than their values.
+- Fixed a number of issues with the experimental modern Tree-sitter grammar mode
 - Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.
 - Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing breaking changes to existing Less StyleSheets. Read more about these changes [here](https://github.com/pulsar-edit/less-cache/releases/tag/v2.0.0). Pulsar will attempt to automatically repair any breaking changes in any package style sheets, while emitting deprecations.
 - Fixed a bug that would render files unable to be clicked with sticky headers enabled on One-Dark and One-Light themes.
