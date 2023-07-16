@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## 1.107.1
+
+- Updated the `github` package to resolve incompatibility in Style Sheets against Less v4
+
+### Pulsar
+
+- Bumped: deps: Update github package to v0.36.17-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/639)
+
+### github
+
+- Fixed: Fix Less Syntax [@confused-Techie](https://github.com/pulsar-edit/github/pull/34)
+
 ## 1.107.0
 
 - Fixed a number of issues with the experimental modern Tree-sitter grammar mode
