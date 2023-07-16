@@ -50,6 +50,9 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
+                Bumped github package to include fixes to the Less syntax, for compatiblity with Less 4
+              </li>
+              <li>
                 Fixed a number of issues with the experimental modern Tree-sitter grammar mode
               </li>
               <li>
