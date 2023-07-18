@@ -16,7 +16,6 @@ describe('Style Guide', () => {
     })
 
     it('opens the style guide', () => {
-      console.log('OK', styleGuideView.element);
       expect(styleGuideView.element.textContent).toContain('Styleguide')
     })
 

@@ -912,18 +912,20 @@ describe('GrammarRegistry', () => {
 
     it('adds an injection point to the grammar with the given id', async () => {
       await atom.packages.activatePackage('language-javascript');
-      atom.grammars.addInjectionPoint('javascript', injectionPoint);
-      const grammar = atom.grammars.grammarForId('javascript');
-      expect(grammar.injectionPoints).toContain(injectionPoint);
+      atom.grammars.addInjectionPoint('source.js', injectionPoint);
+      const grammar = atom.grammars.grammarForId('source.js');
+      expect(
+        grammar.injectionPointsByType['some_node_type']
+      ).toContain(injectionPoint);
     });
 
     it('fires the onDidUpdateGrammar callback', async () => {
+      await atom.packages.activatePackage('language-javascript');
       let callbackDisposable = atom.grammars.onDidUpdateGrammar((grammar) => {
         if (grammar.scopeName === 'source.js') {
           updateCallbackFired = true;
         }
       });
-      await atom.packages.activatePackage('language-javascript');
       atom.grammars.addInjectionPoint('source.js', injectionPoint);
       expect(updateCallbackFired).toBe(true);
     });
@@ -943,10 +945,12 @@ describe('GrammarRegistry', () => {
         addCallbackDisposable = atom.grammars.onDidAddGrammar((grammar) => {
           if (grammar.scopeName === 'source.js') addCallbackFired = true;
         });
-        atom.grammars.addInjectionPoint('javascript', injectionPoint);
+        atom.grammars.addInjectionPoint('source.js', injectionPoint);
         await atom.packages.activatePackage('language-javascript');
-        const grammar = atom.grammars.grammarForId('javascript');
-        expect(grammar.injectionPoints).toContain(injectionPoint);
+        const grammar = atom.grammars.grammarForId('source.js');
+        expect(
+          grammar.injectionPointsByType['some_node_type']
+        ).toContain(injectionPoint);
         expect(updateCallbackFired).toBe(false);
         expect(addCallbackFired).toBe(true);
       });
