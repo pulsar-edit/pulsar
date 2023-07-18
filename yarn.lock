@@ -6257,9 +6257,9 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-less-cache@pulsar-edit/less-cache#v2.0.0:
-  version "2.0.0"
-  resolved "https://codeload.github.com/pulsar-edit/less-cache/tar.gz/6e01ff396df0055330e54e38fb4718807bc770f5"
+less-cache@pulsar-edit/less-cache#v2.0.1:
+  version "2.0.1"
+  resolved "https://codeload.github.com/pulsar-edit/less-cache/tar.gz/40bf113d57aa29d93f7a0d7d575c72045467f016"
   dependencies:
     fs-plus "^3.1.1"
     less "^4.1.3"
