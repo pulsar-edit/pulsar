@@ -122,7 +122,7 @@
     "language-typescript": "file:packages/language-typescript",
     "language-xml": "file:packages/language-xml",
     "language-yaml": "file:packages/language-yaml",
-    "less-cache": "pulsar-edit/less-cache#v2.0.0",
+    "less-cache": "pulsar-edit/less-cache#v2.0.1",
     "line-ending-selector": "file:packages/line-ending-selector",
     "line-top-index": "0.3.1",
     "link": "file:packages/link",
