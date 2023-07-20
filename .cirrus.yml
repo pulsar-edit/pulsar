@@ -66,7 +66,7 @@ arm_linux_task:
                 gnupg2
                 procps
                 curl
-                ruby-rubygems
+                ruby
                 rpm
                 build-essential
                 git
