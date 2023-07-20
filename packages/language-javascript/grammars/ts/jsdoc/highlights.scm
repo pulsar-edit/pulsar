@@ -1,13 +1,13 @@
 ; Highlight this comment even if it's not “valid” JSDoc.
 ((ERROR) @comment.block.documentation.js.jsdoc
-  (#set! test.onlyIfRoot true))
+  (#is? test.root true))
 
 ((ERROR) @punctuation.definition.begin.comment.js.jsdoc
-  (#set! test.onlyIfRoot true)
+  (#is? test.root true)
   (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*\\*"))
 
 ((ERROR) @punctuation.definition.end.comment.js.jsdoc
-  (#set! test.onlyIfRoot true)
+  (#is? test.root true)
   (#set! adjust.startAndEndAroundFirstMatchOf "(?:\\*)?\\*/$"))
 
 

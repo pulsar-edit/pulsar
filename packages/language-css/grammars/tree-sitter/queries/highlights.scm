@@ -8,15 +8,15 @@
 
 (descendant_selector
   (tag_name) @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (ERROR
   (attribute_name) @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((ERROR
   (attribute_name) @invalid.illegal)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; WORKAROUND:
 ;
@@ -41,8 +41,8 @@
 ; Claim this range and block it from being scoped as a tag name.
 (pseudo_element_selector
   (tag_name) @_IGNORE_
-  (#set! test.onlyIfLast true)
-  (#set! test.final true))
+  (#is? test.last true)
+  (#set! capture.final true))
 
 ; COMMENTS
 ; ========
@@ -94,7 +94,7 @@
 ((pseudo_class_selector (class_name) (arguments) .) @entity.other.attribute-name.pseudo-class.css
   (#set! adjust.startAt lastChild.previousSibling.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.previousSibling.endPosition)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Pseudo-classes with arguments: the ":nth-of-type" in `li:nth-of-type(2n-1)`.
 ((pseudo_class_selector (class_name) .) @entity.other.attribute-name.pseudo-class.css
@@ -120,7 +120,7 @@
 (declaration
   (property_name) @variable.other.assignment.css
   (#match? @variable.other.assignment.css "^--" )
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; PROPERTIES
 ; ==========
@@ -233,7 +233,7 @@
 ; The parser is permissive and supports at-rule keywords that don't currently
 ; exist, so we'll set a fallback scope for those.
 ((at_keyword) @keyword.control.at-rule.other.css
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 [(to) (from)] @keyword.control._TYPE_.css
 (important) @keyword.control.important.css
@@ -255,10 +255,10 @@
 
 (rule_set
   (block "{" @punctuation.section.property-list.begin.bracket.curly.css)
-  (#set! test.final true))
+  (#set! capture.final true))
 (rule_set
   (block "}" @punctuation.section.property-list.end.bracket.curly.css)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 "{" @punctuation.bracket.curly.begin.css
 "}" @punctuation.bracket.curly.end.css
@@ -269,7 +269,7 @@
   [":" "::"] @punctuation.definition.entity.css)
 
 (":" @punctuation.separator.key-value.css
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 
 ; SECTIONS
@@ -278,7 +278,7 @@
 ; Used by `autocomplete-css`.
 (rule_set (block) @meta.block.inside-selector.css)
 ((block) @meta.block.css
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 ; Used by `autocomplete-css`. Includes everything before the opening brace so
 ; that autocompletion of selector segments works even when the selector is not
@@ -305,7 +305,7 @@
   .
   (ERROR) @meta.property-value.css
   (#match? @meta.property-value.css "^\s?!i")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (
   (declaration) @meta.property-value.css

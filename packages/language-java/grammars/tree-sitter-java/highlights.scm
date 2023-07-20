@@ -11,7 +11,7 @@
 
 ((comment) @comment.block.documentation.javadoc.java
   (#match? @comment.block.documentation.javadoc.java "^/\\*\\*")
-  (#set! test.final true)
+  (#set! capture.final true)
   (#set! highlight.invalidateOnChange true))
 
 ((comment) @comment.block.java
@@ -36,7 +36,7 @@
 (superclass
   "extends" @storage.modifier.extends.java
   (type_identifier) @entity.other.inherited-class.java
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (class_declaration body: (_) @meta.class.body.java)
 
@@ -65,14 +65,14 @@
 (extends_interfaces
   (interface_type_list
     (type_identifier) @entity.other.inherited-class.java)
-    (#set! test.final true))
+    (#set! capture.final true))
 
 (super_interfaces "implements" @storage.modifier.implements.java)
 
 (super_interfaces
   (interface_type_list
     (type_identifier) @entity.other.inherited-class.java)
-    (#set! test.final true))
+    (#set! capture.final true))
 
 (static_initializer "static" @storage.modifier.static.java)
 
@@ -101,21 +101,21 @@
 
 (object_creation_expression (type_identifier)
   @support.other.class.java
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; WORKAROUND: This matches often when the user is typing, so we shouldn't
 ; highlight it until we know for sure what it is.
 (ERROR
   (type_identifier) @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; WORKAROUND: A chain like `System.out.println` shouldn't match at all until
 ; it's out of an ERROR state; this should catch all references no matter how
 ; long the chain is.
 (scoped_type_identifier
   (type_identifier) @_IGNORE
-  (#set! test.onlyIfDescendantOfType ERROR)
-  (#set! test.final true))
+  (#is? test.descendantOfType ERROR)
+  (#set! capture.final true))
 
 (type_identifier) @storage.type.java
 (type_parameter (identifier) @storage.type.java)
@@ -182,22 +182,22 @@
 
 (field_access (identifier) @constant.other.java
   (#match? @constant.other.java "^[A-Z][A-Z0-9_\\$]+$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (field_access
   object: (identifier) @support.other.class.java
   (#match? @support.other.class.java "^[A-Z]")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (field_access
   field: (identifier) @support.other.class.java
   (#match? @support.other.class.java "^[A-Z]")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 (method_invocation (identifier) @constant.other.java
   (#match? @constant.other.java "^[A-Z][A-Z0-9_\\$]+$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ; VARIABLES
@@ -374,17 +374,17 @@
   condition: (parenthesized_expression
     "(" @punctuation.definition.expression.begin.bracket.round.java
     ")" @punctuation.definition.expression.end.bracket.round.java
-    (#set! test.final true)))
+    (#set! capture.final true)))
 
 (formal_parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.java
   ")" @punctuation.definition.parameters.end.bracket.round.java
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (argument_list
   "(" @punctuation.definition.arguments.begin.bracket.round.java
   ")" @punctuation.definition.arguments.end.bracket.round.java
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 "{" @punctuation.definition.block.begin.bracket.curly.java
