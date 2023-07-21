@@ -231,7 +231,7 @@ describe('StyleManager', () => {
           {}
         );
         expect(upgradedSheet.source).toEqual(
-          "p { padding: (@size + 12px); }"
+          "p { padding: calc(@size + 12px); }"
         );
       });
 
@@ -241,7 +241,7 @@ describe('StyleManager', () => {
           {}
         );
         expect(upgradedSheet.source).toEqual(
-          "p { padding: (12px + padding); }"
+          "p { padding: calc(12px + padding); }"
         );
       });
 
