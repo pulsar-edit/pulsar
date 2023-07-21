@@ -225,6 +225,26 @@ describe('StyleManager', () => {
         );
       });
 
+      it('recognizes valid less variables: right side', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: @size + 12px; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { padding: (@size + 12px); }"
+        );
+      });
+
+      it('recognizes vlaid less variables: left side', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 12px + padding; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { padding: (12px + padding); }"
+        );
+      });
+
     });
 
     describe('when a sourcePath parameter is specified', () => {
