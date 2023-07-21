@@ -235,7 +235,7 @@ describe('StyleManager', () => {
         );
       });
 
-      it('recognizes vlaid less variables: left side', () => {
+      it('recognizes valid less variables: left side', () => {
         let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
           "p { padding: 12px + padding; }",
           {}
