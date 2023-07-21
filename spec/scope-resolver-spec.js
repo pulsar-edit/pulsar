@@ -858,7 +858,7 @@ describe('ScopeResolver', () => {
       })).toBe(true);
     });
 
-    it('supports test.oot', async () => {
+    it('supports test.root', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((_) @is-root
           (#is? test.root true))
