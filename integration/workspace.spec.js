@@ -65,6 +65,8 @@ test.describe('Opening Atom for the first time', () => {
   //})
 
   test('allows to install for packages', async () => {
+   await runCommand(editor, 'Tree View: Toggle')
+   await runCommand(editor, 'Tabs: Close All Tabs')
    await runCommand(editor, 'Settings View: Open')
    await editor.page.locator('a.icon', { hasText: 'Install' }).click()
    await typeInEditor(editor, '.packages', "termination")
