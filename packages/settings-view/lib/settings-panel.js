@@ -36,7 +36,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
       namespace = 'editor'
       settings = {}
       for (const name of SCOPED_SETTINGS) {
-        settings[name] = atom.config.get(name, {scope: [this.options.scopeName]})
+        settings[name] = getWithoutProjectOverride(name, {scope: [this.options.scopeName]})
       }
     } else {
       settings = getWithoutProjectOverride(namespace)
@@ -174,8 +174,12 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     // reflected in the settings panel. We use `observe` to hook into any
     // possible changes to our value, but we double-check it by looking up the
     // value ourselves.
-    let wrappedCallback = () => {
-      callback(getWithoutProjectOverride(name))
+    let wrappedCallback = (nv) => {
+      let params = {}
+      if (this.options.scopeName != null) {
+        params.scope = [this.options.scopeName]
+      }
+      callback(getWithoutProjectOverride(name, params))
     }
 
     this.disposables.add(atom.config.observe(name, params, wrappedCallback))
@@ -404,8 +408,7 @@ function sortSettings (namespace, settings) {
     .value()
 }
 
-function getWithoutProjectOverride (name) {
-  let options = {}
+function getWithoutProjectOverride (name, options = {}) {
   if (atom.config.projectFile) {
     options.excludeSources = [atom.config.projectFile]
   }
