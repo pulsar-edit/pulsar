@@ -14,7 +14,7 @@
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
   "/" @punctuation.definition.tag.end.ts.tsx
-  (#set! test.final true)
+  (#set! capture.final true)
   name: (identifier) @entity.name.tag.ts.tsx)
 
 ; The "bar" in `<Foo bar={true} />`.
@@ -24,17 +24,17 @@
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.ts.tsx
   (#match? @meta.embedded.block.ts.tsx "\\n")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (jsx_expression) @meta.embedded.line.ts.tsx
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.ts.tsx
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((jsx_self_closing_element
   ; The "/>" in `<Foo />`, extended to cover both anonymous nodes at once.
   "/") @punctuation.definition.tag.end.ts.tsx
   (#set! adjust.startAt lastChild.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.endPosition)
-  (#set! test.final true))
+  (#set! capture.final true))

@@ -54,7 +54,7 @@
 
 ((property_identifier) @constant.other.property._LANG_
   (#match? @constant.other.property._LANG_ "^[\$A-Z_]+$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; (property_identifier) @variable.other.object.property._LANG_
 
@@ -72,6 +72,9 @@
 
 (public_field_definition
   name: (property_identifier) @variable.declaration.field._LANG_)
+
+(public_field_definition
+  name: (private_property_identifier) @variable.declaration.field.private._LANG_)
 
 (new_expression
   constructor: (identifier) @support.type.class._LANG_)
@@ -113,7 +116,7 @@
 
 ((literal_type [(null) (undefined)]) @storage.type._TEXT_._LANG_)
 ((literal_type [(null) (undefined)]) @support.type._TEXT_._LANG_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; TODO: Decide whether other literal types — strings, booleans, and whatnot —
 ; should be highlighted as they are in JS, or should be highlighted like other
@@ -138,7 +141,7 @@
   name: (identifier) @entity.other.attribute-name.type._LANG_)
 
 ((type_identifier) @storage.type._LANG_
-  ; (#set! test.onlyIfDescendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
+  ; (#is? test.descendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
   )
 
 ; A capture can satisfy more than one of these criteria, so we need to guard
@@ -146,8 +149,8 @@
 ; two capture names are applied in separate captures — otherwise `test.final`
 ; would be applied after the first capture.
 ((type_identifier) @support.type._LANG_
-  ; (#set! test.onlyIfDescendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
-  (#set! test.final true))
+  ; (#is? test.descendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
+  (#set! capture.final true))
 
 ; OBJECTS
 ; =======
@@ -169,6 +172,8 @@
   object: (member_expression
     property: (property_identifier) @support.other.object._LANG_))
 
+(method_signature
+  (property_identifier) @entity.other.attribute-name.method._LANG_)
 
 (property_signature
   (property_identifier) @entity.other.attribute-name._LANG_)
@@ -213,7 +218,7 @@
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition._LANG_
-    (#set! test.final true))
+    (#set! capture.final true))
   right: [(arrow_function) (function)])
 
 ; Function variable assignment:
@@ -257,7 +262,13 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
-    (#set! test.final true))
+    (#set! capture.final true))
+
+(optional_parameter
+  pattern: (identifier) @variable.parameter.optional._LANG_)
+
+(optional_parameter "?" @keyword.operator.type.optional._LANG_)
+
 
 ["var" "const" "let"] @storage.type._TYPE_._LANG_
 
@@ -336,7 +347,7 @@
     (pair_pattern
       key: (_) @entity.other.attribute-name._LANG_
       value: (identifier) @variable.other.assignment.loop._LANG_)
-      (#set! test.final true)))
+      (#set! capture.final true)))
 
 ; The "error" in `} catch (error) {`
 (catch_clause
@@ -352,31 +363,31 @@
 ((identifier) @support.object.builtin._TEXT_._LANG_
   (#match? @support.object.builtin._TEXT_._LANG_ "^(arguments|module|window|document)$")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @support.object.builtin.filename._LANG_
   (#eq? @support.object.builtin.filename._LANG_ "__filename")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @support.object.builtin.dirname._LANG_
   (#eq? @support.object.builtin.dirname._LANG_ "__dirname")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @support.function.builtin.require._LANG_
   (#eq? @support.function.builtin.require._LANG_ "require")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @constant.language.infinity._LANG_
   (#eq? @constant.language.infinity._LANG_ "Infinity")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Things that `LOOK_LIKE_CONSTANTS`.
 ([(property_identifier) (identifier)] @constant.other._LANG_
   (#match? @constant.other._LANG_ "^[A-Z_][A-Z0-9_]*$")
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 
 ; NUMBERS
@@ -390,27 +401,27 @@
 ((string "\"") @string.quoted.double._LANG_)
 ((string
   "\"" @punctuation.definition.string.begin._LANG_)
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 
 ((string
   "\"" @punctuation.definition.string.end._LANG_)
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 
 ((string "'") @string.quoted.single._LANG_)
 ((string
   "'" @punctuation.definition.string.begin._LANG_)
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 
 ((string
   "'" @punctuation.definition.string.end._LANG_)
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 
 (template_string) @string.quoted.template._LANG_
 
 ((template_string "`" @punctuation.definition.string.begin._LANG_)
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 ((template_string "`" @punctuation.definition.string.end._LANG_)
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 
 ; Interpolations inside of template strings.
 (template_substitution
@@ -483,6 +494,8 @@
   "&="
   "^="
   "|="
+  "??="
+  "||="
 ] @keyword.operator.assignment.compound._LANG_
 
 [
@@ -521,7 +534,13 @@
 
 ; The "?" in a `isFoo?: boolean` property type annotation.
 (property_signature "?" @keyword.operator.type.optional._LANG_)
+; The "?" in a `isFoo()?: boolean` method type annotation.
+(method_signature "?" @keyword.operator.type.optional._LANG_)
+
+; The "?" in a `isFoo?: boolean` class field annotation.
 (public_field_definition "?" @keyword.operator.type.optional._LANG_)
+; The "!" in a `isFoo!: boolean` class field annotation.
+(public_field_definition "!" @keyword.operator.type.definite._LANG_)
 
 "..." @keyword.operator.spread._LANG_
 "." @keyword.operator.accessor._LANG_
@@ -552,23 +571,23 @@
 ; The interiors of functions (useful for snippets and commands).
 (method_definition
   body: (statement_block) @meta.block.function._LANG_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (function_declaration
   body: (statement_block) @meta.block.function._LANG_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (generator_function_declaration
   body: (statement_block) @meta.block.function._LANG_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (function
   body: (statement_block) @meta.block.function._LANG_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (generator_function
   body: (statement_block) @meta.block.function._LANG_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; The interior of a class body (useful for snippets and commands).
 (class_body) @meta.block.class._LANG_

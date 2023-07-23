@@ -152,7 +152,15 @@ class ScopeResolver {
 
   setDataForRange(range, props) {
     let key = this._keyForRange(range);
-    return this.rangeData.set(key, props);
+    let normalizedProps = { ...props };
+    // TEMP: No longer needed when we remove support for (#set! test.final
+    // true).
+    for (let prop of ['final', 'shy']) {
+      if (`test.${prop}` in normalizedProps) {
+        normalizedProps[`capture.${prop}`] = normalizedProps[`test.${prop}`];
+      }
+    }
+    return this.rangeData.set(key, normalizedProps);
   }
 
   getDataForRange(syntax) {
@@ -205,7 +213,26 @@ class ScopeResolver {
 
   normalizeTestProperty(prop) {
     if (prop.startsWith('test.')) {
-      prop = prop.replace(/^test\./, '');
+      prop = prop.substring(5);
+    }
+
+    // TEMP: Normalize `onlyIfNotFoo` and `onlyIfFoo` to `foo`.
+    if (prop.startsWith('onlyIfNot')) {
+      prop = prop.charAt(9).toLowerCase() + prop.substring(10);
+    }
+    if (prop.startsWith('onlyIf')) {
+      prop = prop.charAt(6).toLowerCase() + prop.substring(7);
+    }
+    return prop;
+  }
+
+  normalizeCaptureSettingProperty(prop) {
+    if (prop.startsWith('capture.')) {
+      prop = prop.substring(8);
+    }
+    // TEMP: Normalize `test.final` and `test.shy` to `final` and `shy`.
+    if (prop === 'test.final' || prop === 'test.shy') {
+      prop = prop.substring(5);
     }
     return prop;
   }
@@ -215,9 +242,28 @@ class ScopeResolver {
     return prop in ScopeResolver.TESTS;
   }
 
+  capturePropertyIsCaptureSetting(prop) {
+    // TEMP: Support `test.final` and `test.shy` temporarily.
+    if (prop === 'test.final' || prop === 'test.shy') {
+      return true;
+    }
+    if (prop.includes('.') && !prop.startsWith('capture.')) {
+      return false;
+    }
+    prop = this.normalizeCaptureSettingProperty(prop);
+    return prop in ScopeResolver.CAPTURE_SETTINGS;
+  }
+
   applyTest(prop, ...args) {
+    let isLegacyNegation = prop.includes('onlyIfNot');
     prop = this.normalizeTestProperty(prop);
-    return ScopeResolver.TESTS[prop](...args);
+    let result = ScopeResolver.TESTS[prop](...args);
+    return isLegacyNegation ? !result : result;
+  }
+
+  applyCaptureSettingProperty(prop, ...args) {
+    prop = this.normalizeCaptureSettingProperty(prop);
+    return ScopeResolver.CAPTURE_SETTINGS[prop](...args);
   }
 
   // Given a capture and possible predicate data, determines the buffer range
@@ -265,16 +311,57 @@ class ScopeResolver {
   // Given a syntax capture, test whether we should include its scope in the
   // document.
   test(capture, existingData) {
-    let { node, setProperties: props = {} } = capture;
-    if (existingData?.final || existingData?.['test.final']) { return false; }
+    let {
+      node,
+      setProperties: props = {},
+      assertedProperties: asserted = {},
+      refutedProperties: refuted = {}
+    } = capture;
 
+    if (existingData?.final || existingData?.['capture.final']) {
+      return false;
+    }
+
+    // Capture settings (final/shy) are the only keys in `setProperties` that
+    // matter when testing this capture.
+    //
+    // TODO: For compatibility reasons, we're still checking tests of the form
+    // (#set! test.final) here, but this should be removed before modern
+    // Tree-sitter ships.
     for (let key in props) {
-      if (!this.capturePropertyIsTest(key)) { continue; }
-      let value = props[key];
-      if (!this.applyTest(key, node, value, props, existingData, this)) {
-        return false;
+      let isCaptureSettingProperty = this.capturePropertyIsCaptureSetting(key);
+      let isTest = this.capturePropertyIsTest(key);
+      if (!(isCaptureSettingProperty || isTest)) { continue; }
+      let value = props[key] ?? true;
+      if (isCaptureSettingProperty) {
+        if (!this.applyCaptureSettingProperty(key, node, existingData, this)) {
+          return false;
+        }
+      } else {
+        // TODO: Remove this once third-party grammars have had time to adapt to
+        // the migration of tests to `#is?` and `#is-not?`.
+        if (!this.applyTest(key, node, value, existingData, this)) {
+          return false;
+        }
       }
     }
+
+    // Apply tests of the form `(#is? foo)`.
+    for (let key in asserted) {
+      if (!this.capturePropertyIsTest(key)) { continue; }
+      let value = asserted[key] ?? true;
+      let result = this.applyTest(key, node, value, props, existingData, this);
+      if (!result) return false;
+    }
+
+    // Apply tests of the form `(#is-not? foo)`.
+    for (let key in refuted) {
+      if (!this.capturePropertyIsTest(key)) { continue; }
+      let value = refuted[key] ?? true;
+      let result = this.applyTest(key, node, value, props, existingData, this);
+      if (result) return false;
+    }
+
     return true;
   }
 
@@ -402,16 +489,41 @@ ScopeResolver.interpolateName = (name, node) => {
   return name;
 };
 
+
+// Special `#set!` predicates that work on “claimed” and “unclaimed” ranges.
+ScopeResolver.CAPTURE_SETTINGS = {
+  // Passes only if another capture has not already declared `final` for the
+  // exact same range. If a capture is the first one to define `final`, then
+  // all other captures for that same range are ignored, whether they try to
+  // define `final` or not.
+  final(node, existingData) {
+    let final = existingData?.final || existingData?.['capture.final'];
+    return !(existingData && final);
+  },
+
+  // Passes only if no earlier capture has occurred for the exact same range.
+  shy(node, existingData) {
+    return existingData === undefined;
+  }
+};
+
+
 // These tests are used to define criteria under which the scope should be
 // applied. Set them in a query file like so:
 //
 // (
 //   (foo) @some.scope.name
-//   (#set! onlyIfFirst true)
+//   (#is? test.first)
 // )
 //
-// For boolean rules, the second argument to `#set!` is arbitrary, but must be
-// something truthy; `true` is suggested.
+// For boolean rules, the second argument to `#is?` can be omitted.
+//
+// A test can be negated with `#is-not?`:
+//
+// (
+//   (foo) @some.scope.name
+//   (#is-not? test.first)
+// )
 //
 // These tests come in handy for criteria that can't be represented by the
 // built-in predicates like `#match?` and `#eq?`.
@@ -419,70 +531,37 @@ ScopeResolver.interpolateName = (name, node) => {
 // NOTE: Syntax queries will always be run through a `ScopeResolver`, but other
 // kinds of queries may or may not, depending on purpose.
 //
-ScopeResolver.TESTS = {
-  // Passes only if another capture has not already declared `final` for the
-  // exact same range. If a capture is the first one to define `final`, then
-  // all other captures for that same range are ignored, whether they try to
-  // define `final` or not.
-  final(node, value, props, existingData) {
-    let final = existingData?.final || existingData?.['test.final'];
-    return !(existingData && final);
-  },
 
-  // Passes only if no earlier capture has occurred for the exact same range.
-  shy(node, value, props, existingData) {
-    return existingData === undefined;
-  },
+ScopeResolver.TESTS = {
 
   // Passes only if the node is of the given type. Can accept multiple
   // space-separated types.
-  onlyIfType(node, nodeType) {
+  type(node, nodeType) {
     if (!nodeType.includes(' ')) { return node.type === nodeType }
     let nodeTypes = nodeType.split(/\s+/);
     return nodeTypes.some(t => t === node.type);
   },
 
-  // Negates `onlyIfType`.
-  onlyIfNotType(...args) {
-    let isType = ScopeResolver.TESTS.onlyIfType(...args);
-    return !isType;
-  },
-
   // Passes only if the node contains any descendant ERROR nodes.
-  onlyIfHasError(node) {
+  hasError(node) {
     return node.hasError();
-  },
-
-  // Negates `onlyIfHasError`.
-  onlyIfNotHasError(node) {
-    return !node.hasError();
   },
 
   // Passes when the node's tree belongs to an injection layer, rather than the
   // buffer's root language layer.
-  onlyIfInjection(node, value, props, existingData, instance) {
+  injection(node, value, props, existingData, instance) {
     return instance.languageLayer.depth > 0;
   },
 
-  // Negates `onlyIfInjection`.
-  onlyIfNotInjection(node, value, props, existingData, instance) {
-    return instance.languageLayer.depth === 0;
-  },
-
   // Passes when the node has no parent.
-  onlyIfRoot(node) {
+  root(node) {
     return !node.parent;
-  },
-
-  // Negates `onlyIfRoot`.
-  onlyIfNotRoot(node) {
-    return !!node.parent;
   },
 
   // Passes only if the given node is the first among its siblings.
   //
   // Is not guaranteed to pass if descended from an ERROR node.
-  onlyIfFirst(node) {
+  first(node) {
     // Root nodes are always first.
     if (!node.parent) { return true; }
 
@@ -492,31 +571,19 @@ ScopeResolver.TESTS = {
     return node?.parent?.firstChild?.id === node.id;
   },
 
-  // Negates `onlyIfFirst`.
-  onlyIfNotFirst(node) {
-    if (!node.parent) { return false; }
-    return node?.parent?.firstChild?.id !== node.id;
-  },
-
   // Passes only if the given node is the last among its siblings.
   //
   // Is not guaranteed to pass if descended from an ERROR node.
-  onlyIfLast(node) {
+  last(node) {
     // Root nodes are always last.
     if (!node.parent) { return true; }
     return node?.parent?.lastChild?.id === node.id;
   },
 
-  // Negates `onlyIfLast`.
-  onlyIfNotLast(node) {
-    if (!node.parent) { return false; }
-    return node?.parent?.lastChild?.id !== node.id;
-  },
-
   // Passes when the node is the first of its type among its siblings.
   //
   // Is not guaranteed to pass if descended from an ERROR node.
-  onlyIfFirstOfType(node) {
+  firstOfType(node) {
     if (!node.parent) { return true; }
     let type = node.type;
     let parent = node.parent;
@@ -532,16 +599,10 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Negates `onlyIfFirstOfType`.
-  onlyIfNotFirstOfType(node) {
-    let onlyIfFirstOfType = ScopeResolver.TESTS.onlyIfFirstOfType(node);
-    return !onlyIfFirstOfType;
-  },
-
   // Passes when the node is the last of its type among its siblings.
   //
   // Is not guaranteed to pass if descended from an ERROR node.
-  onlyIfLastOfType(node) {
+  lastOfType(node) {
     if (!node.parent) { return true; }
     let type = node.type;
     let parent = node.parent;
@@ -555,45 +616,27 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Negates `onlyIfLastOfType`.
-  onlyIfNotLastOfType(node) {
-    let onlyIfLastOfType = ScopeResolver.TESTS.onlyIfLastOfType(node);
-    return !onlyIfLastOfType;
-  },
-
   // Passes when the node represents the last non-whitespace content on its
   // row. Considers the node's ending row.
-  onlyIfLastTextOnRow(node, value, props, existingData, instance) {
+  lastTextOnRow(node, value, props, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.endPosition.row);
     let textAfterNode = text.slice(node.endPosition.column);
     return !/\S/.test(textAfterNode);
   },
 
-  // Negates `onlyIfLastTextOnRow`.
-  onlyIfNotLastTextOnRow(...args) {
-    let isLastTextOnRow = ScopeResolver.TESTS.onlyIfLastTextOnRow(...args);
-    return !isLastTextOnRow;
-  },
-
   // Passes when the node represents the first non-whitespace content on its
   // row. Considers the node's starting row.
-  onlyIfFirstTextOnRow(node, value, props, existingData, instance) {
+  firstTextOnRow(node, value, props, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.startPosition.row);
     let textBeforeNode = text.slice(0, node.startPosition.column);
     return !/\S/.test(textBeforeNode);
   },
 
-  // Negates `onlyIfFirstTextOnRow`.
-  onlyIfNotFirstTextOnRow(...args) {
-    let isFirstTextOnRow = ScopeResolver.TESTS.onlyIfFirstTextOnRow(...args);
-    return !isFirstTextOnRow;
-  },
-
   // Passes if this node has any node of the given type(s) in its ancestor
   // chain.
-  onlyIfDescendantOfType(node, type) {
+  descendantOfType(node, type) {
     let multiple = type.includes(' ');
     let target = multiple ? type.split(/\s+/) : type;
     let current = node;
@@ -605,28 +648,16 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Negates `onlyIfDescendantOfType`.
-  onlyIfNotDescendantOfType(...args) {
-    let isDescendantOfType = ScopeResolver.TESTS.onlyIfDescendantOfType(...args);
-    return !isDescendantOfType;
-  },
-
   // Passes if this node has at least one descendant of the given type(s).
-  onlyIfAncestorOfType(node, type) {
+  ancestorOfType(node, type) {
     let target = type.includes(' ') ? type.split(/\s+/) : type;
     let descendants = node.descendantsOfType(target);
     return descendants.length > 0;
   },
 
-  // Negates `onlyIfAncestorOfType`.
-  onlyIfNotAncestorOfType(...args) {
-    let isAncestorOfType = ScopeResolver.TESTS.onlyIfAncestorOfType(...args);
-    return !isAncestorOfType;
-  },
-
   // Passes if this range (after adjustments) has previously had data stored at
   // the given key.
-  onlyIfRangeWithData(node, rawValue, props, existingData) {
+  rangeWithData(node, rawValue, props, existingData) {
     if (existingData === undefined) { return false; }
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -638,15 +669,9 @@ ScopeResolver.TESTS = {
       (key in existingData);
   },
 
-  // Negates `onlyIfRangeWithData`.
-  onlyIfNotRangeWithData(...args) {
-    let isNodeWithData = ScopeResolver.TESTS.onlyIfRangeWithData(...args);
-    return !isNodeWithData;
-  },
-
   // Passes if one of this node's ancestors has stored data at the given key
   // for its inherent range (ignoring adjustments).
-  onlyIfDescendantOfNodeWithData(node, rawValue, props, existingData, instance) {
+  descendantOfNodeWithData(node, rawValue, props, existingData, instance) {
     let current = node;
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -663,42 +688,24 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Negates `onlyIfDescendantOfNodeWithData`.
-  onlyIfNotDescendantOfNodeWithData(...args) {
-    let isDescendantOfNodeWithData = ScopeResolver.TESTS.onlyIfDescendantOfNodeWithData(...args);
-    return !isDescendantOfNodeWithData;
-  },
-
   // Passes if this node starts on the same row as the one in the described
   // position. Accepts a node position descriptor.
-  onlyIfStartsOnSameRowAs(node, descriptor) {
+  startsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
     return otherNodePosition.row === node.startPosition.row;
   },
 
-  // Negates `onlyIfStartsOnSameRowAs`.
-  onlyIfNotStartsOnSameRowAs(node, descriptor) {
-    let otherNodePosition = resolveNodePosition(node, descriptor);
-    return otherNodePosition.row !== node.startPosition.row;
-  },
-
   // Passes if this node ends on the same row as the one in the described
   // position. Accepts a node position descriptor.
-  onlyIfEndsOnSameRowAs(node, descriptor) {
+  endsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
     return otherNodePosition.row === node.endPosition.row;
-  },
-
-  // Negates `onlyIfEndsOnSameRowAs`.
-  onlyIfNotEndsOnSameRowAs(node, descriptor) {
-    let otherNodePosition = resolveNodePosition(node, descriptor);
-    return otherNodePosition.row !== node.endPosition.row;
   },
 
   // Passes only when a given config option is present and truthy. Accepts
   // either (a) a configuration key or (b) a configuration key and value
   // separated by a space.
-  onlyIfConfig(node, rawValue, props, existingData, instance) {
+  config(node, rawValue, props, existingData, instance) {
     let [key, value] = interpretPossibleKeyValuePair(rawValue, true);
 
     // Invalid predicates should be ignored.
@@ -706,12 +713,6 @@ ScopeResolver.TESTS = {
 
     let configValue = instance.getConfig(key) ?? false;
     return value === null ? !!configValue : configValue === value;
-  },
-
-  // Negates `onlyIfConfig`.
-  onlyIfNotConfig(...args) {
-    let onlyIfConfig = ScopeResolver.TESTS.onlyIfConfig(...args);
-    return !onlyIfConfig;
   }
 };
 
