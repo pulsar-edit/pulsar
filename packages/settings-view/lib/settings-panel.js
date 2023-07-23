@@ -116,7 +116,6 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
       let name = type === 'radio' ? input.name : input.id
 
       this.observe(name, (value) => {
-        console.log('change:', name, value)
         this.updateOverrideMessage(name)
         if (type === 'checkbox') {
           input.checked = value
