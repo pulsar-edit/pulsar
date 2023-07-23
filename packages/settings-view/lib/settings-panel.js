@@ -22,6 +22,7 @@ const SCOPED_SETTINGS = [
   'tabType'
 ]
 
+
 export default class SettingsPanel extends CollapsibleSectionPanel {
   constructor (options = {}) {
     super()
@@ -38,7 +39,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
         settings[name] = atom.config.get(name, {scope: [this.options.scopeName]})
       }
     } else {
-      settings = atom.config.get(namespace)
+      settings = getWithoutProjectOverride(namespace)
     }
 
     this.element.appendChild(this.elementForSettings(namespace, settings))
@@ -154,10 +155,22 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
 
   observe (name, callback) {
     let params = {sources: [atom.config.getUserConfigPath()]}
+    if (atom.config.projectFile) {
+      params.excludeSources = [atom.config.projectFile]
+    }
     if (this.options.scopeName != null) {
       params.scope = [this.options.scopeName]
     }
-    this.disposables.add(atom.config.observe(name, params, callback))
+
+    // We need to be sure that project-specific config overrides are never
+    // reflected in the settings panel. We use `observe` to hook into any
+    // possible changes to our value, but we double-check it by looking up the
+    // value ourselves.
+    let wrappedCallback = () => {
+      callback(getWithoutProjectOverride(name))
+    }
+
+    this.disposables.add(atom.config.observe(name, params, wrappedCallback))
   }
 
   isDefault (name) {
@@ -379,7 +392,32 @@ function sortSettings (namespace, settings) {
     .value()
 }
 
+function getWithoutProjectOverride (name) {
+  let options = {}
+  if (atom.config.projectFile) {
+    options.excludeSources = [atom.config.projectFile]
+  }
+  return atom.config.get(name, options)
+}
+
+function getWithProjectOverride(name) {
+  return atom.config.get(name, { sources: [atom.config.projectFile] })
+}
+
+function settingHasProjectOverride (name) {
+  return typeof getWithProjectOverride(name) !== 'undefined'
+}
+
+function addOverrideWarning (element) {
+  let div = document.createElement('div')
+  div.classList.add('text-warning', 'setting-override-warning')
+  div.textContent = `This global setting has been overridden by a project-specific setting. Changing it will affect your global config file, but may not have any effect in this window.`
+
+  element.appendChild(div)
+}
+
 function elementForSetting (namespace, name, value) {
+  let hasOverride = settingHasProjectOverride(`${namespace}.${name}`)
   if (namespace === 'core') {
     if (name === 'themes') { return document.createDocumentFragment() } // Handled in the Themes panel
     if (name === 'disabledPackages') { return document.createDocumentFragment() } // Handled in the Packages panel
@@ -400,6 +438,10 @@ function elementForSetting (namespace, name, value) {
   const controls = document.createElement('div')
   controls.classList.add('controls')
   controlGroup.appendChild(controls)
+
+  if (hasOverride) {
+    addOverrideWarning(controlGroup)
+  }
 
   let schema = atom.config.getSchema(`${namespace}.${name}`)
   if (schema && schema.enum) {
