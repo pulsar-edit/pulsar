@@ -1,4 +1,4 @@
-fdescribe('Config', () => {
+describe('Config', () => {
   let savedSettings;
 
   beforeEach(() => {
