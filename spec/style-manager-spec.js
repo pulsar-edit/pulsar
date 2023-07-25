@@ -237,11 +237,11 @@ describe('StyleManager', () => {
 
       it('recognizes valid less variables: left side', () => {
         let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
-          "p { padding: 12px + padding; }",
+          "p { padding: 12px + @size; }",
           {}
         );
         expect(upgradedSheet.source).toEqual(
-          "p { padding: calc(12px + padding); }"
+          "p { padding: calc(12px + @size); }"
         );
       });
 
