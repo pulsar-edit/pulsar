@@ -6599,7 +6599,7 @@ markdown-it@^12.3.2:
     fs-plus "^3.0.0"
     marked "5.0.3"
     underscore-plus "^1.0.0"
-    yaml-front-matter "^4.0.0"
+    yaml-front-matter "^4.1.1"
 
 marked@0.8.0:
   version "0.8.0"
@@ -10049,7 +10049,7 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml-front-matter@^4.0.0:
+yaml-front-matter@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/yaml-front-matter/-/yaml-front-matter-4.1.1.tgz#66eaa9a998fc3dd723708c73aa8e06e79cac91c9"
   integrity sha512-ULGbghCLsN8Hs8vfExlqrJIe8Hl2TUjD7/zsIGMP8U+dgRXEsDXk4yydxeZJgdGiimP1XB7zhmhOB4/HyfqOyQ==
