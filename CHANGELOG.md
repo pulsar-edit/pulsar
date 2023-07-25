@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+- Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of correctly named binaries on more systems in more contexts (especially Windows). Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
+
+### Pulsar
+
+Bumped: ppm: Update submodule to 49c8ced8f9552bb4aeb279130 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/654)
+
+### ppm
+
+- Added: Add 'ppm' bins to complement existing 'apm' bins [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/80)
+- Fixed: Replace "apm" by "ppm" in help messages. [@azuledu](https://github.com/pulsar-edit/ppm/pull/62)
+- Bumped: Update OS, actions, node [@Spiker985](https://github.com/pulsar-edit/ppm/pull/57)
+
 ## 1.107.1
 
 - Updated the `github` package to resolve incompatibility in Style Sheets against Less v4
