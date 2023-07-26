@@ -227,6 +227,7 @@
     "notifications": "file:./packages/notifications",
     "open-on-github": "file:./packages/open-on-github",
     "package-generator": "file:./packages/package-generator",
+    "pulsar-updater": "file:./packages/pulsar-updater",
     "settings-view": "file:./packages/settings-view",
     "snippets": "1.6.1",
     "spell-check": "file:./packages/spell-check",
