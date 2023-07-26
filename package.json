@@ -145,6 +145,7 @@
     "postcss": "8.2.13",
     "postcss-selector-parser": "6.0.4",
     "property-accessors": "^1.1.3",
+    "pulsar-updater": "file:packages/pulsar-updater",
     "resolve": "1.18.1",
     "scandal": "^3.2.0",
     "scoped-property-store": "^0.17.0",
