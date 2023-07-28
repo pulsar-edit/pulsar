@@ -140,19 +140,7 @@ function linux_debGetInstalled() {
 }
 
 function linux_flatpakInstalled() {
-  //if (atom.applicationDelegate.getWindowLoadSettings().resourcePath !== "/app/Pulsar/resources/app.asar") {
-  //  return false;
-  //}
-
-  //if (fs.existsSync(`${process.env.HOME}/.var/app/dev.pulsar_edit.Pulsar`)) {
-  //  return true;
-  //}
-
-  if (process.env.FLATPAK_ID === "dev.pulsar_edit.Pulsar") {
-    return true;
-  } else {
-    return false;
-  }
+  return process.env.FLATPAK_ID === "dev.pulsar_edit.Pulsar";
 }
 
 module.exports = {
