@@ -13,10 +13,6 @@ class PulsarUpdater {
         "pulsar-updater:check-for-update": () => {
           this.checkForUpdates();
         },
-      })
-    );
-    this.disposables.add(
-      atom.commands.add("atom-workspace", {
         "pulsar-updater:clear-cache": () => {
           this.cache.empty("last-update-check");
           this.cache.empty(`installMethod.${atom.getVersion()}`);
