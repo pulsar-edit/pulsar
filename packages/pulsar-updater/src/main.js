@@ -78,6 +78,14 @@ class PulsarUpdater {
       let objButtonForInstallMethod =
         this.getObjButtonForInstallMethod(installMethod);
 
+      let notificationDetailText = this.getNotificationText(installMethod, latestVersion);
+
+      // Now the notification text may return the special string of "DO_NOT_PROMPT"
+      // If this text is seen, the notification is never shown
+      if (notificationDetailText === "DO_NOT_PROMPT") {
+        return;
+      }
+
       const notification = atom.notifications.addInfo(
         "An update for Pulsar is available.",
         {
@@ -139,12 +147,13 @@ class PulsarUpdater {
           "Since you're in developer mode, Pulsy trusts you know how to update. :)";
         break;
       case "Safe Mode":
+        // The text can be this special value, to abort the notification from being shown
         returnText +=
-          "Declining update suggestion since Pulsar is in Safe Mode.";
+          "DO_NOT_PROMPT";
         break;
       case "Spec Mode":
         returnText +=
-          "Declining update suggestion since Pulsar is in Spec Mode.";
+          "DO_NOT_PROMPT";
         break;
       case "Flatpak Installation":
         returnText += "Install the latest version by running `flatpak update`.";
