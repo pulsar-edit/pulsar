@@ -19,7 +19,7 @@ If a user would prefer to manually check for any updates available then the foll
 
 If an update is available, the notification that is shown is intended to be as non-invasive as possible, providing a few possible options:
 
-* Dismiss: This will remove the notification. And save the fact that it has been cleared, where it should not appear again, until either the cache expires, or a new version is released.
+* Dismiss this Version: This will remove the notification, and prevent an additional notification ever appearing for this version again. Bypassing any cache expirations.
 * Dismiss until next launch: This will remove the notification, but only until the next update check. Which happens automatically at launch, or otherwise can be invoked manually.
 * Download from GitHub: This option is only shown if the installation method was determined to be manually. And clicking it will open the GitHub page containing the specific version to update to.
 
