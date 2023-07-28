@@ -85,7 +85,7 @@ class PulsarUpdater {
       const notification = atom.notifications.addInfo(
         "An update for Pulsar is available.",
         {
-          detail: notificationDetailText,
+          description: notificationDetailText,
           dismissable: true,
           buttons: [
             {
