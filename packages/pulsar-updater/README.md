@@ -12,8 +12,8 @@ Additionally, since the entire process of actually installation is done by the u
 
 If a user would prefer to manually check for any updates available then the following commands are exposed from Pulsar Updater to do so:
 
-* `pulsar-updater:check-for-update`: This will preform an actual update check. Showing a notification only if a new version is available.
-* `pulsar-updater:clear-cache`: If needed for whatever reason, this command will clear this package's cache, ensuring information is as up to date as possible.
+* `pulsar-updater:check-for-update`: Performs an update check and shows a notification if a newer version of Pulsar is available.
+* `pulsar-updater:clear-cache`: Clears the package's cache and forgets any requests to suppress update checking.
 
 ## The Update Notification
 
