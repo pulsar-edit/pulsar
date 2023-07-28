@@ -45,4 +45,4 @@ Since a major part of the functionality of this package is attempting to determi
 
 ## Known Issues
 
-It's important to remember at this stage, that this update system is in no way integrated with the rest of Pulsar at all. The toggles within Pulsar to automatically update are ignored, as no updates are preformed automatically no matter what. The about view will still be unable to alert of new versions, nor track progress on installation. Those systems should eventually be removed, or mothballed, in favour of this.
+It's important to remember that this update system is in no way integrated with the rest of Pulsar. The toggles within Pulsar to update automatically are ignored. The About view will still be unable to alert of new versions, nor track progress on installation. Those systems should eventually be removed, or mothballed, in favour of this.
