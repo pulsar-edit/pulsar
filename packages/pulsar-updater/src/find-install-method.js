@@ -1,61 +1,60 @@
 const findInstallChannel = require("./find-install-channel.js");
 
-
 const INSTALL_CHANNELS = {
   macos: {
     fallback: "Manual Installation",
     channels: [
       {
         string: "Home Brew Installation",
-        func: findInstallChannel.linux_macos_homebrewInstalled
-      }
-    ]
+        func: findInstallChannel.linux_macos_homebrewInstalled,
+      },
+    ],
   },
   linux: {
     fallback: "Manual Installation",
     channels: [
       {
         string: "Flatpak Installation",
-        func: findInstallChannel.linux_flatpakInstalled
+        func: findInstallChannel.linux_flatpakInstalled,
       },
       {
         string: "Deb-Get Installation",
-        func: findInstallChannel.linux_debGetInstalled
+        func: findInstallChannel.linux_debGetInstalled,
       },
       {
         string: "Nix Installation",
-        func: findInstallChannel.linux_nixInstalled
+        func: findInstallChannel.linux_nixInstalled,
       },
       {
         string: "Home Brew Installation",
-        func: findInstallChannel.linux_macos_homebrewInstalled
-      }
+        func: findInstallChannel.linux_macos_homebrewInstalled,
+      },
       // TODO AUR
-    ]
+    ],
   },
   windows: {
     fallback: "Portable Installation",
     channels: [
       {
         string: "Chocolatey Installation",
-        func: findInstallChannel.windows_chocoInstalled
+        func: findInstallChannel.windows_chocoInstalled,
       },
       {
         string: "winget Installation",
-        func: findInstallChannel.windows_wingetInstalled
+        func: findInstallChannel.windows_wingetInstalled,
       },
       // We must check for package installs on windows before, user & machine
       // Since package installs trigger either a user or machine install
       {
         string: "User Installation",
-        func: findInstallChannel.windows_isUserInstalled
+        func: findInstallChannel.windows_isUserInstalled,
       },
       {
         string: "Machine Installation",
-        func: findInstallChannel.windows_isMachineInstalled
-      }
-    ]
-  }
+        func: findInstallChannel.windows_isMachineInstalled,
+      },
+    ],
+  },
 };
 
 // This module will do whatever it can to determine the installation method.
@@ -83,23 +82,32 @@ async function main() {
     return {
       platform: process.platform,
       arch: process.arch,
-      installMethod: returnValue
+      installMethod: returnValue,
     };
   }
 
   if (process.platform === "win32") {
-    returnValue = await determineChannel(INSTALL_CHANNELS.windows.channels, INSTALL_CHANNELS.windows.fallback);
+    returnValue = await determineChannel(
+      INSTALL_CHANNELS.windows.channels,
+      INSTALL_CHANNELS.windows.fallback
+    );
   } else if (process.platform === "darwin") {
-    returnValue = await determineChannel(INSTALL_CHANNELS.macos.channels, INSTALL_CHANNELS.macos.fallback);
+    returnValue = await determineChannel(
+      INSTALL_CHANNELS.macos.channels,
+      INSTALL_CHANNELS.macos.fallback
+    );
   } else if (process.platform === "linux") {
-    returnValue = await determineChannel(INSTALL_CHANNELS.linux.channels, INSTALL_CHANNELS.linux.fallback);
+    returnValue = await determineChannel(
+      INSTALL_CHANNELS.linux.channels,
+      INSTALL_CHANNELS.linux.fallback
+    );
   }
   // Unused aix, freebsd, openbsd, sunos, android
 
   return {
     platform: process.platform,
     arch: process.arch,
-    installMethod: returnValue
+    installMethod: returnValue,
   };
 }
 
@@ -109,7 +117,11 @@ async function determineChannel(channels, fallback) {
 
     let install = await channel.func();
 
-    if (typeof install === "boolean" && install && typeof channel.string === "string") {
+    if (
+      typeof install === "boolean" &&
+      install &&
+      typeof channel.string === "string"
+    ) {
       return channel.string;
     }
   }
@@ -118,6 +130,5 @@ async function determineChannel(channels, fallback) {
   // we should assume the fallback method
   return fallback;
 }
-
 
 module.exports = main;

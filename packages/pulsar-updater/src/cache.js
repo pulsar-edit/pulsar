@@ -9,7 +9,7 @@
 function setCacheItem(key, item) {
   let obj = {
     createdOn: Date.now(),
-    data: JSON.stringify(item)
+    data: JSON.stringify(item),
   };
 
   localStorage.setItem(cacheKeyForPath(key), JSON.stringify(obj));
@@ -34,8 +34,14 @@ function empty(key) {
   localStorage.removeItem(cacheKeyForPath(key));
 }
 
-function isItemExpired(item) {
-  if (!online() || (Date.now() - item.createdOn) < expiry()) {
+function isItemExpired(item, key) {
+  if (key === "last-update-check") {
+    // the last update check item never expires, to ensure skipping version
+    // preferences are permanent
+    return false;
+  }
+
+  if (!online() || Date.now() - item.createdOn < expiry()) {
     return false;
   } else {
     return true;
@@ -63,5 +69,5 @@ module.exports = {
   isItemExpired,
   empty,
   cacheKeyForPath,
-  online
+  online,
 };

@@ -12,7 +12,7 @@ class PulsarUpdater {
       atom.commands.add("atom-workspace", {
         "pulsar-updater:check-for-update": () => {
           this.checkForUpdates();
-        }
+        },
       })
     );
     this.disposables.add(
@@ -20,7 +20,7 @@ class PulsarUpdater {
         "pulsar-updater:clear-cache": () => {
           this.cache.empty("last-update-check");
           this.cache.empty(`installMethod.${atom.getVersion()}`);
-        }
+        },
       })
     );
 
@@ -42,38 +42,57 @@ class PulsarUpdater {
   async checkForUpdates() {
     let cachedUpdateCheck = this.cache.getCacheItem("last-update-check");
 
-    if (cachedUpdateCheck === null) {
-      // Null means that there is no previous check, or the last check expired
-      let latestVersion = await this.newestRelease();
+    // Null means that there is no previous check, or the last check expired
+    let latestVersion = await this.newestRelease();
 
-      let shouldUpdate = !atom.versionSatisfies(`>= ${latestVersion}`);
+    let shouldUpdate = !atom.versionSatisfies(`>= ${latestVersion}`);
 
-      if (shouldUpdate) {
-        this.cache.setCacheItem("last-update-check", {
-          latestVersion: latestVersion,
-          shouldUpdate: shouldUpdate
-        });
+    if (
+      cachedUpdateCheck?.latestVersion === latestVersion &&
+      !cachedUpdateCheck?.shouldUpdate
+    ) {
+      // If the last version check has this exact version, and we are instructed not to update
+      // then we will exit early, and not prompt the user for any update
+      return;
+    }
 
-        findInstallMethod ??= require("./find-install-method.js");
+    if (shouldUpdate) {
+      this.cache.setCacheItem("last-update-check", {
+        latestVersion: latestVersion,
+        shouldUpdate: shouldUpdate,
+      });
 
-        let installMethod =
-          this.cache.getCacheItem(`installMethod.${atom.getVersion()}`) ?? await findInstallMethod();
+      findInstallMethod ??= require("./find-install-method.js");
 
-        this.cache.setCacheItem(`installMethod.${atom.getVersion()}`, installMethod);
+      let installMethod =
+        this.cache.getCacheItem(`installMethod.${atom.getVersion()}`) ??
+        (await findInstallMethod());
 
-        // Lets now trigger a notification to alert the user
+      this.cache.setCacheItem(
+        `installMethod.${atom.getVersion()}`,
+        installMethod
+      );
 
-        let objButtonForInstallMethod = this.getObjButtonForInstallMethod(installMethod);
+      // Lets now trigger a notification to alert the user
 
-        const notification = atom.notifications.addInfo('An update for Pulsar is available.', {
+      let objButtonForInstallMethod =
+        this.getObjButtonForInstallMethod(installMethod);
+
+      const notification = atom.notifications.addInfo(
+        "An update for Pulsar is available.",
+        {
           detail: this.getNotificationText(installMethod, latestVersion),
           dismissable: true,
           buttons: [
             {
-              text: "Dismiss",
+              text: "Dismiss this Version",
               onDidClick: () => {
+                this.cache.setCacheItem("last-update-check", {
+                  latestVersion: latestVersion,
+                  shouldUpdate: false,
+                });
                 notification.dismiss();
-              }
+              },
             },
             {
               text: "Dismiss until next launch",
@@ -81,18 +100,16 @@ class PulsarUpdater {
                 // emptying the cache, will cause the next check to succeed
                 this.cache.empty("last-update-check");
                 notification.dismiss();
-              }
+              },
             },
             // Below we optionally add a button for the install method. That may
             // open to a pulsar download URL, if available for installation method
-            (typeof objButtonForInstallMethod === "object" && objButtonForInstallMethod)
-          ]
-        });
-
-      } // else don't update, rely on cache set above
-    } else {
-      // We don't need to check for updates.
-    }
+            typeof objButtonForInstallMethod === "object" &&
+              objButtonForInstallMethod,
+          ],
+        }
+      );
+    } // else don't update, rely on cache set above
   }
 
   async newestRelease() {
@@ -116,41 +133,49 @@ class PulsarUpdater {
   getNotificationText(installMethod, latestVersion) {
     let returnText = `Pulsar ${latestVersion} is available.\n`;
 
-    switch(installMethod.installMethod) {
+    switch (installMethod.installMethod) {
       case "Developer Mode":
-        returnText += "Since you're in developer mode, Pulsy trusts you know how to update. :)";
+        returnText +=
+          "Since you're in developer mode, Pulsy trusts you know how to update. :)";
         break;
       case "Safe Mode":
-        returnText += "Declining update suggestion since Pulsar is in Safe Mode.";
+        returnText +=
+          "Declining update suggestion since Pulsar is in Safe Mode.";
         break;
       case "Spec Mode":
-        returnText += "Declining update suggestion since Pulsar is in Spec Mode.";
+        returnText +=
+          "Declining update suggestion since Pulsar is in Spec Mode.";
         break;
       case "Flatpak Installation":
         returnText += "Install the latest version by running `flatpak update`.";
         break;
       case "Deb-Get Installation":
-        returnText += "Install the latest version by running `sudo deb-get update`.";
+        returnText +=
+          "Install the latest version by running `sudo deb-get update`.";
         break;
       case "Nix Installation":
         // TODO find nix update command
         returnText += "Install the latest version via Nix.";
         break;
       case "Home Brew Installation":
-        returnText += "Install the latest version by running `brew upgrade pulsar`.";
+        returnText +=
+          "Install the latest version by running `brew upgrade pulsar`.";
         break;
       case "winget Installation":
-        returnText += "Install the latest version by running `winget upgrade pulsar`.";
+        returnText +=
+          "Install the latest version by running `winget upgrade pulsar`.";
         break;
       case "Chocolatey Installation":
-        returnText += "Install the latest version by running `choco upgrade pulsar`.";
+        returnText +=
+          "Install the latest version by running `choco upgrade pulsar`.";
         break;
       case "User Installation":
       case "Machine Installation":
       case "Portable Installation":
       case "Manual Installation":
       default:
-        returnText += "Download the latest version from the Pulsar Website or GitHub.";
+        returnText +=
+          "Download the latest version from the Pulsar Website or GitHub.";
         break;
     }
 
@@ -163,23 +188,26 @@ class PulsarUpdater {
     const openWebGitHub = (e) => {
       e.preventDefault();
       shell = shell || require("electron").shell;
-      shell.openExternal(`https://github.com/pulsar-edit/pulsar/releases/tag/${this.cache.getCacheItem("last-update-check").latestVersion}`);
+      shell.openExternal(
+        `https://github.com/pulsar-edit/pulsar/releases/tag/${
+          this.cache.getCacheItem("last-update-check").latestVersion
+        }`
+      );
     };
 
-    switch(installMethod.installMethod) {
+    switch (installMethod.installMethod) {
       case "User Installation":
       case "Machine Installation":
       default:
         returnObj = {
           text: "Download from GitHub",
-          onDidClick: openWeb
+          onDidClick: openWebGitHub,
         };
         break;
     }
 
     return returnObj;
   }
-
 }
 
 module.exports = new PulsarUpdater();

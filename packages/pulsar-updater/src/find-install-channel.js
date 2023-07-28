@@ -12,7 +12,7 @@ function windows_isUserInstalled() {
   return new Promise((resolve, reject) => {
     let userInstallReg = new Registry({
       hive: "HKCU",
-      key: "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f"
+      key: "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f",
     });
 
     userInstallReg.keyExists((err, exists) => {
@@ -29,7 +29,7 @@ function windows_isMachineInstalled() {
   return new Promise((resolve, reject) => {
     let machineInstallReg = new Registry({
       hive: "HKLM",
-      key: "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f"
+      key: "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f",
     });
 
     machineInstallReg.keyExists((err, exists) => {
@@ -163,5 +163,5 @@ module.exports = {
   linux_macos_homebrewInstalled,
   linux_nixInstalled,
   linux_debGetInstalled,
-  linux_flatpakInstalled
+  linux_flatpakInstalled,
 };
