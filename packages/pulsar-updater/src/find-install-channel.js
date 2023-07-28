@@ -132,11 +132,7 @@ function linux_debGetInstalled() {
     return false;
   }
 
-  if (debGetCheck.stdout.includes("pulsar")) {
-    return true;
-  } else {
-    return false;
-  }
+  return debGetCheck.stdout.includes("pulsar");
 }
 
 function linux_flatpakInstalled() {
