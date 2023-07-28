@@ -52,12 +52,8 @@ function windows_chocoInstalled() {
   if (chocoCheck.code !== 0) {
     return false;
   }
-
-  if (chocoCheck.stdout.includes("pulsar")) {
-    return true;
-  } else {
-    return false;
-  }
+  
+  return chocoCheck.stdout.includes("pulsar");
 }
 
 function windows_wingetInstalled() {
@@ -71,11 +67,7 @@ function windows_wingetInstalled() {
     return false;
   }
 
-  if (wingetCheck.stdout.includes("Pulsar")) {
-    return true;
-  } else {
-    return false;
-  }
+  return wingetCheck.stdout.includes("Pulsar");
 }
 
 function linux_macos_homebrewInstalled() {
@@ -89,11 +81,7 @@ function linux_macos_homebrewInstalled() {
     return false;
   }
 
-  if (homebrewCheck.stdout.includes("pulsar")) {
-    return true;
-  } else {
-    return false;
-  }
+  return homebrewCheck.stdout.includes("pulsar");
 }
 
 function linux_nixInstalled() {
@@ -114,11 +102,7 @@ function linux_nixInstalled() {
     return false;
   }
 
-  if (nixCheck.stdout.includes("pulsar.nemo_action")) {
-    return true;
-  } else {
-    return false;
-  }
+  return nixCheck.stdout.includes("pulsar.nemo_action");
 }
 
 function linux_debGetInstalled() {
