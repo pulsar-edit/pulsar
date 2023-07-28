@@ -157,7 +157,7 @@ class PulsarUpdater {
         // TODO find nix update command
         returnText += "Install the latest version via Nix.";
         break;
-      case "Home Brew Installation":
+      case "Homebrew Installation":
         returnText +=
           "Install the latest version by running `brew upgrade pulsar`.";
         break;

@@ -26,7 +26,7 @@ const INSTALL_CHANNELS = {
         func: findInstallChannel.linux_nixInstalled,
       },
       {
-        string: "Home Brew Installation",
+        string: "Homebrew Installation",
         func: findInstallChannel.linux_macos_homebrewInstalled,
       },
       // TODO AUR
