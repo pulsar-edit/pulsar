@@ -1,12 +1,15 @@
 const { CompositeDisposable } = require("atom");
-let superagent;
+const { Emitter } = require("event-kit");
 let findInstallMethod;
 let shell;
 
 class PulsarUpdater {
+
   activate() {
     this.disposables = new CompositeDisposable();
     this.cache = require("./cache.js");
+    this.emitter = new Emitter();
+    this.findNewestRelease;
 
     this.disposables.add(
       atom.commands.add("atom-workspace", {
@@ -20,6 +23,8 @@ class PulsarUpdater {
       })
     );
 
+    this.disposables.add(this.emitter);
+
     // Setup an event listener for something after the editor has launched
 
     // Lets check for an update right away, likely following some config option
@@ -30,18 +35,23 @@ class PulsarUpdater {
 
   deactivate() {
     this.disposables.dispose();
-    superagent = null;
+    this.findNewestRelease = null;
     findInstallMethod = null;
     this.cache = null;
+    this.emitter = new Emitter();
   }
 
   async checkForUpdates() {
+    console.log("i am checking for updates");
     let cachedUpdateCheck = this.cache.getCacheItem("last-update-check");
 
     // Null means that there is no previous check, or the last check expired
-    let latestVersion = await this.newestRelease();
-
+    this.findNewestRelease ??= require("./find-newest-release.js");
+    console.log("before await");
+    let latestVersion = await this.findNewestRelease();
+    console.log("after await");
     let shouldUpdate = !atom.versionSatisfies(`>= ${latestVersion}`);
+    console.log(`During update: ${shouldUpdate}`);
 
     if (
       cachedUpdateCheck?.latestVersion === latestVersion &&
@@ -49,10 +59,15 @@ class PulsarUpdater {
     ) {
       // If the last version check has this exact version, and we are instructed not to update
       // then we will exit early, and not prompt the user for any update
+      this.emitter.emit("pulsar-updater:update-ignored", { version: latestVersion });
+      console.log("I am ignored an update");
       return;
     }
 
     if (shouldUpdate) {
+      console.log("I am preforming an update");
+      this.emitter.emit("pulsar-updater:update-triggered", { version: latestVersion });
+
       this.cache.setCacheItem("last-update-check", {
         latestVersion: latestVersion,
         shouldUpdate: shouldUpdate,
@@ -114,24 +129,6 @@ class PulsarUpdater {
         }
       );
     } // else don't update, rely on cache set above
-  }
-
-  async newestRelease() {
-    superagent ??= require("superagent");
-
-    let res = await superagent
-      .get("https://api.github.com/repos/pulsar-edit/pulsar/releases")
-      .set("Accept", "application/vnd.github+json")
-      .set("User-Agent", "Pulsar.Pulsar-Updater");
-
-    if (res.status !== 200) {
-      // Lie and say it's something that will never update
-      return "0.0.0";
-    }
-
-    // We can be fast and simply check if the top of the array is newer than our
-    // current version. Since the return is ordered
-    return res.body[0].tag_name;
   }
 
   getNotificationText(installMethod, latestVersion) {
