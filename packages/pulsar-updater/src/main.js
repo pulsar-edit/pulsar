@@ -1,15 +1,13 @@
 const { CompositeDisposable } = require("atom");
-const { Emitter } = require("event-kit");
-let findInstallMethod;
+
 let shell;
+let superagent;
+let findInstallMethod;
 
 class PulsarUpdater {
-
   activate() {
     this.disposables = new CompositeDisposable();
     this.cache = require("./cache.js");
-    this.emitter = new Emitter();
-    this.findNewestRelease;
 
     this.disposables.add(
       atom.commands.add("atom-workspace", {
@@ -23,11 +21,6 @@ class PulsarUpdater {
       })
     );
 
-    this.disposables.add(this.emitter);
-
-    // Setup an event listener for something after the editor has launched
-
-    // Lets check for an update right away, likely following some config option
     if (atom.config.get("pulsar-updater.checkForUpdatesOnLaunch")) {
       this.checkForUpdates();
     }
@@ -35,100 +28,122 @@ class PulsarUpdater {
 
   deactivate() {
     this.disposables.dispose();
-    this.findNewestRelease = null;
-    findInstallMethod = null;
     this.cache = null;
-    this.emitter = new Emitter();
+  }
+
+  async findNewestRelease() {
+    superagent ??= require("superagent");
+
+    let res = await superagent
+      .get("https://api.github.com/repos/pulsar-edit/pulsar/releases")
+      .set("Accept", "application/vnd.github+json")
+      .set("User-Agent", "Pulsar.Pulsar-Updater");
+
+    if (res.status !== 200) {
+      // Lie and say it's something that will never update
+      return "0.0.0";
+    }
+
+    // We get the results ordered by newest tag first, so we can just check the
+    // first item.
+    return res.body[0].tag_name;
   }
 
   async checkForUpdates() {
-    console.log("i am checking for updates");
     let cachedUpdateCheck = this.cache.getCacheItem("last-update-check");
 
     // Null means that there is no previous check, or the last check expired
-    this.findNewestRelease ??= require("./find-newest-release.js");
-    console.log("before await");
     let latestVersion = await this.findNewestRelease();
-    console.log("after await");
     let shouldUpdate = !atom.versionSatisfies(`>= ${latestVersion}`);
-    console.log(`During update: ${shouldUpdate}`);
 
     if (
       cachedUpdateCheck?.latestVersion === latestVersion &&
       !cachedUpdateCheck?.shouldUpdate
     ) {
-      // If the last version check has this exact version, and we are instructed not to update
-      // then we will exit early, and not prompt the user for any update
-      this.emitter.emit("pulsar-updater:update-ignored", { version: latestVersion });
-      console.log("I am ignored an update");
+      // The user has already been notified about this version and told us not
+      // to notify them again until the next release.
       return;
     }
 
     if (shouldUpdate) {
-      console.log("I am preforming an update");
-      this.emitter.emit("pulsar-updater:update-triggered", { version: latestVersion });
+      await this.notifyAboutUpdate(latestVersion);
+    } else {
+      // This can be a no-op or something that generates an actual notification
+      // based on how the update check was invoked.
+      await this.notifyAboutCurrent(latestVersion);
+    }
+  }
 
-      this.cache.setCacheItem("last-update-check", {
-        latestVersion: latestVersion,
-        shouldUpdate: shouldUpdate,
-      });
+  notifyAboutCurrent() {
+    // TODO: Notify if the user initiated the command; otherwise do nothing
+    return;
+  }
 
-      findInstallMethod ??= require("./find-install-method.js");
+  async notifyAboutUpdate(latestVersion) {
+    this.cache.setCacheItem("last-update-check", {
+      latestVersion: latestVersion,
+      shouldUpdate: true
+    });
 
-      let installMethod =
-        this.cache.getCacheItem(`installMethod.${atom.getVersion()}`) ??
-        (await findInstallMethod());
+    findInstallMethod ??= require("./find-install-method.js");
 
-      this.cache.setCacheItem(
-        `installMethod.${atom.getVersion()}`,
-        installMethod
-      );
+    let installMethod =
+      this.cache.getCacheItem(`installMethod.${atom.getVersion()}`) ??
+      (await findInstallMethod());
 
-      // Lets now trigger a notification to alert the user
+    this.cache.setCacheItem(
+      `installMethod.${atom.getVersion()}`,
+      installMethod
+    );
 
-      let objButtonForInstallMethod =
-        this.getObjButtonForInstallMethod(installMethod);
+    let objButtonForInstallMethod = this.getObjButtonForInstallMethod(installMethod);
+    let notificationDetailText = this.getNotificationText(installMethod, latestVersion);
 
-      let notificationDetailText = this.getNotificationText(installMethod, latestVersion);
+    // Notification text of `null` means that we shouldn't show a notification
+    // after all.
+    if (notificationDetailText === null) {
+      return;
+    }
 
-      // Now the notification text may return the special string of "DO_NOT_PROMPT"
-      // If this text is seen, the notification is never shown
-      if (notificationDetailText === "DO_NOT_PROMPT") {
-        return;
+    const notification = atom.notifications.addInfo(
+      "An update for Pulsar is available.",
+      {
+        description: notificationDetailText,
+        dismissable: true,
+        buttons: [
+          {
+            text: "Dismiss this Version",
+            onDidClick: () => {
+              this.ignoreForThisVersion(latestVersion);
+              notification.dismiss();
+            },
+          },
+          {
+            text: "Dismiss until next launch",
+            onDidClick: () => {
+              this.ignoreUntilNextLaunch();
+              notification.dismiss();
+            },
+          },
+          // Below we optionally add a button for the install method. That may
+          // open to a pulsar download URL, if available for installation method
+          typeof objButtonForInstallMethod === "object" &&
+            objButtonForInstallMethod
+        ],
       }
+    );
+  }
 
-      const notification = atom.notifications.addInfo(
-        "An update for Pulsar is available.",
-        {
-          description: notificationDetailText,
-          dismissable: true,
-          buttons: [
-            {
-              text: "Dismiss this Version",
-              onDidClick: () => {
-                this.cache.setCacheItem("last-update-check", {
-                  latestVersion: latestVersion,
-                  shouldUpdate: false,
-                });
-                notification.dismiss();
-              },
-            },
-            {
-              text: "Dismiss until next launch",
-              onDidClick: () => {
-                // emptying the cache, will cause the next check to succeed
-                this.cache.empty("last-update-check");
-                notification.dismiss();
-              },
-            },
-            // Below we optionally add a button for the install method. That may
-            // open to a pulsar download URL, if available for installation method
-            typeof objButtonForInstallMethod === "object" &&
-              objButtonForInstallMethod,
-          ],
-        }
-      );
-    } // else don't update, rely on cache set above
+  ignoreForThisVersion(version) {
+    this.cache.setCacheItem("last-update-check", {
+      latestVersion: version,
+      shouldUpdate: false
+    });
+  }
+
+  ignoreUntilNextLaunch() {
+    // emptying the cache, will cause the next check to succeed
+    this.cache.empty("last-update-check");
   }
 
   getNotificationText(installMethod, latestVersion) {
@@ -140,13 +155,10 @@ class PulsarUpdater {
           "Since you're in developer mode, Pulsy trusts you know how to update. :)";
         break;
       case "Safe Mode":
-        // The text can be this special value, to abort the notification from being shown
-        returnText +=
-          "DO_NOT_PROMPT";
+        return null;
         break;
       case "Spec Mode":
-        returnText +=
-          "DO_NOT_PROMPT";
+        return null;
         break;
       case "Flatpak Installation":
         returnText += "Install the latest version by running `flatpak update`.";
