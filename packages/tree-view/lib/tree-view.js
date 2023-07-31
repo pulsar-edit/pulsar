@@ -1448,8 +1448,10 @@ module.exports = class TreeView {
           }
           const object = getStyleObject(target);
           for (let key in object) {
-            const value = object[key];
-            newElement.style[key] = value;
+            if(!key.match(/^(\d+|length|parentRule)$/)) {
+              const value = object[key];
+              newElement.style[key] = value;
+            }
           }
           newElement.style.paddingLeft = "1em";
           newElement.style.paddingRight = "1em";
