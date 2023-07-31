@@ -18,13 +18,10 @@ export default class ChangeLogView {
   }
 
   wasVersionDismissed() {
-    const lastVersion = atom.config.get('welcome.lastViewedChangeLog');
-    const curVersion = atom.getVersion().split(".");
-    if (lastVersion[0] < curVersion[0] && lastVersion[1] < curVersion[1] && lastVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
-      return false;
-    } else {
-      return true;
-    }
+    // Use the new `.versionSatisfies()` API to check if our last dismissed version
+    // is the same as the current version. `.versionSatisfies()` compares equality
+    // by default, so no comparator is needed
+    return atom.versionSatisfies(atom.config.get('welcome.lastViewedChangeLog'));
   }
 
   update() {}
@@ -53,29 +50,32 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed bug that happens on some systems when trying to launch Pulsar
-                using the Cinnamon desktop environment
+                Bumped github package to include fixes to the Less syntax, for compatiblity with Less 4
               </li>
               <li>
-                Added a modern implementation of Tree-sitter grammars behind an experimental flag.
-                Enable the "Use Modern Tree-Sitter Implementation" in the Core settings
-                to try it out
+                Fixed a number of issues with the experimental modern Tree-sitter grammar mode
               </li>
               <li>
-                Bugfix: fixed Clojure indentation on tree-sitter
+                Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.
               </li>
               <li>
-                Improved the Clojure language support by migrating it to tree-sitter and support block comments,
-                quoting, and other advanced features on modern tree-sitter implementation
+                Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing
+                breaking changes to existing Less Stylesheets. Pulsar will attempt to automatically repair any breaking
+                changes in any package style sheets, while emitting deprecations.
               </li>
               <li>
-                Fixed a bug that could cause images to not appear the first time opening them
+                Fixed a bug that would render files unable to be clicked with sticky headers enabled on One-Dark
+                and One-Light themes.
               </li>
               <li>
-                `autocomplete-css` Completions are now sorted in a way that may match what users expect
+                Added a Modern Tree-Sitter TOML Grammar.
               </li>
               <li>
-                Added a "Log Out" menu item for the `github` package
+                Added a new API endpoint within Pulsar of `atom.versionSatisfies()` to allow packages to safely
+                check the version of Pulsar, instead of having to do so themeselves.
+              </li>
+              <li>
+                An issue in a downstream dependency has been resolved that improperly flagged Pulsar as malicious.
               </li>
 
             </ul>

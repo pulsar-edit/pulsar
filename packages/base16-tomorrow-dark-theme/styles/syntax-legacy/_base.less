@@ -139,7 +139,17 @@
     color: @yellow;
   }
 
-  &.syntax--function  {
+  &.syntax--namespace {
+    color: @yellow;
+  }
+
+  &.syntax--other {
+    &.syntax--function {
+      color: @blue;
+    }
+  }
+
+  &.syntax--function {
     color: @cyan;
 
     &.syntax--any-method {

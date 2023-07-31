@@ -45,12 +45,13 @@ exports.activate = function() {
 
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'regex_pattern',
-      language(regex) {
-        return 'regex';
+      language() {
+        return 'js-regex';
       },
       content(regex) {
         return regex;
-      }
+      },
+      languageScope: null
     });
   }
 };

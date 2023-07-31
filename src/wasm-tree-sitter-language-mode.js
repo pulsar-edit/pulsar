@@ -420,6 +420,12 @@ class WASMTreeSitterLanguageMode {
     return this.atTransactionEndPromise;
   }
 
+  // Alias for `atTransactionEnd` for packages that used the implementation
+  // details of the legacy tree-sitter system.
+  parseCompletePromise() {
+    return this.atTransactionEnd();
+  }
+
   prefillFoldCache(range) {
     this.rootLanguageLayer?.foldResolver?.prefillFoldCache(range);
 
@@ -597,7 +603,8 @@ class WASMTreeSitterLanguageMode {
     for (const scope of iterator.seek(point, point.row + 1)) {
       scopes.push(this.grammar.scopeNameForScopeId(scope));
     }
-    if (point.isEqual(iterator.getPosition())) {
+
+    while (point.isEqual(iterator.getPosition())) {
       for (const scope of iterator.getOpenScopeIds()) {
         scopes.push(this.grammar.scopeNameForScopeId(scope));
       }
@@ -605,7 +612,9 @@ class WASMTreeSitterLanguageMode {
       for (const scope of iterator.getCloseScopeIds()) {
         removeLastOccurrenceOf(scopes, this.grammar.scopeNameForScopeId(scope));
       }
+      iterator.moveToSuccessor();
     }
+
     if (scopes.length === 0 || scopes[0] !== this.grammar.scopeName) {
       scopes.unshift(this.grammar.scopeName);
     }
@@ -1033,7 +1042,7 @@ class WASMTreeSitterLanguageMode {
     // Prefer deeper layers over shallower ones.
     for (let layer of layers) {
       let { depth } = layer;
-      let candidateFold = layer.foldResolver.getFoldRangeForRow(row);
+      let candidateFold = layer.foldResolver?.getFoldRangeForRow(row);
       if (!candidateFold) { continue; }
       if (!leadingCandidate || depth > leadingCandidate.depth) {
         leadingCandidate = { fold: candidateFold, depth };
@@ -3246,10 +3255,7 @@ class LanguageLayer {
     }
 
     if (!this.currentParsePromise) {
-      while (
-        !this.destroyed &&
-        (!this.tree || this.tree.rootNode.hasChanges())
-      ) {
+      do {
         params = { ...params, async: false };
         if (!this.ready) {
           params.async = true;
@@ -3258,7 +3264,11 @@ class LanguageLayer {
         this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
         if (!params.async) { break; }
         await this.currentParsePromise;
-      }
+      } while (
+        !this.destroyed &&
+        (!this.tree || this.tree.rootNode.hasChanges())
+      );
+
       this.currentParsePromise = null;
       // `true` means that this update occurs in its own distinct transaction.
       return true;

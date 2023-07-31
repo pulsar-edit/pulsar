@@ -3,6 +3,8 @@ variable1: value1
 array:
   - foo
   - bar
+object:
+  key: value2
 ---
 
 ## File.markdown

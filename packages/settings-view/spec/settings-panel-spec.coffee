@@ -137,6 +137,16 @@ describe "SettingsPanel", ->
       expect(settingsPanel.isDefault('foo.haz')).toBe false
       expect(atom.config.get('foo.haz')).toBe 'newhaz'
 
+    it "ignores project-specific overrides", ->
+      atom.project.replace(
+        originPath: 'TEST'
+        config:
+          foo:
+            haz: 'newhaz'
+      )
+      expect(settingsPanel.isDefault('foo.haz')).toBe true
+      expect(atom.config.get('foo.haz')).toBe 'newhaz'
+
     it 'has a tooltip showing the default value', ->
       hazEditor = settingsPanel.element.querySelector('[id="foo.haz"]')
       tooltips = atom.tooltips.findTooltips(hazEditor)

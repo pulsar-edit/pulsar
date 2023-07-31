@@ -24,17 +24,17 @@
 .ui-saturation();
 
 .ui-lightness() when (@ui-s-l <  @ui-inv) {
-  @ui-lightness: @ui-s-l + 8%; // increase lightness when too dark
-  @ui-lightness-border: @ui-lightness*.3;
+  @ui-lightness: (@ui-s-l + 8%); // increase lightness when too dark
+  @ui-lightness-border: (@ui-lightness*.3);
 }
 .ui-lightness() when (@ui-s-l >= @ui-inv) {
   @ui-lightness: min(@ui-s-l, 20%); // limit max lightness (for light syntax themes)
-  @ui-lightness-border: @ui-lightness*.6;
+  @ui-lightness-border: (@ui-lightness*.6);
 }
 .ui-lightness();
 
 // Main colors -----------------
-@ui-fg:     hsl(@ui-hue, min(@ui-saturation, 18%), max(@ui-lightness*3, 66%) );
+@ui-fg:     hsl(@ui-hue, min(@ui-saturation, 18%), max((@ui-lightness*3), 66%) );
 @ui-bg:     hsl(@ui-hue, @ui-saturation, @ui-lightness); // normalized @syntax-background-color
 @ui-border: hsl(@ui-hue, @ui-saturation, @ui-lightness-border);
 
@@ -74,7 +74,7 @@
 @accent-text-color:       contrast(@accent-color, hsl(@ui-hue,100%,10%), #fff, 25% );
 
 // used for button, tooltip (larger things)
-@accent-bg-color:         mix( hsv( @ui-hue, 66%, 66%), hsl( @ui-hue, 66%, 60%), @accent-luma * 2 ); // mix hsv + hsl (favor hsl for dark, hsv for light colors)
+@accent-bg-color:         mix( hsv( @ui-hue, 66%, 66%), hsl( @ui-hue, 66%, 60%), (@accent-luma * 2) ); // mix hsv + hsl (favor hsl for dark, hsv for light colors)
 @accent-bg-text-color:    contrast(@accent-bg-color, hsl(@ui-hue,100%,10%), #fff, 30% );
 
 // used for text only
@@ -92,7 +92,7 @@
 @input-selection-color:             mix(@accent-color, @input-background-color, 25%);
 @input-selection-color-focus:       mix(@accent-color, @input-background-color, 50%);
 
-@overlay-backdrop-color:            hsl(@ui-hue, @ui-saturation, @ui-lightness*0.2);
+@overlay-backdrop-color:            hsl(@ui-hue, @ui-saturation, (@ui-lightness*0.2));
 @overlay-backdrop-opacity:          .75;
 
 @progress-background-color:         @accent-color;
@@ -120,12 +120,12 @@
 // Sizes (Custom) -----------------
 
 @ui-size:                 1em;
-@ui-input-size:           @ui-size*1.15;
-@ui-padding:              @ui-size*1.5;
-@ui-padding-pane:         @ui-size*.5;
-@ui-padding-icon:         @ui-padding/3.3;
-@ui-line-height:          @ui-size*2;
-@ui-tab-height:           @ui-size*2.5;
+@ui-input-size:           (@ui-size*1.15);
+@ui-padding:              (@ui-size*1.5);
+@ui-padding-pane:         (@ui-size*.5);
+@ui-padding-icon:         (@ui-padding/3.3);
+@ui-line-height:          (@ui-size*2);
+@ui-tab-height:           (@ui-size*2.5);
 
 
 

@@ -6,7 +6,7 @@
 @width-detail: 450px;
 @max-height-message: 200px;
 @max-height-detail: 500px;
-@max-height: @max-height-message + @max-height-detail + 100px; // 100px for footer. This is only used for the closing animation
+@max-height: (@max-height-message + @max-height-detail + 100px); // 100px for footer. This is only used for the closing animation
 @notification-gap: 2px;
 @font-family-monospace: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 
@@ -37,7 +37,7 @@ atom-notifications {
       display: block;
     }
     .message {
-      padding-right: @component-padding * 2 + 95px; // space for icon and button
+      padding-right: (@component-padding * 2 + 95px); // space for icon and button
     }
   }
 
@@ -49,7 +49,7 @@ atom-notifications {
       padding-right: inherit;
     }
     &.has-close .message {
-      padding-right: @component-padding + 24px; // space for icon
+      padding-right: (@component-padding + 24px); // space for icon
     }
   }
 
@@ -118,7 +118,7 @@ atom-notifications {
     }
 
     &.has-close .message {
-      padding-right: @component-padding + 24px; // space for icon
+      padding-right: (@component-padding + 24px); // space for icon
     }
 
     .content {

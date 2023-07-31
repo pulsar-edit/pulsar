@@ -1,0 +1,20 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      {
+        'label': 'Spell Check'
+        'submenu': [
+          {
+            'label': 'Toggle'
+            'command': 'spell-check:toggle'
+          }
+        ]
+      }
+    ]
+  }
+],
+'context-menu':
+  'atom-text-editor:not([mini])': [
+    {label: 'Correct Spelling', command: 'spell-check:correct-misspelling'}
+  ]

@@ -7,7 +7,7 @@
   ],
   "engines": {
     "atom": ">=1.19.1",
-    "node": "*"
+    "node": ">=12"
   },
   "main": "lib/main",
   "repository": "https://github.com/pulsar-edit/pulsar",
