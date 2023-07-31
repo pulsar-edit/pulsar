@@ -3185,13 +3185,12 @@ cssesc@^3.0.0:
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
 
-ctags@^3.1.0:
+"ctags@https://github.com/pulsar-edit/node-ctags.git#c32ca60":
   version "3.1.0"
-  resolved "https://registry.yarnpkg.com/ctags/-/ctags-3.1.0.tgz#07f133401d573f4614d1eabffb4f7127afcff402"
-  integrity sha512-7/aiGLj8Ih7Ko3bAAg8bQUwHjOGXKQ7XC+bv+vLh84BtkVodPEOpOnr65FnWjX2oFWoKSaDuxe7jFHudD2Q0uw==
+  resolved "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3"
   dependencies:
     event-stream "~3.1.0"
-    nan "^2.14.0"
+    nan "2.17.0"
 
 d@1, d@^1.0.1:
   version "1.0.1"
@@ -6480,7 +6479,7 @@ multi-integer-range@^2.0.0:
   resolved "https://registry.yarnpkg.com/multi-integer-range/-/multi-integer-range-2.1.0.tgz#73675519ba2146dba22cd35960e9c5e804ffe2fc"
   integrity sha512-hhxJJyEXhLlsCgzMsX10NlPL35yM/v/ThBNlHgLP/84/Wkf6VugIMIVqEH1m0bvOwGYSmz92yhPLKdoPV87BBg==
 
-nan@2.17.0, nan@^2.10.0, nan@^2.13.2, nan@^2.14.0, nan@^2.14.2:
+nan@2.17.0, nan@^2.10.0, nan@^2.13.2, nan@^2.14.2:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
   integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
@@ -8247,13 +8246,13 @@ sylvester@^0.0.12:
   resolved "https://registry.yarnpkg.com/sylvester/-/sylvester-0.0.12.tgz#5a884415cd2d002c57e7a3aac99462a75ce9fdb4"
   integrity sha512-SzRP5LQ6Ts2G5NyAa/jg16s8e3R7rfdFjizy1zeoecYWw+nGL+YA1xZvW/+iJmidBGSdLkuvdwTYEyJEb+EiUw==
 
-"symbols-view@https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4":
+"symbols-view@https://github.com/pulsar-edit/symbols-view.git#73464a5":
   version "0.118.4"
-  resolved "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4#cd1b515d4a3d720402b85301ea8e4d6c8815aaf2"
+  resolved "https://github.com/pulsar-edit/symbols-view.git#73464a5a2866ccd60f68e2a560fad659a7538984"
   dependencies:
     async "^0.2.6"
     atom-select-list "^0.7.0"
-    ctags "^3.1.0"
+    ctags "https://github.com/pulsar-edit/node-ctags.git#c32ca60"
     fs-plus "^3.0.0"
     fuzzaldrin "^2.1.0"
     humanize-plus "^1.8.2"

@@ -159,7 +159,7 @@
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
     "superstring": "https://github.com/pulsar-edit/superstring-wasm.git#312d1fb",
-    "symbols-view": "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4",
+    "symbols-view": "https://github.com/pulsar-edit/symbols-view.git#73464a5",
     "tabs": "file:packages/tabs",
     "temp": "0.9.4",
     "text-buffer": "https://github.com/pulsar-edit/text-buffer.git#c0c7cf3e3",
