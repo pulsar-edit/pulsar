@@ -3,7 +3,8 @@ fs = require 'fs-plus'
 path = require 'path'
 temp = require('temp').track()
 os = require 'os'
-{remote, shell} = require 'electron'
+{shell} = require 'electron'
+remote = require '@electron/remote'
 Directory = require '../lib/directory'
 eventHelpers = require "./event-helpers"
 
@@ -2807,7 +2808,7 @@ describe "TreeView", ->
         fileView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}))
         treeView.focus()
 
-        spyOn(shell, 'moveItemToTrash').andReturn(false)
+        spyOn(shell, 'trashItem').andReturn(false)
         spyOn(atom, 'confirm').andCallFake (options, callback) -> callback(0)
 
         atom.commands.dispatch(treeView.element, 'tree-view:remove')

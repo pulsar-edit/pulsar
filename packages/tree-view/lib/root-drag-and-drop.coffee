@@ -1,6 +1,7 @@
 url = require 'url'
 
-{ipcRenderer, remote} = require 'electron'
+{ipcRenderer} = require 'electron'
+remote = require('@electron/remote')
 
 # TODO: Support dragging external folders and using the drag-and-drop indicators for them
 # Currently they're handled in TreeView's drag listeners

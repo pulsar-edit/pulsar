@@ -8455,9 +8455,8 @@ tr46@~0.0.3:
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
 
-"tree-view@https://github.com/pulsar-edit/tree-view.git#4274c7a":
+"tree-view@file:./packages/tree-view":
   version "0.229.1"
-  resolved "https://github.com/pulsar-edit/tree-view.git#4274c7a9ccae7ba3fe8ec568771148f8616a65d2"
   dependencies:
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
