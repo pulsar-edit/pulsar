@@ -290,7 +290,7 @@ class ScopeResolver {
         // Transform the range successively. Later adjustments can optionally
         // act on earlier adjustments, or they can ignore the current position
         // and inspect the original node instead.
-        range = this.applyAdjustment(key, capture.node, value, props, range, this);
+        range = this.applyAdjustment(key, capture.node, value, range, this);
 
         // If any single adjustment returns `null`, we shouldn't store this
         // capture.
@@ -350,7 +350,7 @@ class ScopeResolver {
     for (let key in asserted) {
       if (!this.capturePropertyIsTest(key)) { continue; }
       let value = asserted[key] ?? true;
-      let result = this.applyTest(key, node, value, props, existingData, this);
+      let result = this.applyTest(key, node, value, existingData, this);
       if (!result) return false;
     }
 
@@ -358,7 +358,7 @@ class ScopeResolver {
     for (let key in refuted) {
       if (!this.capturePropertyIsTest(key)) { continue; }
       let value = refuted[key] ?? true;
-      let result = this.applyTest(key, node, value, props, existingData, this);
+      let result = this.applyTest(key, node, value, existingData, this);
       if (result) return false;
     }
 
@@ -549,7 +549,7 @@ ScopeResolver.TESTS = {
 
   // Passes when the node's tree belongs to an injection layer, rather than the
   // buffer's root language layer.
-  injection(node, value, props, existingData, instance) {
+  injection(node, value, existingData, instance) {
     return instance.languageLayer.depth > 0;
   },
 
@@ -618,7 +618,7 @@ ScopeResolver.TESTS = {
 
   // Passes when the node represents the last non-whitespace content on its
   // row. Considers the node's ending row.
-  lastTextOnRow(node, value, props, existingData, instance) {
+  lastTextOnRow(node, value, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.endPosition.row);
     let textAfterNode = text.slice(node.endPosition.column);
@@ -627,7 +627,7 @@ ScopeResolver.TESTS = {
 
   // Passes when the node represents the first non-whitespace content on its
   // row. Considers the node's starting row.
-  firstTextOnRow(node, value, props, existingData, instance) {
+  firstTextOnRow(node, value, existingData, instance) {
     let { buffer } = instance;
     let text = buffer.lineForRow(node.startPosition.row);
     let textBeforeNode = text.slice(0, node.startPosition.column);
@@ -657,7 +657,7 @@ ScopeResolver.TESTS = {
 
   // Passes if this range (after adjustments) has previously had data stored at
   // the given key.
-  rangeWithData(node, rawValue, props, existingData) {
+  rangeWithData(node, rawValue, existingData) {
     if (existingData === undefined) { return false; }
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -671,7 +671,7 @@ ScopeResolver.TESTS = {
 
   // Passes if one of this node's ancestors has stored data at the given key
   // for its inherent range (ignoring adjustments).
-  descendantOfNodeWithData(node, rawValue, props, existingData, instance) {
+  descendantOfNodeWithData(node, rawValue, existingData, instance) {
     let current = node;
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -705,7 +705,7 @@ ScopeResolver.TESTS = {
   // Passes only when a given config option is present and truthy. Accepts
   // either (a) a configuration key or (b) a configuration key and value
   // separated by a space.
-  config(node, rawValue, props, existingData, instance) {
+  config(node, rawValue, existingData, instance) {
     let [key, value] = interpretPossibleKeyValuePair(rawValue, true);
 
     // Invalid predicates should be ignored.
@@ -729,7 +729,7 @@ ScopeResolver.TESTS = {
 //
 ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to start at the start or end of a different node.
-  startAt(node, value, props, range, resolver) {
+  startAt(node, value, range, resolver) {
     let start = resolveNodePosition(node, value);
     if (!start) { return null; }
 
@@ -739,7 +739,7 @@ ScopeResolver.ADJUSTMENTS = {
   },
 
   // Alter the given range to end at the start or end of a different node.
-  endAt(node, value, props, range, resolver) {
+  endAt(node, value, range, resolver) {
     let end = resolveNodePosition(node, value);
     if (!end) { return null; }
 
@@ -750,7 +750,7 @@ ScopeResolver.ADJUSTMENTS = {
 
   // Offset the start position by a fixed number of characters in either
   // direction. Can act after other range alterations.
-  offsetStart(node, value, props, range, resolver) {
+  offsetStart(node, value, range, resolver) {
     let offset = Number(value);
     if (isNaN(offset)) { return null; }
     let { startPosition } = range;
@@ -766,7 +766,7 @@ ScopeResolver.ADJUSTMENTS = {
 
   // Offset the end position by a fixed number of characters in either
   // direction. Can act after other range alterations.
-  offsetEnd(node, value, props, range, resolver) {
+  offsetEnd(node, value, range, resolver) {
     let offset = Number(value);
     if (isNaN(offset)) { return null; }
     let { endPosition } = range;
@@ -783,7 +783,7 @@ ScopeResolver.ADJUSTMENTS = {
   // Change the start and end positions to correspond exactly to the extent of
   // the match of the given regular expression. Will match against the text of
   // the capture's node.
-  startAndEndAroundFirstMatchOf(node, value, props, position, resolver) {
+  startAndEndAroundFirstMatchOf(node, value, position, resolver) {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
     if (!match) { return null; }
@@ -805,7 +805,7 @@ ScopeResolver.ADJUSTMENTS = {
   // Change the start position to the point at the beginning of the match of
   // the given regular expression. Will match against the text of the capture's
   // node.
-  startBeforeFirstMatchOf(node, value, props, position, resolver) {
+  startBeforeFirstMatchOf(node, value, position, resolver) {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
@@ -824,7 +824,7 @@ ScopeResolver.ADJUSTMENTS = {
   // Change the start position to the point at the end of the match of the
   // given regular expression. Will match against the text of the capture's
   // node.
-  startAfterFirstMatchOf(node, value, props, position, resolver) {
+  startAfterFirstMatchOf(node, value, position, resolver) {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
@@ -843,7 +843,7 @@ ScopeResolver.ADJUSTMENTS = {
   // Change the end position to the point at the start of the match of the
   // given regular expression. Will match against the text of the capture's
   // node.
-  endBeforeFirstMatchOf(node, value, props, position, resolver) {
+  endBeforeFirstMatchOf(node, value, position, resolver) {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
@@ -861,7 +861,7 @@ ScopeResolver.ADJUSTMENTS = {
   // Change the end position to the point at the end of the match of the
   // given regular expression. Will match against the text of the capture's
   // node.
-  endAfterFirstMatchOf(node, value, props, position, resolver) {
+  endAfterFirstMatchOf(node, value, position, resolver) {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
