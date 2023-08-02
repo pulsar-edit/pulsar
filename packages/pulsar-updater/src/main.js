@@ -78,17 +78,12 @@ class PulsarUpdater {
     }
   }
 
-  notifyAboutCurrent() {
-    if (this.manuallyTriggeredCheck) {
-      const notification = atom.notifications.addInfo(
-        "Pulsar is already up to date.",
-        {
-          dismissable: true
-        }
-      );
-      this.manuallyTriggeredCheck = false;
-    }
-    return;
+  notifyAboutCurrent(latestVersion, manual) {
+    if (!manual) return;
+    atom.notifications.addInfo(
+      "Pulsar is already up to date.",
+      { dismissable: true }
+    );
   }
 
   async notifyAboutUpdate(latestVersion) {
