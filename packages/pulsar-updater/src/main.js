@@ -8,10 +8,12 @@ class PulsarUpdater {
   activate() {
     this.disposables = new CompositeDisposable();
     this.cache = require("./cache.js");
+    this.manuallyTriggeredCheck = false;
 
     this.disposables.add(
       atom.commands.add("atom-workspace", {
         "pulsar-updater:check-for-update": () => {
+          this.manuallyTriggeredCheck = true;
           this.checkForUpdates();
         },
         "pulsar-updater:clear-cache": () => {
@@ -62,6 +64,9 @@ class PulsarUpdater {
     ) {
       // The user has already been notified about this version and told us not
       // to notify them again until the next release.
+      if (this.manuallyTriggeredCheck) {
+        await this.notifyAboutUpdate(latestVersion);
+      }
       return;
     }
 
@@ -75,7 +80,15 @@ class PulsarUpdater {
   }
 
   notifyAboutCurrent() {
-    // TODO: Notify if the user initiated the command; otherwise do nothing
+    if (this.manuallyTriggeredCheck) {
+      const notification = atom.notifications.addInfo(
+        "Pulsar is already up to date.",
+        {
+          dismissable: true
+        }
+      );
+      this.manuallyTriggeredCheck = false;
+    }
     return;
   }
 
@@ -132,6 +145,7 @@ class PulsarUpdater {
         ],
       }
     );
+    this.manuallyTriggeredCheck = false;
   }
 
   ignoreForThisVersion(version) {
