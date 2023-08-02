@@ -8,13 +8,11 @@ class PulsarUpdater {
   activate() {
     this.disposables = new CompositeDisposable();
     this.cache = require("./cache.js");
-    this.manuallyTriggeredCheck = false;
 
     this.disposables.add(
       atom.commands.add("atom-workspace", {
         "pulsar-updater:check-for-update": () => {
-          this.manuallyTriggeredCheck = true;
-          this.checkForUpdates();
+          this.checkForUpdates({ manual: true });
         },
         "pulsar-updater:clear-cache": () => {
           this.cache.empty("last-update-check");
@@ -51,7 +49,7 @@ class PulsarUpdater {
     return res.body[0].tag_name;
   }
 
-  async checkForUpdates() {
+  async checkForUpdates({ manual = false } = {}) {
     let cachedUpdateCheck = this.cache.getCacheItem("last-update-check");
 
     // Null means that there is no previous check, or the last check expired
@@ -64,7 +62,7 @@ class PulsarUpdater {
     ) {
       // The user has already been notified about this version and told us not
       // to notify them again until the next release.
-      if (this.manuallyTriggeredCheck) {
+      if (manual) {
         await this.notifyAboutUpdate(latestVersion);
       }
       return;
@@ -75,21 +73,16 @@ class PulsarUpdater {
     } else {
       // This can be a no-op or something that generates an actual notification
       // based on how the update check was invoked.
-      await this.notifyAboutCurrent(latestVersion);
+      await this.notifyAboutCurrent(latestVersion, manual);
     }
   }
 
-  notifyAboutCurrent() {
-    if (this.manuallyTriggeredCheck) {
-      const notification = atom.notifications.addInfo(
-        "Pulsar is already up to date.",
-        {
-          dismissable: true
-        }
-      );
-      this.manuallyTriggeredCheck = false;
-    }
-    return;
+  notifyAboutCurrent(latestVersion, manual) {
+    if (!manual) return;
+    atom.notifications.addInfo(
+      "Pulsar is already up to date.",
+      { dismissable: true }
+    );
   }
 
   async notifyAboutUpdate(latestVersion) {
@@ -115,7 +108,6 @@ class PulsarUpdater {
     // Notification text of `null` means that we shouldn't show a notification
     // after all.
     if (notificationDetailText === null) {
-      this.manuallyTriggeredCheck = false;
       return;
     }
 
@@ -146,7 +138,6 @@ class PulsarUpdater {
         ],
       }
     );
-    this.manuallyTriggeredCheck = false;
   }
 
   ignoreForThisVersion(version) {
