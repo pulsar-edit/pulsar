@@ -13,8 +13,7 @@ class PulsarUpdater {
     this.disposables.add(
       atom.commands.add("atom-workspace", {
         "pulsar-updater:check-for-update": () => {
-          this.manuallyTriggeredCheck = true;
-          this.checkForUpdates();
+          this.checkForUpdates({ manual: true });
         },
         "pulsar-updater:clear-cache": () => {
           this.cache.empty("last-update-check");
