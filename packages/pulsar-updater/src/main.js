@@ -63,7 +63,7 @@ class PulsarUpdater {
     ) {
       // The user has already been notified about this version and told us not
       // to notify them again until the next release.
-      if (this.manuallyTriggeredCheck) {
+      if (manual) {
         await this.notifyAboutUpdate(latestVersion);
       }
       return;
