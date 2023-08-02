@@ -115,6 +115,7 @@ class PulsarUpdater {
     // Notification text of `null` means that we shouldn't show a notification
     // after all.
     if (notificationDetailText === null) {
+      this.manuallyTriggeredCheck = false;
       return;
     }
 
