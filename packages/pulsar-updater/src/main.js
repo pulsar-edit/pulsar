@@ -50,7 +50,7 @@ class PulsarUpdater {
     return res.body[0].tag_name;
   }
 
-  async checkForUpdates() {
+  async checkForUpdates({ manual = false } = {}) {
     let cachedUpdateCheck = this.cache.getCacheItem("last-update-check");
 
     // Null means that there is no previous check, or the last check expired
