@@ -437,7 +437,7 @@ function transformDeprecatedMathUsage(css, context) {
   const cssValueIgnoreList = /hsl|abs|acos|asin|atan|atan2|cos|mod|rem|sign|sin|tan|url/g;
 
   const mathExpressionRegex =
-  /-*(\d(\.\d)?)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?(\s*([\/\+\*]|(\-\s+))\s*(\d(\.\d)*)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?)+/g;
+  /(-*(\d(\.\d)?)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+)(\s*([\/\+\*]|(\-\s+))\s*((\d(\.\d)*)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+))+/g;
 
   try {
     transformedSource = postcss.parse(css);
