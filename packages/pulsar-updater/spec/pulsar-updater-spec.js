@@ -39,7 +39,6 @@ describe('PulsarUpdater', () => {
     });
 
     afterEach(() => {
-      console.log('?!?', pack.mainModule.notifyAboutUpdate);
       pack.mainModule.notifyAboutUpdate.reset();
       pack.mainModule.notifyAboutCurrent.reset();
     })
@@ -68,7 +67,7 @@ describe('PulsarUpdater', () => {
       atom.commands.dispatch(workspaceElement, 'pulsar-updater:check-for-update');
       await wait(200);
       expect(pack.mainModule.notifyAboutUpdate).not.toHaveBeenCalled();
-      expect(pack.mainModule.notifyAboutCurrent).toHaveBeenCalledWith("1.0.5");
+      expect(pack.mainModule.notifyAboutCurrent).toHaveBeenCalledWith("1.0.5", true);
     });
   });
 
