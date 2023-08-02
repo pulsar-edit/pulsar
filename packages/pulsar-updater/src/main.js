@@ -8,7 +8,6 @@ class PulsarUpdater {
   activate() {
     this.disposables = new CompositeDisposable();
     this.cache = require("./cache.js");
-    this.manuallyTriggeredCheck = false;
 
     this.disposables.add(
       atom.commands.add("atom-workspace", {
