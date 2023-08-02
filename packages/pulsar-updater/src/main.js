@@ -74,7 +74,7 @@ class PulsarUpdater {
     } else {
       // This can be a no-op or something that generates an actual notification
       // based on how the update check was invoked.
-      await this.notifyAboutCurrent(latestVersion);
+      await this.notifyAboutCurrent(latestVersion, manual);
     }
   }
 
