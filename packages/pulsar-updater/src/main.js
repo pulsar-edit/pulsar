@@ -140,7 +140,6 @@ class PulsarUpdater {
         ],
       }
     );
-    this.manuallyTriggeredCheck = false;
   }
 
   ignoreForThisVersion(version) {
