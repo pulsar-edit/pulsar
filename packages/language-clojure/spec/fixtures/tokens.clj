@@ -72,12 +72,12 @@ error/
 ;               ^ meta.symbol
 ;               ^ !entity.name.function
 
-`(call param ~(call))
+`(call param param# ~(call))
 ;  ^ meta.symbol
-;  ^ !entity.name.function
+;  ^ entity.name.function
 ;       ^ meta.symbol
-;       ^ !entity.name.function
-;               ^ entity.name.function
+;            ^ meta.symbol
+;                     ^ entity.name.function
 
 ;; Comments
 ;   ^ comment.line.semicolon
@@ -109,3 +109,11 @@ error/
 (ns other.namespace
   (:use [foo.bar]))
 ;   ^ invalid.deprecated
+
+#_
+(+ '1 `(+ ba))
+;   ^ comment.block
+;   ^ !constant.numeric
+;      ^ !punctuation
+;       ^ comment.block
+;       ^ !constant.keyword
