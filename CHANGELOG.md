@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+- Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some
+injection points on Clojure. Added support for highligting metadata, and added
+better support for "def" elements (example - don't syntax `default` or
+`definition` as a `def`, but highlights `p/defresolver`)
 - Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of correctly named binaries on more systems in more contexts (especially Windows). Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
 
 ### Pulsar
