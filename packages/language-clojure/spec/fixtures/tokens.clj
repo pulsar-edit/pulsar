@@ -110,6 +110,9 @@ error/
   (:use [foo.bar]))
 ;   ^ invalid.deprecated
 
+^{:some :meta} (def foo 10)
+;  ^ meta.metadata.clojure
+
 #_
 (+ '1 `(+ ba))
 ;   ^ comment.block
