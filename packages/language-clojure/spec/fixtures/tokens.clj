@@ -117,3 +117,35 @@ error/
 ;      ^ !punctuation
 ;       ^ comment.block
 ;       ^ !constant.keyword
+
+;; Special forms (core language features)
+(do :foo)
+; ^ storage.control
+#_
+(do :foo)
+; ^ !storage.control
+(if true 10)
+; ^ keyword.control.conditional.if
+#_
+(if true 10)
+; ^ !keyword.control.conditional.if
+(when true 10)
+; ^ keyword.control.conditional.when
+#_
+(when true 10)
+; ^ !keyword.control.conditional.when
+(cond true 10)
+; ^ keyword.control.conditional.cond
+#_
+(cond true 10)
+; ^ !keyword.control.conditional.cond
+(condp true 10)
+; ^ keyword.control.conditional.cond
+#_
+(condp true 10)
+; ^ !keyword.control.conditional.cond
+(cond-> true 10)
+; ^ keyword.control.conditional.cond
+#_
+(cond-> true 10)
+; ^ !keyword.control.conditional.cond

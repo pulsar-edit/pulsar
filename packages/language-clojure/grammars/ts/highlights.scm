@@ -1,4 +1,26 @@
+;; "Special" things
+(list_lit
+  "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData clojure.dismissTag)
+  .
+  (sym_lit) @storage.control (#eq? @storage.control "do"))
+
+(list_lit
+  "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData clojure.dismissTag)
+  .
+  (sym_lit) @keyword.control.conditional.if (#eq? @keyword.control.conditional.if "if"))
+
+(list_lit
+  "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData clojure.dismissTag)
+  .
+  (sym_lit) @keyword.control.conditional.when (#eq? @keyword.control.conditional.when "when"))
+
 ;; Function calls
+(list_lit
+  "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData clojure.dismissTag)
+  .
+  (sym_lit) @keyword.control.conditional.cond (#match? @keyword.control.conditional.cond "^cond(|.|-{1,2}>)$"))
+
+;; Other function calls
 (anon_fn_lit
  "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData "clojure.dismissTag")
  .
