@@ -18,6 +18,22 @@
   ;  ^ !entity.name.function
   ;      ^ constant.numeric
 
+(deftest abc (+ a b))
+;  ^ keyword.control
+;        ^ entity.global
+
+(defmacro abc [a b])
+;  ^ keyword.control
+;         ^ entity.global
+
+(defaults a)
+;  ^ !keyword.control
+;         ^ !entity.global
+
+(s/defn foobar [a b])
+;  ^ keyword.control
+;       ^ entity.global
+
 (def a "A STRING")
   ; <- keyword.control
   ;  ^ entity.global
@@ -72,12 +88,17 @@ error/
 ;               ^ meta.symbol
 ;               ^ !entity.name.function
 
-`(call param param# ~(call))
+`(call param param# ~(call something))
 ;  ^ meta.symbol
 ;  ^ entity.name.function
-;       ^ meta.symbol
-;            ^ meta.symbol
+;       ^ meta.symbol.syntax-quoted
+;            ^ meta.symbol.generated
+;            ^ !meta.symbol.syntax-quoted
 ;                     ^ entity.name.function
+;;                          ^ !meta.symbol.syntax-quoted
+(call param param# ~(call something))
+;       ^ !meta.symbol.syntax-quoted
+;            ^ !meta.symbol.generated
 
 ;; Comments
 ;   ^ comment.line.semicolon
