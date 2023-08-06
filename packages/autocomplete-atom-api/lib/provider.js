@@ -1,11 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS104: Avoid inline assignments
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const fs = require('fs');
 const path = require('path');
 
@@ -31,18 +24,18 @@ module.exports = {
 
   scanProjectDirectories() {
     this.packageDirectories = [];
-    return atom.project.getDirectories().forEach(directory => {
+    atom.project.getDirectories().forEach(directory => {
       if (directory == null) { return; }
-      return this.readMetadata(directory, (error, metadata) => {
+      this.readMetadata(directory, (error, metadata) => {
         if (this.isAtomPackage(metadata) || this.isAtomCore(metadata)) {
-          return this.packageDirectories.push(directory);
+          this.packageDirectories.push(directory);
         }
       });
     });
   },
 
   readMetadata(directory, callback) {
-    return fs.readFile(path.join(directory.getPath(), 'package.json'), function(error, contents) {
+    fs.readFile(path.join(directory.getPath(), 'package.json'), function(error, contents) {
       let metadata;
       if (error == null) {
         try {
@@ -74,7 +67,7 @@ module.exports = {
         }
       }
     }
-    for (let directory of Array.from(this.packageDirectories != null ? this.packageDirectories : [])) {
+    for (let directory of (this.packageDirectories != null ? this.packageDirectories : [])) {
       if (directory.contains(editorPath)) { return true; }
     }
     return false;
@@ -86,17 +79,16 @@ module.exports = {
   },
 
   getCompletions(line) {
-    let left;
     const completions = [];
     const match =  propertyPrefixPattern.exec(line)?.[1];
     if (!match) { return completions; }
 
     let segments = match.split('.');
-    const prefix = (left = segments.pop()) != null ? left : '';
+    const prefix = segments.pop() ?? '';
     segments = segments.filter(segment => segment);
     const property = segments[segments.length - 1];
     const propertyCompletions = this.completions[property]?.completions != null ? this.completions[property]?.completions : [];
-    for (let completion of Array.from(propertyCompletions)) {
+    for (let completion of propertyCompletions) {
       if (!prefix || firstCharsEqual(completion.name, prefix)) {
         completions.push(clone(completion));
       }
@@ -114,7 +106,7 @@ module.exports = {
 
     this.completions[propertyName] = {completions: []};
 
-    for (let completion of Array.from(classCompletions)) {
+    for (let completion of classCompletions) {
       this.completions[propertyName].completions.push(completion);
       if (completion.type === 'property') {
         const propertyClass = this.getPropertyClass(completion.name);
@@ -124,10 +116,10 @@ module.exports = {
   }
 };
 
-var clone = function(obj) {
+const clone = function(obj) {
   const newObj = {};
   for (let k in obj) { const v = obj[k]; newObj[k] = v; }
   return newObj;
 };
 
-var firstCharsEqual = (str1, str2) => str1[0].toLowerCase() === str2[0].toLowerCase();
+const firstCharsEqual = (str1, str2) => str1[0].toLowerCase() === str2[0].toLowerCase();
