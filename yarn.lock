@@ -4383,6 +4383,10 @@ event-kit@^1.0.0, event-kit@^1.0.2:
   dependencies:
     grim "^1.2.1"
 
+"event-kit@github:pulsar-edit/event-kit":
+  version "2.5.3"
+  resolved "https://codeload.github.com/pulsar-edit/event-kit/tar.gz/80b551c1d03dd05795500f0c71dcf15be3a23c63"
+
 event-stream@~3.1.0:
   version "3.1.7"
   resolved "https://registry.yarnpkg.com/event-stream/-/event-stream-3.1.7.tgz#b4c540012d0fe1498420f3d8946008db6393c37a"
@@ -7850,6 +7854,7 @@ psl@^1.1.28:
 "pulsar-updater@file:packages/pulsar-updater":
   version "1.0.0"
   dependencies:
+    event-kit "github:pulsar-edit/event-kit"
     shelljs "^0.8.5"
     superagent "^8.0.9"
     winreg "^1.2.4"
