@@ -1,0 +1,28 @@
+{
+  "name": "pulsar-updater",
+  "version": "1.0.0",
+  "description": "Detect Pulsar updates on Launch.",
+  "main": "./src/main.js",
+  "scripts": {
+    "test": "pulsar --test spec"
+  },
+  "engines": {
+    "atom": ">=1.106.0 <2.0.0"
+  },
+  "author": "confused-Techie",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "dependencies": {
+    "event-kit": "github:pulsar-edit/event-kit",
+    "shelljs": "^0.8.5",
+    "superagent": "^8.0.9",
+    "winreg": "^1.2.4"
+  },
+  "configSchema": {
+    "checkForUpdatesOnLaunch": {
+      "type": "boolean",
+      "default": true,
+      "description": "If Pulsar Updater should check for an update to Pulsar as soon as Pulsar launches."
+    }
+  }
+}

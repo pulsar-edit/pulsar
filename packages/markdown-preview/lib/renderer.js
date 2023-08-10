@@ -107,7 +107,14 @@ function renderYamlTable (variables) {
   const markdownRows = [
     entries.map(entry => entry[0]),
     entries.map(entry => '--'),
-    entries.map(entry => entry[1])
+    entries.map((entry) => {
+      if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
+        // Remove all newlines, or they ruin formatting of parent table
+        return marked.parse(renderYamlTable(entry[1])).replace(/\n/g,"");
+      } else {
+        return entry[1];
+      }
+    })
   ]
 
   return (
