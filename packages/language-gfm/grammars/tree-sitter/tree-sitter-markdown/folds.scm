@@ -17,6 +17,3 @@
 ; (atx_heading (atx_h6_marker)) @fold.start.h6 @fold.end.h6
 ;
 ; ; [(atx_heading) (setext_heading)] @fold.end @fold.start
-
-((list_item) @fold
-  (#set! fold.endAt endPosition))
