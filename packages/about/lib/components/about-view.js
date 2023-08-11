@@ -3,7 +3,6 @@ const etch = require('etch');
 const { shell } = require('electron');
 const AtomLogo = require('./atom-logo');
 const EtchComponent = require('../etch-component');
-const UpdateView = require('./update-view');
 
 const $ = etch.dom;
 
@@ -31,7 +30,7 @@ module.exports = class AboutView extends EtchComponent {
   handleReleaseNotesClick(e) {
     e.preventDefault();
     shell.openExternal(
-      this.props.updateManager.getReleaseNotesURLForAvailableVersion() //update-manager.js will need updating when we decide how to do the changelog
+      this.props.updateManager.getReleaseNotesURLForCurrentVersion()
     );
   }
 
@@ -52,7 +51,7 @@ module.exports = class AboutView extends EtchComponent {
   handleHowToUpdateClick(e) {
     e.preventDefault();
     shell.openExternal(
-            'https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar'
+            'https://github.com/pulsar-edit/pulsar/tree/master/packages/pulsar-updater#readme'
     );
   }
 
@@ -160,12 +159,30 @@ module.exports = class AboutView extends EtchComponent {
         )
       ),
 
-      $(UpdateView, {
-        updateManager: this.props.updateManager,
-        availableVersion: this.props.availableVersion,
-        viewUpdateReleaseNotes: this.handleReleaseNotesClick.bind(this),
-        viewUpdateInstructions: this.handleHowToUpdateClick.bind(this)
-      }),
+      $.div(
+        { className: 'about-updates group-start' },
+        $.div(
+          { className: 'about-updates-box' },
+          $.div(
+            { className: 'about-updates-status' },
+            $.div(
+              { className: 'about-updates-item app-unsupported' },
+              $.span(
+                { className: 'about-updates-label is-strong' },
+                'AutoUpdates have been moved to the package `pulsar-updater`',
+                $.br()
+              ),
+              $.a(
+                {
+                  className: 'about-updates-instructions',
+                  onclick: this.handleHowToUpdateClick.bind(this)
+                },
+                'How to update'
+              )
+            )
+          )
+        )
+      ),
 
       $.div(
         { className: 'about-actions group-item' },
