@@ -8,14 +8,14 @@ deciders: '@confused-Techie, @Daeraxa, @savetheclocktower, @mauricioszabo'
 ## Context and Problem Statement
 
 To provide users with some form of autoupdate functionality, many thought we could
-adopt the original method used by the Atom team, and defacto method within Electron
+adopt the original method used by the Atom team, and de-facto method within Electron
 applications, Squirrel. While Squirrel is great for AutoUpdating, it has some big
 issues, mainly it requires that every platform has signed binaries, which can be
 prohibitively expensive. Additionally, it only supports Windows and macOS.
 
 ## Decision Drivers
 
-* Users need a way to fullfill AutoUpdate functionality
+* Users need a way to fulfill AutoUpdate functionality
 
 ## Considered Options
 
@@ -75,7 +75,7 @@ There was also additional concerns about not deleting the code used for Squirrel
 in case we ever did want to return to that behavior, since it already works perfectly, if properly setup.
 
 For that reason, instead of keeping the code within the repo, below will be details about where the code that comprises
-of the Squirrel AutoUpdate logic will be kept within Git, so that it can always be retreived if ever needed.
+of the Squirrel AutoUpdate logic will be kept within Git, so that it can always be retrieved if ever needed.
 
 * Last Commit Before Removal: `bf60fbe6fc267b737a70d5d39c03cad1629ea128`
-* PR Where it was Removed: [`pulsar-edit/pulsar#TBD`]()
+* PR Where it was Removed: [`pulsar-edit/pulsar#668`](https://github.com/pulsar-edit/pulsar/pull/668)
