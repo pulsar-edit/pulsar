@@ -684,7 +684,10 @@ module.exports = class Workspace extends Model {
   // open.
   updateWindowTitle() {
     let itemPath, itemTitle, projectPath, representedPath;
-    const appName = atom.getAppName();
+    // We have to use optional chaining on `atom` here, as the observe callback in
+    // init, may call this function prior to the world being spun up during test runs
+    // Should not have any effect in production
+    const appName = atom?.getAppName() ?? "";
     const left = this.project.getPaths();
     const projectPaths = left != null ? left : [];
     const item = this.getActivePaneItem();
@@ -721,10 +724,10 @@ module.exports = class Workspace extends Model {
     }
 
     const titleParts = [];
-    if (item != null && projectPath != null && atom.config.get('core.addCurrentTabToWindowTitle')) {
+    if (item != null && projectPath != null && this.config.get('core.addCurrentTabToWindowTitle')) {
       titleParts.push(itemTitle, projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
-    } else if (item != null && projectPath != null && !atom.config.get('core.addCurrentTabToWindowTitle')) {
+    } else if (item != null && projectPath != null && !this.config.get('core.addCurrentTabToWindowTitle')) {
       titleParts.push(projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
     } else if (projectPath != null) {
