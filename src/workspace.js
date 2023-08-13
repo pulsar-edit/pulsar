@@ -177,6 +177,7 @@ module.exports = class Workspace extends Model {
   constructor(params) {
     super(...arguments);
 
+    this.disposables = new CompositeDisposable();
     this.updateWindowTitle = this.updateWindowTitle.bind(this);
     this.updateDocumentEdited = this.updateDocumentEdited.bind(this);
     this.didDestroyPaneItem = this.didDestroyPaneItem.bind(this);
@@ -381,10 +382,11 @@ module.exports = class Workspace extends Model {
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
 
-    // We use `this.config` since `atom.config` isn't declared globally yet during test runs
-    this.config.observe('core.addCurrentTabToWindowTitle', () => {
-      this.updateWindowTitle();
-    });
+    this.disposables.add(
+      this.config.onDidChange('core.addCurrentTabToWindowTitle', () => {
+        this.updateWindowTitle();
+      })
+    );
   }
 
   consumeServices({ serviceHub }) {
@@ -684,10 +686,7 @@ module.exports = class Workspace extends Model {
   // open.
   updateWindowTitle() {
     let itemPath, itemTitle, projectPath, representedPath;
-    // We have to use optional chaining on `atom` here, as the observe callback in
-    // init, may call this function prior to the world being spun up during test runs
-    // Should not have any effect in production
-    const appName = atom?.getAppName() ?? "";
+    const appName = atom.getAppName();
     const left = this.project.getPaths();
     const projectPaths = left != null ? left : [];
     const item = this.getActivePaneItem();
