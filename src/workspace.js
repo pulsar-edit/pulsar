@@ -381,7 +381,8 @@ module.exports = class Workspace extends Model {
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
 
-    atom.config.observe('core.addCurrentTabToWindowTitle', () => {
+    // We use `this.config` since `atom.config` isn't declared globally yet during test runs
+    this.config.observe('core.addCurrentTabToWindowTitle', () => {
       this.updateWindowTitle();
     });
   }
