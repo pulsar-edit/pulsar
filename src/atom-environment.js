@@ -960,8 +960,6 @@ class AtomEnvironment {
         )
       );
 
-      this.listenForUpdates();
-
       this.registerDefaultTargetForKeymaps();
 
       StartupTime.addMarker(
