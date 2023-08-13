@@ -380,6 +380,10 @@ module.exports = class Workspace extends Model {
     this.subscribeToAddedItems();
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
+
+    atom.config.observe('core.addCurrentTabToWindowTitle', () => {
+      this.updateWindowTitle();
+    });
   }
 
   consumeServices({ serviceHub }) {
@@ -716,8 +720,11 @@ module.exports = class Workspace extends Model {
     }
 
     const titleParts = [];
-    if (item != null && projectPath != null) {
+    if (item != null && projectPath != null && atom.config.get('core.addCurrentTabToWindowTitle')) {
       titleParts.push(itemTitle, projectPath);
+      representedPath = itemPath != null ? itemPath : projectPath;
+    } else if (item != null && projectPath != null && !atom.config.get('core.addCurrentTabToWindowTitle')) {
+      titleParts.push(projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
     } else if (projectPath != null) {
       titleParts.push(projectPath);
