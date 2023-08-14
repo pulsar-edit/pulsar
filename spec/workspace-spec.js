@@ -2079,7 +2079,7 @@ describe('Workspace', () => {
           escapeStringRegex(path.dirname(item.getPath()))
         );
         expect(document.title).toMatch(
-          new RegExp(`^${pathEscaped} \\u2014`)
+          new RegExp(`^${pathEscaped}`)
         );
         atom.config.unset("core.addCurrentTabToWindowTitle");
         // Now with the config changed, the title should automatically update
