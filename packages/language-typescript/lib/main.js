@@ -1,5 +1,5 @@
 exports.activate = function() {
-  for (const scopeName of ['source.ts', 'source.flow']) {
+  for (const scopeName of ['source.ts', 'source.tsx', 'source.flow']) {
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'call_expression',
 

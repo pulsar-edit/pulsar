@@ -9,7 +9,6 @@ exports.activate = function() {
     content(node) {
       return node.descendantsOfType('heredoc_content')
     },
-    // coverShallowerScopes: true
   });
 
   atom.grammars.addInjectionPoint('source.ruby', {
