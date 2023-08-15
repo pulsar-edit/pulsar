@@ -11,15 +11,29 @@
 (
   (comment)* @doc
   .
-  [
-    (class
-      name: (_) @name)
-    (class_declaration
-      name: (_) @name)
-  ] @definition.class
-  (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
-  (#select-adjacent! @doc @definition.class)
+  (class_declaration
+    name: (_) @name) @definition.class
 )
+
+(
+  (comment)* @doc
+  .
+  (class
+    name: (_) @name) @definition.class
+)
+
+; (
+;   (comment)* @doc
+;   .
+;   [
+;     (class
+;       name: (_) @name)
+;     (class_declaration
+;       name: (_) @name)
+;   ] @definition.class
+;   (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
+;   (#select-adjacent! @doc @definition.class)
+; )
 
 (
   (comment)* @doc
