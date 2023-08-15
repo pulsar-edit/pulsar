@@ -171,7 +171,7 @@ class PulsarUpdater {
         break;
       case "Deb-Get Installation":
         returnText +=
-          "Install the latest version by running `sudo deb-get update`.";
+          "Install the latest version by running `deb-get update && deb-get install pulsar`.";
         break;
       case "Nix Installation":
         // TODO find nix update command
