@@ -1,3 +1,17 @@
+;; Special forms (core language features)
+(do :foo)
+; ^ storage.control
+; (if true 10)
+; ; ^ keyword.control.conditional.if
+; (when true 10)
+; ; ^ keyword.control.conditional.when
+; (cond true 10)
+; ; ^ keyword.control.conditional.cond
+; (condp true 10)
+; ; ^ keyword.control.conditional.cond
+; (cond-> true 10)
+; ; ^ keyword.control.conditional.cond
+
 (ns foobar)
 ; <- punctuation.section.expression.begin
 ; ^ meta.definition.global
