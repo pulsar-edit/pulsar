@@ -1,3 +1,5 @@
+try {
+
 console.log("Starting the binary renaming script...");
 
 const fs = require('fs');
@@ -50,4 +52,9 @@ if (lastSegment.length > 4) {
 			};
 		});
 	};
+};
+
+} catch (e) {
+	console.error("There was a problem during the renaming script!:");
+	console.error(e);
 };
