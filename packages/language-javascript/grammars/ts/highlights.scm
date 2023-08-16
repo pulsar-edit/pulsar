@@ -543,10 +543,18 @@
   (#match? @punctuation.definition.comment.js "^\/\/")
   (#set! adjust.startAndEndAroundFirstMatchOf "^\/\/"))
 
+((comment) @comment.block.documentation.js
+  (#match? @comment.block.documentation.js "^/\\*\\*")
+  (#set! capture.final true)
+  (#set! highlight.invalidateOnChange true))
+
+
 ; Block comments. `/* */`
 ((comment) @comment.block.js
   (#match? @comment.block.js "^/\\*")
-  (#match? @comment.block.js "\\*/$"))
+  (#match? @comment.block.js "\\*/$")
+  (#set! highlight.invalidateOnChange true))
+
 
 ((comment) @punctuation.definition.comment.begin.js
   (#match? @punctuation.definition.comment.begin.js "^/\\*")
@@ -888,29 +896,43 @@
 ; The interiors of functions (useful for snippets and commands).
 (method_definition
   body: (statement_block) @meta.block.function.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
 (function_declaration
   body: (statement_block) @meta.block.function.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
 (generator_function_declaration
   body: (statement_block) @meta.block.function.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
 (function
   body: (statement_block) @meta.block.function.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
 (generator_function
   body: (statement_block) @meta.block.function.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
 ; The interior of a class body (useful for snippets and commands).
-(class_body) @meta.block.class.js
+((class_body) @meta.block.class.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
 
 ; All other sorts of blocks.
-(statement_block) @meta.block.js
+((statement_block) @meta.block.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
 
 ; The inside of a parameter definition list.
 ((formal_parameters) @meta.parameters.js
