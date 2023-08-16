@@ -70,6 +70,10 @@
 ((primitive_type) @support.type.stdint.c
   (#match? @support.type.stdint.c "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$"))
 
+(enum_specifier
+  name: (type_identifier) @variable.other.declaration.type.c)
+(type_definition
+  declarator: (_) @variable.other.declaration.type.c)
 
 ; CAVEAT: tree-sitter-c doesn't identify placeholders like `%c` in strings.
 ; Candidate for an injection grammar.
@@ -111,19 +115,19 @@
   declarator: (identifier) @variable.declaration.c)
 
 (field_declaration
-  (field_identifier) @variable.declaration.c)
+  (field_identifier) @entity.other.attribute-name.c)
 
 (field_declaration
   (pointer_declarator
-    (field_identifier) @variable.declaration.c))
+    (field_identifier) @entity.other.attribute-name.c))
 
 (field_declaration
   (array_declarator
-    (field_identifier) @variable.declaration.c))
+    (field_identifier) @entity.other.attribute-name.c))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @variable.declaration.c))
+    (identifier) @entity.other.attribute-name.c))
 
 (assignment_expression
   left: (identifier) @variable.other.assignment.c)
@@ -158,7 +162,7 @@
 ; The "size" in `finfo->size`.
 (field_expression
   "->"
-  field: (field_identifier) @variable.other.member.c)
+  field: (field_identifier) @support.other.property.c)
 
 
 ; FUNCTIONS
