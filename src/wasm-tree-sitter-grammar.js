@@ -45,6 +45,8 @@ module.exports = class WASMTreeSitterGrammar {
       commentEndString: params.comments && params.comments.end
     };
 
+    this.commentMetadata = params.comments;
+
     this.shouldObserveQueryFiles = atom.inDevMode() && !atom.inSpecMode();
     this.getLanguage();
 
@@ -67,6 +69,50 @@ module.exports = class WASMTreeSitterGrammar {
       this.scopeNamesById.set(id, scopeName);
     }
     return id;
+  }
+
+  // Retrieve the comment delimiters for this grammar.
+  //
+  // Traditionally, grammars specified only the delimiters needed for the
+  // “Toggle Line Comments” command — either a line comment (if it existed) or
+  // a block comment. But other features might want to know _all_ of a
+  // language's possible comment delimiters, so we've devised new config values.
+  getCommentDelimiters() {
+    let meta = this.commentMetadata;
+    if (!meta) { return null; }
+
+    let result = {};
+
+    // The new convention is to specify a `line` property and start/end
+    // properties.
+    let { line, block } = this.commentMetadata;
+
+    // Failing that, we can deliver at least a partial result by inspecting the
+    // older convention. If `start` exists but not `end`, we know `start` must
+    // be a line comment delimiter.
+    if (!line && meta.start && !meta.end) {
+      line = meta.start;
+    }
+    // Likewise, if both `start` and `end` exist, we know they must be block
+    // comment delimiters.
+    if (!block && meta.start && meta.end) {
+      block = { start: meta.start, end: meta.end };
+    }
+
+    // Strip all whitespace from delimiters. Whatever is consuming them can
+    // decide if it wants whitespace.
+    if (line) {
+      line = line.strip();
+      result.line = line;
+    }
+
+    if (block) {
+      block.start = block.start?.strip();
+      block.end = block.end?.strip();
+      result.block = block;
+    }
+
+    return result;
   }
 
   classNameForScopeId(id) {

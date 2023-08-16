@@ -1056,19 +1056,42 @@ class WASMTreeSitterLanguageMode {
   Section - Comments
   */
 
-  // TODO: I know that old tree-sitter moved toward placing this data on the
-  // grammar itself, but I would prefer to invert the order of these lookups.
-  // As a config setting it can be scoped and overridden, but as a grammar
-  // property it's just a fact of life that can't be worked around.
+  // Returns the correct comment delimiters for the given buffer position. This
+  // may be defined on the grammar itself, but it can also be defined as a
+  // scope-specific setting for scenarios where a language has different
+  // comment delimiters for different contexts.
   //
-  // TODO: Also, this should be revisited soon so that we can give the
-  // `snippets` package the ability to ask about all of a grammar's comment
-  // tokens — both line and block.
-  //
+  // TODO: Our understanding of the correct delimiters for a given buffer
+  // position is only as granular as the entire buffer row. This can bite us in
+  // edge cases like JSX. It's the right decision if the user toggles a comment
+  // with an empty selection, but if specific buffer text is selected, we
+  // should look up the right delmiters for that specific range. This will
+  // require a new branch in the “Editor: Toggle Line Comments” command.
   commentStringsForPosition(position) {
-    // First ask the grammar for its comment strings.
     const range = this.firstNonWhitespaceRange(position.row) ||
       new Range(position, position);
+
+    // Ask the config system if it has a setting for this scope. This allows
+    // for overrides from the grammar default.
+    const scope = this.scopeDescriptorForPosition(range.start);
+    const commentStartEntries = this.config.getAll(
+      'editor.commentStart', { scope });
+    const commentEndEntries = this.config.getAll(
+      'editor.commentEnd', { scope });
+
+    const commentStartEntry = commentStartEntries[0];
+    const commentEndEntry = commentEndEntries.find(entry => (
+      entry.scopeSelector === commentStartEntry.scopeSelector
+    ));
+
+    if (commentStartEntry) {
+      return {
+        commentStartString: commentStartEntry && commentStartEntry.value,
+        commentEndString: commentEndEntry && commentEndEntry.value
+      };
+    }
+
+    // Fall back to looking up this information on the grammar.
     const { grammar } = this.getSyntaxNodeAndGrammarContainingRange(range);
 
     if (grammar) {
@@ -1079,22 +1102,6 @@ class WASMTreeSitterLanguageMode {
         return commentStrings;
       }
     }
-
-    // Fall back to a lookup through the config system.
-    const scope = this.scopeDescriptorForPosition(position);
-    const commentStartEntries = this.config.getAll(
-      'editor.commentStart', { scope });
-    const commentEndEntries = this.config.getAll(
-      'editor.commentEnd', { scope });
-
-    const commentStartEntry = commentStartEntries[0];
-    const commentEndEntry = commentEndEntries.find(entry => (
-      entry.scopeSelector === commentStartEntry.scopeSelector
-    ));
-    return {
-      commentStartString: commentStartEntry && commentStartEntry.value,
-      commentEndString: commentEndEntry && commentEndEntry.value
-    };
   }
 
   isRowCommented(row) {
@@ -1640,6 +1647,11 @@ class WASMTreeSitterLanguageMode {
           return result;
         });
       }
+    }
+
+    if (!indentTree) {
+      console.error(`No indent tree!`, controllingLayer.inspect());
+      return undefined;
     }
 
     const indents = indentsQuery.captures(
@@ -2928,12 +2940,17 @@ class LanguageLayer {
       if (depth === 0) {
         languageScope = this.grammar.scopeName;
       } else {
+        // Injections can control the base scope name of the grammar being
+        // injected.
         languageScope = injectionPoint.languageScope;
-        // Honor an explicit `null`, but fall back to the default scope name
-        // otherwise.
+
+        // The `languageScope` parameter can be a function.
         if (typeof languageScope === 'function') {
           languageScope = languageScope(this.grammar);
         }
+
+        // Honor an explicit `null`, but fall back to the default scope name
+        // otherwise.
         if (languageScope === undefined) {
           languageScope = this.grammar.scopeName;
         }
