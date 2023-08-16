@@ -146,7 +146,7 @@ silicon_mac_task:
   test_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - rm -R node_modules/electron; yarn install --check-files
-    - hdiutil mount binaries/Pulsar*dmg
+    - hdiutil mount binaries/*Pulsar*dmg
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   always:
@@ -197,7 +197,7 @@ intel_mac_task:
   test_script:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - rm -R node_modules/electron; yarn install --check-files
-    - hdiutil mount binaries/Pulsar*dmg
+    - hdiutil mount binaries/*Pulsar*dmg
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
   always:
