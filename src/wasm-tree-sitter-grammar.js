@@ -127,7 +127,7 @@ module.exports = class WASMTreeSitterGrammar {
           this.observeQueryFile(filePaths, key);
         }
       }
-      Promise.all(promises).then(() => resolve());
+      return Promise.all(promises).then(() => resolve());
     }).then(() => {
       this._queryFilesLoaded = true;
       this._loadQueryFilesPromise = null;
@@ -254,7 +254,9 @@ module.exports = class WASMTreeSitterGrammar {
     await this.getLanguage();
     this.queryCache.delete(queryType);
     this[queryType] = contents;
-    return await this.getQuery(queryType);
+    let query = await this.getQuery(queryType);
+    this.emitter.emit('did-change-query-file', { filePath: '', queryType });
+    return query;
   }
 
   // Observe a particular query file on disk so that it can immediately be
