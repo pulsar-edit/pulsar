@@ -11,7 +11,7 @@
         ^ \\s* (\\s* /[*] .* [*]/ \\s*)* [}\\])]
       '
 
-'.meta.tag.tsx':
+'.meta.tag.tsx, .meta.block.jsx.ts.tsx':
   'editor':
     'commentStart': '{/* ',
     'commentEnd': ' */}',
