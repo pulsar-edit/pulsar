@@ -275,14 +275,14 @@ class BracketMatcherView {
             startTag = firstChild
             endTag = lastChild
           }
+          return true
         }
-        return true
       }
     })
     return {startTag, endTag}
   }
 
-  findMatchingEndBracketWithRegexSearch (startBracketPosition, startBracket, endBracket) {
+  findMatchingEndBracketWithRegexSearch(startBracketPosition, startBracket, endBracket) {
     const scanRange = new Range(
       startBracketPosition.traverse(ONE_CHAR_FORWARD_TRAVERSAL),
       startBracketPosition.traverse(MAX_ROWS_TO_SCAN_FORWARD_TRAVERSAL)
