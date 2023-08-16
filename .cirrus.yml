@@ -139,7 +139,7 @@ silicon_mac_task:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
   rename_binary_script:
-    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - node script/rename.js "Silicon.Mac"
   binary_artifacts:
     path: ./binaries/*
