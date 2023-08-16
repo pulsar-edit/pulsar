@@ -39,4 +39,4 @@
 
 ((comment) @fold
   (#set! fold.endAt endPosition)
-  (#set! fold.adjustEndColumn 0))
+  (#set! fold.offsetEnd -2))
