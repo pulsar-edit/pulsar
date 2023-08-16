@@ -9,6 +9,10 @@
 (import_specifier
   (identifier) @variable.other.assignment.import._LANG_)
 
+; The "foo" in `import * as foo from './bar'`
+(namespace_import
+  (identifier) @variable.other.assignment.import.namespace._LANG_)
+
 ; The "Foo" in `export { Foo }`
 (export_specifier
   name: (identifier) @variable.other.assignment.export._LANG_)
@@ -37,8 +41,19 @@
   (#match? @punctuation.definition.comment._LANG_ "^//")
   (#set! adjust.startAndEndAroundFirstMatchOf "^//"))
 
+((comment) @comment.block.documentation._LANG_
+  (#match? @comment.block.documentation._LANG_ "^/\\*\\*")
+  (#set! capture.final true)
+  (#set! highlight.invalidateOnChange true))
+
+; Block comments. `/* */`
 ((comment) @comment.block._LANG_
-  (#match? @comment.block._LANG_ "^/\\*"))
+  (#match? @comment.block._LANG_ "^/\\*")
+  (#match? @comment.block._LANG_ "\\*/$")
+  (#set! highlight.invalidateOnChange true))
+
+; ((comment) @comment.block._LANG_
+;   (#match? @comment.block._LANG_ "^/\\*"))
 
 ((comment) @punctuation.definition.comment.begin._LANG_
   (#match? @punctuation.definition.comment.begin._LANG_ "^/\\*")
@@ -65,7 +80,8 @@
 ; =======
 
 (class_declaration
-  name: (type_identifier) @entity.name.type.class._LANG_)
+  name: (type_identifier) @entity.name.type.class._LANG_
+  (#set! capture.final true))
 
 (extends_clause
   value: (_) @entity.other.inherited-class._LANG_)
@@ -90,11 +106,26 @@
   "set" @storage.setter._LANG_)
 
 
+; NAMESPACES
+; ==========
+
+(internal_module
+  name: (identifier) @entity.name.type.namespace._LANG_)
+
+
+; DECLARATIONS
+; ============
+
+(function_signature
+  name: (identifier) @entity.name.function.signature._LANG_)
+
+
 ; INTERFACES
 ; ==========
 
 (interface_declaration
   name: (_) @entity.name.type.interface._LANG_)
+
 
 ; TYPES
 ; =====
@@ -178,6 +209,8 @@
 (property_signature
   (property_identifier) @entity.other.attribute-name._LANG_)
 
+
+
 ; FUNCTIONS
 ; =========
 
@@ -260,6 +293,10 @@
   pattern: (identifier) @variable.parameter._LANG_)
 
 (required_parameter
+  pattern: (rest_pattern
+    (identifier) @variable.parameter.rest._LANG_))
+
+(required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
     (#set! capture.final true))
@@ -269,6 +306,9 @@
 
 (optional_parameter "?" @keyword.operator.type.optional._LANG_)
 
+(type_predicate
+  name: (identifier) @variable.other.type._LANG_
+  "is" @keyword.operator.type.is._LANG_)
 
 ["var" "const" "let"] @storage.type._TYPE_._LANG_
 
@@ -306,7 +346,16 @@
   (pair_pattern
     ; TODO: This arguably isn't an object key.
     key: (_) @entity.other.attribute-name._LANG_
-    value: (identifier) @variable.other.assignment.destructuring._LANG_))
+    value: (identifier) @variable.other.assignment.destructuring._LANG_)
+    (#set! capture.final true))
+
+; A complex object alias destructuring:
+; The "bar" in `let { bar: { foo: troz } } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name._LANG_)
+    (#set! capture.final true))
 
 ; A variable object alias destructuring with default value:
 ; The "bar" and "foo" in `let { bar: foo = true } = something`
