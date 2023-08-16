@@ -1,0 +1,31 @@
+# This grammar doesn't have its own name because it's only meant to be injected.
+scopeName: 'source.gfm.embedded'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-markdown'
+
+injectionRegex: '(MARKDOWN|markdown|GFM|gfm)$'
+
+treeSitter:
+  grammar: 'tree-sitter/tree-sitter-markdown.wasm'
+  highlightsQuery: 'tree-sitter/tree-sitter-markdown/highlights.scm'
+  foldsQuery: 'tree-sitter/tree-sitter-markdown/folds.scm'
+  tagsQuery: 'tree-sitter/tree-sitter-markdown/tags.scm'
+
+fileTypes: [
+  'markdown'
+  'md'
+  'mdown'
+  'mdwn'
+  'mkd'
+  'mkdn'
+  'mkdown'
+  'rmd'
+  'ron'
+  'workbook'
+]
+
+comments:
+  start: '<!--'
+  end: '-->'
+  blockStart: '<!--'
+  blockEnd: '-->'
