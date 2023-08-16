@@ -945,6 +945,20 @@
   (#set! adjust.endAt lastChild.startPosition))
 
 
+([
+  (jsx_opening_element)
+  (jsx_closing_element)
+] @meta.jsx.inside-tag.js
+(#set! adjust.startAt firstChild.endPosition))
+
+((jsx_self_closing_element) @meta.jsx.inside-tag.js
+(#set! adjust.startAt firstChild.endPosition)
+(#set! adjust.endAt lastChild.startPosition))
+
+((jsx_element) @meta.block.jsx.js
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
 ; MISC
 ; ====
 
