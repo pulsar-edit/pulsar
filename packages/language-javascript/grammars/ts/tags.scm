@@ -2,8 +2,10 @@
   (comment)* @doc
   .
   (method_definition
-    name: (property_identifier) @name) @definition.method
-  (#not-eq? @name "constructor")
+    name: (property_identifier) @name
+    (#set! symbol.contextNode "parent.parent.parent.firstNamedChild")
+  ) @definition.method
+  ; (#not-eq? @name "constructor")
   (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
   (#select-adjacent! @doc @definition.method)
 )
@@ -21,19 +23,6 @@
   (class
     name: (_) @name) @definition.class
 )
-
-; (
-;   (comment)* @doc
-;   .
-;   [
-;     (class
-;       name: (_) @name)
-;     (class_declaration
-;       name: (_) @name)
-;   ] @definition.class
-;   (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
-;   (#select-adjacent! @doc @definition.class)
-; )
 
 (
   (comment)* @doc
@@ -87,19 +76,19 @@
   key: (property_identifier) @name
   value: [(arrow_function) (function)]) @definition.function
 
-; (
-;   (call_expression
-;     function: (identifier) @name) @reference.call
-;   (#not-match? @name "^(require)$")
-; )
-;
-; (call_expression
-;   function: (member_expression
-;     property: (property_identifier) @name)
-;   arguments: (_) @reference.call)
-;
-; (new_expression
-;   constructor: (_) @name) @reference.class
+(
+  (call_expression
+    function: (identifier) @name) @reference.call
+  (#not-match? @name "^(require)$")
+)
+
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @name)
+  arguments: (_)) @reference.call
+
+(new_expression
+  constructor: (_) @name) @reference.class
 
 (export_statement value: (assignment_expression left: (identifier) @name right: ([
  (number)
