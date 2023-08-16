@@ -2,14 +2,22 @@
   (switch_body)
   (class_body)
   (object)
-  (formal_parameters)
   (template_string)
   (named_imports)
 ] @fold
 
-((arguments) @fold
+; When we've got
+;
+; function foo(
+;   bar,
+;   baz,
+;   thud
+; )
+;
+; we want to be able to fold up the group of function parameters while
+; preserving the ability to collapse the function body.
+([(arguments) (formal_parameters)] @fold
   (#set! fold.adjustToEndOfPreviousRow true))
-
 
 ; When we've got
 ;
