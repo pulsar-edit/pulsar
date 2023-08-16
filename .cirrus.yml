@@ -139,6 +139,7 @@ silicon_mac_task:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
   rename_binary_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - node script/rename.js "Silicon.Mac"
   binary_artifacts:
     path: ./binaries/*
@@ -189,6 +190,7 @@ intel_mac_task:
     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
   rename_binary_script:
+    - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
     - node script/rename.js "Intel.Mac"
   binary_artifacts:
     path: ./binaries/*
