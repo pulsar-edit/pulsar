@@ -12,7 +12,7 @@ const MAX_ROWS_TO_SCAN_BACKWARD_TRAVERSAL = Object.freeze(Point(-MAX_ROWS_TO_SCA
 
 module.exports =
 class BracketMatcherView {
-  constructor (editor, editorElement, matchManager) {
+  constructor(editor, editorElement, matchManager) {
     this.destroy = this.destroy.bind(this)
     this.updateMatch = this.updateMatch.bind(this)
     this.editor = editor
@@ -65,11 +65,11 @@ class BracketMatcherView {
     this.updateMatch()
   }
 
-  destroy () {
+  destroy() {
     this.subscriptions.dispose()
   }
 
-  updateMatch () {
+  updateMatch() {
     if (this.pairHighlighted) {
       this.editor.destroyMarker(this.startMarker.id)
       this.editor.destroyMarker(this.endMarker.id)
@@ -113,13 +113,13 @@ class BracketMatcherView {
     this.tagHighlighted = highlightTag
   }
 
-  selectMatchingBrackets () {
+  selectMatchingBrackets() {
     if (!this.bracket1Range && !this.bracket2Range) return
     this.editor.setSelectedBufferRanges([this.bracket1Range, this.bracket2Range])
     this.matchManager.changeBracketsMode = true
   }
 
-  removeMatchingBrackets () {
+  removeMatchingBrackets() {
     if (this.editor.hasMultipleCursors()) {
       this.editor.backspace()
       return
@@ -159,7 +159,7 @@ class BracketMatcherView {
     })
   }
 
-  findMatchingEndBracket (startBracketPosition, startBracket, endBracket) {
+  findMatchingEndBracket(startBracketPosition, startBracket, endBracket) {
     if (startBracket === endBracket) return
 
     if (this.hasSyntaxTree()) {
@@ -171,7 +171,7 @@ class BracketMatcherView {
     }
   }
 
-  findMatchingStartBracket (endBracketPosition, startBracket, endBracket) {
+  findMatchingStartBracket(endBracketPosition, startBracket, endBracket) {
     if (startBracket === endBracket) return
 
     if (this.hasSyntaxTree()) {
@@ -183,7 +183,7 @@ class BracketMatcherView {
     }
   }
 
-  findMatchingEndBracketWithSyntaxTree (bracketPosition, startBracket, endBracket) {
+  findMatchingEndBracketWithSyntaxTree(bracketPosition, startBracket, endBracket) {
     let result
     const bracketEndPosition = bracketPosition.traverse([0, startBracket.length])
     this.editor.buffer.getLanguageMode().getSyntaxNodeContainingRange(
@@ -202,7 +202,7 @@ class BracketMatcherView {
     return result
   }
 
-  findMatchingStartBracketWithSyntaxTree (bracketPosition, startBracket, endBracket) {
+  findMatchingStartBracketWithSyntaxTree(bracketPosition, startBracket, endBracket) {
     let result
     const bracketEndPosition = bracketPosition.traverse([0, startBracket.length])
     this.editor.buffer.getLanguageMode().getSyntaxNodeContainingRange(
@@ -221,7 +221,7 @@ class BracketMatcherView {
     return result
   }
 
-  findMatchingTagNameRangesWithSyntaxTree () {
+  findMatchingTagNameRangesWithSyntaxTree() {
     const position = this.editor.getCursorBufferPosition()
     const {startTag, endTag} = this.findContainingTagsWithSyntaxTree(position)
     if (startTag && (startTag.range.containsPoint(position) || endTag.range.containsPoint(position))) {
@@ -244,7 +244,7 @@ class BracketMatcherView {
     }
   }
 
-  findMatchingTagsWithSyntaxTree () {
+  findMatchingTagsWithSyntaxTree() {
     const position = this.editor.getCursorBufferPosition()
     const {startTag, endTag} = this.findContainingTagsWithSyntaxTree(position)
     if (startTag) {
@@ -254,7 +254,7 @@ class BracketMatcherView {
     }
   }
 
-  findContainingTagsWithSyntaxTree (position) {
+  findContainingTagsWithSyntaxTree(position) {
     let startTag, endTag
     if (position.column === this.editor.buffer.lineLengthForRow(position.row)) position.column--;
     this.editor.buffer.getLanguageMode().getSyntaxNodeAtPosition(position, node => {
@@ -308,7 +308,7 @@ class BracketMatcherView {
     return endBracketPosition
   }
 
-  findMatchingStartBracketWithRegexSearch (endBracketPosition, startBracket, endBracket) {
+  findMatchingStartBracketWithRegexSearch(endBracketPosition, startBracket, endBracket) {
     const scanRange = new Range(
       endBracketPosition.traverse(MAX_ROWS_TO_SCAN_BACKWARD_TRAVERSAL),
       endBracketPosition
@@ -334,7 +334,7 @@ class BracketMatcherView {
     return startBracketPosition
   }
 
-  findPrecedingStartBracket (cursorPosition) {
+  findPrecedingStartBracket(cursorPosition) {
     if (this.hasSyntaxTree()) {
       return this.findPrecedingStartBracketWithSyntaxTree(cursorPosition)
     } else {
@@ -342,7 +342,7 @@ class BracketMatcherView {
     }
   }
 
-  findPrecedingStartBracketWithSyntaxTree (cursorPosition) {
+  findPrecedingStartBracketWithSyntaxTree(cursorPosition) {
     let result
     this.editor.buffer.getLanguageMode().getSyntaxNodeAtPosition(cursorPosition, node => {
       for (const child of node.children) {
@@ -359,7 +359,7 @@ class BracketMatcherView {
     return result
   }
 
-  findPrecedingStartBracketWithRegexSearch (cursorPosition) {
+  findPrecedingStartBracketWithRegexSearch(cursorPosition) {
     const scanRange = new Range(Point.ZERO, cursorPosition)
     const startBracket = _.escapeRegExp(_.keys(this.matchManager.pairedCharacters).join(''))
     const endBracket = _.escapeRegExp(_.keys(this.matchManager.pairedCharactersInverse).join(''))
@@ -384,7 +384,7 @@ class BracketMatcherView {
     return startPosition
   }
 
-  createMarker (bufferRange) {
+  createMarker(bufferRange) {
     const marker = this.editor.markBufferRange(bufferRange)
     this.editor.decorateMarker(marker, {type: 'highlight', class: 'bracket-matcher', deprecatedRegionClass: 'bracket-matcher'})
     if (atom.config.get('bracket-matcher.highlightMatchingLineNumber', {scope: this.editor.getRootScopeDescriptor()}) && this.gutter) {
@@ -393,7 +393,7 @@ class BracketMatcherView {
     return marker
   }
 
-  findCurrentPair () {
+  findCurrentPair() {
     const currentPosition = this.editor.getCursorBufferPosition()
     const previousPosition = currentPosition.traverse(ONE_CHAR_BACKWARD_TRAVERSAL)
     const nextPosition = currentPosition.traverse(ONE_CHAR_FORWARD_TRAVERSAL)
@@ -422,7 +422,7 @@ class BracketMatcherView {
     return {position, matchPosition, bracket: currentBracket}
   }
 
-  goToMatchingBracket () {
+  goToMatchingBracket() {
     if (!this.pairHighlighted) return this.gotoPrecedingStartBracket()
     const position = this.editor.getCursorBufferPosition()
 
@@ -468,7 +468,7 @@ class BracketMatcherView {
     }
   }
 
-  gotoPrecedingStartBracket () {
+  gotoPrecedingStartBracket() {
     if (this.pairHighlighted) return
 
     const matchPosition = this.findPrecedingStartBracket(this.editor.getCursorBufferPosition())
@@ -522,7 +522,7 @@ class BracketMatcherView {
     })
   }
 
-  selectInsideBrackets () {
+  selectInsideBrackets() {
     let endPosition, endRange, startPosition, startRange
     if (this.pairHighlighted) {
       startRange = this.startMarker.getBufferRange()
@@ -550,7 +550,7 @@ class BracketMatcherView {
 
   // Insert at the current cursor position a closing tag if there exists an
   // open tag that is not closed afterwards.
-  closeTag () {
+  closeTag() {
     const cursorPosition = this.editor.getCursorBufferPosition()
     const preFragment = this.editor.getTextInBufferRange([Point.ZERO, cursorPosition])
     const postFragment = this.editor.getTextInBufferRange([cursorPosition, Point.INFINITY])
@@ -561,15 +561,15 @@ class BracketMatcherView {
     }
   }
 
-  isCursorOnCommentOrString () {
+  isCursorOnCommentOrString() {
     return this.isScopeCommentedOrString(this.editor.getLastCursor().getScopeDescriptor().getScopesArray())
   }
 
-  isRangeCommentedOrString (range) {
+  isRangeCommentedOrString(range) {
     return this.isScopeCommentedOrString(this.editor.scopeDescriptorForBufferPosition(range.start).getScopesArray())
   }
 
-  isScopeCommentedOrString (scopesArray) {
+  isScopeCommentedOrString(scopesArray) {
     for (let scope of scopesArray.reverse()) {
       scope = scope.split('.')
       if (scope.includes('embedded') && scope.includes('source')) return false
@@ -579,7 +579,7 @@ class BracketMatcherView {
     return false
   }
 
-  hasSyntaxTree () {
+  hasSyntaxTree() {
     return this.editor.buffer.getLanguageMode().getSyntaxNodeAtPosition
   }
 }
