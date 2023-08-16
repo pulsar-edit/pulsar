@@ -6,11 +6,39 @@
 
 ## [Unreleased]
 
+## 1.108.0
+
+- Restored ability for `less` files in packages to use inline JavaScript inside backticks.
+- Fixed a syntax highlighting issue inside the `styleguide` package.
+- Fixed an issue with rubygems timing out on ARM Linux workflow.
+- Rewrote Tree-sitter scope predicates to use `#is?` and `#is-not?` where applicable.
+- Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
+- Added a feature in `markdown-preview` that adds support for Linguist, Chroma, Rouge, and HighlightJS for language identifiers in fenced code blocks.
+- Fixed the `TextMate` `language-toml` grammar to properly support whitespace where-ever it may appear.
+- Added a Tree-Sitter grammar for YAML files.
+- Added a new core package `pulsar-updater` to help users update Pulsar.
 - Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of correctly named binaries on more systems in more contexts (especially Windows). Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
+- Added a modern Tree-Sitter grammar for Markdown files.
 
 ### Pulsar
-
-Bumped: ppm: Update submodule to 49c8ced8f9552bb4aeb279130 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/654)
+- Added: Add the Tree-Sitter Markdown grammar [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/659)
+- Fixed: [pulsar-updater] Correct deb-get instructions ( + readme change) [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/669)
+- Added: Tree-sitter running fixes [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/660)
+- Added: Add `pulsar-updater` as a core bundled Package [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/656)
+- Added: Manual Decaf Bundle (`autocomplete-atom-api`, `autoflow`, `deprecation-cop`) Source [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/664)
+- Bumped: [Time Sensitive] Update Cirrus Encrypted token for GitHub Access [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/666)
+- Added: [core]: Transforming Deprecated Math Usage - Support for Variables [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/653)
+- Added: Add Tree-sitter grammar for YAML [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/634)
+- Fixed: [language-toml] Add whitespace rule to values [@arite](https://github.com/pulsar-edit/pulsar/pull/646)
+- Added: [markdown-preview]: Support for nested table objects in Yaml Frontmatter [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/629)
+- Added: [markdown-preview]: Revamp Fenced Code Block Language Identifiers [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/622)
+- Bumped: ppm: Update submodule to 49c8ced8f9552bb4aeb279130 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/654)
+- Fixed: [settings-view] Don't let project-specific settings pollute the UI [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/655)
+- Added: [modern-tree-sitter] Overhaul Tree-sitter scope tests [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/652)
+- Fixed: fix(arm): use rubygems from APT [@cat-master21](https://github.com/pulsar-edit/pulsar/pull/651)
+- Added: [language-*]: Manual Spec Decaf (Part 1) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/632)
+- Fixed: [styleguide] Fix error when styleguide is shown... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/648)
+- Bumped: Bump `less-cache` to 2.0.1 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/644)
 
 ### ppm
 
