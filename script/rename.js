@@ -4,11 +4,16 @@ const fs = require('fs');
 
 const prefix = process.argv[2];
 
-const pulsarVersion = require('../package.json').version
+const pulsarVersion = require('../package.json').version;
+const versionSegments = pulsarVersion.split('.');
+const lastSegment = versionSegments[versionSegments.length - 1];
 
-if (pulsarVersion.endsWith('-dev')) {
-        console.log(`Based on the version string in package.json (${pulsarVersion}),`);
-	console.log('we are not preparing a Regular release, so not renaming any binaries.');
+if (lastSegment.length > 4) {
+	// For example, '1-dev' is longer than 4 characters,
+	// and the format like '2023081600' from CI is longer than 4 characters.
+	// Either of those would indicate Rolling, not Regular.
+	console.log(`Based on the version string in package.json (${pulsarVersion}),`);
+	console.log('we are *not* preparing a Regular release, so *not* renaming any binaries.');
 	console.log('Exiting the binary renaming script.');
 } else {
 
@@ -20,6 +25,10 @@ if (pulsarVersion.endsWith('-dev')) {
 		console.log('or: "node script/rename.js ARM.Linux"');
 		console.log("Exiting the binary renaming script.");
 	} else {
+
+		console.log(`Based on the version string in package.json (${pulsarVersion}),`);
+		console.log('we *are* preparing a Regular release, so *renaming all binaries with prefixes*.');
+
 		console.log(`Prefix is: ${prefix}`);
 
 		// Rename files under ./binaries/* that haven't already been renamed
