@@ -94,23 +94,25 @@
 ; =============================
 
 ; TODO: We might want to make this configurable behavior with the
-; `Config` scope test.
+; `config` scope test.
 
 ; Any of these at the end of a line indicate the next line should be indented…
 (["||" "&&" "?"] @indent
   (#is? test.lastTextOnRow true))
 
-; …and the line after that should be dedented.
+; …and the line after that should be dedented…
 (binary_expression
   ["||" "&&"]
     right: (_) @dedent.next
     (#is-not? test.startsOnSameRowAs parent.startPosition))
 
+; …unless it's a ternary, in which case the dedent should wait until the
+; alternative clause.
+;
 ; let foo = this.longTernaryCondition() ?
 ;   consequenceWhichIsItselfRatherLong :
 ;   alternativeThatIsNotBrief;
 ;
-; …followed by a dedent.
 (ternary_expression
   alternative: (_) @dedent.next
   (#is-not? test.startsOnSameRowAs parent.startPosition))
@@ -153,5 +155,8 @@
 ; JSX
 ; ===
 
-(jsx_opening_element ">") @indent
-(jsx_closing_element ">") @dedent
+
+(jsx_opening_element ["<" ">"] @indent)
+(jsx_opening_element [">"] @dedent)
+
+(jsx_closing_element ">" @dedent)
