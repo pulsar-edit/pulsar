@@ -1,13 +1,14 @@
 {
   "name": "language-shellscript",
   "version": "0.28.2",
+  "main": "lib/main",
   "description": "ShellScript language support in Atom",
   "keywords": [
     "tree-sitter"
   ],
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
