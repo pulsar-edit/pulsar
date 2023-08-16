@@ -234,7 +234,7 @@ windows_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
     - npx yarn dist || npx yarn dist || npx yarn dist
   rename_binary_script:
-    - node script\rename.js "Windows"
+    - node script/rename.js "Windows"
   binary_artifacts:
     path: .\binaries\*
   test_script:
