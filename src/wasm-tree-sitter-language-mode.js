@@ -2821,9 +2821,9 @@ class GrammarLoadError extends Error {
   constructor(grammar, queryType) {
     super(`Grammar ${grammar.scopeName} failed to load its ${queryType}. Please fix this error or contact the maintainer.`);
     this.name = 'GrammarLoadError';
+    this.queryType = queryType;
   }
 }
-
 
 // Manages all aspects of a given language's parsing duties over a given region
 // of the buffer.
@@ -2898,6 +2898,13 @@ class LanguageLayer {
     }).catch((err) => {
       if (err.name === 'GrammarLoadError') {
         console.warn(err.message);
+        if (err.queryType === 'highlightsQuery') {
+          // TODO: Warning?
+          grammar.highlightsQuery = grammar.setQueryForTest(
+            'highlightsQuery',
+            `; (placeholder)`
+          );
+        }
       } else {
         throw err;
       }
