@@ -55,6 +55,14 @@ module.exports = class AboutView extends EtchComponent {
     );
   }
 
+  executeUpdateAction(e) {
+    e.preventDefault();
+    atom.commands.dispatch(
+      atom.views.getView(atom.workspace),
+      'pulsar-updater:check-for-update'
+    );
+  }
+
   handleShowMoreClick(e) {
     e.preventDefault();
     var showMoreDiv = document.querySelector('.show-more');
@@ -169,7 +177,7 @@ module.exports = class AboutView extends EtchComponent {
               { className: 'about-updates-item app-unsupported' },
               $.span(
                 { className: 'about-updates-label is-strong' },
-                'AutoUpdates have been moved to the package `pulsar-updater`',
+                'Updates have been moved to the package `pulsar-updater`',
                 $.br()
               ),
               $.a(
@@ -180,7 +188,8 @@ module.exports = class AboutView extends EtchComponent {
                 'How to update'
               )
             )
-          )
+          ),
+          this.renderUpdateChecker()
         )
       ),
 
@@ -216,6 +225,29 @@ module.exports = class AboutView extends EtchComponent {
         $.a({ className: 'inline', href: `${atom.branding.urlWeb}` }, 'Pulsar Team')
       ),
     );
+  }
+
+  renderUpdateChecker() {
+    if (atom.packages.isPackageDisabled("pulsar-updater")) {
+      return $.div(
+        { className: 'about-updates-item app-unsupported' },
+        $.span(
+          { className: 'about-updates-label is-strong' },
+          'Enable `pulsar-updater` to check for updates'
+        )
+      );
+    } else {
+      return $.button(
+        {
+          className: 'btn about-update-action-button',
+          onclick: this.executeUpdateAction.bind(this),
+          style: {
+            display: 'block'
+          }
+        },
+        'Check Now'
+      );
+    }
   }
 
   serialize() {
