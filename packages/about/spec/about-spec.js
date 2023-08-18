@@ -91,4 +91,16 @@ describe('About', () => {
       expect(atom.clipboard.read()).toBe(process.version);
     });
   });
+
+  describe('check for update appears', () => {
+    it('when "pulsar-updater" is enabled', async () => {
+      atom.packages.activatePackage('pulsar-updater');
+      await atom.workspace.open('atom://about');
+      jasmine.attachToDOM(workspaceElement);
+
+      let aboutElement = workspaceElement.querySelector('.about');
+      let updateContainer = aboutElement.querySelector('.about-update-action-button');
+      expect(updateContainer.innerText).toBe('Check Now');
+    });
+  });
 });
