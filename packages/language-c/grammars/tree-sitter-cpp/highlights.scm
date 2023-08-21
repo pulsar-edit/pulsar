@@ -58,6 +58,17 @@
 (type_identifier) @storage.type.other.cpp
 ; (struct_specifier) @storage.type.cpp
 
+; These types are all reserved words; if we see an identifier with this name,
+; it must be a type.
+((identifier) @storage.type.builtin.cpp
+  (#match? @storage.type.builtin.cpp "^(char|int|float|double|long)$"))
+
+; Assume any identifier that ends in `_t` is a type. This convention is not
+; always followed, but it's a very strong indicator when it's present.
+((identifier) @storage.type.other.cpp
+  (#match? @storage.type.other.cpp "_t$"))
+
+
 [
   "enum"
   "long"
