@@ -38,7 +38,12 @@ jobs:
         git submodule update
 
     - name: Check Pulsar Version
+      if: ${{ matrix.os != 'windows-latest' }}
       run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+
+    - name: Check Pulsar Version - Windows
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
     - name: Install Pulsar Dependencies
       run: yarn install --ignore-engines
@@ -95,6 +100,8 @@ jobs:
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
     - name: Upload Video Artifacts
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      # Seems Visual Tests are broken on macOS and Windows
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Videos
