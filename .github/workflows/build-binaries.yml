@@ -27,9 +27,9 @@ jobs:
 
     - name: Install System Dependencies
       run: |
-        apt-get update
+        sudo apt-get update
         export DEBIAN_FRONTEND="noninteractive"
-        apt-get install -y
+        sudo apt-get install -y
           ffmpeg
           rpm
           build-essential
