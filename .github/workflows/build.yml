@@ -53,15 +53,21 @@ jobs:
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@v2
       with:
-        timeout_minutes: 10
+        timeout_minutes: 30
         max_attempts: 3
         retry_on: error
         command: yarn install --ignore-engines
+        on_retry_command: rm -R node_modules
 
     - name: Build Pulsar
-      run: |
-        yarn build
-        yarn run build:apm
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: |
+          yarn build
+          yarn run build:apm
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS)
@@ -95,7 +101,7 @@ jobs:
         path: ./binaries/*
 
     - name: Test Binary - Linux
-      if: ${{ matrix.os == 'ubuntu-latest' && env.RUN_LINUX_VT == true }}
+      if: ${{ (matrix.os == 'ubuntu-latest') && env.RUN_LINUX_VT }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
         ./binaries/*AppImage --appimage-extract
@@ -104,7 +110,7 @@ jobs:
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
     - name: Test Binary - Windows
-      if: ${{ matrix.os == 'windows-latest' && env.RUN_WINDOWS_VT == true }}
+      if: ${{ (matrix.os == 'windows-latest') && env.RUN_WINDOWS_VT }}
       # TODO: Convert script to PowerShell
       run: |
         mkdir extracted; tar -xf binaries/*zip -C ./extracted/
@@ -112,7 +118,7 @@ jobs:
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
 
     - name: Test Binary - macOS
-      if: ${{ matrix.os == 'macos-latest' && env.RUN_MACOS_VT == true }}
+      if: ${{ (matrix.os == 'macos-latest') && env.RUN_MACOS_VT }}
       run: |
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         rm -R node_modules/electron; yarn install --check-files
