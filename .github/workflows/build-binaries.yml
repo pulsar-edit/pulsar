@@ -33,19 +33,19 @@ jobs:
       run: |
         sudo apt-get update
         export DEBIAN_FRONTEND="noninteractive"
-        sudo apt-get install -y
-                  rpm
-                  build-essential
-                  git
-                  libsecret-1-dev
-                  fakeroot
-                  libx11-dev
-                  libxkbfile-dev
-                  libgdk-pixbuf2.0-dev
-                  libgtk-3-dev
-                  libxss-dev
-                  libasound2-dev
-                  libnss3
+        sudo apt-get install -y \
+                  rpm \
+                  build-essential \
+                  git \
+                  libsecret-1-dev \
+                  fakeroot \
+                  libx11-dev \
+                  libxkbfile-dev \
+                  libgdk-pixbuf2.0-dev \
+                  libgtk-3-dev \
+                  libxss-dev \
+                  libasound2-dev \
+                  libnss3 \
                   xvfb
         git submodule init
         git submodule update
