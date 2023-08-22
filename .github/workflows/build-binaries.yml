@@ -25,12 +25,15 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
+    - name: Setup FFmpeg
+      # GitHub Actions won't let us install ffmpeg from 'apt-get install'
+      uses: FedericoCarboni/setup-ffmpeg@v2
+
     - name: Install System Dependencies
       run: |
         sudo apt-get update
         export DEBIAN_FRONTEND="noninteractive"
         sudo apt-get install -y
-          ffmpeg
           rpm
           build-essential
           git
