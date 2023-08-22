@@ -14,8 +14,6 @@ env:
   RUN_WINDOWS_VT: false
   RUN_LINUX_VT: true
   RUN_MACOS_VT: false
-  # Below variables control signing of OS'
-  SIGN_MACOS: false
 
 jobs:
   build:
@@ -53,7 +51,12 @@ jobs:
       run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
     - name: Install Pulsar Dependencies
-      run: yarn install --ignore-engines
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        retry_on: error
+        command: yarn install --ignore-engines
 
     - name: Build Pulsar
       run: |
@@ -62,18 +65,28 @@ jobs:
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS)
-      if: ${{ matrix.os == 'macos-latest' && env.SIGN_MACOS == true }}
-      env:
-        CSC_LINK: ${{ secrets.CSC_LINK }}
-        CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-        APPLEID: ${{ secrets.APPLEID }}
-        APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
-        TEAM_ID: ${{ secrets.TEAM_ID }}
-      run: yarn dist
+      if: ${{ matrix.os == 'macos-latest' }}
+      # env:
+      #   CSC_LINK: ${{ secrets.CSC_LINK }}
+      #   CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      #   APPLEID: ${{ secrets.APPLEID }}
+      #   APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
+      #   TEAM_ID: ${{ secrets.TEAM_ID }}
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn dist
 
     - name: Build Pulsar Binaries
-      if: ${{ matrix.os != 'macos-latest' || ( matrix.os == 'macos-latest' && env.SIGN_MACOS == false) }}
-      run: yarn dist
+      if: ${{ matrix.os != 'macos-latest' }}
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn dist
 
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v3
