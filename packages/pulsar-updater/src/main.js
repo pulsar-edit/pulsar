@@ -166,6 +166,9 @@ class PulsarUpdater {
       case "Spec Mode":
         return null;
         break;
+      case "Developer Instance":
+        return null;
+        break;
       case "Flatpak Installation":
         returnText += "Install the latest version by running `flatpak update`.";
         break;

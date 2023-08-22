@@ -30,6 +30,7 @@ Since a major part of the functionality of this package is attempting to determi
 * Universal: Developer Mode
 * Universal: Safe Mode
 * Universal: Spec Mode
+* Universal: Developer Instance
 * Windows: Chocolatey Installation
 * Windows: winget Installation
 * Windows: User Installation

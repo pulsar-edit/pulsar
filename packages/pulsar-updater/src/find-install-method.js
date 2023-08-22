@@ -77,6 +77,13 @@ async function main() {
     returnValue = "Spec Mode";
   }
 
+  if (atom.getVersion().endsWith("-dev")) {
+    // This would only be the case if
+    // 1. `yarn start` was used by a developer
+    // 2. Someone built a local binary without removing `-dev` from the version
+    returnValue = "Developer Instance";
+  }
+
   if (returnValue.length > 0) {
     // Return early
     return {
