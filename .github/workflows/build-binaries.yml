@@ -33,7 +33,7 @@ jobs:
       run: |
         sudo apt-get update
         export DEBIAN_FRONTEND="noninteractive"
-        apt-get install -y
+        sudo apt-get install -y
                   rpm
                   build-essential
                   git
