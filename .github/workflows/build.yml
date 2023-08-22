@@ -72,7 +72,7 @@ jobs:
       run: yarn dist
 
     - name: Build Pulsar Binaries
-      if: ${{ matrix.os != 'macos-latest' && env.SIGN_MACOS == true }}
+      if: ${{ matrix.os != 'macos-latest' && env.SIGN_MACOS == false }}
       run: yarn dist
 
     - name: Upload Binary Artifacts
@@ -82,7 +82,7 @@ jobs:
         path: ./binaries/*
 
     - name: Test Binary - Linux
-      if: ${{ matrix.os == 'ubuntu-latest' && env.RUN_WINDOWS_VT == true }}
+      if: ${{ matrix.os == 'ubuntu-latest' && env.RUN_LINUX_VT == true }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
         ./binaries/*AppImage --appimage-extract
