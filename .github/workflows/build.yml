@@ -61,7 +61,7 @@ jobs:
         yarn run build:apm
 
     # macOS Signing Stuff
-    - name: Build Pulsar (macOS)
+    - name: Build Pulsar Binaries (macOS)
       if: ${{ matrix.os == 'macos-latest' && env.SIGN_MACOS == true }}
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
