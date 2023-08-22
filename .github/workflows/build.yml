@@ -60,7 +60,7 @@ jobs:
         yarn build
         yarn run build:apm
 
-    macOS Signing Stuff
+    # macOS Signing Stuff
     - name: Build Pulsar (macOS)
       if: ${{ matrix.os == 'macos-latest' && env.SIGN_MACOS }}
       env:
