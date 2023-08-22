@@ -69,7 +69,7 @@ jobs:
         name: ${{ matrix.os }} Binaries
         path: ./binaries/*
 
-    - name: Test Binary: Linux
+    - name: Test Binary - Linux
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
@@ -78,14 +78,14 @@ jobs:
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
-    - name: Test Binary: Windows
+    - name: Test Binary - Windows
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
         mkdir extracted; tar -xf binaries/*zip -C ./extracted/
         export BINARY_NAME=./extracted/Pulsar.exe
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
 
-    - name: Test Binary: macOS
+    - name: Test Binary - macOS
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
