@@ -62,7 +62,7 @@ jobs:
 
     # macOS Signing Stuff
     - name: Build Pulsar (macOS)
-      if: ${{ matrix.os == 'macos-latest' && env.SIGN_MACOS }}
+      if: ${{ matrix.os == 'macos-latest' && env.SIGN_MACOS == true }}
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
         CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
@@ -72,7 +72,7 @@ jobs:
       run: yarn dist
 
     - name: Build Pulsar Binaries
-      if: ${{ matrix.os != 'macos-latest' && env.SIGN_MACOS }}
+      if: ${{ matrix.os != 'macos-latest' && env.SIGN_MACOS == true }}
       run: yarn dist
 
     - name: Upload Binary Artifacts
@@ -82,7 +82,7 @@ jobs:
         path: ./binaries/*
 
     - name: Test Binary - Linux
-      if: ${{ matrix.os == 'ubuntu-latest' && env.RUN_WINDOWS_VT }}
+      if: ${{ matrix.os == 'ubuntu-latest' && env.RUN_WINDOWS_VT == true }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
         ./binaries/*AppImage --appimage-extract
@@ -91,7 +91,7 @@ jobs:
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
     - name: Test Binary - Windows
-      if: ${{ matrix.os == 'windows-latest' && env.RUN_WINDOWS_VT }}
+      if: ${{ matrix.os == 'windows-latest' && env.RUN_WINDOWS_VT == true }}
       # TODO: Convert script to PowerShell
       run: |
         mkdir extracted; tar -xf binaries/*zip -C ./extracted/
@@ -99,7 +99,7 @@ jobs:
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
 
     - name: Test Binary - macOS
-      if: ${{ matrix.os == 'macos-latest' && env.RUN_MACOS_VT }}
+      if: ${{ matrix.os == 'macos-latest' && env.RUN_MACOS_VT == true }}
       run: |
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         rm -R node_modules/electron; yarn install --check-files
