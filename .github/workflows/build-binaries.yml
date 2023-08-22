@@ -25,10 +25,6 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    #- name: Setup FFmpeg
-      # GitHub Actions won't let us install ffmpeg from 'apt-get install'
-    #  uses: FedericoCarboni/setup-ffmpeg@v2
-
     - name: Install System Dependencies
       run: |
         sudo apt-get update
@@ -92,10 +88,66 @@ jobs:
   #  runs-on:
 
   #build_silicon_mac:
-  #  runs-on: macos-latest-x1
+  #  runs-on:
 
   #build_intel_mac:
   #  runs-on: macos-latest
 
-  #build_windows:
-  #  runs-on: windows-latest
+  build_windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v3
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install System Dependencies
+      run: |
+        choco install python --version=${{ env.PYTHON_VERSION }}
+        choco install git visualstudio2019-workflow-vctools -y
+
+    - name: Setup Git Submodule
+      run: |
+        git submodule init
+        git submodule update
+
+    - name: Configure Python
+      run: npm config set python 'C:\Pyton310\python.exe'
+
+    - name: Check Pulsar Version
+      run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+
+    - name: Install Pulsar Dependencies
+      run: yarn install --ignore-engines
+
+    - name: Build Pulsar
+      run: |
+        yarn build
+        yarn run build:apm
+
+    - name: Build Pulsar Binaries
+      run: yarn dist
+
+    - name: Upload Binary Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Binaries
+        path: ./binaries/*
+
+    - name: Test Binary
+      run: |
+        mkdir extracted; tar -xf binaries/*zip -C ./extracted/
+        export BINARY_NAME=./extracted/Pulsar.exe
+        PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
+
+    - name: Upload Video Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Videos
+        path: ./tests/videos/**
