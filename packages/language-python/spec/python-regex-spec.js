@@ -1,31 +1,27 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe('Python regular expression grammar', function() {
+
+describe('Python regular expression grammar', () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     atom.config.set('core.useTreeSitterParsers', false);
 
 
     waitsForPromise(() => atom.packages.activatePackage('language-python'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.regexp.python'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.regexp.python'));
   });
 
-  return describe('character classes', function() {
-    it('does not recursively match character classes', function() {
+  describe('character classes', () => {
+    it('does not recursively match character classes', () => {
       const {tokens} = grammar.tokenizeLine('[.:[\\]@]');
       expect(tokens[0]).toEqual({value: '[', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']});
       expect(tokens[1]).toEqual({value: '.:[', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp']});
       expect(tokens[2]).toEqual({value: '\\]', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'constant.character.escape.backslash.regexp']});
       expect(tokens[3]).toEqual({value: '@', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp']});
-      return expect(tokens[4]).toEqual({value: ']', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.end.regexp']});
+      expect(tokens[4]).toEqual({value: ']', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.end.regexp']});
   });
 
-    it('does not end the character class early if the first character is a ]', function() {
+    it('does not end the character class early if the first character is a ]', () => {
       let {tokens} = grammar.tokenizeLine('[][]');
       expect(tokens[0]).toEqual({value: '[', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']});
       expect(tokens[1]).toEqual({value: '][', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp']});
@@ -35,10 +31,10 @@ describe('Python regular expression grammar', function() {
       expect(tokens[0]).toEqual({value: '[', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.begin.regexp']});
       expect(tokens[1]).toEqual({value: '^', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'keyword.operator.negation.regexp']});
       expect(tokens[2]).toEqual({value: '][', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp']});
-      return expect(tokens[3]).toEqual({value: ']', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.end.regexp']});
+      expect(tokens[3]).toEqual({value: ']', scopes: ['source.regexp.python', 'constant.other.character-class.set.regexp', 'punctuation.definition.character-class.end.regexp']});
   });
 
-    return it('escapes the character following any backslash', function() {
+    it('escapes the character following any backslash', () => {
       let {tokens} = grammar.tokenizeLine('\\q\\(\\[\\\'\\"\\?\\^\\-\\*\\.\\#');
       expect(tokens[0]).toEqual({value: '\\q', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']});
       expect(tokens[1]).toEqual({value: '\\(', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']});
@@ -56,7 +52,7 @@ describe('Python regular expression grammar', function() {
       expect(tokens[0]).toEqual({value: '(', scopes: ['source.regexp.python', 'meta.group.regexp', 'punctuation.definition.group.regexp']});
       expect(tokens[1]).toEqual({value: '\\(', scopes: ['source.regexp.python', 'meta.group.regexp', 'constant.character.escape.backslash.regexp']});
       expect(tokens[2]).toEqual({value: ')', scopes: ['source.regexp.python', 'meta.group.regexp', 'punctuation.definition.group.regexp']});
-      return expect(tokens[3]).toEqual({value: '\\)', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']});
+      expect(tokens[3]).toEqual({value: '\\)', scopes: ['source.regexp.python', 'constant.character.escape.backslash.regexp']});
   });
 });
 });

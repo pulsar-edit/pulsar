@@ -1,26 +1,22 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe('Python settings', function() {
+
+describe('Python settings', () => {
   let [editor, languageMode] = [];
 
   afterEach(() => editor.destroy());
 
-  beforeEach(function() {
+  beforeEach(() => {
     atom.config.set('core.useTreeSitterParsers', false);
 
 
     waitsForPromise(() => atom.workspace.open().then(function(o) {
       editor = o;
-      return languageMode = editor.languageMode;
+      languageMode = editor.languageMode;
     }));
 
-    return waitsForPromise(() => atom.packages.activatePackage('language-python'));
+    waitsForPromise(() => atom.packages.activatePackage('language-python'));
   });
 
-  it('matches lines correctly using the increaseIndentPattern', function() {
+  it('matches lines correctly using the increaseIndentPattern', () => {
     const increaseIndentRegex = languageMode.increaseIndentRegexForScopeDescriptor(['source.python']);
 
     expect(increaseIndentRegex.findNextMatchSync('for i in range(n):')).toBeTruthy();
@@ -51,20 +47,20 @@ describe('Python settings', function() {
     expect(increaseIndentRegex.findNextMatchSync('  async with open("filename") as f:')).toBeTruthy();
     expect(increaseIndentRegex.findNextMatchSync('while True:')).toBeTruthy();
     expect(increaseIndentRegex.findNextMatchSync('  while True:')).toBeTruthy();
-    return expect(increaseIndentRegex.findNextMatchSync('\t\t  while True:')).toBeTruthy();
+    expect(increaseIndentRegex.findNextMatchSync('\t\t  while True:')).toBeTruthy();
   });
 
-  it('does not match lines incorrectly using the increaseIndentPattern', function() {
+  it('does not match lines incorrectly using the increaseIndentPattern', () => {
     const increaseIndentRegex = languageMode.increaseIndentRegexForScopeDescriptor(['source.python']);
 
     expect(increaseIndentRegex.findNextMatchSync('for i in range(n)')).toBeFalsy();
     expect(increaseIndentRegex.findNextMatchSync('class TheClass(Object)')).toBeFalsy();
     expect(increaseIndentRegex.findNextMatchSync('def f(x)')).toBeFalsy();
     expect(increaseIndentRegex.findNextMatchSync('if this_var == that_var')).toBeFalsy();
-    return expect(increaseIndentRegex.findNextMatchSync('"for i in range(n):"')).toBeFalsy();
+    expect(increaseIndentRegex.findNextMatchSync('"for i in range(n):"')).toBeFalsy();
   });
 
-  it('matches lines correctly using the decreaseIndentPattern', function() {
+  it('matches lines correctly using the decreaseIndentPattern', () => {
     const decreaseIndentRegex = languageMode.decreaseIndentRegexForScopeDescriptor(['source.python']);
 
     expect(decreaseIndentRegex.findNextMatchSync('elif this_var == that_var:')).toBeTruthy();
@@ -77,10 +73,10 @@ describe('Python settings', function() {
     expect(decreaseIndentRegex.findNextMatchSync('  except Exception as e:')).toBeTruthy();
     expect(decreaseIndentRegex.findNextMatchSync('finally:')).toBeTruthy();
     expect(decreaseIndentRegex.findNextMatchSync('  finally:')).toBeTruthy();
-    return expect(decreaseIndentRegex.findNextMatchSync('\t\t  finally:')).toBeTruthy();
+    expect(decreaseIndentRegex.findNextMatchSync('\t\t  finally:')).toBeTruthy();
   });
 
-  return it('does not match lines incorrectly using the decreaseIndentPattern', function() {
+  it('does not match lines incorrectly using the decreaseIndentPattern', () => {
     const decreaseIndentRegex = languageMode.decreaseIndentRegexForScopeDescriptor(['source.python']);
 
     // NOTE! This first one is different from most other rote tests here.
@@ -88,6 +84,6 @@ describe('Python settings', function() {
     expect(decreaseIndentRegex.findNextMatchSync('elif this_var == that_var')).toBeFalsy();
     expect(decreaseIndentRegex.findNextMatchSync('  elif this_var == that_var')).toBeFalsy();
     expect(decreaseIndentRegex.findNextMatchSync('else')).toBeFalsy();
-    return expect(decreaseIndentRegex.findNextMatchSync('  "finally:"')).toBeFalsy();
+    expect(decreaseIndentRegex.findNextMatchSync('  "finally:"')).toBeFalsy();
   });
 });
