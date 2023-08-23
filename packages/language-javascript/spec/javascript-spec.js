@@ -1,11 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const fs = require('fs');
 const path = require('path');
 let TextEditor = null;
@@ -29,12 +22,12 @@ describe("JavaScript grammar", function() {
 
     waitsForPromise(() => atom.packages.activatePackage("language-javascript"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.js"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.js"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("source.js");
+    expect(grammar.scopeName).toBe("source.js");
   });
 
   describe("strings", function() {
@@ -85,7 +78,7 @@ line3\
       })();
   });
 
-    return describe("Unicode escape sequences", function() {
+    describe("Unicode escape sequences", function() {
       const bracketScopes = [
         'punctuation.definition.unicode-escape.begin.bracket.curly.js',
         'punctuation.definition.unicode-escape.end.bracket.curly.js'
@@ -144,7 +137,7 @@ line3\
         return result;
       })());
 
-      return it("highlights sequences with invalid codepoints", function() {
+      it("highlights sequences with invalid codepoints", function() {
         const maxCodepoint = 0x10FFFF;
         return (() => {
           const result = [];
@@ -172,23 +165,23 @@ line3\
     for (var keyword of Array.from(keywords)) {
       it(`tokenizes the ${keyword} keyword`, function() {
         const {tokens} = grammar.tokenizeLine(keyword);
-        return expect(tokens[0]).toEqual({value: keyword, scopes: ['source.js', 'keyword.control.js']});
+        expect(tokens[0]).toEqual({value: keyword, scopes: ['source.js', 'keyword.control.js']});
     });
     }
 
     it("tokenizes the debugger statement", function() {
       const {tokens} = grammar.tokenizeLine("debugger;");
       expect(tokens[0]).toEqual({value: "debugger", scopes: ['source.js', 'keyword.other.debugger.js']});
-      return expect(tokens[1]).toEqual({value: ";", scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[1]).toEqual({value: ";", scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
-    return it("tokenises an `await` keyword after a spread operator", function() {
+    it("tokenises an `await` keyword after a spread operator", function() {
       const {tokens} = grammar.tokenizeLine("...await stuff()");
       expect(tokens[0]).toEqual({value: '...', scopes: ['source.js', 'keyword.operator.spread.js']});
       expect(tokens[1]).toEqual({value: 'await', scopes: ['source.js', 'keyword.control.js']});
       expect(tokens[3]).toEqual({value: 'stuff', scopes: ['source.js', 'meta.function-call.js', 'entity.name.function.js']});
       expect(tokens[4]).toEqual({value: '(', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
-      return expect(tokens[5]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+      expect(tokens[5]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
   });
 });
 
@@ -201,15 +194,15 @@ line3\
       expect(tokens[0]).toEqual({value: 'window', scopes: ['source.js', 'support.variable.dom.js']});
 
       ({tokens} = grammar.tokenizeLine('$window'));
-      return expect(tokens[0]).toEqual({value: '$window', scopes: ['source.js']});
+      expect(tokens[0]).toEqual({value: '$window', scopes: ['source.js']});
   });
 
-    return it("tokenizes built-in variables", function() {
+    it("tokenizes built-in variables", function() {
       let {tokens} = grammar.tokenizeLine('module');
       expect(tokens[0]).toEqual({value: 'module', scopes: ['source.js', 'support.variable.js']});
 
       ({tokens} = grammar.tokenizeLine('module.prop'));
-      return expect(tokens[0]).toEqual({value: 'module', scopes: ['source.js', 'support.variable.js']});
+      expect(tokens[0]).toEqual({value: 'module', scopes: ['source.js', 'support.variable.js']});
   });
 });
 
@@ -243,7 +236,7 @@ line3\
     expect(tokens[10]).toEqual({value: 'Cla$s', scopes: ['source.js', 'meta.class.instance.constructor.js', 'entity.name.type.instance.js']});
     expect(tokens[11]).toEqual({value: '(', scopes: ['source.js', 'meta.brace.round.js']});
     expect(tokens[12]).toEqual({value: ')', scopes: ['source.js', 'meta.brace.round.js']});
-    return expect(tokens[13]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+    expect(tokens[13]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
 }));
 
   describe("regular expressions", function() {
@@ -331,7 +324,7 @@ line3\
       expect(tokens[2]).toEqual({value: ' ', scopes: ['source.js', 'string.regexp.js']});
       expect(tokens[3]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[4]).toEqual({value: 'test', scopes: ['source.js', 'string.regexp.js']});
-      return expect(tokens[5]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
+      expect(tokens[5]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
   });
 
     it("tokenizes regular expressions inside arrays", function() {
@@ -350,7 +343,7 @@ line3\
       expect(tokens[4]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[5]).toEqual({value: 'test', scopes: ['source.js', 'string.regexp.js']});
       expect(tokens[6]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[7]).toEqual({value: ']', scopes: ['source.js', 'meta.brace.square.js']});
+      expect(tokens[7]).toEqual({value: ']', scopes: ['source.js', 'meta.brace.square.js']});
   });
 
     it("tokenizes regular expressions inside curly brackets", function() {
@@ -359,7 +352,7 @@ line3\
       expect(tokens[1]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[2]).toEqual({value: 'test', scopes: ['source.js', 'string.regexp.js']});
       expect(tokens[3]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[4]).toEqual({value: '}', scopes: ['source.js', 'meta.brace.curly.js']});
+      expect(tokens[4]).toEqual({value: '}', scopes: ['source.js', 'meta.brace.curly.js']});
   });
 
     it("tokenizes regular expressions inside arrow function expressions", function() {
@@ -369,15 +362,15 @@ line3\
       expect(tokens[11]).toEqual({value: 'helloworld', scopes: ['source.js', 'string.regexp.js']});
       expect(tokens[12]).toEqual({value: '$', scopes: ['source.js', 'string.regexp.js', 'keyword.control.anchor.regexp']});
       expect(tokens[13]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[14]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[14]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
-    return it("verifies that regular expressions have explicit count modifiers", function() {
+    it("verifies that regular expressions have explicit count modifiers", function() {
       let source = fs.readFileSync(path.resolve(__dirname, '..', 'grammars', 'javascript.cson'), 'utf8');
       expect(source.search(/{,/)).toEqual(-1);
 
       source = fs.readFileSync(path.resolve(__dirname, '..', 'grammars', 'regular expressions (javascript).cson'), 'utf8');
-      return expect(source.search(/{,/)).toEqual(-1);
+      expect(source.search(/{,/)).toEqual(-1);
     });
   });
 
@@ -398,7 +391,7 @@ line3\
       ({tokens} = grammar.tokenizeLine('0X1D30_69A3'));
       expect(tokens[0]).toEqual({value: '0X1D30', scopes: ['source.js', 'constant.numeric.hex.js']});
       expect(tokens[1]).toEqual({value: '_', scopes: ['source.js', 'constant.numeric.hex.js', 'meta.delimiter.numeric.separator.js']});
-      return expect(tokens[2]).toEqual({value: '69A3', scopes: ['source.js', 'constant.numeric.hex.js']});
+      expect(tokens[2]).toEqual({value: '69A3', scopes: ['source.js', 'constant.numeric.hex.js']});
   });
 
     it("tokenizes binary literals", function() {
@@ -425,7 +418,7 @@ line3\
       expect(tokens[7]).toEqual({value: '_', scopes: ['source.js', 'constant.numeric.binary.js', 'meta.delimiter.numeric.separator.js']});
       expect(tokens[8]).toEqual({value: '0110', scopes: ['source.js', 'constant.numeric.binary.js']});
       expect(tokens[9]).toEqual({value: '_', scopes: ['source.js', 'constant.numeric.binary.js', 'meta.delimiter.numeric.separator.js']});
-      return expect(tokens[10]).toEqual({value: '0110', scopes: ['source.js', 'constant.numeric.binary.js']});
+      expect(tokens[10]).toEqual({value: '0110', scopes: ['source.js', 'constant.numeric.binary.js']});
   });
 
     it("tokenizes octal literals", function() {
@@ -454,7 +447,7 @@ line3\
       ({tokens} = grammar.tokenizeLine('0O1411_1236'));
       expect(tokens[0]).toEqual({value: '0O1411', scopes: ['source.js', 'constant.numeric.octal.js']});
       expect(tokens[1]).toEqual({value: '_', scopes: ['source.js', 'constant.numeric.octal.js', 'meta.delimiter.numeric.separator.js']});
-      return expect(tokens[2]).toEqual({value: '1236', scopes: ['source.js', 'constant.numeric.octal.js']});
+      expect(tokens[2]).toEqual({value: '1236', scopes: ['source.js', 'constant.numeric.octal.js']});
   });
 
     it("tokenizes decimals", function() {
@@ -565,10 +558,10 @@ line3\
       expect(tokens[1]).toEqual({value: '_', scopes: ['source.js', 'constant.numeric.decimal.js', 'meta.delimiter.numeric.separator.js']});
       expect(tokens[2]).toEqual({value: '999', scopes: ['source.js', 'constant.numeric.decimal.js']});
       expect(tokens[3]).toEqual({value: '_', scopes: ['source.js', 'constant.numeric.decimal.js', 'meta.delimiter.numeric.separator.js']});
-      return expect(tokens[4]).toEqual({value: '999', scopes: ['source.js', 'constant.numeric.decimal.js']});
+      expect(tokens[4]).toEqual({value: '999', scopes: ['source.js', 'constant.numeric.decimal.js']});
   });
 
-    return it("does not tokenize numbers that are part of a variable", function() {
+    it("does not tokenize numbers that are part of a variable", function() {
       let {tokens} = grammar.tokenizeLine('hi$1');
       expect(tokens[0]).toEqual({value: 'hi$1', scopes: ['source.js']});
 
@@ -587,7 +580,7 @@ line3\
       expect(tokens[2]).toEqual({value: '_1', scopes: ['source.js', 'variable.other.property.js']});
 
       ({tokens} = grammar.tokenizeLine('1__1'));
-      return expect(tokens[0]).toEqual({value: '1__1', scopes: ['source.js', 'invalid.illegal.identifier.js']});
+      expect(tokens[0]).toEqual({value: '1__1', scopes: ['source.js', 'invalid.illegal.identifier.js']});
   });
 });
 
@@ -624,27 +617,27 @@ line3\
 
       ({tokens} = grammar.tokenizeLine('...this'));
       expect(tokens[0]).toEqual({value: '...', scopes: ['source.js', 'keyword.operator.spread.js']});
-      return expect(tokens[1]).toEqual({value: 'this', scopes: ['source.js', 'variable.language.js']});
+      expect(tokens[1]).toEqual({value: 'this', scopes: ['source.js', 'variable.language.js']});
   });
 
     describe("increment, decrement", function() {
       it("tokenizes increment", function() {
         const {tokens} = grammar.tokenizeLine('i++');
         expect(tokens[0]).toEqual({value: 'i', scopes: ['source.js']});
-        return expect(tokens[1]).toEqual({value: '++', scopes: ['source.js', 'keyword.operator.increment.js']});
+        expect(tokens[1]).toEqual({value: '++', scopes: ['source.js', 'keyword.operator.increment.js']});
     });
 
-      return it("tokenizes decrement", function() {
+      it("tokenizes decrement", function() {
         const {tokens} = grammar.tokenizeLine('i--');
         expect(tokens[0]).toEqual({value: 'i', scopes: ['source.js']});
-        return expect(tokens[1]).toEqual({value: '--', scopes: ['source.js', 'keyword.operator.decrement.js']});
+        expect(tokens[1]).toEqual({value: '--', scopes: ['source.js', 'keyword.operator.decrement.js']});
     });
   });
 
     describe("logical", function() {
       const operators = ["&&", "||", "!", "??"];
 
-      return it("tokenizes them", () => (() => {
+      it("tokenizes them", () => (() => {
         const result = [];
         for (let operator of Array.from(operators)) {
           const {tokens} = grammar.tokenizeLine('a ' + operator + ' b');
@@ -659,7 +652,7 @@ line3\
     describe("comparison", function() {
       const operators = ["<=", ">=", "!=", "!==", "===", "==", "<", ">" ];
 
-      return it("tokenizes them", () => (() => {
+      it("tokenizes them", () => (() => {
         const result = [];
         for (let operator of Array.from(operators)) {
           const {tokens} = grammar.tokenizeLine('a ' + operator + ' b');
@@ -675,7 +668,7 @@ line3\
       it("tokenizes bitwise 'not'", function() {
         const {tokens} = grammar.tokenizeLine('~a');
         expect(tokens[0]).toEqual({value: '~', scopes: ['source.js', 'keyword.operator.bitwise.js']});
-        return expect(tokens[1]).toEqual({value: 'a', scopes: ['source.js']});
+        expect(tokens[1]).toEqual({value: 'a', scopes: ['source.js']});
     });
 
       it("tokenizes bitwise shift operators", function() {
@@ -693,7 +686,7 @@ line3\
         })();
     });
 
-      return it("tokenizes them", function() {
+      it("tokenizes them", function() {
         const operators = ["|", "^", "&"];
 
         return (() => {
@@ -723,7 +716,7 @@ line3\
         return result;
       })());
 
-      return it("tokenizes the arithmetic operators when separated by newlines", () => (() => {
+      it("tokenizes the arithmetic operators when separated by newlines", () => (() => {
         const result = [];
         for (let operator of Array.from(operators)) {
           const lines = grammar.tokenizeLines('1\n' + operator + ' 2');
@@ -735,15 +728,15 @@ line3\
       })());
   });
 
-    return describe("assignment", function() {
+    describe("assignment", function() {
       it("tokenizes '=' operator", function() {
         const {tokens} = grammar.tokenizeLine('a = b');
         expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.js']});
         expect(tokens[1]).toEqual({value: '=', scopes: ['source.js', 'keyword.operator.assignment.js']});
-        return expect(tokens[2]).toEqual({value: ' b', scopes: ['source.js']});
+        expect(tokens[2]).toEqual({value: ' b', scopes: ['source.js']});
     });
 
-      return describe("compound", function() {
+      describe("compound", function() {
         it("tokenizes them", function() {
           const operators = ["+=", "-=", "*=", "/=", "%=", "**="];
           return (() => {
@@ -772,7 +765,7 @@ line3\
           })();
       }));
 
-        return describe("bitwise", function() {
+        describe("bitwise", function() {
           it("tokenizes them", function() {
             const operators = ["&=", "^=", "|="];
             return (() => {
@@ -787,7 +780,7 @@ line3\
             })();
         });
 
-          return it("tokenizes bitwise shift", function() {
+          it("tokenizes bitwise shift", function() {
             const operators = ["<<=", ">>=", ">>>="];
             return (() => {
               const result = [];
@@ -829,7 +822,7 @@ line3\
       expect(tokens[8]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
 
       ({tokens} = grammar.tokenizeLine('OBJ.prop'));
-      return expect(tokens[0]).toEqual({value: 'OBJ', scopes: ['source.js', 'constant.other.object.js']});
+      expect(tokens[0]).toEqual({value: 'OBJ', scopes: ['source.js', 'constant.other.object.js']});
   });
 
     it("tokenises constants with dollar signs", function() {
@@ -943,7 +936,7 @@ const {
       expect(tokens[6]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[7]).toEqual({value: 'regex', scopes: ['source.js', 'string.regexp.js']});
       expect(tokens[8]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[9]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[9]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
     it("tokenizes variables declared with `const` in for-in and for-of loops", function() {
@@ -973,7 +966,7 @@ const {
       ({tokens} = grammar.tokenizeLine('const offset = 0;'));
       expect(tokens[0]).toEqual({value: 'const', scopes: ['source.js', 'storage.type.const.js']});
       expect(tokens[2]).toEqual({value: 'offset', scopes: ['source.js', 'constant.other.js']});
-      return expect(tokens[4]).toEqual({value: '=', scopes: ['source.js', 'keyword.operator.assignment.js']});
+      expect(tokens[4]).toEqual({value: '=', scopes: ['source.js', 'keyword.operator.assignment.js']});
   });
 
     it("tokenizes support constants", function() {
@@ -983,17 +976,17 @@ const {
       expect(tokens[3]).toEqual({value: 'cool', scopes: ['source.js', 'variable.other.object.js']});
       expect(tokens[4]).toEqual({value: '.', scopes: ['source.js', 'meta.delimiter.property.period.js']});
       expect(tokens[5]).toEqual({value: 'EPSILON', scopes: ['source.js', 'support.constant.js']});
-      return expect(tokens[6]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[6]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
     it("tokenizes constants in the middle of ternary expressions", function() {
       const {tokens} = grammar.tokenizeLine('a ? FOO : b');
-      return expect(tokens[3]).toEqual({value: 'FOO', scopes: ['source.js', 'constant.other.js']});
+      expect(tokens[3]).toEqual({value: 'FOO', scopes: ['source.js', 'constant.other.js']});
   });
 
-    return it("tokenizes constants at the end of ternary expressions", function() {
+    it("tokenizes constants at the end of ternary expressions", function() {
       const {tokens} = grammar.tokenizeLine('a ? b : FOO');
-      return expect(tokens[7]).toEqual({value: 'FOO', scopes: ['source.js', 'constant.other.js']});
+      expect(tokens[7]).toEqual({value: 'FOO', scopes: ['source.js', 'constant.other.js']});
   });
 });
 
@@ -1019,7 +1012,7 @@ const {
     expect(tokens[11]).toEqual({value: ';', scopes: ['source.js', 'string.quoted.template.js', 'source.js.embedded.source', 'punctuation.terminator.statement.js']});
     expect(tokens[12]).toEqual({value: '}', scopes: ['source.js', 'string.quoted.template.js', 'source.js.embedded.source', 'punctuation.definition.function.body.end.bracket.curly.js']});
     expect(tokens[13]).toEqual({value: '}', scopes: ['source.js', 'string.quoted.template.js', 'source.js.embedded.source', 'punctuation.section.embedded.js']});
-    return expect(tokens[14]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.js', 'punctuation.definition.string.end.js']});
+    expect(tokens[14]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.js', 'punctuation.definition.string.end.js']});
 }));
 
   describe("HTML template strings", function() {
@@ -1043,7 +1036,7 @@ const {
       expect(tokens[9]).toEqual({value: '</', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.begin.html']});
       expect(tokens[10]).toEqual({value: 'b', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, entityScope]});
       expect(tokens[11]).toEqual({value: '>', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.end.html']});
-      return expect(tokens[12]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
+      expect(tokens[12]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
   });
 
     it("tokenizes innerHTML attribute declarations with string template tags", function() {
@@ -1065,7 +1058,7 @@ const {
       expect(tokens[14]).toEqual({value: '</', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.begin.html']});
       expect(tokens[15]).toEqual({value: 'b', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, entityScope]});
       expect(tokens[16]).toEqual({value: '>', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.end.html']});
-      return expect(tokens[17]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
+      expect(tokens[17]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
   });
 
     it("tokenizes ES6 tagged HTML string templates with expanded function name", function() {
@@ -1082,10 +1075,10 @@ const {
       expect(tokens[9]).toEqual({value: '</', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.begin.html']});
       expect(tokens[10]).toEqual({value: 'b', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, entityScope]});
       expect(tokens[11]).toEqual({value: '>', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.end.html']});
-      return expect(tokens[12]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
+      expect(tokens[12]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
   });
 
-    return it("tokenizes ES6 tagged HTML string templates with expanded function name and white space", function() {
+    it("tokenizes ES6 tagged HTML string templates with expanded function name and white space", function() {
       const {tokens} = grammar.tokenizeLine('escapeHTML   `hey <b>${name}</b>`');
       expect(tokens[0]).toEqual({value: 'escapeHTML', scopes: ['source.js', 'string.quoted.template.html.js', 'entity.name.function.js']});
       expect(tokens[1]).toEqual({value: '   ', scopes: ['source.js', 'string.quoted.template.html.js']});
@@ -1100,7 +1093,7 @@ const {
       expect(tokens[10]).toEqual({value: '</', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.begin.html']});
       expect(tokens[11]).toEqual({value: 'b', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, entityScope]});
       expect(tokens[12]).toEqual({value: '>', scopes: ['source.js', 'string.quoted.template.html.js', tagScope, 'punctuation.definition.tag.end.html']});
-      return expect(tokens[13]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
+      expect(tokens[13]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.html.js', 'punctuation.definition.string.end.js']});
   });
 });
 
@@ -1111,7 +1104,7 @@ const {
     expect(tokens[2]).toEqual({value: 'QL', scopes: ['source.js', 'string.quoted.template.graphql.js', 'entity.name.function.js']});
     expect(tokens[3]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.begin.js']});
     expect(tokens[4]).toEqual({value: 'fragment on Foo { id }', scopes: ['source.js', 'string.quoted.template.graphql.js']});
-    return expect(tokens[5]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.end.js']});
+    expect(tokens[5]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.end.js']});
 }));
 
   describe("ES6 tagged Relay.QL string templates with interpolation", () => it("tokenizes them as strings", function() {
@@ -1125,7 +1118,7 @@ const {
     expect(tokens[6]).toEqual({value: 'myFragment', scopes: ['source.js', 'string.quoted.template.graphql.js', 'source.js.embedded.source']});
     expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'string.quoted.template.graphql.js', 'source.js.embedded.source', 'punctuation.section.embedded.js']});
     expect(tokens[8]).toEqual({value: ' }', scopes: ['source.js', 'string.quoted.template.graphql.js']});
-    return expect(tokens[9]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.end.js']});
+    expect(tokens[9]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.end.js']});
 }));
 
   describe("ES6 tagged gql string templates", () => it("tokenizes them as strings", function() {
@@ -1133,7 +1126,7 @@ const {
     expect(tokens[0]).toEqual({value: 'gql', scopes: ['source.js', 'string.quoted.template.graphql.js', 'entity.name.function.js']});
     expect(tokens[1]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.begin.js']});
     expect(tokens[2]).toEqual({value: 'fragment on Foo { id }', scopes: ['source.js', 'string.quoted.template.graphql.js']});
-    return expect(tokens[3]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.end.js']});
+    expect(tokens[3]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.graphql.js', 'punctuation.definition.string.end.js']});
 }));
 
   describe("ES6 tagged SQL string templates", () => it("tokenizes them as strings", function() {
@@ -1141,7 +1134,7 @@ const {
     expect(tokens[0]).toEqual({value: 'SQL', scopes: ['source.js', 'string.quoted.template.sql.js', 'entity.name.function.js']});
     expect(tokens[1]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.sql.js', 'punctuation.definition.string.begin.js']});
     expect(tokens[2]).toEqual({value: 'SELECT foo FROM bar WHERE id = :id', scopes: ['source.js', 'string.quoted.template.sql.js']});
-    return expect(tokens[3]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.sql.js', 'punctuation.definition.string.end.js']});
+    expect(tokens[3]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.sql.js', 'punctuation.definition.string.end.js']});
 }));
 
   describe("ES6 tagged SQL string templates with interpolation", () => it("tokenizes them as strings", function() {
@@ -1152,7 +1145,7 @@ const {
     expect(tokens[3]).toEqual({value: '${', scopes: ['source.js', 'string.quoted.template.sql.js', 'source.js.embedded.source', 'punctuation.section.embedded.js']});
     expect(tokens[4]).toEqual({value: 'id', scopes: ['source.js', 'string.quoted.template.sql.js', 'source.js.embedded.source']});
     expect(tokens[5]).toEqual({value: '}', scopes: ['source.js', 'string.quoted.template.sql.js', 'source.js.embedded.source', 'punctuation.section.embedded.js']});
-    return expect(tokens[6]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.sql.js', 'punctuation.definition.string.end.js']});
+    expect(tokens[6]).toEqual({value: '`', scopes: ['source.js', 'string.quoted.template.sql.js', 'punctuation.definition.string.end.js']});
 }));
 
   describe("ES6 class", function() {
@@ -1165,7 +1158,7 @@ const {
       expect(tokens[2]).toEqual({value: '$abc$', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
 
       ({tokens} = grammar.tokenizeLine('class $$'));
-      return expect(tokens[2]).toEqual({value: '$$', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
+      expect(tokens[2]).toEqual({value: '$$', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
   });
 
     it("tokenizes class...extends", function() {
@@ -1179,10 +1172,10 @@ const {
       expect(tokens[6]).toEqual({value: '$abc$', scopes: ['source.js', 'meta.class.js', 'entity.other.inherited-class.js']});
 
       ({tokens} = grammar.tokenizeLine('class MyClass extends $$'));
-      return expect(tokens[6]).toEqual({value: '$$', scopes: ['source.js', 'meta.class.js', 'entity.other.inherited-class.js']});
+      expect(tokens[6]).toEqual({value: '$$', scopes: ['source.js', 'meta.class.js', 'entity.other.inherited-class.js']});
   });
 
-    return it("tokenizes anonymous class", function() {
+    it("tokenizes anonymous class", function() {
       let {tokens} = grammar.tokenizeLine('class extends SomeClass');
       expect(tokens[0]).toEqual({value: 'class', scopes: ['source.js', 'meta.class.js', 'storage.type.class.js']});
       expect(tokens[2]).toEqual({value: 'extends', scopes: ['source.js', 'meta.class.js', 'storage.modifier.js']});
@@ -1192,7 +1185,7 @@ const {
       expect(tokens[4]).toEqual({value: '$abc$', scopes: ['source.js', 'meta.class.js', 'entity.other.inherited-class.js']});
 
       ({tokens} = grammar.tokenizeLine('class extends $$'));
-      return expect(tokens[4]).toEqual({value: '$$', scopes: ['source.js', 'meta.class.js', 'entity.other.inherited-class.js']});
+      expect(tokens[4]).toEqual({value: '$$', scopes: ['source.js', 'meta.class.js', 'entity.other.inherited-class.js']});
   });
 });
 
@@ -1203,14 +1196,14 @@ const {
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.js', 'meta.import.js', 'string.quoted.double.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[3]).toEqual({value: 'module-name', scopes: ['source.js', 'meta.import.js', 'string.quoted.double.js']});
       expect(tokens[4]).toEqual({value: '"', scopes: ['source.js', 'meta.import.js', 'string.quoted.double.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
     it("tokenizes default import", function() {
       const {tokens} = grammar.tokenizeLine('import defaultMember from "module-name";');
       expect(tokens[0]).toEqual({value: 'import', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
       expect(tokens[2]).toEqual({value: 'defaultMember', scopes: ['source.js', 'meta.import.js', 'variable.other.module.js']});
-      return expect(tokens[4]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(tokens[4]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 
     it("tokenizes default named import", function() {
@@ -1221,7 +1214,7 @@ const {
       expect(tokens[6]).toEqual({value: 'as', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
       expect(tokens[8]).toEqual({value: 'defaultMember', scopes: ['source.js', 'meta.import.js', 'variable.other.module-alias.js']});
       expect(tokens[10]).toEqual({value: '}', scopes: ['source.js', 'meta.import.js', 'punctuation.definition.modules.end.js']});
-      return expect(tokens[12]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(tokens[12]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 
     it("tokenizes named import", function() {
@@ -1241,7 +1234,7 @@ const {
       expect(tokens[10]).toEqual({value: 'as', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
       expect(tokens[12]).toEqual({value: 'alias2', scopes: ['source.js', 'meta.import.js', 'variable.other.module-alias.js']});
       expect(tokens[14]).toEqual({value: '}', scopes: ['source.js', 'meta.import.js', 'punctuation.definition.modules.end.js']});
-      return expect(tokens[16]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(tokens[16]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 
     it("tokenizes entire module import", function() {
@@ -1250,7 +1243,7 @@ const {
       expect(tokens[2]).toEqual({value: '*', scopes: ['source.js', 'meta.import.js', 'variable.language.import-all.js']});
       expect(tokens[4]).toEqual({value: 'as', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
       expect(tokens[6]).toEqual({value: 'name', scopes: ['source.js', 'meta.import.js', 'variable.other.module-alias.js']});
-      return expect(tokens[8]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(tokens[8]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 
     it("tokenizes `import defaultMember, { member } from 'module-name';`", function() {
@@ -1261,7 +1254,7 @@ const {
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'meta.import.js', 'punctuation.definition.modules.begin.js']});
       expect(tokens[7]).toEqual({value: 'member', scopes: ['source.js', 'meta.import.js', 'variable.other.module.js']});
       expect(tokens[9]).toEqual({value: '}', scopes: ['source.js', 'meta.import.js', 'punctuation.definition.modules.end.js']});
-      return expect(tokens[11]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(tokens[11]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 
     it("tokenizes `import defaultMember, * as alias from 'module-name';", function() {
@@ -1272,10 +1265,10 @@ const {
       expect(tokens[5]).toEqual({value: '*', scopes: ['source.js', 'meta.import.js', 'variable.language.import-all.js']});
       expect(tokens[7]).toEqual({value: 'as', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
       expect(tokens[9]).toEqual({value: 'alias', scopes: ['source.js', 'meta.import.js', 'variable.other.module-alias.js']});
-      return expect(tokens[11]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(tokens[11]).toEqual({value: 'from', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 
-    return it("tokenizes comments in statement", function() {
+    it("tokenizes comments in statement", function() {
       let lines = grammar.tokenizeLines(`\
 import /* comment */ {
   member1, // comment
@@ -1300,7 +1293,7 @@ import b from 'b'\
 `
       );
       expect(lines[0][10]).toEqual({value: '//', scopes: ['source.js', 'meta.import.js', 'comment.line.double-slash.js', 'punctuation.definition.comment.js']});
-      return expect(lines[1][0]).toEqual({value: 'import', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
+      expect(lines[1][0]).toEqual({value: 'import', scopes: ['source.js', 'meta.import.js', 'keyword.control.js']});
   });
 });
 
@@ -1322,21 +1315,21 @@ import b from 'b'\
       expect(tokens[0]).toEqual({value: 'export', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[2]).toEqual({value: 'const', scopes: ['source.js', 'storage.type.const.js']});
       expect(tokens[4]).toEqual({value: 'CONSTANT', scopes: ['source.js', 'constant.other.js']});
-      return expect(tokens[6]).toEqual({value: '=', scopes: ['source.js', 'keyword.operator.assignment.js']});
+      expect(tokens[6]).toEqual({value: '=', scopes: ['source.js', 'keyword.operator.assignment.js']});
   });
 
     it("tokenizes named function export", function() {
       const {tokens} = grammar.tokenizeLine('export function func(p1, p2){}');
       expect(tokens[0]).toEqual({value: 'export', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[2]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
-      return expect(tokens[4]).toEqual({value: 'func', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
+      expect(tokens[4]).toEqual({value: 'func', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
   });
 
     it("tokenizes named class export", function() {
       const {tokens} = grammar.tokenizeLine('export class Foo {}');
       expect(tokens[0]).toEqual({value: 'export', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[2]).toEqual({value: 'class', scopes: ['source.js', 'meta.class.js', 'storage.type.class.js']});
-      return expect(tokens[4]).toEqual({value: 'Foo', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
+      expect(tokens[4]).toEqual({value: 'Foo', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
   });
 
     it("tokenizes existing variable export", function() {
@@ -1354,7 +1347,7 @@ import b from 'b'\
       expect(tokens[7]).toEqual({value: 'foo', scopes: ['source.js', 'meta.export.js', 'variable.other.module.js']});
       expect(tokens[9]).toEqual({value: 'as', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[11]).toEqual({value: 'alias', scopes: ['source.js', 'meta.export.js', 'variable.other.module-alias.js']});
-      return expect(tokens[13]).toEqual({value: '}', scopes: ['source.js', 'meta.export.js', 'punctuation.definition.modules.end.js']});
+      expect(tokens[13]).toEqual({value: '}', scopes: ['source.js', 'meta.export.js', 'punctuation.definition.modules.end.js']});
   });
 
     it("tokenizes default export", function() {
@@ -1391,7 +1384,7 @@ export default {
       expect(tokens[11]).toEqual({value: "'", scopes: ['source.js', 'string.quoted.single.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[12]).toEqual({value: "value", scopes: ['source.js', 'string.quoted.single.js']});
       expect(tokens[13]).toEqual({value: "'", scopes: ['source.js', 'string.quoted.single.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[15]).toEqual({value: '}', scopes: ['source.js', 'meta.brace.curly.js']});
+      expect(tokens[15]).toEqual({value: '}', scopes: ['source.js', 'meta.brace.curly.js']});
   });
 
     it("tokenizes default function export", function() {
@@ -1403,7 +1396,7 @@ export default {
       ({tokens} = grammar.tokenizeLine('export default function func() {}'));
       expect(tokens[0]).toEqual({value: 'export', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[2]).toEqual({value: 'default', scopes: ['source.js', 'meta.export.js', 'variable.language.default.js']});
-      return expect(tokens[4]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
+      expect(tokens[4]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
   });
 
     it("tokenizes comments in statement", function() {
@@ -1427,7 +1420,7 @@ export {
       expect(tokens[8]).toEqual({value: '*/', scopes: ['source.js', 'meta.export.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
       expect(tokens[13]).toEqual({value: '/*', scopes: ['source.js', 'meta.export.js', 'comment.block.js', 'punctuation.definition.comment.begin.js']});
       expect(tokens[14]).toEqual({value: ' comment ', scopes: ['source.js', 'meta.export.js', 'comment.block.js']});
-      return expect(tokens[15]).toEqual({value: '*/', scopes: ['source.js', 'meta.export.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[15]).toEqual({value: '*/', scopes: ['source.js', 'meta.export.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenizes default class export", function() {
@@ -1442,7 +1435,7 @@ export {
       expect(tokens[0]).toEqual({value: 'export', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[2]).toEqual({value: 'default', scopes: ['source.js', 'meta.export.js', 'variable.language.default.js']});
       expect(tokens[4]).toEqual({value: 'class', scopes: ['source.js', 'meta.class.js', 'storage.type.class.js']});
-      return expect(tokens[6]).toEqual({value: 'Foo', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
+      expect(tokens[6]).toEqual({value: 'Foo', scopes: ['source.js', 'meta.class.js', 'entity.name.type.class.js']});
   });
 
     it("tokenizes re-export", function() {
@@ -1465,10 +1458,10 @@ export {
       expect(tokens[6]).toEqual({value: 'as', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
       expect(tokens[8]).toEqual({value: 'alias', scopes: ['source.js', 'meta.export.js', 'variable.other.module-alias.js']});
       expect(tokens[10]).toEqual({value: '}', scopes: ['source.js', 'meta.export.js', 'punctuation.definition.modules.end.js']});
-      return expect(tokens[12]).toEqual({value: 'from', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
+      expect(tokens[12]).toEqual({value: 'from', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
   });
 
-    return it("tokenizes multiline re-export", function() {
+    it("tokenizes multiline re-export", function() {
       const lines = grammar.tokenizeLines(`\
 export {
   default as alias,
@@ -1490,20 +1483,20 @@ export {
       expect(lines[3][1]).toEqual({value: 'member2', scopes: ['source.js', 'meta.export.js', 'variable.other.module.js']});
       expect(lines[3][2]).toEqual({value: ',', scopes: ['source.js', 'meta.export.js', 'meta.delimiter.object.comma.js']});
       expect(lines[4][0]).toEqual({value: '}', scopes: ['source.js', 'meta.export.js', 'punctuation.definition.modules.end.js']});
-      return expect(lines[4][2]).toEqual({value: 'from', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
+      expect(lines[4][2]).toEqual({value: 'from', scopes: ['source.js', 'meta.export.js', 'keyword.control.js']});
   });
 });
 
   describe("ES6 yield", function() {
     it("tokenizes yield", function() {
       const {tokens} = grammar.tokenizeLine('yield next');
-      return expect(tokens[0]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
+      expect(tokens[0]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
   });
 
-    return it("tokenizes yield*", function() {
+    it("tokenizes yield*", function() {
       const {tokens} = grammar.tokenizeLine('yield * next');
       expect(tokens[0]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
-      return expect(tokens[2]).toEqual({value: '*', scopes: ['source.js', 'meta.control.yield.js', 'storage.modifier.js']});
+      expect(tokens[2]).toEqual({value: '*', scopes: ['source.js', 'meta.control.yield.js', 'storage.modifier.js']});
   });
 });
 
@@ -1537,7 +1530,7 @@ function foo() {
       expect(tokens[2]).toEqual({value: '$abc$', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
 
       ({tokens} = grammar.tokenizeLine('function $$(){}'));
-      return expect(tokens[2]).toEqual({value: '$$', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
+      expect(tokens[2]).toEqual({value: '$$', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
   });
 
     it("tokenizes anonymous functions", function() {
@@ -1546,14 +1539,14 @@ function foo() {
       expect(tokens[2]).toEqual({value: '(', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
       expect(tokens[3]).toEqual({value: ')', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'punctuation.definition.parameters.end.bracket.round.js']});
       expect(tokens[4]).toEqual({value: '{', scopes: ['source.js', 'punctuation.definition.function.body.begin.bracket.curly.js']});
-      return expect(tokens[5]).toEqual({value: '}', scopes: ['source.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
+      expect(tokens[5]).toEqual({value: '}', scopes: ['source.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
   });
 
     it("tokenizes async functions", function() {
       const {tokens} = grammar.tokenizeLine('async function foo(){}');
       expect(tokens[0]).toEqual({value: 'async', scopes: ['source.js', 'meta.function.js', 'storage.modifier.async.js']});
       expect(tokens[2]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
-      return expect(tokens[4]).toEqual({value: 'foo', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
+      expect(tokens[4]).toEqual({value: 'foo', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
   });
 
     it("tokenizes functions as object properties", function() {
@@ -1575,7 +1568,7 @@ function foo() {
       ({tokens} = grammar.tokenizeLine('document.getElementById("foo").onclick = function('));
       expect(tokens[8]).toEqual({value: '.', scopes: ['source.js', 'meta.function.js', 'meta.delimiter.method.period.js']});
       expect(tokens[9]).toEqual({value: 'onclick', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
-      return expect(tokens[13]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
+      expect(tokens[13]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
   });
 
     it("tokenises getter/setter keywords", function() {
@@ -1585,7 +1578,7 @@ function foo() {
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.js', 'meta.function.method.definition.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
       expect(tokens[4]).toEqual({value: ')', scopes: ['source.js', 'meta.function.method.definition.js', 'meta.parameters.js', 'punctuation.definition.parameters.end.bracket.round.js']});
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'punctuation.definition.function.body.begin.bracket.curly.js']});
-      return expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
+      expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
   });
 
     it("tokenizes ES6 method definitions", function() {
@@ -1641,7 +1634,7 @@ function foo() {
 
       ({tokens} = grammar.tokenizeLine('export (x) { return "Nah"; }'));
       expect(tokens[0]).toEqual({value: 'export', scopes: ['source.js', 'meta.function.method.definition.js', 'entity.name.function.js']});
-      return expect(tokens[11]).toEqual({value: 'Nah', scopes: ['source.js', 'string.quoted.double.js']});
+      expect(tokens[11]).toEqual({value: 'Nah', scopes: ['source.js', 'string.quoted.double.js']});
   });
 
     it("tokenises ES6 methods with computed names", function() {
@@ -1676,7 +1669,7 @@ function foo() {
       expect(tokens[8]).toEqual({value: '(', scopes: ['source.js', 'meta.function.method.definition.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
       expect(tokens[9]).toEqual({value: ')', scopes: ['source.js', 'meta.function.method.definition.js', 'meta.parameters.js', 'punctuation.definition.parameters.end.bracket.round.js']});
       expect(tokens[11]).toEqual({value: '{', scopes: ['source.js', 'punctuation.definition.function.body.begin.bracket.curly.js']});
-      return expect(tokens[13]).toEqual({value: '}', scopes: ['source.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
+      expect(tokens[13]).toEqual({value: '}', scopes: ['source.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
   });
 
     it("tokenizes constructors", function() {
@@ -1690,7 +1683,7 @@ function foo() {
       expect(tokens[10]).toEqual({value: 'this', scopes: ['source.js', 'variable.language.js']});
 
       ({tokens} = grammar.tokenizeLine('constructorABC: {}'));
-      return expect(tokens[0]).not.toEqual({value: 'constructor', scopes: ['source.js', 'meta.function.js', 'entity.name.function.constructor.js']});
+      expect(tokens[0]).not.toEqual({value: 'constructor', scopes: ['source.js', 'meta.function.js', 'entity.name.function.constructor.js']});
   });
 
     it("tokenizes named function expressions", function() {
@@ -1700,7 +1693,7 @@ function foo() {
       expect(tokens[4]).toEqual({value: '=', scopes: ['source.js', 'meta.function.js', 'keyword.operator.assignment.js']});
       expect(tokens[6]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
       expect(tokens[8]).toEqual({value: 'foo', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
-      return expect(tokens[9]).toEqual({value: '(', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
+      expect(tokens[9]).toEqual({value: '(', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
   });
 
     it("tokenizes anonymous function expressions", function() {
@@ -1709,7 +1702,7 @@ function foo() {
       expect(tokens[2]).toEqual({value: 'func', scopes: ['source.js', 'meta.function.js', 'entity.name.function.js']});
       expect(tokens[4]).toEqual({value: '=', scopes: ['source.js', 'meta.function.js', 'keyword.operator.assignment.js']});
       expect(tokens[6]).toEqual({value: 'function', scopes: ['source.js', 'meta.function.js', 'storage.type.function.js']});
-      return expect(tokens[7]).toEqual({value: '(', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
+      expect(tokens[7]).toEqual({value: '(', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'punctuation.definition.parameters.begin.bracket.round.js']});
   });
 
     it("tokenizes functions in object literals", function() {
@@ -1742,7 +1735,7 @@ function foo() {
       expect(tokens[8]).toEqual({value: ' a', scopes: ['source.js']});
 
       ({tokens} = grammar.tokenizeLine('"func" : a => a'));
-      return expect(tokens[8]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.json.js', 'storage.type.function.arrow.js']});
+      expect(tokens[8]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.json.js', 'storage.type.function.arrow.js']});
   });
 
     it("tokenizes generator functions", function() {
@@ -1759,7 +1752,7 @@ function foo() {
       expect(tokens[2]).toEqual({value: '*', scopes: ['source.js', 'meta.function.js', 'storage.modifier.generator.js']});
 
       ({tokens} = grammar.tokenizeLine('function *(){}'));
-      return expect(tokens[2]).toEqual({value: '*', scopes: ['source.js', 'meta.function.js', 'storage.modifier.generator.js']});
+      expect(tokens[2]).toEqual({value: '*', scopes: ['source.js', 'meta.function.js', 'storage.modifier.generator.js']});
   });
 
     it("tokenizes arrow functions", function() {
@@ -1790,7 +1783,7 @@ a = (x,
      y) => {}\
 `
       );
-      return expect(lines[1][3]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
+      expect(lines[1][3]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
   });
 
     it("tokenizes stored arrow functions", function() {
@@ -1799,7 +1792,7 @@ a = (x,
       expect(tokens[2]).toEqual({value: 'func', scopes: ['source.js', 'meta.function.arrow.js', 'entity.name.function.js']});
       expect(tokens[4]).toEqual({value: '=', scopes: ['source.js', 'meta.function.arrow.js', 'keyword.operator.assignment.js']});
       expect(tokens[11]).toEqual({value: ')', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'punctuation.definition.parameters.end.bracket.round.js']});
-      return expect(tokens[13]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
+      expect(tokens[13]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
   });
 
     it("tokenizes arrow functions as object properties", function() {
@@ -1808,7 +1801,7 @@ a = (x,
       expect(tokens[2]).toEqual({value: 'isEmpty', scopes: ['source.js', 'meta.function.arrow.js', 'entity.name.function.js']});
       expect(tokens[4]).toEqual({value: '=', scopes: ['source.js', 'meta.function.arrow.js', 'keyword.operator.assignment.js']});
       expect(tokens[11]).toEqual({value: ')', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'punctuation.definition.parameters.end.bracket.round.js']});
-      return expect(tokens[13]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
+      expect(tokens[13]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
   });
 
     it("tokenizes arrow functions in object literals", function() {
@@ -1822,7 +1815,7 @@ a = (x,
       expect(tokens[1]).toEqual({value: 'foo', scopes: ['source.js', 'meta.function.arrow.json.js', 'string.quoted.double.js', 'entity.name.function.js']});
       expect(tokens[3]).toEqual({value: ':', scopes: ['source.js', 'meta.function.arrow.json.js', 'keyword.operator.assignment.js']});
       expect(tokens[5]).toEqual({value: 'param', scopes: ['source.js', 'meta.function.arrow.json.js', 'meta.parameters.js', 'variable.parameter.function.js']});
-      return expect(tokens[7]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.json.js', 'storage.type.function.arrow.js']});
+      expect(tokens[7]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.json.js', 'storage.type.function.arrow.js']});
   });
 
     it("tokenizes default parameters", function() {
@@ -1836,7 +1829,7 @@ a = (x,
       expect(tokens[6]).toEqual({value: '=', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'keyword.operator.assignment.js']});
       expect(tokens[8]).toEqual({value: 'this', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'variable.language.js']});
       expect(tokens[9]).toEqual({value: '.', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
-      return expect(tokens[10]).toEqual({value: 'something', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'meta.method-call.js', 'entity.name.function.js']});
+      expect(tokens[10]).toEqual({value: 'something', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'meta.method-call.js', 'entity.name.function.js']});
   });
 
     it("tokenizes the rest parameter", function() {
@@ -1846,17 +1839,17 @@ a = (x,
 
       ({tokens} = grammar.tokenizeLine('(c, ...val) => c + val'));
       expect(tokens[4]).toEqual({value: '...', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'keyword.operator.rest.js']});
-      return expect(tokens[5]).toEqual({value: 'val', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'variable.parameter.rest.function.js']});
+      expect(tokens[5]).toEqual({value: 'val', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'variable.parameter.rest.function.js']});
   });
 
-    return it("tokenizes illegal parameters", function() {
+    it("tokenizes illegal parameters", function() {
       let {tokens} = grammar.tokenizeLine('0abc => {}');
       expect(tokens[0]).toEqual({value: '0abc', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'invalid.illegal.identifier.js']});
       expect(tokens[2]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
 
       ({tokens} = grammar.tokenizeLine('(0abc) => {}'));
       expect(tokens[1]).toEqual({value: '0abc', scopes: ['source.js', 'meta.function.arrow.js', 'meta.parameters.js', 'invalid.illegal.identifier.js']});
-      return expect(tokens[4]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
+      expect(tokens[4]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
   });
 });
 
@@ -1872,12 +1865,12 @@ a = (x,
       expect(tokens[0]).toEqual({value: '$this', scopes: ['source.js']});
 
       ({tokens} = grammar.tokenizeLine('this$'));
-      return expect(tokens[0]).toEqual({value: 'this$', scopes: ['source.js']});
+      expect(tokens[0]).toEqual({value: 'this$', scopes: ['source.js']});
   });
 
     it("tokenizes 'super'", function() {
       const {tokens} = grammar.tokenizeLine('super');
-      return expect(tokens[0]).toEqual({value: 'super', scopes: ['source.js', 'variable.language.js']});
+      expect(tokens[0]).toEqual({value: 'super', scopes: ['source.js', 'variable.language.js']});
   });
 
     it("tokenizes 'arguments'", function() {
@@ -1888,7 +1881,7 @@ a = (x,
       expect(tokens[0]).toEqual({value: 'arguments', scopes: ['source.js', 'variable.language.js']});
 
       ({tokens} = grammar.tokenizeLine('arguments.length'));
-      return expect(tokens[0]).toEqual({value: 'arguments', scopes: ['source.js', 'variable.language.js']});
+      expect(tokens[0]).toEqual({value: 'arguments', scopes: ['source.js', 'variable.language.js']});
   });
 
     it("tokenizes illegal identifiers", function() {
@@ -1899,10 +1892,10 @@ a = (x,
       expect(tokens[0]).toEqual({value: '123illegal', scopes: ['source.js', 'invalid.illegal.identifier.js']});
 
       ({tokens} = grammar.tokenizeLine('123$illegal'));
-      return expect(tokens[0]).toEqual({value: '123$illegal', scopes: ['source.js', 'invalid.illegal.identifier.js']});
+      expect(tokens[0]).toEqual({value: '123$illegal', scopes: ['source.js', 'invalid.illegal.identifier.js']});
   });
 
-    return describe("objects", function() {
+    describe("objects", function() {
       it("tokenizes them", function() {
         let {tokens} = grammar.tokenizeLine('obj.prop');
         expect(tokens[0]).toEqual({value: 'obj', scopes: ['source.js', 'variable.other.object.js']});
@@ -1911,10 +1904,10 @@ a = (x,
         expect(tokens[0]).toEqual({value: '$abc$', scopes: ['source.js', 'variable.other.object.js']});
 
         ({tokens} = grammar.tokenizeLine('$$.prop'));
-        return expect(tokens[0]).toEqual({value: '$$', scopes: ['source.js', 'variable.other.object.js']});
+        expect(tokens[0]).toEqual({value: '$$', scopes: ['source.js', 'variable.other.object.js']});
     });
 
-      return it("tokenizes illegal objects", function() {
+      it("tokenizes illegal objects", function() {
         let {tokens} = grammar.tokenizeLine('1.prop');
         expect(tokens[0]).toEqual({value: '1', scopes: ['source.js', 'invalid.illegal.identifier.js']});
 
@@ -1922,7 +1915,7 @@ a = (x,
         expect(tokens[0]).toEqual({value: '123', scopes: ['source.js', 'invalid.illegal.identifier.js']});
 
         ({tokens} = grammar.tokenizeLine('123a.prop'));
-        return expect(tokens[0]).toEqual({value: '123a', scopes: ['source.js', 'invalid.illegal.identifier.js']});
+        expect(tokens[0]).toEqual({value: '123a', scopes: ['source.js', 'invalid.illegal.identifier.js']});
     });
   });
 });
@@ -1967,7 +1960,7 @@ a = (x,
       expect(tokens[0]).toEqual({value: 'ABC', scopes: ['source.js', 'meta.function-call.js', 'entity.name.function.js']});
 
       ({tokens} = grammar.tokenizeLine('$ABC$()'));
-      return expect(tokens[0]).toEqual({value: '$ABC$', scopes: ['source.js', 'meta.function-call.js', 'entity.name.function.js']});
+      expect(tokens[0]).toEqual({value: '$ABC$', scopes: ['source.js', 'meta.function-call.js', 'entity.name.function.js']});
   });
 
     it("tokenizes function calls when they are arguments", function() {
@@ -1978,14 +1971,14 @@ a = (x,
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(tokens[4]).toEqual({value: 'c', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'meta.function-call.js', 'meta.arguments.js']});
       expect(tokens[5]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(tokens[6]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+      expect(tokens[6]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
   });
 
     it("tokenizes illegal function calls", function() {
       const {tokens} = grammar.tokenizeLine('0illegal()');
       expect(tokens[0]).toEqual({value: '0illegal', scopes: ['source.js', 'meta.function-call.js', 'invalid.illegal.identifier.js']});
       expect(tokens[1]).toEqual({value: '(', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
-      return expect(tokens[2]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+      expect(tokens[2]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
   });
 
     it("tokenizes illegal arguments", function() {
@@ -2001,10 +1994,10 @@ a = (x,
       ({tokens} = grammar.tokenizeLine('a(1.prop)'));
       expect(tokens[2]).toEqual({value: '1', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'invalid.illegal.identifier.js']});
       expect(tokens[3]).toEqual({value: '.', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'meta.delimiter.property.period.js']});
-      return expect(tokens[4]).toEqual({value: 'prop', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'variable.other.property.js']});
+      expect(tokens[4]).toEqual({value: 'prop', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'variable.other.property.js']});
   });
 
-    return it("tokenizes function declaration as an argument", function() {
+    it("tokenizes function declaration as an argument", function() {
       const {tokens} = grammar.tokenizeLine('a(function b(p) { return p; })');
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.js', 'meta.function-call.js', 'entity.name.function.js']});
       expect(tokens[1]).toEqual({value: '(', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
@@ -2018,7 +2011,7 @@ a = (x,
       expect(tokens[12]).toEqual({value: ' p', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js']});
       expect(tokens[13]).toEqual({value: ';', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.terminator.statement.js']});
       expect(tokens[15]).toEqual({value: '}', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.function.body.end.bracket.curly.js']});
-      return expect(tokens[16]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+      expect(tokens[16]).toEqual({value: ')', scopes: ['source.js', 'meta.function-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
   });
 });
 
@@ -2077,10 +2070,10 @@ gulp.src("./*.js")
       expect(lines[2][9]).toEqual({value: 'build', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'meta.method-call.js', 'meta.arguments.js', 'string.quoted.double.js']});
       expect(lines[2][10]).toEqual({value: '"', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'meta.method-call.js', 'meta.arguments.js', 'string.quoted.double.js', 'punctuation.definition.string.end.js']});
       expect(lines[2][11]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(lines[2][12]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+      expect(lines[2][12]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
   });
 
-    return describe("built-in methods", function() {
+    describe("built-in methods", function() {
       const methods    = ["require", "parseInt", "parseFloat", "print"];
       const domMethods = ["substringData", "submit", "splitText", "setNamedItem", "setAttribute"];
 
@@ -2090,7 +2083,7 @@ gulp.src("./*.js")
           expect(tokens[0]).toEqual({value: '.', scopes: ['source.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
           expect(tokens[1]).toEqual({value: method, scopes: ['source.js', 'meta.method-call.js', 'support.function.js']});
           expect(tokens[2]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
-          return expect(tokens[3]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+          expect(tokens[3]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
       });
       }
 
@@ -2100,7 +2093,7 @@ gulp.src("./*.js")
           expect(tokens[0]).toEqual({value: '.', scopes: ['source.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
           expect(tokens[1]).toEqual({value: domMethod, scopes: ['source.js', 'meta.method-call.js', 'support.function.dom.js']});
           expect(tokens[2]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
-          return expect(tokens[3]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
+          expect(tokens[3]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
       }));
   });
 });
@@ -2136,7 +2129,7 @@ gulp.src("./*.js")
       ({tokens} = grammar.tokenizeLine('a.123illegal'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.delimiter.property.period.js']});
-      return expect(tokens[2]).toEqual({value: '123illegal', scopes: ['source.js', 'invalid.illegal.identifier.js']});
+      expect(tokens[2]).toEqual({value: '123illegal', scopes: ['source.js', 'invalid.illegal.identifier.js']});
   });
 
     it("tokenizes constant properties", function() {
@@ -2153,7 +2146,7 @@ gulp.src("./*.js")
       ({tokens} = grammar.tokenizeLine('a.C'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.js', 'variable.other.object.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.delimiter.property.period.js']});
-      return expect(tokens[2]).toEqual({value: 'C', scopes: ['source.js', 'constant.other.property.js']});
+      expect(tokens[2]).toEqual({value: 'C', scopes: ['source.js', 'constant.other.property.js']});
   });
 
     it("tokenizes the optional chaining operator", function() {
@@ -2211,10 +2204,10 @@ gulp.src("./*.js")
       ({tokens} = grammar.tokenizeLine('a[5]?.b'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.js', 'variable.other.object.js']});
       expect(tokens[4]).toEqual({value: '?.', scopes: ['source.js', 'meta.delimiter.property.optional.js']});
-      return expect(tokens[5]).toEqual({value: 'b', scopes: ['source.js', 'variable.other.property.js']});
+      expect(tokens[5]).toEqual({value: 'b', scopes: ['source.js', 'variable.other.property.js']});
   });
 
-    return it("detects some illegal uses of the optional chaining operator", function() {
+    it("detects some illegal uses of the optional chaining operator", function() {
       let {tokens} = grammar.tokenizeLine('new a?.b');
       expect(tokens[2]).toEqual({value: 'a', scopes: ['source.js', 'meta.class.instance.constructor.js', 'entity.name.type.instance.js']});
       expect(tokens[3]).toEqual({value: '?.', scopes: ['source.js', 'meta.class.instance.constructor.js', 'entity.name.type.instance.js', 'invalid.illegal.meta.delimiter.property.optional.js']});
@@ -2229,7 +2222,7 @@ gulp.src("./*.js")
       ({tokens} = grammar.tokenizeLine('a?.b = _ => 2'));
       expect(tokens[0]).toEqual({value: 'a', scopes: ['source.js', 'variable.other.object.js']});
       expect(tokens[1]).toEqual({value: '?.', scopes: ['source.js', 'meta.function.arrow.js', 'invalid.illegal.meta.delimiter.method.optional.js']});
-      return expect(tokens[2]).toEqual({value: 'b', scopes: ['source.js', 'meta.function.arrow.js', 'entity.name.function.js']});
+      expect(tokens[2]).toEqual({value: 'b', scopes: ['source.js', 'meta.function.arrow.js', 'entity.name.function.js']});
   });
 });
 
@@ -2280,7 +2273,7 @@ gulp.src("./*.js")
 
       ({tokens} = grammar.tokenizeLine('// stuff'));
       expect(tokens[0]).toEqual({value: '//', scopes: ['source.js', 'comment.line.double-slash.js', 'punctuation.definition.comment.js']});
-      return expect(tokens[1]).toEqual({value: ' stuff', scopes: ['source.js', 'comment.line.double-slash.js']});
+      expect(tokens[1]).toEqual({value: ' stuff', scopes: ['source.js', 'comment.line.double-slash.js']});
   });
 
     it("tokenizes /* */ comments", function() {
@@ -2291,7 +2284,7 @@ gulp.src("./*.js")
       ({tokens} = grammar.tokenizeLine('/* foo */'));
       expect(tokens[0]).toEqual({value: '/*', scopes: ['source.js', 'comment.block.js', 'punctuation.definition.comment.begin.js']});
       expect(tokens[1]).toEqual({value: ' foo ', scopes: ['source.js', 'comment.block.js']});
-      return expect(tokens[2]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[2]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenizes /** */ comments", function() {
@@ -2302,7 +2295,7 @@ gulp.src("./*.js")
       ({tokens} = grammar.tokenizeLine('/** foo */'));
       expect(tokens[0]).toEqual({value: '/**', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.begin.js']});
       expect(tokens[1]).toEqual({value: ' foo ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[2]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[2]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenizes comments inside constant definitions", function() {
@@ -2311,7 +2304,7 @@ gulp.src("./*.js")
       expect(tokens[2]).toEqual({value: 'a', scopes: ['source.js', 'constant.other.js']});
       expect(tokens[3]).toEqual({value: ',', scopes: ['source.js', 'meta.delimiter.object.comma.js']});
       expect(tokens[5]).toEqual({value: '//', scopes: ['source.js', 'comment.line.double-slash.js', 'punctuation.definition.comment.js']});
-      return expect(tokens[6]).toEqual({value: ' comment', scopes: ['source.js', 'comment.line.double-slash.js']});
+      expect(tokens[6]).toEqual({value: ' comment', scopes: ['source.js', 'comment.line.double-slash.js']});
   });
 
     it("tokenizes comments inside function declarations", function() {
@@ -2359,14 +2352,14 @@ x  =>
       expect(lines[0][2]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
       expect(lines[1][1]).toEqual({value: '//', scopes: ['source.js', 'comment.line.double-slash.js', 'punctuation.definition.comment.js']});
       expect(lines[1][2]).toEqual({value: ' comment', scopes: ['source.js', 'comment.line.double-slash.js']});
-      return expect(lines[2][0]).toEqual({value: '{', scopes: ['source.js', 'punctuation.definition.function.body.begin.bracket.curly.js']});
+      expect(lines[2][0]).toEqual({value: '{', scopes: ['source.js', 'punctuation.definition.function.body.begin.bracket.curly.js']});
   });
 
-    return it("tokenizes comments inside function parameters correctly", function() {
+    it("tokenizes comments inside function parameters correctly", function() {
       const {tokens} = grammar.tokenizeLine('function test(p1 /*, p2 */) {}');
       expect(tokens[6]).toEqual({value: '/*', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'comment.block.js', 'punctuation.definition.comment.begin.js']});
       expect(tokens[7]).toEqual({value: ', p2 ', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'comment.block.js']});
-      return expect(tokens[8]).toEqual({value: '*/', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[8]).toEqual({value: '*/', scopes: ['source.js', 'meta.function.js', 'meta.parameters.js', 'comment.block.js', 'punctuation.definition.comment.end.js']});
   });
 });
 
@@ -2380,7 +2373,7 @@ x  =>
       expect(tokens[0]).not.toEqual({value: 'console', scopes: ['source.js', 'entity.name.type.object.console.js']});
 
       ({tokens} = grammar.tokenizeLine('$console'));
-      return expect(tokens[1]).not.toEqual({value: 'console', scopes: ['source.js', 'entity.name.type.object.console.js']});
+      expect(tokens[1]).not.toEqual({value: 'console', scopes: ['source.js', 'entity.name.type.object.console.js']});
   });
 
     it("tokenizes console support functions", function() {
@@ -2419,10 +2412,10 @@ console
       expect(tokens[4]).toEqual({value: 'log', scopes: ['source.js', 'meta.method-call.js', 'support.function.console.js']});
       expect(tokens[5]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(tokens[6]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(tokens[7]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[7]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
-    return it("tokenizes console custom functions", function() {
+    it("tokenizes console custom functions", function() {
       let {tokens} = grammar.tokenizeLine('console.foo();');
       expect(tokens[0]).toEqual({value: 'console', scopes: ['source.js', 'entity.name.type.object.console.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
@@ -2432,7 +2425,7 @@ console
       expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
 
       ({tokens} = grammar.tokenizeLine('console .foo();'));
-      return expect(tokens[3]).toEqual({value: 'foo', scopes: ['source.js', 'meta.method-call.js', 'entity.name.function.js']});
+      expect(tokens[3]).toEqual({value: 'foo', scopes: ['source.js', 'meta.method-call.js', 'entity.name.function.js']});
   });
 });
 
@@ -2440,7 +2433,7 @@ console
     it("tokenizes the json object", function() {
       const {tokens} = grammar.tokenizeLine('JSON;');
       expect(tokens[0]).toEqual({value: 'JSON', scopes: ['source.js', 'support.class.json.js']});
-      return expect(tokens[1]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[1]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
     it("tokenizes json support functions", function() {
@@ -2462,17 +2455,17 @@ JSON
       expect(lines[1][1]).toEqual({value: 'parse', scopes: ['source.js', 'meta.method-call.js', 'support.function.json.js']});
       expect(lines[1][2]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(lines[1][3]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(lines[1][4]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(lines[1][4]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
-    return it("tokenizes json custom functions", function() {
+    it("tokenizes json custom functions", function() {
       const {tokens} = grammar.tokenizeLine('JSON.pi();');
       expect(tokens[0]).toEqual({value: 'JSON', scopes: ['source.js', 'support.class.json.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
       expect(tokens[2]).toEqual({value: 'pi', scopes: ['source.js', 'meta.method-call.js', 'entity.name.function.js']});
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(tokens[4]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 });
 
@@ -2480,7 +2473,7 @@ JSON
     it("tokenizes the math object", function() {
       const {tokens} = grammar.tokenizeLine('Math;');
       expect(tokens[0]).toEqual({value: 'Math', scopes: ['source.js', 'support.class.math.js']});
-      return expect(tokens[1]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[1]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
     it("tokenizes math support functions/properties", function() {
@@ -2508,17 +2501,17 @@ Math
       expect(tokens[0]).toEqual({value: 'Math', scopes: ['source.js', 'support.class.math.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.delimiter.property.period.js']});
       expect(tokens[2]).toEqual({value: 'PI', scopes: ['source.js', 'support.constant.property.math.js']});
-      return expect(tokens[3]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[3]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
-    return it("tokenizes math custom functions", function() {
+    it("tokenizes math custom functions", function() {
       const {tokens} = grammar.tokenizeLine('Math.PI();');
       expect(tokens[0]).toEqual({value: 'Math', scopes: ['source.js', 'support.class.math.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
       expect(tokens[2]).toEqual({value: 'PI', scopes: ['source.js', 'meta.method-call.js', 'entity.name.function.js']});
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(tokens[4]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 });
 
@@ -2526,7 +2519,7 @@ Math
     it("tokenizes the promise object", function() {
       const {tokens} = grammar.tokenizeLine('Promise;');
       expect(tokens[0]).toEqual({value: 'Promise', scopes: ['source.js', 'support.class.promise.js']});
-      return expect(tokens[1]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[1]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
     it("tokenizes promise support functions", function() {
@@ -2548,17 +2541,17 @@ Promise
       expect(lines[1][1]).toEqual({value: 'resolve', scopes: ['source.js', 'meta.method-call.js', 'support.function.promise.js']});
       expect(lines[1][2]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(lines[1][3]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(lines[1][4]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(lines[1][4]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 
-    return it("tokenizes promise custom functions", function() {
+    it("tokenizes promise custom functions", function() {
       const {tokens} = grammar.tokenizeLine('Promise.anExtraFunction();');
       expect(tokens[0]).toEqual({value: 'Promise', scopes: ['source.js', 'support.class.promise.js']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.js', 'meta.method-call.js', 'meta.delimiter.method.period.js']});
       expect(tokens[2]).toEqual({value: 'anExtraFunction', scopes: ['source.js', 'meta.method-call.js', 'entity.name.function.js']});
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.begin.bracket.round.js']});
       expect(tokens[4]).toEqual({value: ')', scopes: ['source.js', 'meta.method-call.js', 'meta.arguments.js', 'punctuation.definition.arguments.end.bracket.round.js']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 });
 
@@ -2569,7 +2562,7 @@ Promise
       it(`tokenizes the ${keyword} keyword when it is an object key`, function() {
         const {tokens} = grammar.tokenizeLine(`${keyword}: 1`);
         expect(tokens[0]).toEqual({value: keyword, scopes: ['source.js']});
-        return expect(tokens[1]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
+        expect(tokens[1]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
     });
     }
 
@@ -2590,19 +2583,19 @@ Promise
       expect(tokens[0]).toEqual({value: '"', scopes: ['source.js', 'string.quoted.double.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[1]).toEqual({value: 'key', scopes: ['source.js', 'string.quoted.double.js']});
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.js', 'string.quoted.double.js', 'punctuation.definition.string.end.js']});
-      return expect(tokens[3]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
+      expect(tokens[3]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
   });
 
     it("tokenizes numbers when they are object keys", function() {
       const {tokens} = grammar.tokenizeLine('123: 1');
       expect(tokens[0]).toEqual({value: '123', scopes: ['source.js', 'constant.numeric.decimal.js']});
-      return expect(tokens[1]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
+      expect(tokens[1]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
   });
 
-    return it("tokenizes constants when they are object keys", function() {
+    it("tokenizes constants when they are object keys", function() {
       const {tokens} = grammar.tokenizeLine('FOO: 1');
       expect(tokens[0]).toEqual({value: 'FOO', scopes: ['source.js', 'constant.other.js']});
-      return expect(tokens[1]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
+      expect(tokens[1]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.assignment.js']});
   });
 });
 
@@ -2623,24 +2616,24 @@ Promise
       (function(keyword, scope) {
         it(`tokenizes \`${keyword}\` in the middle of ternary expressions`, function() {
           const {tokens} = grammar.tokenizeLine(`a ? ${keyword} : b`);
-          return expect(tokens[3]).toEqual({value: keyword, scopes: ['source.js', scope]});
+          expect(tokens[3]).toEqual({value: keyword, scopes: ['source.js', scope]});
       });
 
-        return it(`tokenizes \`${keyword}\` at the end of ternary expressions`, function() {
+        it(`tokenizes \`${keyword}\` at the end of ternary expressions`, function() {
           const {tokens} = grammar.tokenizeLine(`a ? b : ${keyword}`);
-          return expect(tokens[7]).toEqual({value: keyword, scopes: ['source.js', scope]});
+          expect(tokens[7]).toEqual({value: keyword, scopes: ['source.js', scope]});
       });
       })(keyword, scope);
     }
 
     it("tokenizes yield at the end of ternary expressions", function() {
       const {tokens} = grammar.tokenizeLine('a ? b : yield');
-      return expect(tokens[7]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
+      expect(tokens[7]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
   });
 
     it("tokenizes yield in the middle of ternary expressions", function() {
       const {tokens} = grammar.tokenizeLine('a ? yield : b');
-      return expect(tokens[3]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
+      expect(tokens[3]).toEqual({value: 'yield', scopes: ['source.js', 'meta.control.yield.js', 'keyword.control.js']});
   });
 
     it("tokenizes regular expressions inside ternary expressions", function() {
@@ -2656,16 +2649,16 @@ Promise
       expect(tokens[8]).toEqual({value: ' ', scopes: ['source.js', 'string.regexp.js']});
       expect(tokens[9]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.begin.js']});
       expect(tokens[10]).toEqual({value: 'c', scopes: ['source.js', 'string.regexp.js']});
-      return expect(tokens[11]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
+      expect(tokens[11]).toEqual({value: '/', scopes: ['source.js', 'string.regexp.js', 'punctuation.definition.string.end.js']});
   });
 
     it("tokenizes object literals in the middle of ternary expressions", function() {
       const {tokens} = grammar.tokenizeLine('a ? {key: value} : b');
       expect(tokens[1]).toEqual({value: '?', scopes: ['source.js', 'keyword.operator.ternary.js']});
-      return expect(tokens[9]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.ternary.js']});
+      expect(tokens[9]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.ternary.js']});
   });
 
-    return it("tokenizes arrow functions inside ternary expressions", function() {
+    it("tokenizes arrow functions inside ternary expressions", function() {
       let {tokens} = grammar.tokenizeLine('result = condition ? something : (a, b) => a + b');
       expect(tokens[3]).toEqual({value: '?', scopes: ['source.js', 'keyword.operator.ternary.js']});
       expect(tokens[7]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.ternary.js']});
@@ -2674,14 +2667,14 @@ Promise
       ({tokens} = grammar.tokenizeLine('result = condition ? (a, b) => a + b : something'));
       expect(tokens[3]).toEqual({value: '?', scopes: ['source.js', 'keyword.operator.ternary.js']});
       expect(tokens[12]).toEqual({value: '=>', scopes: ['source.js', 'meta.function.arrow.js', 'storage.type.function.arrow.js']});
-      return expect(tokens[18]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.ternary.js']});
+      expect(tokens[18]).toEqual({value: ':', scopes: ['source.js', 'keyword.operator.ternary.js']});
   });
 });
 
   describe("switch statements", function() {
     it("tokenizes the switch keyword", function() {
       const {tokens} = grammar.tokenizeLine('switch(){}');
-      return expect(tokens[0]).toEqual({value: 'switch', scopes: ['source.js', 'meta.switch-statement.js', 'keyword.control.switch.js']});
+      expect(tokens[0]).toEqual({value: 'switch', scopes: ['source.js', 'meta.switch-statement.js', 'keyword.control.switch.js']});
   });
 
     it("tokenizes switch expression", function() {
@@ -2690,10 +2683,10 @@ Promise
       expect(tokens[2]).toEqual({value: 'foo ', scopes: ['source.js', 'meta.switch-statement.js']});
       expect(tokens[3]).toEqual({value: '+', scopes: ['source.js', 'meta.switch-statement.js', 'keyword.operator.js']});
       expect(tokens[4]).toEqual({value: ' bar', scopes: ['source.js', 'meta.switch-statement.js']});
-      return expect(tokens[5]).toEqual({value: ')', scopes: ['source.js', 'meta.switch-statement.js', 'punctuation.definition.switch-expression.end.bracket.round.js']});
+      expect(tokens[5]).toEqual({value: ')', scopes: ['source.js', 'meta.switch-statement.js', 'punctuation.definition.switch-expression.end.bracket.round.js']});
   });
 
-    return it("tokenizes switch block", function() {
+    it("tokenizes switch block", function() {
       const lines = grammar.tokenizeLines(`\
 switch (foo())
 {
@@ -2725,7 +2718,7 @@ switch (foo())
       expect(lines[6][4]).toEqual({value: ':', scopes: ['source.js', 'meta.switch-statement.js', 'punctuation.definition.section.case-statement.js']});
       expect(lines[7][1]).toEqual({value: 'default', scopes: ['source.js', 'meta.switch-statement.js', 'keyword.control.default.js']});
       expect(lines[7][2]).toEqual({value: ':', scopes: ['source.js', 'meta.switch-statement.js', 'punctuation.definition.section.case-statement.js']});
-      return expect(lines[8][0]).toEqual({value: '}', scopes: ['source.js', 'meta.switch-statement.js', 'punctuation.definition.section.switch-block.end.bracket.curly.js']});
+      expect(lines[8][0]).toEqual({value: '}', scopes: ['source.js', 'meta.switch-statement.js', 'punctuation.definition.section.switch-block.end.bracket.curly.js']});
   });
 });
 
@@ -2756,74 +2749,74 @@ switch (foo())
     it("indents allman-style curly braces", () => expectPreservedIndentation(`\
 if (true)
 {
-for (;;)
-{
-  while (true)
+  for (;;)
   {
-    x();
+    while (true)
+    {
+      x();
+    }
   }
-}
 }
 else
 {
-do
-{
-  y();
-} while (true);
+  do
+  {
+    y();
+  } while (true);
 }\
 `
     ));
 
     it("indents non-allman-style curly braces", () => expectPreservedIndentation(`\
 if (true) {
-for (;;) { // "
-  while (true) {
-    x();
+  for (;;) { // "
+    while (true) {
+      x();
+    }
   }
-}
 } else {
-do {
-  y();
-} while (true);
+  do {
+    y();
+  } while (true);
 }\
 `
     ));
 
     it("doesn't indent case statements, because it wouldn't know when to outdent", () => expectPreservedIndentation(`\
 switch (e) {
-case 5:
-something();
-case 6:
-somethingElse();
+  case 5:
+  something();
+  case 6:
+  somethingElse();
 }\
 `
     ));
 
     it("indents collection literals", () => expectPreservedIndentation(`\
 [ // "
-{
-  a: b,
-  c: d
-},
-e,
-f
+  {
+    a: b,
+    c: d
+  },
+  e,
+  f
 ]\
 `
     ));
 
-    return it("indents function arguments", () => expectPreservedIndentation(`\
+    it("indents function arguments", () => expectPreservedIndentation(`\
 f(
-g( // "
-  h,
-  i
-),
-j
+  g( // "
+    h,
+    i
+  ),
+  j
 );\
 `
     ));
   });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -2907,7 +2900,7 @@ j
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=javascript:

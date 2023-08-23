@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("JSDoc grammar", function() {
   let grammar = null;
 
@@ -12,7 +8,7 @@ describe("JSDoc grammar", function() {
 
     waitsForPromise(() => atom.packages.activatePackage("language-javascript"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.js"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.js"));
   });
 
   describe("inline tags", function() {
@@ -26,7 +22,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[6]).toEqual({value: 'target', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'variable.other.description.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[8]).toEqual({value: ' text ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[9]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[9]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises tags with an embedded trailing description", function() {
@@ -51,7 +47,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[6]).toEqual({value: 'target', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'variable.other.description.jsdoc']});
       expect(tokens[7]).toEqual({value: ' Description text', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[8]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
-      return expect(tokens[10]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[10]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises tags with a preceding description", function() {
@@ -81,7 +77,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[10]).toEqual({value: '|', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.separator.pipe.jsdoc']});
       expect(tokens[11]).toEqual({value: 'Description', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[12]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
-      return expect(tokens[14]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[14]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises inline tags which follow block tags", function() {
@@ -131,10 +127,10 @@ describe("JSDoc grammar", function() {
       expect(tokens[18]).toEqual({value: 'example', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'variable.other.description.jsdoc']});
       expect(tokens[19]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[20]).toEqual({value: '. ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[21]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[21]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
-    return it("tokenises inline tags within default @param values", function() {
+    it("tokenises inline tags within default @param values", function() {
       const {tokens} = grammar.tokenizeLine('/** @param {EntityType} [typeHint={@link EntityType.FILE}] */');
       expect(tokens[0]).toEqual({value: '/**', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.begin.js']});
       expect(tokens[2]).toEqual({value: '@', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc', 'punctuation.definition.block.tag.jsdoc']});
@@ -151,7 +147,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[16]).toEqual({value: 'EntityType.FILE', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'entity.name.type.instance.jsdoc', 'variable.other.description.jsdoc']});
       expect(tokens[17]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[18]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-      return expect(tokens[20]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[20]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 });
 
@@ -172,7 +168,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[5]).toEqual({value: '@', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc', 'punctuation.definition.block.tag.jsdoc']});
       expect(tokens[6]).toEqual({value: 'static', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc']});
       expect(tokens[7]).toEqual({value: ' ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[8]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[8]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @see tags with basic links", function() {
@@ -192,7 +188,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[4]).toEqual({value: ' ', scopes: ['source.js', 'comment.block.documentation.js']});
       expect(tokens[5]).toEqual({value: 'http://atom.io/', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.link.underline.jsdoc']});
       expect(tokens[6]).toEqual({value: ' ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[7]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[7]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @see tags with {@link} tags", function() {
@@ -219,7 +215,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[8]).toEqual({value: 'link', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'storage.type.class.jsdoc']});
       expect(tokens[10]).toEqual({value: 'name#path', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'variable.other.description.jsdoc']});
       expect(tokens[11]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
-      return expect(tokens[13]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[13]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises tags with type expressions", function() {
@@ -239,7 +235,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[3]).toEqual({value: 'define', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc']});
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.begin.jsdoc']});
       expect(tokens[6]).toEqual({value: 'object', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
-      return expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
+      expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
   });
 
     it("tokenises unnamed @param tags", function() {
@@ -252,7 +248,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[6]).toEqual({value: 'object', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[8]).toEqual({value: ' ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[9]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[9]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @param tags", function() {
@@ -264,7 +260,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[6]).toEqual({value: 'object', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
-      return expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @param tags with a description", function() {
@@ -321,7 +317,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[9]).toEqual({value: '$variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
       expect(tokens[10]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @param tags marked optional", function() {
@@ -343,7 +339,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[9]).toEqual({value: '[', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.begin.bracket.square.jsdoc']});
       expect(tokens[10]).toEqual({value: ' variable ', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
       expect(tokens[11]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-      return expect(tokens[12]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
+      expect(tokens[12]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
   });
 
     describe("default @param values", function() {
@@ -394,7 +390,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[13]).toEqual({value: '.', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.delimiter.property.period.js']});
         expect(tokens[14]).toEqual({value: 'value', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'support.variable.property.dom.js']});
         expect(tokens[15]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-        return expect(tokens[16]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
+        expect(tokens[16]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
     });
 
       it("tokenises quoted values", function() {
@@ -474,7 +470,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[14]).toEqual({value: ' default value ', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'string.quoted.single.js']});
         expect(tokens[15]).toEqual({value: '\'', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'string.quoted.single.js', 'punctuation.definition.string.end.js']});
         expect(tokens[17]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-        return expect(tokens[18]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
+        expect(tokens[18]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
     });
 
       it("tokenises object literals", function() {
@@ -534,7 +530,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[13]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.brace.curly.js']});
         expect(tokens[15]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.brace.curly.js']});
         expect(tokens[17]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-        return expect(tokens[18]).toEqual({value: ' - Empty object ', scopes: ['source.js', 'comment.block.documentation.js']});
+        expect(tokens[18]).toEqual({value: ' - Empty object ', scopes: ['source.js', 'comment.block.documentation.js']});
     });
 
       it("tokenises arrays", function() {
@@ -594,7 +590,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[13]).toEqual({value: '[', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.brace.square.js']});
         expect(tokens[15]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.brace.square.js']});
         expect(tokens[17]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-        return expect(tokens[18]).toEqual({value: ' - Empty array ', scopes: ['source.js', 'comment.block.documentation.js']});
+        expect(tokens[18]).toEqual({value: ' - Empty array ', scopes: ['source.js', 'comment.block.documentation.js']});
     });
 
       it("tokenizes arrays inside object literals", function() {
@@ -630,7 +626,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[35]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.brace.curly.js']});
         expect(tokens[36]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
         expect(tokens[37]).toEqual({value: ' [Not Highlighted] [] [] [] ', scopes: ['source.js', 'comment.block.documentation.js']});
-        return expect(tokens[38]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+        expect(tokens[38]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
     });
 
       it("flags any description text touching the closing bracket", function() {
@@ -667,7 +663,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[36]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
         expect(tokens[37]).toEqual({value: '[Bad', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'invalid.illegal.syntax.jsdoc']});
         expect(tokens[38]).toEqual({value: ' Description] [] [] [] ', scopes: ['source.js', 'comment.block.documentation.js']});
-        return expect(tokens[39]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+        expect(tokens[39]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
     });
 
       it("does not tokenise arrays inside strings", function() {
@@ -716,10 +712,10 @@ describe("JSDoc grammar", function() {
         expect(tokens[15]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
         expect(tokens[16]).toEqual({value: '[Bad_Unquoted', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'invalid.illegal.syntax.jsdoc']});
         expect(tokens[17]).toEqual({value: ' Description] ', scopes: ['source.js', 'comment.block.documentation.js']});
-        return expect(tokens[18]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+        expect(tokens[18]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
     });
 
-      return it("tokenises escape sequences inside strings", function() {
+      it("tokenises escape sequences inside strings", function() {
         let {tokens} = grammar.tokenizeLine('/** @param {String} [key="a[\\"]z"] */');
         expect(tokens[0]).toEqual({value: '/**', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.begin.js']});
         expect(tokens[2]).toEqual({value: '@', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc', 'punctuation.definition.block.tag.jsdoc']});
@@ -754,7 +750,7 @@ describe("JSDoc grammar", function() {
         expect(tokens[15]).toEqual({value: ']z', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'string.quoted.single.js']});
         expect(tokens[16]).toEqual({value: '\'', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'string.quoted.single.js', 'punctuation.definition.string.end.js']});
         expect(tokens[17]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-        return expect(tokens[19]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+        expect(tokens[19]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
     });
   });
 
@@ -818,7 +814,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[13]).toEqual({value: 'default value', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js']});
       expect(tokens[14]).toEqual({value: ' ', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
       expect(tokens[15]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'punctuation.definition.optional-value.end.bracket.square.jsdoc']});
-      return expect(tokens[16]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
+      expect(tokens[16]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
   });
 
     it("tokenises @param tags with wildcard types", function() {
@@ -833,7 +829,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[6]).toEqual({value: '?', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
-      return expect(tokens[10]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
+      expect(tokens[10]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
   });
 
     it("tokenises @param tags with qualified types", function() {
@@ -857,7 +853,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
       expect(tokens[10]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @param tags with multiple types", function() {
@@ -919,7 +915,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[9]).toEqual({value: ')', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[10]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[12]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
-      return expect(tokens[13]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
+      expect(tokens[13]).toEqual({value: ' this is the description ', scopes: ['source.js', 'comment.block.documentation.js']});
   });
 
     it("tokenises @param tags marked nullable or non-nullable", function() {
@@ -937,7 +933,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.begin.jsdoc']});
       expect(tokens[6]).toEqual({value: '!number', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
-      return expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
+      expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
   });
 
     it("tokenises @param tags marked as variable-length", function() {
@@ -966,7 +962,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[6]).toEqual({value: '...?', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[9]).toEqual({value: 'remainder', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
-      return expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[11]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @param tags using Google Closure Compiler syntax", function() {
@@ -1179,7 +1175,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.begin.jsdoc']});
       expect(tokens[6]).toEqual({value: 'function(string) : number', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
-      return expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
+      expect(tokens[9]).toEqual({value: 'variable', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc']});
   });
 
     it("tokenises @return tags without descriptions", function() {
@@ -1199,7 +1195,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.begin.jsdoc']});
       expect(tokens[6]).toEqual({value: 'object', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
-      return expect(tokens[9]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[9]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
     it("tokenises @return tags with trailing descriptions", function() {
@@ -1229,7 +1225,7 @@ describe("JSDoc grammar", function() {
       expect(tokens[3]).toEqual({value: 'returns', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc']});
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.begin.jsdoc']});
       expect(tokens[6]).toEqual({value: '(Something)', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
-      return expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
+      expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
   });
 
     it("tokenises @return tags with multiple types", function() {
@@ -1253,10 +1249,10 @@ describe("JSDoc grammar", function() {
       expect(tokens[12]).toEqual({value: ')', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(tokens[13]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(tokens[15]).toEqual({value: 'Description', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(tokens[17]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(tokens[17]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
-    return it("tokenises function-type @return tags", function() {
+    it("tokenises function-type @return tags", function() {
       let {tokens} = grammar.tokenizeLine('/** @return {function()} this is the description */');
       expect(tokens[2]).toEqual({value: '@', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc', 'punctuation.definition.block.tag.jsdoc']});
       expect(tokens[3]).toEqual({value: 'return', scopes: ['source.js', 'comment.block.documentation.js', 'storage.type.class.jsdoc']});
@@ -1333,7 +1329,7 @@ describe("JSDoc grammar", function() {
       ({tokens} = grammar.tokenizeLine('/** @return {function(string) : number} this is the description */'));
       expect(tokens[5]).toEqual({value: '{', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.begin.jsdoc']});
       expect(tokens[6]).toEqual({value: 'function(string) : number', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
-      return expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
+      expect(tokens[7]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
   });
 });
 
@@ -1414,10 +1410,10 @@ describe("JSDoc grammar", function() {
       expect(lines[3][3]).toEqual({value: '+', scopes: ['source.js', 'comment.block.documentation.js', 'meta.example.jsdoc', 'source.embedded.js', 'keyword.operator.js']});
       expect(lines[3][5]).toEqual({value: '50', scopes: ['source.js', 'comment.block.documentation.js', 'meta.example.jsdoc', 'source.embedded.js', 'constant.numeric.decimal.js']});
       expect(lines[3][6]).toEqual({value: ';', scopes: ['source.js', 'comment.block.documentation.js', 'meta.example.jsdoc', 'source.embedded.js', 'punctuation.terminator.statement.js']});
-      return expect(lines[4][1]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(lines[4][1]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 
-    return it("tokenises <caption> tags at the start of an example block", function() {
+    it("tokenises <caption> tags at the start of an example block", function() {
       const {tokens} = grammar.tokenizeLine('/** @example <caption>Text</caption> */');
       expect(tokens[0]).toEqual({value: '/**', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.begin.js']});
       expect(tokens[2]).toEqual({value: '@', scopes: ['source.js', 'comment.block.documentation.js', 'meta.example.jsdoc', 'storage.type.class.jsdoc', 'punctuation.definition.block.tag.jsdoc']});
@@ -1465,7 +1461,7 @@ describe("JSDoc grammar", function() {
       expect(lines[3][5]).toEqual({value: 'String', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc']});
       expect(lines[3][6]).toEqual({value: '}', scopes: ['source.js', 'comment.block.documentation.js', 'entity.name.type.instance.jsdoc', 'punctuation.definition.bracket.curly.end.jsdoc']});
       expect(lines[3][7]).toEqual({value: '', scopes: ['source.js', 'comment.block.documentation.js']});
-      return expect(lines[4][1]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
+      expect(lines[4][1]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
   });
 });
 
@@ -1516,10 +1512,10 @@ describe("JSDoc grammar", function() {
       expect(tokens[7]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
       expect(tokens[8]).toEqual({value: 'oo', scopes: ['source.js']});
       expect(tokens[9]).toEqual({value: '"', scopes: ['source.js', 'string.quoted.double.js', 'punctuation.definition.string.begin.js']});
-      return expect(tokens[10]).toEqual({value: '} bar', scopes: ['source.js', 'string.quoted.double.js']});
+      expect(tokens[10]).toEqual({value: '} bar', scopes: ['source.js', 'string.quoted.double.js']});
   });
 
-    return it("terminates any embedded JavaScript code", function() {
+    it("terminates any embedded JavaScript code", function() {
       const lines = grammar.tokenizeLines(`\
 /**
  * @example
@@ -1577,13 +1573,13 @@ describe("JSDoc grammar", function() {
       expect(tokens[25]).toEqual({value: ']', scopes: ['source.js', 'comment.block.documentation.js', 'variable.other.jsdoc', 'source.embedded.js', 'meta.brace.square.js']});
       expect(tokens[27]).toEqual({value: '*/', scopes: ['source.js', 'comment.block.documentation.js', 'punctuation.definition.comment.end.js']});
       expect(tokens[29]).toEqual({value: '20', scopes: ['source.js', 'constant.numeric.decimal.js']});
-      return expect(tokens[30]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
+      expect(tokens[30]).toEqual({value: ';', scopes: ['source.js', 'punctuation.terminator.statement.js']});
   });
 });
 
-  return describe("when the line ends without a closing bracket", () => it("does not attempt to match the optional value (regression)", function() {
+  describe("when the line ends without a closing bracket", () => it("does not attempt to match the optional value (regression)", function() {
     const {tokens} = grammar.tokenizeLine('/** @param {array} [bar = "x" REMOVE THE CLOSE BRACKET HERE.');
     expect(tokens[9]).toEqual({value: '[', scopes: ['source.js', 'comment.block.documentation.js']});
-    return expect(tokens[11]).toEqual({value: ' = "x" REMOVE THE CLOSE BRACKET HERE.', scopes: ['source.js', 'comment.block.documentation.js']});
+    expect(tokens[11]).toEqual({value: ' = "x" REMOVE THE CLOSE BRACKET HERE.', scopes: ['source.js', 'comment.block.documentation.js']});
 }));
 });
