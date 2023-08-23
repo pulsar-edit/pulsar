@@ -1,10 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const path = require('path');
 const grammarTest = require('atom-grammar-test');
 
@@ -17,12 +11,12 @@ describe('TextMate HTML grammar', function() {
 
     waitsForPromise(() => atom.packages.activatePackage('language-html'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('text.html.basic'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('text.html.basic'));
   });
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('text.html.basic');
+    expect(grammar.scopeName).toBe('text.html.basic');
   });
 
   describe('style tags', function() {
@@ -50,7 +44,7 @@ describe('TextMate HTML grammar', function() {
       expect(lines[0][14]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(lines[1][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(lines[1][1]).toEqual({value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']});
-      return expect(lines[1][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
+      expect(lines[1][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes multiline tag attributes', function() {
@@ -74,7 +68,7 @@ describe('TextMate HTML grammar', function() {
       expect(lines[2][0]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(lines[3][1]).toEqual({value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']});
-      return expect(lines[3][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
+      expect(lines[3][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes the content inside the tag as CSS', function() {
@@ -88,10 +82,10 @@ describe('TextMate HTML grammar', function() {
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(lines[1][0]).toEqual({value: '  ', scopes: ['text.html.basic', 'meta.tag.style.html', 'source.css.embedded.html']});
       expect(lines[1][1]).toEqual({value: 'span', scopes: ['text.html.basic', 'meta.tag.style.html', 'source.css.embedded.html', 'meta.selector.css', 'entity.name.tag.css']});
-      return expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
+      expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
   });
 
-    return it('tokenizes multiline tags', function() {
+    it('tokenizes multiline tags', function() {
       const lines = grammar.tokenizeLines(`\
 <style
  class="very-classy">
@@ -102,7 +96,7 @@ describe('TextMate HTML grammar', function() {
 
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(lines[2][1]).toEqual({value: 'span', scopes: ['text.html.basic', 'meta.tag.style.html', 'source.css.embedded.html', 'meta.selector.css', 'entity.name.tag.css']});
-      return expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
+      expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
   });
 });
 
@@ -129,10 +123,10 @@ describe('TextMate HTML grammar', function() {
       expect(lines[0][14]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[1][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[1][1]).toEqual({value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']});
-      return expect(lines[1][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[1][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
-    return it('tokenizes multiline tag attributes', function() {
+    it('tokenizes multiline tag attributes', function() {
       const lines = grammar.tokenizeLines(`\
 <script id="id" type="text/html"
  class="very-classy"
@@ -158,7 +152,7 @@ describe('TextMate HTML grammar', function() {
       expect(lines[2][0]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[3][1]).toEqual({value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']});
-      return expect(lines[3][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[3][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 });
 
@@ -174,10 +168,10 @@ describe('TextMate HTML grammar', function() {
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[1][0]).toEqual({value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html']});
       expect(lines[1][1]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html', 'meta.tag.block.div.html', 'punctuation.definition.tag.begin.html']});
-      return expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
-    return it('tokenizes multiline tags', function() {
+    it('tokenizes multiline tags', function() {
       const lines = grammar.tokenizeLines(`\
 <script id='id' type='text/template'
  class='very-classy'>
@@ -188,7 +182,7 @@ describe('TextMate HTML grammar', function() {
 
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[2][1]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'text.embedded.html', 'meta.tag.block.div.html', 'punctuation.definition.tag.begin.html']});
-      return expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 });
 
@@ -207,7 +201,7 @@ describe('TextMate HTML grammar', function() {
       expect(lines[1][0]).toEqual({value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html']});
 
       expect(lines[1][1]).toEqual({value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']});
-      return expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes multiline tags', function() {
@@ -222,10 +216,10 @@ describe('TextMate HTML grammar', function() {
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
 
       expect(lines[2][1]).toEqual({value: '->', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'meta.function.inline.coffee', 'storage.type.function.coffee']});
-      return expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
-    return it('recognizes closing script tags in comments', function() {
+    it('recognizes closing script tags in comments', function() {
       let lines = grammar.tokenizeLines(`\
 <script id='id' type='text/coffeescript'>
   # comment </script>\
@@ -245,7 +239,7 @@ describe('TextMate HTML grammar', function() {
 
       expect(lines[1][1]).toEqual({value: '###', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'comment.block.coffee', 'punctuation.definition.comment.coffee']});
       expect(lines[2][0]).toEqual({value: '  comment ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.coffee.embedded.html', 'comment.block.coffee']});
-      return expect(lines[2][1]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[2][1]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 });
 
@@ -263,7 +257,7 @@ describe('TextMate HTML grammar', function() {
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[1][0]).toEqual({value: '  ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html']});
       expect(lines[1][1]).toEqual({value: 'var', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'storage.type.var.js']});
-      return expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[2][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes multiline tags', function() {
@@ -277,10 +271,10 @@ describe('TextMate HTML grammar', function() {
 
       expect(lines[0][0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[2][1]).toEqual({value: 'var', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'storage.type.var.js']});
-      return expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[3][0]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
-    return it('recognizes closing script tags in comments', function() {
+    it('recognizes closing script tags in comments', function() {
       let lines = grammar.tokenizeLines(`\
 <script id='id' type='text/javascript'>
   // comment </script>\
@@ -300,7 +294,7 @@ describe('TextMate HTML grammar', function() {
 
       expect(lines[1][1]).toEqual({value: '/*', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'comment.block.js', 'punctuation.definition.comment.begin.js']});
       expect(lines[2][0]).toEqual({value: '  comment ', scopes: ['text.html.basic', 'meta.tag.script.html', 'source.js.embedded.html', 'comment.block.js']});
-      return expect(lines[2][1]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[2][1]).toEqual({value: '</', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 });
 
@@ -317,7 +311,7 @@ describe('TextMate HTML grammar', function() {
     expect(tokens[1]).toEqual({value: ' ', scopes: ['text.html.basic', 'comment.block.html']});
     expect(tokens[2]).toEqual({value: '--', scopes: ['text.html.basic', 'comment.block.html', 'invalid.illegal.bad-comments-or-CDATA.html']});
     expect(tokens[3]).toEqual({value: ' ', scopes: ['text.html.basic', 'comment.block.html']});
-    return expect(tokens[4]).toEqual({value: '-->', scopes: ['text.html.basic', 'comment.block.html', 'punctuation.definition.comment.html']});
+    expect(tokens[4]).toEqual({value: '-->', scopes: ['text.html.basic', 'comment.block.html', 'punctuation.definition.comment.html']});
 }));
 
   grammarTest(path.join(__dirname, 'fixtures/syntax_test_html.html'));
@@ -341,7 +335,7 @@ describe('TextMate HTML grammar', function() {
       expect(tokens[5]).toEqual({value: "'", scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.single.html', 'punctuation.definition.string.begin.html']});
       expect(tokens[6]).toEqual({value: 'foo', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.single.html']});
       expect(tokens[7]).toEqual({value: "'", scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.single.html', 'punctuation.definition.string.end.html']});
-      return expect(tokens[8]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[8]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('recognizes a single attribute with spaces around the equals sign', function() {
@@ -374,7 +368,7 @@ describe('TextMate HTML grammar', function() {
       expect(tokens[7]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']});
       expect(tokens[8]).toEqual({value: 'foo', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html']});
       expect(tokens[9]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']});
-      return expect(tokens[10]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[10]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('recognizes a single attribute with an unquoted value', function() {
@@ -383,14 +377,14 @@ describe('TextMate HTML grammar', function() {
       expect(tokens[3]).toEqual({value: 'class', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'entity.other.attribute-name.class.html']});
       expect(tokens[4]).toEqual({value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'punctuation.separator.key-value.html']});
       expect(tokens[5]).toEqual({value: 'foo-3+5@', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.unquoted.html']});
-      return expect(tokens[6]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[6]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('recognizes a single attribute with no value', function() {
       const {tokens} = grammar.tokenizeLine('<span class>');
 
       expect(tokens[3]).toEqual({value: 'class', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']});
-      return expect(tokens[4]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[4]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('recognizes multiple attributes with varying values', function() {
@@ -407,7 +401,7 @@ describe('TextMate HTML grammar', function() {
       expect(tokens[11]).toEqual({value: 'spellcheck', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.html', 'entity.other.attribute-name.html']});
       expect(tokens[12]).toEqual({value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.html', 'punctuation.separator.key-value.html']});
       expect(tokens[13]).toEqual({value: 'true', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.html', 'string.unquoted.html']});
-      return expect(tokens[14]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[14]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('recognizes attributes that are not on the same line as the tag name', function() {
@@ -422,7 +416,7 @@ describe('TextMate HTML grammar', function() {
       expect(lines[1][2]).toEqual({value: '=', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'punctuation.separator.key-value.html']});
       expect(lines[1][5]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.class.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']});
       expect(lines[2][1]).toEqual({value: 'disabled', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']});
-      return expect(lines[2][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(lines[2][2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('tokenizes only one attribute value in a row', function() {
@@ -435,10 +429,10 @@ describe('TextMate HTML grammar', function() {
       expect(tokens[6]).toEqual({value: 'hello', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
       expect(tokens[7]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']});
       expect(tokens[8]).toEqual({value: 'world', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']});
-      return expect(tokens[9]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[9]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
-    return describe("the 'style' attribute", function() {
+    describe("the 'style' attribute", function() {
       let quote, type;
       beforeEach(() => waitsForPromise(() => atom.packages.activatePackage('language-css')));
 
@@ -471,7 +465,7 @@ describe('TextMate HTML grammar', function() {
           expect(tokens[15]).toEqual({value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'constant.numeric.css']});
           expect(tokens[16]).toEqual({value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']});
           expect(tokens[17]).toEqual({value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'punctuation.definition.string.end.html']});
-          return expect(tokens[18]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+          expect(tokens[18]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
       });
 
         it(`tokenizes ${type}-quoted multiline attributes`, function() {
@@ -490,7 +484,7 @@ z-index: 10;${quote}>\
           expect(lines[1][3]).toEqual({value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'constant.numeric.css']});
           expect(lines[1][4]).toEqual({value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']});
           expect(lines[1][5]).toEqual({value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'punctuation.definition.string.end.html']});
-          return expect(lines[1][6]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+          expect(lines[1][6]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
       });
       }
 
@@ -518,7 +512,7 @@ z-index: 10${quote}>\
         expect(lines[1][0]).toEqual({value: 'z-index', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']});
         expect(lines[1][3]).toEqual({value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'constant.numeric.css']});
         expect(lines[1][4]).toEqual({value: quote, scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', `string.quoted.${type}.html`, 'punctuation.definition.string.end.html']});
-        return expect(lines[1][5]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+        expect(lines[1][5]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
     });
 
       it('ends invalid quoted property lists correctly', function() {
@@ -529,7 +523,7 @@ z-index: 10${quote}>\
         expect(tokens[6]).toEqual({value: 's', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css']});
         expect(tokens[7]).toEqual({value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.separator.key-value.css']});
         expect(tokens[8]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']});
-        return expect(tokens[9]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+        expect(tokens[9]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
     });
 
       it('tokenizes unquoted property lists', function() {
@@ -551,10 +545,10 @@ z-index: 10${quote}>\
         expect(tokens[8]).toEqual({value: ';', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.terminator.rule.css']});
         expect(tokens[9]).toEqual({value: 'z-index', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-name.css', 'support.type.property-name.css']});
         expect(tokens[11]).toEqual({value: '10', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'meta.property-value.css', 'constant.numeric.css']});
-        return expect(tokens[12]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+        expect(tokens[12]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
     });
 
-      return it('ends invalid unquoted property lists correctly', function() {
+      it('ends invalid unquoted property lists correctly', function() {
         let {tokens} = grammar.tokenizeLine('<span style=s:></span>');
 
         expect(tokens[3]).toEqual({value: 'style', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'entity.other.attribute-name.style.html']});
@@ -571,7 +565,7 @@ z-index: 10${quote}>\
         expect(tokens[6]).toEqual({value: ':', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-with-value.style.html', 'string.unquoted.html', 'source.css.style.html', 'meta.property-list.css', 'punctuation.separator.key-value.css']});
         expect(tokens[7]).toEqual({value: ' ', scopes: ['text.html.basic', 'meta.tag.inline.span.html']});
         expect(tokens[8]).toEqual({value: 'none', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'meta.attribute-without-value.html', 'entity.other.attribute-name.html']});
-        return expect(tokens[9]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+        expect(tokens[9]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
     });
   });
 });
@@ -589,7 +583,7 @@ z-index: 10${quote}>\
       expect(tokens[4]).toEqual({value: ' &a', scopes: ['text.html.basic']});
 
       const lines = grammar.tokenizeLines('&\n');
-      return expect(lines[0][0]).toEqual({value: '&', scopes: ['text.html.basic']});
+      expect(lines[0][0]).toEqual({value: '&', scopes: ['text.html.basic']});
   });
 
     it('tokenizes hexadecimal and digit character references', function() {
@@ -603,7 +597,7 @@ z-index: 10${quote}>\
       expect(tokens[6]).toEqual({value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']});
       expect(tokens[8]).toEqual({value: '&', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']});
       expect(tokens[9]).toEqual({value: '#34', scopes: ['text.html.basic', 'constant.character.entity.html', 'entity.name.entity.other.html']});
-      return expect(tokens[10]).toEqual({value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']});
+      expect(tokens[10]).toEqual({value: ';', scopes: ['text.html.basic', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']});
   });
 
     it('tokenizes invalid ampersands', function() {
@@ -625,27 +619,27 @@ z-index: 10${quote}>\
       expect(tokens[0]).toEqual({value: '&', scopes: ['text.html.basic']});
 
       ({tokens} = grammar.tokenizeLine('&&'));
-      return expect(tokens[0]).toEqual({value: '&&', scopes: ['text.html.basic']});
+      expect(tokens[0]).toEqual({value: '&&', scopes: ['text.html.basic']});
   });
 
     it('tokenizes character references in attributes', function() {
       const {tokens} = grammar.tokenizeLine('<a href="http://example.com?&amp;">');
       expect(tokens[7]).toEqual({value: '&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.begin.html']});
       expect(tokens[8]).toEqual({value: 'amp', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'entity.name.entity.other.html']});
-      return expect(tokens[9]).toEqual({value: ';', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']});
+      expect(tokens[9]).toEqual({value: ';', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'constant.character.entity.html', 'punctuation.definition.entity.end.html']});
   });
 
     it('does not tokenize query parameters as character references', function() {
       const {tokens} = grammar.tokenizeLine('<a href="http://example.com?one=1&type=json&topic=css">');
-      return expect(tokens[6]).toEqual({value: 'http://example.com?one=1&type=json&topic=css', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
+      expect(tokens[6]).toEqual({value: 'http://example.com?one=1&type=json&topic=css', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
   });
 
     it('does not tokenize multiple ampersands followed by alphabetical characters as character references', function() {
       const {tokens} = grammar.tokenizeLine('<a href="http://example.com?price&something&yummy:&wow">');
-      return expect(tokens[6]).toEqual({value: 'http://example.com?price&something&yummy:&wow', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
+      expect(tokens[6]).toEqual({value: 'http://example.com?price&something&yummy:&wow', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
   });
 
-    return it('tokenizes invalid ampersands in attributes', function() {
+    it('tokenizes invalid ampersands in attributes', function() {
       // Note: in order to replicate the following tests' behaviors, make sure you have language-hyperlink disabled
       let {tokens} = grammar.tokenizeLine('<a href="http://example.com?&">');
       expect(tokens[7]).toEqual({value: '&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']});
@@ -661,14 +655,14 @@ z-index: 10${quote}>\
 
       ({tokens} = grammar.tokenizeLine('<a href="http://example.com?&&">'));
       expect(tokens[6]).toEqual({value: 'http://example.com?&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
-      return expect(tokens[7]).toEqual({value: '&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']});
+      expect(tokens[7]).toEqual({value: '&', scopes: ['text.html.basic', 'meta.tag.inline.a.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'invalid.illegal.bad-ampersand.html']});
   });
 });
 
   describe('firstLineMatch', function() {
     it('recognises HTML5 doctypes', function() {
       expect(grammar.firstLineRegex.findNextMatchSync('<!DOCTYPE html>')).not.toBeNull();
-      return expect(grammar.firstLineRegex.findNextMatchSync('<!doctype HTML>')).not.toBeNull();
+      expect(grammar.firstLineRegex.findNextMatchSync('<!doctype HTML>')).not.toBeNull();
     });
 
     it('recognises Emacs modelines', function() {
@@ -710,14 +704,14 @@ z-index: 10${quote}>\
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
       })();
     });
 
-    return it('recognises Vim modelines', function() {
+    it('recognises Vim modelines', function() {
       let line;
       const valid = `\
 vim: se filetype=html:
@@ -742,7 +736,7 @@ vim: se filetype=html:
 # vim:ts=4:sts=4 ft=html:noexpandtab:\x20
 # vim:noexpandtab titlestring=hi\|there\\\\ ft=html ts=4\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -776,115 +770,115 @@ _vi: se filetype=HTML:
       const {tokens} = grammar.tokenizeLine('<style>');
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
       expect(tokens[1]).toEqual({value: 'style', scopes: ['text.html.basic', 'meta.tag.style.html', 'entity.name.tag.style.html']});
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.style.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes script tags as such', function() {
       const {tokens} = grammar.tokenizeLine('<script>');
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(tokens[1]).toEqual({value: 'script', scopes: ['text.html.basic', 'meta.tag.script.html', 'entity.name.tag.script.html']});
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes structure tags as such', function() {
       const {tokens} = grammar.tokenizeLine('<html>');
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.structure.html.html', 'punctuation.definition.tag.html']});
       expect(tokens[1]).toEqual({value: 'html', scopes: ['text.html.basic', 'meta.tag.structure.html.html', 'entity.name.tag.structure.html.html']});
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.structure.html.html', 'punctuation.definition.tag.html']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.structure.html.html', 'punctuation.definition.tag.html']});
   });
 
     it('tokenizes block tags as such', function() {
       const {tokens} = grammar.tokenizeLine('<div>');
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.block.div.html', 'punctuation.definition.tag.begin.html']});
       expect(tokens[1]).toEqual({value: 'div', scopes: ['text.html.basic', 'meta.tag.block.div.html', 'entity.name.tag.block.div.html']});
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.block.div.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.block.div.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('tokenizes inline tags as such', function() {
       const {tokens} = grammar.tokenizeLine('<span>');
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.begin.html']});
       expect(tokens[1]).toEqual({value: 'span', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'entity.name.tag.inline.span.html']});
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.inline.span.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('does not tokenize XML namespaces as tags if the prefix is a valid style tag', function() {
       const {tokens} = grammar.tokenizeLine('<style:foo>');
       expect(tokens[1].value).toNotEqual('style');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('does not tokenize XML namespaces as tags if the prefix is a valid script tag', function() {
       const {tokens} = grammar.tokenizeLine('<script:foo>');
       expect(tokens[1].value).toNotEqual('script');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('does not tokenize XML namespaces as tags if the prefix is a valid structure tag', function() {
       const {tokens} = grammar.tokenizeLine('<html:foo>');
       expect(tokens[1].value).toNotEqual('html');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('does not tokenize XML namespaces as tags if the prefix is a valid block tag', function() {
       const {tokens} = grammar.tokenizeLine('<div:foo>');
       expect(tokens[1].value).toNotEqual('div');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('does not tokenize XML namespaces as tags if the prefix is a valid inline tag', function() {
       const {tokens} = grammar.tokenizeLine('<span:foo>');
       expect(tokens[1].value).toNotEqual('span');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('it does not treat only the part before a hyphen as tag name if this part is a is a valid style tag', function() {
       const {tokens} = grammar.tokenizeLine('<style-foo>');
       expect(tokens[1].value).toNotEqual('style');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('it does not treat only the part before a hyphen as tag name if this part is a is a valid script tag', function() {
       const {tokens} = grammar.tokenizeLine('<script-foo>');
       expect(tokens[1].value).toNotEqual('script');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('it does not treat only the part before a hyphen as tag name if this part is a is a valid structure tag', function() {
       const {tokens} = grammar.tokenizeLine('<html-foo>');
       expect(tokens[1].value).toNotEqual('html');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('it does not treat only the part before a hyphen as tag name if this part is a is a valid block tag', function() {
       const {tokens} = grammar.tokenizeLine('<div-foo>');
       expect(tokens[1].value).toNotEqual('div');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('it does not treat only the part before a hyphen as tag name if this part is a is a valid inline tag', function() {
       const {tokens} = grammar.tokenizeLine('<span-foo>');
       expect(tokens[1].value).toNotEqual('span');
-      return expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
+      expect(tokens[1].scopes).toEqual(['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']);
   });
 
     it('tokenizes other tags as such', function() {
       const {tokens} = grammar.tokenizeLine('<foo>');
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.basic', 'meta.tag.other.html', 'punctuation.definition.tag.begin.html']});
       expect(tokens[1]).toEqual({value: 'foo', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']});
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.other.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['text.html.basic', 'meta.tag.other.html', 'punctuation.definition.tag.end.html']});
   });
 
     it('tolerates colons in other tag names', function() {
       const {tokens} = grammar.tokenizeLine('<foo:bar>');
-      return expect(tokens[1]).toEqual({value: 'foo:bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']});
+      expect(tokens[1]).toEqual({value: 'foo:bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']});
   });
 
     it('tolerates hyphens in other tag names', function() {
       const {tokens} = grammar.tokenizeLine('<foo-bar>');
-      return expect(tokens[1]).toEqual({value: 'foo-bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']});
+      expect(tokens[1]).toEqual({value: 'foo-bar', scopes: ['text.html.basic', 'meta.tag.other.html', 'entity.name.tag.other.html']});
   });
 
-    return it('tokenizes XML declaration correctly', function() {
+    it('tokenizes XML declaration correctly', function() {
       const {tokens} = grammar.tokenizeLine('<?xml version="1.0" encoding="UTF-8"?>');
 
       expect(tokens[0]).toEqual({value: '<?', scopes: ['text.html.basic', 'meta.tag.preprocessor.xml.html', 'punctuation.definition.tag.html']});
@@ -901,11 +895,11 @@ _vi: se filetype=HTML:
       expect(tokens[11]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.preprocessor.xml.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'punctuation.definition.string.begin.html']});
       expect(tokens[12]).toEqual({value: 'UTF-8', scopes: ['text.html.basic', 'meta.tag.preprocessor.xml.html', 'meta.attribute-with-value.html', 'string.quoted.double.html']});
       expect(tokens[13]).toEqual({value: '"', scopes: ['text.html.basic', 'meta.tag.preprocessor.xml.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']});
-      return expect(tokens[14]).toEqual({value: '?>', scopes: ['text.html.basic', 'meta.tag.preprocessor.xml.html', 'punctuation.definition.tag.html']});
+      expect(tokens[14]).toEqual({value: '?>', scopes: ['text.html.basic', 'meta.tag.preprocessor.xml.html', 'punctuation.definition.tag.html']});
   });
 });
 
-  return describe('snippets', function() {
+  describe('snippets', function() {
     let snippetsModule = null;
 
     beforeEach(function() {
@@ -921,11 +915,11 @@ _vi: se filetype=HTML:
 
       snippetsModule.activate();
 
-      return waitsFor('snippets to load', done => snippetsModule.onDidLoadSnippets(done));
+      waitsFor('snippets to load', done => snippetsModule.onDidLoadSnippets(done));
     });
 
     it('suggests snippets', () => expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html'])).length).toBeGreaterThan(10));
 
-    return it('does not suggest any HTML snippets when in embedded scripts', () => expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html .source.js.embedded.html'])).length).toBe(0));
+    it('does not suggest any HTML snippets when in embedded scripts', () => expect(Object.keys(snippetsModule.parsedSnippetsForScopes(['.text.html .source.js.embedded.html'])).length).toBe(0));
   });
 });
