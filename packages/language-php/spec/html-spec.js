@@ -1,35 +1,29 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe('PHP in HTML', function() {
+
+describe('PHP in HTML', () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     waitsForPromise(() => atom.packages.activatePackage('language-php'));
 
     waitsForPromise(() => // While not used explicitly in any tests, we still activate language-html
     // to mirror how language-php behaves outside of specs
     atom.packages.activatePackage('language-html'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('text.html.php'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('text.html.php'));
   });
 
-  it('parses the grammar', function() {
+  it('parses the grammar', () => {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('text.html.php');
+    expect(grammar.scopeName).toBe('text.html.php');
   });
 
-  describe('PHP tags', function() {
-    it('tokenizes starting and closing PHP tags on the same line', function() {
+  describe('PHP tags', () => {
+    it('tokenizes starting and closing PHP tags on the same line', () => {
       const startTags = ['<?php', '<?=', '<?'];
 
       return (() => {
         const result = [];
-        for (let startTag of Array.from(startTags)) {
+        for (let startTag of startTags) {
           const tokens = grammar.tokenizeLines(`${startTag} /* stuff */ ?>`);
 
           expect(tokens[0][0]).toEqual({value: startTag, scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.begin.php']});
@@ -44,12 +38,12 @@ describe('PHP in HTML', function() {
       })();
   });
 
-    it('tokenizes starting and closing PHP tags on different lines', function() {
+    it('tokenizes starting and closing PHP tags on different lines', () => {
       const startTags = ['<?php', '<?=', '<?'];
 
       return (() => {
         const result = [];
-        for (let startTag of Array.from(startTags)) {
+        for (let startTag of startTags) {
           let tokens = grammar.tokenizeLines(`${startTag}\n/* stuff */ ?>`);
 
           expect(tokens[0][0]).toEqual({value: startTag, scopes: ['text.html.php', 'meta.embedded.block.php', 'punctuation.section.embedded.begin.php']});
@@ -80,7 +74,7 @@ describe('PHP in HTML', function() {
       })();
   });
 
-    it('tokenizes `include` on the same line as <?php', function() {
+    it('tokenizes `include` on the same line as <?php', () => {
       // https://github.com/atom/language-php/issues/154
       const {tokens} = grammar.tokenizeLine("<?php include 'test'?>");
 
@@ -88,20 +82,20 @@ describe('PHP in HTML', function() {
       expect(tokens[4]).toEqual({value: "'", scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[6]).toEqual({value: "'", scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.include.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
       expect(tokens[7]).toEqual({value: '?', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']});
-      return expect(tokens[8]).toEqual({value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']});
+      expect(tokens[8]).toEqual({value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']});
   });
 
-    it('tokenizes namespaces immediately following <?php', function() {
+    it('tokenizes namespaces immediately following <?php', () => {
       const {tokens} = grammar.tokenizeLine('<?php namespace Test;');
 
       expect(tokens[1]).toEqual({value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']});
       expect(tokens[2]).toEqual({value: 'namespace', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'keyword.other.namespace.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php']});
       expect(tokens[4]).toEqual({value: 'Test', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['text.html.php', 'meta.embedded.block.php', 'source.php', 'punctuation.terminator.expression.php']});
   });
 
-    it('does not tokenize PHP tag syntax within PHP syntax itself inside HTML script tags (regression)', function() {
+    it('does not tokenize PHP tag syntax within PHP syntax itself inside HTML script tags (regression)', () => {
       const lines = grammar.tokenizeLines(`\
 <script>
 <?php
@@ -128,10 +122,10 @@ describe('PHP in HTML', function() {
       expect(lines[6][1]).toEqual({value: '>', scopes: ['text.html.php', 'meta.tag.script.html', 'source.js.embedded.html', 'meta.embedded.block.php', 'punctuation.section.embedded.end.php']});
       expect(lines[7][0]).toEqual({value: '</', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
       expect(lines[7][1]).toEqual({value: 'script', scopes: ['text.html.php', 'meta.tag.script.html', 'entity.name.tag.script.html']});
-      return expect(lines[7][2]).toEqual({value: '>', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
+      expect(lines[7][2]).toEqual({value: '>', scopes: ['text.html.php', 'meta.tag.script.html', 'punctuation.definition.tag.html']});
   });
 
-    return it('does not tokenize PHP tag syntax within PHP syntax itself inside HTML attributes (regression)', function() {
+    it('does not tokenize PHP tag syntax within PHP syntax itself inside HTML attributes (regression)', () => {
       const {tokens} = grammar.tokenizeLine('<img src="<?php /* ?> <?php */ ?>" />');
 
       expect(tokens[0]).toEqual({value: '<', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'punctuation.definition.tag.begin.html']});
@@ -149,12 +143,12 @@ describe('PHP in HTML', function() {
       expect(tokens[12]).toEqual({value: '?', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']});
       expect(tokens[13]).toEqual({value: '>', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']});
       expect(tokens[14]).toEqual({value: '"', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'meta.attribute-with-value.html', 'string.quoted.double.html', 'punctuation.definition.string.end.html']});
-      return expect(tokens[15]).toEqual({value: ' />', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'punctuation.definition.tag.end.html']});
+      expect(tokens[15]).toEqual({value: ' />', scopes: ['text.html.php', 'meta.tag.inline.img.html', 'punctuation.definition.tag.end.html']});
   });
 });
 
-  describe('shebang', function() {
-    it('recognises shebang on the first line of document', function() {
+  describe('shebang', () => {
+    it('recognises shebang on the first line of document', () => {
       const lines = grammar.tokenizeLines(`\
 #!/usr/bin/env php
 <?php echo "test"; ?>\
@@ -163,10 +157,10 @@ describe('PHP in HTML', function() {
 
       expect(lines[0][0]).toEqual({value: '#!', scopes: ['text.html.php', 'comment.line.shebang.php', 'punctuation.definition.comment.php']});
       expect(lines[0][1]).toEqual({value: '/usr/bin/env php', scopes: ['text.html.php', 'comment.line.shebang.php']});
-      return expect(lines[1][0]).toEqual({value: '<?php', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.begin.php']});
+      expect(lines[1][0]).toEqual({value: '<?php', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.begin.php']});
   });
 
-    return it('does not recognize shebang on any of the other lines', function() {
+    it('does not recognize shebang on any of the other lines', () => {
       const lines = grammar.tokenizeLines(`\
 
 #!/usr/bin/env php
@@ -174,12 +168,12 @@ describe('PHP in HTML', function() {
 `
       );
 
-      return expect(lines[1][0]).toEqual({value: '#!/usr/bin/env php', scopes: ['text.html.php']});
+      expect(lines[1][0]).toEqual({value: '#!/usr/bin/env php', scopes: ['text.html.php']});
   });
 });
 
-  return describe('firstLineMatch', function() {
-    it('recognises opening PHP tags', function() {
+  describe('firstLineMatch', () => {
+    it('recognises opening PHP tags', () => {
       const valid = `\
 <?php
 <?PHP
@@ -189,16 +183,16 @@ describe('PHP in HTML', function() {
 <?="test"
 <?php namespace foo;\
 `;
-      for (let line of Array.from(valid.split(/\n/))) {
+      for (let line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
       // Do not allow matching XML declaration until the grammar scoring system takes into account
       // the length of the first line match so that longer matches get the priority over shorter matches.
-      return expect(grammar.firstLineRegex.findNextMatchSync('<?xml version="1.0" encoding="UTF-8"?>')).toBeNull();
+      expect(grammar.firstLineRegex.findNextMatchSync('<?xml version="1.0" encoding="UTF-8"?>')).toBeNull();
     });
 
-    it('recognises interpreter directives', function() {
+    it('recognises interpreter directives', () => {
       let line;
       const valid = `\
 #!/usr/bin/php
@@ -215,7 +209,7 @@ describe('PHP in HTML', function() {
 #! /usr/bin/php
 #!/usr/bin/env php\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -230,14 +224,14 @@ describe('PHP in HTML', function() {
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
       })();
     });
 
-    it('recognises Emacs modelines', function() {
+    it('recognises Emacs modelines', () => {
       let line;
       const valid = `\
 #-*- PHP -*-
@@ -254,7 +248,7 @@ describe('PHP in HTML', function() {
 "-*-font:x;foo:bar; mode : PHP; bar:foo;foooooo:baaaaar;fo:ba;-*-";
 "-*- font:x;foo : bar ; mode : php ; bar : foo ; foooooo:baaaaar;fo:ba-*-";\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -275,14 +269,14 @@ describe('PHP in HTML', function() {
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
       })();
     });
 
-    it('recognises Vim modelines', function() {
+    it('recognises Vim modelines', () => {
       let line;
       const valid = `\
 vim: se filetype=php:
@@ -307,7 +301,7 @@ vim: se filetype=php:
 # vim:ts=4:sts=4 ft=phtml:noexpandtab:\x20
 # vim:noexpandtab titlestring=hi\|there\\\\ ft=phtml ts=4\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -328,14 +322,14 @@ _vi: se filetype=php:
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
       })();
     });
 
-    return it('should tokenize <?php use Some\\Name ?>', function() {
+    it('should tokenize <?php use Some\\Name ?>', () => {
       const lines = grammar.tokenizeLines(`\
 <?php use Some\\Name ?>
 <article>\
@@ -349,7 +343,7 @@ _vi: se filetype=php:
       expect(lines[0][5]).toEqual({value: '\\', scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(lines[0][6]).toEqual({value: 'Name', scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'meta.use.php', 'support.class.php']});
       expect(lines[0][8]).toEqual({value: '?', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php', 'source.php']});
-      return expect(lines[0][9]).toEqual({value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']});
+      expect(lines[0][9]).toEqual({value: '>', scopes: ['text.html.php', 'meta.embedded.line.php', 'punctuation.section.embedded.end.php']});
   });
 });
 });

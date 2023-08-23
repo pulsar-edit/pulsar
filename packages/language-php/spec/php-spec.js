@@ -1,20 +1,15 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('PHP grammar', function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage('language-php'));
 
-    return runs(function() {
+    runs(function() {
       grammar = atom.grammars.grammarForScopeName('source.php');
-      return this.addMatchers({
+      this.addMatchers({
         toContainAll(arr) {
-          return arr.every(el => {
+          arr.every(el => {
             return this.actual.includes(el);
           });
         }
@@ -24,7 +19,7 @@ describe('PHP grammar', function() {
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('source.php');
+    expect(grammar.scopeName).toBe('source.php');
   });
 
   describe('operators', function() {
@@ -36,7 +31,7 @@ describe('PHP grammar', function() {
       expect(tokens[3]).toEqual({value: '=', scopes: ['source.php', 'keyword.operator.assignment.php']});
       expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize + correctly', function() {
@@ -47,7 +42,7 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: '+', scopes: ['source.php', 'keyword.operator.arithmetic.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize - correctly', function() {
@@ -58,7 +53,7 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: '-', scopes: ['source.php', 'keyword.operator.arithmetic.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize * correctly', function() {
@@ -69,7 +64,7 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: '*', scopes: ['source.php', 'keyword.operator.arithmetic.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize / correctly', function() {
@@ -80,7 +75,7 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: '/', scopes: ['source.php', 'keyword.operator.arithmetic.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize % correctly', function() {
@@ -91,7 +86,7 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: '%', scopes: ['source.php', 'keyword.operator.arithmetic.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize ** correctly', function() {
@@ -102,7 +97,7 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: '**', scopes: ['source.php', 'keyword.operator.arithmetic.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize instanceof correctly', function() {
@@ -113,10 +108,10 @@ describe('PHP grammar', function() {
       expect(tokens[2]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[3]).toEqual({value: 'instanceof', scopes: ['source.php', 'keyword.operator.type.php']});
       expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
-      return expect(tokens[5]).toEqual({value: 'Foo', scopes: ['source.php', 'support.class.php']});
+      expect(tokens[5]).toEqual({value: 'Foo', scopes: ['source.php', 'support.class.php']});
   });
 
-    return describe('combined operators', function() {
+    describe('combined operators', function() {
       it('should tokenize === correctly', function() {
         const {tokens} = grammar.tokenizeLine('$test === 2;');
 
@@ -126,7 +121,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '===', scopes: ['source.php', 'keyword.operator.comparison.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize += correctly', function() {
@@ -138,7 +133,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '+=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize -= correctly', function() {
@@ -150,7 +145,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '-=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize *= correctly', function() {
@@ -162,7 +157,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '*=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize /= correctly', function() {
@@ -174,7 +169,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '/=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize %= correctly', function() {
@@ -186,7 +181,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '%=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize .= correctly', function() {
@@ -198,7 +193,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '.=', scopes: ['source.php', 'keyword.operator.string.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize &= correctly', function() {
@@ -210,7 +205,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '&=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize |= correctly', function() {
@@ -222,7 +217,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '|=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize ^= correctly', function() {
@@ -234,7 +229,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '^=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize <<= correctly', function() {
@@ -246,7 +241,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '<<=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize >>= correctly', function() {
@@ -258,7 +253,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '>>=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize **= correctly', function() {
@@ -270,12 +265,12 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '**=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize ?? correctly', function() {
         const {tokens} = grammar.tokenizeLine("$foo = $bar ?? 'bar';");
-        return expect(tokens[8]).toEqual({value: '??', scopes: ['source.php', 'keyword.operator.null-coalescing.php']});
+        expect(tokens[8]).toEqual({value: '??', scopes: ['source.php', 'keyword.operator.null-coalescing.php']});
     });
 
       it('should tokenize ??= correctly', function() {
@@ -287,7 +282,7 @@ describe('PHP grammar', function() {
         expect(tokens[3]).toEqual({value: '??=', scopes: ['source.php', 'keyword.operator.assignment.php']});
         expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php']});
         expect(tokens[5]).toEqual({value: '2', scopes: ['source.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[6]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     });
 
       it('should tokenize ... correctly', function() {
@@ -307,10 +302,10 @@ describe('PHP grammar', function() {
         expect(tokens[6]).toEqual({value: '...', scopes: ["source.php", "meta.function-call.php", "keyword.operator.spread.php"]});
         expect(tokens[7]).toEqual({value: '$', scopes: ["source.php", "meta.function-call.php", "variable.other.php", "punctuation.definition.variable.php"]});
         expect(tokens[8]).toEqual({value: 'b', scopes: ["source.php", "meta.function-call.php", "variable.other.php"]});
-        return expect(tokens[9]).toEqual({value: ')', scopes: ["source.php", "meta.function-call.php", "punctuation.definition.arguments.end.bracket.round.php"]});
+        expect(tokens[9]).toEqual({value: ')', scopes: ["source.php", "meta.function-call.php", "punctuation.definition.arguments.end.bracket.round.php"]});
     });
 
-      return describe('ternaries', function() {
+      describe('ternaries', function() {
         it('should tokenize ternary expressions', function() {
           let {tokens} = grammar.tokenizeLine('$foo = 1 == 3 ? true : false;');
           expect(tokens[11]).toEqual({value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']});
@@ -327,14 +322,14 @@ $foo = 1 == 3
 
           ({tokens} = grammar.tokenizeLine('$foo=1==3?true:false;'));
           expect(tokens[6]).toEqual({value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']});
-          return expect(tokens[8]).toEqual({value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']});
+          expect(tokens[8]).toEqual({value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']});
       });
 
         it('should tokenize shorthand ternaries', function() {
           const {tokens} = grammar.tokenizeLine('$foo = false ?: false ?: true ?: false;');
           expect(tokens[7]).toEqual({value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']});
           expect(tokens[11]).toEqual(tokens[7]);
-          return expect(tokens[15]).toEqual(tokens[7]);
+          expect(tokens[15]).toEqual(tokens[7]);
       });
 
         it('should tokenize a combination of ternaries', function() {
@@ -346,7 +341,7 @@ $foo = false ?: true == 1
           expect(lines[0][7]).toEqual({value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']});
           expect(lines[1][0]).toEqual({value: '?', scopes: ['source.php', 'keyword.operator.ternary.php']});
           expect(lines[1][4]).toEqual({value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']});
-          return expect(lines[1][8]).toEqual({value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']});
+          expect(lines[1][8]).toEqual({value: '?:', scopes: ['source.php', 'keyword.operator.ternary.php']});
       });
 
         it('should tokenize ternaries with double colons', function() {
@@ -355,10 +350,10 @@ $foo = false ?: true == 1
           expect(tokens[2]).toEqual({value: '?', scopes: ["source.php", "keyword.operator.ternary.php"]});
           expect(tokens[5]).toEqual({value: '::', scopes: ["source.php", "keyword.operator.class.php"]});
           expect(tokens[9]).toEqual({value: ':', scopes: ["source.php", "keyword.operator.ternary.php"]});
-          return expect(tokens[12]).toEqual({value: '::', scopes: ["source.php", "keyword.operator.class.php"]});
+          expect(tokens[12]).toEqual({value: '::', scopes: ["source.php", "keyword.operator.class.php"]});
       });
 
-        return it('should NOT tokenize a ternary statement as a goto label', function() {
+        it('should NOT tokenize a ternary statement as a goto label', function() {
           // See https://github.com/atom/language-php/issues/386
           const lines = grammar.tokenizeLines(`\
 $a ?
@@ -373,7 +368,7 @@ $a ?
           expect(lines[1][1]).toEqual({value: 'null', scopes: ['source.php', 'constant.language.php']});
           expect(lines[1][3]).toEqual({value: ':', scopes: ['source.php', 'keyword.operator.ternary.php']});
           expect(lines[2][1]).toEqual({value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-          return expect(lines[2][2]).toEqual({value: 'b', scopes: ['source.php', 'variable.other.php']});
+          expect(lines[2][2]).toEqual({value: 'b', scopes: ['source.php', 'variable.other.php']});
       });
     });
   });
@@ -387,31 +382,31 @@ $a ?
 
       ({tokens} = grammar.tokenizeLine('$aBc'));
 
-      return expect(tokens[1]).toEqual({value: 'aBc', scopes: ['source.php', 'variable.other.php']});
+      expect(tokens[1]).toEqual({value: 'aBc', scopes: ['source.php', 'variable.other.php']});
   });
 
     it('tokenizes identifiers with a combination of letters and numbers', function() {
       const {tokens} = grammar.tokenizeLine('$a1B99c4');
 
-      return expect(tokens[1]).toEqual({value: 'a1B99c4', scopes: ['source.php', 'variable.other.php']});
+      expect(tokens[1]).toEqual({value: 'a1B99c4', scopes: ['source.php', 'variable.other.php']});
   });
 
     it('tokenizes identifiers that contain accents, umlauts, or similar', function() {
       const {tokens} = grammar.tokenizeLine('$ßÄÖÜäöüàésF4s3');
 
-      return expect(tokens[1]).toEqual({value: 'ßÄÖÜäöüàésF4s3', scopes: ['source.php', 'variable.other.php']});
+      expect(tokens[1]).toEqual({value: 'ßÄÖÜäöüàésF4s3', scopes: ['source.php', 'variable.other.php']});
   });
 
     it('tokenizes identifiers that contain Arabic', function() {
       const {tokens} = grammar.tokenizeLine('$سن');
 
-      return expect(tokens[1]).toEqual({value: 'سن', scopes: ['source.php', 'variable.other.php']});
+      expect(tokens[1]).toEqual({value: 'سن', scopes: ['source.php', 'variable.other.php']});
   });
 
-    return it('tokenizes identifiers that contain emojis', function() {
+    it('tokenizes identifiers that contain emojis', function() {
       const {tokens} = grammar.tokenizeLine('$🐘');
 
-      return expect(tokens[1]).toEqual({value: '🐘', scopes: ['source.php', 'variable.other.php']});
+      expect(tokens[1]).toEqual({value: '🐘', scopes: ['source.php', 'variable.other.php']});
   });
 });
 
@@ -424,7 +419,7 @@ $a ?
     ({tokens} = grammar.tokenizeLine('$thistles'));
 
     expect(tokens[0]).toEqual({value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-    return expect(tokens[1]).toEqual({value: 'thistles', scopes: ['source.php', 'variable.other.php']});
+    expect(tokens[1]).toEqual({value: 'thistles', scopes: ['source.php', 'variable.other.php']});
 });
 
   describe('include', function() {
@@ -441,7 +436,7 @@ $a ?
       expect(tokens[0]).toEqual({value: 'require', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']});
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[3]).toEqual({value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']});
-      return expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
+      expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
   });
 
     it('should tokenize include_once correctly', function() {
@@ -450,10 +445,10 @@ $a ?
       expect(tokens[0]).toEqual({value: 'include_once', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']});
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[3]).toEqual({value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']});
-      return expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
+      expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
   });
 
-    return it('should tokenize parentheses correctly', function() {
+    it('should tokenize parentheses correctly', function() {
       const {tokens} = grammar.tokenizeLine('include("foo.php");');
 
       expect(tokens[0]).toEqual({value: 'include', scopes: ['source.php', 'meta.include.php', 'keyword.control.import.include.php']});
@@ -461,7 +456,7 @@ $a ?
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[3]).toEqual({value: 'foo.php', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php']});
       expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'meta.include.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[5]).toEqual({value: ')', scopes: ['source.php', 'meta.include.php', 'punctuation.definition.end.bracket.round.php']});
+      expect(tokens[5]).toEqual({value: ')', scopes: ['source.php', 'meta.include.php', 'punctuation.definition.end.bracket.round.php']});
   });
 });
 
@@ -472,7 +467,7 @@ $a ?
       expect(tokens[0]).toEqual({value: 'namespace', scopes: ['source.php', 'meta.namespace.php', 'keyword.other.namespace.php']});
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.php', 'meta.namespace.php']});
       expect(tokens[2]).toEqual({value: 'Test', scopes: ['source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']});
-      return expect(tokens[3]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[3]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes sub-namespaces', function() {
@@ -485,7 +480,7 @@ $a ?
       expect(tokens[4]).toEqual({value: 'Two', scopes: ['source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']});
       expect(tokens[5]).toEqual({value: '\\', scopes: ['source.php', 'meta.namespace.php', 'entity.name.type.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[6]).toEqual({value: 'Three', scopes: ['source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']});
-      return expect(tokens[7]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[7]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes namespace with emojis', function() {
@@ -497,7 +492,7 @@ $a ?
       expect(tokens[3]).toEqual({value: 'Emojis', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php"]});
       expect(tokens[4]).toEqual({value: '\\', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php", "punctuation.separator.inheritance.php"]});
       expect(tokens[5]).toEqual({value: '🐘', scopes: ["source.php", "meta.namespace.php", "entity.name.type.namespace.php"]});
-      return expect(tokens[6]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
+      expect(tokens[6]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
   });
 
     it('tokenizes bracketed namespaces', function() {
@@ -567,10 +562,10 @@ namespace One\\Two\\Three
       expect(lines[0][6]).toEqual({value: 'Three', scopes: ['source.php', 'meta.namespace.php', 'entity.name.type.namespace.php']});
       expect(lines[1][0]).toEqual({value: '{', scopes: ['source.php', 'meta.namespace.php', 'punctuation.definition.namespace.begin.bracket.curly.php']});
       expect(lines[2][1]).toEqual({value: '//', scopes: ['source.php', 'meta.namespace.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']});
-      return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']});
+      expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']});
   });
 
-    return it('tokenizes global namespaces', function() {
+    it('tokenizes global namespaces', function() {
       let lines = grammar.tokenizeLines(`\
 namespace {
   // code
@@ -595,7 +590,7 @@ namespace
       expect(lines[0][0]).toEqual({value: 'namespace', scopes: ['source.php', 'meta.namespace.php', 'keyword.other.namespace.php']});
       expect(lines[1][0]).toEqual({value: '{', scopes: ['source.php', 'meta.namespace.php', 'punctuation.definition.namespace.begin.bracket.curly.php']});
       expect(lines[2][1]).toEqual({value: '//', scopes: ['source.php', 'meta.namespace.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']});
-      return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']});
+      expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.namespace.php', 'punctuation.definition.namespace.end.bracket.curly.php']});
   });
 });
 
@@ -616,7 +611,7 @@ namespace
       expect(tokens[4]).toEqual({value: 'Full', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php']});
       expect(tokens[5]).toEqual({value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[6]).toEqual({value: 'NSname', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
-      return expect(tokens[7]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[7]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes use statement with emojis', function() {
@@ -630,7 +625,7 @@ namespace
       expect(tokens[5]).toEqual({value: '🐘', scopes: ["source.php", "meta.use.php", "support.other.namespace.php"]});
       expect(tokens[6]).toEqual({value: '\\', scopes: ["source.php", "meta.use.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]});
       expect(tokens[7]).toEqual({value: 'Big🐘', scopes: ["source.php", "meta.use.php", "support.class.php"]});
-      return expect(tokens[8]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
+      expect(tokens[8]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
   });
 
     it('tokenizes multiline use statements', function() {
@@ -648,7 +643,7 @@ use One\\Two,
       expect(lines[1][1]).toEqual({value: 'Three', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php']});
       expect(lines[1][2]).toEqual({value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(lines[1][3]).toEqual({value: 'Four', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
-      return expect(lines[1][4]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(lines[1][4]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes use function statements', function() {
@@ -662,7 +657,7 @@ use One\\Two,
       expect(tokens[6]).toEqual({value: 'Full', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php']});
       expect(tokens[7]).toEqual({value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[8]).toEqual({value: 'functionName', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
-      return expect(tokens[9]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[9]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes use const statements', function() {
@@ -676,7 +671,7 @@ use One\\Two,
       expect(tokens[6]).toEqual({value: 'Full', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php']});
       expect(tokens[7]).toEqual({value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[8]).toEqual({value: 'CONSTANT', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
-      return expect(tokens[9]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[9]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes use-as statements', function() {
@@ -692,7 +687,7 @@ use One\\Two,
       expect(tokens[8]).toEqual({value: 'as', scopes: ['source.php', 'meta.use.php', 'keyword.other.use-as.php']});
       expect(tokens[9]).toEqual({value: ' ', scopes: ['source.php', 'meta.use.php']});
       expect(tokens[10]).toEqual({value: 'Another', scopes: ['source.php', 'meta.use.php', 'entity.other.alias.php']});
-      return expect(tokens[11]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[11]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes multiple combined use statements', function() {
@@ -713,7 +708,7 @@ use One\\Two,
       expect(tokens[15]).toEqual({value: 'Full', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php']});
       expect(tokens[16]).toEqual({value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[17]).toEqual({value: 'NSname', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
-      return expect(tokens[18]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[18]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes grouped use statements', function() {
@@ -742,10 +737,10 @@ use some\\namespace\\{
       expect(tokens[3][4]).toEqual({value: ' ', scopes: ['source.php', 'meta.use.php']});
       expect(tokens[3][5]).toEqual({value: 'C', scopes: ['source.php', 'meta.use.php', 'entity.other.alias.php']});
       expect(tokens[4][0]).toEqual({value: '}', scopes: ['source.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
-      return expect(tokens[4][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[4][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
-    return it('tokenizes trailing comma in use statements', function() {
+    it('tokenizes trailing comma in use statements', function() {
       const lines = grammar.tokenizeLines(`\
 use some\\namespace\\{
   ClassA,
@@ -760,7 +755,7 @@ use some\\namespace\\{
       expect(lines[1][2]).toEqual({value: ',', scopes: ['source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']});
       expect(lines[2][1]).toEqual({value: 'ClassB', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
       expect(lines[2][2]).toEqual({value: ',', scopes: ['source.php', 'meta.use.php', 'punctuation.separator.delimiter.php']});
-      return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
+      expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
   });
 });
 
@@ -775,7 +770,7 @@ use some\\namespace\\{
       expect(tokens[4]).toEqual({value: '{', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.begin.bracket.curly.php']});
       expect(tokens[5]).toEqual({value: ' ', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php']});
       expect(tokens[6]).toEqual({value: '/*', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.block.php', 'punctuation.definition.comment.php']});
-      return expect(tokens[10]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']});
+      expect(tokens[10]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']});
   });
 
     it('tokenizes class instantiation', function() {
@@ -786,7 +781,7 @@ use some\\namespace\\{
       expect(tokens[7]).toEqual({value: 'ClassName', scopes: ["source.php", "support.class.php"]});
       expect(tokens[8]).toEqual({value: '(', scopes: ["source.php", "punctuation.definition.begin.bracket.round.php"]});
       expect(tokens[9]).toEqual({value: ')', scopes: ["source.php", "punctuation.definition.end.bracket.round.php"]});
-      return expect(tokens[10]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
+      expect(tokens[10]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
   });
 
     it('tokenizes class modifiers', function() {
@@ -804,7 +799,7 @@ use some\\namespace\\{
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.php', 'meta.class.php']});
       expect(tokens[2]).toEqual({value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php', 'meta.class.php']});
-      return expect(tokens[4]).toEqual({value: 'Test', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
+      expect(tokens[4]).toEqual({value: 'Test', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
   });
 
     it('tokenizes classes declared immediately after another class ends', function() {
@@ -812,7 +807,7 @@ use some\\namespace\\{
 
       expect(tokens[6]).toEqual({value: 'final', scopes: ['source.php', 'meta.class.php', 'storage.modifier.final.php']});
       expect(tokens[8]).toEqual({value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']});
-      return expect(tokens[10]).toEqual({value: 'Test2', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
+      expect(tokens[10]).toEqual({value: 'Test2', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
   });
 
     describe('properties', function() {
@@ -827,7 +822,7 @@ class A {
         expect(lines[1][1]).toEqual({value: 'public', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]});
         expect(lines[1][3]).toEqual({value: 'int', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.other.type.php"]});
         expect(lines[1][5]).toEqual({value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]});
-        return expect(lines[1][6]).toEqual({value: 'a', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
+        expect(lines[1][6]).toEqual({value: 'a', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
     });
 
       it('tokenizes nullable types', function() {
@@ -853,7 +848,7 @@ class A {
 
         expect(lines[1][1]).toEqual({value: 'static', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "storage.modifier.php"]});
         expect(lines[1][2]).toEqual({value: '?', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.operator.nullable-type.php"]});
-        return expect(lines[1][4]).toEqual({value: 'string', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.other.type.php"]});
+        expect(lines[1][4]).toEqual({value: 'string', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "keyword.other.type.php"]});
     });
 
       it('tokenizes union types', function() {
@@ -869,7 +864,7 @@ class A {
         expect(lines[1][4]).toEqual({value: '|', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.separator.delimiter.php']});
         expect(lines[1][5]).toEqual({value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']});
         expect(lines[1][7]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-        return expect(lines[1][8]).toEqual({value: 'id', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
+        expect(lines[1][8]).toEqual({value: 'id', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
     });
 
       it('tokenizes intersection types', function() {
@@ -885,7 +880,7 @@ class A {
         expect(lines[1][5]).toEqual({value: '&', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.separator.delimiter.php']});
         expect(lines[1][7]).toEqual({value: 'BarInterface', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'support.class.php']});
         expect(lines[1][9]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-        return expect(lines[1][10]).toEqual({value: 'foobar', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
+        expect(lines[1][10]).toEqual({value: 'foobar', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
     });
 
       it('tokenizes 2 modifiers correctly', function() {
@@ -899,7 +894,7 @@ class Foo {
         expect(lines[1][1]).toEqual({value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']});
         expect(lines[1][3]).toEqual({value: 'static', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']});
         expect(lines[1][5]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-        return expect(lines[1][6]).toEqual({value: 'bar', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
+        expect(lines[1][6]).toEqual({value: 'bar', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
     });
 
       it('tokenizes namespaces', function() {
@@ -917,7 +912,7 @@ class A {
         expect(lines[1][6]).toEqual({value: '\\', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]});
         expect(lines[1][7]).toEqual({value: 'Test', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "support.class.php"]});
         expect(lines[1][9]).toEqual({value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]});
-        return expect(lines[1][10]).toEqual({value: 'c', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
+        expect(lines[1][10]).toEqual({value: 'c', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
     });
 
       it('tokenizes multiple properties', function() {
@@ -950,10 +945,10 @@ class A {
         expect(lines[3][9]).toEqual({value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]});
         expect(lines[3][10]).toEqual({value: 'c1', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
         expect(lines[3][13]).toEqual({value: '$', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php", "punctuation.definition.variable.php"]});
-        return expect(lines[3][14]).toEqual({value: 'c2', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
+        expect(lines[3][14]).toEqual({value: 'c2', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "variable.other.php"]});
     });
 
-      return it('tokenizes readonly properties', function() {
+      it('tokenizes readonly properties', function() {
         const lines = grammar.tokenizeLines(`\
 class Foo {
     public readonly mixed $a;
@@ -976,15 +971,15 @@ class Foo {
         expect(lines[3][3]).toEqual({value: 'public', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'storage.modifier.php']});
         expect(lines[3][5]).toEqual({value: 'mixed', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.other.type.php']});
         expect(lines[3][7]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-        return expect(lines[3][8]).toEqual({value: 'c', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
+        expect(lines[3][8]).toEqual({value: 'c', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'variable.other.php']});
     });
   });
 
     describe('consts', () => it('should tokenize constants with reserved names correctly', function() {
       const lines = grammar.tokenizeLines(`\
 class Foo {
-const Bar = 1;
-const String = 'one';
+  const Bar = 1;
+  const String = 'one';
 }\
 `
       );
@@ -1000,7 +995,7 @@ const String = 'one';
       expect(lines[2][5]).toEqual({value: '=', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'keyword.operator.assignment.php']});
       expect(lines[2][7]).toEqual({value: '\'', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(lines[2][8]).toEqual({value: 'one', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'string.quoted.single.php']});
-      return expect(lines[2][9]).toEqual({value: '\'', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
+      expect(lines[2][9]).toEqual({value: '\'', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
   }));
 
     describe('methods', function() {
@@ -1022,7 +1017,7 @@ class Test {
         expect(lines[1][11]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'variable.other.php', 'punctuation.definition.variable.php']});
         expect(lines[1][12]).toEqual({value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'variable.other.php']});
         expect(lines[1][14]).toEqual({value: '=', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'keyword.operator.assignment.php']});
-        return expect(lines[1][16]).toEqual({value: 'false', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'constant.language.php']});
+        expect(lines[1][16]).toEqual({value: 'false', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.default.php', 'constant.language.php']});
     });
 
       it('tokenizes typehinted method', function() {
@@ -1050,7 +1045,7 @@ class Test {
         expect(lines[1][35]).toEqual({value: ':', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'keyword.operator.return-value.php']});
         expect(lines[1][37]).toEqual({value: 'float', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'keyword.other.type.php']});
         expect(lines[1][39]).toEqual({value: '|', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'punctuation.separator.delimiter.php']});
-        return expect(lines[1][41]).toEqual({value: 'ClassA', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'support.class.php']});
+        expect(lines[1][41]).toEqual({value: 'ClassA', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'support.class.php']});
     });
 
       it('tokenizes static return type', function() {
@@ -1062,7 +1057,7 @@ class Test {
         );
 
         expect(lines[1][9]).toEqual({value: ':', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'keyword.operator.return-value.php']});
-        return expect(lines[1][10]).toEqual({value: 'static', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'storage.type.php']});
+        expect(lines[1][10]).toEqual({value: 'static', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'storage.type.php']});
     });
 
       it('tokenizes basic promoted properties in constructor', function() {
@@ -1082,7 +1077,7 @@ class Test {
         expect(lines[1][17]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php', 'punctuation.definition.variable.php']});
         expect(lines[1][18]).toEqual({value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php']});
         expect(lines[1][20]).toEqual({value: '=', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'keyword.operator.assignment.php']});
-        return expect(lines[1][22]).toEqual({value: '1', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'constant.numeric.decimal.php']});
+        expect(lines[1][22]).toEqual({value: '1', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'constant.numeric.decimal.php']});
     });
 
       it('tokenizes promoted properties with parameters in constructor', function() {
@@ -1101,7 +1096,7 @@ class Test {
         expect(lines[1][12]).toEqual({value: 'a', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php']});
         expect(lines[1][15]).toEqual({value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.other.type.php']});
         expect(lines[1][17]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-        return expect(lines[1][18]).toEqual({value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
+        expect(lines[1][18]).toEqual({value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
     });
 
       it('tokenizes readonly promoted properties', function() {
@@ -1123,10 +1118,10 @@ class Test {
         expect(lines[1][20]).toEqual({value: '?', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'keyword.operator.nullable-type.php']});
         expect(lines[1][22]).toEqual({value: 'string', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'keyword.other.type.php']});
         expect(lines[1][24]).toEqual({value: '$', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-        return expect(lines[1][25]).toEqual({value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php']});
+        expect(lines[1][25]).toEqual({value: 'b', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.promoted-property.php', 'variable.other.php']});
     });
 
-      return it('tokenizes constructor with illegal return type declaration', function() {
+      it('tokenizes constructor with illegal return type declaration', function() {
         const lines = grammar.tokenizeLines(`\
 class Test {
   public function __construct() : int {}
@@ -1135,7 +1130,7 @@ class Test {
         );
 
         expect(lines[1][5]).toEqual({value: '__construct', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'support.function.constructor.php']});
-        return expect(lines[1][9]).toEqual({value: ': int', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'invalid.illegal.return-type.php']});
+        expect(lines[1][9]).toEqual({value: ': int', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.function.php', 'invalid.illegal.return-type.php']});
     });
   });
 
@@ -1180,7 +1175,7 @@ class Test {
         expect(lines[1][3]).toEqual({value: 'A', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php']});
         expect(lines[1][4]).toEqual({value: '\\', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
         expect(lines[1][5]).toEqual({value: 'B', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']});
-        return expect(lines[1][6]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']});
+        expect(lines[1][6]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']});
     });
 
       it('tokenizes multiline use statements', function() {
@@ -1200,7 +1195,7 @@ class Test {
         expect(lines[2][1]).toEqual({value: 'Three', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php']});
         expect(lines[2][2]).toEqual({value: '\\', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
         expect(lines[2][3]).toEqual({value: 'Four', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']});
-        return expect(lines[2][4]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']});
+        expect(lines[2][4]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.terminator.expression.php']});
     });
 
       it('tokenizes complex use statements', function() {
@@ -1231,7 +1226,7 @@ class Test {
         expect(lines[2][7]).toEqual({value: 'A', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'support.class.php']});
         expect(lines[2][8]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.terminator.expression.php']});
         expect(lines[3][1]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
-        return expect(lines[4][1]).toEqual({value: '/*', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.block.php', 'punctuation.definition.comment.php']});
+        expect(lines[4][1]).toEqual({value: '/*', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.block.php', 'punctuation.definition.comment.php']});
     });
 
       it('tokenizes aliases', function() {
@@ -1254,10 +1249,10 @@ class Aliased_Talker {
         expect(lines[2][8]).toEqual({value: ' ', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']});
         expect(lines[2][9]).toEqual({value: 'talk', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'entity.other.alias.php']});
         expect(lines[2][10]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.terminator.expression.php']});
-        return expect(lines[3][1]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
+        expect(lines[3][1]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
     });
 
-      return it('tokenizes aliases', function() {
+      it('tokenizes aliases', function() {
         const lines = grammar.tokenizeLines(`\
 class Aliased_Talker {
     use A, B {
@@ -1275,11 +1270,11 @@ class Aliased_Talker {
         expect(lines[2][6]).toEqual({value: ' ', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php']});
         expect(lines[2][7]).toEqual({value: 'talk', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'entity.other.alias.php']});
         expect(lines[2][8]).toEqual({value: ';', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.terminator.expression.php']});
-        return expect(lines[3][1]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
+        expect(lines[3][1]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.use.php', 'punctuation.definition.use.end.bracket.curly.php']});
     });
   });
 
-    return describe('anonymous', function() {
+    describe('anonymous', function() {
 
       it('tokenizes anonymous class declarations', function() {
         const {tokens} = grammar.tokenizeLine('$a = new class{  /* stuff */ };');
@@ -1294,7 +1289,7 @@ class Aliased_Talker {
         expect(tokens[12]).toEqual({value: '*/', scopes: ["source.php", "meta.class.php", "meta.class.body.php", "comment.block.php", "punctuation.definition.comment.php"]});
         expect(tokens[13]).toEqual({value: ' ', scopes: ["source.php", "meta.class.php", "meta.class.body.php"]});
         expect(tokens[14]).toEqual({value: '}', scopes: ["source.php", "meta.class.php", "punctuation.definition.class.end.bracket.curly.php"]});
-        return expect(tokens[15]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
+        expect(tokens[15]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
     });
 
       it('tokenizes inheritance correctly', function() {
@@ -1305,10 +1300,10 @@ class Aliased_Talker {
         expect(tokens[9]).toEqual({value: 'extends', scopes: ["source.php", "meta.class.php", "storage.modifier.extends.php"]});
         expect(tokens[11]).toEqual({value: 'Test', scopes: ["source.php", "meta.class.php", "entity.other.inherited-class.php"]});
         expect(tokens[13]).toEqual({value: 'implements', scopes: ["source.php", "meta.class.php", "storage.modifier.implements.php"]});
-        return expect(tokens[15]).toEqual({value: 'ITest', scopes: ["source.php", "meta.class.php", "entity.other.inherited-class.php"]});
+        expect(tokens[15]).toEqual({value: 'ITest', scopes: ["source.php", "meta.class.php", "entity.other.inherited-class.php"]});
     });
 
-      return it('tokenizes constructor arguments correctly', function() {
+      it('tokenizes constructor arguments correctly', function() {
         const {tokens} = grammar.tokenizeLine('new class(\'string\', optional: 123){}');
 
         expect(tokens[0]).toEqual({value: 'new', scopes: ['source.php', 'meta.class.php', 'keyword.other.new.php']});
@@ -1321,7 +1316,7 @@ class Aliased_Talker {
         expect(tokens[9]).toEqual({value: 'optional', scopes: ['source.php', 'meta.class.php', 'meta.function-call.php', 'entity.name.variable.parameter.php']});
         expect(tokens[10]).toEqual({value: ':', scopes: ['source.php', 'meta.class.php', 'meta.function-call.php', 'punctuation.separator.colon.php']});
         expect(tokens[12]).toEqual({value: '123', scopes: ['source.php', 'meta.class.php', 'meta.function-call.php', 'constant.numeric.decimal.php']});
-        return expect(tokens[13]).toEqual({value: ')', scopes: ['source.php', 'meta.class.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+        expect(tokens[13]).toEqual({value: ')', scopes: ['source.php', 'meta.class.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
     });
   });
 });
@@ -1345,7 +1340,7 @@ enum Test {
       expect(lines[2][1]).toEqual({value: 'case', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'storage.modifier.php']});
       expect(lines[2][3]).toEqual({value: 'BAR', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'constant.enum.php']});
       expect(lines[2][4]).toEqual({value: ';', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'punctuation.terminator.expression.php']});
-      return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
+      expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
   });
 
     it('should tokenize backed enums correctly', function() {
@@ -1376,7 +1371,7 @@ enum HTTPMethods: string {
       expect(lines[2][8]).toEqual({value: 'post', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'string.quoted.single.php']});
       expect(lines[2][9]).toEqual({value: '\'', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
       expect(lines[2][10]).toEqual({value: ';', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'punctuation.terminator.expression.php']});
-      return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
+      expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
   });
 
     it('should tokenize enums with method correctly', function() {
@@ -1410,7 +1405,7 @@ enum HTTPStatus: int {
       expect(lines[4][7]).toEqual({value: ')', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(lines[4][8]).toEqual({value: ':', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'meta.function.php', 'keyword.operator.return-value.php']});
       expect(lines[4][10]).toEqual({value: 'string', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'meta.function.php', 'keyword.other.type.php']});
-      return expect(lines[5][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
+      expect(lines[5][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
   });
 
     it('should tokenize enums implementing interfaces correctly', function() {
@@ -1421,7 +1416,7 @@ enum HTTPStatus: int {
       expect(tokens[4]).toEqual({value: 'implements', scopes: ['source.php', 'meta.enum.php', 'storage.modifier.implements.php']});
       expect(tokens[6]).toEqual({value: 'Foo', scopes: ['source.php', 'meta.enum.php', 'entity.other.inherited-class.php']});
       expect(tokens[8]).toEqual({value: '{', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.begin.bracket.curly.php']});
-      return expect(tokens[9]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
+      expect(tokens[9]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
   });
 
     it('should tokenize switch in enum correctly', function() {
@@ -1456,10 +1451,10 @@ enum Foo {
       expect(lines[4][4]).toEqual({value: ':', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'meta.switch-statement.php', 'punctuation.terminator.statement.php']});
       expect(lines[5][1]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'meta.switch-statement.php', 'punctuation.definition.section.switch-block.end.bracket.curly.php']});
       expect(lines[6][1]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'punctuation.definition.end.bracket.curly.php']});
-      return expect(lines[7][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
+      expect(lines[7][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
   });
 
-    return it('should tokenize constants in enums correctly', function() {
+    it('should tokenize constants in enums correctly', function() {
       const lines = grammar.tokenizeLines(`\
 enum Foo : int {
   case Bar = 1;
@@ -1483,7 +1478,7 @@ enum Foo : int {
       expect(lines[2][5]).toEqual({value: '=', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'keyword.operator.assignment.php']});
       expect(lines[2][7]).toEqual({value: '1', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'constant.numeric.decimal.php']});
       expect(lines[2][8]).toEqual({value: ';', scopes: ['source.php', 'meta.enum.php', 'meta.enum.body.php', 'punctuation.terminator.expression.php']});
-      return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
+      expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.enum.php', 'punctuation.definition.enum.end.bracket.curly.php']});
   });
 });
 
@@ -1500,7 +1495,7 @@ enum Foo : int {
       // Should NOT be tokenized as an actual function
       ({tokens} = grammar.tokenizeLine('function_test() {}'));
 
-      return expect(tokens[0]).toEqual({value: 'function_test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
+      expect(tokens[0]).toEqual({value: 'function_test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
   });
 
     it('tokenizes default array type with old array value', function() {
@@ -1523,7 +1518,7 @@ enum Foo : int {
       expect(tokens[14]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(tokens[15]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[16]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
-      return expect(tokens[17]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+      expect(tokens[17]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
   });
 
     it('tokenizes variadic arguments', function() {
@@ -1531,7 +1526,7 @@ enum Foo : int {
 
       expect(tokens[4]).toEqual({value: '...', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php', 'keyword.operator.variadic.php']});
       expect(tokens[5]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-      return expect(tokens[6]).toEqual({value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php']});
+      expect(tokens[6]).toEqual({value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php']});
   });
 
     it('tokenizes variadic arguments and typehinted class name', function() {
@@ -1540,7 +1535,7 @@ enum Foo : int {
       expect(tokens[4]).toEqual({value: 'class_name', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'support.class.php']});
       expect(tokens[6]).toEqual({value: '...', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php', 'keyword.operator.variadic.php']});
       expect(tokens[7]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-      return expect(tokens[8]).toEqual({value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php']});
+      expect(tokens[8]).toEqual({value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.variadic.php', 'variable.other.php']});
   });
 
     it('tokenizes nullable typehints', function() {
@@ -1557,7 +1552,7 @@ enum Foo : int {
       expect(tokens[5]).toEqual({value: '   ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']});
       expect(tokens[6]).toEqual({value: 'class_name', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']});
       expect(tokens[8]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-      return expect(tokens[9]).toEqual({value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
+      expect(tokens[9]).toEqual({value: 'value', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
   });
 
     it('tokenizes namespaced and typehinted class names', function() {
@@ -1591,7 +1586,7 @@ enum Foo : int {
       expect(tokens[7]).toEqual({value: 'b', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.other.namespace.php']});
       expect(tokens[8]).toEqual({value: '\\', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[9]).toEqual({value: 'class_name', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']});
-      return expect(tokens[11]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']});
+      expect(tokens[11]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']});
   });
 
     it('tokenizes default array type with short array value', function() {
@@ -1613,7 +1608,7 @@ enum Foo : int {
       expect(tokens[13]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(tokens[14]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[15]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
-      return expect(tokens[16]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+      expect(tokens[16]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
   });
 
     it('tokenizes a non-empty array', function() {
@@ -1627,7 +1622,7 @@ enum Foo : int {
       expect(tokens[16]).toEqual({value: '\'', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[17]).toEqual({value: '3', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'string.quoted.single.php']});
       expect(tokens[18]).toEqual({value: '\'', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[19]).toEqual({value: ']', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.section.array.end.php']});
+      expect(tokens[19]).toEqual({value: ']', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.section.array.end.php']});
   });
 
     it('tokenizes default value with non-lowercase array type hinting', function() {
@@ -1649,7 +1644,7 @@ enum Foo : int {
       expect(tokens[13]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(tokens[14]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[15]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
-      return expect(tokens[16]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+      expect(tokens[16]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
   });
 
     it('tokenizes multiple typehinted arguments with default values', function() {
@@ -1676,7 +1671,7 @@ enum Foo : int {
       expect(tokens[21]).toEqual({value: '=', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'keyword.operator.assignment.php']});
       expect(tokens[22]).toEqual({value: ' ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']});
       expect(tokens[23]).toEqual({value: 'null', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'constant.language.php']});
-      return expect(tokens[24]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
+      expect(tokens[24]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
   });
 
     it('tokenizes union types in function parameters', function() {
@@ -1709,7 +1704,7 @@ enum Foo : int {
       expect(tokens[12]).toEqual({value: ' ', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php']});
       expect(tokens[13]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']});
       expect(tokens[14]).toEqual({value: 'a', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
-      return expect(tokens[15]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
+      expect(tokens[15]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
   });
 
     it('tokenizes intersection types in function parameters', function() {
@@ -1722,7 +1717,7 @@ enum Foo : int {
       expect(tokens[5]).toEqual({value: '&', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'punctuation.separator.delimiter.php']});
       expect(tokens[6]).toEqual({value: 'BarInterface', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'support.class.php']});
       expect(tokens[8]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php', 'punctuation.definition.variable.php']});
-      return expect(tokens[9]).toEqual({value: 'foobar', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
+      expect(tokens[9]).toEqual({value: 'foobar', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.typehinted.php', 'variable.other.php']});
   });
 
     it('tokenizes trailing comma in function parameters', function() {
@@ -1737,7 +1732,7 @@ enum Foo : int {
       expect(tokens[8]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']});
       expect(tokens[9]).toEqual({value: 'b', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']});
       expect(tokens[10]).toEqual({value: ',', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'punctuation.separator.delimiter.php']});
-      return expect(tokens[11]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
+      expect(tokens[11]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
   });
 
     it('tokenizes return values', function() {
@@ -1752,7 +1747,7 @@ enum Foo : int {
       expect(tokens[6]).toEqual({value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']});
       expect(tokens[7]).toEqual({value: ' ', scopes: ['source.php', 'meta.function.php']});
       expect(tokens[8]).toEqual({value: 'Client', scopes: ['source.php', 'meta.function.php', 'support.class.php']});
-      return expect(tokens[9]).toEqual({value: ' ', scopes: ['source.php']});
+      expect(tokens[9]).toEqual({value: ' ', scopes: ['source.php']});
   });
 
     it('tokenizes nullable return values', function() {
@@ -1769,7 +1764,7 @@ enum Foo : int {
       expect(tokens[7]).toEqual({value: ' ', scopes: ['source.php', 'meta.function.php']});
       expect(tokens[8]).toEqual({value: '?', scopes: ['source.php', 'meta.function.php', 'keyword.operator.nullable-type.php']});
       expect(tokens[9]).toEqual({value: '   ', scopes: ['source.php', 'meta.function.php']});
-      return expect(tokens[10]).toEqual({value: 'Client', scopes: ['source.php', 'meta.function.php', 'support.class.php']});
+      expect(tokens[10]).toEqual({value: 'Client', scopes: ['source.php', 'meta.function.php', 'support.class.php']});
   });
 
     it('tokenizes union return types', function() {
@@ -1781,7 +1776,7 @@ enum Foo : int {
       expect(tokens[10]).toEqual({value: ' ', scopes: ['source.php', 'meta.function.php']});
       expect(tokens[11]).toEqual({value: '|', scopes: ['source.php', 'meta.function.php', 'punctuation.separator.delimiter.php']});
       expect(tokens[12]).toEqual({value: ' ', scopes: ['source.php', 'meta.function.php']});
-      return expect(tokens[13]).toEqual({value: 'null', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.php']});
+      expect(tokens[13]).toEqual({value: 'null', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.php']});
   });
 
     it('tokenizes intersection return types', function() {
@@ -1792,7 +1787,7 @@ enum Foo : int {
       expect(tokens[6]).toEqual({value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']});
       expect(tokens[8]).toEqual({value: 'FooInterface', scopes: ['source.php', 'meta.function.php', 'support.class.php']});
       expect(tokens[10]).toEqual({value: '&', scopes: ['source.php', 'meta.function.php', 'punctuation.separator.delimiter.php']});
-      return expect(tokens[12]).toEqual({value: 'BarInterface', scopes: ['source.php', 'meta.function.php', 'support.class.php']});
+      expect(tokens[12]).toEqual({value: 'BarInterface', scopes: ['source.php', 'meta.function.php', 'support.class.php']});
   });
 
     it('tokenizes function names with characters other than letters or numbers', function() {
@@ -1807,17 +1802,17 @@ enum Foo : int {
       expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(tokens[5]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[6]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
-      return expect(tokens[7]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+      expect(tokens[7]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
   });
 
-    return it('tokenizes function returning reference', function() {
+    it('tokenizes function returning reference', function() {
       const {tokens} = grammar.tokenizeLine('function &test() {}');
 
       expect(tokens[0]).toEqual({value: 'function', scopes: ["source.php", "meta.function.php", "storage.type.function.php"]});
       expect(tokens[2]).toEqual({value: '&', scopes: ["source.php", "meta.function.php", "storage.modifier.reference.php"]});
       expect(tokens[3]).toEqual({value: 'test', scopes: ["source.php", "meta.function.php", "entity.name.function.php"]});
       expect(tokens[4]).toEqual({value: '(', scopes: ["source.php", "meta.function.php", "punctuation.definition.parameters.begin.bracket.round.php"]});
-      return expect(tokens[5]).toEqual({value: ')', scopes: ["source.php", "meta.function.php", "punctuation.definition.parameters.end.bracket.round.php"]});
+      expect(tokens[5]).toEqual({value: ')', scopes: ["source.php", "meta.function.php", "punctuation.definition.parameters.end.bracket.round.php"]});
   });
 });
 
@@ -1834,7 +1829,7 @@ enum Foo : int {
       expect(tokens[0]).toEqual({value: 'inverse', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.php', 'meta.function-call.php']});
       expect(tokens[2]).toEqual({value: '(', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']});
-      return expect(tokens[3]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[3]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
     it('tokenizes function calls with arguments', function() {
@@ -1861,7 +1856,7 @@ enum Foo : int {
       expect(tokens[6]).toEqual({value: "'", scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[7]).toEqual({value: 'b', scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php']});
       expect(tokens[8]).toEqual({value: "'", scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[9]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[9]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
     it('tokenizes function calls with named arguments', function() {
@@ -1872,7 +1867,7 @@ enum Foo : int {
       expect(tokens[15]).toEqual({value: ':', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.colon.php']});
       // ternary should be still tokenized
       expect(tokens[7]).toEqual({value: 'null', scopes: ['source.php', 'meta.function-call.php', 'constant.language.php']});
-      return expect(tokens[9]).toEqual({value: ':', scopes: ['source.php', 'meta.function-call.php', 'keyword.operator.ternary.php']});
+      expect(tokens[9]).toEqual({value: ':', scopes: ['source.php', 'meta.function-call.php', 'keyword.operator.ternary.php']});
   });
 
     it('tokenizes multiline function calls with named arguments', function() {
@@ -1891,7 +1886,7 @@ doSomething(
       expect(lines[3][2]).toEqual({value: ':', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.colon.php']});
       // ternary should be still tokenized
       expect(lines[2][1]).toEqual({value: 'null', scopes: ['source.php', 'meta.function-call.php', 'constant.language.php']});
-      return expect(lines[2][3]).toEqual({value: ':', scopes: ['source.php', 'meta.function-call.php', 'keyword.operator.ternary.php']});
+      expect(lines[2][3]).toEqual({value: ':', scopes: ['source.php', 'meta.function-call.php', 'keyword.operator.ternary.php']});
   });
 
     it('tokenizes trailing comma in parameters of function call', function() {
@@ -1901,7 +1896,7 @@ doSomething(
       expect(tokens[2]).toEqual({value: '1', scopes: ['source.php', 'meta.function-call.php', 'constant.numeric.decimal.php']});
       expect(tokens[3]).toEqual({value: ',', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']});
       expect(tokens[4]).toEqual({value: '2', scopes: ['source.php', 'meta.function-call.php', 'constant.numeric.decimal.php']});
-      return expect(tokens[5]).toEqual({value: ',', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']});
+      expect(tokens[5]).toEqual({value: ',', scopes: ['source.php', 'meta.function-call.php', 'punctuation.separator.delimiter.php']});
   });
 
     it('tokenizes builtin function calls', function() {
@@ -1922,14 +1917,14 @@ doSomething(
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[4]).toEqual({value: 'Hi!', scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php']});
       expect(tokens[5]).toEqual({value: "'", scopes: ['source.php', 'meta.function-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[6]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[6]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
     it('tokenizes root-namespaced function calls', function() {
       const {tokens} = grammar.tokenizeLine('\\test()');
 
       expect(tokens[0]).toEqual({value: '\\', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
-      return expect(tokens[1]).toEqual({value: 'test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
+      expect(tokens[1]).toEqual({value: 'test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
   });
 
     it('tokenizes user-namespaced function calls', function() {
@@ -1945,7 +1940,7 @@ doSomething(
       expect(tokens[1]).toEqual({value: '\\', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[2]).toEqual({value: 'two', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php']});
       expect(tokens[3]).toEqual({value: '\\', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
-      return expect(tokens[4]).toEqual({value: 'test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
+      expect(tokens[4]).toEqual({value: 'test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
   });
 
     it('tokenizes absolutely-namespaced function calls', function() {
@@ -1963,7 +1958,7 @@ doSomething(
       expect(tokens[2]).toEqual({value: '\\', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[3]).toEqual({value: 'two', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php']});
       expect(tokens[4]).toEqual({value: '\\', scopes: ['source.php', 'meta.function-call.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
-      return expect(tokens[5]).toEqual({value: 'test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
+      expect(tokens[5]).toEqual({value: 'test', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
   });
 
     it('does not treat user-namespaced functions as builtins', function() {
@@ -1973,16 +1968,16 @@ doSomething(
 
       ({tokens} = grammar.tokenizeLine('\\hello\\apc_store()'));
 
-      return expect(tokens[3]).toEqual({value: 'apc_store', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
+      expect(tokens[3]).toEqual({value: 'apc_store', scopes: ['source.php', 'meta.function-call.php', 'entity.name.function.php']});
   });
 
-    return it('tokenizes closure calls', function() {
+    it('tokenizes closure calls', function() {
       const {tokens} = grammar.tokenizeLine('$callback()');
 
       expect(tokens[0]).toEqual({value: '$', scopes: ["source.php", "meta.function-call.invoke.php", "variable.other.php", "punctuation.definition.variable.php"]});
       expect(tokens[1]).toEqual({value: 'callback', scopes: ["source.php", "meta.function-call.invoke.php", "variable.other.php"]});
       expect(tokens[2]).toEqual({value: '(', scopes: ["source.php", "punctuation.definition.begin.bracket.round.php"]});
-      return expect(tokens[3]).toEqual({value: ')', scopes: ["source.php", "punctuation.definition.end.bracket.round.php"]});
+      expect(tokens[3]).toEqual({value: ')', scopes: ["source.php", "punctuation.definition.end.bracket.round.php"]});
   });
 });
 
@@ -2002,7 +1997,7 @@ doSomething(
       expect(tokens[3]).toEqual({value: 'method', scopes: ['source.php', 'meta.method-call.php', 'entity.name.function.php']});
       expect(tokens[4]).toEqual({value: ' ', scopes: ['source.php', 'meta.method-call.php']});
       expect(tokens[5]).toEqual({value: '(', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']});
-      return expect(tokens[6]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[6]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
     it('tokenizes method calls with nullsafe operator', function() {
@@ -2011,10 +2006,10 @@ doSomething(
       expect(tokens[1]).toEqual({value: '?->', scopes: ['source.php', 'meta.method-call.php', 'keyword.operator.class.php']});
       expect(tokens[2]).toEqual({value: 'method', scopes: ['source.php', 'meta.method-call.php', 'entity.name.function.php']});
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.begin.bracket.round.php']});
-      return expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
-    return it('tokenizes method calls with arguments', function() {
+    it('tokenizes method calls with arguments', function() {
       let {tokens} = grammar.tokenizeLine("obj->method(5, 'b')");
 
       expect(tokens[2]).toEqual({value: 'method', scopes: ['source.php', 'meta.method-call.php', 'entity.name.function.php']});
@@ -2038,7 +2033,7 @@ doSomething(
       expect(tokens[8]).toEqual({value: "'", scopes: ['source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[9]).toEqual({value: 'b', scopes: ['source.php', 'meta.method-call.php', 'string.quoted.single.php']});
       expect(tokens[10]).toEqual({value: "'", scopes: ['source.php', 'meta.method-call.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[11]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[11]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 });
 
@@ -2056,7 +2051,7 @@ doSomething(
       expect(tokens[7]).toEqual({value: ' ', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php"]});
       expect(tokens[8]).toEqual({value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "variable.other.php", "punctuation.definition.variable.php"]});
       expect(tokens[9]).toEqual({value: 'b', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "variable.other.php"]});
-      return expect(tokens[10]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
+      expect(tokens[10]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
   });
 
     it('tokenizes return values', function() {
@@ -2078,7 +2073,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: 'function', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]});
       expect(tokens[4]).toEqual({value: ':', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.return-value.php"]});
       expect(tokens[6]).toEqual({value: '\\', scopes: ["source.php", "meta.function.closure.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]});
-      return expect(tokens[7]).toEqual({value: 'Client', scopes: ["source.php", "meta.function.closure.php", "support.class.php"]});
+      expect(tokens[7]).toEqual({value: 'Client', scopes: ["source.php", "meta.function.closure.php", "support.class.php"]});
   });
 
     it('tokenizes nullable return values', function() {
@@ -2094,7 +2089,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: 'function', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]});
       expect(tokens[3]).toEqual({value: ':', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.return-value.php"]});
       expect(tokens[5]).toEqual({value: '?', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.nullable-type.php"]});
-      return expect(tokens[6]).toEqual({value: 'Client', scopes: ["source.php", "meta.function.closure.php", "support.class.php"]});
+      expect(tokens[6]).toEqual({value: 'Client', scopes: ["source.php", "meta.function.closure.php", "support.class.php"]});
   });
 
     it('tokenizes never type', function() {
@@ -2102,7 +2097,7 @@ doSomething(
 
       expect(tokens[0]).toEqual({value: 'function', scopes: ['source.php', 'meta.function.php', 'storage.type.function.php']});
       expect(tokens[6]).toEqual({value: ':', scopes: ['source.php', 'meta.function.php', 'keyword.operator.return-value.php']});
-      return expect(tokens[8]).toEqual({value: 'never', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.never.php']});
+      expect(tokens[8]).toEqual({value: 'never', scopes: ['source.php', 'meta.function.php', 'keyword.other.type.never.php']});
   });
 
     it('tokenizes closure returning reference', function() {
@@ -2119,7 +2114,7 @@ doSomething(
       expect(tokens[1]).toEqual({value: ' ', scopes: ["source.php", "meta.function.closure.php"]});
       expect(tokens[2]).toEqual({value: '&', scopes: ["source.php", "meta.function.closure.php", "storage.modifier.reference.php"]});
       expect(tokens[3]).toEqual({value: '(', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.begin.bracket.round.php"]});
-      return expect(tokens[4]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
+      expect(tokens[4]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
   });
 
     it('tokenizes use inheritance', function() {
@@ -2142,7 +2137,7 @@ doSomething(
       expect(tokens[10]).toEqual({value: ',', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.separator.delimiter.php"]});
       expect(tokens[11]).toEqual({value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]});
       expect(tokens[12]).toEqual({value: 'b', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]});
-      return expect(tokens[13]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.definition.parameters.end.bracket.round.php"]});
+      expect(tokens[13]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "punctuation.definition.parameters.end.bracket.round.php"]});
   });
 
     it('tokenizes use inheritance by reference', function() {
@@ -2152,10 +2147,10 @@ doSomething(
       expect(tokens[5]).toEqual({value: 'use', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "keyword.other.function.use.php"]});
       expect(tokens[8]).toEqual({value: '&', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "storage.modifier.reference.php"]});
       expect(tokens[9]).toEqual({value: '$', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php", "punctuation.definition.variable.php"]});
-      return expect(tokens[10]).toEqual({value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]});
+      expect(tokens[10]).toEqual({value: 'a', scopes: ["source.php", "meta.function.closure.php", "meta.function.closure.use.php", "variable.other.php"]});
   });
 
-    return it('tokenizes trailing comma in closure parameters and use inheritance', function() {
+    it('tokenizes trailing comma in closure parameters and use inheritance', function() {
       const {tokens} = grammar.tokenizeLine('function($a,)use($b,){}');
 
       expect(tokens[0]).toEqual({value: 'function', scopes: ['source.php', 'meta.function.closure.php', 'storage.type.function.php']});
@@ -2165,7 +2160,7 @@ doSomething(
       expect(tokens[6]).toEqual({value: 'use', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'keyword.other.function.use.php']});
       expect(tokens[8]).toEqual({value: '$', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'variable.other.php', 'punctuation.definition.variable.php']});
       expect(tokens[9]).toEqual({value: 'b', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'variable.other.php']});
-      return expect(tokens[10]).toEqual({value: ',', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'punctuation.separator.delimiter.php']});
+      expect(tokens[10]).toEqual({value: ',', scopes: ['source.php', 'meta.function.closure.php', 'meta.function.closure.use.php', 'punctuation.separator.delimiter.php']});
   });
 });
 
@@ -2183,7 +2178,7 @@ doSomething(
       expect(tokens[14]).toEqual({value: 'x', scopes: ["source.php", "variable.other.php"]});
       expect(tokens[16]).toEqual({value: '*', scopes: ["source.php", "keyword.operator.arithmetic.php"]});
       expect(tokens[18]).toEqual({value: '2', scopes: ["source.php", "constant.numeric.decimal.php"]});
-      return expect(tokens[19]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
+      expect(tokens[19]).toEqual({value: ';', scopes: ["source.php", "punctuation.terminator.expression.php"]});
   });
 
     it('tokenizes parameters', function() {
@@ -2195,16 +2190,16 @@ doSomething(
       expect(tokens[10]).toEqual({value: 'x', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "variable.other.php"]});
       expect(tokens[11]).toEqual({value: '=', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "keyword.operator.assignment.php"]});
       expect(tokens[12]).toEqual({value: '0', scopes: ["source.php", "meta.function.closure.php", "meta.function.parameters.php", "meta.function.parameter.typehinted.php", "constant.numeric.decimal.php"]});
-      return expect(tokens[13]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
+      expect(tokens[13]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
   });
 
-    return it('tokenizes return types', function() {
+    it('tokenizes return types', function() {
       const {tokens} = grammar.tokenizeLine('$pow = fn($x) :? int => $x * 2;');
 
       expect(tokens[5]).toEqual({value: 'fn', scopes: ["source.php", "meta.function.closure.php", "storage.type.function.php"]});
       expect(tokens[11]).toEqual({value: ':', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.return-value.php"]});
       expect(tokens[12]).toEqual({value: '?', scopes: ["source.php", "meta.function.closure.php", "keyword.operator.nullable-type.php"]});
-      return expect(tokens[14]).toEqual({value: 'int', scopes: ["source.php", "meta.function.closure.php", "keyword.other.type.php"]});
+      expect(tokens[14]).toEqual({value: 'int', scopes: ["source.php", "meta.function.closure.php", "keyword.other.type.php"]});
   });
 });
 
@@ -2227,7 +2222,7 @@ doSomething(
       expect(tokens[4]).toEqual({value: 'method', scopes: ['source.php', 'meta.method-call.static.php', 'entity.name.function.php']});
       expect(tokens[5]).toEqual({value: ' ', scopes: ['source.php', 'meta.method-call.static.php']});
       expect(tokens[6]).toEqual({value: '(', scopes: ['source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.begin.bracket.round.php']});
-      return expect(tokens[7]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[7]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
     it('tokenizes static method calls with arguments', function() {
@@ -2260,7 +2255,7 @@ doSomething(
       expect(tokens[10]).toEqual({value: "'", scopes: ['source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
       expect(tokens[11]).toEqual({value: 'b', scopes: ['source.php', 'meta.method-call.static.php', 'string.quoted.single.php']});
       expect(tokens[12]).toEqual({value: "'", scopes: ['source.php', 'meta.method-call.static.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[13]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']});
+      expect(tokens[13]).toEqual({value: ')', scopes: ['source.php', 'meta.method-call.static.php', 'punctuation.definition.arguments.end.bracket.round.php']});
   });
 
     it('tokenizes class variables', function() {
@@ -2278,7 +2273,7 @@ doSomething(
       expect(tokens[2]).toEqual({value: '::', scopes: ['source.php', 'keyword.operator.class.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[4]).toEqual({value: '$', scopes: ['source.php', 'variable.other.class.php', 'punctuation.definition.variable.php']});
-      return expect(tokens[5]).toEqual({value: 'variable', scopes: ['source.php', 'variable.other.class.php']});
+      expect(tokens[5]).toEqual({value: 'variable', scopes: ['source.php', 'variable.other.class.php']});
   });
 
     it('tokenizes class constants', function() {
@@ -2294,7 +2289,7 @@ doSomething(
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.php']});
       expect(tokens[2]).toEqual({value: '::', scopes: ['source.php', 'keyword.operator.class.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
-      return expect(tokens[4]).toEqual({value: 'constant', scopes: ['source.php', 'constant.other.class.php']});
+      expect(tokens[4]).toEqual({value: 'constant', scopes: ['source.php', 'constant.other.class.php']});
   });
 
     it('tokenizes namespaced classes', function() {
@@ -2308,10 +2303,10 @@ doSomething(
       expect(tokens[5]).toEqual({value: 'Three', scopes: ['source.php', 'support.class.php']});
       expect(tokens[6]).toEqual({value: '::', scopes: ['source.php', 'keyword.operator.class.php']});
       expect(tokens[7]).toEqual({value: '$', scopes: ['source.php', 'variable.other.class.php', 'punctuation.definition.variable.php']});
-      return expect(tokens[8]).toEqual({value: 'var', scopes: ['source.php', 'variable.other.class.php']});
+      expect(tokens[8]).toEqual({value: 'var', scopes: ['source.php', 'variable.other.class.php']});
   });
 
-    return it('tokenizes the special "class" keyword', function() {
+    it('tokenizes the special "class" keyword', function() {
       let {tokens} = grammar.tokenizeLine('obj::class');
 
       expect(tokens[0]).toEqual({value: 'obj', scopes: ['source.php', 'support.class.php']});
@@ -2331,7 +2326,7 @@ doSomething(
 
       expect(tokens[0]).toEqual({value: 'obj', scopes: ['source.php', 'support.class.php']});
       expect(tokens[1]).toEqual({value: '::', scopes: ['source.php', 'keyword.operator.class.php']});
-      return expect(tokens[2]).toEqual({value: 'classic', scopes: ['source.php', 'constant.other.class.php']});
+      expect(tokens[2]).toEqual({value: 'classic', scopes: ['source.php', 'constant.other.class.php']});
   });
 });
 
@@ -2366,7 +2361,7 @@ doSomething(
       expect(tokens[11]).toEqual({value: 'e', scopes: ['source.php', 'meta.catch.php', 'variable.other.php']});
       expect(tokens[12]).toEqual({value: ')', scopes: ['source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(tokens[14]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
-      return expect(tokens[15]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+      expect(tokens[15]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
   });
 
     it('tokenizes a catch block containing namespaced exception', function() {
@@ -2376,7 +2371,7 @@ doSomething(
       expect(tokens[7]).toEqual({value: '\\', scopes: ["source.php", "meta.catch.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]});
       expect(tokens[8]).toEqual({value: 'Abc', scopes: ["source.php", "meta.catch.php", "support.other.namespace.php"]});
       expect(tokens[9]).toEqual({value: '\\', scopes: ["source.php", "meta.catch.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]});
-      return expect(tokens[10]).toEqual({value: 'Exception', scopes: ["source.php", "meta.catch.php", "support.class.exception.php"]});
+      expect(tokens[10]).toEqual({value: 'Exception', scopes: ["source.php", "meta.catch.php", "support.class.exception.php"]});
   });
 
     it('tokenizes a catch block containing multiple exceptions', function() {
@@ -2395,7 +2390,7 @@ doSomething(
       expect(tokens[18]).toEqual({value: 'e', scopes: ['source.php', 'meta.catch.php', 'variable.other.php']});
       expect(tokens[19]).toEqual({value: ')', scopes: ['source.php', 'meta.catch.php', 'punctuation.definition.parameters.end.bracket.round.php']});
       expect(tokens[21]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
-      return expect(tokens[22]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+      expect(tokens[22]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
   });
 
     it('tokenizes a catch block containing multiple namespaced exceptions', function() {
@@ -2420,10 +2415,10 @@ doSomething(
       expect(tokens[20]).toEqual({value: ' ', scopes: ["source.php", "meta.catch.php"]});
       expect(tokens[21]).toEqual({value: '\\', scopes: ["source.php", "meta.catch.php", "support.other.namespace.php", "punctuation.separator.inheritance.php"]});
       expect(tokens[22]).toEqual({value: 'Error', scopes: ["source.php", "meta.catch.php", "support.class.exception.php"]});
-      return expect(tokens[26]).toEqual({value: ')', scopes: ["source.php", "meta.catch.php", "punctuation.definition.parameters.end.bracket.round.php"]});
+      expect(tokens[26]).toEqual({value: ')', scopes: ["source.php", "meta.catch.php", "punctuation.definition.parameters.end.bracket.round.php"]});
   });
 
-    return it('tokenizes non-capturing catch block', function() {
+    it('tokenizes non-capturing catch block', function() {
       const {tokens} = grammar.tokenizeLine('try {} catch (Exception) {}');
 
       expect(tokens[5]).toEqual({value: 'catch', scopes: ["source.php", "meta.catch.php", "keyword.control.exception.catch.php"]});
@@ -2431,7 +2426,7 @@ doSomething(
       expect(tokens[8]).toEqual({value: 'Exception', scopes: ["source.php", "meta.catch.php", "support.class.exception.php"]});
       expect(tokens[9]).toEqual({value: ')', scopes: ["source.php", "meta.catch.php", "punctuation.definition.parameters.end.bracket.round.php"]});
       expect(tokens[11]).toEqual({value: '{', scopes: ["source.php", "punctuation.definition.begin.bracket.curly.php"]});
-      return expect(tokens[12]).toEqual({value: '}', scopes: ["source.php", "punctuation.definition.end.bracket.curly.php"]});
+      expect(tokens[12]).toEqual({value: '}', scopes: ["source.php", "punctuation.definition.end.bracket.curly.php"]});
   });
 });
 
@@ -2441,7 +2436,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: '0x1D306', scopes: ['source.php', 'constant.numeric.hex.php']});
 
       ({tokens} = grammar.tokenizeLine('0X1D306'));
-      return expect(tokens[0]).toEqual({value: '0X1D306', scopes: ['source.php', 'constant.numeric.hex.php']});
+      expect(tokens[0]).toEqual({value: '0X1D306', scopes: ['source.php', 'constant.numeric.hex.php']});
   });
 
     it('tokenizes binary literals', function() {
@@ -2449,7 +2444,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: '0b011101110111010001100110', scopes: ['source.php', 'constant.numeric.binary.php']});
 
       ({tokens} = grammar.tokenizeLine('0B011101110111010001100110'));
-      return expect(tokens[0]).toEqual({value: '0B011101110111010001100110', scopes: ['source.php', 'constant.numeric.binary.php']});
+      expect(tokens[0]).toEqual({value: '0B011101110111010001100110', scopes: ['source.php', 'constant.numeric.binary.php']});
   });
 
     it('tokenizes octal literals', function() {
@@ -2463,10 +2458,10 @@ doSomething(
       expect(tokens[0]).toEqual({value: '0o010', scopes: ['source.php', 'constant.numeric.octal.php']});
 
       ({tokens} = grammar.tokenizeLine('0O10'));
-      return expect(tokens[0]).toEqual({value: '0O10', scopes: ['source.php', 'constant.numeric.octal.php']});
+      expect(tokens[0]).toEqual({value: '0O10', scopes: ['source.php', 'constant.numeric.octal.php']});
   });
 
-    return it('tokenizes decimals', function() {
+    it('tokenizes decimals', function() {
       let {tokens} = grammar.tokenizeLine('1234');
       expect(tokens[0]).toEqual({value: '1234', scopes: ['source.php', 'constant.numeric.decimal.php']});
 
@@ -2496,7 +2491,7 @@ doSomething(
       ({tokens} = grammar.tokenizeLine('1.E3'));
       expect(tokens[0]).toEqual({value: '1', scopes: ['source.php', 'constant.numeric.decimal.php']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']});
-      return expect(tokens[2]).toEqual({value: 'E3', scopes: ['source.php', 'constant.numeric.decimal.php']});
+      expect(tokens[2]).toEqual({value: 'E3', scopes: ['source.php', 'constant.numeric.decimal.php']});
   });
 });
 
@@ -2506,7 +2501,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: '0xCAFE_F00D', scopes: ['source.php', 'constant.numeric.hex.php']});
 
       ({tokens} = grammar.tokenizeLine('0XFEED_D06_BEEF'));
-      return expect(tokens[0]).toEqual({value: '0XFEED_D06_BEEF', scopes: ['source.php', 'constant.numeric.hex.php']});
+      expect(tokens[0]).toEqual({value: '0XFEED_D06_BEEF', scopes: ['source.php', 'constant.numeric.hex.php']});
   });
 
     it('tokenizes binary literals', function() {
@@ -2514,7 +2509,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: '0b0111_0111_0111_0100_0110_0110', scopes: ['source.php', 'constant.numeric.binary.php']});
 
       ({tokens} = grammar.tokenizeLine('0B0111_0111_0111_0100_0110_0110'));
-      return expect(tokens[0]).toEqual({value: '0B0111_0111_0111_0100_0110_0110', scopes: ['source.php', 'constant.numeric.binary.php']});
+      expect(tokens[0]).toEqual({value: '0B0111_0111_0111_0100_0110_0110', scopes: ['source.php', 'constant.numeric.binary.php']});
   });
 
     it('tokenizes octal literals', function() {
@@ -2528,7 +2523,7 @@ doSomething(
       expect(tokens[0]).toEqual({value: '0o6_4_4', scopes: ['source.php', 'constant.numeric.octal.php']});
 
       ({tokens} = grammar.tokenizeLine('0O6_4_4'));
-      return expect(tokens[0]).toEqual({value: '0O6_4_4', scopes: ['source.php', 'constant.numeric.octal.php']});
+      expect(tokens[0]).toEqual({value: '0O6_4_4', scopes: ['source.php', 'constant.numeric.octal.php']});
   });
 
     it('tokenizes decimals', function() {
@@ -2561,10 +2556,10 @@ doSomething(
       ({tokens} = grammar.tokenizeLine('1.E7_3'));
       expect(tokens[0]).toEqual({value: '1', scopes: ['source.php', 'constant.numeric.decimal.php']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.php', 'constant.numeric.decimal.php', 'punctuation.separator.decimal.period.php']});
-      return expect(tokens[2]).toEqual({value: 'E7_3', scopes: ['source.php', 'constant.numeric.decimal.php']});
+      expect(tokens[2]).toEqual({value: 'E7_3', scopes: ['source.php', 'constant.numeric.decimal.php']});
   });
 
-    return it('tokenizes expression', function() {
+    it('tokenizes expression', function() {
       let {tokens} = grammar.tokenizeLine('2_0*0_7/(3e-1_3-2_0.3_4)*0b0_1+0Xf*_22');
 
       expect(tokens[0]).toEqual({value: '2_0', scopes: ["source.php", "constant.numeric.decimal.php"]});
@@ -2607,7 +2602,7 @@ doSomething(
       expect(tokens[15]).toEqual({value: ']', scopes: ["source.php", "punctuation.section.array.end.php"]});
       expect(tokens[16]).toEqual({value: '[', scopes: ["source.php", "punctuation.section.array.begin.php"]});
       expect(tokens[17]).toEqual({value: '0b1_0', scopes: ["source.php", "constant.numeric.binary.php"]});
-      return expect(tokens[18]).toEqual({value: ']', scopes: ["source.php", "punctuation.section.array.end.php"]});
+      expect(tokens[18]).toEqual({value: ']', scopes: ["source.php", "punctuation.section.array.end.php"]});
   });
 });
 
@@ -2644,7 +2639,7 @@ switch($something)
     expect(lines[6][1]).toEqual({value: 'default', scopes: ['source.php', 'meta.switch-statement.php', 'keyword.control.default.php']});
     expect(lines[6][2]).toEqual({value: ':', scopes: ['source.php', 'meta.switch-statement.php', 'punctuation.terminator.statement.php']});
     expect(lines[7][1]).toEqual({value: 'continue', scopes: ['source.php', 'meta.switch-statement.php', 'keyword.control.continue.php']});
-    return expect(lines[8][0]).toEqual({value: '}', scopes: ['source.php', 'meta.switch-statement.php', 'punctuation.definition.section.switch-block.end.bracket.curly.php']});
+    expect(lines[8][0]).toEqual({value: '}', scopes: ['source.php', 'meta.switch-statement.php', 'punctuation.definition.section.switch-block.end.bracket.curly.php']});
 });
 
   it('should tokenize match statements correctly', function() {
@@ -2684,7 +2679,7 @@ echo match (1) {
     expect(lines[3][7]).toEqual({value: '\'', scopes: ['source.php', 'meta.match-statement.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
     expect(lines[3][8]).toEqual({value: ',', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.separator.delimiter.php']});
     expect(lines[4][0]).toEqual({value: '}', scopes: ['source.php', 'meta.match-statement.php', 'punctuation.definition.section.match-block.end.bracket.curly.php']});
-    return expect(lines[4][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[4][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize storage types correctly', function() {
@@ -2700,7 +2695,7 @@ echo match (1) {
     expect(tokens[1]).toEqual({value: ' ', scopes: ['source.php']});
     expect(tokens[2]).toEqual({value: 'int', scopes: ['source.php', 'storage.type.php']});
     expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php']});
-    return expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'punctuation.definition.storage-type.end.bracket.round.php']});
+    expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'punctuation.definition.storage-type.end.bracket.round.php']});
 });
 
   describe('attributes', function() {
@@ -2715,7 +2710,7 @@ class Foo {}\
       expect(lines[0][1]).toEqual({value: 'ExampleAttribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']});
       expect(lines[0][2]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
       expect(lines[1][0]).toEqual({value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']});
-      return expect(lines[1][2]).toEqual({value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
+      expect(lines[1][2]).toEqual({value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
   });
 
     it('should tokenize inline attribute', function() {
@@ -2725,7 +2720,7 @@ class Foo {}\
       expect(tokens[1]).toEqual({value: 'ExampleAttribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']});
       expect(tokens[2]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
       expect(tokens[4]).toEqual({value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']});
-      return expect(tokens[6]).toEqual({value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
+      expect(tokens[6]).toEqual({value: 'Foo', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
   });
 
     it('should tokenize parameter attribute', function() {
@@ -2739,7 +2734,7 @@ class Foo {}\
       expect(tokens[6]).toEqual({value: ']', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.attribute.php']});
       expect(tokens[8]).toEqual({value: '$', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php', 'punctuation.definition.variable.php']});
       expect(tokens[9]).toEqual({value: 'parameter', scopes: ['source.php', 'meta.function.php', 'meta.function.parameters.php', 'meta.function.parameter.no-default.php', 'variable.other.php']});
-      return expect(tokens[10]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
+      expect(tokens[10]).toEqual({value: ')', scopes: ['source.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
   });
 
     it('should tokenize attribute for method', function() {
@@ -2758,7 +2753,7 @@ class Foo {
       expect(lines[1][3]).toEqual({value: ']', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'meta.attribute.php']});
       expect(lines[3][0]).toEqual({value: '  ', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.whitespace.comment.leading.php']});
       expect(lines[3][1]).toEqual({value: '#', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.line.number-sign.php', 'punctuation.definition.comment.php']});
-      return expect(lines[3][2]).toEqual({value: ' I\'m a happy comment!', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.line.number-sign.php']});
+      expect(lines[3][2]).toEqual({value: ' I\'m a happy comment!', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'comment.line.number-sign.php']});
   });
 
     it('should tokenize attribute with namespace', function() {
@@ -2770,7 +2765,7 @@ class Foo {
       expect(tokens[3]).toEqual({value: 'Bar', scopes: ['source.php', 'meta.attribute.php', 'support.other.namespace.php']});
       expect(tokens[4]).toEqual({value: '\\', scopes: ['source.php', 'meta.attribute.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
       expect(tokens[5]).toEqual({value: 'Attribute', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']});
-      return expect(tokens[6]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
+      expect(tokens[6]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
   });
 
     it('should tokenize multiple attributes', function() {
@@ -2780,7 +2775,7 @@ class Foo {
       expect(tokens[1]).toEqual({value: 'Attribute1', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']});
       expect(tokens[2]).toEqual({value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']});
       expect(tokens[4]).toEqual({value: 'Attribute2', scopes: ['source.php', 'meta.attribute.php', 'support.attribute.php']});
-      return expect(tokens[5]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
+      expect(tokens[5]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
   });
 
     it('should tokenize attribute with arguments', function() {
@@ -2805,7 +2800,7 @@ class Foo {
       expect(tokens[20]).toEqual({value: '2', scopes: ['source.php', 'meta.attribute.php', 'constant.numeric.decimal.php']});
       expect(tokens[21]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php', 'punctuation.section.array.end.php']});
       expect(tokens[22]).toEqual({value: ')', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.end.bracket.round.php']});
-      return expect(tokens[23]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
+      expect(tokens[23]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
   });
 
     it('should tokenize multiline attribute', function() {
@@ -2829,7 +2824,7 @@ class Foo {
       expect(lines[2][3]).toEqual({value: '\'', scopes: ['source.php', 'meta.attribute.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
       expect(lines[2][4]).toEqual({value: ',', scopes: ['source.php', 'meta.attribute.php', 'punctuation.separator.delimiter.php']});
       expect(lines[3][0]).toEqual({value: ')', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.end.bracket.round.php']});
-      return expect(lines[3][1]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
+      expect(lines[3][1]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
   });
 
     it('should tokenize attribute in anonymous class', function() {
@@ -2845,7 +2840,7 @@ class Foo {
       expect(tokens[11]).toEqual({value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']});
       expect(tokens[13]).toEqual({value: '{', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.begin.bracket.curly.php']});
       expect(tokens[14]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']});
-      return expect(tokens[15]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[15]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('should tokenize attribute in arrow function', function() {
@@ -2865,10 +2860,10 @@ class Foo {
       expect(tokens[15]).toEqual({value: '=>', scopes: ['source.php', 'meta.function.closure.php', 'punctuation.definition.arrow.php']});
       expect(tokens[17]).toEqual({value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']});
       expect(tokens[18]).toEqual({value: 'x', scopes: ['source.php', 'variable.other.php']});
-      return expect(tokens[19]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[19]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
-    return it('should tokenize builtin attribute', function() {
+    it('should tokenize builtin attribute', function() {
       const lines = grammar.tokenizeLines(`\
 #[Attribute(Attribute::TARGET_CLASS)]
 class FooAttribute {}\
@@ -2884,7 +2879,7 @@ class FooAttribute {}\
       expect(lines[0][6]).toEqual({value: ')', scopes: ['source.php', 'meta.attribute.php', 'punctuation.definition.arguments.end.bracket.round.php']});
       expect(lines[0][7]).toEqual({value: ']', scopes: ['source.php', 'meta.attribute.php']});
       expect(lines[1][0]).toEqual({value: 'class', scopes: ['source.php', 'meta.class.php', 'storage.type.class.php']});
-      return expect(lines[1][2]).toEqual({value: 'FooAttribute', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
+      expect(lines[1][2]).toEqual({value: 'FooAttribute', scopes: ['source.php', 'meta.class.php', 'entity.name.type.class.php']});
   });
 });
 
@@ -2900,7 +2895,7 @@ class FooAttribute {}\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: '*', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '@api', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
-      return expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     it('should tokenize @method tag correctly', function() {
@@ -2914,7 +2909,7 @@ class FooAttribute {}\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: '*', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '@method', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
-      return expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     it('should tokenize @property tag correctly', function() {
@@ -2928,7 +2923,7 @@ class FooAttribute {}\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: '*', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '@property', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
-      return expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     it('should tokenize @property-read tag correctly', function() {
@@ -2942,7 +2937,7 @@ class FooAttribute {}\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: '*', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '@property-read', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
-      return expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     it('should tokenize @property-write tag correctly', function() {
@@ -2956,7 +2951,7 @@ class FooAttribute {}\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: '*', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '@property-write', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
-      return expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     it('should tokenize @source tag correctly', function() {
@@ -2970,7 +2965,7 @@ class FooAttribute {}\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: '*', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '@source', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
-      return expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(lines[2][0]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     it('should tokenize an inline phpdoc correctly', function() {
@@ -2980,7 +2975,7 @@ class FooAttribute {}\
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
       expect(tokens[2]).toEqual({value: '@var', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
       expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
-      return expect(tokens[4]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+      expect(tokens[4]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
   });
 
     describe('types', function() {
@@ -3005,7 +3000,7 @@ class FooAttribute {}\
         expect(lines[1][1]).toEqual({value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
         expect(lines[1][2]).toEqual({value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
         expect(lines[1][3]).toEqual({value: 'Test', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
-        return expect(lines[1][4]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][4]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize a single nullable type', function() {
@@ -3031,7 +3026,7 @@ class FooAttribute {}\
         expect(lines[1][2]).toEqual({value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
         expect(lines[1][3]).toEqual({value: '?', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.operator.nullable-type.php']});
         expect(lines[1][4]).toEqual({value: 'Test', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
-        return expect(lines[1][5]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][5]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize a single namespaced type', function() {
@@ -3047,7 +3042,7 @@ class FooAttribute {}\
         expect(lines[1][4]).toEqual({value: 'Test', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.other.namespace.php']});
         expect(lines[1][5]).toEqual({value: '\\', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
         expect(lines[1][6]).toEqual({value: 'Type', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
-        return expect(lines[1][7]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][7]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize multiple types', function() {
@@ -3062,7 +3057,7 @@ class FooAttribute {}\
         expect(lines[1][3]).toEqual({value: 'int', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.type.php']});
         expect(lines[1][4]).toEqual({value: '|', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']});
         expect(lines[1][5]).toEqual({value: 'Class', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
-        return expect(lines[1][6]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][6]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize multiple nullable types', function() {
@@ -3079,7 +3074,7 @@ class FooAttribute {}\
         expect(lines[1][5]).toEqual({value: '|', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']});
         expect(lines[1][6]).toEqual({value: '?', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.operator.nullable-type.php']});
         expect(lines[1][7]).toEqual({value: 'Class', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
-        return expect(lines[1][8]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][8]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize intersection types', function() {
@@ -3092,7 +3087,7 @@ class FooAttribute {}\
         expect(lines[1][1]).toEqual({value: '@param', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'keyword.other.phpdoc.php']});
         expect(lines[1][3]).toEqual({value: 'Foo', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
         expect(lines[1][4]).toEqual({value: '&', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.separator.delimiter.php']});
-        return expect(lines[1][5]).toEqual({value: 'Bar', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
+        expect(lines[1][5]).toEqual({value: 'Bar', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
     });
 
       it('should tokenize multiple namespaced types', function() {
@@ -3112,7 +3107,7 @@ class FooAttribute {}\
         expect(lines[1][8]).toEqual({value: 'Another', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.other.namespace.php']});
         expect(lines[1][9]).toEqual({value: '\\', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
         expect(lines[1][10]).toEqual({value: 'Root', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
-        return expect(lines[1][11]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][11]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize a single array type', function() {
@@ -3138,7 +3133,7 @@ class FooAttribute {}\
         expect(lines[1][2]).toEqual({value: ' ', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
         expect(lines[1][3]).toEqual({value: 'Test', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
         expect(lines[1][4]).toEqual({value: '[]', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.array.phpdoc.php']});
-        return expect(lines[1][5]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][5]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize a single namespaced array type', function() {
@@ -3154,7 +3149,7 @@ class FooAttribute {}\
         expect(lines[1][4]).toEqual({value: '\\', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
         expect(lines[1][5]).toEqual({value: 'Type', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'support.class.php']});
         expect(lines[1][6]).toEqual({value: '[]', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.array.phpdoc.php']});
-        return expect(lines[1][7]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][7]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
       it('should tokenize multiple array types', function() {
@@ -3214,23 +3209,23 @@ class FooAttribute {}\
         expect(lines[1][19]).toEqual({value: 'resource', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.type.php']});
         expect(lines[1][20]).toEqual({value: ')', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'punctuation.definition.type.end.bracket.round.phpdoc.php']});
         expect(lines[1][21]).toEqual({value: '[]', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'meta.other.type.phpdoc.php', 'keyword.other.array.phpdoc.php']});
-        return expect(lines[1][22]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
+        expect(lines[1][22]).toEqual({value: ' description', scopes: ['source.php', 'comment.block.documentation.phpdoc.php']});
     });
 
-      return it('should end the PHPDoc at the ending comment even if there are malformed types', function() {
+      it('should end the PHPDoc at the ending comment even if there are malformed types', function() {
         const {tokens} = grammar.tokenizeLine('/** @var array(string) */');
 
-        return expect(tokens[8]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
+        expect(tokens[8]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
     });
   });
 
     it('should not tokenize /*** as phpdoc', function() {
       const {tokens} = grammar.tokenizeLine('/*** @var */');
 
-      return expect(tokens[0].scopes).not.toContain('comment.block.documentation.phpdoc.php');
+      expect(tokens[0].scopes).not.toContain('comment.block.documentation.phpdoc.php');
     });
 
-    return it('should tokenize malformed phpDocumentor DocBlock line that contains closing tag correctly', function() {
+    it('should tokenize malformed phpDocumentor DocBlock line that contains closing tag correctly', function() {
       const lines = grammar.tokenizeLines(`\
 /**
 invalid*/$a=1;\
@@ -3240,7 +3235,7 @@ invalid*/$a=1;\
       expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
       expect(lines[1][0]).toEqual({value: 'invalid', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'invalid.illegal.missing-asterisk.phpdoc.php']});
       expect(lines[1][1]).toEqual({value: '*/', scopes: ['source.php', 'comment.block.documentation.phpdoc.php', 'punctuation.definition.comment.php']});
-      return expect(lines[1][2]).toEqual({value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']});
+      expect(lines[1][2]).toEqual({value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']});
   });
 });
 
@@ -3253,7 +3248,7 @@ invalid*/$a=1;\
       expect(tokens[2]).toEqual({value: '\\007', scopes: ['source.php', 'string.quoted.double.php', 'constant.character.escape.octal.php']});
       expect(tokens[3]).toEqual({value: ' test', scopes: ['source.php', 'string.quoted.double.php']});
       expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes escaped hex sequences', function() {
@@ -3264,7 +3259,7 @@ invalid*/$a=1;\
       expect(tokens[2]).toEqual({value: '\\x0f', scopes: ['source.php', 'string.quoted.double.php', 'constant.character.escape.hex.php']});
       expect(tokens[3]).toEqual({value: ' test', scopes: ['source.php', 'string.quoted.double.php']});
       expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     it('tokenizes escaped unicode sequences', function() {
@@ -3275,7 +3270,7 @@ invalid*/$a=1;\
       expect(tokens[2]).toEqual({value: '\\u{00A0}', scopes: ['source.php', 'string.quoted.double.php', 'constant.character.escape.unicode.php']});
       expect(tokens[3]).toEqual({value: ' test', scopes: ['source.php', 'string.quoted.double.php']});
       expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
-      return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+      expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
   });
 
     return ['n', 'r', 't', 'v', 'e', 'f', '$', '"', '\\'].map((escapeCharacter) =>
@@ -3287,7 +3282,7 @@ invalid*/$a=1;\
         expect(tokens[2]).toEqual({value: `\\${escapeCharacter}`, scopes: ['source.php', 'string.quoted.double.php', 'constant.character.escape.php']});
         expect(tokens[3]).toEqual({value: ' test', scopes: ['source.php', 'string.quoted.double.php']});
         expect(tokens[4]).toEqual({value: '"', scopes: ['source.php', 'string.quoted.double.php', 'punctuation.definition.string.end.php']});
-        return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+        expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     }));
 });
 
@@ -3306,7 +3301,7 @@ invalid*/$a=1;\
     expect(tokens[9]).toEqual({value: 'Plane', scopes: ['source.php', 'meta.interface.php', 'entity.other.inherited-class.php']});
     expect(tokens[10]).toEqual({value: ' ', scopes: ['source.php', 'meta.interface.php']});
     expect(tokens[11]).toEqual({value: '{', scopes: ['source.php', 'meta.interface.php', 'punctuation.definition.interface.begin.bracket.curly.php']});
-    return expect(tokens[12]).toEqual({value: '}', scopes: ['source.php', 'meta.interface.php', 'punctuation.definition.interface.end.bracket.curly.php']});
+    expect(tokens[12]).toEqual({value: '}', scopes: ['source.php', 'meta.interface.php', 'punctuation.definition.interface.end.bracket.curly.php']});
 });
 
   it('should tokenize methods in interface correctly', function() {
@@ -3333,7 +3328,7 @@ interface Test {
     expect(lines[2][6]).toEqual({value: '(', scopes: ['source.php', 'meta.interface.php', 'meta.interface.body.php', 'meta.function.php', 'punctuation.definition.parameters.begin.bracket.round.php']});
     expect(lines[2][7]).toEqual({value: ')', scopes: ['source.php', 'meta.interface.php', 'meta.interface.body.php', 'meta.function.php', 'punctuation.definition.parameters.end.bracket.round.php']});
     expect(lines[2][8]).toEqual({value: ';', scopes: ['source.php', 'meta.interface.php', 'meta.interface.body.php', 'punctuation.terminator.expression.php']});
-    return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.interface.php', 'punctuation.definition.interface.end.bracket.curly.php']});
+    expect(lines[3][0]).toEqual({value: '}', scopes: ['source.php', 'meta.interface.php', 'punctuation.definition.interface.end.bracket.curly.php']});
 });
 
   it('should tokenize trait correctly', function() {
@@ -3344,7 +3339,7 @@ interface Test {
     expect(tokens[2]).toEqual({value: 'Test', scopes: ['source.php', 'meta.trait.php', 'entity.name.type.trait.php']});
     expect(tokens[3]).toEqual({value: ' ', scopes: ['source.php', 'meta.trait.php']});
     expect(tokens[4]).toEqual({value: '{', scopes: ['source.php', 'meta.trait.php', 'punctuation.definition.trait.begin.bracket.curly.php']});
-    return expect(tokens[5]).toEqual({value: '}', scopes: ['source.php', 'meta.trait.php', 'punctuation.definition.trait.end.bracket.curly.php']});
+    expect(tokens[5]).toEqual({value: '}', scopes: ['source.php', 'meta.trait.php', 'punctuation.definition.trait.end.bracket.curly.php']});
 });
 
   it('should tokenize use const correctly', function() {
@@ -3359,7 +3354,7 @@ interface Test {
     expect(tokens[6]).toEqual({value: 'Test', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php']});
     expect(tokens[7]).toEqual({value: '\\', scopes: ['source.php', 'meta.use.php', 'support.other.namespace.php', 'punctuation.separator.inheritance.php']});
     expect(tokens[8]).toEqual({value: 'CONSTANT', scopes: ['source.php', 'meta.use.php', 'support.class.php']});
-    return expect(tokens[9]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(tokens[9]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize use function correctly', function() {
@@ -3378,7 +3373,7 @@ interface Test {
     expect(tokens[10]).toEqual({value: 'as', scopes: ['source.php', 'meta.use.php', 'keyword.other.use-as.php']});
     expect(tokens[11]).toEqual({value: ' ', scopes: ['source.php', 'meta.use.php']});
     expect(tokens[12]).toEqual({value: 'func', scopes: ['source.php', 'meta.use.php', 'entity.other.alias.php']});
-    return expect(tokens[13]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(tokens[13]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('tokenizes yield', function() {
@@ -3398,7 +3393,7 @@ interface Test {
     expect(tokens[11]).toEqual({value: 'a', scopes: ['source.php', 'variable.other.php']});
     expect(tokens[12]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     expect(tokens[13]).toEqual({value: ' ', scopes: ['source.php']});
-    return expect(tokens[14]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
+    expect(tokens[14]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
 });
 
   it('tokenizes `yield from`', function() {
@@ -3416,7 +3411,7 @@ interface Test {
     expect(tokens[9]).toEqual({value: ' ', scopes: ['source.php']});
     expect(tokens[10]).toEqual({value: '$', scopes: ['source.php', 'variable.other.php', 'punctuation.definition.variable.php']});
     expect(tokens[11]).toEqual({value: 'a', scopes: ['source.php', 'variable.other.php']});
-    return expect(tokens[12]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(tokens[12]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize embedded SQL in a string', function() {
@@ -3460,7 +3455,7 @@ ${delim}SELECT something
     expect(tokens[2]).toEqual({value: '\\\\\\\\', scopes: ['source.php', 'string.regexp.single-quoted.php', 'string.regexp.character-class.php']});
     expect(tokens[3]).toEqual({value: ']', scopes: ['source.php', 'string.regexp.single-quoted.php', 'string.regexp.character-class.php', 'punctuation.definition.character-class.php']});
     expect(tokens[4]).toEqual({value: '/\'', scopes: ['source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.end.php']});
-    return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize single quoted string regex with escaped bracket', function() {
@@ -3468,7 +3463,7 @@ ${delim}SELECT something
 
     expect(tokens[0]).toEqual({value: '\'/', scopes: ['source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.begin.php']});
     expect(tokens[1]).toEqual({value: '\\[', scopes: ['source.php', 'string.regexp.single-quoted.php', 'constant.character.escape.php']});
-    return expect(tokens[2]).toEqual({value: '/\'', scopes: ['source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.end.php']});
+    expect(tokens[2]).toEqual({value: '/\'', scopes: ['source.php', 'string.regexp.single-quoted.php', 'punctuation.definition.string.end.php']});
 });
 
   it('should tokenize opening scope of a closure correctly', function() {
@@ -3485,7 +3480,7 @@ ${delim}SELECT something
     expect(tokens[8]).toEqual({value: ' ', scopes: ['source.php']});
     expect(tokens[9]).toEqual({value: '{', scopes: ['source.php', 'punctuation.definition.begin.bracket.curly.php']});
     expect(tokens[10]).toEqual({value: '}', scopes: ['source.php', 'punctuation.definition.end.bracket.curly.php']});
-    return expect(tokens[11]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(tokens[11]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize comments in closures correctly', function() {
@@ -3495,7 +3490,7 @@ ${delim}SELECT something
     expect(tokens[6]).toEqual({value: '(', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.begin.bracket.round.php"]});
     expect(tokens[7]).toEqual({value: ')', scopes: ["source.php", "meta.function.closure.php", "punctuation.definition.parameters.end.bracket.round.php"]});
     expect(tokens[9]).toEqual({value: '/*', scopes: ["source.php", "meta.function.closure.php", "comment.block.php", "punctuation.definition.comment.php"]});
-    return expect(tokens[11]).toEqual({value: '*/', scopes: ["source.php", "meta.function.closure.php", "comment.block.php", "punctuation.definition.comment.php"]});
+    expect(tokens[11]).toEqual({value: '*/', scopes: ["source.php", "meta.function.closure.php", "comment.block.php", "punctuation.definition.comment.php"]});
 });
 
   it('should tokenize non-function-non-control operations correctly', function() {
@@ -3506,7 +3501,7 @@ ${delim}SELECT something
     expect(tokens[2]).toEqual({value: '\'', scopes: ['source.php', 'string.quoted.single.php', 'punctuation.definition.string.begin.php']});
     expect(tokens[3]).toEqual({value: 'test', scopes: ['source.php', 'string.quoted.single.php']});
     expect(tokens[4]).toEqual({value: '\'', scopes: ['source.php', 'string.quoted.single.php', 'punctuation.definition.string.end.php']});
-    return expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(tokens[5]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize heredoc in a function call correctly', function() {
@@ -3530,7 +3525,7 @@ foo(
     expect(lines[4][1]).toEqual({value: '$', scopes: ['source.php', 'meta.function-call.php', 'variable.other.php', 'punctuation.definition.variable.php']});
     expect(lines[4][2]).toEqual({value: 'bar', scopes: ['source.php', 'meta.function-call.php', 'variable.other.php']});
     expect(lines[5][0]).toEqual({value: ')', scopes: ['source.php', 'meta.function-call.php', 'punctuation.definition.arguments.end.bracket.round.php']});
-    return expect(lines[5][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[5][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a simple heredoc correctly', function() {
@@ -3608,7 +3603,7 @@ HEREDOC; // comment\
     expect(lines[2][0]).toEqual({value: 'HEREDOC', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']});
     expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
     expect(lines[2][2]).toEqual({value: ' ', scopes: ['source.php']});
-    return expect(lines[2][3]).toEqual({value: '//', scopes: ['source.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']});
+    expect(lines[2][3]).toEqual({value: '//', scopes: ['source.php', 'comment.line.double-slash.php', 'punctuation.definition.comment.php']});
 });
 
   it('should tokenize a longer heredoc correctly', function() {
@@ -3644,7 +3639,7 @@ GITHUB;\
     expect(lines[8][0]).toEqual({value: '  });', scopes: ['source.php', 'string.unquoted.heredoc.php']});
     expect(lines[9][0]).toEqual({value: '}', scopes: ['source.php', 'string.unquoted.heredoc.php']});
     expect(lines[10][0]).toEqual({value: 'GITHUB', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']});
-    return expect(lines[10][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[10][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a longer heredoc with interpolated values and escaped characters correctly', function() {
@@ -3691,7 +3686,7 @@ GITHUB;\
     expect(lines[11][3]).toEqual({value: '\\\\', scopes: ['source.php', 'string.unquoted.heredoc.php', 'constant.character.escape.php']});
     expect(lines[11][4]).toEqual({value: 'turning\\back.exe', scopes: ['source.php', 'string.unquoted.heredoc.php']});
     expect(lines[12][0]).toEqual({value: 'GITHUB', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']});
-    return expect(lines[12][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[12][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a nowdoc with interpolated values correctly', function() {
@@ -3733,7 +3728,7 @@ GITHUB;\
     expect(lines[10][0]).toEqual({value: '}', scopes: ['source.php', 'string.unquoted.nowdoc.php']});
     expect(lines[11][0]).toEqual({value: 'C:\\\\no\\\\turning\\back.exe', scopes: ['source.php', 'string.unquoted.nowdoc.php']});
     expect(lines[12][0]).toEqual({value: 'GITHUB', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'keyword.operator.nowdoc.php']});
-    return expect(lines[12][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[12][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a heredoc with embedded HTML and interpolation correctly', function() {
@@ -3780,7 +3775,7 @@ HTML;\
       expect(lines[3][3]).toEqual({value: '\\\\', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html', 'constant.character.escape.php']});
       expect(lines[3][4]).toEqual({value: 'turning\\back.exe', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'text.html']});
       expect(lines[4][0]).toEqual({value: 'HTML', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.html', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[4][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[4][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded HTML and interpolation correctly', function() {
@@ -3820,7 +3815,7 @@ HTML;\
       expect(lines[1][6].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.html', 'text.html']);
       expect(lines[2][0]).toEqual({value: 'Jumpin\' Juniper is \\"The $thing\\"', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.html', 'text.html']});
       expect(lines[3][0]).toEqual({value: 'HTML', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.html', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[3][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[3][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with illegal whitespace at the end of the line correctly', function() {
@@ -3841,7 +3836,7 @@ GITHUB;\
     expect(lines[0][7]).toEqual({value: '\t', scopes: ['source.php', 'string.unquoted.heredoc.php', 'invalid.illegal.trailing-whitespace.php']});
     expect(lines[1][0]).toEqual({value: 'This is a plain string.', scopes: ['source.php', 'string.unquoted.heredoc.php']});
     expect(lines[2][0]).toEqual({value: 'GITHUB', scopes: ['source.php', 'string.unquoted.heredoc.php', 'keyword.operator.heredoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a heredoc with embedded XML correctly', function() {
@@ -3869,7 +3864,7 @@ XML;\
       expect(lines[1][2].value).toEqual('/>');
       expect(lines[1][2].scopes).toContainAll(['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.xml', 'text.xml']);
       expect(lines[2][0]).toEqual({value: 'XML', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.xml', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded XML correctly', function() {
@@ -3899,7 +3894,7 @@ XML;\
       expect(lines[1][2].value).toEqual('/>');
       expect(lines[1][2].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.xml', 'text.xml']);
       expect(lines[2][0]).toEqual({value: 'XML', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.xml', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with embedded SQL correctly', function() {
@@ -3933,7 +3928,7 @@ SQL;\
       expect(lines[1][5].value).toEqual(' table');
       expect(lines[1][5].scopes).toContainAll(['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.sql', 'source.sql']);
       expect(lines[2][0]).toEqual({value: 'SQL', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.sql', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded SQL correctly', function() {
@@ -3969,7 +3964,7 @@ SQL;\
       expect(lines[1][5].value).toEqual(' table');
       expect(lines[1][5].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.sql', 'source.sql']);
       expect(lines[2][0]).toEqual({value: 'SQL', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.sql', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with embedded DQL correctly', function() {
@@ -4003,7 +3998,7 @@ DQL;\
       expect(lines[1][5].value).toEqual(' table');
       expect(lines[1][5].scopes).toContainAll(['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.sql', 'source.sql']);
       expect(lines[2][0]).toEqual({value: 'DQL', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.sql', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded DQL correctly', function() {
@@ -4039,7 +4034,7 @@ DQL;\
       expect(lines[1][5].value).toEqual(' table');
       expect(lines[1][5].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.sql', 'source.sql']);
       expect(lines[2][0]).toEqual({value: 'DQL', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.sql', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with embedded javascript correctly', function() {
@@ -4099,7 +4094,7 @@ JS;\
       expect(lines[5][5].value).toEqual(';');
       expect(lines[5][5].scopes).toContainAll(['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.js', 'source.js']);
       expect(lines[6][0]).toEqual({value: 'JS', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.js', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[6][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[6][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded javascript correctly', function() {
@@ -4163,7 +4158,7 @@ JS;\
       expect(lines[5][5].value).toEqual(';');
       expect(lines[5][5].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.js', 'source.js']);
       expect(lines[6][0]).toEqual({value: 'JS', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.js', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[6][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[6][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with embedded json correctly', function() {
@@ -4203,7 +4198,7 @@ JSON;\
       expect(lines[1][8].value).toEqual('}');
       expect(lines[1][8].scopes).toContainAll(['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.json', 'source.json']);
       expect(lines[2][0]).toEqual({value: 'JSON', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.json', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded json correctly', function() {
@@ -4245,7 +4240,7 @@ JSON;\
       expect(lines[1][8].value).toEqual('}');
       expect(lines[1][8].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.json', 'source.json']);
       expect(lines[2][0]).toEqual({value: 'JSON', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.json', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with embedded css correctly', function() {
@@ -4273,7 +4268,7 @@ CSS;\
       expect(lines[1][2].value).toEqual('}');
       expect(lines[1][2].scopes).toContainAll(['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.css', 'source.css']);
       expect(lines[2][0]).toEqual({value: 'CSS', scopes: ['source.php', 'string.unquoted.heredoc.php', 'meta.embedded.css', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a nowdoc with embedded css correctly', function() {
@@ -4303,7 +4298,7 @@ CSS;\
       expect(lines[1][2].value).toEqual('}');
       expect(lines[1][2].scopes).toContainAll(['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.css', 'source.css']);
       expect(lines[2][0]).toEqual({value: 'CSS', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'meta.embedded.css', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});});
 });
 
   it('should tokenize a heredoc with embedded regex escaped bracket correctly', function() {
@@ -4325,7 +4320,7 @@ REGEX;\
     expect(lines[1][1]).toEqual({value: '\\[', scopes: ['source.php', 'string.unquoted.heredoc.php', 'string.regexp.heredoc.php', 'constant.character.escape.regex.php']});
     expect(lines[1][2]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.heredoc.php', 'string.regexp.heredoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEX', scopes: ['source.php', 'string.unquoted.heredoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a nowdoc with embedded regex escape characters correctly', function() {
@@ -4352,7 +4347,7 @@ REGEX;\
     expect(lines[1][4]).toEqual({value: ']', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php', 'string.regexp.character-class.php', 'punctuation.definition.character-class.php']});
     expect(lines[1][5]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEX', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a nowdoc with embedded regex escaped bracket correctly', function() {
@@ -4376,7 +4371,7 @@ REGEX;\
     expect(lines[1][1]).toEqual({value: '\\[', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php', 'constant.character.escape.regex.php']});
     expect(lines[1][2]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEX', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a heredoc with embedded regex escape characters correctly', function() {
@@ -4401,7 +4396,7 @@ REGEXP;\
     expect(lines[1][4]).toEqual({value: ']', scopes: ['source.php', 'string.unquoted.heredoc.php', 'string.regexp.heredoc.php', 'string.regexp.character-class.php', 'punctuation.definition.character-class.php']});
     expect(lines[1][5]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.heredoc.php', 'string.regexp.heredoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEXP', scopes: ['source.php', 'string.unquoted.heredoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a heredoc with embedded regex escaped bracket correctly', function() {
@@ -4423,7 +4418,7 @@ REGEXP;\
     expect(lines[1][1]).toEqual({value: '\\[', scopes: ['source.php', 'string.unquoted.heredoc.php', 'string.regexp.heredoc.php', 'constant.character.escape.regex.php']});
     expect(lines[1][2]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.heredoc.php', 'string.regexp.heredoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEXP', scopes: ['source.php', 'string.unquoted.heredoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.heredoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a nowdoc with embedded regex escape characters correctly', function() {
@@ -4450,7 +4445,7 @@ REGEXP;\
     expect(lines[1][4]).toEqual({value: ']', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php', 'string.regexp.character-class.php', 'punctuation.definition.character-class.php']});
     expect(lines[1][5]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEXP', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
   it('should tokenize a nowdoc with embedded regex escaped bracket correctly', function() {
@@ -4474,10 +4469,10 @@ REGEXP;\
     expect(lines[1][1]).toEqual({value: '\\[', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php', 'constant.character.escape.regex.php']});
     expect(lines[1][2]).toEqual({value: '/', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'string.regexp.nowdoc.php']});
     expect(lines[2][0]).toEqual({value: 'REGEXP', scopes: ['source.php', 'string.unquoted.nowdoc.php', 'punctuation.section.embedded.end.php', 'keyword.operator.nowdoc.php']});
-    return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
+    expect(lines[2][1]).toEqual({value: ';', scopes: ['source.php', 'punctuation.terminator.expression.php']});
 });
 
-  return describe('punctuation', function() {
+  describe('punctuation', function() {
     it('tokenizes brackets', function() {
       let {tokens} = grammar.tokenizeLine('{}');
 
@@ -4500,10 +4495,10 @@ class Test {
       expect(lines[0][4]).toEqual({value: '{', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.begin.bracket.curly.php']});
       expect(lines[1][1]).toEqual({value: '{', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.definition.begin.bracket.curly.php']});
       expect(lines[1][2]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'meta.class.body.php', 'punctuation.definition.end.bracket.curly.php']});
-      return expect(lines[2][0]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']});
+      expect(lines[2][0]).toEqual({value: '}', scopes: ['source.php', 'meta.class.php', 'punctuation.definition.class.end.bracket.curly.php']});
   });
 
-    return it('tokenizes parentheses', function() {
+    it('tokenizes parentheses', function() {
       let {tokens} = grammar.tokenizeLine('()');
 
       expect(tokens[0]).toEqual({value: '(', scopes: ['source.php', 'punctuation.definition.begin.bracket.round.php']});
@@ -4512,7 +4507,7 @@ class Test {
       ({tokens} = grammar.tokenizeLine('(/* stuff */)'));
 
       expect(tokens[0]).toEqual({value: '(', scopes: ['source.php', 'punctuation.definition.begin.bracket.round.php']});
-      return expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'punctuation.definition.end.bracket.round.php']});
+      expect(tokens[4]).toEqual({value: ')', scopes: ['source.php', 'punctuation.definition.end.bracket.round.php']});
   });
 });
 });
