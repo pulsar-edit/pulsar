@@ -1,19 +1,15 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe("Autoflow package", function() {
+
+describe("Autoflow package", () => {
   let [autoflow, editor, editorElement] = [];
   const tabLength = 4;
 
-  describe("autoflow:reflow-selection", function() {
-    beforeEach(function() {
+  describe("autoflow:reflow-selection", () => {
+    beforeEach(() => {
       let activationPromise = null;
 
       waitsForPromise(() => atom.workspace.open());
 
-      runs(function() {
+      runs(() => {
         editor = atom.workspace.getActiveTextEditor();
         editorElement = atom.views.getView(editor);
 
@@ -22,36 +18,36 @@ describe("Autoflow package", function() {
 
         activationPromise = atom.packages.activatePackage('autoflow');
 
-        return atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
+        atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
       });
 
-      return waitsForPromise(() => activationPromise);
+      waitsForPromise(() => activationPromise);
     });
 
-    it("uses the preferred line length based on the editor's scope", function() {
+    it("uses the preferred line length based on the editor's scope", () => {
       atom.config.set('editor.preferredLineLength', 4, {scopeSelector: '.text.plain.null-grammar'});
       editor.setText("foo bar");
       editor.selectAll();
       atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
 
-      return expect(editor.getText()).toBe(`\
+      expect(editor.getText()).toBe(`\
 foo
 bar\
 `
       );
     });
 
-    it("rearranges line breaks in the current selection to ensure lines are shorter than config.editor.preferredLineLength honoring tabLength", function() {
+    it("rearranges line breaks in the current selection to ensure lines are shorter than config.editor.preferredLineLength honoring tabLength", () => {
       editor.setText("\t\tThis is the first paragraph and it is longer than the preferred line length so it should be reflowed.\n\n\t\tThis is a short paragraph.\n\n\t\tAnother long paragraph, it should also be reflowed with the use of this single command.");
 
       editor.selectAll();
       atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
 
       const exedOut = editor.getText().replace(/\t/g, Array(tabLength+1).join('X'));
-      return expect(exedOut).toBe("XXXXXXXXThis is the first\nXXXXXXXXparagraph and it is\nXXXXXXXXlonger than the\nXXXXXXXXpreferred line length\nXXXXXXXXso it should be\nXXXXXXXXreflowed.\n\nXXXXXXXXThis is a short\nXXXXXXXXparagraph.\n\nXXXXXXXXAnother long\nXXXXXXXXparagraph, it should\nXXXXXXXXalso be reflowed with\nXXXXXXXXthe use of this single\nXXXXXXXXcommand.");
+      expect(exedOut).toBe("XXXXXXXXThis is the first\nXXXXXXXXparagraph and it is\nXXXXXXXXlonger than the\nXXXXXXXXpreferred line length\nXXXXXXXXso it should be\nXXXXXXXXreflowed.\n\nXXXXXXXXThis is a short\nXXXXXXXXparagraph.\n\nXXXXXXXXAnother long\nXXXXXXXXparagraph, it should\nXXXXXXXXalso be reflowed with\nXXXXXXXXthe use of this single\nXXXXXXXXcommand.");
     });
 
-    it("rearranges line breaks in the current selection to ensure lines are shorter than config.editor.preferredLineLength", function() {
+    it("rearranges line breaks in the current selection to ensure lines are shorter than config.editor.preferredLineLength", () => {
       editor.setText(`\
 This is the first paragraph and it is longer than the preferred line length so it should be reflowed.
 
@@ -64,7 +60,7 @@ Another long paragraph, it should also be reflowed with the use of this single c
       editor.selectAll();
       atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
 
-      return expect(editor.getText()).toBe(`\
+      expect(editor.getText()).toBe(`\
 This is the first paragraph
 and it is longer than the
 preferred line length so it
@@ -80,7 +76,7 @@ command.\
       );
     });
 
-    it("is not confused when the selection boundary is between paragraphs", function() {
+    it("is not confused when the selection boundary is between paragraphs", () => {
       editor.setText(`\
 v--- SELECTION STARTS AT THE BEGINNING OF THE NEXT LINE (pos 1,0)
 
@@ -97,7 +93,7 @@ converted into a space.
       editor.selectToBufferPosition([6, 0]);
       atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
 
-      return expect(editor.getText()).toBe(`\
+      expect(editor.getText()).toBe(`\
 v--- SELECTION STARTS AT THE BEGINNING OF THE NEXT LINE (pos 1,0)
 
 The preceding newline should
@@ -114,7 +110,7 @@ space.
       );
     });
 
-    it("reflows the current paragraph if nothing is selected", function() {
+    it("reflows the current paragraph if nothing is selected", () => {
       editor.setText(`\
 This is a preceding paragraph, which shouldn't be modified by a reflow of the following paragraph.
 
@@ -131,7 +127,7 @@ This is a following paragraph, which shouldn't be modified by a reflow of the pr
       editor.setCursorBufferPosition([3, 5]);
       atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
 
-      return expect(editor.getText()).toBe(`\
+      expect(editor.getText()).toBe(`\
 This is a preceding paragraph, which shouldn't be modified by a reflow of the following paragraph.
 
 The quick brown fox jumps over
@@ -147,13 +143,13 @@ This is a following paragraph, which shouldn't be modified by a reflow of the pr
       );
     });
 
-    return it("allows for single words that exceed the preferred wrap column length", function() {
+    it("allows for single words that exceed the preferred wrap column length", () => {
       editor.setText("this-is-a-super-long-word-that-shouldn't-break-autoflow and these are some smaller words");
 
       editor.selectAll();
       atom.commands.dispatch(editorElement, 'autoflow:reflow-selection');
 
-      return expect(editor.getText()).toBe(`\
+      expect(editor.getText()).toBe(`\
 this-is-a-super-long-word-that-shouldn't-break-autoflow
 and these are some smaller
 words\
@@ -162,10 +158,10 @@ words\
     });
   });
 
-  return describe("reflowing text", function() {
+  describe("reflowing text", () => {
     beforeEach(() => autoflow = require("../lib/autoflow"));
 
-    it('respects current paragraphs', function() {
+    it('respects current paragraphs', () => {
       const text = `\
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida nibh id magna ullamcorper sagittis. Maecenas
 et enim eu orci tincidunt adipiscing
@@ -187,10 +183,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida nibh
 id magna ullamcorper tincidunt adipiscing lacinia a dui. Etiam quis erat dolor.
 rutrum nisl fermentum rhoncus. Duis blandit ligula facilisis fermentum.\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('respects indentation', function() {
+    it('respects indentation', () => {
       const text = `\
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida nibh id magna ullamcorper sagittis. Maecenas
 et enim eu orci tincidunt adipiscing
@@ -213,10 +209,10 @@ aliquam ligula.
     erat dolor. rutrum nisl fermentum  rhoncus. Duis blandit ligula facilisis
     fermentum\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('respects prefixed text (comments!)', function() {
+    it('respects prefixed text (comments!)', () => {
       const text = `\
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida nibh id magna ullamcorper sagittis. Maecenas
 et enim eu orci tincidunt adipiscing
@@ -239,10 +235,10 @@ aliquam ligula.
   #  erat dolor. rutrum nisl fermentum  rhoncus. Duis blandit ligula facilisis
   #  fermentum\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('respects multiple prefixes (js/c comments)', function() {
+    it('respects multiple prefixes (js/c comments)', () => {
       const text = `\
 // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida
 et enim eu orci tincidunt adipiscing
@@ -253,10 +249,10 @@ aliquam ligula.\
 // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida et
 // enim eu orci tincidunt adipiscing aliquam ligula.\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly handles * prefix', function() {
+    it('properly handles * prefix', () => {
       const text = `\
 * Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida
 et enim eu orci tincidunt adipiscing
@@ -271,18 +267,18 @@ aliquam ligula.
 
   * soidjfiojsoidj foi\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it("does not throw invalid regular expression errors (regression)", function() {
+    it("does not throw invalid regular expression errors (regression)", () => {
       const text = `\
 *** Lorem ipsum dolor sit amet\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(text);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(text);
     });
 
-    it('handles different initial indentation', function() {
+    it('handles different initial indentation', () => {
       const text = `\
 Magna ea magna fugiat nisi minim in id duis. Culpa sit sint consequat quis elit magna pariatur incididunt
   proident laborum deserunt est aliqua reprehenderit. Occaecat et ex non do Lorem irure adipisicing mollit excepteur
@@ -298,10 +294,10 @@ consectetur. Ex ex Lorem duis labore quis ad exercitation elit dolor non
 adipisicing. Pariatur commodo ullamco culpa dolor sunt enim. Ullamco dolore do
 ea nulla ut commodo minim consequat cillum ad velit quis.\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly handles CRLF', function() {
+    it('properly handles CRLF', () => {
       const text = "This is the first line and it is longer than the preferred line length so it should be reflowed.\r\nThis is a short line which should\r\nbe reflowed with the following line.\rAnother long line, it should also be reflowed with everything above it when it is all reflowed.";
 
       const res =
@@ -311,10 +307,10 @@ should be reflowed. This is a short line which should be reflowed with the
 following line. Another long line, it should also be reflowed with everything
 above it when it is all reflowed.\
 `;
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('handles cyrillic text', function() {
+    it('handles cyrillic text', () => {
       const text = `\
 В начале июля, в чрезвычайно жаркое время, под вечер, один молодой человек вышел из своей каморки, которую нанимал от жильцов в С-м переулке, на улицу и медленно, как бы в нерешимости, отправился к К-ну мосту.\
 `;
@@ -325,10 +321,10 @@ above it when it is all reflowed.\
 медленно, как бы в нерешимости, отправился к К-ну мосту.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('handles `yo` character properly', function() {
+    it('handles `yo` character properly', () => {
       // Because there're known problems with this character in major regex engines
       const text = 'Ё Ё Ё';
 
@@ -338,10 +334,10 @@ above it when it is all reflowed.\
 Ё\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 2})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 2})).toEqual(res);
     });
 
-    it('properly reflows // comments ', function() {
+    it('properly reflows // comments ', () => {
       const text =
         `\
 // Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -359,10 +355,10 @@ above it when it is all reflowed.\
 // Meditation microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly reflows /* comments ', function() {
+    it('properly reflows /* comments ', () => {
       const text =
         `\
 /* Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas. */\
@@ -380,10 +376,10 @@ above it when it is all reflowed.\
    Meditation microdosing distillery 8-bit humblebrag migas. */\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly reflows pound comments ', function() {
+    it('properly reflows pound comments ', () => {
       const text =
         `\
 # Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -401,10 +397,10 @@ above it when it is all reflowed.\
 # microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly reflows - list items ', function() {
+    it('properly reflows - list items ', () => {
       const text =
         `\
 - Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -422,10 +418,10 @@ above it when it is all reflowed.\
   microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly reflows % comments ', function() {
+    it('properly reflows % comments ', () => {
       const text =
         `\
 % Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -443,10 +439,10 @@ above it when it is all reflowed.\
 % microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it("properly reflows roxygen comments ", function() {
+    it("properly reflows roxygen comments ", () => {
       const text =
         `\
 #' Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -464,10 +460,10 @@ above it when it is all reflowed.\
 #' Meditation microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it("properly reflows -- comments ", function() {
+    it("properly reflows -- comments ", () => {
       const text =
         `\
 -- Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -485,10 +481,10 @@ above it when it is all reflowed.\
 -- Meditation microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it("properly reflows ||| comments ", function() {
+    it("properly reflows ||| comments ", () => {
       const text =
         `\
 ||| Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -506,10 +502,10 @@ above it when it is all reflowed.\
 ||| Meditation microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly reflows ;; comments ', function() {
+    it('properly reflows ;; comments ', () => {
       const text =
         `\
 ;; Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -527,10 +523,10 @@ above it when it is all reflowed.\
 ;; Meditation microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('does not treat lines starting with a single semicolon as ;; comments', function() {
+    it('does not treat lines starting with a single semicolon as ;; comments', () => {
       const text =
         `\
 ;! Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -548,10 +544,10 @@ tacos pickled fanny pack literally meh pinterest slow-carb. Meditation
 microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it('properly reflows > ascii email inclusions ', function() {
+    it('properly reflows > ascii email inclusions ', () => {
       const text =
         `\
 > Beard pinterest actually brunch brooklyn jean shorts YOLO. Knausgaard sriracha banh mi, cold-pressed retro whatever ethical man braid asymmetrical fingerstache narwhal. Intelligentsia wolf photo booth, tumblr pinterest quinoa leggings four loko poutine. DIY tattooed drinking vinegar, wolf retro actually aesthetic austin keffiyeh marfa beard. Marfa trust fund salvia sartorial letterpress, keffiyeh plaid butcher. Swag try-hard dreamcatcher direct trade, tacos pickled fanny pack literally meh pinterest slow-carb. Meditation microdosing distillery 8-bit humblebrag migas.\
@@ -569,10 +565,10 @@ microdosing distillery 8-bit humblebrag migas.\
 > microdosing distillery 8-bit humblebrag migas.\
 `;
 
-      return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
     });
 
-    it("doesn't allow special characters to surpass wrapColumn", function() {
+    it("doesn't allow special characters to surpass wrapColumn", () => {
       const test =
         `\
 Imagine that I'm writing some LaTeX code. I start a comment, but change my mind. %
@@ -599,11 +595,11 @@ peer deep down into your heart, and you stare into the depths of yourself: is $P
 by no means for the faint of heart.\
 `;
 
-      return expect(autoflow.reflow(test, {wrapColumn: 80})).toEqual(res);
+      expect(autoflow.reflow(test, {wrapColumn: 80})).toEqual(res);
     });
 
-    return describe('LaTeX', function() {
-      it('properly reflows text around LaTeX tags', function() {
+    describe('LaTeX', () => {
+      it('properly reflows text around LaTeX tags', () => {
         const text =
           `\
 \\begin{verbatim}
@@ -622,10 +618,10 @@ by no means for the faint of heart.\
 \\end{verbatim}\
 `;
 
-        return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+        expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
       });
 
-      it('properly reflows text inside LaTeX tags', function() {
+      it('properly reflows text inside LaTeX tags', () => {
         const text =
           `\
 \\item{
@@ -644,10 +640,10 @@ by no means for the faint of heart.\
 }\
 `;
 
-        return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+        expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
       });
 
-      it('properly reflows text inside nested LaTeX tags', function() {
+      it('properly reflows text inside nested LaTeX tags', () => {
         const text =
           `\
 \\begin{enumerate}[label=(\\alph*)]
@@ -670,17 +666,17 @@ by no means for the faint of heart.\
 \\end{enumerate}\
 `;
 
-        return expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
+        expect(autoflow.reflow(text, {wrapColumn: 80})).toEqual(res);
       });
 
-      return it('does not attempt to reflow a selection that contains only LaTeX tags and nothing else', function() {
+      it('does not attempt to reflow a selection that contains only LaTeX tags and nothing else', () => {
         const text =
           `\
 \\begin{enumerate}
 \\end{enumerate}\
 `;
 
-        return expect(autoflow.reflow(text, {wrapColumn: 5})).toEqual(text);
+        expect(autoflow.reflow(text, {wrapColumn: 5})).toEqual(text);
       });
     });
   });
