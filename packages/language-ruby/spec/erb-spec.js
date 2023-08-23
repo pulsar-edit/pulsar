@@ -1,26 +1,22 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe("TextMate HTML (Ruby - ERB) grammar", function() {
+
+describe("TextMate HTML (Ruby - ERB) grammar", () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     atom.config.set('core.useTreeSitterParsers', false);
 
 
     waitsForPromise(() => atom.packages.activatePackage("language-ruby"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("text.html.erb"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("text.html.erb"));
   });
 
-  it("parses the grammar", function() {
+  it("parses the grammar", () => {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("text.html.erb");
+    expect(grammar.scopeName).toBe("text.html.erb");
   });
 
-  return it("tokenizes embedded ruby", function() {
+  it("tokenizes embedded ruby", () => {
     const {tokens} = grammar.tokenizeLine('<%= self %>');
     expect(tokens[0]).toEqual({value: '<%=', scopes: ['text.html.erb', 'meta.embedded.line.erb', 'punctuation.section.embedded.begin.erb']});
     expect(tokens[1]).toEqual({value: ' ', scopes: ['text.html.erb', 'meta.embedded.line.erb', 'source.ruby.embedded.erb']});
@@ -31,6 +27,6 @@ describe("TextMate HTML (Ruby - ERB) grammar", function() {
     const lines = grammar.tokenizeLines('<%=\nself\n%>');
     expect(lines[0][0]).toEqual({value: '<%=', scopes: ['text.html.erb', 'meta.embedded.block.erb', 'punctuation.section.embedded.begin.erb']});
     expect(lines[1][0]).toEqual({value: 'self', scopes: ['text.html.erb', 'meta.embedded.block.erb', 'source.ruby.embedded.erb', 'variable.language.self.ruby']});
-    return expect(lines[2][0]).toEqual({value: '%>', scopes: ['text.html.erb', 'meta.embedded.block.erb', 'punctuation.section.embedded.end.erb']});
+    expect(lines[2][0]).toEqual({value: '%>', scopes: ['text.html.erb', 'meta.embedded.block.erb', 'punctuation.section.embedded.end.erb']});
 });
 });

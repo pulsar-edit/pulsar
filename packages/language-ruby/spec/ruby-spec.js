@@ -1,10 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("TextMate Ruby grammar", function() {
   let grammar = null;
 
@@ -14,17 +8,17 @@ describe("TextMate Ruby grammar", function() {
 
     waitsForPromise(() => atom.packages.activatePackage("language-ruby"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.ruby"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.ruby"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("source.ruby");
+    expect(grammar.scopeName).toBe("source.ruby");
   });
 
   it("tokenizes self", function() {
     const {tokens} = grammar.tokenizeLine('self');
-    return expect(tokens[0]).toEqual({value: 'self', scopes: ['source.ruby', 'variable.language.self.ruby']});
+    expect(tokens[0]).toEqual({value: 'self', scopes: ['source.ruby', 'variable.language.self.ruby']});
 });
 
   it("tokenizes special functions", function() {
@@ -41,7 +35,7 @@ describe("TextMate Ruby grammar", function() {
 
     ({tokens} = grammar.tokenizeLine('thing&.call'));
     expect(tokens[1]).toEqual({value: '&.', scopes: ['source.ruby', 'punctuation.separator.method.ruby']});
-    return expect(tokens[2]).toEqual({value: 'call', scopes: ['source.ruby']});
+    expect(tokens[2]).toEqual({value: 'call', scopes: ['source.ruby']});
 });
 
   it("tokenizes variable constants", function() {
@@ -49,7 +43,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: 'VAR1', scopes: ['source.ruby', 'variable.other.constant.ruby']});
 
     ({tokens} = grammar.tokenizeLine('_VAR2 = 200'));
-    return expect(tokens[0]).toEqual({value: '_VAR2', scopes: ['source.ruby', 'variable.other.constant.ruby']});
+    expect(tokens[0]).toEqual({value: '_VAR2', scopes: ['source.ruby', 'variable.other.constant.ruby']});
 });
 
   it("tokenizes decimal numbers", function() {
@@ -66,7 +60,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: '1.23e-4', scopes: ['source.ruby', 'constant.numeric.ruby']});
 
     ({tokens} = grammar.tokenizeLine('0d100_000'));
-    return expect(tokens[0]).toEqual({value: '0d100_000', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[0]).toEqual({value: '0d100_000', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes hexadecimal numbers", function() {
@@ -74,7 +68,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: '0xAFFF', scopes: ['source.ruby', 'constant.numeric.ruby']});
 
     ({tokens} = grammar.tokenizeLine('0XA_FFF'));
-    return expect(tokens[0]).toEqual({value: '0XA_FFF', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[0]).toEqual({value: '0XA_FFF', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes octal numbers", function() {
@@ -82,7 +76,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: '01_777', scopes: ['source.ruby', 'constant.numeric.ruby']});
 
     ({tokens} = grammar.tokenizeLine('0o1_777'));
-    return expect(tokens[0]).toEqual({value: '0o1_777', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[0]).toEqual({value: '0o1_777', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes binary numbers", function() {
@@ -90,7 +84,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: '0b100_000', scopes: ['source.ruby', 'constant.numeric.ruby']});
 
     ({tokens} = grammar.tokenizeLine('0B00100'));
-    return expect(tokens[0]).toEqual({value: '0B00100', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[0]).toEqual({value: '0B00100', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes symbols", function() {
@@ -104,7 +98,7 @@ describe("TextMate Ruby grammar", function() {
 
     ({tokens} = grammar.tokenizeLine(':<=>'));
     expect(tokens[0]).toEqual({value: ':', scopes: ['source.ruby', 'constant.other.symbol.ruby', 'punctuation.definition.constant.ruby']});
-    return expect(tokens[1]).toEqual({value: '<=>', scopes: ['source.ruby', 'constant.other.symbol.ruby']});
+    expect(tokens[1]).toEqual({value: '<=>', scopes: ['source.ruby', 'constant.other.symbol.ruby']});
 });
 
   it("tokenizes symbol as hash key (1.9 syntax)", function() {
@@ -112,7 +106,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: 'foo', scopes: ['source.ruby', 'constant.other.symbol.hashkey.ruby']});
     expect(tokens[1]).toEqual({value: ':', scopes: ['source.ruby', 'constant.other.symbol.hashkey.ruby', 'punctuation.definition.constant.hashkey.ruby']});
     expect(tokens[2]).toEqual({value: ' ', scopes: ['source.ruby']});
-    return expect(tokens[3]).toEqual({value: '1', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[3]).toEqual({value: '1', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes symbol as hash key (1.8 syntax)", function() {
@@ -122,7 +116,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[2]).toEqual({value: ' ', scopes: ['source.ruby']});
     expect(tokens[3]).toEqual({value: '=>', scopes: ['source.ruby', 'punctuation.separator.key-value.ruby']});
     expect(tokens[4]).toEqual({value: ' ', scopes: ['source.ruby']});
-    return expect(tokens[5]).toEqual({value: '1', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[5]).toEqual({value: '1', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes :: separators", function() {
@@ -173,7 +167,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: '::', scopes: ['source.ruby', 'meta.module.ruby', 'punctuation.separator.namespace.ruby']});
     expect(tokens[4]).toEqual({value: 'B', scopes: ['source.ruby', 'meta.module.ruby', 'entity.other.inherited-class.module.ruby']});
     expect(tokens[5]).toEqual({value: '::', scopes: ['source.ruby', 'meta.module.ruby', 'punctuation.separator.namespace.ruby']});
-    return expect(tokens[6]).toEqual({value: 'C', scopes: ['source.ruby', 'meta.module.ruby', 'entity.name.type.module.ruby']});
+    expect(tokens[6]).toEqual({value: 'C', scopes: ['source.ruby', 'meta.module.ruby', 'entity.name.type.module.ruby']});
 });
 
   it("tokenizes . separator", function() {
@@ -233,7 +227,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: 'def', scopes: ['source.ruby', 'meta.function.method.without-arguments.ruby', 'keyword.control.def.ruby']});
     expect(tokens[2]).toEqual({value: 'self', scopes: ['source.ruby', 'meta.function.method.without-arguments.ruby', 'entity.name.function.ruby', 'variable.language.self.ruby']});
     expect(tokens[3]).toEqual({value: '.', scopes: ['source.ruby', 'meta.function.method.without-arguments.ruby', 'entity.name.function.ruby', 'punctuation.separator.method.ruby']});
-    return expect(tokens[4]).toEqual({value: 'b', scopes: ['source.ruby', 'meta.function.method.without-arguments.ruby', 'entity.name.function.ruby']});
+    expect(tokens[4]).toEqual({value: 'b', scopes: ['source.ruby', 'meta.function.method.without-arguments.ruby', 'entity.name.function.ruby']});
 });
 
   it("tokenizes , separator", function() {
@@ -260,7 +254,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[2]).toEqual({value: 'a', scopes: ['source.ruby']});
     expect(tokens[3]).toEqual({value: ',', scopes: ['source.ruby', 'punctuation.separator.delimiter.ruby']});
     expect(tokens[4]).toEqual({value: 'b', scopes: ['source.ruby']});
-    return expect(tokens[5]).toEqual({value: ')', scopes: ['source.ruby', 'punctuation.section.function.ruby']});
+    expect(tokens[5]).toEqual({value: ')', scopes: ['source.ruby', 'punctuation.section.function.ruby']});
 });
 
 
@@ -273,7 +267,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: 's', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
     expect(tokens[4]).toEqual({value: ')', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.section.scope.ruby']});
     expect(tokens[5]).toEqual({value: 't', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
-    return expect(tokens[6]).toEqual({value: ')', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[6]).toEqual({value: ')', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes %[] style strings", function() {
@@ -285,7 +279,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: 's', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
     expect(tokens[4]).toEqual({value: ']', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.section.scope.ruby']});
     expect(tokens[5]).toEqual({value: 't', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
-    return expect(tokens[6]).toEqual({value: ']', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[6]).toEqual({value: ']', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes %{} style strings", function() {
@@ -297,7 +291,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: 's', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
     expect(tokens[4]).toEqual({value: '}', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.section.scope.ruby']});
     expect(tokens[5]).toEqual({value: 't', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
-    return expect(tokens[6]).toEqual({value: '}', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[6]).toEqual({value: '}', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes %<> style strings", function() {
@@ -309,7 +303,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: 's', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
     expect(tokens[4]).toEqual({value: '>', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.section.scope.ruby']});
     expect(tokens[5]).toEqual({value: 't', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
-    return expect(tokens[6]).toEqual({value: '>', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[6]).toEqual({value: '>', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes %~~ style strings", function() {
@@ -321,7 +315,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: 's', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
     expect(tokens[4]).toEqual({value: '\\~', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'constant.character.escape.ruby']});
     expect(tokens[5]).toEqual({value: 't', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
-    return expect(tokens[6]).toEqual({value: '~', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[6]).toEqual({value: '~', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes %Q() style strings", function() {
@@ -333,7 +327,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[3]).toEqual({value: 's', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
     expect(tokens[4]).toEqual({value: ')', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.section.scope.ruby']});
     expect(tokens[5]).toEqual({value: 't', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby']});
-    return expect(tokens[6]).toEqual({value: ')', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[6]).toEqual({value: ')', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes %x!! style strings", function() {
@@ -342,7 +336,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[0]).toEqual({value: '%x!', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.begin.ruby']});
     expect(tokens[1]).toEqual({value: '#{', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'meta.embedded.line.ruby', 'punctuation.section.embedded.begin.ruby']});
     expect(tokens[11]).toEqual({value: '}', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'meta.embedded.line.ruby', 'punctuation.section.embedded.end.ruby']});
-    return expect(tokens[12]).toEqual({value: '!', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(tokens[12]).toEqual({value: '!', scopes: ['source.ruby', 'string.quoted.other.interpolated.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes regular expressions", function() {
@@ -609,7 +603,7 @@ describe("TextMate Ruby grammar", function() {
     expect(tokens[4]).toEqual({value: ' ', scopes: ['source.ruby']});
     expect(tokens[5]).toEqual({value: '=>', scopes: ['source.ruby', 'punctuation.separator.key-value.ruby']});
     expect(tokens[6]).toEqual({value: ' ', scopes: ['source.ruby']});
-    return expect(tokens[7]).toEqual({value: '1', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[7]).toEqual({value: '1', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes multiline regular expressions", function() {
@@ -627,7 +621,7 @@ regexp = /
     expect(tokens[0][3]).toEqual({value: '/', scopes: ['source.ruby', 'string.regexp.interpolated.ruby', 'punctuation.section.regexp.ruby']});
     expect(tokens[1][0]).toEqual({value: '  foo|', scopes: ['source.ruby', 'string.regexp.interpolated.ruby']});
     expect(tokens[2][0]).toEqual({value: '  bar', scopes: ['source.ruby', 'string.regexp.interpolated.ruby']});
-    return expect(tokens[3][0]).toEqual({value: '/ix', scopes: ['source.ruby', 'string.regexp.interpolated.ruby', 'punctuation.section.regexp.ruby']});
+    expect(tokens[3][0]).toEqual({value: '/ix', scopes: ['source.ruby', 'string.regexp.interpolated.ruby', 'punctuation.section.regexp.ruby']});
 });
 
   it("tokenizes the / arithmetic operator", function() {
@@ -687,7 +681,7 @@ regexp = /
     expect(tokens[4]).toEqual({value: ';', scopes: ['source.ruby', 'punctuation.terminator.statement.ruby']});
     expect(tokens[6]).toEqual({value: '/=', scopes: ['source.ruby', 'keyword.operator.assignment.augmented.ruby']});
     expect(tokens[7]).toEqual({value: ' ', scopes: ['source.ruby']});
-    return expect(tokens[8]).toEqual({value: '2', scopes: ['source.ruby', 'constant.numeric.ruby']});
+    expect(tokens[8]).toEqual({value: '2', scopes: ['source.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes 'not' when used as method name", function() {
@@ -695,27 +689,27 @@ regexp = /
     expect(tokens[2]).toEqual({value: 'not', scopes: ['source.ruby']});
 
     ({tokens} = grammar.tokenizeLine('not?(Array)'));
-    return expect(tokens[0]).toEqual({value: 'not?', scopes: ['source.ruby']});
+    expect(tokens[0]).toEqual({value: 'not?', scopes: ['source.ruby']});
 });
 
   it("tokenizes 'not' as logical operator", function() {
     const {tokens} = grammar.tokenizeLine('not true');
-    return expect(tokens[0]).toEqual({value: 'not', scopes: ['source.ruby', 'keyword.operator.logical.ruby']});
+    expect(tokens[0]).toEqual({value: 'not', scopes: ['source.ruby', 'keyword.operator.logical.ruby']});
 });
 
   it("tokenizes ! when used in method name", function() {
     const {tokens} = grammar.tokenizeLine('sort!');
-    return expect(tokens[0]).toEqual({value: 'sort!', scopes: ['source.ruby']});
+    expect(tokens[0]).toEqual({value: 'sort!', scopes: ['source.ruby']});
 });
 
   it("tokenizes ! as logical operator", function() {
     const {tokens} = grammar.tokenizeLine('!foo');
-    return expect(tokens[0]).toEqual({value: '!', scopes: ['source.ruby', 'keyword.operator.logical.ruby']});
+    expect(tokens[0]).toEqual({value: '!', scopes: ['source.ruby', 'keyword.operator.logical.ruby']});
 });
 
   it("tokenizes != as comparison operator", function() {
     const {tokens} = grammar.tokenizeLine('foo != bar');
-    return expect(tokens[1]).toEqual({value: '!=', scopes: ['source.ruby', 'keyword.operator.comparison.ruby']});
+    expect(tokens[1]).toEqual({value: '!=', scopes: ['source.ruby', 'keyword.operator.comparison.ruby']});
 });
 
   it("tokenizes yard documentation comments", function() {
@@ -822,7 +816,7 @@ regexp = /
     expect(tokens[0][7]).toEqual({value: ']', scopes: ['source.ruby', 'comment.line.number-sign.ruby', 'comment.line.yard.ruby', 'comment.line.type.yard.ruby', 'comment.line.punctuation.yard.ruby']});
     expect(tokens[0][8]).toEqual({value: ' count the number of items', scopes: ['source.ruby', 'comment.line.number-sign.ruby', 'comment.line.string.yard.ruby']});
     expect(tokens[1][0]).toEqual({value: '#', scopes: ['source.ruby', 'comment.line.number-sign.ruby', 'comment.line.string.yard.ruby', 'punctuation.definition.comment.ruby']});
-    return expect(tokens[1][1]).toEqual({value: '   present in the list', scopes: ['source.ruby', 'comment.line.number-sign.ruby', 'comment.line.string.yard.ruby']});
+    expect(tokens[1][1]).toEqual({value: '   present in the list', scopes: ['source.ruby', 'comment.line.number-sign.ruby', 'comment.line.string.yard.ruby']});
 });
 
   it("tokenizes a method with *args properly", function() {
@@ -846,7 +840,7 @@ regexp = /
     expect(tokens[2]).toEqual({value: 'method', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'entity.name.function.ruby']});
     expect(tokens[3]).toEqual({value: ' ', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby']});
     expect(tokens[4]).toEqual({value: '*', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'storage.type.variable.ruby']});
-    return expect(tokens[5]).toEqual({value: 'args', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'variable.parameter.function.ruby']});
+    expect(tokens[5]).toEqual({value: 'args', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'variable.parameter.function.ruby']});
 });
 
   it("tokenizes a method with (symbol: arg) properly", function() {
@@ -855,7 +849,7 @@ regexp = /
     expect(tokens[2]).toEqual({value: 'method', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'entity.name.function.ruby']});
     expect(tokens[3]).toEqual({value: '(', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.definition.parameters.ruby']});
     expect(tokens[4]).toEqual({value: 'red', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.other.symbol.hashkey.parameter.function.ruby']});
-    return expect(tokens[7]).toEqual({value: '2', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.numeric.ruby']});
+    expect(tokens[7]).toEqual({value: '2', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes a method with symbol: arg (no paren) properly", function() {
@@ -863,7 +857,7 @@ regexp = /
     expect(tokens[0]).toEqual({value: 'def', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'keyword.control.def.ruby']});
     expect(tokens[2]).toEqual({value: 'method', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'entity.name.function.ruby']});
     expect(tokens[4]).toEqual({value: 'red', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.other.symbol.hashkey.parameter.function.ruby']});
-    return expect(tokens[7]).toEqual({value: '2', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.numeric.ruby']});
+    expect(tokens[7]).toEqual({value: '2', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.numeric.ruby']});
 });
 
   it("tokenizes a method with (symbol: arg(paren), symbol: arg2(paren)...) properly", function() {
@@ -887,7 +881,7 @@ regexp = /
     expect(tokens[25]).toEqual({value: 'rand', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'support.function.kernel.ruby']});
     expect(tokens[26]).toEqual({value: '(', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.section.function.ruby']});
     expect(tokens[27]).toEqual({value: '4', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.numeric.ruby']});
-    return expect(tokens[28]).toEqual({value: ')', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.section.function.ruby']});
+    expect(tokens[28]).toEqual({value: ')', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.section.function.ruby']});
 });
 
   it("tokenizes a method with symbol: arg(paren), symbol: arg2(paren)... (no outer parens) properly", function() {
@@ -910,12 +904,12 @@ regexp = /
     expect(tokens[25]).toEqual({value: 'rand', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'support.function.kernel.ruby']});
     expect(tokens[26]).toEqual({value: '(', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.section.function.ruby']});
     expect(tokens[27]).toEqual({value: '4', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'constant.numeric.ruby']});
-    return expect(tokens[28]).toEqual({value: ')', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.section.function.ruby']});
+    expect(tokens[28]).toEqual({value: ')', scopes: ['source.ruby', 'meta.function.method.with-arguments.ruby', 'punctuation.section.function.ruby']});
 });
 
   it("tokenizes a stabby lambda properly", function() {
     const {tokens} = grammar.tokenizeLine('method_name -> { puts "A message"} do');
-    return expect(tokens[1]).toEqual({value: '->', scopes: ['source.ruby', 'support.function.kernel.arrow.ruby']});
+    expect(tokens[1]).toEqual({value: '->', scopes: ['source.ruby', 'support.function.kernel.arrow.ruby']});
 });
 
   it("tokenizes a simple do block properly", function() {
@@ -923,7 +917,7 @@ regexp = /
     expect(tokens[0]).toEqual({value: 'do', scopes: ['source.ruby', 'keyword.control.start-block.ruby']});
     expect(tokens[2]).toEqual({value: '|', scopes: ['source.ruby', 'punctuation.separator.variable.ruby']});
     expect(tokens[3]).toEqual({value: 'foo', scopes: ['source.ruby', 'variable.other.block.ruby']});
-    return expect(tokens[4]).toEqual({value: '|', scopes: ['source.ruby', 'punctuation.separator.variable.ruby']});
+    expect(tokens[4]).toEqual({value: '|', scopes: ['source.ruby', 'punctuation.separator.variable.ruby']});
 });
 
   it("tokenizes a complex do block properly", function() {
@@ -945,26 +939,26 @@ regexp = /
     expect(tokens[23]).toEqual({value: 'create', scopes: ['source.ruby', 'constant.other.symbol.hashkey.ruby']});
     expect(tokens[24]).toEqual({value: ':', scopes: ['source.ruby', 'constant.other.symbol.hashkey.ruby', 'punctuation.definition.constant.hashkey.ruby']});
     expect(tokens[26]).toEqual({value: 'false', scopes: ['source.ruby', 'constant.language.boolean.ruby']});
-    return expect(tokens[27]).toEqual({value: '|', scopes: ['source.ruby', 'punctuation.separator.variable.ruby']});
+    expect(tokens[27]).toEqual({value: '|', scopes: ['source.ruby', 'punctuation.separator.variable.ruby']});
 });
 
   it("does not erroneously tokenize a variable ending in `do` followed by a pipe as a block", function() {
     const {tokens} = grammar.tokenizeLine('sudo ||= true');
     expect(tokens[0]).toEqual({value: 'sudo ', scopes: ['source.ruby']});
     expect(tokens[1]).toEqual({value: '||=', scopes: ['source.ruby', 'keyword.operator.assignment.augmented.ruby']});
-    return expect(tokens[3]).toEqual({value: 'true', scopes: ['source.ruby', 'constant.language.boolean.ruby']});
+    expect(tokens[3]).toEqual({value: 'true', scopes: ['source.ruby', 'constant.language.boolean.ruby']});
 });
 
   it("tokenizes <<- heredoc", function() {
     const lines = grammar.tokenizeLines('<<-EOS\nThis is text\nEOS');
     expect(lines[0][0]).toEqual({value: '<<-EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.begin.ruby']});
-    return expect(lines[2][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(lines[2][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes <<~ Ruby 2.3.0 squiggly heredoc", function() {
     const lines = grammar.tokenizeLines('<<~EOS\nThis is text\nEOS');
     expect(lines[0][0]).toEqual({value: '<<~EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.begin.ruby']});
-    return expect(lines[2][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(lines[2][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes quoted heredoc", function() {
@@ -979,30 +973,30 @@ regexp = /
     // Backtick-quoted heredoc:
     lines = grammar.tokenizeLines('<<~`EOS`\nThis is text\nEOS');
     expect(lines[0][0]).toEqual({value: '<<~`EOS`', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.begin.ruby']});
-    return expect(lines[2][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(lines[2][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes heredoc which includes identifier in end of a line", function() {
     const lines = grammar.tokenizeLines('<<-EOS\nThis is text\nThis is Not EOS\nEOS');
     expect(lines[0][0]).toEqual({value: '<<-EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.begin.ruby']});
-    return expect(lines[3][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
+    expect(lines[3][0]).toEqual({value: 'EOS', scopes: ['source.ruby', 'string.unquoted.heredoc.ruby', 'punctuation.definition.string.end.ruby']});
 });
 
   it("tokenizes Kernel support functions autoload? and exit!", function() {
     const lines = grammar.tokenizeLines('p autoload?(:test)\nexit!\nat_exit!');
     expect(lines[0][2]).toEqual({value: 'autoload?', scopes: ['source.ruby', 'support.function.kernel.ruby']});
     expect(lines[1][0]).toEqual({value: 'exit!', scopes: ['source.ruby', 'support.function.kernel.ruby']});
-    return expect(lines[2][0]).toEqual({value: 'at_exit!', scopes: ['source.ruby']});
+    expect(lines[2][0]).toEqual({value: 'at_exit!', scopes: ['source.ruby']});
 });
 
   it("tokenizes iterator? the same way as block_given?", function() {
     const lines = grammar.tokenizeLines('p iterator?\np block_given?');
     expect(lines[0][2].value).toEqual('iterator?');
     expect(lines[1][2].value).toEqual('block_given?');
-    return expect(lines[0][2].scopes).toEqual(lines[1][2].scopes);
+    expect(lines[0][2].scopes).toEqual(lines[1][2].scopes);
   });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -1087,7 +1081,7 @@ regexp = /
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=ruby:
