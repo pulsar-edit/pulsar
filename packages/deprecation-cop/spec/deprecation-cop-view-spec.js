@@ -1,19 +1,14 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const Grim = require('grim');
 const path = require('path');
 const _ = require('underscore-plus');
 const etch = require('etch');
 
-describe("DeprecationCopView", function() {
+describe("DeprecationCopView", () => {
   let [deprecationCopView, workspaceElement] = [];
 
-  beforeEach(function() {
-    spyOn(_, 'debounce').andCallFake(func => (function() { return func.apply(this, arguments); }));
+  beforeEach(() => {
+    spyOn(_, 'debounce').andCallFake(func => (() => { return func.apply(this, arguments); }));
 
     workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
@@ -32,19 +27,19 @@ describe("DeprecationCopView", function() {
 
     waitsFor(() => deprecationCopView = atom.workspace.getActivePane().getActiveItem());
 
-    return runs(() => jasmine.unspy(Grim, 'deprecate'));
+    runs(() => jasmine.unspy(Grim, 'deprecate'));
   });
 
   afterEach(() => jasmine.restoreDeprecationsSnapshot());
 
-  it("displays deprecated methods", function() {
+  it("displays deprecated methods", () => {
     expect(deprecationCopView.element.textContent).toMatch(/Deprecated calls/);
-    return expect(deprecationCopView.element.textContent).toMatch(/This isn't used/);
+    expect(deprecationCopView.element.textContent).toMatch(/This isn't used/);
   });
 
   // TODO: Remove conditional when the new StyleManager deprecation APIs reach stable.
   if (atom.styles.getDeprecations != null) {
-    it("displays deprecated selectors", function() {
+    it("displays deprecated selectors", () => {
       atom.styles.addStyleSheet("atom-text-editor::shadow { color: red }", {sourcePath: path.join('some-dir', 'packages', 'package-1', 'file-1.css')});
       atom.styles.addStyleSheet("atom-text-editor::shadow { color: yellow }", {context: 'atom-text-editor', sourcePath: path.join('some-dir', 'packages', 'package-1', 'file-2.css')});
       atom.styles.addStyleSheet('atom-text-editor::shadow { color: blue }', {sourcePath: path.join('another-dir', 'packages', 'package-2', 'file-3.css')});
@@ -53,7 +48,7 @@ describe("DeprecationCopView", function() {
       const promise = etch.getScheduler().getNextUpdatePromise();
       waitsForPromise(() => promise);
 
-      return runs(function() {
+      runs(() => {
         const packageItems = deprecationCopView.element.querySelectorAll("ul.selectors > li");
         expect(packageItems.length).toBe(3);
         expect(packageItems[0].textContent).toMatch(/package-1/);
@@ -65,12 +60,12 @@ describe("DeprecationCopView", function() {
         expect(packageDeprecationItems[0].textContent).toMatch(/atom-text-editor/);
         expect(packageDeprecationItems[0].querySelector("a").href).toMatch('some-dir/packages/package-1/file-1.css');
         expect(packageDeprecationItems[1].textContent).toMatch(/:host/);
-        return expect(packageDeprecationItems[1].querySelector("a").href).toMatch('some-dir/packages/package-1/file-2.css');
+        expect(packageDeprecationItems[1].querySelector("a").href).toMatch('some-dir/packages/package-1/file-2.css');
       });
     });
   }
 
-  return it('skips stack entries which go through node_modules/ files when determining package name', function() {
+  it('skips stack entries which go through node_modules/ files when determining package name', () => {
     const stack = [
       {
         "functionName": "function0",
@@ -97,6 +92,6 @@ describe("DeprecationCopView", function() {
     spyOn(deprecationCopView, 'getPackagePathsByPackageName').andReturn(packagePathsByPackageName);
 
     const packageName = deprecationCopView.getPackageName(stack);
-    return expect(packageName).toBe("package2");
+    expect(packageName).toBe("package2");
   });
 });
