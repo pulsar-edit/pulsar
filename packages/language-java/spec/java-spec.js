@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('Java grammar', function() {
   let grammar = null;
 
@@ -11,18 +7,18 @@ describe('Java grammar', function() {
 
     waitsForPromise(() => atom.packages.activatePackage('language-java'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.java'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.java'));
   });
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('source.java');
+    expect(grammar.scopeName).toBe('source.java');
   });
 
   it('tokenizes this with `.this` class', function() {
     const {tokens} = grammar.tokenizeLine('this.x');
 
-    return expect(tokens[0]).toEqual({value: 'this', scopes: ['source.java', 'variable.language.this.java']});
+    expect(tokens[0]).toEqual({value: 'this', scopes: ['source.java', 'variable.language.this.java']});
 });
 
   it('tokenizes braces', function() {
@@ -64,7 +60,7 @@ class A<String>
     expect(lines[2][18]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java']});
     expect(lines[3][1]).toEqual({value: '{', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'punctuation.section.method.begin.bracket.curly.java']});
     expect(lines[4][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'punctuation.section.method.end.bracket.curly.java']});
-    return expect(lines[5][0]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'punctuation.section.class.end.bracket.curly.java']});
+    expect(lines[5][0]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'punctuation.section.class.end.bracket.curly.java']});
 });
 
   it('tokenizes punctuation', function() {
@@ -87,7 +83,7 @@ class A<String>
 
     ({tokens} = grammar.tokenizeLine('class A implements B, C'));
 
-    return expect(tokens[7]).toEqual({value: ',', scopes: ['source.java', 'meta.class.java', 'meta.definition.class.implemented.interfaces.java', 'punctuation.separator.delimiter.java']});
+    expect(tokens[7]).toEqual({value: ',', scopes: ['source.java', 'meta.class.java', 'meta.definition.class.implemented.interfaces.java', 'punctuation.separator.delimiter.java']});
 });
 
   it('tokenizes the `package` keyword', function() {
@@ -134,7 +130,7 @@ class A<String>
 
     ({tokens} = grammar.tokenizeLine('package java.;'));
 
-    return expect(tokens[3]).toEqual({value: '.', scopes: ['source.java', 'meta.package.java', 'storage.modifier.package.java', 'invalid.illegal.character_not_allowed_here.java']});
+    expect(tokens[3]).toEqual({value: '.', scopes: ['source.java', 'meta.package.java', 'storage.modifier.package.java', 'invalid.illegal.character_not_allowed_here.java']});
 });
 
   it('tokenizes the `import` keyword', function() {
@@ -193,7 +189,7 @@ class A<String>
 
     ({tokens} = grammar.tokenizeLine('import java.;'));
 
-    return expect(tokens[3]).toEqual({value: '.', scopes: ['source.java', 'meta.import.java', 'storage.modifier.import.java', 'invalid.illegal.character_not_allowed_here.java']});
+    expect(tokens[3]).toEqual({value: '.', scopes: ['source.java', 'meta.import.java', 'storage.modifier.import.java', 'invalid.illegal.character_not_allowed_here.java']});
 });
 
   it('tokenizes reserved keywords', function() {
@@ -203,7 +199,7 @@ class A<String>
 
     ({tokens} = grammar.tokenizeLine('int a = 1; goto;'));
 
-    return expect(tokens[9]).toEqual({value: 'goto', scopes: ['source.java', 'keyword.reserved.java']});
+    expect(tokens[9]).toEqual({value: 'goto', scopes: ['source.java', 'keyword.reserved.java']});
 });
 
   it('tokenizes module keywords', function() {
@@ -221,7 +217,7 @@ module Provider {
     expect(lines[1][1]).toEqual({value: 'requires', scopes: ['source.java', 'meta.module.java', 'meta.module.body.java', 'keyword.module.java']});
     expect(lines[2][1]).toEqual({value: 'provides', scopes: ['source.java', 'meta.module.java', 'meta.module.body.java', 'keyword.module.java']});
     expect(lines[2][3]).toEqual({value: 'with', scopes: ['source.java', 'meta.module.java', 'meta.module.body.java', 'keyword.module.java']});
-    return expect(lines[3][0]).toEqual({value: '}', scopes: ['source.java', 'meta.module.java', 'punctuation.section.module.end.bracket.curly.java']});
+    expect(lines[3][0]).toEqual({value: '}', scopes: ['source.java', 'meta.module.java', 'punctuation.section.module.end.bracket.curly.java']});
 });
 
   it('tokenizes comments inside module', function() {
@@ -241,7 +237,7 @@ module com.foo.bar {
     expect(lines[2][2]).toEqual({value: ' comments ', scopes: ['source.java', 'meta.module.java', 'meta.module.body.java', 'comment.block.java']});
     expect(lines[3][2]).toEqual({value: ' javadoc ', scopes: ['source.java', 'meta.module.java', 'meta.module.body.java', 'comment.block.javadoc.java']});
     expect(lines[4][1]).toEqual({value: 'requires', scopes: ['source.java', 'meta.module.java', 'meta.module.body.java', 'keyword.module.java']});
-    return expect(lines[5][0]).toEqual({value: '}', scopes: ['source.java', 'meta.module.java', 'punctuation.section.module.end.bracket.curly.java']});
+    expect(lines[5][0]).toEqual({value: '}', scopes: ['source.java', 'meta.module.java', 'punctuation.section.module.end.bracket.curly.java']});
 });
 
   it('tokenizes classes', function() {
@@ -278,7 +274,7 @@ class A$B {
     expect(lines[13][1]).toEqual({value: 'Testclass', scopes: ['source.java', 'meta.definition.variable.java', 'storage.type.java']});
     expect(lines[14][1]).toEqual({value: 'TestClass', scopes: ['source.java', 'meta.definition.variable.java', 'storage.type.java']});
     expect(lines[17][0]).toEqual({value: 'class', scopes: ['source.java', 'meta.class.java', 'meta.class.identifier.java', 'storage.modifier.java']});
-    return expect(lines[17][2]).toEqual({value: 'A$B', scopes: ['source.java', 'meta.class.java', 'meta.class.identifier.java', 'entity.name.type.class.java']});
+    expect(lines[17][2]).toEqual({value: 'A$B', scopes: ['source.java', 'meta.class.java', 'meta.class.identifier.java', 'entity.name.type.class.java']});
 });
 
   it('tokenizes enums', function() {
@@ -316,7 +312,7 @@ enum Letters {
     expect(lines[7][1]).toEqual({value: '/**', scopes: commentJavadocDefinition});
     expect(lines[7][2]).toEqual({value: ' Javadoc comment about C ', scopes: commentJavadoc});
     expect(lines[8][1]).toEqual({value: 'C', scopes: ['source.java', 'meta.enum.java', 'constant.other.enum.java']});
-    return expect(lines[9][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
+    expect(lines[9][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
 });
 
   it('tokenizes enums with class body', function() {
@@ -369,7 +365,7 @@ enum Colours {
     expect(lines[19][1]).toEqual({value: 'public', scopes: ['source.java', 'meta.enum.java', 'meta.method.java', 'storage.modifier.java']});
     expect(lines[19][3]).toEqual({value: 'String', scopes: ['source.java', 'meta.enum.java', 'meta.method.java', 'meta.method.return-type.java', 'storage.type.java']});
     expect(lines[19][5]).toEqual({value: 'func', scopes: ['source.java', 'meta.enum.java', 'meta.method.java', 'meta.method.identifier.java', 'entity.name.function.java']});
-    return expect(lines[22][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
+    expect(lines[22][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
 });
 
   it('tokenizes enums with modifiers', function() {
@@ -395,7 +391,7 @@ unknown enum Test {
     expect(lines[6][0]).toEqual({value: 'protected', scopes: ['source.java', 'meta.enum.java', 'storage.modifier.java']});
     expect(lines[6][2]).toEqual({value: 'enum', scopes: ['source.java', 'meta.enum.java', 'storage.modifier.java']});
     expect(lines[9][0]).toEqual({value: 'unknown ', scopes: ['source.java', 'meta.enum.java']});
-    return expect(lines[9][1]).toEqual({value: 'enum', scopes: ['source.java', 'meta.enum.java', 'storage.modifier.java']});
+    expect(lines[9][1]).toEqual({value: 'enum', scopes: ['source.java', 'meta.enum.java', 'storage.modifier.java']});
 });
 
   it('tokenizes enums within a class', function() {
@@ -417,7 +413,7 @@ class A {
     expect(lines[2][1]).toEqual({value: 'RED', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.enum.java', 'constant.other.enum.java']});
     expect(lines[3][1]).toEqual({value: 'GREEN', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.enum.java', 'constant.other.enum.java']});
     expect(lines[4][1]).toEqual({value: 'BLUE', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.enum.java', 'constant.other.enum.java']});
-    return expect(lines[5][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
+    expect(lines[5][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
 });
 
   it('tokenizes enums with method overrides', function() {
@@ -461,7 +457,7 @@ enum TYPES {
     expect(lines[13][1]).toEqual({value: 'TYPE_DEFAULT', scopes: ['source.java', 'meta.enum.java', 'constant.other.enum.java']});
 
     expect(lines[15][1]).toEqual({value: 'int', scopes: ['source.java', 'meta.enum.java', 'meta.method.java', 'meta.method.return-type.java', 'storage.type.primitive.java']});
-    return expect(lines[15][3]).toEqual({value: 'func', scopes: ['source.java', 'meta.enum.java', 'meta.method.java', 'meta.method.identifier.java', 'entity.name.function.java']});
+    expect(lines[15][3]).toEqual({value: 'func', scopes: ['source.java', 'meta.enum.java', 'meta.method.java', 'meta.method.identifier.java', 'entity.name.function.java']});
 });
 
   it('tokenizes enums with method overrides and constructor', function() {
@@ -527,7 +523,7 @@ enum TYPES {
 
     expect(lines[14][1]).toEqual({value: 'TYPE_DEFAULT', scopes: ['source.java', 'meta.enum.java', 'constant.other.enum.java']});
 
-    return expect(lines[27][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
+    expect(lines[27][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.java', 'punctuation.section.enum.end.bracket.curly.java']});
 }); // Test that enum scope correctly ends
 
   it('tokenizes enums with extends and implements', function() {
@@ -588,7 +584,7 @@ class A {
     // Test6
     // TODO ' java.lang.' is highlighted as a single block for some reason, same for the class
     expect(lines[16][5]).toEqual({value: 'implements', scopes: scopeStack.concat(['meta.definition.class.implemented.interfaces.java', 'storage.modifier.implements.java'])});
-    return expect(lines[16][7]).toEqual({value: 'SomeInterface', scopes: scopeStack.concat(['meta.definition.class.implemented.interfaces.java', 'entity.other.inherited-class.java'])});
+    expect(lines[16][7]).toEqual({value: 'SomeInterface', scopes: scopeStack.concat(['meta.definition.class.implemented.interfaces.java', 'entity.other.inherited-class.java'])});
 });
 
   it('does not catastrophically backtrack when tokenizing large enums (regression)', function() {
@@ -605,7 +601,7 @@ public enum test {
 `
     );
 
-    return expect(lines[0][2]).toEqual({value: 'enum', scopes: ['source.java', 'meta.enum.java', 'storage.modifier.java']});
+    expect(lines[0][2]).toEqual({value: 'enum', scopes: ['source.java', 'meta.enum.java', 'storage.modifier.java']});
 });
 
   it('tokenizes methods', function() {
@@ -711,7 +707,7 @@ abstract class A
     expect(lines[25][22]).toEqual({value: 'T', scopes: scopeStack.concat(['meta.method.identifier.java', 'storage.type.generic.java'])});
     expect(lines[25][23]).toEqual({value: '>', scopes: scopeStack.concat(['meta.method.identifier.java', 'punctuation.bracket.angle.java'])});
     expect(lines[25][25]).toEqual({value: 'type', scopes: scopeStack.concat(['meta.method.identifier.java', 'variable.parameter.java'])});
-    return expect(lines[25][26]).toEqual({value: ')', scopes: scopeStack.concat(['meta.method.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java'])});
+    expect(lines[25][26]).toEqual({value: ')', scopes: scopeStack.concat(['meta.method.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java'])});
 });
 
 
@@ -734,7 +730,7 @@ class A
     expect(lines[6][5]).toEqual({value: 'int', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'storage.type.primitive.java']});
     expect(lines[6][8]).toEqual({value: ' ... ', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'comment.block.java']});
     expect(lines[6][14]).toEqual({value: 'int', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'storage.type.primitive.java']});
-    return expect(lines[6][16]).toEqual({value: '...', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'punctuation.definition.parameters.varargs.java']});
+    expect(lines[6][16]).toEqual({value: '...', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'punctuation.definition.parameters.varargs.java']});
 });
 
   it('tokenizes `final` in class method', function() {
@@ -753,7 +749,7 @@ class A
     expect(lines[2][11]).toEqual({value: 'finalScore', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'variable.parameter.java']});
     expect(lines[2][14]).toEqual({value: 'final', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'storage.modifier.java']});
     expect(lines[2][18]).toEqual({value: 'scorefinal', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'variable.parameter.java']});
-    return expect(lines[4][2]).toEqual({value: ' finalScore', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java']});
+    expect(lines[4][2]).toEqual({value: ' finalScore', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java']});
 });
 
   describe('numbers', function() {
@@ -818,7 +814,7 @@ class A
         expect(tokens[0]).toEqual({value: '1x0', scopes: ['source.java']});
 
         ({tokens} = grammar.tokenizeLine('.0x1'));
-        return expect(tokens[0]).toEqual({value: '.', scopes: ['source.java', 'punctuation.separator.period.java']});
+        expect(tokens[0]).toEqual({value: '.', scopes: ['source.java', 'punctuation.separator.period.java']});
     });
 
       it('tokenizes binary literals', function() {
@@ -878,7 +874,7 @@ class A
         expect(tokens[0]).toEqual({value: '1b0', scopes: ['source.java']});
 
         ({tokens} = grammar.tokenizeLine('.0b100101010'));
-        return expect(tokens[0]).toEqual({value: '.', scopes: ['source.java', 'punctuation.separator.period.java']});
+        expect(tokens[0]).toEqual({value: '.', scopes: ['source.java', 'punctuation.separator.period.java']});
     });
 
       it('tokenizes octal literals', function() {
@@ -932,10 +928,10 @@ class A
         expect(tokens[0]).toEqual({value: '0263724263Ll', scopes: ['source.java']});
 
         ({tokens} = grammar.tokenizeLine('0263724263_L'));
-        return expect(tokens[0]).toEqual({value: '0263724263_L', scopes: ['source.java']});
+        expect(tokens[0]).toEqual({value: '0263724263_L', scopes: ['source.java']});
     });
 
-      return it('tokenizes numeric integers', function() {
+      it('tokenizes numeric integers', function() {
         let {tokens} = grammar.tokenizeLine('0');
         expect(tokens[0]).toEqual({value: '0', scopes: ['source.java', 'constant.numeric.decimal.java']});
 
@@ -977,11 +973,11 @@ class A
         expect(tokens[0]).toEqual({value: '2639724263Ll', scopes: ['source.java']});
 
         ({tokens} = grammar.tokenizeLine('2639724263_L'));
-        return expect(tokens[0]).toEqual({value: '2639724263_L', scopes: ['source.java']});
+        expect(tokens[0]).toEqual({value: '2639724263_L', scopes: ['source.java']});
     });
   });
 
-    return describe('floats', function() {
+    describe('floats', function() {
       it('tokenizes hexadecimal floats', function() {
         let {tokens} = grammar.tokenizeLine('0x0P0');
         expect(tokens[0]).toEqual({value: '0x0P0', scopes: ['source.java', 'constant.numeric.hex.java']});
@@ -1072,10 +1068,10 @@ class A
         expect(tokens[0]).toEqual({value: '0x0Pp2', scopes: ['source.java']});
 
         ({tokens} = grammar.tokenizeLine('0xp2'));
-        return expect(tokens[0]).toEqual({value: '0xp2', scopes: ['source.java']});
+        expect(tokens[0]).toEqual({value: '0xp2', scopes: ['source.java']});
     });
 
-      return it('tokenizes numeric floats', function() {
+      it('tokenizes numeric floats', function() {
         let {tokens} = grammar.tokenizeLine('1.');
         expect(tokens[0]).toEqual({value: '1.', scopes: ['source.java', 'constant.numeric.decimal.java']});
 
@@ -1222,7 +1218,7 @@ class A
         expect(tokens[0]).toEqual({value: '$', scopes: ['source.java', 'variable.other.object.java']});
 
         ({tokens} = grammar.tokenizeLine('.1$'));
-        return expect(tokens[0]).toEqual({value: '.', scopes: ['source.java', 'punctuation.separator.period.java']});
+        expect(tokens[0]).toEqual({value: '.', scopes: ['source.java', 'punctuation.separator.period.java']});
     });
   });
 });
@@ -1240,7 +1236,7 @@ class A
     expect(lines[2][3]).toEqual({value: 'final', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'storage.modifier.java']});
     expect(lines[2][7]).toEqual({value: 'finala', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[3][1]).toEqual({value: 'final', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'storage.modifier.java']});
-    return expect(lines[3][7]).toEqual({value: 'bfinal', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
+    expect(lines[3][7]).toEqual({value: 'bfinal', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
 });
 
   it('tokenizes method-local variables', function() {
@@ -1268,7 +1264,7 @@ class A
     expect(lines[6][1]).toEqual({value: 'int', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.definition.variable.java', 'storage.type.primitive.java']});
     expect(lines[6][3]).toEqual({value: 'primitive', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[6][5]).toEqual({value: '=', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'keyword.operator.assignment.java']});
-    return expect(lines[6][7]).toEqual({value: '5', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'constant.numeric.decimal.java']});
+    expect(lines[6][7]).toEqual({value: '5', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'constant.numeric.decimal.java']});
 });
 
   it('tokenizes variables defined with incorrect primitive types', function() {
@@ -1285,7 +1281,7 @@ class A {
     expect(lines[1][8]).toEqual({value: 'b', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[2][0]).toEqual({value: '  aboolean c ', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java']});
     expect(lines[2][6]).toEqual({value: 'boolean', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.primitive.java']});
-    return expect(lines[2][8]).toEqual({value: 'd', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
+    expect(lines[2][8]).toEqual({value: 'd', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
 });
 
   it('tokenizes capitalized variables', function() {
@@ -1311,7 +1307,7 @@ void func()
 
     expect(lines[7][4]).toEqual({value: 'G ', scopes: ['source.java']}); // should not be highlighted as storage type!
     expect(lines[7][5]).toEqual({value: '>', scopes: ['source.java', 'keyword.operator.comparison.java']});
-    return expect(lines[7][6]).toEqual({value: ' g', scopes: ['source.java']});
+    expect(lines[7][6]).toEqual({value: ' g', scopes: ['source.java']});
 });
 
   it('tokenizes variables in for-each loop', function() {
@@ -1337,7 +1333,7 @@ void func()
     expect(lines[6][3]).toEqual({value: '(', scopes: ['source.java', 'punctuation.bracket.round.java']});
     expect(lines[6][4]).toEqual({value: 'HashMap', scopes: ['source.java', 'meta.definition.variable.java', 'storage.type.java']});
     expect(lines[6][12]).toEqual({value: 'map', scopes: ['source.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
-    return expect(lines[6][19]).toEqual({value: ')', scopes: ['source.java', 'punctuation.bracket.round.java']});
+    expect(lines[6][19]).toEqual({value: ')', scopes: ['source.java', 'punctuation.bracket.round.java']});
 });
 
   it('tokenizes Java 10 local variables', function() {
@@ -1368,7 +1364,7 @@ void func() {
     expect(lines[4][5]).toEqual({value: 'd', scopes: ['source.java', 'meta.definition.variable.local.java', 'variable.other.definition.java']});
 
     expect(lines[5][4]).toEqual({value: 'var', scopes: ['source.java', 'meta.definition.variable.local.java', 'storage.type.local.java']});
-    return expect(lines[5][6]).toEqual({value: 'e', scopes: ['source.java', 'meta.definition.variable.local.java', 'variable.other.definition.java']});
+    expect(lines[5][6]).toEqual({value: 'e', scopes: ['source.java', 'meta.definition.variable.local.java', 'variable.other.definition.java']});
 });
 
   it('tokenizes function and method calls', function() {
@@ -1414,7 +1410,7 @@ class A
     expect(lines[8][5]).toEqual({value: 'hello', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.method-call.java', 'entity.name.function.java']});
     expect(lines[8][7]).toEqual({value: 'a', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.method-call.java']});
     expect(lines[8][8]).toEqual({value: ',', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.method-call.java', 'punctuation.separator.delimiter.java']});
-    return expect(lines[8][11]).toEqual({value: ';', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.terminator.java']});
+    expect(lines[8][11]).toEqual({value: ';', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.terminator.java']});
 });
 
   it('tokenizes objects and properties', function() {
@@ -1466,7 +1462,7 @@ class A
     expect(lines[12][1]).toEqual({value: 'object', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'variable.other.object.java']});
     expect(lines[12][2]).toEqual({value: '.', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.separator.period.java']});
     expect(lines[12][3]).toEqual({value: '123illegal', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'invalid.illegal.identifier.java']});
-    return expect(lines[12][4]).toEqual({value: ';', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.terminator.java']});
+    expect(lines[12][4]).toEqual({value: ';', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.terminator.java']});
 });
 
   it('tokenizes generics', function() {
@@ -1564,7 +1560,7 @@ class A<T extends A & B, String, Integer>
     expect(lines[8][9]).toEqual({value: 'K', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.generic.java']});
     expect(lines[8][10]).toEqual({value: '>', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.angle.java']});
     expect(lines[8][11]).toEqual({value: '>', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.angle.java']});
-    return expect(lines[8][13]).toEqual({value: 'set2', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
+    expect(lines[8][13]).toEqual({value: 'set2', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
 });
 
   it('tokenizes generics in if-else code block', function() {
@@ -1585,7 +1581,7 @@ void func() {
     expect(lines[5][3]).toEqual({value: 'S', scopes: ['source.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[5][5]).toEqual({value: '=', scopes: ['source.java', 'keyword.operator.assignment.java']});
     // check that string does not extend to/include ';'
-    return expect(lines[5][10]).toEqual({value: ';', scopes: ['source.java', 'punctuation.terminator.java']});
+    expect(lines[5][10]).toEqual({value: ';', scopes: ['source.java', 'punctuation.terminator.java']});
 });
 
   it('tokenizes generics with multiple conditions in if-else code block', function() {
@@ -1604,7 +1600,7 @@ void func() {
     expect(lines[2][8]).toEqual({value: '&&', scopes: ['source.java', 'keyword.operator.logical.java']});
     // 'b' should be just a variable, not part of generic
     expect(lines[2][9]).toEqual({value: ' b ', scopes: ['source.java']});
-    return expect(lines[2][10]).toEqual({value: '<', scopes: ['source.java', 'keyword.operator.comparison.java']});
+    expect(lines[2][10]).toEqual({value: '<', scopes: ['source.java', 'keyword.operator.comparison.java']});
 });
 
   it('tokenizes generics before if-else code block, not including it', function() {
@@ -1631,7 +1627,7 @@ void func() {
     expect(lines[3][7]).toEqual({value: '>', scopes: ['source.java', 'punctuation.bracket.angle.java']});
     // 'if' code block
     expect(lines[4][4]).toEqual({value: 'A', scopes: ['source.java', 'storage.type.java']});
-    return expect(lines[4][6]).toEqual({value: '<', scopes: ['source.java', 'keyword.operator.comparison.java']});
+    expect(lines[4][6]).toEqual({value: '<', scopes: ['source.java', 'keyword.operator.comparison.java']});
 });
 
   it('tokenizes generics after if-else code block, not including it', function() {
@@ -1658,7 +1654,7 @@ void func() {
     expect(lines[5][7]).toEqual({value: 'A', scopes: ['source.java', 'storage.type.generic.java']});
     expect(lines[5][11]).toEqual({value: 'B', scopes: ['source.java', 'storage.type.generic.java']});
     expect(lines[5][14]).toEqual({value: 'C', scopes: ['source.java', 'storage.type.generic.java']});
-    return expect(lines[5][15]).toEqual({value: '>', scopes: ['source.java', 'punctuation.bracket.angle.java']});
+    expect(lines[5][15]).toEqual({value: '>', scopes: ['source.java', 'punctuation.bracket.angle.java']});
 });
 
   it('tokenizes bit shift correctly, not as generics', function() {
@@ -1671,7 +1667,7 @@ void func() {
     );
 
     expect(lines[2][5]).toEqual({value: '<<', scopes: ['source.java', 'keyword.operator.bitwise.java']});
-    return expect(lines[2][7]).toEqual({value: '12', scopes: ['source.java', 'constant.numeric.decimal.java']});
+    expect(lines[2][7]).toEqual({value: '12', scopes: ['source.java', 'constant.numeric.decimal.java']});
 });
 
   it('tokenizes generics as a function return type', function() {
@@ -1693,7 +1689,7 @@ class Test
     expect(lines[2][7]).toEqual({value: 'B', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.return-type.java', 'storage.type.generic.java']});
     expect(lines[2][8]).toEqual({value: ',', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.return-type.java', 'punctuation.separator.delimiter.java']});
     expect(lines[2][10]).toEqual({value: 'C', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.return-type.java', 'storage.type.generic.java']});
-    return expect(lines[2][11]).toEqual({value: '>', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.return-type.java', 'punctuation.bracket.angle.java']});
+    expect(lines[2][11]).toEqual({value: '>', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.return-type.java', 'punctuation.bracket.angle.java']});
 });
 
   it('tokenizes generics and primitive arrays declarations', function() {
@@ -1724,7 +1720,7 @@ class A<T> {
     expect(lines[2][9]).toEqual({value: 'two', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[2][11]).toEqual({value: '=', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'keyword.operator.assignment.java']});
     expect(lines[2][13]).toEqual({value: 'null', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'constant.language.java']});
-    return expect(lines[2][14]).toEqual({value: ';', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'punctuation.terminator.java']});
+    expect(lines[2][14]).toEqual({value: ';', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'punctuation.terminator.java']});
 });
 
   it('tokenizes lambda expressions', function() {
@@ -1735,7 +1731,7 @@ class A<T> {
     expect(tokens[8]).toEqual({value: '.', scopes: ['source.java', 'meta.method-call.java', 'punctuation.separator.period.java']});
     expect(tokens[10]).toEqual({value: '(', scopes: ['source.java', 'meta.method-call.java', 'punctuation.definition.parameters.begin.bracket.round.java']});
     expect(tokens[11]).toEqual({value: ')', scopes: ['source.java', 'meta.method-call.java', 'punctuation.definition.parameters.end.bracket.round.java']});
-    return expect(tokens[13]).toEqual({value: '-', scopes: ['source.java', 'keyword.operator.arithmetic.java']});
+    expect(tokens[13]).toEqual({value: '-', scopes: ['source.java', 'keyword.operator.arithmetic.java']});
 });
 
   it('tokenizes `new` statements', function() {
@@ -1979,7 +1975,7 @@ class A {
     expect(lines[7][19]).toEqual({value: 'start', scopes: expected});
     expect(lines[8][19]).toEqual({value: 'start', scopes: expected});
     expect(lines[9][19]).toEqual({value: 'start', scopes: expected});
-    return expect(lines[10][19]).toEqual({value: 'start', scopes: expected});
+    expect(lines[10][19]).toEqual({value: 'start', scopes: expected});
   });
 
   it('checks that accessor + new operator do not introduce extra scopes', function() {
@@ -2016,13 +2012,13 @@ public class A {
     expect(lines[8][1]).toEqual({value: 'g', scopes: expected});
     expect(lines[9][1]).toEqual({value: 'g', scopes: expected});
     expect(lines[10][1]).toEqual({value: 'g', scopes: expected});
-    return expect(lines[15][3]).toEqual({value: 'a', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
+    expect(lines[15][3]).toEqual({value: 'a', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
 });
 
   it('tokenizes the `instanceof` operator', function() {
     const {tokens} = grammar.tokenizeLine('instanceof');
 
-    return expect(tokens[0]).toEqual({value: 'instanceof', scopes: ['source.java', 'keyword.operator.instanceof.java']});
+    expect(tokens[0]).toEqual({value: 'instanceof', scopes: ['source.java', 'keyword.operator.instanceof.java']});
 });
 
   it('tokenizes the `instanceof` operator in assertions and if statements', function() {
@@ -2041,7 +2037,7 @@ class Test {
 
     const scopeStack = ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java'];
     expect(lines[3][5]).toEqual({value: 'instanceof', scopes: scopeStack.concat(['keyword.operator.instanceof.java'])});
-    return expect(lines[6][4]).toEqual({value: 'instanceof', scopes: scopeStack.concat(['meta.declaration.assertion.java', 'keyword.operator.instanceof.java'])});
+    expect(lines[6][4]).toEqual({value: 'instanceof', scopes: scopeStack.concat(['meta.declaration.assertion.java', 'keyword.operator.instanceof.java'])});
 });
 
   it('tokenizes the `instanceof` operator in return statements and variable definitions', function() {
@@ -2066,7 +2062,7 @@ class A {
 
     expect(lines[2][3]).toEqual({value: 'instanceof', scopes: expected});
     expect(lines[6][3]).toEqual({value: 'instanceof', scopes: expected});
-    return expect(lines[10][7]).toEqual({value: 'instanceof', scopes: expected});
+    expect(lines[10][7]).toEqual({value: 'instanceof', scopes: expected});
   });
 
   it('tokenizes class fields', function() {
@@ -2193,7 +2189,7 @@ class Test
     expect(lines[17][3]).toEqual({value: '<', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.angle.java']});
     expect(lines[17][4]).toEqual({value: 'String', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.generic.java']});
     expect(lines[17][5]).toEqual({value: '>', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.angle.java']});
-    return expect(lines[17][7]).toEqual({value: 'var2', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
+    expect(lines[17][7]).toEqual({value: 'var2', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
 });
 
   it('tokenizes class fields with complex definitions', function() {
@@ -2249,7 +2245,7 @@ class A {
     expect(lines[4][19]).toEqual({value: 'func', scopes: scopeStack.concat(['meta.function-call.java', 'entity.name.function.java'])});
 
     expect(lines[6][1]).toEqual({value: 'int', scopes: scopeStack.concat(['meta.method.java', 'meta.method.return-type.java', 'storage.type.primitive.java'])});
-    return expect(lines[6][3]).toEqual({value: 'abcd', scopes: scopeStack.concat(['meta.method.java', 'meta.method.identifier.java', 'entity.name.function.java'])});
+    expect(lines[6][3]).toEqual({value: 'abcd', scopes: scopeStack.concat(['meta.method.java', 'meta.method.identifier.java', 'entity.name.function.java'])});
 });
 
   it('tokenizes qualified storage types', function() {
@@ -2314,7 +2310,7 @@ class Test {
     expect(lines[5][4]).toEqual({value: '.', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.separator.period.java']});
     expect(lines[5][5]).toEqual({value: 'String', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.object.array.java']});
     expect(lines[5][6]).toEqual({value: '[', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.square.java']});
-    return expect(lines[5][7]).toEqual({value: ']', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.square.java']});
+    expect(lines[5][7]).toEqual({value: ']', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'punctuation.bracket.square.java']});
 });
 
   it('tokenizes storage types with underscore', function() {
@@ -2336,7 +2332,7 @@ class _Class {
     expect(lines[3][3]).toEqual({value: '_abc', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.java']});
     expect(lines[3][5]).toEqual({value: '_abc', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.java']});
     expect(lines[3][7]).toEqual({value: '_Generic', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.java']});
-    return expect(lines[3][9]).toEqual({value: '_String', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.generic.java']});
+    expect(lines[3][9]).toEqual({value: '_String', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'storage.type.generic.java']});
 });
 
   it('tokenizes try-catch-finally blocks', function() {
@@ -2411,7 +2407,7 @@ class Test {
     expect(lines[10][1]).toEqual({value: 'new', scopes: scopeStack.concat(['keyword.control.new.java'])});
 
     scopeStack.pop();
-    return expect(lines[11][1]).toEqual({value: '}', scopes: scopeStack.concat(['punctuation.section.finally.end.bracket.curly.java'])});
+    expect(lines[11][1]).toEqual({value: '}', scopes: scopeStack.concat(['punctuation.section.finally.end.bracket.curly.java'])});
 });
 
   it('tokenizes nested try-catch-finally blocks', function() {
@@ -2486,7 +2482,7 @@ class Test {
     expect(lines[8][9]).toEqual({value: ')', scopes: scopeStack.concat(['punctuation.definition.parameters.end.bracket.round.java'])});
     expect(lines[8][10]).toEqual({value: ' ', scopes: scopeStack});
     expect(lines[8][11]).toEqual({value: '{', scopes: scopeStack.concat(['punctuation.section.catch.begin.bracket.curly.java'])});
-    return expect(lines[8][12]).toEqual({value: '}', scopes: scopeStack.concat(['punctuation.section.catch.end.bracket.curly.java'])});
+    expect(lines[8][12]).toEqual({value: '}', scopes: scopeStack.concat(['punctuation.section.catch.end.bracket.curly.java'])});
 });
 
   it('tokenizes try-catch blocks with resources', function() {
@@ -2512,7 +2508,7 @@ class Test {
     expect(lines[4][1]).toEqual({value: 'BufferedReader', scopes: scopes.concat(['meta.try.resources.java', 'meta.definition.variable.java', 'storage.type.java'])});
     expect(lines[5][1]).toEqual({value: ')', scopes: scopes.concat(['meta.try.resources.java', 'punctuation.section.try.resources.end.bracket.round.java'])});
     expect(lines[5][2]).toEqual({value: ' ', scopes});
-    return expect(lines[5][3]).toEqual({value: '{', scopes: scopes.concat(['punctuation.section.try.begin.bracket.curly.java'])});
+    expect(lines[5][3]).toEqual({value: '{', scopes: scopes.concat(['punctuation.section.try.begin.bracket.curly.java'])});
 });
 
   it('tokenizes generics with dots in try-catch with resources', function() {
@@ -2539,7 +2535,7 @@ class A {
     expect(lines[2][10]).toEqual({value: 'String', scopes: scopes.concat(['meta.try.resources.java', 'meta.definition.variable.java', 'storage.type.generic.java'])});
     expect(lines[2][11]).toEqual({value: '>', scopes: scopes.concat(['meta.try.resources.java', 'meta.definition.variable.java', 'punctuation.bracket.angle.java'])});
     expect(lines[2][20]).toEqual({value: ')', scopes: scopes.concat(['meta.try.resources.java', 'punctuation.section.try.resources.end.bracket.round.java'])});
-    return expect(lines[2][22]).toEqual({value: '{', scopes: scopes.concat(['punctuation.section.try.begin.bracket.curly.java'])});
+    expect(lines[2][22]).toEqual({value: '{', scopes: scopes.concat(['punctuation.section.try.begin.bracket.curly.java'])});
 });
 
   it('tokenizes storage modifier in catch block', function() {
@@ -2562,7 +2558,7 @@ class Test
     expect(lines[5][6]).toEqual({value: 'final', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'storage.modifier.java']});
     expect(lines[5][8]).toEqual({value: 'Exception1', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'storage.type.java']});
     expect(lines[5][10]).toEqual({value: 'ex', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'variable.parameter.java']});
-    return expect(lines[5][11]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'punctuation.definition.parameters.end.bracket.round.java']});
+    expect(lines[5][11]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'punctuation.definition.parameters.end.bracket.round.java']});
 });
 
   it('tokenizes list of exceptions in catch block', function() {
@@ -2614,7 +2610,7 @@ class Test
     expect(lines[8][1]).toEqual({value: '|', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'punctuation.catch.separator.java']});
     expect(lines[8][3]).toEqual({value: 'Exception3', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'storage.type.java']});
     expect(lines[8][5]).toEqual({value: 'err', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'variable.parameter.java']});
-    return expect(lines[8][6]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'punctuation.definition.parameters.end.bracket.round.java']});
+    expect(lines[8][6]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'punctuation.definition.parameters.end.bracket.round.java']});
 });
 
   it('tokenizes catch parameter in new line or with a comment in between', function() {
@@ -2675,7 +2671,7 @@ class Test
     expect(lines[5][22]).toEqual({value: '/*', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'comment.block.java', 'punctuation.definition.comment.java']});
     expect(lines[5][26]).toEqual({value: 'err', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'variable.parameter.java']});
     expect(lines[5][28]).toEqual({value: '/*', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'meta.catch.parameters.java', 'comment.block.java', 'punctuation.definition.comment.java']});
-    return expect(lines[5][31]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'punctuation.definition.parameters.end.bracket.round.java']});
+    expect(lines[5][31]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.catch.java', 'punctuation.definition.parameters.end.bracket.round.java']});
 });
 
   it('tokenizes list of exceptions in method throws clause', function() {
@@ -2700,7 +2696,7 @@ class Test {
 
     expect(lines[5][9]).toEqual({value: 'throws', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.throwables.java', 'storage.modifier.java']});
     expect(lines[5][11]).toEqual({value: 'Exception1', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.throwables.java', 'storage.type.java']});
-    return expect(lines[5][13]).toEqual({value: '{', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'punctuation.section.method.begin.bracket.curly.java']});
+    expect(lines[5][13]).toEqual({value: '{', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'punctuation.section.method.begin.bracket.curly.java']});
 });
 
   it('tokenizes comment inside method body', function() {
@@ -2725,7 +2721,7 @@ class Test
     expect(lines[4][3]).toEqual({value: '*/', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'comment.block.java', 'punctuation.definition.comment.java']});
 
     expect(lines[5][1]).toEqual({value: '//', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'comment.line.double-slash.java', 'punctuation.definition.comment.java']});
-    return expect(lines[5][2]).toEqual({value: ' single-line comment', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'comment.line.double-slash.java']});
+    expect(lines[5][2]).toEqual({value: ' single-line comment', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'comment.line.double-slash.java']});
 });
 
   it('tokenizes comment inside try-catch-finally block', function() {
@@ -2748,7 +2744,7 @@ try {
     expect(lines[3][1]).toEqual({value: '//', scopes: ['source.java', 'meta.catch.java', 'meta.catch.body.java', 'comment.line.double-slash.java', 'punctuation.definition.comment.java']});
     expect(lines[3][2]).toEqual({value: ' comment B', scopes: ['source.java', 'meta.catch.java', 'meta.catch.body.java', 'comment.line.double-slash.java']});
     expect(lines[5][1]).toEqual({value: '//', scopes: ['source.java', 'meta.finally.java', 'meta.finally.body.java', 'comment.line.double-slash.java', 'punctuation.definition.comment.java']});
-    return expect(lines[5][2]).toEqual({value: ' comment C', scopes: ['source.java', 'meta.finally.java', 'meta.finally.body.java', 'comment.line.double-slash.java']});
+    expect(lines[5][2]).toEqual({value: ' comment C', scopes: ['source.java', 'meta.finally.java', 'meta.finally.body.java', 'comment.line.double-slash.java']});
 });
 
   it('tokenizes single-line javadoc comment', function() {
@@ -2763,7 +2759,7 @@ class Test
 
     expect(lines[0][0]).toEqual({value: '/**', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
     expect(lines[0][1]).toEqual({value: ' single-line javadoc comment ', scopes: ['source.java', 'comment.block.javadoc.java']});
-    return expect(lines[0][2]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
+    expect(lines[0][2]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
 });
 
   it('tokenizes javadoc comment inside class body', function() {
@@ -2785,7 +2781,7 @@ class Test {
 
     expect(lines[5][1]).toEqual({value: '/**', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
     expect(lines[5][2]).toEqual({value: ' javadoc comment ', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
-    return expect(lines[5][3]).toEqual({value: '*/', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
+    expect(lines[5][3]).toEqual({value: '*/', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
 });
 
   it('tokenizes empty/single character comment', function() {
@@ -2820,7 +2816,7 @@ class Test {
     expect(lines[7][0]).toEqual({value: '/**', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
     expect(lines[7][2]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
     expect(lines[8][0]).toEqual({value: '/*', scopes: ['source.java', 'comment.block.java', 'punctuation.definition.comment.java']});
-    return expect(lines[8][2]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.java', 'punctuation.definition.comment.java']});
+    expect(lines[8][2]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.java', 'punctuation.definition.comment.java']});
 });
 
   it('tokenizes inline comment inside method signature', function() {
@@ -2872,7 +2868,7 @@ class A
     expect(lines[8][7]).toEqual({value: '/*', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'comment.block.java', 'punctuation.definition.comment.java']});
     expect(lines[8][8]).toEqual({value: ' comment ', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'comment.block.java']});
     expect(lines[8][9]).toEqual({value: '*/', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'comment.block.java', 'punctuation.definition.comment.java']});
-    return expect(lines[8][10]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java']});
+    expect(lines[8][10]).toEqual({value: ')', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java']});
 });
 
   it('tokenizes multi-line basic javadoc comment', function() {
@@ -2906,7 +2902,7 @@ class Test { }\
     expect(lines[5][2]).toEqual({value: ' version', scopes: ['source.java', 'comment.block.javadoc.java']});
 
     expect(lines[6][0]).toEqual({value: ' ', scopes: ['source.java', 'comment.block.javadoc.java']});
-    return expect(lines[6][1]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
+    expect(lines[6][1]).toEqual({value: '*/', scopes: ['source.java', 'comment.block.javadoc.java', 'punctuation.definition.comment.java']});
 });
 
   it('tokenizes `param` javadoc comment', function() {
@@ -2926,7 +2922,7 @@ class Test
 
     expect(lines[4][1]).toEqual({value: '@param', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'keyword.other.documentation.javadoc.java']});
     expect(lines[4][3]).toEqual({value: 'num', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'variable.parameter.java']});
-    return expect(lines[4][4]).toEqual({value: ' value to increment.', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
+    expect(lines[4][4]).toEqual({value: ' value to increment.', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
 });
 
   it('tokenizes `exception`/`throws` javadoc comment', function() {
@@ -2948,7 +2944,7 @@ class Test
 
     expect(lines[4][1]).toEqual({value: '@exception', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'keyword.other.documentation.javadoc.java']});
     expect(lines[4][3]).toEqual({value: 'IllegalStateException', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'entity.name.type.class.java']});
-    return expect(lines[4][4]).toEqual({value: ' reason', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
+    expect(lines[4][4]).toEqual({value: ' reason', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
 });
 
   it('tokenizes `link` javadoc comment', function() {
@@ -3005,7 +3001,7 @@ class Test
     expect(lines[9][11]).toEqual({value: ' ', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
     expect(lines[9][12]).toEqual({value: 'String', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'entity.name.type.class.java']});
     expect(lines[9][13]).toEqual({value: '#', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java']});
-    return expect(lines[9][14]).toEqual({value: 'chars()', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'variable.parameter.java']});
+    expect(lines[9][14]).toEqual({value: 'chars()', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'comment.block.javadoc.java', 'variable.parameter.java']});
 });
 
 
@@ -3027,7 +3023,7 @@ class Test
     expect(lines[4][3]).toEqual({value: 'a', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[5][1]).toEqual({value: 'set', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'variable.other.object.java']});
     expect(lines[5][3]).toEqual({value: 'add', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method-call.java', 'entity.name.function.java']});
-    return expect(lines[6][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'punctuation.section.block.end.bracket.curly.java']});
+    expect(lines[6][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'punctuation.section.block.end.bracket.curly.java']});
 });
 
   it('tokenizes method-body block initializer', function() {
@@ -3051,7 +3047,7 @@ class Test
     expect(lines[5][3]).toEqual({value: 'a', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[6][1]).toEqual({value: 'list', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'variable.other.object.java']});
     expect(lines[6][3]).toEqual({value: 'add', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'meta.method-call.java', 'entity.name.function.java']});
-    return expect(lines[7][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.section.block.end.bracket.curly.java']});
+    expect(lines[7][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method.java', 'meta.method.body.java', 'punctuation.section.block.end.bracket.curly.java']});
 });
 
   it('tokenizes static initializer', function() {
@@ -3073,7 +3069,7 @@ class Test
     expect(lines[4][3]).toEqual({value: 'a', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.definition.variable.java', 'variable.other.definition.java']});
     expect(lines[5][1]).toEqual({value: 'set', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'variable.other.object.java']});
     expect(lines[5][3]).toEqual({value: 'add', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'meta.method-call.java', 'entity.name.function.java']});
-    return expect(lines[6][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'punctuation.section.block.end.bracket.curly.java']});
+    expect(lines[6][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.java', 'meta.class.body.java', 'punctuation.section.block.end.bracket.curly.java']});
 });
 
   it('tokenizes annotations', function() {
@@ -3123,7 +3119,7 @@ public @interface Test {}\
     expect(lines[8][0]).toEqual({value: 'public', scopes: ['source.java', 'storage.modifier.java']});
     expect(lines[8][2]).toEqual({value: '@', scopes: ['source.java', 'meta.declaration.annotation.java', 'punctuation.definition.annotation.java']});
     expect(lines[8][3]).toEqual({value: 'interface', scopes: ['source.java', 'meta.declaration.annotation.java', 'storage.modifier.java']});
-    return expect(lines[8][5]).toEqual({value: 'Test', scopes: ['source.java', 'meta.declaration.annotation.java', 'storage.type.annotation.java']});
+    expect(lines[8][5]).toEqual({value: 'Test', scopes: ['source.java', 'meta.declaration.annotation.java', 'storage.type.annotation.java']});
 });
 
   it('tokenizes annotations with spaces', function() {
@@ -3145,7 +3141,7 @@ class A {
     expect(lines[1][3]).toEqual({value: 'Override', scopes: scopes.concat(['storage.type.annotation.java'])});
     expect(lines[5][1]).toEqual({value: '@', scopes: scopes.concat(['punctuation.definition.annotation.java'])});
     expect(lines[5][3]).toEqual({value: 'Message', scopes: scopes.concat(['storage.type.annotation.java'])});
-    return expect(lines[5][6]).toEqual({value: 'message', scopes: scopes.concat(['string.quoted.double.java'])});
+    expect(lines[5][6]).toEqual({value: 'message', scopes: scopes.concat(['string.quoted.double.java'])});
   });
 
   it('tokenizes annotations within classes', function() {
@@ -3163,7 +3159,7 @@ class A {
     expect(lines[1][3]).toEqual({value: '@', scopes: scopes.concat(['meta.declaration.annotation.java', 'punctuation.definition.annotation.java'])});
     expect(lines[1][4]).toEqual({value: 'interface', scopes: scopes.concat(['meta.declaration.annotation.java', 'storage.modifier.java'])});
     expect(lines[2][1]).toEqual({value: '//', scopes: scopes.concat(['comment.line.double-slash.java', 'punctuation.definition.comment.java'])});
-    return expect(lines[3][5]).toEqual({value: 'func', scopes: scopes.concat(['meta.function-call.java', 'entity.name.function.java'])});
+    expect(lines[3][5]).toEqual({value: 'func', scopes: scopes.concat(['meta.function-call.java', 'entity.name.function.java'])});
   });
 
   it('tokenizes Java 14 records', function() {
@@ -3177,7 +3173,7 @@ record Point() {}\
     expect(lines[0][3]).toEqual({value: '(', scopes: recordScopes.concat(['meta.record.identifier.java', 'punctuation.definition.parameters.begin.bracket.round.java'])});
     expect(lines[0][4]).toEqual({value: ')', scopes: recordScopes.concat(['meta.record.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java'])});
     expect(lines[0][6]).toEqual({value: '{', scopes: recordScopes.concat(['meta.record.body.java', 'punctuation.section.class.begin.bracket.curly.java'])});
-    return expect(lines[0][7]).toEqual({value: '}', scopes: recordScopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
+    expect(lines[0][7]).toEqual({value: '}', scopes: recordScopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
   });
 
   it('tokenizes Java 14 record implementing other interfaces', function() {
@@ -3197,7 +3193,7 @@ public record Point(int x) implements IA, IB {}\
     expect(lines[0][13]).toEqual({value: ',', scopes: recordScopes.concat(['meta.definition.class.implemented.interfaces.java', 'punctuation.separator.delimiter.java'])});
     expect(lines[0][15]).toEqual({value: 'IB', scopes: recordScopes.concat(['meta.definition.class.implemented.interfaces.java', 'entity.other.inherited-class.java'])});
     expect(lines[0][17]).toEqual({value: '{', scopes: recordScopes.concat(['meta.record.body.java', 'punctuation.section.class.begin.bracket.curly.java'])});
-    return expect(lines[0][18]).toEqual({value: '}', scopes: recordScopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
+    expect(lines[0][18]).toEqual({value: '}', scopes: recordScopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
   });
 
   it('tokenizes Java 14 record with generic types as parameters', function() {
@@ -3216,7 +3212,7 @@ public record Point<T>(T x) { }\
     expect(lines[0][9]).toEqual({value: 'T', scopes: recordScopes.concat(['meta.record.identifier.java', 'storage.type.java'])});
     expect(lines[0][11]).toEqual({value: ')', scopes: recordScopes.concat(['meta.record.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java'])});
     expect(lines[0][13]).toEqual({value: '{', scopes: recordScopes.concat(['meta.record.body.java', 'punctuation.section.class.begin.bracket.curly.java'])});
-    return expect(lines[0][15]).toEqual({value: '}', scopes: recordScopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
+    expect(lines[0][15]).toEqual({value: '}', scopes: recordScopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
   });
 
   it('tokenizes Java 14 record construtor', function() {
@@ -3249,7 +3245,7 @@ public record Point(int x, int y) {
     expect(lines[3][1]).toEqual({value: '}', scopes: methodScopes.concat(['punctuation.section.method.end.bracket.curly.java'])});
     expect(lines[4][1]).toEqual({value: 'private', scopes: methodScopes.concat(['storage.modifier.java'])});
     expect(lines[4][3]).toEqual({value: 'void', scopes: methodScopes.concat(['meta.method.return-type.java', 'storage.type.primitive.java'])});
-    return expect(lines[4][5]).toEqual({value: 'foo', scopes: methodScopes.concat(['meta.method.identifier.java', 'entity.name.function.java'])});
+    expect(lines[4][5]).toEqual({value: 'foo', scopes: methodScopes.concat(['meta.method.identifier.java', 'entity.name.function.java'])});
   });
 
   it('tokenizes Java 14 record as an inner class', function() {
@@ -3266,7 +3262,7 @@ class A {
     expect(lines[1][4]).toEqual({value: '(', scopes: scopes.concat(['meta.record.identifier.java', 'punctuation.definition.parameters.begin.bracket.round.java'])});
     expect(lines[1][5]).toEqual({value: ')', scopes: scopes.concat(['meta.record.identifier.java', 'punctuation.definition.parameters.end.bracket.round.java'])});
     expect(lines[1][7]).toEqual({value: '{', scopes: scopes.concat(['meta.record.body.java', 'punctuation.section.class.begin.bracket.curly.java'])});
-    return expect(lines[1][8]).toEqual({value: '}', scopes: scopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
+    expect(lines[1][8]).toEqual({value: '}', scopes: scopes.concat(['punctuation.section.class.end.bracket.curly.java'])});
   });
 
   it('tokenizes yield keyword', function() {
@@ -3282,10 +3278,10 @@ public static int calculate(int d) {
 `
     );
 
-    return expect(lines[4][1]).toEqual({value: 'yield', scopes: ['source.java', 'keyword.control.java']});
+    expect(lines[4][1]).toEqual({value: 'yield', scopes: ['source.java', 'keyword.control.java']});
 });
 
-  return it('tokenizes sealed, non-sealed, and permits keywords', function() {
+  it('tokenizes sealed, non-sealed, and permits keywords', function() {
     const lines = grammar.tokenizeLines(`\
 public sealed class X extends A implements B permits C { }
 public sealed class X permits A extends B implements C { }
@@ -3306,6 +3302,6 @@ public non-sealed class Square extends Shape {}\
     expect(lines[3][8]).toEqual({value: 'permits', scopes: ['source.java', 'meta.class.java', 'meta.definition.class.permits.classes.java', 'storage.modifier.permits.java']});
     expect(lines[4][2]).toEqual({value: 'sealed', scopes: ['source.java', 'meta.class.java', 'storage.modifier.java']});
     expect(lines[4][8]).toEqual({value: 'permits', scopes: ['source.java', 'meta.class.java', 'meta.definition.class.permits.classes.java', 'storage.modifier.permits.java']});
-    return expect(lines[5][2]).toEqual({value: 'non-sealed', scopes: ['source.java', 'meta.class.java', 'storage.modifier.java']});
+    expect(lines[5][2]).toEqual({value: 'non-sealed', scopes: ['source.java', 'meta.class.java', 'storage.modifier.java']});
 });
 });

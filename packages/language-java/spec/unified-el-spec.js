@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('Unified expression language grammar', function() {
   let grammar = null;
 
@@ -11,12 +7,12 @@ describe('Unified expression language grammar', function() {
 
     waitsForPromise(() => atom.packages.activatePackage('language-java'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.java.el'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.java.el'));
   });
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('source.java.el');
+    expect(grammar.scopeName).toBe('source.java.el');
   });
 
   describe('operators', function() {
@@ -24,137 +20,137 @@ describe('Unified expression language grammar', function() {
       const {tokens} = grammar.tokenizeLine('true ? 0 : 1');
 
       expect(tokens[2]).toEqual({value: '?', scopes: ['source.java.el', 'keyword.control.ternary.java.el']});
-      return expect(tokens[6]).toEqual({value: ':', scopes: ['source.java.el', 'keyword.control.ternary.java.el']});
+      expect(tokens[6]).toEqual({value: ':', scopes: ['source.java.el', 'keyword.control.ternary.java.el']});
   });
 
     it('parses the comparison operator `==`', function() {
       const {tokens} = grammar.tokenizeLine('1 == 1');
-      return expect(tokens[2]).toEqual({value: '==', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: '==', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `!=`', function() {
       const {tokens} = grammar.tokenizeLine('1 != 1');
-      return expect(tokens[2]).toEqual({value: '!=', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: '!=', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `<=`', function() {
       const {tokens} = grammar.tokenizeLine('1 <= 1');
-      return expect(tokens[2]).toEqual({value: '<=', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: '<=', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `>=`', function() {
       const {tokens} = grammar.tokenizeLine('1 >= 1');
-      return expect(tokens[2]).toEqual({value: '>=', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: '>=', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `<`', function() {
       const {tokens} = grammar.tokenizeLine('1 < 1');
-      return expect(tokens[2]).toEqual({value: '<', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: '<', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `>`', function() {
       const {tokens} = grammar.tokenizeLine('1 > 1');
-      return expect(tokens[2]).toEqual({value: '>', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: '>', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `eq`', function() {
       const {tokens} = grammar.tokenizeLine('1 eq 1');
-      return expect(tokens[2]).toEqual({value: 'eq', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: 'eq', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `ne`', function() {
       const {tokens} = grammar.tokenizeLine('1 ne 1');
-      return expect(tokens[2]).toEqual({value: 'ne', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: 'ne', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `le`', function() {
       const {tokens} = grammar.tokenizeLine('1 le 1');
-      return expect(tokens[2]).toEqual({value: 'le', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: 'le', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `gt`', function() {
       const {tokens} = grammar.tokenizeLine('1 gt 1');
-      return expect(tokens[2]).toEqual({value: 'gt', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: 'gt', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `lt`', function() {
       const {tokens} = grammar.tokenizeLine('1 lt 1');
-      return expect(tokens[2]).toEqual({value: 'lt', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: 'lt', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the comparison operator `gt`', function() {
       const {tokens} = grammar.tokenizeLine('1 gt 1');
-      return expect(tokens[2]).toEqual({value: 'gt', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
+      expect(tokens[2]).toEqual({value: 'gt', scopes: ['source.java.el', 'keyword.operator.comparison.java.el']});
   });
 
     it('parses the empty operators', function() {
       const {tokens} = grammar.tokenizeLine('empty foo');
-      return expect(tokens[0]).toEqual({value: 'empty', scopes: ['source.java.el', 'keyword.operator.empty.java.el']});
+      expect(tokens[0]).toEqual({value: 'empty', scopes: ['source.java.el', 'keyword.operator.empty.java.el']});
   });
 
     it('parses the arithmetic operator `-`', function() {
       const {tokens} = grammar.tokenizeLine('1 - 1');
-      return expect(tokens[2]).toEqual({value: '-', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: '-', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the arithmetic operator `+`', function() {
       const {tokens} = grammar.tokenizeLine('1 + 1');
-      return expect(tokens[2]).toEqual({value: '+', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: '+', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the arithmetic operator `*`', function() {
       const {tokens} = grammar.tokenizeLine('1 * 1');
-      return expect(tokens[2]).toEqual({value: '*', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: '*', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the arithmetic operator `/`', function() {
       const {tokens} = grammar.tokenizeLine('1 / 1');
-      return expect(tokens[2]).toEqual({value: '/', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: '/', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the arithmetic operator `%`', function() {
       const {tokens} = grammar.tokenizeLine('1 % 1');
-      return expect(tokens[2]).toEqual({value: '%', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: '%', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the arithmetic operator `div`', function() {
       const {tokens} = grammar.tokenizeLine('1 div 1');
-      return expect(tokens[2]).toEqual({value: 'div', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: 'div', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the arithmetic operator `mod`', function() {
       const {tokens} = grammar.tokenizeLine('1 mod 1');
-      return expect(tokens[2]).toEqual({value: 'mod', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
+      expect(tokens[2]).toEqual({value: 'mod', scopes: ['source.java.el', 'keyword.operator.arithmetic.java.el']});
   });
 
     it('parses the logical operator `!`', function() {
       const {tokens} = grammar.tokenizeLine('!foo');
-      return expect(tokens[0]).toEqual({value: '!', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
+      expect(tokens[0]).toEqual({value: '!', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
   });
 
     it('parses the logical operator `&&`', function() {
       const {tokens} = grammar.tokenizeLine('1 && 1');
-      return expect(tokens[2]).toEqual({value: '&&', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
+      expect(tokens[2]).toEqual({value: '&&', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
   });
 
     it('parses the logical operator `||`', function() {
       const {tokens} = grammar.tokenizeLine('1 || 1');
-      return expect(tokens[2]).toEqual({value: '||', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
+      expect(tokens[2]).toEqual({value: '||', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
   });
 
     it('parses the logical operator `not`', function() {
       const {tokens} = grammar.tokenizeLine('1 not 1');
-      return expect(tokens[2]).toEqual({value: 'not', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
+      expect(tokens[2]).toEqual({value: 'not', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
   });
 
     it('parses the logical operator `and`', function() {
       const {tokens} = grammar.tokenizeLine('1 and 1');
-      return expect(tokens[2]).toEqual({value: 'and', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
+      expect(tokens[2]).toEqual({value: 'and', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
   });
 
-    return it('parses the logical operator `or`', function() {
+    it('parses the logical operator `or`', function() {
       const {tokens} = grammar.tokenizeLine('1 or 1');
-      return expect(tokens[2]).toEqual({value: 'or', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
+      expect(tokens[2]).toEqual({value: 'or', scopes: ['source.java.el', 'keyword.operator.logical.java.el']});
   });
 });
 
@@ -164,7 +160,7 @@ describe('Unified expression language grammar', function() {
       expect(tokens[0]).toEqual({value: 'true', scopes: ['source.java.el', 'constant.boolean.java.el']});
 
       ({tokens} = grammar.tokenizeLine('false'));
-      return expect(tokens[0]).toEqual({value: 'false', scopes: ['source.java.el', 'constant.boolean.java.el']});
+      expect(tokens[0]).toEqual({value: 'false', scopes: ['source.java.el', 'constant.boolean.java.el']});
   });
 
     it('parses the null literal', function() {
@@ -183,7 +179,7 @@ describe('Unified expression language grammar', function() {
       expect(tokens[0]).toEqual({value: '0.54', scopes: ['source.java.el', 'constant.numeric.java.el']});
 
       ({tokens} = grammar.tokenizeLine('13.12'));
-      return expect(tokens[0]).toEqual({value: '13.12', scopes: ['source.java.el', 'constant.numeric.java.el']});
+      expect(tokens[0]).toEqual({value: '13.12', scopes: ['source.java.el', 'constant.numeric.java.el']});
   });
 
     it('tokenizes single quoted string literals', function() {
@@ -194,10 +190,10 @@ describe('Unified expression language grammar', function() {
       expect(tokens[3]).toEqual({value: ' bar ', scopes: ['source.java.el', 'string.quoted.single.java.el']});
       expect(tokens[4]).toEqual({value: '\\\'', scopes: ['source.java.el', 'string.quoted.single.java.el', 'constant.character.escape.java.el']});
       expect(tokens[5]).toEqual({value: 'baz', scopes: ['source.java.el', 'string.quoted.single.java.el']});
-      return expect(tokens[6]).toEqual({value: "'", scopes: ['source.java.el', 'string.quoted.single.java.el', 'punctuation.definition.string.end.java.el']});
+      expect(tokens[6]).toEqual({value: "'", scopes: ['source.java.el', 'string.quoted.single.java.el', 'punctuation.definition.string.end.java.el']});
   });
 
-    return it('tokenizes double quoted string literals', function() {
+    it('tokenizes double quoted string literals', function() {
       const {tokens} = grammar.tokenizeLine('"foo\\n bar \\\"baz"');
       expect(tokens[0]).toEqual({value: '"', scopes: ['source.java.el', 'string.quoted.double.java.el', 'punctuation.definition.string.begin.java.el']});
       expect(tokens[1]).toEqual({value: 'foo', scopes: ['source.java.el', 'string.quoted.double.java.el']});
@@ -205,7 +201,7 @@ describe('Unified expression language grammar', function() {
       expect(tokens[3]).toEqual({value: ' bar ', scopes: ['source.java.el', 'string.quoted.double.java.el']});
       expect(tokens[4]).toEqual({value: '\\\"', scopes: ['source.java.el', 'string.quoted.double.java.el', 'constant.character.escape.java.el']});
       expect(tokens[5]).toEqual({value: 'baz', scopes: ['source.java.el', 'string.quoted.double.java.el']});
-      return expect(tokens[6]).toEqual({value: '"', scopes: ['source.java.el', 'string.quoted.double.java.el', 'punctuation.definition.string.end.java.el']});
+      expect(tokens[6]).toEqual({value: '"', scopes: ['source.java.el', 'string.quoted.double.java.el', 'punctuation.definition.string.end.java.el']});
   });
 });
 
@@ -219,15 +215,15 @@ describe('Unified expression language grammar', function() {
     expect(tokens[4]).toEqual({value: 'foo', scopes: ['source.java.el']});
     expect(tokens[5]).toEqual({value: ',', scopes: ['source.java.el', 'meta.delimiter.java.el']});
     expect(tokens[6]).toEqual({value: ' bar', scopes: ['source.java.el']});
-    return expect(tokens[7]).toEqual({value: ')', scopes: ['source.java.el', 'meta.brace.round.java.el']});
+    expect(tokens[7]).toEqual({value: ')', scopes: ['source.java.el', 'meta.brace.round.java.el']});
 });
 
-  return it('tokenizes a computed property access', function() {
+  it('tokenizes a computed property access', function() {
     const {tokens} = grammar.tokenizeLine('foo[0]');
 
     expect(tokens[0]).toEqual({value: 'foo', scopes: ['source.java.el']});
     expect(tokens[1]).toEqual({value: '[', scopes: ['source.java.el', 'meta.brace.square.java.el']});
     expect(tokens[2]).toEqual({value: '0', scopes: ['source.java.el', 'constant.numeric.java.el']});
-    return expect(tokens[3]).toEqual({value: ']', scopes: ['source.java.el', 'meta.brace.square.java.el']});
+    expect(tokens[3]).toEqual({value: ']', scopes: ['source.java.el', 'meta.brace.square.java.el']});
 });
 });
