@@ -1,26 +1,22 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe("JSON grammar", function() {
+
+describe("JSON grammar", () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     atom.config.set('core.useTreeSitterParsers', false);
 
 
     waitsForPromise(() => atom.packages.activatePackage('language-json'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.json'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.json'));
   });
 
-  it("parses the grammar", function() {
+  it("parses the grammar", () => {
     expect(grammar).toBeDefined();
-    return expect(grammar.scopeName).toBe('source.json');
+    expect(grammar.scopeName).toBe('source.json');
   });
 
-  it("tokenizes arrays", function() {
+  it("tokenizes arrays", () => {
     const baseScopes = ['source.json', 'meta.structure.array.json'];
     const numericScopes = [...baseScopes, 'constant.numeric.json'];
     const separatorScopes = [...baseScopes, 'punctuation.separator.array.json'];
@@ -34,10 +30,10 @@ describe("JSON grammar", function() {
     expect(tokens[5]).toEqual({value: ',', scopes: separatorScopes});
     expect(tokens[6]).toEqual({value: ' ', scopes: baseScopes});
     expect(tokens[7]).toEqual({value: '3', scopes: numericScopes});
-    return expect(tokens[8]).toEqual({value: ']', scopes: [...baseScopes, 'punctuation.definition.array.end.json']});
+    expect(tokens[8]).toEqual({value: ']', scopes: [...baseScopes, 'punctuation.definition.array.end.json']});
 });
 
-  it("identifies trailing commas in arrays", function() {
+  it("identifies trailing commas in arrays", () => {
     const baseScopes = ['source.json', 'meta.structure.array.json'];
     const numericScopes = [...baseScopes, 'constant.numeric.json'];
     const separatorScopes = [...baseScopes, 'punctuation.separator.array.json'];
@@ -47,10 +43,10 @@ describe("JSON grammar", function() {
     expect(tokens[1]).toEqual({value: '1', scopes: numericScopes});
     expect(tokens[2]).toEqual({value: ',', scopes: [...baseScopes, 'invalid.illegal.trailing-array-separator.json']});
     expect(tokens[3]).toEqual({value: ' ', scopes: baseScopes});
-    return expect(tokens[4]).toEqual({value: ']', scopes: [...baseScopes, 'punctuation.definition.array.end.json']});
+    expect(tokens[4]).toEqual({value: ']', scopes: [...baseScopes, 'punctuation.definition.array.end.json']});
 });
 
-  it("tokenizes objects", function() {
+  it("tokenizes objects", () => {
     const baseScopes = ['source.json', 'meta.structure.dictionary.json'];
     const keyScopes = [...baseScopes, 'meta.structure.dictionary.key.json', 'string.quoted.double.json'];
     const keyBeginScopes = [...keyScopes, 'punctuation.definition.string.begin.json'];
@@ -86,10 +82,10 @@ describe("JSON grammar", function() {
     expect(tokens[22]).toEqual({value: '"', scopes: [...stringValueScopes, 'punctuation.definition.string.begin.json']});
     expect(tokens[23]).toEqual({value: 'bar', scopes: stringValueScopes});
     expect(tokens[24]).toEqual({value: '"', scopes: [...stringValueScopes, 'punctuation.definition.string.end.json']});
-    return expect(tokens[25]).toEqual({value: '}', scopes: [...baseScopes, 'punctuation.definition.dictionary.end.json']});
+    expect(tokens[25]).toEqual({value: '}', scopes: [...baseScopes, 'punctuation.definition.dictionary.end.json']});
 });
 
-  return it("identifies trailing commas in objects", function() {
+  it("identifies trailing commas in objects", () => {
     const baseScopes = ['source.json', 'meta.structure.dictionary.json'];
     const keyScopes = [...baseScopes, 'meta.structure.dictionary.key.json', 'string.quoted.double.json'];
     const keyBeginScopes = [...keyScopes, 'punctuation.definition.string.begin.json'];
@@ -116,6 +112,6 @@ describe("JSON grammar", function() {
     expect(tokens[14]).toEqual({value: '2', scopes: [...valueScopes, 'constant.numeric.json']});
     expect(tokens[15]).toEqual({value: ',', scopes: [...valueScopes, 'invalid.illegal.trailing-dictionary-separator.json']});
     expect(tokens[16]).toEqual({value: ' ', scopes: baseScopes});
-    return expect(tokens[17]).toEqual({value: '}', scopes: [...baseScopes, 'punctuation.definition.dictionary.end.json']});
+    expect(tokens[17]).toEqual({value: '}', scopes: [...baseScopes, 'punctuation.definition.dictionary.end.json']});
 });
 });
