@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const path = require('path');
 
 describe('Hyperlink grammar', function() {
@@ -11,12 +7,12 @@ describe('Hyperlink grammar', function() {
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage('language-hyperlink'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('text.hyperlink'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('text.hyperlink'));
   });
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('text.hyperlink');
+    expect(grammar.scopeName).toBe('text.hyperlink');
   });
 
   it('parses http: and https: links', function() {
@@ -32,14 +28,14 @@ describe('Hyperlink grammar', function() {
     expect(tokens[0]).toEqual({value: 'http://twitter.com/#!/AtomEditor', scopes: ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']});
 
     ({tokens} = plainGrammar.tokenizeLine('https://github.com/atom/brightray_example'));
-    return expect(tokens[0]).toEqual({value: 'https://github.com/atom/brightray_example', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
+    expect(tokens[0]).toEqual({value: 'https://github.com/atom/brightray_example', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
 });
 
   it('parses http: and https: links that contains unicode characters', function() {
     const plainGrammar = atom.grammars.selectGrammar();
 
     const {tokens} = plainGrammar.tokenizeLine('https://sv.wikipedia.org/wiki/Mañana');
-    return expect(tokens[0]).toEqual({value: 'https://sv.wikipedia.org/wiki/Mañana', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
+    expect(tokens[0]).toEqual({value: 'https://sv.wikipedia.org/wiki/Mañana', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
 });
 
   it('parses other links', function() {
@@ -52,14 +48,14 @@ describe('Hyperlink grammar', function() {
     expect(tokens[0]).toEqual({value: 'x-man-page://tar', scopes: ['text.plain.null-grammar', 'markup.underline.link.x-man-page.hyperlink']});
 
     ({tokens} = plainGrammar.tokenizeLine('atom://core/open/file?filename=urlEncodedFileName&line=n&column=n'));
-    return expect(tokens[0]).toEqual({value: 'atom://core/open/file?filename=urlEncodedFileName&line=n&column=n', scopes: ['text.plain.null-grammar', 'markup.underline.link.atom.hyperlink']});
+    expect(tokens[0]).toEqual({value: 'atom://core/open/file?filename=urlEncodedFileName&line=n&column=n', scopes: ['text.plain.null-grammar', 'markup.underline.link.atom.hyperlink']});
 });
 
   it('does not parse links in a regex string', function() {
     const testGrammar = atom.grammars.loadGrammarSync(path.join(__dirname, 'fixtures', 'test-grammar.cson'));
 
     const {tokens} = testGrammar.tokenizeLine('regexp:http://github.com');
-    return expect(tokens[1]).toEqual({value: 'http://github.com', scopes: ['source.test', 'string.regexp.test']});
+    expect(tokens[1]).toEqual({value: 'http://github.com', scopes: ['source.test', 'string.regexp.test']});
 });
 
   describe('parsing PHP strings', () => it('does not parse links in a regex string', function() {
@@ -70,38 +66,38 @@ describe('Hyperlink grammar', function() {
 
     waitsForPromise(() => atom.packages.activatePackage('language-php'));
 
-    return runs(function() {
+    runs(function() {
       const phpGrammar = atom.grammars.grammarForScopeName('text.html.php');
 
       const {tokens} = phpGrammar.tokenizeLine('<?php "/mailto:/" ?>');
-      return expect(tokens[3]).toEqual({value: 'mailto:', scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'string.regexp.double-quoted.php']});});
+      expect(tokens[3]).toEqual({value: 'mailto:', scopes: ['text.html.php', 'meta.embedded.line.php', 'source.php', 'string.regexp.double-quoted.php']});});
 }));
 
   describe('parsing cfml strings', function() {
     it('does not include anything between (and including) pound signs', function() {
       const plainGrammar = atom.grammars.selectGrammar();
       const {tokens} = plainGrammar.tokenizeLine('http://github.com/#username#');
-      return expect(tokens[0]).toEqual({value: 'http://github.com/', scopes: ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']});
+      expect(tokens[0]).toEqual({value: 'http://github.com/', scopes: ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']});
   });
 
-    return it('still includes single pound signs', function() {
+    it('still includes single pound signs', function() {
       const plainGrammar = atom.grammars.selectGrammar();
       const {tokens} = plainGrammar.tokenizeLine('http://github.com/atom/#start-of-content');
-      return expect(tokens[0]).toEqual({value: 'http://github.com/atom/#start-of-content', scopes: ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']});
+      expect(tokens[0]).toEqual({value: 'http://github.com/atom/#start-of-content', scopes: ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']});
   });
 });
 
-  return describe('parsing matching parentheses', function() {
+  describe('parsing matching parentheses', function() {
     it('still includes matching parentheses', function() {
       const plainGrammar = atom.grammars.selectGrammar();
       const {tokens} = plainGrammar.tokenizeLine('https://en.wikipedia.org/wiki/Atom_(text_editor)');
-      return expect(tokens[0]).toEqual({value: 'https://en.wikipedia.org/wiki/Atom_(text_editor)', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
+      expect(tokens[0]).toEqual({value: 'https://en.wikipedia.org/wiki/Atom_(text_editor)', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
   });
 
-    return it('does not include wrapping parentheses', function() {
+    it('does not include wrapping parentheses', function() {
       const plainGrammar = atom.grammars.selectGrammar();
       const {tokens} = plainGrammar.tokenizeLine('(https://en.wikipedia.org/wiki/Atom_(text_editor))');
-      return expect(tokens[1]).toEqual({value: 'https://en.wikipedia.org/wiki/Atom_(text_editor)', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
+      expect(tokens[1]).toEqual({value: 'https://en.wikipedia.org/wiki/Atom_(text_editor)', scopes: ['text.plain.null-grammar', 'markup.underline.link.https.hyperlink']});
   });
 });
 });
