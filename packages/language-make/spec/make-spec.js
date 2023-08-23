@@ -1,30 +1,25 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 // NOTE: This spec file doesn't use Coffeescript extended quotes (""")
 // because Make does not support spaces for indentation (which this spec file is using)
 // So we have to settle with \n\t single-line notation
 
-describe("Makefile grammar", function() {
+describe("Makefile grammar", () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     waitsForPromise(() => atom.packages.activatePackage("language-make"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.makefile"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.makefile"));
   });
 
-  it("parses the grammar", function() {
+  it("parses the grammar", () => {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("source.makefile");
+    expect(grammar.scopeName).toBe("source.makefile");
   });
 
   it("selects the Makefile grammar for files that start with a hashbang make -f command", () => expect(atom.grammars.selectGrammar('', '#!/usr/bin/make -f')).toBe(grammar));
 
-  it("parses comments correctly", function() {
+  it("parses comments correctly", () => {
     let lines = grammar.tokenizeLines('#foo\n\t#bar\n#foo\\\nbar');
 
     expect(lines[0][0]).toEqual({value: '#', scopes: ['source.makefile', 'comment.line.number-sign.makefile', 'punctuation.definition.comment.makefile']});
@@ -42,16 +37,16 @@ describe("Makefile grammar", function() {
     expect(lines[0][1]).toEqual({value: ' comment', scopes: ['source.makefile', 'comment.line.number-sign.makefile']});
     expect(lines[0][2]).toEqual({value: '\\', scopes: ['source.makefile', 'comment.line.number-sign.makefile', 'constant.character.escape.continuation.makefile']});
     expect(lines[1][0]).toEqual({value: 'should still be a comment', scopes: ['source.makefile', 'comment.line.number-sign.makefile']});
-    return expect(lines[2][0]).toEqual({value: 'not a comment', scopes: ['source.makefile']});
+    expect(lines[2][0]).toEqual({value: 'not a comment', scopes: ['source.makefile']});
 });
 
-  it("parses recipes", function() {
+  it("parses recipes", () => {
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 
-    return runs(function() {
+    runs(() => {
       const lines = grammar.tokenizeLines('all: foo.bar\n\ttest\n\nclean: foo\n\trm -fr foo.bar');
       expect(lines[0][0]).toEqual({value: 'all', scopes: ['source.makefile', 'meta.scope.target.makefile', 'entity.name.function.target.makefile']});
-      return expect(lines[3][0]).toEqual({value: 'clean', scopes: ['source.makefile', 'meta.scope.target.makefile', 'entity.name.function.target.makefile']});});
+      expect(lines[3][0]).toEqual({value: 'clean', scopes: ['source.makefile', 'meta.scope.target.makefile', 'entity.name.function.target.makefile']});});
 });
 
       // TODO: Enable these specs after language-shellscript@0.25.0 is on stable
@@ -66,7 +61,7 @@ describe("Makefile grammar", function() {
   const testFunctionCall = function(functionName) {
     const {tokens} = grammar.tokenizeLine('foo: echo $(' + functionName + ' /foo/bar.txt)');
 
-    return expect(tokens[4]).toEqual({value: functionName, scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.prerequisites.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'support.function.' + functionName + '.makefile']});
+    expect(tokens[4]).toEqual({value: functionName, scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.prerequisites.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'support.function.' + functionName + '.makefile']});
   };
 
   it("parses `subst` correctly", () => testFunctionCall('subst'));
@@ -135,27 +130,27 @@ describe("Makefile grammar", function() {
 
   it("parses `guile` correctly", () => testFunctionCall('guile'));
 
-  it("parses targets with line breaks in body", function() {
+  it("parses targets with line breaks in body", () => {
     const lines = grammar.tokenizeLines('foo:\n\techo $(basename /foo/bar.txt)');
 
-    return expect(lines[1][3]).toEqual({value: 'basename', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'support.function.basename.makefile']});
+    expect(lines[1][3]).toEqual({value: 'basename', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'support.function.basename.makefile']});
 });
 
-  it("continues matching prerequisites after reaching a line continuation character", function() {
+  it("continues matching prerequisites after reaching a line continuation character", () => {
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 
-    return runs(function() {
+    runs(() => {
       const lines = grammar.tokenizeLines('hello: a b c \\\n d e f\n\techo "test"');
 
       expect(lines[0][3]).toEqual({value: '\\', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.prerequisites.makefile', 'constant.character.escape.continuation.makefile']});
       expect(lines[1][0]).toEqual({value: ' d e f', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.prerequisites.makefile']});
-      return expect(lines[2][1]).toEqual({value: 'echo', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'support.function.builtin.shell']});});
+      expect(lines[2][1]).toEqual({value: 'echo', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'support.function.builtin.shell']});});
 });
 
-  it("parses nested interpolated strings and function calls correctly", function() {
+  it("parses nested interpolated strings and function calls correctly", () => {
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 
-    return runs(function() {
+    runs(() => {
       const lines = grammar.tokenizeLines('default:\n\t$(eval MESSAGE=$(shell node -pe "decodeURIComponent(process.argv.pop())" "${MSG}"))');
 
       expect(lines[1][1]).toEqual({value: '$(', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});
@@ -168,40 +163,40 @@ describe("Makefile grammar", function() {
       expect(lines[1][14]).toEqual({value: '${', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'string.quoted.double.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
       expect(lines[1][16]).toEqual({value: '}', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'string.quoted.double.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
       expect(lines[1][18]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});
-      return expect(lines[1][19]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});});
+      expect(lines[1][19]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});});
 });
 
-  it("recognizes global functions", function() {
+  it("recognizes global functions", () => {
     const {tokens} = grammar.tokenizeLine('$(foreach util,$(EXES),$(eval $(call BUILD_EXE,$(util))))');
 
-    return expect(tokens[0]).toEqual({value: '$(', scopes: ['source.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});
+    expect(tokens[0]).toEqual({value: '$(', scopes: ['source.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});
 });
 
-  it("parses `origin` correctly", function() {
+  it("parses `origin` correctly", () => {
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 
-    return runs(function() {
+    runs(() => {
       const lines = grammar.tokenizeLines('default:\n\t$(origin 1)');
 
       expect(lines[1][1]).toEqual({value: '$(', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});
       expect(lines[1][2]).toEqual({value: 'origin', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'support.function.origin.makefile']});
       expect(lines[1][4]).toEqual({value: '1', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'variable.other.makefile']});
-      return expect(lines[1][5]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});});
+      expect(lines[1][5]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});});
 });
 
-  it("parses `flavor` correctly", function() {
+  it("parses `flavor` correctly", () => {
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 
-    return runs(function() {
+    runs(() => {
       const lines = grammar.tokenizeLines('default:\n\t$(flavor 1)');
 
       expect(lines[1][1]).toEqual({value: '$(', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});
       expect(lines[1][2]).toEqual({value: 'flavor', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'support.function.flavor.makefile']});
       expect(lines[1][4]).toEqual({value: '1', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'meta.scope.function-call.makefile', 'variable.other.makefile']});
-      return expect(lines[1][5]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});});
+      expect(lines[1][5]).toEqual({value: ')', scopes: ['source.makefile', 'meta.scope.target.makefile', 'meta.scope.recipe.makefile', 'string.interpolated.makefile', 'punctuation.definition.variable.makefile']});});
 });
 
-  return it("tokenizes variable assignments", function() {
+  it("tokenizes variable assignments", () => {
     let tokens;
     const operators = ['=', '?=', ':=', '+='];
     for (let operator of Array.from(operators)) {
@@ -226,6 +221,6 @@ describe("Makefile grammar", function() {
     lines = grammar.tokenizeLines('SOMEVAR := foo # bar explanation\nOTHERVAR := bar');
     expect(lines[0][0]).toEqual({value: 'SOMEVAR', scopes: ['source.makefile', 'variable.other.makefile']});
     expect(lines[0][4]).toEqual({value: '#', scopes: ['source.makefile', 'comment.line.number-sign.makefile', 'punctuation.definition.comment.makefile']});
-    return expect(lines[1][0]).toEqual({value: 'OTHERVAR', scopes: ['source.makefile', 'variable.other.makefile']});
+    expect(lines[1][0]).toEqual({value: 'OTHERVAR', scopes: ['source.makefile', 'variable.other.makefile']});
 });
 });
