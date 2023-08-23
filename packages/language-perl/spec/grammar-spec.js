@@ -1,22 +1,16 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("Perl grammar", function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage("language-perl"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.perl"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.perl"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeDefined();
-    return expect(grammar.scopeName).toBe("source.perl");
+    expect(grammar.scopeName).toBe("source.perl");
   });
 
   describe("when a regexp compile tokenizes", function() {
@@ -59,7 +53,7 @@ describe("Perl grammar", function() {
       expect(tokens[2]).toEqual({value: "text", scopes: ["source.perl", "string.regexp.compile.nested_ltgt.perl"]});
       expect(tokens[3]).toEqual({value: ">", scopes: ["source.perl", "string.regexp.compile.nested_ltgt.perl", "punctuation.definition.string.perl"]});
       expect(tokens[4]).toEqual({value: "acdegilmnoprsux", scopes: ["source.perl", "string.regexp.compile.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
-      return expect(tokens[5]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(tokens[5]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("does not treat $) as a variable", function() {
@@ -67,7 +61,7 @@ describe("Perl grammar", function() {
       expect(tokens[2]).toEqual({value: "^text", scopes: ["source.perl", "string.regexp.compile.nested_parens.perl"]});
       expect(tokens[3]).toEqual({value: "$", scopes: ["source.perl", "string.regexp.compile.nested_parens.perl"]});
       expect(tokens[4]).toEqual({value: ")", scopes: ["source.perl", "string.regexp.compile.nested_parens.perl", "punctuation.definition.string.perl"]});
-      return expect(tokens[5]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(tokens[5]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("does not treat ( in a class as a group", function() {
@@ -77,22 +71,22 @@ describe("Perl grammar", function() {
       expect(tokens[6]).toEqual({value: "(", scopes: ["source.perl", "string.regexp.find-m.simple-delimiter.perl"]});
       expect(tokens[7]).toEqual({value: "]", scopes: ["source.perl", "string.regexp.find-m.simple-delimiter.perl"]});
       expect(tokens[13]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find-m.simple-delimiter.perl", "punctuation.definition.string.perl"]});
-      return expect(tokens[14]).toEqual({value: "smx", scopes: ["source.perl", "string.regexp.find-m.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
+      expect(tokens[14]).toEqual({value: "smx", scopes: ["source.perl", "string.regexp.find-m.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
   });
 
     it("does not treat 'm'(hashkey) as a regex match begin", function() {
       const {tokens} = grammar.tokenizeLine("$foo->{m}->bar();");
       expect(tokens[3]).toEqual({value: "{", scopes: ["source.perl", "punctuation.section.brace.curly.bracket.begin.perl"]});
       expect(tokens[4]).toEqual({value: "m", scopes: ["source.perl", "constant.other.bareword.perl"]});
-      return expect(tokens[5]).toEqual({value: "}", scopes: ["source.perl", "punctuation.section.brace.curly.bracket.end.perl"]});
+      expect(tokens[5]).toEqual({value: "}", scopes: ["source.perl", "punctuation.section.brace.curly.bracket.end.perl"]});
   });
 
-    return it("does not treat '#' as a comment in regex match", function() {
+    it("does not treat '#' as a comment in regex match", function() {
       const {tokens} = grammar.tokenizeLine("$asd =~ s#asd#foo#;");
       expect(tokens[5]).toEqual({value: "s", scopes: ["source.perl", "string.regexp.replaceXXX.simple_delimiter.perl", "punctuation.definition.string.perl", "support.function.perl"]});
       expect(tokens[6]).toEqual({value: "#", scopes: ["source.perl", "string.regexp.replaceXXX.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(tokens[8]).toEqual({value: "#", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
-      return expect(tokens[10]).toEqual({value: "#", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
+      expect(tokens[10]).toEqual({value: "#", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
   });
 });
 
@@ -143,7 +137,7 @@ describe("Perl grammar", function() {
       expect(tokens[5]).toEqual({value: "text", scopes: ["source.perl", "string.regexp.find-m.nested_ltgt.perl"]});
       expect(tokens[6]).toEqual({value: ">", scopes: ["source.perl", "string.regexp.find-m.nested_ltgt.perl", "punctuation.definition.string.perl"]});
       expect(tokens[7]).toEqual({value: "acdegilmnoprsux", scopes: ["source.perl", "string.regexp.find-m.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
-      return expect(tokens[8]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(tokens[8]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("works with without any character before a regexp", function() {
@@ -164,7 +158,7 @@ describe("Perl grammar", function() {
       expect(lines[1][0]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl"]});
       expect(lines[1][1]).toEqual({value: "asd", scopes: ["source.perl", "string.regexp.find.perl"]});
       expect(lines[1][2]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl"]});
-      return expect(lines[1][3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(lines[1][3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("works with control keys before a regexp", function() {
@@ -178,7 +172,7 @@ describe("Perl grammar", function() {
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.perl"]});
       expect(tokens[2]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl"]});
       expect(tokens[3]).toEqual({value: "asd", scopes: ["source.perl", "string.regexp.find.perl"]});
-      return expect(tokens[4]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl"]});
+      expect(tokens[4]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl"]});
   });
 
     it("works with multiline regexp", function() {
@@ -191,10 +185,10 @@ describe("Perl grammar", function() {
       expect(lines[1][0]).toEqual({value: "(", scopes: ["source.perl", "string.regexp.find.perl"]});
       expect(lines[1][2]).toEqual({value: ")", scopes: ["source.perl", "string.regexp.find.perl"]});
       expect(lines[2][0]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl"]});
-      return expect(lines[2][1]).toEqual({value: "x", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
+      expect(lines[2][1]).toEqual({value: "x", scopes: ["source.perl", "string.regexp.find.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
   });
 
-    return it("works in a if", function() {
+    it("works in a if", function() {
       let {tokens} = grammar.tokenizeLine("if (/ hello /i) {}");
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.perl"]});
       expect(tokens[2]).toEqual({value: "(", scopes: ["source.perl", "punctuation.section.parenthesis.round.bracket.begin.perl"]});
@@ -219,7 +213,7 @@ describe("Perl grammar", function() {
       expect(tokens[11]).toEqual({value: 'i', scopes: ['source.perl', 'string.regexp.find.perl', 'punctuation.definition.string.perl', 'keyword.control.regexp-option.perl']});
       expect(tokens[12]).toEqual({value: ')', scopes: ['source.perl', 'punctuation.section.parenthesis.round.bracket.end.perl']});
       expect(tokens[14]).toEqual({value: '{', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.begin.perl']});
-      return expect(tokens[15]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
+      expect(tokens[15]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
   });
 });
 
@@ -281,7 +275,7 @@ describe("Perl grammar", function() {
       expect(tokens[3]).toEqual({value: "_", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(tokens[4]).toEqual({value: "test", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl"]});
       expect(tokens[5]).toEqual({value: "_", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
-      return expect(tokens[6]).toEqual({value: "acdegilmnoprsux", scopes: ["source.perl", "string.regexp.replace.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
+      expect(tokens[6]).toEqual({value: "acdegilmnoprsux", scopes: ["source.perl", "string.regexp.replace.perl", "punctuation.definition.string.perl", "keyword.control.regexp-option.perl"]});
   });
 
     it("works with two '/' delimiter in the first line, and one in the last", function() {
@@ -291,7 +285,7 @@ describe("Perl grammar", function() {
       expect(lines[0][6]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replaceXXX.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(lines[0][10]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(lines[2][0]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replaceXXX.format.simple_delimiter.perl", "punctuation.definition.string.perl"]});
-      return expect(lines[2][2]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(lines[2][2]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("works with one '/' delimiter in the first line, one in the next and one in the last", function() {
@@ -302,16 +296,16 @@ describe("Perl grammar", function() {
       expect(lines[0][6]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replace.extended.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(lines[1][0]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replace.extended.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(lines[3][0]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replace.extended.simple_delimiter.perl", "punctuation.definition.string.perl"]});
-      return expect(lines[3][2]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(lines[3][2]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
-    return it("works with one '/' delimiter in the first line and two in the last", function() {
+    it("works with one '/' delimiter in the first line and two in the last", function() {
       const lines = grammar.tokenizeLines(`$line =~ s/&#(\\d+);
 /chr($1)/gxe;`);
       expect(lines[0][6]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replace.extended.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(lines[1][0]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replace.extended.simple_delimiter.perl", "punctuation.definition.string.perl"]});
       expect(lines[1][5]).toEqual({value: "/", scopes: ["source.perl", "string.regexp.replace.extended.simple_delimiter.perl", "punctuation.definition.string.perl"]});
-      return expect(lines[1][7]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(lines[1][7]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 });
 
@@ -333,12 +327,12 @@ describe("Perl grammar", function() {
       expect(tokens[0]).toEqual({value: "__END__", scopes: ["source.perl", "constant.language.perl"]});
 
       ({tokens} = grammar.tokenizeLine("__DATA__"));
-      return expect(tokens[0]).toEqual({value: "__DATA__", scopes: ["source.perl", "constant.language.perl"]});
+      expect(tokens[0]).toEqual({value: "__DATA__", scopes: ["source.perl", "constant.language.perl"]});
   });
 
-    return it("does highlight custom constants different", function() {
+    it("does highlight custom constants different", function() {
       const {tokens} = grammar.tokenizeLine("__TEST__");
-      return expect(tokens[0]).toEqual({value: "__TEST__", scopes: ["source.perl", "string.unquoted.program-block.perl", "punctuation.definition.string.begin.perl"]});
+      expect(tokens[0]).toEqual({value: "__TEST__", scopes: ["source.perl", "string.unquoted.program-block.perl", "punctuation.definition.string.begin.perl"]});
   });
 });
 
@@ -348,7 +342,7 @@ describe("Perl grammar", function() {
 __END__
 "String";\
 `);
-    return expect(lines[2][0]).toEqual({value: '"String";', scopes: ["source.perl", "comment.block.documentation.perl"]});
+    expect(lines[2][0]).toEqual({value: '"String";', scopes: ["source.perl", "comment.block.documentation.perl"]});
 }));
 
   describe("tokenizes compile phase keywords", () => it("does highlight all compile phase keywords", function() {
@@ -368,7 +362,7 @@ __END__
     expect(tokens[0]).toEqual({value: "END", scopes: ["source.perl", "meta.function.perl", "entity.name.function.perl"]});
 
     ({tokens} = grammar.tokenizeLine("DESTROY"));
-    return expect(tokens[0]).toEqual({value: "DESTROY", scopes: ["source.perl", "meta.function.perl", "entity.name.function.perl"]});
+    expect(tokens[0]).toEqual({value: "DESTROY", scopes: ["source.perl", "meta.function.perl", "entity.name.function.perl"]});
 }));
 
   describe("tokenizes method calls", () => it("does not highlight if called like a method", function() {
@@ -409,7 +403,7 @@ __END__
     expect(tokens[3]).toEqual({value: 'qx', scopes: ['source.perl']});
     expect(tokens[4]).toEqual({value: '(', scopes: ['source.perl', 'punctuation.section.parenthesis.round.bracket.begin.perl']});
     expect(tokens[5]).toEqual({value: ')', scopes: ['source.perl', 'punctuation.section.parenthesis.round.bracket.end.perl']});
-    return expect(tokens[6]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+    expect(tokens[6]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
 }));
 
   describe("when a function call tokenizes", () => it("does not highlight calls which looks like a regexp", function() {
@@ -441,7 +435,7 @@ __END__
     expect(tokens[9]).toEqual({value: ',', scopes: ['source.perl', 'string.quoted.double.perl']});
     expect(tokens[10]).toEqual({value: '$', scopes: ['source.perl', 'string.quoted.double.perl', 'variable.other.readwrite.global.perl', 'punctuation.definition.variable.perl']});
     expect(tokens[11]).toEqual({value: 'single_task', scopes: ['source.perl', 'string.quoted.double.perl', 'variable.other.readwrite.global.perl']});
-    return expect(tokens[12]).toEqual({value: ');', scopes: ['source.perl', 'string.quoted.double.perl']});
+    expect(tokens[12]).toEqual({value: ');', scopes: ['source.perl', 'string.quoted.double.perl']});
 }));
 
   describe("tokenizes single quoting", function() {
@@ -462,7 +456,7 @@ __END__
       expect(tokens[0]).toEqual({value: "q~", scopes: ["source.perl", "string.quoted.other.q.perl", "punctuation.definition.string.begin.perl"]});
       expect(tokens[1]).toEqual({value: "Test this\\nadvanced one", scopes: ["source.perl", "string.quoted.other.q.perl"]});
       expect(tokens[2]).toEqual({value: "~", scopes: ["source.perl", "string.quoted.other.q.perl", "punctuation.definition.string.end.perl"]});
-      return expect(tokens[3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(tokens[3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("does not escape characters in single-quote multiline strings", function() {
@@ -488,10 +482,10 @@ last
       expect(lines[2][0]).toEqual({value: "and this the second one)\\x00", scopes: ["source.perl", "string.quoted.other.q.perl"]});
       expect(lines[3][0]).toEqual({value: "last", scopes: ["source.perl", "string.quoted.other.q.perl"]});
       expect(lines[4][0]).toEqual({value: "~", scopes: ["source.perl", "string.quoted.other.q.perl", "punctuation.definition.string.end.perl"]});
-      return expect(lines[4][1]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(lines[4][1]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
-    return it("does not highlight the whole word as an escape sequence", function() {
+    it("does not highlight the whole word as an escape sequence", function() {
       const {tokens} = grammar.tokenizeLine("\"I l\\xF6ve th\\x{00E4}s\";");
       expect(tokens[0]).toEqual({value: "\"", scopes: ["source.perl", "string.quoted.double.perl", "punctuation.definition.string.begin.perl"]});
       expect(tokens[1]).toEqual({value: "I l", scopes: ["source.perl", "string.quoted.double.perl"]});
@@ -500,7 +494,7 @@ last
       expect(tokens[4]).toEqual({value: "\\x{00E4}", scopes: ["source.perl", "string.quoted.double.perl", "constant.character.escape.perl"]});
       expect(tokens[5]).toEqual({value: "s", scopes: ["source.perl", "string.quoted.double.perl"]});
       expect(tokens[6]).toEqual({value: "\"", scopes: ["source.perl", "string.quoted.double.perl", "punctuation.definition.string.end.perl"]});
-      return expect(tokens[7]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(tokens[7]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 });
 
@@ -533,7 +527,7 @@ last
     expect(tokens[4]).toEqual({value: "\\n", scopes: ["source.perl", "string.quoted.other.qq.perl", "constant.character.escape.perl"]});
     expect(tokens[5]).toEqual({value: "advanced one", scopes: ["source.perl", "string.quoted.other.qq.perl"]});
     expect(tokens[6]).toEqual({value: "~", scopes: ["source.perl", "string.quoted.other.qq.perl", "punctuation.definition.string.end.perl"]});
-    return expect(tokens[7]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+    expect(tokens[7]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
 }));
 
   describe("tokenizes word quoting", () => it("quotes words", function() {
@@ -541,7 +535,7 @@ last
     expect(tokens[0]).toEqual({value: "qw(", scopes: ["source.perl", "string.quoted.other.q-paren.perl", "punctuation.definition.string.begin.perl"]});
     expect(tokens[1]).toEqual({value: "Aword Bword Cword", scopes: ["source.perl", "string.quoted.other.q-paren.perl"]});
     expect(tokens[2]).toEqual({value: ")", scopes: ["source.perl", "string.quoted.other.q-paren.perl", "punctuation.definition.string.end.perl"]});
-    return expect(tokens[3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+    expect(tokens[3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
 }));
 
   describe("tokenizes subroutines", function() {
@@ -560,7 +554,7 @@ sub mySub {
       expect(lines[1][4]).toEqual({value: 'asd', scopes: ['source.perl', 'string.quoted.double.perl']});
       expect(lines[1][5]).toEqual({value: '"', scopes: ['source.perl', 'string.quoted.double.perl', 'punctuation.definition.string.end.perl']});
       expect(lines[1][6]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
-      return expect(lines[2][0]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
+      expect(lines[2][0]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
   });
 
     it("highlights subroutines assigned to variables", function() {
@@ -582,10 +576,10 @@ my $test = sub {
       expect(lines[1][5]).toEqual({value: '"', scopes: ['source.perl', 'string.quoted.double.perl', 'punctuation.definition.string.end.perl']});
       expect(lines[1][6]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
       expect(lines[2][0]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
-      return expect(lines[2][1]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[2][1]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 
-    return it("highlights subroutines assigned to hash-keys", function() {
+    it("highlights subroutines assigned to hash-keys", function() {
       const lines = grammar.tokenizeLines(`\
 my $test = { a => sub {
 print "asd";
@@ -608,7 +602,7 @@ print "asd";
       expect(lines[1][5]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
       expect(lines[2][0]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
       expect(lines[2][1]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
-      return expect(lines[2][2]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[2][2]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 });
 
@@ -678,7 +672,7 @@ Assigned to: @<<<<<<<<<<<<<<<<<<<<<< ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     expect(lines[21][0]).toEqual({value: "~                                    ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<", scopes: ["source.perl", "meta.format.perl"]});
     expect(lines[23][0]).toEqual({value: "~                                    ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<", scopes: ["source.perl", "meta.format.perl"]});
     expect(lines[25][0]).toEqual({value: "~                                    ^<<<<<<<<<<<<<<<<<<<<<<<...", scopes: ["source.perl", "meta.format.perl"]});
-    return expect(lines[27][0]).toEqual({value: ".", scopes: ["source.perl", "meta.format.perl"]});
+    expect(lines[27][0]).toEqual({value: ".", scopes: ["source.perl", "meta.format.perl"]});
 }));
 
   describe("when a heredoc tokenizes", function() {
@@ -692,10 +686,10 @@ TEST
       expect(lines[0][5]).toEqual({value: '<<', scopes: ['source.perl', 'punctuation.definition.string.perl', 'string.unquoted.heredoc.perl', 'punctuation.definition.heredoc.perl']});
       expect(lines[0][6]).toEqual({value: 'TEST', scopes: ['source.perl', 'punctuation.definition.string.perl', 'string.unquoted.heredoc.perl']});
       expect(lines[0][7]).toEqual({value: ',', scopes: ['source.perl', 'punctuation.separator.comma.perl']});
-      return expect(lines[3][0]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(lines[3][0]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
-    return it("does not highlight variables and escape sequences in a single quote heredoc", function() {
+    it("does not highlight variables and escape sequences in a single quote heredoc", function() {
       let lines = grammar.tokenizeLines(`\
 $asd->foo(<<'TEST');
 $asd\\n
@@ -708,7 +702,7 @@ $asd->foo(<<\\TEST);
 $asd\\n
 ;\
 `);
-      return expect(lines[1][0]).toEqual({value: "$asd\\n", scopes: ["source.perl", "string.unquoted.heredoc.quote.perl"]});
+      expect(lines[1][0]).toEqual({value: "$asd\\n", scopes: ["source.perl", "string.unquoted.heredoc.quote.perl"]});
   });
 });
 
@@ -717,7 +711,7 @@ $asd\\n
     expect(tokens[0]).toEqual({value: "my", scopes: ["source.perl", "storage.modifier.perl"]});
     expect(tokens[2]).toEqual({value: "our", scopes: ["source.perl", "storage.modifier.perl"]});
     expect(tokens[4]).toEqual({value: "local", scopes: ["source.perl", "storage.modifier.perl"]});
-    return expect(tokens[6]).toEqual({value: "state", scopes: ["source.perl", "storage.modifier.perl"]});
+    expect(tokens[6]).toEqual({value: "state", scopes: ["source.perl", "storage.modifier.perl"]});
 }));
 
   describe('when encountering `v` followed by dot-delimited digits', () => it('tokenises it as a version literal', function() {
@@ -729,7 +723,7 @@ use v5.24.1\
     expect(lines[0][0]).toEqual({value: 'use', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'keyword.control.directive.pragma.use.perl']});
     expect(lines[0][2]).toEqual({value: 'v5.14', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'constant.other.version.literal.perl']});
     expect(lines[1][0]).toEqual({value: 'use', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'keyword.control.directive.pragma.use.perl']});
-    return expect(lines[1][2]).toEqual({value: 'v5.24.1', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'constant.other.version.literal.perl']});
+    expect(lines[1][2]).toEqual({value: 'v5.24.1', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'constant.other.version.literal.perl']});
 }));
 
   describe("when an operator tokenizes", function() {
@@ -749,7 +743,7 @@ use v5.24.1\
       expect(tokens[24]).toEqual({value: "^=", scopes: ["source.perl", "keyword.operator.assignement.compound.bitwise.perl"]});
       expect(tokens[26]).toEqual({value: "&.=", scopes: ["source.perl", "keyword.operator.assignement.compound.stringwise.perl"]});
       expect(tokens[28]).toEqual({value: "|.=", scopes: ["source.perl", "keyword.operator.assignement.compound.stringwise.perl"]});
-      return expect(tokens[30]).toEqual({value: "^.=", scopes: ["source.perl", "keyword.operator.assignement.compound.stringwise.perl"]});
+      expect(tokens[30]).toEqual({value: "^.=", scopes: ["source.perl", "keyword.operator.assignement.compound.stringwise.perl"]});
   });
 
     it("highlights arithmetic operators", function() {
@@ -759,13 +753,13 @@ use v5.24.1\
       expect(tokens[4]).toEqual({value: "*", scopes: ["source.perl", "keyword.operator.arithmetic.perl"]});
       expect(tokens[6]).toEqual({value: "/", scopes: ["source.perl", "keyword.operator.arithmetic.perl"]});
       expect(tokens[8]).toEqual({value: "%", scopes: ["source.perl", "keyword.operator.arithmetic.perl"]});
-      return expect(tokens[10]).toEqual({value: "**", scopes: ["source.perl", "keyword.operator.arithmetic.perl"]});
+      expect(tokens[10]).toEqual({value: "**", scopes: ["source.perl", "keyword.operator.arithmetic.perl"]});
   });
 
     it("highlights increment/decrement operators", function() {
       const {tokens} = grammar.tokenizeLine("++ --");
       expect(tokens[0]).toEqual({value: "++", scopes: ["source.perl", "keyword.operator.increment.perl"]});
-      return expect(tokens[2]).toEqual({value: "--", scopes: ["source.perl", "keyword.operator.decrement.perl"]});
+      expect(tokens[2]).toEqual({value: "--", scopes: ["source.perl", "keyword.operator.decrement.perl"]});
   });
 
     it("highlights bitwise operators", function() {
@@ -775,7 +769,7 @@ use v5.24.1\
       expect(tokens[4]).toEqual({value: "^", scopes: ["source.perl", "keyword.operator.bitwise.perl"]});
       expect(tokens[6]).toEqual({value: "~", scopes: ["source.perl", "keyword.operator.bitwise.perl"]});
       expect(tokens[8]).toEqual({value: ">>", scopes: ["source.perl", "keyword.operator.bitwise.perl"]});
-      return expect(tokens[10]).toEqual({value: "<<", scopes: ["source.perl", "keyword.operator.bitwise.perl"]});
+      expect(tokens[10]).toEqual({value: "<<", scopes: ["source.perl", "keyword.operator.bitwise.perl"]});
   });
 
     it("highlights stringwise operators", function() {
@@ -783,7 +777,7 @@ use v5.24.1\
       expect(tokens[0]).toEqual({value: "&.", scopes: ["source.perl", "keyword.operator.stringwise.perl"]});
       expect(tokens[2]).toEqual({value: "|.", scopes: ["source.perl", "keyword.operator.stringwise.perl"]});
       expect(tokens[4]).toEqual({value: "^.", scopes: ["source.perl", "keyword.operator.stringwise.perl"]});
-      return expect(tokens[6]).toEqual({value: "~.", scopes: ["source.perl", "keyword.operator.stringwise.perl"]});
+      expect(tokens[6]).toEqual({value: "~.", scopes: ["source.perl", "keyword.operator.stringwise.perl"]});
   });
 
     it("highlights comparison operators", function() {
@@ -797,7 +791,7 @@ use v5.24.1\
       expect(tokens[14]).toEqual({value: "=~", scopes: ["source.perl", "keyword.operator.comparison.perl"]});
       expect(tokens[16]).toEqual({value: "!~", scopes: ["source.perl", "keyword.operator.comparison.perl"]});
       expect(tokens[18]).toEqual({value: "~~", scopes: ["source.perl", "keyword.operator.comparison.perl"]});
-      return expect(tokens[20]).toEqual({value: "<=>", scopes: ["source.perl", "keyword.operator.comparison.perl"]});
+      expect(tokens[20]).toEqual({value: "<=>", scopes: ["source.perl", "keyword.operator.comparison.perl"]});
   });
 
     it("highlights stringwise comparison operators", function() {
@@ -808,7 +802,7 @@ use v5.24.1\
       expect(tokens[6]).toEqual({value: "gt", scopes: ["source.perl", "keyword.operator.comparison.stringwise.perl"]});
       expect(tokens[8]).toEqual({value: "le", scopes: ["source.perl", "keyword.operator.comparison.stringwise.perl"]});
       expect(tokens[10]).toEqual({value: "ge", scopes: ["source.perl", "keyword.operator.comparison.stringwise.perl"]});
-      return expect(tokens[12]).toEqual({value: "cmp", scopes: ["source.perl", "keyword.operator.comparison.stringwise.perl"]});
+      expect(tokens[12]).toEqual({value: "cmp", scopes: ["source.perl", "keyword.operator.comparison.stringwise.perl"]});
   });
 
     it("highlights ellipsis statements", function() {
@@ -843,7 +837,7 @@ sub someMethod {
 `
       );
       expect(lines[2][1]).toEqual({value: '...', scopes: ['source.perl', 'keyword.operator.range.perl']});
-      return expect(lines[2][2]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[2][2]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 
     it("highlights logical operators", function() {
@@ -852,23 +846,23 @@ sub someMethod {
       expect(tokens[2]).toEqual({value: "or", scopes: ["source.perl", "keyword.operator.logical.perl"]});
       expect(tokens[4]).toEqual({value: "xor", scopes: ["source.perl", "keyword.operator.logical.perl"]});
       expect(tokens[6]).toEqual({value: "as", scopes: ["source.perl", "keyword.operator.logical.perl"]});
-      return expect(tokens[8]).toEqual({value: "not", scopes: ["source.perl", "keyword.operator.logical.perl"]});
+      expect(tokens[8]).toEqual({value: "not", scopes: ["source.perl", "keyword.operator.logical.perl"]});
   });
 
     it("highlights c-style logical operators", function() {
       const {tokens} = grammar.tokenizeLine("&& ||");
       expect(tokens[0]).toEqual({value: "&&", scopes: ["source.perl", "keyword.operator.logical.c-style.perl"]});
-      return expect(tokens[2]).toEqual({value: "||", scopes: ["source.perl", "keyword.operator.logical.c-style.perl"]});
+      expect(tokens[2]).toEqual({value: "||", scopes: ["source.perl", "keyword.operator.logical.c-style.perl"]});
   });
 
     it("highlights defined-or logical operators", function() {
       const {tokens} = grammar.tokenizeLine("$var // 3");
-      return expect(tokens[3]).toEqual({value: "//", scopes: ["source.perl", "keyword.operator.logical.defined-or.perl"]});
+      expect(tokens[3]).toEqual({value: "//", scopes: ["source.perl", "keyword.operator.logical.defined-or.perl"]});
   });
 
     it("highlights concatenation operators", function() {
       const {tokens} = grammar.tokenizeLine("'x'.'y'");
-      return expect(tokens[3]).toEqual({value: ".", scopes: ["source.perl", "keyword.operator.concatenation.perl"]});
+      expect(tokens[3]).toEqual({value: ".", scopes: ["source.perl", "keyword.operator.concatenation.perl"]});
   });
 
     it("highlights repetition operators", function() {
@@ -889,7 +883,7 @@ axx\
       expect(lines[2][1]).toEqual({value: "x", scopes: ["source.perl", "string.quoted.single.perl"]});
       expect(lines[2][2]).toEqual({value: "'", scopes: ["source.perl", "string.quoted.single.perl", "punctuation.definition.string.end.perl"]});
       expect(lines[2][3]).toEqual({value: "xx", scopes: ["source.perl"]});
-      return expect(lines[3][0]).toEqual({value: "axx", scopes: ["source.perl"]});
+      expect(lines[3][0]).toEqual({value: "axx", scopes: ["source.perl"]});
   });
 
     it("highlights range operators", function() {
@@ -897,22 +891,22 @@ axx\
       expect(tokens[0]).toEqual({value: "..", scopes: ["source.perl", "keyword.operator.range.perl"]});
       expect(tokens[2]).toEqual({value: "...", scopes: ["source.perl", "keyword.operator.range.perl"]});
       expect(tokens[5]).toEqual({value: "..", scopes: ["source.perl", "keyword.operator.range.perl"]});
-      return expect(tokens[9]).toEqual({value: "...", scopes: ["source.perl", "keyword.operator.range.perl"]});
+      expect(tokens[9]).toEqual({value: "...", scopes: ["source.perl", "keyword.operator.range.perl"]});
   });
 
-    return it("highlights readline operators", function() {
+    it("highlights readline operators", function() {
       const {tokens} = grammar.tokenizeLine("<> <$fh>");
       expect(tokens[0]).toEqual({value: "<", scopes: ["source.perl", "keyword.operator.readline.perl"]});
       expect(tokens[1]).toEqual({value: ">", scopes: ["source.perl", "keyword.operator.readline.perl"]});
       expect(tokens[3]).toEqual({value: "<", scopes: ["source.perl", "keyword.operator.readline.perl"]});
-      return expect(tokens[6]).toEqual({value: ">", scopes: ["source.perl", "keyword.operator.readline.perl"]});
+      expect(tokens[6]).toEqual({value: ">", scopes: ["source.perl", "keyword.operator.readline.perl"]});
   });
 });
 
   describe("when a separator tokenizes", function() {
     it("highlights semicolons", function() {
       const {tokens} = grammar.tokenizeLine("$var;");
-      return expect(tokens[2]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
+      expect(tokens[2]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
   });
 
     it("highlights commas", function() {
@@ -922,22 +916,22 @@ axx\
 `);
       expect(lines[0][2]).toEqual({value: ",", scopes: ["source.perl", "punctuation.separator.comma.perl"]});
       expect(lines[1][3]).toEqual({value: ",", scopes: ["source.perl", "punctuation.separator.comma.perl"]});
-      return expect(lines[2][1]).toEqual({value: ",", scopes: ["source.perl", "punctuation.separator.comma.perl"]});
+      expect(lines[2][1]).toEqual({value: ",", scopes: ["source.perl", "punctuation.separator.comma.perl"]});
   });
 
     it("highlights double colons", function() {
       const {tokens} = grammar.tokenizeLine("A::B");
-      return expect(tokens[1]).toEqual({value: "::", scopes: ["source.perl", "punctuation.separator.colon.perl"]});
+      expect(tokens[1]).toEqual({value: "::", scopes: ["source.perl", "punctuation.separator.colon.perl"]});
   });
 
     it("highlights arrows", function() {
       const {tokens} = grammar.tokenizeLine("$abc->d");
-      return expect(tokens[2]).toEqual({value: "->", scopes: ["source.perl", "punctuation.separator.arrow.perl"]});
+      expect(tokens[2]).toEqual({value: "->", scopes: ["source.perl", "punctuation.separator.arrow.perl"]});
   });
 
-    return it("highlights fat arrows", function() {
+    it("highlights fat arrows", function() {
       const {tokens} = grammar.tokenizeLine("key => 'value'");
-      return expect(tokens[2]).toEqual({value: "=>", scopes: ["source.perl", "punctuation.separator.key-value.perl"]});
+      expect(tokens[2]).toEqual({value: "=>", scopes: ["source.perl", "punctuation.separator.key-value.perl"]});
   });
 });
 
@@ -956,7 +950,7 @@ axx\
       expect(lines[2][1]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
       expect(lines[3][0]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
       expect(lines[3][1]).toEqual({value: ".", scopes: ["source.perl", "constant.numeric.decimal.perl", "punctuation.delimiter.decimal.period.perl"]});
-      return expect(lines[3][2]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
+      expect(lines[3][2]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
   });
 
     it("highlights exponentials", function() {
@@ -992,7 +986,7 @@ axx\
       expect(lines[8][2]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.exponential.perl"]});
       expect(lines[9][0]).toEqual({value: "0e-0", scopes: ["source.perl", "constant.numeric.exponential.perl"]});
       expect(lines[9][1]).toEqual({value: ".", scopes: ["source.perl", "constant.numeric.exponential.perl", "punctuation.delimiter.decimal.period.perl"]});
-      return expect(lines[9][2]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.exponential.perl"]});
+      expect(lines[9][2]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.exponential.perl"]});
   });
 
     it("highlights hexadecimals", function() {
@@ -1000,7 +994,7 @@ axx\
 0x0e0\
 `);
       expect(lines[0][0]).toEqual({value: "0x", scopes: ["source.perl", "constant.numeric.hexadecimal.perl"]});
-      return expect(lines[1][0]).toEqual({value: "0x0e0", scopes: ["source.perl", "constant.numeric.hexadecimal.perl"]});
+      expect(lines[1][0]).toEqual({value: "0x0e0", scopes: ["source.perl", "constant.numeric.hexadecimal.perl"]});
   });
 
 
@@ -1009,7 +1003,7 @@ axx\
 0b10\
 `);
       expect(lines[0][0]).toEqual({value: "0b", scopes: ["source.perl", "constant.numeric.binary.perl"]});
-      return expect(lines[1][0]).toEqual({value: "0b10", scopes: ["source.perl", "constant.numeric.binary.perl"]});
+      expect(lines[1][0]).toEqual({value: "0b10", scopes: ["source.perl", "constant.numeric.binary.perl"]});
   });
 
     it("does not highlight decimals as hexadecimals", function() {
@@ -1019,7 +1013,7 @@ axx\
       expect(lines[0][0]).toEqual({value: "00", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
       expect(lines[0][1]).toEqual({value: "x", scopes: ["source.perl"]});
       expect(lines[1][0]).toEqual({value: "00", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
-      return expect(lines[1][1]).toEqual({value: "xa", scopes: ["source.perl"]});
+      expect(lines[1][1]).toEqual({value: "xa", scopes: ["source.perl"]});
   });
 
     it("does not highlight decimals as binaries", function() {
@@ -1029,10 +1023,10 @@ axx\
       expect(lines[0][0]).toEqual({value: "00", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
       expect(lines[0][1]).toEqual({value: "b", scopes: ["source.perl"]});
       expect(lines[1][0]).toEqual({value: "00", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
-      return expect(lines[1][1]).toEqual({value: "b1", scopes: ["source.perl"]});
+      expect(lines[1][1]).toEqual({value: "b1", scopes: ["source.perl"]});
   });
 
-    return it("does not highlight periods between numbers", function() {
+    it("does not highlight periods between numbers", function() {
       const lines = grammar.tokenizeLines(`0.0.0.0
 0..0
 0...0
@@ -1059,7 +1053,7 @@ axx\
       expect(lines[4][1]).toEqual({value: ".", scopes: ["source.perl", "constant.numeric.exponential.perl", "punctuation.delimiter.decimal.period.perl"]});
       expect(lines[4][2]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.exponential.perl"]});
       expect(lines[4][3]).toEqual({value: ".", scopes: ["source.perl", "keyword.operator.concatenation.perl"]});
-      return expect(lines[4][4]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
+      expect(lines[4][4]).toEqual({value: "0", scopes: ["source.perl", "constant.numeric.decimal.perl"]});
   });
 });
 
@@ -1135,7 +1129,7 @@ my $n = 0b1100_0000;\
     expect(lines[8][3]).toEqual({value: 'n', scopes: ['source.perl', 'variable.other.readwrite.global.perl']});
     expect(lines[8][5]).toEqual({value: '=', scopes: ['source.perl', 'keyword.operator.assignement.perl']});
     expect(lines[8][7]).toEqual({value: '0b1100_0000', scopes: ['source.perl', 'constant.numeric.binary.perl']});
-    return expect(lines[8][8]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+    expect(lines[8][8]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
 }));
 
   describe("when a hash variable tokenizes", () => it("does not highlight whitespace beside a key as a constant", function() {
@@ -1148,7 +1142,7 @@ key => 'value1',
     expect(lines[2][0]).toEqual({value: "'", scopes: ["source.perl", "string.quoted.single.perl", "punctuation.definition.string.begin.perl"]});
     expect(lines[2][1]).toEqual({value: "key", scopes: ["source.perl", "string.quoted.single.perl"]});
     expect(lines[2][2]).toEqual({value: "'", scopes: ["source.perl", "string.quoted.single.perl", "punctuation.definition.string.end.perl"]});
-    return expect(lines[2][3]).toEqual({value: " ", scopes: ["source.perl"]});
+    expect(lines[2][3]).toEqual({value: " ", scopes: ["source.perl"]});
 }));
 
   describe("when a variable tokenizes", function() {
@@ -1219,15 +1213,15 @@ my @n = sort {$a <=> $b} @m;\
       expect(lines[8][17]).toEqual({value: '}', scopes: ['source.perl', 'punctuation.section.brace.curly.bracket.end.perl']});
       expect(lines[8][19]).toEqual({value: '@', scopes: ['source.perl', 'variable.other.readwrite.global.perl', 'punctuation.definition.variable.perl']});
       expect(lines[8][20]).toEqual({value: 'm', scopes: ['source.perl', 'variable.other.readwrite.global.perl']});
-      return expect(lines[8][21]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[8][21]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 
-    return it("does not highlight numbers separately", function() {
+    it("does not highlight numbers separately", function() {
       const {tokens} = grammar.tokenizeLine("$0 %a0");
       expect(tokens[0]).toEqual({value: "$", scopes: ["source.perl", "variable.other.predefined.program-name.perl", "punctuation.definition.variable.perl"]});
       expect(tokens[1]).toEqual({value: "0", scopes: ["source.perl", "variable.other.predefined.program-name.perl"]});
       expect(tokens[3]).toEqual({value: "%", scopes: ["source.perl", "variable.other.readwrite.global.perl", "punctuation.definition.variable.perl"]});
-      return expect(tokens[4]).toEqual({value: "a0", scopes: ["source.perl", "variable.other.readwrite.global.perl"]});
+      expect(tokens[4]).toEqual({value: "a0", scopes: ["source.perl", "variable.other.readwrite.global.perl"]});
   });
 });
 
@@ -1238,7 +1232,7 @@ my @n = sort {$a <=> $b} @m;\
     expect(tokens[2]).toEqual({value: "Test::ASD", scopes: ["source.perl", "meta.class.perl", "entity.name.type.class.perl"]});
     expect(tokens[3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
     expect(tokens[5]).toEqual({value: "#", scopes: ["source.perl", "comment.line.number-sign.perl", "punctuation.definition.comment.perl"]});
-    return expect(tokens[6]).toEqual({value: "this is my new class", scopes: ["source.perl", "comment.line.number-sign.perl"]});
+    expect(tokens[6]).toEqual({value: "this is my new class", scopes: ["source.perl", "comment.line.number-sign.perl"]});
 }));
 
   describe("when brackets are encountered", function() {
@@ -1299,10 +1293,10 @@ sub name {
       expect(tokens[19]).toEqual({value: ']', scopes: ['source.perl', 'punctuation.section.square.bracket.end.perl']});
       expect(tokens[21]).toEqual({value: '3', scopes: ['source.perl', 'constant.numeric.decimal.perl']});
       expect(tokens[23]).toEqual({value: ']', scopes: ['source.perl', 'punctuation.section.square.bracket.end.perl']});
-      return expect(tokens[25]).toEqual({value: ']', scopes: ['source.perl', 'punctuation.unmatched.square.bracket.end.perl']});
+      expect(tokens[25]).toEqual({value: ']', scopes: ['source.perl', 'punctuation.unmatched.square.bracket.end.perl']});
   });
 
-    return it("tokenises unbalanced brackets", function() {
+    it("tokenises unbalanced brackets", function() {
       const lines = grammar.tokenizeLines(`\
 BEGIN:
 (
@@ -1342,7 +1336,7 @@ END:\
       expect(lines[8][2]).toEqual({value: ':', scopes: ['source.perl', 'keyword.operator.ternary.perl']});
       expect(lines[9][0]).toEqual({value: ')', scopes: ['source.perl', 'punctuation.unmatched.parenthesis.round.bracket.end.perl']});
       expect(lines[10][0]).toEqual({value: 'END', scopes: ['source.perl', 'meta.function.perl', 'entity.name.function.perl']});
-      return expect(lines[10][1]).toEqual({value: ':', scopes: ['source.perl', 'keyword.operator.ternary.perl']});
+      expect(lines[10][1]).toEqual({value: ':', scopes: ['source.perl', 'keyword.operator.ternary.perl']});
   });
 });
 
@@ -1386,7 +1380,7 @@ use open ":std";\
       expect(lines[4][4]).toEqual({value: '"', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'string.quoted.double.perl', 'punctuation.definition.string.begin.perl']});
       expect(lines[4][5]).toEqual({value: ':std', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'string.quoted.double.perl']});
       expect(lines[4][6]).toEqual({value: '"', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'string.quoted.double.perl', 'punctuation.definition.string.end.perl']});
-      return expect(lines[4][7]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[4][7]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 
     it("flags repeated or conflicting keywords", function() {
@@ -1416,10 +1410,10 @@ use no warnings;\
       expect(lines[3][0]).toEqual({value: 'use', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'keyword.control.directive.pragma.use.perl']});
       expect(lines[3][2]).toEqual({value: 'no', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'invalid.illegal.syntax.pragma.perl']});
       expect(lines[3][4]).toEqual({value: 'warnings', scopes: ['source.perl', 'meta.preprocessor.pragma.perl', 'constant.language.pragma.module.perl']});
-      return expect(lines[3][5]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[3][5]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 
-    return it("highlights `enable diagnostics` as a pragma directive", function() {
+    it("highlights `enable diagnostics` as a pragma directive", function() {
       const lines = grammar.tokenizeLines(`\
 enable diagnostics;
 disable diagnostics;\
@@ -1430,7 +1424,7 @@ disable diagnostics;\
       expect(lines[0][3]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
       expect(lines[1][0]).toEqual({value: 'disable', scopes: ['source.perl', 'meta.diagnostics.pragma.perl', 'keyword.control.diagnostics.disable.perl']});
       expect(lines[1][2]).toEqual({value: 'diagnostics', scopes: ['source.perl', 'meta.diagnostics.pragma.perl', 'constant.language.pragma.module.perl']});
-      return expect(lines[1][3]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
+      expect(lines[1][3]).toEqual({value: ';', scopes: ['source.perl', 'punctuation.terminator.semicolon.perl']});
   });
 });
 
@@ -1444,19 +1438,19 @@ Bar
       );
       expect(lines[0][0]).toEqual({value: "=pod", scopes: ["source.perl", "comment.block.documentation.perl", "storage.type.class.pod.perl"]});
       expect(lines[1][0]).toEqual({value: "Bar", scopes: ["source.perl", "comment.block.documentation.perl"]});
-      return expect(lines[2][0]).toEqual({value: "=cut", scopes: ["source.perl", "comment.block.documentation.perl", "storage.type.class.pod.perl"]});
+      expect(lines[2][0]).toEqual({value: "=cut", scopes: ["source.perl", "comment.block.documentation.perl", "storage.type.class.pod.perl"]});
   });
 
     it("does not highlight commands with leading whitespace", function() {
       const {tokens} = grammar.tokenizeLine(" =pod");
-      return expect(tokens[2]).toEqual({value: "pod", scopes: ["source.perl"]});
+      expect(tokens[2]).toEqual({value: "pod", scopes: ["source.perl"]});
   });
 
     it("highlights additional command parameters", function() {
       const {tokens} = grammar.tokenizeLine("=head1 Heading");
       expect(tokens[0]).toEqual({value: "=head1", scopes: ["source.perl", "comment.block.documentation.perl", "storage.type.class.pod.perl"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.perl", "comment.block.documentation.perl"]});
-      return expect(tokens[2]).toEqual({value: "Heading", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl"]});
+      expect(tokens[2]).toEqual({value: "Heading", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl"]});
   });
 
     it("highlights formatting codes", function() {
@@ -1468,7 +1462,7 @@ See L<perlpod(1)>.\
       expect(lines[1][0]).toEqual({value: "See ", scopes: ["source.perl", "comment.block.documentation.perl"]});
       expect(lines[1][1]).toEqual({value: "L<", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl"]});
       expect(lines[1][2]).toEqual({value: "perlpod(1)", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl", "markup.underline.link.hyperlink.pod.perl"]});
-      return expect(lines[1][3]).toEqual({value: ">", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl"]});
+      expect(lines[1][3]).toEqual({value: ">", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl"]});
   });
 
     it("highlights formatting codes in command parameters", function() {
@@ -1476,7 +1470,7 @@ See L<perlpod(1)>.\
       expect(tokens[2]).toEqual({value: "This is a ", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl"]});
       expect(tokens[3]).toEqual({value: "B<", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl", "entity.name.type.instance.pod.perl"]});
       expect(tokens[4]).toEqual({value: "bold heading", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl", "entity.name.type.instance.pod.perl", "markup.bold.pod.perl"]});
-      return expect(tokens[5]).toEqual({value: ">", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl", "entity.name.type.instance.pod.perl"]});
+      expect(tokens[5]).toEqual({value: ">", scopes: ["source.perl", "comment.block.documentation.perl", "variable.other.pod.perl", "entity.name.type.instance.pod.perl"]});
   });
 
     it("highlights multiple angle-brackets correctly in formatting codes", function() {
@@ -1489,7 +1483,7 @@ Text I<< <italic> >> Text\
       expect(lines[1][1]).toEqual({value: "I<<", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl"]});
       expect(lines[1][2]).toEqual({value: " <italic> ", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl", "markup.italic.pod.perl"]});
       expect(lines[1][3]).toEqual({value: ">>", scopes: ["source.perl", "comment.block.documentation.perl", "entity.name.type.instance.pod.perl"]});
-      return expect(lines[1][4]).toEqual({value: " Text", scopes: ["source.perl", "comment.block.documentation.perl"]});
+      expect(lines[1][4]).toEqual({value: " Text", scopes: ["source.perl", "comment.block.documentation.perl"]});
   });
 
     it("uses HTML highlighting in embedded HTML snippets", function() {
@@ -1506,10 +1500,10 @@ Text I<< <italic> >> Text\
       expect(lines[2][0]).toEqual({value: "<b>Bold</b>", scopes: ["source.perl", "comment.block.documentation.perl", "meta.embedded.pod.perl", "text.embedded.html.basic"]});
       expect(lines[3][0]).toEqual({value: "=end", scopes: ["source.perl", "comment.block.documentation.perl", "meta.embedded.pod.perl", "storage.type.class.pod.perl"]});
       expect(lines[3][1]).toEqual({value: " ", scopes: ["source.perl", "comment.block.documentation.perl", "meta.embedded.pod.perl"]});
-      return expect(lines[3][2]).toEqual({value: "html", scopes: ["source.perl", "comment.block.documentation.perl", "meta.embedded.pod.perl", "variable.other.pod.perl"]});
+      expect(lines[3][2]).toEqual({value: "html", scopes: ["source.perl", "comment.block.documentation.perl", "meta.embedded.pod.perl", "variable.other.pod.perl"]});
   });
 
-    return it("cuts embedded snippets off early before a terminating =cut command", function() {
+    it("cuts embedded snippets off early before a terminating =cut command", function() {
       const lines = grammar.tokenizeLines(`\
 =pod
 =begin html
@@ -1520,11 +1514,11 @@ my $var;\
       );
       expect(lines[2][0]).toEqual({value: "<b>Bold</b>", scopes: ["source.perl", "comment.block.documentation.perl", "meta.embedded.pod.perl", "text.embedded.html.basic"]});
       expect(lines[3][0]).toEqual({value: "=cut", scopes: ["source.perl", "comment.block.documentation.perl", "storage.type.class.pod.perl"]});
-      return expect(lines[4][0]).toEqual({value: "my", scopes: ["source.perl", "storage.modifier.perl"]});
+      expect(lines[4][0]).toEqual({value: "my", scopes: ["source.perl", "storage.modifier.perl"]});
   });
 });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -1614,7 +1608,7 @@ perl
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=perl:
