@@ -1,11 +1,6 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
 const temp = require('temp');
 
-describe("Atom API autocompletions", function() {
+describe("Atom API autocompletions", () => {
   let [editor, provider] = [];
 
   const getCompletions = function() {
@@ -22,63 +17,63 @@ describe("Atom API autocompletions", function() {
     return provider.getSuggestions(request);
   };
 
-  beforeEach(function() {
+  beforeEach(() => {
     waitsForPromise(() => atom.packages.activatePackage('autocomplete-atom-api'));
     runs(() => provider = atom.packages.getActivePackage('autocomplete-atom-api').mainModule.getProvider());
     waitsFor(() => Object.keys(provider.completions).length > 0);
     waitsFor(() => provider.packageDirectories?.length > 0);
     waitsForPromise(() => atom.workspace.open('test.js'));
-    return runs(() => editor = atom.workspace.getActiveTextEditor());
+    runs(() => editor = atom.workspace.getActiveTextEditor());
   });
 
-  it("only includes completions in files that are in an Atom package or Atom core", function() {
+  it("only includes completions in files that are in an Atom package or Atom core", () => {
     const emptyProjectPath = temp.mkdirSync('atom-project-');
     atom.project.setPaths([emptyProjectPath]);
 
     waitsForPromise(() => atom.workspace.open('empty.js'));
 
-    return runs(function() {
+    runs(() => {
       expect(provider.packageDirectories.length).toBe(0);
       editor = atom.workspace.getActiveTextEditor();
       editor.setText('atom.');
       editor.setCursorBufferPosition([0, Infinity]);
 
-      return expect(getCompletions()).toBeUndefined();
+      expect(getCompletions()).toBeUndefined();
     });
   });
 
-  it("only includes completions in .atom/init", function() {
+  it("only includes completions in .atom/init", () => {
     const emptyProjectPath = temp.mkdirSync('some-guy');
     atom.project.setPaths([emptyProjectPath]);
 
     waitsForPromise(() => atom.workspace.open('.atom/init.coffee'));
 
-    return runs(function() {
+    runs(() => {
       expect(provider.packageDirectories.length).toBe(0);
       editor = atom.workspace.getActiveTextEditor();
       editor.setText('atom.');
       editor.setCursorBufferPosition([0, Infinity]);
 
-      return expect(getCompletions()).not.toBeUndefined();
+      expect(getCompletions()).not.toBeUndefined();
     });
   });
 
-  it("does not fail when no editor path", function() {
+  it("does not fail when no editor path", () => {
     const emptyProjectPath = temp.mkdirSync('some-guy');
     atom.project.setPaths([emptyProjectPath]);
 
     waitsForPromise(() => atom.workspace.open());
 
-    return runs(function() {
+    runs(() => {
       expect(provider.packageDirectories.length).toBe(0);
       editor = atom.workspace.getActiveTextEditor();
       editor.setText('atom.');
       editor.setCursorBufferPosition([0, Infinity]);
-      return expect(getCompletions()).toBeUndefined();
+      expect(getCompletions()).toBeUndefined();
     });
   });
 
-  it("includes properties and functions on the atom global", function() {
+  it("includes properties and functions on the atom global", () => {
     editor.setText('atom.');
     editor.setCursorBufferPosition([0, Infinity]);
 
@@ -102,10 +97,10 @@ describe("Atom API autocompletions", function() {
     expect(getCompletions()[6].snippet).toBe('confirm(${1:options})');
     expect(getCompletions()[6].type).toBe('method');
     expect(getCompletions()[6].leftLabel).toBe('Number');
-    return expect(getCompletions()[6].descriptionMoreURL).toBe('https://atom.io/docs/api/latest/AtomEnvironment#instance-confirm');
+    expect(getCompletions()[6].descriptionMoreURL).toBe('https://atom.io/docs/api/latest/AtomEnvironment#instance-confirm');
   });
 
-  return it("includes methods on atom global properties", function() {
+  it("includes methods on atom global properties", () => {
     editor.setText('atom.clipboard.');
     editor.setCursorBufferPosition([0, Infinity]);
 
@@ -119,6 +114,6 @@ describe("Atom API autocompletions", function() {
 
     expect(getCompletions().length).toBe(2);
     expect(getCompletions()[0].text).toBe('read()');
-    return expect(getCompletions()[1].text).toBe('readWithMetadata()');
+    expect(getCompletions()[1].text).toBe('readWithMetadata()');
   });
 });
