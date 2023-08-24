@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('SCSS grammar', function() {
   let grammar = null;
 
@@ -12,12 +7,12 @@ describe('SCSS grammar', function() {
 
     waitsForPromise(() => atom.packages.activatePackage('language-sass'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.css.scss'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.css.scss'));
   });
 
   it('parses the grammar', function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe('source.css.scss');
+    expect(grammar.scopeName).toBe('source.css.scss');
   });
 
   describe('numbers', function() {
@@ -43,17 +38,17 @@ describe('SCSS grammar', function() {
 
       ({tokens} = grammar.tokenizeLine('$q: (color1:$dark-orange);'));
 
-      return expect(tokens[4]).toEqual({value: 'color1', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'support.type.map.key.scss']});
+      expect(tokens[4]).toEqual({value: 'color1', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'support.type.map.key.scss']});
   });
 
-    return it('tokenizes number operations', function() {
+    it('tokenizes number operations', function() {
       let {tokens} = grammar.tokenizeLine('.something { top: +50%; }');
 
       expect(tokens[8]).toEqual({value: '+50', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'constant.numeric.css']});
 
       ({tokens} = grammar.tokenizeLine('.something { top: 50% - 30%; }'));
 
-      return expect(tokens[11]).toEqual({value: '-', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'keyword.operator.css']});
+      expect(tokens[11]).toEqual({value: '-', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'keyword.operator.css']});
   });
 });
 
@@ -93,7 +88,7 @@ describe('SCSS grammar', function() {
           expect(tokens[6]).toEqual({value: "}", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`, "variable.interpolation.scss", "punctuation.definition.interpolation.end.bracket.curly.scss"]});
           expect(tokens[7]).toEqual({value: "-name", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`]});
           expect(tokens[8]).toEqual({value: "\\@", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`, "constant.character.escape.scss"]});
-          return expect(tokens[9]).toEqual({value: "sm", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`]});
+          expect(tokens[9]).toEqual({value: "sm", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`]});
       });
 
         it(`tokenizes invalid identifiers in ${scope} selectors`, function() {
@@ -127,7 +122,7 @@ describe('SCSS grammar', function() {
           expect(tokens[10]).toEqual({value: "$", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`, "invalid.illegal.identifier.scss"]});
           expect(tokens[11]).toEqual({value: "me", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`]});
           expect(tokens[12]).toEqual({value: "\\@", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`, "constant.character.escape.scss"]});
-          return expect(tokens[13]).toEqual({value: "sm", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`]});
+          expect(tokens[13]).toEqual({value: "sm", scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`]});
       });
 
         result.push(it("tokenizes placeholder selectors in at-rules", function() {
@@ -135,7 +130,7 @@ describe('SCSS grammar', function() {
 
           expect(tokens[3]).toEqual({value: '%', scopes: ['source.css.scss', 'meta.at-rule.extend.scss', 'entity.other.attribute-name.placeholder.css', 'punctuation.definition.entity.css']});
           expect(tokens[4]).toEqual({value: 'placeholder', scopes: ['source.css.scss', 'meta.at-rule.extend.scss', 'entity.other.attribute-name.placeholder.css']});
-          return expect(tokens[5]).toEqual({value: ';', scopes: ['source.css.scss', 'punctuation.terminator.rule.css']});
+          expect(tokens[5]).toEqual({value: ';', scopes: ['source.css.scss', 'punctuation.terminator.rule.css']});
       }));
       }
       return result;
@@ -152,7 +147,7 @@ describe('SCSS grammar', function() {
       expect(tokens[3]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'string.quoted.double.attribute-value.scss', 'punctuation.definition.string.begin.scss']});
       expect(tokens[4]).toEqual({value: '1', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'string.quoted.double.attribute-value.scss']});
       expect(tokens[5]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'string.quoted.double.attribute-value.scss', 'punctuation.definition.string.end.scss']});
-      return expect(tokens[6]).toEqual({value: ']', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'punctuation.definition.attribute-selector.end.bracket.square.scss']});
+      expect(tokens[6]).toEqual({value: ']', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'punctuation.definition.attribute-selector.end.bracket.square.scss']});
   });
 
     it("tokenizes complex attribute selectors", function() {
@@ -186,7 +181,7 @@ describe('SCSS grammar', function() {
       expect(tokens[10]).toEqual({value: "d", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.unquoted.attribute-value.scss", "variable.interpolation.scss"]});
       expect(tokens[11]).toEqual({value: "}", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.unquoted.attribute-value.scss", "variable.interpolation.scss", "punctuation.definition.interpolation.end.bracket.curly.scss"]});
       expect(tokens[12]).toEqual({value: "e", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.unquoted.attribute-value.scss"]});
-      return expect(tokens[13]).toEqual({value: "]", scopes: ["source.css.scss", "meta.attribute-selector.scss", "punctuation.definition.attribute-selector.end.bracket.square.scss"]});
+      expect(tokens[13]).toEqual({value: "]", scopes: ["source.css.scss", "meta.attribute-selector.scss", "punctuation.definition.attribute-selector.end.bracket.square.scss"]});
   });
 
     it("tokenizes the $= selector", function() {
@@ -196,10 +191,10 @@ describe('SCSS grammar', function() {
       expect(tokens[1]).toEqual({value: "class", scopes: ["source.css.scss", "meta.attribute-selector.scss", "entity.other.attribute-name.attribute.scss"]});
       expect(tokens[2]).toEqual({value: "$=", scopes: ["source.css.scss", "meta.attribute-selector.scss", "keyword.operator.scss"]});
       expect(tokens[3]).toEqual({value: "test", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.unquoted.attribute-value.scss"]});
-      return expect(tokens[4]).toEqual({value: "]", scopes: ["source.css.scss", "meta.attribute-selector.scss", "punctuation.definition.attribute-selector.end.bracket.square.scss"]});
+      expect(tokens[4]).toEqual({value: "]", scopes: ["source.css.scss", "meta.attribute-selector.scss", "punctuation.definition.attribute-selector.end.bracket.square.scss"]});
   });
 
-    return it("tokenizes multiple attribute selectors", function() {
+    it("tokenizes multiple attribute selectors", function() {
       const {tokens} = grammar.tokenizeLine('[data-name="text-color"][data-value="null"]');
 
       expect(tokens[0]).toEqual({value: '[', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'punctuation.definition.attribute-selector.begin.bracket.square.scss']});
@@ -215,7 +210,7 @@ describe('SCSS grammar', function() {
       expect(tokens[10]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'string.quoted.double.attribute-value.scss', 'punctuation.definition.string.begin.scss']});
       expect(tokens[11]).toEqual({value: 'null', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'string.quoted.double.attribute-value.scss']});
       expect(tokens[12]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'string.quoted.double.attribute-value.scss', 'punctuation.definition.string.end.scss']});
-      return expect(tokens[13]).toEqual({value: ']', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'punctuation.definition.attribute-selector.end.bracket.square.scss']});
+      expect(tokens[13]).toEqual({value: ']', scopes: ['source.css.scss', 'meta.attribute-selector.scss', 'punctuation.definition.attribute-selector.end.bracket.square.scss']});
   });
 });
 
@@ -223,7 +218,7 @@ describe('SCSS grammar', function() {
     const {tokens} = grammar.tokenizeLine('@at-root (without: media) .btn { color: red; }');
 
     expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.at-root.scss', 'keyword.control.at-rule.at-root.scss', 'punctuation.definition.keyword.scss']});
-    return expect(tokens[1]).toEqual({value: 'at-root', scopes: ['source.css.scss', 'meta.at-rule.at-root.scss', 'keyword.control.at-rule.at-root.scss']});
+    expect(tokens[1]).toEqual({value: 'at-root', scopes: ['source.css.scss', 'meta.at-rule.at-root.scss', 'keyword.control.at-rule.at-root.scss']});
 }));
 
   describe('@include', function() {
@@ -254,10 +249,10 @@ describe('SCSS grammar', function() {
       expect(tokens[4]).toEqual({value: '(', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'punctuation.definition.parameters.begin.bracket.round.scss']});
       expect(tokens[8]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'punctuation.separator.key-value.scss']});
       expect(tokens[12]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'punctuation.definition.parameters.end.bracket.round.scss']});
-      return expect(tokens[13]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+      expect(tokens[13]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
   });
 
-    return it("tokenizes correctly for includes from a module", function() {
+    it("tokenizes correctly for includes from a module", function() {
       let {tokens} = grammar.tokenizeLine('@include media.breakpoint{}');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'keyword.control.at-rule.include.scss', 'punctuation.definition.keyword.scss']});
@@ -275,7 +270,7 @@ describe('SCSS grammar', function() {
       expect(tokens[6]).toEqual({value: '(', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'punctuation.definition.parameters.begin.bracket.round.scss']});
       expect(tokens[8]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'punctuation.separator.key-value.scss']});
       expect(tokens[12]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.at-rule.include.scss', 'punctuation.definition.parameters.end.bracket.round.scss']});
-      return expect(tokens[13]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+      expect(tokens[13]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
   });
 });
 
@@ -284,7 +279,7 @@ describe('SCSS grammar', function() {
       const {tokens} = grammar.tokenizeLine('@mixin');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'keyword.control.at-rule.mixin.scss', 'punctuation.definition.keyword.scss']});
-      return expect(tokens[1]).toEqual({value: 'mixin', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'keyword.control.at-rule.mixin.scss']});
+      expect(tokens[1]).toEqual({value: 'mixin', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'keyword.control.at-rule.mixin.scss']});
   });
 
     it('tokenizes @mixin with no arguments correctly', function() {
@@ -293,10 +288,10 @@ describe('SCSS grammar', function() {
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'keyword.control.at-rule.mixin.scss', 'punctuation.definition.keyword.scss']});
       expect(tokens[1]).toEqual({value: 'mixin', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'keyword.control.at-rule.mixin.scss']});
       expect(tokens[3]).toEqual({value: 'media', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'entity.name.function.scss']});
-      return expect(tokens[4]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+      expect(tokens[4]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
   });
 
-    return it('tokenizes @mixin with arguments correctly', function() {
+    it('tokenizes @mixin with arguments correctly', function() {
       let {tokens} = grammar.tokenizeLine('@mixin media ($width){}');
 
       expect(tokens[3]).toEqual({value: 'media', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'entity.name.function.scss']});
@@ -309,7 +304,7 @@ describe('SCSS grammar', function() {
       expect(tokens[3]).toEqual({value: 'media', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'entity.name.function.scss']});
       expect(tokens[5]).toEqual({value: '(', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'punctuation.definition.parameters.begin.bracket.round.scss']});
       expect(tokens[9]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.at-rule.mixin.scss', 'punctuation.definition.parameters.end.bracket.round.scss']});
-      return expect(tokens[10]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+      expect(tokens[10]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
   });
 });
 
@@ -318,7 +313,7 @@ describe('SCSS grammar', function() {
       const {tokens} = grammar.tokenizeLine('@namespace');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss', 'punctuation.definition.keyword.scss']});
-      return expect(tokens[1]).toEqual({value: 'namespace', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss']});
+      expect(tokens[1]).toEqual({value: 'namespace', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss']});
   });
 
     it('tokenizes default namespace definition with url() correctly', function() {
@@ -326,16 +321,16 @@ describe('SCSS grammar', function() {
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss', 'punctuation.definition.keyword.scss']});
       expect(tokens[1]).toEqual({value: 'namespace', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss']});
-      return expect(tokens[3]).toEqual({value: 'url', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'support.function.misc.scss']});
+      expect(tokens[3]).toEqual({value: 'url', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'support.function.misc.scss']});
   });
 
-    return it('tokenizes namespace prefix definition with url() correctly', function() {
+    it('tokenizes namespace prefix definition with url() correctly', function() {
       const {tokens} = grammar.tokenizeLine('@namespace prefix url(XML-namespace-URL);');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss', 'punctuation.definition.keyword.scss']});
       expect(tokens[1]).toEqual({value: 'namespace', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'keyword.control.at-rule.namespace.scss']});
       expect(tokens[3]).toEqual({value: 'prefix', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'entity.name.namespace-prefix.scss']});
-      return expect(tokens[5]).toEqual({value: 'url', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'support.function.misc.scss']});
+      expect(tokens[5]).toEqual({value: 'url', scopes: ['source.css.scss', 'meta.at-rule.namespace.scss', 'support.function.misc.scss']});
   });
 });
 
@@ -386,7 +381,7 @@ text-align: center;
     expect(tokens[1][1]).toEqual({value: 'text-align', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.property-name.css']});
     expect(tokens[1][2]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.separator.key-value.scss']});
     expect(tokens[1][3]).toEqual({value: ' ', scopes: ['source.css.scss', 'meta.property-list.scss']});
-    return expect(tokens[1][4]).toEqual({value: 'center', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
+    expect(tokens[1][4]).toEqual({value: 'center', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
 }));
 
   describe('@supports', function() {
@@ -394,7 +389,7 @@ text-align: center;
       const {tokens} = grammar.tokenizeLine('@supports');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'keyword.control.at-rule.supports.scss', 'punctuation.definition.keyword.scss']});
-      return expect(tokens[1]).toEqual({value: 'supports', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'keyword.control.at-rule.supports.scss']});
+      expect(tokens[1]).toEqual({value: 'supports', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'keyword.control.at-rule.supports.scss']});
   });
 
     it('tokenizes @supports with negation, testing for "flex" as value', function() {
@@ -408,10 +403,10 @@ text-align: center;
       expect(tokens[8]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'punctuation.separator.key-value.scss']});
       expect(tokens[10]).toEqual({value: 'flex', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
       expect(tokens[12]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'punctuation.definition.condition.end.bracket.round.scss']});
-      return expect(tokens[13]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+      expect(tokens[13]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
   });
 
-    return it('tokenizes @supports with disjunction, testing for "flex" as property', function() {
+    it('tokenizes @supports with disjunction, testing for "flex" as property', function() {
       const {tokens} = grammar.tokenizeLine('@supports (flex:2 2) or (  -webkit-flex  : 2 2)  {}');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'keyword.control.at-rule.supports.scss', 'punctuation.definition.keyword.scss']});
@@ -425,7 +420,7 @@ text-align: center;
       expect(tokens[15]).toEqual({value: '-webkit-flex', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'meta.property-name.scss', 'support.type.vendored.property-name.css']});
       expect(tokens[17]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'punctuation.separator.key-value.scss']});
       expect(tokens[19]).toEqual({value: '2', scopes: ['source.css.scss', 'meta.at-rule.supports.scss', 'meta.property-value.scss', 'constant.numeric.css']});
-      return expect(tokens[24]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+      expect(tokens[24]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
   });
 });
 
@@ -436,7 +431,7 @@ text-align: center;
       expect(tokens[4]).toEqual({value: 'color', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.property-name.css']});
       expect(tokens[7]).toEqual({value: 'inherit', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
       expect(tokens[8]).toEqual({value: ';', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.terminator.rule.scss']});
-      return expect(tokens[10]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
+      expect(tokens[10]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
   });
 
     it('tokenizes nested property-lists', function() {
@@ -451,7 +446,7 @@ text-align: center;
       expect(tokens[14]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
       expect(tokens[16]).toEqual({value: 'margin', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.property-name.css']});
       expect(tokens[19]).toEqual({value: 'top', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
-      return expect(tokens[22]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
+      expect(tokens[22]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
   });
 
     it('tokenizes an incomplete inline property-list', function() {
@@ -459,7 +454,7 @@ text-align: center;
 
       expect(tokens[4]).toEqual({value: 'color', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.property-name.css']});
       expect(tokens[7]).toEqual({value: 'inherit', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
-      return expect(tokens[8]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
+      expect(tokens[8]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
   });
 
     it('tokenizes multiple lines of incomplete property-list', function() {
@@ -474,10 +469,10 @@ another-one { display: none; }\
       expect(tokens[0][7]).toEqual({value: 'inherit', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
       expect(tokens[0][9]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
       expect(tokens[1][0]).toEqual({value: 'another-one', scopes: ['source.css.scss', 'entity.name.tag.custom.scss']});
-      return expect(tokens[1][10]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
+      expect(tokens[1][10]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
   });
 
-    return describe('property values', () => it('tokenizes parentheses', function() {
+    describe('property values', () => it('tokenizes parentheses', function() {
       const {tokens} = grammar.tokenizeLine('.foo { margin: ($bar * .8) 0 ($bar * .8) (foo.$bar * 2);');
       expect(tokens[8]).toEqual({value: '(', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.definition.begin.bracket.round.scss']});
       expect(tokens[9]).toEqual({value: '$bar', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.scss']});
@@ -496,7 +491,7 @@ another-one { display: none; }\
       expect(tokens[29]).toEqual({value: '$bar', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.scss']});
       expect(tokens[31]).toEqual({value: '*', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'keyword.operator.css']});
       expect(tokens[33]).toEqual({value: '2', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'constant.numeric.css']});
-      return expect(tokens[34]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.definition.end.bracket.round.scss']});
+      expect(tokens[34]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.definition.end.bracket.round.scss']});
   }));
 });
 
@@ -527,14 +522,14 @@ table-layout: fixed;
     expect(tokens[1][1]).toEqual({value: 'table-layout', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.property-name.css']});
     expect(tokens[1][2]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.separator.key-value.scss']});
     expect(tokens[1][3]).toEqual({value: ' ', scopes: ['source.css.scss', 'meta.property-list.scss']});
-    return expect(tokens[1][4]).toEqual({value: 'fixed', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
+    expect(tokens[1][4]).toEqual({value: 'fixed', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
 }));
 
   describe('vendor properties', () => it('tokenizes the browser prefix', function() {
     const {tokens} = grammar.tokenizeLine('body { -webkit-box-shadow: none; }');
 
     expect(tokens[0]).toEqual({value: 'body', scopes: ['source.css.scss', 'entity.name.tag.css']});
-    return expect(tokens[4]).toEqual({value: '-webkit-box-shadow', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.vendored.property-name.css']});
+    expect(tokens[4]).toEqual({value: '-webkit-box-shadow', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.vendored.property-name.css']});
 }));
 
   describe('custom elements', function() {
@@ -545,7 +540,7 @@ table-layout: fixed;
 
       ({tokens} = grammar.tokenizeLine('very-very-custom { color: red; }'));
 
-      return expect(tokens[0]).toEqual({value: 'very-very-custom', scopes: ['source.css.scss', 'entity.name.tag.custom.scss']});
+      expect(tokens[0]).toEqual({value: 'very-very-custom', scopes: ['source.css.scss', 'entity.name.tag.custom.scss']});
   });
 
     it('tokenizes them with pseudo selectors', function() {
@@ -553,7 +548,7 @@ table-layout: fixed;
 
       expect(tokens[0]).toEqual({value: 'very-custom', scopes: ['source.css.scss', 'entity.name.tag.custom.scss']});
       expect(tokens[1]).toEqual({value: ':', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css', 'punctuation.definition.entity.css']});
-      return expect(tokens[2]).toEqual({value: 'hover', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css']});
+      expect(tokens[2]).toEqual({value: 'hover', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css']});
   });
 
     it('tokenizes them with class selectors', function() {
@@ -561,7 +556,7 @@ table-layout: fixed;
 
       expect(tokens[0]).toEqual({value: 'very-custom', scopes: ['source.css.scss', 'entity.name.tag.custom.scss']});
       expect(tokens[1]).toEqual({value: '.', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css', 'punctuation.definition.entity.css']});
-      return expect(tokens[2]).toEqual({value: 'class', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css']});
+      expect(tokens[2]).toEqual({value: 'class', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css']});
   });
 
     it("tokenizes them with attribute selectors", function() {
@@ -574,10 +569,10 @@ table-layout: fixed;
       expect(tokens[4]).toEqual({value: "'", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.quoted.single.attribute-value.scss", "punctuation.definition.string.begin.scss"]});
       expect(tokens[5]).toEqual({value: "primary", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.quoted.single.attribute-value.scss"]});
       expect(tokens[6]).toEqual({value: "'", scopes: ["source.css.scss", "meta.attribute-selector.scss", "string.quoted.single.attribute-value.scss", "punctuation.definition.string.end.scss"]});
-      return expect(tokens[7]).toEqual({value: ']', scopes: ["source.css.scss", "meta.attribute-selector.scss", "punctuation.definition.attribute-selector.end.bracket.square.scss"]});
+      expect(tokens[7]).toEqual({value: ']', scopes: ["source.css.scss", "meta.attribute-selector.scss", "punctuation.definition.attribute-selector.end.bracket.square.scss"]});
   });
 
-    return it('does not confuse them with properties', function() {
+    it('does not confuse them with properties', function() {
       const tokens = grammar.tokenizeLines(`\
 body {
   border-width: 2;
@@ -603,7 +598,7 @@ body {
       expect(tokens[3][2]).toEqual({value: '  ', scopes: ['source.css.scss', 'meta.property-list.scss']});
       expect(tokens[3][3]).toEqual({value: ':', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.separator.key-value.scss']});
       expect(tokens[3][4]).toEqual({value: ' ', scopes: ['source.css.scss', 'meta.property-list.scss']});
-      return expect(tokens[3][5]).toEqual({value: 'none', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
+      expect(tokens[3][5]).toEqual({value: 'none', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'support.constant.property-value.css']});
   });
 });
 
@@ -612,7 +607,7 @@ body {
       const {tokens} = grammar.tokenizeLine('a:hover {}');
 
       expect(tokens[1]).toEqual({value: ':', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css', 'punctuation.definition.entity.css']});
-      return expect(tokens[2]).toEqual({value: 'hover', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css']});
+      expect(tokens[2]).toEqual({value: 'hover', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css']});
   });
 
     it('tokenizes nth-* pseudo classes', function() {
@@ -660,10 +655,10 @@ body {
       expect(tokens[2]).toEqual({value: 'nth-child', scopes: ['source.css.scss', 'entity.other.attribute-name.pseudo-class.css']});
       expect(tokens[3]).toEqual({value: '(', scopes: ['source.css.scss', 'punctuation.definition.pseudo-class.begin.bracket.round.css']});
       expect(tokens[4]).toEqual({value: 'hi', scopes: ['source.css.scss', 'invalid.illegal.scss']});
-      return expect(tokens[5]).toEqual({value: ')', scopes: ['source.css.scss', 'punctuation.definition.pseudo-class.end.bracket.round.css']});
+      expect(tokens[5]).toEqual({value: ')', scopes: ['source.css.scss', 'punctuation.definition.pseudo-class.end.bracket.round.css']});
   });
 
-    return it("tokenizes complex pseudo classes", function() {
+    it("tokenizes complex pseudo classes", function() {
       let {tokens} = grammar.tokenizeLine("&:nth-child(#\{$j})");
 
       expect(tokens[0]).toEqual({value: "&", scopes: ["source.css.scss", "entity.name.tag.reference.scss"]});
@@ -686,7 +681,7 @@ body {
       expect(tokens[6]).toEqual({value: ".", scopes: ["source.css.scss", "variable.interpolation.scss", "punctuation.access.module.scss"]});
       expect(tokens[7]).toEqual({value: "$j", scopes: ["source.css.scss", "variable.interpolation.scss", "variable.scss"]});
       expect(tokens[8]).toEqual({value: "}", scopes: ["source.css.scss", "variable.interpolation.scss", "punctuation.definition.interpolation.end.bracket.curly.scss"]});
-      return expect(tokens[9]).toEqual({value: ")", scopes: ["source.css.scss", "punctuation.definition.pseudo-class.end.bracket.round.css"]});
+      expect(tokens[9]).toEqual({value: ")", scopes: ["source.css.scss", "punctuation.definition.pseudo-class.end.bracket.round.css"]});
   });
 });
 
@@ -694,7 +689,7 @@ body {
     const {tokens} = grammar.tokenizeLine("&::after");
 
     expect(tokens[1]).toEqual({value: "::", scopes: ["source.css.scss", "entity.other.attribute-name.pseudo-element.css", "punctuation.definition.entity.css"]});
-    return expect(tokens[2]).toEqual({value: "after", scopes: ["source.css.scss", "entity.other.attribute-name.pseudo-element.css"]});
+    expect(tokens[2]).toEqual({value: "after", scopes: ["source.css.scss", "entity.other.attribute-name.pseudo-element.css"]});
 }));
 
   describe('functional pseudo classes', () => it('inherits the matching from language-css', function() {
@@ -705,7 +700,7 @@ body {
     expect(tokens[3]).toEqual({value: "(", scopes: ["source.css.scss", "punctuation.section.function.begin.bracket.round.css"]});
     expect(tokens[4]).toEqual({value: ".", scopes: ["source.css.scss", "entity.other.attribute-name.class.css", "punctuation.definition.entity.css"]});
     expect(tokens[5]).toEqual({value: "selected", scopes: ["source.css.scss", "entity.other.attribute-name.class.css"]});
-    return expect(tokens[6]).toEqual({value: ")", scopes: ["source.css.scss", "punctuation.section.function.end.bracket.round.css"]});
+    expect(tokens[6]).toEqual({value: ")", scopes: ["source.css.scss", "punctuation.section.function.end.bracket.round.css"]});
 }));
 
   describe('@keyframes', function() {
@@ -729,26 +724,26 @@ body {
       expect(tokens[2][1]).toEqual({value: 'to', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'entity.other.attribute-name.scss']});
       expect(tokens[2][5]).toEqual({value: 'opacity', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'meta.property-list.scss', 'meta.property-name.scss', 'support.type.property-name.css']});
       expect(tokens[2][8]).toEqual({value: '1', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'constant.numeric.css']});
-      return expect(tokens[3][0]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'punctuation.section.keyframes.end.scss']});
+      expect(tokens[3][0]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'punctuation.section.keyframes.end.scss']});
   });
 
-    return describe('when animation-name is specified as a string', function() {
+    describe('when animation-name is specified as a string', function() {
       it('can be double-quoted, containing escapes', function() {
         const {tokens} = grammar.tokenizeLine('@keyframes "\\22 foo\\"" {}');
 
         expect(tokens[3]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'string.quoted.double.scss', 'punctuation.definition.string.begin.scss']});
         expect(tokens[4]).toEqual({value: '\\22', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'string.quoted.double.scss', 'entity.name.function.scss', 'constant.character.escape.scss']});
         expect(tokens[7]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'string.quoted.double.scss', 'punctuation.definition.string.end.scss']});
-        return expect(tokens[9]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'punctuation.section.keyframes.begin.scss']});
+        expect(tokens[9]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'punctuation.section.keyframes.begin.scss']});
     });
 
-      return it('can be single-quoted, containing escapes', function() {
+      it('can be single-quoted, containing escapes', function() {
         const {tokens} = grammar.tokenizeLine("@keyframes '\\'foo\\27' {}");
 
         expect(tokens[3]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'string.quoted.single.scss', 'punctuation.definition.string.begin.scss']});
         expect(tokens[6]).toEqual({value: '\\27', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'string.quoted.single.scss', 'entity.name.function.scss', 'constant.character.escape.scss']});
         expect(tokens[7]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'string.quoted.single.scss', 'punctuation.definition.string.end.scss']});
-        return expect(tokens[9]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'punctuation.section.keyframes.begin.scss']});
+        expect(tokens[9]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'punctuation.section.keyframes.begin.scss']});
     });
   });
 });
@@ -783,7 +778,7 @@ body {
     expect(tokens[17]).toEqual({value: 'px', scopes: ['source.css.scss', 'meta.at-rule.media.scss', 'meta.property-list.media-query.scss', 'meta.property-value.media-query.scss', 'constant.numeric.css', 'keyword.other.unit.px.css']});
     expect(tokens[18]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.at-rule.media.scss', 'meta.property-list.media-query.scss', 'punctuation.definition.media-query.end.bracket.round.scss']});
     expect(tokens[20]).toEqual({value: '/*', scopes: ['source.css.scss', 'meta.at-rule.media.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
-    return expect(tokens[24]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
+    expect(tokens[24]).toEqual({value: '{', scopes: ['source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.begin.bracket.curly.scss']});
 }));
 
   describe('functions', function() {
@@ -806,7 +801,7 @@ body {
       expect(tokens[12]).toEqual({value: '$wow', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.scss']});
       expect(tokens[13]).toEqual({value: ',', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.separator.delimiter.scss']});
       expect(tokens[15]).toEqual({value: '3', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'constant.numeric.css']});
-      return expect(tokens[16]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
+      expect(tokens[16]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
   });
 
     it('tokenizes functions with parentheses in them', function() {
@@ -832,10 +827,10 @@ body {
       expect(tokens[15]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.access.module.scss']});
       expect(tokens[16]).toEqual({value: '$b', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.scss']});
       expect(tokens[17]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.definition.end.bracket.round.scss']});
-      return expect(tokens[18]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
+      expect(tokens[18]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
   });
 
-    return it('tokenizes functions from module imports', function() {
+    it('tokenizes functions from module imports', function() {
       const {tokens} = grammar.tokenizeLine('.a { hello: foo.something((a: m.$b)) }');
 
       expect(tokens[8]).toEqual({value: 'foo', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.scss']});
@@ -849,7 +844,7 @@ body {
       expect(tokens[17]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.access.module.scss']});
       expect(tokens[18]).toEqual({value: '$b', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.scss']});
       expect(tokens[19]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.definition.end.bracket.round.scss']});
-      return expect(tokens[20]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
+      expect(tokens[20]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
   });
 });
 
@@ -882,7 +877,7 @@ body {
       expect(tokens[3]).toEqual({value: 'config', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'variable.scss']});
       expect(tokens[4]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'punctuation.access.module.scss']});
       expect(tokens[5]).toEqual({value: '$font-weight', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'variable.scss']});
-      return expect(tokens[6]).toEqual({value: ';', scopes: ['source.css.scss', 'punctuation.terminator.rule.scss']});
+      expect(tokens[6]).toEqual({value: ';', scopes: ['source.css.scss', 'punctuation.terminator.rule.scss']});
   });
 
 
@@ -901,7 +896,7 @@ body {
       expect(tokens[9]).toEqual({value: "px", scopes: [ 'source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'constant.numeric.css', 'keyword.other.unit.px.css']});
       expect(tokens[10]).toEqual({value: ";", scopes: [ 'source.css.scss', 'meta.property-list.scss', 'punctuation.terminator.rule.scss']});
       expect(tokens[11]).toEqual({value: " ", scopes: ['source.css.scss', 'meta.property-list.scss']});
-      return expect(tokens[12]).toEqual({value: "}", scopes: [ 'source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
+      expect(tokens[12]).toEqual({value: "}", scopes: [ 'source.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
   });
 
     it('tokenizes maps', function() {
@@ -921,13 +916,13 @@ body {
       expect(tokens[11]).toEqual({value: ' ', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss']});
       expect(tokens[12]).toEqual({value: '10', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'constant.numeric.css']});
       expect(tokens[14]).toEqual({value: ')', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'punctuation.definition.map.end.bracket.round.scss']});
-      return expect(tokens[15]).toEqual({value: ';', scopes: ['source.css.scss', 'punctuation.terminator.rule.scss']});
+      expect(tokens[15]).toEqual({value: ';', scopes: ['source.css.scss', 'punctuation.terminator.rule.scss']});
   });
 
     it('tokenizes variables in maps', function() {
       const {tokens} = grammar.tokenizeLine('$map: (gutters: $grid-content-gutters)');
 
-      return expect(tokens[7]).toEqual({value: '$grid-content-gutters', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'variable.scss']});
+      expect(tokens[7]).toEqual({value: '$grid-content-gutters', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'variable.scss']});
   });
 
     it('tokenizes module variables in maps', function() {
@@ -935,7 +930,7 @@ body {
 
       expect(tokens[7]).toEqual({value: 'grid', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'variable.scss']});
       expect(tokens[8]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'punctuation.access.module.scss']});
-      return expect(tokens[9]).toEqual({value: '$gutters', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'variable.scss']});
+      expect(tokens[9]).toEqual({value: '$gutters', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'variable.scss']});
   });
 
     it('tokenizes maps inside maps', function() {
@@ -952,7 +947,7 @@ $custom-palettes: (
 
       expect(tokens[1][1]).toEqual({value: 'alr', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'support.type.map.key.scss']});
       expect(tokens[2][1]).toEqual({value: 'alr-blue', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'meta.definition.variable.map.scss', 'support.type.map.key.scss']});
-      return expect(tokens[3][1]).toEqual({value: 'x-light', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'meta.definition.variable.map.scss', 'meta.definition.variable.map.scss', 'support.type.map.key.scss']});
+      expect(tokens[3][1]).toEqual({value: 'x-light', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'meta.definition.variable.map.scss', 'meta.definition.variable.map.scss', 'support.type.map.key.scss']});
   });
 
     it('tokenizes comments', function() {
@@ -962,14 +957,14 @@ $custom-palettes: (
 
       ({tokens} = grammar.tokenizeLine('$font-size: /* comment */'));
 
-      return expect(tokens[3]).toEqual({value: '/*', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
+      expect(tokens[3]).toEqual({value: '/*', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
   });
 
-    return it('tokenizes comments in maps', function() {
+    it('tokenizes comments in maps', function() {
       const {tokens} = grammar.tokenizeLine('$map: (/* comment */ key: // comment)');
 
       expect(tokens[4]).toEqual({value: '/*', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
-      return expect(tokens[11]).toEqual({value: '//', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'comment.line.scss', 'punctuation.definition.comment.scss']});
+      expect(tokens[11]).toEqual({value: '//', scopes: ['source.css.scss', 'meta.definition.variable.scss', 'meta.definition.variable.map.scss', 'comment.line.scss', 'punctuation.definition.comment.scss']});
   });
 });
 
@@ -987,7 +982,7 @@ $custom-palettes: (
       expect(tokens[9]).toEqual({value: 'font', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'variable.interpolation.scss', 'variable.scss']});
       expect(tokens[10]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'variable.interpolation.scss', 'punctuation.access.module.scss']});
       expect(tokens[11]).toEqual({value: '$family', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'variable.interpolation.scss', 'variable.scss']});
-      return expect(tokens[12]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
+      expect(tokens[12]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
   });
 
     it('is tokenized within double quotes', function() {
@@ -1003,7 +998,7 @@ $custom-palettes: (
       expect(tokens[9]).toEqual({value: 'font', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'variable.interpolation.scss', 'variable.scss']});
       expect(tokens[10]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'variable.interpolation.scss', 'punctuation.access.module.scss']});
       expect(tokens[11]).toEqual({value: '$family', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'variable.interpolation.scss', 'variable.scss']});
-      return expect(tokens[12]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
+      expect(tokens[12]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
   });
 
     it('is tokenized without quotes', function() {
@@ -1019,7 +1014,7 @@ $custom-palettes: (
       expect(tokens[8]).toEqual({value: 'font', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.interpolation.scss', 'variable.scss']});
       expect(tokens[9]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.interpolation.scss', 'punctuation.access.module.scss']});
       expect(tokens[10]).toEqual({value: '$family', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.interpolation.scss', 'variable.scss']});
-      return expect(tokens[11]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
+      expect(tokens[11]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
   });
 
     it('is tokenized as a class name', function() {
@@ -1035,7 +1030,7 @@ $custom-palettes: (
       expect(tokens[3]).toEqual({value: 'special', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css', 'variable.interpolation.scss', 'variable.scss']});
       expect(tokens[4]).toEqual({value: '.', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css', 'variable.interpolation.scss', 'punctuation.access.module.scss']});
       expect(tokens[5]).toEqual({value: '$class', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css', 'variable.interpolation.scss', 'variable.scss']});
-      return expect(tokens[6]).toEqual({value: '}', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
+      expect(tokens[6]).toEqual({value: '}', scopes: ['source.css.scss', 'entity.other.attribute-name.class.css', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
   });
 
     it('is tokenized as a keyframe', function() {
@@ -1051,13 +1046,13 @@ $custom-palettes: (
       expect(tokens[8]).toEqual({value: 'animations', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'variable.interpolation.scss', 'variable.scss']});
       expect(tokens[9]).toEqual({value: '.', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'variable.interpolation.scss', 'punctuation.access.module.scss']});
       expect(tokens[10]).toEqual({value: '$keyframe', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'variable.interpolation.scss', 'variable.scss']});
-      return expect(tokens[11]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
+      expect(tokens[11]).toEqual({value: '}', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'variable.interpolation.scss', 'punctuation.definition.interpolation.end.bracket.curly.scss']});
   });
 
-    return it('does not tokenize anything after the closing bracket as interpolation', function() {
+    it('does not tokenize anything after the closing bracket as interpolation', function() {
       const {tokens} = grammar.tokenizeLine('#\{variable}hi');
 
-      return expect(tokens[3]).not.toEqual({value: 'hi', scopes: ['source.css.scss', 'variable.interpolation.scss']});
+      expect(tokens[3]).not.toEqual({value: 'hi', scopes: ['source.css.scss', 'variable.interpolation.scss']});
   });
 });
 
@@ -1067,7 +1062,7 @@ $custom-palettes: (
 
       expect(tokens[8]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'punctuation.definition.string.begin.scss']});
       expect(tokens[9]).toEqual({value: 'hi', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss']});
-      return expect(tokens[10]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'punctuation.definition.string.end.scss']});
+      expect(tokens[10]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'punctuation.definition.string.end.scss']});
   });
 
     it('tokenizes double-quote strings', function() {
@@ -1075,17 +1070,17 @@ $custom-palettes: (
 
       expect(tokens[8]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'punctuation.definition.string.begin.scss']});
       expect(tokens[9]).toEqual({value: 'hi', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss']});
-      return expect(tokens[10]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'punctuation.definition.string.end.scss']});
+      expect(tokens[10]).toEqual({value: '"', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'punctuation.definition.string.end.scss']});
   });
 
-    return it('tokenizes escape characters', function() {
+    it('tokenizes escape characters', function() {
       let {tokens} = grammar.tokenizeLine(".a { content: '\\abcdef' }");
 
       expect(tokens[9]).toEqual({value: '\\abcdef', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.single.scss', 'constant.character.escape.scss']});
 
       ({tokens} = grammar.tokenizeLine('.a { content: "\\abcdef" }'));
 
-      return expect(tokens[9]).toEqual({value: '\\abcdef', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'constant.character.escape.scss']});
+      expect(tokens[9]).toEqual({value: '\\abcdef', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'string.quoted.double.scss', 'constant.character.escape.scss']});
   });
 });
 
@@ -1094,7 +1089,7 @@ $custom-palettes: (
       const {tokens} = grammar.tokenizeLine('//Wow a comment!');
 
       expect(tokens[0]).toEqual({value: '//', scopes: ['source.css.scss', 'comment.line.scss', 'punctuation.definition.comment.scss']});
-      return expect(tokens[1]).toEqual({value: 'Wow a comment!', scopes: ['source.css.scss', 'comment.line.scss']});
+      expect(tokens[1]).toEqual({value: 'Wow a comment!', scopes: ['source.css.scss', 'comment.line.scss']});
   });
 
     it('tokenizes block comments', function() {
@@ -1102,7 +1097,7 @@ $custom-palettes: (
 
       expect(tokens[0]).toEqual({value: '/*', scopes: ['source.css.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
       expect(tokens[1]).toEqual({value: 'Pretty blocky', scopes: ['source.css.scss', 'comment.block.scss']});
-      return expect(tokens[2]).toEqual({value: '*/', scopes: ['source.css.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
+      expect(tokens[2]).toEqual({value: '*/', scopes: ['source.css.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
   });
 
     it("doesn't tokenize URLs as comments", function() {
@@ -1113,10 +1108,10 @@ $custom-palettes: (
 `
       );
 
-      return expect(tokens[1][8]).toEqual({value: '//url/goes/here', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.parameter.url.scss']});
+      expect(tokens[1][8]).toEqual({value: '//url/goes/here', scopes: ['source.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.parameter.url.scss']});
   });
 
-    return it('tokenizes comments in @keyframes', function() {
+    it('tokenizes comments in @keyframes', function() {
       const tokens = grammar.tokenizeLines(`\
 @keyframes foo {
   // comment
@@ -1126,7 +1121,7 @@ $custom-palettes: (
       );
 
       expect(tokens[1][1]).toEqual({value: '//', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'comment.line.scss', 'punctuation.definition.comment.scss']});
-      return expect(tokens[2][1]).toEqual({value: '/*', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
+      expect(tokens[2][1]).toEqual({value: '/*', scopes: ['source.css.scss', 'meta.at-rule.keyframes.scss', 'comment.block.scss', 'punctuation.definition.comment.scss']});
   });
 });
 
@@ -1135,7 +1130,7 @@ $custom-palettes: (
       const {tokens} = grammar.tokenizeLine('@use');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.at-rule.use.scss', 'punctuation.definition.keyword.scss']});
-      return expect(tokens[1]).toEqual({value: 'use', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.at-rule.use.scss']});
+      expect(tokens[1]).toEqual({value: 'use', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.at-rule.use.scss']});
   });
 
     it('tokenizes @use with path correctly', function() {
@@ -1144,7 +1139,7 @@ $custom-palettes: (
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.at-rule.use.scss', 'punctuation.definition.keyword.scss']});
       expect(tokens[1]).toEqual({value: 'use', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.at-rule.use.scss']});
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss', 'punctuation.definition.string.begin.scss']});
-      return expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss']});
+      expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss']});
   });
 
     it('tokenizes @use with explicit namespace correctly', function() {
@@ -1155,7 +1150,7 @@ $custom-palettes: (
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss', 'punctuation.definition.string.begin.scss']});
       expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss']});
       expect(tokens[7]).toEqual({value: 'as', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.operator']});
-      return expect(tokens[9]).toEqual({value: 'm-_', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'variable.scss']});
+      expect(tokens[9]).toEqual({value: 'm-_', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'variable.scss']});
   });
 
     it('tokenizes @use with expanded namespace correctly', function() {
@@ -1166,10 +1161,10 @@ $custom-palettes: (
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss', 'punctuation.definition.string.begin.scss']});
       expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss']});
       expect(tokens[7]).toEqual({value: 'as', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.operator']});
-      return expect(tokens[9]).toEqual({value: '*', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'variable.language.expanded-namespace.scss']});
+      expect(tokens[9]).toEqual({value: '*', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'variable.language.expanded-namespace.scss']});
   });
 
-    return it('tokenizes @use with configuration correctly', function() {
+    it('tokenizes @use with configuration correctly', function() {
       const {tokens} = grammar.tokenizeLine("@use 'module' with ($black: #222, $border-radius: 0.1rem)");
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.at-rule.use.scss', 'punctuation.definition.keyword.scss']});
@@ -1178,16 +1173,16 @@ $custom-palettes: (
       expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'string.quoted.single.scss']});
       expect(tokens[7]).toEqual({value: 'with', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'keyword.control.operator']});
       expect(tokens[9]).toEqual({value: '(', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'punctuation.definition.parameters.begin.bracket.round.scss']});
-      return expect(tokens[10]).toEqual({value: '$black', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'variable.scss']});
+      expect(tokens[10]).toEqual({value: '$black', scopes: ['source.css.scss', 'meta.at-rule.use.scss', 'variable.scss']});
   });
 });
 
-  return describe('@forward', function() {
+  describe('@forward', function() {
     it('tokenizes solitary @forward correctly', function() {
       const {tokens} = grammar.tokenizeLine('@forward');
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.at-rule.forward.scss', 'punctuation.definition.keyword.scss']});
-      return expect(tokens[1]).toEqual({value: 'forward', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.at-rule.forward.scss']});
+      expect(tokens[1]).toEqual({value: 'forward', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.at-rule.forward.scss']});
   });
 
     it('tokenizes @forward with path correctly', function() {
@@ -1196,7 +1191,7 @@ $custom-palettes: (
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.at-rule.forward.scss', 'punctuation.definition.keyword.scss']});
       expect(tokens[1]).toEqual({value: 'forward', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.at-rule.forward.scss']});
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'string.quoted.single.scss', 'punctuation.definition.string.begin.scss']});
-      return expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'string.quoted.single.scss']});
+      expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'string.quoted.single.scss']});
   });
 
     it('tokenizes @forward with prefix correctly', function() {
@@ -1208,7 +1203,7 @@ $custom-palettes: (
       expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'string.quoted.single.scss']});
       expect(tokens[7]).toEqual({value: 'as', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.operator']});
       expect(tokens[9]).toEqual({value: 'prefix', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'entity.other.attribute-name.module.scss']});
-      return expect(tokens[10]).toEqual({value: '*', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'punctuation.definition.wildcard.scss']});
+      expect(tokens[10]).toEqual({value: '*', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'punctuation.definition.wildcard.scss']});
   });
 
     it('tokenizes @forward with hide correctly', function() {
@@ -1220,10 +1215,10 @@ $custom-palettes: (
       expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'string.quoted.single.scss']});
       expect(tokens[7]).toEqual({value: 'hide', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.operator']});
       expect(tokens[9]).toEqual({value: 'a-mixin', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'entity.name.function.scss']});
-      return expect(tokens[11]).toEqual({value: '$private-variable', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'variable.scss']});
+      expect(tokens[11]).toEqual({value: '$private-variable', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'variable.scss']});
   });
 
-    return it('tokenizes @forward with show correctly', function() {
+    it('tokenizes @forward with show correctly', function() {
       const {tokens} = grammar.tokenizeLine("@forward 'module' show public-mixin $public-variable");
 
       expect(tokens[0]).toEqual({value: '@', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.at-rule.forward.scss', 'punctuation.definition.keyword.scss']});
@@ -1232,7 +1227,7 @@ $custom-palettes: (
       expect(tokens[4]).toEqual({value: 'module', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'string.quoted.single.scss']});
       expect(tokens[7]).toEqual({value: 'show', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'keyword.control.operator']});
       expect(tokens[9]).toEqual({value: 'public-mixin', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'entity.name.function.scss']});
-      return expect(tokens[11]).toEqual({value: '$public-variable', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'variable.scss']});
+      expect(tokens[11]).toEqual({value: '$public-variable', scopes: ['source.css.scss', 'meta.at-rule.forward.scss', 'variable.scss']});
   });
 });
 });

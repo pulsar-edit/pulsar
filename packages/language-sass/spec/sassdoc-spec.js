@@ -1,15 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe('SassDoc grammar', function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage('language-sass'));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.css.scss'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.css.scss'));
   });
 
   describe('block tags', function() {
@@ -18,10 +14,10 @@ describe('SassDoc grammar', function() {
       expect(tokens[0]).toEqual({value: '///', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'punctuation.definition.comment.scss']});
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.css.scss', 'comment.block.documentation.scss']});
       expect(tokens[2]).toEqual({value: '@', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'storage.type.class.sassdoc', 'punctuation.definition.block.tag.sassdoc']});
-      return expect(tokens[3]).toEqual({value: 'deprecated', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'storage.type.class.sassdoc']});
+      expect(tokens[3]).toEqual({value: 'deprecated', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'storage.type.class.sassdoc']});
   });
 
-    return it('tokenises @param tags with a description', function() {
+    it('tokenises @param tags with a description', function() {
       const {tokens} = grammar.tokenizeLine('/// @param {type} $name - Description');
       expect(tokens[0]).toEqual({value: '///', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'punctuation.definition.comment.scss']});
       expect(tokens[2]).toEqual({value: '@', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'storage.type.class.sassdoc', 'punctuation.definition.block.tag.sassdoc']});
@@ -30,11 +26,11 @@ describe('SassDoc grammar', function() {
       expect(tokens[6]).toEqual({value: 'type', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'entity.name.type.instance.sassdoc']});
       expect(tokens[7]).toEqual({value: '}', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'entity.name.type.instance.sassdoc', 'punctuation.definition.bracket.curly.end.sassdoc']});
       expect(tokens[9]).toEqual({value: '$name', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'variable.other.sassdoc']});
-      return expect(tokens[10]).toEqual({value: ' - Description', scopes: ['source.css.scss', 'comment.block.documentation.scss']});
+      expect(tokens[10]).toEqual({value: ' - Description', scopes: ['source.css.scss', 'comment.block.documentation.scss']});
   });
 });
 
-  return describe('highlighted examples', () => it('highlights SCSS after an @example tag', function() {
+  describe('highlighted examples', () => it('highlights SCSS after an @example tag', function() {
     const lines = grammar.tokenizeLines(`\
 ///
 /// @example scss - Description
@@ -66,6 +62,6 @@ describe('SassDoc grammar', function() {
     expect(lines[2][12]).toEqual({value: ' ', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'meta.example.css.scss.sassdoc', 'source.embedded.css.scss', 'meta.property-list.scss', 'meta.property-value.scss']});
     expect(lines[2][13]).toEqual({value: '13', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'meta.example.css.scss.sassdoc', 'source.embedded.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'variable.parameter.url.scss']});
     expect(lines[2][14]).toEqual({value: ')', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'meta.example.css.scss.sassdoc', 'source.embedded.css.scss', 'meta.property-list.scss', 'meta.property-value.scss', 'punctuation.section.function.scss']});
-    return expect(lines[2][15]).toEqual({value: '}', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'meta.example.css.scss.sassdoc', 'source.embedded.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
+    expect(lines[2][15]).toEqual({value: '}', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'meta.example.css.scss.sassdoc', 'source.embedded.css.scss', 'meta.property-list.scss', 'punctuation.section.property-list.end.bracket.curly.scss']});
 }));
 });
