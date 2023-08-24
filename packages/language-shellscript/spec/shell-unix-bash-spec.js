@@ -1,11 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 let TextEditor = null;
 const buildTextEditor = function(params) {
   if (atom.workspace.buildTextEditor != null) {
@@ -27,12 +20,12 @@ describe("Shell script grammar", function() {
 
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("source.shell"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("source.shell"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeDefined();
-    return expect(grammar.scopeName).toBe("source.shell");
+    expect(grammar.scopeName).toBe("source.shell");
   });
 
   it("tokenizes strings inside variable constructs", function() {
@@ -41,12 +34,12 @@ describe("Shell script grammar", function() {
     expect(tokens[1]).toEqual({value: "'", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.begin.shell']});
     expect(tokens[2]).toEqual({value: "root", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell']});
     expect(tokens[3]).toEqual({value: "'", scopes: ['source.shell', 'variable.other.bracket.shell', 'string.quoted.single.shell', 'punctuation.definition.string.end.shell']});
-    return expect(tokens[4]).toEqual({value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
+    expect(tokens[4]).toEqual({value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
 });
 
   it("tokenizes if correctly when it's a parameter", function() {
     const {tokens} = grammar.tokenizeLine('dd if=/dev/random of=/dev/null');
-    return expect(tokens[0]).toEqual({value: 'dd if=/dev/random of=/dev/null', scopes: ['source.shell']});
+    expect(tokens[0]).toEqual({value: 'dd if=/dev/random of=/dev/null', scopes: ['source.shell']});
 });
 
   it("tokenizes if as a keyword", function() {
@@ -101,7 +94,7 @@ describe("Shell script grammar", function() {
     ({tokens} = grammar.tokenizeLine('for variable in something do # in'));
     expect(tokens[4]).toEqual({value: 'in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'keyword.control.shell']});
     expect(tokens[8]).toEqual({value: '#', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']});
-    return expect(tokens[9]).toEqual({value: ' in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'comment.line.number-sign.shell']});
+    expect(tokens[9]).toEqual({value: ' in', scopes: ['source.shell', 'meta.scope.for-in-loop.shell', 'comment.line.number-sign.shell']});
 });
 
   it("doesn't tokenize keywords when they're part of a phrase", function() {
@@ -133,7 +126,7 @@ describe("Shell script grammar", function() {
 
     ({tokens} = grammar.tokenizeLine('and,for (( this ))'));
     expect(tokens[0]).toEqual({value: 'and,for ', scopes: ['source.shell']});
-    return expect(tokens[1]).toEqual({value: '((', scopes: ['source.shell', 'string.other.math.shell', 'punctuation.definition.string.begin.shell']});
+    expect(tokens[1]).toEqual({value: '((', scopes: ['source.shell', 'string.other.math.shell', 'punctuation.definition.string.begin.shell']});
 });
 
   it("tokenizes herestrings", function() {
@@ -190,7 +183,7 @@ lorem ipsum${delim}\
     expect(tokens[6]).toEqual({value: '<<<', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'meta.herestring.shell', 'keyword.operator.herestring.shell']});
     expect(tokens[8]).toEqual({value: '$', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell', 'variable.other.normal.shell', 'punctuation.definition.variable.shell']});
     expect(tokens[9]).toEqual({value: 'WORD', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'meta.herestring.shell', 'string.unquoted.herestring.shell', 'variable.other.normal.shell']});
-    return expect(tokens[10]).toEqual({value: ')', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'punctuation.definition.string.end.shell']});
+    expect(tokens[10]).toEqual({value: ')', scopes: ['source.shell', 'string.quoted.double.shell', 'string.interpolated.dollar.shell', 'punctuation.definition.string.end.shell']});
 });
 
   it("tokenizes heredocs", function() {
@@ -291,24 +284,24 @@ ${delim}\
   it("tokenizes shebangs", function() {
     const {tokens} = grammar.tokenizeLine('#!/bin/sh');
     expect(tokens[0]).toEqual({value: '#!', scopes: ['source.shell', 'comment.line.number-sign.shebang.shell', 'punctuation.definition.comment.shebang.shell']});
-    return expect(tokens[1]).toEqual({value: '/bin/sh', scopes: ['source.shell', 'comment.line.number-sign.shebang.shell']});
+    expect(tokens[1]).toEqual({value: '/bin/sh', scopes: ['source.shell', 'comment.line.number-sign.shebang.shell']});
 });
 
   it("tokenizes comments", function() {
     const {tokens} = grammar.tokenizeLine('#comment');
     expect(tokens[0]).toEqual({value: '#', scopes: ['source.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']});
-    return expect(tokens[1]).toEqual({value: 'comment', scopes: ['source.shell', 'comment.line.number-sign.shell']});
+    expect(tokens[1]).toEqual({value: 'comment', scopes: ['source.shell', 'comment.line.number-sign.shell']});
 });
 
   it("tokenizes comments in interpolated strings", function() {
     const {tokens} = grammar.tokenizeLine('`#comment`');
     expect(tokens[1]).toEqual({value: '#', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']});
-    return expect(tokens[3]).toEqual({value: '`', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'punctuation.definition.string.end.shell']});
+    expect(tokens[3]).toEqual({value: '`', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'punctuation.definition.string.end.shell']});
 });
 
   it("does not tokenize -# in argument lists as a comment", function() {
     const {tokens} = grammar.tokenizeLine('curl -#');
-    return expect(tokens[0]).toEqual({value: 'curl -#', scopes: ['source.shell']});
+    expect(tokens[0]).toEqual({value: 'curl -#', scopes: ['source.shell']});
 });
 
   it("tokenizes nested variable expansions", function() {
@@ -317,7 +310,7 @@ ${delim}\
     expect(tokens[1]).toEqual({value: '${', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
     expect(tokens[2]).toEqual({value: 'C', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell']});
     expect(tokens[3]).toEqual({value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
-    return expect(tokens[4]).toEqual({value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
+    expect(tokens[4]).toEqual({value: '}', scopes: ['source.shell', 'variable.other.bracket.shell', 'punctuation.definition.variable.shell']});
 });
 
   it("tokenizes case blocks", function() {
@@ -330,7 +323,7 @@ ${delim}\
     expect(tokens[5]).toEqual({value: ')', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell', 'meta.scope.case-clause.shell', 'meta.scope.case-pattern.shell', 'punctuation.definition.case-pattern.shell']});
     expect(tokens[6]).toEqual({value: ';;', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell', 'meta.scope.case-clause.shell', 'punctuation.terminator.case-clause.shell']});
     expect(tokens[7]).toEqual({value: ' ', scopes: ['source.shell', 'meta.scope.case-block.shell', 'meta.scope.case-body.shell']});
-    return expect(tokens[8]).toEqual({value: 'esac', scopes: ['source.shell', 'meta.scope.case-block.shell', 'keyword.control.shell']});
+    expect(tokens[8]).toEqual({value: 'esac', scopes: ['source.shell', 'meta.scope.case-block.shell', 'keyword.control.shell']});
 });
 
   it("does not confuse strings and functions", function() {
@@ -338,7 +331,7 @@ ${delim}\
     expect(tokens[0]).toEqual({value: 'echo', scopes: ['source.shell', 'support.function.builtin.shell']});
     expect(tokens[2]).toEqual({value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.begin.shell']});
     expect(tokens[3]).toEqual({value: '()', scopes: ['source.shell', 'string.quoted.double.shell']});
-    return expect(tokens[4]).toEqual({value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.end.shell']});
+    expect(tokens[4]).toEqual({value: '"', scopes: ['source.shell', 'string.quoted.double.shell', 'punctuation.definition.string.end.shell']});
 });
 
   describe("indentation", function() {
@@ -367,11 +360,11 @@ ${delim}\
 
     it("indents semicolon-style conditional", () => expectPreservedIndentation(`\
 if [ $? -eq 0 ]; then
-echo "0"
+  echo "0"
 elif [ $? -eq 1 ]; then
-echo "1"
+  echo "1"
 else
-echo "other"
+  echo "other"
 fi\
 `
     ));
@@ -379,33 +372,33 @@ fi\
     it("indents newline-style conditional", () => expectPreservedIndentation(`\
 if [ $? -eq 0 ]
 then
-echo "0"
+  echo "0"
 elif [ $? -eq 1 ]
 then
-echo "1"
+  echo "1"
 else
-echo "other"
+  echo "other"
 fi\
 `
     ));
 
     it("indents semicolon-style while loop", () => expectPreservedIndentation(`\
 while [ $x -gt 0 ]; do
-x=$(($x-1))
+  x=$(($x-1))
 done\
 `
     ));
 
-    return it("indents newline-style while loop", () => expectPreservedIndentation(`\
+    it("indents newline-style while loop", () => expectPreservedIndentation(`\
 while [ $x -gt 0 ]
 do
-x=$(($x-1))
+  x=$(($x-1))
 done\
 `
     ));
   });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises interpreter directives", function() {
       let line;
       const valid = `\
@@ -490,7 +483,7 @@ done\
       })();
     });
 
-    return it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function() {
       let line;
       const valid = `\
 vim: se filetype=sh:
