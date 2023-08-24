@@ -1,19 +1,15 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-describe("TODO grammar", function() {
+
+describe("TODO grammar", () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     waitsForPromise(() => atom.packages.activatePackage("language-todo"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("text.todo"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("text.todo"));
   });
 
-  return it("parses the grammar", function() {
+  it("parses the grammar", () => {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("text.todo");
+    expect(grammar.scopeName).toBe("text.todo");
   });
 });
