@@ -9,7 +9,7 @@ describe('PHP grammar', function() {
       grammar = atom.grammars.grammarForScopeName('source.php');
       this.addMatchers({
         toContainAll(arr) {
-          arr.every(el => {
+          return arr.every(el => {
             return this.actual.includes(el);
           });
         }
@@ -3734,7 +3734,7 @@ GITHUB;\
   it('should tokenize a heredoc with embedded HTML and interpolation correctly', function() {
     waitsForPromise(() => atom.packages.activatePackage('language-html'));
 
-    return runs(function() {
+    runs(function() {
       const lines = grammar.tokenizeLines(`\
 $a = <<<HTML
 <strong>rainbows</strong>
