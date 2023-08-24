@@ -1,17 +1,29 @@
 exports.activate = function () {
   if (!atom.grammars.addInjectionPoint) return;
 
-  // TODO: Uncomment when performance is acceptable.
+  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+  const HYPERLINK_PATTERN = /\bhttps?:/
 
-  // atom.grammars.addInjectionPoint('source.python', {
-  //   type: 'string',
-  //   language() {
-  //     return 'hyperlink';
-  //   },
-  //   content(node) {
-  //     return node;
-  //   }
-  // });
+  atom.grammars.addInjectionPoint('source.python', {
+    type: 'comment',
+    language: (node) => {
+      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  for (let type of ['comment', 'string']) {
+    atom.grammars.addInjectionPoint('source.python', {
+      type,
+      language(node) {
+        return HYPERLINK_PATTERN.test(node.text) ?
+          'hyperlink' : undefined;
+      },
+      content: (node) => node,
+      languageScope: null
+    });
+  }
 
   // TODO: There's no regex literal in Python. The TM-style grammar has a
   // very obscure option that, when enabled, assumes all raw strings are

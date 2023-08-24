@@ -2,7 +2,7 @@ const _ = require('underscore-plus');
 const Grim = require('grim');
 const CSON = require('season');
 const SecondMate = require('second-mate');
-const { Disposable, CompositeDisposable } = require('event-kit');
+const { Disposable, CompositeDisposable, Emitter } = require('event-kit');
 const TextMateLanguageMode = require('./text-mate-language-mode');
 const NodeTreeSitterLanguageMode = require('./tree-sitter-language-mode');
 const WASMTreeSitterLanguageMode = require('./wasm-tree-sitter-language-mode');
@@ -26,6 +26,7 @@ module.exports = class GrammarRegistry {
       maxTokensPerLine: 100,
       maxLineLength: 1000
     });
+    this.emitter = new Emitter();
     this.clear();
   }
 
@@ -137,7 +138,7 @@ module.exports = class GrammarRegistry {
     let grammar = null;
     if (languageId != null) {
       grammar = this.grammarForId(languageId);
-      if (!grammar) return false;
+      if (!grammar || !grammar.scopeName) return false;
       this.languageOverridesByBufferId.set(buffer.id, languageId);
     } else {
       this.languageOverridesByBufferId.set(buffer.id, null);
@@ -248,6 +249,9 @@ module.exports = class GrammarRegistry {
   }
 
   getLanguageParserForScope(scope) {
+    if (typeof scope === 'string') {
+      scope = new ScopeDescriptor({ scopes: [scope] })
+    }
     let useTreeSitterParsers = this.config.get('core.useTreeSitterParsers', { scope });
     let useExperimentalModernTreeSitter = this.config.get('core.useExperimentalModernTreeSitter', { scope });
 
@@ -401,14 +405,28 @@ module.exports = class GrammarRegistry {
       new ScopeDescriptor({ scopes: [languageId] })
     );
 
+    let getTreeSitterGrammar = (table, languageId) => {
+      let grammar = table[languageId];
+      if (grammar?.scopeName) {
+        return grammar;
+      }
+      return null;
+    };
+
     if (config === 'wasm-tree-sitter') {
       return (
-        this.wasmTreeSitterGrammarsById[languageId] ||
+        getTreeSitterGrammar(
+          this.wasmTreeSitterGrammarsById,
+          languageId
+        ) ||
         this.textmateRegistry.grammarForScopeName(languageId)
       );
     } else if (config === 'node-tree-sitter') {
       return (
-        this.treeSitterGrammarsById[languageId] ||
+        getTreeSitterGrammar(
+          this.treeSitterGrammarsById,
+          languageId
+        ) ||
         this.textmateRegistry.grammarForScopeName(languageId)
       );
     } else {
@@ -502,7 +520,12 @@ module.exports = class GrammarRegistry {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddGrammar(callback) {
-    return this.textmateRegistry.onDidAddGrammar(callback);
+    let disposable = new CompositeDisposable();
+    disposable.add(
+      this.textmateRegistry.onDidAddGrammar(callback),
+      this.emitter.on('did-add-grammar', callback)
+    );
+    return disposable;
   }
 
   // Extended: Invoke the given callback when a grammar is updated due to a grammar
@@ -513,7 +536,12 @@ module.exports = class GrammarRegistry {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidUpdateGrammar(callback) {
-    return this.textmateRegistry.onDidUpdateGrammar(callback);
+    let disposable = new CompositeDisposable();
+    disposable.add(
+      this.textmateRegistry.onDidUpdateGrammar(callback),
+      this.emitter.on('did-update-grammar', callback)
+    );
+    return disposable;
   }
 
   // Experimental: Specify a type of syntax node that may embed other languages.
@@ -557,10 +585,16 @@ module.exports = class GrammarRegistry {
       if (grammar) {
         if (grammar.addInjectionPoint) {
           grammar.addInjectionPoint(injectionPoint);
+
+          // This is a grammar that's already loaded — not just a stub. Editors
+          // that already use this grammar will want to know that we added an
+          // injection.
+          this.emitter.emit('did-update-grammar', grammar);
         } else {
           grammar.injectionPoints.push(injectionPoint);
         }
         grammarsToDispose.push(grammar);
+
       } else {
         table[grammarId] = { injectionPoints: [injectionPoint] }
       }
@@ -616,6 +650,7 @@ module.exports = class GrammarRegistry {
         }
       }
       this.grammarAddedOrUpdated(grammar);
+      this.emitter.emit('did-add-grammar', grammar);
       return new Disposable(() => this.removeGrammar(grammar));
     } else if (grammar instanceof TreeSitterGrammar) {
       const existingParams =
@@ -628,6 +663,7 @@ module.exports = class GrammarRegistry {
         }
       }
       this.grammarAddedOrUpdated(grammar);
+      this.emitter.emit('did-add-grammar', grammar);
       return new Disposable(() => this.removeGrammar(grammar));
     } else {
       return this.textmateRegistry.addGrammar(grammar);

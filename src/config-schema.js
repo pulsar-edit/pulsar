@@ -393,6 +393,11 @@ const configSchema = {
         description: 'Whether Pulsar should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.',
         type: 'boolean',
         default: true
+      },
+      addCurrentTabToWindowTitle: {
+        description: 'Add the current tab title to the Pulsar Window title.',
+        type: 'boolean',
+        default: true
       }
     }
   },

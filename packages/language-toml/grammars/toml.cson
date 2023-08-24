@@ -95,11 +95,11 @@
   'values':
     'patterns': [
       {
-        'begin': '\\[\\s*'
+        'begin': '\\['
         'beginCaptures':
           '0':
             'name': 'punctuation.definition.array.begin.toml'
-        'end': '\\s*\\]'
+        'end': '\\]'
         'endCaptures':
           '0':
             'name': 'punctuation.definition.array.end.toml'
@@ -108,7 +108,7 @@
             'include': '#comment'
           }
           {
-            'match': ',\\s*'
+            'match': ','
             'name': 'punctuation.definition.separator.comma.toml'
           }
           {
@@ -199,6 +199,9 @@
       }
       {
         'include': '#numbers'
+      }
+      {
+        'include': '#whitespace'
       }
       {
         'match': '.+'
@@ -293,3 +296,6 @@
         'name': 'constant.numeric.binary.toml'
       }
     ]
+  'whitespace':
+    'match': '\\s+'
+    'name': 'punctuation.whitespace.ignore.toml'

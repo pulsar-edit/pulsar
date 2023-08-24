@@ -2072,6 +2072,22 @@ describe('Workspace', () => {
         );
       });
 
+      it("sets the title to the item's path if addCurrentTabToWindowTitle is disabled", () => {
+        atom.config.set("core.addCurrentTabToWindowTitle", false);
+        const item = atom.workspace.getActivePaneItem();
+        const pathEscaped = fs.tildify(
+          escapeStringRegex(path.dirname(item.getPath()))
+        );
+        expect(document.title).toMatch(
+          new RegExp(`^${pathEscaped}`)
+        );
+        atom.config.unset("core.addCurrentTabToWindowTitle");
+        // Now with the config changed, the title should automatically update
+        expect(document.title).toMatch(
+          new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`)
+        );
+      });
+
       describe('when the title of the active pane item changes', () => {
         it("updates the window title based on the item's new title", () => {
           const editor = atom.workspace.getActivePaneItem();

@@ -1,9 +1,9 @@
 (dictionary
   (pair ":" @_IGNORE_
-  (#set! test.final true)))
+  (#set! capture.final true)))
 
 ((lambda ":" @_IGNORE_)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ":" @indent
 

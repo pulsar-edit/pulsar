@@ -4,7 +4,7 @@ Displays possible autocomplete suggestions on keystroke (or manually by typing `
 
 ![autocomplete+](https://cloud.githubusercontent.com/assets/744740/7656861/9fb8bcc4-faea-11e4-9814-9dca218ded93.png)
 
-[Changelog](https://github.com/atom/autocomplete-plus/releases)
+[Changelog](https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md)
 
 ## Installation
 
@@ -85,7 +85,7 @@ If the default `SymbolProvider` is missing useful information for the language /
 
 ## The `watchEditor` API
 
-The `watchEditor` method on the `AutocompleteManager` object is exposed as a [provided service](http://flight-manual.atom.io/behind-atom/sections/interacting-with-other-packages-via-services/), named `autocomplete.watchEditor`. The method allows external editors to register for autocompletions from providers with a given set of labels. Disposing the returned object will undo this request. External packages can access this service with the following code.
+The `watchEditor` method on the `AutocompleteManager` object is exposed as a [provided service](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar/#interacting-with-other-packages-via-services), named `autocomplete.watchEditor`. The method allows external editors to register for autocompletions from providers with a given set of labels. Disposing the returned object will undo this request. External packages can access this service with the following code.
 
 In `package.json`:
 ```

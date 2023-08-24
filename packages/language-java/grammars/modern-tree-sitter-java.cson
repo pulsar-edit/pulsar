@@ -13,5 +13,6 @@ comments:
 treeSitter:
   grammar: 'tree-sitter-java/tree-sitter-java.wasm'
   highlightsQuery: 'tree-sitter-java/highlights.scm'
+  tagsQuery: 'tree-sitter-java/tags.scm'
   indentsQuery: 'tree-sitter-java/indents.scm'
   foldsQuery: 'tree-sitter-java/folds.scm'

@@ -1,13 +1,16 @@
 ; STRINGS
 ; =======
 
+(pair
+  key: (string) @meta.structure.key.json)
+
 (string
   "\"" @punctuation.definition.string.begin.json
-    (#set! test.onlyIfFirst true))
+    (#is? test.first true))
 
 (string
   "\"" @punctuation.definition.string.end.json
-    (#set! test.onlyIfLast true))
+    (#is? test.last true))
 
 (string) @string.quoted.double.json
 
@@ -33,11 +36,11 @@
 
 (object
   "," @punctuation.separator.object.comma.json
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (array
   "," @punctuation.separator.array.comma.json
-  (#set! test.final true))
+  (#set! capture.final true))
 
 "," @punctuation.separator.comma.json
 ":" @punctuation.separator.key-value.colon.json

@@ -24,9 +24,9 @@
   . [(bare_key) (quoted_key) (dotted_key)]) @meta.pair.key.toml
 
 ((bare_key) @variable.other.key.toml
-  (#set! test.onlyIfDescendantOfType pair))
+  (#is? test.descendantOfType pair))
 ((quoted_key) @variable.other.key.quoted.toml
-  (#set! test.onlyIfDescendantOfType pair))
+  (#is? test.descendantOfType pair))
 
 (dotted_key "." @keyword.operator.accessor.toml)
 
@@ -42,11 +42,11 @@
 
 (string
   ["\"" "'"] @punctuation.definition.string.begin.toml
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 
 (string
   ["\"" "'"] @punctuation.definition.string.end.toml
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 
 ; WORKAROUND: There seems to be a bug with multi-line strings where only the
 ; opening delimiters are exposed. Let's use adjustments to mark these
@@ -79,7 +79,7 @@
   (#match? @constant.numeric.binary.toml "^0b"))
 
 ((integer) @constant.numeric.decimal.integer.toml
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 ; Not sure why `inf` and `nan` are parsed as `float`s, but there you have it.
 ((float) @constant.numeric.infinity.toml
@@ -89,7 +89,7 @@
   (#match? @constant.numeric.nan.toml "^[+-]?nan$"))
 
 ((float) @constant.numeric.decimal.float.toml
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 
 ; DATES

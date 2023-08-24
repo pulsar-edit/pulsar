@@ -22,6 +22,7 @@ module.exports = class WASMTreeSitterGrammar {
 
     this.grammarFilePath = grammarPath;
     this.queryPaths = params.treeSitter;
+    this.languageSegment = params.treeSitter?.languageSegment ?? null;
     const dirName = path.dirname(grammarPath);
 
     this.emitter = new Emitter;
@@ -114,11 +115,16 @@ module.exports = class WASMTreeSitterGrammar {
       for (let [key, name] of Object.entries(queryPaths)) {
         if (!key.endsWith('Query')) { continue; }
 
-        let filePath = path.join(dirName, name);
-        promises.push(this.loadQueryFile(filePath, key));
+        // Every `fooQuery` path can contain either a single file name or an
+        // array of file names. If the latter, each is concatenated together in
+        // order.
+        let paths = Array.isArray(name) ? name : [name];
+        let filePaths = paths.map(p => path.join(dirName, p));
+
+        promises.push(this.loadQueryFile(filePaths, key));
 
         if (this.shouldObserveQueryFiles && !this._queryFilesLoaded) {
-          this.observeQueryFile(filePath, key);
+          this.observeQueryFile(filePaths, key);
         }
       }
       Promise.all(promises).then(() => resolve());
@@ -130,22 +136,44 @@ module.exports = class WASMTreeSitterGrammar {
     return this._loadQueryFilesPromise;
   }
 
-  loadQueryFile(filePath, queryType) {
-    let key = `${filePath}/${queryType}`;
+  loadQueryFile(paths, queryType) {
+    let key = `${paths.join(',')}/${queryType}`;
 
     let existingPromise = this.promisesForQueryFiles.get(key);
     if (existingPromise) { return existingPromise; }
 
-    let promise = fs.promises.readFile(filePath, 'utf-8');
-    promise = promise.then((contents) => {
-      if (contents === "") {
-        // An empty file should still count as “present” when assessing whether
-        // a grammar has a particular query. So we'll set the contents to a
-        // comment instead.
-        contents = '; (empty)';
+    let readFilePromises = paths.map(path => {
+      return fs.promises.readFile(path, 'utf-8').then((contents) => {
+        return { contents, path };
+      });
+    });
+
+    let promise = Promise.all(readFilePromises).then((allResults) => {
+      let output = "";
+      for (let result of allResults) {
+        let { contents, path } = result;
+        if (contents === "") {
+          // An empty file should still count as “present” when assessing whether
+          // a grammar has a particular query. So we'll set the contents to a
+          // comment instead.
+          contents = '; (empty)';
+        }
+        if (contents.includes('._LANG_')) {
+          // The `_LANG_` token indicates places where the last segment of a
+          // scope name will vary based on which grammar includes it. It
+          // assumes that the grammar author will define a segment (like
+          // `ts.tsx`) under the `treeSitter.languageSegment` setting in the
+          // grammar file.
+          if (this.languageSegment) {
+            contents = contents.replace(/\._LANG_/g, `.${this.languageSegment}`);
+          } else {
+            console.warn(`Warning: query file at ${path} includes _LANG_ tokens, but grammar does not specify a "treeSitter.languageSegment" setting.`);
+          }
+        }
+        output += `\n${contents}`;
       }
-      if (this[queryType] !== contents) {
-        this[queryType] = contents;
+      if (this[queryType] !== output) {
+        this[queryType] = output;
         this.queryCache.delete(queryType);
       }
     }).finally(() => {
@@ -173,7 +201,6 @@ module.exports = class WASMTreeSitterGrammar {
   // promise.
   getQuery(queryType) {
     // let inDevMode = atom.inDevMode();
-
     let query = this.queryCache.get(queryType);
     if (query) { return Promise.resolve(query); }
 
@@ -232,26 +259,30 @@ module.exports = class WASMTreeSitterGrammar {
 
   // Observe a particular query file on disk so that it can immediately be
   // re-applied when it changes. Occurs only in dev mode.
-  observeQueryFile(filePath, queryType) {
-    let watcher = new File(filePath);
-    this.subscriptions.add(watcher.onDidChange(() => {
-      let existingQuery = this[queryType];
-      this.loadQueryFile(filePath, queryType).then(async () => {
-        // Sanity-check the language for errors before we let the buffers know
-        // about this change.
-        try {
-          await this.getQuery(queryType);
-        } catch (error) {
-          atom.beep();
-          console.error(`Error parsing query file: ${queryType}`);
-          console.error(error);
-          this[queryType] = existingQuery;
-          this.queryCache.delete(queryType);
-          return;
-        }
-        this.emitter.emit('did-change-query-file', { filePath, queryType });
-      });
-    }));
+  observeQueryFile(filePaths, queryType) {
+    for (let filePath of filePaths) {
+      let watcher = new File(filePath);
+      this.subscriptions.add(watcher.onDidChange(() => {
+        let existingQuery = this[queryType];
+        // When any one of the file paths changes, we have to re-concatenate
+        // the whole set.
+        this.loadQueryFile(filePaths, queryType).then(async () => {
+          // Sanity-check the language for errors before we let the buffers know
+          // about this change.
+          try {
+            await this.getQuery(queryType);
+          } catch (error) {
+            atom.beep();
+            console.error(`Error parsing query file: ${queryType}`);
+            console.error(error);
+            this[queryType] = existingQuery;
+            this.queryCache.delete(queryType);
+            return;
+          }
+          this.emitter.emit('did-change-query-file', { filePath, queryType });
+        });
+      }));
+    }
   }
 
   // Calls `callback` when any of this grammar's query files change.

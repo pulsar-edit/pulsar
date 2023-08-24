@@ -1,6 +1,6 @@
 ; NOTES:
 ;
-; (#set! test.final "true") means that any later rule that matches this exact range
+; (#set! capture.final "true") means that any later rule that matches this exact range
 ; will be ignored.
 ;
 ; (#set! shy "true") means that this rule will be ignored if any previous rule
@@ -14,7 +14,7 @@
   method: (identifier) @keyword.other.special-method.new.ruby
   (#match? @keyword.other.special-method.new.ruby "new")
   (#match? @support.class.builtin.ruby "^(Array|BasicObject|Date|DateTime|Dir|Exception|File|FileUtils|Float|Hash|Integer|Object|Pathname|Process|Range|Rational|Regexp|Set|Struct|Time|Symbol)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ; Common receivers of "static" method calls. Some of these are gems, but
@@ -31,12 +31,12 @@
 (
   (identifier) @support.function.kernel.ruby
   (#match? @support.function.kernel.ruby "^(abort|at_exit|autoload|binding|callcc|caller|caller_locations|chomp|chop|eval|exec|exit|fork|format|gets|global_variables|gsub|lambda|load|local_variables|open|p|print|printf|proc|putc|puts|rand|readline|readlines|select|set_trace_func|sleep|spawn|sprintf|srand|sub|syscall|system|test|trace_var|trap|untrace_var|warn)$")
-  (#set! test.final "true"))
+  (#set! capture.final "true"))
 
 (call
   method: (identifier) @keyword.other.pseudo-method.ruby
     (#match? @keyword.other.pseudo-method.ruby "^(alias_method)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 (call
   method: (identifier) @support.other.function.ruby)
@@ -48,18 +48,18 @@
 ; "Foo" in `class Foo`
 (class
   name: (constant) @entity.name.type.class.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; "<" in `class Foo < Bar`
 (superclass
   "<" @punctuation.separator.inheritance.ruby
   (constant) @entity.other.inherited-class.ruby
-  (#set! test.final "true"))
+  (#set! capture.final "true"))
 
 ; "Foo" in `module Foo`
 (module
   name: (constant) @entity.name.type.module.ruby
-  (#set! test.final "true"))
+  (#set! capture.final "true"))
 
 
 ; Mark `new` as a special method in all contexts, from `Foo.new` to
@@ -72,7 +72,7 @@
 (call
   (identifier) @keyword.other.special-method.ruby
   (#match? @keyword.other.special-method.ruby "^(loop|include|extend|prepend|raise|fail|attr_reader|attr_writer|attr_accessor|attr|catch|throw|private_class_method|public_class_method|module_function|refine|using)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @keyword.other.special-method
   (#match? @keyword.other.special-method "^(private|protected|public)$"))
@@ -86,22 +86,29 @@
   (scope_resolution
     scope: (constant) @entity.other.inherited-class.ruby
     name: (constant) @entity.other.inherited-class.ruby)
-    (#set! test.final true))
+    (#set! capture.final true))
 
-; "Foo" in `Foo::Bar`.
+; Marks all nodes on the left side of `scope_resolution` with an arbitrary key.
 (scope_resolution
-  scope: (constant) @support.other.namespace.ruby
-  (#set! test.final "true"))
+  scope: (_) @_IGNORE_
+  (#set! isOnLeftSideOfNamespaceChain true))
+
+; Targets all `constant` nodes with the aforementioned key, no matter how deep
+; into a Chain::Of::Namespaces they happen to be.
+; "Foo" and "Bar" in `Foo::Bar::Baz`.
+((constant) @support.other.namespace.ruby
+  (#is? test.descendantOfNodeWithData isOnLeftSideOfNamespaceChain)
+  (#set! capture.final true))
 
 ; "::" in `Foo::Bar`.
 (scope_resolution
   "::" @keyword.operator.namespace.ruby
-  (#set! test.final "true"))
+  (#set! capture.final true))
 
-; "Bar" in `Foo::Bar`.
+; "Bar" in `Foo::Bar`, regardless of the length of the chain.
 (scope_resolution
   name: (constant) @support.other.class.ruby
-  (#set! test.final "true"))
+  (#set! capture.final true))
 
 
 
@@ -116,7 +123,7 @@
 
 (method
   name: [(identifier) (constant)] @entity.name.function.ruby
-  (#set! test.final "true"))
+  (#set! capture.final "true"))
 
 (singleton_method
   "." @keyword.operator.accessor.ruby
@@ -154,16 +161,16 @@
   scope: [(constant) (scope_resolution)]
   "::" @keyword.operator.namespace.ruby
   name: [(constant)] @support.other.class.ruby
-  (#set! test.final "true"))
+  (#set! capture.final "true"))
 
 ; (call
 ;   receiver: (constant) @constant.ruby (#match? @constant.ruby "^[A-Z\\d_]+$")
 ; )
 (call
   receiver: (constant) @support.other.class.ruby
- (#set! test.final "true"))
+ (#set! capture.final "true"))
 
-(call "." @keyword.operator.accessor.ruby (#set! test.final "true"))
+(call "." @keyword.operator.accessor.ruby (#set! capture.final "true"))
 
 ((identifier) @constant.builtin.ruby
  (#match? @constant.builtin.ruby "^__(FILE|LINE|ENCODING)__$"))
@@ -172,7 +179,7 @@
 ; it as `constant` if it's all uppercase…
 ((constant) @constant.ruby
  (#match? @constant.ruby "^[A-Z\\d_]+$")
- (#set! test.final "true"))
+ (#set! capture.final "true"))
 
 ; …otherwise treat it as a variable.
 ; ((constant) @variable.other.constant.ruby)
@@ -193,13 +200,13 @@
 ((keyword_parameter) @constant.other.symbol.hashkey.parameter.ruby
   (#set! adjust.startAt firstChild.startPosition)
   (#set! adjust.endAt firstChild.nextSibling.endPosition)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; This scope should span both the key and the adjacent colon.
 ((pair key: (hash_key_symbol)) @constant.other.symbol.hashkey.ruby
   (#set! adjust.startAt firstChild.startPosition)
   (#set! adjust.endAt firstChild.nextSibling.endPosition)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (pair
   key: (hash_key_symbol)
@@ -207,7 +214,7 @@
   ; separates it from its value.
   ":" @punctuation.definition.constant.hashkey.ruby
       @punctuation.separator.key-value.ruby
-      (#set! test.final true))
+      (#set! capture.final true))
 
 (optional_parameter
   name: (identifier) @variable.parameter.function.optional.ruby)
@@ -233,7 +240,7 @@
   @string.quoted.single.ruby
   (#match? @string.quoted.single.ruby "^'")
   (#match? @string.quoted.single.ruby "'$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ; Double-quoted string "bar"
@@ -245,7 +252,7 @@
   @string.quoted.double.interpolated.ruby
   (#match? @string.quoted.double.interpolated.ruby "^\"")
   (#match? @string.quoted.double.interpolated.ruby "\"$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; "Other" strings
 (
@@ -255,7 +262,7 @@
     "\"" @punctuation.definition.string.end.ruby)
   @string.quoted.other.ruby
   (#match? @string.quoted.other.ruby "^%q")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (
   (string
@@ -264,7 +271,7 @@
     "\"" @punctuation.definition.string.end.ruby)
   @string.quoted.other.interpolated.ruby
   (#match? @string.quoted.other.interpolated.ruby "^%Q")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 (
@@ -273,7 +280,7 @@
     (string_content)?
     "\"" @punctuation.definition.string.end.ruby)
   @string.quoted.other.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Highlight the interpolation inside of a string.
 (
@@ -322,7 +329,7 @@
     "`" @punctuation.definition.string.begin.ruby
     (_)?
     "`" @punctuation.definition.string.end.ruby)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (subshell) @meta.embedded.line.subshell.ruby @string.quoted.subshell.interpolation.ruby
 
@@ -352,9 +359,9 @@
 
 (regex) @string.regexp.interpolated.ruby
 (regex "/" @punctuation.definition.begin.regexp.ruby
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 (regex "/" @punctuation.definition.end.regexp.ruby
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 
 (escape_sequence) @constant.character.escape.ruby
 
@@ -434,16 +441,16 @@
 ; OPERATORS
 ; =========
 
-(splat_parameter "*" @keyword.operator.splat.ruby (#set! test.final true))
-(splat_argument "*" @keyword.operator.splat.ruby (#set! test.final true))
-(rest_assignment "*" @keyword.operator.splat.ruby (#set! test.final true))
+(splat_parameter "*" @keyword.operator.splat.ruby (#set! capture.final true))
+(splat_argument "*" @keyword.operator.splat.ruby (#set! capture.final true))
+(rest_assignment "*" @keyword.operator.splat.ruby (#set! capture.final true))
 
 (hash_splat_argument
   "**" @keyword.operator.double-splat.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 (hash_splat_parameter
   "**" @keyword.operator.double-splat.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (singleton_class
   "<<" @keyword.operator.assigment.ruby)
@@ -453,15 +460,15 @@
 
 (conditional
   ["?" ":"] @keyword.operator.conditional.ruby
-  (#set! test.final "true"))
+  (#set! capture.final "true"))
 
 (binary
   ["+" "-" "*" "/" "**"] @keyword.operator.arithmetic.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (unary
   ["+" "-" "!" "~" "not" "&" "*"] @keyword.operator.unary.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 
 [
   "="
@@ -514,17 +521,17 @@
 ; To distinguish them from the bitwise "|" operator.
 (block_parameters
   "|" @punctuation.separator.parameters.begin.ruby
-  (#set! test.onlyIfFirst true)
-  (#set! test.final true))
+  (#is? test.first true)
+  (#set! capture.final true))
 
 (block_parameters
   "|" @punctuation.separator.parameters.end.ruby
-  (#set! test.onlyIfLast true)
-  (#set! test.final true))
+  (#is? test.last true)
+  (#set! capture.final true))
 
 (block_parameters
   "," @punctuation.separator.parameters.ruby
-  (#set! test.final true))
+  (#set! capture.final true))
 
 "=>" @punctuation.separator.key-value.ruby
 
@@ -557,7 +564,7 @@
   (#set! adjust.endAt lastChild.startPosition))
 
 ((do_block) @meta.block.ruby
-  (#set! test.onlyIfNotRangeWithData hasBlockParameters)
+  (#is-not? test.rangeWithData hasBlockParameters)
   ; Start just after `do`.
   (#set! adjust.startAt firstChild.endPosition)
   (#set! adjust.endAt lastChild.startPosition))
