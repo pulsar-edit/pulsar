@@ -1,20 +1,16 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("YAML grammar", function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage("language-yaml"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName('source.yaml'));
+    runs(() => grammar = atom.grammars.grammarForScopeName('source.yaml'));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("source.yaml");
+    expect(grammar.scopeName).toBe("source.yaml");
   });
 
   it("selects the grammar for cloud config files", function() {
@@ -45,7 +41,7 @@ describe("YAML grammar", function() {
         expect(tokens[5]).toEqual({value: "\\\"", scopes: ["source.yaml", "string.quoted.double.yaml", "constant.character.escape.yaml"]});
         expect(tokens[6]).toEqual({value: "escaped", scopes: ["source.yaml", "string.quoted.double.yaml"]});
         expect(tokens[7]).toEqual({value: "\\\"", scopes: ["source.yaml", "string.quoted.double.yaml", "constant.character.escape.yaml"]});
-        return expect(tokens[8]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
+        expect(tokens[8]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
     });
 
       it("parses other escape sequences", function() {
@@ -70,10 +66,10 @@ describe("YAML grammar", function() {
 
         ({tokens} = grammar.tokenizeLine('"\\ hi"'));
         expect(tokens[1]).toEqual({value: "\\ ", scopes: ["source.yaml", "string.quoted.double.yaml", "constant.character.escape.yaml"]});
-        return expect(tokens[2]).toEqual({value: "hi", scopes: ["source.yaml", "string.quoted.double.yaml"]});
+        expect(tokens[2]).toEqual({value: "hi", scopes: ["source.yaml", "string.quoted.double.yaml"]});
     });
 
-      return it("parses invalid escape sequences", function() {
+      it("parses invalid escape sequences", function() {
         let {tokens} = grammar.tokenizeLine('"\\uqerww"');
         expect(tokens[1]).toEqual({value: "\\uqerw", scopes: ["source.yaml", "string.quoted.double.yaml", "invalid.illegal.escape.yaml"]});
         expect(tokens[2]).toEqual({value: "w", scopes: ["source.yaml", "string.quoted.double.yaml"]});
@@ -88,7 +84,7 @@ describe("YAML grammar", function() {
 
         ({tokens} = grammar.tokenizeLine('"\\c3"'));
         expect(tokens[1]).toEqual({value: "\\c", scopes: ["source.yaml", "string.quoted.double.yaml", "invalid.illegal.escape.yaml"]});
-        return expect(tokens[2]).toEqual({value: "3", scopes: ["source.yaml", "string.quoted.double.yaml"]});
+        expect(tokens[2]).toEqual({value: "3", scopes: ["source.yaml", "string.quoted.double.yaml"]});
     });
   });
 
@@ -111,14 +107,14 @@ describe("YAML grammar", function() {
         expect(tokens[5]).toEqual({value: "''", scopes: ["source.yaml", "string.quoted.single.yaml", "constant.character.escape.yaml"]});
         expect(tokens[6]).toEqual({value: "escaped", scopes: ["source.yaml", "string.quoted.single.yaml"]});
         expect(tokens[7]).toEqual({value: "''", scopes: ["source.yaml", "string.quoted.single.yaml", "constant.character.escape.yaml"]});
-        return expect(tokens[8]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.end.yaml"]});
+        expect(tokens[8]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.end.yaml"]});
     });
 
-      return it("does not recognize backslashes as escape characters", function() {
+      it("does not recognize backslashes as escape characters", function() {
         const {tokens} = grammar.tokenizeLine("'I am not \\escaped'");
         expect(tokens[0]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.begin.yaml"]});
         expect(tokens[1]).toEqual({value: "I am not \\escaped", scopes: ["source.yaml", "string.quoted.single.yaml"]});
-        return expect(tokens[2]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.end.yaml"]});
+        expect(tokens[2]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.end.yaml"]});
     });
   });
 
@@ -133,7 +129,7 @@ key: |
         expect(lines[0][0]).toEqual({value: "key", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[0][1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
         expect(lines[1][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-        return expect(lines[2][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[2][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses content with empty lines", function() {
@@ -148,7 +144,7 @@ key: |
         expect(lines[0][1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
         expect(lines[1][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
         expect(lines[2][0]).toEqual({value: "", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-        return expect(lines[3][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[3][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses keys with decimals", function() {
@@ -161,7 +157,7 @@ key: |
         expect(lines[0][0]).toEqual({value: "2.0", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[0][1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
         expect(lines[1][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-        return expect(lines[2][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[2][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses keys with quotes", function() {
@@ -177,7 +173,7 @@ double"quotes": >
         expect(lines[1][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
         expect(lines[2][0]).toEqual({value: "double\"quotes\"", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[2][1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
-        return expect(lines[3][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[3][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses keys with quotes in sequences", function() {
@@ -195,7 +191,7 @@ double"quotes": >
         expect(lines[2][0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
         expect(lines[2][2]).toEqual({value: "double\"quotes\"", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[2][3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
-        return expect(lines[3][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[3][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses keys with quotes in sequences even when not using | or >", function() {
@@ -213,7 +209,7 @@ double"quotes": >
         expect(lines[2][0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
         expect(lines[2][2]).toEqual({value: "double\"quotes\"", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[2][3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
-        return expect(lines[3][1]).toEqual({value: "content here", scopes: ["source.yaml", "string.unquoted.yaml"]});
+        expect(lines[3][1]).toEqual({value: "content here", scopes: ["source.yaml", "string.unquoted.yaml"]});
     });
 
       it("parses keys with spaces", function() {
@@ -234,7 +230,7 @@ space after : |
         expect(lines[3][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
         expect(lines[4][0]).toEqual({value: "space after", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[4][2]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
-        return expect(lines[5][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[5][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses keys with spaces in sequences", function() {
@@ -258,7 +254,7 @@ space after : |
         expect(lines[4][0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
         expect(lines[4][2]).toEqual({value: "space after", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[4][4]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
-        return expect(lines[5][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[5][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("properly parses through pound signs in blocks", function() {
@@ -275,7 +271,7 @@ key: |
         expect(lines[1][0]).toEqual({value: "  # this is not a legit comment", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
         expect(lines[2][0]).toEqual({value: "  unquoted block", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
         expect(lines[3][0]).toEqual({value: "  ### this is just a markdown header", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-        return expect(lines[4][0]).toEqual({value: "  another unquoted block", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[4][0]).toEqual({value: "  another unquoted block", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses keys following blocks in sequences", function() {
@@ -295,7 +291,7 @@ key: |
         expect(lines[3][1]).toEqual({value: "key with spaces", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[3][2]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
         expect(lines[3][3]).toEqual({value: " ", scopes: ["source.yaml"]});
-        return expect(lines[3][4]).toEqual({value: "following text", scopes: ["source.yaml", "string.unquoted.yaml"]});
+        expect(lines[3][4]).toEqual({value: "following text", scopes: ["source.yaml", "string.unquoted.yaml"]});
     });
 
       it("ignores key-like structures in block content", function() {
@@ -309,7 +305,7 @@ key: |
         expect(lines[0][2]).toEqual({value: "textblock", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[0][3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
         expect(lines[1][0]).toEqual({value: "    am i a key: nope", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-        return expect(lines[2][0]).toEqual({value: "    text", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+        expect(lines[2][0]).toEqual({value: "    text", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     });
 
       it("parses content even when not using | or >", function() {
@@ -329,10 +325,10 @@ key: |
         expect(lines[3][1]).toEqual({value: "key", scopes: ["source.yaml", "entity.name.tag.yaml"]});
         expect(lines[3][2]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
         expect(lines[3][3]).toEqual({value: " ", scopes: ["source.yaml"]});
-        return expect(lines[3][4]).toEqual({value: "following text", scopes: ["source.yaml", "string.unquoted.yaml"]});
+        expect(lines[3][4]).toEqual({value: "following text", scopes: ["source.yaml", "string.unquoted.yaml"]});
     });
 
-      return describe("parses content with unindented empty lines", function() {
+      describe("parses content with unindented empty lines", function() {
         it("ending the content", function() {
           const lines = grammar.tokenizeLines(`\
 key: |
@@ -346,7 +342,7 @@ key: |
           expect(lines[0][3]).toEqual({value: "|", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
           expect(lines[1][0]).toEqual({value: "  content here", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
           expect(lines[2][0]).toEqual({value: "", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-          return expect(lines[3][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
+          expect(lines[3][0]).toEqual({value: "  second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
       });
 
         it("ending with new element", function() {
@@ -367,7 +363,7 @@ other: hi\
           expect(lines[4][0]).toEqual({value: "other", scopes: ["source.yaml", "entity.name.tag.yaml"]});
           expect(lines[4][1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
           expect(lines[4][2]).toEqual({value: " ", scopes: ["source.yaml"]});
-          return expect(lines[4][3]).toEqual({value: "hi", scopes: ["source.yaml", "string.unquoted.yaml"]});
+          expect(lines[4][3]).toEqual({value: "hi", scopes: ["source.yaml", "string.unquoted.yaml"]});
       });
 
         it("ending with new element, part of list", function() {
@@ -391,7 +387,7 @@ other: hi\
           expect(lines[4][2]).toEqual({value: "other", scopes: ["source.yaml", "entity.name.tag.yaml"]});
           expect(lines[4][3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
           expect(lines[4][4]).toEqual({value: " ", scopes: ["source.yaml"]});
-          return expect(lines[4][5]).toEqual({value: "hi", scopes: ["source.yaml", "string.unquoted.yaml"]});
+          expect(lines[4][5]).toEqual({value: "hi", scopes: ["source.yaml", "string.unquoted.yaml"]});
       });
 
         it("ending with twice unindented new element", function() {
@@ -413,10 +409,10 @@ other: hi\
           expect(lines[5][0]).toEqual({value: "other", scopes: ["source.yaml", "entity.name.tag.yaml"]});
           expect(lines[5][1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
           expect(lines[5][2]).toEqual({value: " ", scopes: ["source.yaml"]});
-          return expect(lines[5][3]).toEqual({value: "hi", scopes: ["source.yaml", "string.unquoted.yaml"]});
+          expect(lines[5][3]).toEqual({value: "hi", scopes: ["source.yaml", "string.unquoted.yaml"]});
       });
 
-        return it("ending with an indented comment", function() {
+        it("ending with an indented comment", function() {
           const lines = grammar.tokenizeLines(`\
 root:
   key: |
@@ -434,16 +430,16 @@ root:
           expect(lines[4][0]).toEqual({value: "    second line", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
           expect(lines[5][0]).toEqual({value: "  ", scopes: ["source.yaml"]});
           expect(lines[5][1]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
-          return expect(lines[5][2]).toEqual({value: " hi", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
+          expect(lines[5][2]).toEqual({value: " hi", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
       });
     });
   });
 
-    return it("does not confuse keys and strings", function() {
+    it("does not confuse keys and strings", function() {
       const {tokens} = grammar.tokenizeLine("- 'Section 2.4: 3, 6abc, 12ab, 30, 32a'");
       expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
       expect(tokens[2]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.begin.yaml"]});
-      return expect(tokens[3]).toEqual({value: "Section 2.4: 3, 6abc, 12ab, 30, 32a", scopes: ["source.yaml", "string.quoted.single.yaml"]});
+      expect(tokens[3]).toEqual({value: "Section 2.4: 3, 6abc, 12ab, 30, 32a", scopes: ["source.yaml", "string.quoted.single.yaml"]});
   });
 });
 
@@ -455,7 +451,7 @@ root:
     expect(tokens[3]).toEqual({value: "!", scopes: ["source.yaml", "punctuation.definition.tag.non-specific.yaml"]});
     expect(tokens[5]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.begin.yaml"]});
     expect(tokens[6]).toEqual({value: "hi", scopes: ["source.yaml", "string.quoted.single.yaml"]});
-    return expect(tokens[7]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml",  "punctuation.definition.string.end.yaml"]});
+    expect(tokens[7]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml",  "punctuation.definition.string.end.yaml"]});
 });
 
   it("parses nested keys", function() {
@@ -486,7 +482,7 @@ first:
     expect(lines[3][3]).toEqual({value: " ", scopes: ["source.yaml"]});
     expect(lines[3][4]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.begin.yaml"]});
     expect(lines[3][5]).toEqual({value: "4th", scopes: ["source.yaml", "string.quoted.double.yaml"]});
-    return expect(lines[3][6]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
+    expect(lines[3][6]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
 });
 
   it("parses multiple blocks", function() {
@@ -505,7 +501,7 @@ stuff:
     expect(lines[2][0]).toEqual({value: "    hello", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     expect(lines[4][1]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
     expect(lines[4][3]).toEqual({value: "second_string", scopes: ["source.yaml", "entity.name.tag.yaml"]});
-    return expect(lines[5][1]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
+    expect(lines[5][1]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
 });
 
   it("parses keys and values", function() {
@@ -532,7 +528,7 @@ fourth:invalid\
     expect(lines[2][2]).toEqual({value: " ", scopes: ["source.yaml"]});
     expect(lines[2][3]).toEqual({value: "th{ree}", scopes: ["source.yaml", "string.unquoted.yaml"]});
 
-    return expect(lines[3][0]).toEqual({value: "fourth:invalid", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(lines[3][0]).toEqual({value: "fourth:invalid", scopes: ["source.yaml", "string.unquoted.yaml"]});
 });
 
   it("parses quoted keys", function() {
@@ -556,7 +552,7 @@ fourth:invalid\
     expect(lines[0][0]).toEqual({value: '"', scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.begin.yaml"]});
     expect(lines[0][1]).toEqual({value: "G@role:deployer", scopes: ["source.yaml", "string.quoted.double.yaml", "entity.name.tag.yaml"]});
     expect(lines[0][2]).toEqual({value: '"', scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
-    return expect(lines[0][3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
+    expect(lines[0][3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
 });
 
   it("parses comments at the beginning of lines", function() {
@@ -575,7 +571,7 @@ fourth:invalid\
     expect(lines[1][2]).toEqual({value: " second", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
 
     expect(lines[2][0]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
-    return expect(lines[2][1]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
+    expect(lines[2][1]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
 });
 
   it("parses comments at the end of lines", function() {
@@ -628,7 +624,7 @@ multiline: # comment!
     expect(lines[2][1]).toEqual({value: "Ditto", scopes: ["source.yaml", "string.unquoted.yaml"]});
     expect(lines[3][1]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
     expect(lines[4][1]).toEqual({value: "String", scopes: ["source.yaml", "string.unquoted.yaml"]});
-    return expect(lines[5][0]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
+    expect(lines[5][0]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
 });
 
   it("parses comments on the same line as a multiline tag", function() {
@@ -636,7 +632,7 @@ multiline: # comment!
     expect(tokens[0]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
 
     ({tokens} = grammar.tokenizeLine("condition: > # comment"));
-    return expect(tokens[4]).toEqual({value: "#", scopes: ["source.yaml", "string.unquoted.block.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
+    expect(tokens[4]).toEqual({value: "#", scopes: ["source.yaml", "string.unquoted.block.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
 });
 
   it("ignores comments in proper multiline tags", function() {
@@ -652,20 +648,20 @@ multiline: >
 
     expect(lines[1][0]).toEqual({value: "  This should still be a string # not a comment!", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
     expect(lines[3][0]).toEqual({value: "  # Guess what this is", scopes: ["source.yaml", "string.unquoted.block.yaml"]});
-    return expect(lines[5][0]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
+    expect(lines[5][0]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
 });
 
   it("does not confuse keys and comments", function() {
     const {tokens} = grammar.tokenizeLine("- Entry 2 # This colon breaks syntax highlighting: see?");
     expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
     expect(tokens[3]).toEqual({value: "#", scopes: ["source.yaml", "comment.line.number-sign.yaml", "punctuation.definition.comment.yaml"]});
-    return expect(tokens[4]).toEqual({value: " This colon breaks syntax highlighting: see?", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
+    expect(tokens[4]).toEqual({value: " This colon breaks syntax highlighting: see?", scopes: ["source.yaml", "comment.line.number-sign.yaml"]});
 });
 
   it("does not confuse keys and unquoted strings", function() {
     const {tokens} = grammar.tokenizeLine("- { role: common }");
     expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
-    return expect(tokens[2]).toEqual({value: "{ role: common }", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(tokens[2]).toEqual({value: "{ role: common }", scopes: ["source.yaml", "string.unquoted.yaml"]});
 });
 
   it("parses colons in key names", function() {
@@ -706,7 +702,7 @@ colon: "this is another :colon"\
     expect(lines[4][2]).toEqual({value: " ", scopes: ["source.yaml"]});
     expect(lines[4][3]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.begin.yaml"]});
     expect(lines[4][4]).toEqual({value: "this is another :colon", scopes: ["source.yaml", "string.quoted.double.yaml"]});
-    return expect(lines[4][5]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
+    expect(lines[4][5]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
 });
 
   it("parses spaces in key names", function() {
@@ -731,7 +727,7 @@ with quotes: "3"\
     expect(lines[2][2]).toEqual({value: " ", scopes: ["source.yaml"]});
     expect(lines[2][3]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.begin.yaml"]});
     expect(lines[2][4]).toEqual({value: "3", scopes: ["source.yaml", "string.quoted.double.yaml"]});
-    return expect(lines[2][5]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
+    expect(lines[2][5]).toEqual({value: "\"", scopes: ["source.yaml", "string.quoted.double.yaml", "punctuation.definition.string.end.yaml"]});
 });
 
   it("parses quotes in unquoted key names", function() {
@@ -764,7 +760,7 @@ Conan "the Barbarian": '4'\
     expect(lines[3][2]).toEqual({value: " ", scopes: ["source.yaml"]});
     expect(lines[3][3]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.begin.yaml"]});
     expect(lines[3][4]).toEqual({value: "4", scopes: ["source.yaml", "string.quoted.single.yaml"]});
-    return expect(lines[3][5]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.end.yaml"]});
+    expect(lines[3][5]).toEqual({value: "'", scopes: ["source.yaml", "string.quoted.single.yaml", "punctuation.definition.string.end.yaml"]});
 });
 
   it("parses the merge-key tag", function() {
@@ -784,7 +780,7 @@ Conan "the Barbarian": '4'\
     expect(tokens[5]).toEqual({value: "variable", scopes: ["source.yaml", "variable.other.yaml"]});
 
     ({tokens} = grammar.tokenizeLine("<<:*variable"));
-    return expect(tokens[0]).toEqual({value: "<<:*variable", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(tokens[0]).toEqual({value: "<<:*variable", scopes: ["source.yaml", "string.unquoted.yaml"]});
 });
 
   it("parses local tags", function() {
@@ -801,7 +797,7 @@ Conan "the Barbarian": '4'\
     expect(tokens[0]).toEqual({value: "- !", scopes: ["source.yaml", "string.unquoted.yaml"]});
 
     ({tokens} = grammar.tokenizeLine("- !!"));
-    return expect(tokens[0]).toEqual({value: "- !!", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(tokens[0]).toEqual({value: "- !!", scopes: ["source.yaml", "string.unquoted.yaml"]});
 });
 
   it("parses the !!omap directive", function() {
@@ -824,7 +820,7 @@ Conan "the Barbarian": '4'\
     expect(tokens[8]).toEqual({value: "omap", scopes: ["source.yaml", "keyword.other.omap.yaml"]});
 
     ({tokens} = grammar.tokenizeLine("hello:!!omap"));
-    return expect(tokens[0]).toEqual({value: "hello:!!omap", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(tokens[0]).toEqual({value: "hello:!!omap", scopes: ["source.yaml", "string.unquoted.yaml"]});
 });
 
   it("parses dates in YYYY-MM-DD format", function() {
@@ -877,7 +873,7 @@ multiline:
     ({tokens} = grammar.tokenizeLine("- 2001-01-01 uh oh"));
     expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
     expect(tokens[1]).toEqual({value: " ", scopes: ["source.yaml"]});
-    return expect(tokens[2]).toEqual({value: "2001-01-01 uh oh", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(tokens[2]).toEqual({value: "2001-01-01 uh oh", scopes: ["source.yaml", "string.unquoted.yaml"]});
 });
 
   describe("numbers", function() {
@@ -904,7 +900,7 @@ multiline:
       expect(tokens[2]).toEqual({value: "negative", scopes: ["source.yaml", "entity.name.tag.yaml"]});
       expect(tokens[3]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
       expect(tokens[4]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[5]).toEqual({value: "-42", scopes: ["source.yaml", "constant.numeric.integer.yaml"]});
+      expect(tokens[5]).toEqual({value: "-42", scopes: ["source.yaml", "constant.numeric.integer.yaml"]});
   });
 
     it("parses octals", function() {
@@ -912,7 +908,7 @@ multiline:
       expect(tokens[0]).toEqual({value: "octal", scopes: ["source.yaml", "entity.name.tag.yaml"]});
       expect(tokens[1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
       expect(tokens[2]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[3]).toEqual({value: "0o664", scopes: ["source.yaml", "constant.numeric.octal.yaml"]});
+      expect(tokens[3]).toEqual({value: "0o664", scopes: ["source.yaml", "constant.numeric.octal.yaml"]});
   });
 
     it("parses hexadecimals", function() {
@@ -920,7 +916,7 @@ multiline:
       expect(tokens[0]).toEqual({value: "hex", scopes: ["source.yaml", "entity.name.tag.yaml"]});
       expect(tokens[1]).toEqual({value: ":", scopes: ["source.yaml", "punctuation.separator.key-value.yaml"]});
       expect(tokens[2]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[3]).toEqual({value: "0x726Fa", scopes: ["source.yaml", "constant.numeric.hexadecimal.yaml"]});
+      expect(tokens[3]).toEqual({value: "0x726Fa", scopes: ["source.yaml", "constant.numeric.hexadecimal.yaml"]});
   });
 
     it("parses floats", function() {
@@ -937,7 +933,7 @@ multiline:
       ({tokens} = grammar.tokenizeLine("- -0.7e9001"));
       expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[2]).toEqual({value: "-0.7e9001", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
+      expect(tokens[2]).toEqual({value: "-0.7e9001", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
   });
 
     it("parses infinities", function() {
@@ -954,7 +950,7 @@ multiline:
       ({tokens} = grammar.tokenizeLine("- +.INF"));
       expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[2]).toEqual({value: "+.INF", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
+      expect(tokens[2]).toEqual({value: "+.INF", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
   });
 
     it("parses NaNs", function() {
@@ -971,7 +967,7 @@ multiline:
       ({tokens} = grammar.tokenizeLine("- .NAN"));
       expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[2]).toEqual({value: ".NAN", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
+      expect(tokens[2]).toEqual({value: ".NAN", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
   });
 
     it("parses multiple numbers", function() {
@@ -982,10 +978,10 @@ multiline:
 `
       );
       expect(lines[1][3]).toEqual({value: "3.14", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
-      return expect(lines[2][1]).toEqual({value: "3.14", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
+      expect(lines[2][1]).toEqual({value: "3.14", scopes: ["source.yaml", "constant.numeric.float.yaml"]});
   });
 
-    return it("does not parse numbers surrounded by other characters", function() {
+    it("does not parse numbers surrounded by other characters", function() {
       let {tokens} = grammar.tokenizeLine("- pi 3.14");
       expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.yaml"]});
@@ -994,7 +990,7 @@ multiline:
       ({tokens} = grammar.tokenizeLine("- 3.14 uh oh"));
       expect(tokens[0]).toEqual({value: "-", scopes: ["source.yaml", "punctuation.definition.entry.yaml"]});
       expect(tokens[1]).toEqual({value: " ", scopes: ["source.yaml"]});
-      return expect(tokens[2]).toEqual({value: "3.14 uh oh", scopes: ["source.yaml", "string.unquoted.yaml"]});
+      expect(tokens[2]).toEqual({value: "3.14 uh oh", scopes: ["source.yaml", "string.unquoted.yaml"]});
   });
 });
 
@@ -1015,7 +1011,7 @@ multiline:
     expect(tokens[0]).toEqual({value: "& variable", scopes: ["source.yaml", "string.unquoted.yaml"]});
 
     ({tokens} = grammar.tokenizeLine("&variable hey"));
-    return expect(tokens[0]).toEqual({value: "&variable hey", scopes: ["source.yaml", "string.unquoted.yaml"]});
+    expect(tokens[0]).toEqual({value: "&variable hey", scopes: ["source.yaml", "string.unquoted.yaml"]});
 }));
 
   describe("constants", function() {
@@ -1054,12 +1050,12 @@ multiline:
       expect(tokens[3]).toEqual({value: "true$", scopes: ["source.yaml", "string.unquoted.yaml"]});
 
       ({tokens} = grammar.tokenizeLine("key: true false"));
-      return expect(tokens[3]).toEqual({value: "true false", scopes: ["source.yaml", "string.unquoted.yaml"]});
+      expect(tokens[3]).toEqual({value: "true false", scopes: ["source.yaml", "string.unquoted.yaml"]});
   });
 
-    return it("does not tokenize keys as constants", function() {
+    it("does not tokenize keys as constants", function() {
       const {tokens} = grammar.tokenizeLine("true: something");
-      return expect(tokens[0]).toEqual({value: "true", scopes: ["source.yaml", "entity.name.tag.yaml"]});
+      expect(tokens[0]).toEqual({value: "true", scopes: ["source.yaml", "entity.name.tag.yaml"]});
   });
 });
 
@@ -1069,15 +1065,15 @@ multiline:
       expect(tokens[0]).toEqual({value: "---", scopes: ["source.yaml", "punctuation.definition.directives.end.yaml"]});
 
       ({tokens} = grammar.tokenizeLine(" ---"));
-      return expect(tokens[1]).not.toEqual({value: "---", scopes: ["source.yaml", "punctuation.definition.directives.end.yaml"]});
+      expect(tokens[1]).not.toEqual({value: "---", scopes: ["source.yaml", "punctuation.definition.directives.end.yaml"]});
   });
 
     it("tokenizes document end markers", function() {
       const {tokens} = grammar.tokenizeLine("...");
-      return expect(tokens[0]).toEqual({value: "...", scopes: ["source.yaml", "punctuation.definition.document.end.yaml"]});
+      expect(tokens[0]).toEqual({value: "...", scopes: ["source.yaml", "punctuation.definition.document.end.yaml"]});
   });
 
-    return it("tokenizes structures in an actual YAML document", function() {
+    it("tokenizes structures in an actual YAML document", function() {
       const lines = grammar.tokenizeLines(`\
 ---
 time: 20:03:20
@@ -1094,12 +1090,12 @@ action: grand slam
       expect(lines[0][0]).toEqual({value: "---", scopes: ["source.yaml", "punctuation.definition.directives.end.yaml"]});
       expect(lines[4][0]).toEqual({value: "...", scopes: ["source.yaml", "punctuation.definition.document.end.yaml"]});
       expect(lines[5][0]).toEqual({value: "---", scopes: ["source.yaml", "punctuation.definition.directives.end.yaml"]});
-      return expect(lines[9][0]).toEqual({value: "...", scopes: ["source.yaml", "punctuation.definition.document.end.yaml"]});
+      expect(lines[9][0]).toEqual({value: "...", scopes: ["source.yaml", "punctuation.definition.document.end.yaml"]});
   });
 });
 
-  return describe("tabs", () => it("marks them as invalid", function() {
+  describe("tabs", () => it("marks them as invalid", function() {
     const {tokens} = grammar.tokenizeLine("\t\ttabs:");
-    return expect(tokens[0]).toEqual({value: '\t\t', scopes: ['source.yaml', 'invalid.illegal.whitespace.yaml']});
+    expect(tokens[0]).toEqual({value: '\t\t', scopes: ['source.yaml', 'invalid.illegal.whitespace.yaml']});
 }));
 });
