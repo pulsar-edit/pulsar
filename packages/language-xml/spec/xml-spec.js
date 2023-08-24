@@ -1,22 +1,16 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 describe("XML grammar", function() {
   let grammar = null;
 
   beforeEach(function() {
     waitsForPromise(() => atom.packages.activatePackage("language-xml"));
 
-    return runs(() => grammar = atom.grammars.grammarForScopeName("text.xml"));
+    runs(() => grammar = atom.grammars.grammarForScopeName("text.xml"));
   });
 
   it("parses the grammar", function() {
     expect(grammar).toBeTruthy();
-    return expect(grammar.scopeName).toBe("text.xml");
+    expect(grammar.scopeName).toBe("text.xml");
   });
 
   it("tokenizes comments in internal subsets correctly", function() {
@@ -31,14 +25,14 @@ describe("XML grammar", function() {
 
     expect(lines[1][1]).toEqual({value: '<!--', scopes: ['text.xml', 'meta.tag.sgml.doctype.xml', 'meta.internalsubset.xml', 'comment.block.xml', 'punctuation.definition.comment.xml']});
     expect(lines[2][1]).toEqual({value: '<!--', scopes: ['text.xml', 'meta.tag.sgml.doctype.xml', 'meta.internalsubset.xml', 'comment.block.xml', 'punctuation.definition.comment.xml']});
-    return expect(lines[3][1]).toEqual({value: '<!--', scopes: ['text.xml', 'meta.tag.sgml.doctype.xml', 'meta.internalsubset.xml', 'comment.block.xml', 'punctuation.definition.comment.xml']});
+    expect(lines[3][1]).toEqual({value: '<!--', scopes: ['text.xml', 'meta.tag.sgml.doctype.xml', 'meta.internalsubset.xml', 'comment.block.xml', 'punctuation.definition.comment.xml']});
 });
 
   it('tokenizes comment endings with more than two dashes as invalid', function() {
     const {tokens} = grammar.tokenizeLine('<!-- invalid comment --->');
     expect(tokens[0]).toEqual({value: '<!--', scopes: ['text.xml', 'comment.block.xml', 'punctuation.definition.comment.xml']});
     expect(tokens[1]).toEqual({value: ' invalid comment ', scopes: ['text.xml', 'comment.block.xml']});
-    return expect(tokens[2]).toEqual({value: '--', scopes: ['text.xml', 'comment.block.xml', 'invalid.illegal.bad-comments-or-CDATA.xml']});
+    expect(tokens[2]).toEqual({value: '--', scopes: ['text.xml', 'comment.block.xml', 'invalid.illegal.bad-comments-or-CDATA.xml']});
 });
 
   it('tokenizes comments with two dashes not followed by ">" as invalid', function() {
@@ -46,7 +40,7 @@ describe("XML grammar", function() {
     expect(tokens[0]).toEqual({value: '<!--', scopes: ['text.xml', 'comment.block.xml', 'punctuation.definition.comment.xml']});
     expect(tokens[1]).toEqual({value: ' invalid ', scopes: ['text.xml', 'comment.block.xml']});
     expect(tokens[2]).toEqual({value: '--', scopes: ['text.xml', 'comment.block.xml', 'invalid.illegal.bad-comments-or-CDATA.xml']});
-    return expect(tokens[3]).toEqual({value: ' comment -->', scopes: ['text.xml', 'comment.block.xml']});
+    expect(tokens[3]).toEqual({value: ' comment -->', scopes: ['text.xml', 'comment.block.xml']});
 });
 
   it("tokenizes empty element meta.tag.no-content.xml", function() {
@@ -56,7 +50,7 @@ describe("XML grammar", function() {
     expect(tokens[2]).toEqual({value: '>',   scopes: ['text.xml', 'meta.tag.no-content.xml', 'punctuation.definition.tag.xml']});
     expect(tokens[3]).toEqual({value: '</',  scopes: ['text.xml', 'meta.tag.no-content.xml', 'punctuation.definition.tag.xml']});
     expect(tokens[4]).toEqual({value: 'n',   scopes: ['text.xml', 'meta.tag.no-content.xml', 'entity.name.tag.xml', 'entity.name.tag.localname.xml']});
-    return expect(tokens[5]).toEqual({value: '>',   scopes: ['text.xml', 'meta.tag.no-content.xml', 'punctuation.definition.tag.xml']});
+    expect(tokens[5]).toEqual({value: '>',   scopes: ['text.xml', 'meta.tag.no-content.xml', 'punctuation.definition.tag.xml']});
 });
 
   it("tokenizes attribute-name of multi-line tag", function() {
@@ -74,7 +68,7 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(linesWithoutIndent[1][0]).toEqual({value: 'attrName', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
+    expect(linesWithoutIndent[1][0]).toEqual({value: 'attrName', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
 });
 
   it("tokenizes attribute-name.namespace contains period", function() {
@@ -83,7 +77,7 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(lines[0][3]).toEqual({value: 'name.space', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.namespace.xml']});
+    expect(lines[0][3]).toEqual({value: 'name.space', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.namespace.xml']});
 });
 
   it("tokenizes attribute-name.namespace contains East-Asian Kanji", function() {
@@ -92,7 +86,7 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(lines[0][3]).toEqual({value: '名前空間名', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.namespace.xml']});
+    expect(lines[0][3]).toEqual({value: '名前空間名', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.namespace.xml']});
 });
 
   it("tokenizes attribute-name.localname contains period", function() {
@@ -101,7 +95,7 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(lines[0][3]).toEqual({value: 'attr.name', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
+    expect(lines[0][3]).toEqual({value: 'attr.name', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
 });
 
   it("tokenizes attribute-name.localname contains colon", function() {
@@ -110,7 +104,7 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(lines[0][5]).toEqual({value: 'attr:name', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
+    expect(lines[0][5]).toEqual({value: 'attr:name', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
 });
 
   it("tokenizes attribute-name.localname contains East-Asian Kanji", function() {
@@ -119,7 +113,7 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(lines[0][3]).toEqual({value: '属性名', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
+    expect(lines[0][3]).toEqual({value: '属性名', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
 });
 
   it("tokenizes attribute-name.localname when followed by spaces", function() {
@@ -128,10 +122,10 @@ attrName="attrValue">
 </el>\
 `
     );
-    return expect(lines[0][3]).toEqual({value: 'attrName', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
+    expect(lines[0][3]).toEqual({value: 'attrName', scopes: ['text.xml', 'meta.tag.xml', 'entity.other.attribute-name.localname.xml']});
 });
 
-  return describe("firstLineMatch", function() {
+  describe("firstLineMatch", function() {
     it("recognises Emacs modelines", function() {
       let line;
       const valid = `\
@@ -149,7 +143,7 @@ attrName="attrValue">
 "-*-font:x;foo:bar; mode : xml;bar:foo;foooooo:baaaaar;fo:ba;-*-";
 "-*- font:x;foo : bar ; mode : xMl ; bar : foo ; foooooo:baaaaar;fo:ba-*-";\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -170,7 +164,7 @@ attrName="attrValue">
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
@@ -202,7 +196,7 @@ vim: se filetype=xml:
 # vim:ts=4:sts=4 ft=xml:noexpandtab:\x20
 # vim:noexpandtab titlestring=hi\|there\\\\ ft=xml ts=4\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -223,14 +217,14 @@ _vi: se filetype=xml:
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
       })();
     });
 
-    return it("recognises a valid XML declaration", function() {
+    it("recognises a valid XML declaration", function() {
       let line;
       const valid = `\
 <?xml version="1.0"?>
@@ -239,7 +233,7 @@ _vi: se filetype=xml:
 <?xml version = '1.0' ?>
 <?xml version="1.0" encoding='UTF-8' standalone='no' ?>\
 `;
-      for (line of Array.from(valid.split(/\n/))) {
+      for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();
       }
 
@@ -255,7 +249,7 @@ _vi: se filetype=xml:
 `;
       return (() => {
         const result = [];
-        for (line of Array.from(invalid.split(/\n/))) {
+        for (line of invalid.split(/\n/)) {
           result.push(expect(grammar.firstLineRegex.findNextMatchSync(line)).toBeNull());
         }
         return result;
