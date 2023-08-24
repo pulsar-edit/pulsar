@@ -54,9 +54,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     app.commandLine.appendSwitch('force-color-profile', colorProfile);
   }
 
-  if (handleStartupEventWithSquirrel()) {
-    return;
-  } else if (args.test && args.mainProcess) {
+  if (args.test && args.mainProcess) {
     app.setPath(
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
@@ -116,16 +114,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     AtomApplication.open(args);
   });
 };
-
-function handleStartupEventWithSquirrel() {
-  if (process.platform !== 'win32') {
-    return false;
-  }
-
-  const SquirrelUpdate = require('./squirrel-update');
-  const squirrelCommand = process.argv[1];
-  return SquirrelUpdate.handleStartupEvent(squirrelCommand);
-}
 
 function getConfig() {
   const config = new Config();
