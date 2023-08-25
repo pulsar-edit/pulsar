@@ -7,7 +7,6 @@ linux_task:
   alias: linux
   container:
     image: node:16-slim
-    memory: 8G
     cpu: 1
     greedy: true
   prepare_script:
@@ -58,7 +57,6 @@ arm_linux_task:
   alias: linux
   arm_container:
     image: node:16-slim
-    memory: 8G
     cpu: 1
     greedy: true
   env:
