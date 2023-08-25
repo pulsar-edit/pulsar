@@ -36,15 +36,23 @@ module.exports = class AtomProtocolHandler {
       let filePath;
       if (relativePath.indexOf('assets/') === 0) {
         const assetsPath = path.join(process.env.ATOM_HOME, relativePath);
-        const stat = fs.statSync(assetsPath).catch( () => false );
-        if (stat && stat.isFile()) filePath = assetsPath;
+        try {
+          const stat = fs.statSync(assetsPath);
+          if (stat && stat.isFile()) filePath = assetsPath;
+        } catch() {
+          return false;
+        }
       }
 
       if (!filePath) {
         for (let loadPath of this.loadPaths) {
           filePath = path.join(loadPath, relativePath);
-          const stat = fs.statSync(filePath).catch( () => false );
-          if (stat && stat.isFile()) break;
+          try {
+            const stat = fs.statSync(filePath);
+            if (stat && stat.isFile()) break;
+          } catch() {
+            return false;
+          }
         }
       }
 
