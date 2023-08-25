@@ -55,6 +55,7 @@ linux_task:
 
 arm_linux_task:
   alias: linux
+  timeout_in: 90m
   arm_container:
     image: node:16-slim
     cpu: 1
