@@ -279,17 +279,17 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
+    this.i18n.initialize({
+      configDirPath: this.configDirPath,
+      packages: this.packages,
+      resourcePath
+    });
+
     this.packages.initialize({
       devMode,
       configDirPath: this.configDirPath,
       resourcePath,
       safeMode
-    });
-
-    this.i18n.initialize({
-      configDirPath: this.configDirPath,
-      packages: this.packages,
-      resourcePath
     });
 
     this.menu.initialize({ resourcePath });
