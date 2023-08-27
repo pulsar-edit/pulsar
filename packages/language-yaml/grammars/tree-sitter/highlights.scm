@@ -4,11 +4,11 @@
 
 (block_mapping_pair
   key: (_) @entity.name.tag.yaml
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (flow_pair
   key: (_) @entity.name.tag.yaml
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ; COMMENTS
