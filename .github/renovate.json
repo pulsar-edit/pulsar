@@ -5,6 +5,13 @@
   },
   "labels": ["dependencies"],
   "separateMajorMinor": "false",
+  "ignorePaths": [
+    "packages/autocomplete-atom-api/spec/fixtures/",
+    "packages/dev-live-reload/spec/fixtures/",
+    "packages/incompatible-packages/spec/fixtures/",
+    "packages/settings-view/spec/fixtures/",
+    "spec/fixtures/"
+  ],
   "packageRules": [
     {
       "description": "Group all DevDependencies for the Core Editor",
