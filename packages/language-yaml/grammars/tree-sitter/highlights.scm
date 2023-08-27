@@ -35,6 +35,8 @@
 
 ((string_scalar) @string.quoted.yaml)
 
+(single_quote_scalar) @string.quoted.single.yaml
+
 (double_quote_scalar) @string.quoted.double.yaml
 
 ((double_quote_scalar) @punctuation.definition.string.begin.yaml
