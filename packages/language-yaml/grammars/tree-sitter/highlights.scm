@@ -37,6 +37,12 @@
 
 (single_quote_scalar) @string.quoted.single.yaml
 
+((single_quote_scalar) @punctuation.definition.string.begin.yaml
+  (#set! adjust.endAfterFirstMatchOf "^'"))
+
+((single_quote_scalar) @punctuation.definition.string.end.yaml
+  (#set! adjust.startBeforeFirstMatchOf "'$"))
+
 (double_quote_scalar) @string.quoted.double.yaml
 
 ((double_quote_scalar) @punctuation.definition.string.begin.yaml
