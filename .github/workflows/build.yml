@@ -101,7 +101,7 @@ jobs:
         path: ./binaries/*
 
     - name: Test Binary - Linux
-      if: ${{ (matrix.os == 'ubuntu-latest') && env.RUN_LINUX_VT }}
+      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
         ./binaries/*AppImage --appimage-extract
