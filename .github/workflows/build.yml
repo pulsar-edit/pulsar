@@ -43,11 +43,11 @@ jobs:
         git submodule update
 
     - name: Check Pulsar Version
-      if: ${{ matrix.os != 'windows-latest' }}
+      if: ${{ runner.os != 'Windows' }}
       run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
 
     - name: Check Pulsar Version - Windows
-      if: ${{ matrix.os == 'windows-latest' }}
+      if: ${{ runner.os == 'Windows' }}
       run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
     - name: Install Pulsar Dependencies
