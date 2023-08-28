@@ -13,7 +13,7 @@ env:
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
   RUN_LINUX_VT: true
-  RUN_MACOS_VT: false
+  RUN_MACOS_VT: true
 
 jobs:
   build:
