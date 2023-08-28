@@ -147,6 +147,7 @@ silicon_mac_task:
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   rolling_upload_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - cd ./script/rolling-release-scripts
     - npm install
     - node ./rolling-release-binary-upload.js cirrus
