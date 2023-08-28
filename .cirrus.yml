@@ -101,7 +101,7 @@ arm_linux_task:
   rolling_upload_script:
     - cd ./script/rolling-release-scripts
     - npm install
-    - node ./rolling-release-binary-upload.js
+    - node ./rolling-release-binary-upload.js cirrus
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -149,7 +149,7 @@ silicon_mac_task:
   rolling_upload_script:
     - cd ./script/rolling-release-scripts
     - npm install
-    - node ./rolling-release-binary-upload.js
+    - node ./rolling-release-binary-upload.js cirrus
   always:
     videos_artifacts:
       path: ./tests/videos/**

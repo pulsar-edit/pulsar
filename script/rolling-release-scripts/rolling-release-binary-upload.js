@@ -16,6 +16,21 @@ if (verSegments[verSegments.length - 1].length > 4) {
   process.exit(0);
 }
 
+// Again since cirrus ALWAYS triggers this script, without being able to skip for
+// non PR builds, Cirrus provides cli args to indicate that it is being run via cirrus,
+// so we can exit depending on the presence of certain env vars
+let cirrusFlag = process.argv.slice(2)[0];
+
+if (cirrusFlag === "cirrus") {
+  if (typeof process.env.CIRRUS_CHANGE_MESSAGE === "string") {
+    // This build is the result of a PR or commit, not a cron job rolling release,
+    // lets exit
+    console.log("Due to the presence of `CIRRUS_CHANGE_MESSAGE` it seems this is a PR created build...");
+    console.log("Exiting without uploading binaries...");
+    process.exit(0);
+  }
+}
+
 (async () => {
 
   if (!fs.existsSync("../../binaries")) {
