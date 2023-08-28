@@ -22,10 +22,10 @@ if (verSegments[verSegments.length - 1].length < 4) {
 let cirrusFlag = process.argv.slice(2)[0];
 
 if (cirrusFlag === "cirrus") {
-  if (typeof process.env.CIRRUS_CHANGE_MESSAGE === "string") {
+  if (typeof process.env.CIRRUS_CRON != "string") {
     // This build is the result of a PR or commit, not a cron job rolling release,
     // lets exit
-    console.log("Due to the presence of `CIRRUS_CHANGE_MESSAGE` it seems this is a PR created build...");
+    console.log("Due to the absence of `CIRRUS_CRON` it seems this is not a rolling release...");
     console.log("Exiting without uploading binaries...");
     process.exit(0);
   }
