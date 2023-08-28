@@ -49,7 +49,7 @@ if (cirrusFlag === "cirrus") {
   console.log(`Uploading local binaries to rolling release repo: ${binaryAssets.join(",")}`);
 
   publish({
-    token: process.env.GITHUB_TOKEN,
+    token: process.env.ROLLING_UPLOAD_TOKEN || process.env.GITHUB_TOKEN,
     owner: "pulsar-edit",
     repo: "pulsar-rolling-releases",
     name: packageJson.version,

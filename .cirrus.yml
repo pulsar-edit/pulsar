@@ -99,6 +99,8 @@ arm_linux_task:
     - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   rolling_upload_script:
+    env:
+      ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
     - cd ./script/rolling-release-scripts
     - npm install
     - node ./rolling-release-binary-upload.js cirrus
@@ -147,6 +149,8 @@ silicon_mac_task:
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   rolling_upload_script:
+    env:
+      ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - cd ./script/rolling-release-scripts
     - npm install
