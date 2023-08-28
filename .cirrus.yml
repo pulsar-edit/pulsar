@@ -98,6 +98,10 @@ arm_linux_task:
     - ./binaries/*AppImage --appimage-extract
     - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+  rolling_upload_script:
+    - cd ./script/rolling-release-scripts
+    - npm install
+    - node ./rolling-release-binary-upload.js
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -142,6 +146,10 @@ silicon_mac_task:
     - hdiutil mount binaries/Pulsar*dmg
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+  rolling_upload_script:
+    - cd ./script/rolling-release-scripts
+    - npm install
+    - node ./rolling-release-binary-upload.js
   always:
     videos_artifacts:
       path: ./tests/videos/**

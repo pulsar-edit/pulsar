@@ -6,6 +6,16 @@ const path = require("path");
 const publish = require("publish-release");
 const pack = require("../../package.json");
 
+// Since cirrus always triggers this script, we must check if the version is a rolling
+// release version
+const verSegments = pack.version.split(".");
+
+if (verSegments[verSegments.length - 1].length > 4) {
+  console.log(`According to our version: ${pack.version} this is not a rolling release...`);
+  console.log("Exiting without changes...");
+  process.exit(0);
+}
+
 (async () => {
 
   if (!fs.existsSync("../../binaries")) {
