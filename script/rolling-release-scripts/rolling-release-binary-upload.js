@@ -42,8 +42,8 @@ if (cirrusFlag === "cirrus") {
 
   let files = fs.readdirSync("../../binaries");
 
-  for (let i = 0; i < files.length; i++) {
-    binaryAssets.push(path.resolve(`../../binaries/${files[i]}`));
+  for (const file of files) {
+    binaryAssets.push(path.resolve(`../../binaries/${file}`));
   }
 
   console.log("Uploading local binaries to rolling release repo...");
