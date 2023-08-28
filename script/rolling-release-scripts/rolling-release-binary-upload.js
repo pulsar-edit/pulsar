@@ -46,7 +46,7 @@ if (cirrusFlag === "cirrus") {
     binaryAssets.push(path.resolve(`../../binaries/${file}`));
   }
 
-  console.log("Uploading local binaries to rolling release repo...");
+  console.log(`Uploading local binaries to rolling release repo: ${binaryAssets.join(",")}`);
 
   const release = await publish({
     token: process.env.GITHUB_TOKEN,
@@ -63,7 +63,13 @@ if (cirrusFlag === "cirrus") {
     assets: binaryAssets
   });
 
-  console.log(`Releases published successfully: ${release.html_url}`);
-  process.exit(0);
+  if (typeof release?.html_url !== "string") {
+    console.error("No 'html_url' found on release object!");
+    console.error(release);
+    process.exit(1);
+  } else {
+    console.log(`Releases published successfully: ${release.html_url}`);
+    process.exit(0);
+  }
 
 })();
