@@ -48,7 +48,7 @@ if (cirrusFlag === "cirrus") {
 
   console.log(`Uploading local binaries to rolling release repo: ${binaryAssets.join(",")}`);
 
-  const release = await publish({
+  publish({
     token: process.env.GITHUB_TOKEN,
     owner: "pulsar-edit",
     repo: "pulsar-rolling-releases",
@@ -61,15 +61,21 @@ if (cirrusFlag === "cirrus") {
     reuseRelease: true,
     skipIfPublished: false,
     assets: binaryAssets
-  });
+  }, (err, release) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
 
-  if (typeof release?.html_url !== "string") {
-    console.error("No 'html_url' found on release object!");
-    console.error(release);
-    process.exit(1);
-  } else {
-    console.log(`Releases published successfully: ${release.html_url}`);
-    process.exit(0);
-  }
+    if (typeof release?.html_url !== "string") {
+      console.error("No 'html_url' found on release object!");
+      console.error(release);
+      process.exit(1);
+    } else {
+      console.log(`Releases published successfully: ${release.html_url}`);
+      process.exit(0);
+    }
+
+  });
 
 })();
