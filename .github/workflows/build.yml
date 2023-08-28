@@ -71,7 +71,7 @@ jobs:
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS)
-      if: ${{ matrix.os == 'macos-latest' }}
+      if: ${{ runner.os == 'macOS' }}
       # env:
       #   CSC_LINK: ${{ secrets.CSC_LINK }}
       #   CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
