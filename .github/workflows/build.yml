@@ -51,7 +51,7 @@ jobs:
       run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
     - name: Install Pulsar Dependencies
-      uses: nick-fields/retry@v2
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -60,7 +60,7 @@ jobs:
         on_retry_command: rm -R node_modules
 
     - name: Build Pulsar
-      uses: nick-fields/retry@v2
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -78,7 +78,7 @@ jobs:
       #   APPLEID: ${{ secrets.APPLEID }}
       #   APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
       #   TEAM_ID: ${{ secrets.TEAM_ID }}
-      uses: nick-fields/retry@v2
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -87,7 +87,7 @@ jobs:
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
-      uses: nick-fields/retry@v2
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
         timeout_minutes: 30
         max_attempts: 3
