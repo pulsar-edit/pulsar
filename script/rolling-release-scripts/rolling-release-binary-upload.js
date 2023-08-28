@@ -10,7 +10,7 @@ const packageJson = require("../../package.json");
 // release version
 const verSegments = packageJson.version.split(".");
 
-if (verSegments[verSegments.length - 1].length > 4) {
+if (verSegments[verSegments.length - 1].length < 4) {
   console.log(`According to our version: ${packageJson.version} this is not a rolling release...`);
   console.log("Exiting without changes...");
   process.exit(0);
