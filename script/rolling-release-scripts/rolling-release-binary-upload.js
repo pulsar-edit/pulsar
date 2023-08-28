@@ -4,14 +4,14 @@
 const fs = require("fs");
 const path = require("path");
 const publish = require("publish-release");
-const pack = require("../../package.json");
+const packageJson = require("../../package.json");
 
 // Since cirrus always triggers this script, we must check if the version is a rolling
 // release version
-const verSegments = pack.version.split(".");
+const verSegments = packageJson.version.split(".");
 
 if (verSegments[verSegments.length - 1].length > 4) {
-  console.log(`According to our version: ${pack.version} this is not a rolling release...`);
+  console.log(`According to our version: ${packageJson.version} this is not a rolling release...`);
   console.log("Exiting without changes...");
   process.exit(0);
 }
@@ -52,9 +52,9 @@ if (cirrusFlag === "cirrus") {
     token: process.env.GITHUB_TOKEN,
     owner: "pulsar-edit",
     repo: "pulsar-rolling-releases",
-    name: pack.version,
-    notes: `Rolling Release: ${pack.version}`,
-    tag: `v${pack.version}`,
+    name: packageJson.version,
+    notes: `Rolling Release: ${packageJson.version}`,
+    tag: `v${packageJson.version}`,
     draft: false,
     prerelease: false,
     editRelease: true,
