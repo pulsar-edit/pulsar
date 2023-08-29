@@ -57,6 +57,7 @@ env:
 arm_linux_task:
   alias: linux
   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   arm_container:
     image: node:16-slim
     memory: 8G
@@ -119,6 +120,7 @@ arm_linux_task:
 silicon_mac_task:
   alias: mac
   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-xcode:14
     memory: 8G
