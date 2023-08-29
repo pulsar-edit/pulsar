@@ -1,0 +1,7 @@
+{
+  "name": "rolling-release-scripts",
+  "description": "Contains possible modules needed for these scripts",
+  "dependencies": {
+    "publish-release": "^1.6.1"
+  }
+}
