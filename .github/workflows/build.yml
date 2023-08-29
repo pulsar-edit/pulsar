@@ -1,9 +1,11 @@
 name: Build Pulsar Binaries
 
 on:
-  pull_request:
   push:
-    branches: [ 'master' ]
+    branches:
+      - 'master'
+  pull_request:
+  workflow_dispatch:
 
 env:
   # Variables needed for build information
