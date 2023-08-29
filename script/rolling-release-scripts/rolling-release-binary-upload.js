@@ -48,6 +48,10 @@ if (cirrusFlag === "cirrus") {
 
   console.log(`Uploading local binaries to rolling release repo: ${binaryAssets.join(",")}`);
 
+  // ROLLING_UPLOAD_TOKEN:
+  // - Assigned within Cirrus via encrypted variables
+  // - Assigned within GitHub Actions via secrets API
+  // - GITHUB_TOKEN as fallback
   publish({
     token: process.env.ROLLING_UPLOAD_TOKEN || process.env.GITHUB_TOKEN,
     owner: "pulsar-edit",
