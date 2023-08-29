@@ -54,6 +54,7 @@ env:
 
 arm_linux_task:
   alias: linux
+  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG == "regular_release"
   arm_container:
     image: node:16-slim
     memory: 8G
@@ -113,6 +114,7 @@ arm_linux_task:
 
 silicon_mac_task:
   alias: mac
+  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG == "regular_release"
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-xcode:14
     memory: 8G
