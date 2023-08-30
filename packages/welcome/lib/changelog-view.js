@@ -50,32 +50,40 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Bumped github package to include fixes to the Less syntax, for compatiblity with Less 4
+                Restored ability for `less` files in packages to use inline JavaScript inside backticks.
               </li>
               <li>
-                Fixed a number of issues with the experimental modern Tree-sitter grammar mode
+                Fixed a syntax highlighting issue inside the `styleguide` package.
               </li>
               <li>
-                Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.
+                Fixed an issue with rubygems timing out on ARM Linux workflow.
               </li>
               <li>
-                Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing
-                breaking changes to existing Less Stylesheets. Pulsar will attempt to automatically repair any breaking
-                changes in any package style sheets, while emitting deprecations.
+                Rewrote Tree-sitter scope predicates to use `#is?` and `#is-not?` where applicable.
               </li>
               <li>
-                Fixed a bug that would render files unable to be clicked with sticky headers enabled on One-Dark
-                and One-Light themes.
+                Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
               </li>
               <li>
-                Added a Modern Tree-Sitter TOML Grammar.
+                Added a feature in `markdown-preview` that adds support for Linguist, Chroma, Rouge, and HighlightJS for
+                language identifiers in fenced code blocks.
               </li>
               <li>
-                Added a new API endpoint within Pulsar of `atom.versionSatisfies()` to allow packages to safely
-                check the version of Pulsar, instead of having to do so themeselves.
+                Fixed the `TextMate` `language-toml` grammar to properly support whitespace where-ever it may appear.
               </li>
               <li>
-                An issue in a downstream dependency has been resolved that improperly flagged Pulsar as malicious.
+                Added a Tree-Sitter grammar for YAML files.
+              </li>
+              <li>
+                Added a new core package `pulsar-updater` to help users update Pulsar.
+              </li>
+              <li>
+                Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of
+                correctly named binaries on more systems in more contexts (especially Windows).
+                Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
+              </li>
+              <li>
+                Added a modern Tree-Sitter grammar for Markdown files.
               </li>
 
             </ul>
