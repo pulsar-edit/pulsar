@@ -190,7 +190,8 @@ module.exports = class ThemeManager {
   requireStylesheet(
     stylesheetPath,
     priority,
-    skipDeprecatedSelectorsTransformation
+    skipDeprecatedSelectorsTransformation,
+    skipDeprecatedMathUsageTransformation
   ) {
     let fullPath = this.resolveStylesheet(stylesheetPath);
     if (fullPath) {
@@ -199,7 +200,8 @@ module.exports = class ThemeManager {
         fullPath,
         content,
         priority,
-        skipDeprecatedSelectorsTransformation
+        skipDeprecatedSelectorsTransformation,
+        skipDeprecatedMathUsageTransformation
       );
     } else {
       throw new Error(`Could not find a file at path '${stylesheetPath}'`);
@@ -357,12 +359,13 @@ On linux there are currently problems with watch sizes. See
     }
   }
 
-  applyStylesheet(path, text, priority, skipDeprecatedSelectorsTransformation) {
+  applyStylesheet(path, text, priority, skipDeprecatedSelectorsTransformation, skipDeprecatedMathUsageTransformation) {
     this.styleSheetDisposablesBySourcePath[
       path
     ] = this.styleManager.addStyleSheet(text, {
       priority,
       skipDeprecatedSelectorsTransformation,
+      skipDeprecatedMathUsageTransformation,
       sourcePath: path
     });
 

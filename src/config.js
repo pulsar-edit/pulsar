@@ -516,7 +516,7 @@ class Config {
     } else {
       return this.observeKeyPath(
         keyPath,
-        options != null ? options : {},
+        options ?? {},
         callback
       );
     }
@@ -608,7 +608,7 @@ class Config {
   //   * `sources` (optional) {Array} of {String} source names. If provided, only
   //     values that were associated with these sources during {::set} will be used.
   //   * `excludeSources` (optional) {Array} of {String} source names. If provided,
-  //     values that  were associated with these sources during {::set} will not
+  //     values that were associated with these sources during {::set} will not
   //     be used.
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
@@ -744,7 +744,7 @@ class Config {
 
     if (source && !scopeSelector && source !== this.projectFile) {
       throw new Error(
-        "::set with a 'source' and no 'sourceSelector' is not yet implemented!"
+        "::set with a 'source' and no 'scopeSelector' is not yet implemented!"
       );
     }
 
@@ -1080,13 +1080,24 @@ class Config {
   }
 
   getRawValue(keyPath, options = {}) {
+    let { excludeSources, sources } = options;
     let value;
-    if (
-      !options.excludeSources ||
-      !options.excludeSources.includes(this.mainSource)
-    ) {
+    // If `excludeSources` is missing or does not exclude the main source…
+    if (!excludeSources || !excludeSources.includes(this.mainSource)) {
       value = getValueAtKeyPath(this.settings, keyPath);
-      if (this.projectFile != null) {
+      // we should prefer the project specific setting as long as…
+      if (
+        this.projectFile != null &&
+        // `excludeSources` is missing or does not include the project-specific
+        // source, and…
+        (
+          !excludeSources || !excludeSources.includes(this.projectFile)
+        ) &&
+        // `sources` is missing or includes the project-specific source.
+        (
+          !sources || sources.includes(this.projectFile)
+        )
+      ) {
         const projectValue = getValueAtKeyPath(this.projectSettings, keyPath);
         value = projectValue === undefined ? value : projectValue;
       }

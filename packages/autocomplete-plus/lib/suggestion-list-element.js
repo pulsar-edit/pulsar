@@ -141,7 +141,9 @@ module.exports = class SuggestionListElement {
         marked(item.descriptionMarkdown, {
           gfm: true,
           breaks: true,
-          sanitize: false
+          sanitize: false,
+          mangle: false,
+          headerIds: false
         })
       )
       this.setDescriptionMoreLink(item)

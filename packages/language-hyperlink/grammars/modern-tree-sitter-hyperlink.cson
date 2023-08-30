@@ -1,0 +1,9 @@
+# name: 'Hyperlink'
+scopeName: 'text.hyperlink'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-hyperlink'
+
+injectionRegex: 'hyperlink'
+treeSitter:
+  grammar: 'ts/tree-sitter-hyperlink.wasm'
+  highlightsQuery: 'ts/highlights.scm'

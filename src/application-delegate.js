@@ -289,36 +289,6 @@ module.exports = class ApplicationDelegate {
     return this.ipcMessageEmitter().on('open-locations', callback);
   }
 
-  onUpdateAvailable(callback) {
-    // TODO: Yes, this is strange that `onUpdateAvailable` is listening for
-    // `did-begin-downloading-update`. We currently have no mechanism to know
-    // if there is an update, so begin of downloading is a good proxy.
-    return this.ipcMessageEmitter().on(
-      'did-begin-downloading-update',
-      callback
-    );
-  }
-
-  onDidBeginDownloadingUpdate(callback) {
-    return this.onUpdateAvailable(callback);
-  }
-
-  onDidBeginCheckingForUpdate(callback) {
-    return this.ipcMessageEmitter().on('checking-for-update', callback);
-  }
-
-  onDidCompleteDownloadingUpdate(callback) {
-    return this.ipcMessageEmitter().on('update-available', callback);
-  }
-
-  onUpdateNotAvailable(callback) {
-    return this.ipcMessageEmitter().on('update-not-available', callback);
-  }
-
-  onUpdateError(callback) {
-    return this.ipcMessageEmitter().on('update-error', callback);
-  }
-
   onApplicationMenuCommand(handler) {
     const outerCallback = (event, ...args) => handler(...args);
 
@@ -373,22 +343,6 @@ module.exports = class ApplicationDelegate {
 
   openExternal(url) {
     return shell.openExternal(url);
-  }
-
-  checkForUpdate() {
-    return ipcRenderer.send('command', 'application:check-for-update');
-  }
-
-  restartAndInstallUpdate() {
-    return ipcRenderer.send('command', 'application:install-update');
-  }
-
-  getAutoUpdateManagerState() {
-    return ipcRenderer.sendSync('get-auto-update-manager-state');
-  }
-
-  getAutoUpdateManagerErrorMessage() {
-    return ipcRenderer.sendSync('get-auto-update-manager-error');
   }
 
   emitWillSavePath(path) {

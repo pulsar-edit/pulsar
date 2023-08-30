@@ -1,9 +1,10 @@
 {
   "name": "language-python",
+  "main": "lib/main",
   "version": "0.53.6",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
   },
   "description": "Python language support in Atom",
   "keywords": [

@@ -7,13 +7,18 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:node/recommended",
-    "plugin:jsdoc/recommended"
+    // "plugin:jsdoc/recommended"
   ],
   overrides: [],
   parserOptions: {
     ecmaVersion: "latest"
   },
   rules: {
+    "space-before-function-paren": ["error", {
+      anonymous: "always",
+      asyncArrow: "always",
+      named: "never"
+    }],
     "node/no-unpublished-require": [
       "error",
       {

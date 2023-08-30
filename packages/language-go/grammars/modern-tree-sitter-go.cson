@@ -1,0 +1,17 @@
+name: 'Go'
+scopeName: 'source.go'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-go'
+
+fileTypes: [
+  'go'
+]
+
+comments:
+  start: '// '
+
+treeSitter:
+  grammar: 'tree-sitter-go/tree-sitter-go.wasm'
+  highlightsQuery: 'tree-sitter-go/highlights.scm'
+  foldsQuery: 'tree-sitter-go/folds.scm'
+  indentsQuery: 'tree-sitter-go/indents.scm'

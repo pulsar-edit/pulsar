@@ -1,12 +1,13 @@
-const {CompositeDisposable} = require('atom')
+const {CompositeDisposable, Emitter} = require('atom')
 
 module.exports =
 class Bookmarks {
-  static deserialize (editor, state) {
+  static deserialize(editor, state) {
     return new Bookmarks(editor, editor.getMarkerLayer(state.markerLayerId))
   }
 
-  constructor (editor, markerLayer) {
+  constructor(editor, markerLayer) {
+    this.emitter = new Emitter()
     this.editor = editor
     this.markerLayer = markerLayer || this.editor.addMarkerLayer({persistent: true})
     this.decorationLayer = this.editor.decorateMarkerLayer(this.markerLayer, {type: 'line-number', class: 'bookmarked'})
@@ -24,23 +25,23 @@ class Bookmarks {
     this.disposables.add(this.editor.onDidDestroy(this.destroy.bind(this)))
   }
 
-  destroy () {
+  destroy() {
     this.deactivate()
     this.markerLayer.destroy()
   }
 
-  deactivate () {
+  deactivate() {
     this.decorationLayer.destroy()
     this.decorationLayerLine.destroy()
     this.decorationLayerHighlight.destroy()
     this.disposables.dispose()
   }
 
-  serialize () {
+  serialize() {
     return {markerLayerId: this.markerLayer.id}
   }
 
-  toggleBookmark () {
+  toggleBookmark() {
     for (const range of this.editor.getSelectedBufferRanges()) {
       const bookmarks = this.markerLayer.findMarkers({intersectsRowRange: [range.start.row, range.end.row]})
       if (bookmarks && bookmarks.length > 0) {
@@ -52,19 +53,34 @@ class Bookmarks {
         this.disposables.add(bookmark.onDidChange(({isValid}) => {
           if (!isValid) {
             bookmark.destroy()
+            // TODO: If N bookmarks are affected by a buffer change,
+            // `did-change-bookmarks` will be emitted N times. We could
+            // debounce this if we were willing to go async.
+            this.emitter.emit('did-change-bookmarks', this.getAllBookmarks())
           }
         }))
       }
+      this.emitter.emit('did-change-bookmarks', this.getAllBookmarks())
     }
   }
 
-  clearBookmarks () {
+  getAllBookmarks() {
+    let markers = this.markerLayer.getMarkers()
+    return markers
+  }
+
+  onDidChangeBookmarks(callback) {
+    return this.emitter.on('did-change-bookmarks', callback)
+  }
+
+  clearBookmarks() {
     for (const bookmark of this.markerLayer.getMarkers()) {
       bookmark.destroy()
     }
+    this.emitter.emit('did-change-bookmarks', [])
   }
 
-  jumpToNextBookmark () {
+  jumpToNextBookmark() {
     if (this.markerLayer.getMarkerCount() > 0) {
       const bufferRow = this.editor.getLastCursor().getMarker().getStartBufferPosition().row
       const markers = this.markerLayer.getMarkers().sort((a, b) => a.compare(b))
@@ -76,7 +92,7 @@ class Bookmarks {
     }
   }
 
-  jumpToPreviousBookmark () {
+  jumpToPreviousBookmark() {
     if (this.markerLayer.getMarkerCount() > 0) {
       const bufferRow = this.editor.getLastCursor().getMarker().getStartBufferPosition().row
       const markers = this.markerLayer.getMarkers().sort((a, b) => b.compare(a))
@@ -88,7 +104,7 @@ class Bookmarks {
     }
   }
 
-  selectToNextBookmark () {
+  selectToNextBookmark() {
     if (this.markerLayer.getMarkerCount() > 0) {
       const bufferRow = this.editor.getLastCursor().getMarker().getStartBufferPosition().row
       const markers = this.markerLayer.getMarkers().sort((a, b) => a.compare(b))
@@ -103,7 +119,7 @@ class Bookmarks {
     }
   }
 
-  selectToPreviousBookmark () {
+  selectToPreviousBookmark() {
     if (this.markerLayer.getMarkerCount() > 0) {
       const bufferRow = this.editor.getLastCursor().getMarker().getStartBufferPosition().row
       const markers = this.markerLayer.getMarkers().sort((a, b) => b.compare(a))

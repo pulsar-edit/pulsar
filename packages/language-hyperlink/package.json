@@ -4,7 +4,7 @@
   "description": "Hyperlink colorization in Atom",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=14"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT"

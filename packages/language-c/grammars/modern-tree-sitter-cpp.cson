@@ -1,0 +1,35 @@
+name: 'C++'
+scopeName: 'source.cpp'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-cpp'
+
+injectionRegex: '^(c|C)(\\+\\+|pp|PP)$'
+
+treeSitter:
+  grammar: 'tree-sitter-cpp/tree-sitter-cpp.wasm'
+  highlightsQuery: 'tree-sitter-cpp/highlights.scm'
+  tagsQuery: 'tree-sitter-cpp/tags.scm'
+  foldsQuery: 'tree-sitter-cpp/folds.scm'
+  indentsQuery: 'tree-sitter-cpp/indents.scm'
+
+fileTypes: [
+  'cc'
+  'cpp'
+  'cp'
+  'cxx'
+  'c++'
+  'cu'
+  'cuh'
+  'h'
+  'hh'
+  'hpp'
+  'hxx'
+  'h++'
+  'inl'
+  'ino'
+  'ipp'
+  'tcc'
+  'tpp'
+]
+
+contentRegex: '\n\\s*(namespace|class|template)\\s+'

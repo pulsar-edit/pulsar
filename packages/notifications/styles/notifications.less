@@ -1,0 +1,336 @@
+@import "ui-variables";
+@import "octicon-mixins";
+
+@icon-size: 30px;
+@width: 450px;
+@width-detail: 450px;
+@max-height-message: 200px;
+@max-height-detail: 500px;
+@max-height: (@max-height-message + @max-height-detail + 100px); // 100px for footer. This is only used for the closing animation
+@notification-gap: 2px;
+@font-family-monospace: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+
+atom-notifications {
+  display: block;
+  z-index: 1000; // TODO: Have some convention about z-index stacking
+  position: absolute;
+  top: 35px;
+  right: 0;
+  bottom: 0;
+  padding: @component-padding;
+  font-size: 1.2em;
+  overflow-x: hidden;
+  overflow-y: auto;
+  pointer-events: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  atom-notification {
+    .close-all {
+      display: none;
+    }
+  }
+
+  atom-notification:first-child {
+    .close-all {
+      display: block;
+    }
+    .message {
+      padding-right: (@component-padding * 2 + 95px); // space for icon and button
+    }
+  }
+
+  atom-notification:only-child {
+    .close-all {
+      display: none;
+    }
+    .message {
+      padding-right: inherit;
+    }
+    &.has-close .message {
+      padding-right: (@component-padding + 24px); // space for icon
+    }
+  }
+
+  atom-notification {
+    float: right;
+    clear: right;
+    position: relative;
+    width: @width;
+    padding-left: @icon-size;
+    margin-bottom: @notification-gap;
+    max-height: @max-height;
+    word-wrap: break-word;
+    pointer-events: auto;
+
+    &.icon:before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: @icon-size;
+      height: 100%;
+      padding-top: @component-padding;
+      text-align: center;
+      border-radius: @component-border-radius 0 0 @component-border-radius;
+    }
+
+
+    // fill space between notifiactions to prevent click throughs
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -@notification-gap;
+      height: @notification-gap;
+    }
+
+    .meta,
+    .close,
+    .detail,
+    .stack-toggle,
+    .stack-container {
+      display: none;
+    }
+
+    &.fatal .meta,
+    &.has-description .meta,
+    &.has-buttons .meta,
+    &.has-close .close,
+    &.has-detail .detail,
+    &.has-stack .stack-toggle,
+    &.has-stack .stack-container {
+      display: block;
+    }
+
+    // .item's are used as general containers
+    .item {
+      padding: @component-padding;
+      border-top: 1px solid hsla(0,0%,0%,.1);
+      &.message {
+        border-top: none;
+        p:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    &.has-close .message {
+      padding-right: (@component-padding + 24px); // space for icon
+    }
+
+    .content {
+      border-radius: 0 @component-border-radius @component-border-radius 0;
+    }
+
+    .message {
+      max-height: @max-height-message;
+      overflow-y: auto;
+    }
+
+    .close-all.btn {
+      position: absolute;
+      top: 7px;
+      right: 38px;
+      background: none;
+    }
+
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 38px;
+      height: 38px;
+      line-height: 38px;
+      text-align: center;
+      font-size: 16px;
+      text-shadow: none;
+      color: black;
+      opacity: .4;
+      &:hover, &:focus {
+        opacity: 1;
+      }
+      &:active {
+        opacity: .2;
+      }
+      &:before {
+        margin: 0;
+      }
+    }
+
+    &.has-detail {
+      width: @width-detail;
+    }
+
+    .detail {
+      font-size: .8em;
+      background-color: hsla(0,0%,100%,.3);
+      background-clip: padding-box;
+      max-height: @max-height-detail;
+      overflow-y: auto;
+
+      .line {
+        font-family: @font-family-monospace;
+      }
+
+      .stack-toggle {
+        margin-top: @component-padding;
+
+        .icon:before {
+          margin: 0;
+        }
+      }
+
+      .detail-content {
+        .line {
+          white-space: pre-wrap;
+        }
+      }
+
+      .stack-container {
+        margin-top: @component-padding;
+
+        .line {
+          white-space: pre;
+        }
+      }
+    }
+
+    .description {
+      font-size: .8em;
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .btn-toolbar.btn-toolbar {
+      margin-top: 10px;
+      margin-bottom: -5px;
+      margin-left: 0;
+    }
+
+    .btn-toolbar.btn-toolbar > .btn {
+      margin-left: 0;
+      margin-bottom: 5px;
+    }
+
+    .btn-copy-report {
+      vertical-align: middle;
+    }
+
+    .opening {
+      cursor: progress;
+    }
+  }
+}
+
+// Types -------------------------------
+
+atom-notifications {
+  atom-notification.fatal {
+    .notification(@text-color-error; @background-color-error);
+  }
+
+  atom-notification.error {
+    .notification(@text-color-error; @background-color-error);
+  }
+
+  atom-notification.warning {
+    .notification(@text-color-warning; @background-color-warning);
+  }
+
+  atom-notification.info {
+    .notification(@text-color-info; @background-color-info);
+  }
+
+  atom-notification.success {
+    .notification(@text-color-success; @background-color-success);
+  }
+}
+
+
+// Mixins -------------------------------
+
+.notification(@txt; @bg) {
+
+  .content {
+    color: darken(@txt, 40%);
+    background-color: lighten(@bg, 25%);
+  }
+
+  a {
+    color: darken(@txt, 20%);
+  }
+
+  code {
+    color: darken(@txt, 40%);
+    background-color: desaturate(lighten(@bg, 18%), 5%);
+  }
+
+  &.icon:before {
+    color: lighten(@bg, 36%);
+    background-color: @bg;
+  }
+
+  .close-all.btn {
+    border: 1px solid fadeout(darken(@txt, 40%), 70%);
+    color: fadeout(darken(@txt, 40%), 40%);
+    text-shadow: none;
+
+    &:hover {
+      background: none;
+      border-color: fadeout(darken(@txt, 40%), 20%);
+      color: darken(@txt, 40%);
+    }
+  }
+}
+
+
+// Animations -------------------------------
+
+atom-notifications atom-notification {
+  -webkit-animation: notification-show .16s cubic-bezier(0.175, 0.885, 0.32, 1.27499);
+
+  &[type="fatal"] {
+    -webkit-animation: notification-show .16s cubic-bezier(0.175, 0.885, 0.32, 1.27499),
+                       notification-shake 4s 2s;
+    -webkit-animation-iteration-count: 1, 3; // shake 3 times after showing
+    &:hover {
+      -webkit-animation-play-state: paused; // stop shaking when hovering
+    }
+  }
+
+  &.remove,
+  &.remove:hover {
+    -webkit-animation: notification-hide   .12s      cubic-bezier(.34,.07,1,.2),
+                       notification-shrink .24s .12s cubic-bezier(0.5, 0, 0, 1);
+    -webkit-animation-fill-mode: forwards;
+  }
+}
+
+@-webkit-keyframes notification-show {
+    0% { opacity: 0; transform: perspective(@width) translate(0, -@icon-size) rotateX(90deg); }
+  100% { opacity: 1; transform: perspective(@width) translate(0,           0) rotateX( 0deg); }
+}
+
+@-webkit-keyframes notification-hide {
+    0% { opacity: 1; transform: scale( 1); }
+  100% { opacity: 0; transform: scale(.8); }
+}
+
+@-webkit-keyframes notification-shrink {
+    0% {  opacity: 0; max-height: @max-height; transform: scale(.8); }
+  100% {  opacity: 0; max-height: 0;           transform: scale(.8); }
+}
+
+@-webkit-keyframes notification-shake {
+    0% { transform: translateX(   0); }
+    2% { transform: translateX(-4px); }
+    4% { transform: translateX( 8px); }
+    6% { transform: translateX(-4px); }
+    8% { transform: translateX(   0); }
+  100% { transform: translateX(   0); }
+}

@@ -36,7 +36,6 @@ module.exports = class About {
     if (this.views.aboutView) this.views.aboutView.destroy();
     this.views.aboutView = null;
 
-    if (this.state.updateManager) this.state.updateManager.dispose();
     this.setState({ updateManager: null });
 
     this.subscriptions.dispose();
@@ -69,8 +68,7 @@ module.exports = class About {
         currentAtomVersion: this.state.currentAtomVersion,
         currentElectronVersion: this.state.currentElectronVersion,
         currentChromeVersion: this.state.currentChromeVersion,
-        currentNodeVersion: this.state.currentNodeVersion,
-        availableVersion: this.state.updateManager.getAvailableVersion()
+        currentNodeVersion: this.state.currentNodeVersion
       });
       this.handleStateChanges();
     }
@@ -86,14 +84,9 @@ module.exports = class About {
           currentAtomVersion: this.state.currentAtomVersion,
           currentElectronVersion: this.state.currentElectronVersion,
           currentChromeVersion: this.state.currentChromeVersion,
-          currentNodeVersion: this.state.currentNodeVersion,
-          availableVersion: this.state.updateManager.getAvailableVersion()
+          currentNodeVersion: this.state.currentNodeVersion
         });
       }
-    });
-
-    this.state.updateManager.onDidChange(() => {
-      this.didChange();
     });
   }
 };
