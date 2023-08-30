@@ -314,7 +314,10 @@ module.exports = class Package {
           sourcePath,
           priority,
           context,
-          skipDeprecatedSelectorsTransformation: this.bundledPackage
+          skipDeprecatedSelectorsTransformation:
+            this.bundledPackage ? this.bundledPackage : !this.config.get("core.transformDeprecatedStyleSheetSelectors"),
+          skipDeprecatedMathUsageTransformation:
+            this.bundledPackage ? this.bundledPackage : !this.config.get("core.transformDeprecatedStyleSheetMathExpressions")
         })
       );
     }
@@ -923,27 +926,6 @@ module.exports = class Package {
           );
         }
         return this.mainModule;
-      }
-    }
-  }
-
-  // a require function with both ES5 and ES6 default export support
-  _require(path) {
-    const modul = require(path);
-    if (modul === null || modul === undefined) {
-      // if null do not bother
-      return modul;
-    } else {
-      if (
-        modul.__esModule === true &&
-        typeof modul.default === 'object' &&
-        typeof modul.default.activate === 'function'
-      ) {
-        // __esModule flag is true and the activate function exists inside it, which means
-        // an object containing the main functions (e.g. activate, etc) is default exported
-        return modul.default;
-      } else {
-        return modul;
       }
     }
   }

@@ -10,6 +10,7 @@ treeSitter:
   highlightsQuery: 'tree-sitter/queries/highlights.scm'
   indentsQuery: 'tree-sitter/queries/indents.scm'
   foldsQuery: 'tree-sitter/queries/folds.scm'
+  tagsQuery: 'tree-sitter/queries/tags.scm'
 
 fileTypes: [
   'avsc'

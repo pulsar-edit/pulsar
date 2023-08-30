@@ -1,6 +1,7 @@
 {
   "name": "language-gfm",
   "version": "0.90.8",
+  "main": "lib/main",
   "description": "Syntax highlighting and snippets for GitHub Flavored Markdown (GFM).",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",

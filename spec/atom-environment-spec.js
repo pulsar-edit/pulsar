@@ -48,6 +48,16 @@ describe('AtomEnvironment', () => {
     });
   });
 
+  describe('.versionSatisfies()', () => {
+    it('returns appropriately for provided range', () => {
+      let testPulsarVersion = '0.1.0';
+      spyOn(atom, 'getVersion').andCallFake(() => testPulsarVersion);
+      expect(atom.versionSatisfies('>0.2.0')).toBe(false);
+      expect(atom.versionSatisfies('>=0.x.x <=2.x.x')).toBe(true);
+      expect(atom.versionSatisfies('^0.1.x')).toBe(true);
+    });
+  });
+
   describe('loading default config', () => {
     it('loads the default core config schema', () => {
       expect(atom.config.get('core.excludeVcsIgnoredPaths')).toBe(true);

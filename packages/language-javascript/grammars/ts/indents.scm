@@ -1,6 +1,6 @@
 
 ; ((template_string) @ignore
-  ; (#set! test.onlyIfNotOnStartingOrEndingRow true))
+  ; (#is-not? test.OnStartingOrEndingRow true))
 
 ; STATEMENT BLOCKS
 ; ================
@@ -17,7 +17,7 @@
 ; of the line where the switch statement starts.
 (switch_statement
   body: (switch_body "}" @match
-    (#set! test.onlyIfLast true))
+    (#is? test.last true))
     (#set! indent.matchIndentOf parent.startPosition))
 
 ; 'case' and 'default' need to be indented one level more than their containing
@@ -33,16 +33,16 @@
 ; An `if` statement without an opening brace should indent the next line…
 (if_statement
   condition: (parenthesized_expression ")" @indent
-  (#set! test.onlyIfLastTextOnRow true)))
+  (#is? test.lastTextOnRow true)))
 ; (as should a braceless `else`…)
 ("else" @indent
-  (#set! test.onlyIfLastTextOnRow true))
+  (#is? test.lastTextOnRow true))
 
 ; …and keep that indent level if the user types a comment before the
 ; consequence…
 (if_statement
   consequence: (empty_statement) @match
-  (#set! test.onlyIfNotStartsOnSameRowAs parent.startPosition)
+  (#is-not? test.startsOnSameRowAs parent.startPosition)
   (#set! indent.matchIndentOf parent.startPosition)
   (#set! indent.offsetIndent 1))
 
@@ -87,24 +87,24 @@
     (throw_statement)
     (debugger_statement)
   ] @dedent.next
-  (#set! test.onlyIfNotStartsOnSameRowAs parent.startPosition))
+  (#is-not? test.startsOnSameRowAs parent.startPosition))
 
 
 ; HANGING INDENT ON SPLIT LINES
 ; =============================
 
 ; TODO: We might want to make this configurable behavior with the
-; `onlyIfConfig` scope test.
+; `Config` scope test.
 
 ; Any of these at the end of a line indicate the next line should be indented…
 (["||" "&&" "?"] @indent
-  (#set! test.onlyIfLastTextOnRow true))
+  (#is? test.lastTextOnRow true))
 
 ; …and the line after that should be dedented.
 (binary_expression
   ["||" "&&"]
     right: (_) @dedent.next
-    (#set! test.onlyIfNotStartsOnSameRowAs parent.startPosition))
+    (#is-not? test.startsOnSameRowAs parent.startPosition))
 
 ; let foo = this.longTernaryCondition() ?
 ;   consequenceWhichIsItselfRatherLong :
@@ -113,7 +113,7 @@
 ; …followed by a dedent.
 (ternary_expression
   alternative: (_) @dedent.next
-  (#set! test.onlyIfNotStartsOnSameRowAs parent.startPosition))
+  (#is-not? test.startsOnSameRowAs parent.startPosition))
 
 
 ; DEDENT-NEXT IN LIMITED SCENARIOS
@@ -125,15 +125,15 @@
 ;   short, forEach, toHave, itsOwn, line);
 ;
 ; (arguments ")" @dedent.next
-;   (#set! test.onlyIfNotStartsOnSameRowAs parent.firstChild.startPosition)
-;   (#set! test.onlyIfNotFirstTextOnRow true))
+;   (#is-not? test.startsOnSameRowAs parent.firstChild.startPosition)
+;   (#is-not? test.firstTextOnRow true))
 
 
 ; GENERAL
 ; =======
 
 ; Weed out `}`s that should not signal dedents.
-(template_substitution "}" @_IGNORE_ (#set! test.final true))
+(template_substitution "}" @_IGNORE_ (#set! capture.final true))
 
 [
   "{"

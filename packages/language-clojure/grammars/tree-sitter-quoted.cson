@@ -1,0 +1,9 @@
+scopeName: 'source.quoted.clojure'
+type: 'modern-tree-sitter'
+injectionRegExp: '^source-quoted-clojure$'
+parser: 'tree-sitter-clojure'
+
+treeSitter:
+  grammar: 'ts/grammar.wasm'
+  highlightsQuery: 'ts/edn-highlights.scm'
+  foldsQuery: 'ts/folds.scm'

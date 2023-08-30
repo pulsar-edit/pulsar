@@ -40,16 +40,16 @@ atom-workspace.find-visible {
   @min-width: 200px; // min width before it starts scrolling
 
   -webkit-user-select: none;
-  padding: @component-padding/2;
+  padding: (@component-padding/2);
   overflow-x: auto;
 
   .header {
-    padding: @component-padding/4 @component-padding/2;
+    padding: (@component-padding/4) (@component-padding/2);
     min-width: @min-width;
     line-height: 1.75;
   }
   .header-item {
-    margin: @component-padding/4 0;
+    margin: (@component-padding/4) 0;
   }
 
   .input-block {
@@ -61,7 +61,7 @@ atom-workspace.find-visible {
   .input-block-item {
     display: flex;
     flex: 1;
-    padding: @component-padding / 2;
+    padding: (@component-padding / 2);
   }
 
   .btn-group {
@@ -170,7 +170,7 @@ atom-workspace.find-visible {
     position: absolute;
     top: 1px;
     right: 0;
-    margin: @component-padding/2 @component-padding/2 0 0;
+    margin: (@component-padding/2) (@component-padding/2) 0 0;
     z-index: 2;
     font-size: .9em;
     line-height: @component-line-height;
@@ -182,7 +182,7 @@ atom-workspace.find-visible {
 }
 
 .find-wrap-icon {
-  @wrap-size: @font-size * 10;
+  @wrap-size: (@font-size * 10);
 
   opacity: 0;
   transition: opacity 0.5s;
@@ -197,16 +197,16 @@ atom-workspace.find-visible {
   right: initial !important;
   bottom: initial !important;
 
-  margin-top: @wrap-size * -0.5;
-  margin-left: @wrap-size * -0.5;
+  margin-top: (@wrap-size * -0.5);
+  margin-left: (@wrap-size * -0.5);
 
   background: fadeout(darken(@syntax-background-color, 4%), 55%);
-  border-radius: @component-border-radius * 2;
+  border-radius: (@component-border-radius * 2);
   text-align: center;
   pointer-events: none;
   &:before {
     // Octicons look best in sizes that are multiples of 16px
-    font-size: @wrap-size - mod(@wrap-size, 16px) - 32px;
+    font-size: (@wrap-size - mod(@wrap-size, 16px) - 32px);
     line-height: @wrap-size;
     height: @wrap-size;
     width: @wrap-size;
@@ -244,7 +244,7 @@ atom-workspace.find-visible {
   .preview-header {
     display: flex;
     flex-wrap: wrap;
-    padding: @component-padding/2;
+    padding: (@component-padding/2);
     align-items: center;
     justify-content: space-between;
     overflow: hidden;
@@ -254,14 +254,14 @@ atom-workspace.find-visible {
   }
 
   .preview-count {
-    margin: @component-padding/2;
+    margin: (@component-padding/2);
   }
 
   .preview-controls {
     display: flex;
     flex-wrap: wrap;
     .btn-group {
-      margin: @component-padding/2;
+      margin: (@component-padding/2);
     }
   }
 

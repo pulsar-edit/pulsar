@@ -338,12 +338,12 @@ end\
           [...preview.element.querySelectorAll('table th')].map(
             el => el.textContent
           )
-        ).toEqual(['variable1', 'array'])
+        ).toEqual(['variable1', 'array', 'object', 'key'])
         expect(
           [...preview.element.querySelectorAll('table td')].map(
             el => el.textContent
           )
-        ).toEqual(['value1', 'foo,bar'])
+        ).toEqual(['value1', 'foo,bar', 'keyvalue2', 'value2'])
       })
     })
   })

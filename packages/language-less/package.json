@@ -10,7 +10,7 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "devDependencies": {
     "bluebird": "^2.9.25",
-    "request": "^2.53.0",
-    "season": "^6.0.2"
+    "season": "^6.0.2",
+    "superagent": "^8.0.9"
   }
 }

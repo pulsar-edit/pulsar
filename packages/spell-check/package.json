@@ -1,0 +1,134 @@
+{
+  "name": "spell-check",
+  "version": "0.77.1",
+  "main": "./lib/main",
+  "description": "Highlights misspelled words and shows possible corrections.",
+  "dependencies": {
+    "atom-pathspec": "^0.0.0",
+    "atom-select-list": "^0.7.0",
+    "debug": "^4.1.1",
+    "multi-integer-range": "^2.0.0",
+    "natural": "^0.4.0",
+    "spellchecker": "^3.7.1",
+    "spelling-manager": "^1.1.0",
+    "underscore-plus": "^1"
+  },
+  "devDependencies": {
+    "husky": "^4.2.5",
+    "prettier": "^2.1.1"
+  },
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "scripts": {
+    "format": "prettier --write \"spec/*.js\" \"lib/**/*.js\" \"script/*.js\" --loglevel warn"
+  },
+  "configSchema": {
+    "grammars": {
+      "type": "array",
+      "default": [
+        "source.asciidoc",
+        "source.gfm",
+        "text.git-commit",
+        "text.plain",
+        "text.plain.null-grammar",
+        "source.rst",
+        "text.restructuredtext"
+      ],
+      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language.",
+      "order": 1
+    },
+    "excludedScopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "List of sub-scopes that will be ignored. Specify the most detailed scope to avoid ignoring otherwise relevant text. The scopes will be parsed as regular expressions. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language.",
+      "order": 2
+    },
+    "useSystem": {
+      "type": "boolean",
+      "default": true,
+      "description": "If checked, use the built-in spell checking on macOS and some versions of Windows. This setting is ignored on Linux, even if checked.",
+      "order": 3
+    },
+    "useLocales": {
+      "type": "boolean",
+      "default": true,
+      "description": "If checked, then the locales below will be used for checking.",
+      "order": 4
+    },
+    "locales": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "description": "List of locales to use for the system spell-checking. Examples would be `en-US` or `de-DE`. If this is blank, then the default language for the user will be used.",
+      "order": 5
+    },
+    "localePaths": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "description": "List of additional paths to search for dictionary files when checking using locales. If a locale cannot be found in these, the internal code will attempt to find it using common search paths.",
+      "order": 6
+    },
+    "knownWords": {
+      "type": "array",
+      "default": [],
+      "description": "List words that are considered correct even if they do not appear in any other dictionary. Words with capitals or ones that start with `!` are case-sensitive.",
+      "order": 7
+    },
+    "addKnownWords": {
+      "type": "boolean",
+      "default": false,
+      "description": "If checked, then the suggestions will include options to add to the known words list above.",
+      "order": 8
+    },
+    "noticesMode": {
+      "type": "string",
+      "default": "both",
+      "description": "Choose where loading errors and other notices are displayed: popup, console, or both.",
+      "order": 9,
+      "enum": [
+        {
+          "value": "both",
+          "description": "Display notices in popups and in the console"
+        },
+        {
+          "value": "popup",
+          "description": "Display notices only in popups"
+        },
+        {
+          "value": "console",
+          "description": "Display notices only on the console"
+        }
+      ]
+    },
+    "enableDebug": {
+      "type": "boolean",
+      "default": false,
+      "title": "Enable debug information for spell check",
+      "order": 10
+    }
+  },
+  "consumedServices": {
+    "spell-check": {
+      "versions": {
+        "^1.0.0": "consumeSpellCheckers"
+      }
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run format",
+      "pre-push": "npm run format"
+    }
+  }
+}

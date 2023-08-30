@@ -1,47 +1,70 @@
-const scopesByFenceName = {
-  bash: 'source.shell',
-  sh: 'source.shell',
-  powershell: 'source.powershell',
-  ps1: 'source.powershell',
-  c: 'source.c',
-  'c++': 'source.cpp',
-  cpp: 'source.cpp',
-  coffee: 'source.coffee',
-  'coffee-script': 'source.coffee',
-  coffeescript: 'source.coffee',
-  cs: 'source.cs',
-  csharp: 'source.cs',
-  css: 'source.css',
-  sass: 'source.sass',
-  scss: 'source.css.scss',
-  erlang: 'source.erl',
-  go: 'source.go',
-  html: 'text.html.basic',
-  java: 'source.java',
-  javascript: 'source.js',
-  js: 'source.js',
-  json: 'source.json',
-  less: 'source.less',
-  mustache: 'text.html.mustache',
-  objc: 'source.objc',
-  'objective-c': 'source.objc',
-  php: 'text.html.php',
-  py: 'source.python',
-  python: 'source.python',
-  rb: 'source.ruby',
-  ruby: 'source.ruby',
-  text: 'text.plain',
-  toml: 'source.toml',
-  ts: 'source.ts',
-  typescript: 'source.ts',
-  xml: 'text.xml',
-  yaml: 'source.yaml',
-  yml: 'source.yaml'
+
+function getUserLanguageIds() {
+  try {
+    let usersLanguageIDs = atom.config.get("markdown-preview.customSyntaxHighlightingLanguageIdentifiers");
+
+    let obj = {};
+
+    // Bail early if empty
+    if (usersLanguageIDs.length === 0) {
+      return obj;
+    }
+
+    let pairs = usersLanguageIDs.split(",");
+
+    for (let i = 0; i < pairs.length; i++) {
+     let split = pairs[i].split(":");
+    obj[split[0].trim()] = split[1].trim();
+    }
+
+    return obj;
+
+  } catch(err) {
+    atom.notifications.addError(`Unable to load Markdown Preview Custom Syntax Highlighting Language Identifiers\n${err.toString()}`);
+    return {};
+  }
+}
+
+function getLanguageIds() {
+
+  let preferredLanguageID = atom.config.get("markdown-preview.syntaxHighlightingLanguageIdentifier");
+  let usersLanguageIDs = getUserLanguageIds();
+
+  let languageIds;
+
+  switch(preferredLanguageID) {
+    // Defer require for all language id files. First call for an given one will
+    // be expensive, but due to the module cache, should be fine afterwards
+    // plus only requiring the one needed, should result in less wasted memory
+    case "chroma":
+      languageIds = require("./language-ids/chroma.js");
+      break;
+    case "highlightjs":
+      languageIds = require("./language-ids/highlightjs.js");
+      break;
+    case "rouge":
+      languageIds = require("./language-ids/rouge.js");
+      break;
+    case "linguist":
+    default:
+      languageIds = require("./language-ids/linguist.js");
+      break;
+  }
+
+  if (Object.keys(usersLanguageIDs).length > 0) {
+    for (let key in usersLanguageIDs) {
+      languageIds[key] = usersLanguageIDs[key];
+    }
+  }
+
+  return languageIds;
 }
 
 module.exports = {
   scopeForFenceName (fenceName) {
     fenceName = fenceName.toLowerCase()
+
+    let scopesByFenceName = getLanguageIds();
 
     return scopesByFenceName.hasOwnProperty(fenceName)
       ? scopesByFenceName[fenceName]

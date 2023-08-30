@@ -7,39 +7,41 @@
 
 (string
   "'" @punctuation.definition.string.begin.js
-  (#set! test.onlyIfFirst true))
+  (#is? test.first))
 
 (string
   "'" @punctuation.definition.string.end.js
-  (#set! test.onlyIfLast true))
+  (#is? test.last))
 
 ; Double-quoted.
 (string "\"") @string.quoted.double.js
 
 (string
   "\"" @punctuation.definition.string.begin.js
-  (#set! test.onlyIfFirst true))
+  (#is? test.first))
 
 (string
   "\"" @punctuation.definition.string.end.js
-  (#set! test.onlyIfLast true))
+  (#is? test.last))
 
 ; Template string (backticks).
 (template_string) @string.quoted.template.js
 
 (template_string
   "`" @punctuation.definition.string.begin.js
-  (#set! test.onlyIfFirst true))
+  (#is? test.first))
 
 (template_string
   "`" @punctuation.definition.string.end.js
-  (#set! test.onlyIfLast true))
+  (#is? test.last))
 
 ; Interpolations inside of template strings.
+(template_substitution) @meta.embedded.line.interpolation.js
+
 (template_substitution
-  "${" @punctuation.definition.template-expression.begin.js
-  "}" @punctuation.definition.template-expression.end.js
-) @meta.embedded.line.interpolation.js
+  "${" @punctuation.section.embedded.begin.js
+  "}" @punctuation.section.embedded.end.js
+  (#set! capture.final true))
 
 (string
   (escape_sequence) @constant.character.escape.js)
@@ -69,8 +71,7 @@
 (assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
-; A variable object destructuring:
-; The "foo" in `let { foo } = something`
+; The "bar" in `foo.bar = true`
 (assignment_expression
   left: (member_expression
     property: (property_identifier)) @variable.other.assignment.property.js)
@@ -85,6 +86,9 @@
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
+;
+; A variable object destructuring:
+; The "foo" in `let { foo } = something`
 ((object_pattern
   (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js))
 
@@ -109,6 +113,12 @@
     key: (_) @entity.other.attribute-name.js
     value: (assignment_pattern
       left: (identifier) @variable.other.assignment.destructuring.js)))
+
+; A "rest" parameter destructuring:
+; The "bar" in `let { foo, ...bar } = something`
+(object_pattern
+  (rest_pattern
+    (identifier) @variable.other.assignment.destructuring.rest.js))
 
 ; A variable array destructuring:
 ; The "foo" and "bar" in `let [foo, bar] = something`
@@ -140,7 +150,7 @@
     (pair_pattern
       key: (_) @entity.other.attribute-name.js
       value: (identifier) @variable.other.assignment.loop.js)
-      (#set! test.final true)))
+      (#set! capture.final true)))
 
 ; The "error" in `} catch (error) {`
 (catch_clause
@@ -219,7 +229,7 @@
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition.js
-    (#set! test.final true))
+    (#set! capture.final true))
   right: [(arrow_function) (function)])
 
 ; Function variable assignment:
@@ -260,7 +270,7 @@
     (#eq? @support.object.builtin.js "Array")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(from|isArray|of)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Date methods.
 (member_expression
@@ -268,7 +278,7 @@
     (#eq? @support.object.builtin.js "Date")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(now|parse|UTC)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; JSON methods.
 (member_expression
@@ -276,7 +286,7 @@
     (#eq? @support.object.builtin.js "JSON")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(parse|stringify)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Math methods.
 (member_expression
@@ -284,7 +294,7 @@
     (#eq? @support.object.builtin.js "Math")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(abs|acos|acosh|asin|asinh|atan|atanh|atan2|cbrt|ceil|clz32|cos|cosh|exp|expm1|floor|fround|hypot|imul|log|log1p|log10|log2|max|min|pow|random|round|sign|sin|sinh|sqrt|tan|tanh|trunc)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Object methods.
 (member_expression
@@ -292,7 +302,7 @@
     (#eq? @support.object.builtin.js "Object")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(assign|create|defineProperty|defineProperties|entries|freeze|fromEntries|getOwnPropertyDescriptor|getOwnPropertyDescriptors|getOwnPropertyNames|getOwnPropertySymbols|getPrototypeOf|is|isExtensible|isFrozen|isSealed|keys|preventExtensions|seal|setPrototypeOf|values)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Reflect methods.
 (member_expression
@@ -300,7 +310,7 @@
     (#eq? @support.object.builtin.js "Reflect")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(apply|construct|defineProperty|deleteProperty|get|getOwnPropertyDescriptor|getPrototypeOf|has|isExtensible|ownKeys|preventExtensions|set|setPrototypeOf)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Intl.X instantiations.
 (new_expression
@@ -309,25 +319,25 @@
       (#eq? @support.object.builtin.js "Intl")
     property: (property_identifier) @support.class.builtin.js
       (#match? @support.class.builtin.js "^(Collator|DateTimeFormat|DisplayNames|ListFormat|Locale|NumberFormat|PluralRules|Segmenter)$"))
-      (#set! test.final true))
+      (#set! capture.final true))
 
 ; Built-in class instantiations.
 (new_expression
   constructor: (identifier) @support.class.builtin.instance.js
     (#match? @support.class.builtin.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Built-in constructors that can be invoked without `new`.
 (call_expression
   (identifier) @support.function.builtin.js
   (#match? @support.function.builtin.js "^(AggregateError|Array|ArrayBuffer|Boolean|BigInt|Error|EvalError|Function|Number|Object|Proxy|RangeError|String|Symbol|SyntaxError|URIError)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Built-in functions.
 (call_expression
   (identifier) @support.function.builtin.js
   (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Built-in `console` functions.
 
@@ -336,7 +346,7 @@
     (#eq? @support.class.builtin.console.js "console")
   property: (property_identifier) @support.function.builtin.console.js
     (#match? @support.function.builtin.console.js "^(assert|clear|count(Reset)?|debug|dir(xml)?|error|group(End)?info|log|profile(End)?|table|time(End|Log|Stamp)?|trace|warn)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Static methods of `Promise`.
 (member_expression
@@ -344,7 +354,7 @@
     (#eq? @support.class.builtin.js "Promise")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(all|allSettled|any|race|resolve|reject)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; All “well-known” symbols (as they are referred to in the spec).
 (member_expression
@@ -352,7 +362,7 @@
   property: (property_identifier) @support.property.builtin.js
   (#eq? @support.class.builtin.js "Symbol")
   (#match? @support.property.builtin.js "^(asyncIterator|hasInstance|isConcatSpreadable|iterator|match|matchAll|replace|search|split|species|toPrimitive|toStringTag|unscopables)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Static methods of `Symbol`.
 (member_expression
@@ -360,28 +370,28 @@
     (#eq? @support.class.builtin.js "Symbol")
   property: (property_identifier) @support.function.builtin.js
     (#match? @support.function.builtin.js "^(for|keyFor)$")
-    (#set! test.final true))
+    (#set! capture.final true))
 
 ; Other built-in objects.
 ((identifier) @support.class.builtin.js
   (#match? @support.class.builtin.js "^(Symbol)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Deprecated built-in functions.
 (call_expression
   (identifier) @invalid.deprecated.function.js
   (#match? @invalid.deprecated.function.js "^(escape|unescape)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Built-in DOM classes.
 ((identifier) @support.class.builtin.js
   (#match? @support.class.builtin.js "^(Document|Element|HTMLElement|HTMLDocument|HTML(Select|BR|HR|LI|Div|Map|Mod|Pre|Area|Base|Body|Data|Font|Form|Head|Html|Link|Menu|Meta|Slot|Span|Time|Audio|DList|Embed|Image|Input|Label|Media|Meter|OList|Param|Quote|Style|Table|Title|Track|UList|Video|Anchor|Button|Canvas|Dialog|IFrame|Legend|Object|Option|Output|Script|Source|Content|Details|Heading|Marquee|Picture|Unknown|DataList|FieldSet|FrameSet|MenuItem|OptGroup|Progress|TableCol|TableRow|Template|TextArea|Paragraph|TableCell|Options|TableCaption|TableSection|FormControls))$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Deprecated built-in DOM classes.
 ((identifier) @invalid.deprecated.class.js
   (#match? @invalid.deprecated.class.js "^(HTMLShadowElement)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; Built-in DOM methods on `document`.
 (call_expression
@@ -390,7 +400,7 @@
     (#eq? @support.object.builtin.js "document")
     property: (property_identifier) @support.function.method.builtin.js
     (#match? @support.function.method.builtin.js "^(adoptNode|append|caretPositionFromPoint|caretRangeFromPoint|createAttribute(?:NS)?|createCDATASection|createComment|createDocumentFragment|createElement(?:NS)?|createEvent|createNodeIterator|createProcessingInstruction|createRange|createTextNode|createTreeWalker|elementFromPoint|elementsFromPoint|exitFullscreen|exitPictureInPicture|exitPointerLock|getAnimations|getElementById|getElementsByClassName|getElementsByTagName(?:NS)?|getSelection|hasStorageAccess|importNode|prepend|querySelector|querySelectorAll|releaseCapture|replaceChildren|requestStorageAccess|createExpression|createNSResolver|evaluate|getElementsByName|hasFocus|write|writeln|open|close)$")
-    (#set! test.final true)))
+    (#set! capture.final true)))
 
 ; Built-in DOM methods on nodes. These will show up as builtins on _any_ class, but
 ; they're distinctive enough that we're OK with that possibility.
@@ -398,7 +408,7 @@
   function: (member_expression
     property: (property_identifier) @support.function.method.builtin.js
     (#match? @support.function.method.builtin.js "^(addEventListener|appendChild|cloneNode|compareDocumentPosition|contains|getElementsByClassName|getElementsByTagName(?:NS)?|getRootNode|hasChildNodes|insertBefore|isDefaultNamespace|isEqualNode|isSameNode|lookupPrefix|lookupNamespaceURI|normalize|querySelector|querySelectorAll|removeChild|replaceChild|removeEventListener)$")
-    (#set! test.final true)))
+    (#set! capture.final true)))
 
 
 ; FUNCTION CALLS
@@ -412,7 +422,7 @@
 (call_expression
   function: (member_expression
     property: (property_identifier) @support.other.function.method.js
-    (#set! test.final true)))
+    (#set! capture.final true)))
 
 
 ; OBJECTS
@@ -513,6 +523,14 @@
 (export_statement
   (identifier) @variable.other.assignment.export.js)
 
+; The "*" in `import * as Foo`
+(import_clause
+  (namespace_import "*" @variable.other.assignment.import.all.js))
+
+; The "Foo" in `import * as Foo`
+(import_clause
+  (namespace_import
+    (identifier) @variable.other.assignment.import.alias.js))
 
 ; COMMENTS
 ; ========
@@ -611,23 +629,23 @@
 ((identifier) @support.object.builtin._TEXT_.js
   (#match? @support.object.builtin._TEXT_.js "^(arguments|module|window|document)$")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @support.object.builtin.filename.js
   (#eq? @support.object.builtin.filename.js "__filename")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((identifier) @support.object.builtin.dirname.js
   (#eq? @support.object.builtin.dirname.js "__dirname")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ((identifier) @support.function.builtin.require.js
   (#eq? @support.function.builtin.require.js "require")
   (#is-not? local)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 [
   (null)
@@ -641,7 +659,7 @@
 
 ((identifier) @constant.language.infinity.js
   (#eq? @constant.language.infinity.js "Infinity")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (arrow_function
   "=>" @punctuation.function.arrow.js)
@@ -649,7 +667,7 @@
 ; Things that `LOOK_LIKE_CONSTANTS`.
 ([(property_identifier) (identifier)] @constant.other.js
   (#match? @constant.other.js "^[A-Z_][A-Z0-9_]*$")
-  (#set! test.shy true))
+  (#set! capture.shy true))
 
 ; TODO: What do we do with computed object keys?
 ;
@@ -673,11 +691,11 @@
 (regex) @string.regexp.js
 (regex
   "/" @punctuation.definition.string.begin.js
-  (#set! test.onlyIfFirst true))
+  (#is? test.first))
 
 (regex
   "/" @punctuation.definition.string.end.js
-  (#set! test.onlyIfLast true))
+  (#is? test.last))
 
 (regex_flags) @keyword.other.js
 
@@ -697,7 +715,7 @@
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
   "/" @punctuation.definition.tag.end.js
-  (#set! test.final true)
+  (#set! capture.final true)
   name: (identifier) @entity.name.tag.js)
 
 ; The "bar" in `<Foo bar={true} />`.
@@ -707,7 +725,7 @@
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.jsx.js
   (#match? @meta.embedded.block.jsx.js "\\n")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (jsx_expression) @meta.embedded.line.jsx.js
 
@@ -721,14 +739,14 @@
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((jsx_self_closing_element
   ; The "/>" in `<Foo />`, extended to cover both anonymous nodes at once.
   "/") @punctuation.definition.tag.end.js
   (#set! adjust.startAt lastChild.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.endPosition)
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ; OPERATORS
@@ -800,7 +818,7 @@
     (#set! prohibitsOptionalChaining true))
 
 ((optional_chain) @invalid.illegal.optional-chain.js
-  (#set! test.onlyIfDescendantOfNodeWithData prohibitsOptionalChaining))
+  (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 
 ; PUNCTUATION
@@ -809,37 +827,37 @@
 (formal_parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.js
   ")"@punctuation.definition.parameters.end.bracket.round.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (object
   "{" @punctuation.definition.object.begin.bracket.curly.js
   "}" @punctuation.definition.object.end.bracket.curly.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (arguments
   "(" @punctuation.definition.arguments.begin.bracket.round.js
   ")" @punctuation.definition.arguments.end.bracket.round.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (computed_property_name
   "[" @punctuation.definition.computed-property.begin.bracket.square.js
   "]" @punctuation.definition.computed-property.end.bracket.square.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (subscript_expression
   "[" @punctuation.definition.subscript.begin.bracket.square.js
   "]" @punctuation.definition.subscript.end.bracket.square.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (array
   "[" @punctuation.definition.array.begin.bracket.square.js
   "]" @punctuation.definition.array.end.bracket.square.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (array_pattern
   "[" @punctuation.definition.array.begin.bracket.square.js
   "]" @punctuation.definition.array.end.bracket.square.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 "{" @punctuation.definition.block.begin.bracket.curly.js
 "}" @punctuation.definition.block.end.bracket.curly.js
@@ -850,15 +868,15 @@
 
 (array
   "," @punctuation.separator.array.comma.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (array_pattern
   "," @punctuation.separator.array.comma.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (pair
   ":" @punctuation.separator.key-value.colon.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ";" @punctuation.terminator.statement.js
 "," @punctuation.separator.comma.js
@@ -870,23 +888,23 @@
 ; The interiors of functions (useful for snippets and commands).
 (method_definition
   body: (statement_block) @meta.block.function.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (function_declaration
   body: (statement_block) @meta.block.function.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (generator_function_declaration
   body: (statement_block) @meta.block.function.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (function
   body: (statement_block) @meta.block.function.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (generator_function
   body: (statement_block) @meta.block.function.js
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ; The interior of a class body (useful for snippets and commands).
 (class_body) @meta.block.class.js
@@ -933,4 +951,4 @@
 ; TODO: Any identifier not yet scoped might as well be scoped as a variable,
 ; but that's an opinionated choice. We might want to make this configurable.
 ; ((identifier) @variable.other.other.js
-;   (#set! test.shy true))
+;   (#set! capture.shy true))

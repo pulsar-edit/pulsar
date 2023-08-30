@@ -3,6 +3,8 @@ variable1: value1
 array:
   - foo
   - bar
+object:
+  key: value2
 ---
 
 ## File.markdown
@@ -21,9 +23,9 @@ def func
 end
 ```
 
-* ```javascript
+```javascript
 if a === 3 {
-  b = 5
+b = 5
 }
 ```
 

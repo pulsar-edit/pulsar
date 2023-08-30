@@ -129,11 +129,6 @@
       color: @mono-1;
     }
 
-    &.syntax--heading,
-    &.syntax--identity {
-      color: @hue-2;
-    }
-
     &.syntax--bold {
       color: @hue-6-2;
       font-weight: bold;
@@ -159,12 +154,23 @@
 }
 
 .syntax--support {
-  &.syntax--class {
+  &.syntax--class,
+  &.syntax--module {
+    color: @hue-6-2;
+  }
+
+  &.syntax--namespace {
     color: @hue-6-2;
   }
 
   &.syntax--type {
     color: @hue-1;
+  }
+
+  &.syntax--other {
+    &.syntax--function {
+      color: @hue-2;
+    }
   }
 
   &.syntax--function  {
@@ -288,7 +294,7 @@
     color: @hue-5;
 
     .syntax--punctuation.syntax--definition.syntax--heading {
-      color: @hue-2;
+      color: @hue-5;
     }
   }
 
