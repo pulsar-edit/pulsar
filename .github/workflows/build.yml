@@ -73,14 +73,20 @@ jobs:
           yarn run build:apm
 
     # macOS Signing Stuff
-    - name: Build Pulsar Binaries (macOS)
-      if: ${{ runner.os == 'macOS' }}
+    - name: Setup macOS Signing Env Vars
+      if: ${{ github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
+      # PRs generated from forks cannot access GitHub Secrets
+      # The empty string assignment of these values will cause macOS builds to fail
+      # So if the PR is a fork, we will still build, but will not sign.
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
         CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         APPLEID: ${{ secrets.APPLEID }}
         APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
+
+    - name: Build Pulsar Binaries (macOS)
+      if: ${{ runner.os == 'macOS' }}
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
         timeout_minutes: 30
