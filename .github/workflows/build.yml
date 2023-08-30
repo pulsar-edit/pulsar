@@ -97,6 +97,18 @@ jobs:
         retry_on: error
         command: yarn dist
 
+    - name: Rename Pulsar Binaries for Regular release (Linux)
+      if: ${{ runner.os == 'Linux' }}
+      run: node ./script/rename.js "Linux"
+
+    - name: Rename Pulsar Binaries for Regular release (macOS)
+      if: ${{ runner.os == 'macOS' }}
+      run: node ./script/rename.js "Intel.Mac"
+
+    - name: Rename Pulsar Binaries for Regular release (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: node ./script/rename.js "Windows"
+
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -125,7 +137,7 @@ jobs:
       run: |
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         rm -R node_modules/electron; yarn install --check-files
-        hdiutil mount binaries/Pulsar*dmg
+        hdiutil mount binaries/*Pulsar*dmg
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
