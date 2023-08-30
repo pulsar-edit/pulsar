@@ -30,6 +30,7 @@ Since a major part of the functionality of this package is attempting to determi
 * Universal: Developer Mode
 * Universal: Safe Mode
 * Universal: Spec Mode
+* Universal: Developer Instance
 * Windows: Chocolatey Installation
 * Windows: winget Installation
 * Windows: User Installation
@@ -38,9 +39,9 @@ Since a major part of the functionality of this package is attempting to determi
 * Linux: Flatpak Installation
 * Linux: Deb-Get Installation
 * Linux: Nix Installation
-* Linux: Home Brew Installation
+* Linux: Homebrew Installation
 * Linux: Manual Installation
-* macOS: Home Brew Installation
+* macOS: Homebrew Installation
 * macOS: Manual Installation
 
 ## Known Issues

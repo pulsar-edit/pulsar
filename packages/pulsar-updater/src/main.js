@@ -166,12 +166,15 @@ class PulsarUpdater {
       case "Spec Mode":
         return null;
         break;
+      case "Developer Instance":
+        return null;
+        break;
       case "Flatpak Installation":
         returnText += "Install the latest version by running `flatpak update`.";
         break;
       case "Deb-Get Installation":
         returnText +=
-          "Install the latest version by running `sudo deb-get update`.";
+          "Install the latest version by running `deb-get update && deb-get install pulsar`.";
         break;
       case "Nix Installation":
         // TODO find nix update command
