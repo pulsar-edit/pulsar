@@ -120,7 +120,7 @@
 
 ((identifier) @constant.other.rust
   (#match? @constant.other.rust "^[A-Z_][A-Z\\d_]+$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (boolean_literal) @constant.language.boolean._TEXT_.rust
 (escape_sequence) @constant.character.escape.rust

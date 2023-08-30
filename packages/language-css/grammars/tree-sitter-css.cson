@@ -46,11 +46,21 @@ scopes:
   'namespace_name': 'entity.namespace.name'
   'function_name': 'support.function'
 
+  'rule_set > block > "{"': 'punctuation.section.property-list.begin.bracket.curly.css'
+  'rule_set > block > "}"': 'punctuation.section.property-list.end.bracket.curly.css'
+
+  'rule_set > block': 'meta.block.inside-selector.css'
+
+  # Not perfect, but better than nothing:
+  'selectors': 'meta.selector.css'
+
+  'plain_value, integer_value, string_value': 'meta.property-value.css'
+
   'property_name, plain_value': [
     {match: '^--', scopes: 'variable.css'}
   ]
 
-  'property_name': 'support.property-name'
+  'property_name': 'support.type.property-name.css'
   'attribute_name': 'entity.other.attribute-name'
 
   '

@@ -8,7 +8,7 @@
 
 ((comment) @comment.line.double-slash.go
   (#match? @comment.line.double-slash.go "^\/\/")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((comment) @punctuation.definition.comment.go
   (#match? @punctuation.definition.comment.go "^\/\/")
@@ -33,7 +33,7 @@
 (type_declaration
   (type_spec
     name: (type_identifier) @entity.name.type.go)
-    (#set! test.final true))
+    (#set! capture.final true))
 
 (type_identifier) @storage.type.other.go
 
@@ -83,7 +83,7 @@
 (call_expression
   (identifier) @support.function.builtin.go
   (#match? @support.function.builtin.go "^(?:append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (call_expression
   (identifier) @support.other.function.go)
@@ -111,7 +111,7 @@
 
 (package_clause
   (package_identifier) @entity.name.package.go
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (package_identifier) @support.object.package.go
 
@@ -121,11 +121,11 @@
 ((interpreted_string_literal "\"") @string.quoted.double.go)
 (interpreted_string_literal
   "\"" @punctuation.definition.string.begin.go
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 
 (interpreted_string_literal
   "\"" @punctuation.definition.string.end.go
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 
 (escape_sequence) @constant.character.escape.go
 
@@ -257,13 +257,13 @@
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.go
   ")" @punctuation.definition.parameters.end.bracket.round.go
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (composite_literal
   body: (literal_value
     "{" @punctuation.definition.struct.begin.bracket.curly.go
     "}" @punctuation.definition.struct.end.bracket.curly.go
-    (#set! test.final true)))
+    (#set! capture.final true)))
 
 "{" @punctuation.definition.begin.bracket.curly.go
 "}" @punctuation.definition.end.bracket.curly.go
@@ -277,7 +277,7 @@
 
 (function_declaration
   (block) @meta.block.function.go
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (block) @meta.block.go
 

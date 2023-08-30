@@ -34,7 +34,7 @@ div > div.block:last-child {
   margin-right: @component-padding;
 }
 .inline-block-tight {
-  margin-right: @component-padding/2;
+  margin-right: (@component-padding/2);
 }
 div > .inline-block:last-child,
 div > .inline-block-tight:last-child {
@@ -67,7 +67,7 @@ div > .inline-block-tight:last-child {
   }
   .inline-block-tight {
     margin-right: 0;
-    margin-left: @component-padding/2;
+    margin-left: (@component-padding/2);
   }
 
   > .inline-block:first-child,

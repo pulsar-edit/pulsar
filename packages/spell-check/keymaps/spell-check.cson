@@ -1,0 +1,21 @@
+'.platform-darwin atom-text-editor':
+  'cmd-:': 'spell-check:correct-misspelling'
+
+'.platform-darwin .corrections atom-text-editor':
+  'cmd-:': 'core:cancel'
+
+'.platform-win32 atom-text-editor':
+  'ctrl-:': 'spell-check:correct-misspelling'
+
+'.platform-win32 .corrections atom-text-editor':
+  'ctrl-:': 'core:cancel'
+
+'.platform-linux atom-text-editor':
+  'ctrl-:': 'spell-check:correct-misspelling'
+
+'.platform-linux .corrections atom-text-editor':
+  'ctrl-:': 'core:cancel'
+
+'.corrections atom-text-editor[mini]':
+  'enter': 'core:confirm'
+  'tab': 'core:confirm'

@@ -31,6 +31,6 @@ treeSitter:
   # to add support for `match` statements.
   grammar: 'ts/tree-sitter-python.wasm'
   highlightsQuery: 'ts/highlights.scm'
-  localsQuery: 'ts/locals.scm'
+  tagsQuery: 'ts/tags.scm'
   foldsQuery: 'ts/folds.scm'
   indentsQuery: 'ts/indents.scm'

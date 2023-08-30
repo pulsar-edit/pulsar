@@ -38,7 +38,7 @@
 (anonymous_capturing_group
   "(" @punctuation.definition.group.begin.bracket.round.regexp
   ")" @punctuation.definition.group.end.bracket.round.regexp
-  (#set! test.final true))
+  (#set! capture.final true))
 
 "|" @keyword.operator.or.regexp
 ["*" "+"] @keyword.operator.quantifier.regexp

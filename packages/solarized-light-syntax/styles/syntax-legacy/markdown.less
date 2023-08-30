@@ -17,10 +17,30 @@
     font-style: italic;
   }
 
+  .syntax--meta.syntax--link.syntax--text {
+    color: @violet;
+  }
+
+  .syntax--markup.syntax--list.unnumbered {
+    .syntax--punctuation.syntax--definition.syntax--list-item {
+      color: @yellow;
+    }
+  }
+
+  .syntax--markup.syntax--list.numbered {
+    .syntax--punctuation.syntax--definition.syntax--list-item {
+      color: @green;
+    }
+  }
+
   &.syntax--support {
-    color:@syntax-comment-color;
+    color: @syntax-comment-color;
     &.syntax--quote {
       color: @violet;
     }
+  }
+
+  .syntax--punctuation.syntax--definition.syntax--blockquote {
+    color: @violet;
   }
 }

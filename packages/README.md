@@ -31,8 +31,8 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **dev-live-reload** | [`./dev-live-reload`](./dev-live-reload) | |
 | **encoding-selector** | [`./encoding-selector`](./encoding-selector) | |
 | **exception-reporting** | [`./exception-reporting`](./exception-reporting) | |
-| **find-and-replace** | [`./find-and-replace`][find-and-replace] |  |
-| **fuzzy-finder** | [`./fuzzy-finder`][fuzzy-finder] |  |
+| **find-and-replace** | [`./find-and-replace`](./find-and-replace) |  |
+| **fuzzy-finder** | [`./fuzzy-finder`](./fuzzy-finder) |  |
 | **github** | [`pulsar-edit/github`][github] |  |
 | **git-diff** | [`./git-diff`](./git-diff) | |
 | **go-to-line** | [`./go-to-line`](./go-to-line) | |
@@ -77,7 +77,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **line-ending-selector** | [`./line-ending-selector`](./line-ending-selector) | |
 | **link** | [`./link`](./link) | |
 | **markdown-preview** | [`./markdown-preview`](./markdown-preview) |  |
-| **notifications** | [`atom/notifications`][notifications] | [#18277](https://github.com/atom/atom/issues/18277) |
+| **notifications** | [`./notifications`](./notifications) | |
 | **one-dark-syntax** | [`./one-dark-syntax`](./one-dark-syntax) | |
 | **one-dark-ui** | [`./one-dark-ui`](./one-dark-ui) | |
 | **one-light-syntax** | [`./one-light-syntax`](./one-light-syntax) | |
@@ -85,10 +85,11 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **open-on-github** | [`./open-on-github`](./open-on-github) | |
 | **settings-view** | [`./settings-view`](./settings-view) |  |
 | **package-generator** | [`./package-generator`](./package-generator) | |
+| **pulsar-updater** | [`./pulsar-updater`](./pulsar-updater) | |
 | **snippets** | [`pulsar-edit/snippets`][snippets] |  |
 | **solarized-dark-syntax** | [`./solarized-dark-syntax`](./solarized-dark-syntax) | |
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
-| **spell-check** | [`atom/spell-check`][spell-check] |  |
+| **spell-check** | [`./spell-check`](./spell-check) |  |
 | **status-bar** | [`./status-bar`](./status-bar) | |
 | **styleguide** | [`./styleguide`](./styleguide) | |
 | **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
@@ -101,7 +102,5 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
 [github]: https://github.com/pulsar-edit/github
-[notifications]: https://github.com/pulsar-edit/notifications
 [snippets]: https://github.com/pulsar-edit/snippets
-[spell-check]: https://github.com/pulsar-edit/spell-check
 [symbols-view]: https://github.com/pulsar-edit/symbols-view

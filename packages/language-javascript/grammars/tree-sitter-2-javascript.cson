@@ -3,7 +3,7 @@ scopeName: 'source.js'
 type: 'modern-tree-sitter'
 parser: 'tree-sitter-javascript'
 
-injectionRegex: '^(js|javascript)$'
+injectionRegex: '^(js|javascript|JS|JAVASCRIPT)$'
 treeSitter:
   grammar: 'ts/grammar.wasm'
   highlightsQuery: 'ts/highlights.scm'

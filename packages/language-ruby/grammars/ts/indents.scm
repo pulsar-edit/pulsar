@@ -1,13 +1,13 @@
 
 ; Prevent postfix modifiers from triggering indents on the next line.
 (unless_modifier "unless" @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 (if_modifier "if" @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 (while_modifier "while" @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 (until_modifier "until" @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 [

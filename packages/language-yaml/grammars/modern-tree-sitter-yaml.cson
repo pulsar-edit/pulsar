@@ -1,0 +1,36 @@
+name: 'YAML'
+scopeName: 'source.yaml'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-yaml'
+
+injectionRegex: 'yml|yaml|YML|YAML'
+
+treeSitter:
+  grammar: 'tree-sitter/tree-sitter-yaml.wasm'
+  highlightsQuery: 'tree-sitter/highlights.scm'
+  foldsQuery: 'tree-sitter/folds.scm'
+  indentsQuery: 'tree-sitter/indents.scm'
+  tagsQuery: 'tree-sitter/tags.scm'
+
+firstLineRegex: [
+  '^(#cloud-config|---)'
+]
+
+fileTypes: [
+  'clang-format'
+  'eyaml'
+  'eyml'
+  'yaml'
+  'yamllint'
+  'yaml.erb'
+  'yml'
+  'yml.erb'
+  'sls'
+  'stylelintrc'
+  'sublime-syntax'
+  'Boxfile'
+  'ksy'
+]
+
+comments:
+  start: '# '

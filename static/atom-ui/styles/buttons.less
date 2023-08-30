@@ -13,7 +13,7 @@
 .btn {
   display: inline-block;
   margin-bottom: 0; // For input.btn
-  height: @component-line-height + 2px;
+  height: (@component-line-height + 2px);
   padding: 0 @component-padding;
   font-size: @font-size;
   font-weight: normal;
@@ -154,31 +154,31 @@
 
 .btn-xs,
 .btn-group-xs > .btn {
-  padding: @component-padding/4 @component-padding/2;
-  font-size: @font-size - 2px;
+  padding: (@component-padding/4) (@component-padding/2);
+  font-size: (@font-size - 2px);
   height: auto;
   line-height: 1.3em;
   &.icon:before {
-    font-size: @font-size - 2px;
+    font-size: (@font-size - 2px);
   }
 }
 .btn-sm,
 .btn-group-sm > .btn {
-  padding: @component-padding/4 @component-padding/2;
+  padding: (@component-padding/4) (@component-padding/2);
   height: auto;
   line-height: 1.3em;
   &.icon:before {
-    font-size: @font-size + 1px;
+    font-size: (@font-size + 1px);
   }
 }
 .btn-lg,
 .btn-group-lg > .btn {
   font-size: @font-size + 2px;
-  padding: @component-padding - 2px  @component-padding + 2px;
+  padding: (@component-padding - 2px)  (@component-padding + 2px);
   height: auto;
   line-height: 1.3em;
   &.icon:before {
-    font-size: @font-size + 6px;
+    font-size: (@font-size + 6px);
   }
 }
 
@@ -266,7 +266,7 @@ input[type="button"] {
     margin-left: 0;
   }
   > * {
-    margin-right: @component-padding / 2;
+    margin-right: (@component-padding / 2);
   }
   > *:last-child {
     margin-right: 0;

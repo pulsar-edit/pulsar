@@ -27,4 +27,14 @@
     color: @cyan;
   }
 
+  &.syntax--heading {
+    .syntax--punctuation {
+      color: inherit;
+    }
+  }
+
+  &.syntax--quote {
+    color: @syntax-comment-color;
+    font-style: italic;
+  }
 }

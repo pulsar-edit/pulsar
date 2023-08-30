@@ -5,6 +5,13 @@
   },
   "labels": ["dependencies"],
   "separateMajorMinor": "false",
+  "ignorePaths": [
+    "packages/autocomplete-atom-api/spec/fixtures/",
+    "packages/dev-live-reload/spec/fixtures/",
+    "packages/incompatible-packages/spec/fixtures/",
+    "packages/settings-view/spec/fixtures/",
+    "spec/fixtures/"
+  ],
   "packageRules": [
     {
       "description": "Group all DevDependencies for the Core Editor",
@@ -39,6 +46,9 @@
       "matchPaths": [ "packages/archive-view/**" ], "groupName": "archive-view package"
     },
     {
+      "matchPaths": [ "packages/autocomplete-atom-api/**" ], "groupName": "autocomplete-atom-api"
+    },
+    {
       "matchPaths": [ "packages/autocomplete-css/**" ], "groupName": "autocomplete-css package"
     },
     {
@@ -52,6 +62,9 @@
     },
     {
       "matchPaths": [ "packages/autoflow/**" ], "groupName": "autoflow package"
+    },
+    {
+      "matchPaths": [ "packages/autosave/**" ], "groupName": "autosave package"
     },
     {
       "matchPaths": [ "packages/background-tips/**" ], "groupName": "background-tips package"
@@ -81,6 +94,12 @@
       "matchPaths": [ "packages/exception-reporting/**" ], "groupName": "exception-reporting package"
     },
     {
+      "matchPaths": [ "packages/find-and-replace/**" ], "groupName": "find-and-replace package"
+    },
+    {
+      "matchPaths": [ "packages/fuzzy-finder/**" ], "groupName": "fuzzy-finder package"
+    },
+    {
       "matchPaths": [ "packages/git-diff/**" ], "groupName": "git-diff package"
     },
     {
@@ -96,6 +115,9 @@
       "matchPaths": [ "packages/incompatible-packages/**" ], "groupName": "incompatible-packages package"
     },
     {
+      "matchPaths": [ "packages/keybinding-resolver/**" ], "groupName": "keybinding-resolver package"
+    },
+    {
       "matchPaths": [ "packages/line-ending-selector/**" ], "groupName": "line-ending-selector package"
     },
     {
@@ -105,13 +127,22 @@
       "matchPaths": [ "packages/markdown-preview/**" ], "groupName": "markdown-preview package"
     },
     {
+      "matchPaths": [ "packages/notifications/**" ], "groupName": "notifications package"
+    },
+    {
       "matchPaths": [ "packages/open-on-github/**" ], "groupName": "open-on-github package"
     },
     {
       "matchPaths": [ "packages/package-generator/**" ], "groupName": "package-generator package"
     },
     {
+      "matchPaths": [ "packages/pulsar-updater/**" ], "groupName": "pulsar-updater package"
+    },
+    {
       "matchPaths": [ "packages/settings-view/**" ], "groupName": "settings-view package"
+    },
+    {
+      "matchPaths": [ "packages/spell-check/**" ], "groupName": "spell-check package"
     },
     {
       "matchPaths": [ "packages/status-bar/**" ], "groupName": "status-bar package"
@@ -120,7 +151,16 @@
       "matchPaths": [ "packages/styleguide/**" ], "groupName": "styleguide package"
     },
     {
+      "matchPaths": [ "packages/symbols-view/**" ], "groupName": "symbols-view package"
+    },
+    {
       "matchPaths": [ "packages/tabs/**" ], "groupName": "tabs package"
+    },
+    {
+      "matchPaths": [ "packages/timecop/**" ], "groupName": "timecop package"
+    },
+    {
+      "matchPaths": [ "packages/tree-view/**" ], "groupName": "tree-view package"
     },
     {
       "matchPaths": [ "packages/update-package-dependencies/**" ], "groupName": "update-package-dependencies package"
