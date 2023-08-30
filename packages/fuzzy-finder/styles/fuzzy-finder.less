@@ -1,0 +1,27 @@
+@import "ui-variables";
+
+// Highlight matched text
+.fuzzy-finder .list-group .character-match {
+  color: @text-color-highlight;
+  font-weight: bold;
+}
+
+.FuzzyFinderResult {
+  position: relative;
+
+  @size: 28px;
+
+  &.has-avatar {
+    // add some extra space for the avatar
+    padding-right: (@size + (@component-padding * 2)) !important;
+  }
+
+  &-avatar {
+    position: absolute !important;
+    border-radius: @size;
+    width: @size;
+    top: 50%;
+    margin-top: -(@size / 2);
+    right: @component-padding;
+  }
+}

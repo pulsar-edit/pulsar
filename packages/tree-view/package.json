@@ -1,0 +1,86 @@
+{
+  "name": "tree-view",
+  "version": "0.229.1",
+  "main": "./lib/main",
+  "description": "Explore and open files in the current project.",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "private": true,
+  "dependencies": {
+    "fs-plus": "^3.0.0",
+    "minimatch": "~0.3.0",
+    "pathwatcher": "^8.1.0",
+    "temp": "~0.9.0",
+    "underscore-plus": "^1.0.0"
+  },
+  "deserializers": {
+    "TreeView": "getTreeViewInstance"
+  },
+  "consumedServices": {
+    "atom.file-icons": {
+      "versions": {
+        "1.0.0": "consumeFileIcons"
+      }
+    },
+    "file-icons.element-icons": {
+      "versions": {
+        "1.0.0": "consumeElementIcons"
+      }
+    }
+  },
+  "providedServices": {
+    "tree-view": {
+      "description": "A tree-like view of directories and files",
+      "versions": {
+        "1.0.0": "provideTreeView"
+      }
+    }
+  },
+  "configSchema": {
+    "squashDirectoryNames": {
+      "type": "boolean",
+      "default": false,
+      "title": "Collapse directories",
+      "description": "Collapse directories that only contain a single directory."
+    },
+    "hideVcsIgnoredFiles": {
+      "type": "boolean",
+      "default": false,
+      "title": "Hide VCS Ignored Files",
+      "description": "Don't show files and directories ignored by the current project's VCS system. For example, projects using Git have these paths defined in their `.gitignore` file."
+    },
+    "hideIgnoredNames": {
+      "type": "boolean",
+      "default": false,
+      "description": "Don't show items matched by the `Ignored Names` core config setting."
+    },
+    "sortFoldersBeforeFiles": {
+      "type": "boolean",
+      "default": true,
+      "description": "When listing directory items, list subdirectories before listing files."
+    },
+    "autoReveal": {
+      "type": "boolean",
+      "default": false,
+      "description": "Reveal tree view entries when they become the active pane item."
+    },
+    "focusOnReveal": {
+      "type": "boolean",
+      "default": true,
+      "description": "Focus the tree view when revealing entries."
+    },
+    "alwaysOpenExisting": {
+      "type": "boolean",
+      "default": false,
+      "description": "When opening a file, always focus an already-existing view of the file even if it's in another pane."
+    },
+    "hiddenOnStartup": {
+      "type": "boolean",
+      "default": false,
+      "description": "When Pulsar is opened, the view is hidden."
+    }
+  }
+}

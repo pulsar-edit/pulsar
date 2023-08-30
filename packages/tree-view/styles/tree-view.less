@@ -1,0 +1,141 @@
+@import "ui-variables";
+
+.project-root-header {
+  -webkit-user-drag: element;
+}
+
+.tree-view {
+  contain: size;
+  overflow: auto;
+  z-index: 2;
+  -webkit-user-select: none;
+
+  display: flex;
+  flex-direction: column;
+
+  #add-projects-view {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.25em;
+    padding: 30px;
+    cursor: default;
+
+    > * {
+      margin: 10px 0;
+    }
+
+    .description {
+      margin: 10px 0;
+    }
+
+    .icon::before {
+      color: #c1c1c1;
+    }
+
+    .btn {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .icon-large::before {
+    margin-right: 0;
+    margin-bottom: 50px;
+    width: auto;
+    height: auto;
+    font-size: 8em;
+  }
+
+  .tree-view-root {
+    padding-left: @component-icon-padding;
+    padding-right: @component-padding;
+    background-color: inherit;
+
+    /*
+     * Force a new stacking context to prevent a large, duplicate paint layer from
+     * being created for tree-view's scrolling contents that can make the cost of
+     * layer tree updates scale at 3x the size of the layer rather than the
+     * optimal 1x.
+     *
+     * On high resolution displays, Chromium handles layers for scrolling content
+     * differently and inadvertently creates a duplicate paint layer the size of
+     * .tree-view-scroller because descendants of the scroller overlap the
+     * auto-created layer.
+     */
+    isolation: isolate;
+
+    // Expands tree-view root to take up full height.
+    // This makes sure that the context menu can still be openend in the empty
+    // area underneath the files.
+    flex-grow: 1;
+
+    // Expands tree-view root to take up as much width as needed by the content.
+    // This makes sure that the selected item's "bar/background" expands to full width.
+    position: relative;
+    min-width: min-content;
+  }
+
+  .header {
+    position: relative;
+  }
+
+  .tree-view-root .list-tree {
+    // Keeps selections expanded while dragging
+    position: static;
+  }
+
+  .entry {
+    // This fixes #110, see that issue for more details
+    &::before {
+      content: '';
+      position: absolute;
+    }
+  }
+
+  /* Drag and Drop */
+  .placeholder {
+    position: absolute;
+    left: @component-icon-padding;
+    padding: 0;
+    z-index: 999;
+    display: inline-block;
+
+    width: calc(~"100% -" @component-icon-padding);
+    background: @background-color-info;
+
+    list-style: none;
+    pointer-events: none;
+
+    // bar
+    &:before {
+      content: "";
+      position: absolute;
+      height: 2px;
+      margin: -1px; padding: 0;
+      width: inherit;
+      background: inherit;
+    }
+
+    &:after {
+      content: "";
+      position: absolute;
+      left: 0;
+      margin-top: -2px;
+      margin-left: -1px;
+      width: 4px;
+      height: 4px;
+      background: @background-color-info;
+      border-radius: 4px;
+      border: 1px solid transparent;
+    }
+
+    // ensure that placeholder doesn't disappear above the top of the view
+    &:first-child {
+      margin-top: 1px;
+    }
+  }
+}

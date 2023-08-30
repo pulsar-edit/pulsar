@@ -1,30 +1,28 @@
 {
   "name": "autocomplete-plus",
   "version": "2.42.6",
-  "main": "./lib/main",
+  "main": "./lib/main.js",
   "description": "Display possible completions in the editor while typing",
-  "repository": "https://github.com/atom/autocomplete-plus",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": ">=0.189.0 <2.0.0"
   },
   "dependencies": {
     "atom-slick": "^2.0.0",
-    "dompurify": "^2.2.6",
+    "dompurify": "^3.0.4",
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.6.0",
     "grim": "^2.0.1",
-    "marked": "^4.0.10",
+    "marked": "^5.1.1",
     "minimatch": "^3.0.3",
-    "selector-kit": "^0.1",
-    "stable": "^0.1.5",
-    "underscore-plus": "^1.6.6"
+    "selector-kit": "^0.1.0",
+    "stable": "^0.1.8",
+    "underscore-plus": "^1.7.0"
   },
   "devDependencies": {
-    "coffeelint": "^1.9.7",
-    "fs-plus": ">=2.4.0",
-    "standard": "^8.3.0",
-    "temp": ">=0.7.0"
+    "fs-plus": "^3.1.1",
+    "temp": "^0.9.4"
   },
   "providedServices": {
     "autocomplete.watchEditor": {
@@ -88,7 +86,7 @@
     },
     "useCoreMovementCommands": {
       "title": "Use Core Movement Commands",
-      "description": "Disable this if you want to bind your own keystrokes to move around the suggestion list. You will also need to add definitions to your keymap. See: https://github.com/atom/autocomplete-plus#remapping-movement-commands",
+      "description": "Disable this if you want to bind your own keystrokes to move around the suggestion list. You will also need to add definitions to your keymap. See: https://github.com/pulsar-edit/pulsar/blob/master/packages/autocomplete-plus/README.md#remapping-movement-commands",
       "type": "boolean",
       "default": true,
       "order": 5
@@ -107,7 +105,7 @@
     },
     "scopeBlacklist": {
       "title": "Scope Blacklist",
-      "description": "Suggestions will not be provided for scopes matching this list. See: http://flight-manual.atom.io/behind-atom/sections/scoped-settings-scopes-and-scope-descriptors/",
+      "description": "Suggestions will not be provided for scopes matching this list. See: https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar/#scoped-settings-scopes-and-scope-descriptors",
       "type": "array",
       "default": [],
       "items": {
@@ -241,18 +239,5 @@
       "default": false,
       "order": 23
     }
-  },
-  "standard": {
-    "globals": [
-      "CustomEvent",
-      "HTMLElement",
-      "advanceClock",
-      "atom",
-      "getComputedStyle",
-      "waitsForPromise"
-    ],
-    "ignore": [
-      "**/spec/fixtures/**"
-    ]
   }
 }

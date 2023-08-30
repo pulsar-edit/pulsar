@@ -10,15 +10,7 @@
     "atom": ">=1.7 <2.0.0"
   },
   "dependencies": {
-    "etch": "^0.14.1",
-    "semver": "^7.3.8"
-  },
-  "consumedServices": {
-    "status-bar": {
-      "versions": {
-        "^1.0.0": "consumeStatusBar"
-      }
-    }
+    "etch": "^0.14.1"
   },
   "deserializers": {
     "AboutView": "deserializeAboutView"

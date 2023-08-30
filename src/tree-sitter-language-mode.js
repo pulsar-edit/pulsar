@@ -957,6 +957,7 @@ class HighlightIterator {
   }
 
   seek(targetPosition, endRow) {
+    // console.log("SEEK", targetPosition, endRow)
     const injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
       {
         intersectsRange: new Range(targetPosition, new Point(endRow + 1, 0))
@@ -991,6 +992,7 @@ class HighlightIterator {
     this.iterators.sort((a, b) => b.compare(a));
     this.detectCoveredScope();
 
+    // console.log("T", containingTags)
     return containingTags;
   }
 
@@ -1012,6 +1014,7 @@ class HighlightIterator {
       this.iterators.pop();
     }
 
+    // console.log("Move to Successor")
     this.detectCoveredScope();
   }
 
@@ -1039,8 +1042,10 @@ class HighlightIterator {
   getPosition() {
     const iterator = last(this.iterators);
     if (iterator) {
+      // console.log("getPosition", iterator.getPosition())
       return iterator.getPosition();
     } else {
+      // console.log("getPosition - INF")
       return Point.INFINITY;
     }
   }
@@ -1048,6 +1053,7 @@ class HighlightIterator {
   getCloseScopeIds() {
     const iterator = last(this.iterators);
     if (iterator && !this.currentScopeIsCovered) {
+      // console.log("CLOSE", iterator.getCloseScopeIds())
       return iterator.getCloseScopeIds();
     }
     return [];
@@ -1056,6 +1062,7 @@ class HighlightIterator {
   getOpenScopeIds() {
     const iterator = last(this.iterators);
     if (iterator && !this.currentScopeIsCovered) {
+      // console.log("CLOSE", iterator.getOpenScopeIds())
       return iterator.getOpenScopeIds();
     }
     return [];

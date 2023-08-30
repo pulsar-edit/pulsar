@@ -160,6 +160,29 @@ module.exports = class StyleManager {
       }
     }
 
+    if (!params.skipDeprecatedMathUsageTransformation) {
+      const transformed = this.upgradeDeprecatedMathUsageForStyleSheet(
+        styleElement.textContent,
+        params.context
+      );
+      styleElement.textContent = transformed.source;
+      if (transformed.deprecationMessage) {
+        // Now we may already have a deprecation message from upgrading deprecated
+        // selectors, so we want to check if the message already exists for this
+        // source path, and add to it, otherwise we can create a new one
+        if (typeof this.deprecationsBySourcePath[params.sourcePath]?.message === "string") {
+          this.deprecationsBySourcePath[params.sourcePath].message += `\n${transformed.deprecationMessage}`;
+          this.emitter.emit('did-update-deprecations');
+        } else {
+          // lets create a new deprecation
+          this.deprecationsBySourcePath[params.sourcePath] = {
+            message: transformed.deprecationMessage
+          };
+          this.emitter.emit('did-update-deprecations');
+        }
+      }
+    }
+
     if (updated) {
       this.emitter.emit('did-update-style-element', styleElement);
     } else {
@@ -223,6 +246,26 @@ module.exports = class StyleManager {
       }
     } else {
       return transformDeprecatedShadowDOMSelectors(styleSheet, context);
+    }
+  }
+
+  upgradeDeprecatedMathUsageForStyleSheet(styleSheet, context) {
+    if (this.cacheDirPath != null) {
+      const hash = crypto.createHash('sha1');
+      if (context != null) {
+        hash.update(context);
+      }
+      hash.update(styleSheet);
+      const cacheFilePath = path.join(this.cacheDirPath, hash.digest('hex'));
+      try {
+        return JSON.parse(fs.readFileSync(cacheFilePath));
+      } catch(e) {
+        const transformed = transformDeprecatedMathUsage(styleSheet, context);
+        fs.writeFileSync(cacheFilePath, JSON.stringify(transformed));
+        return transformed;
+      }
+    } else {
+      return transformDeprecatedMathUsage(styleSheet, context);
     }
   }
 
@@ -373,6 +416,95 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
     return { source: transformedSource.toString(), deprecationMessage };
   } else {
     // CSS was malformed so we don't transform it.
+    return { source: css };
+  }
+}
+
+function transformDeprecatedMathUsage(css, context) {
+  const transformedProperties = [];
+  let transformedSource;
+
+  // Some CSS keys **do** have very valid usage of `/` that might trigger a false
+  // positive of this regex, without any easy way to detect it as such.
+  // In those cases, it may be safer to ignore the key totally, as some broken
+  // UI because of an outdated community package, is better than breaking valid
+  // less style sheets.
+  const cssKeyIgnoreList = [ "font", "background", "grid-column", "cursor", "aspect-ratio" ];
+  // There are certain functions that may be used within a CSS value, where `/`
+  // or other mathematical expressions are valid, and we do not want to modify.
+  // In those cases, if we find the existance of that function within, then we
+  // stop modifying that value completely.
+  const cssValueIgnoreList = /hsl|abs|acos|asin|atan|atan2|cos|mod|rem|sign|sin|tan|url/g;
+
+  const mathExpressionRegex =
+  /(-*(\d(\.\d)?)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+)(\s*([\/\+\*]|(\-\s+))\s*((\d(\.\d)*)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+))+/g;
+
+  try {
+    transformedSource = postcss.parse(css);
+  } catch(e) {
+    transformedSource = null;
+  }
+
+  if (transformedSource) {
+    transformedSource.walkRules(rule => {
+      rule.each(node => {
+
+        if (
+          typeof node.value === "string" &&
+          !cssKeyIgnoreList.includes(node.prop) &&
+          !cssValueIgnoreList.test(node.value)
+        ) {
+          let containsMath = node.value.match(mathExpressionRegex);
+
+          if (containsMath !== null) {
+            let nodeOriginal = node.value;
+            let appliedChanges = false;
+            for (let i = 0; i < containsMath.length; i++) {
+              let match = containsMath[i];
+              if (!node.value.includes(`calc(${match})`)) {
+                node.value = node.value.replace(match, `calc(${match})`);
+                appliedChanges = true;
+              }
+            }
+            if (appliedChanges) {
+              transformedProperties.push({
+                property: node.prop,
+                valueBefore: nodeOriginal,
+                valueAfter: node.value
+              });
+            }
+          }
+        }
+
+      });
+    });
+
+    let deprecationMessage;
+    if (transformedProperties.length > 0) {
+      deprecationMessage =
+        'Starting from Pulsar v1.107.0, less v4.1.3 is used to transpile less style sheets. ';
+      deprecationMessage +=
+        'This means that Parens-division is now the default math setting, and all ';
+      deprecationMessage +=
+        'less style sheets must wrap division within parenthesis. ';
+      deprecationMessage +=
+        'To prevent breakage with existing style sheets, Pulsar will automatically ';
+      deprecationMessage +=
+        'wrap any mathematical expressions found unparsed by Less with `calc()`. ';
+      deprecationMessage +=
+        'Upgrading the values of the following properties:\n\n';
+      deprecationMessage +=
+        transformedProperties
+          .map(prop => `* \`${prop.property}\`: \`${prop.valueBefore}\` => \`${prop.valueAfter}\``)
+          .join(`\n\n`) + `\n\n`;
+      deprecationMessage +=
+        'Please, make sure to upgrade usage of mathematical expressions within ';
+      deprecationMessage +=
+        'less style sheets.';
+    }
+    return { source: transformedSource.toString(), deprecationMessage };
+  } else {
+    // CSS was malformed, so we don't transform it.
     return { source: css };
   }
 }

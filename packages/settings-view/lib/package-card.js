@@ -4,6 +4,7 @@
 import {CompositeDisposable, Disposable} from 'atom'
 import {shell} from 'electron'
 import etch from 'etch'
+import BadgeView from './badge-view'
 
 import {ownerFromRepository} from './utils'
 
@@ -46,6 +47,7 @@ export default class PackageCard {
     this.handlePackageEvents()
     this.handleButtonEvents(options)
     this.loadCachedMetadata()
+    this.addBadges()
 
     // themes have no status and cannot be dis/enabled
     if (this.type === 'theme') {
@@ -91,6 +93,7 @@ export default class PackageCard {
             <span className='package-version'>
               <span ref='versionValue' className='value'>{String(this.pack.version)}</span>
             </span>
+            <span ref='badges'></span>
           </h4>
           <span ref='packageDescription' className='package-description'>{description}</span>
           <div ref='packageMessage' className='package-message' />
@@ -296,8 +299,9 @@ export default class PackageCard {
           this.refs.downloadIcon.classList.add('icon-git-branch')
           this.refs.downloadCount.textContent = this.pack.apmInstallSource.sha.substr(0, 8)
         } else {
-          this.refs.stargazerCount.textContent = data.stargazers_count ? data.stargazers_count.toLocaleString() : ''
-          this.refs.downloadCount.textContent = data.downloads ? data.downloads.toLocaleString() : ''
+
+          this.refs.stargazerCount.textContent = data.stargazers_count ? parseInt(data.stargazers_count).toLocaleString() : ''
+          this.refs.downloadCount.textContent = data.downloads ? parseInt(data.downloads).toLocaleString() : ''
         }
       }
     })
@@ -319,6 +323,17 @@ export default class PackageCard {
       this.refs.settingsButton.style.display = ''
     } else {
       this.refs.settingsButton.style.display = 'none'
+    }
+  }
+
+  addBadges() {
+    if (Array.isArray(this.pack.badges)) {
+      // This safety check is especially needed, as any cached package
+      // data will not contain the badges field
+      for (const badge of this.pack.badges) {
+        let badgeView = new BadgeView(badge)
+        this.refs.badges.appendChild(badgeView.element)
+      }
     }
   }
 

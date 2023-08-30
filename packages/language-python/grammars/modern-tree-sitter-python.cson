@@ -1,0 +1,36 @@
+name: 'Python'
+scopeName: 'source.python'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-python'
+
+injectionRegex: '^(py|PY|python|PYTHON)$'
+
+firstLineRegex: [
+  # shebang line
+  '^#![ \\t]*/.*\\bpython[\\d\\.]*\\b'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=python'
+]
+
+fileTypes: [
+  'py'
+  'pyi'
+  'pyw'
+  'gyp'
+  'gypi'
+  'SConstruct'
+  'Sconstruct'
+  'sconstruct'
+  'SConscript'
+  'wsgi'
+]
+
+treeSitter:
+  # Built from tree-sitter-python 62827156d01c74dc1538266344e788da74536b8a
+  # to add support for `match` statements.
+  grammar: 'ts/tree-sitter-python.wasm'
+  highlightsQuery: 'ts/highlights.scm'
+  tagsQuery: 'ts/tags.scm'
+  foldsQuery: 'ts/folds.scm'
+  indentsQuery: 'ts/indents.scm'

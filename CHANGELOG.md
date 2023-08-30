@@ -6,11 +6,227 @@
 
 ## [Unreleased]
 
+## 1.108.0
+
+- Restored ability for `less` files in packages to use inline JavaScript inside backticks.
+- Fixed a syntax highlighting issue inside the `styleguide` package.
+- Fixed an issue with rubygems timing out on ARM Linux workflow.
+- Rewrote Tree-sitter scope predicates to use `#is?` and `#is-not?` where applicable.
+- Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
+- Added a feature in `markdown-preview` that adds support for Linguist, Chroma, Rouge, and HighlightJS for language identifiers in fenced code blocks.
+- Fixed the `TextMate` `language-toml` grammar to properly support whitespace where-ever it may appear.
+- Added a Tree-Sitter grammar for YAML files.
+- Added a new core package `pulsar-updater` to help users update Pulsar.
+- Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of correctly named binaries on more systems in more contexts (especially Windows). Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
+- Added a modern Tree-Sitter grammar for Markdown files.
+
+### Pulsar
+- Added: Add the Tree-Sitter Markdown grammar [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/659)
+- Fixed: [pulsar-updater] Correct deb-get instructions ( + readme change) [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/669)
+- Added: Tree-sitter running fixes [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/660)
+- Added: Add `pulsar-updater` as a core bundled Package [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/656)
+- Added: Manual Decaf Bundle (`autocomplete-atom-api`, `autoflow`, `deprecation-cop`) Source [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/664)
+- Bumped: [Time Sensitive] Update Cirrus Encrypted token for GitHub Access [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/666)
+- Added: [core]: Transforming Deprecated Math Usage - Support for Variables [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/653)
+- Added: Add Tree-sitter grammar for YAML [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/634)
+- Fixed: [language-toml] Add whitespace rule to values [@arite](https://github.com/pulsar-edit/pulsar/pull/646)
+- Added: [markdown-preview]: Support for nested table objects in Yaml Frontmatter [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/629)
+- Added: [markdown-preview]: Revamp Fenced Code Block Language Identifiers [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/622)
+- Bumped: ppm: Update submodule to 49c8ced8f9552bb4aeb279130 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/654)
+- Fixed: [settings-view] Don't let project-specific settings pollute the UI [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/655)
+- Added: [modern-tree-sitter] Overhaul Tree-sitter scope tests [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/652)
+- Fixed: fix(arm): use rubygems from APT [@cat-master21](https://github.com/pulsar-edit/pulsar/pull/651)
+- Added: [language-*]: Manual Spec Decaf (Part 1) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/632)
+- Fixed: [styleguide] Fix error when styleguide is shown... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/648)
+- Bumped: Bump `less-cache` to 2.0.1 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/644)
+
+### ppm
+
+- Added: Add 'ppm' bins to complement existing 'apm' bins [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/80)
+- Fixed: Replace "apm" by "ppm" in help messages. [@azuledu](https://github.com/pulsar-edit/ppm/pull/62)
+- Bumped: Update OS, actions, node [@Spiker985](https://github.com/pulsar-edit/ppm/pull/57)
+
+## 1.107.1
+
+- Updated the `github` package to resolve incompatibility in Style Sheets against Less v4
+
+### Pulsar
+
+- Bumped: deps: Update github package to v0.36.17-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/639)
+
+### github
+
+- Fixed: Fix Less Syntax [@confused-Techie](https://github.com/pulsar-edit/github/pull/34)
+
+## 1.107.0
+
+- Fixed a number of issues with the experimental modern Tree-sitter grammar mode
+- Pulsar can now be added to the PATH on Windows, via the "System" pane within Settings View.
+- Bumped `less-cache` to `v2.0.0` which uses `less@4.1.3`. This adds many new features of Less, while causing breaking changes to existing Less StyleSheets. Read more about these changes [here](https://github.com/pulsar-edit/less-cache/releases/tag/v2.0.0). Pulsar will attempt to automatically repair any breaking changes in any package style sheets, while emitting deprecations.
+- Fixed a bug that would render files unable to be clicked with sticky headers enabled on One-Dark and One-Light themes.
+- Added a Modern Tree-Sitter TOML Grammar.
+- Added a new API endpoint within Pulsar of `atom.versionSatisifes()` to allow packages to safely check the version of Pulsar, instead of having to do so themselves.
+- An issue in a downstream dependency has been resolved that improperly flagged Pulsar as malicious.
+
+### Pulsar
+- Added: Improved Windows Install (`PATH`, `ATOM_HOME`, `InstallLocation`) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/604)
+- Fixed: Running PR for Tree-Sitter fixes [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/555)
+- Added: [autocomplete-css]: Manual Decaf of Source [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/631)
+- Fixed: [welcome]: Ensure Changelog Always Shows if enabled, and version hasn't been dismissed [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/607)
+- Bumped: [autocomplete-plus] Maintenance - Deps bumps, remove CoffeeScript files [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/630)
+- Fixed: Fix tree-view sticky headers of one-dark & one-light themes [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/599)
+- Fixed: [spell-check]: Remove usage of reserved word [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/620)
+- Added: [core]: Implement API on `atom.` to compare Pulsar Versions [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/588)
+- Added: [settings-view]: Manual Decaf (source) [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/558)
+- Bumped: [core]: Bump `less-cache` to `v2.0.0` Upgrades `less` to `4.1.3` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/611)
+- Added: [core]: Bundle `spell-check` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/614)
+- Bumped: Update dependency semver to v7.5.2 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/609)
+- Added: [modern-tree-sitter] Add TOML tree-sitter grammar [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/617)
+- Fixed: [language-toml]: Allow spaces within Array [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/610)
+- Fixed: Pin `es5-ext` to `pulsar-edit/es5-ext` removing code flagged as malicious [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/608)
+- Bumped: [git-diff] Bump all Deps [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/603)
+- Bumped: Update dependency semver [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/605)
+- Fixed: [autocomplete-css] Get tests passing for new CSS tree-sitter grammar [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/601)
+- Bumped: [dalek] Bump dependencies to latest, fix links [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/602)
+- Bumped: Update dependency marked to v5.0.3 [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/568)
+
+### less-cache
+- Bumped: Bump `1.1.1` => `2.0.0` [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/5)
+- Bumped: Bump `less` `3.12.2` => `4.1.3` [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/4)
+- Added: Repository Cleanup + CoffeeScript tool Removal (Depends on #2) [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/3)
+- Added: Manual decaf of source files [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/2)
+- Added: Implement Repo Tests [@confused-Techie](https://github.com/pulsar-edit/less-cache/pull/1)
+
+## 1.106.0
+
+- Fixed bug that happens on some systems when trying to launch Pulsar using the Cinnamon desktop environment
+- Added a modern implementation of Tree-sitter grammars behind an experimental flag. Enable the “Use Modern Tree-Sitter Implementation” in the Core settings to try it out
+- Bugfix: fixed Clojure indentation on tree-sitter
+- Improved the Clojure language support by migrating it to tree-sitter and support block comments, quoting, and other advanced features on modern tree-sitter implementation
+- Fixed a bug that could cause images to not appear the first time opening them
+- `autocomplete-css` Completions are now sorted in a way that may match what users expect
+- Added a "Log Out" menu item for the `github` package
+
+### Pulsar
+- Updated: deps: Bump github to v0.36.16-pretranspiled [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/592)
+- Removed: Mostly remove `request` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/474)
+- Fixed: Fix: Image doesn't appear at first open [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/579)
+- Removed: Remove specific cinnamon condition [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/563)
+- Fixed: Fix of Clojure's indentation rules by removing query file [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/584)
+- Fixed: Update links in settings page [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/570)
+- Added: [autocomplete-css] Sort `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/552)
+- Fixed: Fixes on "comment block" for Clojure grammar [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/573)
+- Added: Hardcode NSIS GUID [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/566)
+- Fixed: Make yarn sane [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/567)
+- Fixed: Huge improvement on Clojure highlighting [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/553)
+- Removed: Removed unused_require method [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/561)
+- Bumped: Update dependency underscore to 1.12.1 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/504)
+- Added: Add modern tree-sitter support behind an experimental flag [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/472)
+- Added: Make CHANGELOG easier to merge and update dompurify [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/537)
+- Added: js operators [@icecream17](https://github.com/pulsar-edit/pulsar/pull/79)
+- Bumped: Update dependency postcss to v8.2.13 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/514)
+
+### github
+- Added: Add logout menu option [@Daeraxa](https://github.com/pulsar-edit/github/pull/27)
+- Updated: ci: Bump action dependencies [@Spiker985](https://github.com/pulsar-edit/github/pull/19)
+
+## 1.105.0
+
+- Rebranded notifications, using our backend to find new versions of package,
+and our github repository to find issues on Pulsar. Also fixed the "view issue"
+and "create issue" buttons that were not working
+- Bumped to latest version of `second-mate`, fixing a memory usage issue in `vscode-oniguruma`
+- Removed a cache for native modules - fix bugs where an user rebuilds a native
+module outside of Pulsar, but Pulsar refuses to load anyway
+- Removed `nslog` dependency
+- Fixed an error where the GitHub package tried to interact with a diff view after it was closed
+- Fixed RPM installation failure when Atom was installed on the same machine
+- Added a new set of Package `activationHooks`, `...:uri-opened` lets a package activate when any URI is opened within Pulsar, and `...:file-name-opened` lets a package activate when any specific filename is opened within Pulsar.
+
+### Pulsar
+- Added: Add new `...:uri-opened` && `...:file-name-opened` Package Activation Hook [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/518)
+- Fixed: Properly localize Download/Stargazer Counts within `settings-view` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/526)
+- Added: Add bookmarks service for consumption by other packages [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/525)
+- Added: Bundle notifications [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/529)
+- Fixed: Fix Ripgrep download issues in CirrusCI [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/530)
+- Removed: Revert Incorrect Commit [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/528)
+- Fixed: Making CI green, hopefully [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/523)
+- Bumped: Bump `second-mate` to 96866771 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/524)
+- Removed: Remove cache of incompatible native packages [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/493)
+- Added: Simplify and bundle fuzzy-finder [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/515)
+- Added: Bundle find and replace [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/517)
+- Added: Bundle tree view [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/513)
+- Added: Bundle `autocomplete-atom-api` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/476)
+- Added: Add FPM option to stop rpm buildid clash [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/505)
+- Bumped: chore(deps): update dependency minimist [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/502)
+- Fixed: Disable Failing Tests [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/477)
+- Bumped: chore(deps): update dependency ajv to 6.12.3 [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/501)
+- Bumped: chore(deps): update dependency async to 3.2.2 [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/495)
+- Added: Add "icon only" class to settings view icon [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/456)
+- Bumped: chore(deps): update dependency minimatch [security] [@renovate](https://github.com/pulsar-edit/pulsar/pull/496)
+ - Removed: Remove `nslog` dependency [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/494)
+- Added: Setup Renovate [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/469)
+- Fixed: Don't mark diff ranges on a destroyed buffer [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/481)
+- Added: First Architectural Design Records [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/480)
+- Bumped: use pular's `typscript-simple` fork, which bumps `typescript` to 5.0.3 [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/458)
+- Added: CI: cache and restore dependencies, plus skip rebuilding all over the place (saves a lot of time) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/492)
+
+### notifications
+- Fixed: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/notifications/pull/1)
+- Added: reject promise with Error instance [@Sertonix](https://github.com/pulsar-edit/notifications/pull/2)
+- Added: Add our Testing Action [@confused-Techie](https://github.com/pulsar-edit/notifications/pull/3)
+- Fixed: Change atom strings to pulsar [@mdibella-dev](https://github.com/pulsar-edit/notifications/pull/4)
+- Bumped: Bump to v3.2 of action-pulsar-dependency [@confused-Techie](https://github.com/pulsar-edit/notifications/pull/5)
+- Fixed: Fix all Tests [@confused-Techie](https://github.com/pulsar-edit/notifications/pull/6)
+
+## 1.104.0
+
 - The settings-view package now lists a package’s snippets more accurately
 - Fixed some issues with some packages with WebComponents v0 (tablr package
 should work now) by internalizing and patching document-register-element
 - Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM
 version). This fixes issues with Electron 21
+- Ensured new WASM packages will work on Apple Silicon
+- Completions for HTML will now be as bleeding edge as possible.
+
+### Pulsar
+- Added: `settings-view` Support for Badges [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/451)
+- Removed: remove weird duplicate accented fixture file (hopefully?) [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/488)
+- Added: Add optional entitlements monkey-patch [@confused-Tecie](https://github.com/pulsar-edit/pulsar/pull/483)
+- Added: Decaf `wrap-guide` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/443)
+- Added: Additional Bundling of Core Packages [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/424)
+- Added: add allow-jit entitlement (fixes Apple Silicon builds) [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/454)
+- Removed: Revert "Create i18n API" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/471)
+- Added: Build first, and test later [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/463)
+- Update: [settings-view] Update package snippets view to reflect new features [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/406)
+- Added: Create i18n API [@Meadowsys](https://github.com/pulsar-edit/pulsar/pull/446)
+- Added: Add Automated updating of `autocomplete-html` `completions.json` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/405)
+- Fixed: docs: fix markdown links in packages README [@oakmac](https://github.com/pulsar-edit/pulsar/pull/450)
+- Fixed: Patch document register element [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/438)
+- Added: Using "second-mate" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/435)
+- Fixed: Fix spacing of PHP's "for ..." snippet [@machitgarha](https://github.com/pulsar-edit/pulsar/pull/440)
+- Update: Update resources metadata [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/414)
+- Fixed: Cirrus: Windows: install ppm deps with Yarn [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/434)
+- Added: made cirrus build scripts consistent [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/239)
+- Update: Update package.json author [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/432)
+
+### second-mate
+- Added: Migrate to vscode-oniguruma [@mauricioszabo](https://github.com/pulsar-edit/second-mate/pull/1)
+
+### autosave
+- Removed: removed fs-plus dependency [@Sertonix](https://github.com/pulsar-edit/autosave/pull/2)
+- Update: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/autosave/pull/1)
+
+### bracket-matcher
+- Fixed: Fixing test that need to run locally [@mauricioszabo](https://github.com/pulsar-edit/bracket-matcher/pull/3)
+- Update: cleanup .md and rename repo url [@Sertonix](https://github.com/pulsar-edit/bracket-matcher/pull/2)
+- Update: Rename A[a]tom -> P[p]ulsar [@Spiker985](https://github.com/pulsar-edit/bracket-matcher/pull/1)
+
+### timecop
+- Update: cleanup and rename [@Sertonix](https://github.com/pulsar-edit/timecop/pull/1)
+
+### keybinding-resolver
+- Update: Cleanup and rename [@Sertonix](https://github.com/pulsar-edit/keybinding-resolver/pull/1)
 
 ## 1.103.0
 

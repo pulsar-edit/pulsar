@@ -8,6 +8,7 @@ const { deprecate } = require('grim');
 const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
 const fs = require('fs-plus');
 const { mapSourcePosition } = require('@atom/source-map-support');
+const semver = require("semver");
 const WindowEventHandler = require('./window-event-handler');
 const StateStore = require('./state-store');
 const registerDefaultCommands = require('./register-default-commands');
@@ -43,10 +44,8 @@ const Dock = require('./dock');
 const TextEditor = require('./text-editor');
 const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
-const AutoUpdateManager = require('./auto-update-manager');
 const StartupTime = require('./startup-time');
 const getReleaseChannel = require('./get-release-channel');
-const I18n = require("./i18n");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -126,11 +125,6 @@ class AtomEnvironment {
     /** @type {StyleManager} */
     this.styles = new StyleManager();
 
-    this.i18n = new I18n({
-      notificationManager: this.notifications,
-      config: this.config
-    });
-
     /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
@@ -141,8 +135,7 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       deserializerManager: this.deserializers,
       viewRegistry: this.views,
-      uriHandlerRegistry: this.uriHandlerRegistry,
-      i18n: this.i18n
+      uriHandlerRegistry: this.uriHandlerRegistry
     });
 
     /** @type {ThemeManager} */
@@ -156,7 +149,6 @@ class AtomEnvironment {
 
     /** @type {MenuManager} */
     this.menu = new MenuManager({
-      i18n: this.i18n,
       keymapManager: this.keymaps,
       packageManager: this.packages
     });
@@ -204,10 +196,6 @@ class AtomEnvironment {
     });
 
     this.themes.workspace = this.workspace;
-
-    this.autoUpdater = new AutoUpdateManager({
-      applicationDelegate: this.applicationDelegate
-    });
 
     if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
       this.keymaps.loadBundledKeymaps();
@@ -282,19 +270,6 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
-    this.packages.initialize({
-      devMode,
-      configDirPath: this.configDirPath,
-      resourcePath,
-      safeMode
-    });
-
-    this.i18n.initialize({
-      configDirPath: this.configDirPath,
-      packages: this.packages,
-      resourcePath
-    });
-
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
 
@@ -308,6 +283,12 @@ class AtomEnvironment {
     this.commands.attach(this.window);
 
     this.styles.initialize({ configDirPath: this.configDirPath });
+    this.packages.initialize({
+      devMode,
+      configDirPath: this.configDirPath,
+      resourcePath,
+      safeMode
+    });
     this.themes.initialize({
       configDirPath: this.configDirPath,
       resourcePath,
@@ -320,7 +301,6 @@ class AtomEnvironment {
       'core',
       CoreURIHandlers.create(this)
     );
-    this.autoUpdater.initialize();
 
     this.protocolHandlerInstaller.initialize(this.config, this.notifications);
 
@@ -484,7 +464,6 @@ class AtomEnvironment {
     this.project = null;
     this.commands.clear();
     if (this.stylesElement) this.stylesElement.remove();
-    this.autoUpdater.destroy();
     this.uriHandlerRegistry.destroy();
 
     this.uninstallWindowEventHandler();
@@ -600,6 +579,18 @@ class AtomEnvironment {
     if (this.appVersion == null)
       this.appVersion = this.getLoadSettings().appVersion;
     return this.appVersion;
+  }
+
+  /**
+   * @memberof AtomEnvironment
+   * Compares the current Pulsar version against any valid semver range.
+   * @param {string} value - Any valid semver range.
+   * @returns {boolean} True if the current version satisfies the range provided,
+   * false otherwise.
+   * @see {@link https://github.com/npm/node-semver#ranges}
+   */
+  versionSatisfies(value) {
+    return semver.satisfies(this.getVersion(), value);
   }
 
   // Public: Gets the release channel of the Pulsar application.
@@ -968,8 +959,6 @@ class AtomEnvironment {
           this.prepareToUnloadEditorWindow.bind(this)
         )
       );
-
-      this.listenForUpdates();
 
       this.registerDefaultTargetForKeymaps();
 
@@ -1580,24 +1569,6 @@ or use Pane::saveItemAs for programmatic saving.`);
         );
       }
     }
-  }
-
-  // TODO: We should deprecate the update events here, and use `atom.autoUpdater` instead
-  onUpdateAvailable(callback) {
-    return this.emitter.on('update-available', callback);
-  }
-
-  updateAvailable(details) {
-    return this.emitter.emit('update-available', details);
-  }
-
-  listenForUpdates() {
-    // listen for updates available locally (that have been successfully downloaded)
-    this.disposables.add(
-      this.autoUpdater.onDidCompleteDownloadingUpdate(
-        this.updateAvailable.bind(this)
-      )
-    );
   }
 
   setBodyPlatformClass() {

@@ -1,0 +1,22 @@
+{
+  "name": "autocomplete-atom-api",
+  "version": "0.10.7",
+  "description": "Pulsar API autocompletions",
+  "main": "./lib/main",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "getProvider"
+      }
+    }
+  },
+  "devDependencies": {
+    "request": "^2.53.0",
+    "temp": "^0.8.1"
+  }
+}

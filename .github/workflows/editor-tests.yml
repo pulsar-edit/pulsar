@@ -1,13 +1,15 @@
 name: Editor tests
 on:
-  - pull_request
+  pull_request:
+  push:
+    branches: ['master']
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
 
 jobs:
   tests:
-    name: tests
+    name: Tests
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
@@ -19,20 +21,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup node
-      uses: actions/setup-node@v2-beta
+      uses: actions/setup-node@v3
       with:
         node-version: 16
 
-    - name: install dependencies
+    - name: Install Dependencies
       run: yarn install
 
-    - name: build dependencies
+    - name: Build Dependencies
       run: yarn build
 
-    - name: Run tests
-      uses: GabrielBB/xvfb-action@v1
+    - name: Run Tests
+      uses: coactions/setup-xvfb@v1.0.1
       with:
         run: node script/run-tests.js spec

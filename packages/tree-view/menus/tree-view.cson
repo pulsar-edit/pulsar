@@ -1,0 +1,125 @@
+'menu': [
+  {
+    'label': 'View'
+    'submenu': [
+      {'label': 'Toggle Tree View', 'command': 'tree-view:toggle'}
+    ]
+  }
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Tree View'
+      'submenu': [
+        {'label': 'Focus', 'command': 'tree-view:toggle-focus'}
+        {'label': 'Toggle', 'command': 'tree-view:toggle'}
+        {'label': 'Reveal Active File', 'command': 'tree-view:reveal-active-file'}
+        {'label': 'Toggle Tree Side', 'command': 'tree-view:toggle-side'}
+      ]
+    ]
+  }
+]
+
+'context-menu':
+  '.tree-view .full-menu': [
+    {'label': 'New File', 'command': 'tree-view:add-file'}
+    {'label': 'New Folder', 'command': 'tree-view:add-folder'}
+    {'type': 'separator'}
+
+    {'label': 'Rename', 'command': 'tree-view:move'}
+    {'label': 'Duplicate', 'command': 'tree-view:duplicate'}
+    {'label': 'Delete', 'command': 'tree-view:remove'}
+    {'label': 'Copy', 'command': 'tree-view:copy'}
+    {'label': 'Cut', 'command': 'tree-view:cut'}
+    {'label': 'Paste', 'command': 'tree-view:paste'}
+    {'type': 'separator'}
+
+    {'label': 'Add Project Folder', 'command': 'application:add-project-folder'}
+    {'type': 'separator'}
+
+    {'label': 'Copy Full Path', 'command': 'tree-view:copy-full-path'}
+    {'label': 'Copy Project Path', 'command': 'tree-view:copy-project-path'}
+    {'label': 'Open in New Window', 'command': 'tree-view:open-in-new-window'}
+  ]
+
+  '.tree-view .full-menu [is="tree-view-file"]': [
+    {'label': 'Split Up', 'command': 'tree-view:open-selected-entry-up'}
+    {'label': 'Split Down', 'command': 'tree-view:open-selected-entry-down'}
+    {'label': 'Split Left', 'command': 'tree-view:open-selected-entry-left'}
+    {'label': 'Split Right', 'command': 'tree-view:open-selected-entry-right'}
+    {'type': 'separator'}
+  ]
+
+  '.tree-view .full-menu .project-root > .header': [
+    {'label': 'New File', 'command': 'tree-view:add-file'}
+    {'label': 'New Folder', 'command': 'tree-view:add-folder'}
+    {'type': 'separator'}
+
+    {'label': 'Rename', 'command': 'tree-view:move'}
+    {'label': 'Duplicate', 'command': 'tree-view:duplicate'}
+    {'label': 'Delete', 'command': 'tree-view:remove'}
+    {'label': 'Copy', 'command': 'tree-view:copy'}
+    {'label': 'Cut', 'command': 'tree-view:cut'}
+    {'label': 'Paste', 'command': 'tree-view:paste'}
+    {'type': 'separator'}
+
+    {'label': 'Add Project Folder', 'command': 'application:add-project-folder'}
+    {'label': 'Remove Project Folder', 'command': 'tree-view:remove-project-folder'}
+    {'label': 'Collapse All Project Folders', 'command': 'tree-view:collapse-all'}
+    {'type': 'separator'}
+
+    {'label': 'Copy Full Path', 'command': 'tree-view:copy-full-path'}
+    {'label': 'Copy Project Path', 'command': 'tree-view:copy-project-path'}
+    {'label': 'Open in New Window', 'command': 'tree-view:open-in-new-window'}
+  ]
+
+  '.platform-darwin .tree-view .full-menu': [
+    {'label': 'Reveal in Finder', 'command': 'tree-view:show-in-file-manager'}
+  ]
+
+  '.platform-win32 .tree-view .full-menu': [
+    {'label': 'Show in Explorer', 'command': 'tree-view:show-in-file-manager'}
+  ]
+
+  '.platform-linux .tree-view .full-menu': [
+    {'label': 'Show in File Manager', 'command': 'tree-view:show-in-file-manager'}
+  ]
+
+  '.tree-view .multi-select': [
+    {'label': 'Delete', 'command': 'tree-view:remove'}
+    {'label': 'Copy', 'command': 'tree-view:copy'}
+    {'label': 'Cut', 'command': 'tree-view:cut'}
+    {'label': 'Paste', 'command': 'tree-view:paste'}
+  ]
+
+  'atom-pane[data-active-item-path] .item-views': [
+    {'label': 'Reveal in Tree View', 'command': 'tree-view:reveal-active-file'}
+  ]
+
+  'atom-pane[data-active-item-path] .tab.active': [
+    {'label': 'Rename', 'command': 'tree-view:rename'}
+    {'label': 'Reveal in Tree View', 'command': 'tree-view:reveal-active-file'}
+  ]
+
+  '.platform-darwin atom-pane[data-active-item-path] .tab.active': [
+    {'label': 'Reveal In Finder', 'command': 'tree-view:show-current-file-in-file-manager'}
+  ]
+
+  '.platform-win32 atom-pane[data-active-item-path] .tab.active': [
+    {'label': 'Show In Explorer', 'command': 'tree-view:show-current-file-in-file-manager'}
+  ]
+
+  '.platform-linux atom-pane[data-active-item-path] .tab.active': [
+    {'label': 'Show in File Manager', 'command': 'tree-view:show-current-file-in-file-manager'}
+  ]
+
+  '.platform-darwin atom-text-editor:not([mini])': [
+    {'label': 'Reveal In Finder', 'command': 'tree-view:show-current-file-in-file-manager'}
+  ]
+
+  '.platform-win32 atom-text-editor:not([mini])': [
+    {'label': 'Show In Explorer', 'command': 'tree-view:show-current-file-in-file-manager'}
+  ]
+
+  '.platform-linux atom-text-editor:not([mini])': [
+    {'label': 'Show in File Manager', 'command': 'tree-view:show-current-file-in-file-manager'}
+  ]

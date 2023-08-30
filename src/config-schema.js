@@ -362,6 +362,12 @@ const configSchema = {
         default: true,
         description: 'Use Tree-sitter parsers for supported languages.'
       },
+      useExperimentalModernTreeSitter: {
+        type: 'boolean',
+        default: false,
+        title: 'Use Modern Tree-Sitter Implementation',
+        description: 'Experimental: Use the new query-file-based Tree-sitter system instead of the legacy system from Atom. (This system will eventually replace the legacy system.) Has no effect unless "Use Tree Sitter Parsers" is also checked.'
+      },
       colorProfile: {
         description:
           "Specify whether Pulsar should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Pulsar to take effect.",
@@ -377,6 +383,21 @@ const configSchema = {
             description: 'Use sRGB color profile'
           }
         ]
+      },
+      transformDeprecatedStyleSheetSelectors: {
+        description: 'Whether Pulsar should transform deprecated DOM Selectors in community package style sheets. Increases compatibility, as well as startup time.',
+        type: 'boolean',
+        default: true
+      },
+      transformDeprecatedStyleSheetMathExpressions: {
+        description: 'Whether Pulsar should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.',
+        type: 'boolean',
+        default: true
+      },
+      addCurrentTabToWindowTitle: {
+        description: 'Add the current tab title to the Pulsar Window title.',
+        type: 'boolean',
+        default: true
       }
     }
   },

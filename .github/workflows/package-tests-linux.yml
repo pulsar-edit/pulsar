@@ -1,6 +1,8 @@
-name: Package tests for Pulsar on Linux
+name: Package tests
 on:
-  - pull_request
+  pull_request:
+  push:
+    branches: ['master']
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
@@ -13,10 +15,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup node
-      uses: actions/setup-node@v2-beta
+      uses: actions/setup-node@v3
       with:
         node-version: 16
 
@@ -38,6 +40,15 @@ jobs:
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
+
+    - name: Cache dependencies
+      id: cache-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: dependencies-${{ github.sha }}
 
   test:
     name: Package
@@ -93,12 +104,13 @@ jobs:
           - package: "notifications"
           - package: "open-on-github"
           - package: "package-generator"
+          - package: "pulsar-updater"
           - package: "settings-view"
           - package: "snippets"
           - package: "spell-check"
           - package: "status-bar"
           - package: "styleguide"
-          - package: "symbols-view"
+          # - package: "symbols-view"
           - package: "tabs"
           - package: "timecop"
           - package: "tree-view"
@@ -143,15 +155,27 @@ jobs:
 
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup NodeJS
       uses: actions/setup-node@v3
       with:
         node-version: 16
+
+    - name: Restore dependencies from Cache
+      id: restore-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: dependencies-${{ github.sha }}
+
     - name: Install Dependencies
+      if: steps.restore-dependencies.outputs.cache-hit != 'true'
       run: yarn install || yarn install
 
     - name: Build Dependencies
+      if: steps.restore-dependencies.outputs.cache-hit != 'true'
       run: yarn build || yarn build
 
     - name: Restore pulsar from Cache

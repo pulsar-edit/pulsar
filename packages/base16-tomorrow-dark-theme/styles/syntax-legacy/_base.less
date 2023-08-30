@@ -139,7 +139,17 @@
     color: @yellow;
   }
 
-  &.syntax--function  {
+  &.syntax--namespace {
+    color: @yellow;
+  }
+
+  &.syntax--other {
+    &.syntax--function {
+      color: @blue;
+    }
+  }
+
+  &.syntax--function {
     color: @cyan;
 
     &.syntax--any-method {
@@ -262,6 +272,20 @@
 .syntax--source.syntax--gfm {
   .syntax--markup {
     -webkit-font-smoothing: auto;
+  }
+
+  .syntax--meta.syntax--link.syntax--text {
+    color: @cyan;
+  }
+
+  .syntax--punctuation.syntax--definition.syntax--list-item {
+    color: @red;
+  }
+
+  .syntax--markup.syntax--heading {
+    .syntax--punctuation {
+      color: inherit;
+    }
   }
 
   .syntax--link .syntax--entity {

@@ -1,5 +1,4 @@
 const { app } = require('electron');
-const nslog = require('nslog');
 const path = require('path');
 const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
@@ -43,11 +42,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   const args = parseCommandLine(process.argv.slice(1));
 
-  // This must happen after parseCommandLine() because yargs uses console.log
-  // to display the usage message.
-  const previousConsoleLog = console.log;
-  console.log = nslog;
-
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
@@ -60,14 +54,11 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     app.commandLine.appendSwitch('force-color-profile', colorProfile);
   }
 
-  if (handleStartupEventWithSquirrel()) {
-    return;
-  } else if (args.test && args.mainProcess) {
+  if (args.test && args.mainProcess) {
     app.setPath(
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
     );
-    console.log = previousConsoleLog;
     app.on('ready', function() {
       const testRunner = require(path.join(
         args.resourcePath,
@@ -123,16 +114,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     AtomApplication.open(args);
   });
 };
-
-function handleStartupEventWithSquirrel() {
-  if (process.platform !== 'win32') {
-    return false;
-  }
-
-  const SquirrelUpdate = require('./squirrel-update');
-  const squirrelCommand = process.argv[1];
-  return SquirrelUpdate.handleStartupEvent(squirrelCommand);
-}
 
 function getConfig() {
   const config = new Config();

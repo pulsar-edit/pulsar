@@ -1,5 +1,5 @@
 exports.activate = function() {
-  for (const scopeName of ['source.ts', 'source.flow']) {
+  for (const scopeName of ['source.ts', 'source.tsx', 'source.flow']) {
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'call_expression',
 
@@ -45,12 +45,13 @@ exports.activate = function() {
 
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'regex_pattern',
-      language(regex) {
-        return 'regex';
+      language() {
+        return 'js-regex';
       },
       content(regex) {
         return regex;
-      }
+      },
+      languageScope: null
     });
   }
 };

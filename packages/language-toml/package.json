@@ -1,10 +1,15 @@
 {
   "name": "language-toml",
   "version": "0.20.0",
+  "main": "lib/main",
   "description": "Syntax highlighting for Tom's Obvious, Minimal Language (TOML).",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
-    "atom": "*"
+    "atom": "*",
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "tree-sitter-toml": "^0.5.1"
   }
 }

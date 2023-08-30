@@ -1652,6 +1652,24 @@ describe('Workspace', () => {
     });
   });
 
+  describe('the file opened hook', () => {
+    it('fires when opening a file', async () => {
+      const packageUsed = jasmine.createSpy('my-fake-package');
+
+      atom.packages.triggerDeferredActivationHooks();
+      atom.packages.onDidTriggerActivationHook(
+        'sample.js:file-name-opened',
+        packageUsed
+      );
+
+      expect(packageUsed).not.toHaveBeenCalled();
+      const editor = await atom.workspace.open('sample.js', {
+        autoIndent: false
+      });
+      expect(packageUsed).toHaveBeenCalled();
+    })
+  });
+
   describe('::reopenItem()', () => {
     it("opens the uri associated with the last closed pane that isn't currently open", () => {
       const pane = workspace.getActivePane();
@@ -2049,6 +2067,22 @@ describe('Workspace', () => {
         const pathEscaped = fs.tildify(
           escapeStringRegex(path.dirname(item.getPath()))
         );
+        expect(document.title).toMatch(
+          new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`)
+        );
+      });
+
+      it("sets the title to the item's path if addCurrentTabToWindowTitle is disabled", () => {
+        atom.config.set("core.addCurrentTabToWindowTitle", false);
+        const item = atom.workspace.getActivePaneItem();
+        const pathEscaped = fs.tildify(
+          escapeStringRegex(path.dirname(item.getPath()))
+        );
+        expect(document.title).toMatch(
+          new RegExp(`^${pathEscaped}`)
+        );
+        atom.config.unset("core.addCurrentTabToWindowTitle");
+        // Now with the config changed, the title should automatically update
         expect(document.title).toMatch(
           new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`)
         );

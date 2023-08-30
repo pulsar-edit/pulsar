@@ -1,0 +1,43 @@
+name: 'Clojure'
+scopeName: 'source.clojure'
+type: 'modern-tree-sitter'
+injectionRegExp: '^source-clojure$'
+parser: 'tree-sitter-clojure'
+
+'fileTypes': [
+  'boot'
+  'clj'
+  'clj.hl'
+  'cljc'
+  'cljs'
+  'cljs.hl'
+  'cljx'
+  'clojure'
+  'org'
+  'bb'
+  'joke'
+  'joker'
+]
+'firstLineMatch': '''(?x)
+  # Hashbang
+  ^\\#!.*(?:\\s|\\/)
+    boot
+  (?:$|\\s)
+  |
+  # Modeline
+  (?i:
+    # Emacs
+    -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)
+      clojure(script)?
+    (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-
+    |
+    # Vim
+    (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=
+      clojure
+    (?=\\s|:|$)
+  )
+'''
+treeSitter:
+  grammar: 'ts/grammar.wasm'
+  highlightsQuery: 'ts/highlights.scm'
+  foldsQuery: 'ts/folds.scm'

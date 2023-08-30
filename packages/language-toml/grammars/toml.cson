@@ -201,6 +201,9 @@
         'include': '#numbers'
       }
       {
+        'include': '#whitespace'
+      }
+      {
         'match': '.+'
         'name': 'invalid.illegal.toml'
       }
@@ -293,3 +296,6 @@
         'name': 'constant.numeric.binary.toml'
       }
     ]
+  'whitespace':
+    'match': '\\s+'
+    'name': 'punctuation.whitespace.ignore.toml'

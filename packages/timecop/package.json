@@ -1,0 +1,19 @@
+{
+  "name": "timecop",
+  "version": "0.36.2",
+  "description": "Displays information about where time is spent while Pulsar loads.",
+  "main": "./lib/main",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "deserializers": {
+    "TimecopView": "createTimecopView"
+  },
+  "dependencies": {
+    "dedent": "^0.7.0",
+    "etch": "^0.12.6",
+    "underscore-plus": "^1.0.0"
+  }
+}

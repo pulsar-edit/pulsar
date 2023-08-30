@@ -1,0 +1,17 @@
+name: 'EJS'
+scopeName: 'text.html.ejs'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-embedded-template'
+
+fileTypes: [
+  'ejs'
+  'html.ejs'
+]
+
+injectionRegex: '^(ejs|EJS)$'
+
+treeSitter:
+  grammar: 'tree-sitter-embedded-template/tree-sitter-embedded-template.wasm'
+  highlightsQuery: 'tree-sitter-embedded-template/ejs/highlights.scm'
+  foldsQuery: 'tree-sitter-embedded-template/ejs/folds.scm'
+  indentsQuery: 'tree-sitter-embedded-template/ejs/indents.scm'
