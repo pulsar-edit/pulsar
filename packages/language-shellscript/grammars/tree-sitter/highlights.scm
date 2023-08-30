@@ -9,11 +9,11 @@
 ; Why isn't this a keyword in the parser?
 ((command_name) @keyword.control.return.shell
   (#eq? @keyword.control.return.shell "return")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((command_name) @support.function.builtin.shell
   (#match? @support.function.builtin.shell "^(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (command_name) @support.other.function.shell
 
@@ -49,13 +49,13 @@
 
 ((simple_expansion) @variable.other.positional.shell
   (#match? @variable.other.positional.shell "^\\$\\d+$")
-  (#set! test.final true))
+  (#set! capture.final true))
 
 ((simple_expansion) @variable.other.normal.shell)
 
 ; Prevent the "foo" in $foo from matching the following rule.
 (simple_expansion (variable_name) @_IGNORE_
-  (#set! test.final true))
+  (#set! capture.final true))
 (variable_name) @variable.other.shell
 
 
@@ -64,9 +64,9 @@
 
 (string "\"") @string.quoted.double.shell
 (string "\"" @punctuation.definition.string.begin.shell
-  (#set! test.onlyIfFirst true))
+  (#is? test.first true))
 (string "\"" @punctuation.definition.string.end.shell
-  (#set! test.onlyIfLast true))
+  (#is? test.last true))
 (raw_string) @string.quoted.single.shell
 
 (string

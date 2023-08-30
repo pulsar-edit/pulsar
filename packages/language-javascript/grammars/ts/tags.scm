@@ -11,15 +11,29 @@
 (
   (comment)* @doc
   .
-  [
-    (class
-      name: (_) @name)
-    (class_declaration
-      name: (_) @name)
-  ] @definition.class
-  (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
-  (#select-adjacent! @doc @definition.class)
+  (class_declaration
+    name: (_) @name) @definition.class
 )
+
+(
+  (comment)* @doc
+  .
+  (class
+    name: (_) @name) @definition.class
+)
+
+; (
+;   (comment)* @doc
+;   .
+;   [
+;     (class
+;       name: (_) @name)
+;     (class_declaration
+;       name: (_) @name)
+;   ] @definition.class
+;   (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
+;   (#select-adjacent! @doc @definition.class)
+; )
 
 (
   (comment)* @doc
@@ -107,12 +121,12 @@
   arguments: (arguments
     (string
       (string_fragment) @name))
-      (#match? @_fn "^(describe|it)$"))
+      (#match? @_fn "^(f+describe|f+it)$")
+      (#set! symbol.prepend "Focused: "))
 
 (call_expression
   function: (identifier) @_fn
   arguments: (arguments
     (string
       (string_fragment) @name))
-      (#match? @_fn "^(fdescribe|fit)$")
-      (#set! symbols.prepend "Focused: "))
+      (#match? @_fn "^(describe|it)$"))

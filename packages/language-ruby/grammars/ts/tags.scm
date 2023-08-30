@@ -3,13 +3,13 @@
   name: [
     (constant) @name
     (scope_resolution name: (_) @name)
-  ])
+  ]) @definition.class
 
 (singleton_class
   value: [
     (constant) @name
     (scope_resolution name: (_) @name)
-  ])
+  ]) @definition.class
 
 ; Module names
 (module
@@ -17,11 +17,11 @@
     (constant) @name
     (scope_resolution
       name: (_) @name)
-    ])
+    ]) @definition.module
 
 ; Method names
-(method name: (_) @name)
-(singleton_method name: (_) @name)
+(method name: (_) @name) @definition.method
+(singleton_method name: (_) @name) @definition.method
 
 ; Aliased methods
-(alias name: (_) @name)
+(alias name: (_) @name) @definition.method

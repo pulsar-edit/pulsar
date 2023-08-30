@@ -11,6 +11,7 @@ treeSitter:
   grammar: 'tree-sitter/tree-sitter-css.wasm'
   highlightsQuery: 'tree-sitter/queries/highlights.scm'
   foldsQuery: 'tree-sitter/queries/folds.scm'
+  tagsQuery: 'tree-sitter/queries/tags.scm'
   indentsQuery: 'tree-sitter/queries/indents.scm'
 
 injectionRegex: '^(css|CSS)$'

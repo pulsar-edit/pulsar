@@ -1,13 +1,13 @@
 ; Highlight this comment even if it's not “valid” JSDoc.
 ((ERROR) @comment.block.documentation.js.jsdoc
-  (#set! test.onlyIfRoot true))
+  (#is? test.root true))
 
 ((ERROR) @punctuation.definition.begin.comment.js.jsdoc
-  (#set! test.onlyIfRoot true)
+  (#is? test.root true)
   (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*\\*"))
 
 ((ERROR) @punctuation.definition.end.comment.js.jsdoc
-  (#set! test.onlyIfRoot true)
+  (#is? test.root true)
   (#set! adjust.startAndEndAroundFirstMatchOf "(?:\\*)?\\*/$"))
 
 
@@ -26,6 +26,8 @@
   ; Join the type with its surrounding braces.
   (#set! adjust.startAt firstChild.nextSibling.startPosition)
   (#set! adjust.endAt firstChild.nextSibling.nextSibling.nextSibling.endPosition))
+
+(identifier) @variable.other.jsdoc
 
 "{" @punctuation.definition.begin.bracket.curly.jsdoc
 "}" @punctuation.definition.end.bracket.curly.jsdoc

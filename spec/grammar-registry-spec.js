@@ -137,6 +137,22 @@ describe('GrammarRegistry', () => {
         grammarRegistry.grammarForId('source.js') instanceof SecondMate.Grammar
       ).toBe(true);
     });
+
+    it('never returns a stub object before a grammar has loaded', () => {
+      grammarRegistry.addInjectionPoint('source.js', {
+        type: 'some_node_type',
+        language() {
+          return 'some_language_name';
+        },
+        content(node) {
+          return node;
+        }
+      });
+
+      expect(
+        grammarRegistry.grammarForId('source.js')
+      ).toBe(undefined);
+    });
   });
 
   describe('.autoAssignLanguageMode(buffer)', () => {
@@ -878,23 +894,65 @@ describe('GrammarRegistry', () => {
       }
     };
 
+    let addCallbackFired;
+    let updateCallbackFired;
+    let addCallbackDisposable;
+    let updateCallbackDisposable;
+
     beforeEach(() => {
+      addCallbackFired = false;
+      updateCallbackFired = false;
       setConfigForLanguageMode('node-tree-sitter');
+    });
+
+    afterEach(() => {
+      addCallbackDisposable?.dispose();
+      updateCallbackDisposable?.dispose();
     });
 
     it('adds an injection point to the grammar with the given id', async () => {
       await atom.packages.activatePackage('language-javascript');
-      atom.grammars.addInjectionPoint('javascript', injectionPoint);
-      const grammar = atom.grammars.grammarForId('javascript');
-      expect(grammar.injectionPoints).toContain(injectionPoint);
+      atom.grammars.addInjectionPoint('source.js', injectionPoint);
+      const grammar = atom.grammars.grammarForId('source.js');
+      expect(
+        grammar.injectionPointsByType['some_node_type']
+      ).toContain(injectionPoint);
+    });
+
+    it('fires the onDidUpdateGrammar callback', async () => {
+      await atom.packages.activatePackage('language-javascript');
+      let callbackDisposable = atom.grammars.onDidUpdateGrammar((grammar) => {
+        if (grammar.scopeName === 'source.js') {
+          updateCallbackFired = true;
+        }
+      });
+      atom.grammars.addInjectionPoint('source.js', injectionPoint);
+      expect(updateCallbackFired).toBe(true);
     });
 
     describe('when called before a grammar with the given id is loaded', () => {
       it('adds the injection point once the grammar is loaded', async () => {
-        atom.grammars.addInjectionPoint('javascript', injectionPoint);
+        // Adding an injection point before a grammar loads should not trigger
+        // onDidUpdateGrammar at any point.
+        updateCallbackDisposable = atom.grammars.onDidUpdateGrammar((grammar) => {
+          if (!grammar.scopeName) {
+            updateCallbackFired = true;
+          }
+        });
+
+        // But onDidAddGrammar should be triggered when the grammar eventually
+        // loads.
+        addCallbackDisposable = atom.grammars.onDidAddGrammar((grammar) => {
+          if (grammar.scopeName === 'source.js') addCallbackFired = true;
+        });
+        atom.grammars.addInjectionPoint('source.js', injectionPoint);
         await atom.packages.activatePackage('language-javascript');
-        const grammar = atom.grammars.grammarForId('javascript');
-        expect(grammar.injectionPoints).toContain(injectionPoint);
+        const grammar = atom.grammars.grammarForId('source.js');
+        expect(
+          grammar.injectionPointsByType['some_node_type']
+        ).toContain(injectionPoint);
+        expect(updateCallbackFired).toBe(false);
+        expect(addCallbackFired).toBe(true);
       });
     });
   });

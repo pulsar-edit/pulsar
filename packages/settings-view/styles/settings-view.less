@@ -2,8 +2,8 @@
 @import "octicon-utf-codes";
 @import "ui-variables";
 
-@section-padding: 2 * @component-padding;
-@breadcrumb-padding: 2 * @component-padding;
+@section-padding: (2 * @component-padding);
+@breadcrumb-padding: (2 * @component-padding);
 
 .settings-view {
   display: flex;
@@ -80,7 +80,7 @@
     .error-link {
       color: inherit;
       text-decoration: underline;
-      margin-left: @component-padding/2;
+      margin-left: (@component-padding/2);
     }
   }
 
@@ -152,7 +152,7 @@
   }
 
   .editor-container {
-    margin: @component-padding*2 0;
+    margin: (@component-padding*2) 0;
     &:last-child {
       margin-bottom: 0;
     }
@@ -211,7 +211,7 @@
 
   section .section-heading,
   .section .section-heading {
-    margin-bottom: @component-padding*2;
+    margin-bottom: (@component-padding*2);
     color: @text-color-highlight;
     font-size: 1.75em;
     font-weight: bold;
@@ -222,7 +222,7 @@
 
   .sub-section-heading.icon:before,
   .section-heading.icon:before {
-    margin-right: @component-padding*.8;
+    margin-right: (@component-padding*.8);
   }
 
   .section-heading-count {
@@ -265,7 +265,7 @@
 
     .sub-section-body {
       margin-top: @component-padding;
-      margin-bottom: @component-padding*3;
+      margin-bottom: (@component-padding*3);
       margin-left: 6px;
       padding-left: 14px;
       border-left: 1px solid @base-border-color;
@@ -421,6 +421,10 @@
       color: @text-color;
     }
 
+    .setting-override-warning {
+      margin-top: 0.75em;
+    }
+
     .control-group + .control-group {
       margin-top:  1.5em;
     }
@@ -487,7 +491,7 @@
 
   .themes-panel {
     .control-group {
-      margin-top:  @component-padding*3;
+      margin-top:  (@component-padding*3);
     }
     .themes-picker {
       display: flex;
@@ -517,7 +521,7 @@
     }
 
     .theme-chooser {
-      padding-top: @component-padding*2;
+      padding-top: (@component-padding*2);
     }
 
     .theme-description {
@@ -532,18 +536,18 @@
     .search-container {
       display: flex;
       flex-wrap: wrap;
-      margin: 0 -@component-padding/2;
-      padding-top: @component-padding*1.5;
+      margin: 0 (-@component-padding/2);
+      padding-top: (@component-padding*1.5);
 
 
       .editor-container {
         flex: 1;
         min-width: 130px;
-        margin: @component-padding/2;
+        margin: (@component-padding/2);
       }
 
       .btn-group {
-        margin: @component-padding/2;
+        margin: (@component-padding/2);
         padding-left: 1px; // Counter balance since btns have margin-left: -1px
       }
     }
@@ -608,7 +612,7 @@
     }
 
     th {
-      padding: @component-padding - 2px @component-padding;
+      padding: (@component-padding - 2px) @component-padding;
       padding-left: 0;
     }
 
@@ -663,7 +667,7 @@
     }
 
     td, th {
-      padding: 0 @component-padding @component-padding/2 0;
+      padding: 0 @component-padding (@component-padding/2) 0;
     }
   }
 }
@@ -715,7 +719,7 @@
   }
 
   .update-all-button:last-child {
-    margin-left: @component-padding/2;
+    margin-left: (@component-padding/2);
   }
 
   .keybinding-panel .is-user {
@@ -724,7 +728,7 @@
   }
 
   .btn-wrap-group .btn {
-    margin: 0 @component-padding/2 @component-padding/2 0;
+    margin: 0 (@component-padding/2) (@component-padding/2) 0;
   }
 }
 

@@ -70,7 +70,7 @@ exports.activate = function() {
   const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
   const HYPERLINK_PATTERN = /\bhttps?:/
 
-  for (const scopeName of ['source.js', 'source.flow', 'source.ts']) {
+  for (const scopeName of ['source.js', 'source.ts', 'source.ts.tsx']) {
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'comment',
       language(comment) {
@@ -105,27 +105,6 @@ exports.activate = function() {
       });
     }
 
-    // atom.grammars.addInjectionPoint(scopeName, {
-    //   type: 'program',
-    //   language: () => 'todo',
-    //   content: (node) => {
-    //     return node.descendantsOfType('comment');
-    //   },
-    //   languageScope: null
-    // });
-    //
-    // atom.grammars.addInjectionPoint(scopeName, {
-    //   type: 'program',
-    //   language: () => 'hyperlink',
-    //   content: (node) => {
-    //     return node.descendantsOfType([
-    //       'template_string',
-    //       'string_fragment',
-    //       'comment'
-    //     ]);
-    //   },
-    //   languageScope: null
-    // });
   }
 };
 

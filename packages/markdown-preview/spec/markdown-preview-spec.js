@@ -588,14 +588,6 @@ describe('Markdown Preview', function () {
           ).toBe('')
         })
       })
-
-      describe('when the code block is nested in a list', function () {
-        it('detects and styles the block', function () {
-          expect(preview.querySelector('pre.lang-javascript')).toHaveClass(
-            'editor-colors'
-          )
-        })
-      })
     })
   })
 

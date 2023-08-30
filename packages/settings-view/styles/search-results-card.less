@@ -5,11 +5,11 @@
 .settings-view {
 
   .search-result {
-    padding: @component-padding*1.5;
+    padding: (@component-padding*1.5);
     margin-bottom: @component-padding;
     list-style-type: none;
     font-size: 1.2em;
-    border-radius: @component-border-radius*2;
+    border-radius: (@component-border-radius*2);
     border: 1px solid @base-border-color;
     background-color: @package-card-background-color;
     overflow: hidden;
@@ -68,16 +68,6 @@
       margin: 0 0 .2em 0;
       font-size: 1.2em;
       line-height: 1.4;
-
-      .css-truncate-target {
-        color: $greenDark;
-      }
-    }
-
-    .body {
-      .css-truncate-target {
-        max-width: 100%;
-      }
     }
 
     .search-package-name {

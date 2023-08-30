@@ -8,7 +8,7 @@
 ; we might have to make this configurable somehow.
 (switch_statement
   body: (compound_statement "}" @match
-    (#set! test.onlyIfLast true))
+    (#is? test.last true))
   (#set! indent.matchIndentOf parent.startPosition))
 
 ; 'case' and 'default' need to be indented one level more than their containing
