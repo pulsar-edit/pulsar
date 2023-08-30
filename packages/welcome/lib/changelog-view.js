@@ -18,13 +18,10 @@ export default class ChangeLogView {
   }
 
   wasVersionDismissed() {
-    const lastVersion = atom.config.get('welcome.lastViewedChangeLog');
-    const curVersion = atom.getVersion().split(".");
-    if (lastVersion[0] < curVersion[0] && lastVersion[1] < curVersion[1] && lastVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
-      return false;
-    } else {
-      return true;
-    }
+    // Use the new `.versionSatisfies()` API to check if our last dismissed version
+    // is the same as the current version. `.versionSatisfies()` compares equality
+    // by default, so no comparator is needed
+    return atom.versionSatisfies(atom.config.get('welcome.lastViewedChangeLog'));
   }
 
   update() {}
@@ -53,19 +50,40 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                The settings-view package now lists a package's snippets more accurately.
+                Restored ability for `less` files in packages to use inline JavaScript inside backticks.
               </li>
               <li>
-                Fixed some issues with some packages with WebComponents v0 (tablr package should work now) by internalizing and patching document-register-element.
+                Fixed a syntax highlighting issue inside the `styleguide` package.
               </li>
               <li>
-                Migrated away from `node-oniguruma` in favor of `vscode-oniguruma` (WASM Version). This fixes issues with Electron 21.
+                Fixed an issue with rubygems timing out on ARM Linux workflow.
               </li>
               <li>
-                Ensured new WASM packages will work on Apple Silicon.
+                Rewrote Tree-sitter scope predicates to use `#is?` and `#is-not?` where applicable.
               </li>
               <li>
-                Completions for HTML will now be as bleeding edge as possible.
+                Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
+              </li>
+              <li>
+                Added a feature in `markdown-preview` that adds support for Linguist, Chroma, Rouge, and HighlightJS for
+                language identifiers in fenced code blocks.
+              </li>
+              <li>
+                Fixed the `TextMate` `language-toml` grammar to properly support whitespace where-ever it may appear.
+              </li>
+              <li>
+                Added a Tree-Sitter grammar for YAML files.
+              </li>
+              <li>
+                Added a new core package `pulsar-updater` to help users update Pulsar.
+              </li>
+              <li>
+                Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of
+                correctly named binaries on more systems in more contexts (especially Windows).
+                Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
+              </li>
+              <li>
+                Added a modern Tree-Sitter grammar for Markdown files.
               </li>
 
             </ul>

@@ -10,14 +10,10 @@ const MenuHelpers = require('../menu-helpers');
   * and maintain the state of all menu items.
   */
 module.exports = class ApplicationMenu {
-  constructor(version, autoUpdateManager) {
+  constructor(version) {
     this.version = version;
-    this.autoUpdateManager = autoUpdateManager;
     this.windowTemplates = new WeakMap();
     this.setActiveTemplate(this.getDefaultTemplate());
-    this.autoUpdateManager.on('state-changed', state =>
-      this.showUpdateMenuItem(state)
-    );
   }
 
   /**
@@ -45,7 +41,7 @@ module.exports = class ApplicationMenu {
       Menu.setApplicationMenu(this.menu);
     }
 
-    return this.showUpdateMenuItem(this.autoUpdateManager.getState());
+    return;
   }
 
   // Register a BrowserWindow with this application menu.
@@ -128,71 +124,15 @@ module.exports = class ApplicationMenu {
     if (item) item.label = `Version ${this.version}`;
   }
 
-  // Sets the proper visible state the update menu items
-  showUpdateMenuItem(state) {
-    const items = this.flattenMenuItems(this.menu);
-    const checkForUpdateItem = items.find(
-      ({ id }) => id === 'Check for Update'
-    );
-    const checkingForUpdateItem = items.find(
-      ({ id }) => id === 'Checking for Update'
-    );
-    const downloadingUpdateItem = items.find(
-      ({ id }) => id === 'Downloading Update'
-    );
-    const installUpdateItem = items.find(
-      ({ id }) => id === 'Restart and Install Update'
-    );
-
-    if (
-      !checkForUpdateItem ||
-      !checkingForUpdateItem ||
-      !downloadingUpdateItem ||
-      !installUpdateItem
-    )
-      return;
-
-    checkForUpdateItem.visible = false;
-    checkingForUpdateItem.visible = false;
-    downloadingUpdateItem.visible = false;
-    installUpdateItem.visible = false;
-
-    switch (state) {
-      case 'idle':
-      case 'error':
-      case 'no-update-available':
-        checkForUpdateItem.visible = true;
-        break;
-      case 'checking':
-        checkingForUpdateItem.visible = true;
-        break;
-      case 'downloading':
-        downloadingUpdateItem.visible = true;
-        break;
-      case 'update-available':
-        installUpdateItem.visible = true;
-        break;
-    }
-  }
-
-  /**
-    * @name getDefaultTemplate
-    * @memberof ApplicationMenu
-    * @private
-    * @desc Default list of menu items.
-    * @returns {array} Returns an Array of menu item Objects.
-    */
+  // Default list of menu items.
+  //
+  // Returns an Array of menu item Objects.
   getDefaultTemplate() {
     return [
       {
         label: 'Pulsar',
         id: 'Pulsar',
         submenu: [
-          {
-            label: 'Check for Update',
-            id: 'Check for Update',
-            metadata: { autoUpdate: true }
-          },
           {
             label: 'Reload',
             id: 'Reload',

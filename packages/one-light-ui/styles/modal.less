@@ -1,6 +1,6 @@
 
-@modal-padding: @ui-padding/2 @ui-padding/1.5;
-@modal-width: @ui-size * 50;
+@modal-padding: (@ui-padding/2) (@ui-padding/1.5);
+@modal-width: (@ui-size * 50);
 
 atom-panel-container.modal {
   position: absolute;
@@ -15,14 +15,14 @@ atom-panel.modal {
   left: initial;
   color: @text-color;
   background-color: transparent;
-  padding: @ui-padding/2;
+  padding: (@ui-padding/2);
 
   &.from-top {
-    top: @component-padding * 5;
+    top: (@component-padding * 5);
   }
 
   atom-text-editor[mini] {
-    margin-bottom: @ui-padding/2;
+    margin-bottom: (@ui-padding/2);
   }
 
   .select-list ol.list-group,
@@ -68,8 +68,8 @@ atom-panel.modal {
 
   .select-list .key-binding {
     margin-top: -1px;
-    margin-left: @ui-padding/2;
-    margin-right: calc( -@ui-padding/3 ~"+" 1px);
+    margin-left: (@ui-padding/2);
+    margin-right: calc( (-@ui-padding/3) ~"+" 1px);
   }
 
   .select-list .primary-line {
@@ -96,7 +96,7 @@ atom-panel.modal {
     bottom: 0;
     z-index: 0;
     background-color: @overlay-background-color;
-    border-radius: @component-border-radius*2;
+    border-radius: (@component-border-radius*2);
     box-shadow: 0 6px 12px -2px hsla(0,0%,0%,.4);
   }
 

@@ -1,6 +1,6 @@
 .tooltip {
   white-space: nowrap;
-  font-size: @ui-size*1.15;
+  font-size: (@ui-size*1.15);
 
   &.in {
     opacity: 1;
@@ -9,7 +9,7 @@
 
   .tooltip-inner {
     line-height: 1;
-    padding: @ui-padding*.5 @ui-padding*.65;
+    padding: (@ui-padding*.5) (@ui-padding*.65);
     border-radius: @component-border-radius;
     background-color: @tooltip-background-color;
     color: @tooltip-text-color;
@@ -18,10 +18,10 @@
   }
 
   .keystroke {
-    font-size: max(1em, @ui-size*.85);
+    font-size: max(1em, (@ui-size*.85));
     padding: .1em .4em;
-    margin: 0 @ui-padding*-.35 0 @ui-padding*.25;
-    border-radius: max(2px, @component-border-radius / 2);
+    margin: 0 (@ui-padding*-.35) 0 (@ui-padding*.25);
+    border-radius: max(2px, (@component-border-radius / 2));
     color: @tooltip-text-key-color;
     background: @tooltip-background-key-color;
   }

@@ -177,6 +177,7 @@ module.exports = class Workspace extends Model {
   constructor(params) {
     super(...arguments);
 
+    this.disposables = new CompositeDisposable();
     this.updateWindowTitle = this.updateWindowTitle.bind(this);
     this.updateDocumentEdited = this.updateDocumentEdited.bind(this);
     this.didDestroyPaneItem = this.didDestroyPaneItem.bind(this);
@@ -380,6 +381,12 @@ module.exports = class Workspace extends Model {
     this.subscribeToAddedItems();
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
+
+    this.disposables.add(
+      this.config.onDidChange('core.addCurrentTabToWindowTitle', () => {
+        this.updateWindowTitle();
+      })
+    );
   }
 
   consumeServices({ serviceHub }) {
@@ -716,8 +723,11 @@ module.exports = class Workspace extends Model {
     }
 
     const titleParts = [];
-    if (item != null && projectPath != null) {
+    if (item != null && projectPath != null && this.config.get('core.addCurrentTabToWindowTitle')) {
       titleParts.push(itemTitle, projectPath);
+      representedPath = itemPath != null ? itemPath : projectPath;
+    } else if (item != null && projectPath != null && !this.config.get('core.addCurrentTabToWindowTitle')) {
+      titleParts.push(projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
     } else if (projectPath != null) {
       titleParts.push(projectPath);
@@ -1242,6 +1252,34 @@ module.exports = class Workspace extends Model {
       if (uri) {
         this.incoming.delete(uri);
       }
+
+      // After emitting the open event, lets trigger any packages activation commands
+      let activationHookItem;
+      let activationHookText;
+
+      if (item instanceof TextEditor) {
+        // This is a TextEditor opening, meaning a file
+        activationHookItem = item.getTitle();
+        activationHookText = "file-name-opened";
+      } else {
+        activationHookText = "uri-opened";
+        if (typeof item.getURI === "function") {
+          activationHookItem = item.getURI();
+        } else if (typeof item.getUri === "function") {
+          activationHookItem = item.getUri();
+        } else {
+          activationHookItem = "";
+          activationHookText = "";
+          // We are purposefully redeclaring the text here, to fail gracefully
+        }
+      }
+
+      if (activationHookText?.length > 1 && activationHookItem?.length > 1) {
+        this.packageManager.triggerActivationHook(
+          `${activationHookItem}:${activationHookText}`
+        );
+      }
+
     } finally {
       resolveItem();
     }

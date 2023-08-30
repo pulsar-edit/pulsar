@@ -1,0 +1,20 @@
+name: 'Rust'
+scopeName: 'source.rust'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-rust'
+
+injectionRegex: '^(rust|RUST)$'
+
+fileTypes: [
+  'rs'
+]
+
+comments:
+  start: '// '
+
+treeSitter:
+  grammar: 'tree-sitter-rust/tree-sitter-rust.wasm'
+  highlightsQuery: 'tree-sitter-rust/queries/highlights.scm'
+  tagsQuery: 'tree-sitter-rust/queries/tags.scm'
+  foldsQuery: 'tree-sitter-rust/queries/folds.scm'
+  indentsQuery: 'tree-sitter-rust/queries/indents.scm'

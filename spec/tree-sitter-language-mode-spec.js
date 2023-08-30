@@ -41,6 +41,8 @@ describe('TreeSitterLanguageMode', () => {
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
+    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set('core.useExperimentalModernTreeSitter', false);
   });
 
   describe('highlighting', () => {
@@ -249,7 +251,7 @@ describe('TreeSitterLanguageMode', () => {
         [{ text: 'a(', scopes: [] }],
         [{ text: 'b,', scopes: [] }],
         [{ text: 'c', scopes: [] }],
-        [{ text: '', scopes: [] }]
+        []
       ]);
 
       buffer.append(')');
@@ -307,7 +309,7 @@ describe('TreeSitterLanguageMode', () => {
 
       expectTokensToEqual(editor, [
         [{ text: '// abc', scopes: ['comment'] }],
-        [{ text: '', scopes: [] }],
+        [],
         [
           { text: 'a(', scopes: [] },
           { text: '"b"', scopes: ['string'] },
@@ -319,7 +321,7 @@ describe('TreeSitterLanguageMode', () => {
       buffer.insert([2, 0], '  ');
       expectTokensToEqual(editor, [
         [{ text: '// abc', scopes: ['comment'] }],
-        [{ text: '', scopes: [] }],
+        [],
         [
           { text: '  ', scopes: ['leading-whitespace'] },
           { text: 'a(', scopes: [] },
@@ -391,7 +393,7 @@ describe('TreeSitterLanguageMode', () => {
           { text: '…', scopes: ['fold-marker'] },
           { text: ' */', scopes: ['comment'] }
         ],
-        [{ text: '', scopes: [] }],
+        [],
         [{ text: 'hello', scopes: ['function'] }, { text: '();', scopes: [] }]
       ]);
     });
@@ -482,12 +484,18 @@ describe('TreeSitterLanguageMode', () => {
         await new Promise(process.nextTick);
 
         expectTokensToEqual(editor, [
-          [{ text: 'abc', scopes: ['variable'] }, { text: ';', scopes: [] }]
+          [
+            { text: 'abc', scopes: ['variable'] },
+            { text: ';', scopes: [] }
+          ]
         ]);
 
         buffer.setTextInRange([[0, 3], [0, 3]], '()');
         expectTokensToEqual(editor, [
-          [{ text: 'abc()', scopes: ['variable'] }, { text: ';', scopes: [] }]
+          [
+            { text: 'abc()', scopes: ['variable'] },
+            { text: ';', scopes: [] }
+          ]
         ]);
 
         buffer.setTextInRange([[0, 0], [0, 0]], 'new ');
@@ -614,8 +622,7 @@ describe('TreeSitterLanguageMode', () => {
             { text: ' = ', scopes: [] },
             { text: 'html', scopes: ['function'] },
             { text: ' ', scopes: [] },
-            { text: '`', scopes: ['string'] },
-            { text: '', scopes: ['string', 'html'] }
+            { text: '`', scopes: ['string'] }
           ],
           [
             { text: 'a ', scopes: ['string', 'html'] },
@@ -734,8 +741,7 @@ describe('TreeSitterLanguageMode', () => {
             { text: ' = ', scopes: [] },
             { text: 'html', scopes: ['function'] },
             { text: ' ', scopes: [] },
-            { text: '`', scopes: ['string'] },
-            { text: '', scopes: ['string', 'html'] }
+            { text: '`', scopes: ['string'] }
           ],
           [
             { text: 'a ', scopes: ['string', 'html'] },
@@ -2556,6 +2562,9 @@ function expectTokensToEqual(editor, expectedTokenLines) {
           )
         }));
     }
+
+    // console.log('EXPECTED:', expectedTokenLines);
+    // console.log('ACTUAL:', tokenLines);
 
     for (let row = startRow; row <= lastRow; row++) {
       const tokenLine = tokenLines[row];

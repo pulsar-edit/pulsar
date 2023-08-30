@@ -1,7 +1,6 @@
 const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
-const AutoUpdateManager = require('./auto-update-manager');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -239,11 +238,6 @@ module.exports = class AtomApplication extends EventEmitter {
       path.join(process.env.ATOM_HOME, 'recovery')
     );
     this.storageFolder = new StorageFolder(process.env.ATOM_HOME);
-    this.autoUpdateManager = new AutoUpdateManager(
-      this.version,
-      options.test,
-      this.config
-    );
 
     this.disposable = new CompositeDisposable();
     this.handleEvents();
@@ -261,8 +255,7 @@ module.exports = class AtomApplication extends EventEmitter {
     global.atomApplication = this;
 
     this.applicationMenu = new ApplicationMenu(
-      this.version,
-      this.autoUpdateManager
+      this.version
     );
     this.atomProtocolHandler = new AtomProtocolHandler(
       this.resourcePath,
@@ -280,7 +273,6 @@ module.exports = class AtomApplication extends EventEmitter {
     this.setupDockMenu();
 
     const result = await this.launch(options);
-    this.autoUpdateManager.initialize();
 
     StartupTime.addMarker('main-process:atom-application:initialize:end');
 
@@ -464,11 +456,6 @@ module.exports = class AtomApplication extends EventEmitter {
     if (this.applicationMenu)
       this.applicationMenu.addWindow(window.browserWindow);
 
-    window.once('window:loaded', () => {
-      this.autoUpdateManager &&
-        this.autoUpdateManager.emitUpdateAvailableEvent(window);
-    });
-
     if (!window.isSpec) {
       const focusHandler = () => this.windowStack.touch(window);
       const blurHandler = () => this.saveCurrentWindowOptions(false);
@@ -625,16 +612,6 @@ module.exports = class AtomApplication extends EventEmitter {
     );
     this.on('application:search-issues', () =>
       shell.openExternal('https://github.com/pulsar-edit/pulsar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
-    );
-
-    this.on('application:install-update', () => {
-      this.quitting = true;
-      this.quittingForUpdate = true;
-      this.autoUpdateManager.install();
-    });
-
-    this.on('application:check-for-update', () =>
-      this.autoUpdateManager.check()
     );
 
     if (process.platform === 'darwin') {
@@ -1065,18 +1042,6 @@ module.exports = class AtomApplication extends EventEmitter {
           event.sender.devToolsWebContents &&
           event.sender.devToolsWebContents.executeJavaScript(code)
       )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, 'get-auto-update-manager-state', event => {
-        event.returnValue = this.autoUpdateManager.getState();
-      })
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, 'get-auto-update-manager-error', event => {
-        event.returnValue = this.autoUpdateManager.getErrorMessage();
-      })
     );
 
     this.disposable.add(

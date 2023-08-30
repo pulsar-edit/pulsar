@@ -4,7 +4,7 @@ const SuggestionListElement = require('./suggestion-list-element')
 
 module.exports =
 class SuggestionList {
-  constructor () {
+  constructor() {
     this.wordPrefixRegex = null
     this.cancel = this.cancel.bind(this)
     this.confirm = this.confirm.bind(this)
@@ -16,9 +16,10 @@ class SuggestionList {
     this.hide = this.hide.bind(this)
     this.destroyOverlay = this.destroyOverlay.bind(this)
     this.activeEditor = null
+    this.lastActiveAt = 0
   }
 
-  initialize () {
+  initialize() {
     this.emitter = new Emitter()
     this.subscriptions = new CompositeDisposable()
 
@@ -37,7 +38,7 @@ class SuggestionList {
     }))
   }
 
-  get suggestionListElement () {
+  get suggestionListElement() {
     if (!this._suggestionListElement) {
       this._suggestionListElement = new SuggestionListElement(this)
     }
@@ -45,7 +46,7 @@ class SuggestionList {
     return this._suggestionListElement
   }
 
-  addBindings (editor) {
+  addBindings(editor) {
     if (this.bindings && this.bindings.dispose) {
       this.bindings.dispose()
     }
@@ -124,47 +125,47 @@ class SuggestionList {
   Section: Event Triggers
   */
 
-  cancel () {
+  cancel() {
     return this.emitter.emit('did-cancel')
   }
 
-  confirm (match) {
+  confirm(match) {
     return this.emitter.emit('did-confirm', match)
   }
 
-  confirmSelection () {
+  confirmSelection() {
     return this.emitter.emit('did-confirm-selection')
   }
 
-  confirmSelectionIfNonDefault (event) {
+  confirmSelectionIfNonDefault(event) {
     return this.emitter.emit('did-confirm-selection-if-non-default', event)
   }
 
-  select (suggestion) {
+  select(suggestion) {
     return this.emitter.emit('did-select', suggestion)
   }
 
-  selectNext () {
+  selectNext() {
     return this.emitter.emit('did-select-next')
   }
 
-  selectPrevious () {
+  selectPrevious() {
     return this.emitter.emit('did-select-previous')
   }
 
-  selectPageUp () {
+  selectPageUp() {
     return this.emitter.emit('did-select-page-up')
   }
 
-  selectPageDown () {
+  selectPageDown() {
     return this.emitter.emit('did-select-page-down')
   }
 
-  selectTop () {
+  selectTop() {
     return this.emitter.emit('did-select-top')
   }
 
-  selectBottom () {
+  selectBottom() {
     return this.emitter.emit('did-select-bottom')
   }
 
@@ -172,67 +173,67 @@ class SuggestionList {
   Section: Events
   */
 
-  onDidConfirmSelection (fn) {
+  onDidConfirmSelection(fn) {
     return this.emitter.on('did-confirm-selection', fn)
   }
 
-  onDidconfirmSelectionIfNonDefault (fn) {
+  onDidconfirmSelectionIfNonDefault(fn) {
     return this.emitter.on('did-confirm-selection-if-non-default', fn)
   }
 
-  onDidConfirm (fn) {
+  onDidConfirm(fn) {
     return this.emitter.on('did-confirm', fn)
   }
 
-  onDidSelect (fn) {
+  onDidSelect(fn) {
     return this.emitter.on('did-select', fn)
   }
 
-  onDidSelectNext (fn) {
+  onDidSelectNext(fn) {
     return this.emitter.on('did-select-next', fn)
   }
 
-  onDidSelectPrevious (fn) {
+  onDidSelectPrevious(fn) {
     return this.emitter.on('did-select-previous', fn)
   }
 
-  onDidSelectPageUp (fn) {
+  onDidSelectPageUp(fn) {
     return this.emitter.on('did-select-page-up', fn)
   }
 
-  onDidSelectPageDown (fn) {
+  onDidSelectPageDown(fn) {
     return this.emitter.on('did-select-page-down', fn)
   }
 
-  onDidSelectTop (fn) {
+  onDidSelectTop(fn) {
     return this.emitter.on('did-select-top', fn)
   }
 
-  onDidSelectBottom (fn) {
+  onDidSelectBottom(fn) {
     return this.emitter.on('did-select-bottom', fn)
   }
 
-  onDidCancel (fn) {
+  onDidCancel(fn) {
     return this.emitter.on('did-cancel', fn)
   }
 
-  onDidDispose (fn) {
+  onDidDispose(fn) {
     return this.emitter.on('did-dispose', fn)
   }
 
-  onDidChangeItems (fn) {
+  onDidChangeItems(fn) {
     return this.emitter.on('did-change-items', fn)
   }
 
-  onDidChangeItem (fn) {
+  onDidChangeItem(fn) {
     return this.emitter.on('did-change-item', fn)
   }
 
-  isActive () {
+  isActive() {
     return (this.activeEditor != null)
   }
 
-  show (editor, options) {
+  show(editor, options) {
     if (atom.config.get('autocomplete-plus.suggestionListFollows') === 'Cursor') {
       return this.showAtCursorPosition(editor, options)
     } else {
@@ -250,7 +251,7 @@ class SuggestionList {
     }
   }
 
-  showAtBeginningOfPrefix (editor, prefix, followRawPrefix = false) {
+  showAtBeginningOfPrefix(editor, prefix, followRawPrefix = false) {
     let bufferPosition
     if (editor) {
       bufferPosition = editor.getCursorBufferPosition()
@@ -275,6 +276,7 @@ class SuggestionList {
         this.overlayDecoration = editor.decorateMarker(marker, {type: 'overlay', item: this.suggestionListElement, position: 'tail', class: 'autocomplete-plus'})
         const editorElement = atom.views.getView(this.activeEditor)
         if (editorElement && editorElement.classList) {
+          this.lastActiveAt = performance.now()
           editorElement.classList.add('autocomplete-active')
         }
 
@@ -283,7 +285,7 @@ class SuggestionList {
     }
   }
 
-  showAtCursorPosition (editor) {
+  showAtCursorPosition(editor) {
     if (this.activeEditor === editor || (editor == null)) { return }
     this.destroyOverlay()
 
@@ -295,6 +297,7 @@ class SuggestionList {
       this.activeEditor = editor
       const editorElement = atom.views.getView(this.activeEditor)
       if (editorElement && editorElement.classList) {
+        this.lastActiveAt = performance.now()
         editorElement.classList.add('autocomplete-active')
       }
 
@@ -303,7 +306,7 @@ class SuggestionList {
     }
   }
 
-  hide () {
+  hide() {
     this.destroyOverlay()
     if (this.activeEditor === null) {
       return
@@ -317,7 +320,7 @@ class SuggestionList {
     return this.activeEditor
   }
 
-  destroyOverlay () {
+  destroyOverlay() {
     if (this.suggestionMarker && this.suggestionMarker.destroy) {
       this.suggestionMarker.destroy()
     } else if (this.overlayDecoration && this.overlayDecoration.destroy) {
@@ -325,7 +328,11 @@ class SuggestionList {
     }
     const editorElement = atom.views.getView(this.activeEditor)
     if (editorElement && editorElement.classList) {
+      let timestamp = this.lastActiveAt
       atom.views.updateDocument(() => {
+        // A newer timestamp here means that the menu is open again and we
+        // shouldn't remove this class name anymore.
+        if (this.lastActiveAt > timestamp) return
         editorElement.classList.remove('autocomplete-active')
       })
     }
@@ -334,12 +341,12 @@ class SuggestionList {
     return this.overlayDecoration
   }
 
-  changeItems (items) {
+  changeItems(items) {
     this.items = items
     return this.emitter.emit('did-change-items', this.items)
   }
 
-  replaceItem (oldSuggestion, newSuggestion) {
+  replaceItem(oldSuggestion, newSuggestion) {
     if (newSuggestion == null) {
       return
     }
@@ -368,7 +375,7 @@ class SuggestionList {
   }
 
   // Public: Clean up, stop listening to events
-  dispose () {
+  dispose() {
     if (this.subscriptions) {
       this.subscriptions.dispose()
     }

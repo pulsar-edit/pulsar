@@ -1,0 +1,13 @@
+name: 'Clojure EDN'
+scopeName: 'source.edn'
+type: 'modern-tree-sitter'
+injectionRegExp: '^source-edn$'
+parser: 'tree-sitter-clojure'
+
+fileTypes: [
+  'edn'
+]
+treeSitter:
+  grammar: 'ts/grammar.wasm'
+  highlightsQuery: 'ts/edn-highlights.scm'
+  foldsQuery: 'ts/folds.scm'
