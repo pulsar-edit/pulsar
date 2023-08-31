@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const EditorPanel = require('../lib/editor-panel');
 
 describe("EditorPanel", function() {
@@ -85,7 +80,7 @@ describe("EditorPanel", function() {
 
     expect(atom.config.get('editor.string')).toBeUndefined();
     expect(atom.config.get('editor.object.int')).toBeUndefined();
-    return expect(atom.config.get('editor.object.string')).toBeUndefined();
+    expect(atom.config.get('editor.object.string')).toBeUndefined();
   });
 
   it("does not save the config value until it has been changed to a new value", function() {
@@ -101,13 +96,13 @@ describe("EditorPanel", function() {
     observeHandler.reset();
 
     setValueForId('editor.simpleArray', 2);
-    return expect(observeHandler).not.toHaveBeenCalled();
+    expect(observeHandler).not.toHaveBeenCalled();
   });
 
   it("does not update the editor text unless the value it parses to changes", function() {
     setValueForId('editor.simpleArray', "a, b,");
     expect(atom.config.get('editor.simpleArray')).toEqual(['a', 'b']);
-    return expect(getValueForId('editor.simpleArray')).toBe('a, b,');
+    expect(getValueForId('editor.simpleArray')).toBe('a, b,');
   });
 
   it("only adds editors for arrays when all the values in the array are strings", function() {
@@ -117,11 +112,11 @@ describe("EditorPanel", function() {
     setValueForId('editor.simpleArray', 'a, d');
 
     expect(atom.config.get('editor.simpleArray')).toEqual(['a', 'd']);
-    return expect(atom.config.get('editor.complexArray')).toEqual(['a', 'b', {c: true}]);
+    expect(atom.config.get('editor.complexArray')).toEqual(['a', 'b', {c: true}]);
 });
 
-  return it("shows the package settings notes for core and editor settings", function() {
+  it("shows the package settings notes for core and editor settings", function() {
     expect(panel.element.querySelector('#editor-settings-note')).toExist();
-    return expect(panel.element.querySelector('#editor-settings-note').textContent).toContain('Check language settings');
+    expect(panel.element.querySelector('#editor-settings-note').textContent).toContain('Check language settings');
   });
 });

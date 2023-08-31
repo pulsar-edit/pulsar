@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const AtomIoClient = require('../lib/atom-io-client');
 
 describe("AtomIoClient", function() {
@@ -26,10 +22,10 @@ describe("AtomIoClient", function() {
       this.client.package('test-package', function() {});
 
       expect(this.client.fetchFromCache).toHaveBeenCalled();
-      return expect(this.client.request).not.toHaveBeenCalled();
+      expect(this.client.request).not.toHaveBeenCalled();
     });
 
-    return it("returns an error if the API response is not JSON", function() {
+    it("returns an error if the API response is not JSON", function() {
       const jsonParse = JSON.parse;
 
       waitsFor(function(done) {
