@@ -1,10 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const fs = require('fs-plus');
 const path = require('path');
 const os = require('os');
@@ -20,7 +14,7 @@ describe("Built-in Status Bar Tiles", function() {
 
     waitsForPromise(() => atom.packages.activatePackage('status-bar'));
 
-    return runs(() => statusBar = workspaceElement.querySelector("status-bar"));
+    runs(() => statusBar = workspaceElement.querySelector("status-bar"));
   });
 
   describe("the file info, cursor and selection tiles", function() {
@@ -29,7 +23,7 @@ describe("Built-in Status Bar Tiles", function() {
     beforeEach(function() {
       waitsForPromise(() => atom.workspace.open('sample.js'));
 
-      return runs(function() {
+      runs(function() {
         let launchMode;
         [launchMode, fileInfo, cursorPosition, selectionCount] =
           statusBar.getLeftTiles().map(tile => tile.getItem());
@@ -41,18 +35,18 @@ describe("Built-in Status Bar Tiles", function() {
     describe("when associated with an unsaved buffer", () => it("displays 'untitled' instead of the buffer's path, but still displays the buffer position", function() {
       waitsForPromise(() => atom.workspace.open());
 
-      return runs(function() {
+      runs(function() {
         atom.views.performDocumentUpdate();
         expect(fileInfo.currentPath.textContent).toBe('untitled');
         expect(cursorPosition.textContent).toBe('1:1');
-        return expect(selectionCount).toBeHidden();
+        expect(selectionCount).toBeHidden();
       });
     }));
 
     describe("when the associated editor's path changes", () => it("updates the path in the status bar", function() {
       waitsForPromise(() => atom.workspace.open('sample.txt'));
 
-      return runs(() => expect(fileInfo.currentPath.textContent).toBe('sample.txt'));
+      runs(() => expect(fileInfo.currentPath.textContent).toBe('sample.txt'));
     }));
 
     describe("when associated with remote file path", function() {
@@ -65,48 +59,48 @@ describe("Built-in Status Bar Tiles", function() {
       it("updates the path in the status bar", function() {
         // The remote path isn't relativized in the test because no remote directory provider is registered.
         expect(fileInfo.currentPath.textContent).toBe('remote://server:123/folder/remote_file.txt');
-        return expect(fileInfo.currentPath).toBeVisible();
+        expect(fileInfo.currentPath).toBeVisible();
       });
 
       it("when the path is clicked", function() {
         fileInfo.currentPath.click();
-        return expect(atom.clipboard.read()).toBe('/folder/remote_file.txt');
+        expect(atom.clipboard.read()).toBe('/folder/remote_file.txt');
       });
 
-      return it("calls relativize with the remote URL on shift-click", function() {
+      it("calls relativize with the remote URL on shift-click", function() {
         const spy = spyOn(atom.project, 'relativize').andReturn('remote_file.txt');
         const event = new MouseEvent('click', {shiftKey: true});
         fileInfo.dispatchEvent(event);
         expect(atom.clipboard.read()).toBe('remote_file.txt');
-        return expect(spy).toHaveBeenCalledWith('remote://server:123/folder/remote_file.txt');
+        expect(spy).toHaveBeenCalledWith('remote://server:123/folder/remote_file.txt');
       });
     });
 
     describe("when file info tile is clicked", () => it("copies the absolute path into the clipboard if available", function() {
       waitsForPromise(() => atom.workspace.open('sample.txt'));
 
-      return runs(function() {
+      runs(function() {
         fileInfo.click();
-        return expect(atom.clipboard.read()).toBe(fileInfo.getActiveItem().getPath());
+        expect(atom.clipboard.read()).toBe(fileInfo.getActiveItem().getPath());
       });
     }));
 
     describe("when the file info tile is shift-clicked", () => it("copies the relative path into the clipboard if available", function() {
       waitsForPromise(() => atom.workspace.open('sample.txt'));
 
-      return runs(function() {
+      runs(function() {
         const event = new MouseEvent('click', {shiftKey: true});
         fileInfo.dispatchEvent(event);
-        return expect(atom.clipboard.read()).toBe('sample.txt');
+        expect(atom.clipboard.read()).toBe('sample.txt');
       });
     }));
 
     describe("when path of an unsaved buffer is clicked", () => it("copies the 'untitled' into clipboard", function() {
       waitsForPromise(() => atom.workspace.open());
 
-      return runs(function() {
+      runs(function() {
         fileInfo.currentPath.click();
-        return expect(atom.clipboard.read()).toBe('untitled');
+        expect(atom.clipboard.read()).toBe('untitled');
       });
     }));
 
@@ -114,19 +108,19 @@ describe("Built-in Status Bar Tiles", function() {
       jasmine.attachToDOM(workspaceElement);
       waitsForPromise(() => atom.workspace.open());
 
-      return runs(() => expect(document.querySelector('.tooltip')).not.toExist());
+      runs(() => expect(document.querySelector('.tooltip')).not.toExist());
     }));
 
     describe("when buffer's path is clicked", () => it("displays path tooltip and the tooltip disappears after ~2 seconds", function() {
       jasmine.attachToDOM(workspaceElement);
       waitsForPromise(() => atom.workspace.open());
 
-      return runs(function() {
+      runs(function() {
         fileInfo.currentPath.click();
         expect(document.querySelector('.tooltip')).toBeVisible();
         // extra leeway so test won't fail because tooltip disappeared few milliseconds too late
         advanceClock(2100);
-        return expect(document.querySelector('.tooltip')).not.toExist();
+        expect(document.querySelector('.tooltip')).not.toExist();
       });
     }));
 
@@ -135,9 +129,9 @@ describe("Built-in Status Bar Tiles", function() {
         jasmine.attachToDOM(workspaceElement);
         waitsForPromise(() => atom.workspace.open('sample.txt'));
 
-        return runs(function() {
+        runs(function() {
           fileInfo.currentPath.click();
-          return expect(document.querySelector('.tooltip')).toHaveText(`Copied: ${fileInfo.getActiveItem().getPath()}`);
+          expect(document.querySelector('.tooltip')).toHaveText(`Copied: ${fileInfo.getActiveItem().getPath()}`);
         });
       });
 
@@ -146,20 +140,20 @@ describe("Built-in Status Bar Tiles", function() {
         dummyView.getPath = () => '/user/path/for/my/file.txt';
         atom.workspace.getActivePane().activateItem(dummyView);
 
-        return runs(function() {
+        runs(function() {
           fileInfo.currentPath.click();
-          return expect(document.querySelector('.tooltip')).toHaveText(`Copied: ${dummyView.getPath()}`);
+          expect(document.querySelector('.tooltip')).toHaveText(`Copied: ${dummyView.getPath()}`);
         });
       });
 
-      return it("displays a tooltip containing text 'Copied:' for an absolute Windows path", function() {
+      it("displays a tooltip containing text 'Copied:' for an absolute Windows path", function() {
         jasmine.attachToDOM(workspaceElement);
         dummyView.getPath = () => 'c:\\user\\path\\for\\my\\file.txt';
         atom.workspace.getActivePane().activateItem(dummyView);
 
-        return runs(function() {
+        runs(function() {
           fileInfo.currentPath.click();
-          return expect(document.querySelector('.tooltip')).toHaveText(`Copied: ${dummyView.getPath()}`);
+          expect(document.querySelector('.tooltip')).toHaveText(`Copied: ${dummyView.getPath()}`);
         });
       });
     });
@@ -168,9 +162,9 @@ describe("Built-in Status Bar Tiles", function() {
       jasmine.attachToDOM(workspaceElement);
       waitsForPromise(() => atom.workspace.open());
 
-      return runs(function() {
+      runs(function() {
         fileInfo.currentPath.click();
-        return expect(document.querySelector('.tooltip')).toHaveText("Copied: untitled");
+        expect(document.querySelector('.tooltip')).toHaveText("Copied: untitled");
       });
     }));
 
@@ -194,13 +188,13 @@ describe("Built-in Status Bar Tiles", function() {
           expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
           editor.insertText("\n");
           advanceClock(buffer.stoppedChangingDelay);
-          return expect(fileInfo.classList.contains('buffer-modified')).toBe(true);
+          expect(fileInfo.classList.contains('buffer-modified')).toBe(true);
         });
 
         waitsForPromise(() => // TODO - remove this Promise.resolve once atom/atom#14435 lands.
         Promise.resolve(editor.getBuffer().save()));
 
-        return runs(() => expect(fileInfo.classList.contains('buffer-modified')).toBe(false));
+        runs(() => expect(fileInfo.classList.contains('buffer-modified')).toBe(false));
       });
 
       it("disables the buffer modified indicator if the content matches again", function() {
@@ -210,17 +204,17 @@ describe("Built-in Status Bar Tiles", function() {
         expect(fileInfo.classList.contains('buffer-modified')).toBe(true);
         editor.backspace();
         advanceClock(buffer.stoppedChangingDelay);
-        return expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
+        expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
       });
 
-      return it("disables the buffer modified indicator when the change is undone", function() {
+      it("disables the buffer modified indicator when the change is undone", function() {
         expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
         editor.insertText("\n");
         advanceClock(buffer.stoppedChangingDelay);
         expect(fileInfo.classList.contains('buffer-modified')).toBe(true);
         editor.undo();
         advanceClock(buffer.stoppedChangingDelay);
-        return expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
+        expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
       });
     });
 
@@ -230,24 +224,24 @@ describe("Built-in Status Bar Tiles", function() {
 
         waitsForPromise(() => atom.workspace.open('sample.txt'));
 
-        return runs(function() {
+        runs(function() {
           editor = atom.workspace.getActiveTextEditor();
           editor.insertText("\n");
           advanceClock(buffer.stoppedChangingDelay);
-          return expect(fileInfo.classList.contains('buffer-modified')).toBe(true);
+          expect(fileInfo.classList.contains('buffer-modified')).toBe(true);
         });
       });
 
-      return it("doesn't update the buffer modified indicator for the old buffer", function() {
+      it("doesn't update the buffer modified indicator for the old buffer", function() {
         const oldBuffer = editor.getBuffer();
         expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
 
         waitsForPromise(() => atom.workspace.open('sample.txt'));
 
-        return runs(function() {
+        runs(function() {
           oldBuffer.setText("new text");
           advanceClock(buffer.stoppedChangingDelay);
-          return expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
+          expect(fileInfo.classList.contains('buffer-modified')).toBe(false);
         });
       });
     });
@@ -257,21 +251,21 @@ describe("Built-in Status Bar Tiles", function() {
         jasmine.attachToDOM(workspaceElement);
         editor.setCursorScreenPosition([1, 2]);
         atom.views.performDocumentUpdate();
-        return expect(cursorPosition.textContent).toBe('2:3');
+        expect(cursorPosition.textContent).toBe('2:3');
       });
 
-      return it("does not throw an exception if the cursor is moved as the result of the active pane item changing to a non-editor (regression)", function() {
+      it("does not throw an exception if the cursor is moved as the result of the active pane item changing to a non-editor (regression)", function() {
         waitsForPromise(() => Promise.resolve(atom.packages.deactivatePackage('status-bar'))); // Wrapped so works with Promise & non-Promise deactivate
         runs(() => atom.workspace.onDidChangeActivePaneItem(() => editor.setCursorScreenPosition([1, 2])));
         waitsForPromise(() => atom.packages.activatePackage('status-bar'));
-        return runs(function() {
+        runs(function() {
           statusBar = workspaceElement.querySelector("status-bar");
           cursorPosition = statusBar.getLeftTiles()[2].getItem();
 
           atom.workspace.getActivePane().activateItem(document.createElement('div'));
           expect(editor.getCursorScreenPosition()).toEqual([1, 2]);
           atom.views.performDocumentUpdate();
-          return expect(cursorPosition).toBeHidden();
+          expect(cursorPosition).toBeHidden();
         });
       });
     });
@@ -290,21 +284,21 @@ describe("Built-in Status Bar Tiles", function() {
 
         editor.setSelectedBufferRange([[0, 0], [1, 30]]);
         atom.views.performDocumentUpdate();
-        return expect(selectionCount.textContent).toBe("(2, 60)");
+        expect(selectionCount.textContent).toBe("(2, 60)");
       });
 
-      return it("does not throw an exception if the cursor is moved as the result of the active pane item changing to a non-editor (regression)", function() {
+      it("does not throw an exception if the cursor is moved as the result of the active pane item changing to a non-editor (regression)", function() {
         waitsForPromise(() => Promise.resolve(atom.packages.deactivatePackage('status-bar'))); // Wrapped so works with Promise & non-Promise deactivate
         runs(() => atom.workspace.onDidChangeActivePaneItem(() => editor.setSelectedBufferRange([[1, 2], [1, 3]])));
         waitsForPromise(() => atom.packages.activatePackage('status-bar'));
-        return runs(function() {
+        runs(function() {
           statusBar = workspaceElement.querySelector("status-bar");
           selectionCount = statusBar.getLeftTiles()[3].getItem();
 
           atom.workspace.getActivePane().activateItem(document.createElement('div'));
           expect(editor.getSelectedBufferRange()).toEqual([[1, 2], [1, 3]]);
           atom.views.performDocumentUpdate();
-          return expect(selectionCount).toBeHidden();
+          expect(selectionCount).toBeHidden();
         });
       });
     });
@@ -313,7 +307,7 @@ describe("Built-in Status Bar Tiles", function() {
       jasmine.attachToDOM(workspaceElement);
       atom.workspace.getActivePane().activateItem(dummyView);
       atom.views.performDocumentUpdate();
-      return expect(cursorPosition).toBeHidden();
+      expect(cursorPosition).toBeHidden();
     }));
 
     describe("when the active pane item implements getTitle() but not getPath()", () => it("displays the title", function() {
@@ -321,13 +315,13 @@ describe("Built-in Status Bar Tiles", function() {
       dummyView.getTitle = () => 'View Title';
       atom.workspace.getActivePane().activateItem(dummyView);
       expect(fileInfo.currentPath.textContent).toBe('View Title');
-      return expect(fileInfo.currentPath).toBeVisible();
+      expect(fileInfo.currentPath).toBeVisible();
     }));
 
     describe("when the active pane item neither getTitle() nor getPath()", () => it("hides the path view", function() {
       jasmine.attachToDOM(workspaceElement);
       atom.workspace.getActivePane().activateItem(dummyView);
-      return expect(fileInfo.currentPath).toBeHidden();
+      expect(fileInfo.currentPath).toBeHidden();
     }));
 
     describe("when the active pane item's title changes", () => it("updates the path view with the new title", function() {
@@ -344,7 +338,7 @@ describe("Built-in Status Bar Tiles", function() {
       expect(fileInfo.currentPath.textContent).toBe('View Title');
       dummyView.getTitle = () => 'New Title';
       for (let callback of Array.from(callbacks)) { callback(); }
-      return expect(fileInfo.currentPath.textContent).toBe('New Title');
+      expect(fileInfo.currentPath.textContent).toBe('New Title');
     }));
 
     describe('the cursor position tile', function() {
@@ -354,7 +348,7 @@ describe("Built-in Status Bar Tiles", function() {
         jasmine.attachToDOM(workspaceElement);
         editor.setCursorScreenPosition([1, 2]);
         atom.views.performDocumentUpdate();
-        return expect(cursorPosition.textContent).toBe('foo 2 bar 3');
+        expect(cursorPosition.textContent).toBe('foo 2 bar 3');
       });
 
       it('updates when the configuration changes', function() {
@@ -365,25 +359,25 @@ describe("Built-in Status Bar Tiles", function() {
 
         atom.config.set('status-bar.cursorPositionFormat', 'baz %C quux %L');
         atom.views.performDocumentUpdate();
-        return expect(cursorPosition.textContent).toBe('baz 3 quux 2');
+        expect(cursorPosition.textContent).toBe('baz 3 quux 2');
       });
 
-      return describe("when clicked", () => it("triggers the go-to-line toggle event", function() {
+      describe("when clicked", () => it("triggers the go-to-line toggle event", function() {
         const eventHandler = jasmine.createSpy('eventHandler');
         atom.commands.add('atom-text-editor', 'go-to-line:toggle', eventHandler);
         cursorPosition.click();
-        return expect(eventHandler).toHaveBeenCalled();
+        expect(eventHandler).toHaveBeenCalled();
       }));
     });
 
-    return describe('the selection count tile', function() {
+    describe('the selection count tile', function() {
       beforeEach(() => atom.config.set('status-bar.selectionCountFormat', '%L foo %C bar selected'));
 
       it('respects a format string', function() {
         jasmine.attachToDOM(workspaceElement);
         editor.setSelectedBufferRange([[0, 0], [1, 30]]);
         atom.views.performDocumentUpdate();
-        return expect(selectionCount.textContent).toBe("2 foo 60 bar selected");
+        expect(selectionCount.textContent).toBe("2 foo 60 bar selected");
       });
 
       it('updates when the configuration changes', function() {
@@ -394,7 +388,7 @@ describe("Built-in Status Bar Tiles", function() {
 
         atom.config.set('status-bar.selectionCountFormat', 'Selection: baz %C quux %L');
         atom.views.performDocumentUpdate();
-        return expect(selectionCount.textContent).toBe("Selection: baz 60 quux 2");
+        expect(selectionCount.textContent).toBe("Selection: baz 60 quux 2");
       });
 
       it('does not include the next line if the last selected character is a LF', function() {
@@ -404,22 +398,22 @@ describe("Built-in Status Bar Tiles", function() {
         jasmine.attachToDOM(workspaceElement);
         editor.setSelectedBufferRange([[0, 0], [1, 0]]);
         atom.views.performDocumentUpdate();
-        return expect(selectionCount.textContent).toBe("1 foo 30 bar selected");
+        expect(selectionCount.textContent).toBe("1 foo 30 bar selected");
       });
 
-      return it('does not include the next line if the last selected character is CRLF', function() {
+      it('does not include the next line if the last selected character is CRLF', function() {
         const lineEndingRegExp = /\r\n|\n|\r/g;
         buffer = editor.getBuffer();
         buffer.setText(buffer.getText().replace(lineEndingRegExp, '\r\n'));
         jasmine.attachToDOM(workspaceElement);
         editor.setSelectedBufferRange([[0, 0], [1, 0]]);
         atom.views.performDocumentUpdate();
-        return expect(selectionCount.textContent).toBe("1 foo 31 bar selected");
+        expect(selectionCount.textContent).toBe("1 foo 31 bar selected");
       });
     });
   });
 
-  return describe("the git tile", function() {
+  describe("the git tile", function() {
     let gitView = null;
 
     const hover = function(element, fn) {
@@ -458,16 +452,16 @@ describe("Built-in Status Bar Tiles", function() {
         waitsForPromise(() => atom.workspace.open(filePath)
           .then(() => repo.refreshStatus()));
 
-        return runs(function() {
+        runs(function() {
           const behindElement = document.body.querySelector(".commits-behind-label");
           const aheadElement = document.body.querySelector(".commits-ahead-label");
           expect(aheadElement).toBeVisible();
           expect(behindElement).toBeVisible();
-          return expect(aheadElement.textContent).toContain('1');
+          expect(aheadElement.textContent).toContain('1');
         });
       });
 
-      return it("stays hidden when no commits can be pushed/pulled", function() {
+      it("stays hidden when no commits can be pushed/pulled", function() {
         const workingDir = setupWorkingDir('no-ahead-behind-repo');
         atom.project.setPaths([workingDir]);
         const filePath = atom.project.getDirectories()[0].resolve('a.txt');
@@ -476,11 +470,11 @@ describe("Built-in Status Bar Tiles", function() {
         waitsForPromise(() => atom.workspace.open(filePath)
           .then(() => repo.refreshStatus()));
 
-        return runs(function() {
+        runs(function() {
           const behindElement = document.body.querySelector(".commits-behind-label");
           const aheadElement = document.body.querySelector(".commits-ahead-label");
           expect(aheadElement).not.toBeVisible();
-          return expect(behindElement).not.toBeVisible();
+          expect(behindElement).not.toBeVisible();
         });
       });
     });
@@ -512,7 +506,7 @@ describe("Built-in Status Bar Tiles", function() {
           return atom.workspace.getActivePane().activateItem(dummyView);
         });
 
-        return runs(() => expect(gitView.branchArea).not.toBeVisible());
+        runs(() => expect(gitView.branchArea).not.toBeVisible());
       });
 
       it("displays the current branch tooltip", function() {
@@ -520,7 +514,7 @@ describe("Built-in Status Bar Tiles", function() {
 
         waitsForPromise(() => atom.workspace.open('a.txt'));
 
-        return runs(function() {
+        runs(function() {
           const currentBranch = atom.project.getRepositories()[0].getShortHead();
           return hover(gitView.branchArea, () => expect(document.body.querySelector(".tooltip").innerText)
             .toBe(`On branch ${currentBranch}`));
@@ -532,17 +526,17 @@ describe("Built-in Status Bar Tiles", function() {
 
         waitsForPromise(() => atom.workspace.open(path.join(os.tmpdir(), 'temp.txt')));
 
-        return runs(() => expect(gitView.branchArea).toBeHidden());
+        runs(() => expect(gitView.branchArea).toBeHidden());
       });
 
-      return it("doesn't display the current branch for a file outside the current project", function() {
+      it("doesn't display the current branch for a file outside the current project", function() {
         waitsForPromise(() => atom.workspace.open(path.join(os.tmpdir(), 'atom-specs', 'not-in-project.txt')));
 
-        return runs(() => expect(gitView.branchArea).toBeHidden());
+        runs(() => expect(gitView.branchArea).toBeHidden());
       });
     });
 
-    return describe("the git status label", function() {
+    describe("the git status label", function() {
       let [repo, filePath, originalPathText, newPath, ignorePath, ignoredPath, projectPath] = [];
 
       beforeEach(function() {
@@ -577,7 +571,7 @@ describe("Built-in Status Bar Tiles", function() {
             fs.writeFileSync(filePath, "i've changed for the worse");
             return repo.refreshStatus();
         }));
-        return runs(() => expect(gitView.gitStatusIcon).toHaveClass('icon-diff-modified'));
+        runs(() => expect(gitView.gitStatusIcon).toHaveClass('icon-diff-modified'));
       });
 
       it("displays the 1 line added and not committed tooltip", function() {
@@ -587,7 +581,7 @@ describe("Built-in Status Bar Tiles", function() {
             return repo.refreshStatus();
         }));
 
-        return runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
+        runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
           .toBe("1 line added to this file not yet committed")));
       });
 
@@ -598,7 +592,7 @@ describe("Built-in Status Bar Tiles", function() {
             return repo.refreshStatus();
         }));
 
-        return runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
+        runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
           .toBe("2 lines added to this file not yet committed")));
       });
 
@@ -606,14 +600,14 @@ describe("Built-in Status Bar Tiles", function() {
         waitsForPromise(() => atom.workspace.open(filePath)
           .then(() => repo.refreshStatus()));
 
-        return runs(() => expect(gitView.gitStatusIcon).toHaveText(''));
+        runs(() => expect(gitView.gitStatusIcon).toHaveText(''));
       });
 
       it("displays the new icon for a new file", function() {
         waitsForPromise(() => atom.workspace.open(newPath)
           .then(() => repo.refreshStatus()));
 
-        return runs(function() {
+        runs(function() {
           expect(gitView.gitStatusIcon).toHaveClass('icon-diff-added');
           return hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
             .toBe("1 line in this new file not yet committed"));
@@ -624,7 +618,7 @@ describe("Built-in Status Bar Tiles", function() {
         waitsForPromise(() => atom.workspace.open(newPath)
           .then(() => repo.refreshStatus()));
 
-        return runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
+        runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
           .toBe("1 line in this new file not yet committed")));
       });
 
@@ -633,14 +627,14 @@ describe("Built-in Status Bar Tiles", function() {
         waitsForPromise(() => atom.workspace.open(newPath)
           .then(() => repo.refreshStatus()));
 
-        return runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
+        runs(() => hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
           .toBe("2 lines in this new file not yet committed")));
       });
 
       it("displays the ignored icon for an ignored file", function() {
         waitsForPromise(() => atom.workspace.open(ignoredPath));
 
-        return runs(function() {
+        runs(function() {
           expect(gitView.gitStatusIcon).toHaveClass('icon-diff-ignored');
           return hover(gitView.gitStatusIcon, () => expect(document.body.querySelector(".tooltip").innerText)
             .toBe("File is ignored by git"));
@@ -653,14 +647,14 @@ describe("Built-in Status Bar Tiles", function() {
             fs.writeFileSync(filePath, "i've changed for the worse");
             return repo.refreshStatus();
         }));
-        return runs(function() {
+        runs(function() {
           expect(gitView.gitStatusIcon).toHaveClass('icon-diff-modified');
 
           waitsForPromise(function() {
             fs.writeFileSync(filePath, originalPathText);
             return repo.refreshStatus();
           });
-          return runs(() => expect(gitView.gitStatusIcon).not.toHaveClass('icon-diff-modified'));
+          runs(() => expect(gitView.gitStatusIcon).not.toHaveClass('icon-diff-modified'));
         });
       });
 
@@ -670,20 +664,20 @@ describe("Built-in Status Bar Tiles", function() {
             fs.writeFileSync(filePath, "i've changed for the worse");
             return repo.refreshStatus();
         }));
-        return runs(() => expect(gitView.gitStatusIcon).toHaveText('+1'));
+        runs(() => expect(gitView.gitStatusIcon).toHaveText('+1'));
       });
 
       it("displays the diff stat for new files", function() {
         waitsForPromise(() => atom.workspace.open(newPath)
           .then(() => repo.refreshStatus()));
 
-        return runs(() => expect(gitView.gitStatusIcon).toHaveText('+1'));
+        runs(() => expect(gitView.gitStatusIcon).toHaveText('+1'));
       });
 
-      return it("does not display for files not in the current project", function() {
+      it("does not display for files not in the current project", function() {
         waitsForPromise(() => atom.workspace.open('/tmp/atom-specs/not-in-project.txt'));
 
-        return runs(() => expect(gitView.gitStatusIcon).toBeHidden());
+        runs(() => expect(gitView.gitStatusIcon).toBeHidden());
       });
     });
   });
