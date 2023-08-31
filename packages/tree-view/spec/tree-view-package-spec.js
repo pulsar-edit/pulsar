@@ -1,12 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS202: Simplify dynamic range loops
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 let _ = require('underscore-plus');
 const fs = require('fs-plus');
 const path = require('path');
@@ -85,7 +77,7 @@ describe("TreeView", function() {
       root2 = treeView.roots[1];
       sampleJs = files[0];
       sampleTxt = files[1];
-      return expect(root1.directory.watchSubscription).toBeTruthy();
+      expect(root1.directory.watchSubscription).toBeTruthy();
     });
   });
 
@@ -119,19 +111,19 @@ describe("TreeView", function() {
 
       const file2 = root1.querySelector('.file [data-name="tree-view.txt"]');
       expect(file2).toExist();
-      return expect(file2).toHaveText('tree-view.txt');
+      expect(file2).toHaveText('tree-view.txt');
     });
 
     it("selects the root folder", () => expect(treeView.selectedEntry()).toEqual(treeView.roots[0]));
 
     it("makes the root folder non-draggable", () => expect(treeView.roots[0].hasAttribute('draggable')).toBe(false));
 
-    return describe("when the project has no paths", function() {
+    describe("when the project has no paths", function() {
       beforeEach(() => atom.project.setPaths([]));
 
       it("displays a view to add projects", function() {
         expect(treeView.element.querySelector('#add-projects-view')).toExist();
-        return expect(treeView.element.querySelector('.tree-view-root')).not.toExist();
+        expect(treeView.element.querySelector('.tree-view-root')).not.toExist();
       });
 
       describe("when clicking on 'Add projects'", function() {
@@ -144,7 +136,7 @@ describe("TreeView", function() {
 
           addProjectsButton.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
 
-          return expect(atom.pickFolder).toHaveBeenCalled();
+          expect(atom.pickFolder).toHaveBeenCalled();
         });
 
         it("sets the project paths with whatever folders are chosen", function() {
@@ -162,7 +154,7 @@ describe("TreeView", function() {
           return waitsFor(() => done);
         });
 
-        return it("does not attempt to set any project paths if the folder picker was cancelled", function() {
+        it("does not attempt to set any project paths if the folder picker was cancelled", function() {
           let done = false;
 
           spyOn(atom.project, 'setPaths');
@@ -183,7 +175,7 @@ describe("TreeView", function() {
 
         beforeEach(() => reopenProjectsButton = treeView.element.querySelectorAll('#add-projects-view .btn')[1]);
 
-        return it("opens a modal to choose an old project", function() {
+        it("opens a modal to choose an old project", function() {
           let done = false;
 
           atom.commands.onDidDispatch(function(event) {
@@ -214,7 +206,7 @@ describe("TreeView", function() {
         return runs(() => expect(treeView.roots).toHaveLength(0));
       });
 
-      return describe("when the project is assigned a path", () => it("creates a root directory view", function() {
+      describe("when the project is assigned a path", () => it("creates a root directory view", function() {
         const projectPath = temp.mkdirSync('atom-project');
 
         atom.project.setPaths([projectPath]);
@@ -223,7 +215,7 @@ describe("TreeView", function() {
         expect(fs.absolute(treeView.roots[0].getPath())).toBe(fs.absolute(projectPath));
 
         expect(treeView.element.querySelector('.tree-view-root')).toExist();
-        return expect(treeView.element.querySelector('#add-projects-view')).not.toExist();
+        expect(treeView.element.querySelector('#add-projects-view')).not.toExist();
       }));
     });
   });
@@ -237,7 +229,7 @@ describe("TreeView", function() {
       return runs(() => expect(treeView.destroy).toHaveBeenCalled());
     });
 
-    return it("waits for the Tree View to open before destroying it", function() {
+    it("waits for the Tree View to open before destroying it", function() {
       jasmine.useRealClock();
       let resolveOpenPromise = null;
       let opened = false;
@@ -269,20 +261,20 @@ describe("TreeView", function() {
     describe("when the tree view is visible", function() {
       beforeEach(() => expect(atom.workspace.getLeftDock().isVisible()).toBe(true));
 
-      return it("hides the tree view", function() {
+      it("hides the tree view", function() {
         workspaceElement.focus();
         waitsForPromise(() => treeView.toggle());
         return runs(() => expect(atom.workspace.getLeftDock().isVisible()).toBe(false));
       });
     });
 
-    return describe("when the tree view is hidden", () => it("shows and focuses the tree view", function() {
+    describe("when the tree view is hidden", () => it("shows and focuses the tree view", function() {
       atom.workspace.getLeftDock().hide();
       expect(atom.workspace.getLeftDock().isVisible()).toBe(false);
       waitsForPromise(() => treeView.toggle());
       return runs(function() {
         expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-        return expect(treeView.element).toHaveFocus();
+        expect(treeView.element).toHaveFocus();
       });
     }));
   });
@@ -295,11 +287,11 @@ describe("TreeView", function() {
       waitsForPromise(() => treeView.toggleFocus());
       return runs(function() {
         expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-        return expect(treeView.element).toHaveFocus();
+        expect(treeView.element).toHaveFocus();
       });
     }));
 
-    return describe("when the tree view is shown", function() {
+    describe("when the tree view is shown", function() {
       it("focuses the tree view", function() {
         waitsForPromise(() => atom.workspace.open()); // When we call focus below, we want an editor to become focused
 
@@ -310,12 +302,12 @@ describe("TreeView", function() {
           waitsForPromise(() => treeView.toggleFocus());
           return runs(function() {
             expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-            return expect(treeView.element).toHaveFocus();
+            expect(treeView.element).toHaveFocus();
           });
         });
       });
 
-      return describe("when the tree view is focused", () => it("unfocuses the tree view", function() {
+      describe("when the tree view is focused", () => it("unfocuses the tree view", function() {
         waitsForPromise(() => atom.workspace.open()); // When we call focus below, we want an editor to become focused
 
         return runs(function() {
@@ -323,7 +315,7 @@ describe("TreeView", function() {
           expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
           treeView.toggleFocus();
           expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-          return expect(treeView.element).not.toHaveFocus();
+          expect(treeView.element).not.toHaveFocus();
         });
       }));
     });
@@ -341,7 +333,7 @@ describe("TreeView", function() {
       const treeView2 = atom.workspace.getLeftDock().getActivePaneItem();
       treeView2.roots[0].expand();
       const entryCountAfterRecreatingView = treeView2.element.getElementsByClassName('entry').length;
-      return expect(entryCountAfterRecreatingView).toBe(entryCountBeforeRecreatingView);
+      expect(entryCountAfterRecreatingView).toBe(entryCountBeforeRecreatingView);
     });
   }));
 
@@ -361,7 +353,7 @@ describe("TreeView", function() {
 
         runs(function() {
           expect(treeView.element.parentElement).toBeTruthy();
-          return expect(treeView.focus).toHaveBeenCalled();
+          expect(treeView.focus).toHaveBeenCalled();
         });
 
         waitsForPromise(function() {
@@ -373,7 +365,7 @@ describe("TreeView", function() {
 
         return runs(function() {
           expect(treeView.element.parentElement).toBeTruthy();
-          return expect(treeView.focus).toHaveBeenCalled();
+          expect(treeView.focus).toHaveBeenCalled();
         });
       }));
 
@@ -386,7 +378,7 @@ describe("TreeView", function() {
 
         runs(function() {
           expect(treeView.element.parentElement).toBeTruthy();
-          return expect(treeView.focus).not.toHaveBeenCalled();
+          expect(treeView.focus).not.toHaveBeenCalled();
         });
 
         waitsForPromise(function() {
@@ -398,11 +390,11 @@ describe("TreeView", function() {
 
         return runs(function() {
           expect(treeView.element.parentElement).toBeTruthy();
-          return expect(treeView.focus).not.toHaveBeenCalled();
+          expect(treeView.focus).not.toHaveBeenCalled();
         });
       }));
 
-      return describe("if the file is located under collapsed folders", () => it("expands all the folders and selects the file", function() {
+      describe("if the file is located under collapsed folders", () => it("expands all the folders and selects the file", function() {
         waitsForPromise(() => atom.workspace.open(path.join(path1, 'dir1', 'file1')));
 
         runs(function() {
@@ -416,7 +408,7 @@ describe("TreeView", function() {
           expect(treeView.entryForPath(path1).classList.contains('expanded')).toBe(true);
           expect(treeView.entryForPath(path.join(path1, 'dir1')).classList.contains('expanded')).toBe(true);
           expect(treeView.selectedEntry()).toBeTruthy();
-          return expect(treeView.selectedEntry().getPath()).toBe(path.join(path1, 'dir1', 'file1'));
+          expect(treeView.selectedEntry().getPath()).toBe(path.join(path1, 'dir1', 'file1'));
         });
       }));
     });
@@ -426,14 +418,14 @@ describe("TreeView", function() {
 
       runs(function() {
         expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBeUndefined();
-        return expect(atom.workspace.getLeftDock().isVisible()).toBe(false);
+        expect(atom.workspace.getLeftDock().isVisible()).toBe(false);
       });
 
       waitsForPromise(() => treeView.revealActiveFile());
 
       return runs(function() {
         expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-        return expect(treeView.focus).toHaveBeenCalled();
+        expect(treeView.focus).toHaveBeenCalled();
       });
     }));
 
@@ -445,11 +437,11 @@ describe("TreeView", function() {
 
       return runs(function() {
         expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-        return expect(treeView.focus).toHaveBeenCalled();
+        expect(treeView.focus).toHaveBeenCalled();
       });
     }));
 
-    return describe('if there are more items than can be visible in the viewport', function() {
+    describe('if there are more items than can be visible in the viewport', function() {
       let [rootDirPath] = [];
 
       beforeEach(function() {
@@ -465,7 +457,7 @@ describe("TreeView", function() {
         return jasmine.attachToDOM(workspaceElement);
       });
 
-      return it('scrolls the selected file into the visible view', function() {
+      it('scrolls the selected file into the visible view', function() {
         // Open file at bottom
         waitsForPromise(() => atom.workspace.open(path.join(rootDirPath, 'file-20.txt')));
         waitsForPromise(() => treeView.revealActiveFile());
@@ -491,7 +483,7 @@ describe("TreeView", function() {
         waitsForPromise(() => treeView.revealActiveFile());
         runs(function() {
           expect(treeView.scrollTop()).toBeLessThan(400);
-          return expect(treeView.scrollTop()).toBeGreaterThan(0);
+          expect(treeView.scrollTop()).toBeGreaterThan(0);
         });
 
         // Open file at top
@@ -512,7 +504,7 @@ describe("TreeView", function() {
       atom.commands.dispatch(treeView.element, 'tree-view:unfocus');
       expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
       expect(treeView.element).not.toHaveFocus();
-      return expect(atom.workspace.getCenter().getActivePane().isActive()).toBe(true);
+      expect(atom.workspace.getCenter().getActivePane().isActive()).toBe(true);
     });
   }));
 
@@ -529,32 +521,32 @@ describe("TreeView", function() {
       it("copies the selected path to the clipboard", function() {
         treeView.selectedPath = pathToSelect;
         atom.commands.dispatch(treeView.element, 'tree-view:copy-full-path');
-        return expect(atom.clipboard.write).toHaveBeenCalledWith(pathToSelect);
+        expect(atom.clipboard.write).toHaveBeenCalledWith(pathToSelect);
       });
 
-      return describe("when there is no selected path", function() {
+      describe("when there is no selected path", function() {
         beforeEach(() => treeView.selectedPath = null);
 
-        return it("does nothing", function() {
+        it("does nothing", function() {
           atom.commands.dispatch(treeView.element, 'tree-view:copy-full-path');
-          return expect(atom.clipboard.write).not.toHaveBeenCalled();
+          expect(atom.clipboard.write).not.toHaveBeenCalled();
         });
       });
     });
 
-    return describe("when tree-view:copy-project-path is triggered on the tree view", function() {
+    describe("when tree-view:copy-project-path is triggered on the tree view", function() {
       it("copies the relativized selected path to the clipboard", function() {
         treeView.selectedPath = pathToSelect;
         atom.commands.dispatch(treeView.element, 'tree-view:copy-project-path');
-        return expect(atom.clipboard.write).toHaveBeenCalledWith(relativizedPath);
+        expect(atom.clipboard.write).toHaveBeenCalledWith(relativizedPath);
       });
 
-      return describe("when there is no selected path", function() {
+      describe("when there is no selected path", function() {
         beforeEach(() => treeView.selectedPath = null);
 
-        return it("does nothing", function() {
+        it("does nothing", function() {
           atom.commands.dispatch(treeView.element, 'tree-view:copy-project-path');
-          return expect(atom.clipboard.write).not.toHaveBeenCalled();
+          expect(atom.clipboard.write).not.toHaveBeenCalled();
         });
       });
     });
@@ -571,7 +563,7 @@ describe("TreeView", function() {
       expect(subdir).toHaveClass('expanded');
 
       subdir.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
-      return expect(subdir).not.toHaveClass('expanded');
+      expect(subdir).not.toHaveClass('expanded');
     });
 
     it("restores the expansion state of descendant directories", function() {
@@ -589,10 +581,10 @@ describe("TreeView", function() {
       expect(root1.querySelectorAll('.entries > li > .entries > li > .entries').length).toBe(1);
 
       // collapsed descendants remain collapsed
-      return expect(root1.querySelectorAll('.entries > li')[1].querySelector('.entries')).not.toHaveClass('expanded');
+      expect(root1.querySelectorAll('.entries > li')[1].querySelector('.entries')).not.toHaveClass('expanded');
     });
 
-    return it("when collapsing a directory, removes change subscriptions from the collapsed directory and its descendants", function() {
+    it("when collapsing a directory, removes change subscriptions from the collapsed directory and its descendants", function() {
       const child = root1.querySelector('li');
       child.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
 
@@ -607,7 +599,7 @@ describe("TreeView", function() {
 
       expect(root1.directory.watchSubscription).toBeFalsy();
       expect(child.directory.watchSubscription).toBeFalsy();
-      return expect(grandchild.directory.watchSubscription).toBeFalsy();
+      expect(grandchild.directory.watchSubscription).toBeFalsy();
     });
   });
 
@@ -619,7 +611,7 @@ describe("TreeView", function() {
 
     expect(sampleJs).not.toHaveClass('selected');
     sampleJs.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, detail: 1}));
-    return expect(sampleJs).toHaveClass('selected');
+    expect(sampleJs).toHaveClass('selected');
   }));
 
   describe("when the package first activates and there is a file open (regression)", function() {
@@ -630,7 +622,7 @@ describe("TreeView", function() {
     describe("when the file is permanent", function() {
       beforeEach(() => waitForWorkspaceOpenEvent(() => atom.workspace.open('tree-view.js')));
 
-      return it("does not throw when the file is double clicked", function() {
+      it("does not throw when the file is double clicked", function() {
         expect(function() {
           sampleJs.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           return sampleJs.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 2}));}).not.toThrow();
@@ -641,12 +633,12 @@ describe("TreeView", function() {
       });
     });
 
-    return describe("when the file is pending", function() {
+    describe("when the file is pending", function() {
       let editor = null;
 
       beforeEach(() => waitsForPromise(() => atom.workspace.open('tree-view.js', {pending: true}).then(o => editor = o)));
 
-      return it("marks the pending file as permanent", function() {
+      it("marks the pending file as permanent", function() {
         runs(function() {
           expect(atom.workspace.getCenter().getActivePane().getActiveItem()).toBe(editor);
           expect(atom.workspace.getCenter().getActivePane().getPendingItem()).toBe(editor);
@@ -678,12 +670,12 @@ describe("TreeView", function() {
 
         it("selects the file and retains focus on tree-view", function() {
           expect(sampleJs).toHaveClass('selected');
-          return expect(treeView.element).toHaveFocus();
+          expect(treeView.element).toHaveFocus();
         });
 
-        return it("opens the file in a pending state", function() {
+        it("opens the file in a pending state", function() {
           expect(activePaneItem.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
-          return expect(atom.workspace.getCenter().getActivePane().getPendingItem()).toEqual(activePaneItem);
+          expect(atom.workspace.getCenter().getActivePane().getPendingItem()).toEqual(activePaneItem);
         });
       });
 
@@ -698,13 +690,13 @@ describe("TreeView", function() {
 
         it("selects the file and retains focus on tree-view", function() {
           expect(sampleJs).toHaveClass('selected');
-          return expect(treeView.element).toHaveFocus();
+          expect(treeView.element).toHaveFocus();
         });
 
-        return it("does not open the file", () => expect(atom.workspace.open).not.toHaveBeenCalled());
+        it("does not open the file", () => expect(atom.workspace.open).not.toHaveBeenCalled());
       });
 
-      return describe("when it is immediately opened with `::openSelectedEntry` afterward", () => it("does not open a duplicate file", function() {
+      describe("when it is immediately opened with `::openSelectedEntry` afterward", () => it("does not open a duplicate file", function() {
         // Fixes https://github.com/atom/atom/issues/11391
         let openedCount = 0;
         const originalOpen = atom.workspace.open.bind(atom.workspace);
@@ -719,7 +711,7 @@ describe("TreeView", function() {
       }));
     });
 
-    return describe("when a file is double-clicked", function() {
+    describe("when a file is double-clicked", function() {
       let activePaneItem = null;
 
       beforeEach(() => treeView.focus());
@@ -735,11 +727,11 @@ describe("TreeView", function() {
         return runs(function() {
           activePaneItem = atom.workspace.getCenter().getActivePaneItem();
           expect(activePaneItem.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
-          return expect(atom.views.getView(activePaneItem)).toHaveFocus();
+          expect(atom.views.getView(activePaneItem)).toHaveFocus();
         });
       });
 
-      return it("does not open a duplicate file", function() {
+      it("does not open a duplicate file", function() {
         // Fixes https://github.com/atom/atom/issues/11391
         let openedCount = 0;
         const originalOpen = atom.workspace.open.bind(atom.workspace);
@@ -758,7 +750,7 @@ describe("TreeView", function() {
   describe("when a directory is single-clicked", () => it("is selected", function() {
     const subdir = root1.querySelector('.directory');
     subdir.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
-    return expect(subdir).toHaveClass('selected');
+    expect(subdir).toHaveClass('selected');
   }));
 
   describe("when a directory is double-clicked", () => it("toggles the directory expansion state and does not change the focus to the editor", function() {
@@ -776,7 +768,7 @@ describe("TreeView", function() {
       subdir.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 2}));
       expect(subdir).toHaveClass('selected');
       expect(subdir).not.toHaveClass('expanded');
-      return expect(treeView.element).toHaveFocus();
+      expect(treeView.element).toHaveFocus();
     });
   }));
 
@@ -795,7 +787,7 @@ describe("TreeView", function() {
         expect(child).toHaveClass('expanded'));
     }));
 
-    return describe("when the directory is expanded", function() {
+    describe("when the directory is expanded", function() {
       let parent    = null;
       let children  = null;
 
@@ -807,7 +799,7 @@ describe("TreeView", function() {
           child.expand());
       });
 
-      return it("recursively collapses the directory", function() {
+      it("recursively collapses the directory", function() {
         let child;
         parent.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         parent.expand();
@@ -824,7 +816,7 @@ describe("TreeView", function() {
         for (child of Array.from(children)) {
           expect(child).not.toHaveClass('expanded');
         }
-        return expect(treeView.roots[0]).toHaveClass('expanded');
+        expect(treeView.roots[0]).toHaveClass('expanded');
       });
     });
   });
@@ -837,7 +829,7 @@ describe("TreeView", function() {
 
       return runs(function() {
         expect(sampleTxt).toHaveClass('selected');
-        return expect(treeView.element.querySelectorAll('.selected').length).toBe(1);
+        expect(treeView.element.querySelectorAll('.selected').length).toBe(1);
       });
     });
 
@@ -846,17 +838,17 @@ describe("TreeView", function() {
 
       return runs(function() {
         const dirView = root1.querySelector('.directory');
-        return expect(dirView).toHaveClass('selected');
+        expect(dirView).toHaveClass('selected');
       });
     });
 
-    return describe("when the tree-view.autoReveal config setting is true", function() {
+    describe("when the tree-view.autoReveal config setting is true", function() {
       beforeEach(function() {
         jasmine.attachToDOM(atom.workspace.getElement());
         return atom.config.set("tree-view.autoReveal", true);
       });
 
-      return it("selects the active item's entry in the tree view, expanding parent directories if needed", function() {
+      it("selects the active item's entry in the tree view, expanding parent directories if needed", function() {
         waitsForPromise(() => atom.workspace.open(path.join('dir1', 'sub-dir1', 'sub-file1')));
 
         waitsFor(() => treeView.getSelectedEntries()[0].textContent === 'sub-file1');
@@ -869,7 +861,7 @@ describe("TreeView", function() {
   describe("when a different editor becomes active", function() {
     beforeEach(() => jasmine.attachToDOM(workspaceElement));
 
-    return it("selects the file in that is open in that editor", function() {
+    it("selects the file in that is open in that editor", function() {
       let leftEditorPane = null;
 
       waitForWorkspaceOpenEvent(() => sampleJs.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
@@ -884,7 +876,7 @@ describe("TreeView", function() {
       return runs(function() {
         expect(sampleTxt).toHaveClass('selected');
         leftEditorPane.activate();
-        return expect(sampleJs).toHaveClass('selected');
+        expect(sampleJs).toHaveClass('selected');
       });
     });
   });
@@ -897,7 +889,7 @@ describe("TreeView", function() {
         root1.querySelector('.directory').dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
 
         atom.commands.dispatch(treeView.element, 'core:move-down');
-        return expect(root1.querySelectorAll('.directory')[1]).toHaveClass('selected');
+        expect(root1.querySelectorAll('.directory')[1]).toHaveClass('selected');
       }));
 
       describe("when an expanded directory is selected", () => it("selects the first entry of the directory", function() {
@@ -906,7 +898,7 @@ describe("TreeView", function() {
 
         atom.commands.dispatch(treeView.element, 'core:move-down');
 
-        return expect(subdir.querySelector('.entry')).toHaveClass('selected');
+        expect(subdir.querySelector('.entry')).toHaveClass('selected');
       }));
 
       describe("when the last entry of an expanded directory is selected", () => it("selects the entry after its parent directory", function() {
@@ -919,7 +911,7 @@ describe("TreeView", function() {
 
         return runs(function() {
           atom.commands.dispatch(treeView.element, 'core:move-down');
-          return expect(root1.querySelectorAll('.directory')[2]).toHaveClass('selected');
+          expect(root1.querySelectorAll('.directory')[2]).toHaveClass('selected');
         });
       }));
 
@@ -938,25 +930,25 @@ describe("TreeView", function() {
 
         describe("when the directory is collapsed", () => it("selects the entry after its grandparent directory", function() {
           atom.commands.dispatch(treeView.element, 'core:move-down');
-          return expect(nested.nextSibling).toHaveClass('selected');
+          expect(nested.nextSibling).toHaveClass('selected');
         }));
 
-        return describe("when the directory is expanded", () => it("selects the entry after its grandparent directory", function() {
+        describe("when the directory is expanded", () => it("selects the entry after its grandparent directory", function() {
           nested2.expand();
           nested2.querySelector('.file').remove(); // kill the .gitkeep file, which has to be there but screws the test
           atom.commands.dispatch(treeView.element, 'core:move-down');
-          return expect(nested.nextSibling).toHaveClass('selected');
+          expect(nested.nextSibling).toHaveClass('selected');
         }));
       });
 
-      return describe("when the last entry of the last directory is selected", () => it("does not change the selection", function() {
+      describe("when the last entry of the last directory is selected", () => it("does not change the selection", function() {
         const entries = root2.querySelectorAll('.entries .entry');
         const lastEntry = entries[entries.length - 1];
         waitForWorkspaceOpenEvent(() => lastEntry.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
 
         return runs(function() {
           atom.commands.dispatch(treeView.element, 'core:move-down');
-          return expect(lastEntry).toHaveClass('selected');
+          expect(lastEntry).toHaveClass('selected');
         });
       }));
     });
@@ -975,7 +967,7 @@ describe("TreeView", function() {
         it("selects the last entry in the expanded directory", function() {
           atom.commands.dispatch(treeView.element, 'core:move-up');
           const entries = lastDir.querySelectorAll('.entry');
-          return expect(entries[entries.length - 1]).toHaveClass('selected');
+          expect(entries[entries.length - 1]).toHaveClass('selected');
         });
 
         describe("when the last child of the expanded directory is another expanded directory", () => it("selects the last entry in the expanded directory", function() {
@@ -984,14 +976,14 @@ describe("TreeView", function() {
 
           atom.commands.dispatch(treeView.element, 'core:move-up');
           const entries = subDir.querySelectorAll('.entry');
-          return expect(entries[entries.length - 1]).toHaveClass('selected');
+          expect(entries[entries.length - 1]).toHaveClass('selected');
         }));
 
-        return describe("when the expanded directory has no children", () => it("selects the expanded directory itself", function() {
+        describe("when the expanded directory has no children", () => it("selects the expanded directory itself", function() {
           lastDir.querySelector('.entry').remove(); // pretend it's empty
 
           atom.commands.dispatch(treeView.element, 'core:move-up');
-          return expect(lastDir).toHaveClass('selected');
+          expect(lastDir).toHaveClass('selected');
         }));
       });
 
@@ -1002,7 +994,7 @@ describe("TreeView", function() {
 
         return runs(function() {
           atom.commands.dispatch(treeView.element, 'core:move-up');
-          return expect(lastEntry.previousSibling).toHaveClass('selected');
+          expect(lastEntry.previousSibling).toHaveClass('selected');
         });
       }));
 
@@ -1013,23 +1005,23 @@ describe("TreeView", function() {
 
         atom.commands.dispatch(treeView.element, 'core:move-up');
 
-        return expect(subdir).toHaveClass('selected');
+        expect(subdir).toHaveClass('selected');
       }));
 
       describe("when there is no parent directory or previous entry", () => it("does not change the selection", function() {
         root1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         atom.commands.dispatch(treeView.element, 'core:move-up');
-        return expect(treeView.roots[0]).toHaveClass('selected');
+        expect(treeView.roots[0]).toHaveClass('selected');
       }));
 
-      return describe("when the tree view is empty", () => it("does nothing", function() {
+      describe("when the tree view is empty", () => it("does nothing", function() {
         atom.commands.dispatch(treeView.roots[0].querySelector(".header"), "tree-view:remove-project-folder");
         atom.commands.dispatch(treeView.roots[0].querySelector(".header"), "tree-view:remove-project-folder");
         expect(atom.project.getPaths()).toHaveLength(0);
         expect(treeView.element.querySelectorAll('.selected').length).toBe(0);
 
         atom.commands.dispatch(treeView.element, 'core:move-up');
-        return expect(treeView.element.querySelectorAll('.selected').length).toBe(0);
+        expect(treeView.element.querySelectorAll('.selected').length).toBe(0);
       }));
     });
 
@@ -1045,16 +1037,16 @@ describe("TreeView", function() {
         _.times(entryCount, () => atom.commands.dispatch(treeView.element, 'core:move-down'));
 
         atom.commands.dispatch(treeView.element, 'core:move-to-top');
-        return expect(treeView.element.scrollTop).toBe(0);
+        expect(treeView.element.scrollTop).toBe(0);
       });
 
-      return it("selects the root entry", function() {
+      it("selects the root entry", function() {
         const entryCount = treeView.element.querySelectorAll(".entry").length;
         _.times(entryCount, () => atom.commands.dispatch(treeView.element, 'core:move-down'));
 
         expect(treeView.roots[0]).not.toHaveClass('selected');
         atom.commands.dispatch(treeView.element, 'core:move-to-top');
-        return expect(treeView.roots[0]).toHaveClass('selected');
+        expect(treeView.roots[0]).toHaveClass('selected');
       });
     });
 
@@ -1072,14 +1064,14 @@ describe("TreeView", function() {
         treeView.roots[0].collapse();
         treeView.roots[1].collapse();
         atom.commands.dispatch(treeView.element, 'core:move-to-bottom');
-        return expect(treeView.element.scrollTop).toBe(0);
+        expect(treeView.element.scrollTop).toBe(0);
       });
 
-      return it("selects the last entry", function() {
+      it("selects the last entry", function() {
         expect(treeView.roots[0]).toHaveClass('selected');
         atom.commands.dispatch(treeView.element, 'core:move-to-bottom');
         const entries = root2.querySelectorAll('.entry');
-        return expect(entries[entries.length - 1]).toHaveClass('selected');
+        expect(entries[entries.length - 1]).toHaveClass('selected');
       });
     });
 
@@ -1097,7 +1089,7 @@ describe("TreeView", function() {
       expect(scrollTop).toBeGreaterThan(0);
 
       atom.commands.dispatch(treeView.element, 'core:page-up');
-      return expect(treeView.element.scrollTop).toBe(scrollTop - treeView.element.offsetHeight);
+      expect(treeView.element.scrollTop).toBe(scrollTop - treeView.element.offsetHeight);
     }));
 
     describe("core:page-down", () => it("scrolls down a page", function() {
@@ -1108,7 +1100,7 @@ describe("TreeView", function() {
 
       expect(treeView.element.scrollTop).toBe(0);
       atom.commands.dispatch(treeView.element, 'core:page-down');
-      return expect(treeView.element.scrollTop).toBe(treeView.element.offsetHeight);
+      expect(treeView.element.scrollTop).toBe(treeView.element.offsetHeight);
     }));
 
     describe("movement outside of viewable region", () => it("scrolls the tree view to the selected item", function() {
@@ -1127,7 +1119,7 @@ describe("TreeView", function() {
       expect(treeView.element.scrollTop + treeView.element.offsetHeight).toBeGreaterThan((entryCount * entryHeight) - 1);
 
       _.times(entryCount, () => atom.commands.dispatch(treeView.element, 'core:move-up'));
-      return expect(treeView.element.scrollTop).toBe(0);
+      expect(treeView.element.scrollTop).toBe(0);
     }));
 
     describe("tree-view:expand-directory", function() {
@@ -1139,10 +1131,10 @@ describe("TreeView", function() {
 
           expect(subdir).not.toHaveClass('expanded');
           atom.commands.dispatch(treeView.element, 'tree-view:expand-item');
-          return expect(subdir).toHaveClass('expanded');
+          expect(subdir).toHaveClass('expanded');
         });
 
-        return describe("when the directory is already expanded", function() {
+        describe("when the directory is already expanded", function() {
           describe("when the directory is empty", () => xit("does nothing", function() {
             const rootDirPath = fs.absolute(temp.mkdirSync('tree-view-root1'));
             fs.mkdirSync(path.join(rootDirPath, "empty-dir"));
@@ -1157,21 +1149,21 @@ describe("TreeView", function() {
 
             atom.commands.dispatch(treeView.element, 'tree-view:expand-directory');
             expect(subdir).toHaveClass('expanded');
-            return expect(subdir).toHaveClass('selected');
+            expect(subdir).toHaveClass('selected');
           }));
 
-          return describe("when the directory has entries", () => it("moves the cursor down to the first sub-entry", function() {
+          describe("when the directory has entries", () => it("moves the cursor down to the first sub-entry", function() {
             const subdir = root1.querySelector('.directory');
             subdir.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
             subdir.expand();
 
             atom.commands.dispatch(treeView.element, 'tree-view:expand-item');
-            return expect(subdir.querySelector('.entry')).toHaveClass('selected');
+            expect(subdir.querySelector('.entry')).toHaveClass('selected');
           }));
         });
       });
 
-      return describe("when a file entry is selected", () => it("does nothing", function() {
+      describe("when a file entry is selected", () => it("does nothing", function() {
         waitForWorkspaceOpenEvent(() => root1.querySelector('.file').dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
 
         return runs(() => atom.commands.dispatch(treeView.element, 'tree-view:expand-directory'));
@@ -1193,7 +1185,7 @@ describe("TreeView", function() {
           expect(child).toHaveClass('expanded'));
       }));
 
-      return describe("when a file is selected and ordered to recursively expand", () => it("recursively expands the selected file's parent directory", function() {
+      describe("when a file is selected and ordered to recursively expand", () => it("recursively expands the selected file's parent directory", function() {
         const dir1 = root1.querySelector('.entries > .directory');
         const dir2 = root1.querySelectorAll('.entries > .directory')[1];
         dir1.expand();
@@ -1207,7 +1199,7 @@ describe("TreeView", function() {
           expect(dir1).toHaveClass('expanded');
           expect(subdir1).toHaveClass('expanded');
           expect(file1).toHaveClass('selected');
-          return expect(dir2).toHaveClass('collapsed');
+          expect(dir2).toHaveClass('collapsed');
         });
       }));
     });
@@ -1228,7 +1220,7 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, 'tree-view:collapse-directory');
 
         expect(subdir).not.toHaveClass('expanded');
-        return expect(treeView.roots[0]).toHaveClass('expanded');
+        expect(treeView.roots[0]).toHaveClass('expanded');
       }));
 
       describe("when a collapsed directory is selected", () => it("collapses and selects the selected directory's parent directory", function() {
@@ -1239,7 +1231,7 @@ describe("TreeView", function() {
 
         expect(subdir).not.toHaveClass('expanded');
         expect(subdir).toHaveClass('selected');
-        return expect(treeView.roots[0]).toHaveClass('expanded');
+        expect(treeView.roots[0]).toHaveClass('expanded');
       }));
 
       describe("when collapsed root directory is selected", () => it("does not raise an error", function() {
@@ -1249,14 +1241,14 @@ describe("TreeView", function() {
         return atom.commands.dispatch(treeView.element, 'tree-view:collapse-directory');
       }));
 
-      return describe("when a file is selected", () => it("collapses and selects the selected file's parent directory", function() {
+      describe("when a file is selected", () => it("collapses and selects the selected file's parent directory", function() {
         waitForWorkspaceOpenEvent(() => subdir.querySelector('.file').dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
 
         return runs(function() {
           atom.commands.dispatch(treeView.element, 'tree-view:collapse-directory');
           expect(subdir).not.toHaveClass('expanded');
           expect(subdir).toHaveClass('selected');
-          return expect(treeView.roots[0]).toHaveClass('expanded');
+          expect(treeView.roots[0]).toHaveClass('expanded');
         });
       }));
     });
@@ -1273,7 +1265,7 @@ describe("TreeView", function() {
           child.expand());
       });
 
-      return describe("when an expanded directory is recursively collapsed", () => it("collapses the directory and all its child directories", function() {
+      describe("when an expanded directory is recursively collapsed", () => it("collapses the directory and all its child directories", function() {
         let child;
         parent.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         parent.expand();
@@ -1290,7 +1282,7 @@ describe("TreeView", function() {
         for (child of Array.from(children)) {
           expect(child).not.toHaveClass('expanded');
         }
-        return expect(treeView.roots[0]).toHaveClass('expanded');
+        expect(treeView.roots[0]).toHaveClass('expanded');
       }));
     });
 
@@ -1329,7 +1321,7 @@ describe("TreeView", function() {
         return checkAllCollapsed();
       });
 
-      return it("collapses all the project directories when nothing is selected", function() {
+      it("collapses all the project directories when nothing is selected", function() {
         expandAll();
 
         treeView.deselect();
@@ -1353,11 +1345,11 @@ describe("TreeView", function() {
             const item = atom.workspace.getCenter().getActivePaneItem();
             expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
             expect(atom.views.getView(item)).toHaveFocus();
-            return expect(atom.workspace.getCenter().getActivePane().getPendingItem()).not.toEqual(item);
+            expect(atom.workspace.getCenter().getActivePane().getPendingItem()).not.toEqual(item);
           });
         });
 
-        return it("opens pending items in a permanent state", function() {
+        it("opens pending items in a permanent state", function() {
           jasmine.attachToDOM(workspaceElement);
 
           treeView.selectEntry(sampleJs);
@@ -1379,7 +1371,7 @@ describe("TreeView", function() {
             const item = atom.workspace.getCenter().getActivePaneItem();
             expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
             expect(atom.views.getView(item)).toHaveFocus();
-            return expect(atom.workspace.getCenter().getActivePane().getPendingItem()).not.toEqual(item);
+            expect(atom.workspace.getCenter().getActivePane().getPendingItem()).not.toEqual(item);
           });
         });
       });
@@ -1393,12 +1385,12 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, 'tree-view:open-selected-entry');
         expect(subdir).toHaveClass('expanded');
         atom.commands.dispatch(treeView.element, 'tree-view:open-selected-entry');
-        return expect(subdir).not.toHaveClass('expanded');
+        expect(subdir).not.toHaveClass('expanded');
       }));
 
-      return describe("when nothing is selected", () => it("does nothing", function() {
+      describe("when nothing is selected", () => it("does nothing", function() {
         atom.commands.dispatch(treeView.element, 'tree-view:open-selected-entry');
-        return expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
+        expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
       }));
     });
 
@@ -1413,7 +1405,7 @@ describe("TreeView", function() {
       return _.each(splitOptions, function(options, direction) {
         const command = `tree-view:open-selected-entry-${direction}`;
 
-        return describe(command, function() {
+        describe(command, function() {
           describe("when a file is selected", function() {
             let previousPane = null;
 
@@ -1435,29 +1427,29 @@ describe("TreeView", function() {
 
             it(`creates a new split pane ${direction}`, () => expect(previousPane.split).toHaveBeenCalledWith(...options));
 
-            return it("opens the file in the new split pane and focuses it", function() {
+            it("opens the file in the new split pane and focuses it", function() {
               const splitPane = atom.workspace.getCenter().getActivePane();
               const splitPaneItem = atom.workspace.getCenter().getActivePaneItem();
               expect(previousPane).not.toBe(splitPane);
               expect(splitPaneItem.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
-              return expect(atom.views.getView(splitPaneItem)).toHaveFocus();
+              expect(atom.views.getView(splitPaneItem)).toHaveFocus();
             });
           });
 
           describe("when a directory is selected", () => it("does nothing", function() {
             atom.commands.dispatch(treeView.element, command);
-            return expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
+            expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
           }));
 
-          return describe("when nothing is selected", () => it("does nothing", function() {
+          describe("when nothing is selected", () => it("does nothing", function() {
             atom.commands.dispatch(treeView.element, command);
-            return expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
+            expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
           }));
         });
       });
     });
 
-    return describe("tree-view:expand-item", function() {
+    describe("tree-view:expand-item", function() {
       describe("when a file is selected", () => it("opens the file in the editor in pending state and focuses it", function() {
         jasmine.attachToDOM(workspaceElement);
 
@@ -1469,7 +1461,7 @@ describe("TreeView", function() {
           const item = atom.workspace.getCenter().getActivePaneItem();
           expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
           expect(atom.workspace.getCenter().getActivePane().getPendingItem()).toEqual(item);
-          return expect(atom.views.getView(item)).toHaveFocus();
+          expect(atom.views.getView(item)).toHaveFocus();
         });
       }));
 
@@ -1480,12 +1472,12 @@ describe("TreeView", function() {
 
         expect(subdir).not.toHaveClass('expanded');
         atom.commands.dispatch(treeView.element, 'tree-view:expand-item');
-        return expect(subdir).toHaveClass('expanded');
+        expect(subdir).toHaveClass('expanded');
       }));
 
-      return describe("when nothing is selected", () => it("does nothing", function() {
+      describe("when nothing is selected", () => it("does nothing", function() {
         atom.commands.dispatch(treeView.element, 'tree-view:expand-item');
-        return expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
+        expect(atom.workspace.getCenter().getActivePaneItem()).toBeUndefined();
       }));
     });
   });
@@ -1505,17 +1497,17 @@ describe("TreeView", function() {
       const paneNumber = index + 1;
       const command = `tree-view:open-selected-entry-in-pane-${paneNumber}`;
 
-      return describe(command, () => describe("when a file is selected", function() {
+      describe(command, () => describe("when a file is selected", function() {
         beforeEach(function() {
           selectEntry('tree-view.txt');
           return waitForWorkspaceOpenEvent(() => atom.commands.dispatch(treeView.element, command));
         });
 
-        return it(`opens the file in pane ${paneNumber} and focuses it`, function() {
+        it(`opens the file in pane ${paneNumber} and focuses it`, function() {
           const pane = atom.workspace.getCenter().getPanes()[index];
           const item = atom.workspace.getCenter().getActivePaneItem();
           expect(atom.views.getView(pane)).toHaveFocus();
-          return expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
+          expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
         });
       }));
     });
@@ -1540,19 +1532,19 @@ describe("TreeView", function() {
       const paneNumber = index + 1;
       const command = `tree-view:open-selected-entry-in-pane-${paneNumber}`;
 
-      return describe(command, () => [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(fileIndex) {
+      describe(command, () => [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(fileIndex) {
         const fileName = getPaneFileName(fileIndex);
-        return describe(`when a file is selected that is already open in pane ${fileIndex}`, function() {
+        describe(`when a file is selected that is already open in pane ${fileIndex}`, function() {
           beforeEach(function() {
             selectEntry(fileName);
             return waitForWorkspaceOpenEvent(() => atom.commands.dispatch(treeView.element, command));
           });
 
-          return it(`opens the file in pane ${paneNumber} and focuses it`, function() {
+          it(`opens the file in pane ${paneNumber} and focuses it`, function() {
             const pane = atom.workspace.getCenter().getPanes()[index];
             const item = atom.workspace.getCenter().getActivePaneItem();
             expect(atom.views.getView(pane)).toHaveFocus();
-            return expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve(fileName));
+            expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve(fileName));
           });
         });
       }));
@@ -1563,25 +1555,25 @@ describe("TreeView", function() {
     describe("when the project folder is selected", () => it("removes the folder from the project", function() {
       const rootHeader = treeView.roots[1].querySelector(".header");
       atom.commands.dispatch(rootHeader, "tree-view:remove-project-folder");
-      return expect(atom.project.getPaths()).toEqual([path1]);
+      expect(atom.project.getPaths()).toEqual([path1]);
   }));
 
     describe("when an entry is selected", () => it("removes the project folder containing the entry", function() {
       treeView.selectEntry(treeView.roots[1].querySelector(".entries").querySelector("li"));
       atom.commands.dispatch(treeView.element, "tree-view:remove-project-folder");
-      return expect(atom.project.getPaths()).toEqual([path1]);
+      expect(atom.project.getPaths()).toEqual([path1]);
   }));
 
     describe("when nothing is selected and there is only one project folder", () => it("removes the project folder", function() {
       atom.project.removePath(path2);
       atom.commands.dispatch(treeView.element, "tree-view:remove-project-folder");
-      return expect(atom.project.getPaths()).toHaveLength(0);
+      expect(atom.project.getPaths()).toHaveLength(0);
     }));
 
-    return describe("when nothing is selected and there are multiple project folders", () => it("does nothing", function() {
+    describe("when nothing is selected and there are multiple project folders", () => it("does nothing", function() {
       treeView.deselect(treeView.getSelectedEntries());
       atom.commands.dispatch(treeView.element, "tree-view:remove-project-folder");
-      return expect(atom.project.getPaths()).toHaveLength(2);
+      expect(atom.project.getPaths()).toHaveLength(2);
     }));
   });
 
@@ -1639,22 +1631,22 @@ describe("TreeView", function() {
       describe("when a file is selected", function() {
         it("saves the selected file/directory path to localStorage['tree-view:copyPath']", () => expect(LocalStorage['tree-view:copyPath']).toBeTruthy());
 
-        return it("Clears the localStorage['tree-view:cutPath']", function() {
+        it("Clears the localStorage['tree-view:cutPath']", function() {
           LocalStorage.clear();
           LocalStorage['tree-view:cutPath'] = "I live!";
           atom.commands.dispatch(treeView.element, "tree-view:copy");
-          return expect(LocalStorage['tree-view:cutPath']).toBeFalsy;
+          expect(LocalStorage['tree-view:cutPath']).toBeFalsy;
         });
       });
 
-      return describe('when multiple files are selected', () => it('saves the selected item paths in localStorage', function() {
+      describe('when multiple files are selected', () => it('saves the selected item paths in localStorage', function() {
         fileView3.classList.add('selected');
         atom.commands.dispatch(treeView.element, "tree-view:copy");
         const storedPaths = JSON.parse(LocalStorage['tree-view:copyPath']);
 
         expect(storedPaths.length).toBe(2);
         expect(storedPaths[0]).toBe(fileView2.getPath());
-        return expect(storedPaths[1]).toBe(fileView3.getPath());
+        expect(storedPaths[1]).toBe(fileView3.getPath());
       }));
     });
 
@@ -1672,15 +1664,15 @@ describe("TreeView", function() {
       describe("when a file is selected", function() {
         it("saves the selected file/directory path to localStorage['tree-view:cutPath']", () => expect(LocalStorage['tree-view:cutPath']).toBeTruthy());
 
-        return it("Clears the localStorage['tree-view:copyPath']", function() {
+        it("Clears the localStorage['tree-view:copyPath']", function() {
           LocalStorage.clear();
           LocalStorage['tree-view:copyPath'] = "I live to CUT!";
           atom.commands.dispatch(treeView.element, "tree-view:cut");
-          return expect(LocalStorage['tree-view:copyPath']).toBeFalsy();
+          expect(LocalStorage['tree-view:copyPath']).toBeFalsy();
         });
       });
 
-      return describe('when multiple files are selected', () => it('saves the selected item paths in localStorage', function() {
+      describe('when multiple files are selected', () => it('saves the selected item paths in localStorage', function() {
         LocalStorage.clear();
         fileView3.classList.add('selected');
         atom.commands.dispatch(treeView.element, "tree-view:cut");
@@ -1688,7 +1680,7 @@ describe("TreeView", function() {
 
         expect(storedPaths.length).toBe(2);
         expect(storedPaths[0]).toBe(fileView2.getPath());
-        return expect(storedPaths[1]).toBe(fileView3.getPath());
+        expect(storedPaths[1]).toBe(fileView3.getPath());
       }));
     });
 
@@ -1707,7 +1699,7 @@ describe("TreeView", function() {
         dirView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
         expect(fs.existsSync(newPath)).toBe(false);
-        return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
       }));
 
       describe("when attempting to paste a directory into a nested child directory", () => it("shows a warning notification and does not paste", function() {
@@ -1722,7 +1714,7 @@ describe("TreeView", function() {
         nestedView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
         expect(fs.existsSync(newPath)).toBe(false);
-        return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
       }));
 
       describe("when attempting to paste a directory into a sibling directory that starts with the same letter", () => it("allows the paste to occur", function() {
@@ -1732,7 +1724,7 @@ describe("TreeView", function() {
         dirView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
         expect(fs.existsSync(newPath)).toBe(true);
-        return expect(atom.notifications.getNotifications()[0]).toBeUndefined();
+        expect(atom.notifications.getNotifications()[0]).toBeUndefined();
       }));
 
       describe("when attempting to paste a directory into a symlink of itself", () => it("shows a warning notification and does not paste", function() {
@@ -1745,7 +1737,7 @@ describe("TreeView", function() {
         symlinkView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
         expect(fs.existsSync(newPath)).toBe(false);
-        return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
       }));
 
       describe("when attempting to paste a symlink into its target directory", () => it("allows the paste to occur", function() {
@@ -1758,7 +1750,7 @@ describe("TreeView", function() {
         dirView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
         expect(fs.existsSync(newPath)).toBe(true);
-        return expect(atom.notifications.getNotifications()[0]).toBeUndefined();
+        expect(atom.notifications.getNotifications()[0]).toBeUndefined();
       }));
 
       describe("when pasting entries which don't exist anymore", () => it("skips the entry which doesn't exist", function() {
@@ -1775,7 +1767,7 @@ describe("TreeView", function() {
         expect(fs.existsSync(path.join(dirPath, path.basename(filePathDoesntExist1)))).toBeFalsy();
         expect(fs.existsSync(path.join(dirPath, path.basename(filePathDoesntExist2)))).toBeFalsy();
         expect(fs.existsSync(filePath2)).toBeTruthy();
-        return expect(fs.existsSync(filePath3)).toBeTruthy();
+        expect(fs.existsSync(filePath3)).toBeTruthy();
       }));
 
       describe("when a file has been copied", function() {
@@ -1788,7 +1780,7 @@ describe("TreeView", function() {
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(fs.existsSync(newPath)).toBeTruthy();
-            return expect(fs.existsSync(filePath)).toBeTruthy();
+            expect(fs.existsSync(filePath)).toBeTruthy();
           });
 
           it("emits an event", function() {
@@ -1798,10 +1790,10 @@ describe("TreeView", function() {
             atom.commands.dispatch(treeView.element, "tree-view:paste");
 
             const newPath = path.join(dirPath2, path.basename(filePath));
-            return expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
+            expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
           });
 
-          return describe("when the target already exists", () => it("appends a number to the destination name", function() {
+          describe("when the target already exists", () => it("appends a number to the destination name", function() {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]);
 
             fileView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
@@ -1810,7 +1802,7 @@ describe("TreeView", function() {
 
             expect(fs.existsSync(path.join(path.dirname(filePath), "test-file0.txt"))).toBeTruthy();
             expect(fs.existsSync(path.join(path.dirname(filePath), "test-file1.txt"))).toBeTruthy();
-            return expect(fs.existsSync(filePath)).toBeTruthy();
+            expect(fs.existsSync(filePath)).toBeTruthy();
           }));
         });
 
@@ -1825,10 +1817,10 @@ describe("TreeView", function() {
             fileView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
             expect(fs.existsSync(path.join(dirPath, path.basename(dotFilePath)))).toBeTruthy();
-            return expect(fs.existsSync(dotFilePath)).toBeTruthy();
+            expect(fs.existsSync(dotFilePath)).toBeTruthy();
           });
 
-          return describe("when the target already exists", () => it("appends a number to the destination name", function() {
+          describe("when the target already exists", () => it("appends a number to the destination name", function() {
             const dotFilePath = path.join(dirPath, "test.file.txt");
             fs.writeFileSync(dotFilePath, "doesn't matter .");
             LocalStorage['tree-view:copyPath'] = JSON.stringify([dotFilePath]);
@@ -1839,7 +1831,7 @@ describe("TreeView", function() {
 
             expect(fs.existsSync(path.join(dirPath, 'test0.file.txt'))).toBeTruthy();
             expect(fs.existsSync(path.join(dirPath, 'test1.file.txt'))).toBeTruthy();
-            return expect(fs.existsSync(dotFilePath)).toBeTruthy();
+            expect(fs.existsSync(dotFilePath)).toBeTruthy();
           }));
         }));
 
@@ -1851,10 +1843,10 @@ describe("TreeView", function() {
             atom.commands.dispatch(treeView.element, "tree-view:paste");
 
             expect(fs.existsSync(path.join(dirPath2, path.basename(filePath)))).toBeTruthy();
-            return expect(fs.existsSync(filePath)).toBeTruthy();
+            expect(fs.existsSync(filePath)).toBeTruthy();
           });
 
-          return describe("when the target already exists", () => it("appends a number to the destination file name", function() {
+          describe("when the target already exists", () => it("appends a number to the destination file name", function() {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]);
 
             dirView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
@@ -1863,7 +1855,7 @@ describe("TreeView", function() {
 
             expect(fs.existsSync(path.join(path.dirname(filePath), "test-file0.txt"))).toBeTruthy();
             expect(fs.existsSync(path.join(path.dirname(filePath), "test-file1.txt"))).toBeTruthy();
-            return expect(fs.existsSync(filePath)).toBeTruthy();
+            expect(fs.existsSync(filePath)).toBeTruthy();
           }));
         });
 
@@ -1886,10 +1878,10 @@ describe("TreeView", function() {
             atom.commands.dispatch(treeView.element, "tree-view:paste");
 
             expect(fs.existsSync(path.join(dotDirPath, path.basename(filePath)))).toBeTruthy();
-            return expect(fs.existsSync(filePath)).toBeTruthy();
+            expect(fs.existsSync(filePath)).toBeTruthy();
           });
 
-          return describe("when the target already exists", () => it("appends a number to the destination file name", function() {
+          describe("when the target already exists", () => it("appends a number to the destination file name", function() {
             const dotFilePath = path.join(dotDirPath, "test.file.txt");
             fs.writeFileSync(dotFilePath, "doesn't matter .");
             LocalStorage['tree-view:copyPath'] = JSON.stringify([dotFilePath]);
@@ -1902,7 +1894,7 @@ describe("TreeView", function() {
 
             expect(fs.existsSync(path.join(dotDirPath, "test0.file.txt"))).toBeTruthy();
             expect(fs.existsSync(path.join(dotDirPath, "test1.file.txt"))).toBeTruthy();
-            return expect(fs.existsSync(dotFilePath)).toBeTruthy();
+            expect(fs.existsSync(dotFilePath)).toBeTruthy();
           }));
         });
 
@@ -1910,10 +1902,10 @@ describe("TreeView", function() {
           LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath4]);
           dirView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           atom.commands.dispatch(treeView.element, "tree-view:paste");
-          return expect(fs.existsSync(path.join(dirPath2, path.basename(filePath4)))).toBeTruthy();
+          expect(fs.existsSync(path.join(dirPath2, path.basename(filePath4)))).toBeTruthy();
         }));
 
-        return describe("when pasting a file with an asterisk char '*' in to different directory", () => it("should successfully move the file", function() {
+        describe("when pasting a file with an asterisk char '*' in to different directory", () => it("should successfully move the file", function() {
           // Files cannot contain asterisks on Windows
           if (process.platform === "win32") { return; }
 
@@ -1922,7 +1914,7 @@ describe("TreeView", function() {
           LocalStorage['tree-view:copyPath'] = JSON.stringify([asteriskFilePath]);
           dirView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           atom.commands.dispatch(treeView.element, "tree-view:paste");
-          return expect(fs.existsSync(path.join(dirPath2, path.basename(asteriskFilePath)))).toBeTruthy();
+          expect(fs.existsSync(path.join(dirPath2, path.basename(asteriskFilePath)))).toBeTruthy();
         }));
       });
 
@@ -1938,10 +1930,10 @@ describe("TreeView", function() {
           expect(fs.existsSync(path.join(dirPath, path.basename(filePath2)))).toBeTruthy();
           expect(fs.existsSync(path.join(dirPath, path.basename(filePath3)))).toBeTruthy();
           expect(fs.existsSync(filePath2)).toBeTruthy();
-          return expect(fs.existsSync(filePath3)).toBeTruthy();
+          expect(fs.existsSync(filePath3)).toBeTruthy();
         });
 
-        return describe('when the target destination file exists', () => it('appends a number to the duplicate destination target names', function() {
+        describe('when the target destination file exists', () => it('appends a number to the duplicate destination target names', function() {
           LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath2, filePath3]);
 
           filePath4 = path.join(dirPath, "test-file2.txt");
@@ -1953,7 +1945,7 @@ describe("TreeView", function() {
           atom.commands.dispatch(treeView.element, "tree-view:paste");
 
           expect(fs.existsSync(path.join(dirPath, "test-file20.txt"))).toBeTruthy();
-          return expect(fs.existsSync(path.join(dirPath, "test-file30.txt"))).toBeTruthy();
+          expect(fs.existsSync(path.join(dirPath, "test-file30.txt"))).toBeTruthy();
         }));
       }));
 
@@ -1967,7 +1959,7 @@ describe("TreeView", function() {
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(fs.existsSync(newPath)).toBeTruthy();
-            return expect(fs.existsSync(filePath)).toBeFalsy();
+            expect(fs.existsSync(filePath)).toBeFalsy();
           });
 
           it("emits an event", function() {
@@ -1978,7 +1970,7 @@ describe("TreeView", function() {
             atom.commands.dispatch(treeView.element, "tree-view:paste");
 
             const newPath = path.join(dirPath2, path.basename(filePath));
-            return expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
+            expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
           });
 
           describe('when the target destination file exists', function() {
@@ -1994,7 +1986,7 @@ describe("TreeView", function() {
               fileView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
 
-              return expect(atom.confirm).toHaveBeenCalled();
+              expect(atom.confirm).toHaveBeenCalled();
             });
 
             describe("when selecting the replace option", () => it("replaces the existing file", function() {
@@ -2010,7 +2002,7 @@ describe("TreeView", function() {
               atom.commands.dispatch(treeView.element, "tree-view:paste");
 
               expect(fs.existsSync(filePath)).toBe(false);
-              return expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath: filePath3});
+              expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath: filePath3});
             }));
 
             describe("when selecting the skip option", () => it("does not replace the existing file", function() {
@@ -2026,10 +2018,10 @@ describe("TreeView", function() {
               atom.commands.dispatch(treeView.element, "tree-view:paste");
 
               expect(fs.existsSync(filePath)).toBe(true);
-              return expect(callback).not.toHaveBeenCalled();
+              expect(callback).not.toHaveBeenCalled();
             }));
 
-            return describe("when cancelling the dialog", () => it("does not replace the existing file", function() {
+            describe("when cancelling the dialog", () => it("does not replace the existing file", function() {
               spyOn(atom, 'confirm').andReturn(2);
 
               const callback = jasmine.createSpy("onEntryMoved");
@@ -2042,11 +2034,11 @@ describe("TreeView", function() {
               atom.commands.dispatch(treeView.element, "tree-view:paste");
 
               expect(fs.existsSync(filePath)).toBe(true);
-              return expect(callback).not.toHaveBeenCalled();
+              expect(callback).not.toHaveBeenCalled();
             }));
           });
 
-          return describe('when the file is currently open', function() {
+          describe('when the file is currently open', function() {
             beforeEach(() => waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath)));
 
             it('has its path updated', function() {
@@ -2054,10 +2046,10 @@ describe("TreeView", function() {
               atom.commands.dispatch(treeView.element, "tree-view:paste");
 
               const newPath = path.join(dirPath2, path.basename(filePath));
-              return expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
+              expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
             });
 
-            return it('does not update paths for similarly-named editors', function() {
+            it('does not update paths for similarly-named editors', function() {
               filePath2 = path.join(dirPath, 'test-file.txt2');
               fs.writeFileSync(filePath2, 'copy');
 
@@ -2070,13 +2062,13 @@ describe("TreeView", function() {
                 const newPath = path.join(dirPath2, path.basename(filePath));
                 const editors = atom.workspace.getTextEditors();
                 expect(editors[0].getPath()).toBe(newPath);
-                return expect(editors[1].getPath()).toBe(filePath2);
+                expect(editors[1].getPath()).toBe(filePath2);
               });
             });
           });
         });
 
-        return describe("when a directory is selected", () => it("creates a copy of the original file in the selected directory and removes the original", function() {
+        describe("when a directory is selected", () => it("creates a copy of the original file in the selected directory and removes the original", function() {
           LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath]);
 
           const callback = jasmine.createSpy("onEntryMoved");
@@ -2087,7 +2079,7 @@ describe("TreeView", function() {
           const newPath = path.join(dirPath2, path.basename(filePath));
           expect(fs.existsSync(newPath)).toBeTruthy();
           expect(fs.existsSync(filePath)).toBeFalsy();
-          return expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
+          expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
         }));
       });
 
@@ -2104,7 +2096,7 @@ describe("TreeView", function() {
             expect(fs.existsSync(newPath2)).toBeTruthy();
             expect(fs.existsSync(newPath3)).toBeTruthy();
             expect(fs.existsSync(filePath2)).toBeFalsy();
-            return expect(fs.existsSync(filePath3)).toBeFalsy();
+            expect(fs.existsSync(filePath3)).toBeFalsy();
           });
 
           it("emits events", function() {
@@ -2117,10 +2109,10 @@ describe("TreeView", function() {
             const newPath3 = path.join(dirPath, path.basename(filePath3));
             expect(callback.callCount).toEqual(2);
             expect(callback).toHaveBeenCalledWith({initialPath: filePath2, newPath: newPath2});
-            return expect(callback).toHaveBeenCalledWith({initialPath: filePath3, newPath: newPath3});
+            expect(callback).toHaveBeenCalledWith({initialPath: filePath3, newPath: newPath3});
           });
 
-          return describe("when the target destination file exists", function() {
+          describe("when the target destination file exists", function() {
             let filePath5 = null;
 
             beforeEach(function() {
@@ -2157,10 +2149,10 @@ describe("TreeView", function() {
 
               expect(fs.existsSync(filePath5)).toBe(false);
               expect(fs.existsSync(filePath2)).toBe(true);
-              return expect(fs.existsSync(filePath3)).toBe(false);
+              expect(fs.existsSync(filePath3)).toBe(false);
             });
 
-            return it("immediately cancels any pending file moves when cancel is chosen", function() {
+            it("immediately cancels any pending file moves when cancel is chosen", function() {
               let calls = 0;
               const getButton = function() {
                 calls++;
@@ -2181,23 +2173,23 @@ describe("TreeView", function() {
 
               expect(fs.existsSync(filePath5)).toBe(false);
               expect(fs.existsSync(filePath2)).toBe(true);
-              return expect(fs.existsSync(filePath3)).toBe(true);
+              expect(fs.existsSync(filePath3)).toBe(true);
             });
           });
         });
 
-        return describe("when a directory is selected", () => it("creates a copy of the original file in the selected directory and removes the original", function() {
+        describe("when a directory is selected", () => it("creates a copy of the original file in the selected directory and removes the original", function() {
           LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath]);
 
           dirView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           atom.commands.dispatch(treeView.element, "tree-view:paste");
 
           expect(fs.existsSync(path.join(dirPath2, path.basename(filePath)))).toBeTruthy();
-          return expect(fs.existsSync(filePath)).toBeFalsy();
+          expect(fs.existsSync(filePath)).toBeFalsy();
         }));
       });
 
-      return describe("when pasting the file fails due to a filesystem error", () => it("shows a notification", function() {
+      describe("when pasting the file fails due to a filesystem error", () => it("shows a notification", function() {
         spyOn(fs, 'writeFileSync').andCallFake(function() {
           const writeError = new Error(`ENOENT: no such file or directory, open '${filePath}'`);
           writeError.code = 'ENOENT';
@@ -2212,7 +2204,7 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, "tree-view:paste");
 
         expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Failed to copy entry');
-        return expect(atom.notifications.getNotifications()[0].getDetail()).toContain('ENOENT: no such file or directory');
+        expect(atom.notifications.getNotifications()[0].getDetail()).toContain('ENOENT: no such file or directory');
       }));
     });
 
@@ -2240,12 +2232,12 @@ describe("TreeView", function() {
           expect(atom.project.relativize(dirPath)).toMatch(/[^\\\/]$/);
           expect(addDialog.miniEditor.getText()).toBe(atom.project.relativize(dirPath) + path.sep);
           expect(addDialog.miniEditor.getCursorBufferPosition().column).toBe(addDialog.miniEditor.getText().length);
-          return expect(addDialog.miniEditor.element).toHaveFocus();
+          expect(addDialog.miniEditor.element).toHaveFocus();
         });
 
         describe("when the parent directory of the selected file changes", () => it("still shows the active file as selected", function() {
           dirView.directory.emitter.emit('did-remove-entries', new Map().set('deleted.txt', {}));
-          return expect(treeView.element.querySelector('.selected').textContent).toBe(path.basename(filePath));
+          expect(treeView.element.querySelector('.selected').textContent).toBe(path.basename(filePath));
         }));
 
         describe(`when the path without a trailing '${path.sep}' is changed and confirmed`, function() {
@@ -2261,7 +2253,7 @@ describe("TreeView", function() {
               runs(function() {
                 expect(fs.isFileSync(newPath)).toBeTruthy();
                 expect(atom.workspace.getModalPanels().length).toBe(0);
-                return expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
+                expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
               });
 
               waitsFor("file to be added to tree view", () => dirView.entries.querySelectorAll(".file").length > 1);
@@ -2270,11 +2262,11 @@ describe("TreeView", function() {
 
               return runs(function() {
                 expect(treeView.element.querySelector('.selected').textContent).toBe(path.basename(newPath));
-                return expect(callback).toHaveBeenCalledWith({path: newPath});
+                expect(callback).toHaveBeenCalledWith({path: newPath});
               });
             });
 
-            return it("adds file in any project path", function() {
+            it("adds file in any project path", function() {
               const newPath = path.join(dirPath3, "new-test-file.txt");
 
               waitForWorkspaceOpenEvent(() => fileView4.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
@@ -2290,7 +2282,7 @@ describe("TreeView", function() {
               runs(function() {
                 expect(fs.isFileSync(newPath)).toBeTruthy();
                 expect(atom.workspace.getModalPanels().length).toBe(0);
-                return expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
+                expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
               });
 
               waitsFor("file to be added to tree view", () => dirView3.entries.querySelectorAll(".file").length > 1);
@@ -2299,7 +2291,7 @@ describe("TreeView", function() {
 
               return runs(function() {
                 expect(treeView.element.querySelector('.selected').textContent).toBe(path.basename(newPath));
-                return expect(callback).toHaveBeenCalledWith({path: newPath});
+                expect(callback).toHaveBeenCalledWith({path: newPath});
               });
             });
           });
@@ -2313,10 +2305,10 @@ describe("TreeView", function() {
             expect(addDialog.errorMessage.textContent).toContain('already exists');
             expect(addDialog.element).toHaveClass('error');
             expect(atom.workspace.getModalPanels()[0]).toBe(addPanel);
-            return expect(callback).not.toHaveBeenCalled();
+            expect(callback).not.toHaveBeenCalled();
           }));
 
-          return describe("when the project has no path", () => it("adds a file and closes the dialog", function() {
+          describe("when the project has no path", () => it("adds a file and closes the dialog", function() {
             atom.project.setPaths([]);
             addDialog.close();
             atom.commands.dispatch(atom.views.getView(atom.workspace), "tree-view:add-file");
@@ -2332,7 +2324,7 @@ describe("TreeView", function() {
               expect(fs.isFileSync(newPath)).toBeTruthy();
               expect(atom.workspace.getModalPanels().length).toBe(0);
               expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
-              return expect(callback).toHaveBeenCalledWith({path: newPath});
+              expect(callback).toHaveBeenCalledWith({path: newPath});
             });
           }));
         });
@@ -2344,23 +2336,23 @@ describe("TreeView", function() {
           expect(addDialog.errorMessage.textContent).toContain('names must not end with');
           expect(addDialog.element).toHaveClass('error');
           expect(atom.workspace.getModalPanels()[0]).toBe(addPanel);
-          return expect(callback).not.toHaveBeenCalled();
+          expect(callback).not.toHaveBeenCalled();
         }));
 
         describe("when 'core:cancel' is triggered on the add dialog", () => it("removes the dialog and focuses the tree view", function() {
           atom.commands.dispatch(addDialog.element, 'core:cancel');
           expect(atom.workspace.getModalPanels().length).toBe(0);
           expect(document.activeElement).toBe(treeView.element);
-          return expect(callback).not.toHaveBeenCalled();
+          expect(callback).not.toHaveBeenCalled();
         }));
 
         describe("when the add dialog's editor loses focus", () => it("removes the dialog and focuses root view", function() {
           workspaceElement.focus();
           expect(atom.workspace.getModalPanels().length).toBe(0);
-          return expect(atom.views.getView(atom.workspace.getCenter().getActivePane())).toHaveFocus();
+          expect(atom.views.getView(atom.workspace.getCenter().getActivePane())).toHaveFocus();
         }));
 
-        return describe("when the path ends with whitespace", () => it("removes the trailing whitespace before creating the file", function() {
+        describe("when the path ends with whitespace", () => it("removes the trailing whitespace before creating the file", function() {
           const newPath = path.join(dirPath, "new-test-file.txt");
           addDialog.miniEditor.insertText(path.basename(newPath) + "  ");
 
@@ -2369,7 +2361,7 @@ describe("TreeView", function() {
           return runs(function() {
             expect(fs.isFileSync(newPath)).toBeTruthy();
             expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
-            return expect(callback).toHaveBeenCalledWith({path: newPath});
+            expect(callback).toHaveBeenCalledWith({path: newPath});
           });
         }));
       });
@@ -2385,7 +2377,7 @@ describe("TreeView", function() {
         expect(atom.project.relativize(dirPath)).toMatch(/[^\\\/]$/);
         expect(addDialog.miniEditor.getText()).toBe(atom.project.relativize(dirPath) + path.sep);
         expect(addDialog.miniEditor.getCursorBufferPosition().column).toBe(addDialog.miniEditor.getText().length);
-        return expect(addDialog.miniEditor.element).toHaveFocus();
+        expect(addDialog.miniEditor.element).toHaveFocus();
       }));
 
       describe("when the root directory is selected", () => it("opens an add dialog with no path populated", function() {
@@ -2394,7 +2386,7 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, "tree-view:add-file");
         addDialog = atom.workspace.getModalPanels()[0].getItem();
 
-        return expect(addDialog.miniEditor.getText()).toBe("");
+        expect(addDialog.miniEditor.getText()).toBe("");
       }));
 
       describe("when there is no entry selected", () => it("opens an add dialog with no path populated", function() {
@@ -2405,10 +2397,10 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, "tree-view:add-file");
         addDialog = atom.workspace.getModalPanels()[0].getItem();
 
-        return expect(addDialog.miniEditor.getText()).toBe("");
+        expect(addDialog.miniEditor.getText()).toBe("");
       }));
 
-      return describe("when the project doesn't have a root directory", () => it("shows an error", function() {
+      describe("when the project doesn't have a root directory", () => it("shows an error", function() {
         addDialog.cancel();
         atom.project.setPaths([]);
         atom.commands.dispatch(workspaceElement, "tree-view:add-folder");
@@ -2416,7 +2408,7 @@ describe("TreeView", function() {
         addDialog = addPanel.getItem();
         addDialog.miniEditor.insertText("a-file");
         atom.commands.dispatch(addDialog.element, 'core:confirm');
-        return expect(addDialog.element.textContent).toContain("You must open a directory to create a file with a relative path");
+        expect(addDialog.element.textContent).toContain("You must open a directory to create a file with a relative path");
       }));
     });
 
@@ -2437,14 +2429,14 @@ describe("TreeView", function() {
         });
       });
 
-      return describe("when a file is selected", function() {
+      describe("when a file is selected", function() {
         it("opens an add dialog with the file's current directory path populated", function() {
           expect(addDialog.element).toExist();
           expect(addDialog.promptText.textContent).toBeTruthy();
           expect(atom.project.relativize(dirPath)).toMatch(/[^\\\/]$/);
           expect(addDialog.miniEditor.getText()).toBe(atom.project.relativize(dirPath) + path.sep);
           expect(addDialog.miniEditor.getCursorBufferPosition().column).toBe(addDialog.miniEditor.getText().length);
-          return expect(addDialog.miniEditor.element).toHaveFocus();
+          expect(addDialog.miniEditor.element).toHaveFocus();
         });
 
         describe(`when the path without a trailing '${path.sep}' is changed and confirmed`, () => describe("when no directory exists at the given path", () => it("adds a directory and closes the dialog", function() {
@@ -2457,10 +2449,10 @@ describe("TreeView", function() {
 
           expect(document.activeElement).toBe(treeView.element);
           expect(dirView.querySelector('.directory.selected').textContent).toBe('new');
-          return expect(callback).toHaveBeenCalledWith({path: newPath});
+          expect(callback).toHaveBeenCalledWith({path: newPath});
         })));
 
-        return describe(`when the path with a trailing '${path.sep}' is changed and confirmed`, function() {
+        describe(`when the path with a trailing '${path.sep}' is changed and confirmed`, function() {
           describe("when no directory exists at the given path", function() {
             it("adds a directory, closes the dialog, and emits an event", function() {
               const newPath = path.join(dirPath, 'new', 'dir');
@@ -2472,7 +2464,7 @@ describe("TreeView", function() {
 
               expect(document.activeElement).toBe(treeView.element);
               expect(dirView.querySelector('.directory.selected').textContent).toBe('new');
-              return expect(callback).toHaveBeenCalledWith({path: newPath + path.sep});
+              expect(callback).toHaveBeenCalledWith({path: newPath + path.sep});
             });
 
             it("selects the created directory and does not change the expansion state of existing directories", function() {
@@ -2493,10 +2485,10 @@ describe("TreeView", function() {
               expect(document.activeElement).toBe(treeView.element);
               expect(dirView.querySelector('.directory.selected').textContent).toBe('new2');
               expect(treeView.entryForPath(expandedPath).isExpanded).toBeTruthy();
-              return expect(callback).toHaveBeenCalledWith({path: newPath});
+              expect(callback).toHaveBeenCalledWith({path: newPath});
             });
 
-            return describe("when the project has no path", () => it("adds a directory and closes the dialog", function() {
+            describe("when the project has no path", () => it("adds a directory and closes the dialog", function() {
               addDialog.close();
               atom.project.setPaths([]);
               atom.commands.dispatch(atom.views.getView(atom.workspace), "tree-view:add-folder");
@@ -2509,11 +2501,11 @@ describe("TreeView", function() {
               atom.commands.dispatch(addDialog.element, 'core:confirm');
               expect(fs.isDirectorySync(newPath)).toBeTruthy();
               expect(atom.workspace.getModalPanels().length).toBe(0);
-              return expect(callback).toHaveBeenCalledWith({path: newPath});
+              expect(callback).toHaveBeenCalledWith({path: newPath});
             }));
           });
 
-          return describe("when a directory already exists at the given path", () => it("shows an error message and does not close the dialog", function() {
+          describe("when a directory already exists at the given path", () => it("shows an error message and does not close the dialog", function() {
             const newPath = path.join(dirPath, "new-dir");
             fs.makeTreeSync(newPath);
             addDialog.miniEditor.insertText(`new-dir${path.sep}`);
@@ -2522,7 +2514,7 @@ describe("TreeView", function() {
             expect(addDialog.errorMessage.textContent).toContain('already exists');
             expect(addDialog.element).toHaveClass('error');
             expect(atom.workspace.getModalPanels()[0]).toBe(addPanel);
-            return expect(callback).not.toHaveBeenCalled();
+            expect(callback).not.toHaveBeenCalled();
           }));
         });
       });
@@ -2552,7 +2544,7 @@ describe("TreeView", function() {
           expect(moveDialog.promptText.textContent).toBe("Enter the new path for the file.");
           expect(moveDialog.miniEditor.getText()).toBe(atom.project.relativize(filePath));
           expect(moveDialog.miniEditor.getSelectedText()).toBe(fileNameWithoutExtension);
-          return expect(moveDialog.miniEditor.element).toHaveFocus();
+          expect(moveDialog.miniEditor.element).toHaveFocus();
         });
 
         describe("when the path is changed and confirmed", function() {
@@ -2575,7 +2567,7 @@ describe("TreeView", function() {
               dirView = treeView.roots[0].querySelector('.directory');
               dirView.expand();
               expect(dirView.entries.children.length).toBe(0);
-              return expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
+              expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
             });
           }));
 
@@ -2593,7 +2585,7 @@ describe("TreeView", function() {
             return runs(function() {
               expect(fs.existsSync(newPath)).toBeTruthy();
               expect(fs.existsSync(filePath)).toBeFalsy();
-              return expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
+              expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
             });
           }));
 
@@ -2607,10 +2599,10 @@ describe("TreeView", function() {
             expect(moveDialog.errorMessage.textContent).toContain('already exists');
             expect(moveDialog.element).toHaveClass('error');
             expect(moveDialog.element.parentElement).toBeTruthy();
-            return expect(callback).not.toHaveBeenCalled();
+            expect(callback).not.toHaveBeenCalled();
           }));
 
-          return describe('when the file is currently open', function() {
+          describe('when the file is currently open', function() {
             beforeEach(() => waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath)));
 
             it('has its path updated', function() {
@@ -2619,10 +2611,10 @@ describe("TreeView", function() {
 
               atom.commands.dispatch(moveDialog.element, 'core:confirm');
 
-              return expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
+              expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
             });
 
-            return it('does not update paths for similarly-named editors', function() {
+            it('does not update paths for similarly-named editors', function() {
               filePath2 = path.join(dirPath, 'test-file.txt2');
               fs.writeFileSync(filePath2, 'copy');
 
@@ -2636,7 +2628,7 @@ describe("TreeView", function() {
 
                 const editors = atom.workspace.getTextEditors();
                 expect(editors[0].getPath()).toBe(newPath);
-                return expect(editors[1].getPath()).toBe(filePath2);
+                expect(editors[1].getPath()).toBe(filePath2);
               });
             });
           });
@@ -2645,13 +2637,13 @@ describe("TreeView", function() {
         describe("when 'core:cancel' is triggered on the move dialog", () => it("removes the dialog and focuses the tree view", function() {
           atom.commands.dispatch(moveDialog.element, 'core:cancel');
           expect(atom.workspace.getModalPanels().length).toBe(0);
-          return expect(treeView.element).toHaveFocus();
+          expect(treeView.element).toHaveFocus();
         }));
 
-        return describe("when the move dialog's editor loses focus", () => it("removes the dialog and focuses root view", function() {
+        describe("when the move dialog's editor loses focus", () => it("removes the dialog and focuses root view", function() {
           workspaceElement.focus();
           expect(atom.workspace.getModalPanels().length).toBe(0);
-          return expect(atom.views.getView(atom.workspace.getCenter().getActivePane())).toHaveFocus();
+          expect(atom.views.getView(atom.workspace.getCenter().getActivePane())).toHaveFocus();
         }));
       });
 
@@ -2673,10 +2665,10 @@ describe("TreeView", function() {
           });
         });
 
-        return it("selects the entire file name", function() {
+        it("selects the entire file name", function() {
           expect(moveDialog.element).toExist();
           expect(moveDialog.miniEditor.getText()).toBe(atom.project.relativize(dotFilePath));
-          return expect(moveDialog.miniEditor.getSelectedText()).toBe('.dotfile');
+          expect(moveDialog.miniEditor.getSelectedText()).toBe('.dotfile');
         });
       });
 
@@ -2698,10 +2690,10 @@ describe("TreeView", function() {
           });
         });
 
-        return it("selects only the part of the filename up to the first extension", function() {
+        it("selects only the part of the filename up to the first extension", function() {
           expect(moveDialog.element).toExist();
           expect(moveDialog.miniEditor.getText()).toBe(atom.project.relativize(dotFilePath));
-          return expect(moveDialog.miniEditor.getSelectedText()).toBe('test');
+          expect(moveDialog.miniEditor.getSelectedText()).toBe('test');
         });
       });
 
@@ -2727,10 +2719,10 @@ describe("TreeView", function() {
           expect(moveDialog.element).toExist();
           expect(moveDialog.promptText.textContent).toBe("Enter the new path for the directory.");
           expect(moveDialog.miniEditor.getText()).toBe(atom.project.relativize(dirPath));
-          return expect(moveDialog.miniEditor.element).toHaveFocus();
+          expect(moveDialog.miniEditor.element).toHaveFocus();
         });
 
-        return describe("when the path is changed and confirmed", function() {
+        describe("when the path is changed and confirmed", function() {
           it("updates text editor paths accordingly", function() {
             const editor = atom.workspace.getCenter().getActiveTextEditor();
             expect(editor.getPath()).toBe(filePath);
@@ -2740,10 +2732,10 @@ describe("TreeView", function() {
 
             atom.commands.dispatch(moveDialog.element, 'core:confirm');
             expect(atom.workspace.getActivePaneItem()).toBe(editor);
-            return expect(editor.getPath()).toBe(filePath.replace('test-dir', 'renamed-dir'));
+            expect(editor.getPath()).toBe(filePath.replace('test-dir', 'renamed-dir'));
           });
 
-          return it('does not update paths for editors with similar paths', function() {
+          it('does not update paths for editors with similar paths', function() {
             waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath2));
 
             return runs(function() {
@@ -2754,16 +2746,16 @@ describe("TreeView", function() {
 
               const editors = atom.workspace.getTextEditors();
               expect(editors[0].getPath()).toBe(filePath.replace('test-dir', 'renamed-dir'));
-              return expect(editors[1].getPath()).toBe(filePath2);
+              expect(editors[1].getPath()).toBe(filePath2);
             });
           });
         });
       });
 
-      return describe("when the project is selected", () => it("doesn't display the move dialog", function() {
+      describe("when the project is selected", () => it("doesn't display the move dialog", function() {
         treeView.roots[0].dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         atom.commands.dispatch(treeView.element, "tree-view:move");
-        return expect(atom.workspace.getModalPanels().length).toBe(0);
+        expect(atom.workspace.getModalPanels().length).toBe(0);
       }));
     });
 
@@ -2791,7 +2783,7 @@ describe("TreeView", function() {
           expect(copyDialog.promptText.textContent).toBe("Enter the new path for the duplicate.");
           expect(copyDialog.miniEditor.getText()).toBe(atom.project.relativize(filePath));
           expect(copyDialog.miniEditor.getSelectedText()).toBe(fileNameWithoutExtension);
-          return expect(copyDialog.miniEditor.element).toHaveFocus();
+          expect(copyDialog.miniEditor.element).toHaveFocus();
         });
 
         describe("when the path is changed and confirmed", function() {
@@ -2810,7 +2802,7 @@ describe("TreeView", function() {
               dirView = treeView.roots[0].entries.querySelector('.directory');
               dirView.expand();
               expect(dirView.entries.children.length).toBe(1);
-              return expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
+              expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
             });
           }));
 
@@ -2826,7 +2818,7 @@ describe("TreeView", function() {
 
             return runs(function() {
               expect(fs.existsSync(filePath)).toBeTruthy();
-              return expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
+              expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
             });
           }));
 
@@ -2839,10 +2831,10 @@ describe("TreeView", function() {
 
             expect(copyDialog.errorMessage.textContent).toContain('already exists');
             expect(copyDialog.element).toHaveClass('error');
-            return expect(copyDialog.element.parentElement).toBeTruthy();
+            expect(copyDialog.element.parentElement).toBeTruthy();
           })));
 
-          return describe("when trying to duplicate a file with the same name but different case", () => it("shows an error message and does not close the dialog", () => runs(function() {
+          describe("when trying to duplicate a file with the same name but different case", () => it("shows an error message and does not close the dialog", () => runs(function() {
             const newPath = path.join(dirPath, "TEST-FILE.txt");
             copyDialog.miniEditor.setText(newPath);
 
@@ -2855,7 +2847,7 @@ describe("TreeView", function() {
             } else {
               expect(copyDialog.errorMessage.textContent).toContain('already exists');
               expect(copyDialog.element).toHaveClass('error');
-              return expect(copyDialog.element.parentElement).toBeTruthy();
+              expect(copyDialog.element.parentElement).toBeTruthy();
             }
           })));
         });
@@ -2864,13 +2856,13 @@ describe("TreeView", function() {
           jasmine.attachToDOM(treeView.element);
           atom.commands.dispatch(copyDialog.element, 'core:cancel');
           expect(atom.workspace.getModalPanels().length).toBe(0);
-          return expect(treeView.element).toHaveFocus();
+          expect(treeView.element).toHaveFocus();
         }));
 
-        return describe("when the duplicate dialog's editor loses focus", () => it("removes the dialog and focuses root view", function() {
+        describe("when the duplicate dialog's editor loses focus", () => it("removes the dialog and focuses root view", function() {
           workspaceElement.focus();
           expect(atom.workspace.getModalPanels().length).toBe(0);
-          return expect(atom.views.getView(atom.workspace.getCenter().getActivePane())).toHaveFocus();
+          expect(atom.views.getView(atom.workspace.getCenter().getActivePane())).toHaveFocus();
         }));
       });
 
@@ -2894,10 +2886,10 @@ describe("TreeView", function() {
           });
         });
 
-        return it("selects the entire file name", function() {
+        it("selects the entire file name", function() {
           expect(copyDialog.element).toExist();
           expect(copyDialog.miniEditor.getText()).toBe(atom.project.relativize(dotFilePath));
-          return expect(copyDialog.miniEditor.getSelectedText()).toBe('.dotfile');
+          expect(copyDialog.miniEditor.getSelectedText()).toBe('.dotfile');
         });
       });
 
@@ -2921,17 +2913,17 @@ describe("TreeView", function() {
           });
         });
 
-        return it("selects only the part of the filename up to the first extension", function() {
+        it("selects only the part of the filename up to the first extension", function() {
           expect(copyDialog.element).toExist();
           expect(copyDialog.miniEditor.getText()).toBe(atom.project.relativize(dotFilePath));
-          return expect(copyDialog.miniEditor.getSelectedText()).toBe('test');
+          expect(copyDialog.miniEditor.getSelectedText()).toBe('test');
         });
       });
 
       describe("when the project is selected", () => it("doesn't display the copy dialog", function() {
         treeView.roots[0].dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         atom.commands.dispatch(treeView.element, "tree-view:duplicate");
-        return expect(atom.workspace.getModalPanels().length).toBe(0);
+        expect(atom.workspace.getModalPanels().length).toBe(0);
       }));
 
       describe("when the editor has focus", function() {
@@ -2949,19 +2941,19 @@ describe("TreeView", function() {
           });
         });
 
-        return it("duplicates the current file", () => expect(copyDialog.miniEditor.getText()).toBe('tree-view.js'));
+        it("duplicates the current file", () => expect(copyDialog.miniEditor.getText()).toBe('tree-view.js'));
       });
 
-      return describe("when nothing is selected", () => it("doesn't display the copy dialog", function() {
+      describe("when nothing is selected", () => it("doesn't display the copy dialog", function() {
         jasmine.attachToDOM(workspaceElement);
         treeView.focus();
         treeView.deselect();
         atom.commands.dispatch(treeView.element, "tree-view:duplicate");
-        return expect(atom.workspace.getModalPanels().length).toBe(0);
+        expect(atom.workspace.getModalPanels().length).toBe(0);
       }));
     });
 
-    return describe("tree-view:remove", function() {
+    describe("tree-view:remove", function() {
       beforeEach(() => jasmine.attachToDOM(workspaceElement));
 
       it("won't remove the root directory", function() {
@@ -2971,7 +2963,7 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, 'tree-view:remove');
 
         const args = atom.confirm.mostRecentCall.args[0];
-        return expect(args.buttons).toEqual(['OK']);
+        expect(args.buttons).toEqual(['OK']);
     });
 
       it("shows the native alert dialog", function() {
@@ -2982,7 +2974,7 @@ describe("TreeView", function() {
         return runs(function() {
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
           const args = atom.confirm.mostRecentCall.args[0];
-          return expect(args.buttons).toEqual(['Move to Trash', 'Cancel']);});
+          expect(args.buttons).toEqual(['Move to Trash', 'Cancel']);});
     });
 
       it("can delete an active path that isn't in the project", function() {
@@ -3024,7 +3016,7 @@ describe("TreeView", function() {
           if (notificationsNumber === 1) {
             const notification = atom.notifications.getNotifications()[0];
             expect(notification.getMessage()).toContain('The following file couldn\'t be moved to the trash');
-            return expect(notification.getDetail()).toContain('test-file.txt');
+            expect(notification.getDetail()).toContain('test-file.txt');
           }
         });
       });
@@ -3039,7 +3031,7 @@ describe("TreeView", function() {
         atom.commands.dispatch(treeView.element, 'tree-view:remove');
 
         expect(atom.confirm.mostRecentCall).not.toExist();
-        return expect(atom.notifications.getNotifications().length).toBe(0);
+        expect(atom.notifications.getNotifications().length).toBe(0);
       });
 
       describe("when a directory is removed", function() {
@@ -3066,7 +3058,7 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([]);
+            expect(openFilePaths).toEqual([]);
           });
         });
 
@@ -3095,7 +3087,7 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([filePath3]);
+            expect(openFilePaths).toEqual([filePath3]);
           });
         });
 
@@ -3129,7 +3121,7 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([filePath20]);
+            expect(openFilePaths).toEqual([filePath20]);
           });
         });
 
@@ -3160,11 +3152,11 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([undefined]);
+            expect(openFilePaths).toEqual([undefined]);
           });
         });
 
-        return it("focuses the directory's parent folder", function() {
+        it("focuses the directory's parent folder", function() {
           const callback = jasmine.createSpy('onEntryDeleted');
           treeView.onEntryDeleted(callback);
 
@@ -3203,7 +3195,7 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([]);
+            expect(openFilePaths).toEqual([]);
           });
         });
 
@@ -3230,7 +3222,7 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([filePath2]);
+            expect(openFilePaths).toEqual([filePath2]);
           });
         });
 
@@ -3258,11 +3250,11 @@ describe("TreeView", function() {
 
           return runs(function() {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
-            return expect(openFilePaths).toEqual([filePath2Copy]);
+            expect(openFilePaths).toEqual([filePath2Copy]);
           });
         });
 
-        return it("focuses the file's parent folder", function() {
+        it("focuses the file's parent folder", function() {
           const callback = jasmine.createSpy('onEntryDeleted');
           treeView.onEntryDeleted(callback);
 
@@ -3303,7 +3295,7 @@ describe("TreeView", function() {
           return runs(() => expect(atom.notifications.getNotifications().length).toBe(0));
         });
 
-        return it("focuses the first selected entry's parent folder", function() {
+        it("focuses the first selected entry's parent folder", function() {
           jasmine.attachToDOM(workspaceElement);
 
           const callback = jasmine.createSpy('onEntryDeleted');
@@ -3323,7 +3315,7 @@ describe("TreeView", function() {
         });
       });
 
-      return describe("when the entry is deleted before 'Move to Trash' is selected", () => it("does not error", function() {
+      describe("when the entry is deleted before 'Move to Trash' is selected", () => it("does not error", function() {
         // If the file is marked for deletion but has already been deleted
         // outside of Atom by the time the deletion is confirmed, do not error
         atom.notifications.clear();
@@ -3356,7 +3348,7 @@ describe("TreeView", function() {
       return temporaryFilePath = path.join(atom.project.getPaths()[0], 'temporary');
     });
 
-    return describe("when a file is added or removed in an expanded directory", () => it("updates the directory view to display the directory's new contents", function() {
+    describe("when a file is added or removed in an expanded directory", () => it("updates the directory view to display the directory's new contents", function() {
       let entriesCountBefore = null;
 
       runs(function() {
@@ -3382,23 +3374,23 @@ describe("TreeView", function() {
       treeView = atom.workspace.getLeftDock().getActivePaneItem();
       return root1 = treeView.roots[0];});
 
-    return describe("when a root folder is added", function() {
+    describe("when a root folder is added", function() {
       it("maintains expanded folders", function() {
         root1.querySelector('.directory').dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         atom.project.setPaths([path1, path2]);
 
         treeView = atom.workspace.getLeftDock().getActivePaneItem();
         expect(treeView.element).toExist();
-        return expect(treeView.roots[0].querySelector(".directory")).toHaveClass("expanded");
+        expect(treeView.roots[0].querySelector(".directory")).toHaveClass("expanded");
       });
 
-      return it("maintains collapsed (root) folders", function() {
+      it("maintains collapsed (root) folders", function() {
         root1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         atom.project.setPaths([path1, path2]);
 
         treeView = atom.workspace.getLeftDock().getActivePaneItem();
         expect(treeView.element).toExist();
-        return expect(treeView.roots[0]).toHaveClass("collapsed");
+        expect(treeView.roots[0]).toHaveClass("collapsed");
       });
     });
   });
@@ -3426,10 +3418,10 @@ describe("TreeView", function() {
         expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual(['.gitignore']);
 
         atom.config.set("tree-view.hideVcsIgnoredFiles", false);
-        return expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual(['.gitignore', 'ignored.txt']);
+        expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual(['.gitignore', 'ignored.txt']);
       });
 
-      return it("works in conjunction with the hideIgnoredNames config option", function() {
+      it("works in conjunction with the hideIgnoredNames config option", function() {
         // https://github.com/atom/tree-view/issues/489
 
         atom.config.set('tree-view.hideVcsIgnoredFiles', true);
@@ -3439,11 +3431,11 @@ describe("TreeView", function() {
         expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual(['.gitignore']);
 
         atom.config.set('tree-view.hideIgnoredNames', true);
-        return expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual([]);
+        expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual([]);
       });
     });
 
-    return describe("when the project's path is a subfolder of the repository's working directory", function() {
+    describe("when the project's path is a subfolder of the repository's working directory", function() {
       beforeEach(function() {
         const fixturePath = path.join(__dirname, 'fixtures', 'root-dir1');
         const projectPath = temp.mkdirSync('tree-view-project');
@@ -3455,7 +3447,7 @@ describe("TreeView", function() {
         return atom.config.set("tree-view.hideVcsIgnoredFiles", true);
       });
 
-      return it("does not hide git ignored files", () => expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual(['.gitignore', 'tree-view.js', 'tree-view.txt']));
+      it("does not hide git ignored files", () => expect(Array.from(treeView.element.querySelectorAll('.file')).map(f => f.textContent)).toEqual(['.gitignore', 'tree-view.js', 'tree-view.txt']));
     });
   });
 
@@ -3479,7 +3471,7 @@ describe("TreeView", function() {
     expect(Array.from(treeView.roots[0].querySelectorAll('.entry')).map(e => e.textContent)).toEqual(['test.txt']);
 
     atom.config.set("core.ignoredNames", []);
-    return expect(Array.from(treeView.roots[0].querySelectorAll('.entry')).map(e => e.textContent)).toEqual(['.git', 'test.js', 'test.txt']);
+    expect(Array.from(treeView.roots[0].querySelectorAll('.entry')).map(e => e.textContent)).toEqual(['.git', 'test.js', 'test.txt']);
   }));
 
   describe("the squashedDirectoryName config option", function() {
@@ -3539,7 +3531,7 @@ describe("TreeView", function() {
 
     it("defaults to disabled", () => expect(atom.config.get("tree-view.squashDirectoryNames")).toBeFalsy());
 
-    return describe("when enabled", function() {
+    describe("when enabled", function() {
       beforeEach(() => atom.config.set('tree-view.squashDirectoryNames', true));
 
       it("does not squash root directories", function() {
@@ -3552,7 +3544,7 @@ describe("TreeView", function() {
         const rootDirPath = treeView.roots[0].getPath();
         expect(rootDirPath).toBe(rootDir);
         const zetaDirPath = findDirectoryContainingText(treeView.roots[0], 'zeta').getPath();
-        return expect(zetaDirPath).toBe(zetaDir);
+        expect(zetaDirPath).toBe(zetaDir);
       });
 
       it("does not squash a file in to a DirectoryViews", function() {
@@ -3560,7 +3552,7 @@ describe("TreeView", function() {
         zetaDir.expand();
         const zetaEntries = [].slice.call(zetaDir.children[1].children).map(element => element.innerText);
 
-        return expect(zetaEntries).toEqual(["zeta.txt"]);
+        expect(zetaEntries).toEqual(["zeta.txt"]);
       });
 
       it("squashes two dir names when the first only contains a single dir", function() {
@@ -3568,7 +3560,7 @@ describe("TreeView", function() {
         betaDir.expand();
         const betaEntries = [].slice.call(betaDir.children[1].children).map(element => element.innerText);
 
-        return expect(betaEntries).toEqual(["beta.txt"]);
+        expect(betaEntries).toEqual(["beta.txt"]);
       });
 
       it("squashes three dir names when the first and second only contain single dirs", function() {
@@ -3576,7 +3568,7 @@ describe("TreeView", function() {
         epsilonDir.expand();
         const epsilonEntries = [].slice.call(epsilonDir.children[1].children).map(element => element.innerText);
 
-        return expect(epsilonEntries).toEqual(["theta.txt"]);
+        expect(epsilonEntries).toEqual(["theta.txt"]);
       });
 
       it("does not squash a dir name when there are two child dirs ", function() {
@@ -3584,7 +3576,7 @@ describe("TreeView", function() {
         lambdaDir.expand();
         const lambdaEntries = [].slice.call(lambdaDir.children[1].children).map(element => element.innerText);
 
-        return expect(lambdaEntries).toEqual(["iota", "kappa"]);
+        expect(lambdaEntries).toEqual(["iota", "kappa"]);
       });
 
       describe("when a squashed directory is deleted", () => it("un-squashes the directories", function() {
@@ -3603,7 +3595,7 @@ describe("TreeView", function() {
 
         return runs(function() {
           const omicronDir = findDirectoryContainingText(treeView.roots[0], "omicron");
-          return expect(omicronDir.header.textContent).toEqual("omicron");
+          expect(omicronDir.header.textContent).toEqual("omicron");
         });
       }));
 
@@ -3623,7 +3615,7 @@ describe("TreeView", function() {
         piDir = findDirectoryContainingText(omicronDir, "pi");
         expect(piDir.header.textContent).toEqual("pi");
         const sigmaFile = findFileContainingText(omicronDir, "sigma.txt");
-        return expect(sigmaFile.fileName.textContent).toEqual("sigma.txt");
+        expect(sigmaFile.fileName.textContent).toEqual("sigma.txt");
       }));
 
       describe("when a directory is created within a directory with another squashed directory", () => it("un-squashes the directories", function() {
@@ -3642,10 +3634,10 @@ describe("TreeView", function() {
         piDir = findDirectoryContainingText(omicronDir, "pi");
         expect(piDir.header.textContent).toEqual("pi");
         const rhoDir = findDirectoryContainingText(omicronDir, "rho");
-        return expect(rhoDir.header.textContent).toEqual("rho");
+        expect(rhoDir.header.textContent).toEqual("rho");
       }));
 
-      return describe("when a directory is reloaded", () => it("squashes the directory names the last of which is same as an unsquashed directory", function() {
+      describe("when a directory is reloaded", () => it("squashes the directory names the last of which is same as an unsquashed directory", function() {
         const muDir = findDirectoryContainingText(treeView.roots[0], "mu");
         muDir.expand();
         let muEntries = Array.from(muDir.children[1].children).map(element => element.innerText);
@@ -3654,7 +3646,7 @@ describe("TreeView", function() {
         muDir.expand();
         muDir.reload();
         muEntries = Array.from(muDir.children[1].children).map(element => element.innerText);
-        return expect(muEntries).toEqual([`nu${path.sep}xi`, "xi"]);
+        expect(muEntries).toEqual([`nu${path.sep}xi`, "xi"]);
       }));
     });
   });
@@ -3703,7 +3695,7 @@ describe("TreeView", function() {
 
     describe("when a file is new", () => it("adds a custom style", function() {
       treeView.roots[0].entries.querySelectorAll('.directory')[2].expand();
-      return expect(treeView.element.querySelector('.project-root .file.status-added')).toHaveText('new2');
+      expect(treeView.element.querySelector('.project-root .file.status-added')).toHaveText('new2');
     }));
 
     describe("when a file is new", () => it("adds a custom style to the project root", () => expect(treeView.element.querySelector('.project-root')).toHaveClass('status-modified')));
@@ -3725,7 +3717,7 @@ describe("TreeView", function() {
         return fileView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
       });
 
-      return describe("when the file is deleted", () => it("updates the style of the directory", function() {
+      describe("when the file is deleted", () => it("updates the style of the directory", function() {
         const callback = jasmine.createSpy("onEntryDeleted");
         treeView.onEntryDeleted(callback);
 
@@ -3743,7 +3735,7 @@ describe("TreeView", function() {
       }));
     });
 
-    return describe("on #darwin, when the project is a symbolic link to the repository root", function() {
+    describe("on #darwin, when the project is a symbolic link to the repository root", function() {
       beforeEach(function() {
         const symlinkPath = temp.path('tree-view-project');
         fs.symlinkSync(projectPath, symlinkPath, 'junction');
@@ -3762,16 +3754,16 @@ describe("TreeView", function() {
       describe("when a file is modified", () => it("updates its and its parent directories' styles", function() {
         expect(treeView.element.querySelector('.project-root .file.status-modified')).toHaveText('b.txt');
         expect(treeView.element.querySelector('.project-root .directory.status-modified').header).toHaveText('dir');
-        return expect(treeView.element.querySelector('.project-root')).toHaveClass('status-modified');
+        expect(treeView.element.querySelector('.project-root')).toHaveClass('status-modified');
       }));
 
-      return describe("when a file loses its modified status", () => it("updates its and its parent directories' styles", function() {
+      describe("when a file loses its modified status", () => it("updates its and its parent directories' styles", function() {
         fs.writeFileSync(modifiedFile, originalFileContent);
         atom.project.getRepositories()[0].getPathStatus(modifiedFile);
 
         expect(treeView.element.querySelector('.project-root .file.status-modified')).not.toExist();
         expect(treeView.element.querySelector('.project-root .directory.status-modified')).not.toExist();
-        return expect(treeView.element.querySelector('.project-root.status-modified')).not.toExist();
+        expect(treeView.element.querySelector('.project-root.status-modified')).not.toExist();
       }));
     });
   });
@@ -3804,13 +3796,13 @@ describe("TreeView", function() {
       return [fileView1, fileView2, fileView3, fileView4, fileView5] = dirView.querySelectorAll('.file');
     });
 
-    return describe('selecting multiple items', function() {
+    describe('selecting multiple items', function() {
       it('switches the contextual menu to muli-select mode', function() {
         fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         fileView2.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, shiftKey: true}));
         expect(treeView.list).toHaveClass('multi-select');
         fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}));
-        return expect(treeView.list).toHaveClass('full-menu');
+        expect(treeView.list).toHaveClass('full-menu');
       });
 
       describe('selecting one of the selected items', function() {
@@ -3819,16 +3811,16 @@ describe("TreeView", function() {
           fileView2.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, shiftKey: true}));
           fileView1.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}));
           expect(treeView.list).not.toHaveClass('full-menu');
-          return expect(treeView.list).toHaveClass('multi-select');
+          expect(treeView.list).toHaveClass('multi-select');
         });
 
-        return it('switches to full-menu on mouseup', function() {
+        it('switches to full-menu on mouseup', function() {
           fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           fileView2.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, shiftKey: true}));
           fileView1.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}));
           fileView1.dispatchEvent(new MouseEvent('mouseup', {bubbles: true}));
           expect(treeView.list).toHaveClass('full-menu');
-          return expect(treeView.list).not.toHaveClass('multi-select');
+          expect(treeView.list).not.toHaveClass('multi-select');
         });
       });
 
@@ -3837,7 +3829,7 @@ describe("TreeView", function() {
         fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, shiftKey: true}));
         expect(fileView1).toHaveClass('selected');
         expect(fileView2).toHaveClass('selected');
-        return expect(fileView3).toHaveClass('selected');
+        expect(fileView3).toHaveClass('selected');
       }));
 
       describe('using the metakey(cmd) key', () => it('selects the cmd-clicked item in addition to the original selected item', function() {
@@ -3845,7 +3837,7 @@ describe("TreeView", function() {
         fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, metaKey: true}));
         expect(fileView1).toHaveClass('selected');
         expect(fileView2).not.toHaveClass('selected');
-        return expect(fileView3).toHaveClass('selected');
+        expect(fileView3).toHaveClass('selected');
       }));
 
       describe('using the metakey(cmd) key on already selected item', () => it('deselects just the cmd-clicked item', function() {
@@ -3855,7 +3847,7 @@ describe("TreeView", function() {
         fileView1.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, metaKey: true}));
         expect(fileView1).not.toHaveClass('selected');
         expect(fileView2).not.toHaveClass('selected');
-        return expect(fileView3).toHaveClass('selected');
+        expect(fileView3).toHaveClass('selected');
       }));
 
       describe('using the shift and metakey(cmd) keys', () => it('selects the items between the last cmd-clicked item and the clicked item', function() {
@@ -3866,7 +3858,7 @@ describe("TreeView", function() {
         expect(fileView2).not.toHaveClass('selected');
         expect(fileView3).toHaveClass('selected');
         expect(fileView4).toHaveClass('selected');
-        return expect(fileView5).toHaveClass('selected');
+        expect(fileView5).toHaveClass('selected');
       }));
 
       describe('non-darwin platform', function() {
@@ -3878,16 +3870,16 @@ describe("TreeView", function() {
         afterEach(() => // Ensure that process.platform is set back to its original value
         Object.defineProperty(process, "platform", {__proto__: null, value: originalPlatform}));
 
-        return describe('using the ctrl key', () => it('selects the ctrl-clicked item in addition to the original selected item', function() {
+        describe('using the ctrl key', () => it('selects the ctrl-clicked item in addition to the original selected item', function() {
           fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
           expect(fileView1).toHaveClass('selected');
           expect(fileView3).toHaveClass('selected');
-          return expect(fileView2).not.toHaveClass('selected');
+          expect(fileView2).not.toHaveClass('selected');
         }));
       });
 
-      return describe('darwin platform', function() {
+      describe('darwin platform', function() {
         const originalPlatform = process.platform;
 
         beforeEach(() => // Stub platform.process so we can test non-darwin behavior
@@ -3903,14 +3895,14 @@ describe("TreeView", function() {
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
               expect(fileView1).not.toHaveClass('selected');
               expect(fileView3).toHaveClass('selected');
-              return expect(fileView2).not.toHaveClass('selected');
+              expect(fileView2).not.toHaveClass('selected');
             });
 
-            return it('displays the full contextual menu', function() {
+            it('displays the full contextual menu', function() {
               fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
               expect(treeView.list).toHaveClass('full-menu');
-              return expect(treeView.list).not.toHaveClass('multi-select');
+              expect(treeView.list).not.toHaveClass('multi-select');
             });
           });
 
@@ -3920,15 +3912,15 @@ describe("TreeView", function() {
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, metaKey: true}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
               expect(treeView.list).not.toHaveClass('full-menu');
-              return expect(treeView.list).toHaveClass('multi-select');
+              expect(treeView.list).toHaveClass('multi-select');
             });
 
-            return it('does not deselect any of the items', function() {
+            it('does not deselect any of the items', function() {
               fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, metaKey: true}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
               expect(fileView1).toHaveClass('selected');
-              return expect(fileView3).toHaveClass('selected');
+              expect(fileView3).toHaveClass('selected');
             });
           });
 
@@ -3936,24 +3928,24 @@ describe("TreeView", function() {
             fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
             fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
             expect(treeView.list).toHaveClass('full-menu');
-            return expect(treeView.list).not.toHaveClass('multi-select');
+            expect(treeView.list).not.toHaveClass('multi-select');
           }));
 
-          return describe('when no item is selected', function() {
+          describe('when no item is selected', function() {
             it('selects the ctrl-clicked item', function() {
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
-              return expect(fileView3).toHaveClass('selected');
+              expect(fileView3).toHaveClass('selected');
             });
 
-            return it('displays the full context menu', function() {
+            it('displays the full context menu', function() {
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, ctrlKey: true}));
               expect(treeView.list).toHaveClass('full-menu');
-              return expect(treeView.list).not.toHaveClass('multi-select');
+              expect(treeView.list).not.toHaveClass('multi-select');
             });
           });
         });
 
-        return describe("right-clicking", function() {
+        describe("right-clicking", function() {
           describe('when multiple items are selected', () => it('displays the multi-select context menu', function() {
             fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
             fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, metaKey: true}));
@@ -3961,7 +3953,7 @@ describe("TreeView", function() {
             expect(fileView1).toHaveClass('selected');
             expect(fileView3).toHaveClass('selected');
             expect(treeView.list).not.toHaveClass('full-menu');
-            return expect(treeView.list).toHaveClass('multi-select');
+            expect(treeView.list).toHaveClass('multi-select');
           }));
 
           describe('when a single item is selected', function() {
@@ -3969,33 +3961,33 @@ describe("TreeView", function() {
               fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, button: 2}));
               expect(treeView.list).toHaveClass('full-menu');
-              return expect(treeView.list).not.toHaveClass('multi-select');
+              expect(treeView.list).not.toHaveClass('multi-select');
             });
 
             it('selects right-clicked item', function() {
               fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, button: 2}));
-              return expect(fileView3).toHaveClass('selected');
+              expect(fileView3).toHaveClass('selected');
             });
 
-            return it('deselects the previously selected item', function() {
+            it('deselects the previously selected item', function() {
               fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, button: 2}));
-              return expect(fileView1).not.toHaveClass('selected');
+              expect(fileView1).not.toHaveClass('selected');
             });
           });
 
-          return describe('when no item is selected', function() {
+          describe('when no item is selected', function() {
             it('selects the right-clicked item', function() {
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, button: 2}));
-              return expect(fileView3).toHaveClass('selected');
+              expect(fileView3).toHaveClass('selected');
             });
 
-            return it('shows the full context menu', function() {
+            it('shows the full context menu', function() {
               fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, button: 2}));
               expect(fileView3).toHaveClass('selected');
               expect(treeView.list).toHaveClass('full-menu');
-              return expect(treeView.list).not.toHaveClass('multi-select');
+              expect(treeView.list).not.toHaveClass('multi-select');
             });
           });
         });
@@ -4056,10 +4048,10 @@ describe("TreeView", function() {
       gammaDir.expand();
       const gammaEntries = [].slice.call(gammaDir.children[1].children).map(element => element.innerText);
 
-      return expect(gammaEntries).toEqual(["theta", "delta.txt", "epsilon.txt"]);
+      expect(gammaEntries).toEqual(["theta", "delta.txt", "epsilon.txt"]);
     });
 
-    return it("sorts folders as files if the option is not set", function() {
+    it("sorts folders as files if the option is not set", function() {
       atom.config.set("tree-view.sortFoldersBeforeFiles", false);
 
       const topLevelEntries = [].slice.call(treeView.roots[0].entries.children).map(element => element.innerText);
@@ -4076,7 +4068,7 @@ describe("TreeView", function() {
       gammaDir.expand();
       const gammaEntries = [].slice.call(gammaDir.children[1].children).map(element => element.innerText);
 
-      return expect(gammaEntries).toEqual(["delta.txt", "epsilon.txt", "theta"]);
+      expect(gammaEntries).toEqual(["delta.txt", "epsilon.txt", "theta"]);
     });
   });
 
@@ -4086,19 +4078,19 @@ describe("TreeView", function() {
     it("does nothing if no entry is selected", function() {
       treeView.deselect();
       treeView.showSelectedEntryInFileManager();
-      return expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(shell.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("shows the selected entry in the OS's file manager", function() {
       treeView.showSelectedEntryInFileManager();
-      return expect(shell.showItemInFolder).toHaveBeenCalled();
+      expect(shell.showItemInFolder).toHaveBeenCalled();
     });
 
-    return it("displays a notification if showing the file fails", function() {
+    it("displays a notification if showing the file fails", function() {
       spyOn(fs, 'existsSync').andReturn(false);
       treeView.showSelectedEntryInFileManager();
       expect(atom.notifications.getNotifications().length).toBe(1);
-      return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Unable to show');
+      expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Unable to show');
     });
   });
 
@@ -4109,7 +4101,7 @@ describe("TreeView", function() {
       expect(atom.workspace.getCenter().getPaneItems().length).toBe(0);
 
       treeView.showCurrentFileInFileManager();
-      return expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(shell.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("does nothing when only an untitled tab is opened", function() {
@@ -4118,7 +4110,7 @@ describe("TreeView", function() {
       return runs(function() {
         workspaceElement.focus();
         treeView.showCurrentFileInFileManager();
-        return expect(shell.showItemInFolder).not.toHaveBeenCalled();
+        expect(shell.showItemInFolder).not.toHaveBeenCalled();
       });
     });
 
@@ -4129,11 +4121,11 @@ describe("TreeView", function() {
 
       return runs(function() {
         treeView.showCurrentFileInFileManager();
-        return expect(shell.showItemInFolder).toHaveBeenCalled();
+        expect(shell.showItemInFolder).toHaveBeenCalled();
       });
     });
 
-    return it("shows a notification if showing the file fails", function() {
+    it("shows a notification if showing the file fails", function() {
       const filePath = path.join(os.tmpdir(), 'non-project-file.txt');
       fs.writeFileSync(filePath, 'test');
       spyOn(fs, 'existsSync').andReturn(false);
@@ -4142,7 +4134,7 @@ describe("TreeView", function() {
       return runs(function() {
         treeView.showCurrentFileInFileManager();
         expect(atom.notifications.getNotifications().length).toBe(1);
-        return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Unable to show');
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Unable to show');
       });
     });
   });
@@ -4171,7 +4163,7 @@ describe("TreeView", function() {
 
     fs.mkdirSync(path.join(projectPath, 'other'));
     treeView.roots[0].reload();
-    return expect(treeView.roots[0].directory.serializeExpansionState()).toEqual({
+    expect(treeView.roots[0].directory.serializeExpansionState()).toEqual({
       isExpanded: true,
       entries: new Map().set('other', {
         isExpanded: false,
@@ -4259,7 +4251,7 @@ describe("TreeView", function() {
       expect(alphaDir).toHaveClass('selected');
 
       treeView.onDragLeave(dragEnterEvent);
-      return expect(alphaDir).not.toHaveClass('selected');
+      expect(alphaDir).not.toHaveClass('selected');
     }));
 
     describe("when dragging a FileView onto a FileView", () => it("should add the selected class to the parent DirectoryView", function() {
@@ -4285,7 +4277,7 @@ describe("TreeView", function() {
       expect(alphaDir).toHaveClass('selected');
 
       treeView.onDragLeave(dragEnterEvent);
-      return expect(alphaDir).not.toHaveClass('selected');
+      expect(alphaDir).not.toHaveClass('selected');
     }));
 
     describe("when dropping a FileView onto a DirectoryView's header", function() {
@@ -4313,7 +4305,7 @@ describe("TreeView", function() {
 
         return runs(function() {
           expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          return expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
+          expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
         });
       });
 
@@ -4340,11 +4332,11 @@ describe("TreeView", function() {
 
         return runs(function() {
           expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          return expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents);
+          expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents);
         });
       }));
 
-      return it("shouldn't update editors with similar file paths", function() {
+      it("shouldn't update editors with similar file paths", function() {
         const deltaFilePath2 = path.join(gammaDirPath, 'delta.txt2');
         fs.writeFileSync(deltaFilePath2, 'copy');
 
@@ -4370,7 +4362,7 @@ describe("TreeView", function() {
 
           const editors = atom.workspace.getTextEditors();
           expect(editors[0].getPath()).toBe(deltaFilePath.replace('gamma', 'alpha'));
-          return expect(editors[1].getPath()).toBe(deltaFilePath2);
+          expect(editors[1].getPath()).toBe(deltaFilePath2);
         });
       });
     });
@@ -4401,11 +4393,11 @@ describe("TreeView", function() {
 
         return runs(function() {
           expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          return expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
+          expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
         });
       });
 
-      return it("shouldn't update editors with similar file paths", function() {
+      it("shouldn't update editors with similar file paths", function() {
         const deltaFilePath2 = path.join(gammaDirPath, 'delta.txt2');
         fs.writeFileSync(deltaFilePath2, 'copy');
 
@@ -4432,7 +4424,7 @@ describe("TreeView", function() {
 
           const editors = atom.workspace.getTextEditors();
           expect(editors[0].getPath()).toBe(deltaFilePath.replace('gamma', 'alpha'));
-          return expect(editors[1].getPath()).toBe(deltaFilePath2);
+          expect(editors[1].getPath()).toBe(deltaFilePath2);
         });
       });
     });
@@ -4455,7 +4447,7 @@ describe("TreeView", function() {
       runs(function() {
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        return expect(alphaDir.entries.children.length).toBe(2);
+        expect(alphaDir.entries.children.length).toBe(2);
       });
 
       waitsFor("directory view contents to refresh", () => (findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents) &&
@@ -4463,7 +4455,7 @@ describe("TreeView", function() {
 
       return runs(function() {
         expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2);
-        return expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 2);
+        expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 2);
       });
     }));
 
@@ -4489,7 +4481,7 @@ describe("TreeView", function() {
       runs(function() {
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        return expect(thetaDir.children.length).toBe(2);
+        expect(thetaDir.children.length).toBe(2);
       });
 
       waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'theta').querySelectorAll('.entry').length > thetaDirContents);
@@ -4500,7 +4492,7 @@ describe("TreeView", function() {
         // alpha dir still has all its entries
         alphaDir = findDirectoryContainingText(thetaDir.entries, 'alpha');
         alphaDir.expand();
-        return expect(alphaDir.querySelectorAll('.entry').length).toBe(alphaDirContents);
+        expect(alphaDir.querySelectorAll('.entry').length).toBe(alphaDirContents);
       });
     }));
 
@@ -4536,7 +4528,7 @@ describe("TreeView", function() {
           expect(thetaDir.querySelectorAll('.entry').length).toBe(thetaDirContents);
 
           const editor = atom.workspace.getActiveTextEditor();
-          return expect(editor.getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
+          expect(editor.getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
         });
       });
 
@@ -4569,7 +4561,7 @@ describe("TreeView", function() {
 
             const editors = atom.workspace.getTextEditors();
             expect(editors[0].getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
-            return expect(editors[1].getPath()).toBe(thetaFilePath2);
+            expect(editors[1].getPath()).toBe(thetaFilePath2);
           });
         });
       });
@@ -4590,7 +4582,7 @@ describe("TreeView", function() {
         etaDir.expand();
         expect(etaDir.querySelector('.entries').children.length).toBe(0);
 
-        return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
       });
 
       it("shows a warning notification and does not move the directory if it would result in recursive copying (symlink)", function() {
@@ -4609,7 +4601,7 @@ describe("TreeView", function() {
         symlinkDir.expand();
         expect(symlinkDir.querySelector('.entries').children.length).toBe(2);
 
-        return expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
       });
 
       it("moves successfully when dragging a directory onto a sibling directory that starts with the same letter", function() {
@@ -4626,10 +4618,10 @@ describe("TreeView", function() {
         alpha2Dir.expand();
         expect(alpha2Dir.querySelector('.entries').children.length).toBe(1);
 
-        return expect(atom.notifications.getNotifications()[0]).toBeUndefined();
+        expect(atom.notifications.getNotifications()[0]).toBeUndefined();
       });
 
-      return it("moves successfully when dragging a symlink into its target directory", function() {
+      it("moves successfully when dragging a symlink into its target directory", function() {
         // Dragging alphaDir onto symalpha, which is a symlink to alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4645,7 +4637,7 @@ describe("TreeView", function() {
         alphaDir.reload();
         expect(alphaDir.querySelector('.entries').children.length).toBe(3);
 
-        return expect(atom.notifications.getNotifications()[0]).toBeUndefined();
+        expect(atom.notifications.getNotifications()[0]).toBeUndefined();
       });
     });
 
@@ -4664,7 +4656,7 @@ describe("TreeView", function() {
 
       treeView.onDragStart(dragStartEvent);
       treeView.onDrop(dropEvent);
-      return expect(treeView.moveEntry).not.toHaveBeenCalled();
+      expect(treeView.moveEntry).not.toHaveBeenCalled();
     }));
 
     describe("when dropping a DirectoryView and FileViews in the same parent DirectoryView", () => describe("when the ctrl/cmd modifier key is pressed", () => it("should copy the files and directory", function() {
@@ -4692,7 +4684,7 @@ describe("TreeView", function() {
       return runs(function() {
         expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2);
         expect(fs.existsSync(path.join(alphaDirPath, 'beta0.txt'))).toBe(true);
-        return expect(fs.existsSync(path.join(alphaDirPath, 'eta0'))).toBe(true);
+        expect(fs.existsSync(path.join(alphaDirPath, 'eta0'))).toBe(true);
       });
     })));
 
@@ -4713,11 +4705,11 @@ describe("TreeView", function() {
 
         return runs(function() {
           expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          return expect(fs.existsSync(deltaFilePath)).toBe(false);
+          expect(fs.existsSync(deltaFilePath)).toBe(false);
         });
       });
 
-      return describe("when the ctrl/cmd modifier key is pressed", () => it("should copy the file to the hovered directory", function() {
+      describe("when the ctrl/cmd modifier key is pressed", () => it("should copy the file to the hovered directory", function() {
         // Dragging delta.txt from OS file explorer onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4728,14 +4720,14 @@ describe("TreeView", function() {
 
         runs(function() {
           treeView.onDrop(dropEvent);
-          return expect(alphaDir.children.length).toBe(2);
+          expect(alphaDir.children.length).toBe(2);
         });
 
         waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
 
         return runs(function() {
           expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          return expect(fs.existsSync(deltaFilePath)).toBe(true);
+          expect(fs.existsSync(deltaFilePath)).toBe(true);
         });
       }));
     });
@@ -4799,7 +4791,7 @@ describe("TreeView", function() {
         const names = treeView.roots.map(root => root.querySelector('.header .name').innerText);
         expect(names.includes('gamma')).toBe(true);
         expect(names.includes('alpha')).toBe(true);
-        return expect(names.includes('eta')).toBe(true);
+        expect(names.includes('eta')).toBe(true);
       });
     }));
 
@@ -4827,28 +4819,28 @@ describe("TreeView", function() {
           spyOn(atom, 'confirm');
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
-          return expect(atom.confirm).toHaveBeenCalled();
+          expect(atom.confirm).toHaveBeenCalled();
         });
 
         describe("when selecting the replace option", () => it("replaces the existing file", function() {
           spyOn(atom, 'confirm').andReturn(0);
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
-          return expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe("doesn't matter");
+          expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe("doesn't matter");
         }));
 
         describe("when selecting the skip option", () => it("does not replace the existing file", function() {
           spyOn(atom, 'confirm').andReturn(1);
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
-          return expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe('old');
+          expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe('old');
         }));
 
-        return describe("when cancelling the dialog", () => it("does not replace the existing file", function() {
+        describe("when cancelling the dialog", () => it("does not replace the existing file", function() {
           spyOn(atom, 'confirm').andReturn(2);
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
-          return expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe('old');
+          expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe('old');
         }));
       });
 
@@ -4897,10 +4889,10 @@ describe("TreeView", function() {
 
           expect(fs.readFileSync(aAlphaFilePath, 'utf8')).toBe('new');
           expect(fs.readFileSync(bAlphaFilePath, 'utf8')).toBe('old');
-          return expect(fs.readFileSync(cAlphaFilePath, 'utf8')).toBe('new');
+          expect(fs.readFileSync(cAlphaFilePath, 'utf8')).toBe('new');
         });
 
-        return it("immediately cancels any pending file moves when cancel is chosen", function() {
+        it("immediately cancels any pending file moves when cancel is chosen", function() {
           let calls = 0;
           const getButton = function() {
             calls++;
@@ -4918,11 +4910,11 @@ describe("TreeView", function() {
 
           expect(fs.readFileSync(aAlphaFilePath, 'utf8')).toBe('new');
           expect(fs.readFileSync(bAlphaFilePath, 'utf8')).toBe('old');
-          return expect(fs.readFileSync(cAlphaFilePath, 'utf8')).toBe('old');
+          expect(fs.readFileSync(cAlphaFilePath, 'utf8')).toBe('old');
         });
       });
 
-      return describe("when dragging directories", function() {
+      describe("when dragging directories", function() {
         let [oldAFilePath, oldBFilePath, oldCFilePath, oldNestedDirPath, oldNestedFilePath,
          onlyOldDirPath, onlyOldFilePath, newAlphaDirPath, newAFilePath, newBFilePath,
          newCFilePath, newNestedDirPath, newNestedFilePath, onlyNewDirPath, onlyNewFilePath] = [];
@@ -4985,7 +4977,7 @@ describe("TreeView", function() {
           expect(atom.confirm.calls[0].args[0].message).toContain('a.txt');
           expect(atom.confirm.calls[1].args[0].message).toContain('b.txt');
           expect(atom.confirm.calls[2].args[0].message).toContain('c.txt');
-          return expect(atom.confirm.calls[3].args[0].message).toContain('nested.txt');
+          expect(atom.confirm.calls[3].args[0].message).toContain('nested.txt');
         });
 
         it("removes the containing folder only if it is empty after all entries have finished moving", function() {
@@ -5008,7 +5000,7 @@ describe("TreeView", function() {
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
           expect(fs.existsSync(newAlphaDirPath)).toBe(true);
-          return expect(fs.existsSync(newNestedDirPath)).toBe(false);
+          expect(fs.existsSync(newNestedDirPath)).toBe(false);
         });
 
         it("immediately cancels any pending file moves when cancel is chosen", function() {
@@ -5033,10 +5025,10 @@ describe("TreeView", function() {
           expect(fs.readFileSync(oldAFilePath, 'utf8')).toBe('new');
           expect(fs.existsSync(newBFilePath)).toBe(true);
           expect(fs.existsSync(onlyNewDirPath)).toBe(true); // true since this comes after b.txt
-          return expect(fs.existsSync(newNestedFilePath)).toBe(true);
+          expect(fs.existsSync(newNestedFilePath)).toBe(true);
         });
 
-        return it("moves everything as expected", function() {
+        it("moves everything as expected", function() {
           spyOn(atom, 'confirm').andReturn(0);
           spyOn(fs, 'renameSync').andCallThrough();
           treeView.onDragStart(dragStartEvent);
@@ -5054,12 +5046,12 @@ describe("TreeView", function() {
           expect(fs.existsSync(path.join(alphaDirPath, 'new'))).toBe(true);
           expect(fs.readFileSync(path.join(alphaDirPath, 'new', 'no-conflict.txt'), 'utf8')).toBe('neither');
           expect(fs.existsSync(onlyNewDirPath)).toBe(false);
-          return expect(fs.existsSync(newAlphaDirPath)).toBe(false);
+          expect(fs.existsSync(newAlphaDirPath)).toBe(false);
         });
       });
     });
 
-    return describe("when the event does not originate from the Tree View", () => it("does nothing", function() {
+    describe("when the event does not originate from the Tree View", () => it("does nothing", function() {
       const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
       alphaDir.expand();
 
@@ -5085,7 +5077,7 @@ describe("TreeView", function() {
 
       spyOn(treeView, 'moveEntry');
       treeView.onDrop(dropEvent);
-      return expect(treeView.moveEntry).not.toHaveBeenCalled();
+      expect(treeView.moveEntry).not.toHaveBeenCalled();
     }));
   });
 
@@ -5098,7 +5090,7 @@ describe("TreeView", function() {
         return jasmine.attachToDOM(workspaceElement);
       });
 
-      return it("selects the files and opens it in the active editor, without changing focus", function() {
+      it("selects the files and opens it in the active editor, without changing focus", function() {
         treeView.focus();
 
         waitForWorkspaceOpenEvent(() => sampleJs.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
@@ -5106,7 +5098,7 @@ describe("TreeView", function() {
         runs(function() {
           expect(sampleJs).toHaveClass('selected');
           expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
-          return expect(treeView.element).toHaveFocus();
+          expect(treeView.element).toHaveFocus();
         });
 
         waitForWorkspaceOpenEvent(() => sampleTxt.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
@@ -5115,12 +5107,12 @@ describe("TreeView", function() {
           expect(sampleTxt).toHaveClass('selected');
           expect(treeView.element.querySelectorAll('.selected').length).toBe(1);
           expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
-          return expect(treeView.element).toHaveFocus();
+          expect(treeView.element).toHaveFocus();
         });
       });
     });
 
-    return describe("opening existing opened files in existing split panes", function() {
+    describe("opening existing opened files in existing split panes", function() {
       beforeEach(function() {
 
         jasmine.attachToDOM(workspaceElement);
@@ -5139,7 +5131,7 @@ describe("TreeView", function() {
 
       describe("tree-view:open-selected-entry", function() {
         beforeEach(() => atom.config.set("tree-view.alwaysOpenExisting", true));
-        return describe("when the first pane is focused, a file is opened that is already open in the second pane", function() {
+        describe("when the first pane is focused, a file is opened that is already open in the second pane", function() {
           beforeEach(function() {
             const firstPane = atom.workspace.getCenter().getPanes()[0];
             firstPane.activate();
@@ -5147,11 +5139,11 @@ describe("TreeView", function() {
             return waitForWorkspaceOpenEvent(() => atom.commands.dispatch(treeView.element, "tree-view:open-selected-entry"));
           });
 
-          return it("opens the file in the second pane and focuses it", function() {
+          it("opens the file in the second pane and focuses it", function() {
             const pane = atom.workspace.getCenter().getPanes()[1];
             const item = atom.workspace.getCenter().getActivePaneItem();
             expect(atom.views.getView(pane)).toHaveFocus();
-            return expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
+            expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
           });
         });
       });
@@ -5160,7 +5152,7 @@ describe("TreeView", function() {
         beforeEach(() => atom.config.set("tree-view.alwaysOpenExisting", false));
 
 
-        return describe("when the first pane is focused, a file is opened that is already open in the second pane", function() {
+        describe("when the first pane is focused, a file is opened that is already open in the second pane", function() {
           let firstPane = null;
           beforeEach(function() {
             firstPane = atom.workspace.getCenter().getPanes()[0];
@@ -5169,10 +5161,10 @@ describe("TreeView", function() {
             return waitForWorkspaceOpenEvent(() => atom.commands.dispatch(treeView.element, "tree-view:open-selected-entry"));
           });
 
-          return it("opens the file in the first pane, which was the current focus", function() {
+          it("opens the file in the first pane, which was the current focus", function() {
             const item = atom.workspace.getCenter().getActivePaneItem();
             expect(atom.views.getView(firstPane)).toHaveFocus();
-            return expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
+            expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
           });
         });
       });
@@ -5180,7 +5172,7 @@ describe("TreeView", function() {
       describe("when a file that is already open in other pane is single-clicked", function() {
         beforeEach(() => atom.config.set("tree-view.alwaysOpenExisting", true));
 
-        return describe("when core.allowPendingPaneItems is set to true (default)", function() {
+        describe("when core.allowPendingPaneItems is set to true (default)", function() {
           let activePaneItem;
           let firstPane = (activePaneItem = null);
           beforeEach(function() {
@@ -5196,17 +5188,17 @@ describe("TreeView", function() {
 
           it("selects the file and retains focus on tree-view", function() {
             expect(sampleTxt).toHaveClass('selected');
-            return expect(treeView.element).toHaveFocus();
+            expect(treeView.element).toHaveFocus();
           });
 
-          return it("doesn't open the file in the active pane", function() {
+          it("doesn't open the file in the active pane", function() {
             expect(atom.views.getView(treeView)).toHaveFocus();
-            return expect(activePaneItem.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
+            expect(activePaneItem.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
           });
         });
       });
 
-      return describe("when a file is double-clicked", function() {
+      describe("when a file is double-clicked", function() {
         beforeEach(() => atom.config.set("tree-view.alwaysOpenExisting", true));
         let activePaneItem = null;
 
@@ -5226,10 +5218,10 @@ describe("TreeView", function() {
           return runs(() => activePaneItem = atom.workspace.getCenter().getActivePaneItem());
         });
 
-        return it("opens the file and focuses it", function() {
+        it("opens the file and focuses it", function() {
 
           expect(activePaneItem.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
-          return expect(atom.views.getView(atom.workspace.getCenter().getPanes()[1])).toHaveFocus();
+          expect(atom.views.getView(atom.workspace.getCenter().getPanes()[1])).toHaveFocus();
         });
       });
     });
@@ -5286,7 +5278,7 @@ describe("TreeView", function() {
 
         // Is removed when drag ends
         treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-        return expect(document.querySelector('.placeholder')).not.toExist();
+        expect(document.querySelector('.placeholder')).not.toExist();
       }));
 
       describe("when dragging on the bottom part of the root", () => it("should add the placeholder below the directory", function() {
@@ -5302,10 +5294,10 @@ describe("TreeView", function() {
 
         // Is removed when drag ends
         treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-        return expect(document.querySelector('.placeholder')).not.toExist();
+        expect(document.querySelector('.placeholder')).not.toExist();
       }));
 
-      return describe("when below all entries", () => it("should add the placeholder below the last directory", function() {
+      describe("when below all entries", () => it("should add the placeholder below the last directory", function() {
         // Dragging gammaDir onto alphaDir
         const alphaDir = treeView.roots[0];
         const lastDir = treeView.roots[treeView.roots.length - 1];
@@ -5320,7 +5312,7 @@ describe("TreeView", function() {
 
         // Is removed when drag ends
         treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-        return expect(document.querySelector('.placeholder')).not.toExist();
+        expect(document.querySelector('.placeholder')).not.toExist();
       }));
     });
 
@@ -5339,10 +5331,10 @@ describe("TreeView", function() {
         expect(projectPaths[1]).toEqual(alphaDirPath);
 
         // Is removed when drag ends
-        return expect(document.querySelector('.placeholder')).not.toExist();
+        expect(document.querySelector('.placeholder')).not.toExist();
       }));
 
-      return describe("when dropping on the bottom part of the header", () => it("should add the placeholder below the directory", function() {
+      describe("when dropping on the bottom part of the header", () => it("should add the placeholder below the directory", function() {
         // dropping thetaDir below alphaDir
         const alphaDir = treeView.roots[0];
         const thetaDir = treeView.roots[2];
@@ -5357,7 +5349,7 @@ describe("TreeView", function() {
         expect(projectPaths[2]).toEqual(gammaDirPath);
 
         // Is removed when drag ends
-        return expect(document.querySelector('.placeholder')).not.toExist();
+        expect(document.querySelector('.placeholder')).not.toExist();
       }));
     });
 
@@ -5368,7 +5360,7 @@ describe("TreeView", function() {
 
       expect(dragStartEvent.dataTransfer.getData("text/plain")).toEqual(gammaDirPath);
       if (['darwin', 'linux'].includes(process.platform)) {
-        return expect(dragStartEvent.dataTransfer.getData("text/uri-list")).toEqual(`file://${gammaDirPath}`);
+        expect(dragStartEvent.dataTransfer.getData("text/uri-list")).toEqual(`file://${gammaDirPath}`);
       }
     }));
 
@@ -5393,7 +5385,7 @@ describe("TreeView", function() {
 
       return runs(function() {
         expect(atom.project.getPaths()).toContain(etaDirPath);
-        return expect(document.querySelector('.placeholder')).not.toExist();
+        expect(document.querySelector('.placeholder')).not.toExist();
       });
     }));
 
@@ -5405,10 +5397,10 @@ describe("TreeView", function() {
       treeView.rootDragAndDrop.onDropOnOtherWindow({}, Array.from(gammaDir.parentElement.children).indexOf(gammaDir));
 
       expect(atom.project.getPaths()).toEqual([alphaDirPath, thetaDirPath]);
-      return expect(document.querySelector('.placeholder')).not.toExist();
+      expect(document.querySelector('.placeholder')).not.toExist();
     }));
 
-    return describe("when the event does not originate from the Tree View", () => it("does nothing", function() {
+    describe("when the event does not originate from the Tree View", () => it("does nothing", function() {
       const alphaDir = treeView.roots[0];
       const gammaDir = treeView.roots[1];
       const [dragStartEvent, dragOverEvents, dragEndEvent] =
@@ -5428,7 +5420,7 @@ describe("TreeView", function() {
       expect(projectPaths[1]).toEqual(gammaDirPath);
 
       treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-      return expect(document.querySelector('.placeholder')).not.toExist();
+      expect(document.querySelector('.placeholder')).not.toExist();
     }));
   });
 
@@ -5440,7 +5432,7 @@ describe("TreeView", function() {
 
     runs(function() {
       expect(sampleJs).toHaveClass('selected');
-      return expect(treeView.getSelectedEntries().length).toBe(1);
+      expect(treeView.getSelectedEntries().length).toBe(1);
     });
 
     waitsForPromise(() => atom.workspace.open(nonProjectPath));
@@ -5497,7 +5489,7 @@ describe("TreeView", function() {
       if ((entry.entries != null) || (convertedEntries.get(name).entries != null)) {
         assertEntriesDeepEqual(entry.entries, convertedEntries.get(name).entries);
       }
-      return expect(entry).toEqual(convertedEntries.get(name));
+      expect(entry).toEqual(convertedEntries.get(name));
     });
 
     return assertEntriesDeepEqual(directory.expansionState.entries, convertedState.entries);
@@ -5527,9 +5519,9 @@ describe("Service provider", function() {
 
   it("provides the `selectedPaths` method which should return the selected paths in the Tree View", () => expect(treeViewService.selectedPaths()).toEqual([atom.project.getPaths()[0]]));
 
-  return it("provides the `entryForPath` method which should return the Tree View entry for a given path", function() {
+  it("provides the `entryForPath` method which should return the Tree View entry for a given path", function() {
     const root = atom.project.getPaths()[0];
-    return expect(treeViewService.entryForPath(root)).toEqual(treeView.roots[0]);
+    expect(treeViewService.entryForPath(root)).toEqual(treeView.roots[0]);
   });
 });
 
@@ -5570,7 +5562,7 @@ describe('Icon class handling', () => it('allows multiple classes to be passed',
     providerDisposable.dispose();
 
     files = workspaceElement.querySelectorAll('li[is="tree-view-file"]');
-    return expect(files[0].fileName.className).toBe('name icon icon-file-text');
+    expect(files[0].fileName.className).toBe('name icon icon-file-text');
   });
 }));
 
@@ -5594,7 +5586,7 @@ describe('Hidden on startup', function() {
     return runs(() => expect(atom.workspace.getLeftDock().isVisible()).toBe(false));
   });
 
-  return describe('When set to false', () => it('allows the pane to show up as normal', function() {
+  describe('When set to false', () => it('allows the pane to show up as normal', function() {
     waitsForPromise(() => // First deactivate the package so that we can start from scratch
     atom.packages.deactivatePackage('tree-view'));
 

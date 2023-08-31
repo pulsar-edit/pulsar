@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const path = require('path');
@@ -30,7 +26,7 @@ describe("FileStats", function() {
         return atom.packages.activatePackage("tree-view");
       });
 
-      return runs(() => treeView = atom.workspace.getLeftDock().getActivePaneItem());
+      runs(() => treeView = atom.workspace.getLeftDock().getActivePaneItem());
     });
 
     it("passes stats to File instances", function() {
@@ -39,7 +35,7 @@ describe("FileStats", function() {
       } = treeView.roots[0].directory.entries.get("file1.txt");
       expect(stats).toBeDefined();
       expect(stats.mtime).toBeDefined();
-      return expect(stats.size).toEqual(file1Data.length);
+      expect(stats.size).toEqual(file1Data.length);
     });
 
     it("passes stats to Directory instances", function() {
@@ -47,7 +43,7 @@ describe("FileStats", function() {
         stats
       } = treeView.roots[0].directory.entries.get("subdir");
       expect(stats).toBeDefined();
-      return expect(stats.mtime).toBeDefined();
+      expect(stats.mtime).toBeDefined();
     });
 
     it("passes stats to a root directory when initialised", () => expect(treeView.roots[0].directory.stats).toBeDefined());
@@ -59,7 +55,7 @@ describe("FileStats", function() {
         stats
       } = subdir.entries.get("file2.txt");
       expect(stats).toBeDefined();
-      return expect(stats.size).toEqual(file2Data.length);
+      expect(stats.size).toEqual(file2Data.length);
     });
 
     it("converts date-stats to timestamps", function() {
@@ -69,26 +65,26 @@ describe("FileStats", function() {
       const stamp = stats.mtime;
       expect(_.isDate(stamp)).toBe(false);
       expect(typeof stamp).toBe("number");
-      return expect(Number.isNaN(stamp)).toBe(false);
+      expect(Number.isNaN(stamp)).toBe(false);
     });
 
-    return it("accurately converts timestamps", function() {
+    it("accurately converts timestamps", function() {
       const {
         stats
       } = treeView.roots[0].directory.entries.get("file1.txt");
       // Two minutes should be enough
-      return expect(Math.abs(stats.mtime - timeStarted)).toBeLessThan(120000);
+      expect(Math.abs(stats.mtime - timeStarted)).toBeLessThan(120000);
     });
   });
 
-  return describe("virtual filepaths", function() {
+  describe("virtual filepaths", function() {
     beforeEach(function() {
       atom.project.setPaths([]);
-      return waitsForPromise(() => Promise.all([
+      waitsForPromise(() => Promise.all([
         atom.packages.activatePackage("tree-view"),
         atom.packages.activatePackage("about")
       ]));});
 
-    return it("doesn't throw an exception when accessing virtual filepaths", () => atom.project.setPaths(["atom://about"]));
+    it("doesn't throw an exception when accessing virtual filepaths", () => atom.project.setPaths(["atom://about"]));
   });
 });
