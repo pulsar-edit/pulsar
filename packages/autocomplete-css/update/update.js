@@ -1,6 +1,4 @@
-/**
-  @ignore
-  (^^ ignore used above because this is mistakenly included into Pulsar's Docs)
+/*
   This file will manage the updating of `autocomplete-css` `completions.json`.
   We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
   list of all properties seperated by their spec shortname. An example

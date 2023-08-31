@@ -1,6 +1,4 @@
-/**
- @ignore
- (^^ ignore used above because this is mistakenly included into Pulsar's Docs)
+/*
  This file aims to run some short simple tests against `update.js`. Focusing
  mainly on the Regex used within `sanitizeDescription()`
 */

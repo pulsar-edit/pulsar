@@ -1,9 +1,7 @@
 require = require("esm")(module)
 module.exports = require("./chromium-elements-shim.mjs")
 
-/**
-@ignore
-(^^ ignore used above because this is mistakenly included into Pulsar's Docs)
+/*
 Used to aid in the automatic updating of our `completions.json`
 
 So while this, coupled with `chromium-elements-shim.mjs` is a rather ugly solution
