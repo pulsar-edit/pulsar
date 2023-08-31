@@ -36,6 +36,8 @@ env:
 #     - yarn run build:apm
 #   build_binary_script:
 #     - yarn dist || yarn dist
+#   rename_binary_script:
+#     - node script/rename.js "Linux"
 #   binary_artifacts:
 #     path: ./binaries/*
 #   test_script:
@@ -93,6 +95,8 @@ arm_linux_task:
     - yarn run build:apm
   build_binary_script:
     - yarn dist || yarn dist
+  rename_binary_script:
+    - node script/rename.js "ARM.Linux"
   binary_artifacts:
     path: ./binaries/*
   test_script:
@@ -142,12 +146,15 @@ silicon_mac_task:
   build_binary_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn dist || yarn dist
+  rename_binary_script:
+    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+    - node script/rename.js "Silicon.Mac"
   binary_artifacts:
     path: ./binaries/*
   test_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - rm -R node_modules/electron; yarn install --check-files
-    - hdiutil mount binaries/Pulsar*dmg
+    - hdiutil mount binaries/*Pulsar*dmg
     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   rolling_upload_script:
@@ -195,12 +202,15 @@ silicon_mac_task:
 #   build_binary_script:
 #     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
 #     - arch -x86_64 npx yarn dist || arch -x86_64 npx yarn dist
+#   rename_binary_script:
+#     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+#     - node script/rename.js "Intel.Mac"
 #   binary_artifacts:
 #     path: ./binaries/*
 #   test_script:
 #     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
 #     - rm -R node_modules/electron; yarn install --check-files
-#     - hdiutil mount binaries/Pulsar*dmg
+#     - hdiutil mount binaries/*Pulsar*dmg
 #     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
 #     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 #   always:
@@ -236,6 +246,8 @@ silicon_mac_task:
 #   build_binary_script:
 #     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
 #     - npx yarn dist || npx yarn dist || npx yarn dist
+#   rename_binary_script:
+#     - node script/rename.js "Windows"
 #   binary_artifacts:
 #     path: .\binaries\*
 #   test_script:
