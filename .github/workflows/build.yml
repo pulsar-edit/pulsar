@@ -76,7 +76,6 @@ jobs:
     - name: Build Pulsar Binaries (macOS) (Signed)
       if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
       # PRs generated from forks cannot access GitHub Secrets
-      # The empty string assignment of these values will cause macOS builds to fail
       # So if the PR is a fork, we will still build, but will not sign.
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
