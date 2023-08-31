@@ -60,7 +60,7 @@ describe("KeybindingsPanel", function() {
       panel.element.querySelector('.copy-icon').click();
       expect(atom.clipboard.read()).toBe(`\
 '.editor, .platform-test':
-'ctrl-a': 'core:select-all'\
+  'ctrl-a': 'core:select-all'\
 `
       );
     }));
@@ -70,7 +70,7 @@ describe("KeybindingsPanel", function() {
       panel.element.querySelector('.copy-icon').click();
       expect(atom.clipboard.read()).toBe(`\
 ".editor, .platform-test": {
-"ctrl-a": "core:select-all"
+  "ctrl-a": "core:select-all"
 }\
 `
       );
