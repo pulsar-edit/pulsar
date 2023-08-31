@@ -1,18 +1,12 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const SettingsPanel = require('../lib/settings-panel');
 const _ = require('underscore-plus');
 
-describe("SettingsPanel", function() {
+describe("SettingsPanel", () => {
   let settingsPanel = null;
 
-  describe("sorted settings", function() {
-    beforeEach(function() {
+  describe("sorted settings", () => {
+    beforeEach(() => {
       const config = {
         type: 'object',
         properties: {
@@ -66,10 +60,10 @@ describe("SettingsPanel", function() {
       atom.config.setSchema("foo", config);
       atom.config.setDefaults("foo", {gong: 'gong'});
       expect(_.size(atom.config.get('foo'))).toBe(7);
-      return settingsPanel = new SettingsPanel({namespace: "foo", includeTitle: false});
+      settingsPanel = new SettingsPanel({namespace: "foo", includeTitle: false});
     });
 
-    it("sorts settings by order and then alphabetically by the key", function() {
+    it("sorts settings by order and then alphabetically by the key", () => {
       const settings = atom.config.get('foo');
       expect(_.size(settings)).toBe(7);
       const sortedSettings = settingsPanel.sortSettings("foo", settings);
@@ -79,22 +73,22 @@ describe("SettingsPanel", function() {
       expect(sortedSettings[3]).toBe('enum');
       expect(sortedSettings[4]).toBe('gong');
       expect(sortedSettings[5]).toBe('haz');
-      return expect(sortedSettings[6]).toBe('radio');
+      expect(sortedSettings[6]).toBe('radio');
     });
 
-    it("gracefully deals with a null settings object", function() {
+    it("gracefully deals with a null settings object", () => {
       const sortedSettings = settingsPanel.sortSettings("foo", null);
       expect(sortedSettings).not.toBeNull;
-      return expect(_.size(sortedSettings)).toBe(0);
+      expect(_.size(sortedSettings)).toBe(0);
     });
 
-    it("presents enum options with their descriptions", function() {
+    it("presents enum options with their descriptions", () => {
       const select = settingsPanel.element.querySelector('#foo\\.enum');
       const pairs = (Array.from(select.children).map((opt) => [opt.value, opt.innerText]));
-      return expect(pairs).toEqual([['one', 'One'], ['Two', 'Two']]);
+      expect(pairs).toEqual([['one', 'One'], ['Two', 'Two']]);
     });
 
-    return it("presents radio options with their descriptions", function() {
+    it("presents radio options with their descriptions", () => {
       const radio = settingsPanel.element.querySelector('#foo\\.radio');
       const options = (() => {
         const result = [];
@@ -104,12 +98,12 @@ describe("SettingsPanel", function() {
         }
         return result;
       })();
-      return expect(options).toEqual([['foo.radio[one]', 'one', 'One'], ['foo.radio[Two]', 'Two', 'Two']]);
+      expect(options).toEqual([['foo.radio[one]', 'one', 'One'], ['foo.radio[Two]', 'Two', 'Two']]);
     });
   });
 
-  describe('default settings', function() {
-    beforeEach(function() {
+  describe('default settings', () => {
+    beforeEach(() => {
       const config = {
         type: 'object',
         properties: {
@@ -154,25 +148,25 @@ describe("SettingsPanel", function() {
       atom.config.setSchema("foo", config);
       atom.config.setDefaults("foo", {gong: 'gong'});
       expect(_.size(atom.config.get('foo'))).toBe(5);
-      return settingsPanel = new SettingsPanel({namespace: "foo", includeTitle: false});
+      settingsPanel = new SettingsPanel({namespace: "foo", includeTitle: false});
     });
 
-    it('ensures default stays default', function() {
+    it('ensures default stays default', () => {
       expect(settingsPanel.getDefault('foo.haz')).toBe('haz');
       expect(settingsPanel.isDefault('foo.haz')).toBe(true);
       settingsPanel.set('foo.haz', 'haz');
-      return expect(settingsPanel.isDefault('foo.haz')).toBe(true);
+      expect(settingsPanel.isDefault('foo.haz')).toBe(true);
     });
 
-    it('can be overwritten', function() {
+    it('can be overwritten', () => {
       expect(settingsPanel.getDefault('foo.haz')).toBe('haz');
       expect(settingsPanel.isDefault('foo.haz')).toBe(true);
       settingsPanel.set('foo.haz', 'newhaz');
       expect(settingsPanel.isDefault('foo.haz')).toBe(false);
-      return expect(atom.config.get('foo.haz')).toBe('newhaz');
+      expect(atom.config.get('foo.haz')).toBe('newhaz');
     });
 
-    it("ignores project-specific overrides", function() {
+    it("ignores project-specific overrides", () => {
       atom.project.replace({
         originPath: 'TEST',
         config: {
@@ -182,31 +176,31 @@ describe("SettingsPanel", function() {
         }
       });
       expect(settingsPanel.isDefault('foo.haz')).toBe(true);
-      return expect(atom.config.get('foo.haz')).toBe('newhaz');
+      expect(atom.config.get('foo.haz')).toBe('newhaz');
     });
 
-    it('has a tooltip showing the default value', function() {
+    it('has a tooltip showing the default value', () => {
       const hazEditor = settingsPanel.element.querySelector('[id="foo.haz"]');
       const tooltips = atom.tooltips.findTooltips(hazEditor);
       expect(tooltips).toHaveLength(1);
       const {
         title
       } = tooltips[0].options;
-      return expect(title).toBe("Default: haz");
+      expect(title).toBe("Default: haz");
     });
 
-    it('has a tooltip showing the description of the default value', function() {
+    it('has a tooltip showing the description of the default value', () => {
       const quxEditor = settingsPanel.element.querySelector('[id="foo.qux"]');
       const tooltips = atom.tooltips.findTooltips(quxEditor);
       expect(tooltips).toHaveLength(1);
       const {
         title
       } = tooltips[0].options;
-      return expect(title).toBe("Default: Alice");
+      expect(title).toBe("Default: Alice");
     });
 
     // Regression test for #783
-    it('allows 0 to be a default', function() {
+    it('allows 0 to be a default', () => {
       const zeroEditor = settingsPanel.element.querySelector('[id="foo.testZero"]');
       expect(zeroEditor.getModel().getText()).toBe('');
       expect(zeroEditor.getModel().getPlaceholderText()).toBe('Default: 0');
@@ -218,17 +212,17 @@ describe("SettingsPanel", function() {
       expect(settingsPanel.isDefault('foo.testZero')).toBe(false);
 
       settingsPanel.set('foo.testZero', 0);
-      return expect(settingsPanel.isDefault('foo.testZero')).toBe(true);
+      expect(settingsPanel.isDefault('foo.testZero')).toBe(true);
     });
 
-    it("selects the default choice for radio options", function() {
+    it("selects the default choice for radio options", () => {
       expect(settingsPanel.getDefault('foo.radio')).toBe('Two');
       settingsPanel.set('foo.radio', 'Two');
-      return expect(settingsPanel.element.querySelector('#foo\\.radio\\[Two\\]')).toBeChecked();
+      expect(settingsPanel.element.querySelector('#foo\\.radio\\[Two\\]')).toBeChecked();
     });
 
-    return describe('scoped settings', function() {
-      beforeEach(function() {
+    describe('scoped settings', () => {
+      beforeEach(() => {
         const schema = {
           scopes: {
             '.source.python': {
@@ -238,17 +232,17 @@ describe("SettingsPanel", function() {
         };
 
         atom.config.setScopedDefaultsFromSchema('editor.tabLength', schema);
-        return expect(atom.config.get('editor.tabLength')).toBe(2);
+        expect(atom.config.get('editor.tabLength')).toBe(2);
       });
 
-      it('displays the scoped default', function() {
+      it('displays the scoped default', () => {
         settingsPanel = new SettingsPanel({namespace: "editor", includeTitle: false, scopeName: '.source.python'});
         const tabLengthEditor = settingsPanel.element.querySelector('[id="editor.tabLength"]');
         expect(tabLengthEditor.getModel().getText()).toBe('');
-        return expect(tabLengthEditor.getModel().getPlaceholderText()).toBe('Default: 4');
+        expect(tabLengthEditor.getModel().getPlaceholderText()).toBe('Default: 4');
       });
 
-      it('allows the scoped setting to be changed to its normal default if the unscoped value is different', function() {
+      it('allows the scoped setting to be changed to its normal default if the unscoped value is different', () => {
         atom.config.set('editor.tabLength', 8);
 
         settingsPanel = new SettingsPanel({namespace: "editor", includeTitle: false, scopeName: '.source.js'});
@@ -259,10 +253,10 @@ describe("SettingsPanel", function() {
         // This is the unscoped default, but it differs from the current unscoped value
         settingsPanel.set('editor.tabLength', 2);
         expect(tabLengthEditor.getModel().getText()).toBe('2');
-        return expect(atom.config.get('editor.tabLength', {scope: ['source.js']})).toBe(2);
+        expect(atom.config.get('editor.tabLength', {scope: ['source.js']})).toBe(2);
       });
 
-      return it('allows the scoped setting to be changed to the unscoped default if it is different', function() {
+      it('allows the scoped setting to be changed to the unscoped default if it is different', () => {
         settingsPanel = new SettingsPanel({namespace: "editor", includeTitle: false, scopeName: '.source.python'});
         const tabLengthEditor = settingsPanel.element.querySelector('[id="editor.tabLength"]');
         expect(tabLengthEditor.getModel().getText()).toBe('');
@@ -271,13 +265,13 @@ describe("SettingsPanel", function() {
         // This is the unscoped default, but it differs from the scoped default
         settingsPanel.set('editor.tabLength', 2);
         expect(tabLengthEditor.getModel().getText()).toBe('2');
-        return expect(atom.config.get('editor.tabLength', {scope: ['source.python']})).toBe(2);
+        expect(atom.config.get('editor.tabLength', {scope: ['source.python']})).toBe(2);
       });
     });
   });
 
-  describe('grouped settings', function() {
-    beforeEach(function() {
+  describe('grouped settings', () => {
+    beforeEach(() => {
       const config = {
         type: 'object',
         properties: {
@@ -314,10 +308,10 @@ describe("SettingsPanel", function() {
       };
       atom.config.setSchema('foo', config);
       expect(_.size(atom.config.get('foo'))).toBe(3);
-      return settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false});
+      settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false});
     });
 
-    it('ensures that only grouped settings have a group title', function() {
+    it('ensures that only grouped settings have a group title', () => {
       expect(settingsPanel.element.querySelectorAll('.section-container > .section-body')).toHaveLength(1);
       const controlGroups = settingsPanel.element.querySelectorAll('.section-body > .control-group');
       expect(controlGroups).toHaveLength(3);
@@ -332,10 +326,10 @@ describe("SettingsPanel", function() {
       subsectionBody = controlGroups[1].querySelector('.sub-section .sub-section-body');
       expect(subsectionBody.querySelectorAll('.control-group')).toHaveLength(1);
       expect(controlGroups[2].querySelectorAll('.sub-section')).toHaveLength(0);
-      return expect(controlGroups[2].querySelectorAll('.sub-section-heading')).toHaveLength(0);
+      expect(controlGroups[2].querySelectorAll('.sub-section-heading')).toHaveLength(0);
     });
 
-    it('ensures grouped settings are collapsable', function() {
+    it('ensures grouped settings are collapsable', () => {
       expect(settingsPanel.element.querySelectorAll('.section-container > .section-body')).toHaveLength(1);
       const controlGroups = settingsPanel.element.querySelectorAll('.section-body > .control-group');
       expect(controlGroups).toHaveLength(3);
@@ -346,20 +340,20 @@ describe("SettingsPanel", function() {
       expect(controlGroups[1].querySelectorAll('.sub-section .sub-section-heading')).toHaveLength(1);
       expect(controlGroups[1].querySelector('.sub-section .sub-section-heading').classList.contains('has-items')).toBe(true);
       // Should be already collapsed
-      return expect(controlGroups[1].querySelector('.sub-section .sub-section-heading').parentElement.classList.contains('collapsed')).toBe(true);
+      expect(controlGroups[1].querySelector('.sub-section .sub-section-heading').parentElement.classList.contains('collapsed')).toBe(true);
     });
 
-    return it('ensures grouped settings can have a description', function() {
+    it('ensures grouped settings can have a description', () => {
       expect(settingsPanel.element.querySelectorAll('.section-container > .section-body')).toHaveLength(1);
       const controlGroups = settingsPanel.element.querySelectorAll('.section-body > .control-group');
       expect(controlGroups).toHaveLength(3);
       expect(controlGroups[0].querySelectorAll('.sub-section > .setting-description')).toHaveLength(1);
-      return expect(controlGroups[0].querySelector('.sub-section > .setting-description').textContent).toBe('description of bar group');
+      expect(controlGroups[0].querySelector('.sub-section > .setting-description').textContent).toBe('description of bar group');
     });
   });
 
-  return describe('settings validation', function() {
-    beforeEach(function() {
+  describe('settings validation', () => {
+    beforeEach(() => {
       const config = {
         type: 'object',
         properties: {
@@ -383,10 +377,10 @@ describe("SettingsPanel", function() {
       };
 
       atom.config.setSchema('foo', config);
-      return settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false});
+      settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false});
     });
 
-    it('prevents setting a value below the minimum', function() {
+    it('prevents setting a value below the minimum', () => {
       const minMaxEditor = settingsPanel.element.querySelector('[id="foo.minMax"]');
       minMaxEditor.getModel().setText('0');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
@@ -394,10 +388,10 @@ describe("SettingsPanel", function() {
 
       minMaxEditor.getModel().setText('-5');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
-      return expect(minMaxEditor.getModel().getText()).toBe('1');
+      expect(minMaxEditor.getModel().getText()).toBe('1');
     });
 
-    it('prevents setting a value above the maximum', function() {
+    it('prevents setting a value above the maximum', () => {
       const minMaxEditor = settingsPanel.element.querySelector('[id="foo.minMax"]');
       minMaxEditor.getModel().setText('1000');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
@@ -405,10 +399,10 @@ describe("SettingsPanel", function() {
 
       minMaxEditor.getModel().setText('10000');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
-      return expect(minMaxEditor.getModel().getText()).toBe('100');
+      expect(minMaxEditor.getModel().getText()).toBe('100');
     });
 
-    it('prevents setting a value that cannot be coerced to the correct type', function() {
+    it('prevents setting a value that cannot be coerced to the correct type', () => {
       const minMaxEditor = settingsPanel.element.querySelector('[id="foo.minMax"]');
       minMaxEditor.getModel().setText('"abcde"');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
@@ -420,19 +414,19 @@ describe("SettingsPanel", function() {
 
       minMaxEditor.getModel().setText('"abcde"');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
-      return expect(minMaxEditor.getModel().getText()).toBe('15');
+      expect(minMaxEditor.getModel().getText()).toBe('15');
     });
 
-    it('allows setting a valid scoped value', function() {
+    it('allows setting a valid scoped value', () => {
       settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false, scopeName: 'source.js'});
       const minMaxEditor = settingsPanel.element.querySelector('atom-text-editor');
       minMaxEditor.getModel().setText('15');
       advanceClock(minMaxEditor.getModel().getBuffer().getStoppedChangingDelay());
-      return expect(minMaxEditor.getModel().getText()).toBe('15');
+      expect(minMaxEditor.getModel().getText()).toBe('15');
     });
 
-    return describe('commaValueArray', function() {
-      it('comma in value is escaped', function() {
+    describe('commaValueArray', () => {
+      it('comma in value is escaped', () => {
         const commaValueArrayEditor = settingsPanel.element.querySelector('[id="foo.commaValueArray"]');
         commaValueArrayEditor.getModel().setText('1, \\,, 2');
         advanceClock(commaValueArrayEditor.getModel().getBuffer().getStoppedChangingDelay());
@@ -448,10 +442,10 @@ describe("SettingsPanel", function() {
 
         commaValueArrayEditor.getModel().setText('\\, 2');
         advanceClock(commaValueArrayEditor.getModel().getBuffer().getStoppedChangingDelay());
-        return expect(atom.config.get('foo.commaValueArray')).toEqual([', 2']);
+        expect(atom.config.get('foo.commaValueArray')).toEqual([', 2']);
     });
 
-      return it('renders an escaped comma', function() {
+      it('renders an escaped comma', () => {
         const commaValueArrayEditor = settingsPanel.element.querySelector('[id="foo.commaValueArray"]');
         atom.config.set('foo.commaValueArray', ['3', ',', '4']);
         advanceClock(1000);
@@ -467,7 +461,7 @@ describe("SettingsPanel", function() {
 
         atom.config.set('foo.commaValueArray', [', 4']);
         advanceClock(1000);
-        return expect(commaValueArrayEditor.getModel().getText()).toBe('\\, 4');
+        expect(commaValueArrayEditor.getModel().getText()).toBe('\\, 4');
       });
     });
   });

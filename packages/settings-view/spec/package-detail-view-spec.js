@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const fs = require('fs');
 const path = require('path');
 const {shell} = require('electron');
@@ -23,7 +18,7 @@ describe("PackageDetailView", function() {
 
   beforeEach(function() {
     packageManager = new PackageManager;
-    return view = null;
+    view = null;
   });
 
   const loadPackageFromRemote = function(packageName, opts) {
@@ -55,7 +50,7 @@ describe("PackageDetailView", function() {
     view = new PackageDetailView(pack, new SettingsView(), packageManager, SnippetsProvider);
 
     // Perhaps there are more things to assert here.
-    return expect(view.refs.title.textContent).toBe('Package With Config');
+    expect(view.refs.title.textContent).toBe('Package With Config');
   });
 
   it("does not call the atom.io api for package metadata when present", function() {
@@ -64,14 +59,14 @@ describe("PackageDetailView", function() {
 
     // PackageCard is a subview, and it calls AtomIoClient::package once to load
     // metadata from the cache.
-    return expect(packageManager.client.package.callCount).toBe(1);
+    expect(packageManager.client.package.callCount).toBe(1);
   });
 
   it("shows a loading message and calls out to atom.io when package metadata is missing", function() {
     loadPackageFromRemote('package-with-readme');
     expect(view.refs.loadingMessage).not.toBe(null);
     expect(view.refs.loadingMessage.classList.contains('hidden')).not.toBe(true);
-    return expect(packageManager.client.package).toHaveBeenCalled();
+    expect(packageManager.client.package).toHaveBeenCalled();
   });
 
   it("shows an error when package metadata cannot be loaded via the API", function() {
@@ -85,7 +80,7 @@ describe("PackageDetailView", function() {
 
     expect(view.refs.errorMessage.classList.contains('hidden')).not.toBe(true);
     expect(view.refs.loadingMessage.classList.contains('hidden')).toBe(true);
-    return expect(view.element.querySelectorAll('.package-card').length).toBe(0);
+    expect(view.element.querySelectorAll('.package-card').length).toBe(0);
   });
 
   it("shows an error when package metadata cannot be loaded from the cache and the network is unavailable", function() {
@@ -101,14 +96,14 @@ describe("PackageDetailView", function() {
 
     expect(view.refs.errorMessage.classList.contains('hidden')).not.toBe(true);
     expect(view.refs.loadingMessage.classList.contains('hidden')).toBe(true);
-    return expect(view.element.querySelectorAll('.package-card').length).toBe(0);
+    expect(view.element.querySelectorAll('.package-card').length).toBe(0);
   });
 
   it("renders the README successfully after a call to the atom.io api", function() {
     loadPackageFromRemote('package-with-readme');
     expect(view.packageCard).toBeDefined();
     expect(view.packageCard.refs.packageName.textContent).toBe('package-with-readme');
-    return expect(view.element.querySelectorAll('.package-readme').length).toBe(1);
+    expect(view.element.querySelectorAll('.package-readme').length).toBe(1);
   });
 
   it("renders the README successfully with sanitized html", function() {
@@ -118,7 +113,7 @@ describe("PackageDetailView", function() {
     expect(view.element.querySelectorAll('.package-readme input[type="checkbox"][disabled]').length).toBe(2);
     expect(view.element.querySelector('img[alt="AbsoluteImage"]').getAttribute('src')).toBe('https://example.com/static/image.jpg');
     expect(view.element.querySelector('img[alt="RelativeImage"]').getAttribute('src')).toBe('https://github.com/example/package-with-readme/blob/master/static/image.jpg');
-    return expect(view.element.querySelector('img[alt="Base64Image"]').getAttribute('src')).toBe('data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
+    expect(view.element.querySelector('img[alt="Base64Image"]').getAttribute('src')).toBe('data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
   });
 
   it("renders the README when the package path is undefined", function() {
@@ -129,53 +124,53 @@ describe("PackageDetailView", function() {
 
     expect(view.packageCard).toBeDefined();
     expect(view.packageCard.refs.packageName.textContent).toBe('package-with-readme');
-    return expect(view.element.querySelectorAll('.package-readme').length).toBe(1);
+    expect(view.element.querySelectorAll('.package-readme').length).toBe(1);
   });
 
   it("triggers a report issue button click and checks that the fallback repository issue tracker URL was opened", function() {
     loadCustomPackageFromRemote('package-without-bugs-property');
     spyOn(shell, 'openExternal');
     view.refs.issueButton.click();
-    return expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/example/package-without-bugs-property/issues/new');
+    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/example/package-without-bugs-property/issues/new');
   });
 
   it("triggers a report issue button click and checks that the bugs URL string was opened", function() {
     loadCustomPackageFromRemote('package-with-bugs-property-url-string');
     spyOn(shell, 'openExternal');
     view.refs.issueButton.click();
-    return expect(shell.openExternal).toHaveBeenCalledWith('https://example.com/custom-issue-tracker/new');
+    expect(shell.openExternal).toHaveBeenCalledWith('https://example.com/custom-issue-tracker/new');
   });
 
   it("triggers a report issue button click and checks that the bugs URL was opened", function() {
     loadCustomPackageFromRemote('package-with-bugs-property-url');
     spyOn(shell, 'openExternal');
     view.refs.issueButton.click();
-    return expect(shell.openExternal).toHaveBeenCalledWith('https://example.com/custom-issue-tracker/new');
+    expect(shell.openExternal).toHaveBeenCalledWith('https://example.com/custom-issue-tracker/new');
   });
 
   it("triggers a report issue button click and checks that the bugs email link was opened", function() {
     loadCustomPackageFromRemote('package-with-bugs-property-email');
     spyOn(shell, 'openExternal');
     view.refs.issueButton.click();
-    return expect(shell.openExternal).toHaveBeenCalledWith('mailto:issues@example.com');
+    expect(shell.openExternal).toHaveBeenCalledWith('mailto:issues@example.com');
   });
 
   it("should show 'Install' as the first breadcrumb by default", function() {
     loadPackageFromRemote('package-with-readme');
-    return expect(view.refs.breadcrumb.textContent).toBe('Install');
+    expect(view.refs.breadcrumb.textContent).toBe('Install');
   });
 
   it("should open repository url", function() {
     loadPackageFromRemote('package-with-readme');
     spyOn(shell, 'openExternal');
     view.refs.packageRepo.click();
-    return expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/example/package-with-readme');
+    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/example/package-with-readme');
   });
 
-  return it("should open internal package repository url", function() {
+  it("should open internal package repository url", function() {
     loadPackageFromRemote('package-internal');
     spyOn(shell, 'openExternal');
     view.refs.packageRepo.click();
-    return expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/pulsar-edit/pulsar/tree/master/packages/package-internal');
+    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/pulsar-edit/pulsar/tree/master/packages/package-internal');
   });
 });

@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const path = require('path');
 
 const fs = require('fs-plus');
@@ -28,7 +23,7 @@ describe('InstalledPackagesPanel', function() {
       return (this.packageManager.getInstalled.callCount === 1) && (this.panel.refs.communityCount.textContent.indexOf('…') < 0);
     });
 
-    return runs(function() {
+    runs(function() {
       expect(this.panel.refs.communityCount.textContent.trim()).toBe('1/1');
       expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
 
@@ -36,7 +31,7 @@ describe('InstalledPackagesPanel', function() {
       expect(this.panel.refs.corePackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
 
       expect(this.panel.refs.devCount.textContent.trim()).toBe('0/1');
-      return expect(this.panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
+      expect(this.panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
     });
   }));
 
@@ -50,7 +45,7 @@ describe('InstalledPackagesPanel', function() {
       spyOn(this.packageManager, 'getInstalled').andReturn(Promise.resolve(this.installed));
       this.panel = new InstalledPackagesPanel(settingsView, this.packageManager);
 
-      return waitsFor(function() {
+      waitsFor(function() {
         return (this.packageManager.getInstalled.callCount === 1) && (this.panel.refs.communityCount.textContent.indexOf('…') < 0);
       });
     });
@@ -63,7 +58,7 @@ describe('InstalledPackagesPanel', function() {
       expect(this.panel.refs.corePackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
 
       expect(this.panel.refs.devCount.textContent.trim()).toBe('1');
-      return expect(this.panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
+      expect(this.panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
     });
 
     it('filters packages by name', function() {
@@ -76,7 +71,7 @@ describe('InstalledPackagesPanel', function() {
       expect(this.panel.refs.corePackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
 
       expect(this.panel.refs.devCount.textContent.trim()).toBe('0/1');
-      return expect(this.panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
+      expect(this.panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
     });
 
     it('adds newly installed packages to the list', function() {
@@ -97,13 +92,13 @@ describe('InstalledPackagesPanel', function() {
 
       advanceClock(InstalledPackagesPanel.loadPackagesDelay());
       waits(1);
-      return runs(function() {
+      runs(function() {
         expect(this.panel.refs.communityCount.textContent.trim()).toBe('2');
-        return expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(2);
+        expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(2);
       });
     });
 
-    return it('removes uninstalled packages from the list', function() {
+    it('removes uninstalled packages from the list', function() {
       let [uninstallCallback] = [];
       spyOn(this.packageManager, 'runCommand').andCallFake(function(args, callback) {
         uninstallCallback = callback;
@@ -121,9 +116,9 @@ describe('InstalledPackagesPanel', function() {
 
       advanceClock(InstalledPackagesPanel.loadPackagesDelay());
       waits(1);
-      return runs(function() {
+      runs(function() {
         expect(this.panel.refs.communityCount.textContent.trim()).toBe('0');
-        return expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
+        expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
       });
     });
   });
@@ -138,7 +133,7 @@ describe('InstalledPackagesPanel', function() {
       spyOn(this.packageManager, 'getInstalled').andReturn(Promise.resolve(this.installed));
       this.panel = new InstalledPackagesPanel(settingsView, this.packageManager);
 
-      return waitsFor(function() {
+      waitsFor(function() {
         return (this.packageManager.getInstalled.callCount === 1) && (this.panel.refs.communityCount.textContent.indexOf('…') < 0);
       });
     });
@@ -151,7 +146,7 @@ describe('InstalledPackagesPanel', function() {
       expect(this.panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
 
       this.panel.element.querySelector('.sub-section.installed-packages .sub-section-heading').click();
-      return expect(this.panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
+      expect(this.panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
     });
 
     it('can collapse and expand any of the sub-sections', function() {
@@ -172,20 +167,20 @@ describe('InstalledPackagesPanel', function() {
 
       expect(this.panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
       expect(this.panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass('collapsed');
-      return expect(this.panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
+      expect(this.panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
     });
 
-    return it('can collapse sub-sections when filtering', function() {
+    it('can collapse sub-sections when filtering', function() {
       this.panel.refs.filterEditor.setText('user-');
       window.advanceClock(this.panel.refs.filterEditor.getBuffer().stoppedChangingDelay);
 
       const hasItems = this.panel.element.querySelectorAll('.sub-section-heading.has-items');
       expect(hasItems.length).toBe(1);
-      return expect(hasItems[0].textContent).toMatch(/Community Packages/);
+      expect(hasItems[0].textContent).toMatch(/Community Packages/);
     });
   });
 
-  return describe('when there are no packages', function() {
+  describe('when there are no packages', function() {
     beforeEach(function() {
       const settingsView = new SettingsView;
       this.packageManager = new PackageManager;
@@ -199,7 +194,7 @@ describe('InstalledPackagesPanel', function() {
       spyOn(this.packageManager, 'getInstalled').andReturn(Promise.resolve(this.installed));
       this.panel = new InstalledPackagesPanel(settingsView, this.packageManager);
 
-      return waitsFor(function() {
+      waitsFor(function() {
         return (this.packageManager.getInstalled.callCount === 1) && (this.panel.refs.communityCount.textContent.indexOf('…') < 0);
       });
     });
@@ -207,7 +202,7 @@ describe('InstalledPackagesPanel', function() {
     it('has a count of zero in all headings', function() {
       expect(this.panel.element.querySelector('.section-heading-count').textContent).toMatch(/^0+$/);
       expect(this.panel.element.querySelectorAll('.sub-section .icon-package').length).toBe(4);
-      return expect(this.panel.element.querySelectorAll('.sub-section .icon-package.has-items').length).toBe(0);
+      expect(this.panel.element.querySelectorAll('.sub-section .icon-package.has-items').length).toBe(0);
     });
 
     it('can not collapse and expand any of the sub-sections', function() {
@@ -218,16 +213,16 @@ describe('InstalledPackagesPanel', function() {
 
       expect(this.panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
       expect(this.panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass('collapsed');
-      return expect(this.panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
+      expect(this.panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
     });
 
-    return it('does not allow collapsing on any section when filtering', function() {
+    it('does not allow collapsing on any section when filtering', function() {
       this.panel.refs.filterEditor.setText('user-');
       window.advanceClock(this.panel.refs.filterEditor.getBuffer().stoppedChangingDelay);
 
       expect(this.panel.element.querySelector('.section-heading-count').textContent).toMatch(/^(0\/0)+$/);
       expect(this.panel.element.querySelectorAll('.sub-section .icon-package').length).toBe(4);
-      return expect(this.panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe(0);
+      expect(this.panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe(0);
     });
   });
 });

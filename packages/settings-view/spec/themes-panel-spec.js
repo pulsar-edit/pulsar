@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const path = require('path');
 const fs = require('fs');
 
@@ -29,25 +24,25 @@ describe("ThemesPanel", function() {
 
     waitsFor("themes to be reloaded", () => reloadedHandler.callCount === 1);
 
-    return runs(function() {
+    runs(function() {
       packageManager = new PackageManager;
       const themeMetadata = CSON.readFileSync(path.join(__dirname, 'fixtures', 'a-theme', 'package.json'));
       spyOn(packageManager, 'getFeatured').andCallFake(callback => Promise.resolve([themeMetadata]));
       panel = new ThemesPanel(settingsView, packageManager);
 
       // Make updates synchronous
-      return spyOn(panel, 'scheduleUpdateThemeConfig').andCallFake(function() { return this.updateThemeConfig(); });
+      spyOn(panel, 'scheduleUpdateThemeConfig').andCallFake(function() { return this.updateThemeConfig(); });
     });
   });
 
   afterEach(function() {
     if (atom.packages.isPackageLoaded('a-theme')) { atom.packages.unloadPackage('a-theme'); }
-    return waitsForPromise(() => Promise.resolve(atom.themes.deactivateThemes()));
+    waitsForPromise(() => Promise.resolve(atom.themes.deactivateThemes()));
   }); // Ensure works on promise and non-promise versions
 
   it("selects the active syntax and UI themes", function() {
     expect(panel.refs.uiMenu.value).toBe('atom-dark-ui');
-    return expect(panel.refs.syntaxMenu.value).toBe('atom-dark-syntax');
+    expect(panel.refs.syntaxMenu.value).toBe('atom-dark-syntax');
   });
 
   describe("when a UI theme is selected", () => it("updates the 'core.themes' config key with the selected UI theme", function() {
@@ -56,7 +51,7 @@ describe("ThemesPanel", function() {
       child.dispatchEvent(new Event('change', {bubbles: true}));
     }
     waitsFor(() => reloadedHandler.callCount === 2);
-    return runs(() => expect(atom.config.get('core.themes')).toEqual(['atom-light-ui', 'atom-dark-syntax']));
+    runs(() => expect(atom.config.get('core.themes')).toEqual(['atom-light-ui', 'atom-dark-syntax']));
 }));
 
   describe("when a syntax theme is selected", () => it("updates the 'core.themes' config key with the selected syntax theme", function() {
@@ -65,7 +60,7 @@ describe("ThemesPanel", function() {
       child.dispatchEvent(new Event('change', {bubbles: true}));
     }
     waitsFor(() => reloadedHandler.callCount === 2);
-    return runs(() => expect(atom.config.get('core.themes')).toEqual(['atom-dark-ui', 'atom-light-syntax']));
+    runs(() => expect(atom.config.get('core.themes')).toEqual(['atom-dark-ui', 'atom-light-syntax']));
 }));
 
   describe("when the 'core.config' key changes", () => it("refreshes the theme menus", function() {
@@ -74,15 +69,15 @@ describe("ThemesPanel", function() {
 
     waitsFor(() => reloadedHandler.callCount === 1);
 
-    return runs(function() {
+    runs(function() {
       expect(panel.refs.uiMenu.value).toBe('atom-light-ui');
-      return expect(panel.refs.syntaxMenu.value).toBe('atom-light-syntax');
+      expect(panel.refs.syntaxMenu.value).toBe('atom-light-syntax');
     });
   }));
 
   xdescribe("when the themes panel is navigated to", () => xit("focuses the search filter", function() {
     settingsView.showPanel('Themes');
-    return expect(panel.refs.filterEditor.element).toHaveFocus();
+    expect(panel.refs.filterEditor.element).toHaveFocus();
   }));
 
   describe("theme lists", function() {
@@ -93,7 +88,7 @@ describe("ThemesPanel", function() {
       spyOn(packageManager, 'getInstalled').andReturn(Promise.resolve(installed));
       panel = new ThemesPanel(settingsView, packageManager);
 
-      return waitsFor(() => (packageManager.getInstalled.callCount === 1) && (panel.refs.communityCount.textContent.indexOf('…') < 0));
+      waitsFor(() => (packageManager.getInstalled.callCount === 1) && (panel.refs.communityCount.textContent.indexOf('…') < 0));
     });
 
     it('shows the themes', function() {
@@ -104,7 +99,7 @@ describe("ThemesPanel", function() {
       expect(panel.refs.corePackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
 
       expect(panel.refs.devCount.textContent.trim()).toBe('1');
-      return expect(panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
+      expect(panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
     });
 
     it('filters themes by name', function() {
@@ -117,7 +112,7 @@ describe("ThemesPanel", function() {
       expect(panel.refs.corePackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
 
       expect(panel.refs.devCount.textContent.trim()).toBe('0/1');
-      return expect(panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
+      expect(panel.refs.devPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(0);
     });
 
     it('adds newly installed themes to the list', function() {
@@ -136,9 +131,9 @@ describe("ThemesPanel", function() {
 
       advanceClock(ThemesPanel.loadPackagesDelay());
       waits(1);
-      return runs(function() {
+      runs(function() {
         expect(panel.refs.communityCount.textContent.trim()).toBe('2');
-        return expect(panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(2);
+        expect(panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(2);
       });
     });
 
@@ -151,7 +146,7 @@ describe("ThemesPanel", function() {
       expect(panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
 
       panel.element.querySelector('.sub-section.installed-packages .sub-section-heading.has-items').click();
-      return expect(panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
+      expect(panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
     });
 
     it('can collapse and expand any of the sub-sections', function() {
@@ -170,20 +165,20 @@ describe("ThemesPanel", function() {
       }
       expect(panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
       expect(panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass('collapsed');
-      return expect(panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
+      expect(panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
     });
 
-    return it('can collapse sub-sections when filtering', function() {
+    it('can collapse sub-sections when filtering', function() {
       panel.refs.filterEditor.setText('user-');
       window.advanceClock(panel.refs.filterEditor.getBuffer().stoppedChangingDelay);
 
       const hasItems = panel.element.querySelectorAll('.sub-section-heading.has-items');
       expect(hasItems.length).toBe(1);
-      return expect(hasItems[0].textContent).toMatch(/^Community Themes/);
+      expect(hasItems[0].textContent).toMatch(/^Community Themes/);
     });
   });
 
-  return describe('when there are no themes', function() {
+  describe('when there are no themes', function() {
     beforeEach(function() {
       const installed = {
         dev: [],
@@ -195,7 +190,7 @@ describe("ThemesPanel", function() {
       spyOn(packageManager, 'getInstalled').andReturn(Promise.resolve(installed));
       panel = new ThemesPanel(settingsView, packageManager);
 
-      return waitsFor(() => (packageManager.getInstalled.callCount === 1) && (panel.refs.communityCount.textContent.indexOf('…') < 0));
+      waitsFor(() => (packageManager.getInstalled.callCount === 1) && (panel.refs.communityCount.textContent.indexOf('…') < 0));
     });
 
     afterEach(() => waitsForPromise(() => Promise.resolve(atom.themes.deactivateThemes()))); // Ensure works on promise and non-promise versions
@@ -205,7 +200,7 @@ describe("ThemesPanel", function() {
         expect(heading.textContent).toMatch(/^0+$/);
       }
       expect(panel.element.querySelectorAll('.sub-section .icon-paintcan').length).toBe(4);
-      return expect(panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe(0);
+      expect(panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe(0);
     });
 
     it('can collapse and expand any of the sub-sections', function() {
@@ -214,10 +209,10 @@ describe("ThemesPanel", function() {
       }
       expect(panel.element.querySelector('.sub-section.installed-packages')).not.toHaveClass('collapsed');
       expect(panel.element.querySelector('.sub-section.core-packages')).not.toHaveClass('collapsed');
-      return expect(panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
+      expect(panel.element.querySelector('.sub-section.dev-packages')).not.toHaveClass('collapsed');
     });
 
-    return it('does not allow collapsing on any section when filtering', function() {
+    it('does not allow collapsing on any section when filtering', function() {
       panel.refs.filterEditor.setText('user-');
       window.advanceClock(panel.refs.filterEditor.getBuffer().stoppedChangingDelay);
 
@@ -225,7 +220,7 @@ describe("ThemesPanel", function() {
         expect(heading.textContent).toMatch(/^(0\/0)+$/);
       }
       expect(panel.element.querySelectorAll('.sub-section .icon-paintcan').length).toBe(4);
-      return expect(panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe(0);
+      expect(panel.element.querySelectorAll('.sub-section .icon-paintcan.has-items').length).toBe(0);
     });
   });
 });

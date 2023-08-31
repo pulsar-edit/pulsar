@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const UpdatesPanel = require('../lib/updates-panel');
 const PackageManager = require('../lib/package-manager');
 const SettingsView = require('../lib/settings-view');
@@ -33,26 +29,26 @@ describe('UpdatesPanel', function() {
 
     // skip packman stubbing
     panel.beforeShow({updates: [pack]});
-    return expect(panel.refs.updatesContainer.children.length).toBe(1);
+    expect(panel.refs.updatesContainer.children.length).toBe(1);
   });
 
   it("shows a message when updates are not available", function() {
     panel.beforeShow({updates: []});
     expect(panel.refs.updatesContainer.children.length).toBe(0);
-    return expect(panel.refs.noUpdatesMessage.style.display).not.toBe('none');
+    expect(panel.refs.noUpdatesMessage.style.display).not.toBe('none');
   });
 
   describe("version pinned packages message", function() {
     it('shows a message when there are pinned version packages', function() {
       spyOn(packageManager, 'getVersionPinnedPackages').andReturn(['foo', 'bar', 'baz']);
       panel.beforeShow({updates: []});
-      return expect(panel.refs.versionPinnedPackagesMessage.style.display).not.toBe('none');
+      expect(panel.refs.versionPinnedPackagesMessage.style.display).not.toBe('none');
     });
 
-    return it('does not show a message when there are no version pinned packages', function() {
+    it('does not show a message when there are no version pinned packages', function() {
       spyOn(packageManager, 'getVersionPinnedPackages').andReturn([]);
       panel.beforeShow({updates: []});
-      return expect(panel.refs.versionPinnedPackagesMessage.style.display).toBe('none');
+      expect(panel.refs.versionPinnedPackagesMessage.style.display).toBe('none');
     });
   });
 
@@ -93,7 +89,7 @@ describe('UpdatesPanel', function() {
       spyOn(cardB, 'update').andReturn(new Promise((resolve, reject) => [resolveB, rejectB] = [resolve, reject]));
       spyOn(cardC, 'update').andReturn(new Promise((resolve, reject) => [resolveC, rejectC] = [resolve, reject]));
 
-      return atom.config.set("settings-view.packageUpdateConcurrency", -1);
+      atom.config.set("settings-view.packageUpdateConcurrency", -1);
     });
 
     it('attempts to update all packages and prompts to restart if at least one package updates successfully', function() {
@@ -114,7 +110,7 @@ describe('UpdatesPanel', function() {
 
       waitsFor(() => atom.notifications.getNotifications().length === 1);
 
-      return runs(function() {
+      runs(function() {
         const notifications = atom.notifications.getNotifications();
         expect(notifications.length).toBe(1);
         const notif = notifications[0];
@@ -129,7 +125,7 @@ describe('UpdatesPanel', function() {
 
         spyOn(notif, 'dismiss');
         notif.options.buttons[1].onDidClick();
-        return expect(notif.dismiss).toHaveBeenCalled();
+        expect(notif.dismiss).toHaveBeenCalled();
       });
     });
 
@@ -143,7 +139,7 @@ describe('UpdatesPanel', function() {
       resolveB();
       resolveC();
 
-      return waitsFor(() => panel.refs.updateAllButton.style.display === 'none');
+      waitsFor(() => panel.refs.updateAllButton.style.display === 'none');
     });
 
     it('becomes hidden if all updates succeed', function() {
@@ -157,7 +153,7 @@ describe('UpdatesPanel', function() {
       resolveB();
       resolveC();
 
-      return waitsFor(() => panel.refs.updateAllButton.style.display === 'none');
+      waitsFor(() => panel.refs.updateAllButton.style.display === 'none');
     });
 
     it('remains enabled and visible if not all updates succeed', function() {
@@ -173,19 +169,19 @@ describe('UpdatesPanel', function() {
 
       waitsFor(() => panel.refs.updateAllButton.disabled === false);
 
-      return runs(() => expect(panel.refs.updateAllButton).toBeVisible());
+      runs(() => expect(panel.refs.updateAllButton).toBeVisible());
     });
 
-    return it('does not attempt to update packages that are already updating', function() {
+    it('does not attempt to update packages that are already updating', function() {
       cardA.update();
       packageManager.emitPackageEvent('updating', packA);
       panel.updateAll();
 
-      return expect(cardA.update.calls.length).toBe(1);
+      expect(cardA.update.calls.length).toBe(1);
     });
   });
 
-  return describe('the Check for Updates button', function() {
+  describe('the Check for Updates button', function() {
     const pack = {
       name: 'test-package',
       description: 'some description',
@@ -212,7 +208,7 @@ describe('UpdatesPanel', function() {
       });
 
       waits(0);
-      return runs(() => expect(panel.refs.checkButton.disabled).toBe(false));
+      runs(() => expect(panel.refs.checkButton.disabled).toBe(false));
     });
 
     it('clears the outdated cache when checking for updates', function() {
@@ -220,18 +216,18 @@ describe('UpdatesPanel', function() {
       // For that, look at the PackageManager specs
       resolveOutdated();
       waits(0);
-      return runs(function() {
+      runs(function() {
         panel.refs.checkButton.click();
-        return expect(packageManager.getOutdated).toHaveBeenCalledWith(true);
+        expect(packageManager.getOutdated).toHaveBeenCalledWith(true);
       });
     });
 
-    return it('is disabled when packages are updating', function() {
+    it('is disabled when packages are updating', function() {
       // Updates panel checks for updates on initialization so resolve the promise
       resolveOutdated();
 
       waits(0);
-      return runs(function() {
+      runs(function() {
         expect(panel.refs.checkButton.disabled).toBe(false);
 
         packageManager.emitPackageEvent('updating', {name: 'packA'});
@@ -244,7 +240,7 @@ describe('UpdatesPanel', function() {
         expect(panel.refs.checkButton.disabled).toBe(true);
 
         packageManager.emitPackageEvent('update-failed', {name: 'packA'});
-        return expect(panel.refs.checkButton.disabled).toBe(false);
+        expect(panel.refs.checkButton.disabled).toBe(false);
       });
     });
   });

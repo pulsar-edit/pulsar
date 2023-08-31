@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const PackageManager = require('../lib/package-manager');
 const PackageUpdatesStatusView = require('../lib/package-updates-status-view');
 
@@ -27,7 +23,7 @@ describe("PackageUpdatesStatusView", function() {
 
     waitsForPromise(() => atom.packages.activatePackage('settings-view'));
 
-    return runs(function() {
+    runs(function() {
       atom.packages.emitter.emit('did-activate-all');
       expect(document.querySelector('status-bar .package-updates-status-view')).toExist();
 
@@ -40,42 +36,42 @@ describe("PackageUpdatesStatusView", function() {
       spyOn(atom.commands, 'dispatch').andCallFake(function() {});
 
       document.querySelector('status-bar .package-updates-status-view').click();
-      return expect(atom.commands.dispatch).toHaveBeenCalledWith(atom.views.getView(atom.workspace), 'settings-view:check-for-package-updates');
+      expect(atom.commands.dispatch).toHaveBeenCalledWith(atom.views.getView(atom.workspace), 'settings-view:check-for-package-updates');
     });
 
-    return it("does not destroy the tile", function() {
+    it("does not destroy the tile", function() {
       document.querySelector('status-bar .package-updates-status-view').click();
-      return expect(document.querySelector('status-bar .package-updates-status-view')).toExist();
+      expect(document.querySelector('status-bar .package-updates-status-view')).toExist();
     });
   });
 
   describe("when a package is updating", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('updating', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/2 updating');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/2 updating');
   }));
 
   describe("when a package finishes updating", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('updating', outdatedPackage1);
     packageManager.emitPackageEvent('updated', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 
   describe("when a package is updated without a prior updating event", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('updated', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 
   describe("when multiple packages are updating and one finishes", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('updating', outdatedPackage1);
     packageManager.emitPackageEvent('updating', outdatedPackage2);
     packageManager.emitPackageEvent('updated', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/1 updating');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/1 updating');
   }));
 
   describe("when a package fails to update", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('updating', outdatedPackage1);
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates (1 failed)');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates (1 failed)');
   }));
 
   describe("when a package that previously failed to update starts updating again", () => it("updates the tile", function() {
@@ -84,26 +80,26 @@ describe("PackageUpdatesStatusView", function() {
     packageManager.emitPackageEvent('updating', outdatedPackage1);
     expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/2 updating');
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates (1 failed)');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates (1 failed)');
   }));
 
   describe("when a package update that previously failed succeeds on a subsequent try", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
     packageManager.emitPackageEvent('updated', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 
   describe("when multiple events are happening at the same time", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('update-available', installedPackage);
     packageManager.emitPackageEvent('updating', outdatedPackage1);
     packageManager.emitPackageEvent('update-failed', outdatedPackage2);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/3 updating (1 failed)');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1/3 updating (1 failed)');
   }));
 
   describe("when there are no more updates", () => it("destroys the tile", function() {
     packageManager.emitPackageEvent('updated', outdatedPackage1);
     packageManager.emitPackageEvent('updated', outdatedPackage2);
-    return expect(document.querySelector('status-bar .package-updates-status-view')).not.toExist();
+    expect(document.querySelector('status-bar .package-updates-status-view')).not.toExist();
   }));
 
   describe("when a new update becomes available and the tile is destroyed", () => it("recreates the tile", function() {
@@ -111,12 +107,12 @@ describe("PackageUpdatesStatusView", function() {
     packageManager.emitPackageEvent('updated', outdatedPackage2);
     packageManager.emitPackageEvent('update-available', installedPackage);
     expect(document.querySelector('status-bar .package-updates-status-view')).toExist();
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 
   describe("when an update becomes available for a package", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('update-available', installedPackage);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('3 updates');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('3 updates');
   }));
 
   describe("when updates are checked for multiple times and no new updates are available", () => it("does not keep updating the tile", function() {
@@ -128,30 +124,30 @@ describe("PackageUpdatesStatusView", function() {
     // There are more fields in an actual package object,
     // so make sure only name is tested and not object equality
     packageManager.emitPackageEvent('update-available', {name: 'out-dated-1', date: Date.now()});
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates');
   }));
 
   describe("when the same update fails multiple times", () => it("does not keep updating the tile", function() {
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates (1 failed)');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('2 updates (1 failed)');
   }));
 
   describe("when a package that can be updated is uninstalled", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('uninstalled', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 
   describe("when a package that is updating is uninstalled", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('updating', outdatedPackage1);
     packageManager.emitPackageEvent('uninstalled', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 
-  return describe("when a package that failed to update is uninstalled", () => it("updates the tile", function() {
+  describe("when a package that failed to update is uninstalled", () => it("updates the tile", function() {
     packageManager.emitPackageEvent('update-failed', outdatedPackage1);
     packageManager.emitPackageEvent('uninstalled', outdatedPackage1);
-    return expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
+    expect(document.querySelector('status-bar .package-updates-status-view').textContent).toBe('1 update');
   }));
 });

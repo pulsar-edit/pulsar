@@ -1,15 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const List = require('../lib/list');
 const ListView = require('../lib/list-view');
 
-describe('ListView', function() {
+describe('ListView', () => {
   let [list, view, container] = [];
 
-  beforeEach(function() {
+  beforeEach(() => {
     list = new List('name');
     container = document.createElement('div');
     return view = new ListView(list, container, function(item) {
@@ -19,7 +15,7 @@ describe('ListView', function() {
       return {element, destroy() { return element.remove(); }};
   });});
 
-  it('updates the list when the items are changed', function() {
+  it('updates the list when the items are changed', () => {
     expect(container.children.length).toBe(0);
 
     let items = [{name: 'one', text: 'a'}, {name: 'two', text: 'b'}];
@@ -33,10 +29,10 @@ describe('ListView', function() {
     expect(container.children.length).toBe(2);
     expect(container.querySelector('.one')).not.toExist();
     expect(container.querySelector('.two').textContent).toBe('two|b');
-    return expect(container.querySelector('.three').textContent).toBe('three|c');
+    expect(container.querySelector('.three').textContent).toBe('three|c');
   });
 
-  it('filters views', function() {
+  it('filters views', () => {
     const items = [
       {name: 'one', text: '', filterText: 'x'},
       {name: 'two', text: '', filterText: 'y'},
@@ -49,10 +45,10 @@ describe('ListView', function() {
 
     expect(views).toHaveLength(2);
     expect(views[0].element.textContent).toBe('one|');
-    return expect(views[1].element.textContent).toBe('three|');
+    expect(views[1].element.textContent).toBe('three|');
   });
 
-  return it('filters views after an update', function() {
+  it('filters views after an update', () => {
     let items = [
       {name: 'one', text: '', filterText: 'x'},
       {name: 'two', text: '', filterText: 'y'},
@@ -72,6 +68,6 @@ describe('ListView', function() {
 
     expect(views).toHaveLength(2);
     expect(views[0].element.textContent).toBe('one|');
-    return expect(views[1].element.textContent).toBe('three|');
+    expect(views[1].element.textContent).toBe('three|');
   });
 });

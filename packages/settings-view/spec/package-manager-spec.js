@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const path = require('path');
 const process = require('process');
 const PackageManager = require('../lib/package-manager');
@@ -14,7 +9,7 @@ describe("PackageManager", function() {
   beforeEach(function() {
     spyOn(atom.packages, 'getApmPath').andReturn('/an/invalid/apm/command/to/run');
     atom.config.set('core.useProxySettingsWhenCallingApm', false);
-    return packageManager = new PackageManager();
+    packageManager = new PackageManager();
   });
 
   it("handle errors spawning apm", function() {
@@ -57,7 +52,7 @@ describe("PackageManager", function() {
       const updateArg = updateCallback.argsForCall[0][0];
       expect(updateArg.message).toBe("Updating to \u201Cfoo@1.0.0\u201D failed.");
       expect(updateArg.packageInstallError).toBe(true);
-      return expect(updateArg.stderr).toContain(noSuchCommandError);
+      expect(updateArg.stderr).toContain(noSuchCommandError);
     });
   });
 
@@ -66,12 +61,12 @@ describe("PackageManager", function() {
 
     it("returns true when a package is loaded", function() {
       spyOn(atom.packages, 'isPackageLoaded').andReturn(true);
-      return expect(packageManager.isPackageInstalled('some-package')).toBe(true);
+      expect(packageManager.isPackageInstalled('some-package')).toBe(true);
     });
 
-    return it("returns true when a package is disabled", function() {
+    it("returns true when a package is disabled", function() {
       spyOn(atom.packages, 'getAvailablePackageNames').andReturn(['some-package']);
-      return expect(packageManager.isPackageInstalled('some-package')).toBe(true);
+      expect(packageManager.isPackageInstalled('some-package')).toBe(true);
     });
   });
 
@@ -87,35 +82,35 @@ describe("PackageManager", function() {
     it("installs the latest version when a package version is not specified", function() {
       packageManager.install({name: 'something'}, function() {});
       expect(packageManager.runCommand).toHaveBeenCalled();
-      return expect(runArgs).toEqual(['install', 'something', '--json']);
+      expect(runArgs).toEqual(['install', 'something', '--json']);
   });
 
     it("installs the package@version when a version is specified", function() {
       packageManager.install({name: 'something', version: '0.2.3'}, function() {});
       expect(packageManager.runCommand).toHaveBeenCalled();
-      return expect(runArgs).toEqual(['install', 'something@0.2.3', '--json']);
+      expect(runArgs).toEqual(['install', 'something@0.2.3', '--json']);
   });
 
-    return describe("git url installation", function() {
+    describe("git url installation", function() {
       it('installs https:// urls', function() {
         const url = "https://github.com/user/repo.git";
         packageManager.install({name: url});
         expect(packageManager.runCommand).toHaveBeenCalled();
-        return expect(runArgs).toEqual(['install', 'https://github.com/user/repo.git', '--json']);
+        expect(runArgs).toEqual(['install', 'https://github.com/user/repo.git', '--json']);
     });
 
       it('installs git@ urls', function() {
         const url = "git@github.com:user/repo.git";
         packageManager.install({name: url});
         expect(packageManager.runCommand).toHaveBeenCalled();
-        return expect(runArgs).toEqual(['install', 'git@github.com:user/repo.git', '--json']);
+        expect(runArgs).toEqual(['install', 'git@github.com:user/repo.git', '--json']);
     });
 
       it('installs user/repo url shortcuts', function() {
         const url = "user/repo";
         packageManager.install({name: url});
         expect(packageManager.runCommand).toHaveBeenCalled();
-        return expect(runArgs).toEqual(['install', 'user/repo', '--json']);
+        expect(runArgs).toEqual(['install', 'user/repo', '--json']);
     });
 
       it('installs and activates git pacakges with names different from the repo name', function() {
@@ -127,10 +122,10 @@ describe("PackageManager", function() {
           }
         };
         runCallback(0, JSON.stringify([json]), '');
-        return expect(atom.packages.activatePackage).toHaveBeenCalledWith(json.metadata.name);
+        expect(atom.packages.activatePackage).toHaveBeenCalledWith(json.metadata.name);
       });
 
-      return it('emits an installed event with a copy of the pack including the full package metadata', function() {
+      it('emits an installed event with a copy of the pack including the full package metadata', function() {
         spyOn(packageManager, 'emitPackageEvent');
         const originalPackObject = {name: 'git-repo-name', otherData: {will: 'beCopied'}};
         packageManager.install(originalPackObject);
@@ -151,7 +146,7 @@ describe("PackageManager", function() {
             installEmittedCount++;
           }
         }
-        return expect(installEmittedCount).toBe(1);
+        expect(installEmittedCount).toBe(1);
       });
     });
   });
@@ -167,26 +162,26 @@ describe("PackageManager", function() {
       });
     });
 
-    return it("removes the package from the core.disabledPackages list", function() {
+    it("removes the package from the core.disabledPackages list", function() {
       atom.config.set('core.disabledPackages', ['something']);
 
       packageManager.uninstall({name: 'something'}, function() {});
 
       expect(atom.config.get('core.disabledPackages')).toContain('something');
       runCallback(0, '', '');
-      return expect(atom.config.get('core.disabledPackages')).not.toContain('something');
+      expect(atom.config.get('core.disabledPackages')).not.toContain('something');
     });
   });
 
   describe("::packageHasSettings", function() {
     it("returns true when the pacakge has config", function() {
       atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'));
-      return expect(packageManager.packageHasSettings('package-with-config')).toBe(true);
+      expect(packageManager.packageHasSettings('package-with-config')).toBe(true);
     });
 
     it("returns false when the pacakge does not have config and doesn't define language grammars", () => expect(packageManager.packageHasSettings('random-package')).toBe(false));
 
-    return it("returns true when the pacakge does not have config, but does define language grammars", function() {
+    it("returns true when the pacakge does not have config, but does define language grammars", function() {
       const packageName = 'language-test';
 
       waitsForPromise(() => atom.packages.activatePackage(path.join(__dirname, 'fixtures', packageName)));
@@ -195,7 +190,7 @@ describe("PackageManager", function() {
     });
   });
 
-  return describe("::loadOutdated", function() {
+  describe("::loadOutdated", function() {
     it("caches results", function() {
       spyOn(packageManager, 'runCommand').andCallFake(function(args, callback) {
         callback(0, '[{"name": "boop"}]', '');
@@ -206,7 +201,7 @@ describe("PackageManager", function() {
       expect(packageManager.apmCache.loadOutdated.value).toMatch([{"name": "boop"}]);
 
       packageManager.loadOutdated(false, function() {});
-      return expect(packageManager.runCommand.calls.length).toBe(1);
+      expect(packageManager.runCommand.calls.length).toBe(1);
     });
 
     it("expires results after a timeout", function() {
@@ -221,7 +216,7 @@ describe("PackageManager", function() {
       Date.now.andReturn(((() => now + packageManager.CACHE_EXPIRY + 1))());
       packageManager.loadOutdated(false, function() {});
 
-      return expect(packageManager.runCommand.calls.length).toBe(2);
+      expect(packageManager.runCommand.calls.length).toBe(2);
     });
 
     it("expires results after a package updated/installed", function() {
@@ -253,7 +248,7 @@ describe("PackageManager", function() {
       expect(packageManager.runCommand.calls.length).toBe(4);
 
       packageManager.loadOutdated(false, function() {}); // +0 runCommand call, should be cached
-      return expect(packageManager.runCommand.calls.length).toBe(4);
+      expect(packageManager.runCommand.calls.length).toBe(4);
     });
 
     it("expires results if it is called with clearCache set to true", function() {
@@ -269,10 +264,10 @@ describe("PackageManager", function() {
 
       packageManager.loadOutdated(true, function() {});
       expect(packageManager.runCommand.calls.length).toBe(1);
-      return expect(packageManager.apmCache.loadOutdated.value).toEqual([{"name": "boop"}]);
+      expect(packageManager.apmCache.loadOutdated.value).toEqual([{"name": "boop"}]);
   });
 
-    return describe("when there is a version pinned package", function() {
+    describe("when there is a version pinned package", function() {
       beforeEach(() => atom.config.set('core.versionPinnedPackages', ['beep']));
 
       it("caches results", function() {
@@ -285,7 +280,7 @@ describe("PackageManager", function() {
         expect(packageManager.apmCache.loadOutdated.value).toMatch([{"name": "boop"}]);
 
         packageManager.loadOutdated(false, function() {});
-        return expect(packageManager.runCommand.calls.length).toBe(1);
+        expect(packageManager.runCommand.calls.length).toBe(1);
       });
 
       it("expires results after a timeout", function() {
@@ -300,7 +295,7 @@ describe("PackageManager", function() {
         Date.now.andReturn(((() => now + packageManager.CACHE_EXPIRY + 1))());
         packageManager.loadOutdated(false, function() {});
 
-        return expect(packageManager.runCommand.calls.length).toBe(2);
+        expect(packageManager.runCommand.calls.length).toBe(2);
       });
 
       it("expires results after a package updated/installed", function() {
@@ -332,10 +327,10 @@ describe("PackageManager", function() {
         expect(packageManager.runCommand.calls.length).toBe(4);
 
         packageManager.loadOutdated(false, function() {}); // +0 runCommand call, should be cached
-        return expect(packageManager.runCommand.calls.length).toBe(4);
+        expect(packageManager.runCommand.calls.length).toBe(4);
       });
 
-      return it("expires results if it is called with clearCache set to true", function() {
+      it("expires results if it is called with clearCache set to true", function() {
         packageManager.apmCache.loadOutdated = {
           value: ['hi'],
           expiry: Date.now() + 999999999
@@ -348,7 +343,7 @@ describe("PackageManager", function() {
 
         packageManager.loadOutdated(true, function() {});
         expect(packageManager.runCommand.calls.length).toBe(1);
-        return expect(packageManager.apmCache.loadOutdated.value).toEqual([{"name": "boop"}]);
+        expect(packageManager.apmCache.loadOutdated.value).toEqual([{"name": "boop"}]);
     });
   });
 });

@@ -1,16 +1,12 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const List = require('../lib/list');
 
-describe('List', function() {
+describe('List', () => {
   let list = null;
 
   beforeEach(() => list = new List('name'));
 
-  return it('emits add and remove events when setting items', function() {
+  it('emits add and remove events when setting items', () => {
     const addHandler = jasmine.createSpy();
     const removeHandler = jasmine.createSpy();
     list.onDidAddItem(addHandler);
@@ -36,6 +32,6 @@ describe('List', function() {
     removeHandler.reset();
     items.push({name: 'four'});
     list.setItems(items);
-    return expect(addHandler.callCount).toBe(1);
+    expect(addHandler.callCount).toBe(1);
   });
 });

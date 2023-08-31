@@ -1,11 +1,7 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const GeneralPanel = require('../lib/general-panel');
 
-describe("GeneralPanel", function() {
+describe("GeneralPanel", () => {
   let panel = null;
 
   const getValueForId = function(id) {
@@ -33,7 +29,7 @@ describe("GeneralPanel", function() {
     }
   };
 
-  beforeEach(function() {
+  beforeEach(() => {
     atom.config.set('core.enum', 4);
     atom.config.set('core.int', 22);
     atom.config.set('core.float', 0.1);
@@ -46,10 +42,10 @@ describe("GeneralPanel", function() {
     }
     );
 
-    return panel = new GeneralPanel();
+    panel = new GeneralPanel();
   });
 
-  it("automatically binds named fields to their corresponding config keys", function() {
+  it("automatically binds named fields to their corresponding config keys", () => {
     expect(getValueForId('core.enum')).toBe('4');
     expect(getValueForId('core.int')).toBe('22');
     expect(getValueForId('core.float')).toBe('0.1');
@@ -74,10 +70,10 @@ describe("GeneralPanel", function() {
     setValueForId('core.float', '');
 
     expect(atom.config.get('core.int')).toBeUndefined();
-    return expect(atom.config.get('core.float')).toBeUndefined();
+    expect(atom.config.get('core.float')).toBeUndefined();
   });
 
-  it("does not save the config value until it has been changed to a new value", function() {
+  it("does not save the config value until it has been changed to a new value", () => {
     const observeHandler = jasmine.createSpy("observeHandler");
     atom.config.observe("core.int", observeHandler);
     observeHandler.reset();
@@ -90,17 +86,17 @@ describe("GeneralPanel", function() {
     observeHandler.reset();
 
     setValueForId('core.int', 2);
-    return expect(observeHandler).not.toHaveBeenCalled();
+    expect(observeHandler).not.toHaveBeenCalled();
   });
 
-  it("does not update the editor text unless the value it parses to changes", function() {
+  it("does not update the editor text unless the value it parses to changes", () => {
     setValueForId('core.int', "2.");
     expect(atom.config.get('core.int')).toBe(2);
-    return expect(getValueForId('core.int')).toBe('2.');
+    expect(getValueForId('core.int')).toBe('2.');
   });
 
-  return it("shows the package settings notes for core and editor settings", function() {
+  it("shows the package settings notes for core and editor settings", () => {
     expect(panel.element.querySelector('#core-settings-note')).toExist();
-    return expect(panel.element.querySelector('#core-settings-note').textContent).toContain('their package card in');
+    expect(panel.element.querySelector('#core-settings-note').textContent).toContain('their package card in');
   });
 });

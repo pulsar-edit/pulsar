@@ -1,12 +1,8 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const {getSettingDescription} = require('../lib/rich-description');
 
-describe("Rich descriptions", function() {
-  beforeEach(function() {
+describe("Rich descriptions", () => {
+  beforeEach(() => {
     const config = {
       type: 'object',
       properties: {
@@ -129,10 +125,10 @@ Description without table
       }
     };
 
-    return atom.config.setSchema("foo", config);
+    atom.config.setSchema("foo", config);
   });
 
-  describe('supported Markdown', function() {
+  describe('supported Markdown', () => {
     it('handles plain text', () => expect(getSettingDescription('foo.plainText')).toEqual('Plain text description'));
 
     it('handles italics', () => expect(getSettingDescription('foo.italics')).toEqual('Description <em>with</em> italics'));
@@ -145,10 +141,10 @@ Description without table
 
     it('handles line breaks', () => expect(getSettingDescription('foo.lineBreak')).toEqual('Description with<br/> line break'));
 
-    return it('handles strikethrough', () => expect(getSettingDescription('foo.strikethrough')).toEqual('Description <del>with</del> strikethrough'));
+    it('handles strikethrough', () => expect(getSettingDescription('foo.strikethrough')).toEqual('Description <del>with</del> strikethrough'));
   });
 
-  return describe('unsupported Markdown', function() {
+  describe('unsupported Markdown', () => {
     it('strips images', () => expect(getSettingDescription('foo.image')).toEqual('Description without  image'));
 
     it('strips fenced code blocks', () => expect(getSettingDescription('foo.fencedBlockCode')).toEqual('Description without fenced block code'));
@@ -165,6 +161,6 @@ Description without table
 
     it('strips unordered lists', () => expect(getSettingDescription('foo.unorderedList')).toEqual('Description without unordered list'));
 
-    return it('strips tables', () => expect(getSettingDescription('foo.table')).toEqual('Description without table'));
+    it('strips tables', () => expect(getSettingDescription('foo.table')).toEqual('Description without table'));
   });
 });

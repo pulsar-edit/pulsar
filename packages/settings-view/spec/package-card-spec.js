@@ -1,8 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
+
 const path = require('path');
 const PackageCard = require('../lib/package-card');
 const PackageManager = require('../lib/package-manager');
@@ -12,56 +8,56 @@ describe("PackageCard", function() {
   const setPackageStatusSpies = function(opts) {
     spyOn(PackageCard.prototype, 'isInstalled').andReturn(opts.installed);
     spyOn(PackageCard.prototype, 'isDisabled').andReturn(opts.disabled);
-    return spyOn(PackageCard.prototype, 'hasSettings').andReturn(opts.hasSettings);
+    spyOn(PackageCard.prototype, 'hasSettings').andReturn(opts.hasSettings);
   };
 
   let [card, packageManager] = [];
 
   beforeEach(function() {
     packageManager = new PackageManager();
-    return spyOn(packageManager, 'runCommand');
+    spyOn(packageManager, 'runCommand');
   });
 
   it("doesn't show the disable control for a theme", function() {
     setPackageStatusSpies({installed: true, disabled: false});
     card = new PackageCard({theme: 'syntax', name: 'test-theme'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
-    return expect(card.refs.enablementButton).not.toBeVisible();
+    expect(card.refs.enablementButton).not.toBeVisible();
   });
 
   it("doesn't show the status indicator for a theme", function() {
     setPackageStatusSpies({installed: true, disabled: false});
     card = new PackageCard({theme: 'syntax', name: 'test-theme'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
-    return expect(card.refs.statusIndicatorButton).not.toBeVisible();
+    expect(card.refs.statusIndicatorButton).not.toBeVisible();
   });
 
   it("doesn't show the settings button for a theme", function() {
     setPackageStatusSpies({installed: true, disabled: false});
     card = new PackageCard({theme: 'syntax', name: 'test-theme'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
-    return expect(card.refs.settingsButton).not.toBeVisible();
+    expect(card.refs.settingsButton).not.toBeVisible();
   });
 
   it("doesn't show the settings button on the settings view", function() {
     setPackageStatusSpies({installed: true, disabled: false, hasSettings: true});
     card = new PackageCard({name: 'test-package'}, new SettingsView(), packageManager, {onSettingsView: true});
     jasmine.attachToDOM(card.element);
-    return expect(card.refs.settingsButton).not.toBeVisible();
+    expect(card.refs.settingsButton).not.toBeVisible();
   });
 
   it("removes the settings button if a package has no settings", function() {
     setPackageStatusSpies({installed: true, disabled: false, hasSettings: false});
     card = new PackageCard({name: 'test-package'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
-    return expect(card.refs.settingsButton).not.toBeVisible();
+    expect(card.refs.settingsButton).not.toBeVisible();
   });
 
   it("removes the uninstall button if a package has is a bundled package", function() {
     setPackageStatusSpies({installed: true, disabled: false, hasSettings: true});
     card = new PackageCard({name: 'find-and-replace'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
-    return expect(card.refs.uninstallButton).not.toBeVisible();
+    expect(card.refs.uninstallButton).not.toBeVisible();
   });
 
   it("displays the new version in the update button", function() {
@@ -69,7 +65,7 @@ describe("PackageCard", function() {
     card = new PackageCard({name: 'find-and-replace', version: '1.0.0', latestVersion: '1.2.0'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
     expect(card.refs.updateButton).toBeVisible();
-    return expect(card.refs.updateButton.textContent).toContain('Update to 1.2.0');
+    expect(card.refs.updateButton.textContent).toContain('Update to 1.2.0');
   });
 
   it("displays the new version in the update button when the package is disabled", function() {
@@ -77,7 +73,7 @@ describe("PackageCard", function() {
     card = new PackageCard({name: 'find-and-replace', version: '1.0.0', latestVersion: '1.2.0'}, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
     expect(card.refs.updateButton).toBeVisible();
-    return expect(card.refs.updateButton.textContent).toContain('Update to 1.2.0');
+    expect(card.refs.updateButton.textContent).toContain('Update to 1.2.0');
   });
 
   it("shows the author details", function() {
@@ -91,7 +87,7 @@ describe("PackageCard", function() {
 
     jasmine.attachToDOM(card.element);
 
-    return expect(card.refs.loginLink.textContent).toBe(authorName);
+    expect(card.refs.loginLink.textContent).toBe(authorName);
   });
 
   describe("when the package is not installed", function() {
@@ -107,7 +103,7 @@ describe("PackageCard", function() {
 
       expect(card.refs.installButtonGroup).toBeVisible();
       expect(card.refs.updateButtonGroup).not.toBeVisible();
-      return expect(card.refs.packageActionButtonGroup).not.toBeVisible();
+      expect(card.refs.packageActionButtonGroup).not.toBeVisible();
     });
 
     it("can be installed if currently not installed", function() {
@@ -118,7 +114,7 @@ describe("PackageCard", function() {
       expect(card.refs.installButton.style.display).not.toBe('none');
       expect(card.refs.uninstallButton.style.display).toBe('none');
       card.refs.installButton.click();
-      return expect(packageManager.install).toHaveBeenCalled();
+      expect(packageManager.install).toHaveBeenCalled();
     });
 
     it("can be installed if currently not installed and package latest release engine match atom version", function() {
@@ -152,7 +148,7 @@ describe("PackageCard", function() {
       expect(card.refs.uninstallButton.style.display).toBe('none');
       card.refs.installButton.click();
       expect(packageManager.install).toHaveBeenCalled();
-      return expect(packageManager.install.mostRecentCall.args[0]).toEqual({
+      expect(packageManager.install.mostRecentCall.args[0]).toEqual({
         name: 'test-package',
         version: '0.1.0',
         engines: {
@@ -192,7 +188,7 @@ describe("PackageCard", function() {
       expect(card.refs.packageMessage).toHaveClass('text-warning');
       card.refs.installButton.click();
       expect(packageManager.install).toHaveBeenCalled();
-      return expect(packageManager.install.mostRecentCall.args[0]).toEqual({
+      expect(packageManager.install.mostRecentCall.args[0]).toEqual({
         name: 'test-package',
         version: '0.0.1',
         engines: {
@@ -201,7 +197,7 @@ describe("PackageCard", function() {
       });
     });
 
-    return it("can't be installed if there is no version compatible with the current atom version", function() {
+    it("can't be installed if there is no version compatible with the current atom version", function() {
       spyOn(packageManager, 'loadCompatiblePackageVersion').andCallFake(function(packageName, callback) {
         const pack =
           {name: packageName};
@@ -223,11 +219,11 @@ describe("PackageCard", function() {
       expect(card.refs.installButtonGroup).not.toBeVisible();
       expect(card.refs.packageActionButtonGroup).not.toBeVisible();
       expect(card.refs.versionValue).toHaveClass('text-error');
-      return expect(card.refs.packageMessage).toHaveClass('text-error');
+      expect(card.refs.packageMessage).toHaveClass('text-error');
     });
   });
 
-  return describe("when the package is installed", function() {
+  describe("when the package is installed", function() {
     beforeEach(function() {
       atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'));
       return waitsFor(() => atom.packages.isPackageLoaded('package-with-config') === true);
@@ -240,7 +236,7 @@ describe("PackageCard", function() {
       card = new PackageCard({name: 'test-package'}, new SettingsView(), packageManager);
       expect(card.refs.enablementButton.querySelector('.disable-text').textContent).toBe('Disable');
       card.refs.enablementButton.click();
-      return expect(atom.packages.disablePackage).toHaveBeenCalled();
+      expect(atom.packages.disablePackage).toHaveBeenCalled();
     });
 
     it("can be updated", function() {
@@ -265,7 +261,7 @@ describe("PackageCard", function() {
 
       waitsFor(() => packageUpdated);
 
-      return runs(() => expect(card.refs.updateButton).not.toBeVisible());
+      runs(() => expect(card.refs.updateButton).not.toBeVisible());
     });
 
     it('keeps the update button visible if the update failed', function() {
@@ -290,7 +286,7 @@ describe("PackageCard", function() {
 
       waitsFor(() => updateFailed);
 
-      return runs(() => expect(card.refs.updateButton).toBeVisible());
+      runs(() => expect(card.refs.updateButton).toBeVisible());
     });
 
     it('does not error when attempting to update without any update available', function() {
@@ -309,7 +305,7 @@ describe("PackageCard", function() {
 
       waitsForPromise(() => card.update());
 
-      return runs(() => expect(card.refs.updateButton).not.toBeVisible());
+      runs(() => expect(card.refs.updateButton).not.toBeVisible());
     });
 
     it("will stay disabled after an update", function() {
@@ -333,7 +329,7 @@ describe("PackageCard", function() {
 
       waitsFor(() => packageUpdated);
 
-      return runs(() => expect(atom.packages.isPackageDisabled('package-with-config')).toBe(true));
+      runs(() => expect(atom.packages.isPackageDisabled('package-with-config')).toBe(true));
     });
 
     it("is uninstalled when the uninstallButton is clicked", function() {
@@ -370,12 +366,12 @@ describe("PackageCard", function() {
       uninstallCallback(0, '', '');
 
       waits(1);
-      return runs(function() {
+      runs(function() {
         expect(card.refs.uninstallButton.disabled).toBe(false);
         expect(card.refs.uninstallButton).not.toHaveClass('is-uninstalling');
         expect(card.refs.installButtonGroup).toBeVisible();
         expect(card.refs.updateButtonGroup).not.toBeVisible();
-        return expect(card.refs.packageActionButtonGroup).not.toBeVisible();
+        expect(card.refs.packageActionButtonGroup).not.toBeVisible();
       });
     });
 
@@ -392,7 +388,7 @@ describe("PackageCard", function() {
       expect(card.refs.settingsButton).toBeVisible();
       expect(card.refs.uninstallButton).toBeVisible();
       expect(card.refs.enablementButton).toBeVisible();
-      return expect(card.refs.enablementButton.textContent).toBe('Enable');
+      expect(card.refs.enablementButton.textContent).toBe('Enable');
     });
 
     it("shows the settings, uninstall, and disable buttons", function() {
@@ -408,10 +404,10 @@ describe("PackageCard", function() {
       expect(card.refs.settingsButton).toBeVisible();
       expect(card.refs.uninstallButton).toBeVisible();
       expect(card.refs.enablementButton).toBeVisible();
-      return expect(card.refs.enablementButton.textContent).toBe('Disable');
+      expect(card.refs.enablementButton.textContent).toBe('Disable');
     });
 
-    return it("does not show the settings button when there are no settings", function() {
+    it("does not show the settings button when there are no settings", function() {
       const pack = atom.packages.getLoadedPackage('package-with-config');
       spyOn(PackageCard.prototype, 'hasSettings').andReturn(false);
       card = new PackageCard(pack, new SettingsView(), packageManager);
@@ -421,7 +417,7 @@ describe("PackageCard", function() {
       expect(card.refs.settingsButton).not.toBeVisible();
       expect(card.refs.uninstallButton).toBeVisible();
       expect(card.refs.enablementButton).toBeVisible();
-      return expect(card.refs.enablementButton.textContent).toBe('Disable');
+      expect(card.refs.enablementButton.textContent).toBe('Disable');
     });
   });
 });
