@@ -3,20 +3,20 @@ const InstallPanel = require('../lib/install-panel');
 const PackageManager = require('../lib/package-manager');
 const SettingsView = require('../lib/settings-view');
 
-describe('InstallPanel', () => {
-  beforeEach(() => {
+describe('InstallPanel', function() {
+  beforeEach(function() {
     const settingsView = new SettingsView();
     this.packageManager = new PackageManager();
     return this.panel = new InstallPanel(settingsView, this.packageManager);
   });
 
-  describe("when the packages button is clicked", () => {
-    beforeEach(() => {
+  describe("when the packages button is clicked", function() {
+    beforeEach(function() {
       spyOn(this.panel, 'search');
       return this.panel.refs.searchEditor.setText('something');
     });
 
-    it("performs a search for the contents of the input", () => {
+    it("performs a search for the contents of the input", function() {
       this.panel.refs.searchPackagesButton.click();
       expect(this.panel.searchType).toBe('packages');
       expect(this.panel.search).toHaveBeenCalledWith('something');
@@ -29,13 +29,13 @@ describe('InstallPanel', () => {
     });
   });
 
-  describe("when the themes button is clicked", () => {
-    beforeEach(() => {
+  describe("when the themes button is clicked", function() {
+    beforeEach(function() {
       spyOn(this.panel, 'search');
       return this.panel.refs.searchEditor.setText('something');
     });
 
-    it("performs a search for the contents of the input", () => {
+    it("performs a search for the contents of the input", function() {
       this.panel.refs.searchThemesButton.click();
       expect(this.panel.searchType).toBe('themes');
       expect(this.panel.search.callCount).toBe(1);
@@ -47,13 +47,13 @@ describe('InstallPanel', () => {
     });
   });
 
-  describe("when the buttons are toggled", () => {
-    beforeEach(() => {
+  describe("when the buttons are toggled", function() {
+    beforeEach(function() {
       spyOn(this.panel, 'search');
       return this.panel.refs.searchEditor.setText('something');
     });
 
-    it("performs a search for the contents of the input", () => {
+    it("performs a search for the contents of the input", function() {
       this.panel.refs.searchThemesButton.click();
       expect(this.panel.searchType).toBe('themes');
       expect(this.panel.search.callCount).toBe(1);
@@ -69,7 +69,7 @@ describe('InstallPanel', () => {
     });
   });
 
-  describe("searching packages", () => it("displays the packages in the order returned", () => {
+  describe("searching packages", () => it("displays the packages in the order returned", function() {
     spyOn(this.panel.client, 'search').andCallFake(() => Promise.resolve([{name: 'not-first'}, {name: 'first'}]));
     spyOn(this.panel, 'getPackageCardView').andCallThrough();
 
@@ -77,18 +77,18 @@ describe('InstallPanel', () => {
       return this.panel.search('first');
     });
 
-    runs(() => {
+    return runs(function() {
       expect(this.panel.getPackageCardView.argsForCall[0][0].name).toEqual('not-first');
       expect(this.panel.getPackageCardView.argsForCall[1][0].name).toEqual('first');
     });
   }));
 
-  describe("searching git packages", () => {
+  describe("searching git packages", function() {
     beforeEach(() => {
       return spyOn(this.panel, 'showGitInstallPackageCard').andCallThrough();
     });
 
-    it("shows a git installation card with git specific info for ssh URLs", () => {
+    it("shows a git installation card with git specific info for ssh URLs", function() {
       const query = 'git@github.com:user/repo.git';
       this.panel.performSearchForQuery(query);
       const args = this.panel.showGitInstallPackageCard.argsForCall[0][0];
