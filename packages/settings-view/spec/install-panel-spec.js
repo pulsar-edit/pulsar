@@ -7,13 +7,13 @@ describe('InstallPanel', () => {
   beforeEach(() => {
     const settingsView = new SettingsView();
     this.packageManager = new PackageManager();
-    this.panel = new InstallPanel(settingsView, this.packageManager);
+    return this.panel = new InstallPanel(settingsView, this.packageManager);
   });
 
   describe("when the packages button is clicked", () => {
     beforeEach(() => {
       spyOn(this.panel, 'search');
-      this.panel.refs.searchEditor.setText('something');
+      return this.panel.refs.searchEditor.setText('something');
     });
 
     it("performs a search for the contents of the input", () => {
@@ -32,7 +32,7 @@ describe('InstallPanel', () => {
   describe("when the themes button is clicked", () => {
     beforeEach(() => {
       spyOn(this.panel, 'search');
-      this.panel.refs.searchEditor.setText('something');
+      return this.panel.refs.searchEditor.setText('something');
     });
 
     it("performs a search for the contents of the input", () => {
@@ -50,7 +50,7 @@ describe('InstallPanel', () => {
   describe("when the buttons are toggled", () => {
     beforeEach(() => {
       spyOn(this.panel, 'search');
-      this.panel.refs.searchEditor.setText('something');
+      return this.panel.refs.searchEditor.setText('something');
     });
 
     it("performs a search for the contents of the input", () => {
@@ -85,7 +85,7 @@ describe('InstallPanel', () => {
 
   describe("searching git packages", () => {
     beforeEach(() => {
-      spyOn(this.panel, 'showGitInstallPackageCard').andCallThrough();
+      return spyOn(this.panel, 'showGitInstallPackageCard').andCallThrough();
     });
 
     it("shows a git installation card with git specific info for ssh URLs", () => {
