@@ -83,13 +83,13 @@ module.exports = {
       atom.menu.add([menuItem]);
     }
 
-    this.subscriptions.add(atom.config.observe('find-and-replace.showInMenuBar'), (value) => {
+    this.subscriptions.add(atom.config.observe('find-and-replace.showInMenuBar', (value) => {
       if (value) {
         atom.menu.add([menuItem]);
       } else {
         atom.menu.remove([menuItem]);
       }
-    });
+    }));
 
     this.subscriptions.add(atom.commands.add('.find-and-replace, .project-find', 'window:focus-next-pane', () => atom.views.getView(atom.workspace).focus())
     );
