@@ -382,10 +382,10 @@ On linux there are currently problems with watch sizes. See
     // ^^ Luminosity per ITU-R BT.709
     if (luminosity < 40) {
       // Considered Dark
-      this.applicationDelegate.setWindowTheme({ setTheme: "dark" });
+      this.applicationDelegate.setWindowTheme("dark");
     } else {
       // Considered Bright
-      this.applicationDelegate.setWindowTheme({ setTheme: "light" });
+      this.applicationDelegate.setWindowTheme("light");
     }
   }
 

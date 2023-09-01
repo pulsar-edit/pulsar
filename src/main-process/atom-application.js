@@ -809,10 +809,8 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.disposable.add(
       ipcHelpers.on(ipcMain, 'setWindowTheme', (event, options) => {
-        if (options) {
-          if (typeof options.setTheme === 'string') {
-            nativeTheme.themeSource = options.setTheme;
-          }
+        if (options && typeof options === 'string') {
+          nativeTheme.themeSource = options;
         }
       })
     );
