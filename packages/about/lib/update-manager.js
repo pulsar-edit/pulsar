@@ -14,13 +14,11 @@ let UpdateManager = class UpdateManager {
       return 'https://pulsar-edit.dev/download.html';
     }
 
-    if (!appVersion.startsWith('v')) {
-      appVersion = `v${appVersion}`;
+    if (appVersion.startsWith('v')) {
+      appVersion = appVersion.replace("v", "");
     }
 
-    const releaseRepo =
-      appVersion.indexOf('nightly') > -1 ? 'pulsar-nightly-releases' : 'pulsar';
-    return `https://github.com/pulsar-edit/${releaseRepo}/releases/tag/${appVersion}`;
+    return `https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md#${appVersion.replace(".", "")}`;
   }
 };
 
