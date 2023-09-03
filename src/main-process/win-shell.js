@@ -10,8 +10,7 @@ const fileIconPath = `"${Path.join(
   process.execPath,
   '..',
   'resources',
-  'cli',
-  'file.ico'
+  'pulsar.ico'
 )}"`;
 
 class ShellOption {
