@@ -7,6 +7,7 @@ const ConfigFile = require('../config-file');
 const FileRecoveryService = require('./file-recovery-service');
 const StartupTime = require('../startup-time');
 const ipcHelpers = require('../ipc-helpers');
+const { getConfigFilePath } = require('../get-app-details.js');
 const {
   BrowserWindow,
   Menu,
@@ -207,11 +208,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.initializeAtomHome(process.env.ATOM_HOME);
 
-    const configFilePath = fs.existsSync(
-      path.join(process.env.ATOM_HOME, 'config.json')
-    )
-      ? path.join(process.env.ATOM_HOME, 'config.json')
-      : path.join(process.env.ATOM_HOME, 'config.cson');
+    const configFilePath = getConfigFilePath();
 
     this.configFile = ConfigFile.at(configFilePath);
     this.config = new Config({

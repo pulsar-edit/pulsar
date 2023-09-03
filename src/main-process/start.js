@@ -2,7 +2,7 @@ const { app } = require('electron');
 const path = require('path');
 const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
-const getReleaseChannel = require('../get-release-channel');
+const { getReleaseChannel, getConfigFilePath } = require('../get-app-details.js');
 const atomPaths = require('../atom-paths');
 const fs = require('fs');
 const CSON = require('season');
@@ -118,12 +118,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 function getConfig() {
   const config = new Config();
 
-  let configFilePath;
-  if (fs.existsSync(path.join(process.env.ATOM_HOME, 'config.json'))) {
-    configFilePath = path.join(process.env.ATOM_HOME, 'config.json');
-  } else if (fs.existsSync(path.join(process.env.ATOM_HOME, 'config.cson'))) {
-    configFilePath = path.join(process.env.ATOM_HOME, 'config.cson');
-  }
+  let configFilePath = getConfigFilePath();
 
   if (configFilePath) {
     const configFileData = CSON.readFileSync(configFilePath);
