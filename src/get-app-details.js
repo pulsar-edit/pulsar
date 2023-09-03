@@ -1,3 +1,6 @@
+// External modules must be imported within each function. As the context
+// (eg renderer or main process) is different depending on where these functions
+// are being called.
 
 function getReleaseChannel(version) {
   // This matches stable, dev (with or without commit hash) and any other
@@ -46,8 +49,19 @@ function getConfigFilePath() {
   }
 }
 
+function getPlaceholderConfigFilePath() {
+  // This is only used when `./src/main-process/atom-application.js` initializes
+  // the `ConfigFile` instance. Since it passes the config file path, without any
+  // recovery logic for being unable to find it, we must provide a path to `ConfigFile`
+  // even if incorrect. Instead of passing `null` on being unable to find the config.
+  const path = require("path");
+
+  return path.join(process.env.ATOM_HOME, "config.cson");
+}
+
 module.exports = {
   getReleaseChannel,
   getAppName,
   getConfigFilePath,
+  getPlaceholderConfigFilePath,
 };
