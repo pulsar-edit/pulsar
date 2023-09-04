@@ -45,7 +45,7 @@ const TextEditor = require('./text-editor');
 const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
-const getReleaseChannel = require('./get-release-channel');
+const { getReleaseChannel } = require('./get-app-details.js');
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
