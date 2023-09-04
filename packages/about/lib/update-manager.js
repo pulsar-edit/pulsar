@@ -18,7 +18,7 @@ let UpdateManager = class UpdateManager {
       appVersion = appVersion.replace("v", "");
     }
 
-    return `https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md#${appVersion.replace(".", "")}`;
+    return `https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md#${appVersion.replace(/\./g, "")}`;
   }
 };
 
