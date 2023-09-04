@@ -6,14 +6,15 @@ const { repoForPath } = require("./helpers");
 module.exports =
 class CopyDialog extends Dialog {
   constructor(initialPath, {onCopy}) {
-    this.initialPath = initialPath;
-    this.onCopy = onCopy;
     super({
       prompt: 'Enter the new path for the duplicate.',
-      initialPath: atom.project.relativize(this.initialPath),
+      initialPath: atom.project.relativize(initialPath),
       select: true,
       iconClass: 'icon-arrow-right'
     });
+
+    this.initialPath = initialPath;
+    this.onCopy = onCopy;
   }
 
   onConfirm(newPath) {

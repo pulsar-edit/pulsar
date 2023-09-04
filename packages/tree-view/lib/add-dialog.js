@@ -7,7 +7,6 @@ module.exports =
 class AddDialog extends Dialog {
   constructor(initialPath, isCreatingFile) {
     let directoryPath;
-    this.isCreatingFile = isCreatingFile;
 
     if (fs.isFileSync(initialPath)) {
       directoryPath = path.dirname(initialPath);
@@ -15,8 +14,9 @@ class AddDialog extends Dialog {
       directoryPath = initialPath;
     }
 
+    let rootProjectPath;
     let relativeDirectoryPath = directoryPath;
-    [this.rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(directoryPath);
+    [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(directoryPath);
     if (relativeDirectoryPath.length > 0) { relativeDirectoryPath += path.sep; }
 
     super({
@@ -25,6 +25,9 @@ class AddDialog extends Dialog {
       select: false,
       iconClass: isCreatingFile ? 'icon-file-add' : 'icon-file-directory-create'
     });
+
+    this.isCreatingFile = isCreatingFile;
+    this.rootProjectPath = rootProjectPath;
   }
 
   onDidCreateFile(callback) {
