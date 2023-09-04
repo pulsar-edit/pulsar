@@ -34,7 +34,7 @@ function getAppName() {
   return appNameParts.join(" ");
 }
 
-function getConfigFilePath() {
+function getConfigFilePath(opts = {}) {
   const fs = require("fs");
   const path = require("path");
 
@@ -45,23 +45,20 @@ function getConfigFilePath() {
   if (configFilePath) {
     return configFilePath;
   } else {
-    return null;
+    if (opts.returnPlaceholder) {
+      // This is only used when `./src/main-process/atom-application.js` initializes
+      // the `ConfigFile` instance. Since it must provide a path, even if it turns
+      // out the path doesn't exist. By default if the path doesn't exist then
+      // `null` is returned.
+      return path.join(process.env.ATOM_HOME, "config.cson");
+    } else {
+      return null;
+    }
   }
-}
-
-function getPlaceholderConfigFilePath() {
-  // This is only used when `./src/main-process/atom-application.js` initializes
-  // the `ConfigFile` instance. Since it passes the config file path, without any
-  // recovery logic for being unable to find it, we must provide a path to `ConfigFile`
-  // even if incorrect. Instead of passing `null` on being unable to find the config.
-  const path = require("path");
-
-  return path.join(process.env.ATOM_HOME, "config.cson");
 }
 
 module.exports = {
   getReleaseChannel,
   getAppName,
   getConfigFilePath,
-  getPlaceholderConfigFilePath,
 };
