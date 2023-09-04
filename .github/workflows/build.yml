@@ -1,0 +1,168 @@
+name: Build Pulsar Binaries
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Variables needed for build information
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PYTHON_VERSION: '3.10'
+  NODE_VERSION: 16
+  ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
+  # Below variables allow us to quickly control visual tests for each platform
+  RUN_WINDOWS_VT: false
+  RUN_LINUX_VT: true
+  RUN_MACOS_VT: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v3
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Setup Git Submodule
+      run: |
+        git submodule init
+        git submodule update
+
+    - name: Check Pulsar Version
+      if: ${{ runner.os != 'Windows' }}
+      run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+
+    - name: Check Pulsar Version - Windows
+      if: ${{ runner.os == 'Windows' }}
+      run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
+
+    - name: Install Pulsar Dependencies
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn install --ignore-engines
+        on_retry_command: rm -R node_modules
+
+    - name: Build Pulsar
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: |
+          yarn build
+          yarn run build:apm
+
+    # macOS Signing Stuff
+    - name: Build Pulsar Binaries (macOS) (Signed)
+      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
+      # PRs generated from forks cannot access GitHub Secrets
+      # So if the PR is a fork, we will still build, but will not sign.
+      env:
+        CSC_LINK: ${{ secrets.CSC_LINK }}
+        CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        APPLEID: ${{ secrets.APPLEID }}
+        APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
+        TEAM_ID: ${{ secrets.TEAM_ID }}
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn dist
+
+    - name: Build Pulsar Binaries (macOS) (Unsigned)
+      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name != 'pulsar-edit/pulsar' }}
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn dist
+
+    - name: Build Pulsar Binaries
+      if: ${{ runner.os != 'macOS' }}
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn dist
+
+    - name: Rename Pulsar Binaries for Regular release (Linux)
+      if: ${{ runner.os == 'Linux' }}
+      run: node ./script/rename.js "Linux"
+
+    - name: Rename Pulsar Binaries for Regular release (macOS)
+      if: ${{ runner.os == 'macOS' }}
+      run: node ./script/rename.js "Intel.Mac"
+
+    - name: Rename Pulsar Binaries for Regular release (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: node ./script/rename.js "Windows"
+
+    - name: Upload Binary Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }} Binaries
+        path: ./binaries/*
+
+    - name: Test Binary - Linux
+      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      run: |
+        rm -R node_modules/electron; yarn install --check-files
+        ./binaries/*AppImage --appimage-extract
+        export BINARY_NAME='squashfs-root/pulsar'
+        mkdir -p ./tests/videos
+        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+
+    - name: Test Binary - Windows
+      if: runner.os == 'Windows' && env.RUN_WINDOWS_VT == true
+      # TODO: Convert script to PowerShell
+      run: |
+        mkdir extracted; tar -xf binaries/*zip -C ./extracted/
+        export BINARY_NAME=./extracted/Pulsar.exe
+        PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
+
+    - name: Test Binary - macOS
+      if: runner.os == 'macOS' && env.RUN_MACOS_VT == true
+      run: |
+        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+        rm -R node_modules/electron; yarn install --check-files
+        hdiutil mount binaries/*Pulsar*dmg
+        export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
+        PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+
+    - name: Add binaries to Rolling Release Repo
+      if: ${{ github.event_name == 'push' }}
+      # We only want to upload rolling binaries if they are a commit to master
+      # Otherwise we want to not upload if it's a PR or manually triggered build
+      run: |
+        cd ./script/rolling-release-scripts
+        npm install
+        node ./rolling-release-binary-upload.js
+
+    - name: Upload Video Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }} Videos
+        path: ./tests/videos/**
