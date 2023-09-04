@@ -1,11 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let RootDragAndDropHandler;
 const url = require('url');
 
 const {ipcRenderer, remote} = require('electron');
@@ -14,7 +6,7 @@ const {ipcRenderer, remote} = require('electron');
 // Currently they're handled in TreeView's drag listeners
 
 module.exports =
-(RootDragAndDropHandler = class RootDragAndDropHandler {
+class RootDragAndDropHandler {
   constructor(treeView) {
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragLeave = this.onDragLeave.bind(this);
@@ -38,7 +30,7 @@ module.exports =
     this.treeView.element.addEventListener('dragend', this.onDragEnd.bind(this));
     this.treeView.element.addEventListener('dragleave', this.onDragLeave.bind(this));
     this.treeView.element.addEventListener('dragover', this.onDragOver.bind(this));
-    return this.treeView.element.addEventListener('drop', this.onDrop.bind(this));
+    this.treeView.element.addEventListener('drop', this.onDrop.bind(this));
   }
 
   onDragStart(e) {
@@ -252,4 +244,4 @@ module.exports =
   getWindowId() {
     return this.processId != null ? this.processId : (this.processId = atom.getCurrentWindow().id);
   }
-});
+}

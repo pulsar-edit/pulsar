@@ -8,7 +8,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
-let TreeView;
 const path = require('path');
 const {shell} = require('electron');
 
@@ -35,7 +34,7 @@ const toggleConfig = keyPath => atom.config.set(keyPath, !atom.config.get(keyPat
 let nextId = 1;
 
 module.exports =
-(TreeView = class TreeView {
+class TreeView {
   constructor(state) {
     this.moveConflictingEntry = this.moveConflictingEntry.bind(this);
     this.onStylesheetsChanged = this.onStylesheetsChanged.bind(this);
@@ -1580,7 +1579,7 @@ module.exports =
   isVisible() {
     return (this.element.offsetWidth !== 0) || (this.element.offsetHeight !== 0);
   }
-});
+}
 
 function __range__(left, right, inclusive) {
   let range = [];

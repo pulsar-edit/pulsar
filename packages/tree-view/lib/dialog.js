@@ -1,19 +1,12 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let Dialog;
-const {TextEditor, CompositeDisposable, Disposable, Emitter, Range, Point} = require('atom');
+const { TextEditor, CompositeDisposable, Disposable, Emitter, Range, Point } = require('atom');
 const path = require('path');
-const {getFullExtension} = require("./helpers");
+const { getFullExtension } = require("./helpers");
 
 module.exports =
-(Dialog = class Dialog {
+class Dialog {
   constructor(param) {
     if (param == null) { param = {}; }
-    const {initialPath, select, iconClass, prompt} = param;
+    const { initialPath, select, iconClass, prompt } = param;
     this.emitter = new Emitter();
     this.disposables = new CompositeDisposable();
 
@@ -64,7 +57,7 @@ module.exports =
   attach() {
     this.panel = atom.workspace.addModalPanel({item: this});
     this.miniEditor.element.focus();
-    return this.miniEditor.scrollToCursorPosition();
+    this.miniEditor.scrollToCursorPosition();
   }
 
   close() {
@@ -82,7 +75,7 @@ module.exports =
 
   cancel() {
     this.close();
-    return document.querySelector('.tree-view')?.focus();
+    document.querySelector('.tree-view')?.focus();
   }
 
   showError(message) {
@@ -90,7 +83,7 @@ module.exports =
     this.errorMessage.textContent = message;
     if (message) {
       this.element.classList.add('error');
-      return window.setTimeout((() => this.element.classList.remove('error')), 300);
+      window.setTimeout((() => this.element.classList.remove('error')), 300);
     }
   }
-});
+}

@@ -1,18 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS002: Fix invalid constructor
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let CopyDialog;
 const path = require('path');
 const fs = require('fs-plus');
 const Dialog = require('./dialog');
-const {repoForPath} = require("./helpers");
+const { repoForPath } = require("./helpers");
 
 module.exports =
-(CopyDialog = class CopyDialog extends Dialog {
+class CopyDialog extends Dialog {
   constructor(initialPath, {onCopy}) {
     this.initialPath = initialPath;
     this.onCopy = onCopy;
@@ -69,4 +61,4 @@ module.exports =
       return this.showError(`${error.message}.`);
     }
   }
-});
+}

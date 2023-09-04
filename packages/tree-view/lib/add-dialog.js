@@ -1,18 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS002: Fix invalid constructor
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let AddDialog;
 const path = require('path');
 const fs = require('fs-plus');
 const Dialog = require('./dialog');
-const {repoForPath} = require('./helpers');
+const { repoForPath } = require('./helpers');
 
 module.exports =
-(AddDialog = class AddDialog extends Dialog {
+class AddDialog extends Dialog {
   constructor(initialPath, isCreatingFile) {
     let directoryPath;
     this.isCreatingFile = isCreatingFile;
@@ -78,4 +70,4 @@ module.exports =
       return this.showError(`${error.message}.`);
     }
   }
-});
+}

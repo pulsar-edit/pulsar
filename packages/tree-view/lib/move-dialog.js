@@ -1,18 +1,10 @@
-/*
- * decaffeinate suggestions:
- * DS002: Fix invalid constructor
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let MoveDialog;
 const path = require('path');
 const fs = require('fs-plus');
 const Dialog = require('./dialog');
-const {repoForPath} = require("./helpers");
+const { repoForPath } = require("./helpers");
 
 module.exports =
-(MoveDialog = class MoveDialog extends Dialog {
+class MoveDialog extends Dialog {
   constructor(initialPath, {willMove, onMove, onMoveFailed}) {
     let prompt;
     this.initialPath = initialPath;
@@ -84,4 +76,4 @@ module.exports =
       return true; // new path does not exist so it is valid
     }
   }
-});
+}
