@@ -39,9 +39,7 @@ module.exports = class AtomProtocolHandler {
         try {
           const stat = fs.statSync(assetsPath);
           if (stat && stat.isFile()) filePath = assetsPath;
-        } catch (e) {
-          return false;
-        }
+        } catch (e) {}
       }
 
       if (!filePath) {
@@ -50,9 +48,7 @@ module.exports = class AtomProtocolHandler {
           try {
             const stat = fs.statSync(filePath);
             if (stat && stat.isFile()) break;
-          } catch (e) {
-            return false;
-          }
+          } catch (e) {}
         }
       }
 
