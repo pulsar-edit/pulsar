@@ -1,17 +1,8 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let StatusBarView;
-const {Disposable} = require('atom');
+const { Disposable } = require('atom');
 const Tile = require('./tile');
 
 module.exports =
-(StatusBarView = class StatusBarView {
+class StatusBarView {
   constructor() {
     this.element = document.createElement('status-bar');
     this.element.classList.add('status-bar');
@@ -45,7 +36,7 @@ module.exports =
       this.storeActiveBuffer();
       this.subscribeAllToBuffer();
 
-      return this.element.dispatchEvent(new CustomEvent('active-buffer-changed', {bubbles: true}));
+     this.element.dispatchEvent(new CustomEvent('active-buffer-changed', {bubbles: true}));
     });
 
     this.storeActiveBuffer();
@@ -54,7 +45,7 @@ module.exports =
   destroy() {
     this.activeItemSubscription.dispose();
     this.unsubscribeAllFromBuffer();
-    return this.element.remove();
+    this.element.remove();
   }
 
   addLeftTile(options) {
@@ -116,7 +107,7 @@ module.exports =
   }
 
   storeActiveBuffer() {
-    return this.buffer = this.getActiveItem()?.getBuffer?.();
+    this.buffer = this.getActiveItem()?.getBuffer?.();
   }
 
   subscribeToBuffer(event, callback) {
@@ -126,23 +117,25 @@ module.exports =
 
   subscribeAllToBuffer() {
     if (!this.buffer) { return; }
-    return (() => {
-      const result = [];
-      for (let [event, callback] of Array.from(this.bufferSubscriptions)) {
-        result.push(this.buffer.on(event, callback));
-      }
-      return result;
-    })();
+
+    const result = [];
+
+    for (let [event, callback] of this.bufferSubscriptions) {
+      result.push(this.buffer.on(event, callback));
+    }
+
+    return result;
   }
 
   unsubscribeAllFromBuffer() {
     if (!this.buffer) { return; }
-    return (() => {
-      const result = [];
-      for (let [event, callback] of Array.from(this.bufferSubscriptions)) {
-        result.push(this.buffer.off(event, callback));
-      }
-      return result;
-    })();
+
+    const result = [];
+
+    for (let [event, callback] of this.bufferSubscriptions) {
+      result.push(this.buffer.off(event, callback));
+    }
+
+    return result;
   }
-});
+}

@@ -1,16 +1,9 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-let FileInfoView;
-const {Disposable} = require('atom');
+const { Disposable } = require('atom');
 const url = require('url');
 const fs = require('fs-plus');
 
 module.exports =
-(FileInfoView = class FileInfoView {
+class FileInfoView {
   constructor() {
     this.element = document.createElement('status-bar-file');
     this.element.classList.add('file-info', 'inline-block');
@@ -23,7 +16,7 @@ module.exports =
     this.element.getActiveItem = this.getActiveItem.bind(this);
 
     this.activeItemSubscription = atom.workspace.getCenter().onDidChangeActivePaneItem(() => {
-      return this.subscribeToActiveItem();
+      this.subscribeToActiveItem();
     });
     this.subscribeToActiveItem();
 
@@ -44,7 +37,7 @@ module.exports =
   }
 
   registerTooltip() {
-    return this.tooltip = atom.tooltips.add(this.element, { title() {
+    this.tooltip = atom.tooltips.add(this.element, { title() {
       return "Click to copy absolute file path (Shift + Click to copy relative path)";
     }
   });
@@ -52,14 +45,14 @@ module.exports =
 
   clearCopiedTooltip() {
     this.copiedTooltip?.dispose();
-    return this.registerTooltip();
+    this.registerTooltip();
   }
 
   showCopiedTooltip(copyRelativePath) {
     this.tooltip?.dispose();
     this.copiedTooltip?.dispose();
     const text = this.getActiveItemCopyText(copyRelativePath);
-    return this.copiedTooltip = atom.tooltips.add(this.element, {
+    this.copiedTooltip = atom.tooltips.add(this.element, {
       title: `Copied: ${text}`,
       trigger: 'manual',
       delay: {
@@ -92,11 +85,11 @@ module.exports =
   }
 
   subscribeToActiveItem() {
-    let activeItem;
     this.modifiedSubscription?.dispose();
     this.titleSubscription?.dispose();
+    const activeItem = this.getActiveItem();
 
-    if (activeItem = this.getActiveItem()) {
+    if (activeItem) {
       if (this.updateCallback == null) { this.updateCallback = () => this.update(); }
 
       if (typeof activeItem.onDidChangeTitle === 'function') {
@@ -113,7 +106,7 @@ module.exports =
       this.modifiedSubscription = activeItem.onDidChangeModified?.(this.updateCallback);
     }
 
-    return this.update();
+    this.update();
   }
 
   destroy() {
@@ -122,7 +115,7 @@ module.exports =
     this.modifiedSubscription?.dispose();
     this.clickSubscription?.dispose();
     this.copiedTooltip?.dispose();
-    return this.tooltip?.dispose();
+    this.tooltip?.dispose();
   }
 
   getActiveItem() {
@@ -131,28 +124,30 @@ module.exports =
 
   update() {
     this.updatePathText();
-    return this.updateBufferHasModifiedText(this.getActiveItem()?.isModified?.());
+    this.updateBufferHasModifiedText(this.getActiveItem()?.isModified?.());
   }
 
   updateBufferHasModifiedText(isModified) {
     if (isModified) {
       this.element.classList.add('buffer-modified');
-      return this.isModified = true;
+      this.isModified = true;
     } else {
       this.element.classList.remove('buffer-modified');
-      return this.isModified = false;
+      this.isModified = false;
     }
   }
 
   updatePathText() {
-    let path, title;
-    if (path = this.getActiveItem()?.getPath?.()) {
+    const path = this.getActiveItem()?.getPath?.();
+    const title = this.getActiveItem()?.getTitle?.();
+
+    if (path) {
       const relativized = atom.project.relativize(path);
-      return this.currentPath.textContent = (relativized != null) ? fs.tildify(relativized) : path;
-    } else if ((title = this.getActiveItem()?.getTitle?.())) {
-      return this.currentPath.textContent = title;
+      this.currentPath.textContent = (relativized != null) ? fs.tildify(relativized) : path;
+    } else if (title) {
+      this.currentPath.textContent = title;
     } else {
-      return this.currentPath.textContent = '';
+      this.currentPath.textContent = '';
     }
   }
-});
+}

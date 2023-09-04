@@ -1,10 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
- */
-const {CompositeDisposable, Emitter} = require('atom');
+const { CompositeDisposable, Emitter } = require('atom');
 const Grim = require('grim');
 const StatusBarView = require('./status-bar-view');
 const FileInfoView = require('./file-info-view');
@@ -22,7 +16,7 @@ module.exports = {
     this.attachStatusBar();
 
     this.subscriptions.add(atom.config.onDidChange('status-bar.fullWidth', () => {
-      return this.attachStatusBar();
+      this.attachStatusBar();
     })
     );
 
@@ -30,18 +24,18 @@ module.exports = {
 
     this.statusBarVisibilitySubscription =
       atom.config.observe('status-bar.isVisible', () => {
-        return this.updateStatusBarVisibility();
+        this.updateStatusBarVisibility();
       });
 
     atom.commands.add('atom-workspace', 'status-bar:toggle', () => {
       if (this.statusBarPanel.isVisible()) {
-        return atom.config.set('status-bar.isVisible', false);
+        atom.config.set('status-bar.isVisible', false);
       } else {
-        return atom.config.set('status-bar.isVisible', true);
+        atom.config.set('status-bar.isVisible', true);
       }
     });
 
-    const {safeMode, devMode} = atom.getLoadSettings();
+    const { safeMode, devMode } = atom.getLoadSettings();
     if (safeMode || devMode) {
       const launchModeView = new LaunchModeView({safeMode, devMode});
       this.statusBar.addLeftTile({item: launchModeView.element, priority: -1});
@@ -57,7 +51,7 @@ module.exports = {
     this.statusBar.addLeftTile({item: this.selectionCount.element, priority: 2});
 
     this.gitInfo = new GitView();
-    return this.gitInfoTile = this.statusBar.addRightTile({item: this.gitInfo.element, priority: 0});
+    this.gitInfoTile = this.statusBar.addRightTile({item: this.gitInfo.element, priority: 0});
   },
 
   deactivate() {
@@ -88,14 +82,14 @@ module.exports = {
     this.emitters?.dispose();
     this.emitters = null;
 
-    if (atom.__workspaceView != null) { return delete atom.__workspaceView.statusBar; }
+    if (atom.__workspaceView != null) { delete atom.__workspaceView.statusBar; }
   },
 
   updateStatusBarVisibility() {
     if (atom.config.get('status-bar.isVisible')) {
-      return this.statusBarPanel.show();
+      this.statusBarPanel.show();
     } else {
-      return this.statusBarPanel.hide();
+      this.statusBarPanel.hide();
     }
   },
 
@@ -114,9 +108,9 @@ module.exports = {
 
     const panelArgs = {item: this.statusBar, priority: 0};
     if (atom.config.get('status-bar.fullWidth')) {
-      return this.statusBarPanel = atom.workspace.addFooterPanel(panelArgs);
+      this.statusBarPanel = atom.workspace.addFooterPanel(panelArgs);
     } else {
-      return this.statusBarPanel = atom.workspace.addBottomPanel(panelArgs);
+      this.statusBarPanel = atom.workspace.addBottomPanel(panelArgs);
     }
   },
 
@@ -131,19 +125,19 @@ module.exports = {
     return {
       addLeftTile(...args) {
         Grim.deprecate("Use version ^1.0.0 of the status-bar Service API.");
-        return statusbar.addLeftTile(...args);
+        statusbar.addLeftTile(...args);
       },
       addRightTile(...args) {
         Grim.deprecate("Use version ^1.0.0 of the status-bar Service API.");
-        return statusbar.addRightTile(...args);
+        statusbar.addRightTile(...args);
       },
       getLeftTiles() {
         Grim.deprecate("Use version ^1.0.0 of the status-bar Service API.");
-        return statusbar.getLeftTiles();
+        statusbar.getLeftTiles();
       },
       getRightTiles() {
         Grim.deprecate("Use version ^1.0.0 of the status-bar Service API.");
-        return statusbar.getRightTiles();
+        statusbar.getRightTiles();
       }
     };
   }
