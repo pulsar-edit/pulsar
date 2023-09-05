@@ -7,7 +7,7 @@ const createDOMPurify = require('dompurify')
 
 const createSuggestionFrag = () => {
   const frag = document.createDocumentFragment()
-  const children = ['icon-container', 'left-label', 'word-container', 'right-label']
+  const children = ['icon--container', 'left-label', 'word-container', 'right-label']
   children.forEach(c => {
     let el = document.createElement('span')
     el.className = c
@@ -470,8 +470,8 @@ module.exports = class SuggestionListElement {
     if (index === this.selectedIndex) { this.selectedLi = li }
 
     const iconContainer = document.createElement('span')
-    iconContainer.className = 'icon-container'
-    li.replaceChild(iconContainer, li.querySelector('.icon-container'))
+    iconContainer.className = 'icon--container'
+    li.replaceChild(iconContainer, li.querySelector('.icon--container'))
 
     const sanitizedType = isString(type) ? type : ''
     const sanitizedIconHTML = isString(iconHTML) ? iconHTML : undefined

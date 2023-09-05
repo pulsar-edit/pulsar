@@ -4594,6 +4594,11 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
+finden-filum@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/finden-filum/-/finden-filum-1.0.5.tgz#40e79f3458698620449fe459e559bb43e0333381"
+  integrity sha512-s0qeGK2JeO3xdwscK2HGYGQbhSXEb/B6xRKhLd2qd7xv83y2aFeQo8c7Y7qvUBdroFdRQ4r6k7fozwEHqWx/HA==
+
 flat-cache@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/flat-cache/-/flat-cache-3.0.4.tgz#61b0338302b2fe9f957dcc32fc2a87f1c3048b11"
@@ -9479,6 +9484,7 @@ tree-sitter@0.20.0:
 "tree-view@file:packages/tree-view":
   version "0.229.1"
   dependencies:
+    finden-filum "^1.0.5"
     fs-plus "^3.0.0"
     minimatch "~0.3.0"
     pathwatcher "^8.1.0"

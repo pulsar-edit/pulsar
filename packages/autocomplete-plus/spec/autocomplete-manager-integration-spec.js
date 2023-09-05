@@ -1778,7 +1778,7 @@ defm`
         it('displays the text in the suggestion', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
-          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon-container')
+          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon--container')
           let leftLabel = editorView.querySelector('.autocomplete-plus li .right-label')
           let rightLabel = editorView.querySelector('.autocomplete-plus li .right-label')
 
@@ -1793,11 +1793,11 @@ defm`
           spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'omg'}])
         })
 
-        it('displays an icon in the icon-container', async () => {
+        it('displays an icon in the icon--container', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let icon = editorView.querySelector('.autocomplete-plus li .icon-container .icon')
+          let icon = editorView.querySelector('.autocomplete-plus li .icon--container .icon')
           expect(icon.textContent).toBe('o')
         })
       })
@@ -1807,11 +1807,11 @@ defm`
           spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'snippet'}])
         })
 
-        it('displays the default icon in the icon-container', async () => {
+        it('displays the default icon in the icon--container', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let icon = editorView.querySelector('.autocomplete-plus li .icon-container .icon i')
+          let icon = editorView.querySelector('.autocomplete-plus li .icon--container .icon i')
           expect(icon).toHaveClass('icon-move-right')
         })
       })
@@ -1821,11 +1821,11 @@ defm`
           spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: ''}])
         })
 
-        it('does not display an icon in the icon-container', async () => {
+        it('does not display an icon in the icon--container', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon-container')
+          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon--container')
           expect(iconContainer.childNodes).toHaveLength(0)
         })
       })
@@ -1835,11 +1835,11 @@ defm`
           spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', iconHTML: '<i class="omg"></i>'}])
         })
 
-        it('displays an icon in the icon-container', async () => {
+        it('displays an icon in the icon--container', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let icon = editorView.querySelector('.autocomplete-plus li .icon-container .icon .omg')
+          let icon = editorView.querySelector('.autocomplete-plus li .icon--container .icon .omg')
           expect(icon).toExist()
         })
       })
@@ -1849,11 +1849,11 @@ defm`
           spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'something', iconHTML: false}])
         })
 
-        it('does not display an icon in the icon-container', async () => {
+        it('does not display an icon in the icon--container', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon-container')
+          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon--container')
           expect(iconContainer.childNodes).toHaveLength(0)
         })
       })
@@ -1863,11 +1863,11 @@ defm`
           spyOn(provider, 'getSuggestions').andCallFake(options => [{text: 'ok', type: 'something', iconHTML: true}])
         })
 
-        it('displays the default icon in the icon-container', async () => {
+        it('displays the default icon in the icon--container', async () => {
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let icon = editorView.querySelector('.autocomplete-plus li .icon-container .icon')
+          let icon = editorView.querySelector('.autocomplete-plus li .icon--container .icon')
           expect(icon.textContent).toBe('s')
         })
       })
@@ -1881,7 +1881,7 @@ defm`
           triggerAutocompletion(editor)
           await waitForAutocomplete(editor)
 
-          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon-container')
+          let iconContainer = editorView.querySelector('.autocomplete-plus li .icon--container')
           expect(iconContainer.childNodes).toHaveLength(0)
         })
       })
