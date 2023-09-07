@@ -25,8 +25,7 @@
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
       await Promise.all([
-        require('second-mate').ready,
-        require('superstring').superstring
+        require('second-mate').ready
       ])
 
       process.on('unhandledRejection', function(error, promise) {

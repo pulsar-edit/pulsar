@@ -159,11 +159,11 @@
     "spell-check": "file:packages/spell-check",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
-    "superstring": "https://github.com/pulsar-edit/superstring-wasm.git#312d1fb",
+    "superstring": "2.4.4",
     "symbols-view": "https://github.com/pulsar-edit/symbols-view.git#73464a5",
     "tabs": "file:packages/tabs",
     "temp": "0.9.4",
-    "text-buffer": "https://github.com/pulsar-edit/text-buffer.git#c0c7cf3e3",
+    "text-buffer": "^13.18.6",
     "timecop": "file:./packages/timecop",
     "tree-view": "file:./packages/tree-view",
     "typescript-simple": "github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7",
@@ -297,6 +297,9 @@
   },
   "resolutions": {
     "node-abi": "3.45.0",
+    "superstring": "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459",
+    "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
+    "text-buffer": "13.18.6",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244"
   }
 }
