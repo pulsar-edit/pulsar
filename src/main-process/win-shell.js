@@ -1,7 +1,7 @@
 const Registry = require('winreg');
 const Path = require('path');
 const ChildProcess = require('child_process');
-const getAppName = require('../get-app-name');
+const { getAppName } = require('../get-app-details.js');
 
 const appName = getAppName();
 const exeName = Path.basename(process.execPath);
@@ -10,8 +10,7 @@ const fileIconPath = `"${Path.join(
   process.execPath,
   '..',
   'resources',
-  'cli',
-  'file.ico'
+  'pulsar.ico'
 )}"`;
 
 class ShellOption {

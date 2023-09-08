@@ -1,5 +1,5 @@
 const { protocol } = require('electron');
-const fs = require('fs-plus');
+const fs = require('fs');
 const path = require('path');
 
 // Handles requests with 'atom' protocol.
@@ -36,15 +36,19 @@ module.exports = class AtomProtocolHandler {
       let filePath;
       if (relativePath.indexOf('assets/') === 0) {
         const assetsPath = path.join(process.env.ATOM_HOME, relativePath);
-        const stat = fs.statSyncNoException(assetsPath);
-        if (stat && stat.isFile()) filePath = assetsPath;
+        try {
+          const stat = fs.statSync(assetsPath);
+          if (stat && stat.isFile()) filePath = assetsPath;
+        } catch (e) {}
       }
 
       if (!filePath) {
         for (let loadPath of this.loadPaths) {
           filePath = path.join(loadPath, relativePath);
-          const stat = fs.statSyncNoException(filePath);
-          if (stat && stat.isFile()) break;
+          try {
+            const stat = fs.statSync(filePath);
+            if (stat && stat.isFile()) break;
+          } catch (e) {}
         }
       }
 
