@@ -73,14 +73,25 @@ jobs:
           yarn run build:apm
 
     # macOS Signing Stuff
-    - name: Build Pulsar Binaries (macOS)
-      if: ${{ runner.os == 'macOS' }}
+    - name: Build Pulsar Binaries (macOS) (Signed)
+      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
+      # PRs generated from forks cannot access GitHub Secrets
+      # So if the PR is a fork, we will still build, but will not sign.
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
         CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         APPLEID: ${{ secrets.APPLEID }}
         APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
+      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn dist
+
+    - name: Build Pulsar Binaries (macOS) (Unsigned)
+      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name != 'pulsar-edit/pulsar' }}
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
         timeout_minutes: 30
@@ -96,6 +107,18 @@ jobs:
         max_attempts: 3
         retry_on: error
         command: yarn dist
+
+    - name: Rename Pulsar Binaries for Regular release (Linux)
+      if: ${{ runner.os == 'Linux' }}
+      run: node ./script/rename.js "Linux"
+
+    - name: Rename Pulsar Binaries for Regular release (macOS)
+      if: ${{ runner.os == 'macOS' }}
+      run: node ./script/rename.js "Intel.Mac"
+
+    - name: Rename Pulsar Binaries for Regular release (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: node ./script/rename.js "Windows"
 
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v3
@@ -125,7 +148,7 @@ jobs:
       run: |
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         rm -R node_modules/electron; yarn install --check-files
-        hdiutil mount binaries/Pulsar*dmg
+        hdiutil mount binaries/*Pulsar*dmg
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
