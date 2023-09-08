@@ -1747,7 +1747,6 @@ abbrev@^1.0.0:
   version "1.9.1"
   dependencies:
     etch "^0.14.1"
-    semver "^7.3.8"
 
 acorn-jsx@^5.3.2:
   version "5.3.2"
