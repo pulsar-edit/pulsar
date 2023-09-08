@@ -6640,6 +6640,11 @@ node-addon-api@^3.1.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
   integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
 
+node-addon-api@^5.0.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-5.1.0.tgz#49da1ca055e109a23d537e9de43c09cca21eb762"
+  integrity sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==
+
 node-api-version@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/node-api-version/-/node-api-version-0.1.4.tgz#1ed46a485e462d55d66b5aa1fe2821720dedf080"
@@ -7066,7 +7071,7 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-"pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1":
+pathwatcher@^8.1.0, "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1":
   version "8.1.2"
   resolved "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1"
   dependencies:
@@ -8325,9 +8330,11 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-"superstring@https://github.com/pulsar-edit/superstring-wasm.git#312d1fb":
+superstring@2.4.4, superstring@^2.4.4, "superstring@https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459":
   version "2.4.4"
-  resolved "https://github.com/pulsar-edit/superstring-wasm.git#312d1fb33d88832cbc543096696db173cef5f126"
+  resolved "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459"
+  dependencies:
+    node-addon-api "^5.0.0"
 
 supports-color@6.0.0:
   version "6.0.0"
@@ -8495,9 +8502,10 @@ test-value@^3.0.0:
     array-back "^2.0.0"
     typical "^2.6.1"
 
-"text-buffer@https://github.com/pulsar-edit/text-buffer.git#c0c7cf3e3":
+text-buffer@13.18.6, text-buffer@^13.18.6:
   version "13.18.6"
-  resolved "https://github.com/pulsar-edit/text-buffer.git#c0c7cf3e369dc9924488712d31bf08881eacf032"
+  resolved "https://registry.yarnpkg.com/text-buffer/-/text-buffer-13.18.6.tgz#0191a6185177b26e3560cb07988701ac2d30ae9f"
+  integrity sha512-kgtWyJL9ktX0+ynDxUILaB/XGsaMOSzbKgyyDO9s4sN6X8Cq+ZIMNRDDMG29iztK8nZxuynzcuo1vHQojpdT9A==
   dependencies:
     delegato "^1.0.0"
     diff "^2.2.1"
@@ -8507,9 +8515,9 @@ test-value@^3.0.0:
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#567561f"
+    pathwatcher "^8.1.0"
     serializable "^1.0.3"
-    superstring "https://github.com/pulsar-edit/superstring-wasm.git#312d1fb"
+    superstring "^2.4.4"
     underscore-plus "^1.0.0"
     winattr "^3.0.0"
 
