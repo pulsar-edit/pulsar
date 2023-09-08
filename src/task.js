@@ -73,10 +73,6 @@ module.exports = class Task {
     const env = Object.assign({}, process.env, {userAgent: navigator.userAgent});
     this.childProcess = ChildProcess.fork(require.resolve('./task-bootstrap'), [compileCachePath, taskPath], { env, silent: true});
 
-    this.on("task:log", () => console.log(...arguments));
-    this.on("task:warn", () => console.warn(...arguments));
-    this.on("task:error", () => console.error(...arguments));
-
     this.on("task:deprecations", (deprecations) => {
       for (let i = 0; i < deprecations.length; i++) {
         Grim.addSerializedDeprecation(deprecations[i]);

@@ -11,10 +11,5 @@
   "license": "MIT",
   "keywords": [
     "tree-sitter"
-  ],
-  "dependencies": {
-    "tree-sitter-javascript": "0.19.0",
-    "tree-sitter-jsdoc": "0.19.0",
-    "tree-sitter-regex": "0.19.0"
-  }
+  ]
 }

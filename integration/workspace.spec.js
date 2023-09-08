@@ -14,7 +14,7 @@ const languages = [
   // {language: "gfm", code: '10', checks: {numeric: '10'}},
   // {language: "git", code: '10', checks: {numeric: '10'}},
   {language: "Go", code: '10', checks: {numeric: '10'}},
-  {language: "HTML", code: '<foo type="10"></foo>', checks: {string: '10'}},
+  {language: "HTML", code: '<foo type="9910"></foo>', checks: {string: '9910'}},
   {language: "XML", code: '<foo type="10"></foo>', checks: {string: '"10"'}},
   // {language: "hyperlink", code: '10', checks: {numeric: '10'}},
   {language: "JSON", code: '10', checks: {numeric: '10'}},
@@ -104,9 +104,10 @@ test.describe('Opening Atom for the first time', () => {
         await modalInput.press('Enter')
 
         await Promise.all(
-          Object.keys(checks).map(k =>
-            expect(syntaxElement(k, checks[k])).toHaveText(checks[k])
-          )
+          Object.keys(checks).map(k => {
+            // let match = new RegExp(checks[k])
+            return expect(syntaxElement(k, checks[k])).toContainText(checks[k])
+          })
         )
       })
     })
@@ -115,7 +116,6 @@ test.describe('Opening Atom for the first time', () => {
 
 function syntaxElement(kind, text) {
   return editor.page.locator(
-    `atom-text-editor.is-focused .syntax--${kind}`,
-    { hasText: text }
+    `atom-text-editor.is-focused .syntax--${kind}:text('${text}')`
  )
 }
