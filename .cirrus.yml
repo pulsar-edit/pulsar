@@ -17,7 +17,7 @@ silently_mark_unscheduled_builds_as_failed_task:
   only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
   timeout_in: 12s
   clone_script: |
-    false # This command does nothing other than exit with status 1 (an "error" status code)
+    true # This command does nothing other than exit with status 0 (a "clean" status code)
   env:
     CIRRUS_CLONE_DEPTH: 1
   container:
