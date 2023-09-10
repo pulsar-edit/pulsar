@@ -1,6 +1,5 @@
 linux_task:
   container:
-    image: node:16-slim
     cpu: 1
     timeout_in: 6s
   echo_env_vars_script:
