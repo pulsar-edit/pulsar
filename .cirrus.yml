@@ -3,6 +3,7 @@ linux_task:
     CIRRUS_CLONE_DEPTH: 1
     CIRRUS_REPO_CLONE_URL: "https://github.com/pulsar-edit/pulsar-rolling-releases"
   container:
+    image: node:16-slim
     cpu: 1
     timeout_in: 6s
   echo_env_vars_script:
