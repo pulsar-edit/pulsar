@@ -1,4 +1,5 @@
 linux_task:
+  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   env:
     CIRRUS_CLONE_DEPTH: 1
   container:
