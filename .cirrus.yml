@@ -1,6 +1,5 @@
 linux_task:
-  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
-  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
+  only_if: $CIRRUS_CHANGE_IN_REPO != $CIRRUS_LAST_GREEN_CHANGE && ($CIRRUS_CRON != "" || $CIRRUS_TAG != "")
   clone_script: true # Just a fake clone script to save a second
   container:
     image: node:16-slim
