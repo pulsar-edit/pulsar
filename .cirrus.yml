@@ -6,7 +6,7 @@ linux_task:
     cpu: 1
     timeout_in: 6s
   echo_env_vars_script:
-    - echo "CIRRUS_CRON is: xyz${CIRRUS_CRON}xyz"
-    - echo "CIRRUS_TAG is: xyz${CIRRUS_TAG}xyz"
-    - echo "CIRRUS_CHANGE_IN_REPO is: xyz${CIRRUS_CHANGE_IN_REPO}xyz"
-    - echo "CIRRUS_LAST_GREEN_CHANGE is: xyz${CIRRUS_LAST_GREEN_CHANGE}xyz"
+    - echo "CIRRUS_CRON is: xyz--${CIRRUS_CRON}--xyz"
+    - echo "CIRRUS_TAG is: xyz--${CIRRUS_TAG}--xyz"
+    - echo "CIRRUS_CHANGE_IN_REPO is: xyz--${CIRRUS_CHANGE_IN_REPO}--xyz"
+    - echo "CIRRUS_LAST_GREEN_CHANGE is: xyz--${CIRRUS_LAST_GREEN_CHANGE}--xyz"
