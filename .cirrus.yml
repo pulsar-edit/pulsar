@@ -28,7 +28,7 @@ silently_mark_skipped_or_no_scheduled_task_builds_as_failed_task:
     # Fake "clone repo" script that  does nothing other than exit with status 0 (a "clean" status code)
     # Overwrites the default clone script that would actually try to clone stuff, which takes a few seconds of billable CPU time.
   mark_task_as_failed_script: |
-    false # This command/script does nothing other than exit with status 1 (an "error" status code), thus failing the build.
+    false # This command/script does nothing other than exit with status 1 (an "error" status code), marking the build as failed, and protecting the CIRRUS_LAST_GREEN_CHANGE.
     # This "failing" script prevents "skipped" or "no tasks scheduled" builds from updating the CIRRUS_LAST_GREEN_CHANGE to their newer commit SHAs.
     # Yes, this is kind of hacky, but it works.
   timeout_in: 6s
