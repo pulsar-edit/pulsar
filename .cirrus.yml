@@ -18,8 +18,6 @@ silently_mark_skipped_or_no_scheduled_task_builds_as_failed_task:
   only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
   # Only mark the "skipped" or "no-tasks-cheduled" builds as failed. "Cron" builds and "tag push" builds should be allowed to succeed.
   # !!! Don't forget to update the "only_if:" for this task to match if you update the logic in the other tasks. !!!
-  timeout_in: 6s
-  # Avoid wasting any more than 6 seconds, or up to 12 seconds if an automatic re-run is triggered. 2 seconds is more typical.
   container:
     image: alpine:latest
     # A light and minimal image, to save Cirrus some resources, why not?
@@ -34,3 +32,5 @@ silently_mark_skipped_or_no_scheduled_task_builds_as_failed_task:
     # This command does nothing other than exit with status 1 (an "error" status code), thus failing the build.
     # This "failing" script prevents "skipped" or "no tasks scheduled" builds from updating the CIRRUS_LAST_GREEN_CHANGE to their newer commit SHAs.
     # Yes, this is kind of hacky, but it works.
+  timeout_in: 6s
+  # Avoid wasting any more than 6 seconds, or up to 12 seconds if an automatic re-run is triggered. 2 seconds is more typical.
