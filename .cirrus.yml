@@ -12,16 +12,15 @@ linux_task:
     - echo "CIRRUS_CHANGE_IN_REPO is: xyz--${CIRRUS_CHANGE_IN_REPO}--xyz"
     - echo "CIRRUS_LAST_GREEN_CHANGE is: xyz--${CIRRUS_LAST_GREEN_CHANGE}--xyz"
 
-silently_mark_unscheduled_builds_as_failed_task:
+silently_mark_no_scheduled_task_builds_as_failed_task:
   skip_notifications: true
   only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
-  timeout_in: 12s
-  clone_script: |
-    true # This command does nothing other than exit with status 0 (a "clean" status code)
-  env:
-    CIRRUS_CLONE_DEPTH: 1
+  timeout_in: 6s
   container:
     image: alpine:latest
     cpu: 1
-  mark_task_as_failed_script:
-    - false # This command does nothing other than exit with status 1 (an "error" status code)
+  clone_script: |
+    true # Fake "clone repo" script that  does nothing other than exit with status 0 (a "clean" status code)
+    # Overwrites the default clone script that would actually try to clone stuff, and which takes a few seconds.
+  mark_task_as_failed_script: |
+    false # This command does nothing other than exit with status 1 (an "error" status code), thus failing the build.
