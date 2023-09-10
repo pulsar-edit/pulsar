@@ -15,7 +15,7 @@ linux_task:
 silently_mark_unscheduled_builds_as_failed_task:
   skip_notifications: true
   only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
-  timeout_in: 1s
+  timeout_in: 12s
   env:
     CIRRUS_CLONE_DEPTH: 1
   container:
