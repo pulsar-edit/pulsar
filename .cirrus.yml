@@ -1,5 +1,4 @@
 linux_task:
-  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
   env:
     CIRRUS_CLONE_DEPTH: 1
   container:
