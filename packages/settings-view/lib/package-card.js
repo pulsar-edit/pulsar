@@ -5,6 +5,7 @@ import {CompositeDisposable, Disposable} from 'atom'
 import {shell} from 'electron'
 import etch from 'etch'
 import BadgeView from './badge-view'
+import path from 'path'
 
 import {ownerFromRepository} from './utils'
 
