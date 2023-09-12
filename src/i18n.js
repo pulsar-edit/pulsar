@@ -4,7 +4,7 @@ const { parse: parseString } = require("@formatjs/icu-messageformat-parser");
 class Language {
   constructor({ langStrings, locale, cachedASTs }) {
     /** @type {LanguageStrings} */
-    this.langStrings = langStrings || {};
+    this.langStrings = langStrings;
     /** @type {string} */
     this.locale = locale;
     /** @type {LanguageASTCache} */
