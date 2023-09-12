@@ -8,7 +8,7 @@ class Language {
     /** @type {string} */
     this.locale = locale;
     /** @type {LanguageASTCache} */
-    this.cachedASTs = cachedASTs || {};
+    this.cachedASTs = cachedASTs || { keys: {} };
     /** @type {LanguageFormatterCache} */
     this.cachedFormatters = {};
   }
@@ -75,8 +75,6 @@ class Language {
     if (v instanceof IntlMessageFormat) {
       return v;
     }
-
-    return;
   }
 
   /**
@@ -112,16 +110,19 @@ class Language {
       const string = this._getStringMaybe(key);
       if (!string) return;
 
-      const ast = parseString(string);
-      return { ast };
+      /** @type {AST} */
+      const ast = {
+        ast: parseString(string)
+      };
+
+      value.keys[last] = ast;
+      return ast;
     }
 
-    const v = value.keys[last]
+    const v = value.keys[last];
     if (isAST(v)) {
       return v;
     }
-
-    return;
   }
 
   /**
@@ -141,7 +142,8 @@ class Language {
       value = v;
     }
 
-    const v = value[lastKeyPos];
+    const last = key[lastKeyPos]
+    const v = value[last];
     if (typeof v === "string") return v;
   }
 }
