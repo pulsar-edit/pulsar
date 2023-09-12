@@ -45,7 +45,7 @@ const TextEditor = require('./text-editor');
 const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
-const I18n = require("./i18n");
+// const I18n = require("./i18n");
 const { getReleaseChannel } = require('./get-app-details.js');
 const packagejson = require("../package.json");
 
@@ -139,11 +139,11 @@ class AtomEnvironment {
       uriHandlerRegistry: this.uriHandlerRegistry
     });
 
-    /** @type {I18n} */
-    this.i18n = new I18n({
-      config: this.config,
-      packages: this.packages
-    });
+    // /** @type {I18n} */
+    // this.i18n = new I18n({
+    //   config: this.config,
+    //   packages: this.packages
+    // });
 
     /** @type {ThemeManager} */
     this.themes = new ThemeManager({
@@ -288,6 +288,10 @@ class AtomEnvironment {
     }
 
     this.commands.attach(this.window);
+
+    // this.i18n.initialise({
+    //   resourcePath
+    // });
 
     this.styles.initialize({ configDirPath: this.configDirPath });
     this.packages.initialize({
