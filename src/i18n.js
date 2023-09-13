@@ -21,11 +21,8 @@ class Localisations {
     if (i < 0) return fallback(_keystr, opts);
 
     const pkgName = _keystr.substring(0, i);
-    if (!this.packages[pkgName]) return fallback(_keystr, opts);
-
     const keystr = _keystr.substring(i + 1);
-
-    return this.packages[pkgName].t(keystr, opts) ?? fallback(_keystr, opts);
+    return this.packages[pkgName]?.t(keystr, opts) ?? fallback(_keystr, opts);
   }
 
   /**
