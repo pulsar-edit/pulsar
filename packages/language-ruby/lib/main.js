@@ -1,4 +1,4 @@
-exports.activate = function() {
+exports.activate = function () {
   if (!atom.grammars.addInjectionPoint) return;
 
   atom.grammars.addInjectionPoint('source.ruby', {
@@ -19,6 +19,7 @@ exports.activate = function() {
     content(node) {
       return node;
     },
+    languageScope: null,
     includeChildren: true,
     // coverShallowerScopes: false
   });

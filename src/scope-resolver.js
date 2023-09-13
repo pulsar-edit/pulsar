@@ -16,6 +16,11 @@ function comparePoints(a, b) {
   }
 }
 
+function rangeSpecToString (range) {
+  let [sp, ep] = [range.startPosition, range.endPosition];
+  return `(${sp.row}, ${sp.column}) - (${ep.row}, ${ep.column})`;
+}
+
 function resolveNodeDescriptor(node, descriptor) {
   let parts = descriptor.split('.');
   let result = node;
@@ -266,6 +271,20 @@ class ScopeResolver {
     return ScopeResolver.CAPTURE_SETTINGS[prop](...args);
   }
 
+  warnAboutExceededRange(range, capture) {
+    let msg = ['Cannot extend past original range of capture!'];
+
+    msg.push(`Scope name: ${capture.name}`);
+    msg.push(`Original range: ${rangeSpecToString(capture.node)}`);
+    msg.push(`Adjusted range: ${rangeSpecToString(range)}`);
+
+    if (atom.inDevMode()) {
+      throw new Error(msg.join('\n'));
+    }
+
+    console.warn(msg.join('\n'));
+  }
+
   // Given a capture and possible predicate data, determines the buffer range
   // that this capture wants to cover.
   determineCaptureRange(capture) {
@@ -299,7 +318,7 @@ class ScopeResolver {
     }
 
     if (this.rangeExceedsBoundsOfCapture(range, capture)) {
-      throw new Error('Cannot extend past original range of capture');
+      this.warnAboutExceededRange(range, capture);
     }
 
     // Any invalidity in the returned range means we shouldn't store this

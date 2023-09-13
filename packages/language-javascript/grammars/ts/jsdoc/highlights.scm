@@ -19,6 +19,7 @@
 ((document) @punctuation.definition.end.comment.js.jsdoc
   (#set! adjust.startAndEndAroundFirstMatchOf "(?:\\*)?\\*/$"))
 
+((inline_tag) @meta.inline-tag.js.jsdoc)
 
 (tag_name) @storage.type.class.jsdoc
 

@@ -1,4 +1,4 @@
-exports.activate = function() {
+exports.activate = function () {
   if (!atom.grammars.addInjectionPoint) return;
 
   atom.grammars.addInjectionPoint('source.js', {
@@ -70,41 +70,38 @@ exports.activate = function() {
   const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
   const HYPERLINK_PATTERN = /\bhttps?:/
 
-  for (const scopeName of ['source.js', 'source.ts', 'source.ts.tsx']) {
-    atom.grammars.addInjectionPoint(scopeName, {
-      type: 'comment',
-      language(comment) {
-        if (comment.text.startsWith('/**')) return 'jsdoc';
-      },
-      content(comment) {
-        return comment;
-      },
-      languageScope: null,
-      coverShallowerScopes: true
-    });
+  atom.grammars.addInjectionPoint('source.js', {
+    type: 'comment',
+    language(comment) {
+      if (comment.text.startsWith('/**')) return 'jsdoc';
+    },
+    content(comment) {
+      return comment;
+    },
+    languageScope: null,
+    coverShallowerScopes: true
+  });
 
-    // Experiment: better to have one layer with lots of nodes, or lots of
-    // layers each managing one node?
-    atom.grammars.addInjectionPoint(scopeName, {
-      type: 'comment',
+  // Experiment: better to have one layer with lots of nodes, or lots of
+  // layers each managing one node?
+  atom.grammars.addInjectionPoint('source.js', {
+    type: 'comment',
+    language: (node) => {
+      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
+  for (let type of ['template_string', 'string_fragment', 'comment']) {
+    atom.grammars.addInjectionPoint('source.js', {
+      type,
       language: (node) => {
-        return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+        return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
       },
       content: (node) => node,
       languageScope: null
     });
-
-    for (let type of ['template_string', 'string_fragment', 'comment']) {
-      atom.grammars.addInjectionPoint(scopeName, {
-        type,
-        language: (node) => {
-          return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
-        },
-        content: (node) => node,
-        languageScope: null
-      });
-    }
-
   }
 };
 

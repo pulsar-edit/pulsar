@@ -4,11 +4,11 @@
 
 (block_mapping_pair
   key: (_) @entity.name.tag.yaml
-  (#set! test.final true))
+  (#set! capture.final true))
 
 (flow_pair
   key: (_) @entity.name.tag.yaml
-  (#set! test.final true))
+  (#set! capture.final true))
 
 
 ; COMMENTS
@@ -34,6 +34,14 @@
 ; =======
 
 ((string_scalar) @string.quoted.yaml)
+
+(single_quote_scalar) @string.quoted.single.yaml
+
+((single_quote_scalar) @punctuation.definition.string.begin.yaml
+  (#set! adjust.endAfterFirstMatchOf "^'"))
+
+((single_quote_scalar) @punctuation.definition.string.end.yaml
+  (#set! adjust.startBeforeFirstMatchOf "'$"))
 
 (double_quote_scalar) @string.quoted.double.yaml
 

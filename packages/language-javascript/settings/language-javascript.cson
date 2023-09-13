@@ -11,3 +11,13 @@
     'decreaseIndentPattern': '(?x)
         ^ \\s* (\\s* /[*] .* [*]/ \\s*)* [}\\])]
       '
+
+'.source.js .meta.block.jsx.js':
+  'editor':
+    'commentStart': '{/*'
+    'commentEnd': '*/}'
+
+'.source.js .meta.jsx.inside-tag.js':
+  'editor':
+    'commentStart': '{/*'
+    'commentEnd': '*/}'

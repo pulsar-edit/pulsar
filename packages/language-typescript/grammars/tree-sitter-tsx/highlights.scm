@@ -38,3 +38,21 @@
   (#set! adjust.startAt lastChild.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.endPosition)
   (#set! capture.final true))
+
+
+; META
+; ====
+
+([
+  (jsx_opening_element)
+  (jsx_closing_element)
+] @meta.jsx.inside-tag.ts.tsx
+(#set! adjust.startAt firstChild.endPosition))
+
+((jsx_self_closing_element) @meta.jsx.inside-tag.ts.tsx
+(#set! adjust.startAt firstChild.endPosition)
+(#set! adjust.endAt lastChild.startPosition))
+
+((jsx_element) @meta.block.jsx.ts.tsx
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
