@@ -2,12 +2,79 @@ const { default: IntlMessageFormat } = require("intl-messageformat");
 const { parse: parseString } = require("@formatjs/icu-messageformat-parser");
 
 class Language {
-  constructor({ langStrings, locale, cachedASTs }) {
-    /** @type {LanguageStrings} */
-    this.langStrings = langStrings;
-    /** @type {string} */
+  /**
+   * @param {object} opts
+   * @param {string} opts.locale
+   * @param {{ [k: string]: LanguageStrings }} opts.strings
+   * @param {{ [k: string]: LanguageASTCache }} [opts.cachedASTs]
+   */
+  constructor({ locale, strings, cachedASTs }) {
+    this.strings = strings;
     this.locale = locale;
-    /** @type {LanguageASTCache} */
+    this.cachedASTs = cachedASTs || {};
+    /** @type {{ [k: string]: SinglePackageLanguage }} */
+    this.packageLanguages = {};
+  }
+
+  /**
+   * @param {string} keystr
+   * @param {{ [k: string]: string }} opts
+   * @return {string | undefined}
+   */
+  tMaybe(keystr, opts = {}) {
+    const nsIndex = keystr.indexOf(".");
+    if (nsIndex < 0) return;
+
+    const pkgName = keystr.substring(0, nsIndex);
+    const keystrWithoutPkgName = keystr.substring(nsIndex + 1);
+
+    const pkg = this._getPackageObj(pkgName);
+    return pkg?.tMaybe(keystrWithoutPkgName, opts);
+  }
+
+  /**
+   * @param {string} pkgName
+   */
+  _getPackageObj(pkgName) {
+    if (this.packageLanguages[pkgName]) return this.packageLanguages[pkgName];
+    if (!this.strings[pkgName]) return;
+
+    this.cachedASTs[pkgName] ??= { keys: {} };
+
+    this.packageLanguages[pkgName] = new SinglePackageLanguage({
+      locale: this.locale,
+      strings: this.strings[pkgName],
+      cachedASTs: this.cachedASTs[pkgName]
+    });
+
+    return this.packageLanguages[pkgName];
+  }
+
+  /**
+   * @param {object} opts
+   * @param {string} opts.pkgName
+   * @param {LanguageStrings} opts.strings
+   * @param {LanguageASTCache} [opts.cachedASTs]
+   */
+  addOrReplaceStringsForPackage({ pkgName, strings, cachedASTs }) {
+    this.strings[pkgName] = strings;
+    this.cachedASTs[pkgName] = cachedASTs || { keys: {} };
+    delete this.packageLanguages[pkgName];
+    // side effect: `this.packageLanguages[pkgName]` gets remade
+    this._getPackageObj(pkgName);
+  }
+}
+
+class SinglePackageLanguage {
+  /**
+   * @param {object} opts
+   * @param {string} opts.locale
+   * @param {LanguageStrings} opts.strings
+   * @param {LanguageASTCache} [opts.cachedASTs]
+   */
+  constructor({ locale, strings, cachedASTs }) {
+    this.strings = strings;
+    this.locale = locale;
     this.cachedASTs = cachedASTs || { keys: {} };
     /** @type {LanguageFormatterCache} */
     this.cachedFormatters = {};
@@ -16,9 +83,9 @@ class Language {
   /**
    * @param {string} keystr
    * @param {{ [k: string]: string }} opts
-   * @return {string}
+   * @return {string | undefined}
    */
-  t(keystr, opts = {}) {
+  tMaybe(keystr, opts = {}) {
     const key = keystr.split(".");
     guardPrototypePollution(key);
 
@@ -27,7 +94,6 @@ class Language {
       const formatted = /** @type {string} */ (formatter.format(opts));
       return formatted;
     }
-    return keystr;
   }
 
   /**
@@ -130,7 +196,7 @@ class Language {
    * @return {string | undefined}
    */
   _getStringMaybe(key) {
-    let value = this.langStrings;
+    let value = this.strings;
 
     const lastKeyPos = key.length - 1;
     for (let i = 0; i < lastKeyPos; i++) {
