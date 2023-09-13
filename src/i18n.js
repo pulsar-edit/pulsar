@@ -1,15 +1,65 @@
 const { default: IntlMessageFormat } = require("intl-messageformat");
 const { parse: parseToAST } = require("@formatjs/icu-messageformat-parser");
 
-class Localisations {
+module.exports = class I18n {
+  /**
+   * @param {object} opts
+   * @param {import("./config")} opts.config
+   */
+  constructor({ config }) {
+    this.config = config;
+    /** @type {Array<string>} */
+    this.locales = [];
+    this.localisations = new Localisations();
+
+    this.config.setSchema("core.languageSettings", {
+      type: "object",
+      description: "These settings currently require a full restart to take effect",
+      properties: {
+        primaryLanguage: {
+          type: "string",
+          order: 1,
+          default: "en",
+          // TODO get available languages for enum
+        },
+        fallbackLanguages: {
+          type: "array",
+          order: 2,
+          description: "List of fallback languages in case something is not translated in your primary language. Note: `en` is always the last fallback language, to ensure that things at least show up.",
+          default: [],
+          items: {
+            type: "string"
+            // TODO consider array enum when enum array options are improved in settings UI?
+          }
+        }
+      }
+    })
+  }
+
   /**
    * @param {object} opts
    * @param {Array<string>} opts.locales
    */
-  constructor({ locales }) {
+  initialise({ locales }) {
     this.locales = locales;
+    this.localisations.initialise({ locales });
+  }
+}
+
+class Localisations {
+  constructor() {
+    /** @type {Array<string>} */
+    this.locales = [];
     /** @type {{ [k: string]: PackageLocalisations }} */
     this.packages = {};
+  }
+
+  /**
+   * @param {object} opts
+   * @param {Array<string>} opts.locales
+   */
+  initialise({ locales }) {
+    this.locales = locales;
   }
 
   /**
