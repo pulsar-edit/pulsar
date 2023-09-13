@@ -263,3 +263,15 @@ silicon_mac_task:
 #       path: report.xml
 #       type: text/xml
 #       format: junit
+
+silently_mark_skipped_or_no_scheduled_tasks_builds_as_failed_task:
+  skip_notifications: true
+  only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
+  ### !!! ^ Don't forget to update this appropriately if our `only_if:` or `skip:` logic changes for the other tasks! !!! ###
+  ### !!! ^ We want this task to run [only] if all other tasks would have skipped. !!! ###
+  container:
+    image: alpine:latest
+    cpu: 1
+  clone_script: exit 0 # Shortest possible script that succeeds. Saves time vs actually cloning. Failing here triggers an automatic re-run, so don't do that!
+  mark_task_as_failed_script: exit 1 # Shortest possible script to mark a build as "failed". This protects CIRRUS_LAST_GREEN_CHANGE from being updated by builds that actually just skipped CI.
+  timeout_in: 6s
