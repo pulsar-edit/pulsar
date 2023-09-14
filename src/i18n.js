@@ -1,9 +1,25 @@
 const fs = require("fs-plus");
 const path = require("path");
+const season = require("season");
 const { default: IntlMessageFormat } = require("intl-messageformat");
 const { parse: parseToAST } = require("@formatjs/icu-messageformat-parser");
 
-const supportedFileExts = ["cson", "json"];
+/**
+ * @type {Array<{
+ *   ext: string;
+ *   parse: (s: string) => any
+ * }>}
+ */
+const supportedFileExts = [
+  {
+    ext: "cson",
+    parse: str => season.parse(str)
+  },
+  {
+    ext: "json",
+    parse: str => JSON.parse(str)
+  }
+];
 
 module.exports = class I18n {
   /**
@@ -58,7 +74,9 @@ module.exports = class I18n {
     this.loadStringsForCore();
   }
 
-  loadStringsForCore() {}
+  loadStringsForCore() {
+    this._loadStringsAt("core", path.join(this.resourcePath, "i18n"));
+  }
 
   loadStringsForPackage() {}
 
@@ -67,6 +85,7 @@ module.exports = class I18n {
    * @param {string} i18nDirPath path to the i18n dir with the files in it
    */
   _loadStringsAt(pkgName, i18nDirPath) {
+    if (!fs.existsSync(i18nDirPath)) return;
     /** @type {Array<string>} */
     const filesArray = fs.readdirSync(i18nDirPath);
     const files = new Set(filesArray.map(f => f.toLowerCase()));
@@ -74,14 +93,14 @@ module.exports = class I18n {
     /** @type {PackageStrings} */
     const packageStrings = {};
     this.locales.forEach(locale => {
-      const ext = supportedFileExts.find(ext => files.has(`${locale}.${ext}`));
+      const ext = supportedFileExts.find(({ ext }) => files.has(`${locale}.${ext}`));
       if (!ext) return;
 
-      const filename = `${locale}.${ext}`;
+      const filename = `${locale}.${ext.ext}`;
       const filepath = path.join(i18nDirPath, filename);
 
       const strings = fs.readFileSync(filepath, "utf8");
-      packageStrings[locale] = strings;
+      packageStrings[locale] = ext.parse(strings);
     });
     this.localisations.addPackage({
       pkgName,
