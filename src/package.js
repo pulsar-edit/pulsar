@@ -30,6 +30,7 @@ module.exports = class Package {
     this.contextMenuManager = params.contextMenuManager;
     this.deserializerManager = params.deserializerManager;
     this.viewRegistry = params.viewRegistry;
+    this.i18n = params.i18n;
     this.emitter = new Emitter();
 
     this.mainModule = null;
