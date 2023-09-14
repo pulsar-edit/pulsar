@@ -41,7 +41,7 @@ module.exports = class I18n {
           type: "string",
           order: 1,
           default: "en",
-          // TODO get available languages for enum
+          // TODO get available languages for enum purposes
         },
         fallbackLanguages: {
           type: "array",
@@ -54,7 +54,7 @@ module.exports = class I18n {
           }
         }
       }
-    })
+    });
   }
 
   /**
