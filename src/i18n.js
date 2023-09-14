@@ -82,6 +82,17 @@ module.exports = class I18n {
     return this.localisations.t(keystr, opts);
   }
 
+  /**
+   * @param {string} ns
+   */
+  getT(ns) {
+    /**
+     * @param {Key} keystr
+     * @param {Opts} opts
+     */
+    return (keystr, opts = {}) => this.t(`${ns}.${keystr}`, opts);
+  }
+
   _loadStringsForCore() {
     this._loadStringsAt("core", path.join(this.resourcePath, "i18n"));
   }

@@ -18,7 +18,8 @@ describe('Package', function() {
       menuManager: atom.menu,
       contextMenuManager: atom.contextMenu,
       deserializerManager: atom.deserializers,
-      viewRegistry: atom.views
+      viewRegistry: atom.views,
+      i18n: atom.i18n
     });
 
   const buildPackage = packagePath => build(Package, packagePath);

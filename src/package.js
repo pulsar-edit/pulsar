@@ -46,6 +46,7 @@ module.exports = class Package {
       (this.metadata && this.metadata.name) ||
       params.name ||
       path.basename(this.path);
+    this.t = this.i18n.getT(this.name);
     this.reset();
   }
 
