@@ -71,14 +71,29 @@ module.exports = class I18n {
 
     this.localisations.initialise({ locales: this.locales }); // TODO ast cache
 
-    this.loadStringsForCore();
+    this._loadStringsForCore();
   }
 
-  loadStringsForCore() {
+  /**
+   * @param {Key} keystr
+   * @param {Opts} opts
+   */
+  t(keystr, opts = {}) {
+    return this.localisations.t(keystr, opts);
+  }
+
+  _loadStringsForCore() {
     this._loadStringsAt("core", path.join(this.resourcePath, "i18n"));
   }
 
-  loadStringsForPackage() {}
+  /**
+   * @param {object} obj
+   * @param {string} obj.pkgName
+   * @param {string} obj.pkgPath
+   */
+  loadStringsForPackage({ pkgName, pkgPath }) {
+    this._loadStringsAt(pkgName, path.join(pkgPath, "i18n"));
+  }
 
   /**
    * @param {string} pkgName
@@ -86,8 +101,10 @@ module.exports = class I18n {
    */
   _loadStringsAt(pkgName, i18nDirPath) {
     if (!fs.existsSync(i18nDirPath)) return;
+
     /** @type {Array<string>} */
     const filesArray = fs.readdirSync(i18nDirPath);
+    // set search performance is supposed to be better than array
     const files = new Set(filesArray.map(f => f.toLowerCase()));
 
     /** @type {PackageStrings} */
@@ -186,8 +203,11 @@ class PackageLocalisations {
    * @param {Opts} opts
    */
   t(keystr, opts = {}) {
+    const key = keystr.split(".");
+    guardPrototypePollution(key);
+
     for (const locale of this.locales) {
-      const localised = this.localeObjs[locale]?.t(keystr, opts);
+      const localised = this.localeObjs[locale]?.t(key, opts);
       if (localised) return localised;
     }
   }
@@ -214,13 +234,10 @@ class SingleLanguageLocalisations {
   }
 
   /**
-   * @param {Key} keystr
+   * @param {SplitKey} key
    * @param {Opts} opts
    */
-  t(keystr, opts = {}) {
-    const key = keystr.split(".");
-    guardPrototypePollution(key);
-
+  t(key, opts = {}) {
     const formatter = this._getFormatter(key);
     if (formatter) {
       const formatted = /** @type {string} */ (formatter.format(opts));
