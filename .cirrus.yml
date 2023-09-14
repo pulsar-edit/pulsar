@@ -28,7 +28,8 @@ env:
 #                 xvfb
 #     - git submodule init
 #     - git submodule update
-#     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+#     - export COMMIT_DATE=`TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H' --format="%cd"`
+#     - sed -i -e "s/[0-9]*-dev/${COMMIT_DATE}/g" package.json
 #   install_script:
 #     - yarn install --ignore-engines || yarn install --ignore-engines
 #   build_script:
@@ -88,7 +89,8 @@ arm_linux_task:
     - gem install fpm
     - git submodule init
     - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - export COMMIT_DATE=`TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H' --format="%cd"`
+    - sed -i -e "s/[0-9]*-dev/${COMMIT_DATE}/g" package.json
   install_script:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
@@ -137,7 +139,8 @@ silicon_mac_task:
     - git submodule update
     - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - export COMMIT_DATE=`TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H' --format="%cd"`
+    - sed -i -e "s/[0-9]*-dev/${COMMIT_DATE}/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
     - yarn install --ignore-engines || yarn install --ignore-engines
@@ -193,7 +196,8 @@ silicon_mac_task:
 #     - ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
 #     - git submodule init
 #     - git submodule update
-#     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+#     - export COMMIT_DATE=`TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H' --format="%cd"`
+#     - sed -i -e "s/[0-9]*-dev/${COMMIT_DATE}/g" package.json
 #   install_script:
 #     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
 #     - arch -x86_64 npx yarn install --ignore-engines || arch -x86_64 npx yarn install --ignore-engines
@@ -246,7 +250,8 @@ silicon_mac_task:
 #     - npx yarn build:apm
 #     - npx yarn build || npx yarn build || npx yarn build
 #   build_binary_script:
-#     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+#     - export COMMIT_DATE=`TZ=UTC0 git show --quiet --date='format-local:%Y%m%d%H' --format="%cd"`
+#     - sed -i -e "s/[0-9]*-dev/${COMMIT_DATE}/g" package.json
 #     - npx yarn dist || npx yarn dist || npx yarn dist
 #   rename_binary_script:
 #     - node script/rename.js "Windows"
