@@ -271,9 +271,7 @@ class AtomEnvironment {
     });
     this.config.resetUserSettings(userSettings);
 
-    this.i18n.initialise({
-      locales: ["en"] // TODO implement config
-    });
+    this.i18n.initialise({ resourcePath });
 
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);

@@ -1,5 +1,9 @@
+const fs = require("fs-plus");
+const path = require("path");
 const { default: IntlMessageFormat } = require("intl-messageformat");
 const { parse: parseToAST } = require("@formatjs/icu-messageformat-parser");
+
+const supportedFileExts = ["cson", "json"];
 
 module.exports = class I18n {
   /**
@@ -11,6 +15,7 @@ module.exports = class I18n {
     /** @type {Array<string>} */
     this.locales = [];
     this.localisations = new Localisations();
+    this.resourcePath = "";
 
     this.config.setSchema("core.languageSettings", {
       type: "object",
@@ -38,11 +43,50 @@ module.exports = class I18n {
 
   /**
    * @param {object} opts
-   * @param {Array<string>} opts.locales
+   * @param {string} opts.resourcePath
    */
-  initialise({ locales }) {
-    this.locales = locales;
-    this.localisations.initialise({ locales });
+  initialise({ resourcePath }) {
+    this.locales = [
+      this.config.get("core.languageSettings.primaryLanguage"),
+      ...this.config.get("core.languageSettings.fallbackLanguages"),
+      "en"
+    ].map(l => l.toLowerCase());
+    this.resourcePath = resourcePath;
+
+    this.localisations.initialise({ locales: this.locales }); // TODO ast cache
+
+    this.loadStringsForCore();
+  }
+
+  loadStringsForCore() {}
+
+  loadStringsForPackage() {}
+
+  /**
+   * @param {string} pkgName
+   * @param {string} i18nDirPath path to the i18n dir with the files in it
+   */
+  _loadStringsAt(pkgName, i18nDirPath) {
+    /** @type {Array<string>} */
+    const filesArray = fs.readdirSync(i18nDirPath);
+    const files = new Set(filesArray.map(f => f.toLowerCase()));
+
+    /** @type {PackageStrings} */
+    const packageStrings = {};
+    this.locales.forEach(locale => {
+      const ext = supportedFileExts.find(ext => files.has(`${locale}.${ext}`));
+      if (!ext) return;
+
+      const filename = `${locale}.${ext}`;
+      const filepath = path.join(i18nDirPath, filename);
+
+      const strings = fs.readFileSync(filepath, "utf8");
+      packageStrings[locale] = strings;
+    });
+    this.localisations.addPackage({
+      pkgName,
+      strings: packageStrings
+    });
   }
 }
 
@@ -57,9 +101,11 @@ class Localisations {
   /**
    * @param {object} opts
    * @param {Array<string>} opts.locales
+   * @param {AllAstCache} [opts.asts]
    */
-  initialise({ locales }) {
+  initialise({ locales, asts }) {
     this.locales = locales;
+    this.asts = asts;
   }
 
   /**
@@ -79,13 +125,12 @@ class Localisations {
    * @param {object} opts
    * @param {string} opts.pkgName
    * @param {PackageStrings} opts.strings
-   * @param {PackageASTCache} [opts.asts]
    */
-  addPackage({ pkgName, strings, asts }) {
+  addPackage({ pkgName, strings }) {
     this.packages[pkgName] = new PackageLocalisations({
       locales: this.locales,
       strings,
-      asts
+      asts: this.asts?.[pkgName]
     });
   }
 }
