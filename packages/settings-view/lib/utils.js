@@ -22,13 +22,21 @@ const ownerFromRepository = repository => {
 const repoUrlFromRepository = repository => {
   if (!repository) return ''
 
+  let repo = repository
+
   if (typeof repository === 'string') {
-    return repository
+    repo = repository
   } else if (typeof repository === 'object' && typeof repository.url === 'string') {
-    return repository.url
+    repo = repository.url
   } else {
-    return ''
+    repo = ''
   }
+
+  if (repo.endsWith('.git')) {
+    repo = repo.replace('.git', '')
+  }
+
+  return repo
 }
 
 const packageComparatorAscending = (left, right) => {
