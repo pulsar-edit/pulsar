@@ -283,7 +283,7 @@ export default class PackageCard {
   loadCachedMetadata () {
     if (this.pack.repository === atom.branding.urlCoreRepo) {
       // Don't hit the web for our bundled packages. Just use the local image.
-      this.refs.avatar.src = `file://${path.join(process.execPath, "..", "resources", "pulsar.png")}`;
+      this.refs.avatar.src = `file://${path.join(process.resourcesPath, "pulsar.png")}`;
     } else {
       this.client.avatar(ownerFromRepository(this.pack.repository), (err, avatarPath) => {
         if (!err && avatarPath) {
