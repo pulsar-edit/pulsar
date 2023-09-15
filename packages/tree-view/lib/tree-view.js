@@ -1732,7 +1732,7 @@
      * @function selectedPaths
      * @desc Public: Return an array of paths from all selected items
      * @example
-     * @selectedPaths() => ['selected/path/one', 'selected/path/two', 'selected/path/three' ]
+     * selectedPaths() => [ 'selected/path/one', 'selected/path/two', 'selected/path/three' ]
      * @returns {array} Selected item paths
      */
     TreeView.prototype.selectedPaths = function() {
