@@ -7,7 +7,7 @@ import etch from 'etch'
 import BadgeView from './badge-view'
 import path from 'path'
 
-import {ownerFromRepository} from './utils'
+import {ownerFromRepository, repoUrlFromRepository} from './utils'
 
 let marked = null
 
@@ -281,7 +281,7 @@ export default class PackageCard {
   }
 
   loadCachedMetadata () {
-    if (this.pack.repository === atom.branding.urlCoreRepo) {
+    if (repoUrlFromRepository(this.pack.repository) === atom.branding.urlCoreRepo) {
       // Don't hit the web for our bundled packages. Just use the local image.
       this.refs.avatar.src = `file://${path.join(process.resourcesPath, "pulsar.png")}`;
     } else {

@@ -19,6 +19,18 @@ const ownerFromRepository = repository => {
   return match ? match[1] : ''
 }
 
+const repoUrlFromRepository = repository => {
+  if (!repository) return ''
+
+  if (typeof repository === 'string') {
+    return repository
+  } else if (typeof repository === 'object' && typeof repository.url === 'string') {
+    return repository.url
+  } else {
+    return ''
+  }
+}
+
 const packageComparatorAscending = (left, right) => {
   const leftStatus = atom.packages.isPackageDisabled(left.name)
   const rightStatus = atom.packages.isPackageDisabled(right.name)
@@ -37,4 +49,4 @@ const packageComparatorAscending = (left, right) => {
   }
 }
 
-module.exports = {ownerFromRepository, packageComparatorAscending}
+module.exports = {ownerFromRepository, repoUrlFromRepository, packageComparatorAscending}
