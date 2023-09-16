@@ -50,40 +50,31 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Restored ability for `less` files in packages to use inline JavaScript inside backticks.
+                Fixed a race condition that could cause `autocomplete-plus` to ignore user input.
               </li>
               <li>
-                Fixed a syntax highlighting issue inside the `styleguide` package.
+                Fixed the `about` package linking to release notes for Pulsar.
               </li>
               <li>
-                Fixed an issue with rubygems timing out on ARM Linux workflow.
+                Reduced the amount of network requests that `settings-view` creates.
               </li>
               <li>
-                Rewrote Tree-sitter scope predicates to use `#is?` and `#is-not?` where applicable.
+                Fixed the icon used when registering Pulsar as a file handler on Windows.
+              </li>
+              <li>
+                Removed the `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
               </li>
               <li>
                 Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
               </li>
               <li>
-                Added a feature in `markdown-preview` that adds support for Linguist, Chroma, Rouge, and HighlightJS for
-                language identifiers in fenced code blocks.
+                Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
               </li>
               <li>
-                Fixed the `TextMate` `language-toml` grammar to properly support whitespace where-ever it may appear.
+                Removed all CoffeeScript code from Pulsar and core packages.
               </li>
               <li>
-                Added a Tree-Sitter grammar for YAML files.
-              </li>
-              <li>
-                Added a new core package `pulsar-updater` to help users update Pulsar.
-              </li>
-              <li>
-                Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of
-                correctly named binaries on more systems in more contexts (especially Windows).
-                Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
-              </li>
-              <li>
-                Added a modern Tree-Sitter grammar for Markdown files.
+                Migrated the majority of our CI to GitHub Actions.
               </li>
 
             </ul>
