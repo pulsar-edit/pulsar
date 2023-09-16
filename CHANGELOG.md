@@ -10,7 +10,7 @@
 
 - Fixed a race condition that could cause `autocomplete-plus` to ignore user input.
 - Fixed the `about` package linking to release notes for Pulsar.
-- Reduced the amount of network requests that `settings-view` does.
+- Reduced the amount of network requests that `settings-view` creates.
 - Fixed the icon used when registering Pulsar as a file handler on Windows.
 - Removed the `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
 - Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
@@ -18,6 +18,7 @@
 - Migrated the majority of our CI to GitHub Actions.
 
 ### Pulsar
+- Added: about: Make the About page's CSS responsive for narrow panes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/717)
 - Added: [core & settings-view] Avoid network requests for bundled packages [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/711)
 - Fixed: Remove @ from example to fix Documentation CI [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/719)
 - Fixed: Cirrus: Don't update last good commit if CI skipped [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/716)
