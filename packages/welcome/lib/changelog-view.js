@@ -62,7 +62,7 @@ export default class ChangeLogView {
                 Fixed the icon used when registering Pulsar as a file handler on Windows.
               </li>
               <li>
-                Removed the `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
+                Removed the non-functional `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
               </li>
               <li>
                 Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
@@ -71,7 +71,7 @@ export default class ChangeLogView {
                 Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
               </li>
               <li>
-                Removed all CoffeeScript code from Pulsar and core packages.
+                Removed the last CoffeeScript code from Pulsar and core packages.
               </li>
               <li>
                 Migrated the majority of our CI to GitHub Actions.

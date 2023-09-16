@@ -12,9 +12,9 @@
 - Fixed the `about` package linking to release notes for Pulsar.
 - Reduced the amount of network requests that `settings-view` creates.
 - Fixed the icon used when registering Pulsar as a file handler on Windows.
-- Removed the `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
+- Removed the non-functional `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
 - Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
-- Removed all CoffeeScript code from Pulsar and core packages.
+- Removed the last CoffeeScript code from Pulsar and core packages.
 - Migrated the majority of our CI to GitHub Actions.
 
 ### Pulsar
