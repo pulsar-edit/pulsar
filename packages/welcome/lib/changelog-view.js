@@ -56,6 +56,9 @@ export default class ChangeLogView {
                 Fixed the `about` package linking to release notes for Pulsar.
               </li>
               <li>
+                Reduced the amount of network requests that `settings-view` creates.
+              </li>
+              <li>
                 Fixed the icon used when registering Pulsar as a file handler on Windows.
               </li>
               <li>
