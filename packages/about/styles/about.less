@@ -33,6 +33,10 @@
     margin-top: -.2em;
   }
 
+  .min-width-min-content {
+    min-width: min-content;
+  }
+
   // used to group different elements
   .group-start {
     margin-top: 4em;
@@ -45,7 +49,12 @@
 .about-container {
   width: 100%;
   max-width: 500px;
+
+  .icon::before {
+    margin-right: 0;
+  }
 }
+
 
 // Header --------------------------------
 
@@ -64,7 +73,16 @@
   transition: color 0.2s;
 }
 
+.about-header-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: 30px;
+}
 .about-version-container {
+  vertical-align: middle;
+  white-space: nowrap;
   &:hover {
     color: lighten(@text-color, 15%);
   }
@@ -84,17 +102,12 @@
   font-size: .9em;
 }
 
-.about-header-release-notes {
-  vertical-align: middle;
-  margin-left: 1em;
-}
-
 
 // Updates --------------------------------
 
 .about-updates {
   width: 100%;
-  max-width: 500px;
+  max-width: 39em;
 }
 
 .about-updates-box {
@@ -102,14 +115,14 @@
   align-items: center;
   padding: @component-padding;
   border: 1px solid @base-border-color;
-  border-radius: @component-border-radius * 2;
+  border-radius: (@component-border-radius * 2);
   background-color: @background-color-highlight;
 }
 
 .about-updates-status {
   flex: 1;
   margin-left: .5em;
-  text-align: left;
+  text-align: center;
 }
 
 .about-updates-item,
@@ -128,11 +141,6 @@
   margin: 0 .4em;
 }
 
-.about-updates-release-notes,
-.about-updates-instructions {
-  margin: 0 1em 0 1.5em;
-}
-
 .about-auto-updates {
   margin-top: 1em;
   input {
@@ -144,6 +152,8 @@
 // Love --------------------------------
 
 .about-love {
+  min-width: max-content;
+
   .icon::before {
     // Make these octicons look good inlined with text
     position: relative;

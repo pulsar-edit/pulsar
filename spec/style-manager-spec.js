@@ -141,6 +141,112 @@ describe('StyleManager', () => {
       });
     });
 
+    describe('css mathematical expression calc() wrap upgrades', () => {
+      const mathStyleManager = new StyleManager();
+      mathStyleManager.configDirPath = null; // Ensures for testing that we never
+      // go looking for cached files, and will always use the css provided
+
+      it('does not upgrade already wrapped math', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: calc(10px/2); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2); }");
+      });
+
+      it('does not upgrade negative numbers', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 0 -1px; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: 0 -1px; }");
+      });
+
+      it('upgrades simple division', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 10px/2; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2); }");
+      });
+
+      it('upgrades multi parameter math', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 0 10px/2 5em; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: 0 calc(10px/2) 5em; }");
+      });
+
+      it('upgrades math with spaces', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 10px / 2; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px / 2); }");
+      });
+
+      it('upgrades multiple math expressions in a single line', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 10px/2 10px/3; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2) calc(10px/3); }");
+      });
+
+      it('does not upgrade base64 strings', () => {
+        // Regression Check
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }"
+        );
+      });
+
+      it('does not modify hsl function where `/` is valid', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { caret-color: hsl(228deg 4% 24% / 0.8); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { caret-color: hsl(228deg 4% 24% / 0.8); }"
+        );
+      });
+
+      it('does not modify acos function, where math is valid', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { transform: rotate(acos(2 * 0.125)); }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { transform: rotate(acos(2 * 0.125)); }"
+        );
+      });
+
+      it('recognizes valid less variables: right side', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: @size + 12px; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { padding: calc(@size + 12px); }"
+        );
+      });
+
+      it('recognizes valid less variables: left side', () => {
+        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+          "p { padding: 12px + @size; }",
+          {}
+        );
+        expect(upgradedSheet.source).toEqual(
+          "p { padding: calc(12px + @size); }"
+        );
+      });
+
+    });
+
     describe('when a sourcePath parameter is specified', () => {
       it('ensures a maximum of one style element for the given source path, updating a previous if it exists', () => {
         styleManager.addStyleSheet('a {color: red}', {

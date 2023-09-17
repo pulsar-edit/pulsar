@@ -4,8 +4,10 @@
 import {CompositeDisposable, Disposable} from 'atom'
 import {shell} from 'electron'
 import etch from 'etch'
+import BadgeView from './badge-view'
+import path from 'path'
 
-import {ownerFromRepository} from './utils'
+import {ownerFromRepository, repoUrlFromRepository} from './utils'
 
 let marked = null
 
@@ -46,6 +48,7 @@ export default class PackageCard {
     this.handlePackageEvents()
     this.handleButtonEvents(options)
     this.loadCachedMetadata()
+    this.addBadges()
 
     // themes have no status and cannot be dis/enabled
     if (this.type === 'theme') {
@@ -91,6 +94,7 @@ export default class PackageCard {
             <span className='package-version'>
               <span ref='versionValue' className='value'>{String(this.pack.version)}</span>
             </span>
+            <span ref='badges'></span>
           </h4>
           <span ref='packageDescription' className='package-description'>{description}</span>
           <div ref='packageMessage' className='package-message' />
@@ -277,30 +281,39 @@ export default class PackageCard {
   }
 
   loadCachedMetadata () {
-    this.client.avatar(ownerFromRepository(this.pack.repository), (err, avatarPath) => {
-      if (!err && avatarPath) {
-        this.refs.avatar.src = `file://${avatarPath}`
-      }
-    })
-
-    this.client.package(this.pack.name, (err, data) => {
-      // We don't need to actually handle the error here, we can just skip
-      // showing the download count if there's a problem.
-      if (!err) {
-        if (data == null) {
-          data = {}
+    if (repoUrlFromRepository(this.pack.repository) === atom.branding.urlCoreRepo) {
+      // Don't hit the web for our bundled packages. Just use the local image.
+      this.refs.avatar.src = `file://${path.join(process.resourcesPath, "pulsar.png")}`;
+    } else {
+      this.client.avatar(ownerFromRepository(this.pack.repository), (err, avatarPath) => {
+        if (!err && avatarPath) {
+          this.refs.avatar.src = `file://${avatarPath}`
         }
+      })
+    }
 
-        if (this.pack.apmInstallSource && this.pack.apmInstallSource.type === 'git') {
-          this.refs.downloadIcon.classList.remove('icon-cloud-download')
-          this.refs.downloadIcon.classList.add('icon-git-branch')
-          this.refs.downloadCount.textContent = this.pack.apmInstallSource.sha.substr(0, 8)
-        } else {
-          this.refs.stargazerCount.textContent = data.stargazers_count ? data.stargazers_count.toLocaleString() : ''
-          this.refs.downloadCount.textContent = data.downloads ? data.downloads.toLocaleString() : ''
+    // We don't want to hit the API for this data, if it's a bundled package
+    if (this.pack.repository !== atom.branding.urlCoreRepo) {
+      this.client.package(this.pack.name, (err, data) => {
+        // We don't need to actually handle the error here, we can just skip
+        // showing the download count if there's a problem.
+        if (!err) {
+          if (data == null) {
+            data = {}
+          }
+
+          if (this.pack.apmInstallSource && this.pack.apmInstallSource.type === 'git') {
+            this.refs.downloadIcon.classList.remove('icon-cloud-download')
+            this.refs.downloadIcon.classList.add('icon-git-branch')
+            this.refs.downloadCount.textContent = this.pack.apmInstallSource.sha.substr(0, 8)
+          } else {
+
+            this.refs.stargazerCount.textContent = data.stargazers_count ? parseInt(data.stargazers_count).toLocaleString() : ''
+            this.refs.downloadCount.textContent = data.downloads ? parseInt(data.downloads).toLocaleString() : ''
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   updateInterfaceState () {
@@ -319,6 +332,17 @@ export default class PackageCard {
       this.refs.settingsButton.style.display = ''
     } else {
       this.refs.settingsButton.style.display = 'none'
+    }
+  }
+
+  addBadges() {
+    if (Array.isArray(this.pack.badges)) {
+      // This safety check is especially needed, as any cached package
+      // data will not contain the badges field
+      for (const badge of this.pack.badges) {
+        let badgeView = new BadgeView(badge)
+        this.refs.badges.appendChild(badgeView.element)
+      }
     }
   }
 

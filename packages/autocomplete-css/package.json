@@ -2,7 +2,7 @@
   "name": "autocomplete-css",
   "version": "0.17.5",
   "description": "CSS property name and value autocompletions",
-  "main": "./lib/main",
+  "main": "./lib/main.js",
   "license": "MIT",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
@@ -18,6 +18,6 @@
   "devDependencies": {
     "@webref/css": "^6.3.4",
     "content": "github:mdn/content",
-    "request": "^2.53.0"
+    "superagent": "^8.0.9"
   }
 }

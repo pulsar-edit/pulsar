@@ -1,0 +1,193 @@
+@import "ui-variables";
+@import "octicon-mixins";
+
+@icon-size: 30px;
+@font-family-monospace: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+
+.notifications-log {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+
+  header {
+    flex: none;
+    background-color: @base-background-color;
+    border-bottom: 1px solid @base-border-color;
+
+    button {
+      border: none;
+      width: @icon-size;
+      height: @icon-size;
+      margin: 1px;
+      padding: 0;
+      color: @text-color-subtle;
+      opacity: .5;
+      background: @base-background-color;
+    }
+
+    .notifications-clear-log {
+      float: right;
+    }
+  }
+
+  .notifications-log-items  {
+    flex: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+
+    .notifications-log-item {
+      display: flex;
+      box-sizing: content-box; // Keep spacing even
+      border-bottom: 1px solid @base-border-color;
+      max-height: @icon-size;
+      overflow: hidden;
+
+      .notifications-log-notification {
+        flex: auto;
+        display: flex;
+        position: relative;
+        padding-left: @icon-size;
+        overflow: hidden;
+
+        &.icon:before {
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: @icon-size;
+          height: 100%;
+          padding-top: (@component-padding/2);
+          text-align: center;
+        }
+
+        .message {
+          flex: 0 1 auto;
+          word-wrap: break-word;
+          padding: (@component-padding/2) @component-padding;
+          border-left: 1px solid @base-border-color;
+        }
+
+        .btn-toolbar {
+          flex: 1 0 auto;
+          display: flex;
+          align-items: center;
+          white-space: nowrap;
+
+          &:empty {
+            display: none;
+          }
+
+          .btn-copy-report {
+            vertical-align: middle;
+            margin-left: (@component-padding/2);
+
+            &::before {
+              margin: 0;
+            }
+          }
+        }
+      }
+
+      .timestamp {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        text-align: center;
+        line-height: @icon-size;
+        padding: 0 @component-padding;
+      }
+    }
+  }
+
+}
+
+// Types -------------------------------
+
+.notifications-log {
+
+  // fatal
+  .notification-type.fatal {
+    .type(@text-color-error; @background-color-error);
+  }
+
+  .hide-fatal li.fatal {
+    display: none;
+  }
+
+  .notifications-log-notification.fatal {
+    .log(@text-color-error; @background-color-error);
+  }
+
+  // error
+  .notification-type.error {
+    .type(@text-color-error; @background-color-error);
+  }
+
+  .hide-error li.error {
+    display: none;
+  }
+
+  .notifications-log-notification.error {
+    .log(@text-color-error; @background-color-error);
+  }
+
+  // warning
+  .notification-type.warning {
+    .type(@text-color-warning; @background-color-warning);
+  }
+
+  .hide-warning li.warning {
+    display: none;
+  }
+
+  .notifications-log-notification.warning {
+    .log(@text-color-warning; @background-color-warning);
+  }
+
+  // info
+  .notification-type.info {
+    .type(@text-color-info; @background-color-info);
+  }
+
+  .hide-info li.info {
+    display: none;
+  }
+
+  .notifications-log-notification.info {
+    .log(@text-color-info; @background-color-info);
+  }
+
+  // success
+  .notification-type.success {
+    .type(@text-color-success; @background-color-success);
+  }
+
+  .hide-success li.success {
+    display: none;
+  }
+
+  .notifications-log-notification.success {
+    .log(@text-color-success; @background-color-success);
+  }
+
+}
+
+// Type Mixin
+
+.type(@txt; @bg) {
+  &.show-type {
+    color: @txt;
+    opacity: 1;
+  }
+}
+
+.log(@txt; @bg) {
+  .message {
+    color: lighten(@txt, 0%);
+  }
+
+  &.icon:before {
+    color: @txt;
+  }
+}

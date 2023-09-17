@@ -7,7 +7,7 @@
   const path = require('path');
   const Module = require('module');
   const getWindowLoadSettings = require('../src/get-window-load-settings');
-  const getReleaseChannel = require('../src/get-release-channel');
+  const { getReleaseChannel } = require('../src/get-app-details.js');
   const StartupTime = require('../src/startup-time');
   const entryPointDirPath = __dirname;
   let blobStore = null;

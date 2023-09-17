@@ -1,7 +1,7 @@
 @import "ui-variables";
 @import "syntax-variables";
 
-@styleguide-spacing: @component-padding *1.5;
+@styleguide-spacing: (@component-padding *1.5);
 @styleguide-bg: darken(@base-background-color, 2%);
 
 .styleguide {
@@ -101,14 +101,14 @@
   display: flex;
   flex-wrap: wrap;
   border-radius: @component-border-radius;
-  padding: @component-padding / 2;
+  padding: (@component-padding / 2);
 
   .example-rendered,
   .example-code {
     position: relative;
     flex: 1 1 300px;
     min-width: 0;
-    margin: @component-padding / 2;
+    margin: (@component-padding / 2);
     border-radius: @component-border-radius;
     border: 1px solid @tool-panel-border-color;
   }

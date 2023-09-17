@@ -150,7 +150,8 @@ let options = {
   rpm: {
     afterInstall: "script/post-install.sh",
     afterRemove: "script/post-uninstall.sh",
-    compression: 'xz'
+    compression: 'xz',
+    fpm: ['--rpm-rpmbuild-define=_build_id_links none']
   },
   "linux": {
     // Giving a single PNG icon to electron-builder prevents the correct
@@ -181,8 +182,6 @@ let options = {
     "category": "public.app-category.developer-tools",
     "minimumSystemVersion": "10.8",
     "hardenedRuntime": true,
-    "entitlements": "resources/mac/entitlements.plist",
-    "entitlementsInherit": "resources/mac/entitlements.plist",
     "extendInfo": {
       // This contains extra values that will be inserted into the App's plist
       "CFBundleExecutable": "Pulsar",
@@ -214,6 +213,10 @@ let options = {
         "from": "resources/win/pulsar.js",
         "to": "pulsar.js"
       },
+      {
+        "from": "resources/win/modifyWindowsPath.ps1",
+        "to": "modifyWindowsPath.ps1"
+      }
     ],
     "target": [
       { "target": "nsis" },
@@ -228,6 +231,12 @@ let options = {
     "runAfterFinish": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
+    "guid": "0949b555-c22c-56b7-873a-a960bdefa81f",
+    // The GUID is generated from Electron-Builder based on our AppID
+    // Hardcoding it here means it will always be used as generated from
+    // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
+    // A PR to GitHub Desktop must be made with the updated value
+    "include": "resources/win/installer.nsh"
   },
   "extraMetadata": {
   },
@@ -239,6 +248,24 @@ let options = {
     "**/node_modules/spellchecker/**", // Matching Atom Glob
   ]
 
+}
+
+/**
+ The below optional entitlements is needed for the following reasons:
+  - `allow-jit` needs to be applied on silicon builds for WASM to work:
+      https://github.com/pulsar-edit/pulsar/pull/454
+  - But setting `allow-jit` on Intel decreases performance of `fork()` operations
+    e.g. `require('child_process').spanw(...)`
+  - This monkey patch will no longer be needed when we can bump Electron
+    and get `libuv` `v1.42.0` as this issue is fixed upstream there
+  - See: https://github.com/microsoft/vscode/issues/105446
+*/
+if (process.arch === "x64") {
+  options.mac.entitlements = "resources/mac/entitlements.intel.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
+} else {
+  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
+  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
 }
 
 function whatToBuild() {

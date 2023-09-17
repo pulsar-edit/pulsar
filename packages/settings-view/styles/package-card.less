@@ -7,11 +7,11 @@
   // TODO: Somehow unify the "card".
 
   .package-card {
-    padding: @component-padding*1.5;
+    padding: (@component-padding*1.5);
     margin-bottom: @component-padding;
     list-style-type: none;
     font-size: 1.2em;
-    border-radius: @component-border-radius*2;
+    border-radius: (@component-border-radius*2);
     border: 1px solid @base-border-color;
     background-color: @package-card-background-color;
     overflow: hidden;
@@ -47,7 +47,7 @@
       margin: 0;
       min-height: 140px;
       color: @text-color;
-      border-radius: @component-border-radius*2;
+      border-radius: (@component-border-radius*2);
       border: 1px solid @base-border-color;
       background-color: @package-card-background-color;
 
@@ -114,16 +114,12 @@
       margin: 0 0 .2em 0;
       font-size: 1.2em;
       line-height: 1.4;
-
-      .css-truncate-target {
-        color: $greenDark;
-      }
     }
 
     .stats {
 
       .stats-item {
-        margin-left: @component-padding*1.5;
+        margin-left: (@component-padding*1.5);
         height: 26px;
         display: inline-block;
         line-height: 24px;
@@ -148,15 +144,25 @@
       }
     }
 
-    .body {
-      .css-truncate-target {
-        max-width: 100%;
-      }
-    }
-
     .package-description {
       white-space: normal;
       line-height: 1.4;
+    }
+
+    .badge:hover .badge-text {
+      display: contents;
+    }
+
+    .badge:hover .badge-expandable {
+      display: none;
+    }
+
+    .badge-expandable {
+      display: contents;
+    }
+
+    .badge-text {
+      display: none;
     }
 
     .meta {
@@ -167,16 +173,6 @@
 
       a.linked-octicon {
         text-decoration: none;
-
-        &:hover {
-          .octicon {
-            color: $greenDark;
-          }
-
-          .value {
-            color: $greenDark;
-          }
-        }
       }
 
       .action {
@@ -217,7 +213,7 @@
     }
 
     .meta-controls {
-      margin-top: @component-padding/2;
+      margin-top: (@component-padding/2);
 
       .install-button.is-installing,
       .uninstall-button.is-uninstalling {
@@ -229,7 +225,7 @@
 
       .status-indicator {
         padding: 0;
-        width: @component-padding/2;
+        width: (@component-padding/2);
         min-width: 4px;
         pointer-events: none;
         transition: background .4s;
@@ -241,7 +237,7 @@
 
       .btn-toolbar > .btn-group {
         float: left;
-        margin: @component-padding/2 0 0 @component-padding/2;
+        margin: (@component-padding/2) 0 0 (@component-padding/2);
       }
     }
 
@@ -253,7 +249,7 @@
 
     &.blank-slate {
       text-align: center;
-      color: $beigeDark;
+      //color: $beigeDark;
       height: 132px;
       line-height: 132px;
     }

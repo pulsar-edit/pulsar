@@ -3,7 +3,6 @@ const etch = require('etch');
 const { shell } = require('electron');
 const AtomLogo = require('./atom-logo');
 const EtchComponent = require('../etch-component');
-const UpdateView = require('./update-view');
 
 const $ = etch.dom;
 
@@ -31,7 +30,7 @@ module.exports = class AboutView extends EtchComponent {
   handleReleaseNotesClick(e) {
     e.preventDefault();
     shell.openExternal(
-      this.props.updateManager.getReleaseNotesURLForAvailableVersion() //update-manager.js will need updating when we decide how to do the changelog
+      this.props.updateManager.getReleaseNotesURLForCurrentVersion()
     );
   }
 
@@ -52,7 +51,15 @@ module.exports = class AboutView extends EtchComponent {
   handleHowToUpdateClick(e) {
     e.preventDefault();
     shell.openExternal(
-            'https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar'
+            'https://github.com/pulsar-edit/pulsar/tree/master/packages/pulsar-updater#readme'
+    );
+  }
+
+  executeUpdateAction(e) {
+    e.preventDefault();
+    atom.commands.dispatch(
+      atom.views.getView(atom.workspace),
+      'pulsar-updater:check-for-update'
     );
   }
 
@@ -76,7 +83,7 @@ module.exports = class AboutView extends EtchComponent {
     return $.div(
       { className: 'pane-item native-key-bindings about' },
       $.div(
-        { className: 'about-container' },
+        { className: 'about-container min-width-min-content' },
         $.header(
           { className: 'about-header' },
           $.a(
@@ -87,7 +94,7 @@ module.exports = class AboutView extends EtchComponent {
             { className: 'about-header-info' },
             $.span(
               {
-                className: 'about-version-container inline-block atom',
+                className: 'about-version-container atom',
                 onclick: this.handleAtomVersionClick.bind(this)
               },
               $.span(
@@ -107,7 +114,7 @@ module.exports = class AboutView extends EtchComponent {
           $.span(
             {
               className:
-                'about-version-container inline-block show-more-expand',
+                'about-version-container show-more-expand',
               onclick: this.handleShowMoreClick.bind(this)
             },
             $.span({ className: 'about-more-expand' }, 'Show more')
@@ -160,12 +167,31 @@ module.exports = class AboutView extends EtchComponent {
         )
       ),
 
-      $(UpdateView, {
-        updateManager: this.props.updateManager,
-        availableVersion: this.props.availableVersion,
-        viewUpdateReleaseNotes: this.handleReleaseNotesClick.bind(this),
-        viewUpdateInstructions: this.handleHowToUpdateClick.bind(this)
-      }),
+      $.div(
+        { className: 'about-updates group-start min-width-min-content' },
+        $.div(
+          { className: 'about-updates-box' },
+          $.div(
+            { className: 'about-updates-status' },
+            $.div(
+              { className: 'about-updates-item app-unsupported' },
+              $.span(
+                { className: 'about-updates-label is-strong' },
+                'Updates have been moved to the package ', $.code({style: {'white-space': 'nowrap'}}, 'pulsar-updater'), '.',
+                $.br()
+              ),
+              $.a(
+                {
+                  className: 'about-updates-instructions',
+                  onclick: this.handleHowToUpdateClick.bind(this)
+                },
+                'How to update'
+              )
+            )
+          ),
+          this.renderUpdateChecker()
+        )
+      ),
 
       $.div(
         { className: 'about-actions group-item' },
@@ -199,6 +225,30 @@ module.exports = class AboutView extends EtchComponent {
         $.a({ className: 'inline', href: `${atom.branding.urlWeb}` }, 'Pulsar Team')
       ),
     );
+  }
+
+  renderUpdateChecker() {
+    if (atom.packages.isPackageDisabled("pulsar-updater")) {
+      return $.div(
+        { className: 'about-updates-item app-unsupported' },
+        $.span(
+          { className: 'about-updates-label is-strong' },
+          'Enable `pulsar-updater` to check for updates'
+        )
+      );
+    } else {
+      return $.button(
+        {
+          className: 'btn about-update-action-button',
+          onclick: this.executeUpdateAction.bind(this),
+          style: {
+            display: 'block',
+            margin: '0 .5em'
+          }
+        },
+        'Check Now'
+      );
+    }
   }
 
   serialize() {

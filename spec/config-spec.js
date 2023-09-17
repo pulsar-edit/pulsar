@@ -6,7 +6,7 @@ describe('Config', () => {
     atom.config.settingsLoaded = true;
 
     savedSettings = [];
-    atom.config.saveCallback = function(settings) {
+    atom.config.saveCallback = function (settings) {
       savedSettings.push(settings);
     };
   });
@@ -40,7 +40,11 @@ describe('Config', () => {
       expect(atom.config.get('bar.baz')).toEqual({ a: 3 });
     });
 
-    describe("when a 'sources' option is specified", () =>
+    describe("when a 'sources' option is specified", () => {
+      afterEach(() => {
+        atom.project.replace(null);
+      });
+
       it('only retrieves values from the specified sources', () => {
         atom.config.set('x.y', 1, { scopeSelector: '.foo', source: 'a' });
         atom.config.set('x.y', 2, { scopeSelector: '.foo', source: 'b' });
@@ -64,9 +68,50 @@ describe('Config', () => {
         expect(
           atom.config.get(null, { sources: ['a'], scope: ['.foo'] }).x.y
         ).toBe(1);
-      }));
+      })
 
-    describe("when an 'excludeSources' option is specified", () =>
+      it(`ignores project-specific settings unless specified in the "sources" option`, () => {
+        atom.config.set('x.y', 1);
+        atom.config.set('u.v', 5);
+
+        atom.project.replace({
+          originPath: 'TEST',
+          paths: atom.project.getPaths(),
+          config: {
+            "*": {
+              "x": {
+                "y": 4
+              }
+            }
+          }
+        });
+
+        expect(
+          atom.config.get('x.y', { sources: [atom.config.mainSource] })
+        ).toBe(1);
+        expect(
+          atom.config.get('x.y', { sources: [atom.config.mainSource, atom.config.projectFile] })
+        ).toBe(4);
+
+        expect(
+          atom.config.get('x.y', { sources: [atom.config.projectFile] })
+        ).toBe(4);
+
+        expect(
+          atom.config.get('u.v', {
+            sources: [atom.config.projectFile],
+            excludeSources: [atom.config.mainSource]
+          })
+        ).toBeUndefined();
+      });
+    });
+
+
+    describe("when an 'excludeSources' option is specified", () => {
+      afterEach(() => {
+        atom.project.replace(null);
+      });
+
       it('only retrieves values from the specified sources', () => {
         atom.config.set('x.y', 0);
         atom.config.set('x.y', 1, { scopeSelector: '.foo', source: 'a' });
@@ -103,7 +148,29 @@ describe('Config', () => {
             excludeSources: [atom.config.getUserConfigPath()]
           })
         ).toBe(4);
-      }));
+      });
+
+      it("ignores the project-specific source when 'excludeSources' tells it to", () => {
+        atom.config.set('x.y', 1);
+
+        atom.project.replace({
+          originPath: 'TEST',
+          paths: atom.project.getPaths(),
+          config: {
+            "*": {
+              "x": {
+                "y": 4
+              }
+            }
+          }
+        });
+
+        expect( atom.config.get('x.y') ).toBe(4);
+        expect(
+          atom.config.get('x.y', { excludeSources: [atom.config.projectFile] })
+        ).toBe(1);
+      });
+    });
 
     describe("when a 'scope' option is given", () => {
       it('returns the property with the most specific scope selector', () => {
@@ -590,7 +657,7 @@ describe('Config', () => {
         ).toBe(55);
 
         advanceClock(150);
-        
+
         savedSettings.length = 0;
 
         atom.config.unset('foo.bar.baz', { scopeSelector: '.source.coffee' });

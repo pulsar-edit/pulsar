@@ -5,7 +5,7 @@ const {
   ipcMain,
   nativeImage
 } = require('electron');
-const getAppName = require('../get-app-name');
+const { getAppName } = require('../get-app-details.js');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');

@@ -13,9 +13,9 @@
     "dompurify": "^2.0.17",
     "emoji-images": "^0.1.1",
     "fs-plus": "^3.0.0",
-    "marked": "^0.7.0",
+    "marked": "5.0.3",
     "underscore-plus": "^1.0.0",
-    "yaml-front-matter": "^4.0.0"
+    "yaml-front-matter": "^4.1.1"
   },
   "devDependencies": {
     "temp": "^0.8.1"
@@ -61,6 +61,34 @@
       "type": "boolean",
       "default": false,
       "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
+    },
+    "syntaxHighlightingLanguageIdentifier": {
+      "description": "Syntax Highlighting System to use for code block language identification. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for details.",
+      "type": "string",
+      "default": "linguist",
+      "enum": [
+        {
+          "value": "linguist",
+          "description": "Linguist: GitHub"
+        },
+        {
+          "value": "chroma",
+          "description": "Chroma: CodeBerg/Gitea/Hugo/Goldmark"
+        },
+        {
+          "value": "rouge",
+          "description": "Rouge: GitLab/Jekyll"
+        },
+        {
+          "value": "highlightjs",
+          "description": "HighlightJS: Markdown-IT"
+        }
+      ]
+    },
+    "customSyntaxHighlightingLanguageIdentifiers": {
+      "description": "Custom comma seperated list of Syntax Language Identifiers to map to any language. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for usage.",
+      "type": "string",
+      "default": ""
     }
   }
 }

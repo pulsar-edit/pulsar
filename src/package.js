@@ -314,7 +314,10 @@ module.exports = class Package {
           sourcePath,
           priority,
           context,
-          skipDeprecatedSelectorsTransformation: this.bundledPackage
+          skipDeprecatedSelectorsTransformation:
+            this.bundledPackage ? this.bundledPackage : !this.config.get("core.transformDeprecatedStyleSheetSelectors"),
+          skipDeprecatedMathUsageTransformation:
+            this.bundledPackage ? this.bundledPackage : !this.config.get("core.transformDeprecatedStyleSheetMathExpressions")
         })
       );
     }
@@ -927,27 +930,6 @@ module.exports = class Package {
     }
   }
 
-  // a require function with both ES5 and ES6 default export support
-  _require(path) {
-    const modul = require(path);
-    if (modul === null || modul === undefined) {
-      // if null do not bother
-      return modul;
-    } else {
-      if (
-        modul.__esModule === true &&
-        typeof modul.default === 'object' &&
-        typeof modul.default.activate === 'function'
-      ) {
-        // __esModule flag is true and the activate function exists inside it, which means
-        // an object containing the main functions (e.g. activate, etc) is default exported
-        return modul.default;
-      } else {
-        return modul;
-      }
-    }
-  }
-
   getMainModulePath() {
     if (this.resolvedMainModulePath) return this.mainModulePath;
     this.resolvedMainModulePath = true;
@@ -1237,9 +1219,7 @@ module.exports = class Package {
         this.compatible = true;
       } else if (this.getMainModulePath()) {
         this.incompatibleModules = this.getIncompatibleNativeModules();
-        this.compatible =
-          this.incompatibleModules.length === 0 &&
-          this.getBuildFailureOutput() == null;
+        this.compatible = this.incompatibleModules.length === 0;
       } else {
         this.compatible = true;
       }
@@ -1267,10 +1247,6 @@ module.exports = class Package {
             result.stderr
           );
         }
-        global.localStorage.setItem(
-          this.getIncompatibleNativeModulesStorageKey(),
-          '[]'
-        );
         resolve(result);
       })
     );
@@ -1308,13 +1284,6 @@ module.exports = class Package {
     }:build-error`;
   }
 
-  getIncompatibleNativeModulesStorageKey() {
-    const electronVersion = process.versions.electron;
-    return `installed-packages:${this.name}:${
-      this.metadata.version
-    }:electron-${electronVersion}:incompatible-native-modules`;
-  }
-
   getCanDeferMainModuleRequireStorageKey() {
     return `installed-packages:${this.name}:${
       this.metadata.version
@@ -1327,15 +1296,6 @@ module.exports = class Package {
   // This information is cached in local storage on a per package/version basis
   // to minimize the impact on startup time.
   getIncompatibleNativeModules() {
-    if (!this.packageManager.devMode) {
-      try {
-        const arrayAsString = global.localStorage.getItem(
-          this.getIncompatibleNativeModulesStorageKey()
-        );
-        if (arrayAsString) return JSON.parse(arrayAsString);
-      } catch (error1) {}
-    }
-
     const incompatibleNativeModules = [];
     const nativeModulePaths = this.getNativeModuleDependencyPathsMap();
     for (const [nativeModulePath, nodeFilesPaths] of nativeModulePaths) {
@@ -1357,11 +1317,6 @@ module.exports = class Package {
         });
       }
     }
-
-    global.localStorage.setItem(
-      this.getIncompatibleNativeModulesStorageKey(),
-      JSON.stringify(incompatibleNativeModules)
-    );
 
     return incompatibleNativeModules;
   }

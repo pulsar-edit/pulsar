@@ -1,0 +1,31 @@
+name: 'Shell Script'
+scopeName: 'source.shell'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-bash'
+
+fileTypes: [
+  'sh'
+  'bash'
+]
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(bash|sh)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=(sh|bash)'
+]
+
+# Try to match `bash` exactly, or failing that, anything that ends in `sh`
+# (for zsh/fish/etc.).
+injectionRegex: '(^(bash|BASH)$|sh^|SH^)'
+
+treeSitter:
+  grammar: 'tree-sitter/tree-sitter-bash.wasm'
+  highlightsQuery: 'tree-sitter/highlights.scm'
+  tagsQuery: 'tree-sitter/tags.scm'
+  foldsQuery: 'tree-sitter/folds.scm'
+  indentsQuery: 'tree-sitter/indents.scm'
+
+comments:
+  start: '# '

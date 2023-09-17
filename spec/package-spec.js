@@ -74,19 +74,6 @@ describe('Package', function() {
       expect(pack.isCompatible()).toBe(false);
     });
 
-    it('caches the incompatible native modules in local storage', function() {
-      const packagePath = atom.project
-        .getDirectories()[0]
-        .resolve('packages/package-with-incompatible-native-module');
-      expect(buildPackage(packagePath).isCompatible()).toBe(false);
-      expect(global.localStorage.getItem.callCount).toBe(1);
-      expect(global.localStorage.setItem.callCount).toBe(1);
-
-      expect(buildPackage(packagePath).isCompatible()).toBe(false);
-      expect(global.localStorage.getItem.callCount).toBe(2);
-      expect(global.localStorage.setItem.callCount).toBe(1);
-    });
-
     it('logs an error to the console describing the problem', function() {
       const packagePath = atom.project
         .getDirectories()[0]
@@ -166,7 +153,6 @@ describe('Package', function() {
       // A different package instance has the same failure output (simulates reload)
       const pack2 = buildPackage(packagePath);
       expect(pack2.getBuildFailureOutput()).toBe('It is broken');
-      expect(pack2.isCompatible()).toBe(false);
 
       // Clears the build failure after a successful build
       pack.rebuild();
@@ -174,25 +160,6 @@ describe('Package', function() {
 
       expect(pack.getBuildFailureOutput()).toBeNull();
       expect(pack2.getBuildFailureOutput()).toBeNull();
-    });
-
-    it('sets cached incompatible modules to an empty array when the rebuild completes (there may be a build error, but rebuilding *deletes* native modules)', function() {
-      const packagePath = __guard__(atom.project.getDirectories()[0], x =>
-        x.resolve('packages/package-with-incompatible-native-module')
-      );
-      const pack = buildPackage(packagePath);
-
-      expect(pack.getIncompatibleNativeModules().length).toBeGreaterThan(0);
-
-      const rebuildCallbacks = [];
-      spyOn(pack, 'runRebuildProcess').andCallFake(callback =>
-        rebuildCallbacks.push(callback)
-      );
-
-      pack.rebuild();
-      expect(pack.getIncompatibleNativeModules().length).toBeGreaterThan(0);
-      rebuildCallbacks[0]({ code: 0, stdout: 'It worked' });
-      expect(pack.getIncompatibleNativeModules().length).toBe(0);
     });
   });
 

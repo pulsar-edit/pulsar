@@ -18,13 +18,10 @@ export default class ChangeLogView {
   }
 
   wasVersionDismissed() {
-    const lastVersion = atom.config.get('welcome.lastViewedChangeLog');
-    const curVersion = atom.getVersion().split(".");
-    if (lastVersion[0] < curVersion[0] && lastVersion[1] < curVersion[1] && lastVersion[2].split(" ")[0] < curVersion[2].split(" ")[0]) {
-      return false;
-    } else {
-      return true;
-    }
+    // Use the new `.versionSatisfies()` API to check if our last dismissed version
+    // is the same as the current version. `.versionSatisfies()` compares equality
+    // by default, so no comparator is needed
+    return atom.versionSatisfies(atom.config.get('welcome.lastViewedChangeLog'));
   }
 
   update() {}
@@ -53,19 +50,31 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new feature to Search for Pulsar's settings
+                Fixed a race condition that could cause `autocomplete-plus` to ignore user input.
               </li>
               <li>
-                Updated the completions provided by `autocomplete-css` to be as bleeding edge as possible.
+                Fixed the `about` package linking to release notes for Pulsar.
               </li>
               <li>
-                Updated the instructions and look of the login flow for the `github` package.
+                Reduced the amount of network requests that `settings-view` creates.
               </li>
               <li>
-                Snippet transformations no longer have an implied global flag, bringing them into compatibility with snippets in most other editors.
+                Fixed the icon used when registering Pulsar as a file handler on Windows.
               </li>
               <li>
-                Snippets can now be given command names instead of tab triggers, and thus can now be assigned to key shortcuts in `keymap.cson`.
+                Removed the non-functional `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
+              </li>
+              <li>
+                Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
+              </li>
+              <li>
+                Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
+              </li>
+              <li>
+                Removed the last CoffeeScript code from Pulsar and core packages.
+              </li>
+              <li>
+                Migrated the majority of our CI to GitHub Actions.
               </li>
 
             </ul>

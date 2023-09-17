@@ -1,0 +1,19 @@
+name: 'C'
+scopeName: 'source.c'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-c'
+
+injectionRegex: '^(c|C)$'
+
+treeSitter:
+  grammar: 'tree-sitter-c/tree-sitter-c.wasm'
+  highlightsQuery: 'tree-sitter-c/highlights.scm'
+  tagsQuery: 'tree-sitter-c/tags.scm'
+  foldsQuery: 'tree-sitter-c/folds.scm'
+  indentsQuery: 'tree-sitter-c/indents.scm'
+
+fileTypes: [
+  'h'
+  'c'
+  'h.in'
+]

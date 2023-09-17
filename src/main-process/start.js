@@ -1,9 +1,8 @@
 const { app } = require('electron');
-const nslog = require('nslog');
 const path = require('path');
 const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
-const getReleaseChannel = require('../get-release-channel');
+const { getReleaseChannel, getConfigFilePath } = require('../get-app-details.js');
 const atomPaths = require('../atom-paths');
 const fs = require('fs');
 const CSON = require('season');
@@ -43,11 +42,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   const args = parseCommandLine(process.argv.slice(1));
 
-  // This must happen after parseCommandLine() because yargs uses console.log
-  // to display the usage message.
-  const previousConsoleLog = console.log;
-  console.log = nslog;
-
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
@@ -60,14 +54,11 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     app.commandLine.appendSwitch('force-color-profile', colorProfile);
   }
 
-  if (handleStartupEventWithSquirrel()) {
-    return;
-  } else if (args.test && args.mainProcess) {
+  if (args.test && args.mainProcess) {
     app.setPath(
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
     );
-    console.log = previousConsoleLog;
     app.on('ready', function() {
       const testRunner = require(path.join(
         args.resourcePath,
@@ -124,25 +115,10 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   });
 };
 
-function handleStartupEventWithSquirrel() {
-  if (process.platform !== 'win32') {
-    return false;
-  }
-
-  const SquirrelUpdate = require('./squirrel-update');
-  const squirrelCommand = process.argv[1];
-  return SquirrelUpdate.handleStartupEvent(squirrelCommand);
-}
-
 function getConfig() {
   const config = new Config();
 
-  let configFilePath;
-  if (fs.existsSync(path.join(process.env.ATOM_HOME, 'config.json'))) {
-    configFilePath = path.join(process.env.ATOM_HOME, 'config.json');
-  } else if (fs.existsSync(path.join(process.env.ATOM_HOME, 'config.cson'))) {
-    configFilePath = path.join(process.env.ATOM_HOME, 'config.cson');
-  }
+  let configFilePath = getConfigFilePath();
 
   if (configFilePath) {
     const configFileData = CSON.readFileSync(configFilePath);

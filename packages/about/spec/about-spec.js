@@ -2,15 +2,6 @@ describe('About', () => {
   let workspaceElement;
 
   beforeEach(async () => {
-    let storage = {};
-
-    spyOn(window.localStorage, 'setItem').andCallFake((key, value) => {
-      storage[key] = value;
-    });
-    spyOn(window.localStorage, 'getItem').andCallFake(key => {
-      return storage[key];
-    });
-
     workspaceElement = atom.views.getView(atom.workspace);
     await atom.packages.activatePackage('about');
   });
@@ -98,6 +89,18 @@ describe('About', () => {
       let versionContainer = aboutElement.querySelector('.node');
       versionContainer.click();
       expect(atom.clipboard.read()).toBe(process.version);
+    });
+  });
+
+  describe('check for update appears', () => {
+    it('when "pulsar-updater" is enabled', async () => {
+      atom.packages.activatePackage('pulsar-updater');
+      await atom.workspace.open('atom://about');
+      jasmine.attachToDOM(workspaceElement);
+
+      let aboutElement = workspaceElement.querySelector('.about');
+      let updateContainer = aboutElement.querySelector('.about-update-action-button');
+      expect(updateContainer.innerText).toBe('Check Now');
     });
   });
 });
