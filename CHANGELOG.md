@@ -5,6 +5,7 @@
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+- Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
 
 ## 1.109.0
 
