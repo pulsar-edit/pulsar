@@ -22,7 +22,6 @@ const {CompositeDisposable} = require('event-kit');
 const TextEditor = require('../src/text-editor');
 const TextEditorElement = require('../src/text-editor-element');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
-const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
 const {clipboard} = require('electron');
 const {mockDebounce} = require("./spec-helper-functions.js");
 
@@ -132,7 +131,6 @@ beforeEach(function() {
 
   // make tokenization synchronous
   TextMateLanguageMode.prototype.chunkSize = Infinity;
-  TreeSitterLanguageMode.prototype.syncTimeoutMicros = Infinity;
   spyOn(TextMateLanguageMode.prototype, "tokenizeInBackground").andCallFake(function() { return this.tokenizeNextChunk(); });
 
   // Without this spy, TextEditor.onDidTokenize callbacks would not be called

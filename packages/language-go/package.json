@@ -10,8 +10,5 @@
     "atom": "*",
     "node": ">=14"
   },
-  "repository": "https://github.com/pulsar-edit/pulsar",
-  "dependencies": {
-    "tree-sitter-go": "0.19.1"
-  }
+  "repository": "https://github.com/pulsar-edit/pulsar"
 }

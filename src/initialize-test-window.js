@@ -1,5 +1,5 @@
 const ipcHelpers = require('./ipc-helpers');
-const { requireModule } = require('./module-utils');
+const { addAtomExport, requireModule } = require('./module-utils');
 
 function cloneObject(object) {
   const clone = {};
@@ -10,7 +10,7 @@ function cloneObject(object) {
 }
 
 module.exports = async function({ blobStore }) {
-  const { remote } = require('electron');
+  const remote = require('@electron/remote');
   const getWindowLoadSettings = require('./get-window-load-settings');
 
   const exitWithStatusCode = function(status) {
@@ -87,14 +87,7 @@ module.exports = async function({ blobStore }) {
 
     window.addEventListener('keydown', handleKeydown, { capture: true });
 
-    // Add 'exports' to module search path.
-    const exportsPath = path.join(
-      getWindowLoadSettings().resourcePath,
-      'exports'
-    );
-    require('module').globalPaths.push(exportsPath);
-    process.env.NODE_PATH = exportsPath; // Set NODE_PATH env variable since tasks may need it.
-
+    addAtomExport(atom);
     updateProcessEnv(env);
 
     // Set up optional transpilation for packages under test if any

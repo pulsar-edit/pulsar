@@ -98,6 +98,13 @@ module.exports = function parseCommandLine(processArgs) {
       'Run the specified specs and exit with error code on failures.'
     );
   options
+    .alias('s', 'run-tests')
+    .boolean('s')
+    .describe(
+      'm',
+      'Run the specified tests (with Mocha) and exit with error code on failures.'
+    );
+  options
     .alias('m', 'main-process')
     .boolean('m')
     .describe('m', 'Run the specified specs in the main process.');

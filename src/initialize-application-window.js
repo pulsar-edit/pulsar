@@ -2,6 +2,7 @@ const AtomEnvironment = require('./atom-environment');
 const ApplicationDelegate = require('./application-delegate');
 const Clipboard = require('./clipboard');
 const TextEditor = require('./text-editor');
+const { addAtomExport } = require('./module-utils');
 
 require('./text-editor-component');
 require('./file-system-blob-store');
@@ -31,11 +32,7 @@ module.exports = function({ blobStore }) {
   const { ipcRenderer } = require('electron');
   const { resourcePath, devMode } = getWindowLoadSettings();
   require('./electron-shims');
-
-  // Add application-specific exports to module search path.
-  const exportsPath = path.join(resourcePath, 'exports');
-  require('module').globalPaths.push(exportsPath);
-  process.env.NODE_PATH = exportsPath;
+  addAtomExport(global.atom);
 
   // Make React faster
   if (!devMode && process.env.NODE_ENV == null) {

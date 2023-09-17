@@ -155,7 +155,7 @@ module.exports = class AtomApplication extends EventEmitter {
     // speedup startup.
     if (
       !socketPath ||
-      options.test ||
+      options.test || options.mocha ||
       (process.platform !== 'win32' && !fs.existsSync(socketPath))
     ) {
       return createApplication(options);
@@ -292,7 +292,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let optionsForWindowsToOpen = [];
     let shouldReopenPreviousWindows = false;
 
-    if (options.test || options.benchmark || options.benchmarkTest) {
+    if (options.test || options.benchmark || options.benchmarkTest || options.mocha) {
       optionsForWindowsToOpen.push(options);
     } else if (options.newWindow) {
       shouldReopenPreviousWindows = false;
@@ -336,6 +336,7 @@ module.exports = class AtomApplication extends EventEmitter {
       benchmark,
       benchmarkTest,
       test,
+      mocha,
       pidToKillWhenClosed,
       devMode,
       safeMode,
@@ -354,12 +355,25 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     if (test) {
-      return this.runTests({
+      return this.runTestsLegacy({
         headless: true,
         devMode,
         resourcePath: this.resourcePath,
         executedFrom,
         pathsToOpen,
+        logFile,
+        timeout,
+        env
+      });
+    } else if (mocha) {
+      return this.runTests({
+        headless: true,
+        devMode,
+        resourcePath: this.resourcePath,
+        // FIXME - Find this
+        projectRoots,
+        // FIXME - Find this
+        testPaths,
         logFile,
         timeout,
         env
@@ -874,11 +888,28 @@ module.exports = class AtomApplication extends EventEmitter {
         ipcMain,
         'run-package-specs',
         (event, packageSpecPath, options = {}) => {
-          this.runTests(
+          this.runTestsLegacy(
             Object.assign(
               {
                 resourcePath: this.devResourcePath,
                 pathsToOpen: [packageSpecPath],
+                headless: false
+              },
+              options
+            )
+          );
+        }
+      )
+    );
+    this.disposable.add(
+      ipcHelpers.on(
+        ipcMain,
+        'run-package-tests',
+        (event, options = {}) => {
+          this.runTests(
+            Object.assign(
+              {
+                resourcePath: this.devResourcePath,
                 headless: false
               },
               options
@@ -1253,11 +1284,18 @@ module.exports = class AtomApplication extends EventEmitter {
     clearWindowState = Boolean(clearWindowState);
 
     const locationsToOpen = await Promise.all(
-      pathsToOpen.map(pathToOpen =>
-        this.parsePathToOpen(pathToOpen, executedFrom, {
-          hasWaitSession: pidToKillWhenClosed != null
-        })
-      )
+      pathsToOpen.map(pathToOpen => {
+        const extra = { hasWaitSession: pidToKillWhenClosed != null }
+        if(typeof(pathToOpen) === 'object') {
+          return this.parsePathToOpen(
+            pathToOpen.pathToOpen,
+            executedFrom,
+            Object.assign(extra, pathToOpen)
+          )
+        } else {
+          return this.parsePathToOpen(pathToOpen, executedFrom, extra)
+        }
+      })
     );
 
     for (const folderToOpen of foldersToOpen) {
@@ -1660,11 +1698,53 @@ module.exports = class AtomApplication extends EventEmitter {
   // options -
   //   :headless - A Boolean that, if true, will close the window upon
   //                   completion.
+  //   :projectPaths - All paths of the "project" we're testing
+  //   :testPaths - Test paths (spec or test)
+  //   :specPath - The directory to load specs from.
+  runTests({
+    headless,
+    resourcePath,
+    executedFrom,
+    projectRoots,
+    testPaths,
+    logFile,
+    env
+  }) {
+    if (testPaths.length === 0) {
+      process.stderr.write('Error: Specify at least one test path\n\n');
+      process.exit(1);
+    }
+
+    const windowInitializationScript = path.join(
+      __dirname, "..", "initialize-new-test-window"
+    );
+
+    const window = this.createWindow({
+      windowInitializationScript,
+      resourcePath,
+      headless,
+      isSpec: true,
+      devMode: true,
+      projectRoots,
+      testPaths,
+      logFile,
+      env
+    });
+    this.addWindow(window);
+    if (env) window.replaceEnvironment(env);
+    return window;
+  }
+
+  // Opens up a new {AtomWindow} to run specs within.
+  //
+  // options -
+  //   :headless - A Boolean that, if true, will close the window upon
+  //                   completion.
   //   :resourcePath - The path to include specs from.
   //   :specPath - The directory to load specs from.
   //   :safeMode - A Boolean that, if true, won't run specs from ~/.pulsar/packages
   //               and ~/.pulsar/dev/packages, defaults to false.
-  runTests({
+  runTestsLegacy({
     headless,
     resourcePath,
     executedFrom,

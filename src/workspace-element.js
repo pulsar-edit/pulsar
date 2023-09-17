@@ -446,6 +446,20 @@ class WorkspaceElement extends HTMLElement {
       ipcRenderer.send('run-package-specs', specPath, options);
     }
   }
+
+  runPackageTests(options = {}) {
+    const projectRoots = atom.project.getPaths();
+    if (projectRoots.length > 0) {
+      const testPaths = projectRoots.flatMap(p => {
+        const newPaths = [ path.join(p, 'spec'), path.join(p, 'test') ];
+        return newPaths.filter(fs.existsSync);
+      })
+
+      ipcRenderer.send('run-package-tests', Object.assign(
+        {testPaths, projectRoots}, options
+      ));
+    }
+  }
 }
 
 function isTab(element) {
