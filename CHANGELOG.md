@@ -6,6 +6,51 @@
 
 ## [Unreleased]
 
+## 1.109.0
+
+- Fixed a race condition that could cause `autocomplete-plus` to ignore user input.
+- Fixed the `about` package linking to release notes for Pulsar.
+- Reduced the amount of network requests that `settings-view` creates.
+- Fixed the icon used when registering Pulsar as a file handler on Windows.
+- Removed the non-functional `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
+- Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
+- Removed the last CoffeeScript code from Pulsar and core packages.
+- Migrated the majority of our CI to GitHub Actions.
+
+### Pulsar
+- Added: about: Make the About page's CSS responsive for narrow panes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/717)
+- Added: [core & settings-view] Avoid network requests for bundled packages [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/711)
+- Fixed: Remove @ from example to fix Documentation CI [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/719)
+- Fixed: Cirrus: Don't update last good commit if CI skipped [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/716)
+- Fixed: Tree-sitter running fixes (August edition) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/677)
+- Added: [status-bar & tree-view] Manual Decaf Source [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/707)
+- Added: [core] Consolidate app detail logic into single module [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/705)
+- Fixed: [about] Link release notes to `CHANGELOG.md` instead of tagged release of Pulsar [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/706)
+- Removed: Remove `fs-plus` from atom-protocol-handler [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/170)
+- Fixed: [core] Fix the icon used when registering Pulsar as a file handler in Windows [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/704)
+- Added: Decaf Packages Spec [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/700)
+- Removed: settings-view: Don't fix repository for core themes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/702)
+- Added: Cirrus: Skip builds if same commit was previously built [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/701)
+- Fixed: CI: Tweak Cirrus build filter to allow tag pushes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/699)
+- Added: Automatically rename binaries in CI during Regular releases [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/675)
+- Removed: remove repository fallback [@Sertonix](https://github.com/pulsar-edit/pulsar/pull/264)
+- Added: [meta] GitHub Actions: Don't sign macOS builds from forked repo PRs [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/698)
+- Added: [meta] Ensure Actions can upload Rolling Releases [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/695)
+- Added: [meta] Cleanup `push` trigger, add `workflow_dispatch` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/694)
+- Added: Migrate most binary building to GitHub Actions [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/682)
+- Added: [meta] Add `ignorePaths` to renovate config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/691)
+- Added: [language- && packages] Manual Decaf Spec Bundle [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/686)
+- Fixed: fix links of packages readme [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/689)
+- Added: [meta] Add new and missing packages to renovate config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/687)
+- Added: Small Update to Docs [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/621)
+- Fixed: [autocomplete-plus] Detect when menu state gets out of sync with DOM [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/680)
+- Removed: Remove AutoUpdate functionality from Core [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/668)
+- Bumped: Update autocomplete-html package [@renovate](https://github.com/pulsar-edit/pulsar/pull/688)
+- Added: [core]: Make showing tab title in window title optional [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/671)
+- Fixed: [autocomplete-plus] Suppress `marked` warnings [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/683)
+- Added: [pulsar-updater] Don't notify if Pulsar is running via `yarn start` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/679)
+- Bumped: bump actions/checkout to v3 [@casswedson](https://github.com/pulsar-edit/pulsar/pull/678)
+
 ## 1.108.0
 
 - Restored ability for `less` files in packages to use inline JavaScript inside backticks.

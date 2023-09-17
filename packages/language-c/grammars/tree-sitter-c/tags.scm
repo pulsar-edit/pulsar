@@ -1,2 +1,3 @@
 
-((function_declarator (identifier) @name))
+(function_declarator
+  (identifier) @name) @definition.function

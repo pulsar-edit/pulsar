@@ -1313,11 +1313,14 @@ module.exports = class TreeView {
     }
   }
 
-  // Public: Return an array of paths from all selected items
-  //
-  // Example: @selectedPaths()
-  // => ['selected/path/one', 'selected/path/two', 'selected/path/three']
-  // Returns Array of selected item paths
+  /**
+   * @memberof TreeView
+   * @function selectedPaths
+   * @desc Public: Return an array of paths from all selected items
+   * @example
+   * selectedPaths() => [ 'selected/path/one', 'selected/path/two', 'selected/path/three' ]
+   * @returns {array} Selected item paths
+   */
   selectedPaths() {
     return Array.from(this.getSelectedEntries()).map((entry) => entry.getPath());
   }

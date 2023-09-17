@@ -228,7 +228,7 @@ describe('ScopeResolver', () => {
         let bar = "this is a line below a comment"
       `);
       // Prevent an exception from being thrown before we can even check the
-      // scopeResovler.
+      // scopeResolver.
       spyOn(languageMode, 'isRowCommented').andReturn(false);
       await languageMode.ready;
 

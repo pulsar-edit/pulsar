@@ -128,3 +128,18 @@
   'return':
     'prefix': 'ret'
     'body': 'return $1;$0'
+
+'.source.js .meta.block.function.js':
+  'Function':
+    'prefix': 'fun'
+    'body': 'function ${1:functionName}($2) {\n\t$0\n}'
+
+'.source.js .meta.block.class.js':
+  'Function':
+    'prefix': 'fun'
+    'body': '${1:functionName}($2) {\n\t$0\n}'
+
+'.source.js .meta.object.js':
+  'Function':
+    'prefix': 'fun'
+    'body': '${1:functionName}($2) {\n\t$0\n},'

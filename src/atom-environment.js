@@ -222,7 +222,8 @@ class AtomEnvironment {
       name: packagejson.branding.name,
       urlWeb: packagejson.branding.urlWeb,
       urlGH: packagejson.branding.urlGH,
-      urlForum: packagejson.branding.urlForum
+      urlForum: packagejson.branding.urlForum,
+      urlCoreRepo: packagejson.repository.url
     };
 
     // Keep instances of HistoryManager in sync

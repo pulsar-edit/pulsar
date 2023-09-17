@@ -83,7 +83,7 @@ module.exports = class AboutView extends EtchComponent {
     return $.div(
       { className: 'pane-item native-key-bindings about' },
       $.div(
-        { className: 'about-container' },
+        { className: 'about-container min-width-min-content' },
         $.header(
           { className: 'about-header' },
           $.a(
@@ -94,7 +94,7 @@ module.exports = class AboutView extends EtchComponent {
             { className: 'about-header-info' },
             $.span(
               {
-                className: 'about-version-container inline-block atom',
+                className: 'about-version-container atom',
                 onclick: this.handleAtomVersionClick.bind(this)
               },
               $.span(
@@ -114,7 +114,7 @@ module.exports = class AboutView extends EtchComponent {
           $.span(
             {
               className:
-                'about-version-container inline-block show-more-expand',
+                'about-version-container show-more-expand',
               onclick: this.handleShowMoreClick.bind(this)
             },
             $.span({ className: 'about-more-expand' }, 'Show more')
@@ -168,7 +168,7 @@ module.exports = class AboutView extends EtchComponent {
       ),
 
       $.div(
-        { className: 'about-updates group-start' },
+        { className: 'about-updates group-start min-width-min-content' },
         $.div(
           { className: 'about-updates-box' },
           $.div(
@@ -177,7 +177,7 @@ module.exports = class AboutView extends EtchComponent {
               { className: 'about-updates-item app-unsupported' },
               $.span(
                 { className: 'about-updates-label is-strong' },
-                'Updates have been moved to the package ', $.code({}, 'pulsar-updater'), '.',
+                'Updates have been moved to the package ', $.code({style: {'white-space': 'nowrap'}}, 'pulsar-updater'), '.',
                 $.br()
               ),
               $.a(
@@ -242,7 +242,8 @@ module.exports = class AboutView extends EtchComponent {
           className: 'btn about-update-action-button',
           onclick: this.executeUpdateAction.bind(this),
           style: {
-            display: 'block'
+            display: 'block',
+            margin: '0 .5em'
           }
         },
         'Check Now'

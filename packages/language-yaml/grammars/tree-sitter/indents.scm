@@ -1,4 +1,4 @@
 (":" @indent
-  (#set! test.onlyIfLastTextOnRow true))
+  (#is? test.lastTextOnRow true))
 
 ["|" ">"] @indent
