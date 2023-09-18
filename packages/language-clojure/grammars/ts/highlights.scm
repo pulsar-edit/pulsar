@@ -16,17 +16,15 @@
 
 ;; Syntax quoting
 ((syn_quoting_lit)
- @meta.syntax-quoted
- (#set! clojure.syntaxQuoted))
-((unquoting_lit)
- @meta.syntax-quoted
- (#unset! clojure.syntaxQuoted))
+  @meta.syntax-quoted
+  (#is? test.ancestorTypeNearerThan "syn_quoting_lit unquoting_lit"))
 
 ((sym_lit) @meta.symbol.syntax-quoted
-  (#is? test.descendantOfNodeWithData clojure.syntaxQuoted)
+  (#is? test.ancestorTypeNearerThan "syn_quoting_lit unquoting_lit")
   (#match? @meta.symbol.syntax-quoted "[^#]$"))
-((sym_name) @meta.symbol.generated
-  (#is? test.descendantOfNodeWithData clojure.syntaxQuoted)
+
+((sym_lit) @meta.symbol.generated
+  (#is? test.ancestorTypeNearerThan "syn_quoting_lit unquoting_lit")
   (#match? @meta.symbol.generated "#$"))
 
 ;; Function calls

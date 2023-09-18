@@ -667,6 +667,20 @@ ScopeResolver.TESTS = {
     return false;
   },
 
+  // Passes if there's an ancestor, but fails if the ancestor type matches
+  // the second,third,etc argument
+  ancestorTypeNearerThan(node, types) {
+    let [target, ...rejected] = types.split(/\s+/);
+    rejected = new Set(rejected)
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      if (rejected.has(current.type)) { return false; }
+      if (target === current.type) { return true; }
+    }
+    return false;
+  },
+
   // Passes if this node has at least one descendant of the given type(s).
   ancestorOfType(node, type) {
     let target = type.includes(' ') ? type.split(/\s+/) : type;

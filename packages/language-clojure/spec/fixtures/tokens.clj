@@ -95,8 +95,9 @@ error/
 ;            ^ meta.symbol.generated
 ;            ^ !meta.symbol.syntax-quoted
 ;                     ^ entity.name.function
-;;                          ^ !meta.symbol.syntax-quoted
-(call param param# ~(call something))
+;                          ^ !meta.syntax-quoted
+;                          ^ !meta.symbol.syntax-quoted
+(call param param#)
 ;       ^ !meta.symbol.syntax-quoted
 ;            ^ !meta.symbol.generated
 
