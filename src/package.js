@@ -242,7 +242,10 @@ module.exports = class Package {
         }
         if (typeof this.mainModule.activate === 'function') {
           this.mainModule.activate(
-            this.packageManager.getPackageState(this.name) || {}
+            this.packageManager.getPackageState(this.name) || {},
+            {
+              t: this.t
+            }
           );
         }
         this.mainActivated = true;
