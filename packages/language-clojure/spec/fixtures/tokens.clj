@@ -18,6 +18,22 @@
   ;  ^ !entity.name.function
   ;      ^ constant.numeric
 
+(deftest abc (+ a b))
+;  ^ keyword.control
+;        ^ entity.global
+
+(defmacro abc [a b])
+;  ^ keyword.control
+;         ^ entity.global
+
+(defaults a)
+;  ^ !keyword.control
+;         ^ !entity.global
+
+(s/defn foobar [a b])
+;  ^ keyword.control
+;       ^ entity.global
+
 (def a "A STRING")
   ; <- keyword.control
   ;  ^ entity.global
@@ -72,12 +88,17 @@ error/
 ;               ^ meta.symbol
 ;               ^ !entity.name.function
 
-`(call param ~(call))
+`(call param param# ~(call something))
 ;  ^ meta.symbol
-;  ^ !entity.name.function
-;       ^ meta.symbol
-;       ^ !entity.name.function
-;               ^ entity.name.function
+;  ^ entity.name.function
+;       ^ meta.symbol.syntax-quoted
+;            ^ meta.symbol.generated
+;            ^ !meta.symbol.syntax-quoted
+;                     ^ entity.name.function
+;;                          ^ !meta.symbol.syntax-quoted
+(call param param# ~(call something))
+;       ^ !meta.symbol.syntax-quoted
+;            ^ !meta.symbol.generated
 
 ;; Comments
 ;   ^ comment.line.semicolon
@@ -109,3 +130,46 @@ error/
 (ns other.namespace
   (:use [foo.bar]))
 ;   ^ invalid.deprecated
+
+^{:some :meta} (def foo 10)
+;  ^ meta.metadata.clojure
+
+#_
+(+ '1 `(+ ba))
+;   ^ comment.block
+;   ^ !constant.numeric
+;      ^ !punctuation
+;       ^ comment.block
+;       ^ !constant.keyword
+
+;; Special forms (core language features)
+(do :foo)
+; ^ storage.control
+#_
+(do :foo)
+; ^ !storage.control
+(if true 10)
+; ^ keyword.control.conditional.if
+#_
+(if true 10)
+; ^ !keyword.control.conditional.if
+(when true 10)
+; ^ keyword.control.conditional.when
+#_
+(when true 10)
+; ^ !keyword.control.conditional.when
+(cond true 10)
+; ^ keyword.control.conditional.cond
+#_
+(cond true 10)
+; ^ !keyword.control.conditional.cond
+(condp true 10)
+; ^ keyword.control.conditional.cond
+#_
+(condp true 10)
+; ^ !keyword.control.conditional.cond
+(cond-> true 10)
+; ^ keyword.control.conditional.cond
+#_
+(cond-> true 10)
+; ^ !keyword.control.conditional.cond

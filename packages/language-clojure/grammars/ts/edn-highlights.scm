@@ -19,6 +19,8 @@
  "}" @punctuation.section.set.end)
 @meta.set
 
+(meta_lit) @meta.metadata.clojure
+
 ((regex_lit) @string.regexp (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((sym_lit) @meta.symbol (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((kwd_lit) @constant.keyword (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
