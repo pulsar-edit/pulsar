@@ -153,17 +153,16 @@
     "service-hub": "^0.7.4",
     "settings-view": "file:packages/settings-view",
     "sinon": "9.2.1",
-    "snippets": "github:pulsar-edit/snippets#a054a4335c5ee6e34c0baabcda4e144b046a4292",
+    "snippets": "github:pulsar-edit/snippets#9a7c118",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "file:packages/spell-check",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
-    "superstring": "2.4.4",
     "symbols-view": "https://github.com/pulsar-edit/symbols-view.git#73464a5",
     "tabs": "file:packages/tabs",
     "temp": "0.9.4",
-    "text-buffer": "^13.18.6",
+    "text-buffer": "https://github.com/pulsar-edit/text-buffer#8d3e3cd5c177802f60a8556abc64337fa7de8c79",
     "timecop": "file:./packages/timecop",
     "tree-view": "file:./packages/tree-view",
     "typescript-simple": "github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7",
@@ -224,7 +223,7 @@
     "package-generator": "file:./packages/package-generator",
     "pulsar-updater": "file:./packages/pulsar-updater",
     "settings-view": "file:./packages/settings-view",
-    "snippets": "1.6.1",
+    "snippets": "1.7.1",
     "spell-check": "file:./packages/spell-check",
     "status-bar": "file:./packages/status-bar",
     "styleguide": "file:./packages/styleguide",
@@ -297,9 +296,7 @@
   },
   "resolutions": {
     "node-abi": "3.45.0",
-    "superstring": "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459",
     "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
-    "text-buffer": "13.18.6",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244"
   }
 }

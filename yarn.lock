@@ -7139,9 +7139,8 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-pathwatcher@^8.1.0, "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1":
+"pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#e56a44c":
   version "8.1.2"
-  uid "567561f76e77333107a528c0aa0ee30863d796e1"
   resolved "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1"
   dependencies:
     async "~0.2.10"
@@ -8029,9 +8028,9 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@github:pulsar-edit/snippets#a054a4335c5ee6e34c0baabcda4e144b046a4292":
-  version "1.7.0"
-  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/a054a4335c5ee6e34c0baabcda4e144b046a4292"
+"snippets@github:pulsar-edit/snippets#9a7c118":
+  version "1.7.1"
+  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/9a7c118f7006e103da3ba0ad5028b31d304eb878"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
@@ -8415,7 +8414,7 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@2.4.4, superstring@^2.4.4, "superstring@https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459":
+"superstring@https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459":
   version "2.4.4"
   resolved "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459"
   dependencies:
@@ -8587,10 +8586,9 @@ test-value@^3.0.0:
     array-back "^2.0.0"
     typical "^2.6.1"
 
-text-buffer@13.18.6, text-buffer@^13.18.6:
+"text-buffer@https://github.com/pulsar-edit/text-buffer#8d3e3cd5c177802f60a8556abc64337fa7de8c79":
   version "13.18.6"
-  resolved "https://registry.yarnpkg.com/text-buffer/-/text-buffer-13.18.6.tgz#0191a6185177b26e3560cb07988701ac2d30ae9f"
-  integrity sha512-kgtWyJL9ktX0+ynDxUILaB/XGsaMOSzbKgyyDO9s4sN6X8Cq+ZIMNRDDMG29iztK8nZxuynzcuo1vHQojpdT9A==
+  resolved "https://github.com/pulsar-edit/text-buffer#8d3e3cd5c177802f60a8556abc64337fa7de8c79"
   dependencies:
     delegato "^1.0.0"
     diff "^2.2.1"
@@ -8600,9 +8598,9 @@ text-buffer@13.18.6, text-buffer@^13.18.6:
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    pathwatcher "^8.1.0"
+    pathwatcher "https://github.com/pulsar-edit/node-pathwatcher.git#e56a44c"
     serializable "^1.0.3"
-    superstring "^2.4.4"
+    superstring "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459"
     underscore-plus "^1.0.0"
     winattr "^3.0.0"
 
