@@ -24,7 +24,15 @@
 ((regex_lit) @string.regexp (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((sym_lit) @meta.symbol (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((kwd_lit) @constant.keyword (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
-((str_lit) @string.quoted.double (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
+(str_lit
+  "\"" @punctuation.definition.string.begin.clojure
+  (#is-not? test.descendantOfNodeWithData "clojure.dismissTag")
+  (#is? test.first))
+(str_lit
+  "\"" @punctuation.definition.string.end.clojure
+  (#is-not? test.descendantOfNodeWithData "clojure.dismissTag")
+  (#is? test.last))
+((str_content) @string.quoted.double (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((num_lit) @constant.numeric (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((nil_lit) @constant.language (#is-not? test.descendantOfNodeWithData "clojure.dismissTag"))
 ((bool_lit) @constant.language (#is-not? test.descendantOfNodeWithData clojure.dismissTag))

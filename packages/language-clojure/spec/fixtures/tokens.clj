@@ -37,7 +37,9 @@
 (def a "A STRING")
   ; <- keyword.control
   ;  ^ entity.global
+  ;    ^ punctuation.definition.string.begin
   ;      ^ string.quoted.double
+  ;             ^ punctuation.definition.string.end
 
 #{'foo}
 ; <- punctuation.section.set.begin
