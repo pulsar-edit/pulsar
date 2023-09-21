@@ -617,28 +617,36 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     if (cursors == null) { return }
 
     return this.editor.transact(() => {
-      for (let i = 0; i < cursors.length; i++) {
-        const cursor = cursors[i]
-        const endPosition = cursor.getBufferPosition()
-        const beginningPosition = [endPosition.row, endPosition.column - suggestion.replacementPrefix.length]
+      if(suggestion.ranges) {
+        for (let i = 0; i < suggestion.ranges.length; i++) {
+          const range = suggestion.ranges[i]
+          this.editor.setTextInBufferRange(
+            range, suggestion.text != null ? suggestion.text : suggestion.snippet
+          )
+        }
+      } else {
+        for (let i = 0; i < cursors.length; i++) {
+          const cursor = cursors[i]
+          const endPosition = cursor.getBufferPosition()
+          const beginningPosition = [endPosition.row, endPosition.column - suggestion.replacementPrefix.length]
 
-        if (this.editor.getTextInBufferRange([beginningPosition, endPosition]) === suggestion.replacementPrefix) {
-          const suffix = this.consumeSuffix ? this.getSuffix(this.editor, endPosition, suggestion) : ''
-          if (suffix.length) { cursor.moveRight(suffix.length) }
-          cursor.selection.selectLeft(suggestion.replacementPrefix.length + suffix.length)
+          if (this.editor.getTextInBufferRange([beginningPosition, endPosition]) === suggestion.replacementPrefix) {
+            const suffix = this.consumeSuffix ? this.getSuffix(this.editor, endPosition, suggestion) : ''
+            if (suffix.length) { cursor.moveRight(suffix.length) }
+            cursor.selection.selectLeft(suggestion.replacementPrefix.length + suffix.length)
 
-          if ((suggestion.snippet != null) && (this.snippetsManager != null)) {
-            this.snippetsManager.insertSnippet(suggestion.snippet, this.editor, cursor)
-          } else {
-            cursor.selection.insertText(suggestion.text != null ? suggestion.text : suggestion.snippet, {
-              autoIndentNewline: this.editor.shouldAutoIndent(),
-              autoDecreaseIndent: this.editor.shouldAutoIndent()
-            })
+            if ((suggestion.snippet != null) && (this.snippetsManager != null)) {
+              this.snippetsManager.insertSnippet(suggestion.snippet, this.editor, cursor)
+            } else {
+              cursor.selection.insertText(suggestion.text != null ? suggestion.text : suggestion.snippet, {
+                autoIndentNewline: this.editor.shouldAutoIndent(),
+                autoDecreaseIndent: this.editor.shouldAutoIndent()
+              })
+            }
           }
         }
       }
-    }
-    )
+    })
   }
 
   getSuffix (editor, bufferPosition, suggestion) {

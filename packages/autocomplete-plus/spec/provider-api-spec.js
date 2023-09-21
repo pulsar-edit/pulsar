@@ -1,7 +1,11 @@
 'use babel'
 /* eslint-env jasmine */
 
-import {waitForAutocomplete, triggerAutocompletion, conditionPromise} from './spec-helper'
+import {
+  waitForAutocomplete,
+  triggerAutocompletion,
+  conditionPromise,
+  waitForAutocompleteToDisappear} from './spec-helper'
 import path from 'path'
 
 describe('Provider API', () => {
@@ -288,6 +292,40 @@ describe('Provider API', () => {
           {text: 'okwow'}
         ])
       })
+    })
+  })
+
+  describe('Provider API v5.0.0', () => {
+    const getSuggestions = () => autocompleteManager.suggestionList.items.map(({text}) => ({text}))
+    const triggerAutocompletion = () => {
+      atom.commands.dispatch(atom.views.getView(editor), 'autocomplete-plus:activate')
+      return waitForAutocomplete(editor)
+    }
+    const confirmChoice = () => {
+      atom.commands.dispatch(atom.views.getView(editor), 'autocomplete-plus:confirm')
+      return waitForAutocompleteToDisappear(editor)
+    }
+
+    beforeEach(() => editor.setText(''))
+
+    it('replaces the right range on the editor when `range` is present', async () => {
+      testProvider = {
+        scopeSelector: '.source.js',
+        filterSuggestions: true,
+        getSuggestions (options) {
+          return [
+            {text: 'ohai', ranges: [[[0, 0], [0, 5]]]},
+            {text: 'ca.ts'},
+            {text: '::dogs'}
+          ]
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
+      editor.insertText('hello, world\n')
+      await triggerAutocompletion()
+      await confirmChoice(0)
+
+      expect(editor.getText()).toEqual("ohai, world\n")
     })
   })
 })
