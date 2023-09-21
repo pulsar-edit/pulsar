@@ -1,11 +1,10 @@
 name: 'Clojure EDN'
 scopeName: 'source.edn'
 type: 'modern-tree-sitter'
-injectionRegExp: '^source-edn$'
+injectionRegExp: '^source-clojure-edn$'
 parser: 'tree-sitter-clojure'
 
 fileTypes: [
-  'edn'
 ]
 treeSitter:
   grammar: 'ts/grammar.wasm'
