@@ -162,7 +162,7 @@
     "symbols-view": "https://github.com/pulsar-edit/symbols-view.git#73464a5",
     "tabs": "file:packages/tabs",
     "temp": "0.9.4",
-    "text-buffer": "https://github.com/pulsar-edit/text-buffer#8f0321e93",
+    "text-buffer": "https://github.com/pulsar-edit/text-buffer#11be3a78a",
     "timecop": "file:./packages/timecop",
     "tree-view": "file:./packages/tree-view",
     "typescript-simple": "github:pulsar-edit/typescript-simple#ccb03e558217030e8f261339281f1d69147934f7",

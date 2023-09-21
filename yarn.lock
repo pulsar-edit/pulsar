@@ -8586,9 +8586,9 @@ test-value@^3.0.0:
     array-back "^2.0.0"
     typical "^2.6.1"
 
-"text-buffer@https://github.com/pulsar-edit/text-buffer#8f0321e93":
+"text-buffer@https://github.com/pulsar-edit/text-buffer#11be3a78a":
   version "13.18.6"
-  resolved "https://github.com/pulsar-edit/text-buffer#8f0321e930cc88b974b1e66308631186532ef858"
+  resolved "https://github.com/pulsar-edit/text-buffer#11be3a78a220bc94d69221d7fd701571ea049b48"
   dependencies:
     delegato "^1.0.0"
     diff "^2.2.1"
