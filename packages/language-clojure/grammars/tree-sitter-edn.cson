@@ -8,5 +8,8 @@ fileTypes: [
 ]
 treeSitter:
   grammar: 'ts/grammar.wasm'
-  highlightsQuery: 'ts/edn-highlights.scm'
+  highlightsQuery: [
+    'ts/edn-only-highlights.scm'
+    'ts/edn-highlights.scm'
+  ]
   foldsQuery: 'ts/folds.scm'
