@@ -27,6 +27,12 @@ describe('Clojure grammars', () => {
     await runGrammarTests(path.join(__dirname, 'fixtures', 'tokens.clj'), /;/)
   });
 
+  it('tokenizes EDN using modern tree-sitter parser', async () => {
+    setConfigForLanguageMode('modern-tree-sitter');
+    atom.config.set('language-clojure.dismissTag', true);
+    await runGrammarTests(path.join(__dirname, 'fixtures', 'tokens.edn'), /;/)
+  });
+
   it('tokenizes the editor using modern tree-sitter, but with all default configs toggled', async () => {
     setConfigForLanguageMode('modern-tree-sitter');
     atom.config.set('language-clojure.dismissTag', false);
