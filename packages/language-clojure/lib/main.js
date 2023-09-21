@@ -37,9 +37,9 @@ exports.activate = function() {
   const checkFormCall = (specialFormText, node) => {
     let parent = node.parent
     let grandparent = parent?.parent
-    return grandparent &&
-      grandparent.children[2].id === parent.id &&
-      grandparent.children[1].text === specialFormText
+    return grandparent?.type === 'list_lit' &&
+      grandparent.children[1].text === specialFormText &&
+      grandparent.children[2].id === parent.id
   }
 
   atom.grammars.addInjectionPoint('source.clojure', {

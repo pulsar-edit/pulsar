@@ -179,6 +179,10 @@ error/
 ; ^ !keyword.control.conditional.cond
 
 ;; Specific stuff
+[js* "console.log('abc');", "'foo'"]
+; ^ !keyword.control.js.clojure
+;      ^ !support.class.builtin.console.js
+
 (js* "console.log('abc');", "'foo'")
 ; ^ keyword.control.js.clojure
 ;      ^ support.class.builtin.console.js
