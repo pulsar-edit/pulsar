@@ -864,7 +864,7 @@ class LanguageLayer {
         );
         if (!grammar) continue;
 
-        const contentNodes = injectionPoint.content(node);
+        const contentNodes = injectionPoint.content(node, this.buffer);
         if (!contentNodes) continue;
 
         const injectionNodes = [].concat(contentNodes);
