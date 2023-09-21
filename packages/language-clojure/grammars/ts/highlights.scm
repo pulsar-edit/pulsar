@@ -14,6 +14,11 @@
   .
   (sym_lit) @keyword.control.conditional.when (#eq? @keyword.control.conditional.when "when"))
 
+(list_lit
+  "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData clojure.dismissTag)
+  .
+  (sym_lit) @keyword.control.js.clojure (#eq? @keyword.control.js.clojure "js*"))
+
 ;; Syntax quoting
 ((syn_quoting_lit)
   @meta.syntax-quoted

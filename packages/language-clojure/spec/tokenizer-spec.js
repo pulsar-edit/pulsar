@@ -9,8 +9,9 @@ function setConfigForLanguageMode(mode) {
 }
 
 describe('Clojure grammars', () => {
-
   beforeEach(async () => {
+    await atom.packages.activatePackage('language-c');
+    await atom.packages.activatePackage('language-javascript');
     await atom.packages.activatePackage('language-clojure');
   });
 
