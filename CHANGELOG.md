@@ -5,6 +5,18 @@
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+- Added a new modern tree sitter "test" for highlight query - `ancestorTypeNearerThan`
+  that matches if it finds the _first_ type as an ancestor, but _not matches_ if
+  any "other" ancestors are found before
+- Syntax quoting and unquoting in Clojure now highlights correctly, and also
+  highlights full qualified keywords differently than generated ones
+- `content` field of addInjectionPoint for modern-tree-sitter now supports a second
+  `buffer` argument, for better customization if one wants to
+- EDN is back to be detected as Clojure (for compatibility) but highlights as EDN
+- Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some
+  injection points on Clojure. Added support for highligting metadata, and added
+  better support for "def" elements (example - don't syntax `default` or
+  `definition` as a `def`, but highlights `p/defresolver`)
 - Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
 
 ## 1.109.0
@@ -17,10 +29,6 @@
 - Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
 - Removed the last CoffeeScript code from Pulsar and core packages.
 - Migrated the majority of our CI to GitHub Actions.
-- Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some
-injection points on Clojure. Added support for highligting metadata, and added
-better support for "def" elements (example - don't syntax `default` or
-`definition` as a `def`, but highlights `p/defresolver`)
 - Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of correctly named binaries on more systems in more contexts (especially Windows). Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
 
 ### Pulsar
