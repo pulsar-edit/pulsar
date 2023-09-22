@@ -54,7 +54,7 @@ class TextEditorElement extends HTMLElement {
     return ['mini', 'placeholder-text', 'gutter-hidden', 'readonly'];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name, _, newValue) {
     if (this.component) {
       switch (name) {
         case 'mini':
