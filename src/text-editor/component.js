@@ -3,8 +3,8 @@
 const etch = require('etch');
 const { Point, Range } = require('text-buffer');
 const LineTopIndex = require('line-top-index');
-const TextEditor = require('./text-editor');
-const { isPairedCharacter } = require('./text-utils');
+const TextEditor = require('../text-editor');
+const { isPairedCharacter } = require('./utils');
 const electron = require('electron');
 const clipboard = electron.clipboard;
 const $ = etch.dom;
@@ -66,7 +66,7 @@ module.exports = class TextEditorComponent {
       this.element = props.element;
     } else {
       if (!TextEditorElement)
-        TextEditorElement = require('./text-editor-element');
+        TextEditorElement = require('./element');
       this.element = TextEditorElement.createTextEditorElement();
     }
     this.element.initialize(this);

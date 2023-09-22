@@ -1,7 +1,7 @@
 const _ = require('underscore-plus');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const TextEditor = require('./text-editor');
-const ScopeDescriptor = require('./scope-descriptor');
+const TextEditor = require('../text-editor');
+const ScopeDescriptor = require('../scope-descriptor');
 
 const EDITOR_PARAMS_BY_SETTING_KEY = [
   ['core.fileEncoding', 'encoding'],

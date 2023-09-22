@@ -43,7 +43,7 @@ const Pane = require('./pane');
 const Dock = require('./dock');
 const TextEditor = require('./text-editor');
 const TextBuffer = require('text-buffer');
-const TextEditorRegistry = require('./text-editor-registry');
+const TextEditorRegistry = require('./text-editor/registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const packagejson = require("../package.json");
@@ -238,7 +238,7 @@ class AtomEnvironment {
     // This will force TextEditorElement to register the custom element, so that
     // using `document.createElement('atom-text-editor')` works if it's called
     // before opening a buffer.
-    require('./text-editor-element');
+    require('./text-editor/element');
 
     this.window = params.window;
     this.document = params.document;

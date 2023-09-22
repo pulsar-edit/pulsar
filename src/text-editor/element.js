@@ -1,6 +1,6 @@
 const { Emitter, Range } = require('atom');
 const Grim = require('grim');
-const TextEditorComponent = require('./text-editor-component');
+const TextEditorComponent = require('./component');
 const dedent = require('dedent');
 
 class TextEditorElement extends HTMLElement {

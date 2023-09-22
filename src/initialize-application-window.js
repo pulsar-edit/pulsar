@@ -3,7 +3,7 @@ const ApplicationDelegate = require('./application-delegate');
 const Clipboard = require('./clipboard');
 const TextEditor = require('./text-editor');
 
-require('./text-editor-component');
+require('./text-editor/component');
 require('./file-system-blob-store');
 require('./native-compile-cache');
 require('./compile-cache');
