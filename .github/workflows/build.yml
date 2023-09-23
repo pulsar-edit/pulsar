@@ -54,8 +54,11 @@ jobs:
       run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
     - name: Reinstall Current Node-GYP NodeJS Headers
+      # Overwrite bad headers that get downloaded.
+      # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
+      # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
-      
+
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
