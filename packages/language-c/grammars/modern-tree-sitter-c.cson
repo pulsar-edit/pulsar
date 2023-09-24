@@ -6,6 +6,7 @@ parser: 'tree-sitter-c'
 injectionRegex: '^(c|C)$'
 
 treeSitter:
+  parserSource: 'just a string, doesnt actually matter'
   grammar: 'tree-sitter-c/tree-sitter-c.wasm'
   highlightsQuery: 'tree-sitter-c/highlights.scm'
   tagsQuery: 'tree-sitter-c/tags.scm'
