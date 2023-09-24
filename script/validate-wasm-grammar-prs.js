@@ -17,11 +17,11 @@ let verbose = false;
 
 // Lets first find our common ancestor commit
 // This lets us determine the commit where the branch or fork departed from
-const commonAncestorCmd = cp.spawnSync("git", [ "merge-base", "master", "HEAD" ]);
+const commonAncestorCmd = cp.spawnSync("git", [ "merge-base", "master", "HEAD^" ]);
 
 if (commonAncestorCmd.status !== 0 || commonAncestorCmd.stderr.toString().length > 0) {
   console.error("Git Command has failed!");
-  console.error("'git merge-base master HEAD'");
+  console.error("'git merge-base master HEAD^'");
   console.error(commonAncestorCmd.stderr.toString());
   process.exit(1);
 }
@@ -32,11 +32,11 @@ if (verbose) {
   console.log(`Common Ancestor Commit: '${commit}'`);
 }
 
-const cmd = cp.spawnSync("git", [ "diff", "--name-only", "-r", "HEAD", commit])
+const cmd = cp.spawnSync("git", [ "diff", "--name-only", "-r", "HEAD^", commit])
 
 if (cmd.status !== 0 || cmd.stderr.toString().length > 0) {
   console.error("Git Command has failed!");
-  console.error(`'git diff --name-only -r HEAD ${commit}'`);
+  console.error(`'git diff --name-only -r HEAD^ ${commit}'`);
   console.error(cmd.stderr.toString());
   process.exit(1);
 }
