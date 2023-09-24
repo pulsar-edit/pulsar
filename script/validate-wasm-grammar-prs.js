@@ -123,14 +123,14 @@ for (const wasmFile of wasmFilesChanged) {
         if (newParserSource.length === 0) {
           console.error(`Failed to find the new \`parserSource\` within: '${filePath}'`);
           console.error(contents.treeSitter);
-          process.exit(0);
+          process.exit(1);
         }
 
         if (oldParserSource == newParserSource) {
           // The repo and commit is identical! This means it hasn't been updated
           console.error(`The \`parserSource\` key of '${filePath}' has not been updated!`);
           console.error(`Current key: ${newParserSource} - Old key: ${oldParserSource}`);
-          process.exit(0);
+          process.exit(1);
         }
 
         // Else it looks like it has been updated properly
