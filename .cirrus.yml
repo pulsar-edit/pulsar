@@ -5,6 +5,8 @@ env:
 
 # linux_task:
 #   alias: linux
+#   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+#   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
 #   container:
 #     image: node:16-slim
 #     memory: 8G
@@ -174,6 +176,8 @@ silicon_mac_task:
 
 intel_mac_task:
   alias: mac
+  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   macos_instance:
     image: ghcr.io/cirruslabs/macos-monterey-xcode:14
     memory: 8G
@@ -225,6 +229,8 @@ intel_mac_task:
 
 # windows_task:
 #   alias: windows
+#   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+#   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
 #   timeout_in: 90m
 #   windows_container:
 #     image: cirrusci/windowsservercore:visualstudio2022-2022.06.23
