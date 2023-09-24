@@ -56,123 +56,123 @@ env:
 #       type: text/xml
 #       format: junit
 
-arm_linux_task:
-  alias: linux
-  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
-  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
-  arm_container:
-    image: node:16-slim
-    memory: 8G
-  env:
-    USE_SYSTEM_FPM: 'true'
-    ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
-  prepare_script:
-    - apt-get update
-    - export DEBIAN_FRONTEND="noninteractive"
-    - apt-get install -y
-                gnupg2
-                procps
-                curl
-                ruby
-                rpm
-                build-essential
-                git
-                libsecret-1-dev
-                fakeroot
-                libx11-dev
-                libxkbfile-dev
-                libgdk-pixbuf2.0-dev
-                libgtk-3-dev
-                libxss-dev
-                libasound2-dev
-                libnss3
-                xvfb
-    - gem install fpm
-    - git submodule init
-    - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-  install_script:
-    - yarn install --ignore-engines || yarn install --ignore-engines
-  build_script:
-    - yarn build
-    - yarn run build:apm
-  build_binary_script:
-    - yarn dist || yarn dist
-  rename_binary_script:
-    - node script/rename.js "ARM.Linux"
-  binary_artifacts:
-    path: ./binaries/*
-  test_script:
-    - rm -R node_modules/electron; yarn install --check-files
-    - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/pulsar'
-    - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
-  rolling_upload_script:
-    - cd ./script/rolling-release-scripts
-    - npm install
-    - node ./rolling-release-binary-upload.js cirrus
-  always:
-    videos_artifacts:
-      path: ./tests/videos/**
-    junit_artifacts:
-      path: report.xml
-      type: text/xml
-      format: junit
+# arm_linux_task:
+#   alias: linux
+#   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+#   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
+#   arm_container:
+#     image: node:16-slim
+#     memory: 8G
+#   env:
+#     USE_SYSTEM_FPM: 'true'
+#     ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
+#   prepare_script:
+#     - apt-get update
+#     - export DEBIAN_FRONTEND="noninteractive"
+#     - apt-get install -y
+#                 gnupg2
+#                 procps
+#                 curl
+#                 ruby
+#                 rpm
+#                 build-essential
+#                 git
+#                 libsecret-1-dev
+#                 fakeroot
+#                 libx11-dev
+#                 libxkbfile-dev
+#                 libgdk-pixbuf2.0-dev
+#                 libgtk-3-dev
+#                 libxss-dev
+#                 libasound2-dev
+#                 libnss3
+#                 xvfb
+#     - gem install fpm
+#     - git submodule init
+#     - git submodule update
+#     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+#   install_script:
+#     - yarn install --ignore-engines || yarn install --ignore-engines
+#   build_script:
+#     - yarn build
+#     - yarn run build:apm
+#   build_binary_script:
+#     - yarn dist || yarn dist
+#   rename_binary_script:
+#     - node script/rename.js "ARM.Linux"
+#   binary_artifacts:
+#     path: ./binaries/*
+#   test_script:
+#     - rm -R node_modules/electron; yarn install --check-files
+#     - ./binaries/*AppImage --appimage-extract
+#     - export BINARY_NAME='squashfs-root/pulsar'
+#     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+#   rolling_upload_script:
+#     - cd ./script/rolling-release-scripts
+#     - npm install
+#     - node ./rolling-release-binary-upload.js cirrus
+#   always:
+#     videos_artifacts:
+#       path: ./tests/videos/**
+#     junit_artifacts:
+#       path: report.xml
+#       type: text/xml
+#       format: junit
 
-silicon_mac_task:
-  alias: mac
-  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
-  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
-  macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-xcode:14
-    memory: 8G
-  env:
-    CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
-    CSC_KEY_PASSWORD: ENCRYPTED[82bb72653d39578035ed1860ab4978703d50bd326d925a146ff08782f987ceb37ac2d8dbace52dec2b0e2ef92debf097]
-    APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
-    APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
-    TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
-    ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
-  prepare_script:
-    - brew install node@16 yarn git python@$PYTHON_VERSION
-    - git submodule init
-    - git submodule update
-    - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-  install_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn install --ignore-engines || yarn install --ignore-engines
-  build_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn build
-    - yarn run build:apm
-  build_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - yarn dist || yarn dist
-  rename_binary_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - node script/rename.js "Silicon.Mac"
-  binary_artifacts:
-    path: ./binaries/*
-  test_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - rm -R node_modules/electron; yarn install --check-files
-    - hdiutil mount binaries/*Pulsar*dmg
-    - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
-    - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
-  rolling_upload_script:
-    - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
-    - cd ./script/rolling-release-scripts
-    - npm install
-    - node ./rolling-release-binary-upload.js cirrus
-  always:
-    videos_artifacts:
-      path: ./tests/videos/**
-    junit_artifacts:
-      path: report.xml
-      type: text/xml
-      format: junit
+# silicon_mac_task:
+#   alias: mac
+#   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+#   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
+#   macos_instance:
+#     image: ghcr.io/cirruslabs/macos-monterey-xcode:14
+#     memory: 8G
+#   env:
+#     CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
+#     CSC_KEY_PASSWORD: ENCRYPTED[82bb72653d39578035ed1860ab4978703d50bd326d925a146ff08782f987ceb37ac2d8dbace52dec2b0e2ef92debf097]
+#     APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
+#     APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
+#     TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
+#     ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
+#   prepare_script:
+#     - brew install node@16 yarn git python@$PYTHON_VERSION
+#     - git submodule init
+#     - git submodule update
+#     - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+#   install_script:
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - yarn install --ignore-engines || yarn install --ignore-engines
+#   build_script:
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - yarn build
+#     - yarn run build:apm
+#   build_binary_script:
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - yarn dist || yarn dist
+#   rename_binary_script:
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - node script/rename.js "Silicon.Mac"
+#   binary_artifacts:
+#     path: ./binaries/*
+#   test_script:
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - rm -R node_modules/electron; yarn install --check-files
+#     - hdiutil mount binaries/*Pulsar*dmg
+#     - export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
+#     - PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+#   rolling_upload_script:
+#     - export PATH="/opt/homebrew/bin:/opt/homebrew/opt/node@16/bin:$PATH"
+#     - cd ./script/rolling-release-scripts
+#     - npm install
+#     - node ./rolling-release-binary-upload.js cirrus
+#   always:
+#     videos_artifacts:
+#       path: ./tests/videos/**
+#     junit_artifacts:
+#       path: report.xml
+#       type: text/xml
+#       format: junit
 
 intel_mac_task:
   alias: mac
