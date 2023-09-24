@@ -13,7 +13,7 @@ const fs = require("node:fs");
 const CSON = require("season");
 
 // Change this if you want more logs
-let verbose = false;
+let verbose = true;
 
 // Lets first find our common ancestor commit
 // This lets us determine the commit where the branch or fork departed from
