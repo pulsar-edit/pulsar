@@ -17,7 +17,7 @@ let verbose = false;
 
 // Lets first find our common ancestor commit
 // This lets us determine the commit where the branch or fork departed from
-const commonAncestorCmd = cp.spawnSync("git", [ "merge-base", "master", "HEAD^" ]);
+const commonAncestorCmd = cp.spawnSync("git", [ "merge-base", "origin/master", "HEAD^" ]);
 
 if (commonAncestorCmd.status !== 0 || commonAncestorCmd.stderr.toString().length > 0) {
   console.error("Git Command has failed!");
