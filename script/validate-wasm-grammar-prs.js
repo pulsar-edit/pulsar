@@ -45,6 +45,11 @@ const changedFiles = cmd.stdout.toString().split("\n");
 // This gives us an array of the name and path of every single changed file from the last two commits
 // Now to check if there's any changes we care about.
 
+if (verbose) {
+  console.log("Array of changed files between commits:");
+  console.log(changedFiles);
+}
+
 const wasmFilesChanged = changedFiles.filter(element => element.endsWith(".wasm"));
 
 if (wasmFilesChanged.length === 0) {
