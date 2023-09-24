@@ -15,7 +15,16 @@ jobs:
     - name: Checkout the Latest Code
       uses: actions/checkout@v3
       with:
-        fetch-depth: 2
+        fetch-depth: 0
+        # Make sure we get all commits, so that we can compare to early commits
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: yarn install
 
     - name: Run Validation Script
       run: node ./script/validate-wasm-grammar-prs.js
