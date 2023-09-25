@@ -46,7 +46,7 @@ jobs:
         #sudo rm -rf /Libary/Developer/CommandLineTools
         #echo A | softwareupdate --install-rosetta
         #arch -x86_64 xcode-select --install
-        arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.github.usercontent.com/Homebrew/install/master/install.sh)"
+        arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
         ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
