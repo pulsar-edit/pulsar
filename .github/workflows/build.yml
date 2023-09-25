@@ -44,7 +44,7 @@ jobs:
       if: ${{ runner.os == 'macOS' }}
       run: |
         sudo rm -rf /Libary/Developer/CommandLineTools
-        echo A | software update --install-rosetta
+        echo A | softwareupdate --install-rosetta
         arch -x86_64 xcode-select --install
         arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.github.usercontent.com/Homebrew/install/master/install.sh)"
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
