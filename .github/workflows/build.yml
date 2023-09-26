@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         #os: [ ubuntu-latest, windows-latest, macos-latest ]
-        os: [ ubuntu-latest, windows-latest, ghcr.io/cirruslabs/macos-monterey-xcode:14 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -35,24 +35,27 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ env.NODE_VERSION }}
+      if: ${{ runner.os != 'macOS' }}
 
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+      if: ${{ runner.os != 'macOS' }}
 
     - name: Manual Installation Steps (macOS)
       if: ${{ runner.os == 'macOS' }}
       run: |
         #sudo rm -rf $(xcode-select -print-path)
-        sudo rm -rf /Libary/Developer/CommandLineTools
+        #sudo rm -rf /Libary/Developer/CommandLineTools
         #sudo xcode-select --reset
-        echo A | softwareupdate --install-rosetta
-        arch -x86_64 xcode-select --install
+        #echo A | softwareupdate --install-rosetta
+        #arch -x86_64 xcode-select --install
         arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
         arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
         ln -sf /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
+        ln -sf /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python3
 
     - name: Setup Git Submodule
       run: |
@@ -79,7 +82,10 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: yarn install --ignore-engines
+        shell: bash
+        command: |
+          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+          yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
     - name: Build Pulsar
@@ -88,13 +94,15 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
+        shell: bash
         command: |
+          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
           yarn build
           yarn run build:apm
 
     # macOS Signing Stuff
-    - name: Build Pulsar Binaries (macOS) (Signed)
-      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
+    - name: Build Pulsar Binaries (macOS)
+      if: ${{ runner.os == 'macOS' }}
       # PRs generated from forks cannot access GitHub Secrets
       # So if the PR is a fork, we will still build, but will not sign.
       env:
@@ -108,16 +116,14 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: yarn dist
-
-    - name: Build Pulsar Binaries (macOS) (Unsigned)
-      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name != 'pulsar-edit/pulsar' }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
-      with:
-        timeout_minutes: 30
-        max_attempts: 3
-        retry_on: error
-        command: yarn dist
+        command: |
+          if [[ -z "${CSC_LINK}" ]]; then unset CSC_LINK; fi
+          if [[ -z "${CSC_KEY_PASSWORD}" ]]; then unset CSC_KEY_PASSWORD; fi
+          if [[ -z "${APPLEID}" ]]; then unset APPLEID; fi
+          if [[ -z "${APPLEID_PASSWORD}" ]]; then unset APPLEID_PASSWORD; fi
+          if [[ -z "${TEAM_ID}" ]]; then unset TEAM_ID; fi
+          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+          yarn dist
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
@@ -126,7 +132,9 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: yarn dist
+        command: |
+          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+          yarn dist
 
     - name: Rename Pulsar Binaries for Regular release (Linux)
       if: ${{ runner.os == 'Linux' }}
@@ -134,7 +142,9 @@ jobs:
 
     - name: Rename Pulsar Binaries for Regular release (macOS)
       if: ${{ runner.os == 'macOS' }}
-      run: node ./script/rename.js "Intel.Mac"
+      run: |
+        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+        node ./script/rename.js "Intel.Mac"
 
     - name: Rename Pulsar Binaries for Regular release (Windows)
       if: ${{ runner.os == 'Windows' }}
@@ -166,7 +176,7 @@ jobs:
     - name: Test Binary - macOS
       if: runner.os == 'macOS' && env.RUN_MACOS_VT == true
       run: |
-        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
         rm -R node_modules/electron; yarn install --check-files
         hdiutil mount binaries/*Pulsar*dmg
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
