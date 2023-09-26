@@ -85,7 +85,7 @@ jobs:
         retry_on: error
         shell: bash
         command: |
-          if [[ `uname -s` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
+          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
@@ -97,7 +97,7 @@ jobs:
         retry_on: error
         shell: bash
         command: |
-          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn build
           yarn run build:apm
 
@@ -123,7 +123,7 @@ jobs:
           if [[ -z "${APPLEID}" ]]; then unset APPLEID; fi
           if [[ -z "${APPLEID_PASSWORD}" ]]; then unset APPLEID_PASSWORD; fi
           if [[ -z "${TEAM_ID}" ]]; then unset TEAM_ID; fi
-          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn dist
 
     - name: Build Pulsar Binaries
@@ -134,7 +134,7 @@ jobs:
         max_attempts: 3
         retry_on: error
         command: |
-          export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
+          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn dist
 
     - name: Rename Pulsar Binaries for Regular release (Linux)
@@ -188,6 +188,7 @@ jobs:
       # We only want to upload rolling binaries if they are a commit to master
       # Otherwise we want to not upload if it's a PR or manually triggered build
       run: |
+        if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
         cd ./script/rolling-release-scripts
         npm install
         node ./rolling-release-binary-upload.js
