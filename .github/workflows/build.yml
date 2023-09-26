@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        group: A
+        group: [ A ]
         include:
           - os: ubuntu-latest
             image: "ghcr.io/cirruslabs/macos-monterey-xcode:14"
