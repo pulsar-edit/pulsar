@@ -79,8 +79,8 @@ jobs:
           yarn run build:apm
 
     # macOS Signing Stuff
-    - name: Build Pulsar Binaries (macOS) (Signed)
-      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
+    - name: Build Pulsar Binaries (macOS)
+      if: ${{ runner.os == 'macOS' }}
       # PRs generated from forks cannot access GitHub Secrets
       # So if the PR is a fork, we will still build, but will not sign.
       env:
@@ -94,16 +94,13 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: yarn dist
-
-    - name: Build Pulsar Binaries (macOS) (Unsigned)
-      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name != 'pulsar-edit/pulsar' }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
-      with:
-        timeout_minutes: 30
-        max_attempts: 3
-        retry_on: error
-        command: yarn dist
+        command: |
+          for var in CSC_LINK CSC_KEY_PASSWORD APPLEID APPLEID_PASSWORD TEAM_ID; do
+            # Fully unset these env vars if have been set as empty (such as when not decrypted for PRs),
+            # since otherwise they will make electron-builder try to sign and fail if they are set empty.
+            if [[ -z ${!var} ]]; then unset ${var}; fi
+          done
+          yarn dist
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
