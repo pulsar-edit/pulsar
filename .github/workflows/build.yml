@@ -39,8 +39,10 @@ jobs:
     - name: Setup Node (macOS)
       if: ${{ runner.os == 'macOS' }}
       run: |
-        npx -y n@9.1.0 --version # populate the npx cache as a non-root user, otherwise root-owned cache files break any future npx runs
-        sudo npx n@9.1.0 install ${{ env.NODE_VERSION }}
+        sudo npx -y n@9.1.0 install ${{ env.NODE_VERSION }}
+        sudo chown -R `id -u`:`id -g` ~/.npm
+        # ^ Reset ownership of root-owned cache files to the current user and its group.
+        #   Prevents issues with future npx commands failing due to not being able to read/write the cache.
 
     - name: Setup Git Submodule
       run: |
