@@ -22,10 +22,15 @@ jobs:
   build:
     strategy:
       matrix:
-        #os: [ ubuntu-latest, windows-latest, macos-latest ]
-        os: [ ubuntu-latest, windows-latest, ghcr.io/cirruslabs/macos-monterey-xcode:14 ]
+        os: [ ubuntu-latest, windows-latest ]
+        group: A
+        include:
+          - os: ubuntu-latest
+            image: "ghcr.io/cirruslabs/macos-monterey-xcode:14"
+            group: B
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.image }}
 
     steps:
     - name: Checkout the latest code
@@ -35,14 +40,17 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ env.NODE_VERSION }}
+      if: ${{ matrix.group != 'B' }}
+
 
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+      if: ${{ matrix.group != 'B' }}
 
     - name: Manual Installation Steps (macOS)
-      if: ${{ runner.os == 'macOS' }}
+      if: ${{ matrix.group == 'B' }}
       run: |
         #sudo rm -rf $(xcode-select -print-path)
         sudo rm -rf /Libary/Developer/CommandLineTools
