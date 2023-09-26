@@ -22,7 +22,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        #os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, ghcr.io/cirruslabs/macos-monterey-xcode:14 ]
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -43,10 +44,10 @@ jobs:
     - name: Manual Installation Steps (macOS)
       if: ${{ runner.os == 'macOS' }}
       run: |
-        sudo rm -rf $(xcode-select -print-path)
+        #sudo rm -rf $(xcode-select -print-path)
         sudo rm -rf /Libary/Developer/CommandLineTools
-        sudo xcode-select --reset
-        #echo A | softwareupdate --install-rosetta
+        #sudo xcode-select --reset
+        echo A | softwareupdate --install-rosetta
         arch -x86_64 xcode-select --install
         arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
