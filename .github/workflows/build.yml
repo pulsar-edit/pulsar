@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,14 +50,9 @@ jobs:
     - name: Manual Installation Steps (macOS)
       if: ${{ runner.os == 'macOS' }}
       run: |
-        #sudo rm -rf $(xcode-select -print-path)
-        #sudo rm -rf /Libary/Developer/CommandLineTools
-        #sudo xcode-select --reset
-        #echo A | softwareupdate --install-rosetta
-        #arch -x86_64 xcode-select --install
-        arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"
-        arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
+        brew install node@16 yarn git python@$PYTHON_VERSION
         ln -sf /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
         ln -sf /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python3
 
@@ -63,12 +62,7 @@ jobs:
         git submodule update
 
     - name: Check Pulsar Version
-      if: ${{ runner.os != 'Windows' }}
       run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
-
-    - name: Check Pulsar Version - Windows
-      if: ${{ runner.os == 'Windows' }}
-      run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
     - name: Reinstall Current Node-GYP NodeJS Headers
       # Overwrite bad headers that get downloaded.
@@ -85,7 +79,7 @@ jobs:
         retry_on: error
         shell: bash
         command: |
-          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
+          if [[ `uname -s` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
@@ -97,7 +91,7 @@ jobs:
         retry_on: error
         shell: bash
         command: |
-          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
+          if [[ `uname -s` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn build
           yarn run build:apm
 
@@ -123,7 +117,7 @@ jobs:
           if [[ -z "${APPLEID}" ]]; then unset APPLEID; fi
           if [[ -z "${APPLEID_PASSWORD}" ]]; then unset APPLEID_PASSWORD; fi
           if [[ -z "${TEAM_ID}" ]]; then unset TEAM_ID; fi
-          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
+          if [[ `uname -s` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn dist
 
     - name: Build Pulsar Binaries
@@ -133,8 +127,9 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
+        shell: bash
         command: |
-          if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
+          if [[ `uname -s` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
           yarn dist
 
     - name: Rename Pulsar Binaries for Regular release (Linux)
@@ -188,7 +183,7 @@ jobs:
       # We only want to upload rolling binaries if they are a commit to master
       # Otherwise we want to not upload if it's a PR or manually triggered build
       run: |
-        if [[ `node -e "console.log(os.type())"` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
+        if [[ `uname -s` == "Darwin" ]]; then export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:${PATH}"; fi
         cd ./script/rolling-release-scripts
         npm install
         node ./rolling-release-binary-upload.js
