@@ -38,7 +38,7 @@ jobs:
 
     - name: Setup Node (macOS)
       if: ${{ runner.os == 'macOS' }}
-      run: npx -y n@9.1.0 install ${{ env.NODE_VERSION }}
+      run: sudo npx -y n@9.1.0 install ${{ env.NODE_VERSION }}
 
     - name: Setup Python
       uses: actions/setup-python@v4
