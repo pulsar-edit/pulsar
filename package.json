@@ -33,7 +33,7 @@
     "async": "3.2.4",
     "atom-dark-syntax": "file:packages/atom-dark-syntax",
     "atom-dark-ui": "file:packages/atom-dark-ui",
-    "atom-keymap": "https://github.com/pulsar-edit/atom-keymap.git#49ae64d",
+    "atom-keymap": "https://github.com/pulsar-edit/atom-keymap.git#0a6fc78",
     "atom-light-syntax": "file:packages/atom-light-syntax",
     "atom-light-ui": "file:packages/atom-light-ui",
     "atom-select-list": "^0.8.1",
