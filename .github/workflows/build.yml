@@ -49,9 +49,9 @@ jobs:
         echo "running 'command -V python3'..."
         command -V python3 || true
 
-    - name: Install git and python3 - Linux
+    - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3
+      run: apt-get update && apt-get install -y git python3 make gcc g++
 
     - name: Printing Python info to terminal for debugging purposes - Linux
       if: ${{ runner.os == 'Linux' }}
