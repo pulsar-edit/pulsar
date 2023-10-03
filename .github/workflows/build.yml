@@ -78,6 +78,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup Python
+      if: ${{ runner.os != 'Linux' }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
