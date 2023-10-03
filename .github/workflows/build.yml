@@ -27,7 +27,7 @@ jobs:
         os: [ macos-latest, windows-latest ]
         include:
           - os: ubuntu-latest
-            image: "debian:8"
+            image: "debian:10"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
