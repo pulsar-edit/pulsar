@@ -39,11 +39,15 @@ jobs:
         echo "running 'whereis python'..."
         whereis python
         echo "running 'which -a python'..."
-        which -a python
+        which -a python || true
+        echo "running 'command -V python'..."
+        command -V python
         echo "running 'whereis python3'..."
         whereis python3
         echo "running 'which -a python3'..."
-        which -a python3
+        which -a python3 || true
+        echo "running 'command -V python3'..."
+        command -V python3
 
     - name: Install git and python3 - Linux
       if: ${{ runner.os == 'Linux' }}
@@ -55,11 +59,15 @@ jobs:
         echo "running 'whereis python'..."
         whereis python
         echo "running 'which -a python'..."
-        which -a python
+        which -a python || true
+        echo "running 'command -V python'..."
+        command -V python
         echo "running 'whereis python3'..."
         whereis python3
         echo "running 'which -a python3'..."
-        which -a python3
+        which -a python3 || true
+        echo "running 'command -V python3'..."
+        command -V python3
 
     - name: Checkout the latest code
       uses: actions/checkout@v3
@@ -117,11 +125,15 @@ jobs:
         echo "running 'whereis python'..."
         whereis python
         echo "running 'which -a python'..."
-        which -a python
+        which -a python || true
+        echo "running 'command -V python'..."
+        command -V python
         echo "running 'whereis python3'..."
         whereis python3
         echo "running 'which -a python3'..."
-        which -a python3
+        which -a python3 || true
+        echo "running 'command -V python3'..."
+        command -V python3
 
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
