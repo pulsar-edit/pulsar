@@ -49,7 +49,15 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Setup Git Submodule
+      if: ${{ runner.os != 'Linux' }}
       run: |
+        git submodule init
+        git submodule update
+
+    - name: Setup Git Submodule - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        git config --global --add safe.directory ${{ github.workspace }}
         git submodule init
         git submodule update
 
