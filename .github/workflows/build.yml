@@ -44,6 +44,10 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
+    - name: Install git
+      if: ${{ runner.os == 'Linux' }}
+      run: apt-get update && apt-get install -y git
+
     - name: Setup Git Submodule
       run: |
         git submodule init
