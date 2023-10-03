@@ -65,7 +65,7 @@ jobs:
     - name: Setup Git Submodule - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
-        git config --global --add safe.directory ${{ github.workspace }}
+        git config --global --add safe.directory /__w/pulsar/pulsar
         git submodule init
         git submodule update
 
