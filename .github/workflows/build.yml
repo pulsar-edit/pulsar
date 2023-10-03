@@ -33,6 +33,10 @@ jobs:
     container: ${{ matrix.image }}
 
     steps:
+    - name: Install git
+      if: ${{ runner.os == 'Linux' }}
+      run: apt-get update && apt-get install -y git
+
     - name: Checkout the latest code
       uses: actions/checkout@v3
 
@@ -51,10 +55,6 @@ jobs:
       # are incompatible with Python 3.12+, which no-longer ships 'distutils'
       # out of the box. 'setuptools' package provides 'distutils'.
       run: python3 -m pip install setuptools
-
-    - name: Install git
-      if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git
 
     - name: Setup Git Submodule
       run: |
