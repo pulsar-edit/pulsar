@@ -33,9 +33,9 @@ jobs:
     container: ${{ matrix.image }}
 
     steps:
-    - name: Install git
+    - name: Install git and python3 - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git
+      run: apt-get update && apt-get install -y git python3
 
     - name: Checkout the latest code
       uses: actions/checkout@v3
