@@ -51,7 +51,7 @@ jobs:
 
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm
+      run: apt-get update && apt-get install -y git python3 make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm ffmpeg
 
     - name: Printing Python info to terminal for debugging purposes - Linux
       if: ${{ runner.os == 'Linux' }}
