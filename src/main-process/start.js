@@ -126,7 +126,7 @@ function getConfig() {
       if (error) {
         console.log(error.message);
       } else {
-        config.resetUserSettings(configFileData);
+        config.resetUserSettings(data);
       }
     });
   }
