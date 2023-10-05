@@ -33,49 +33,9 @@ jobs:
     container: ${{ matrix.image }}
 
     steps:
-    - name: Printing Python info to terminal for debugging purposes - Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        echo "running 'whereis python'..."
-        whereis python
-        echo "running 'which -a python'..."
-        which -a python || true
-        echo "running 'command -V python'..."
-        command -V python || true
-        echo "running 'python --version'..."
-        python --version || true
-        echo "running 'whereis python3'..."
-        whereis python3
-        echo "running 'which -a python3'..."
-        which -a python3 || true
-        echo "running 'command -V python3'..."
-        command -V python3 || true
-        echo "running 'python3 --version'..."
-        python3 --version || true
-
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git python3 make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg
-
-    - name: Printing Python info to terminal for debugging purposes - Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        echo "running 'whereis python'..."
-        whereis python
-        echo "running 'which -a python'..."
-        which -a python || true
-        echo "running 'command -V python'..."
-        command -V python || true
-        echo "running 'python --version'..."
-        python --version || true
-        echo "running 'whereis python3'..."
-        whereis python3
-        echo "running 'which -a python3'..."
-        which -a python3 || true
-        echo "running 'command -V python3'..."
-        command -V python3 || true
-        echo "running 'python3 --version'..."
-        python3 --version || true
 
     - name: Checkout the latest code
       uses: actions/checkout@v3
@@ -96,6 +56,10 @@ jobs:
       # are incompatible with Python 3.12+, which no-longer ships 'distutils'
       # out of the box. 'setuptools' package provides 'distutils'.
       run: python3 -m pip install setuptools
+
+    - name: Install Yarn - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: npm install -g yarn
 
     - name: Setup Git Submodule
       if: ${{ runner.os != 'Linux' }}
@@ -123,30 +87,6 @@ jobs:
       # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
-
-    - name: Install Yarn - Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: npm install -g yarn
-
-    - name: Printing Python info to terminal for debugging purposes - Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        echo "running 'whereis python'..."
-        whereis python
-        echo "running 'which -a python'..."
-        which -a python || true
-        echo "running 'command -V python'..."
-        command -V python || true
-        echo "running 'python --version'..."
-        python --version || true
-        echo "running 'whereis python3'..."
-        whereis python3
-        echo "running 'which -a python3'..."
-        which -a python3 || true
-        echo "running 'command -V python3'..."
-        command -V python3 || true
-        echo "running 'python3 --version'..."
-        python3 --version || true
 
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
@@ -228,6 +168,7 @@ jobs:
         rm -R node_modules/electron; yarn install --check-files
         ./binaries/*AppImage --appimage-extract
         export BINARY_NAME='squashfs-root/pulsar'
+        chmod -R a+rwx "${BINARY_NAME}"
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
