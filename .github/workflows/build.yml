@@ -42,12 +42,16 @@ jobs:
         which -a python || true
         echo "running 'command -V python'..."
         command -V python || true
+        echo "running 'python --version'..."
+        python --version || true
         echo "running 'whereis python3'..."
         whereis python3
         echo "running 'which -a python3'..."
         which -a python3 || true
         echo "running 'command -V python3'..."
         command -V python3 || true
+        echo "running 'python3 --version'..."
+        python3 --version || true
 
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
@@ -62,12 +66,16 @@ jobs:
         which -a python || true
         echo "running 'command -V python'..."
         command -V python || true
+        echo "running 'python --version'..."
+        python --version || true
         echo "running 'whereis python3'..."
         whereis python3
         echo "running 'which -a python3'..."
         which -a python3 || true
         echo "running 'command -V python3'..."
         command -V python3 || true
+        echo "running 'python3 --version'..."
+        python3 --version || true
 
     - name: Checkout the latest code
       uses: actions/checkout@v3
@@ -129,12 +137,16 @@ jobs:
         which -a python || true
         echo "running 'command -V python'..."
         command -V python || true
+        echo "running 'python --version'..."
+        python --version || true
         echo "running 'whereis python3'..."
         whereis python3
         echo "running 'which -a python3'..."
         which -a python3 || true
         echo "running 'command -V python3'..."
         command -V python3 || true
+        echo "running 'python3 --version'..."
+        python3 --version || true
 
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
