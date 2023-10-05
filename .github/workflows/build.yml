@@ -107,6 +107,15 @@ jobs:
           yarn build
           yarn run build:apm
 
+    - name: Cache Pulsar dependencies - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: dependencies-${{ github.sha }}-${{ github.workflow }}
+
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS) (Signed)
       if: ${{ runner.os == 'macOS' && github.event_name == 'push' }}
@@ -156,21 +165,18 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: node ./script/rename.js "Windows"
 
+    - name: Cache Pulsar Binaries - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache@v3
+      with:
+        path: ./binaries
+        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Binaries
         path: ./binaries/*
-
-    - name: Test Binary - Linux
-      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
-      run: |
-        rm -R node_modules/electron; yarn install --check-files
-        ./binaries/*AppImage --appimage-extract
-        export BINARY_NAME='squashfs-root/pulsar'
-        chmod -R a+rwx "${BINARY_NAME}"
-        mkdir -p ./tests/videos
-        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
     - name: Test Binary - Windows
       if: runner.os == 'Windows' && env.RUN_WINDOWS_VT == true
@@ -190,7 +196,7 @@ jobs:
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
     - name: Add binaries to Rolling Release Repo
-      if: ${{ github.event_name == 'push' }}
+      if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
       # We only want to upload rolling binaries if they are a commit to master
       # Otherwise we want to not upload if it's a PR or manually triggered build
       run: |
@@ -203,3 +209,43 @@ jobs:
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
+
+
+  test-and-upload-Linux:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Restore Cached Pulsar Binaries - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache@v3
+      with:
+        path: ./binaries
+        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+
+    - name: Restore Cached Pulsar dependencies - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: dependencies-${{ github.sha }}-${{ github.workflow }}
+
+    - name: Test Binary - Linux
+      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      run: |
+        rm -R node_modules/electron; yarn install --check-files
+        ./binaries/*AppImage --appimage-extract
+        export BINARY_NAME='squashfs-root/pulsar'
+        mkdir -p ./tests/videos
+        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+
+    - name: Add binaries to Rolling Release Repo - Linux
+      if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
+      # We only want to upload rolling binaries if they are a commit to master
+      # Otherwise we want to not upload if it's a PR or manually triggered build
+      run: |
+        cd ./script/rolling-release-scripts
+        npm install
+        node ./rolling-release-binary-upload.js
