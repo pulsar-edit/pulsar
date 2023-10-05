@@ -55,7 +55,7 @@ jobs:
 
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg
+      run: apt-get update && apt-get install -y git make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg
 
     - name: Printing Python info to terminal for debugging purposes - Linux
       if: ${{ runner.os == 'Linux' }}
@@ -86,7 +86,6 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup Python
-      if: ${{ runner.os != 'Linux' }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
