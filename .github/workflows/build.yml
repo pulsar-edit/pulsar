@@ -109,12 +109,12 @@ jobs:
 
     - name: Cache Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache@v3
+      uses: actions/cache/save@v3
       with:
         path: |
           node_modules
           packages
-        key: dependencies-${{ github.sha }}-${{ github.workflow }}
+        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS) (Signed)
@@ -167,7 +167,7 @@ jobs:
 
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache@v3
+      uses: actions/cache/save@v3
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
@@ -219,19 +219,19 @@ jobs:
     steps:
     - name: Restore Cached Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v3
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v3
       with:
         path: |
           node_modules
           packages
-        key: dependencies-${{ github.sha }}-${{ github.workflow }}
+        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
 
     - name: Test Binary - Linux
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
