@@ -121,8 +121,14 @@ function getConfig() {
   let configFilePath = getConfigFilePath();
 
   if (configFilePath) {
-    const configFileData = CSON.readFileSync(configFilePath);
-    config.resetUserSettings(configFileData);
+    CSON.readFile(configFilePath, (error, data) => {
+      // Duplicated from `./src/config-file.js`.reload()
+      if (error) {
+        console.log(error.message);
+      } else {
+        config.resetUserSettings(data);
+      }
+    });
   }
 
   return config;
