@@ -46,6 +46,7 @@ const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
+const I18n = require("./i18n");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -125,6 +126,11 @@ class AtomEnvironment {
     /** @type {StyleManager} */
     this.styles = new StyleManager();
 
+    this.i18n = new I18n({
+      notificationManager: this.notifications,
+      config: this.config
+    });
+
     /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
@@ -135,7 +141,8 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       deserializerManager: this.deserializers,
       viewRegistry: this.views,
-      uriHandlerRegistry: this.uriHandlerRegistry
+      uriHandlerRegistry: this.uriHandlerRegistry,
+      i18n: this.i18n
     });
 
     /** @type {ThemeManager} */
@@ -149,6 +156,7 @@ class AtomEnvironment {
 
     /** @type {MenuManager} */
     this.menu = new MenuManager({
+      i18n: this.i18n,
       keymapManager: this.keymaps,
       packageManager: this.packages
     });
@@ -196,10 +204,6 @@ class AtomEnvironment {
     });
 
     this.themes.workspace = this.workspace;
-
-    if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
-      this.keymaps.loadBundledKeymaps();
-    }
 
     this.registerDefaultCommands();
     this.registerDefaultOpeners();
@@ -271,25 +275,30 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
-    this.menu.initialize({ resourcePath });
-    this.contextMenu.initialize({ resourcePath, devMode });
+    this.i18n.initialize({
+      configDirPath: this.configDirPath,
+      packages: this.packages,
+      resourcePath
+    });
 
-    this.keymaps.configDirPath = this.configDirPath;
-    this.keymaps.resourcePath = resourcePath;
-    this.keymaps.devMode = devMode;
-    if (!this.keymaps.canLoadBundledKeymapsFromMemory()) {
-      this.keymaps.loadBundledKeymaps();
-    }
-
-    this.commands.attach(this.window);
-
-    this.styles.initialize({ configDirPath: this.configDirPath });
     this.packages.initialize({
       devMode,
       configDirPath: this.configDirPath,
       resourcePath,
       safeMode
     });
+
+    this.menu.initialize({ resourcePath });
+    this.contextMenu.initialize({ resourcePath, devMode });
+
+    this.keymaps.configDirPath = this.configDirPath;
+    this.keymaps.resourcePath = resourcePath;
+    this.keymaps.devMode = devMode;
+    this.keymaps.loadBundledKeymaps();
+
+    this.commands.attach(this.window);
+
+    this.styles.initialize({ configDirPath: this.configDirPath });
     this.themes.initialize({
       configDirPath: this.configDirPath,
       resourcePath,
