@@ -156,16 +156,18 @@ class Localisations {
   }
 
   /**
-   * @param {Key} _keystr
+   * @param {Key} keystr
    * @param {Opts} opts
    */
-  t(_keystr, opts = {}) {
-    const i = _keystr.indexOf(".");
-    if (i < 0) return fallback(_keystr, opts);
+  t(keystr, opts = {}) {
+    let key = keystr.split(".");
+    if (key.length < 2) return fallback(keystr, opts);
 
-    const pkgName = _keystr.substring(0, i);
-    const keystr = _keystr.substring(i + 1);
-    return this.packages[pkgName]?.t(keystr, opts) ?? fallback(_keystr, opts);
+    guardPrototypePollution(key);
+
+    const pkgName = key[0];
+    key = key.slice(1);
+    return this.packages[pkgName]?.t(key, opts) ?? fallback(keystr, opts);
   }
 
   /**
@@ -210,13 +212,10 @@ class PackageLocalisations {
   }
 
   /**
-   * @param {Key} keystr
+   * @param {SplitKey} key
    * @param {Opts} opts
    */
-  t(keystr, opts = {}) {
-    const key = keystr.split(".");
-    guardPrototypePollution(key);
-
+  t(key, opts = {}) {
     for (const locale of this.locales) {
       const localised = this.localeObjs[locale]?.t(key, opts);
       if (localised) return localised;
