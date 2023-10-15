@@ -5,7 +5,54 @@
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+
+## 1.109.1
+
+- Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`
+- Fixed Snippets from `language-php` that would lose the `$` character
+- Fixed a condition where an invalid config may crash Pulsar before fully starting up, but not registering that it's crashed
+- Reduced error notifications that may appear from `autocomplete-html` when handling EJS files
+- Fixed macOS binary signing after moving over to GitHub Actions for CI
+- Updated PPM to a newer `node-gyp` allowing newer versions of C++ toolkits to be used
 - Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
+
+### Pulsar
+- Added: Add escapement to variable literals within php snippets [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/758)
+- Added: [core] Handle invalid config on load [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/750)
+- Added: [autocomplete-html] Wrap completions in `try/catch` handler [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/753)
+- Bumped: Update dependency postcss to v8.4.31 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/752)
+- Fixed: CI: Sign macOS binaries for branch pushes, not PRs [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/745)
+- Fixed: CI: Use Python 3.11 to fix macOS signing [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/743)
+- Fixed: [meta] Fix Windows Builds in CI [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/738)
+- Bumped: ppm: Update ppm submodule to commit a2ade745bfbc5f [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/725)
+- Added: Making autocomplete-plus work to replace ranges [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/479)
+
+### ppm
+- Bumped: Update npm and node-gyp, for macOS signing fix [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/94)
+- Removed: Remove emnants of Coffeescript building [@2colours](https://github.com/pulsar-edit/ppm/pull/92)
+- Added: Update unpublishing wording [@Daeraxa](https://github.com/pulsar-edit/ppm/pull/90)
+- Added: Migrate to `second-mate` and remove `first-mate` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/86)
+- Added: Cleanup `visualStudioIsInstalled()` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/85)
+- Decafed: Decaf Source [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/84)
+- Fixed: Make `postinstall` scripts work on Windows with spaces in cwd path [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/83)
+- Added: Move Spec Decaf PRs into `master` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/81)
+- Bumped: Switch to our npm fork, to get newer node-gyp (node-gyp 9.x) [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/79)
+- Decafed: Decaffeinate remaining spec files from list-spec on [@2colours](https://github.com/pulsar-edit/ppm/pull/78)
+- Decafed: Decaffeinate link spec [@2colours](https://github.com/pulsar-edit/ppm/pull/77)
+- Decafed: Decaffeinate install spec [@2colours](https://github.com/pulsar-edit/ppm/pull/76)
+- Decafed: Decaffeinate init spec [@2colours](https://github.com/pulsar-edit/ppm/pull/75)
+- Decafed: Decaffeinate help spec [@2colours](https://github.com/pulsar-edit/ppm/pull/74)
+- Decafed: Decaffeinate featured spec [@2colours](https://github.com/pulsar-edit/ppm/pull/73)
+- Decafed: Decaffeinate enable spec [@2colours](https://github.com/pulsar-edit/ppm/pull/72)
+- Decafed: Decaffeinate docs spec [@2colours](https://github.com/pulsar-edit/ppm/pull/71)
+- Decafed: Decaffeinate disable spec [@2colours](https://github.com/pulsar-edit/ppm/pull/70)
+- Decafed: Decaffeinate develop spec [@2colours](https://github.com/pulsar-edit/ppm/pull/69)
+- Decafed: Decaffeinate config spec [@2colours](https://github.com/pulsar-edit/ppm/pull/68)
+- Decafed: Decaffeinate command spec [@2colours](https://github.com/pulsar-edit/ppm/pull/67)
+- Decafed: Decaffeinate clean spec [@2colours](https://github.com/pulsar-edit/ppm/pull/66)
+- Decafed: Decaffeinate ci spec [@2colours](https://github.com/pulsar-edit/ppm/pull/65)
+- Decafed: Decaffeinate apm cli spec [@2colours](https://github.com/pulsar-edit/ppm/pull/64)
+- Decafed: Decaffeinate spec helper (updated) [@2colours](https://github.com/pulsar-edit/ppm/pull/63)
 
 ## 1.109.0
 
