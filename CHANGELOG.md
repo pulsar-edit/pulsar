@@ -17,6 +17,7 @@
 - Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
 
 ### Pulsar
+- Added: Tree-sitter running fixes for September [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/735)
 - Added: Add escapement to variable literals within php snippets [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/758)
 - Added: [core] Handle invalid config on load [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/750)
 - Added: [autocomplete-html] Wrap completions in `try/catch` handler [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/753)
