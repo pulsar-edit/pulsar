@@ -6,7 +6,7 @@
 
 ## [Unreleased]
 
-## 1.109.1
+## 1.110.0
 
 - Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`
 - Fixed Snippets from `language-php` that would lose the `$` character
