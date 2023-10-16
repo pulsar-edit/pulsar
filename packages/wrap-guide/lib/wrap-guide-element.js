@@ -90,8 +90,10 @@ module.exports = class WrapGuideElement {
       const columns = uniqueAscending(args.newValue);
       if (columns != null ? columns.length : undefined) {
         atom.config.set('wrap-guide.columns', columns);
-        atom.config.set('editor.preferredLineLength', columns[columns.length - 1],
-          {scopeSelector: `.${this.editor.getGrammar().scopeName}`});
+        if (atom.config.get('wrap-guide.modifyPreferredLineLength')) {
+          atom.config.set('editor.preferredLineLength', columns[columns.length - 1],
+            {scopeSelector: `.${this.editor.getGrammar().scopeName}`});
+        }
         return this.updateGuide();
       }
     };
