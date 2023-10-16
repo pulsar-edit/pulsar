@@ -14,6 +14,7 @@
 - Reduced error notifications that may appear from `autocomplete-html` when handling EJS files
 - Fixed macOS binary signing after moving over to GitHub Actions for CI
 - Updated PPM to a newer `node-gyp`, allowing newer versions of C/C++ compiler toolchains and Python to be used (also dropped support for Python 2.x!)
+- Fully decaffed the entire PPM codebase
 - Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
 
 ### Pulsar
@@ -31,7 +32,7 @@
 
 ### ppm
 - Bumped: Update npm and node-gyp, for macOS signing fix [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/94)
-- Removed: Remove emnants of Coffeescript building [@2colours](https://github.com/pulsar-edit/ppm/pull/92)
+- Removed: Remove remnants of Coffeescript building [@2colours](https://github.com/pulsar-edit/ppm/pull/92)
 - Added: Update unpublishing wording [@Daeraxa](https://github.com/pulsar-edit/ppm/pull/90)
 - Added: Migrate to `second-mate` and remove `first-mate` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/86)
 - Added: Cleanup `visualStudioIsInstalled()` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/85)

@@ -68,6 +68,9 @@ export default class ChangeLogView {
                 Updated PPM to a newer `node-gyp`, allowing newer versions of C/C++ compiler toolchains and Python to be used (also dropped support for Python 2.x!)
               </li>
               <li>
+                Fully decaffed the entire PPM codebase
+              </li>
+              <li>
                 Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
               </li>
 
