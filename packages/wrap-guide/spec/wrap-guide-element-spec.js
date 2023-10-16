@@ -105,7 +105,7 @@ describe("WrapGuideElement", function() {
       for (let i = 0; i < columnCount; i++) {
         columns.push(i * 10);
       }
-      
+
       atom.config.set("wrap-guide.columns", columns);
       waitsForPromise(() => editorElement.getComponent().getNextUpdatePromise());
 
@@ -243,6 +243,19 @@ describe("WrapGuideElement", function() {
         expect(positions[1]).toBeGreaterThan(positions[0]);
         expect(positions[2]).toBeGreaterThan(positions[1]);
         expect(wrapGuide).toBeVisible();
+      });
+    });
+
+    it("leaves alone preferredLineLength if modifyPreferredLineLength is false", () => {
+      const initial = atom.config.get("editor.preferredLineLength", { scope: editor.getRootScopeDescriptor() });
+      atom.config.set("wrap-guide.modifyPreferredLineLength", false);
+
+      atom.config.set("wrap-guide.columns", [ initial, initial + 10]);
+      waitsForPromise(() => editorElement.getComponent().getNextUpdatePromise());
+
+      runs(() => {
+        const length = atom.config.get("editor.preferredLineLength", { scope: editor.getRootScopeDescriptor() });
+        expect(length).toBe(initial);
       });
     });
   });
