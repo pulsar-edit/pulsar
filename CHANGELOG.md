@@ -13,7 +13,7 @@
 - Fixed a condition where an invalid config may crash Pulsar before fully starting up, but not registering that it's crashed
 - Reduced error notifications that may appear from `autocomplete-html` when handling EJS files
 - Fixed macOS binary signing after moving over to GitHub Actions for CI
-- Updated PPM to a newer `node-gyp` allowing newer versions of C++ toolkits to be used
+- Updated PPM to a newer `node-gyp`, allowing newer versions of C/C++ compiler toolchains and Python to be used (also dropped support for Python 2.x!)
 - Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
 
 ### Pulsar
