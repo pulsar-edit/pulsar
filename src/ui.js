@@ -311,9 +311,9 @@ const fuzzyMatcher = {
     return this.match(candidate, query)?.score || 0;
   },
 
-  match(candidate, query) {
+  match(candidate, query, opts = {}) {
     const matcher = setCandidates([candidate]);
-    return matcher.match(query)[0];
+    return matcher.match(query, opts)[0];
   }
 }
 
