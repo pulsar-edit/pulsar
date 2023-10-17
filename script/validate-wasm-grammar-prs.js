@@ -101,7 +101,7 @@ for (const wasmFile of wasmFilesChanged) {
           // This can fail for two major reasons
           // 1. It actually failed
           // 2. This is a new file, and it failed to find an earlier one that didn't exist
-          // So that we don't faile brand new TreeSitter grammars, we manually check for number 2
+          // So that we don't fail brand new TreeSitter grammars, we manually check for number 2
 
           if (getPrevFile.stderr.toString().includes("exists on disk, but not in")) {
             // Looks like this file is new. Skip this check
