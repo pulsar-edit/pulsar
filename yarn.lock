@@ -4909,15 +4909,7 @@ getpass@^0.1.1:
   dependencies:
     atom-select-list "^0.8.1"
 
-git-utils@5.7.1:
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.1.tgz#f26e95f8cc05b475b2b8b09151b68f3788c8a173"
-  integrity sha512-+mWdJDq9emWoq6GzzrGEB7SIBmAk0lNNv2wgNkgwTVZUkAFkWvgRsJ+Kvs3d1QQD6WG6vczti2WLpjmh2Twtlw==
-  dependencies:
-    fs-plus "^3.0.0"
-    nan "^2.14.0"
-
-git-utils@^5.6.0:
+git-utils@^5.6.0, git-utils@^5.7.3:
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.3.tgz#3b53983204678313b305bbf278c07dc015ba2155"
   integrity sha512-in1hjFfmzY86gKBt+YMTaVyCGtX2WTnN0uPj37bI5HsrnU2oj8OFcWOEzOI5PxQXPMxFxtvRebOHAOGB8M125w==
