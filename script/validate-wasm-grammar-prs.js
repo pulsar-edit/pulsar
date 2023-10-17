@@ -13,7 +13,7 @@ const fs = require("node:fs");
 const CSON = require("season");
 
 // Change this if you want more logs
-let verbose = false;
+let verbose = true;
 
 // Lets first find our common ancestor commit
 // This lets us determine the commit where the branch or fork departed from
@@ -99,12 +99,15 @@ for (const wasmFile of wasmFilesChanged) {
 
         if (getPrevFile.status !== 0 || getPrevFile.stderr.toString().length > 0) {
           // This can fail for two major reasons
-          // 1. It actually failed
-          // 2. This is a new file, and it failed to find an earlier one that didn't exist
+          // 1. The `git show` command has returned an error code other than `0`, failing.
+          // 2. This is a new file, and it failed to find an earlier copy (which didn't exist)
           // So that we don't fail brand new TreeSitter grammars, we manually check for number 2
 
           if (getPrevFile.stderr.toString().includes("exists on disk, but not in")) {
             // Looks like this file is new. Skip this check
+            if (verbose) {
+              console.log("Looks like this file is new. Skipping...");
+            }
             continue;
           }
 
@@ -135,6 +138,10 @@ for (const wasmFile of wasmFilesChanged) {
 
         // Else it looks like it has been updated properly
         console.log(`Validated \`parserSource\` has been updated within '${filePath}' properly.`);
+      } else {
+        if (verbose) {
+          console.log("This grammar file doesn't use a WASM file that's changed (On the current interation)");
+        }
       }
     }
   }
