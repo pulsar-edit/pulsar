@@ -306,9 +306,14 @@ function setCandidates(matcherOrCandidates, candidates) {
 }
 const fuzzyMatcher = {
   setCandidates: setCandidates,
+
   score(candidate, query) {
+    return this.match(candidate, query)?.score || 0;
+  },
+
+  match(candidate, query) {
     const matcher = setCandidates([candidate]);
-    return matcher.match(query)[0].score;
+    return matcher.match(query)[0];
   }
 }
 
