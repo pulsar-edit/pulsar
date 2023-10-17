@@ -76,7 +76,6 @@
     "git-diff": "file:packages/git-diff",
     "git-utils": "5.7.1",
     "github": "https://codeload.github.com/pulsar-edit/github/tar.gz/refs/tags/v0.36.17-pretranspiled",
-    "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
     "grim": "2.0.3",
