@@ -1,5 +1,6 @@
 const MarkdownIt = require("markdown-it");
 const { TextEditor } = require("atom");
+const { Matcher } = require("@pulsar-edit/fuzzy-native");
 let yamlFrontMatter, markdownItEmoji, markdownItGitHubHeadings, markdownItTaskCheckbox;
 
 // Regex Declarations
@@ -289,8 +290,31 @@ function convertToDOM(content) {
   return template.body;
 }
 
+function setCandidates(matcherOrCandidates, candidates) {
+  if(candidates) {
+    matcherOrCandidates.setCandidates(
+      [...Array(candidates.length).keys()],
+      candidates
+    );
+    return matcherOrCandidates;
+  } else {
+    return new Matcher(
+      [...Array(matcherOrCandidates.length).keys()],
+      matcherOrCandidates
+    );
+  }
+}
+const fuzzyMatcher = {
+  setCandidates: setCandidates,
+  score(candidate, query) {
+    const matcher = setCandidates([candidate]);
+    return matcher.match(query)[0].score;
+  }
+}
+
 module.exports = {
   renderMarkdown,
   applySyntaxHighlighting,
   convertToDOM,
+  fuzzyMatcher
 };
