@@ -18,6 +18,7 @@
 - Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
 
 ### Pulsar
+- Added: [wrap-guide] Make the automatic modification of `editor.preferredLineLength` configurable [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/754)
 - Fixed: Fixed filtering of suggestions with ranges [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/762)
 - Added: Tree-sitter running fixes for September [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/735)
 - Added: Add escapement to variable literals within php snippets [@Spiker985](https://github.com/pulsar-edit/pulsar/pull/758)
