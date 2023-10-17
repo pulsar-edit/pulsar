@@ -75,7 +75,7 @@
     "functional-red-black-tree": "^1.0.1",
     "fuzzy-finder": "file:packages/fuzzy-finder",
     "git-diff": "file:packages/git-diff",
-    "git-utils": "5.7.1",
+    "git-utils": "^5.7.3",
     "github": "https://codeload.github.com/pulsar-edit/github/tar.gz/refs/tags/v0.36.17-pretranspiled",
     "glob": "^7.1.1",
     "go-to-line": "file:packages/go-to-line",
