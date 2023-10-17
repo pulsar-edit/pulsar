@@ -133,10 +133,10 @@ export default class CommandPaletteView {
   }
 
   highlightMatchesInElement (text, query, el) {
-    const matches = atom.ui.fuzzyMatcher.match(text, query)
+    const matches = atom.ui.fuzzyMatcher.match(text, query, {recordMatchIndexes: true})
     let matchedChars = []
     let lastIndex = 0
-    for (const matchIndex of matches) {
+    matches.matchIndexes.forEach(matchIndex => {
       const unmatched = text.substring(lastIndex, matchIndex)
       if (unmatched) {
         if (matchedChars.length > 0) {
@@ -152,7 +152,7 @@ export default class CommandPaletteView {
 
       matchedChars.push(text[matchIndex])
       lastIndex = matchIndex + 1
-    }
+    })
 
     if (matchedChars.length > 0) {
       const matchSpan = document.createElement('span')
