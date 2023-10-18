@@ -1,17 +1,25 @@
 const MarkdownIt = require("markdown-it");
 const { TextEditor } = require("atom");
-let yamlFrontMatter, markdownItEmoji, markdownItGitHubHeadings, markdownItTaskCheckbox;
 
-// Regex Declarations
-const reg = {
-  localLinks: {
-    currentDir: new RegExp(/^\.\//),
-    rootDir: new RegExp(/^\//)
+// Helper Markdown Components
+const mdComponents = {
+  deps: {
+    yamlFrontMatter: null,
+    markdownItEmoji: null,
+    markdownItGitHubHeadings: null,
+    markdownItTaskCheckbox: null
   },
-  atomLinks: {
-    package: new RegExp(/^https:\/\/atom\.io\/packages\/(.*)$/),
-    flightManual: new RegExp(/^https:\/\/flight-manual\.atom\.io\//)
-  }
+  // Regex Declarations
+  reg: {
+    localLinks: {
+      currentDir: new RegExp(/^\.\//),
+      rootDir: new RegExp(/^\//)
+    },
+    atomLinks: {
+      package: new RegExp(/^https:\/\/atom\.io\/packages\/(.*)$/),
+      flightManual: new RegExp(/^https:\/\/flight-manual\.atom\.io\//)
+    }
+  },
 };
 
 function renderMarkdown(content, givenOpts = {}) {
@@ -51,16 +59,16 @@ function renderMarkdown(content, givenOpts = {}) {
   let md = new MarkdownIt(markdownItOpts);
 
   if (opts.useDefaultEmoji) {
-    markdownItEmoji = require("markdown-it-emoji");
-    md.use(markdownItEmoji, {});
+    mdComponents.deps.markdownItEmoji = require("markdown-it-emoji");
+    md.use(mdComponents.deps.markdownItEmoji, {});
   }
   if (opts.useGitHubHeadings) {
-    markdownItGitHubHeadings = require("markdown-it-github-headings");
-    md.use(markdownItGitHubHeadings, {});
+    mdComponents.deps.markdownItGitHubHeadings = require("markdown-it-github-headings");
+    md.use(mdComponents.deps.markdownItGitHubHeadings, {});
   }
   if (opts.useTaskCheckbox) {
-    markdownItTaskCheckbox = require("markdown-it-task-checkbox");
-    md.use(markdownItTaskCheckbox, {
+    mdComponents.deps.markdownItTaskCheckbox = require("markdown-it-task-checkbox");
+    md.use(mdComponents.deps.markdownItTaskCheckbox, {
       disabled: opts.taskCheckboxDisabled,
       divWrap: opts.taskCheckboxDivWrap
     });
@@ -77,13 +85,13 @@ function renderMarkdown(content, givenOpts = {}) {
       // Lets say content contains './my-cool-image.png'
       // We need to turn it into something like this:
       // https://github.com/USER/REPO/raw/HEAD/my-cool-image.png
-      if (reg.localLinks.currentDir.test(token.attrGet("src"))) {
+      if (mdComponents.reg.localLinks.currentDir.test(token.attrGet("src"))) {
         let rawLink = token.attrGet("src");
-        rawLink = rawLink.replace(reg.localLinks.currentDir, "");
+        rawLink = rawLink.replace(mdComponents.reg.localLinks.currentDir, "");
         token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-      } else if (reg.localLinks.rootDir.test(token.attrGet("src"))) {
+      } else if (mdComponents.reg.localLinks.rootDir.test(token.attrGet("src"))) {
         let rawLink = token.attrGet("src");
-        rawLink = rawLink.replace(reg.localLinks.rootDir, "");
+        rawLink = rawLink.replace(mdComponents.reg.localLinks.rootDir, "");
         token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
       } else if (!token.attrGet("src").startsWith("http")) {
         // Check for implicit relative urls
@@ -109,18 +117,18 @@ function renderMarkdown(content, givenOpts = {}) {
                 if (attr[0] === "href") {
                   let link = attr[1];
 
-                  if (opts.transformAtomLinks && reg.atomLinks.package.test(link)) {
+                  if (opts.transformAtomLinks && mdComponents.reg.atomLinks.package.test(link)) {
                     // Fix any links that attempt to point to packages on `https://atom.io/packages/...`
-                    attr[1] = `https://web.pulsar-edit.dev/packages/${link.match(reg.atomLinks.package)[1]}`;
-                  } else if (opts.transformNonFqdnLinks && reg.localLinks.currentDir.test(link)) {
-                    attr[1] = `${cleanRootDomain()}/raw/HEAD/${link.replace(reg.localLinks.currentDir, "")}`;
-                  } else if (opts.transformNonFqdnLinks && reg.localLinks.rootDir.test(link)) {
-                    attr[1] = `${cleanRootDomain()}/raw/HEAD/${link.replace(reg.localLinks.rootDir, "")}`;
+                    attr[1] = `https://web.pulsar-edit.dev/packages/${link.match(mdComponents.reg.atomLinks.package)[1]}`;
+                  } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.currentDir.test(link)) {
+                    attr[1] = `${cleanRootDomain()}/raw/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
+                  } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.rootDir.test(link)) {
+                    attr[1] = `${cleanRootDomain()}/raw/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
                   } else if (opts.transformNonFqdnLinks && !link.startsWith("http")) {
                     attr[1] = `${cleanRootDomain()}/raw/HEAD/${link.replace(".git", "")}`;
-                  } else if (opts.transformAtomLinks && reg.atomLinks.flightManual.test(link)) {
+                  } else if (opts.transformAtomLinks && mdComponents.reg.atomLinks.flightManual.test(link)) {
                     // Resolve any links to the flight manual to web archive
-                    attr[1] = link.replace(reg.atomLinks.flightManual, "https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/");
+                    attr[1] = link.replace(mdComponents.reg.atomLinks.flightManual, "https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/");
                   }
                 }
               });
@@ -134,8 +142,8 @@ function renderMarkdown(content, givenOpts = {}) {
   let textContent;
 
   if (opts.handleFrontMatter) {
-    yamlFrontMatter = require("yaml-front-matter");
-    const { __content, vars } = yamlFrontMatter.loadFront(content);
+    mdComponents.deps.yamlFrontMatter = require("yaml-front-matter");
+    const { __content, vars } = mdComponents.deps.yamlFrontMatter.loadFront(content);
 
     const renderYamlTable = (variables) => {
       if (typeof variables === "undefined") {
@@ -289,8 +297,13 @@ function convertToDOM(content) {
   return template.body;
 }
 
+// Markdown Exported Object
+const markdown = {
+  renderMarkdown: renderMarkdown,
+  applySyntaxHighlighting: applySyntaxHighlighting,
+  convertToDOM: convertToDOM
+};
+
 module.exports = {
-  renderMarkdown,
-  applySyntaxHighlighting,
-  convertToDOM,
+  markdown,
 };
