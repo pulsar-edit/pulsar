@@ -68,6 +68,7 @@
 (string "\"" @punctuation.definition.string.end.shell
   (#is? test.last true))
 (raw_string) @string.quoted.single.shell
+(ansi_c_string) @string.quoted.single.shell
 
 (string
   (command_substitution) @meta.embedded.line.subshell.shell)
