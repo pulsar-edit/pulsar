@@ -305,7 +305,7 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
 
 // Markdown Exported Object
 const markdown = {
-  renderMarkdown: renderMarkdown,
+  render: renderMarkdown,
   applySyntaxHighlighting: applySyntaxHighlighting,
   convertToDOM: convertToDOM
 };

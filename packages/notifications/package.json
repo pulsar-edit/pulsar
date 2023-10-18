@@ -9,9 +9,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "dompurify": "3.0.3",
     "fs-plus": "^3.0.0",
-    "marked": "5.0.3",
     "moment": "^2.19.3",
     "semver": "^7.0.0",
     "stacktrace-parser": "^0.1.3",
