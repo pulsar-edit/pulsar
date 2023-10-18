@@ -69,6 +69,12 @@
   (#is? test.last true))
 (raw_string) @string.quoted.single.shell
 (ansi_c_string) @string.quoted.single.shell
+((ansi_c_string) @punctuation.definition.string.begin.shell
+  (#match? @punctuation.definition.string.begin.shell "^..")
+  (#set! adjust.startAndEndAroundFirstMatchOf "^.."))
+((ansi_c_string) @punctuation.definition.string.end.shell
+  (#match? @punctuation.definition.string.end.shell ".$")
+  (#set! adjust.startAndEndAroundFirstMatchOf ".$"))
 
 (string
   (command_substitution) @meta.embedded.line.subshell.shell)
