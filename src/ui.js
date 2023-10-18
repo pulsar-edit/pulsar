@@ -191,7 +191,7 @@ function renderMarkdown(content, givenOpts = {}) {
   return rendered;
 }
 
-function applySyntaxHighlighting(content, givenOpts = {}) {
+async function applySyntaxHighlighting(content, givenOpts = {}) {
   const defaultOpts = {
     syntaxScopeNameFunc: null, // Function used to resolve codeblock fences language id
     // to a Pulsar Grammar source. Should be a function that takes the declared scope and returns a source,
@@ -244,48 +244,17 @@ function applySyntaxHighlighting(content, givenOpts = {}) {
     editorElement.setUpdatedSynchronously(true);
     preElement.innerHTML = "";
     preElement.parentNode.insertBefore(editorElement, preElement);
-    editor.setText(codeBlock.textContent.replace(/\r?\n%/, ""));
+    editor.setText(codeBlock.textContent.replace(/\r?\n$/, ""));
     atom.grammars.assignLanguageMode(editor, scopeForFenceName(fenceName));
     editor.setVisible(true);
 
     let editorCallback;
 
     if (opts.renderMode === "fragment") {
-      editorCallback = (editorElementToModify, preElementToModify) => {
-        return new Promise((resolve) => {
-          const editorModel = editorElementToModify.getModel();
-          const done = () => {
-            editorModel.component.getNextUpdatePromise().then(() => {
-              for (const line of editorElementToModify.querySelectorAll(".line:not(.dummy)")) {
-                const line2 = document.createElement("div");
-                line2.className = "line";
-                line2.innerHTML = line.firstChild.innerHTML;
-                preElementToModify.appendChild(line2);
-              }
-              editorElementToModify.remove();
-              resolve();
-            });
-          };
-          const languageMode = editorModel.getBuffer().getLanguageMode();
-          if (languageMode.fullyTokenized || languageMode.tree) {
-            done();
-          } else {
-            editorModel.onDidTokenize(done);
-          }
-        });
-      };
+      editorCallback = makeAtomEditorNonInteractive;
     } else {
       // Captures full and defaults
-      editorCallback = (editorElementToModify, preElementToModify) => {
-        preElementToModify.remove();
-        editorElementToModify.setAttributeNode(document.createAttribute("gutter-hidden")); // Hide gutter
-        editorElementToModify.removeAttribute("tabindex"); // Make read-only
-
-        // Remove line decorations from code blocks
-        for (const cursorLineDecoration of editorElementToModify.getModel().cursorLineDecorations) {
-          cursorLineDecoration.destroy();
-        }
-      };
+      editorCallback = convertAtomEditorToStandardElement;
     }
     promises.push(editorCallback(editorElement, preElement));
   }
@@ -295,6 +264,43 @@ function applySyntaxHighlighting(content, givenOpts = {}) {
 function convertToDOM(content) {
   const template = new DOMParser().parseFromString(content, "text/html");
   return template.body;
+}
+
+function makeAtomEditorNonInteractive(editorElement, preElement) {
+  preElement.remove()
+  editorElement.setAttributeNode(document.createAttribute('gutter-hidden')) // Hide gutter
+  editorElement.removeAttribute('tabindex') // Make read-only
+
+  // Remove line decorations from code blocks.
+  for (const cursorLineDecoration of editorElement.getModel()
+    .cursorLineDecorations) {
+    cursorLineDecoration.destroy()
+  }
+}
+
+function convertAtomEditorToStandardElement(editorElement, preElement) {
+  return new Promise(function (resolve) {
+    const editor = editorElement.getModel()
+    const done = () =>
+      editor.component.getNextUpdatePromise().then(function () {
+        for (const line of editorElement.querySelectorAll(
+          '.line:not(.dummy)'
+        )) {
+          const line2 = document.createElement('div')
+          line2.className = 'line'
+          line2.innerHTML = line.firstChild.innerHTML
+          preElement.appendChild(line2)
+        }
+        editorElement.remove()
+        resolve()
+      })
+    const languageMode = editor.getBuffer().getLanguageMode()
+    if (languageMode.fullyTokenized || languageMode.tree) {
+      done()
+    } else {
+      editor.onDidTokenize(done)
+    }
+  });
 }
 
 // Markdown Exported Object
