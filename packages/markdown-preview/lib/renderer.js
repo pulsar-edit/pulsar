@@ -33,7 +33,8 @@ exports.toDOMFragment = async function (text, filePath, grammar, callback) {
     const domFragment = atom.ui.markdown.render(text,
       {
         renderMode: "fragment",
-        filePath: filePath
+        filePath: filePath,
+        breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
       }
     );
     const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
@@ -71,7 +72,8 @@ exports.toHTML = async function (text, filePath, grammar) {
     const domFragment = atom.ui.markdown.render(text,
       {
         renderMode: "full",
-        filePath: filePath
+        filePath: filePath,
+        breaks: atom.config.get('markdown-preview.breakOnSingleNewline')
       }
     );
     const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
