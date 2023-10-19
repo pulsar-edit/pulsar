@@ -6,7 +6,6 @@ import { CompositeDisposable } from 'atom';
 import etch from 'etch';
 import fs from 'fs-plus';
 import Grim from 'grim';
-import { marked } from 'marked';
 import path from 'path';
 import { shell } from 'electron';
 
@@ -138,7 +137,7 @@ export default class DeprecationCopView {
                   <span className="text-warning icon icon-alert" />
                   <div
                     className="list-item deprecation-message"
-                    innerHTML={marked(deprecation.getMessage())}
+                    innerHTML={atom.ui.markdown.render(deprecation.getMessage())}
                   />
                   {this.renderIssueURLIfNeeded(
                     packageName,
@@ -218,7 +217,7 @@ export default class DeprecationCopView {
                         <span className="text-warning icon icon-alert" />
                         <div
                           className="list-item deprecation-message"
-                          innerHTML={marked(deprecation.message)}
+                          innerHTML={atom.ui.markdown.render(deprecation.message)}
                         />
                         {this.renderSelectorIssueURLIfNeeded(
                           packageName,
