@@ -139,6 +139,12 @@ function renderMarkdown(content, givenOpts = {}) {
     });
   }
 
+  // Here we can add some simple additions that make code highlighting possible later on,
+  // but doesn't actually preform any code highlighting.
+  md.options.highlight = function(str, lang) {
+    return `<pre><code class="language-${lang}">${str}</code></pre>`;
+  };
+
   let textContent;
 
   if (opts.handleFrontMatter) {
@@ -179,19 +185,12 @@ function renderMarkdown(content, givenOpts = {}) {
     textContent = content;
   }
 
-  let rendered;
-
-  if (opts.renderMode === "fragment") {
-    rendered = md.renderInline(textContent);
-  } else {
-    // Captures "full" and anything else
-    rendered = md.render(textContent);
-  }
+  let rendered = md.render(textContent);
 
   return rendered;
 }
 
-async function applySyntaxHighlighting(content, givenOpts = {}) {
+function applySyntaxHighlighting(content, givenOpts = {}) {
   const defaultOpts = {
     syntaxScopeNameFunc: null, // Function used to resolve codeblock fences language id
     // to a Pulsar Grammar source. Should be a function that takes the declared scope and returns a source,
@@ -227,17 +226,26 @@ async function applySyntaxHighlighting(content, givenOpts = {}) {
     }
   }
 
+  let editorCallback;
+
+  if (opts.renderMode === "fragment") {
+    editorCallback = makeAtomEditorNonInteractive;
+  } else {
+    // Captures full and defaults
+    editorCallback = convertAtomEditorToStandardElement;
+  }
+
   const promises = [];
   for (const preElement of content.querySelectorAll("pre")) {
-    const codeBlock = preElement.firstElementChild != null  ? preElement.firstElementChild : preElement;
+    const codeBlock = preElement.firstElementChild ?? preElement;
     const className = codeBlock.getAttribute("class");
-    const fenceName = className != null ? className.replace(/^language-/, "") : defaultLanguage;
+    const fenceName =
+      className != null ? className.replace(/^language-/, "") : defaultLanguage;
 
     const editor = new TextEditor({
       readonly: true,
       keyboardInputEnabled: false
     });
-
     const editorElement = editor.getElement();
 
     preElement.classList.add("editor-colors", `lang-${fenceName}`);
@@ -248,57 +256,50 @@ async function applySyntaxHighlighting(content, givenOpts = {}) {
     atom.grammars.assignLanguageMode(editor, scopeForFenceName(fenceName));
     editor.setVisible(true);
 
-    let editorCallback;
-
-    if (opts.renderMode === "fragment") {
-      editorCallback = makeAtomEditorNonInteractive;
-    } else {
-      // Captures full and defaults
-      editorCallback = convertAtomEditorToStandardElement;
-    }
     promises.push(editorCallback(editorElement, preElement));
   }
   return Promise.all(promises);
 }
 
 function convertToDOM(content) {
-  const template = new DOMParser().parseFromString(content, "text/html");
-  return template.body;
+  const template = document.createElement("template");
+  template.innerHTML = content;
+  const fragment = template.content.cloneNode(true);
+  return fragment;
 }
 
 function makeAtomEditorNonInteractive(editorElement, preElement) {
-  preElement.remove()
-  editorElement.setAttributeNode(document.createAttribute('gutter-hidden')) // Hide gutter
-  editorElement.removeAttribute('tabindex') // Make read-only
+  preElement.remove();
+  editorElement.setAttributeNode(document.createAttribute("gutter-hidden")); // Hide gutter
+  editorElement.removeAttribute("tabindex"); // Make read-only
 
   // Remove line decorations from code blocks.
-  for (const cursorLineDecoration of editorElement.getModel()
-    .cursorLineDecorations) {
-    cursorLineDecoration.destroy()
+  for (const cursorLineDecoration of editorElement.getModel().cursorLineDecorations) {
+    cursorLineDecoration.destroy();
   }
 }
 
 function convertAtomEditorToStandardElement(editorElement, preElement) {
   return new Promise(function (resolve) {
-    const editor = editorElement.getModel()
+    const editor = editorElement.getModel();
     const done = () =>
       editor.component.getNextUpdatePromise().then(function () {
         for (const line of editorElement.querySelectorAll(
-          '.line:not(.dummy)'
+          ".line:not(.dummy)"
         )) {
-          const line2 = document.createElement('div')
-          line2.className = 'line'
-          line2.innerHTML = line.firstChild.innerHTML
-          preElement.appendChild(line2)
+          const line2 = document.createElement("div");
+          line2.className = "line";
+          line2.innerHTML = line.firstChild.innerHTML;
+          preElement.appendChild(line2);
         }
-        editorElement.remove()
-        resolve()
+        editorElement.remove();
+        resolve();
       })
-    const languageMode = editor.getBuffer().getLanguageMode()
+    const languageMode = editor.getBuffer().getLanguageMode();
     if (languageMode.fullyTokenized || languageMode.tree) {
-      done()
+      done();
     } else {
-      editor.onDidTokenize(done)
+      editor.onDidTokenize(done);
     }
   });
 }
