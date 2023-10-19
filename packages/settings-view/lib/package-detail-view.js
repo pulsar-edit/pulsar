@@ -385,14 +385,16 @@ export default class PackageDetailView {
       readme = fs.readFileSync(this.readmePath, {encoding: 'utf8'})
     }
 
-    let readmeSrc
+    let readmeSrc, readmeIsLocal;
 
     if (this.pack.path) {
       // If package is installed, use installed path
       readmeSrc = this.pack.path
+      readmeIsLocal = true;
     } else {
       // If package isn't installed, use url path
       let repoUrl = this.packageManager.getRepositoryUrl(this.pack)
+      readmeIsLocal = false;
 
       // Check if URL is undefined (i.e. package is unpublished)
       if (repoUrl) {
@@ -400,7 +402,7 @@ export default class PackageDetailView {
       }
     }
 
-    const readmeView = new PackageReadmeView(readme, readmeSrc)
+    const readmeView = new PackageReadmeView(readme, readmeSrc, readmeIsLocal)
     if (this.readmeView) {
       this.readmeView.element.parentElement.replaceChild(readmeView.element, this.readmeView.element)
       this.readmeView.destroy()

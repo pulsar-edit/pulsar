@@ -41,7 +41,12 @@ function renderMarkdown(content, givenOpts = {}) {
     transformAtomLinks: true, // Attempt to rewrite links to Atom pages, changing them to Pulsar
     transformNonFqdnLinks: true, // Attempt to resolve non-FQDN links
     rootDomain: "", // The root URL that should be used for the above 'transform' options
-    filePath: "", // The path to the file where this markdown is generated from
+    filePath: "", // The path to the file where this markdown is generated from,
+    disableInlineCode: false,
+    disableCodeBlocks: false,
+    disableHeading: false,
+    disableImage: false,
+    disableList: false
   };
 
   let opts = { ...defaultOpts, ...givenOpts };
@@ -177,6 +182,25 @@ function renderMarkdown(content, givenOpts = {}) {
   md.options.highlight = function(str, lang) {
     return `<pre><code class="language-${lang}">${str}</code></pre>`;
   };
+
+  // Process disables
+  if (opts.disableInlineCode) {
+    md.renderer.rules.code_inline = () => { return ""; };
+  }
+  if (opts.disableCodeBlocks) {
+    md.disable("code");
+    md.disable("fence");
+  }
+  if (opts.disableHeading) {
+    md.disable("heading");
+    md.disable("lheading");
+  }
+  if (opts.disableImage) {
+    md.disable("image");
+  }
+  if (opts.disableList) {
+    md.disable("list");
+  }
 
   let textContent;
 
