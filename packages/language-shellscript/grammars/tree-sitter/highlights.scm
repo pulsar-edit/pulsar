@@ -74,7 +74,7 @@
 ((raw_string) @punctuation.definition.string.end.shell
   (#match? @punctuation.definition.string.begin.shell ".$")
   (#set! adjust.startAndEndAroundFirstMatchOf ".$"))
-(ansi_c_string) @string.quoted.single.shell
+(ansi_c_string) @string.quoted.single.dollar.shell
 ((ansi_c_string) @punctuation.definition.string.begin.shell
   (#match? @punctuation.definition.string.begin.shell "^..")
   (#set! adjust.startAndEndAroundFirstMatchOf "^.."))
