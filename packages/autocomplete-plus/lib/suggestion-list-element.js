@@ -2,8 +2,6 @@ const {CompositeDisposable} = require('atom')
 const SnippetParser = require('./snippet-parser')
 const {isString} = require('./type-helpers')
 const fuzzaldrinPlus = require('fuzzaldrin-plus')
-const {marked} = require('marked')
-const createDOMPurify = require('dompurify')
 
 const createSuggestionFrag = () => {
   const frag = document.createDocumentFragment()
@@ -137,15 +135,13 @@ module.exports = class SuggestionListElement {
 
     if (item.descriptionMarkdown && item.descriptionMarkdown.length > 0) {
       this.descriptionContainer.style.display = 'block'
-      this.descriptionContent.innerHTML = createDOMPurify().sanitize(
-        marked(item.descriptionMarkdown, {
-          gfm: true,
+      this.descriptionContent.innerHTML = atom.ui.markdown.render(
+        item.descriptionMarkdown,
+        {
           breaks: true,
-          sanitize: false,
-          mangle: false,
-          headerIds: false
-        })
-      )
+          renderMode: "fragment"
+        }
+      );
       this.setDescriptionMoreLink(item)
     } else if (item.description && item.description.length > 0) {
       this.descriptionContainer.style.display = 'block'
