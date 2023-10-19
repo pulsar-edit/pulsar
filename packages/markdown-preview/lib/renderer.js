@@ -30,9 +30,20 @@ exports.toDOMFragment = async function (text, filePath, grammar, callback) {
 
   } else {
     // We use the new parser!
-    const domFragment = atom.ui.markdown.render(text, { renderMode: "fragment" });
+    const domFragment = atom.ui.markdown.render(text,
+      {
+        renderMode: "fragment",
+        filePath: filePath
+      }
+    );
     const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
-    await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment, { renderMode: "fragment", syntaxScopeNameFunc: scopeForFenceName, grammar: grammar });
+    await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment,
+      {
+        renderMode: "fragment",
+        syntaxScopeNameFunc: scopeForFenceName,
+        grammar: grammar
+      }
+    );
 
     return domHTMLFragment;
   }
@@ -57,14 +68,25 @@ exports.toHTML = async function (text, filePath, grammar) {
     return result
   } else {
     // We use the new parser!
-    const domFragment = atom.ui.markdown.render(text, { renderMode: "full" });
+    const domFragment = atom.ui.markdown.render(text,
+      {
+        renderMode: "full",
+        filePath: filePath
+      }
+    );
     const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
 
     const div = document.createElement("div");
     div.appendChild(domHTMLFragment);
     document.body.appendChild(div);
 
-    await atom.ui.markdown.applySyntaxHighlighting(div, { renderMode: "full", syntaxScopeNameFunc: scopeForFenceName, grammar: grammar });
+    await atom.ui.markdown.applySyntaxHighlighting(div,
+      {
+        renderMode: "full",
+        syntaxScopeNameFunc: scopeForFenceName,
+        grammar: grammar
+      }
+    );
 
     const result = div.innerHTML;
     div.remove();

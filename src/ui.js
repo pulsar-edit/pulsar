@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const MarkdownIt = require("markdown-it");
 const { TextEditor } = require("atom");
 
@@ -28,10 +30,10 @@ function renderMarkdown(content, givenOpts = {}) {
     renderMode: "full", // Determines if we are rendering a fragment or full page.
     // Valid values: 'full', 'fragment'
     html: true, // Enable HTML tags in source
-    breaks: true, // Convert `\n` in paragraphs into `<br>`
+    breaks: false, // Convert `\n` in paragraphs into `<br>`
     handleFrontMatter: true, // Determines if Front Matter content should be parsed
     useDefaultEmoji: true, // Use `markdown-it-emoji`
-    useGitHubHeadings: true, // Use `markdown-it-github-headings`
+    useGitHubHeadings: false, // Use `markdown-it-github-headings`
     useTaskCheckbox: true, // Use `markdown-it-task-checkbox`
     taskCheckboxDisabled: true, // `markdown-it-task-checkbox`: Disable checkbox interactivity
     taskCheckboxDivWrap: false, // `markdown-it-task-checkbox`: Wrap div arround checkboc
@@ -39,6 +41,7 @@ function renderMarkdown(content, givenOpts = {}) {
     transformAtomLinks: true, // Attempt to rewrite links to Atom pages, changing them to Pulsar
     transformNonFqdnLinks: true, // Attempt to resolve non-FQDN links
     rootDomain: "", // The root URL that should be used for the above 'transform' options
+    filePath: "", // The path to the file where this markdown is generated from
   };
 
   let opts = { ...defaultOpts, ...givenOpts };
@@ -78,6 +81,14 @@ function renderMarkdown(content, givenOpts = {}) {
     // our best to ensure they can accurately resolve.
     const defaultImageRenderer = md.renderer.rules.image; // We want to keep access to this
 
+    // Determines when we handle links if the item could be a local file or not
+    let couldBeLocalItem;
+    if (typeof opts.filePath != "string" || opts.filePath.length < 1) {
+      couldBeLocalItem = false;
+    } else {
+      couldBeLocalItem = true;
+    }
+
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
       let token = tokens[idx];
       let aIndex = token.attrIndex("src");
@@ -88,11 +99,33 @@ function renderMarkdown(content, givenOpts = {}) {
       if (mdComponents.reg.localLinks.currentDir.test(token.attrGet("src"))) {
         let rawLink = token.attrGet("src");
         rawLink = rawLink.replace(mdComponents.reg.localLinks.currentDir, "");
-        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+        // Now we need to handle links for both the web and locally
+        // We can do this by first checking if the link resolves locally
+        if (couldBeLocalItem) {
+          let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
+          if (!fs.lstatSync(newSrc).isFile()) {
+            token.attrSet("src", newSrc);
+          } else {
+            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+          }
+        } else {
+          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+        }
       } else if (mdComponents.reg.localLinks.rootDir.test(token.attrGet("src"))) {
         let rawLink = token.attrGet("src");
         rawLink = rawLink.replace(mdComponents.reg.localLinks.rootDir, "");
-        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+        // Now to handle the possible web or local link
+        if (couldBeLocalItem) {
+          const [rootDirectory] = atom.project.relativePath(opts.filePath);
+          if (!fs.lstatSync(src).isFile() && rootDirectory) {
+            let newSrc = path.join(rootDirectory, rawLink);
+            token.attrSet("src", newSrc);
+          } else {
+            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+          }
+        } else {
+          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+        }
       } else if (!token.attrGet("src").startsWith("http")) {
         // Check for implicit relative urls
         let rawLink = token.attrGet("src");
