@@ -1826,6 +1826,9 @@ var TreeSitter = function() {
                 var _isalpha = Module["_isalpha"] = function() {
                     return (_isalpha = Module["_isalpha"] = Module["asm"]["isalpha"]).apply(null, arguments)
                 };
+                var _isalnum = Module["_isalnum"] = function() {
+                    return (_isalnum = Module["_isalnum"] = Module["asm"]["isalnum"]).apply(null, arguments)
+                };
                 var ___errno_location = Module["___errno_location"] = function() {
                     return (___errno_location = Module["___errno_location"] = Module["asm"]["__errno_location"]).apply(null, arguments)
                 };
