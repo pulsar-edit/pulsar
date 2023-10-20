@@ -6,20 +6,25 @@ module.exports = {
     this.subscriptions = new CompositeDisposable();
     this.wrapGuides = new Map();
 
-    this.subscriptions.add(atom.workspace.observeTextEditors(editor => {
-      if (this.wrapGuides.has(editor)) { return; }
+    this.when = atom.config.get("wrap-guide.showWrapGuide");
+    this.subscriptions.add(atom.config.onDidChange('wrap-guide.showWrapGuide', (args) => {
+      this.when = args.newValue;
+      atom.workspace.getTextEditors().forEach(async (editor) => {
+        await this.wrapGuides.get(editor).setWhen(this.when);
+      });
+    }));
 
+    this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
+      if (this.wrapGuides.has(editor)) return;
       const editorElement = atom.views.getView(editor);
-      const wrapGuideElement = new WrapGuideElement(editor, editorElement);
+      const wrapGuideElement = new WrapGuideElement(editor, editorElement, this.when);
 
       this.wrapGuides.set(editor, wrapGuideElement);
       this.subscriptions.add(editor.onDidDestroy(() => {
         this.wrapGuides.get(editor).destroy();
         this.wrapGuides.delete(editor);
-      })
-      );
-    })
-    );
+      }));
+    }));
   },
 
   deactivate() {
