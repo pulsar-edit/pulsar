@@ -1,5 +1,5 @@
 env:
-  PYTHON_VERSION: 3.10
+  PYTHON_VERSION: 3.12
   GITHUB_TOKEN: ENCRYPTED[!b0ff4671044672be50914a3a10b49af642bd8e0e681a6f4e5855ec5230a5cf9afbc53d9e90239b8d2c79455f014f383f!]
   # The above token, is a GitHub API Token, that allows us to download RipGrep without concern of API limits
 
@@ -86,6 +86,7 @@ arm_linux_task:
                 libnss3
                 xvfb
     - gem install fpm
+    - python3 -m pip install setuptools
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
@@ -133,6 +134,7 @@ silicon_mac_task:
     ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
   prepare_script:
     - brew install node@16 yarn git python@$PYTHON_VERSION
+    - python3 -m pip install setuptools
     - git submodule init
     - git submodule update
     - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
