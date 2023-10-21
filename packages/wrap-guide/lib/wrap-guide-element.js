@@ -17,7 +17,7 @@ module.exports = class WrapGuideElement {
     this.setWhen(when);
 
     this.element.updateGuide = (async () => await this.updateGuide()).bind(this);
-    this.element.getDefaultColumn = (async () => await this.getDefaultColumn()).bind(this);
+    this.element.getDefaultColumn = this.getDefaultColumn.bind(this);
   }
 
   get shouldShow() { return this.#_shouldShow; }

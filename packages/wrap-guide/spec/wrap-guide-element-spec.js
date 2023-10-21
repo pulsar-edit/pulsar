@@ -58,13 +58,10 @@ describe("WrapGuideElement", function() {
       });
 
       it("positions the guide at the configured column", function() {
-        // const width = editor.getDefaultCharWidth() * wrapGuide.getDefaultColumn();
-        waitsForPromise(() => wrapGuide.getDefaultColumn().then((column) => {
-          const width = column * editor.getDefaultCharWidth();
-          expect(width).toBeGreaterThan(0);
-          expect(Math.abs(getLeftPosition(wrapGuide.firstChild) - width)).toBeLessThan(1);
-          expect(wrapGuide).toBeVisible();
-        }));
+        const width = editor.getDefaultCharWidth() * wrapGuide.getDefaultColumn();
+        expect(width).toBeGreaterThan(0);
+        expect(Math.abs(getLeftPosition(wrapGuide.firstChild) - width)).toBeLessThan(1);
+        expect(wrapGuide).toBeVisible();
       });
 
       it("appends multiple wrap guides to all existing and new editors", function() {
@@ -311,7 +308,7 @@ describe("WrapGuideElement", function() {
       it('::getDefaultColumn returns the scope-specific column value', function() {
         atom.config.set('editor.preferredLineLength', 132, {scopeSelector: '.source.js'});
 
-        waitsForPromise(() => wrapGuide.getDefaultColumn().then((column) => expect(column).toBe(132)));
+        expect(wrapGuide.getDefaultColumn()).toBe(132);
       });
 
       it('updates the guide when the scope-specific column changes', function() {
