@@ -220,6 +220,11 @@ jobs:
     - name: Checkout the latest code
       uses: actions/checkout@v3
 
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
     - name: Restore Cached Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
       uses: actions/cache/restore@v3
