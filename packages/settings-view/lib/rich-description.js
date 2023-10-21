@@ -11,11 +11,7 @@ module.exports = {
       {
         html: false,
         useTaskCheckbox: false,
-        disableInlineCode: true,
-        disableCodeBlocks: true,
-        disableHeading: true,
-        disableImage: true,
-        disableList: true
+        disableMode: "strict",
       }
     ).replace(/<p>(.*)<\/p>/, "$1").trim();
   }

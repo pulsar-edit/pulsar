@@ -42,11 +42,10 @@ function renderMarkdown(content, givenOpts = {}) {
     transformNonFqdnLinks: true, // Attempt to resolve non-FQDN links
     rootDomain: "", // The root URL that should be used for the above 'transform' options
     filePath: "", // The path to the file where this markdown is generated from,
-    disableInlineCode: false,
-    disableCodeBlocks: false,
-    disableHeading: false,
-    disableImage: false,
-    disableList: false
+    disableMode: "none", // The level of disabling that should be done on the output.
+    // Provides helpful defaults to control how much or how little is disabled:
+    // - none: Nothing is disabled
+    // - strict: Everything possible is disabled, except what is otherwise needed
   };
 
   let opts = { ...defaultOpts, ...givenOpts };
@@ -184,22 +183,25 @@ function renderMarkdown(content, givenOpts = {}) {
   };
 
   // Process disables
-  if (opts.disableInlineCode) {
-    md.renderer.rules.code_inline = () => { return ""; };
-  }
-  if (opts.disableCodeBlocks) {
+  if (opts.disableMode === "strict") {
+    // Disable Code Blocks
     md.disable("code");
     md.disable("fence");
-  }
-  if (opts.disableHeading) {
+    // Disable BlockQuotes
+    md.disable("blockquote");
+    // Disable Headings
     md.disable("heading");
     md.disable("lheading");
-  }
-  if (opts.disableImage) {
+    // Disable Images
     md.disable("image");
-  }
-  if (opts.disableList) {
+    // Disable Lists
     md.disable("list");
+    // Disable Tables
+    md.disable("table");
+    // Only support line breaks in HTML
+    md.inline.ruler.before("html_inline", "only_allow_line_breaks", (state) => {
+      state.tokens.forEach()
+    });
   }
 
   let textContent;
