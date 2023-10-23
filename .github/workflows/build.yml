@@ -10,7 +10,7 @@ on:
 env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PYTHON_VERSION: '3.10'
+  PYTHON_VERSION: '3.12'
   NODE_VERSION: 16
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
@@ -22,7 +22,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-20.04, windows-latest, macos-latest ]
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -40,6 +40,9 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
+    - name: Install Python Packages
+      run: python3 -m pip install setuptools
+      
     - name: Setup Git Submodule
       run: |
         git submodule init
@@ -52,6 +55,12 @@ jobs:
     - name: Check Pulsar Version - Windows
       if: ${{ runner.os == 'Windows' }}
       run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
+
+    - name: Reinstall Current Node-GYP NodeJS Headers
+      # Overwrite bad headers that get downloaded.
+      # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
+      # for this issue. At that point this additional step can be removed.
+      run: npx node-gyp install ${{ env.NODE_VERSION }}
 
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
@@ -74,9 +83,10 @@ jobs:
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS) (Signed)
-      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name == 'pulsar-edit/pulsar' }}
-      # PRs generated from forks cannot access GitHub Secrets
-      # So if the PR is a fork, we will still build, but will not sign.
+      if: ${{ runner.os == 'macOS' && github.event_name == 'push' }}
+      # Note: PRs generated from forks cannot access GitHub Secrets.
+      # So if the PR is from a fork, we can still build, but cannot sign.
+      # Note: We aren't attempting to sign for *any* PRs anymore, though.
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
         CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
@@ -85,16 +95,16 @@ jobs:
         TEAM_ID: ${{ secrets.TEAM_ID }}
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
-        timeout_minutes: 30
+        timeout_minutes: 45
         max_attempts: 3
         retry_on: error
         command: yarn dist
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
-      if: ${{ runner.os == 'macOS' && github.event.pull_request.head.repo.full_name != 'pulsar-edit/pulsar' }}
+      if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
       uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
       with:
-        timeout_minutes: 30
+        timeout_minutes: 45
         max_attempts: 3
         retry_on: error
         command: yarn dist

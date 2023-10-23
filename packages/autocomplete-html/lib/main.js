@@ -8,10 +8,19 @@ const provider = {
   filterSuggestions: true,
 
   getSuggestions (request) {
-    if (request.editor.getBuffer().getLanguageMode().tree) {
-      return getSuggestionsWithTreeSitter(request)
-    } else {
-      return getSuggestionsWithTextMate(request)
+    try {
+      if (request.editor.getBuffer().getLanguageMode().tree) {
+        return getSuggestionsWithTreeSitter(request)
+      } else {
+        return getSuggestionsWithTextMate(request)
+      }
+    } catch(err) {
+      // We avoid creating any actual error messages, as this is intended to fix
+      // the case when providing completions for EJS that multiple continious
+      // errors are created rapidly.
+      // https://github.com/pulsar-edit/pulsar/issues/649
+      console.error(err);
+      return [];
     }
   },
 
