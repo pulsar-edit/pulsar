@@ -104,7 +104,7 @@ module.exports = class WrapGuideElement {
         columns[columns.length - 1] = args.newValue;
         columns = uniqueAscending(Array.from(columns).filter((i) => i <= args.newValue));
         atom.config.set('wrap-guide.columns', columns,
-          {scopeSelector: this.editor.getRootScopeDescriptor()});
+          {scopeSelector: `.${this.editor.getGrammar().scopeName}`});
       }
       return await this.updateGuide();
     };
@@ -128,7 +128,7 @@ module.exports = class WrapGuideElement {
         atom.config.set('wrap-guide.columns', columns);
         if (atom.config.get('wrap-guide.modifyPreferredLineLength')) {
           atom.config.set('editor.preferredLineLength', columns[columns.length - 1],
-            {scopeSelector: this.editor.getRootScopeDescriptor()});
+            {scopeSelector: `.${this.editor.getGrammar().scopeName}`});
         }
         return await this.updateGuide();
       }

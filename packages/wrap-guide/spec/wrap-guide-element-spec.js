@@ -375,19 +375,19 @@ describe("WrapGuideElement", function() {
           atom.config.get('editor.softWrapAtPreferredLineLength')]).toEqual([true, true]);
         expect(getWrapGuides().length).toBe(2);
 
-        atom.config.set('editor.softWrap', false, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrap', false, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrap'),
           atom.config.get('editor.softWrap', {scope: scopeDescriptor})]).toEqual([true, false]);
 
         expect(getWrapGuides().length).toBe(1);
 
-        atom.config.set('editor.softWrap', true, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrap', true, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect(atom.config.get('editor.softWrap', {scope: scopeDescriptor})).toBe(true);
         expect(getWrapGuides().length).toBe(2);
 
-        atom.config.set('editor.softWrapAtPreferredLineLength', false, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrapAtPreferredLineLength', false, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrapAtPreferredLineLength'),
           atom.config.get('editor.softWrapAtPreferredLineLength', {scope: scopeDescriptor})]).
@@ -395,7 +395,7 @@ describe("WrapGuideElement", function() {
 
         expect(getWrapGuides().length).toBe(1);
 
-        atom.config.unset('editor.softWrapAtPreferredLineLength', {scopeSelector: scopeDescriptor});
+        atom.config.unset('editor.softWrapAtPreferredLineLength', {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect(atom.config.get('editor.softWrapAtPreferredLineLength', {scope: scopeDescriptor})).toBe(true);
 
@@ -426,7 +426,7 @@ describe("WrapGuideElement", function() {
           atom.config.get('editor.softWrapAtPreferredLineLength')]).toEqual([true, true]);
         expect(getWrapGuides().length).toBe(2);
 
-        atom.config.set('editor.softWrapAtPreferredLineLength', false, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrapAtPreferredLineLength', false, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrapAtPreferredLineLength'),
           atom.config.get('editor.softWrapAtPreferredLineLength', {scope: scopeDescriptor})]).toEqual([true, false]);
@@ -442,7 +442,7 @@ describe("WrapGuideElement", function() {
 
         expect(getWrapGuides().length).toBe(2);
 
-        atom.config.set('editor.softWrapAtPreferredLineLength', false, {scopeSelector: new_scopeDescriptor});
+        atom.config.set('editor.softWrapAtPreferredLineLength', false, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect(getWrapGuides().length).toBe(1);
       });
@@ -481,14 +481,14 @@ describe("WrapGuideElement", function() {
           atom.config.get('editor.softWrapAtPreferredLineLength')]).toEqual([false, false]);
         expect(getWrapGuides().length).toBe(0);
 
-        atom.config.set('editor.softWrap', true, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrap', true, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrap'),
           atom.config.get('editor.softWrap', {scope: scopeDescriptor})]).toEqual([false, true]);
 
         expect(getWrapGuides().length).toBe(0);
 
-        atom.config.set('editor.softWrapAtPreferredLineLength', true, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrapAtPreferredLineLength', true, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrapAtPreferredLineLength'),
           atom.config.get('editor.softWrapAtPreferredLineLength', {scope: scopeDescriptor})]).
@@ -507,13 +507,12 @@ describe("WrapGuideElement", function() {
           });
           return wrapGuides;
         }
-        const scopeDescriptor = editor.getRootScopeDescriptor();
 
         expect([atom.config.get('editor.softWrap'),
           atom.config.get('editor.softWrapAtPreferredLineLength')]).toEqual([false, false]);
         expect(getWrapGuides().length).toBe(0);
 
-        atom.config.set('editor.softWrap', true, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrap', true, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect(getWrapGuides().length).toBe(0);
 
@@ -564,15 +563,14 @@ describe("WrapGuideElement", function() {
           });
           return wrapGuides;
         }
-        const scopeDescriptor = editor.getRootScopeDescriptor();
 
         expect(atom.config.get('editor.softWrap')).toBe(true);
         expect(getWrapGuides().length).toBe(2);
 
-        atom.config.set('editor.softWrap', false, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrap', false, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrap'),
-          atom.config.get('editor.softWrap', {scope: scopeDescriptor})]).toEqual([true, false]);
+          atom.config.get('editor.softWrap', {scope: editor.getRootScopeDescriptor()})]).toEqual([true, false]);
 
         expect(getWrapGuides().length).toBe(1);
       });
@@ -604,15 +602,14 @@ describe("WrapGuideElement", function() {
           });
           return wrapGuides;
         }
-        const scopeDescriptor = editor.getRootScopeDescriptor();
 
         expect(atom.config.get('editor.softWrap')).toBe(false);
         expect(getWrapGuides().length).toBe(0);
 
-        atom.config.set('editor.softWrap', true, {scopeSelector: scopeDescriptor});
+        atom.config.set('editor.softWrap', true, {scopeSelector: `.${editor.getGrammar().scopeName}`});
 
         expect([atom.config.get('editor.softWrap'),
-          atom.config.get('editor.softWrap', {scope: scopeDescriptor})]).toEqual([false, true]);
+          atom.config.get('editor.softWrap', {scope: editor.getRootScopeDescriptor()})]).toEqual([false, true]);
 
         expect(getWrapGuides().length).toBe(1);
       });
