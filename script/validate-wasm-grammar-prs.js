@@ -140,7 +140,7 @@ for (const wasmFile of wasmFilesChanged) {
         console.log(`Validated \`parserSource\` has been updated within '${filePath}' properly.`);
       } else {
         if (verbose) {
-          console.log("This grammar file doesn't use a WASM file that's changed (On the current interation)");
+          console.log("This grammar file doesn't use a WASM file that's changed (On the current iteration)");
         }
       }
     }
