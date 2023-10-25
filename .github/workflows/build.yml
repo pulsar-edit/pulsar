@@ -195,6 +195,15 @@ jobs:
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
+    - name: Test Binary - Linux
+      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      run: |
+        rm -R node_modules/electron; yarn install --check-files
+        apt-get install -y ./binaries/*.deb
+        export BINARY_NAME=`which pulsar`
+        mkdir -p ./tests/videos
+        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+
     - name: Add binaries to Rolling Release Repo
       if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
       # We only want to upload rolling binaries if they are a commit to master
