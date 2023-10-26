@@ -199,9 +199,9 @@ function renderMarkdown(content, givenOpts = {}) {
     // Disable Tables
     md.disable("table");
     // Only support line breaks in HTML
-    md.inline.ruler.before("html_inline", "only_allow_line_breaks", (state) => {
-      state.tokens.forEach()
-    });
+    // md.inline.ruler.before("html_inline", "only_allow_line_breaks", (state) => {
+    //   // Determine how to best handle this to only allow line breaks. Research needed
+    // });
   }
 
   let textContent;
