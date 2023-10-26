@@ -1,0 +1,30 @@
+name: Validate WASM Grammar PR Changes
+# Since we now want to enforce the rule that any changes to a WASM grammar binary
+# file, is accompanied by a change to the `parserSource` key within the
+# `grammar.cson` file. This GHA will preform this check for us.
+
+on:
+  pull_request:
+    paths:
+      - '**.wasm'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the Latest Code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        # Make sure we get all commits, so that we can compare to early commits
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Run Validation Script
+      run: node ./script/validate-wasm-grammar-prs.js
