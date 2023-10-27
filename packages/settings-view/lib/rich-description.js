@@ -9,7 +9,6 @@ module.exports = {
     return atom.ui.markdown.render(
       description,
       {
-        html: false,
         useTaskCheckbox: false,
         disableMode: "strict",
       }
