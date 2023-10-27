@@ -62,6 +62,7 @@
     "deprecation-cop": "file:packages/deprecation-cop",
     "dev-live-reload": "file:packages/dev-live-reload",
     "document-register-element": "https://github.com/pulsar-edit/document-register-element.git#1f5868f",
+    "dompurify": "^3.0.6",
     "encoding-selector": "file:packages/encoding-selector",
     "etch": "0.14.1",
     "event-kit": "^2.5.3",

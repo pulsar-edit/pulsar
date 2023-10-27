@@ -6,6 +6,7 @@ const { TextEditor } = require("atom");
 // Helper Markdown Components
 const mdComponents = {
   deps: {
+    domPurify: null,
     yamlFrontMatter: null,
     markdownItEmoji: null,
     markdownItGitHubHeadings: null,
@@ -30,6 +31,7 @@ function renderMarkdown(content, givenOpts = {}) {
     renderMode: "full", // Determines if we are rendering a fragment or full page.
     // Valid values: 'full', 'fragment'
     html: true, // Enable HTML tags in source
+    sanitize: true, // Enable or disable sanitization
     breaks: false, // Convert `\n` in paragraphs into `<br>`
     handleFrontMatter: true, // Determines if Front Matter content should be parsed
     useDefaultEmoji: true, // Use `markdown-it-emoji`
@@ -66,15 +68,15 @@ function renderMarkdown(content, givenOpts = {}) {
   let md = new MarkdownIt(markdownItOpts);
 
   if (opts.useDefaultEmoji) {
-    mdComponents.deps.markdownItEmoji = require("markdown-it-emoji");
+    mdComponents.deps.markdownItEmoji ??= require("markdown-it-emoji");
     md.use(mdComponents.deps.markdownItEmoji, {});
   }
   if (opts.useGitHubHeadings) {
-    mdComponents.deps.markdownItGitHubHeadings = require("markdown-it-github-headings");
+    mdComponents.deps.markdownItGitHubHeadings ??= require("markdown-it-github-headings");
     md.use(mdComponents.deps.markdownItGitHubHeadings, {});
   }
   if (opts.useTaskCheckbox) {
-    mdComponents.deps.markdownItTaskCheckbox = require("markdown-it-task-checkbox");
+    mdComponents.deps.markdownItTaskCheckbox ??= require("markdown-it-task-checkbox");
     md.use(mdComponents.deps.markdownItTaskCheckbox, {
       disabled: opts.taskCheckboxDisabled,
       divWrap: opts.taskCheckboxDivWrap
@@ -324,7 +326,7 @@ function renderMarkdown(content, givenOpts = {}) {
   let textContent;
 
   if (opts.handleFrontMatter) {
-    mdComponents.deps.yamlFrontMatter = require("yaml-front-matter");
+    mdComponents.deps.yamlFrontMatter ??= require("yaml-front-matter");
     const { __content, vars } = mdComponents.deps.yamlFrontMatter.loadFront(content);
 
     const renderYamlTable = (variables) => {
@@ -362,6 +364,12 @@ function renderMarkdown(content, givenOpts = {}) {
   }
 
   let rendered = md.render(textContent);
+
+  if (opts.sanitize) {
+    mdComponents.deps.domPurify ??= require("dompurify");
+
+    rendered = mdComponents.deps.domPurify.sanitize(rendered);
+  }
 
   return rendered;
 }

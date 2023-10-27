@@ -3798,6 +3798,11 @@ dompurify@^2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.1.tgz#f9cb1a275fde9af6f2d0a2644ef648dd6847b631"
   integrity sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==
 
+dompurify@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.6.tgz#925ebd576d54a9531b5d76f0a5bef32548351dae"
+  integrity sha512-ilkD8YEnnGh1zJ240uJsW7AzE+2qpbOUYjacomn3AvJ6J4JhKGSZ2nh4wUIXPZrEPppaCLx5jFe8T89Rk8tQ7w==
+
 domutils@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-3.0.1.tgz#696b3875238338cb186b6c0612bd4901c89a4f1c"
@@ -8593,13 +8598,11 @@ setimmediate@^1.0.5:
   version "0.261.11"
   dependencies:
     async "^3.2.0"
-    dompurify "^2.0.17"
     etch "0.9.0"
     fs-plus "^3.0.0"
     fuzzaldrin "^2.1"
     glob "5.0.15"
     hosted-git-info "^2.8.9"
-    marked "5.0.3"
     request "^2.83.0"
     season "^6.0.2"
     semver "^5.3.0"
