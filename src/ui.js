@@ -19,7 +19,7 @@ const mdComponents = {
       rootDir: new RegExp(/^\//)
     },
     globalLinks: {
-      base64: new RegExp(/^data:image\/.*;base64/, "i");
+      base64: new RegExp(/^data:image\/.*;base64/, "i")
     },
     atomLinks: {
       package: new RegExp(/^https:\/\/atom\.io\/packages\/(.*)$/),
