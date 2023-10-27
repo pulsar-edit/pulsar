@@ -184,24 +184,141 @@ function renderMarkdown(content, givenOpts = {}) {
 
   // Process disables
   if (opts.disableMode === "strict") {
-    // Disable Code Blocks
-    md.disable("code");
-    md.disable("fence");
-    // Disable BlockQuotes
-    md.disable("blockquote");
-    // Disable Headings
-    md.disable("heading");
+
+    // Easy Disable
     md.disable("lheading");
+
+    // Disable Code Blocks
+    md.renderer.rules.code_block = (tokens, idx, _options, _env, _self) => {
+      if (tokens[idx].type === "code_block") {
+        return "";
+      }
+    };
+
+    // Disable Code Fences
+    md.renderer.rules.fence = (tokens, idx, _options, _env, _self) => {
+      if (tokens[idx].type === "fence") {
+        return "";
+      }
+    };
+
     // Disable Images
-    md.disable("image");
-    // Disable Lists
-    md.disable("list");
-    // Disable Tables
-    md.disable("table");
-    // Only support line breaks in HTML
-    // md.inline.ruler.before("html_inline", "only_allow_line_breaks", (state) => {
-    //   // Determine how to best handle this to only allow line breaks. Research needed
-    // });
+    md.renderer.rules.image = (tokens, idx, _options, _env, _self) => {
+      // Double check this is an image
+      if (tokens[idx].type === "image") {
+        return "";
+      }
+    };
+
+    // Only support line breaks in HTML that's inline
+    md.inline.ruler.before("html_inline", "only_allow_line_breaks", (state) => {
+      // Determine how to best handle this to only allow line breaks. Research needed
+      if (state.src.charAt(state.pos) === "<") {
+        // We only want to act once on the beginning of the inline element
+        // Then confirm if it's the item we expect
+        const textAfterPending = state.src.replace(state.pending, "");
+        const match = textAfterPending.match(/^<br\s*\/?>/);
+        if (match) {
+          // We define breakline as a custom Token Type
+          let token = state.push("html_inline", "breakline", 0);
+          token.content = "<br/>";
+          state.pos += "<br/>".length;
+          return true;
+        }
+      }
+    });
+
+    // Disable Heading
+    md.block.ruler.before("heading", "strip_heading", (state, startLine, endLine) => {
+      let pos = state.bMarks[startLine] + state.tShift[startLine];
+
+      if (state.src.charAt(pos) === "#") {
+        let max = state.eMarks[startLine];
+
+        const isSpace = () => {
+          let code = state.src.charCodeAt(pos);
+          switch(code) {
+            case 0x09:
+            case 0x20:
+              return true;
+          }
+          return false;
+        };
+
+        let level = 1;
+
+        let ch = state.src.charAt(++pos);
+        while (ch === "#" && pos < max && level <= 6) {
+          level++;
+          ch = state.src.charAt(++pos);
+        }
+
+        if (level > 6 || (pos < max && !isSpace())) { return false; }
+        // Now that we are confident we are within a heading, lets strip it
+        state.pos += level;
+        state.line = startLine + 1;
+        return true;
+      }
+    });
+
+    const stripAllTokensTill = (tokens, initIdx, endType) => {
+      // This function will loop a given set of tokens, stripping them of all data
+      // (converting them to empty text tokens)
+      // until the specified token is reached. Which it will also strip to text,
+      // then return
+      let idx = initIdx;
+      while(idx < tokens.length) {
+        tokens[idx].type = "text";
+        tokens[idx].content = "";
+
+        if (tokens[idx].type == endType) {
+          break;
+        }
+
+        idx++;
+      }
+      return;
+    };
+
+    // Disable blockquotes
+    md.renderer.rules.blockquote_open = (tokens, idx, _options, _env, _self) => {
+      stripAllTokensTill(tokens, idx, "blockquote_close");
+      return "";
+    };
+
+    // Disable Bullet lists
+    md.renderer.rules.bullet_list_open = (tokens, idx, _options, _env, _self) => {
+      stripAllTokensTill(tokens, idx, "bullet_list_close");
+      return "";
+    };
+
+    // Disable Ordered lists
+    md.renderer.rules.ordered_list_open = (tokens, idx, _options, _env, _self) => {
+      stripAllTokensTill(tokens, idx, "ordered_list_close");
+      return "";
+    };
+
+    // Ensure that only breaklines are supported as inline raw HTML
+    md.renderer.rules.html_inline = (tokens, idx, _options, _env, _self) => {
+      if (tokens[idx].type === "html_inline") {
+        // Here we can build an allow list of inline HTML elements to keep.
+        if (
+          tokens[idx].tag !== "breakline"
+          ) {
+            return "";
+          } else {
+            return tokens[idx].content;
+          }
+      }
+    };
+
+    // Ensure nothing is supported as block HTML
+    md.renderer.rules.html_block = (tokens, idx, _options, _env, _self) => {
+      if (tokens[idx].type === "html_block") {
+        return "";
+      }
+    };
+
   }
 
   let textContent;
