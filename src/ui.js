@@ -374,7 +374,7 @@ function renderMarkdown(content, givenOpts = {}) {
     mdComponents.deps.domPurify ??= require("dompurify");
 
     let domPurifyOpts = {
-      ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols
+      ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols,
       ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose
     };
 
