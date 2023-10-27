@@ -398,7 +398,7 @@ export default class PackageDetailView {
 
       // Check if URL is undefined (i.e. package is unpublished)
       if (repoUrl) {
-        readmeSrc = repoUrl + `/blob/master/`
+        readmeSrc = repoUrl;
       }
     }
 
