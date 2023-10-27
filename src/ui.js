@@ -62,7 +62,8 @@ function renderMarkdown(content, givenOpts = {}) {
   };
 
   const cleanRootDomain = () => {
-    return opts.rootDomain.replace(".git", "");
+    // We will also remove any trailing `/` as link resolvers down the line add them in
+    return opts.rootDomain.replace(".git", "").replace(/\/$/, "");
   };
 
   const markdownItOpts = {
@@ -137,7 +138,7 @@ function renderMarkdown(content, givenOpts = {}) {
         } else {
           token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
         }
-      } else if (!token.attrGet("src").startsWith("http")) {
+      } else if (!token.attrGet("src").startsWith("http") && !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))) {
         // Check for implicit relative urls
         let rawLink = token.attrGet("src");
         token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
@@ -165,11 +166,11 @@ function renderMarkdown(content, givenOpts = {}) {
                     // Fix any links that attempt to point to packages on `https://atom.io/packages/...`
                     attr[1] = `https://web.pulsar-edit.dev/packages/${link.match(mdComponents.reg.atomLinks.package)[1]}`;
                   } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.currentDir.test(link)) {
-                    attr[1] = `${cleanRootDomain().replace(/\/$/, "")}/raw/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
+                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
                   } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.rootDir.test(link)) {
-                    attr[1] = `${cleanRootDomain().replace(/\/$/, "")}/raw/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
-                  } else if (opts.transformNonFqdnLinks && !link.startsWith("http") && !mdComponents.reg.globalLinks.base64.test(link)) {
-                    attr[1] = `${cleanRootDomain().replace(/\/$/, "")}/raw/HEAD/${link.replace(".git", "")}`;
+                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
+                  } else if (opts.transformNonFqdnLinks && !link.startsWith("http")) {
+                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(".git", "")}`;
                   } else if (opts.transformAtomLinks && mdComponents.reg.atomLinks.flightManual.test(link)) {
                     // Resolve any links to the flight manual to web archive
                     attr[1] = link.replace(mdComponents.reg.atomLinks.flightManual, "https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/");
