@@ -124,6 +124,11 @@
 (function_declarator
   (identifier) @entity.name.function.cpp)
 
+; The "foo" in `void Bar::foo () {`.
+(function_declarator
+  declarator: (qualified_identifier
+    name: (identifier) @entity.name.function.cpp))
+
 (function_declarator
   (field_identifier) @entity.name.function.method.cpp)
 
@@ -137,6 +142,12 @@
 (call_expression
   (field_expression
     field: (field_identifier) @support.other.function.cpp)
+  (#set! capture.final true))
+
+; The "foo" in `troz::foo(...)`.
+(call_expression
+  function: (qualified_identifier
+    name: (identifier) @support.other.function.cpp)
   (#set! capture.final true))
 
 (call_expression
@@ -205,6 +216,11 @@
 
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
+
+; The "foo" in `bar.foo = "baz"`.
+(assignment_expression
+  left: (field_expression
+    field: (field_identifier) @variable.other.member.assignment.cpp))
 
 (reference_declarator
   (identifier) @variable.declaration.cpp)
