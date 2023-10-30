@@ -6,6 +6,7 @@ parser: 'tree-sitter-cpp'
 injectionRegex: '^(c|C)(\\+\\+|pp|PP)$'
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-cpp#a90f170f92d5d70e7c2d4183c146e61ba5f3a457'
   grammar: 'tree-sitter-cpp/tree-sitter-cpp.wasm'
   highlightsQuery: 'tree-sitter-cpp/highlights.scm'
   tagsQuery: 'tree-sitter-cpp/tags.scm'
@@ -33,3 +34,6 @@ fileTypes: [
 ]
 
 contentRegex: '\n\\s*(namespace|class|template)\\s+'
+
+comments:
+  start: '// '

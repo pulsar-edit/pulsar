@@ -51,12 +51,14 @@
 
 (primitive_type) @support.type.builtin.cpp
 
-; Type parameters
-(template_argument_list
-  (type_descriptor
-    type: (type_identifier) @variable.parameter.type.cpp
-    (#set! capture.final true)))
+; Mark all function definition types with data…
+(function_definition
+  type: (_) @_IGNORE_
+  (#set! functionDefinitionType true))
 
+; …so that we can detect when a type identifier is part of a template/generic.
+((type_identifier) @variable.parameter.type.cpp
+  (#is? test.descendantOfNodeWithData functionDefinitionType))
 
 (class_specifier
   (type_identifier) @entity.name.class.cpp
@@ -148,6 +150,13 @@
 (call_expression
   function: (qualified_identifier
     name: (identifier) @support.other.function.cpp)
+  (#set! capture.final true))
+
+; The "foo" in `troz::foo<SomeType>(...)`.
+(call_expression
+  function: (qualified_identifier
+    name: (template_function
+      name: (identifier) @support.other.function.cpp))
   (#set! capture.final true))
 
 (call_expression
@@ -272,7 +281,6 @@
   (null)
   (true)
   (false)
-  (nullptr)
 ] @constant.language._TYPE_.cpp
 
 ((identifier) @constant.cpp
