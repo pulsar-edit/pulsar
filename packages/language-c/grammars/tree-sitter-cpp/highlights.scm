@@ -126,6 +126,10 @@
 (function_declarator
   (identifier) @entity.name.function.cpp)
 
+(function_declarator
+  (destructor_name
+    (identifier) @entity.name.function.cpp))
+
 ; The "foo" in `void Bar::foo () {`.
 (function_declarator
   declarator: (qualified_identifier
@@ -339,6 +343,7 @@
   "throw"
   "using"
   "namespace"
+  "class"
 ] @keyword.control._TYPE_.cpp
 
 ; OPERATORS
@@ -348,6 +353,7 @@
 (abstract_pointer_declarator "*" @keyword.operator.pointer.cpp)
 (pointer_expression "*" @keyword.operator.pointer.cpp)
 
+(destructor_name "~" @keyword.operator.destructor.cpp)
 
 "sizeof" @keyword.operator.sizeof.cpp
 (pointer_expression "&" @keyword.operator.pointer.cpp)
