@@ -235,8 +235,9 @@
   left: (field_expression
     field: (field_identifier) @variable.other.member.assignment.cpp))
 
-(reference_declarator
+((reference_declarator
   (identifier) @variable.declaration.cpp)
+  (#is-not? test.descendantOfType parameter_declaration))
 
 ; Function parameters
 ; -------------------
@@ -250,6 +251,11 @@
 (parameter_declaration
   declarator: (pointer_declarator
     declarator: (identifier) @variable.parameter.cpp))
+
+(parameter_declaration
+  declarator: (reference_declarator
+    (identifier) @variable.parameter.cpp))
+
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
