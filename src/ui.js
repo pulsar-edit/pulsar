@@ -28,6 +28,49 @@ const mdComponents = {
   },
 };
 
+/**
+ * @function renderMarkdown
+ * @memberof markdown
+ * @alias render
+ * @desc Takes a Markdown document and renders it as HTML.
+ * @param {string} content - The Markdown source material.
+ * @param {object} givenOpts - The optional arguments:
+ * @param {string} givenOpts.renderMode - Determines how the page is rendered.
+ * Valid values "full" or "fragment".
+ * @param {boolean} givenOpts.html - Whether HTML tags should be allowed.
+ * @param {boolean} givenOpts.sanitize - If the page content should be saniized via DOMPurify.
+ * @param {boolean} givenOpts.sanitizeAllowUnknownProtocols - Controls DOMPurify's
+ * own option of 'ALLOW_UNKNOWN_PROTOCOLS'.
+ * @param {boolean} givenOpts.sanitizeAllowSelfClose - Controls DOMPurify's
+ * own option of 'ALLOW_SELF_CLOSE'
+ * @param {boolean} givenOpts.breaks - If newlines should always be converted
+ * into breaklines.
+ * @param {boolean} givenOpts.handleFrontMatter - Whether frontmatter data should
+ * processed and displayed.
+ * @param {boolean} givenOpts.useDefaultEmoji - Whether `markdown-it-emoji` should be enabled.
+ * @param {boolean} givenOpts.useGitHubHeadings - Whether `markdown-it-github-headings`
+ * should be enabled. False by default.
+ * @param {boolean} givenOpts.useTaskCheckbox - Whether `markdown-it-task-checkbox`
+ * should be enabled. True by default.
+ * @param {boolean} givenOpts.taskCheckboxDisabled - Controls `markdown-it-task-checkbox`
+ * `disabled` option. True by default.
+ * @param {boolean} givenOpts.taskCheckboxDivWrap - Controls `markdown-it-task-checkboc`
+ * `divWrap` option. False by default.
+ * @param {boolean} givenOpts.transformImageLinks - Attempt to resolve image URLs.
+ * True by default.
+ * @param {boolean} givenOpts.transformAtomLinks - Attempt to resolve links
+ * pointing to Atom. True by Default.
+ * @param {boolean} givenOpts.transformNonFqdnLinks - Attempt to resolve links
+ * that are not fully qualified domain names. True by Default.
+ * @param {string} givenOpts.rootDomain - The root URL of the online resource.
+ * Useful when attempting to resolve any links on the page. Only works for online
+ * resources.
+ * @param {string} givenOpts.filePath - The local alternative to `rootDomain`.
+ * Used to resolve incomplete paths, but locally on the file system.
+ * @param {string} givenOpts.disabledMode - The level of disabling of markdown features.
+ * `none` by default. But supports: "none", "strict"
+ * @returns {string} Parsed HTML content.
+ */
 function renderMarkdown(content, givenOpts = {}) {
   // First we will setup our markdown renderer instance according to the opts provided
   const defaultOpts = {
@@ -385,6 +428,23 @@ function renderMarkdown(content, givenOpts = {}) {
   return rendered;
 }
 
+/**
+ * @function applySyntaxHighlighting
+ * @memberof markdown
+ * @async
+ * @desc Uses Pulsar's built-in Syntax Highlighting system to apply the same syntax
+ * highlighting to code blocks within markdown. Modifies the existing object passed.
+ * @param {HTMLFragment} content - The HTML Node/Fragment to apply syntax highlighting on.
+ * Will modifyn the original object.
+ * @param {object} givenOpts - Optional Arguments:
+ * @param {function} givenOpts.syntaxScopeNameFunc - A function that can be called with
+ * any given language ID from a code block scope, and returns the grammar source id
+ * that should be used to preform syntax highlighting.
+ * @param {string} givenOpts.renderMode - Whether we are rdnering a document fragment
+ * or a full document. Valid values: "full", "fragment".
+ * @param {object} givenOpts.grammar - The grammar of the source file. Carryover from
+ * original `markdown-preview` functionality.
+ */
 function applySyntaxHighlighting(content, givenOpts = {}) {
   const defaultOpts = {
     syntaxScopeNameFunc: null, // Function used to resolve codeblock fences language id
@@ -456,6 +516,14 @@ function applySyntaxHighlighting(content, givenOpts = {}) {
   return Promise.all(promises);
 }
 
+/**
+ * @function convertToDOM
+ * @memberof markdown
+ * @desc Takes a raw HTML string of data and returns a proper HTMLFragment.
+ * This should be done if you need access to APIs available on the DOM itself.
+ * @param {string} content - The HTML String.
+ * @returns {HTMLFragment}
+ */
 function convertToDOM(content) {
   const template = document.createElement("template");
   template.innerHTML = content;
@@ -500,6 +568,12 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
 }
 
 // Markdown Exported Object
+/**
+ * @member markdown
+ * @memberof ui
+ * @desc The Markdown object exported from the UI API.
+ * Provides access to: ".render", ".applySyntaxHighlighting", ".convertToDOM"
+ */
 const markdown = {
   render: renderMarkdown,
   applySyntaxHighlighting: applySyntaxHighlighting,
