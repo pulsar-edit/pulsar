@@ -86,7 +86,6 @@ arm_linux_task:
                 libnss3
                 xvfb
     - gem install fpm
-    - python3 -m pip install setuptools
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
@@ -133,6 +132,7 @@ silicon_mac_task:
     TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
     ROLLING_UPLOAD_TOKEN: ENCRYPTED[690950798401ec3715e9d20ac29a0859d3c58097038081ff6afeaf4721e661672d34eb952d8a6442bc7410821ab8545a]
   prepare_script:
+    - brew update
     - brew install node@16 yarn git python@$PYTHON_VERSION
     - python3 -m pip install setuptools
     - git submodule init
@@ -191,6 +191,7 @@ silicon_mac_task:
 #     - arch -x86_64 xcode-select --install
 #     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 #     - export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
+#     - arch -x86_64 brew update
 #     - arch -x86_64 brew install node@16 yarn git python@$PYTHON_VERSION
 #     - ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
 #     - git submodule init
