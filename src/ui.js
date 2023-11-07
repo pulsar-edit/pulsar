@@ -195,7 +195,32 @@ function renderMarkdown(content, givenOpts = {}) {
       return defaultImageRenderer(tokens, idx, options, env, self);
     };
   }
-  if (validateRootDomain() && (opts.transformNonFqdnLinks || opts.transformAtomLinks)) {
+  if (validateRootDomain() && opts.transformNonFqdnLinks) {
+    md.core.ruler.after("inline", "fix-links", (state) => {
+      state.tokens.forEach((blockToken) => {
+        if (blockToken.type === "inline" && blockToken.children) {
+          blockToken.children.forEach((token) => {
+            if (token.type === "link_open") {
+              token.attrs.forEach((attr) => {
+                if (attr[0] === "href") {
+                  let link = attr[1];
+
+                  if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.currentDir.test(link)) {
+                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
+                  } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.rootDir.test(link)) {
+                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
+                  } else if (opts.transformNonFqdnLinks && !link.startsWith("http")) {
+                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(".git", "")}`;
+                  }
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+  } else if (opts.transformAtomLinks) {
+    // This is a separate if since transforming Atom links does not need a valid root domain provided
     md.core.ruler.after("inline", "fix-atom-links", (state) => {
       state.tokens.forEach((blockToken) => {
         if (blockToken.type === "inline" && blockToken.children) {
@@ -205,16 +230,10 @@ function renderMarkdown(content, givenOpts = {}) {
                 if (attr[0] === "href") {
                   let link = attr[1];
 
-                  if (opts.transformAtomLinks && mdComponents.reg.atomLinks.package.test(link)) {
+                  if (mdComponents.reg.atomLinks.package.test(link)) {
                     // Fix any links that attempt to point to packages on `https://atom.io/packages/...`
                     attr[1] = `https://web.pulsar-edit.dev/packages/${link.match(mdComponents.reg.atomLinks.package)[1]}`;
-                  } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.currentDir.test(link)) {
-                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
-                  } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.rootDir.test(link)) {
-                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
-                  } else if (opts.transformNonFqdnLinks && !link.startsWith("http")) {
-                    attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(".git", "")}`;
-                  } else if (opts.transformAtomLinks && mdComponents.reg.atomLinks.flightManual.test(link)) {
+                  } else if (mdComponents.reg.atomLinks.flightManual.test(link)) {
                     // Resolve any links to the flight manual to web archive
                     attr[1] = link.replace(mdComponents.reg.atomLinks.flightManual, "https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/");
                   }
