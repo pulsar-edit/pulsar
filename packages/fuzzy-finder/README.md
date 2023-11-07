@@ -1,6 +1,6 @@
 # Fuzzy Finder package
 
-Quickly find and open files.
+Quickly find and open files using <kbd>cmd/ctrl-t</kbd>.
 
   * <kbd>cmd-t</kbd>/<kbd>cmd-p</kbd> *(macOS)* or <kbd>ctrl-t</kbd>/<kbd>ctrl-p</kbd> *(Linux/Windows)* to open the file finder
   * <kbd>cmd-b</kbd> *(macOS)* or <kbd>ctrl-b</kbd> *(Linux/Windows)* to open the list of open buffers
