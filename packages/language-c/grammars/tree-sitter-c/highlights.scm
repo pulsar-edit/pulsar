@@ -43,18 +43,18 @@
   (type_identifier) @_IGNORE_
   (#set! capture.final true))
 
-(primitive_type) @storage.type.builtin.c
-(type_identifier) @storage.type.other.c
+(primitive_type) @support.type.builtin.c
+(type_identifier) @support.type.other.c
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @storage.type.builtin.c
-  (#match? @storage.type.builtin.c "^(char|int|float|double|long)$"))
+((identifier) @support.type.builtin.c
+  (#match? @support.type.builtin.c "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @storage.type.other.c
-  (#match? @storage.type.other.c "_t$"))
+((identifier) @support.type.other.c
+  (#match? @support.type.other.c "_t$"))
 
 [
   "enum"

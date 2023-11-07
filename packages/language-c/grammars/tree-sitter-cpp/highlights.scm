@@ -49,24 +49,31 @@
   (#set! capture.final true))
 
 
-(primitive_type) @storage.type.builtin.cpp
+(primitive_type) @support.type.builtin.cpp
+
+; Type parameters
+(template_argument_list
+  (type_descriptor
+    type: (type_identifier) @variable.parameter.type.cpp
+    (#set! capture.final true)))
+
 
 (class_specifier
   (type_identifier) @entity.name.class.cpp
   (#set! capture.final true))
 
-(type_identifier) @storage.type.other.cpp
+(type_identifier) @support.type.other.cpp
 ; (struct_specifier) @storage.type.cpp
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @storage.type.builtin.cpp
-  (#match? @storage.type.builtin.cpp "^(char|int|float|double|long)$"))
+((identifier) @support.type.builtin.cpp
+  (#match? @support.type.builtin.cpp "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @storage.type.other.cpp
-  (#match? @storage.type.other.cpp "_t$"))
+((identifier) @support.type.other.cpp
+  (#match? @support.type.other.cpp "_t$"))
 
 
 [
