@@ -2340,9 +2340,7 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "2.42.6"
   dependencies:
     atom-slick "^2.0.0"
-    dompurify "^3.0.4"
     grim "^2.0.1"
-    marked "^5.1.1"
     minimatch "^3.0.3"
     selector-kit "^0.1.0"
     stable "^0.1.8"
@@ -3629,7 +3627,6 @@ depd@^1.1.2:
     etch "0.9.0"
     fs-plus "^3.0.0"
     grim "^2.0.1"
-    marked "5.0.3"
     underscore-plus "^1.7.0"
 
 detect-libc@^1.0.3:
@@ -3792,20 +3789,15 @@ dompurify@2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.17.tgz#505ffa126a580603df4007e034bdc9b6b738668e"
   integrity sha512-nNwwJfW55r8akD8MSFz6k75bzyT2y6JEa1O3JrZFBf+Y5R9JXXU4OsRl0B9hKoPgHTw2b7ER5yJ5Md97MMUJPg==
 
-dompurify@3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.3.tgz#4b115d15a091ddc96f232bcef668550a2f6f1430"
-  integrity sha512-axQ9zieHLnAnHh0sfAamKYiqXMJAVwu+LM/alQ7WDagoWessyWvMSFyW65CqF3owufNu8HBcE4cM2Vflu7YWcQ==
-
 dompurify@^2.0.17:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.1.tgz#f9cb1a275fde9af6f2d0a2644ef648dd6847b631"
   integrity sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==
 
-dompurify@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.4.tgz#963116d05c94ee42f8353a3690f935475d8cd2f7"
-  integrity sha512-ae0mA+Qiqp6C29pqZX3fQgK+F91+F7wobM/v8DRzDqJdZJELXiFUx4PP4pK/mzUS0xkiSEx3Ncd9gr69jg3YsQ==
+dompurify@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.6.tgz#925ebd576d54a9531b5d76f0a5bef32548351dae"
+  integrity sha512-ilkD8YEnnGh1zJ240uJsW7AzE+2qpbOUYjacomn3AvJ6J4JhKGSZ2nh4wUIXPZrEPppaCLx5jFe8T89Rk8tQ7w==
 
 domutils@^3.0.1:
   version "3.0.1"
@@ -4785,17 +4777,12 @@ function.prototype.name@^1.1.5:
     es-abstract "^1.19.0"
     functions-have-names "^1.2.2"
 
-functional-red-black-tree@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
-  integrity sha512-dsKNQNdj6xA3T+QlADDA7mOSlX0qiMINjn0cgr+eGHGsbSHzTabcIogz2+p/iqP1Xs6EP/sS2SbqH+brGTbq0g==
-
 functions-have-names@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
-fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
+fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
@@ -4909,15 +4896,7 @@ getpass@^0.1.1:
   dependencies:
     atom-select-list "^0.8.1"
 
-git-utils@5.7.1:
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.1.tgz#f26e95f8cc05b475b2b8b09151b68f3788c8a173"
-  integrity sha512-+mWdJDq9emWoq6GzzrGEB7SIBmAk0lNNv2wgNkgwTVZUkAFkWvgRsJ+Kvs3d1QQD6WG6vczti2WLpjmh2Twtlw==
-  dependencies:
-    fs-plus "^3.0.0"
-    nan "^2.14.0"
-
-git-utils@^5.6.0:
+git-utils@^5.6.0, git-utils@^5.7.3:
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/git-utils/-/git-utils-5.7.3.tgz#3b53983204678313b305bbf278c07dc015ba2155"
   integrity sha512-in1hjFfmzY86gKBt+YMTaVyCGtX2WTnN0uPj37bI5HsrnU2oj8OFcWOEzOI5PxQXPMxFxtvRebOHAOGB8M125w==
@@ -5023,7 +5002,7 @@ glob@7.1.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.0.0, glob@^7.1.1, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6, glob@^7.2.0:
+glob@^7.0.0, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6, glob@^7.2.0:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
   integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
@@ -6717,11 +6696,6 @@ marked@^4.2.3:
   resolved "https://registry.yarnpkg.com/marked/-/marked-4.2.5.tgz#979813dfc1252cc123a79b71b095759a32f42a5d"
   integrity sha512-jPueVhumq7idETHkb203WDD4fMA3yV9emQ5vLwop58lu8bTclMghBWcYAavlDqIEMaisADinV1TooIFCfqOsYQ==
 
-marked@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-5.1.1.tgz#40b3963bb9da225314f746d5012ba7e34942f636"
-  integrity sha512-bTmmGdEINWmOMDjnPWDxGPQ4qkDLeYorpYbEtFOXzOruTwUE671q4Guiuchn4N8h/v6NGd7916kXsm3Iz4iUSg==
-
 marky@^1.2.2:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/marky/-/marky-1.2.5.tgz#55796b688cbd72390d2d399eaaf1832c9413e3c0"
@@ -7275,9 +7249,7 @@ normalize-url@^6.0.1:
 "notifications@file:./packages/notifications":
   version "0.73.0"
   dependencies:
-    dompurify "3.0.3"
     fs-plus "^3.0.0"
-    marked "5.0.3"
     moment "^2.19.3"
     semver "^7.0.0"
     stacktrace-parser "^0.1.3"
@@ -7865,7 +7837,7 @@ prop-types@^15.5.0, prop-types@^15.5.8, prop-types@^15.6.2:
     object-assign "^4.1.1"
     react-is "^16.13.1"
 
-property-accessors@^1, property-accessors@^1.1, property-accessors@^1.1.3:
+property-accessors@^1, property-accessors@^1.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/property-accessors/-/property-accessors-1.1.3.tgz#1dde84024631865909ef30703365680c5f928b15"
   integrity sha512-WQTVW7rn+k6wq8FyYVM15afyoB2loEdeIzd/o7+HEA5hMZcxvRf4Khie0fBM9wLP3EJotKhiH15kY7Dd4gc57g==
@@ -8603,13 +8575,10 @@ setimmediate@^1.0.5:
   version "0.261.11"
   dependencies:
     async "^3.2.0"
-    dompurify "^2.0.17"
     etch "0.9.0"
     fs-plus "^3.0.0"
-    fuzzaldrin "^2.1"
     glob "5.0.15"
     hosted-git-info "^2.8.9"
-    marked "5.0.3"
     request "^2.83.0"
     season "^6.0.2"
     semver "^5.3.0"

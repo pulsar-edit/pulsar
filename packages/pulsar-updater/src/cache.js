@@ -23,7 +23,7 @@ function getCacheItem(key) {
 
   let cached = JSON.parse(obj);
 
-  if (typeof cached === "object" && !isItemExpired(cached)) {
+  if (typeof cached === "object" && !isItemExpired(cached, key)) {
     return JSON.parse(cached.data);
   }
 
