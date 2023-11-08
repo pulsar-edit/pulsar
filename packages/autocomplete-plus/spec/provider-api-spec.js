@@ -327,5 +327,25 @@ describe('Provider API', () => {
 
       expect(editor.getText()).toEqual("ohai, world\n")
     })
+
+    it('ignores `prefix` if `range` is present', async () => {
+      testProvider = {
+        scopeSelector: '.source.js',
+        filterSuggestions: true,
+        getSuggestions (options) {
+          return [
+            {text: 'notmatch/foololohairange', ranges: [[[0, 0], [0, 5]]]},
+            {text: 'notmatch/foololohaiprefix'},
+            {text: 'foololohaiprefix2'}
+          ]
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
+      editor.insertText('foololohai')
+      await triggerAutocompletion()
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohairange/)
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/foololohaiprefix2/)
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toNotMatch(/notmatch\/foololohaiprefix/)
+    })
   })
 })

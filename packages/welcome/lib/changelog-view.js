@@ -50,31 +50,28 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a race condition that could cause `autocomplete-plus` to ignore user input.
+                Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`
               </li>
               <li>
-                Fixed the `about` package linking to release notes for Pulsar.
+                Fixed Snippets from `language-php` that would lose the `$` character
               </li>
               <li>
-                Reduced the amount of network requests that `settings-view` creates.
+                Fixed a condition where an invalid config may crash Pulsar before fully starting up, but not registering that it's crashed
               </li>
               <li>
-                Fixed the icon used when registering Pulsar as a file handler on Windows.
+                Reduced error notifications that may appear from `autocomplete-html` when handling EJS files
               </li>
               <li>
-                Removed the non-functional `autoUpdate` API from Pulsar, instead relying on the `pulsar-updater` package.
+                Fixed macOS binary signing after moving over to GitHub Actions for CI
               </li>
               <li>
-                Ensure that project-specific setting overrides don't leak to the user's config file when the settings UI is visited.
+                Updated PPM to a newer `node-gyp`, allowing newer versions of C/C++ compiler toolchains and Python to be used (also dropped support for Python 2.x!)
               </li>
               <li>
-                Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
+                Fully decaffed the entire PPM codebase
               </li>
               <li>
-                Removed the last CoffeeScript code from Pulsar and core packages.
-              </li>
-              <li>
-                Migrated the majority of our CI to GitHub Actions.
+                Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
               </li>
 
             </ul>

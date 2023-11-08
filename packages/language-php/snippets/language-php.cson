@@ -5,7 +5,7 @@
 '.source.php':
   '$GLOBALS[\'…\']':
     'prefix': 'globals'
-    'body': '$GLOBALS[\'${1:variable}\']${2: = }${3:something}${4:;}$0'
+    'body': '\\$GLOBALS[\'${1:variable}\']${2: = }${3:something}${4:;}$0'
   '?>…<?php':
     'prefix': 'php'
     'body': '?>$0<?php'
@@ -14,7 +14,7 @@
     'body': '<?= $0 ?>'
   'function __construct':
     'prefix': 'con'
-    'body': '${1:public }function __construct(${2:${3:Type }$${4:foo} ${5:= ${6:null}}})\n{\n\t${2:$this->${4:foo} = $${4:foo};}$0\n}'
+    'body': '${1:public }function __construct(${2:${3:Type }$${4:foo} ${5:= ${6:null}}})\n{\n\t${2:\\$this->${4:foo} = $${4:foo};}$0\n}'
   'Heredoc':
     'prefix': '<<<'
     'body': '<<<${1:HTML}\n${2:content here}\n${1:HTML};\n'
@@ -44,7 +44,7 @@
     'body': '$1defined(\'$2\')$0'
   'do … while …':
     'prefix': 'do'
-    'body': 'do {\n\t${0:// code...}\n} while (${1:$a <= 10});'
+    'body': 'do {\n\t${0:// code...}\n} while (${1:\\$a <= 10});'
   'echo "…"':
     'prefix': 'echo'
     'body': 'echo "${1:string}";$0'
@@ -113,16 +113,16 @@
     'body': 'case \'${1:variable}\':\n\t${0:// code...}\n\tbreak;'
   '$this->…':
     'prefix': 'this'
-    'body': '$this->$0'
+    'body': '\\$this->$0'
   'echo $this->…':
     'prefix': 'ethis'
-    'body': 'echo $this->$0'
+    'body': 'echo \\$this->$0'
   'Throw Exception':
     'prefix': 'throw'
     'body': 'throw new $1\\\\Exception(${2:"${3:Error Processing Request}"}${4:, ${5:1}});\n$0'
   'try …':
     'prefix': 'try'
-    'body': 'try {\n\t$0\n} catch (${1:\\\\Exception $e}) {\n\t$2\n}\n'
+    'body': 'try {\n\t$0\n} catch (${1:\\\\Exception \\$e}) {\n\t$2\n}\n'
   'while …':
     'prefix': 'while'
     'body': 'while (${1:$a <= 10}) {\n\t${0:// code...}\n}'

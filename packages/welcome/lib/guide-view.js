@@ -10,7 +10,6 @@ export default class GuideView {
     this.didClickProjectButton = this.didClickProjectButton.bind(this);
     this.didClickGitButton = this.didClickGitButton.bind(this);
     this.didClickGitHubButton = this.didClickGitHubButton.bind(this);
-    this.didClickTeletypeButton = this.didClickTeletypeButton.bind(this);
     this.didClickPackagesButton = this.didClickPackagesButton.bind(this);
     this.didClickThemesButton = this.didClickThemesButton.bind(this);
     this.didClickStylingButton = this.didClickStylingButton.bind(this);
@@ -99,36 +98,6 @@ export default class GuideView {
                   <strong>Next time:</strong> You can toggle the Git tab by
                   clicking on the
                   <span className="icon icon-diff" /> button in your status bar.
-                </p>
-              </div>
-            </details>
-
-            <details
-              className="welcome-card"
-              {...this.getSectionProps('teletype')}
-            >
-              <summary className="welcome-summary icon icon-radio-tower">
-                Collaborate in real time with{' '}
-                <span class="welcome-highlight">Teletype</span>
-              </summary>
-              <div className="welcome-detail">
-                <p>
-                  <img
-                    className="welcome-img"
-                    src="atom://welcome/assets/code.svg"
-                  />
-                </p>
-                <p>
-                  Share your workspace with team members and collaborate on code
-                  in real time.
-                </p>
-                <p>
-                  <button
-                    onclick={this.didClickTeletypeButton}
-                    className="btn btn-primary inline-block"
-                  >
-                    Install Teletype for {this.brand}
-                  </button>
                 </p>
               </div>
             </details>
@@ -448,9 +417,5 @@ export default class GuideView {
 
   didClickSnippetsButton() {
     atom.workspace.open('atom://.pulsar/snippets', { split: 'left' });
-  }
-
-  didClickTeletypeButton() {
-    atom.workspace.open('atom://config/packages/teletype', { split: 'left' });
   }
 }

@@ -377,14 +377,15 @@ class AutocompleteManager {
       const text = (suggestion.snippet || suggestion.text)
       const suggestionPrefix = suggestion.replacementPrefix != null ? suggestion.replacementPrefix : prefix
       const prefixIsEmpty = !suggestionPrefix || suggestionPrefix === ' '
-      const firstCharIsMatch = !prefixIsEmpty && suggestionPrefix[0].toLowerCase() === text[0].toLowerCase()
 
       if (prefixIsEmpty) {
         results.push(suggestion)
-      }
-      if (firstCharIsMatch && (score = fuzzaldrinProvider.score(text, suggestionPrefix)) > 0) {
-        suggestion.score = score * suggestion.sortScore
-        results.push(suggestion)
+      } else {
+        const keepMatching = suggestion.ranges || suggestionPrefix[0].toLowerCase() === text[0].toLowerCase()
+        if (keepMatching && (score = fuzzaldrinProvider.score(text, suggestionPrefix)) > 0) {
+          suggestion.score = score * suggestion.sortScore
+          results.push(suggestion)
+        }
       }
     }
 

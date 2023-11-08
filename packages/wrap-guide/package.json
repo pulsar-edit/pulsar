@@ -17,6 +17,11 @@
       },
       "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`."
     },
+    "modifyPreferredLineLength": {
+      "default": true,
+      "type": "boolean",
+      "description": "Modify the Editor's Preferred Line Length when changing Wrap Guide's Columns setting."
+    },
     "enabled": {
       "default": true,
       "type": "boolean"

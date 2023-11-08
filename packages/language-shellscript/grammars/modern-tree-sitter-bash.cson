@@ -21,6 +21,9 @@ firstLineRegex: [
 injectionRegex: '(^(bash|BASH)$|sh^|SH^)'
 
 treeSitter:
+  # Grammar generated on 2023-09-22 from commit:
+  # fd4e40dab883d6456da4d847de8321aee9c80805
+  parserSource: 'github:tree-sitter/tree-sitter-bash#fd4e40dab883d6456da4d847de8321aee9c80805'
   grammar: 'tree-sitter/tree-sitter-bash.wasm'
   highlightsQuery: 'tree-sitter/highlights.scm'
   tagsQuery: 'tree-sitter/tags.scm'
