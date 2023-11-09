@@ -112,7 +112,7 @@ describe("PackageDetailView", function() {
     expect(view.element.querySelectorAll('.package-readme iframe').length).toBe(0);
     expect(view.element.querySelectorAll('.package-readme input[type="checkbox"][disabled]').length).toBe(2);
     expect(view.element.querySelector('img[alt="AbsoluteImage"]').getAttribute('src')).toBe('https://example.com/static/image.jpg');
-    expect(view.element.querySelector('img[alt="RelativeImage"]').getAttribute('src')).toBe('https://github.com/example/package-with-readme/blob/master/static/image.jpg');
+    expect(view.element.querySelector('img[alt="RelativeImage"]').getAttribute('src')).toBe('https://github.com/example/package-with-readme/raw/HEAD/static/image.jpg');
     expect(view.element.querySelector('img[alt="Base64Image"]').getAttribute('src')).toBe('data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
   });
 

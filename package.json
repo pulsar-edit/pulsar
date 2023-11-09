@@ -62,6 +62,7 @@
     "deprecation-cop": "file:packages/deprecation-cop",
     "dev-live-reload": "file:packages/dev-live-reload",
     "document-register-element": "https://github.com/pulsar-edit/document-register-element.git#1f5868f",
+    "dompurify": "^3.0.6",
     "encoding-selector": "file:packages/encoding-selector",
     "etch": "0.14.1",
     "event-kit": "^2.5.3",
@@ -124,6 +125,10 @@
     "line-ending-selector": "file:packages/line-ending-selector",
     "line-top-index": "0.3.1",
     "link": "file:packages/link",
+    "markdown-it": "^13.0.2",
+    "markdown-it-emoji": "^2.0.2",
+    "markdown-it-github-headings": "^2.0.1",
+    "markdown-it-task-checkbox": "^1.0.6",
     "markdown-preview": "file:./packages/markdown-preview",
     "minimatch": "^3.0.3",
     "mocha": "6.2.3",
@@ -176,6 +181,7 @@
     "whitespace": "file:./packages/whitespace",
     "winreg": "^1.2.1",
     "wrap-guide": "file:./packages/wrap-guide",
+    "yaml-front-matter": "^4.1.1",
     "yargs": "17.6.2"
   },
   "packageDependencies": {

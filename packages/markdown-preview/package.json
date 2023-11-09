@@ -89,6 +89,11 @@
       "description": "Custom comma seperated list of Syntax Language Identifiers to map to any language. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for usage.",
       "type": "string",
       "default": ""
+    },
+    "useOriginalParser": {
+      "description": "Wether to use the original Markdown Parser, or the new Pulsar one.",
+      "type": "boolean",
+      "default": "true"
     }
   }
 }

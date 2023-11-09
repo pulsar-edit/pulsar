@@ -8,17 +8,13 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 let NotificationElement;
-const createDOMPurify = require('dompurify');
 const fs = require('fs-plus');
 const path = require('path');
-const marked = require('marked');
 const {shell} = require('electron');
 
 const NotificationIssue = require('./notification-issue');
 const TemplateHelper = require('./template-helper');
 const UserUtilities = require('./user-utilities');
-
-let DOMPurify = null;
 
 const NotificationTemplate = `\
 <div class="content">
@@ -110,12 +106,7 @@ module.exports =
 
       const notificationContainer = this.element.querySelector('.message');
 
-      if (DOMPurify === null) {
-        DOMPurify = createDOMPurify();
-      }
-      notificationContainer.innerHTML = DOMPurify.sanitize(
-        marked.parse(this.model.getMessage())
-      );
+      notificationContainer.innerHTML = atom.ui.markdown.render(this.model.getMessage());
 
       if (detail = this.model.getDetail()) {
         let stack;
@@ -137,7 +128,7 @@ module.exports =
         metaContainer = this.element.querySelector('.meta');
         metaContainer.appendChild(TemplateHelper.render(this.metaTemplate));
         const description = this.element.querySelector('.description');
-        description.innerHTML = marked.parse(metaContent);
+        description.innerHTML = atom.ui.markdown.render(metaContent);
       }
 
       if (options.buttons && (options.buttons.length > 0)) {
