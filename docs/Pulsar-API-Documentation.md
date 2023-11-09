@@ -173,6 +173,9 @@ style: Exclusively used for the <code>style</code> attribute</p>
 ## Functions
 
 <dl>
+<dt><a href="#renderMarkdown">renderMarkdown(content, givenOpts)</a> ⇒ <code>string</code></dt>
+<dd><p>Takes a Markdown document and renders it as HTML.</p>
+</dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>

@@ -30,7 +30,7 @@ describe("Renders Markdown", () => {
       expect(atom.ui.markdown.render(
         "[Hello](/readme.md)",
         { rootDomain: "https://github.com/pulsar-edit/pulsar" }
-      )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEADreadme.md">Hello</a></p>\n');
+      )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/readme.md">Hello</a></p>\n');
     });
   });
 
