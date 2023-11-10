@@ -3838,13 +3838,13 @@ class LanguageLayer {
     if (existingInjectionMarkers.length > 0) {
       // Enlarge our range to contain all of the injection zones in the
       // affected buffer range.
-      let earliest, latest;
+      let earliest = range.start, latest = range.end;
       for (let marker of existingInjectionMarkers) {
         range = marker.getRange();
-        if (!earliest || range.start.compare(earliest) === -1) {
+        if (range.start.compare(earliest) === -1) {
           earliest = range.start;
         }
-        if (!latest || range.end.compare(latest) === 1) {
+        if (range.end.compare(latest) === 1) {
           latest = range.end;
         }
       }
