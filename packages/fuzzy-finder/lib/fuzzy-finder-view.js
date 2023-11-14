@@ -206,7 +206,7 @@ module.exports = class FuzzyFinderView {
     if (atom.config.get('fuzzy-finder.prefillFromSelection') === true) {
       this.prefillQueryFromSelection()
     }
-    this.selectListView.focus()
+    for (let i=0 ; i<2 ; i++) { this.selectListView.focus() }
   }
 
   hide () {

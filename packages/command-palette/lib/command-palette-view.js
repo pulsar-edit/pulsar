@@ -117,7 +117,7 @@ export default class CommandPaletteView {
 
     this.previouslyFocusedElement = document.activeElement
     this.panel.show()
-    this.selectListView.focus()
+    for (let i=0 ; i<2 ; i++) { this.selectListView.focus() }
   }
 
   hide () {
