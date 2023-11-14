@@ -36,11 +36,11 @@
         },
         {
           "value": "wrapping",
-          "description": "If wrapping"
+          "description": "When soft wrap is enabled"
         },
         {
           "value": "atPreferredLineLength",
-          "description": "If wrapping at preferred line length"
+          "description": "When soft wrap at preferred line length is enabled"
         }
       ],
       "default": "always"
