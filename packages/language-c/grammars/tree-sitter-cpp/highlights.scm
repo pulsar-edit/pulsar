@@ -51,12 +51,14 @@
 
 (primitive_type) @support.type.builtin.cpp
 
-; Type parameters
-(template_argument_list
-  (type_descriptor
-    type: (type_identifier) @variable.parameter.type.cpp
-    (#set! capture.final true)))
+; Mark all function definition types with data…
+(function_definition
+  type: (_) @_IGNORE_
+  (#set! functionDefinitionType true))
 
+; …so that we can detect when a type identifier is part of a template/generic.
+((type_identifier) @variable.parameter.type.cpp
+  (#is? test.descendantOfNodeWithData functionDefinitionType))
 
 (class_specifier
   (type_identifier) @entity.name.class.cpp
@@ -125,6 +127,15 @@
   (identifier) @entity.name.function.cpp)
 
 (function_declarator
+  (destructor_name
+    (identifier) @entity.name.function.cpp))
+
+; The "foo" in `void Bar::foo () {`.
+(function_declarator
+  declarator: (qualified_identifier
+    name: (identifier) @entity.name.function.cpp))
+
+(function_declarator
   (field_identifier) @entity.name.function.method.cpp)
 
 (call_expression
@@ -137,6 +148,19 @@
 (call_expression
   (field_expression
     field: (field_identifier) @support.other.function.cpp)
+  (#set! capture.final true))
+
+; The "foo" in `troz::foo(...)`.
+(call_expression
+  function: (qualified_identifier
+    name: (identifier) @support.other.function.cpp)
+  (#set! capture.final true))
+
+; The "foo" in `troz::foo<SomeType>(...)`.
+(call_expression
+  function: (qualified_identifier
+    name: (template_function
+      name: (identifier) @support.other.function.cpp))
   (#set! capture.final true))
 
 (call_expression
@@ -206,8 +230,14 @@
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
 
-(reference_declarator
+; The "foo" in `bar.foo = "baz"`.
+(assignment_expression
+  left: (field_expression
+    field: (field_identifier) @variable.other.member.assignment.cpp))
+
+((reference_declarator
   (identifier) @variable.declaration.cpp)
+  (#is-not? test.descendantOfType parameter_declaration))
 
 ; Function parameters
 ; -------------------
@@ -221,6 +251,11 @@
 (parameter_declaration
   declarator: (pointer_declarator
     declarator: (identifier) @variable.parameter.cpp))
+
+(parameter_declaration
+  declarator: (reference_declarator
+    (identifier) @variable.parameter.cpp))
+
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
@@ -256,7 +291,6 @@
   (null)
   (true)
   (false)
-  (nullptr)
 ] @constant.language._TYPE_.cpp
 
 ((identifier) @constant.cpp
@@ -315,6 +349,7 @@
   "throw"
   "using"
   "namespace"
+  "class"
 ] @keyword.control._TYPE_.cpp
 
 ; OPERATORS
@@ -324,6 +359,7 @@
 (abstract_pointer_declarator "*" @keyword.operator.pointer.cpp)
 (pointer_expression "*" @keyword.operator.pointer.cpp)
 
+(destructor_name "~" @keyword.operator.destructor.cpp)
 
 "sizeof" @keyword.operator.sizeof.cpp
 (pointer_expression "&" @keyword.operator.pointer.cpp)

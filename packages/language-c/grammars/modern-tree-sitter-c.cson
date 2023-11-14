@@ -17,3 +17,6 @@ fileTypes: [
   'c'
   'h.in'
 ]
+
+comments:
+  start: '// '
