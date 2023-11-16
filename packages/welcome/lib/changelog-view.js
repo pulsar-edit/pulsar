@@ -50,7 +50,7 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new `UI` API to `atom.` accessible via `atom.ui`. That exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+                Added a new `UI` API to `atom.` accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
               </li>
               <li>
                 Fine-tuned/deduped dependencies to remove over ~35.5 MB from Pulsar's installed size.
