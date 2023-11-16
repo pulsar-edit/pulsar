@@ -50,28 +50,22 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`
+                Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
               </li>
               <li>
-                Fixed Snippets from `language-php` that would lose the `$` character
+                Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
               </li>
               <li>
-                Fixed a condition where an invalid config may crash Pulsar before fully starting up, but not registering that it's crashed
+                Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
               </li>
               <li>
-                Reduced error notifications that may appear from `autocomplete-html` when handling EJS files
+                Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
               </li>
               <li>
-                Fixed macOS binary signing after moving over to GitHub Actions for CI
+                Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
               </li>
               <li>
-                Updated PPM to a newer `node-gyp`, allowing newer versions of C/C++ compiler toolchains and Python to be used (also dropped support for Python 2.x!)
-              </li>
-              <li>
-                Fully decaffed the entire PPM codebase
-              </li>
-              <li>
-                Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
+                Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
               </li>
 
             </ul>
