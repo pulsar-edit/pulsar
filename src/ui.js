@@ -3,7 +3,6 @@ const fs = require("fs");
 const MarkdownIt = require("markdown-it");
 const { TextEditor } = require("atom");
 const { Matcher } = require("@pulsar-edit/fuzzy-native");
-let yamlFrontMatter, markdownItEmoji, markdownItGitHubHeadings, markdownItTaskCheckbox;
 
 // Helper Markdown Components
 const mdComponents = {
