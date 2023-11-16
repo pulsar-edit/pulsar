@@ -53,7 +53,7 @@ export default class ChangeLogView {
                 Added a new `UI` API to `atom.` accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
               </li>
               <li>
-                Fine-tuned/deduped dependencies to remove over ~35.5 MB from Pulsar's installed size.
+                Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
               </li>
               <li>
                 Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
