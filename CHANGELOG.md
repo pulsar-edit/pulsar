@@ -6,6 +6,46 @@
 
 ## [Unreleased]
 
+## 1.111.0
+
+- Added a new `UI` API to `atom.` accessible via `atom.ui`. That exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+- Fine-tuned/deduped dependencies to remove over ~35.5 MB from Pulsar's installed size.
+- Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
+- Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
+- Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
+- Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions.
+
+### Pulsar
+- Bumped: deps: Update `github`, for `dugite` deduping purposes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/799)
+- Fixed: Tree-sitter running fixes (October) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/789)
+- Fixed: Prevent "half screen" bug by resetting scroll position when editor regains focus [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/798)
+- Added: [core] New `UI` API [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/763)
+- Fixed: CI: Build binaries for tag pushes (GitHub Actions) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/782)
+- Added: [DOCS] Add non-macOS keybindings for fuzzy-finder readme [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/796)
+- Removed: Remove Teletype from Welcome guide [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/793)
+- Fixed: CI: Python 3.12-related fixes on Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/794)
+- Fixed: CI: Work around missing 'distutils' for Python 3.12+ (GHA round two) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/795)
+- Added: [meta] Create Workflow to validate WASM Grammar Changes [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/740)
+- Fixed: 🐛 ✅ Fix caching for "Dismiss this Version" in pulsar-updater [@kiskoza](https://github.com/pulsar-edit/pulsar/pull/785)
+- Fixed: [tree-sitter] Fix proliferation of extra injection layers [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/783)
+- Added: CI: Increase timeout length for macOS binary builds [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/781)
+- Fixed: Fix the matching of `$'...'` strings. [@danfuzz](https://github.com/pulsar-edit/pulsar/pull/776)
+- Fixed: [meta] Install Python package `setuptools` && Use Python `3.12.x` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/779)
+- Fixed: Update `web-tree-sitter` to include `isalnum` builtin [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/770)
+- Fixed: [meta] Build x86 Linux binaries on Ubuntu 20.04, for older (more compatible) glibc [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/760)
+- Bumped: [core] Bump `git-utils`: `5.7.1` => `^5.7.3` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/772)
+- Removed: [core] Cleanup Unused Deps [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/771)
+
+### github
+- Bumped: deps: Update `whats-my-line` to bump `dugite` to 2.1.0 [@DeeDeeG](https://github.com/pulsar-edit/github/pull/36)
+
+### whats-my-line
+- Bumped: Pin `dugite` to `2.1.0` [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/7)
+- Bumped: Bump dugite && Bump `package.json` version [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/2)
+- Added: Add dugite tests [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/4)
+- Removed: Remove TypeScript [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/3)
+- Added: Setup Tests and Modernize [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/1)
+
 ## 1.110.0
 
 - Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`
