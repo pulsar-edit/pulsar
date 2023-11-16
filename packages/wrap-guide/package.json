@@ -1,6 +1,6 @@
 {
   "name": "wrap-guide",
-  "version": "0.41.0",
+  "version": "0.41.1",
   "main": "./lib/main",
   "description": "Displays a vertical line at the 80th character in the editor.\nThis packages uses the config value of `editor.preferredLineLength` when set.",
   "license": "MIT",
@@ -25,6 +25,25 @@
     "enabled": {
       "default": true,
       "type": "boolean"
+    },
+    "showWrapGuide": {
+      "type": "string",
+      "description": "Choose when to show the wrap guide.",
+      "enum": [
+        {
+          "value": "always",
+          "description": "Always"
+        },
+        {
+          "value": "wrapping",
+          "description": "When soft wrap is enabled"
+        },
+        {
+          "value": "atPreferredLineLength",
+          "description": "When soft wrap at preferred line length is enabled"
+        }
+      ],
+      "default": "always"
     }
   }
 }
