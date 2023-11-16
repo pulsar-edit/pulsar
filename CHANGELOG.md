@@ -13,7 +13,7 @@
 - Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
 - Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
 - Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
-- Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions.
+- Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
 
 ### Pulsar
 - Fixed: meta: Update CirrusCI GitHub Token [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/804)
