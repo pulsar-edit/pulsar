@@ -8,7 +8,7 @@
 
 ## 1.111.0
 
-- Added a new `UI` API to `atom.` accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+- Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
 - Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
 - Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
 - Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
