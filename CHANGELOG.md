@@ -16,6 +16,7 @@
 - Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions.
 
 ### Pulsar
+- Fixed: meta: Update CirrusCI GitHub Token [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/804)
 - Bumped: deps: Update `github`, for `dugite` deduping purposes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/799)
 - Fixed: Tree-sitter running fixes (October) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/789)
 - Fixed: Prevent "half screen" bug by resetting scroll position when editor regains focus [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/798)
