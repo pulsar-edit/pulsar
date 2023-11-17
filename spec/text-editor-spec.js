@@ -370,9 +370,7 @@ describe('TextEditor', () => {
             'deleteToBeginningOfWord',
             'deleteToBeginningOfSubword',
             'deleteToPreviousWordBoundary',
-            'deleteToBeginningOfLine',
-            // 'deleteLine',
-            // 'joinLines'
+            'deleteToBeginningOfLine'
           ]
           cmds.forEach(command => {
             editor.setText("HelloWorld!")
