@@ -383,7 +383,7 @@ describe('TextEditor', () => {
           })
         });
 
-        fit('emits the event with textChanged: true if whole lines were changed', () => {
+        it('emits the event with textChanged: true if whole lines were changed', () => {
           let callbacks = [];
           let callback = evt => { callbacks.push(evt.textChanged) };
           editor.getLastCursor().onDidChangePosition(callback);
@@ -397,9 +397,13 @@ describe('TextEditor', () => {
           callbacks = [];
           editor.deleteLine();
           // One for the change, and another to reposition the cursor
-          expect(callbacks).toEqual([true, false], "on command deleteLine")
-            // 'joinLines'
-          })
+          expect(callbacks).toEqual([true, true, false, false], "on command deleteLine")
+
+          editor.setText("HelloWorld!\nGoodbye, world");
+          editor.setCursorBufferPosition([0, 5]);
+          callbacks = [];
+          editor.joinLines();
+          expect(callbacks).toEqual([true, true, false, false], "on command joinLines")
         });
 
         it("doesn't emit the event if you deleted something forward", () => {
@@ -6611,7 +6615,7 @@ describe('TextEditor', () => {
     });
   });
 
-  fdescribe('.deleteLine()', () => {
+  describe('.deleteLine()', () => {
     it('deletes the first line when the cursor is there', () => {
       editor.getLastCursor().moveToTop();
       const line1 = buffer.lineForRow(1);
