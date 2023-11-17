@@ -775,21 +775,23 @@ module.exports = class Selection {
   deleteLine(options = {}) {
     if (!this.ensureWritable('deleteLine', options)) return;
     const range = this.getBufferRange();
-    if (range.isEmpty()) {
-      const start = this.cursor.getScreenRow();
-      const range = this.editor.bufferRowsForScreenRows(start, start + 1);
-      if (range[1] > range[0]) {
-        this.editor.buffer.deleteRows(range[0], range[1] - 1);
+    this.editor.transact(() => {
+      if (range.isEmpty()) {
+        const start = this.cursor.getScreenRow();
+        const range = this.editor.bufferRowsForScreenRows(start, start + 1);
+        if (range[1] > range[0]) {
+          this.editor.buffer.deleteRows(range[0], range[1] - 1);
+        } else {
+          this.editor.buffer.deleteRow(range[0]);
+        }
       } else {
-        this.editor.buffer.deleteRow(range[0]);
+        const start = range.start.row;
+        let end = range.end.row;
+        if (end !== this.editor.buffer.getLastRow() && range.end.column === 0)
+          end--;
+        this.editor.buffer.deleteRows(start, end);
       }
-    } else {
-      const start = range.start.row;
-      let end = range.end.row;
-      if (end !== this.editor.buffer.getLastRow() && range.end.column === 0)
-        end--;
-      this.editor.buffer.deleteRows(start, end);
-    }
+    })
     this.cursor.setBufferPosition({
       row: this.cursor.getBufferRow(),
       column: range.start.column
