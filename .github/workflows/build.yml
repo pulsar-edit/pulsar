@@ -192,7 +192,7 @@ jobs:
       run: |
         rm -R node_modules/electron; yarn install --check-files
         tar xf ./binaries/*.tar.gz
-        export BINARY_NAME=`./pulsar-*/resources/pulsar.sh`
+        export BINARY_NAME=./pulsar-*/resources/pulsar.sh
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
