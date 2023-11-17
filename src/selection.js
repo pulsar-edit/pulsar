@@ -594,13 +594,11 @@ module.exports = class Selection {
   backspace(options = {}) {
     if (!this.ensureWritable('backspace', options)) return;
 
-    const screenPosition = this.cursor.getPreviousColumnScreenPosition()
-    this._deleteToPreviousPoint(
-      this.cursor.marker.layer.translateScreenPosition(screenPosition),
-      options
+    const screenPosition = this.cursor.getPreviousColumnScreenPosition();
+    const bufferPosition = this.cursor.marker.layer.translateScreenPosition(
+      screenPosition, { clipDirection: 'backward' }
     );
-    // if (this.isEmpty()) this.selectLeft();
-    // this.deleteSelectedText(options);
+    this._deleteToPreviousPoint(bufferPosition, options);
   }
 
   // Public: Removes the selection or, if nothing is selected, then all
@@ -611,8 +609,6 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToPreviousWordBoundary(options = {}) {
     if (!this.ensureWritable('deleteToPreviousWordBoundary', options)) return;
-    // if (this.isEmpty()) this.selectToPreviousWordBoundary();
-    // this.deleteSelectedText(options);
     this._deleteToPreviousPoint(
       this.cursor.getPreviousWordBoundaryBufferPosition(),
       options
@@ -627,8 +623,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToNextWordBoundary(options = {}) {
     if (!this.ensureWritable('deleteToNextWordBoundary', options)) return;
-    if (this.isEmpty()) this.selectToNextWordBoundary();
-    this.deleteSelectedText(options);
+    const position = this.cursor.getNextWordBoundaryBufferPosition();
+    this._deleteToNextPoint(position, options);
   }
 
   // Public: Removes from the start of the selection to the beginning of the
@@ -676,9 +672,11 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   delete(options = {}) {
     if (!this.ensureWritable('delete', options)) return;
-    if (this.isEmpty()) this.selectRight();
-    this.deleteSelectedText(options);
-    // this._deleteToPreviousPoint( this.cursor.getNextColumnBufferPosition(), options );
+    const screenPosition = this.cursor.getNextColumnScreenPosition();
+    const bufferPosition = this.cursor.marker.layer.translateScreenPosition(
+      screenPosition, { clipDirection: 'forward' }
+    );
+    this._deleteToNextPoint(bufferPosition, options);
   }
 
   // Public: If the selection is empty, removes all text from the cursor to the
@@ -690,14 +688,14 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfLine(options = {}) {
     if (!this.ensureWritable('deleteToEndOfLine', options)) return;
-    if (this.isEmpty()) {
-      if (this.cursor.isAtEndOfLine()) {
-        this.delete(options);
-        return;
-      }
-      this.selectToEndOfLine();
+    if (this.isEmpty() && this.cursor.isAtEndOfLine()) {
+      this.delete(options);
+    } else {
+      this._deleteToNextPoint(
+        new Point(this.cursor.getScreenRow(), Infinity),
+        options
+      );
     }
-    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or all characters from the start of the
@@ -707,8 +705,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfWord(options = {}) {
     if (!this.ensureWritable('deleteToEndOfWord', options)) return;
-    if (this.isEmpty()) this.selectToEndOfWord();
-    this.deleteSelectedText(options);
+    const position = this.cursor.getEndOfCurrentWordBufferPosition();
+    this._deleteToNextPoint(position, options);
   }
 
   // Public: Removes the selection or all characters from the start of the
@@ -718,8 +716,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToBeginningOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfSubword', options)) return;
-    if (this.isEmpty()) this.selectToPreviousSubwordBoundary();
-    this.deleteSelectedText(options);
+    const position = this.cursor.getPreviousWordBoundaryBufferPosition(options);
+    this._deleteToPreviousPoint(position, options);
   }
 
   // Public: Removes the selection or all characters from the start of the
@@ -729,8 +727,10 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToEndOfSubword', options)) return;
-    if (this.isEmpty()) this.selectToNextSubwordBoundary();
-    this.deleteSelectedText(options);
+    const position = this.cursor.getNextWordBoundaryBufferPosition(
+      { wordRegex: this.cursor.subwordRegExp() }
+    );
+    this._deleteToNextPoint(position, options);
   }
 
   // Public: Removes only the selected text.
@@ -746,9 +746,20 @@ module.exports = class Selection {
 
   _deleteToPreviousPoint(point, options) {
     if (this.isEmpty()) {
-      const prevRange = new Range( this.getBufferRange().start, point );
+      const prevRange = new Range(this.getBufferRange().start, point);
       this.editor.buffer.setTextInRange(
         prevRange, '', pick(options, 'undo', 'normalizeLineEndings')
+      );
+    } else {
+      this.deleteSelectedText(options);
+    }
+  }
+
+  _deleteToNextPoint(point, options) {
+    if (this.isEmpty()) {
+      const nextRange = new Range(point, this.getBufferRange().end);
+      this.editor.buffer.setTextInRange(
+        nextRange, '', pick(options, 'undo', 'normalizeLineEndings')
       );
     } else {
       this.deleteSelectedText(options);
