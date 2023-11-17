@@ -33,6 +33,10 @@ jobs:
     container: ${{ matrix.image }}
 
     steps:
+    - name: Echo shell info - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: echo $SHELL
+
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git python3 make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd
@@ -199,8 +203,9 @@ jobs:
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
-        tar xf ./binaries/*.tar.gz
-        export BINARY_NAME=./pulsar-*/resources/pulsar.sh
+        tar xf ./binaries/*.tar.gz --verbose
+        ls
+        export BINARY_NAME=`ls ./pulsar-*/resources/pulsar.sh`
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
