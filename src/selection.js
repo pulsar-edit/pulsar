@@ -810,9 +810,10 @@ module.exports = class Selection {
   joinLines(options = {}) {
     if (!this.ensureWritable('joinLines', options)) return;
     let joinMarker;
+    const buffer = this.editor.getBuffer();
     const selectedRange = this.getBufferRange();
     if (selectedRange.isEmpty()) {
-      if (selectedRange.start.row === this.editor.buffer.getLastRow()) return;
+      if (selectedRange.start.row === buffer.getLastRow()) return;
     } else {
       joinMarker = this.editor.markBufferRange(selectedRange, {
         invalidate: 'never'
@@ -820,45 +821,58 @@ module.exports = class Selection {
     }
 
     const rowCount = Math.max(1, selectedRange.getRowCount() - 1);
-    for (let i = 0; i < rowCount; i++) {
-      this.cursor.setBufferPosition([selectedRange.start.row]);
-      this.cursor.moveToEndOfLine();
+    let cursorPositionAfterEdit = null;
+    buffer.transact(() => {
+      for (let i = 0; i < rowCount; i++) {
+        // this.cursor.setBufferPosition([selectedRange.start.row]);
+        // this.cursor.moveToEndOfLine();
+        //
+        // Remove trailing whitespace from the current line
+        const scanRange = this.cursor.getCurrentLineBufferRange();
+        this.editor.scanInBufferRange(/[ \t]+$/, scanRange, ({ range }) => {
+          buffer.setTextInRange(range, '');
+        });
+        const currentRow = selectedRange.start.row;
+        const nextRow = currentRow + 1;
+        const haveNextLine = nextRow <= buffer.getLastRow();
+        // if (insertSpace) this.insertText(' ', options);
+        //
+        // this.cursor.moveToEndOfLine();
+        //
 
-      // Remove trailing whitespace from the current line
-      const scanRange = this.cursor.getCurrentLineBufferRange();
-      let trailingWhitespaceRange = null;
-      this.editor.scanInBufferRange(/[ \t]+$/, scanRange, ({ range }) => {
-        trailingWhitespaceRange = range;
-      });
-      if (trailingWhitespaceRange) {
-        this.setBufferRange(trailingWhitespaceRange);
-        this.deleteSelectedText(options);
+        if(haveNextLine) {
+          // Remove leading whitespace from the line below
+          const nextLineRange = this.editor.bufferRangeForBufferRow(nextRow);
+          this.editor.scanInBufferRange(/^[ \t]+/, nextLineRange, ({ range }) => {
+            buffer.setTextInRange(range, '');
+          });
+
+          const nextLineIsntEmpty = buffer.lineLengthForRow(nextRow) > 0;
+          const insertSpace = nextLineIsntEmpty && buffer.lineLengthForRow(currentRow) > 0;
+
+          const endOfLine = new Point(currentRow, Infinity);
+          const startOfNextLine = new Point(nextRow, 0);
+          if(i === rowCount - 1) {
+            // We "trick" the editor into thinking we made a change to where
+            // the cursor was. Not ideal, but it fixes https://github.com/pulsar-edit/pulsar/issues/802
+            this.cursor.setBufferPosition(startOfNextLine);
+          }
+          const removeRange = new Range(endOfLine, startOfNextLine);
+          cursorPositionAfterEdit =
+            buffer.setTextInRange(removeRange, insertSpace ? ' ' : '').end;
+          if(nextLineIsntEmpty) {
+            cursorPositionAfterEdit = cursorPositionAfterEdit.traverse([0, -1]);
+          }
+        }
       }
-
-      const currentRow = selectedRange.start.row;
-      const nextRow = currentRow + 1;
-      const insertSpace =
-        nextRow <= this.editor.buffer.getLastRow() &&
-        this.editor.buffer.lineLengthForRow(nextRow) > 0 &&
-        this.editor.buffer.lineLengthForRow(currentRow) > 0;
-      if (insertSpace) this.insertText(' ', options);
-
-      this.cursor.moveToEndOfLine();
-
-      // Remove leading whitespace from the line below
-      this.modifySelection(() => {
-        this.cursor.moveRight();
-        this.cursor.moveToFirstCharacterOfLine();
-      });
-      this.deleteSelectedText(options);
-
-      if (insertSpace) this.cursor.moveLeft();
-    }
+    });
 
     if (joinMarker) {
       const newSelectedRange = joinMarker.getBufferRange();
       this.setBufferRange(newSelectedRange);
       joinMarker.destroy();
+    } else if(cursorPositionAfterEdit) {
+      this.cursor.setBufferPosition(cursorPositionAfterEdit);
     }
   }
 

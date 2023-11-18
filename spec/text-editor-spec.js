@@ -401,7 +401,10 @@ describe('TextEditor', () => {
           editor.setCursorBufferPosition([0, 5]);
           callbacks = [];
           editor.joinLines();
-          expect(callbacks).toEqual([true, true, false, false], "on command joinLines")
+          // TODO: Again, not ideal. But still...
+          // One for moving to the line that will be deleted, one for the actual change
+          // and one to move to the "join position" between the lines
+          expect(callbacks).toEqual([false, false, true, true, false, false], "on command joinLines")
         });
 
         it("doesn't emit the event if you deleted something forward", () => {
