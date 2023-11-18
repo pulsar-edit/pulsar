@@ -716,7 +716,9 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToBeginningOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfSubword', options)) return;
-    const position = this.cursor.getPreviousWordBoundaryBufferPosition(options);
+    const position = this.cursor.getPreviousWordBoundaryBufferPosition({
+      wordRegex: this.cursor.subwordRegExp({ backwards: true })
+    });
     this._deleteToPreviousPoint(position, options);
   }
 
