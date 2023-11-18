@@ -824,9 +824,6 @@ module.exports = class Selection {
     let cursorPositionAfterEdit = null;
     buffer.transact(() => {
       for (let i = 0; i < rowCount; i++) {
-        // this.cursor.setBufferPosition([selectedRange.start.row]);
-        // this.cursor.moveToEndOfLine();
-        //
         // Remove trailing whitespace from the current line
         const scanRange = this.cursor.getCurrentLineBufferRange();
         this.editor.scanInBufferRange(/[ \t]+$/, scanRange, ({ range }) => {
@@ -835,10 +832,6 @@ module.exports = class Selection {
         const currentRow = selectedRange.start.row;
         const nextRow = currentRow + 1;
         const haveNextLine = nextRow <= buffer.getLastRow();
-        // if (insertSpace) this.insertText(' ', options);
-        //
-        // this.cursor.moveToEndOfLine();
-        //
 
         if(haveNextLine) {
           // Remove leading whitespace from the line below
