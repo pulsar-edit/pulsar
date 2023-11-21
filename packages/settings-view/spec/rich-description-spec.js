@@ -139,9 +139,9 @@ Description without table
 
     it('handles inline code', () => expect(getSettingDescription('foo.inlineCode')).toEqual('Description <code>with</code> inline code'));
 
-    it('handles line breaks', () => expect(getSettingDescription('foo.lineBreak')).toEqual('Description with<br/> line break'));
+    it('handles line breaks', () => expect(getSettingDescription('foo.lineBreak')).toEqual('Description with<br> line break'));
 
-    it('handles strikethrough', () => expect(getSettingDescription('foo.strikethrough')).toEqual('Description <del>with</del> strikethrough'));
+    it('handles strikethrough', () => expect(getSettingDescription('foo.strikethrough')).toEqual('Description <s>with</s> strikethrough'));
   });
 
   describe('unsupported Markdown', () => {

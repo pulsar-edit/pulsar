@@ -10,11 +10,9 @@
   },
   "dependencies": {
     "atom-slick": "^2.0.0",
-    "dompurify": "^3.0.4",
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.6.0",
     "grim": "^2.0.1",
-    "marked": "^5.1.1",
     "minimatch": "^3.0.3",
     "selector-kit": "^0.1.0",
     "stable": "^0.1.8",
