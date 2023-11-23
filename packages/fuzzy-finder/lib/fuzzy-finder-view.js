@@ -83,7 +83,7 @@ module.exports = class FuzzyFinderView {
         );
         const items = this.nativeFuzzyForResults.match(
           filterQuery,
-          {maxResults: 1, recordMatchIndexes: true}
+          {maxResults: 1, recordMatchIndexes: true, algorithm: 'command-t'}
         )
         const matches = items.length ? items[0].matchIndexes : []
         const repository = repositoryForPath(filePath)
@@ -338,7 +338,7 @@ module.exports = class FuzzyFinderView {
 
   filterFn(items, query) {
     if (!query) return items
-    return this.nativeFuzzy.match(query, {maxResults: MAX_RESULTS})
+    return this.nativeFuzzy.match(query, {maxResults: MAX_RESULTS, algorithm: 'command-t'})
       .map(({id}) => this.items[id])
   }
 }
