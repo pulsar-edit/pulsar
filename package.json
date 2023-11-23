@@ -30,7 +30,7 @@
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
-    "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f",
+    "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#130c1c8e0b3f919f6ee318dabea387559bcc88c6",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
     "async": "3.2.4",

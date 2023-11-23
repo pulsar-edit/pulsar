@@ -1576,9 +1576,9 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
-"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
+"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#130c1c8e0b3f919f6ee318dabea387559bcc88c6":
   version "1.2.1"
-  resolved "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5fe348bc0a38bbec1de86d43940893010c8"
+  resolved "https://github.com/pulsar-edit/fuzzy-native.git#130c1c8e0b3f919f6ee318dabea387559bcc88c6"
   dependencies:
     nan "2.17.0"
 
