@@ -573,15 +573,17 @@ function convertToDOM(content) {
 */
 function setCandidates(matcherOrCandidates, candidates) {
   if(candidates) {
-    matcherOrCandidates.setCandidates(
+    matcherOrCandidates.fuzzyMatcher.setCandidates(
       [...Array(candidates.length).keys()],
       candidates
     );
     return matcherOrCandidates;
   } else {
     return new Matcher(
-      [...Array(matcherOrCandidates.length).keys()],
-      matcherOrCandidates
+      new fuzzyNative.Matcher(
+        [...Array(matcherOrCandidates.length).keys()],
+        matcherOrCandidates
+      )
     );
   }
 }
@@ -636,7 +638,7 @@ class Matcher {
     let {numThreads, algorithm} = options;
     numThreads ||= this.numCpus;
     algorithm ||= 'fuzzaldrin';
-    return thiz.fuzzyMatcher.match(query, {...options, numThreads, algorithm});
+    return this.fuzzyMatcher.match(query, {...options, numThreads, algorithm});
   }
 
   /*
@@ -646,7 +648,7 @@ class Matcher {
     Exactly the same as {setCandidates}, passing this {Matcher} as the first parameter
   */
   setCandidates(candidates) {
-    setCandidates(this, candidates);
+    return setCandidates(this, candidates);
   }
 }
 
