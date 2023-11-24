@@ -214,6 +214,11 @@ exports.runningAsAdmin = (callback) => {
 exports.appName = appName;
 
 const supportedFileTypes = [
+  // ext: The extension of the file. This must be exact and will be applied to
+  //      this exact extension within the Windows registry.
+  // ico: This should be the filename of the specific icon within `./resources/file-icons/win/icons`
+  // progID: This is an arbitrary ID. But best to be in format of `Pulsar.<EXT>`
+  // desc: This is a human friendly description of the file type.
   {
     ext: ".c++",
     ico: "cplusplus.ico",
