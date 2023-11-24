@@ -213,6 +213,65 @@ exports.runningAsAdmin = (callback) => {
 
 exports.appName = appName;
 
+const supportedFileTypes = [
+  {
+    ext: ".c++",
+    ico: "cplusplus.ico",
+    progID: "Pulsar.c++",
+    desc: "C++ Source File"
+  },
+  {
+    ext: ".cs",
+    ico: "csharp.ico",
+    progID: "Pulsar.cs",
+    desc: "C Sharp Source File"
+  },
+  {
+    ext: ".js",
+    ico: "javascript.ico",
+    progID: "Pulsar.js",
+    desc: "JavaScript Source File"
+  },
+  {
+    ext: ".less",
+    ico: "less.ico",
+    progID: "Pulsar.less",
+    desc: "Less Source File"
+  },
+  {
+    ext: ".rb",
+    ico: "ruby.ico",
+    progID: "Pulsar.rb",
+    desc: "Ruby Source File"
+  }
+];
+
+exports.registerSupportedFileTypes = () => {
+  for (let i = 0; i < supportedFileTypes.length; i++) {
+    let extRegister = new ShellOption(
+      `\\Software\\Classes\\${supportedFileTypes[i].ext}`,
+      [
+        { key: "OpenWithProgids", name: supportedFileTypes[i].progID, value: "" }
+      ]
+    );
+
+    extRegister.register(function () {});
+
+    let progIdRegister = new ShellOption(
+      `\\Software\Classes\\${supportedFileTypes[i].progID}`,
+      [
+        { name: "", value: supportedFileTypes[i].desc },
+        { name: "AppUserModelID", value: "dev.pulsar-edit.pulsar" },
+        { key: "DefaultIcon", name: "", value: `${Path.join(process.execPath, "..", "resources", "icons", supportedFileTypes[i].ico )}` },
+        { key: "shell\\open\\command", name: "", value: `"${appPath}" "%1"` },
+        { key: "shell\\open", name: "Icon", value: `${appPath}` },
+      ]
+    );
+
+    progIdRegister.register(function () {});
+  }
+};
+
 exports.fileHandler = new ShellOption(
   `\\Software\\Classes\\Applications\\${exeName}`,
   [
