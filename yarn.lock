@@ -1836,6 +1836,11 @@
   resolved "https://registry.yarnpkg.com/@electron/remote/-/remote-2.0.10.tgz#133e2f607b1861ac249bd78b5abd1e961feed713"
   integrity sha512-3SFKKaQXcyWgwmibud+UqJl/XlHOgLcI3fwtB9pNelPSJAcTxocOJrF6FaxBIQaj1+R05Di6xuAswZpXAW7xhA==
 
+"@electron/remote@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@electron/remote/-/remote-2.1.0.tgz#7f3980840b5f4f3058ac7fd1da7a1167d10a9eaf"
+  integrity sha512-38jzz2beoYTo0DNS+aoaGyLS/fHeNTAc1Aom6HlYsxKnvVWjcg4xriC7J2IUkYSEDHGKX/D7jUst+mH4dHR6QA==
+
 "@electron/universal@1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@electron/universal/-/universal-1.2.1.tgz#3c2c4ff37063a4e9ab1e6ff57db0bc619bc82339"
@@ -5376,9 +5381,9 @@ github-slugger@^1.1.1:
   resolved "https://registry.yarnpkg.com/github-slugger/-/github-slugger-1.5.0.tgz#17891bbc73232051474d68bd867a34625c955f7d"
   integrity sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==
 
-"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.18-pretranspiled.tar.gz":
+"github@https://github.com/pulsar-edit/github.git#c1f8a9eb5447d24c61e00f5ecb53b8e00efe9551":
   version "0.36.18"
-  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.18-pretranspiled.tar.gz#4ebae479a441895e902a9c29def680c1ff8800ea"
+  resolved "https://github.com/pulsar-edit/github.git#c1f8a9eb5447d24c61e00f5ecb53b8e00efe9551"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -5388,6 +5393,7 @@ github-slugger@^1.1.1:
     "@babel/plugin-proposal-object-rest-spread" "7.8.0"
     "@babel/preset-env" "7.12.1"
     "@babel/preset-react" "7.8.0"
+    "@electron/remote" "^2.1.0"
     babel-plugin-relay "5.0.0"
     bintrees "1.0.2"
     bytes "3.1.0"

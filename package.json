@@ -74,7 +74,7 @@
     "fuzzy-finder": "file:packages/fuzzy-finder",
     "git-diff": "file:packages/git-diff",
     "git-utils": "https://github.com/pulsar-edit/git-utils.git#f4e8c37",
-    "github": "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.18-pretranspiled.tar.gz",
+    "github": "https://github.com/pulsar-edit/github.git#c1f8a9eb5447d24c61e00f5ecb53b8e00efe9551",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
     "grim": "2.0.3",
