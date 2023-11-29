@@ -5,7 +5,7 @@ const SelectListView = require('atom-select-list')
 
 module.exports =
 class EncodingListView {
-  constructor (encodings) {
+  constructor(encodings) {
     this.encodings = encodings
     this.selectListView = new SelectListView({
       itemsClassList: ['mark-active'],
@@ -35,24 +35,29 @@ class EncodingListView {
     this.selectListView.element.classList.add('encoding-selector')
   }
 
-  destroy () {
+  destroy() {
     this.cancel()
     return this.selectListView.destroy()
   }
 
-  cancel () {
+  cancel() {
     if (this.panel != null) {
       this.panel.destroy()
     }
     this.panel = null
     this.currentEncoding = null
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
+    setTimeout(() => {
+      // Don't restore previous focus if a modal panel currently has focus.
+      let focusedModal = document.activeElement.closest('atom-panel.modal')
+
+      if (this.previouslyFocusedElement && !focusedModal) {
+        this.previouslyFocusedElement.focus()
+        this.previouslyFocusedElement = null
+      }
+    }, 0)
   }
 
-  attach () {
+  attach() {
     this.previouslyFocusedElement = document.activeElement
     if (this.panel == null) {
       this.panel = atom.workspace.addModalPanel({item: this.selectListView})
@@ -61,7 +66,7 @@ class EncodingListView {
     this.selectListView.reset()
   }
 
-  async toggle () {
+  async toggle() {
     if (this.panel != null) {
       this.cancel()
     } else if (atom.workspace.getActiveTextEditor()) {
@@ -82,7 +87,7 @@ class EncodingListView {
     }
   }
 
-  detectEncoding () {
+  detectEncoding() {
     const editor = atom.workspace.getActiveTextEditor()
     const filePath = editor.getPath()
     if (fs.existsSync(filePath)) {

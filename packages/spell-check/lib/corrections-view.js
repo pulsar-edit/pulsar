@@ -93,10 +93,16 @@ export default class CorrectionsView {
             this.destroyed = true;
             this.overlayDecoration.destroy();
             await this.selectListView.destroy();
-            if (this.previouslyFocusedElement) {
-                this.previouslyFocusedElement.focus();
-                this.previouslyFocusedElement = null;
-            }
+
+            setTimeout(() => {
+                // Don't restore previous focus if a modal panel currently has focus.
+                let focusedModal = document.activeElement.closest('atom-panel.modal')
+
+                if (this.previouslyFocusedElement && !focusedModal) {
+                    this.previouslyFocusedElement.focus();
+                    this.previouslyFocusedElement = null;
+                }
+            }, 0);
         }
     }
 }

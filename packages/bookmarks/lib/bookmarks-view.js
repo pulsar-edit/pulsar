@@ -4,7 +4,7 @@ const SelectListView = require('atom-select-list')
 
 module.exports =
 class BookmarksView {
-  constructor (editorsBookmarks) {
+  constructor(editorsBookmarks) {
     this.editorsBookmarks = editorsBookmarks
     this.selectList = new SelectListView({
       emptyMessage: 'No bookmarks found',
@@ -48,16 +48,22 @@ class BookmarksView {
     this.selectList.element.classList.add('bookmarks-view')
   }
 
-  destroy () {
+  destroy() {
     this.selectList.destroy()
     this.getModalPanel().destroy()
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
+
+    setTimeout(() => {
+      // Don't restore previous focus if a modal panel currently has focus.
+      let focusedModal = document.activeElement.closest('atom-panel.modal')
+
+      if (this.previouslyFocusedElement && !focusedModal) {
+        this.previouslyFocusedElement.focus()
+        this.previouslyFocusedElement = null
+      }
+    }, 0);
   }
 
-  async show () {
+  async show() {
     const bookmarks = []
     for (const {editor, markerLayer} of this.editorsBookmarks) {
       for (const marker of markerLayer.getMarkers()) {
@@ -83,7 +89,7 @@ class BookmarksView {
     this.selectList.focus()
   }
 
-  hide () {
+  hide() {
     this.getModalPanel().hide()
     if (this.previouslyFocusedElement) {
       this.previouslyFocusedElement.focus()
@@ -91,7 +97,7 @@ class BookmarksView {
     }
   }
 
-  getModalPanel () {
+  getModalPanel() {
     if (!this.modalPanel) {
       this.modalPanel = atom.workspace.addModalPanel({item: this.selectList})
     }

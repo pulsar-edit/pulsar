@@ -64,8 +64,15 @@ export class Selector {
   hide() {
     // hide modal panel
     this.modalPanel.hide();
-    // focus on the previous active pane
-    this.previousActivePane.activate();
+
+    setTimeout(() => {
+      // Don't restore previous focus if a modal panel currently has focus.
+      let focusedModal = document.activeElement.closest('atom-panel.modal');
+
+      if (!focusedModal) {
+        this.previousActivePane.activate();
+      }
+    }, 0);
   }
 
   // Dispose selector

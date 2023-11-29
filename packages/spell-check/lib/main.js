@@ -6,6 +6,7 @@ let spellCheckViews = {};
 const LARGE_FILE_SIZE = 2 * 1024 * 1024;
 
 let log = (str) => {};
+let debug;
 
 module.exports = {
     activate() {
