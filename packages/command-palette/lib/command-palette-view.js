@@ -122,10 +122,16 @@ export default class CommandPaletteView {
 
   hide () {
     this.panel.hide()
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
+
+    setTimeout(() => {
+      // Don't restore previous focus if a modal panel currently has focus.
+      let focusedModal = document.activeElement.closest('atom-panel.modal')
+
+      if (this.previouslyFocusedElement && !focusedModal) {
+        this.previouslyFocusedElement.focus()
+        this.previouslyFocusedElement = null
+      }
+    }, 0)
   }
 
   async update (props) {
