@@ -38,30 +38,31 @@ exports.activate = () => {
     includeChildren: true
   });
 
-  // Highlight inline HTML within paragraphs.
-  atom.grammars.addInjectionPoint('source.gfm.embedded', {
-    type: 'paragraph',
-    language(node) {
-      let html = node.descendantsOfType([
-        'html_open_tag',
-        'html_close_tag',
-        'html_self_closing_tag'
-      ]);
-      if (html.length === 0) { return null; }
-      return 'html';
-    },
+  for (let nodeType of ['paragraph', 'table_cell']) {
+    atom.grammars.addInjectionPoint('source.gfm.embedded', {
+      type: nodeType,
+      language(node) {
+        let html = node.descendantsOfType([
+          'html_open_tag',
+          'html_close_tag',
+          'html_self_closing_tag'
+        ]);
+        if (html.length === 0) { return null; }
+        return 'html';
+      },
 
-    content(node) {
-      let html = node.descendantsOfType([
-        'html_open_tag',
-        'html_close_tag',
-        'html_self_closing_tag'
-      ]);
-      return html;
-    },
+      content(node) {
+        let html = node.descendantsOfType([
+          'html_open_tag',
+          'html_close_tag',
+          'html_self_closing_tag'
+        ]);
+        return html;
+      },
 
-    includeChildren: true
-  });
+      includeChildren: true
+    });
+  }
 
   // All code blocks of the form
   //
