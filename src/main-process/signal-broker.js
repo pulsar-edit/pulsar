@@ -17,8 +17,9 @@ function start() {
     instances.add(event.sender);
   });
 
-  ipcMain.on('signal-message', (event, bundle, { includeSelf = false } = {}) => {
+  ipcMain.on('signal-message', (event, bundle) => {
     let { sender } = event;
+    let { includeSelf, ...rest } = bundle;
 
     for (let instance of instances) {
       if (sender === instance && !includeSelf) continue;
@@ -31,7 +32,7 @@ function start() {
       }
 
       try {
-        instance.send('signal-message-reply', bundle);
+        instance.send('signal-message-reply', rest);
       } catch (err) {
         instances.delete(instance);
       }
