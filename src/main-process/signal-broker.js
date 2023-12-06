@@ -2,9 +2,9 @@ const { ipcMain } = require('electron');
 
 // The easiest way to send a message from the main Electron process to a
 // renderer process is via a `WebContents` instance. That instance is sent to
-// use as part of the event metadata whenever a renderer process sends a
-// message to the main process. So we'll keep track of each of these instances
-// in a set. A new window is responsible for sending us a message upon
+// us as part of the event metadata whenever a renderer process sends a message
+// to the main process. So we'll keep track of each of these instances in a
+// set. A new window is responsible for sending us a message upon
 // initialization so that we can keep track of it.
 const instances = new Set;
 let initialized = false;
