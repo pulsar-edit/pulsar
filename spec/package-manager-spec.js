@@ -1019,7 +1019,7 @@ describe('PackageManager', () => {
 
       spyOn(pack.mainModule, 'activate').andCallThrough();
       await atom.packages.activatePackage('package-with-serialization');
-      expect(pack.mainModule.activate).toHaveBeenCalledWith({ someNumber: 77 });
+      expect(pack.mainModule.activate).toHaveBeenCalledWith({ someNumber: 77 }, { t: pack.t });
     });
 
     it('invokes ::onDidActivatePackage listeners with the activated package', async () => {

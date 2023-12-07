@@ -45,6 +45,7 @@ const TextEditor = require('./text-editor');
 const TextBuffer = require('text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
+const I18n = require("./i18n");
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
 const packagejson = require("../package.json");
@@ -104,6 +105,10 @@ class AtomEnvironment {
       type: 'object',
       properties: _.clone(ConfigSchema)
     });
+    /** @type {I18n} */
+    this.i18n = new I18n({
+      config: this.config
+    });
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
@@ -136,7 +141,8 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       deserializerManager: this.deserializers,
       viewRegistry: this.views,
-      uriHandlerRegistry: this.uriHandlerRegistry
+      uriHandlerRegistry: this.uriHandlerRegistry,
+      i18n: this.i18n
     });
 
     /** @type {ThemeManager} */
@@ -269,6 +275,8 @@ class AtomEnvironment {
       projectHomeSchema: ConfigSchema.projectHome
     });
     this.config.resetUserSettings(userSettings);
+
+    this.i18n.initialise({ resourcePath });
 
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);

@@ -30,6 +30,7 @@ module.exports = class Package {
     this.contextMenuManager = params.contextMenuManager;
     this.deserializerManager = params.deserializerManager;
     this.viewRegistry = params.viewRegistry;
+    this.i18n = params.i18n;
     this.emitter = new Emitter();
 
     this.mainModule = null;
@@ -45,6 +46,7 @@ module.exports = class Package {
       (this.metadata && this.metadata.name) ||
       params.name ||
       path.basename(this.path);
+    this.t = this.i18n.getT(this.name);
     this.reset();
   }
 
@@ -240,7 +242,10 @@ module.exports = class Package {
         }
         if (typeof this.mainModule.activate === 'function') {
           this.mainModule.activate(
-            this.packageManager.getPackageState(this.name) || {}
+            this.packageManager.getPackageState(this.name) || {},
+            {
+              t: this.t
+            }
           );
         }
         this.mainActivated = true;
