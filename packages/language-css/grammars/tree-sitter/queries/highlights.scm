@@ -113,6 +113,8 @@
 (attribute_selector
   ["=" "^=" "$=" "~=" "|="] @keyword.operator.pattern.css)
 
+; The `foo` in `@keyframes foo {`.
+(keyframes_name) @entity.name.keyframes.css
 
 ; VARIABLES
 ; =========
