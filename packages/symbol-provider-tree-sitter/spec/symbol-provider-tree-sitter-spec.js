@@ -5,21 +5,21 @@ const temp = require('temp');
 const TreeSitterProvider = require('../lib/tree-sitter-provider');
 
 // Just for syntax highlighting.
-function scm (strings) {
+function scm(strings) {
   return strings.join('');
 }
 
-function getEditor () {
+function getEditor() {
   return atom.workspace.getActiveTextEditor();
 }
 
-async function wait (ms) {
+async function wait(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
 let provider;
 
-async function getSymbols (editor, type = 'file') {
+async function getSymbols(editor, type = 'file') {
   let controller = new AbortController();
   let symbols = await provider.getSymbols({
     type,
@@ -72,7 +72,7 @@ describe('TreeSitterProvider', () => {
 
     it('is willing to provide symbols for the current file', () => {
       let meta = { type: 'file', editor };
-      expect(provider.canProvideSymbols(meta)).toBe(true);
+      expect(provider.canProvideSymbols(meta)).toBe(0.999);
     });
 
     it('is not willing to provide symbols for an entire project', () => {
@@ -121,7 +121,7 @@ describe('TreeSitterProvider', () => {
 
     it('is willing to provide symbols', () => {
       let meta = { type: 'file', editor };
-      expect(provider.canProvideSymbols(meta)).toBe(true);
+      expect(provider.canProvideSymbols(meta)).toBe(0.999);
     });
 
     describe('and has content', () => {
