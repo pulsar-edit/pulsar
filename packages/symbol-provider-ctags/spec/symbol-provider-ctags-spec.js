@@ -93,7 +93,7 @@ describe('CTagsProvider', () => {
     it('returns a lower match score', () => {
       editor.insertText("\n");
       let meta = { type: 'file', editor };
-      expect(provider.canProvideSymbols(meta)).toBe(0.9);
+      expect(provider.canProvideSymbols(meta)).toBe(0.89);
     });
   });
 
