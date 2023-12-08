@@ -2,7 +2,7 @@ const CaptureOrganizer = require('./capture-organizer');
 const { Emitter } = require('atom');
 
 class TreeSitterProvider {
-  constructor () {
+  constructor() {
     this.packageName = 'symbol-provider-tree-sitter';
     this.name = 'Tree-sitter';
     this.isExclusive = true;
@@ -15,16 +15,16 @@ class TreeSitterProvider {
     });
   }
 
-  destroy () {
+  destroy() {
     this.captureOrganizer.destroy();
     this.disposable.dispose();
   }
 
-  onShouldClearCache (callback) {
+  onShouldClearCache(callback) {
     return this.emitter.on('should-clear-cache', callback);
   }
 
-  canProvideSymbols (meta) {
+  canProvideSymbols(meta) {
     let { editor, type } = meta;
 
     // This provider can't crawl the whole project.
@@ -42,10 +42,12 @@ class TreeSitterProvider {
       return false;
     }
 
-    return true;
+    // Return a value that will beat the built-in `ctags` provider, but which
+    // will (by default) lose to any provider from a community package.
+    return 0.999;
   }
 
-  async getSymbols (meta) {
+  async getSymbols(meta) {
     let { editor, signal } = meta;
     let languageMode = editor?.getBuffer()?.getLanguageMode();
     if (!languageMode) return null;
