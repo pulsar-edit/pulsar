@@ -1,0 +1,36 @@
+{
+  "name": "symbol-provider-ctags",
+  "main": "./lib/main",
+  "version": "1.0.0",
+  "description": "Provides symbols to symbols-view via ctags",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0",
+    "node": ">=14"
+  },
+  "providedServices": {
+    "symbol.provider": {
+      "description": "Allows external sources to suggest symbols for a given file or project.",
+      "versions": {
+        "1.0.0": "provideSymbols"
+      }
+    }
+  },
+  "configSchema": {
+    "useEditorGrammarAsCtagsLanguage": {
+      "default": true,
+      "type": "boolean",
+      "description": "Force `ctags` to use the name of the current file's language in Pulsar when generating tags. By default, `ctags` automatically selects the language of a source file, ignoring those files whose language cannot be determined. This option forces the specified language to be used instead of automatically selecting the language based upon its extension."
+    }
+  },
+  "dependencies": {
+    "async": "^0.2.6",
+    "fs-plus": "^3.1.1",
+    "ctags": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.39.0",
+    "temp": "^0.9.4"
+  }
+}
