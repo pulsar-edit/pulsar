@@ -8,7 +8,7 @@ const Config = require('./config');
  * @extends Error
  */
 class InvalidProviderError extends Error {
-  constructor (faults, provider) {
+  constructor(faults, provider) {
     let packageName = provider.packageName ?
       `the ${provider.packageName} provider`
       : 'a symbol provider';
@@ -26,7 +26,7 @@ class InvalidProviderError extends Error {
  * @class
  */
 module.exports = class ProviderBroker {
-  constructor () {
+  constructor() {
     this.providers = [];
     this.providerSubscriptions = new Map();
     this.subscriptions = new CompositeDisposable();
@@ -38,7 +38,7 @@ module.exports = class ProviderBroker {
    *
    * @param {SymbolProvider[]} providers Any number of symbol providers.
    */
-  add (...providers) {
+  add(...providers) {
     for (let provider of providers) {
       try {
         this.validateSymbolProvider(provider);
@@ -57,7 +57,7 @@ module.exports = class ProviderBroker {
    *
    * @param {SymbolProvider[]} providers Any number of symbol providers.
    */
-  remove (...providers) {
+  remove(...providers) {
     for (let provider of providers) {
       let index = this.providers.indexOf(provider);
       // Providers that were invalid may not have been added. Not a problem.
@@ -74,7 +74,7 @@ module.exports = class ProviderBroker {
    *
    * @param {SymbolProvider} provider A symbol provider to validate.
    */
-  validateSymbolProvider (provider) {
+  validateSymbolProvider(provider) {
     let faults = [];
     if (typeof provider.name !== 'string') faults.push('name');
     if (typeof provider.packageName !== 'string') faults.push('packageName');
@@ -93,7 +93,7 @@ module.exports = class ProviderBroker {
    *
    * @param {SymbolProvider} provider A symbol provider.
    */
-  observeProvider (provider) {
+  observeProvider(provider) {
     let disposable = new CompositeDisposable();
     this.providerSubscriptions.set(provider, disposable);
 
@@ -113,28 +113,28 @@ module.exports = class ProviderBroker {
    *
    * @param {SymbolProvider} provider A symbol provider.
    */
-  stopObservingProvider (provider) {
+  stopObservingProvider(provider) {
     let disposable = this.providerSubscriptions.get(provider);
     this.providerSubscriptions.delete(provider);
     disposable?.dispose;
   }
 
-  destroy () {
+  destroy() {
     for (let provider of this.providers) {
       provider?.destroy?.();
       this.emitter.emit('did-remove-provider', provider);
     }
   }
 
-  onDidAddProvider (callback) {
+  onDidAddProvider(callback) {
     return this.emitter.on('did-add-provider', callback);
   }
 
-  onDidRemoveProvider (callback) {
+  onDidRemoveProvider(callback) {
     return this.emitter.on('did-remove-provider', callback);
   }
 
-  onShouldClearCache (callback) {
+  onShouldClearCache(callback) {
     return this.emitter.on('should-clear-cache', callback);
   }
 
@@ -152,7 +152,8 @@ module.exports = class ProviderBroker {
    * @returns {Number} The amount by which to boost the provider's relevance
    *   score.
    */
-  getScoreBoost (name, packageName, preferredProviders = []) {
+  getScoreBoost(name, packageName, preferredProviders = []) {
+    let shouldLog = Config.get('enableDebugLogging');
     if (packageName === 'unknown') return 0;
     let index = preferredProviders.indexOf(packageName);
     if (index === -1) {
@@ -160,6 +161,8 @@ module.exports = class ProviderBroker {
     }
     if (index === -1) return 0;
     let scoreBoost = preferredProviders.length - index;
+    if (shouldLog)
+      console.log('Score boost for provider', name, packageName, 'is', scoreBoost);
     return scoreBoost;
   }
 
@@ -172,12 +175,12 @@ module.exports = class ProviderBroker {
    * @returns {Promise<SymbolProvider[]>} A promise that resolves with a list
    *   of symbol providers.
    */
-  async select (meta) {
+  async select(meta) {
     let shouldLog = Config.get('enableDebugLogging');
     let exclusivesByScore = [];
     let results = [];
 
-    let preferredProviders = atom.config.get('symbols-view-redux.preferCertainProviders');
+    let preferredProviders = atom.config.get('symbols-view.preferCertainProviders');
 
     if (shouldLog) {
       console.debug(`Provider broker choosing among ${this.providers.length} candidates:`, this.providers);
