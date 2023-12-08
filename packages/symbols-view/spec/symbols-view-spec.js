@@ -765,7 +765,7 @@ describe('SymbolsView', () => {
         );
       });
 
-      fit('alerts the user', () => {
+      it('alerts the user', () => {
         migrateOldConfigIfNeeded({ force: true });
 
         expect(atom.notifications.addInfo).toHaveBeenCalled();

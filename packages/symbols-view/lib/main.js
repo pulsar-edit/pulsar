@@ -5,8 +5,6 @@ const Path = require('path');
 const { shell } = require('electron');
 const { migrateOldConfigIfNeeded } = require('./util');
 
-console.log('SYMBOLS VIEW !!!');
-
 const NO_PROVIDERS_MESSAGE = `You don’t have any symbol providers installed.`;
 const NO_PROVIDERS_DESCRIPTION = `The button below will show all packages that can provide symbols.
 
