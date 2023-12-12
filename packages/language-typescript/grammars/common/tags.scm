@@ -29,3 +29,14 @@
 (function_signature
   name: (identifier) @name
   (#set! symbol.tag "function")) @definition.function
+
+(
+  (comment)* @doc
+  .
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier) @name
+      value: [(arrow_function) (function)]) @definition.function)
+  (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
+  (#select-adjacent! @doc @definition.function)
+)
