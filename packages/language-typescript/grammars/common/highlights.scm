@@ -93,7 +93,7 @@
 (object_pattern
   (pair_pattern
     ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name.z._LANG_
+    key: (_) @entity.other.attribute-name._LANG_
     value: (identifier) @variable.other.assignment.destructuring._LANG_)
     (#set! capture.final true))
 
@@ -102,7 +102,7 @@
 (object_pattern
   (pair_pattern
     ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name.y._LANG_)
+    key: (_) @entity.other.attribute-name._LANG_)
     (#set! capture.final true))
 
 ; A variable object alias destructuring with default value:
@@ -110,7 +110,7 @@
 (object_pattern
   (pair_pattern
     ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name.x._LANG_
+    key: (_) @entity.other.attribute-name._LANG_
     value: (assignment_pattern
       left: (identifier) @variable.other.assignment.destructuring._LANG_)))
 

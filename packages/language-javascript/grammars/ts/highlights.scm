@@ -111,7 +111,7 @@
 (object_pattern
   (pair_pattern
     ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name.y._LANG_)
+    key: (_) @entity.other.attribute-name.js)
     (#set! capture.final true))
 
 
