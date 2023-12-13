@@ -3,7 +3,6 @@
 
 import {CompositeDisposable, TextEditor} from 'atom'
 import etch from 'etch'
-import fuzzaldrin from 'fuzzaldrin'
 
 import CollapsibleSectionPanel from './collapsible-section-panel'
 import PackageCard from './package-card'
@@ -227,7 +226,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
         } else {
           const owner = pack.owner != null ? pack.owner : ownerFromRepository(pack.repository)
           const filterText = `${pack.name} ${owner}`
-          return fuzzaldrin.score(filterText, text) > 0
+          return atom.ui.fuzzyMatcher.score(filterText, text) > 0
         }
       })
 

@@ -1576,9 +1576,9 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
-"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
+"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#c6ddd2e0ace7b3cfe8082fcbe5985c49f76da5b8":
   version "1.2.1"
-  resolved "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5fe348bc0a38bbec1de86d43940893010c8"
+  resolved "https://github.com/pulsar-edit/fuzzy-native.git#c6ddd2e0ace7b3cfe8082fcbe5985c49f76da5b8"
   dependencies:
     nan "2.17.0"
 
@@ -2340,8 +2340,6 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "2.42.6"
   dependencies:
     atom-slick "^2.0.0"
-    fuzzaldrin "^2.1.0"
-    fuzzaldrin-plus "^0.6.0"
     grim "^2.0.1"
     minimatch "^3.0.3"
     selector-kit "^0.1.0"
@@ -3176,8 +3174,6 @@ command-line-usage@^4.1.0:
   version "0.43.5"
   dependencies:
     atom-select-list "^0.7.1"
-    fuzzaldrin "^2.1.0"
-    fuzzaldrin-plus "^0.6.0"
     underscore-plus "^1.0.0"
 
 commander@2.9.0:
@@ -4760,12 +4756,7 @@ functions-have-names@^1.2.2:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
-fuzzaldrin-plus@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
-  integrity sha512-srIDThJHkdp3aPwJpR/HNzYZCRJwm07b/igxseoHSB7qR8e/gQp4F6lMGknE3TQI1Aq14TiFf/wzrHOp9LY/EA==
-
-fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
+fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
@@ -4773,7 +4764,6 @@ fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
 "fuzzy-finder@file:packages/fuzzy-finder":
   version "1.14.3"
   dependencies:
-    "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
     minimatch "~3.0.3"
@@ -8539,7 +8529,6 @@ setimmediate@^1.0.5:
     async "^3.2.0"
     etch "0.9.0"
     fs-plus "^3.0.0"
-    fuzzaldrin "^2.1"
     glob "5.0.15"
     hosted-git-info "^2.8.9"
     request "^2.83.0"

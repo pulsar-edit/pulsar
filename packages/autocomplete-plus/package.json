@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "atom-slick": "^2.0.0",
-    "fuzzaldrin": "^2.1.0",
-    "fuzzaldrin-plus": "^0.6.0",
     "grim": "^2.0.1",
     "minimatch": "^3.0.3",
     "selector-kit": "^0.1.0",
@@ -197,12 +195,6 @@
       "type": "boolean",
       "default": true,
       "order": 18
-    },
-    "useAlternateScoring": {
-      "description": "Prefers runs of consecutive characters, acronyms and start of words. (Experimental)",
-      "type": "boolean",
-      "default": true,
-      "order": 19
     },
     "useLocalityBonus": {
       "description": "Gives words near the cursor position a higher score than those far away",

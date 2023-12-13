@@ -1,6 +1,7 @@
 /* eslint-env jasmine */
 /* eslint-disable no-template-curly-in-string */
 const SuggestionListElement = require('../lib/suggestion-list-element')
+const { conditionPromise } = require('./spec-helper')
 
 const fragmentToHtml = fragment => {
   const el = document.createElement('span')
@@ -63,11 +64,12 @@ describe('Suggestion List Element', () => {
   })
 
   describe('itemChanged', () => {
-    beforeEach(() => jasmine.attachToDOM(suggestionListElement.element))
+    beforeEach(() => {
+      jasmine.useRealClock()
+      jasmine.attachToDOM(suggestionListElement.element)
+    })
 
     it('updates the list item', async () => {
-      jasmine.useRealClock()
-
       const suggestion = {text: 'foo'}
       const newSuggestion = {text: 'foo', description: 'foobar', rightLabel: 'foo'}
       suggestionListElement.model = {items: [newSuggestion]}
@@ -77,6 +79,9 @@ describe('Suggestion List Element', () => {
 
       suggestionListElement.itemChanged({suggestion: newSuggestion, index: 0})
 
+      await conditionPromise(() =>
+        suggestionListElement.element.querySelector('.right-label').innerText
+      )
       expect(suggestionListElement.element.querySelector('.right-label').innerText)
         .toBe('foo')
 
@@ -190,14 +195,15 @@ describe('Suggestion List Element', () => {
       let snippets = suggestionListElement.snippetParser.findSnippets(text)
       text = suggestionListElement.removeSnippetsFromText(snippets, text)
       let matches = suggestionListElement.findCharacterMatchIndices(text, replacementPrefix)
+      matches = new Set(matches)
 
       for (var i = 0; i <= text.length; i++) {
         if (truthyIndices.indexOf(i) !== -1) {
-          expect(matches[i]).toBeTruthy()
+          expect(matches.has(i)).toBeTruthy()
         } else {
           let m = matches
           if (m) {
-            m = m[i]
+            m = m.has(i)
           }
           expect(m).toBeFalsy()
         }
@@ -208,14 +214,14 @@ describe('Suggestion List Element', () => {
       assertMatches('hello', '', [])
       assertMatches('hello', 'h', [0])
       assertMatches('hello', 'hl', [0, 2])
-      assertMatches('hello', 'hlo', [0, 2, 4])
+      assertMatches('hello', 'hlo', [0, 3, 4])
     })
 
     it('finds matches when snippets exist', () => {
       assertMatches('${0:hello}', '', [])
       assertMatches('${0:hello}', 'h', [0])
       assertMatches('${0:hello}', 'hl', [0, 2])
-      assertMatches('${0:hello}', 'hlo', [0, 2, 4])
+      assertMatches('${0:hello}', 'hlo', [0, 3, 4])
       assertMatches('${0:hello}world', '', [])
       assertMatches('${0:hello}world', 'h', [0])
       assertMatches('${0:hello}world', 'hw', [0, 5])

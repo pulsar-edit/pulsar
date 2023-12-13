@@ -1,6 +1,5 @@
 const {Point, CompositeDisposable} = require('atom')
 const fs = require('fs')
-const NativeFuzzy = require('@pulsar-edit/fuzzy-native')
 
 const path = require('path')
 const SelectListView = require('atom-select-list')
@@ -79,10 +78,12 @@ module.exports = class FuzzyFinderView {
       elementForItem: ({filePath, label, ownerGitHubUsername}) => {
         const filterQuery = this.selectListView.getFilterQuery()
 
-        this.nativeFuzzyForResults.setCandidates([0], [label])
+        atom.ui.fuzzyMatcher.setCandidates(
+          this.nativeFuzzyForResults, [label]
+        );
         const items = this.nativeFuzzyForResults.match(
           filterQuery,
-          {maxResults: 1, recordMatchIndexes: true}
+          {maxResults: 1, recordMatchIndexes: true, algorithm: 'command-t'}
         )
         const matches = items.length ? items[0].matchIndexes : []
         const repository = repositoryForPath(filePath)
@@ -125,14 +126,13 @@ module.exports = class FuzzyFinderView {
     })
 
     if (!this.nativeFuzzy) {
-      this.nativeFuzzy = new NativeFuzzy.Matcher(
-        indexArray(this.items.length),
+      this.nativeFuzzy = atom.ui.fuzzyMatcher.setCandidates(
         this.items.map(el => el.label)
-      )
+      );
       // We need a separate instance of the fuzzy finder to calculate the
       // matched paths only for the returned results. This speeds up considerably
       // the filtering of items.
-      this.nativeFuzzyForResults = new NativeFuzzy.Matcher([], [])
+      this.nativeFuzzyForResults = atom.ui.fuzzyMatcher.setCandidates([]);
     }
     this.selectListView.update({ filter: this.filterFn })
   }
@@ -290,10 +290,10 @@ module.exports = class FuzzyFinderView {
 
   setItems (items) {
     this.items = items
-    this.nativeFuzzy.setCandidates(
-      indexArray(this.items.length),
+    atom.ui.fuzzyMatcher.setCandidates(
+      this.nativeFuzzy,
       this.items.map(item => item.label)
-    )
+    );
 
     if (this.isQueryALineJump()) {
       this.selectListView.update({
@@ -338,7 +338,7 @@ module.exports = class FuzzyFinderView {
 
   filterFn(items, query) {
     if (!query) return items
-    return this.nativeFuzzy.match(query, {maxResults: MAX_RESULTS})
+    return this.nativeFuzzy.match(query, {maxResults: MAX_RESULTS, algorithm: 'command-t'})
       .map(({id}) => this.items[id])
   }
 }
@@ -380,14 +380,6 @@ function highlight (path, matches, offsetIndex) {
   // Remaining characters are plain text
   fragment.appendChild(document.createTextNode(path.substring(lastIndex)))
   return fragment
-}
-
-function indexArray (length) {
-  const array = []
-  for (let i = 0; i < length; i++) {
-    array[i] = i
-  }
-  return array
 }
 
 class FuzzyFinderItem {
