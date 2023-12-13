@@ -31,6 +31,130 @@
   (identifier) @variable.other.assignment.export._LANG_)
 
 
+; VARIABLES
+; =========
+
+(this) @variable.language.this._LANG_
+(super) @variable.language.super._LANG_._LANG_x
+
+(required_parameter
+  pattern: (identifier) @variable.parameter._LANG_)
+
+(required_parameter
+  pattern: (rest_pattern
+    (identifier) @variable.parameter.rest._LANG_))
+
+(required_parameter
+  pattern: (object_pattern
+    (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
+    (#set! capture.final true))
+
+(optional_parameter
+  pattern: (identifier) @variable.parameter.optional._LANG_)
+
+(optional_parameter "?" @keyword.operator.type.optional._LANG_)
+
+(type_predicate
+  name: (identifier) @variable.other.type._LANG_
+  "is" @keyword.operator.type.is._LANG_)
+
+["var" "const" "let"] @storage.type._TYPE_._LANG_
+
+; A simple variable declaration:
+; The "foo" in `let foo = true`
+(variable_declarator
+  name: (identifier) @variable.other.assignment._LANG_)
+
+; A reassignment of a variable declared earlier:
+; The "foo" in `foo = true`
+(assignment_expression
+  left: (identifier) @variable.other.assignment._LANG_)
+
+; The "foo" in `foo += 1`.
+(augmented_assignment_expression
+  left: (identifier) @variable.other.assignment._LANG_)
+
+; The "foo" in `foo++`.
+(update_expression
+  argument: (identifier) @variable.other.assignment._LANG_)
+
+; `object_pattern` appears to only be encountered in assignment expressions, so
+; this won't match other uses of object/prop shorthand.
+((object_pattern
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring._LANG_))
+
+; A variable object destructuring with default value:
+; The "foo" in `let { foo = true } = something`
+(object_assignment_pattern
+  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring._LANG_)
+
+; A variable object alias destructuring:
+; The "bar" and "foo" in `let { bar: foo } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name._LANG_
+    value: (identifier) @variable.other.assignment.destructuring._LANG_)
+    (#set! capture.final true))
+
+; A complex object alias destructuring:
+; The "bar" in `let { bar: { foo: troz } } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name._LANG_)
+    (#set! capture.final true))
+
+; A variable object alias destructuring with default value:
+; The "bar" and "foo" in `let { bar: foo = true } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name._LANG_
+    value: (assignment_pattern
+      left: (identifier) @variable.other.assignment.destructuring._LANG_)))
+
+; A variable array destructuring:
+; The "foo" and "bar" in `let [foo, bar] = something`
+(variable_declarator
+  (array_pattern
+    (identifier) @variable.other.assignment.destructuring._LANG_))
+
+; A variable declaration in a for…(in|of) loop:
+; The "foo" in `for (let foo of bar) {`
+(for_in_statement
+  left: (identifier) @variable.other.assignment.loop._LANG_)
+
+; A variable array destructuring in a for…(in|of) loop:
+; The "foo" and "bar" in `for (let [foo, bar] of baz)`
+(for_in_statement
+  left: (array_pattern
+    (identifier) @variable.other.assignment.loop._LANG_))
+
+; A variable object destructuring in a for…(in|of) loop:
+; The "foo" and "bar" in `for (let { foo, bar } of baz)`
+(for_in_statement
+  left: (object_pattern
+    (shorthand_property_identifier_pattern) @variable.other.assignment.loop._LANG_))
+
+; A variable object destructuring in a for…(in|of) loop:
+; The "foo" in `for (let { bar: foo } of baz)`
+(for_in_statement
+  left: (object_pattern
+    (pair_pattern
+      key: (_) @entity.other.attribute-name._LANG_
+      value: (identifier) @variable.other.assignment.loop._LANG_)
+      (#set! capture.final true)))
+
+; The "error" in `} catch (error) {`
+(catch_clause
+  parameter: (identifier) @variable.other.assignment.catch._LANG_)
+
+; Single parameter of an arrow function:
+; The "foo" in `(foo => …)`
+(arrow_function parameter: (identifier) @variable.parameter._LANG_)
+
+
 ; COMMENTS
 ; ========
 
@@ -282,129 +406,154 @@
 (generator_function_declaration "*" @storage.modifier.generator._LANG_)
 (method_definition "*" @storage.modifier.generator._LANG_)
 
+; SUPPORT
+; =======
 
-; VARIABLES
-; =========
-
-(this) @variable.language.this._LANG_
-(super) @variable.language.super._LANG_._LANG_x
-
-(required_parameter
-  pattern: (identifier) @variable.parameter._LANG_)
-
-(required_parameter
-  pattern: (rest_pattern
-    (identifier) @variable.parameter.rest._LANG_))
-
-(required_parameter
-  pattern: (object_pattern
-    (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
+; Array methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Array")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(from|isArray|of)$")
     (#set! capture.final true))
 
-(optional_parameter
-  pattern: (identifier) @variable.parameter.optional._LANG_)
-
-(optional_parameter "?" @keyword.operator.type.optional._LANG_)
-
-(type_predicate
-  name: (identifier) @variable.other.type._LANG_
-  "is" @keyword.operator.type.is._LANG_)
-
-["var" "const" "let"] @storage.type._TYPE_._LANG_
-
-; A simple variable declaration:
-; The "foo" in `let foo = true`
-(variable_declarator
-  name: (identifier) @variable.other.assignment._LANG_)
-
-; A reassignment of a variable declared earlier:
-; The "foo" in `foo = true`
-(assignment_expression
-  left: (identifier) @variable.other.assignment._LANG_)
-
-; The "foo" in `foo += 1`.
-(augmented_assignment_expression
-  left: (identifier) @variable.other.assignment._LANG_)
-
-; The "foo" in `foo++`.
-(update_expression
-  argument: (identifier) @variable.other.assignment._LANG_)
-
-; `object_pattern` appears to only be encountered in assignment expressions, so
-; this won't match other uses of object/prop shorthand.
-((object_pattern
-  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring._LANG_))
-
-; A variable object destructuring with default value:
-; The "foo" in `let { foo = true } = something`
-(object_assignment_pattern
-  (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring._LANG_)
-
-; A variable object alias destructuring:
-; The "bar" and "foo" in `let { bar: foo } = something`
-(object_pattern
-  (pair_pattern
-    ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name._LANG_
-    value: (identifier) @variable.other.assignment.destructuring._LANG_)
+; Date methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Date")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(now|parse|UTC)$")
     (#set! capture.final true))
 
-; A complex object alias destructuring:
-; The "bar" in `let { bar: { foo: troz } } = something`
-(object_pattern
-  (pair_pattern
-    ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name._LANG_)
+; JSON methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "JSON")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(parse|stringify)$")
     (#set! capture.final true))
 
-; A variable object alias destructuring with default value:
-; The "bar" and "foo" in `let { bar: foo = true } = something`
-(object_pattern
-  (pair_pattern
-    ; TODO: This arguably isn't an object key.
-    key: (_) @entity.other.attribute-name._LANG_
-    value: (assignment_pattern
-      left: (identifier) @variable.other.assignment.destructuring._LANG_)))
+; Math methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Math")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(abs|acos|acosh|asin|asinh|atan|atanh|atan2|cbrt|ceil|clz32|cos|cosh|exp|expm1|floor|fround|hypot|imul|log|log1p|log10|log2|max|min|pow|random|round|sign|sin|sinh|sqrt|tan|tanh|trunc)$")
+    (#set! capture.final true))
 
-; A variable array destructuring:
-; The "foo" and "bar" in `let [foo, bar] = something`
-(variable_declarator
-  (array_pattern
-    (identifier) @variable.other.assignment.destructuring._LANG_))
+; Object methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Object")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(assign|create|defineProperty|defineProperties|entries|freeze|fromEntries|getOwnPropertyDescriptor|getOwnPropertyDescriptors|getOwnPropertyNames|getOwnPropertySymbols|getPrototypeOf|is|isExtensible|isFrozen|isSealed|keys|preventExtensions|seal|setPrototypeOf|values)$")
+    (#set! capture.final true))
 
-; A variable declaration in a for…(in|of) loop:
-; The "foo" in `for (let foo of bar) {`
-(for_in_statement
-  left: (identifier) @variable.other.assignment.loop._LANG_)
+; Reflect methods.
+(member_expression
+  object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "Reflect")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(apply|construct|defineProperty|deleteProperty|get|getOwnPropertyDescriptor|getPrototypeOf|has|isExtensible|ownKeys|preventExtensions|set|setPrototypeOf)$")
+    (#set! capture.final true))
 
-; A variable array destructuring in a for…(in|of) loop:
-; The "foo" and "bar" in `for (let [foo, bar] of baz)`
-(for_in_statement
-  left: (array_pattern
-    (identifier) @variable.other.assignment.loop._LANG_))
+; Intl.X instantiations.
+(new_expression
+  constructor: (member_expression
+    object: (identifier) @support.object.builtin.js
+      (#eq? @support.object.builtin.js "Intl")
+    property: (property_identifier) @support.class.builtin.js
+      (#match? @support.class.builtin.js "^(Collator|DateTimeFormat|DisplayNames|ListFormat|Locale|NumberFormat|PluralRules|Segmenter)$"))
+      (#set! capture.final true))
 
-; A variable object destructuring in a for…(in|of) loop:
-; The "foo" and "bar" in `for (let { foo, bar } of baz)`
-(for_in_statement
-  left: (object_pattern
-    (shorthand_property_identifier_pattern) @variable.other.assignment.loop._LANG_))
+; Built-in class instantiations.
+(new_expression
+  constructor: (identifier) @support.class.builtin.instance.js
+    (#match? @support.class.builtin.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
+    (#set! capture.final true))
 
-; A variable object destructuring in a for…(in|of) loop:
-; The "foo" in `for (let { bar: foo } of baz)`
-(for_in_statement
-  left: (object_pattern
-    (pair_pattern
-      key: (_) @entity.other.attribute-name._LANG_
-      value: (identifier) @variable.other.assignment.loop._LANG_)
-      (#set! capture.final true)))
+; Built-in constructors that can be invoked without `new`.
+(call_expression
+  (identifier) @support.function.builtin.js
+  (#match? @support.function.builtin.js "^(AggregateError|Array|ArrayBuffer|Boolean|BigInt|Error|EvalError|Function|Number|Object|Proxy|RangeError|String|Symbol|SyntaxError|URIError)$")
+  (#set! capture.final true))
 
-; The "error" in `} catch (error) {`
-(catch_clause
-  parameter: (identifier) @variable.other.assignment.catch._LANG_)
+; Built-in functions.
+(call_expression
+  (identifier) @support.function.builtin.js
+  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
+  (#set! capture.final true))
 
-; Single parameter of an arrow function:
-; The "foo" in `(foo => …)`
-(arrow_function parameter: (identifier) @variable.parameter._LANG_)
+; Built-in `console` functions.
+
+(member_expression
+  object: (identifier) @support.class.builtin.console.js
+    (#eq? @support.class.builtin.console.js "console")
+  property: (property_identifier) @support.function.builtin.console.js
+    (#match? @support.function.builtin.console.js "^(assert|clear|count(Reset)?|debug|dir(xml)?|error|group(End)?info|log|profile(End)?|table|time(End|Log|Stamp)?|trace|warn)$")
+    (#set! capture.final true))
+
+; Static methods of `Promise`.
+(member_expression
+  object: (identifier) @support.class.builtin.js
+    (#eq? @support.class.builtin.js "Promise")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(all|allSettled|any|race|resolve|reject)$")
+    (#set! capture.final true))
+
+; All “well-known” symbols (as they are referred to in the spec).
+(member_expression
+  object: (identifier) @support.class.builtin.js
+  property: (property_identifier) @support.property.builtin.js
+  (#eq? @support.class.builtin.js "Symbol")
+  (#match? @support.property.builtin.js "^(asyncIterator|hasInstance|isConcatSpreadable|iterator|match|matchAll|replace|search|split|species|toPrimitive|toStringTag|unscopables)$")
+  (#set! capture.final true))
+
+; Static methods of `Symbol`.
+(member_expression
+  object: (identifier) @support.class.builtin.js
+    (#eq? @support.class.builtin.js "Symbol")
+  property: (property_identifier) @support.function.builtin.js
+    (#match? @support.function.builtin.js "^(for|keyFor)$")
+    (#set! capture.final true))
+
+; Other built-in objects.
+((identifier) @support.class.builtin.js
+  (#match? @support.class.builtin.js "^(Symbol)$")
+  (#set! capture.final true))
+
+; Deprecated built-in functions.
+(call_expression
+  (identifier) @invalid.deprecated.function.js
+  (#match? @invalid.deprecated.function.js "^(escape|unescape)$")
+  (#set! capture.final true))
+
+; Built-in DOM classes.
+((identifier) @support.class.builtin.js
+  (#match? @support.class.builtin.js "^(Document|Element|HTMLElement|HTMLDocument|HTML(Select|BR|HR|LI|Div|Map|Mod|Pre|Area|Base|Body|Data|Font|Form|Head|Html|Link|Menu|Meta|Slot|Span|Time|Audio|DList|Embed|Image|Input|Label|Media|Meter|OList|Param|Quote|Style|Table|Title|Track|UList|Video|Anchor|Button|Canvas|Dialog|IFrame|Legend|Object|Option|Output|Script|Source|Content|Details|Heading|Marquee|Picture|Unknown|DataList|FieldSet|FrameSet|MenuItem|OptGroup|Progress|TableCol|TableRow|Template|TextArea|Paragraph|TableCell|Options|TableCaption|TableSection|FormControls))$")
+  (#set! capture.final true))
+
+; Deprecated built-in DOM classes.
+((identifier) @invalid.deprecated.class.js
+  (#match? @invalid.deprecated.class.js "^(HTMLShadowElement)$")
+  (#set! capture.final true))
+
+; Built-in DOM methods on `document`.
+(call_expression
+  function: (member_expression
+    object: (identifier) @support.object.builtin.js
+    (#eq? @support.object.builtin.js "document")
+    property: (property_identifier) @support.function.method.builtin.js
+    (#match? @support.function.method.builtin.js "^(adoptNode|append|caretPositionFromPoint|caretRangeFromPoint|createAttribute(?:NS)?|createCDATASection|createComment|createDocumentFragment|createElement(?:NS)?|createEvent|createNodeIterator|createProcessingInstruction|createRange|createTextNode|createTreeWalker|elementFromPoint|elementsFromPoint|exitFullscreen|exitPictureInPicture|exitPointerLock|getAnimations|getElementById|getElementsByClassName|getElementsByTagName(?:NS)?|getSelection|hasStorageAccess|importNode|prepend|querySelector|querySelectorAll|releaseCapture|replaceChildren|requestStorageAccess|createExpression|createNSResolver|evaluate|getElementsByName|hasFocus|write|writeln|open|close)$")
+    (#set! capture.final true)))
+
+; Built-in DOM methods on nodes. These will show up as builtins on _any_ class, but
+; they're distinctive enough that we're OK with that possibility.
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @support.function.method.builtin.js
+    (#match? @support.function.method.builtin.js "^(addEventListener|appendChild|cloneNode|compareDocumentPosition|contains|getElementsByClassName|getElementsByTagName(?:NS)?|getRootNode|hasChildNodes|insertBefore|isDefaultNamespace|isEqualNode|isSameNode|lookupPrefix|lookupNamespaceURI|normalize|querySelector|querySelectorAll|removeChild|replaceChild|removeEventListener)$")
+    (#set! capture.final true)))
 
 ; BUILTINS
 ; ========

@@ -103,7 +103,17 @@
   (pair_pattern
     ; TODO: This arguably isn't an object key.
     key: (_) @entity.other.attribute-name.js
-    value: (identifier) @variable.other.assignment.destructuring.js))
+    value: (identifier) @variable.other.assignment.destructuring.js)
+    (#set! capture.final true))
+
+; A complex object alias destructuring:
+; The "bar" in `let { bar: { foo: troz } } = something`
+(object_pattern
+  (pair_pattern
+    ; TODO: This arguably isn't an object key.
+    key: (_) @entity.other.attribute-name.js)
+    (#set! capture.final true))
+
 
 ; A variable object alias destructuring with default value:
 ; The "bar" and "foo" in `let { bar: foo = true } = something`

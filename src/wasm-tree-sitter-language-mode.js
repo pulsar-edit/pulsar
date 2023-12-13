@@ -3852,6 +3852,12 @@ class LanguageLayer {
       range = range.union(new Range(earliest, latest));
     }
 
+    // Why do we have to do this explicitly? Because `descendantsOfType` will
+    // incorrectly return nodes if the range runs from (0, 0) to (0, 0). All
+    // other empty ranges seem not to have this problem. Upon cursory
+    // inspection, this bug doesn't seem to be limited to `web-tree-sitter`.
+    if (range.isEmpty()) { return; }
+
     // Now that we've enlarged the range, we might have more existing injection
     // markers to consider. But check for containment rather than intersection
     // so that we don't have to enlarge it again.
