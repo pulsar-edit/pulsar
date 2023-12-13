@@ -274,7 +274,7 @@ class SymbolsView {
       // Open a different file, then jump to a position.
       atom.workspace.open(
         Path.join(tag.directory, tag.file),
-        { pending }
+        { pending, activatePane: false }
       ).then(() => {
         if (position) {
           return this.moveToPosition(position, { range });
