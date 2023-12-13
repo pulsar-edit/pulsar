@@ -315,7 +315,7 @@ class FileView extends SymbolsView {
       await Promise.race([Promise.allSettled(tasks), timeout(this.timeoutMs)]);
     }
 
-    this.updateView({ loadingMessage: null });
+    await this.updateView({ loadingMessage: null });
 
     if (signal.aborted) {
       // This means the user cancelled the task. No cleanup necessary; the
