@@ -335,6 +335,7 @@ class SymbolsView {
         symbol.directory = `${parts.dir}${Path.sep}`;
         symbol.file = parts.base;
       }
+      symbol.name = symbol.name.replace(/[\n\r\t]/, ' ');
       allSymbols.push(symbol);
     }
   }
