@@ -8,7 +8,7 @@
 
 ## 1.112.0
 
-- Added the ability for a user to indicate when to automatically show or hide the wrap-guide; between always, when soft wrap is enabled, or when soft wrap at preferred line length is enabled.
+- Added options for a user to control when to automatically show or hide the wrap-guide; "Always", "When soft wrap is enabled", and "When soft wrap at preferred line length is enabled".
 - Updated network handling in PPM to something newer and more secure.
 - Updated most of PPM's code to use async/await and promises internally.
 - Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
