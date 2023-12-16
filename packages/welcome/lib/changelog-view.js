@@ -56,7 +56,7 @@ export default class ChangeLogView {
                 Updated network handling in PPM to something newer and more secure.
               </li>
               <li>
-                Made PPM async.
+                Updated most of PPM's code to use async/await and promises internally.
               </li>
               <li>
                 Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
