@@ -1,3 +1,4 @@
+const { CompositeDisposable } = require('event-kit');
 const { Point } = require('text-buffer');
 const ScopeDescriptor = require('./scope-descriptor');
 
@@ -69,17 +70,36 @@ function interpretPossibleKeyValuePair(rawValue, coerceValue = false) {
 // `onDidChange` handlers (which are costly when observing all config values).
 class ConfigCache {
   constructor(config) {
+    this.subscriptions = new CompositeDisposable();
     this.cachesByGrammar = new Map();
     this.config = config;
 
-    this.config.onDidChange(() => {
-      for (let cache of this.cachesByGrammar.values()) {
-        cache.clear();
-      }
-    });
+    this.subscriptions.add(
+      this.config.onDidChange(() => this.clearAll()),
+      atom.grammars.onDidAddGrammar(() => this.clearAll()),
+      atom.grammars.onDidUpdateGrammar(() => this.clearAll())
+    );
   }
+
+  dispose() {
+    this.subscriptions.dispose();
+  }
+
+  clearAll() {
+    for (let cache of this.cachesByGrammar.values()) {
+      cache.clear();
+    }
+  }
+
   getCacheForGrammar(grammar) {
     let { scopeName } = grammar;
+    // We key on the scope name rather than the grammar instance. We need to be
+    // able to iterate over grammars, so we can't use a `WeakSet` here, and we
+    // have no lifecycle event to keep the map from getting stale.
+    //
+    // To prevent two different incarnations of the same grammar (after
+    // disabling and reenabling) from incorrectly sharing a cache, we clear all
+    // caches whenever grammars are added or updated.
     let cache = this.cachesByGrammar.get(scopeName);
     if (!cache) {
       cache = new Map();
