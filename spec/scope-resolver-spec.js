@@ -104,6 +104,10 @@ describe('ScopeResolver', () => {
     atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
+  afterEach(() => {
+    ScopeResolver.clearConfigCache();
+  });
+
   it('resolves all scopes in absence of any tests or adjustments', async () => {
     await grammar.setQueryForTest('highlightsQuery', `
       (comment) @comment

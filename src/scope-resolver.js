@@ -124,6 +124,10 @@ ConfigCache.forConfig = (config) => {
   return configCache;
 };
 
+ConfigCache.clear = () => {
+  ConfigCache.CACHES_FOR_CONFIG_OBJECTS.clear();
+};
+
 
 // A data structure for storing scope information while processing capture
 // data. The data is reset in between each task.
@@ -952,6 +956,10 @@ ScopeResolver.ADJUSTMENTS = {
 
     return position;
   }
+};
+
+ScopeResolver.clearConfigCache = () => {
+  ConfigCache.clear();
 };
 
 
