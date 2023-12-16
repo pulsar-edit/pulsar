@@ -50,22 +50,25 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+                Fixed github package not giving feedback when a token with the wrong scopes was entered, tweak scope-checking logic to match expectations, and log incorrect scopes.
               </li>
               <li>
-                Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
+                Various cleanups, maintenance and upkeep of the PPM repo.
               </li>
               <li>
-                Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
+                Added options for a user to control when to automatically show or hide the wrap-guide; "Always", "When soft wrap is enabled", and "When soft wrap at preferred line length is enabled".
               </li>
               <li>
-                Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
+                Updated network handling in PPM to something newer and more secure.
               </li>
               <li>
-                Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
+                Updated most of PPM's code to use async/await and promises internally.
               </li>
               <li>
-                Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
+                Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
+              </li>
+              <li>
+                Fixed an issue that prevented Pulsar from inheriting the directory from which the `pulsar` binary was run.
               </li>
 
             </ul>

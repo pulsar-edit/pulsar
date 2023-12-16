@@ -6,6 +6,50 @@
 
 ## [Unreleased]
 
+## 1.112.0
+
+- Fixed github package not giving feedback when a token with the wrong scopes was entered, tweak scope-checking logic to match expectations, and log incorrect scopes.
+- Various cleanups, maintenance and upkeep of the PPM repo.
+- Added options for a user to control when to automatically show or hide the wrap-guide; "Always", "When soft wrap is enabled", and "When soft wrap at preferred line length is enabled".
+- Updated network handling in PPM to something newer and more secure.
+- Updated most of PPM's code to use async/await and promises internally.
+- Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
+- Fixed an issue that prevented Pulsar from inheriting the directory from which the `pulsar` binary was run.
+
+### Pulsar
+- Added: [tree-sitter] Share config caches between `ScopeResolver`s [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/836)
+- Bumped: deps: Update github to v0.36.19-pretranspiled (fix silent failure when inputting a token with incorrect scopes) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/838)
+- Bumped: ppm: Update ppm to commit 957acbd90cfc9f361c183b3c [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/837)
+- Added: Return to original logic for `ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/831)
+- Added: Moving fuzzy-native to core [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/774)
+- Fixed: Tree-sitter rolling fixes for November [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/819)
+- Fixed: CI: Update Rolling upload token for Cirrus [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/812)
+- Bumped: ppm: Update to commit 13fb2845e00d7e04c2461f93 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/809)
+- Added: Ability to indicate when to automatically show or hide the wrap-guide [@Trigan2025](https://github.com/pulsar-edit/pulsar/pull/780)
+
+### PPM
+- Bumped: fix(deps): update dependency semver to v7.5.2 [security] [@renovate](https://github.com/pulsar-edit/ppm/pull/114)
+- Added: Configure Renovate [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/110)
+- Added: Migrate from `rimraf` to NodeJS `fs` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/108)
+- Added: Implement Codacy Recommendations [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/113)
+- Removed: Prune outdated Deps [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/109)
+- Removed: Remove unused Variables [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/112)
+- Added: Add Codacy and Friends Configuration [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/111)
+- Removed: src: Delete unused code in uninstall.js [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/104)
+- Fixed: src: Fix usage/help text (and error message) for -b/-t flags for ppm install [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/105)
+- Added: Repository Cleanup [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/107)
+- Fixed: Fix Newer NodeJS CI [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/106)
+- Fixed: src: Stop pinging backend during package uninstalls [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/103)
+- Added: Asyncify without topmost interface [@2colours](https://github.com/pulsar-edit/ppm/pull/95)
+- Fixed: CI: Work around a weird bug in Yarn v1.x [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/101)
+- Fixed: src: Rebrand two lines of "ppm --version" output [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/100)
+- Bumped: deps: Bump nan for compatibility with newer NodeJS [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/97)
+- Fixed: Fix Error Handling [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/99)
+- Removed: Remove `request` Migrate to `superagent` && Fix CI [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/87)
+
+### github
+- Added: lib: Allow parent scopes when checking if each required scope is set [@DeeDeeG](https://github.com/pulsar-edit/github/pull/38)
+
 ## 1.111.0
 
 - Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
