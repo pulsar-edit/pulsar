@@ -32,19 +32,41 @@ const jsRegexGrammarPath = resolve(
 );
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);
 
-async function getAllCaptures(grammar, languageMode, layer = null) {
+async function getAllCapturesWithScopeResolver(grammar, languageMode, scopeResolver, layer = null) {
   let query = await grammar.getQuery('highlightsQuery');
   layer = layer ?? languageMode.rootLanguageLayer;
-  let scopeResolver = new ScopeResolver(
-    layer,
-    (name) => languageMode.idForScope(name),
-  );
   let { start, end } = languageMode.buffer.getRange();
   let { tree } = layer;
   return {
     captures: query.captures(tree.rootNode, start, end),
     scopeResolver
   };
+}
+
+function makeScopeResolver(languageMode, layer) {
+  layer = layer ?? languageMode.rootLanguageLayer;
+  return new ScopeResolver(
+    layer,
+    (name) => languageMode.idForScope(name),
+  );
+}
+
+async function getAllCaptures(grammar, languageMode, layer = null) {
+  layer = layer ?? languageMode.rootLanguageLayer;
+  let scopeResolver = makeScopeResolver(languageMode, layer);
+  return getAllCapturesWithScopeResolver(grammar, languageMode, scopeResolver, layer);
+}
+
+async function getAllMatchesWithScopeResolver(...args) {
+  let { captures, scopeResolver } = await getAllCapturesWithScopeResolver(...args);
+  let matches = [];
+  for (let capture of captures) {
+    let range = scopeResolver.store(capture);
+    if (range) {
+      matches.push(capture);
+    }
+  }
+  return matches;
 }
 
 async function getAllMatches(...args) {
@@ -1136,12 +1158,33 @@ describe('ScopeResolver', () => {
       `);
       await languageMode.ready;
 
-      let matched = await getAllMatches(grammar, languageMode);
+      let scopeResolver = makeScopeResolver(languageMode);
+
+      let matched = await getAllMatchesWithScopeResolver(grammar, languageMode, scopeResolver);
       expect(matched.length).toBe(4);
 
       atom.config.set('core.careAboutBooleans', "something-else");
 
-      matched = await getAllMatches(grammar, languageMode);
+      matched = await getAllMatchesWithScopeResolver(grammar, languageMode, scopeResolver);
+      expect(matched.length).toBe(0);
+
+      atom.config.set(
+        'core.careAboutBooleans',
+        'something',
+        { scope: [grammar.scopeName] }
+      );
+
+      matched = await getAllMatchesWithScopeResolver(grammar, languageMode, scopeResolver);
+      expect(matched.length).toBe(4);
+
+      atom.config.set('core.careAboutBooleans', "something");
+
+      atom.config.set(
+        'core.careAboutBooleans',
+        'something-else',
+        { scope: [grammar.scopeName] }
+      );
+      matched = await getAllMatchesWithScopeResolver(grammar, languageMode, scopeResolver);
       expect(matched.length).toBe(0);
     });
 
