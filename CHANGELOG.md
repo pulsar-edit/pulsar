@@ -6,6 +6,30 @@
 
 ## [Unreleased]
 
+## 1.112.0
+
+- Added the ability for a user to indicate when to automatically show or hide the wrap-guide; between always, when soft wrap is enabled, or when soft wrap at preferred line length is enabled.
+- Updated network handling in PPM to something newer and more secure.
+- Made PPM async.
+- Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
+- Fixed an issue that prevented Pulsar from inheriting the directory from which the `pulsar` binary was run.
+
+### Pulsar
+- Added: Return to original logic for `ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/831)
+- Added: Moving fuzzy-native to core [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/774)
+- Fixed: Tree-sitter rolling fixes for November [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/819)
+- Fixed: CI: Update Rolling upload token for Cirrus [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/812)
+- Bumped: ppm: Update to commit 13fb2845e00d7e04c2461f93 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/809)
+- Added: Ability to indicate when to automatically show or hide the wrap-guide [@Trigan2025](https://github.com/pulsar-edit/pulsar/pull/780)
+
+### PPM
+- Added: Asyncify without topmost interface [@2colours](https://github.com/pulsar-edit/ppm/pull/95)
+- Fixed: CI: Work around a weird bug in Yarn v1.x [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/101)
+- Fixed: src: Rebrand two lines of "ppm --version" output [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/100)
+- Bumped: deps: Bump nan for compatibility with newer NodeJS [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/97)
+- Fixed: Fix Error Handling [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/99)
+- Removed: Remove `request` Migrate to `superagent` && Fix CI [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/87)
+
 ## 1.111.0
 
 - Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.

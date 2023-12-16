@@ -50,22 +50,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+                Added the ability for a user to indicate when to automatically show or hide the wrap-guide; between always, when soft wrap is enabled, or when soft wrap at preferred line length is enabled.
               </li>
               <li>
-                Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
+                Updated network handling in PPM to something newer and more secure.
               </li>
               <li>
-                Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
+                Made PPM async.
               </li>
               <li>
-                Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
+                Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
               </li>
               <li>
-                Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
-              </li>
-              <li>
-                Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
+                Fixed an issue that prevented Pulsar from inheriting the directory from which the `pulsar` binary was run.
               </li>
 
             </ul>
