@@ -5,7 +5,7 @@
   "main": "lib/main",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
