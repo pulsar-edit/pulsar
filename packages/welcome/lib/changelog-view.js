@@ -50,27 +50,8 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed github package not giving feedback when a token with the wrong scopes was entered, tweak scope-checking logic to match expectations, and log incorrect scopes.
+                Fixed a bug in PPM during package publication that prevented the output of any text on the console.
               </li>
-              <li>
-                Various cleanups, maintenance and upkeep of the PPM repo.
-              </li>
-              <li>
-                Added options for a user to control when to automatically show or hide the wrap-guide; "Always", "When soft wrap is enabled", and "When soft wrap at preferred line length is enabled".
-              </li>
-              <li>
-                Updated network handling in PPM to something newer and more secure.
-              </li>
-              <li>
-                Updated most of PPM's code to use async/await and promises internally.
-              </li>
-              <li>
-                Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
-              </li>
-              <li>
-                Fixed an issue that prevented Pulsar from inheriting the directory from which the `pulsar` binary was run.
-              </li>
-
             </ul>
 
             <section className="welcome-panel">
