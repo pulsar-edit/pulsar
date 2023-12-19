@@ -103,6 +103,9 @@
 (list ["&&" "||"] @keyword.operator.logical.shell)
 (binary_expression ["&&" "||"] @keyword.operator.logical.shell)
 
+(pipeline "|" @keyword.operator.pipe.shell)
+
+
 ; "*" @keyword.operator.glob.shell
 
 [
