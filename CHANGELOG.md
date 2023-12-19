@@ -8,7 +8,7 @@
 
 ## 1.112.1
 
-- Fixed a bug in PPM during package publication that prevented the output of any text on the console.
+- Fixed a bug in PPM that prevented package publishing.
 
 ### Pulsar
 - Bumped: ppm: Update ppm to commit 7dfd9ca8cf877391fc6ef1d5 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/842)
