@@ -50,7 +50,7 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a bug in PPM during package publication that prevented the output of any text on the console.
+                Fixed a bug in PPM that prevented package publishing.
               </li>
             </ul>
 

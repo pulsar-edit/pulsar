@@ -8,12 +8,14 @@
 
 ## 1.112.1
 
-- Fixed a bug in PPM during package publication that prevented the output of any text on the console.
+- Fixed a bug in PPM that prevented package publishing.
 
 ### Pulsar
+- Bumped: ppm: Update ppm to commit 0bc207133b26de82aa28500e [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/845)
 - Bumped: ppm: Update ppm to commit 7dfd9ca8cf877391fc6ef1d5 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/842)
 
 ### PPM
+- Fixed: Fix placement of `setTimeout` [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/118)
 - Fixed: Fix bugs found in `publish` after 1.112 release [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/116)
 
 ## 1.112.0
