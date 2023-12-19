@@ -110,7 +110,6 @@
 (binary_expression ["&&" "||"] @keyword.operator.logical.shell)
 
 (pipeline "|" @keyword.operator.pipe.shell)
-(expansion operator: "#" @keyword.operator.expansion.shell)
 
 
 ; "*" @keyword.operator.glob.shell
