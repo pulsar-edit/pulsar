@@ -21,7 +21,10 @@
 
 ; Method names
 (method name: (_) @name) @definition.method
-(singleton_method name: (_) @name) @definition.method
+(
+  (singleton_method name: (_) @name) @definition.method
+  (#set! symbol.prepend "self."))
+
 
 ; Aliased methods
 (alias name: (_) @name) @definition.method
