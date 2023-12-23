@@ -1214,7 +1214,25 @@ class WASMTreeSitterLanguageMode {
     // `indents.scm`, perhaps with an explanatory comment.)
     let controllingLayer = this.controllingLayerAtPoint(
       comparisonRowEnd,
-      (layer) => !!layer.indentsQuery
+      (layer) => {
+        if (!layer.indentsQuery) return false;
+        // We want to exclude layers with a content range that _begins at_ the
+        // cursor position. Why? Because the content that starts at the cursor
+        // is about to shift down to the next line. It'd be odd if that layer
+        // was in charge of the indentation hint if it didn't have any content
+        // on the preceding line.
+        //
+        // So first we test for containment exclusive of endpoints…
+        if (layer.containsPoint(comparisonRowEnd, true)) {
+          return true;
+        }
+
+        // …but we'll still accept layers that have a content range which
+        // _ends_ at the cursor position.
+        return layer.getCurrentRanges().some(r => {
+          return r.end.compare(comparisonRowEnd) === 0;
+        });
+      }
     );
 
     if (!controllingLayer) {
@@ -3687,9 +3705,9 @@ class LanguageLayer {
     return markers.map(m => m.getRange());
   }
 
-  containsPoint(point) {
+  containsPoint(point, exclusive = false) {
     let ranges = this.getCurrentRanges() ?? [this.getExtent()];
-    return ranges.some(r => r.containsPoint(point));
+    return ranges.some(r => r.containsPoint(point, exclusive));
   }
 
   getOrParseTree({ force = true, anonymous = false } = {}) {
