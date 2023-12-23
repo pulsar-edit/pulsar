@@ -1229,7 +1229,7 @@ class WASMTreeSitterLanguageMode {
 
         // …but we'll still accept layers that have a content range which
         // _ends_ at the cursor position.
-        return layer.getCurrentRanges().some(r => {
+        return layer.getCurrentRanges()?.some(r => {
           return r.end.compare(comparisonRowEnd) === 0;
         });
       }
@@ -1519,7 +1519,7 @@ class WASMTreeSitterLanguageMode {
       // because we start at the previous row to find the suggested indent for
       // the current row.
       let controllingLayer = this.controllingLayerAtPoint(
-        new Point(row - 1, Infinity),
+        this.buffer.clipPosition(new Point(row - 1, Infinity)),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
 
