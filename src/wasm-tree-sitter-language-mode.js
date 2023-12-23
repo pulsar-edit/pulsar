@@ -1229,7 +1229,7 @@ class WASMTreeSitterLanguageMode {
 
         // …but we'll still accept layers that have a content range which
         // _ends_ at the cursor position.
-        return layer.getCurrentRanges()?.some(r => {
+        return layer.getCurrentRanges().some(r => {
           return r.end.compare(comparisonRowEnd) === 0;
         });
       }
