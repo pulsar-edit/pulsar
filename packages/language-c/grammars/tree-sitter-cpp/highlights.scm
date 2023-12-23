@@ -138,6 +138,9 @@
 (function_declarator
   (field_identifier) @entity.name.function.method.cpp)
 
+(field_initializer
+  (field_identifier) @entity.name.function.cpp)
+
 (call_expression
   (identifier) @support.function.c99.cpp
   ; Regex copied from the TM grammar.
