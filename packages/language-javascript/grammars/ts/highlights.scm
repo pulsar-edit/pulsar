@@ -203,7 +203,7 @@
 ; The "foo" in `function (foo = false) {`.
 (formal_parameters
   (assignment_pattern
-    (identifier) @variable.parameter.js))
+    left: (identifier) @variable.parameter.js))
 
 
 ; FUNCTIONS
