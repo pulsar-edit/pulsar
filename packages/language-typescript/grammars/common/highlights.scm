@@ -58,6 +58,11 @@
   name: (identifier) @variable.other.type._LANG_
   "is" @keyword.operator.type.is._LANG_)
 
+; Assertion functions: the `asserts` in
+; `function checkFoo(obj: unknown): asserts obj is foo`
+(asserts "asserts" @keyword.type.asserts._LANG_)
+(asserts (identifier) @variable.other.type._LANG_)
+
 ["var" "const" "let"] @storage.type._TYPE_._LANG_
 
 ; A simple variable declaration:
@@ -405,6 +410,7 @@
 (generator_function "*" @storage.modifier.generator._LANG_)
 (generator_function_declaration "*" @storage.modifier.generator._LANG_)
 (method_definition "*" @storage.modifier.generator._LANG_)
+
 
 ; SUPPORT
 ; =======
