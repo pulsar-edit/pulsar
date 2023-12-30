@@ -36,7 +36,10 @@ showIf = (condition) ->
   else
     {display: 'none'}
 
-capitalize = (str) -> str[0].toUpperCase() + str.toLowerCase().slice(1)
+capitalize = (str) ->
+  return '' if str == ''
+  str[0].toUpperCase() + str.toLowerCase().slice(1)
+
 titleize = (str) -> str.toLowerCase().replace(/(?:^|\s)\S/g, (capital) -> capital.toUpperCase())
 
 preserveCase = (text, reference) ->
