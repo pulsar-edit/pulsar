@@ -35,6 +35,7 @@ exports.toDOMFragment = async function (text, filePath, grammar, callback) {
         renderMode: "fragment",
         filePath: filePath,
         breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+        useDefaultEmoji: true,
         sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
       }
     );
@@ -75,6 +76,7 @@ exports.toHTML = async function (text, filePath, grammar) {
         renderMode: "full",
         filePath: filePath,
         breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+        useDefaultEmoji: true,
         sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
       }
     );
@@ -148,7 +150,7 @@ var render = function (text, filePath) {
   return fragment
 }
 
-function renderYamlTable (variables) {
+function renderYamlTable(variables) {
   const entries = Object.entries(variables)
 
   if (!entries.length) {
