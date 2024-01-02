@@ -74,7 +74,13 @@
 ; The "bar" in `foo.bar = true`
 (assignment_expression
   left: (member_expression
-    property: (property_identifier)) @variable.other.assignment.property.js)
+    property: (property_identifier) @variable.other.assignment.property.js))
+
+; The "bar" in `foo.#bar = true`
+(assignment_expression
+  left: (member_expression
+    property: (private_property_identifier) @variable.other.assignment.property.private.js))
+
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
@@ -83,6 +89,9 @@
 ; The "foo" in `foo++`.
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
+
+(field_definition
+  property: (private_property_identifier) @variable.other.assignment.property.private.js)
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
@@ -450,6 +459,10 @@
 ; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
 (member_expression
   property: (property_identifier) @support.other.property.js)
+
+; The "#bar" in `foo.#bar`, `foo.#bar.baz`, and `foo.#bar[baz]`.
+(member_expression
+  property: (private_property_identifier) @support.other.property.private.js)
 
 ; The "BAR" in `foo.BAR` should also be scoped as a constant.
 (member_expression
