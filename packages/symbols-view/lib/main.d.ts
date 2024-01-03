@@ -1,4 +1,3 @@
-
 import type { TextEditor, Point, Range as AtomRange } from 'atom';
 
 type MaybePromise<T> = T | Promise<T>;
@@ -295,5 +294,5 @@ export type SymbolProviderMainModule = {
   //
   // A single package can supply multiple providers if need be.
   //
-  provideSymbols(): SymbolProvider | [SymbolProvider...]
+  provideSymbols(): SymbolProvider | SymbolProvider[],
 };
