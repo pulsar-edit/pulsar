@@ -159,6 +159,12 @@
 ; The "foo" in `(foo => …)`
 (arrow_function parameter: (identifier) @variable.parameter._LANG_)
 
+; `infer` keywords inside `extends` clauses function as a sort of type
+; parameter, so we'll try highlighting them that way.
+;
+; TODO: We may or may not want `capture.final` here.
+(infer_type (type_identifier) @variable.parameter.type._LANG_
+  (#set! capture.final true))
 
 ; COMMENTS
 ; ========
@@ -260,7 +266,7 @@
 ; =====
 
 ["var" "let" "const"] @storage.modifier._TYPE_._LANG_
-["extends" "static" "async"] @storage.modifier._TYPE_._LANG_
+["extends" "static" "async" "infer"] @storage.modifier._TYPE_._LANG_
 
 ["class" "function"] @storage.type._TYPE_._LANG_
 
@@ -752,6 +758,9 @@
 
 
 (ternary_expression
+  ["?" ":"] @keyword.operator.ternary._LANG_)
+
+(conditional_type
   ["?" ":"] @keyword.operator.ternary._LANG_)
 
 ; PUNCTUATION
