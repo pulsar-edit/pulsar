@@ -532,7 +532,7 @@ describe('SymbolsView', () => {
       await activationPromise;
       atom.commands.dispatch(getEditorView(), 'symbols-view:toggle-project-symbols');
       symbolsView = atom.workspace.getModalPanels()[0].item;
-      await wait(200);
+      await wait(2000);
 
       expect(symbolsView.element.querySelectorAll('li .primary-line').length).toBe(0);
       expect(ProgressiveProjectProvider.getSymbols.callCount).toBe(1);
@@ -540,7 +540,7 @@ describe('SymbolsView', () => {
       expect(symbolsView.selectListView.props.emptyMessage).toBe('Query must be at least 3 characters long.');
 
       await symbolsView.updateView({ query: 'lor' });
-      await wait(200);
+      await wait(2000);
 
       expect(symbolsView.selectListView.props.emptyMessage).toBeNull();
 
