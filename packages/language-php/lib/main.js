@@ -73,6 +73,9 @@ exports.activate = function () {
     includeAdjacentWhitespace: true
   });
 
+  // TODOs and URLs
+  // ==============
+
   const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
   const HYPERLINK_PATTERN = /\bhttps?:/
 
@@ -104,6 +107,9 @@ exports.activate = function () {
     });
   }
 
+  // HEREDOCS and NOWDOCS
+  // ====================
+
   atom.grammars.addInjectionPoint('text.html.php', {
     type: 'heredoc',
     language(node) {
@@ -118,6 +124,24 @@ exports.activate = function () {
     }
   });
 
+  atom.grammars.addInjectionPoint('text.html.php', {
+    type: 'nowdoc',
+    language(node) {
+      let id = node.firstNamedChild;
+      if (id.type !== 'heredoc_start') return null;
+      return id.text;
+    },
+    content(node) {
+      let body = node.children.find(c => c.type === 'nowdoc_body');
+      let results = body.children.filter(c => c.type === 'nowdoc_string');
+      return results;
+    }
+  });
+
+
+  // PHPDoc
+  // ======
+  
   atom.grammars.addInjectionPoint('text.html.php', {
     type: 'comment',
     language(node) {
