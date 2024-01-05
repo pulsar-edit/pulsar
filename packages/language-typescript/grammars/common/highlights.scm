@@ -38,6 +38,11 @@
 (super) @variable.language.super._LANG_._LANG_x
 
 (required_parameter
+  pattern: (identifier) @variable.parameter.with-default._LANG_
+  value: (_)
+  (#set! capture.final true))
+
+(required_parameter
   pattern: (identifier) @variable.parameter._LANG_)
 
 (required_parameter
@@ -47,6 +52,12 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
+    (#set! capture.final true))
+
+(required_parameter
+  pattern: (object_pattern
+    (object_assignment_pattern
+      (shorthand_property_identifier_pattern) @variable.parameter.destructuring.with-default._LANG_))
     (#set! capture.final true))
 
 (optional_parameter
@@ -329,6 +340,12 @@
 (object
   (shorthand_property_identifier) @entity.other.attribute-name.shorthand._LANG_)
 
+; The "FOO" in `FOO.bar` should be scoped as a constant.
+(member_expression
+  object: (identifier) @constant.other.object._LANG_
+  (#match? @constant.other.object._LANG_ "^[_A-Z]+$")
+  (#set! capture.final true))
+
 ; The "foo" in `foo.bar`.
 (member_expression
   object: (identifier) @support.other.object._LANG_)
@@ -417,6 +434,7 @@
 (generator_function_declaration "*" @storage.modifier.generator._LANG_)
 (method_definition "*" @storage.modifier.generator._LANG_)
 
+(asserts "asserts" @keyword.control.type.asserts._LANG_)
 
 ; SUPPORT
 ; =======
