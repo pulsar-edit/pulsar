@@ -176,21 +176,6 @@
   name: (name) @entity.name.function.php)
 
 (method_declaration
-  name: (name) @entity.name.function.magic.constructor.php
-  (#eq? @entity.name.function.magic.constructor.php "__construct")
-  (#set! capture.final true))
-
-(method_declaration
-  name: (name) @entity.name.function.magic.php
-  (#match? @entity.name.function.magic.php "^__(?:call|callStatic|get|set|isset|unset|sleep|wakeup|serialize|unserialize|toString|invoke|set_state|clone|debuginfo)$")
-  (#set! capture.final true))
-
-(method_declaration
-  (static_modifier)
-  name: (name) @entity.name.function.method.static.php
-  (#set! capture.final true))
-
-(method_declaration
   name: (name) @entity.name.function.method.php)
 
 ; Function calls not caught by anything in the support section.
@@ -202,38 +187,27 @@
 ; NAMESPACES
 ; ==========
 
-; The "Foo" in `use Bar as Foo;`
-(namespace_aliasing_clause
-  (name) @entity.name.type.namespace.alias.php)
-
-; The "Bar" in `use Bar as Foo;`
-(namespace_use_clause
-  (name) @entity.name.type.namespace.aliased.php
-  . (namespace_aliasing_clause)
-  (#set! capture.final true)
-)
-
-; The "Foo" and "Bar" in `use Foo\Bar\Baz;`.
-(namespace_name_as_prefix
-  (namespace_name) @support.other.namespace.php)
-
-; The last segment of a namespace; the "Baz" in `Foo\Bar\Baz;`.
-(qualified_name (name) @entity.name.type.namespace.php)
-
 ; The "Foo" in `namespace Foo;`
 (namespace_definition
   name: (namespace_name
     (name) @entity.name.type.namespace.php)
     (#set! isNamespaceDefinition true))
 
-; The "Foo" in `use Foo;`
-(namespace_use_clause (name) @entity.name.type.namespace.php)
+; The "Bar" and "Foo" in `use Bar as Foo;`
+(namespace_use_clause
+  (name) @variable.other.namespace.aliased.php
+  (#set! isPartOfNamespaceAlias true)
+  (namespace_aliasing_clause
+    (name) @entity.name.type.namespace.alias.php))
 
+; The "Foo" in `use Foo;`
+(namespace_use_clause
+  (name) @entity.name.type.namespace.php
+    (#is-not? test.rangeWithData isPartOfNamespaceAlias))
 
 ; The "Foo" in `Foo\Bar::method();`
 (namespace_name
   (name) @support.other.namespace.php
-  (#is-not? test.descendantOfType "namespace_use_clause")
   (#is-not? test.rangeWithData isNamespaceDefinition))
 
 
@@ -242,18 +216,12 @@
 
 (class_declaration (name) @entity.name.type.class.php)
 
-(class_declaration (base_clause (name) @entity.other.inherited-class.php))
-(class_declaration (class_interface_clause (name) @entity.other.implemented-interface.php))
-
 ; Static method calls.
 (scoped_call_expression
   name: (name) @support.other.function.method.static.php)
 
 (member_call_expression
   name: (name) @support.other.function.method.php)
-
-(scoped_call_expression
-  scope: (name) @support.class.php)
 
 
 ; TRAITS
@@ -274,20 +242,15 @@
 
 ["trait" "class"] @storage.type.TYPE.php
 "function" @storage.type.function.php
-"fn" @storage.type.function.arrow.php
 
 
 ; VARIABLES
 ; =========
 
-; All usages of "$this".
-((variable_name) @variable.language.builtin.this.php
-  (#eq? @variable.language.builtin.this.php "$this")
-  (#set! capture.final true))
+((name) @constant.language.builtin.this.php
+  (#eq? @constant.language.builtin.this.php "this"))
 
-; The `self` builtin (for referring to the current class) and the `parent`
-; builtin (for referring to the parent class).
-(relative_scope) @variable.language.builtin._TEXT_.php
+(relative_scope) @variable.language.builtin.php
 
 ; The "$foo" in `function bar($foo) {`.
 (formal_parameters
@@ -295,11 +258,6 @@
     (variable_name
       "$" @punctuation.definition.variable.php
     ) @variable.parameter.php))
-
-; The "$bar" in `$foo->$bar`.
-(member_access_expression
-  name: (variable_name) @variable.other.property.php
-  (#set! capture.final true))
 
 ((variable_name
   ("$" @punctuation.definition.variable.php)
@@ -321,6 +279,10 @@
 ((name) @constant.language.php
  (#match? @constant.language.php "^__[A-Z][A-Z\d_]+__$"))
 
+((name) @support.other.function.constructor.php
+  (#match? @support.other.function.constructor.php "^[A-Z]")
+  (#set! capture.shy true))
+
 (argument
   name: (_) @variable.other.named-argument.php
   ":" @punctuation.separator.key-value.php)
@@ -341,8 +303,7 @@
 (encapsed_string
   (escape_sequence) @constant.character.escape.php)
 
-[(heredoc) (nowdoc)] @string.unquoted.heredoc.php
-
+(heredoc) @string.unquoted.heredoc.php
 
 [
   "abstract"
@@ -375,6 +336,9 @@
   "interface"
   "namespace"
   "new"
+  "private"
+  "protected"
+  "public"
   "require_once"
   "require"
   "return"
@@ -384,13 +348,6 @@
   "use"
   "while"
 ] @keyword.control._TYPE_.php
-
-[
-  "private"
-  "protected"
-  "public"
-  "static"
-] @storage.modifier._TYPE_.php
 
 (expression_statement (name) @keyword.control.exit.php
   (#eq? @keyword.control.exit.php "exit"))
@@ -443,9 +400,6 @@
 
 (binary_expression "." @keyword.operator.string.php)
 
-(optional_type "?" @keyword.operator.nullable-type.php)
-(union_type "|" @keyword.operator.union-type.php)
-
 ["&&" "||"] @keyword.operator.logical.php
 
 ["="] @keyword.operator.assignment.php
@@ -486,23 +440,5 @@
 "=>" @punctuation.separator.key-value.php
 
 "\\" @keyword.operator.namespace.php
-"::" @keyword.operator.accessor.php
-
-";" @punctuation.terminator.statement.php;
 
 (unary_op_expression "!" @keyword.operator.unary.php)
-
-; PUNCTUATION
-; ===========
-
-(formal_parameters
-  "(" @punctuation.definition.parameters.begin.bracket.round.php
-  ")"@punctuation.definition.parameters.end.bracket.round.php
-  (#set! capture.final true))
-
-"{" @punctuation.definition.block.begin.bracket.curly.php
-"}" @punctuation.definition.block.end.bracket.curly.php
-"(" @punctuation.definition.begin.bracket.round.php
-")" @punctuation.definition.end.bracket.round.php
-"[" @punctuation.definition.begin.bracket.square.php
-"]" @punctuation.definition.end.bracket.square.php
