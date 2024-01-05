@@ -303,7 +303,8 @@
 (encapsed_string
   (escape_sequence) @constant.character.escape.php)
 
-(heredoc) @string.unquoted.heredoc.php
+[(heredoc) (nowdoc)] @string.unquoted.heredoc.php
+
 
 [
   "abstract"
