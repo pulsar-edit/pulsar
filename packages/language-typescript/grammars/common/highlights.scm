@@ -434,6 +434,7 @@
 (generator_function_declaration "*" @storage.modifier.generator._LANG_)
 (method_definition "*" @storage.modifier.generator._LANG_)
 
+(asserts "asserts" @keyword.control.type.asserts._LANG_)
 
 ; SUPPORT
 ; =======
