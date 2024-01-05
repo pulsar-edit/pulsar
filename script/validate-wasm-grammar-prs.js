@@ -79,6 +79,9 @@ for (const wasmFile of wasmFilesChanged) {
   }
 
   for (const file of files) {
+    // Only check `cson` files.
+    if (!file.endsWith('.cson')) continue;
+
     const filePath = path.join(wasmPath, "..", file);
     console.log(`Checking: ${filePath}`);
 
