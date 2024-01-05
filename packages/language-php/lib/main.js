@@ -108,8 +108,7 @@ exports.activate = function () {
     type: 'heredoc',
     language(node) {
       let id = node.firstNamedChild;
-      if (id.type !== 'heredoc_start') { return null; }
-      console.log('returning heredoc name:', id.text);
+      if (id.type !== 'heredoc_start') return null;
       return id.text;
     },
     content(node) {
