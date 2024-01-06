@@ -383,7 +383,7 @@ function highlight (path, matches, offsetIndex) {
 }
 
 class FuzzyFinderItem {
-  constructor ({filePath, label, ownerGitHubUsername, filterQuery, matches, repository}) {
+  constructor ({filePath, label, ownerGitHubUsername, matches, repository}) {
     this.filePath = filePath
     this.label = label
     this.element = document.createElement('li')
