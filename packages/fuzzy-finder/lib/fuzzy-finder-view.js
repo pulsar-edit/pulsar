@@ -1,4 +1,4 @@
-const {Point, CompositeDisposable} = require('atom')
+const {Point} = require('atom')
 const fs = require('fs')
 
 const path = require('path')
