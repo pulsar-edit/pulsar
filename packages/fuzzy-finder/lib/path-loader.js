@@ -2,7 +2,7 @@ const fs = require('fs')
 const {Task} = require('atom')
 
 module.exports = {
-  startTask (callback, metricsReporter) {
+  startTask (callback) {
     const results = []
     const taskPath = require.resolve('./load-paths-handler')
     const followSymlinks = atom.config.get('core.followSymlinks')
@@ -12,8 +12,6 @@ module.exports = {
     const projectPaths = atom.project.getPaths().map((path) => fs.realpathSync(path))
     const useRipGrep = atom.config.get('fuzzy-finder.useRipGrep')
 
-    const startTime = performance.now()
-
     const task = Task.once(
       taskPath,
       projectPaths,
@@ -21,15 +19,7 @@ module.exports = {
       ignoreVcsIgnores,
       ignoredNames,
       useRipGrep,
-      () => {
-        callback(results)
-
-        const duration = Math.round(performance.now() - startTime)
-        const numFiles = results.length
-        const crawlerType = useRipGrep ? 'ripgrep' : 'fs'
-
-        metricsReporter.sendCrawlEvent(duration, numFiles, crawlerType)
-      }
+      () => callback(results)
     )
 
     task.on('load-paths:paths-found',

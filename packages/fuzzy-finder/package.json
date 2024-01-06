@@ -36,11 +36,6 @@
       "versions": {
         "1.0.0": "consumeElementIcons"
       }
-    },
-    "metrics-reporter": {
-      "versions": {
-        "^1.1.0": "consumeMetricsReporter"
-      }
     }
   },
   "configSchema": {

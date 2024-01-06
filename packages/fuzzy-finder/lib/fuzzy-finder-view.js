@@ -10,10 +10,9 @@ const getIconServices = require('./get-icon-services')
 const MAX_RESULTS = 10
 
 module.exports = class FuzzyFinderView {
-  constructor (metricsReporter) {
+  constructor () {
     this.previousQueryWasLineJump = false
     this.items = []
-    this.metricsReporter = metricsReporter
     this.filterFn = this.filterFn.bind(this)
 
     this.selectListView = new SelectListView({

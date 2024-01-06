@@ -35,7 +35,6 @@ const genPromiseToCheck = fn => new Promise(resolve => {
 })
 
 describe('FuzzyFinder', () => {
-  let disposable, reporterStub
   let rootDir1, rootDir2
   let fuzzyFinder, projectView, bufferView, gitStatusView, workspaceElement, fixturesPath
   const filesPromise = () => genPromiseToCheck( () =>
@@ -45,12 +44,6 @@ describe('FuzzyFinder', () => {
   )
 
   beforeEach(async () => {
-    reporterStub = {
-      addTiming: sinon.spy(),
-      incrementCounter: () => {}
-    }
-    disposable = fuzzyFinderPackage.consumeMetricsReporter(reporterStub)
-
     const ancestorDir = fs.realpathSync(temp.mkdirSync())
     rootDir1 = path.join(ancestorDir, 'root-dir1')
     rootDir2 = path.join(ancestorDir, 'root-dir2')
@@ -81,12 +74,6 @@ describe('FuzzyFinder', () => {
     gitStatusView = fuzzyFinder.createGitStatusView()
 
     jasmine.useRealClock()
-  })
-
-  afterEach(() => {
-    if (disposable) {
-      disposable.dispose()
-    }
   })
 
   async function waitForPathsToDisplay (fuzzyFinderView) {
@@ -1707,40 +1694,6 @@ describe('FuzzyFinder', () => {
 
               expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).toBeDefined()
             })
-          })
-        })
-
-        describe('logging of metrics events', () => {
-          it('logs the crawling time', async () => {
-            // After setting the reporter it may receive some old events from previous tests
-            // that we want to discard.
-            reporterStub.addTiming.resetHistory()
-
-            await projectView.toggle()
-
-            await waitForPathsToDisplay(projectView)
-
-            expect(reporterStub.addTiming.firstCall.args[0]).toEqual('fuzzy-finder-v1')
-            expect(reporterStub.addTiming.firstCall.args[2]).toEqual(
-              {ec: 'time-to-crawl', el: useRipGrep ? 'ripgrep' : 'fs', ev: 5}
-            )
-          })
-
-          it('queues the events until a reporter is set', async () => {
-            // After setting the reporter it may receive some old events from previous tests
-            // that we want to discard.
-            reporterStub.addTiming.resetHistory()
-
-            await projectView.toggle()
-
-            await waitForPathsToDisplay(projectView)
-
-            fuzzyFinderPackage.consumeMetricsReporter(reporterStub)
-
-            expect(reporterStub.addTiming.firstCall.args[0]).toEqual('fuzzy-finder-v1')
-            expect(reporterStub.addTiming.firstCall.args[2]).toEqual(
-              {ec: 'time-to-crawl', el: useRipGrep ? 'ripgrep' : 'fs', ev: 5}
-            )
           })
         })
       })
