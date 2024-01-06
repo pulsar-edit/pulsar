@@ -3,9 +3,9 @@ const SelectListView = require('atom-select-list');
 
 function setConfigForLanguageMode(mode) {
   let useTreeSitterParsers = mode !== 'textmate';
-  let useExperimentalModernTreeSitter = mode === 'wasm-tree-sitter';
+  let useLegacyTreeSitter = mode === 'node-tree-sitter';
   atom.config.set('core.useTreeSitterParsers', useTreeSitterParsers);
-  atom.config.set('core.useExperimentalModernTreeSitter', useExperimentalModernTreeSitter);
+  atom.config.set('core.useLegacyTreeSitter', useLegacyTreeSitter);
 }
 
 describe('GrammarSelector', () => {

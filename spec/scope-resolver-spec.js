@@ -93,7 +93,7 @@ function rangeFromDescriptor(rawRange) {
 }
 
 describe('ScopeResolver', () => {
-  let editor, buffer, grammar, scopeResolver;
+  let editor, buffer, grammar;
 
   beforeEach(async () => {
     grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -101,7 +101,6 @@ describe('ScopeResolver', () => {
     buffer = editor.getBuffer();
     atom.grammars.addGrammar(grammar);
     atom.config.set('core.useTreeSitterParsers', true);
-    atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
   afterEach(() => {
@@ -126,7 +125,7 @@ describe('ScopeResolver', () => {
     let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
     for (let capture of captures) {
-      let { node, name } = capture;
+      let { node } = capture;
       let range = scopeResolver.store(capture);
       expect(stringForNodeRange(range))
         .toBe(stringForNodeRange(node));

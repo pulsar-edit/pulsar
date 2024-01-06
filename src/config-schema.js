@@ -360,13 +360,14 @@ const configSchema = {
       useTreeSitterParsers: {
         type: 'boolean',
         default: true,
+        title: 'Use Tree-sitter Parsers',
         description: 'Use Tree-sitter parsers for supported languages.'
       },
-      useExperimentalModernTreeSitter: {
+      useLegacyTreeSitter: {
         type: 'boolean',
         default: false,
-        title: 'Use Modern Tree-Sitter Implementation',
-        description: 'Experimental: Use the new query-file-based Tree-sitter system instead of the legacy system from Atom. (This system will eventually replace the legacy system.) Has no effect unless "Use Tree Sitter Parsers" is also checked.'
+        title: 'Use legacy Tree-sitter Implementation',
+        description: 'Opt into the legacy Atom Tree-sitter system instead of the modern system added by Pulsar. (This legacy system will soon be removed.) Has no effect unless “Use Tree-sitter Parsers” is also checked.'
       },
       colorProfile: {
         description:

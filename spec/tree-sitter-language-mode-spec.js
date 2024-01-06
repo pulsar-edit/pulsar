@@ -42,7 +42,7 @@ describe('TreeSitterLanguageMode', () => {
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
     atom.config.set('core.useTreeSitterParsers', true);
-    atom.config.set('core.useExperimentalModernTreeSitter', false);
+    atom.config.set('core.useLegacyTreeSitter', true);
   });
 
   describe('highlighting', () => {

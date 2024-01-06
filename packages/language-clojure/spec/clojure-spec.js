@@ -4,7 +4,6 @@ describe("Clojure grammar", function() {
 
   beforeEach(function() {
     atom.config.set('core.useTreeSitterParsers', false);
-    atom.config.set('core.useExperimentalModernTreeSitter', false);
 
     waitsForPromise(() => atom.packages.activatePackage("language-clojure"));
 
