@@ -19,6 +19,7 @@ const realRgPath = rgPath.replace(/\bapp\.asar\b/, 'app.asar.unpacked')
 const MaxConcurrentCrawls = Math.min(Math.max(os.cpus().length - 1, 8), 1)
 
 const trackedPaths = new Set()
+const ignoredPaths = new Set()
 
 class PathLoader {
   constructor (rootPath, options) {
@@ -29,6 +30,7 @@ class PathLoader {
     this.useRipGrep = options.useRipGrep
     this.indexIgnoredPaths = options.indexIgnoredPaths
     this.paths = []
+    this.ignoredPaths = []
     this.inodes = new Set()
     this.repo = null
     if (this.ignoreVcsIgnores && !this.useRipGrep) {
@@ -41,7 +43,11 @@ class PathLoader {
 
   load (done) {
     if (this.useRipGrep) {
-      this.loadFromRipGrep().then(done)
+      // first, load tracked paths and populate the set of tracked paths
+      // then, load all paths (tracked and not), using the above set to differentiate
+      this.loadFromRipGrep()
+        .then(() => this.indexIgnoredPaths && this.loadFromRipGrep({loadIgnoredPaths: true}))
+        .then(done)
 
       return
     }
@@ -53,11 +59,11 @@ class PathLoader {
     })
   }
 
-  async loadFromRipGrep () {
+  async loadFromRipGrep (options = {}) {
     return new Promise((resolve) => {
       const args = ['--files', '--hidden', '--sort', 'path']
 
-      if (!this.ignoreVcsIgnores) {
+      if (!this.ignoreVcsIgnores || options.loadIgnoredPaths) {
         args.push('--no-ignore')
       }
 
@@ -65,8 +71,10 @@ class PathLoader {
         args.push('--follow')
       }
 
-      for (let ignoredName of this.ignoredNames) {
-        args.push('-g', '!' + ignoredName.pattern)
+      if (! options.loadIgnoredPaths) {
+          for (let ignoredName of this.ignoredNames) {
+            args.push('-g', '!' + ignoredName.pattern)
+          }
       }
 
       if (this.ignoreVcsIgnores) {
@@ -83,7 +91,11 @@ class PathLoader {
 
         for (const file of files) {
           let loadedPath = path.join(this.rootPath, file)
-            this.trackedPathLoaded(loadedPath, null)
+          if (options.loadIgnoredPaths) {
+            this.ignoredPathLoaded(loadedPath)
+          } else {
+            this.trackedPathLoaded(loadedPath)
+          }
         }
       })
       result.stderr.on('data', () => {
@@ -116,16 +128,36 @@ class PathLoader {
     if (this.paths.length === PathsChunkSize) {
       this.flushPaths()
     }
+
+    done && done()
+  }
+
+  ignoredPathLoaded (loadedPath, done) {
+    if (trackedPaths.has(loadedPath)) {
+        return
+    }
+
+    if (!ignoredPaths.has(loadedPath)) {
+      ignoredPaths.add(loadedPath)
+      this.ignoredPaths.push(loadedPath)
+    }
+
+    if (this.ignoredPaths.length === PathsChunkSize) {
+      this.flushPaths()
+    }
+
     done && done()
   }
 
   flushPaths () {
-    emit('load-paths:paths-found', this.paths)
+    emit('load-paths:paths-found', {paths: this.paths, ignoredPaths: this.ignoredPaths})
     this.paths = []
+    this.ignoredPaths = []
   }
 
   loadPath (pathToLoad, root, done) {
-    if (this.isIgnored(pathToLoad) && !root) return done()
+    const isIgnored = this.isIgnored(pathToLoad)
+    if (isIgnored && !this.indexIgnoredPaths && !root) return done()
 
     fs.lstat(pathToLoad, (error, stats) => {
       if (error != null) { return done() }
@@ -139,7 +171,13 @@ class PathLoader {
           }
 
           if (stats.isFile()) {
-            this.trackedPathLoaded(pathToLoad, done)
+            if (!isIgnored ) {
+              this.trackedPathLoaded(pathToLoad, done)
+            } else if (this.indexIgnoredPaths) {
+              this.ignoredPathLoaded(pathToLoad, done)
+            } else {
+              done()
+            }
           } else if (stats.isDirectory()) {
             if (this.traverseSymlinkDirectories) {
               this.loadFolder(pathToLoad, done)
@@ -153,9 +191,22 @@ class PathLoader {
       } else {
         this.inodes.add(stats.ino)
         if (stats.isDirectory()) {
-          this.loadFolder(pathToLoad, done)
+          // descend into the .git dir only if we're including ignored paths
+          // FIXME this it not correct if the repo dir is non-default
+          // FIXME / is not platform agnostic
+          if (!pathToLoad.match(/(^|\/)\.git/) || !this.ignoreVcsIgnores) {
+            this.loadFolder(pathToLoad, done)
+          } else {
+            done()
+          }
         } else if (stats.isFile()) {
-          this.trackedPathLoaded(pathToLoad, done)
+          if (!isIgnored) {
+            this.trackedPathLoaded(pathToLoad, done)
+          } else if (this.indexIgnoredPaths) {
+            this.ignoredPathLoaded(pathToLoad, done)
+          } else {
+            done()
+          }
         } else {
           done()
         }

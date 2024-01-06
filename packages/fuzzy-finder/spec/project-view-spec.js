@@ -20,7 +20,7 @@ describe('ProjectView', () => {
   })
 
   it('includes remote editors when teletype is enabled', async () => {
-    const projectView = new ProjectView([])
+    const projectView = new ProjectView([], [])
 
     const projectPath = fs.realpathSync(temp.mkdirSync())
     const file1Path = path.join(projectPath, 'a')
@@ -49,7 +49,7 @@ describe('ProjectView', () => {
   })
 
   it('shows remote editors even when there is no open project', async () => {
-    const projectView = new ProjectView([])
+    const projectView = new ProjectView([], [])
 
     atom.project.setPaths([])
     projectView.setTeletypeService({
@@ -69,7 +69,7 @@ describe('ProjectView', () => {
   })
 
   it('gracefully defaults to empty list if teletype is unable to provide remote editors', async () => {
-    const projectView = new ProjectView([])
+    const projectView = new ProjectView([], [])
 
     atom.project.setPaths([])
     projectView.setTeletypeService({

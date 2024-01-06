@@ -822,21 +822,26 @@ describe('FuzzyFinder', () => {
           })
 
           it('passes the indexed paths into the project view when it is created', () => {
-            const {projectPaths} = fuzzyFinder
+            const {projectPaths, ignoredPaths} = fuzzyFinder
             expect(projectPaths.length).toBe(19)
+            expect(ignoredPaths.length).toBe(0)
+
             projectView = fuzzyFinder.createProjectView()
             expect(projectView.paths).toBe(projectPaths)
+            expect(projectView.ignoredPaths).toBe(ignoredPaths)
             expect(projectView.reloadPaths).toBe(false)
           })
 
           it('busts the cached paths when the project paths change', () => {
             atom.project.setPaths([])
 
-            const {projectPaths} = fuzzyFinder
+            const {projectPaths, ignoredPaths} = fuzzyFinder
             expect(projectPaths).toBe(null)
+            expect(ignoredPaths).toBe(null)
 
             projectView = fuzzyFinder.createProjectView()
             expect(projectView.paths).toBe(null)
+            expect(projectView.ignoredPaths).toBe(null)
             expect(projectView.reloadPaths).toBe(true)
           })
         })
@@ -1611,6 +1616,21 @@ describe('FuzzyFinder', () => {
               await projectView.toggle()
 
               await waitForPathsToDisplay(projectView)
+
+              expect(projectView.paths.length).toBe(6)
+              expect(projectView.ignoredPaths.length).toBe(0)
+
+              expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).not.toBeDefined()
+            })
+
+            it('includes paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              await projectView.toggle()
+
+              await waitForPathsToDisplay(projectView)
+
+              expect(projectView.paths.length).toBe(6)
+              expect(projectView.ignoredPaths.length).toBe(1)
 
               expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).not.toBeDefined()
             })

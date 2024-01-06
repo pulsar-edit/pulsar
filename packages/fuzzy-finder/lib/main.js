@@ -48,6 +48,7 @@ module.exports = {
       this.gitStatusView = null
     }
     this.projectPaths = null
+    this.ignoredPaths = null
     this.stopLoadPathsTask()
     this.active = false
   },
@@ -82,8 +83,9 @@ module.exports = {
 
     if (this.projectView == null) {
       const ProjectView = require('./project-view')
-      this.projectView = new ProjectView(this.projectPaths)
+      this.projectView = new ProjectView(this.projectPaths, this.ignoredPaths)
       this.projectPaths = null
+      this.ignoredPaths = null
       if (this.teletypeService) {
         this.projectView.setTeletypeService(this.teletypeService)
       }
@@ -117,11 +119,13 @@ module.exports = {
     if (atom.project.getPaths().length === 0) return
 
     const PathLoader = require('./path-loader')
-    this.loadPathsTask = PathLoader.startTask((projectPaths) => {
+    this.loadPathsTask = PathLoader.startTask((projectPaths, ignoredPaths) => {
       this.projectPaths = projectPaths
+      this.ignoredPaths = ignoredPaths
     })
     this.projectPathsSubscription = atom.project.onDidChangePaths(() => {
       this.projectPaths = null
+      this.ignoredPaths = null
       this.stopLoadPathsTask()
     })
   },

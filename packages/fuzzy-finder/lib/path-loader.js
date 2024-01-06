@@ -4,6 +4,7 @@ const {Task} = require('atom')
 module.exports = {
   startTask (callback) {
     const results = []
+    const ignoredResults = []
     const taskPath = require.resolve('./load-paths-handler')
     const followSymlinks = atom.config.get('core.followSymlinks')
     let ignoredNames = atom.config.get('fuzzy-finder.ignoredNames') || []
@@ -23,13 +24,14 @@ module.exports = {
           useRipGrep,
           indexIgnoredPaths
       },
-      () => callback(results)
+      () => callback(results, ignoredResults)
     )
 
     task.on('load-paths:paths-found',
       (paths) => {
-        paths = paths || []
-        results.push(...paths)
+        paths = paths || {paths: [], ignoredPaths: []}
+        results.push(...paths.paths)
+        ignoredResults.push(...paths.ignoredPaths)
       }
     )
 
