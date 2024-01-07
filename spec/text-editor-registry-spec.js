@@ -5,6 +5,13 @@ const { Point, Range } = TextBuffer;
 const dedent = require('dedent');
 const NullGrammar = require('../src/null-grammar');
 
+function setupLanguageMode (editor) {
+  let languageMode = editor.getBuffer().getLanguageMode();
+  languageMode.useAsyncParsing = false;
+  languageMode.useAsyncIndent = false;
+  return languageMode;
+}
+
 describe('TextEditorRegistry', function() {
   let registry, editor, initialPackageActivation;
 
@@ -298,8 +305,10 @@ describe('TextEditorRegistry', function() {
         await initialPackageActivation;
         await atom.packages.activatePackage('language-javascript');
         atom.grammars.assignLanguageMode(editor, 'source.js');
+        let languageMode = setupLanguageMode(editor);
         atom.config.set('editor.tabType', 'auto');
         await initialPackageActivation;
+        await languageMode.ready;
 
         editor.setText(dedent`
           {
