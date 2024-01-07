@@ -634,7 +634,8 @@ class TreeSitterLanguageMode {
 
   grammarForLanguageString(languageString) {
     return this.grammarRegistry.treeSitterGrammarForLanguageString(
-      languageString
+      languageString,
+      'original'
     );
   }
 

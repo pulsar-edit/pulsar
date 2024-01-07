@@ -154,6 +154,7 @@ class WASMTreeSitterLanguageMode {
 
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
     this.useAsyncParsing = FEATURE_ASYNC_PARSE;
+    this.useAsyncIndent = FEATURE_ASYNC_INDENT;
 
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
@@ -1231,7 +1232,7 @@ class WASMTreeSitterLanguageMode {
     let indentTree = options.tree;
 
     if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncParsing || !this.useAsyncIndent) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
         // We can't answer this yet because we don't yet have a new syntax
@@ -1600,7 +1601,17 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForEditedBufferRow(row, tabLength, options = {}) {
-    if (row === 0) { return 0; }
+    const line = this.buffer.lineForRow(row);
+    const currentRowIndent = this.indentLevelForLine(line, tabLength);
+
+    // If the row is not indented at all, we have nothing to do, because we can
+    // only dedent a line at this phase.
+    if (currentRowIndent === 0) { return; }
+
+    // If we're on the first row, we have no preceding line to compare
+    // ourselves to. We should do nothing.
+    if (row === 0) { return; }
+
     // By the time this function runs, we probably know enough to be sure of
     // which layer controls the beginning of this row, even if we don't know
     // which one owns the position at the cursor.
@@ -1619,14 +1630,11 @@ class WASMTreeSitterLanguageMode {
     // resolvers.
     scopeResolver.reset();
 
-    const currentRowIndent = this.indentLevelForLine(
-      this.buffer.lineForRow(row), tabLength);
-
     // Ideally, we're running when the tree is clean, but if not, we must
     // re-parse the tree in order to make an accurate indents query.
     let indentTree = options.tree;
     if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncIndent || !this.useAsyncParsing) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
         return this.atTransactionEnd().then(({ changeCount }) => {
