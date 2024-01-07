@@ -105,7 +105,7 @@
 ; ----------
 
 (attribute "=" @punctuation.separator.key-value.html)
-(attribute_name) @entity.other.attribute-name
+(attribute_name) @entity.other.attribute-name.html
 
 ; Single- and double-quotes around attribute values.
 ((quoted_attribute_value ["\"" "'"] @punctuation.definition.string.begin.html)
@@ -135,3 +135,8 @@
 ; ====
 
 (entity) @constant.character.entity.html
+
+; Helpers for autocomplete-html
+
+((element) @meta.tag.incomplete.html
+  (#not-match? @meta.tag.incomplete.html ">$"))
