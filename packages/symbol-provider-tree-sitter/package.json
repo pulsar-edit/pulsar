@@ -1,0 +1,32 @@
+{
+  "name": "symbol-provider-tree-sitter",
+  "main": "./lib/main",
+  "version": "1.0.0",
+  "description": "Provides symbols to symbols-view based on tree-sitter queries",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0",
+    "node": ">=14"
+  },
+  "providedServices": {
+    "symbol.provider": {
+      "description": "Allows external sources to suggest symbols for a given file or project.",
+      "versions": {
+        "1.0.0": "provideSymbols"
+      }
+    }
+  },
+  "configSchema": {
+    "includeReferences": {
+      "default": false,
+      "type": "boolean",
+      "description": "Whether to make symbols out of references (for example, function calls) in addition to definitions."
+    }
+  },
+  "devDependencies": {
+    "eslint": "^8.44.0",
+    "fs-plus": "^3.1.1",
+    "temp": "^0.9.4"
+  }
+}
