@@ -27,10 +27,11 @@ module.exports = class GrammarListView {
           let badgeText = 'Tree-sitter';
 
           if (isLegacyTreeSitterMode()) {
+            // Color the legacy badge green to represent the user's preference.
             badgeColor = isLegacyTreeSitter(grammar) ?
               'badge-success' : 'badge-warning';
             badgeText = isLegacyTreeSitter(grammar) ?
-              'Tree-sitter' : 'Legacy Tree-sitter';
+              'Legacy Tree-sitter' : 'Modern Tree-sitter';
           }
 
           parser.classList.add(
@@ -184,7 +185,11 @@ function compareGrammarType(a, b) {
 
 function getGrammarScore(grammar) {
   let languageParser = getLanguageModeConfig();
-  if (isModernTreeSitter(grammar)) { return -2; }
-  if (isLegacyTreeSitter(grammar)) { return -1; }
+  if (isModernTreeSitter(grammar)) {
+    return languageParser === 'node-tree-sitter' ? -1 : -2;
+  }
+  if (isLegacyTreeSitter(grammar)) {
+    return languageParser === 'node-tree-sitter' ? -2 : -1;
+  }
   return languageParser === 'textmate' ? -3 : 0;
 }
