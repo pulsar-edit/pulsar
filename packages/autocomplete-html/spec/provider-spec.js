@@ -32,19 +32,21 @@ describe('HTML autocompletions', () => {
     return -1;
   }
 
-  beforeEach(() => {
-    waitsForPromise(() => atom.packages.activatePackage('autocomplete-html'))
-    waitsForPromise(() => atom.packages.activatePackage('language-html'))
-    waitsForPromise(() => atom.workspace.open('test.html'))
-    waitsForPromise(() => {
-      let editor = atom.workspace.getActiveTextEditor()
-      let languageMode = editor.getBuffer().getLanguageMode()
-      return languageMode.ready
-    })
+  beforeEach(async () => {
+    await atom.packages.activatePackage('autocomplete-html')
+    await atom.packages.activatePackage('language-html')
+    await atom.workspace.open('test.html')
+    editor = atom.workspace.getActiveTextEditor()
+    languageMode = editor.getBuffer().getLanguageMode()
+    languageMode.useAsyncParsing = false
+    languageMode.useAsyncIndent = false
+    await languageMode.ready
 
-    runs(() => provider = atom.packages.getActivePackage('autocomplete-html').mainModule.getProvider())
-    runs(() => editor = atom.workspace.getActiveTextEditor())
-    runs(() => languageMode = editor.getBuffer().getLanguageMode())
+    provider = atom.packages.getActivePackage('autocomplete-html').mainModule.getProvider()
+  })
+
+  afterEach(async () => {
+    await languageMode.atTransactionEnd()
   })
 
   it('returns no completions when not at the start of a tag', async () => {
@@ -591,13 +593,8 @@ describe('HTML autocompletions', () => {
       return languageMode.atTransactionEnd()
     })
 
-    waitsForPromise(() => {
-      return atom.packages.activatePackage('language-javascript')
-    })
-
-    runs(() => {
-      editor.setCursorBufferPosition([0, editor.getText().indexOf('""') + 1])
-      expect(() => getCompletions()).not.toThrow()
-    })
+    await atom.packages.activatePackage('language-javascript')
+    editor.setCursorBufferPosition([0, editor.getText().indexOf('""') + 1])
+    expect(() => getCompletions()).not.toThrow()
   })
 })

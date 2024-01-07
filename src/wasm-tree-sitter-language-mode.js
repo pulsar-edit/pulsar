@@ -4043,20 +4043,38 @@ class LanguageLayer {
 class NodeRangeSet {
   constructor(previous, nodes, injectionPoint) {
     this.previous = previous;
-    this.nodes = nodes;
     this.newlinesBetween = injectionPoint.newlinesBetween;
     this.includeAdjacentWhitespace = injectionPoint.includeAdjacentWhitespace;
     this.includeChildren = injectionPoint.includeChildren;
+
+    // We shouldn't retain references to nodes here because the tree might get
+    // disposed of layer. Let's compile the information we need now while we're
+    // sure the tree is fresh.
+    this.nodeSpecs = [];
+    for (let node of nodes) {
+      this.nodeSpecs.push(this.getNodeSpec(node, true));
+    }
+  }
+
+  getNodeSpec (node, getChildren) {
+    let { startIndex, endIndex, startPosition, endPosition, id } = node;
+    let result = { startIndex, endIndex, startPosition, endPosition, id };
+    if (node.children && getChildren) {
+      result.children = [];
+      for (let child of node.children) {
+        result.children.push(this.getNodeSpec(child, false));
+      }
+    }
+    return result;
   }
 
   getRanges(buffer) {
     const previousRanges = this.previous && this.previous.getRanges(buffer);
     let result = [];
 
-    for (const node of this.nodes) {
+    for (const node of this.nodeSpecs) {
       let position = node.startPosition, index = node.startIndex;
-
-      if (!this.includeChildren) {
+      if (node.children && !this.includeChildren) {
         // If `includeChildren` is `false`, we're effectively collecting all
         // the disjoint text nodes that are direct descendants of this node.
         for (const child of node.children) {

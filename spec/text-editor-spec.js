@@ -16,7 +16,7 @@ async function languageModeReady (editor) {
   }
 }
 
-fdescribe('TextEditor', () => {
+describe('TextEditor', () => {
   let buffer, editor, lineLengths, languageMode;
 
   beforeEach(async () => {
