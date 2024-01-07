@@ -934,8 +934,10 @@ class WASMTreeSitterLanguageMode {
   */
   getFoldableRangeContainingPoint(point) {
     point = this.buffer.clipPosition(point);
-    let fold = this.getFoldRangeForRow(point.row);
-    if (fold) { return fold; }
+    if (point.column >= this.buffer.lineLengthForRow(point.row)) {
+      let fold = this.getFoldRangeForRow(point.row);
+      if (fold) { return fold; }
+    }
 
     // Move backwards until we find a fold range containing this row.
     for (let row = point.row - 1; row >= 0; row--) {
@@ -950,12 +952,12 @@ class WASMTreeSitterLanguageMode {
     if (!this.tokenized) { return []; }
 
     let layers = this.getAllLanguageLayers();
-    let folds = [];
+    let allFolds = [];
     for (let layer of layers) {
       let folds = layer.foldResolver.getAllFoldRanges();
-      folds.push(...folds);
+      allFolds.push(...folds);
     }
-    return folds;
+    return allFolds;
   }
 
   // This method is improperly named, and is based on an assumption that every

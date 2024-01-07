@@ -7,9 +7,16 @@ const os = require('os');
 const TextEditor = require('../src/text-editor');
 const TextBuffer = require('text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
-const TreeSitterLanguageMode = require('../src/tree-sitter-language-mode');
+const WASMTreeSitterLanguageMode = require('../src/wasm-tree-sitter-language-mode');
 
-describe('TextEditor', () => {
+async function languageModeReady (editor) {
+  let languageMode = editor.getBuffer().getLanguageMode();
+  if (languageMode.ready) {
+    await languageMode.ready;
+  }
+}
+
+fdescribe('TextEditor', () => {
   let buffer, editor, lineLengths, languageMode;
 
   beforeEach(async () => {
@@ -8235,17 +8242,23 @@ describe('TextEditor', () => {
     });
 
     it('returns the result of syntaxTreeScopeDescriptorForBufferPosition() when tree-sitter language mode is used', async () => {
+      jasmine.useRealClock();
       editor = await atom.workspace.open('sample.js', { autoIndent: false });
       await atom.packages.activatePackage('language-javascript');
 
       let buffer = editor.getBuffer();
 
-      buffer.setLanguageMode(
-        new TreeSitterLanguageMode({
-          buffer,
-          grammar: atom.grammars.grammarForScopeName('source.js')
-        })
-      );
+      let languageMode = new WASMTreeSitterLanguageMode({
+        buffer,
+        grammar: atom.grammars.grammarForScopeName('source.js'),
+        grammars: atom.grammars
+      });
+
+      languageMode.useAsyncParsing = false;
+      languageMode.useAsyncIndent = false;
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
 
       const syntaxTreeeScopeDescriptor = editor.syntaxTreeScopeDescriptorForBufferPosition(
         [4, 17]
@@ -8771,6 +8784,7 @@ describe('TextEditor', () => {
     describe('.unfoldAll()', () => {
       it('unfolds every folded line', async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await languageModeReady(editor);
 
         const initialScreenLineCount = editor.getScreenLineCount();
         editor.foldBufferRow(0);
@@ -8786,6 +8800,7 @@ describe('TextEditor', () => {
         editor = await atom.workspace.open('sample-with-comments.js', {
           autoIndent: false
         });
+        await languageModeReady(editor);
 
         const initialScreenLineCount = editor.getScreenLineCount();
         editor.foldBufferRow(0);
@@ -8801,6 +8816,7 @@ describe('TextEditor', () => {
     describe('.foldAll()', () => {
       it('folds every foldable line', async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await languageModeReady(editor);
 
         editor.foldAll();
         const [fold1, fold2, fold3] = editor.unfoldAll();
@@ -8813,6 +8829,7 @@ describe('TextEditor', () => {
     describe('.foldBufferRow(bufferRow)', () => {
       beforeEach(async () => {
         editor = await atom.workspace.open('sample.js');
+        await languageModeReady(editor);
       });
 
       describe('when bufferRow can be folded', () => {
@@ -8875,6 +8892,7 @@ describe('TextEditor', () => {
     describe('.foldAllAtIndentLevel(indentLevel)', () => {
       it('folds blocks of text at the given indentation level', async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await languageModeReady(editor);
 
         editor.foldAllAtIndentLevel(0);
         expect(editor.lineTextForScreenRow(0)).toBe(
@@ -8908,6 +8926,7 @@ describe('TextEditor', () => {
         editor = await atom.workspace.open('sample-with-comments.js', {
           autoIndent: false
         });
+        await languageModeReady(editor);
 
         editor.foldAllAtIndentLevel(0);
         const folds = editor.unfoldAll();
