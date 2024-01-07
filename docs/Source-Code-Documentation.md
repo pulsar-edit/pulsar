@@ -7,6 +7,23 @@
 </dd>
 <dt><a href="#Clipboard">Clipboard</a></dt>
 <dd></dd>
+<dt><a href="#Container">Container</a></dt>
+<dd><p>A container capture. When another capture&#39;s node is contained by the
+definition capture&#39;s node, it gets added to this instance.</p>
+</dd>
+<dt><a href="#CaptureOrganizer">CaptureOrganizer</a></dt>
+<dd><p>Keeps track of @definition.* captures and the captures they may contain.</p>
+</dd>
+<dt><a href="#InvalidProviderError">InvalidProviderError</a> ⇐ <code>Error</code></dt>
+<dd><p>An error thrown when a newly added symbol provider does not conform to its
+contract.</p>
+</dd>
+<dt><a href="#ListController">ListController</a></dt>
+<dd><p>A class for setting various UI properties on a symbol list palette. This is a
+privilege given to the “main” (or <em>exclusive</em>) provider for a given task.</p>
+<p>This is how we allow a provider to communicate its state to the UI without
+giving it full control over the <code>SelectListView</code> used to show results.</p>
+</dd>
 </dl>
 
 ## Constants
@@ -202,6 +219,25 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
+<dt><a href="#isIterable">isIterable(obj)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Ensures an object can be iterated over.</p>
+<p>The contract with the symbol providers is that they return an object that
+gives us symbol objects when we iterate over it. It&#39;ll probably be an array,
+but we&#39;re cool with anything iterable.</p>
+</dd>
+<dt><a href="#timeout">timeout(ms)</a> ⇒ <code>Promise.&lt;true&gt;</code></dt>
+<dd><p>Returns a promise that resolves after a given number of milliseconds.</p>
+</dd>
+<dt><a href="#getBadgeTextVariant">getBadgeTextVariant(text)</a> ⇒ <code>String</code></dt>
+<dd><p>Given a string of text, returns a hexadecimal character from <code>0</code> to <code>f</code> to
+represent a classification “bucket.” This is used when assigning colors to
+various symbol badges.</p>
+</dd>
+<dt><a href="#badge">badge(text, options)</a> ⇒ <code>Element</code></dt>
+<dd><p>Return a DOM element for a badge for a given symbol tag name.</p>
+</dd>
+<dt><a href="#beforeEach">beforeEach()</a></dt>
+<dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
@@ -366,6 +402,37 @@ atom.clipboard.write('hello');
 
 console.log(atom.clipboard.read());
 ```
+<a name="Container"></a>
+
+## Container
+A container capture. When another capture's node is contained by the
+definition capture's node, it gets added to this instance.
+
+**Kind**: global class  
+<a name="CaptureOrganizer"></a>
+
+## CaptureOrganizer
+Keeps track of @definition.* captures and the captures they may contain.
+
+**Kind**: global class  
+<a name="InvalidProviderError"></a>
+
+## InvalidProviderError ⇐ <code>Error</code>
+An error thrown when a newly added symbol provider does not conform to its
+contract.
+
+**Kind**: global class  
+**Extends**: <code>Error</code>  
+<a name="ListController"></a>
+
+## ListController
+A class for setting various UI properties on a symbol list palette. This is a
+privilege given to the “main” (or _exclusive_) provider for a given task.
+
+This is how we allow a provider to communicate its state to the UI without
+giving it full control over the `SelectListView` used to show results.
+
+**Kind**: global class  
 <a name="etch"></a>
 
 ## etch
@@ -634,6 +701,68 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## beforeEach()
 **Kind**: global function  
 **Babel**:   
+<a name="beforeEach"></a>
+
+## beforeEach()
+**Kind**: global function  
+**Babel**:   
+<a name="isIterable"></a>
+
+## isIterable(obj) ⇒ <code>Boolean</code>
+Ensures an object can be iterated over.
+
+The contract with the symbol providers is that they return an object that
+gives us symbol objects when we iterate over it. It'll probably be an array,
+but we're cool with anything iterable.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - Whether the item will respond correctly to a `for..of`
+  loop.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| obj | <code>?</code> | Anything. |
+
+<a name="timeout"></a>
+
+## timeout(ms) ⇒ <code>Promise.&lt;true&gt;</code>
+Returns a promise that resolves after a given number of milliseconds.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;true&gt;</code> - A promise that resolves with `true` as its argument.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ms | <code>Number</code> | Number of milliseconds after which to resolve. |
+
+<a name="getBadgeTextVariant"></a>
+
+## getBadgeTextVariant(text) ⇒ <code>String</code>
+Given a string of text, returns a hexadecimal character from `0` to `f` to
+represent a classification “bucket.” This is used when assigning colors to
+various symbol badges.
+
+**Kind**: global function  
+**Returns**: <code>String</code> - A single character that represents a hexadecimal digit.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>String</code> | The text of the badge. |
+
+<a name="badge"></a>
+
+## badge(text, options) ⇒ <code>Element</code>
+Return a DOM element for a badge for a given symbol tag name.
+
+**Kind**: global function  
+**Returns**: <code>Element</code> - An element for adding to an `atom-select-view` entry.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>String</code> | The text of the tag. |
+| options | <code>Object</code> | Options. Defaults to an empty object. |
+| options.variant | <code>Boolean</code> | Whether to add a class name for the badge's   “variant.” If enabled, this will attempt to assign a different badge color   for each kind of tag. Optional; defaults to `false`. |
+
 <a name="beforeEach"></a>
 
 ## beforeEach()

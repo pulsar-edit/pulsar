@@ -5313,7 +5313,7 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-humanize-plus@^1.8.2, humanize-plus@~1.8.2:
+humanize-plus@~1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/humanize-plus/-/humanize-plus-1.8.2.tgz#a65b34459ad6367adbb3707a82a3c9f916167030"
   integrity sha512-jaLeQyyzjjINGv7O9JJegjsaUcWjSj/1dcXvLEgU3pGdqCdP1PiC/uwr+saJXhTNBHZtmKnmpXyazgh+eceRxA==
@@ -6989,6 +6989,11 @@ multi-integer-range@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/multi-integer-range/-/multi-integer-range-2.1.0.tgz#73675519ba2146dba22cd35960e9c5e804ffe2fc"
   integrity sha512-hhxJJyEXhLlsCgzMsX10NlPL35yM/v/ThBNlHgLP/84/Wkf6VugIMIVqEH1m0bvOwGYSmz92yhPLKdoPV87BBg==
+
+murmurhash-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/murmurhash-js/-/murmurhash-js-1.0.0.tgz#b06278e21fc6c37fa5313732b0412bcb6ae15f51"
+  integrity sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==
 
 nan@2.14.0:
   version "2.14.0"
@@ -9054,18 +9059,23 @@ sylvester@^0.0.12:
   resolved "https://registry.yarnpkg.com/sylvester/-/sylvester-0.0.12.tgz#5a884415cd2d002c57e7a3aac99462a75ce9fdb4"
   integrity sha512-SzRP5LQ6Ts2G5NyAa/jg16s8e3R7rfdFjizy1zeoecYWw+nGL+YA1xZvW/+iJmidBGSdLkuvdwTYEyJEb+EiUw==
 
-"symbols-view@https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4":
-  version "0.118.4"
-  resolved "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4#cd1b515d4a3d720402b85301ea8e4d6c8815aaf2"
+"symbol-provider-ctags@file:./packages/symbol-provider-ctags":
+  version "1.0.0"
   dependencies:
     async "^0.2.6"
-    atom-select-list "^0.7.0"
     ctags "^3.1.0"
-    fs-plus "^3.0.0"
+    fs-plus "^3.1.1"
+
+"symbol-provider-tree-sitter@file:./packages/symbol-provider-tree-sitter":
+  version "1.0.0"
+
+"symbols-view@file:./packages/symbols-view":
+  version "1.0.0"
+  dependencies:
+    atom-select-list "^0.8.1"
+    fs-plus "^3.1.1"
     fuzzaldrin "^2.1.0"
-    humanize-plus "^1.8.2"
-    temp "^0.8.3"
-    underscore-plus "^1.6.6"
+    murmurhash-js "^1.0.0"
 
 tabbable@^5.1.5:
   version "5.3.3"
@@ -9582,7 +9592,7 @@ unbzip2-stream@1.4.3:
     buffer "^5.2.1"
     through "^2.3.8"
 
-underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.6.6, underscore-plus@^1.7.0, underscore-plus@~1.x:
+underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.7.0, underscore-plus@~1.x:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/underscore-plus/-/underscore-plus-1.7.0.tgz#107f1900c520ac1fefe4edec6580a7ff08a99d0f"
   integrity sha512-A3BEzkeicFLnr+U/Q3EyWwJAQPbA19mtZZ4h+lLq3ttm9kn8WC4R3YpuJZEXmWdLjYP47Zc8aLZm9kwdv+zzvA==
