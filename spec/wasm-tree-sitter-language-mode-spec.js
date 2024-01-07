@@ -52,9 +52,7 @@ let rubyConfig = CSON.readFileSync(rubyGrammarPath);
 let htmlConfig = CSON.readFileSync(htmlGrammarPath);
 
 function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('WASMTreeSitterLanguageMode', () => {
@@ -3802,10 +3800,13 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
-
-      editor.setCursorBufferPosition([2, 4]);
+      console.log('TEXT:\n', editor.getText().replaceAll(' ', '_'));
+      editor.setCursorBufferPosition([2, 0]);
+      editor.insertText('    ');
+      await wait(0);
       editor.insertText('}', { autoIndent: true });
 
+      await languageMode.atTransactionEnd();
       await wait(0);
       expect(editor.lineTextForBufferRow(2)).toEqual(`  }`);
 
