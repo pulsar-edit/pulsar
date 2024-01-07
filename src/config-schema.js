@@ -366,7 +366,7 @@ const configSchema = {
       useLegacyTreeSitter: {
         type: 'boolean',
         default: false,
-        title: 'Use legacy Tree-sitter Implementation',
+        title: 'Use Legacy Tree-sitter Implementation',
         description: 'Opt into the legacy Atom Tree-sitter system instead of the modern system added by Pulsar. (This legacy system will soon be removed.) Has no effect unless “Use Tree-sitter Parsers” is also checked.'
       },
       colorProfile: {

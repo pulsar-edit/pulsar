@@ -153,6 +153,7 @@ class WASMTreeSitterLanguageMode {
     this.grammarRegistry = grammars;
 
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
+    this.useAsyncParsing = FEATURE_ASYNC_PARSE;
 
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
@@ -3261,7 +3262,7 @@ class LanguageLayer {
   }
 
   async update(nodeRangeSet, params = {}) {
-    if (!FEATURE_ASYNC_PARSE) {
+    if (!this.languageMode.useAsyncParsing) {
       // Practically speaking, updates that affect _only this layer_ will happen
       // synchronously, because we've made sure not to call this method until the
       // root grammar's tree-sitter parser has been loaded. But we can't load any
@@ -3493,7 +3494,7 @@ class LanguageLayer {
     this.patchSinceCurrentParseStarted = new Patch();
     let language = this.grammar.getLanguageSync();
     let tree;
-    if (FEATURE_ASYNC_PARSE) {
+    if (this.languageMode.useAsyncParsing) {
       tree = this.languageMode.parseAsync(
         language,
         this.tree,
