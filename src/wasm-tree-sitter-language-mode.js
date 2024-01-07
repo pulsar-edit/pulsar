@@ -566,6 +566,9 @@ class WASMTreeSitterLanguageMode {
     let layers = this.languageLayersAtPoint(point);
     let results = [];
     for (let layer of layers) {
+      if (layer.grammar.scopeName === selector) {
+        return layer.getExtent();
+      }
       let items = layer.scopeMapAtPosition(point);
       for (let { capture, adjustedRange } of items) {
         let range = rangeForNode(adjustedRange);
@@ -3477,6 +3480,11 @@ class LanguageLayer {
   }
 
   async _performUpdate(nodeRangeSet, params = {}) {
+    // It's much more common in specs than in real life, but it's always
+    // possible for a layer to get destroyed during the async period between
+    // layer updates.
+    if (this.destroyed) return;
+
     let includedRanges = null;
     this.rangeList.clear();
 
