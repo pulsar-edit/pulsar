@@ -159,7 +159,7 @@
     "service-hub": "^0.7.4",
     "settings-view": "file:packages/settings-view",
     "sinon": "9.2.1",
-    "snippets": "github:pulsar-edit/snippets#ba70705",
+    "snippets": "github:pulsar-edit/snippets#6b9163415270b8757b262f5dfaafaa05d47324a9",
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "file:packages/spell-check",
