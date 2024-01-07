@@ -1644,7 +1644,7 @@ describe('FuzzyFinder', () => {
             })
 
             if (useRipGrep) {
-              it('does excludes paths that are git ignored', async () => {
+              it('excludes paths that are git ignored', async () => {
                 fs.writeFileSync(path.join(projectPath, 'dir', 'a.txt'), 'something')
 
                 await projectView.toggle()
@@ -1693,6 +1693,81 @@ describe('FuzzyFinder', () => {
                 a.textContent.includes('HEAD'))).not.toBeDefined()
             })
           })
+
+          describe('when the query starts with an exclamation point', () => {
+            beforeEach(() => {
+              const ignoreFile = path.join(projectPath, '.gitignore')
+              fs.writeFileSync(ignoreFile, "ignored.txt\nanother.txt")
+
+              fs.writeFileSync(
+                  path.join(projectPath, 'ignored.txt'),
+                  'this text is not important'
+              )
+              fs.writeFileSync(
+                  path.join(projectPath, 'another.txt'),
+                  'this text is not important'
+              )
+            })
+
+            it('excludes paths that are tracked when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              projectView.selectListView.refs.queryEditor.insertText('!')
+
+              await projectView.toggle()
+              await waitForPathsToDisplay(projectView)
+
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('a.txt'))
+              ).not.toBeDefined()
+            })
+
+            it('includes paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              projectView.selectListView.refs.queryEditor.insertText('!')
+
+              await projectView.toggle()
+              await waitForPathsToDisplay(projectView)
+
+              expect(projectView.queryOverridesIgnore()).toBe(true)
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('ignored.txt'))
+              ).toBeDefined()
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('another.txt'))
+              ).toBeDefined()
+            })
+
+            it('matches paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              projectView.selectListView.refs.queryEditor.insertText('!anoth')
+
+              await projectView.toggle()
+              await waitForPathsToDisplay(projectView)
+
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('ignored.txt'))
+              ).not.toBeDefined()
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('another.txt'))
+              ).toBeDefined()
+            })
+
+            it('excludes paths that are git ignored when indexIgnoredPaths is false', async () => {
+                atom.config.set('fuzzy-finder.indexIgnoredPaths', false)
+                projectView.selectListView.refs.queryEditor.insertText('!ig')
+
+                await projectView.toggle()
+                await waitForReCrawlerToFinish(projectView)
+
+                expect(projectView.queryOverridesIgnore()).toBe(true)
+                expect(projectView.element.querySelectorAll('li').length).toBe(0)
+            })
+          })
         })
 
         describe('when core.excludeVcsIgnoredPaths is set to false', () => {
@@ -1713,6 +1788,29 @@ describe('FuzzyFinder', () => {
               await waitForPathsToDisplay(projectView)
 
               expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).toBeDefined()
+            })
+          })
+
+          describe('when the query starts with an exclamation point', () => {
+            beforeEach(() => {
+              const ignoreFile = path.join(projectPath, '.gitignore')
+              fs.writeFileSync(ignoreFile, 'ignored.txt')
+
+              const ignoredFile = path.join(projectPath, 'ignored.txt')
+              fs.writeFileSync(ignoredFile, 'ignored text')
+            })
+
+            it('excludes paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', false)
+              projectView.selectListView.refs.queryEditor.insertText('!ig')
+
+              await projectView.toggle()
+              await waitForReCrawlerToFinish(projectView)
+
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('ignored.txt'))
+              ).not.toBeDefined()
             })
           })
         })
