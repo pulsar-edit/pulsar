@@ -33,6 +33,7 @@ describe('HTML autocompletions', () => {
   }
 
   beforeEach(() => {
+    atom.config.set('core.useLegacyTreeSitter', true)
     waitsForPromise(() => atom.packages.activatePackage('autocomplete-html'))
     waitsForPromise(() => atom.packages.activatePackage('language-html'))
     waitsForPromise(() => atom.workspace.open('test.html'))
