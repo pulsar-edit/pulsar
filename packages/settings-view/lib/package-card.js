@@ -242,7 +242,7 @@ export default class PackageCard {
 
     const packageAuthorClickHandler = (event) => {
       event.stopPropagation()
-      shell.openExternal(`https://web.pulsar-edit.dev/packages?owner=${ownerFromRepository(this.pack.repository)}`)
+      shell.openExternal(`https://web.pulsar-edit.dev/owners/${ownerFromRepository(this.pack.repository)}`)
     }
     this.refs.loginLink.addEventListener('click', packageAuthorClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.loginLink.removeEventListener('click', packageAuthorClickHandler) }))
