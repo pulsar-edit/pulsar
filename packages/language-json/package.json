@@ -1,5 +1,6 @@
 {
   "name": "language-json",
+  "main": "lib/main",
   "version": "1.0.5",
   "description": "JSON language support in Atom",
   "engines": {
