@@ -107,6 +107,13 @@
 (attribute "=" @punctuation.separator.key-value.html)
 (attribute_name) @entity.other.attribute-name.html
 
+; If this matches, the value is double-quoted.
+(quoted_attribute_value "\"") @string.quoted.double.html
+
+; If this matches, the value is single-quoted.
+(quoted_attribute_value "'") @string.quoted.single.html
+
+
 ; Single- and double-quotes around attribute values.
 ((quoted_attribute_value ["\"" "'"] @punctuation.definition.string.begin.html)
   (#is? test.first true))
@@ -114,11 +121,6 @@
 ((quoted_attribute_value ["\"" "'"] @punctuation.definition.string.end.html)
   (#is? test.last true))
 
-; If this matches, the value is double-quoted.
-(quoted_attribute_value "\"") @string.quoted.double.html
-
-; If this matches, the value is single-quoted.
-(quoted_attribute_value "'") @string.quoted.single.html
 
 ; Prevent quoted attribute values from having `string.unquoted` applied.
 (quoted_attribute_value
