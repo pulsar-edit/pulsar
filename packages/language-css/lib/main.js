@@ -8,7 +8,8 @@ exports.activate = () => {
     language(node) {
       return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
     },
-    content: (node) => node
+    content: (node) => node,
+    languageScope: null
   });
 
   for (let type of ['comment', 'string_value']) {
@@ -17,7 +18,8 @@ exports.activate = () => {
       language(node) {
         return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
       },
-      content: (node) => node
+      content: (node) => node,
+      languageScope: null
     });
   }
 
