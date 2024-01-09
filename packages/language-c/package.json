@@ -10,7 +10,7 @@
   "license": "MIT",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
   },
   "dependencies": {
     "tree-sitter-c": "0.20.2",
