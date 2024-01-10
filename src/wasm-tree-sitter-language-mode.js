@@ -1400,6 +1400,42 @@ class WASMTreeSitterLanguageMode {
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
 
+      // The controlling layer on the previous line gets to decide what our
+      // starting indent is on the current line. But it might not extend to the
+      // current line, so we should determine which layer is in charge of the
+      // second phase.
+      let rowStart = new Point(row, 0);
+      let dedentControllingLayer = this.controllingLayerAtPoint(
+        rowStart,
+        (layer) => {
+          if (!layer.indentsQuery) return false;
+          // We're inverting the logic from above: now we want to allow layers
+          // that _begin_ at the cursor and exclude layers that _end_ at the
+          // cursor. Because we'll be analyzing content that comes _after_ the
+          // cursor to understand whether to dedent!
+          //
+          // So first we test for containment exclusive of endpoints…
+          if (layer.containsPoint(rowStart, true)) {
+            return true;
+          }
+
+          // …but we'll still accept layers that have a content range which
+          // _starts_ at the cursor position.
+          return layer.getCurrentRanges()?.some(r => {
+            return r.start.compare(rowStart) === 0;
+          });
+        }
+      );
+
+      if (dedentControllingLayer && dedentControllingLayer !== controllingLayer) {
+        // If this layer is different from the one we used above, then we
+        // should run this layer's indents query against its own tree. If _no_
+        // layers qualify at this position, we can still reluctantly use the
+        // original layer.
+        indentsQuery = dedentControllingLayer.indentsQuery;
+        indentTree = dedentControllingLayer.getOrParseTree();
+      }
+
       // The second phase covers any captures on the current line that can
       // cause the current line to be indented or dedented.
       let dedentCaptures = indentsQuery.captures(

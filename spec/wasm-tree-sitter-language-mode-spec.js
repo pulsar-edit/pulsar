@@ -1625,9 +1625,16 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // `suggestedIndentForBufferRows` should use the HTML grammar to
       // determine the indent level of `let foo` rather than the JS grammar.
+      //
+      // And on line 5, it should use the JavaScript grammar to determine
+      // `</script>`'s _initial_ indentation level, but the HTML grammar to
+      // determine whether to dedent relative to that initial level.
       buffer.setText(dedent`
         <script>
           let foo;
+          if (foo) {
+            debug(true);
+          }
         </script>
       `);
 
@@ -1641,9 +1648,9 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
-      let map = languageMode.suggestedIndentForBufferRows(1, 1, editor.getTabLength());
+      let map = languageMode.suggestedIndentForBufferRows(0, 5, editor.getTabLength());
 
-      expect(map.get(1)).toBe(1);
+      expect(Array.from(map.values())).toEqual([0, 1, 1, 2, 1, 0]);
     });
   });
 
@@ -3285,7 +3292,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.set('whitespace.removeTrailingWhitespace', false);
     });
 
-    it('interprets @indent and @dedent captures', async () => {
+    fit('interprets @indent and @dedent captures', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
