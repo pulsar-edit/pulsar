@@ -274,6 +274,10 @@
 ; builtin (for referring to the parent class).
 (relative_scope) @variable.language.builtin._TEXT_.php
 
+(object_creation_expression
+  (name ["self" "parent" "static"] @variable.language.builtin._TEXT_.php)
+  (#set! capture.final true))
+
 ; The "$foo" in `function bar($foo) {`.
 (formal_parameters
   (simple_parameter
