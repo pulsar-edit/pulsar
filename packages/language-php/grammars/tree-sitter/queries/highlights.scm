@@ -202,24 +202,33 @@
 ; NAMESPACES
 ; ==========
 
+; The "Foo" in `use Bar as Foo;`
+(namespace_aliasing_clause
+  (name) @entity.name.type.namespace.alias.php)
+
+; The "Bar" in `use Bar as Foo;`
+(namespace_use_clause
+  (name) @entity.name.type.namespace.aliased.php
+  . (namespace_aliasing_clause)
+  (#set! capture.final true)
+)
+
+; The "Foo" and "Bar" in `use Foo\Bar\Baz;`.
+(namespace_name_as_prefix
+  (namespace_name) @support.other.namespace.php)
+
+; The last segment of a namespace; the "Baz" in `Foo\Bar\Baz;`.
+(qualified_name (name) @entity.name.type.namespace.php)
+
 ; The "Foo" in `namespace Foo;`
 (namespace_definition
   name: (namespace_name
     (name) @entity.name.type.namespace.php)
     (#set! isNamespaceDefinition true))
 
-; The "Bar" and "Foo" in `use Bar as Foo;`
-(namespace_use_clause
-  (name) @variable.other.namespace.aliased.php
-  (#set! isPartOfNamespaceAlias true)
-  (namespace_aliasing_clause
-    (name) @entity.name.type.namespace.alias.php))
-
 ; The "Foo" in `use Foo;`
-; Also the "Foo" and "Bar" in `use Foo\Bar;`
-((name) @entity.name.type.namespace.php
-  (#is-not? test.rangeWithData isPartOfNamespaceAlias)
-  (#is? test.descendantOfType "namespace_use_clause"))
+(namespace_use_clause (name) @entity.name.type.namespace.php)
+
 
 ; The "Foo" in `Foo\Bar::method();`
 (namespace_name
@@ -233,12 +242,18 @@
 
 (class_declaration (name) @entity.name.type.class.php)
 
+(class_declaration (base_clause (name) @entity.other.inherited-class.php))
+(class_declaration (class_interface_clause (name) @entity.other.implemented-interface.php))
+
 ; Static method calls.
 (scoped_call_expression
   name: (name) @support.other.function.method.static.php)
 
 (member_call_expression
   name: (name) @support.other.function.method.php)
+
+(scoped_call_expression
+  scope: (name) @support.class.php)
 
 
 ; TRAITS
@@ -309,10 +324,6 @@
 
 ((name) @constant.language.php
  (#match? @constant.language.php "^__[A-Z][A-Z\d_]+__$"))
-
-((name) @support.other.function.constructor.php
-  (#match? @support.other.function.constructor.php "^[A-Z]")
-  (#set! capture.shy true))
 
 (argument
   name: (_) @variable.other.named-argument.php
@@ -480,6 +491,9 @@
 "=>" @punctuation.separator.key-value.php
 
 "\\" @keyword.operator.namespace.php
+"::" @keyword.operator.accessor.php
+
+";" @punctuation.terminator.statement.php;
 
 (unary_op_expression "!" @keyword.operator.unary.php)
 
