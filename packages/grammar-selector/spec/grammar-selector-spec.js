@@ -368,7 +368,7 @@ describe('GrammarSelector', () => {
     });
 
     describe('when grammar-selector:show is triggered', () => {
-      it('displays a list of all the available grammars ', async () => {
+      it('displays a list of all the available grammars', async () => {
         const grammarView = (await getGrammarView(editor)).element;
 
         // -1 for removing nullGrammar, +1 for adding "Auto Detect"
