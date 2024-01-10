@@ -257,7 +257,7 @@
 
 "global" @storage.modifier.global.php
 
-["trait" "class"] @storage.type.TYPE.php
+["trait" "class"] @storage.type._TYPE_.php
 "function" @storage.type.function.php
 "fn" @storage.type.function.arrow.php
 
@@ -353,7 +353,6 @@
   "endswitch"
   "endwhile"
   "extends"
-  "final"
   "finally"
   "foreach"
   "if"
@@ -375,9 +374,11 @@
 ] @keyword.control._TYPE_.php
 
 [
+  "final"
   "private"
   "protected"
   "public"
+  "readonly"
   "static"
 ] @storage.modifier._TYPE_.php
 
@@ -492,3 +493,6 @@
 ")" @punctuation.definition.end.bracket.round.php
 "[" @punctuation.definition.begin.bracket.square.php
 "]" @punctuation.definition.end.bracket.square.php
+
+(php_tag) @punctuation.section.embedded.begin.php
+"?>" @punctuation.section.embedded.end.php
