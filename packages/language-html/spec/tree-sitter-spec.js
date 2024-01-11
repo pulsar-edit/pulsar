@@ -3,7 +3,7 @@ const dedent = require('dedent');
 describe('Tree-sitter HTML grammar', () => {
   beforeEach(async () => {
     atom.config.set('core.useTreeSitterParsers', true);
-    atom.config.set('core.useExperimentalModernTreeSitter', false);
+    atom.config.set('core.useLegacyTreeSitter', true);
     await atom.packages.activatePackage('language-html');
   });
 

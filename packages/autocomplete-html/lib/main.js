@@ -9,7 +9,8 @@ const provider = {
 
   getSuggestions (request) {
     try {
-      if (request.editor.getBuffer().getLanguageMode().tree) {
+      let languageMode = request.editor.getBuffer().getLanguageMode();
+      if (languageMode.constructor.name === 'TreeSitterLanguageMode') {
         return getSuggestionsWithTreeSitter(request)
       } else {
         return getSuggestionsWithTextMate(request)

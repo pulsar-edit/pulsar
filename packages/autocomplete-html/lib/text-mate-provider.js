@@ -50,7 +50,7 @@ function isTagStart ({prefix, scopeDescriptor, bufferPosition, editor}) {
 function isAttributeStart ({prefix, scopeDescriptor, bufferPosition, editor}) {
   const scopes = scopeDescriptor.getScopesArray()
   if (!getPreviousAttribute(editor, bufferPosition) && prefix && !prefix.trim()) {
-    return hasTagScope(scopes)
+    return hasTagScope(scopes) || afterTagScope(editor, bufferPosition)
   }
 
   const previousBufferPosition = [bufferPosition.row, Math.max(0, bufferPosition.column - 1)]
@@ -68,12 +68,36 @@ function isAttributeStart ({prefix, scopeDescriptor, bufferPosition, editor}) {
   )
 }
 
+// This fixes the
+//
+// <div |
+//
+// scenario in Tree-sitter grammars — no closing `>` on the tag, so we should
+// move back to the nearest text and try to read the scopes from there.
+// Designed to work no matter how many spaces there are between the end of the
+// tag name and the cursor.
+function afterTagScope (editor, bufferPosition) {
+  let cursor = editor.getCursors().find(cursor => {
+    return cursor.getBufferPosition().isEqual(bufferPosition)
+  })
+  if (!cursor) return false;
+  let position = cursor.getPreviousWordBoundaryBufferPosition();
+  position = position.translate([0, -1]);
+  let scopes = editor.scopeDescriptorForBufferPosition(position);
+  return scopes.getScopesArray().some(t => t.startsWith('entity.name.tag'));
+}
+
 function isAttributeValueStart ({scopeDescriptor, bufferPosition, editor}) {
   const scopes = scopeDescriptor.getScopesArray()
 
   const previousBufferPosition = [bufferPosition.row, Math.max(0, bufferPosition.column - 1)]
   const previousScopes = editor.scopeDescriptorForBufferPosition(previousBufferPosition)
   const previousScopesArray = previousScopes.getScopesArray()
+
+  // This is an unambiguous case — if the cursor is on the right side of the
+  // opening quote, then we must be in the right place.
+  if (previousScopesArray.includes('punctuation.definition.string.begin.html'))
+    return true
 
   // autocomplete here: attribute="|"
   // not here: attribute=|""

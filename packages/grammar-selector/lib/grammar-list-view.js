@@ -26,11 +26,12 @@ module.exports = class GrammarListView {
           let badgeColor = 'badge-success';
           let badgeText = 'Tree-sitter';
 
-          if (isExperimentalTreeSitterMode()) {
-            badgeColor = isModernTreeSitter(grammar) ?
+          if (isLegacyTreeSitterMode()) {
+            // Color the legacy badge green to represent the user's preference.
+            badgeColor = isLegacyTreeSitter(grammar) ?
               'badge-success' : 'badge-warning';
-            badgeText = isModernTreeSitter(grammar) ?
-              'Tree-sitter' : 'Legacy Tree-sitter';
+            badgeText = isLegacyTreeSitter(grammar) ?
+              'Legacy Tree-sitter' : 'Modern Tree-sitter';
           }
 
           parser.classList.add(
@@ -118,13 +119,15 @@ module.exports = class GrammarListView {
           return grammar !== atom.grammars.nullGrammar && grammar.name;
         });
 
-      // Don't show modern tree-sitter grammars in the selector unless the user
+      // Don't show legacy Tree-sitter grammars in the selector unless the user
       // has opted into it.
-      if (!isExperimentalTreeSitterMode()) {
-        grammars = grammars.filter(grammar => !isModernTreeSitter(grammar));
+      if (!isLegacyTreeSitterMode()) {
+        grammars = grammars.filter(grammar => !isLegacyTreeSitter(grammar));
       }
 
       if (atom.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
+        // Filter out all TextMate grammars for which there is a Tree-sitter
+        // grammar with the exact same name.
         const blacklist = new Set();
         grammars.forEach(grammar => {
           if (isTreeSitter(grammar)) {
@@ -155,24 +158,24 @@ module.exports = class GrammarListView {
 
 function getLanguageModeConfig() {
   let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
-  let isExperimental = atom.config.get('core.useExperimentalModernTreeSitter');
+  let isLegacy = atom.config.get('core.useLegacyTreeSitter');
   if (!isTreeSitterMode) return 'textmate';
-  return isExperimental ? 'wasm-tree-sitter' : 'node-tree-sitter';
+  return isLegacy ? 'node-tree-sitter' : 'wasm-tree-sitter';
 }
 
-function isExperimentalTreeSitterMode() {
-  return getLanguageModeConfig() === 'wasm-tree-sitter';
+function isLegacyTreeSitterMode() {
+  return getLanguageModeConfig() === 'node-tree-sitter';
 }
 
 function isTreeSitter(grammar) {
-  return isOldTreeSitter(grammar) || isModernTreeSitter(grammar);
+  return isLegacyTreeSitter(grammar) || isModernTreeSitter(grammar);
 }
 
 function isModernTreeSitter(grammar) {
   return grammar.constructor.name === 'WASMTreeSitterGrammar';
 }
 
-function isOldTreeSitter(grammar) {
+function isLegacyTreeSitter(grammar) {
   return grammar.constructor.name === 'TreeSitterGrammar';
 }
 
@@ -182,7 +185,11 @@ function compareGrammarType(a, b) {
 
 function getGrammarScore(grammar) {
   let languageParser = getLanguageModeConfig();
-  if (isModernTreeSitter(grammar)) { return -2; }
-  if (isOldTreeSitter(grammar)) { return -1; }
+  if (isModernTreeSitter(grammar)) {
+    return languageParser === 'node-tree-sitter' ? -1 : -2;
+  }
+  if (isLegacyTreeSitter(grammar)) {
+    return languageParser === 'node-tree-sitter' ? -2 : -1;
+  }
   return languageParser === 'textmate' ? -3 : 0;
 }

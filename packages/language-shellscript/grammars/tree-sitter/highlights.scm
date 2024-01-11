@@ -36,7 +36,8 @@
   ["local" "export"] @storage.modifier._TYPE_.shell)
 
 (variable_assignment
-  (variable_name) @variable.other.member.shell)
+  (variable_name) @variable.other.member.shell
+  (#set! capture.final true))
 
 
 (simple_expansion

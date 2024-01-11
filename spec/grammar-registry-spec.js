@@ -11,9 +11,9 @@ const { OnigScanner } = SecondMate;
 // Expects one of `textmate`, `node-tree-sitter`, or `wasm-tree-sitter`.
 function setConfigForLanguageMode(mode, options = {}) {
   let useTreeSitterParsers = mode !== 'textmate';
-  let useExperimentalModernTreeSitter = mode === 'wasm-tree-sitter';
+  let useLegacyTreeSitter = mode === 'node-tree-sitter';
   atom.config.set('core.useTreeSitterParsers', useTreeSitterParsers, options);
-  atom.config.set('core.useExperimentalModernTreeSitter', useExperimentalModernTreeSitter, options);
+  atom.config.set('core.useLegacyTreeSitter', useLegacyTreeSitter, options);
 }
 
 describe('GrammarRegistry', () => {

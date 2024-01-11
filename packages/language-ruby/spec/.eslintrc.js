@@ -2,7 +2,9 @@ module.exports = {
   env: { jasmine: true },
   globals: {
     waitsForPromise: true,
-    advanceClock: true
+    runGrammarTests: true,
+    runFoldsTests: true,
+    normalizeTreeSitterTextData: true
   },
   rules: {
     "node/no-unpublished-require": "off",

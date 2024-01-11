@@ -4,7 +4,7 @@
   "description": "YAML language support in Atom",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT"

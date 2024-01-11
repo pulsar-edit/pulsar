@@ -1983,63 +1983,62 @@ describe('Workspace', () => {
     });
   });
 
-  it('stores the active grammars used by all the open editors', () => {
-    waitsForPromise(() => atom.packages.activatePackage('language-javascript'));
+  it('stores the active grammars used by all the open editors', async () => {
+    await Promise.all([
+      atom.packages.activatePackage('language-javascript'),
+      atom.packages.activatePackage('language-coffee-script'),
+      atom.packages.activatePackage('language-todo'),
+    ]);
 
-    waitsForPromise(() =>
-      atom.packages.activatePackage('language-coffee-script')
+    await atom.workspace.open('sample.coffee');
+
+    atom.workspace.getActiveTextEditor().setText(dedent`
+      i = /test/; #FIXME\
+    `);
+
+    const atom2 = new AtomEnvironment({
+      applicationDelegate: atom.applicationDelegate
+    });
+    atom2.initialize({
+      window: document.createElement('div'),
+      document: Object.assign(document.createElement('div'), {
+        body: document.createElement('div'),
+        head: document.createElement('div')
+      })
+    });
+
+    atom2.packages.loadPackage('language-javascript');
+    atom2.packages.loadPackage('language-coffee-script');
+    atom2.packages.loadPackage('language-todo');
+    atom2.project.deserialize(atom.project.serialize());
+    atom2.workspace.deserialize(
+      atom.workspace.serialize(),
+      atom2.deserializers
     );
 
-    waitsForPromise(() => atom.packages.activatePackage('language-todo'));
+    let grammars = atom2.grammars
+      .getGrammars({ includeTreeSitter: true });
 
-    waitsForPromise(() => atom.workspace.open('sample.coffee'));
+    let grammarScopes = grammars.map(grammar => grammar.scopeName).sort();
 
-    runs(() => {
-      atom.workspace.getActiveTextEditor().setText(dedent`
-        i = /test/; #FIXME\
-      `);
+    expect(
+      grammarScopes
+    ).toEqual([
+      'source.coffee',
+      'source.js', // Tree-sitter grammars also load
+      'source.js',
+      'source.js.regexp',
+      'source.js.regexp',
+      'source.js.regexp.replacement',
+      'source.jsdoc',
+      'source.jsdoc',
+      'source.litcoffee',
+      'text.plain.null-grammar',
+      'text.todo',
+      'text.todo'
+    ]);
 
-      const atom2 = new AtomEnvironment({
-        applicationDelegate: atom.applicationDelegate
-      });
-      atom2.initialize({
-        window: document.createElement('div'),
-        document: Object.assign(document.createElement('div'), {
-          body: document.createElement('div'),
-          head: document.createElement('div')
-        })
-      });
-
-      atom2.packages.loadPackage('language-javascript');
-      atom2.packages.loadPackage('language-coffee-script');
-      atom2.packages.loadPackage('language-todo');
-      atom2.project.deserialize(atom.project.serialize());
-      atom2.workspace.deserialize(
-        atom.workspace.serialize(),
-        atom2.deserializers
-      );
-
-      expect(
-        atom2.grammars
-          .getGrammars({ includeTreeSitter: true })
-          .map(grammar => grammar.scopeName)
-          .sort()
-      ).toEqual([
-        'source.coffee',
-        'source.js', // Tree-sitter grammars also load
-        'source.js',
-        'source.js.regexp',
-        'source.js.regexp',
-        'source.js.regexp.replacement',
-        'source.jsdoc',
-        'source.jsdoc',
-        'source.litcoffee',
-        'text.plain.null-grammar',
-        'text.todo'
-      ]);
-
-      atom2.destroy();
-    });
+    atom2.destroy();
   });
 
   describe('document.title', () => {
