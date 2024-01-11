@@ -106,7 +106,7 @@ class SpeledWrong {}`
         }
 
         {
-            atom.config.set('spell-check.excludedScopes', []);
+            atom.config.set('spell-check.excludedScopes', ['.functio.entity']);
             await conditionPromise(() => getMisspellingMarkers().length === 3);
             const markers = getMisspellingMarkers();
             expect(markers.map((marker) => marker.getBufferRange())).toEqual([
