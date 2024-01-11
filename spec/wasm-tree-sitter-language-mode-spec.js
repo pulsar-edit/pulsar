@@ -3292,7 +3292,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.set('whitespace.removeTrailingWhitespace', false);
     });
 
-    fit('interprets @indent and @dedent captures', async () => {
+    it('interprets @indent and @dedent captures', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
