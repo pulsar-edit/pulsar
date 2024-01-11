@@ -2016,18 +2016,8 @@ describe('Workspace', () => {
       atom2.deserializers
     );
 
-    // HACK: This test rightly identified that our JS regexp injection grammar
-    // was using the `source.regexp.js` scope name instead of
-    // `source.js.regexp`. That change has been made in source, but these tests
-    // seem to be drawing packages from `node_modules`. Presumably this will be
-    // fixed once the name change propagates to a release. In the meantime,
-    // we'll fix it manually here just to make the test happy, then revert this
-    // hack later when it isn't needed.
     let grammars = atom2.grammars
       .getGrammars({ includeTreeSitter: true });
-
-    let grammarToFix = grammars.find(g => g.scopeName === 'source.regexp.js');
-    if (grammarToFix) grammarToFix.scopeName = 'source.js.regexp';
 
     let grammarScopes = grammars.map(grammar => grammar.scopeName).sort();
 

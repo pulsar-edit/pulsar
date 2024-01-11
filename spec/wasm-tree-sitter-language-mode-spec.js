@@ -3800,7 +3800,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
-      console.log('TEXT:\n', editor.getText().replaceAll(' ', '_'));
       editor.setCursorBufferPosition([2, 0]);
       editor.insertText('    ');
       await wait(0);
