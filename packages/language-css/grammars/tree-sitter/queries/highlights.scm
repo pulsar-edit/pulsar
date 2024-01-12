@@ -113,6 +113,8 @@
 (attribute_selector
   ["=" "^=" "$=" "~=" "|="] @keyword.operator.pattern.css)
 
+; The `foo` in `@keyframes foo {`.
+(keyframes_name) @entity.name.keyframes.css
 
 ; VARIABLES
 ; =========
@@ -286,15 +288,18 @@
 ((rule_set) @meta.selector.css
   (#set! adjust.endBeforeFirstMatchOf "{"))
 
+; Scope the inside of a media query block so that tooling doesn't mistake it
+; for a property/value pair.
+(keyword_query) @meta.media-query.css
+((feature_query) @meta.media-query.css
+  (#set! adjust.startAfterFirstMatchOf "^\\(")
+  (#set! adjust.endBeforeFirstMatchOf "\\)$"))
+
+(parenthesized_query) @meta.media-query.css
+
 
 ; META
 ; ====
-
-[
-  (plain_value)
-  (integer_value)
-  (string_value)
-] @meta.property-value.css
 
 ; `!important` starts out as an ERROR node as it's being typed, but we need it
 ; to be recognized as a possible property value for `autocomplete-css` to be

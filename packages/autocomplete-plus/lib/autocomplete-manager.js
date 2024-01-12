@@ -1,7 +1,5 @@
 const {CompositeDisposable, Disposable, Point, Range} = require('atom')
 const path = require('path')
-const fuzzaldrin = require('fuzzaldrin')
-const fuzzaldrinPlus = require('fuzzaldrin-plus')
 
 const ProviderManager = require('./provider-manager')
 const SuggestionList = require('./suggestion-list')
@@ -190,7 +188,6 @@ class AutocompleteManager {
     this.subscriptions.add(atom.config.observe('autocomplete-plus.enableAutoActivation', (value) => { this.autoActivationEnabled = value }))
     this.subscriptions.add(atom.config.observe('autocomplete-plus.enableAutoConfirmSingleSuggestion', (value) => { this.autoConfirmSingleSuggestionEnabled = value }))
     this.subscriptions.add(atom.config.observe('autocomplete-plus.consumeSuffix', (value) => { this.consumeSuffix = value }))
-    this.subscriptions.add(atom.config.observe('autocomplete-plus.useAlternateScoring', (value) => { this.useAlternateScoring = value }))
     this.subscriptions.add(atom.config.observe('autocomplete-plus.fileBlacklist', (value) => {
       if (value) {
         this.fileBlacklist = value.map((s) => { return s.trim() })
@@ -365,7 +362,6 @@ class AutocompleteManager {
 
   filterSuggestions (suggestions, {prefix}) {
     const results = []
-    const fuzzaldrinProvider = this.useAlternateScoring ? fuzzaldrinPlus : fuzzaldrin
     for (let i = 0; i < suggestions.length; i++) {
       // sortScore mostly preserves in the original sorting. The function is
       // chosen such that suggestions with a very high match score can break out.
@@ -382,7 +378,7 @@ class AutocompleteManager {
         results.push(suggestion)
       } else {
         const keepMatching = suggestion.ranges || suggestionPrefix[0].toLowerCase() === text[0].toLowerCase()
-        if (keepMatching && (score = fuzzaldrinProvider.score(text, suggestionPrefix)) > 0) {
+        if (keepMatching && (score = atom.ui.fuzzyMatcher.score(text, suggestionPrefix)) > 0) {
           suggestion.score = score * suggestion.sortScore
           results.push(suggestion)
         }

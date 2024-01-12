@@ -3,8 +3,6 @@
 ; * No support for lookbehind as of March 2023 (waiting on
 ; https://github.com/tree-sitter/tree-sitter-regex/pull/15)
 
-(pattern) @string.regexp
-
 (non_capturing_group) @meta.group.non-capturing.regexp
 
 [

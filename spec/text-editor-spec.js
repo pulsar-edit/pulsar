@@ -7,9 +7,17 @@ const os = require('os');
 const TextEditor = require('../src/text-editor');
 const TextBuffer = require('text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
+const WASMTreeSitterLanguageMode = require('../src/wasm-tree-sitter-language-mode');
+
+async function languageModeReady (editor) {
+  let languageMode = editor.getBuffer().getLanguageMode();
+  if (languageMode.ready) {
+    await languageMode.ready;
+  }
+}
 
 describe('TextEditor', () => {
-  let buffer, editor, lineLengths;
+  let buffer, editor, lineLengths, languageMode;
 
   beforeEach(async () => {
     editor = await atom.workspace.open('sample.js');
@@ -17,7 +25,21 @@ describe('TextEditor', () => {
     editor.update({ autoIndent: false });
     lineLengths = buffer.getLines().map(line => line.length);
     await atom.packages.activatePackage('language-javascript');
+    languageMode = buffer.getLanguageMode();
+    if ('useAsyncParsing' in languageMode) {
+      languageMode.useAsyncParsing = false;
+      languageMode.useAsyncIndent = false;
+    }
+    if (languageMode.ready) {
+      await languageMode.ready;
+    }
   });
+
+  afterEach(async () => {
+    if (languageMode?.atTransactionEnd) {
+      await languageMode.atTransactionEnd();
+    }
+  })
 
   it('generates unique ids for each editor', async () => {
     // Deserialized editors are initialized with the serialized id. We can
@@ -2222,7 +2244,7 @@ describe('TextEditor', () => {
         expect(scopeDescriptors[0].getScopesArray()).toEqual(['source.js']);
         expect(scopeDescriptors[1].getScopesArray()).toEqual([
           'source.js',
-          'string.quoted'
+          'string.quoted.single.js'
         ]);
 
         spyOn(
@@ -4159,9 +4181,10 @@ describe('TextEditor', () => {
         });
       });
 
-      it("inserts a newline below the cursor's current line, autoindents it, and moves the cursor to the end of the line", () => {
+      it("inserts a newline below the cursor's current line, autoindents it, and moves the cursor to the end of the line", async () => {
         editor.update({ autoIndent: true });
         editor.insertNewlineBelow();
+        await languageMode.atTransactionEnd();
         expect(buffer.lineForRow(0)).toBe('var quicksort = function () {');
         expect(buffer.lineForRow(1)).toBe('  ');
         expect(editor.getCursorBufferPosition()).toEqual([1, 2]);
@@ -5354,12 +5377,13 @@ describe('TextEditor', () => {
           });
 
           describe('when pasting line(s) above a line that matches the decreaseIndentPattern', () =>
-            it('auto-indents based on the pasted line(s) only', () => {
+            it('auto-indents based on the pasted line(s) only', async () => {
               atom.clipboard.write('a(x);\n  b(x);\n    c(x);\n', {
                 indentBasis: 0
               });
               editor.setCursorBufferPosition([7, 0]);
               editor.pasteText();
+              await languageMode.atTransactionEnd();
 
               expect(editor.lineTextForBufferRow(7)).toBe('      a(x);');
               expect(editor.lineTextForBufferRow(8)).toBe('        b(x);');
@@ -6822,7 +6846,7 @@ describe('TextEditor', () => {
   describe("when the buffer's language mode changes", () => {
     beforeEach(() => {
       atom.config.set('core.useTreeSitterParsers', false);
-;
+
     });
 
     it('notifies onDidTokenize observers when retokenization is finished', async () => {
@@ -6907,7 +6931,7 @@ describe('TextEditor', () => {
         });
 
         describe('when the line preceding the newline is a comment', () => {
-          it('maintains the indent of the commented line', () => {
+          it('maintains the indent of the commented line', async () => {
             editor.setCursorBufferPosition([0, 0]);
             editor.insertText('    //');
             editor.setCursorBufferPosition([0, Infinity]);
@@ -7380,7 +7404,7 @@ describe('TextEditor', () => {
   describe("when the editor's grammar has an injection selector", () => {
     beforeEach(async () => {
       atom.config.set('core.useTreeSitterParsers', false);
-;
+
       await atom.packages.activatePackage('language-text');
       await atom.packages.activatePackage('language-javascript');
     });
@@ -8070,45 +8094,52 @@ describe('TextEditor', () => {
   describe('indent guides', () => {
     it('shows indent guides when `editor.showIndentGuide` is set to true and the editor is not mini', () => {
       editor.update({ showIndentGuide: false });
+
       expect(editor.tokensForScreenRow(1).slice(0, 3)).toEqual([
         {
           text: '  ',
-          scopes: ['syntax--source syntax--js', 'leading-whitespace']
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js', 'leading-whitespace']
         },
         {
           text: 'var',
-          scopes: ['syntax--source syntax--js', 'syntax--storage syntax--type']
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js', 'syntax--storage syntax--type syntax--var syntax--js']
         },
-        { text: ' sort ', scopes: ['syntax--source syntax--js'] }
+        {
+          text: ' ',
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js']
+        }
       ]);
 
       editor.update({ showIndentGuide: true });
       expect(editor.tokensForScreenRow(1).slice(0, 3)).toEqual([
         {
           text: '  ',
-          scopes: [
-            'syntax--source syntax--js',
-            'leading-whitespace indent-guide'
-          ]
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js', 'leading-whitespace indent-guide']
         },
         {
           text: 'var',
-          scopes: ['syntax--source syntax--js', 'syntax--storage syntax--type']
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js', 'syntax--storage syntax--type syntax--var syntax--js']
         },
-        { text: ' sort ', scopes: ['syntax--source syntax--js'] }
+        {
+          text: ' ',
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js']
+        }
       ]);
 
       editor.setMini(true);
       expect(editor.tokensForScreenRow(1).slice(0, 3)).toEqual([
         {
           text: '  ',
-          scopes: ['syntax--source syntax--js', 'leading-whitespace']
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js', 'leading-whitespace']
         },
         {
           text: 'var',
-          scopes: ['syntax--source syntax--js', 'syntax--storage syntax--type']
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js', 'syntax--storage syntax--type syntax--var syntax--js']
         },
-        { text: ' sort ', scopes: ['syntax--source syntax--js'] }
+        {
+          text: ' ',
+          scopes: ['syntax--source syntax--js', 'syntax--meta syntax--block syntax--function syntax--js']
+        }
       ]);
     });
   });
@@ -8183,7 +8214,7 @@ describe('TextEditor', () => {
   describe('.syntaxTreeScopeDescriptorForBufferPosition(position)', () => {
     it('returns the result of scopeDescriptorForBufferPosition() when textmate language mode is used', async () => {
       atom.config.set('core.useTreeSitterParsers', false);
-;
+
       editor = await atom.workspace.open('sample.js', { autoIndent: false });
       await atom.packages.activatePackage('language-javascript');
 
@@ -8209,6 +8240,50 @@ describe('TextEditor', () => {
         'support.variable.property.js'
       ]);
     });
+<<<<<<< HEAD
+=======
+
+    it('returns the result of syntaxTreeScopeDescriptorForBufferPosition() when tree-sitter language mode is used', async () => {
+      jasmine.useRealClock();
+      editor = await atom.workspace.open('sample.js', { autoIndent: false });
+      await atom.packages.activatePackage('language-javascript');
+
+      let buffer = editor.getBuffer();
+
+      let languageMode = new WASMTreeSitterLanguageMode({
+        buffer,
+        grammar: atom.grammars.grammarForScopeName('source.js'),
+        grammars: atom.grammars
+      });
+
+      languageMode.useAsyncParsing = false;
+      languageMode.useAsyncIndent = false;
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      const syntaxTreeeScopeDescriptor = editor.syntaxTreeScopeDescriptorForBufferPosition(
+        [4, 17]
+      );
+      expect(syntaxTreeeScopeDescriptor.getScopesArray()).toEqual([
+        'source.js',
+        'program',
+        'variable_declaration',
+        'variable_declarator',
+        'function',
+        'statement_block',
+        'variable_declaration',
+        'variable_declarator',
+        'function',
+        'statement_block',
+        'while_statement',
+        'parenthesized_expression',
+        'binary_expression',
+        'member_expression',
+        'property_identifier'
+      ]);
+    });
+>>>>>>> origin/master
   });
 
   describe('.shouldPromptToSave()', () => {
@@ -8712,6 +8787,7 @@ describe('TextEditor', () => {
     describe('.unfoldAll()', () => {
       it('unfolds every folded line', async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await languageModeReady(editor);
 
         const initialScreenLineCount = editor.getScreenLineCount();
         editor.foldBufferRow(0);
@@ -8727,6 +8803,7 @@ describe('TextEditor', () => {
         editor = await atom.workspace.open('sample-with-comments.js', {
           autoIndent: false
         });
+        await languageModeReady(editor);
 
         const initialScreenLineCount = editor.getScreenLineCount();
         editor.foldBufferRow(0);
@@ -8742,6 +8819,7 @@ describe('TextEditor', () => {
     describe('.foldAll()', () => {
       it('folds every foldable line', async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await languageModeReady(editor);
 
         editor.foldAll();
         const [fold1, fold2, fold3] = editor.unfoldAll();
@@ -8754,6 +8832,7 @@ describe('TextEditor', () => {
     describe('.foldBufferRow(bufferRow)', () => {
       beforeEach(async () => {
         editor = await atom.workspace.open('sample.js');
+        await languageModeReady(editor);
       });
 
       describe('when bufferRow can be folded', () => {
@@ -8816,6 +8895,7 @@ describe('TextEditor', () => {
     describe('.foldAllAtIndentLevel(indentLevel)', () => {
       it('folds blocks of text at the given indentation level', async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
+        await languageModeReady(editor);
 
         editor.foldAllAtIndentLevel(0);
         expect(editor.lineTextForScreenRow(0)).toBe(
@@ -8849,6 +8929,7 @@ describe('TextEditor', () => {
         editor = await atom.workspace.open('sample-with-comments.js', {
           autoIndent: false
         });
+        await languageModeReady(editor);
 
         editor.foldAllAtIndentLevel(0);
         const folds = editor.unfoldAll();

@@ -2,8 +2,6 @@
 
 import SelectListView from 'atom-select-list'
 import {humanizeKeystroke} from 'underscore-plus'
-import fuzzaldrin from 'fuzzaldrin'
-import fuzzaldrinPlus from 'fuzzaldrin-plus'
 
 export default class CommandPaletteView {
   constructor (initiallyVisibleItemCount = 10) {
@@ -55,7 +53,7 @@ export default class CommandPaletteView {
 
           if (Array.isArray(item.tags)) {
             const matchingTags = item.tags
-              .map(t => [t, this.fuzz.score(t, query)])
+              .map(t => [t, atom.ui.fuzzyMatcher.score(t, query)])
               .filter(([t, s]) => s > 0)
               .sort((a, b) => a.s - b.s)
               .map(([t, s]) => t)
@@ -132,21 +130,13 @@ export default class CommandPaletteView {
     if (props.hasOwnProperty('preserveLastSearch')) {
       this.preserveLastSearch = props.preserveLastSearch
     }
-
-    if (props.hasOwnProperty('useAlternateScoring')) {
-      this.useAlternateScoring = props.useAlternateScoring
-    }
-  }
-
-  get fuzz () {
-    return this.useAlternateScoring ? fuzzaldrinPlus : fuzzaldrin
   }
 
   highlightMatchesInElement (text, query, el) {
-    const matches = this.fuzz.match(text, query)
+    const matches = atom.ui.fuzzyMatcher.match(text, query, {recordMatchIndexes: true})
     let matchedChars = []
     let lastIndex = 0
-    for (const matchIndex of matches) {
+    matches.matchIndexes.forEach(matchIndex => {
       const unmatched = text.substring(lastIndex, matchIndex)
       if (unmatched) {
         if (matchedChars.length > 0) {
@@ -162,7 +152,7 @@ export default class CommandPaletteView {
 
       matchedChars.push(text[matchIndex])
       lastIndex = matchIndex + 1
-    }
+    })
 
     if (matchedChars.length > 0) {
       const matchSpan = document.createElement('span')
@@ -184,15 +174,15 @@ export default class CommandPaletteView {
 
     const scoredItems = []
     for (const item of items) {
-      let score = this.fuzz.score(item.displayName, query)
+      let score = atom.ui.fuzzyMatcher.score(item.displayName, query)
       if (item.tags) {
         score += item.tags.reduce(
-          (currentScore, tag) => currentScore + this.fuzz.score(tag, query),
+          (currentScore, tag) => currentScore + atom.ui.fuzzyMatcher.score(tag, query),
           0
         )
       }
       if (item.description) {
-        score += this.fuzz.score(item.description, query)
+        score += atom.ui.fuzzyMatcher.score(item.description, query)
       }
 
       if (score > 0) {

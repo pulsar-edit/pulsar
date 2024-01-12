@@ -31,8 +31,10 @@
 ; we want the folds to work a little differently so that collapsing the `if`
 ; fold doesn't interfere with our ability to collapse the `else` fold.
 ((if_statement
-  consequence: (statement_block) @fold)
-  (#set! fold.adjustToEndOfPreviousRow true))
+  consequence: (statement_block) @fold
+  alternative: (else_clause)
+  (#set! fold.adjustToEndOfPreviousRow true)
+))
 
 (else_clause (statement_block) @fold)
 

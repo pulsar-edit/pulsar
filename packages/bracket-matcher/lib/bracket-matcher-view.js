@@ -264,7 +264,7 @@ class BracketMatcherView {
           firstChild.childCount > 2 &&
           firstChild.firstChild.type === '<'
         ) {
-          if (lastChild === firstChild && firstChild.lastChild.type === '/>') {
+          if (lastChild.id === firstChild.id && firstChild.lastChild.type === '/>') {
             startTag = firstChild
             endTag = firstChild
           } else if (

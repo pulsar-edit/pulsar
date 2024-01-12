@@ -3,8 +3,16 @@ const {Point, TextBuffer} = require('atom')
 const HAS_NEW_TEXT_BUFFER_VERSION = (new TextBuffer()).getLanguageMode().bufferDidFinishTransaction
 const path = require('path')
 
+function editorReady (languageMode) {
+  if (languageMode.atTransactionEnd) {
+    return languageMode.atTransactionEnd()
+  } else {
+    return Promise.resolve()
+  }
+}
+
 describe('bracket matching', () => {
-  let editorElement, editor, buffer
+  let editorElement, editor, buffer, languageMode
 
   beforeEach(() => {
     atom.config.set('bracket-matcher.autocompleteBrackets', true)
@@ -17,10 +25,17 @@ describe('bracket matching', () => {
 
     waitsForPromise(() => atom.workspace.open(path.join(__dirname, 'fixtures', 'sample.js')))
 
+    waitsForPromise(() => {
+      let editor = atom.workspace.getActiveTextEditor()
+      let languageMode = editor.getBuffer().getLanguageMode()
+      return languageMode.ready
+    })
+
     runs(() => {
       editor = atom.workspace.getActiveTextEditor()
       editorElement = atom.views.getView(editor)
       buffer = editor.getBuffer()
+      languageMode = buffer.getLanguageMode()
     })
   })
 
@@ -112,9 +127,10 @@ describe('bracket matching', () => {
     })
 
     describe('when there are unpaired brackets', () => {
-      it('highlights the correct start/end pairs', () => {
+      it('highlights the correct start/end pairs', async () => {
         editor.setText('(()')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectNoHighlights()
 
         editor.setCursorBufferPosition([0, 1])
@@ -125,6 +141,7 @@ describe('bracket matching', () => {
 
         editor.setText(('())'))
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 1])
 
         editor.setCursorBufferPosition([0, 1])
@@ -139,9 +156,10 @@ describe('bracket matching', () => {
     })
 
     describe('when there are commented brackets', () => {
-      it('highlights the correct start/end pairs', () => {
+      it('highlights the correct start/end pairs', async () => {
         editor.setText('(//)')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectNoHighlights()
 
         editor.setCursorBufferPosition([0, 2])
@@ -152,6 +170,7 @@ describe('bracket matching', () => {
 
         editor.setText('{/*}*/')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectNoHighlights()
 
         editor.setCursorBufferPosition([0, 2])
@@ -162,6 +181,7 @@ describe('bracket matching', () => {
 
         editor.setText('[/*]*/]')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 6])
 
         editor.setCursorBufferPosition([0, 6])
@@ -173,9 +193,10 @@ describe('bracket matching', () => {
     })
 
     describe('when there are quoted brackets', () => {
-      it('highlights the correct start/end pairs', () => {
+      it('highlights the correct start/end pairs', async () => {
         editor.setText("(')')")
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 4])
 
         editor.setCursorBufferPosition([0, 5])
@@ -186,6 +207,7 @@ describe('bracket matching', () => {
 
         editor.setText('["]"]')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 4])
 
         editor.setCursorBufferPosition([0, 5])
@@ -197,9 +219,10 @@ describe('bracket matching', () => {
     })
 
     describe('when there are brackets inside code embedded in a string', () => {
-      it('highlights the correct start/end pairs', () => {
+      it('highlights the correct start/end pairs', async () => {
         editor.setText('(`${(1+1)}`)')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 11])
 
         editor.setCursorBufferPosition([0, 12])
@@ -211,9 +234,10 @@ describe('bracket matching', () => {
     })
 
     describe('when there are brackets inside a string inside code embedded in a string', () => {
-      it('highlights the correct start/end pairs', () => {
+      it('highlights the correct start/end pairs', async () => {
         editor.setText("(`${('(1+1)')}`)")
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 15])
 
         editor.setCursorBufferPosition([0, 16])
@@ -225,9 +249,10 @@ describe('bracket matching', () => {
     })
 
     describe('when there are brackets in regular expressions', () => {
-      it('highlights the correct start/end pairs', () => {
+      it('highlights the correct start/end pairs', async () => {
         editor.setText('(/[)]/)')
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectHighlights([0, 0], [0, 6])
 
         editor.setCursorBufferPosition([0, 7])
@@ -239,9 +264,10 @@ describe('bracket matching', () => {
     })
 
     describe('when the start character and end character of the pair are equivalent', () => {
-      it('does not attempt to highlight pairs', () => {
+      it('does not attempt to highlight pairs', async () => {
         editor.setText("'hello'")
         editor.setCursorBufferPosition([0, 0])
+        await editorReady(languageMode)
         expectNoHighlights()
       })
     })
@@ -257,12 +283,13 @@ describe('bracket matching', () => {
     })
 
     describe('when the pair moves', () => {
-      it('repositions the highlights', () => {
+      it('repositions the highlights', async () => {
         editor.moveToEndOfLine()
         editor.moveLeft()
         expectHighlights([0, 28], [12, 0])
 
         editor.deleteToBeginningOfLine()
+        await editorReady(languageMode)
         expectHighlights([0, 0], [12, 0])
       })
     })
@@ -313,21 +340,20 @@ describe('bracket matching', () => {
 
     forEachLanguageWithTags(scopeName => {
       describe(`${scopeName} tag matching`, () => {
-        beforeEach(() => {
-          waitsForPromise(() => atom.packages.activatePackage('language-html'))
-          waitsForPromise(() => atom.workspace.open(path.join(__dirname, 'fixtures', 'sample.xml')))
-
-          runs(() => {
-            editor = atom.workspace.getActiveTextEditor()
-            editorElement = atom.views.getView(editor)
-            buffer = editor.buffer
-            atom.grammars.assignLanguageMode(buffer, scopeName)
-            buffer.getLanguageMode().syncOperationLimit = Infinity
-          })
+        beforeEach( async () => {
+          await atom.packages.activatePackage('language-html')
+          await atom.workspace.open(path.join(__dirname, 'fixtures', 'sample.xml'))
+          editor = atom.workspace.getActiveTextEditor()
+          editorElement = atom.views.getView(editor)
+          buffer = editor.buffer
+          atom.grammars.assignLanguageMode(buffer, scopeName)
+          languageMode = buffer.getLanguageMode()
+          languageMode.syncOperationLimit = Infinity
+          await languageMode.ready
         })
 
         describe('when on an opening tag', () => {
-          it('highlights the opening and closing tag', () => {
+          it('highlights the opening and closing tag', async () => {
             buffer.setText(`\
 <test>
   <test>text</test>
@@ -337,6 +363,7 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([0, 0])
+            await editorReady(languageMode)
             expectHighlights([0, 1], [3, 2])
 
             editor.setCursorBufferPosition([0, 1])
@@ -345,7 +372,7 @@ describe('bracket matching', () => {
         })
 
         describe('when on a closing tag', () => {
-          it('highlights the opening and closing tag', () => {
+          it('highlights the opening and closing tag', async () => {
             buffer.setText(`\
 <test>
   <!-- <test> -->
@@ -355,6 +382,7 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([3, 0])
+            await editorReady(languageMode)
             expectHighlights([3, 2], [0, 1])
 
             editor.setCursorBufferPosition([3, 2])
@@ -369,13 +397,14 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([1, Infinity])
+            await editorReady(languageMode)
             expectHighlights([1, 14], [1, 3])
 
             editor.setCursorBufferPosition([2, Infinity])
             expectHighlights([2, 14], [2, 3])
           })
 
-          it('highlights the correct opening tag, skipping self-closing tags', () => {
+          it('highlights the correct opening tag, skipping self-closing tags', async () => {
             buffer.setText(`\
 <test>
   <test />
@@ -384,12 +413,13 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([2, Infinity])
+            await editorReady(languageMode)
             expectHighlights([2, 2], [0, 1])
           })
         })
 
         describe('when on a self-closing tag', () => {
-          it('highlights only the self-closing tag', () => {
+          it('highlights only the self-closing tag', async () => {
             buffer.setText(`\
 <test>
   <test />
@@ -398,10 +428,11 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([1, Infinity])
+            await editorReady(languageMode)
             expectHighlights([1, 3], [1, 3])
           })
 
-          it('highlights a self-closing tag without a space', () => {
+          it('highlights a self-closing tag without a space', async () => {
             buffer.setText(`\
 <test>
   <test/>
@@ -410,10 +441,11 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([1, Infinity])
+            await editorReady(languageMode)
             expectHighlights([1, 3], [1, 3])
           })
 
-          it('highlights a self-closing tag with many spaces', () => {
+          it('highlights a self-closing tag with many spaces', async () => {
             buffer.setText(`\
 <test>
   <test          />
@@ -422,10 +454,11 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([1, Infinity])
+            await editorReady(languageMode)
             expectHighlights([1, 3], [1, 3])
           })
 
-          it('does not catastrophically backtrack when many attributes are present (regression)', () => {
+          it('does not catastrophically backtrack when many attributes are present (regression)', async () => {
             // https://github.com/atom/bracket-matcher/issues/303
 
             buffer.setText(`\
@@ -438,6 +471,7 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([0, 6])
+            await editorReady(languageMode)
             expectHighlights([0, 1], [4, 2])
 
             editor.setCursorBufferPosition([1, 6])
@@ -455,7 +489,7 @@ describe('bracket matching', () => {
         })
 
         describe('when the tag spans multiple lines', () => {
-          it('highlights the opening and closing tag', () => {
+          it('highlights the opening and closing tag', async () => {
             buffer.setText(`\
 <div>
   <div class="test"
@@ -469,6 +503,7 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([0, 1])
+            await editorReady(languageMode)
             expectHighlights([0, 1], [6, 2])
             editor.setCursorBufferPosition([6, 2])
             expectHighlights([6, 2], [0, 1])
@@ -476,7 +511,7 @@ describe('bracket matching', () => {
         })
 
         describe('when the tag has attributes', () => {
-          it('highlights the opening and closing tags', () => {
+          it('highlights the opening and closing tags', async () => {
             buffer.setText(`\
 <test a="test">
   text
@@ -485,6 +520,7 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([2, 2])
+            await editorReady(languageMode)
             expectHighlights([2, 2], [0, 1])
 
             editor.setCursorBufferPosition([0, 7])
@@ -493,7 +529,7 @@ describe('bracket matching', () => {
         })
 
         describe("when the tag has an attribute with a value of '/'", () => {
-          it('highlights the opening and closing tags', () => {
+          it('highlights the opening and closing tags', async () => {
             buffer.setText(`\
 <test a="/">
   text
@@ -502,6 +538,7 @@ describe('bracket matching', () => {
             )
 
             editor.setCursorBufferPosition([2, 2])
+            await editorReady(languageMode)
             expectHighlights([2, 2], [0, 1])
 
             editor.setCursorBufferPosition([0, 7])
@@ -510,10 +547,11 @@ describe('bracket matching', () => {
         })
 
         describe('when the opening and closing tags are on the same line', () => {
-          it('highlight the opening and closing tags', () => {
+          it('highlight the opening and closing tags', async () => {
             buffer.setText('<test>text</test>')
 
             editor.setCursorBufferPosition([0, 2])
+            await editorReady(languageMode)
             expectHighlights([0, 1], [0, 12])
 
             editor.setCursorBufferPosition([0, 12])
@@ -522,17 +560,19 @@ describe('bracket matching', () => {
         })
 
         describe('when the closing tag is missing', () => {
-          it('does not highlight anything', () => {
+          it('does not highlight anything', async () => {
             buffer.setText('<test>\ntext\n')
             editor.setCursorBufferPosition([0, 10])
+            await editorReady(languageMode)
             expectNoHighlights()
           })
         })
 
         describe('when between the opening and closing tag', () => {
-          it('does not highlight anything', () => {
+          it('does not highlight anything', async () => {
             buffer.setText('<div>\nhi\n</div>\n')
             editor.setCursorBufferPosition([1, 0])
+            await editorReady(languageMode)
             expectNoHighlights()
           })
         })
@@ -986,14 +1026,16 @@ describe('bracket matching', () => {
   })
 
   describe('matching bracket insertion', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       editor.buffer.setText('')
+      await editorReady(languageMode)
       atom.config.set('editor.autoIndent', true)
     })
 
     describe('when more than one character is inserted', () => {
-      it('does not insert a matching bracket', () => {
+      it('does not insert a matching bracket', async () => {
         editor.insertText('woah(')
+        await editorReady(languageMode)
         expect(editor.buffer.getText()).toBe('woah(')
       })
     })
@@ -1467,18 +1509,23 @@ describe('bracket matching', () => {
     })
 
     describe('when return is pressed inside a matching pair', () => {
-      it('puts the cursor on the indented empty line', () => {
+      it('puts the cursor on the indented empty line', async () => {
         editor.insertText('void main() ')
         editor.insertText('{')
+        await editorReady(languageMode)
         expect(editor.getText()).toBe('void main() {}')
         editor.insertNewline()
         expect(editor.getCursorBufferPosition()).toEqual([1, 2])
         expect(buffer.lineForRow(1)).toBe('  ')
         expect(buffer.lineForRow(2)).toBe('}')
 
-        editor.setText('  void main() ')
+        editor.setText('void main() ')
         editor.insertText('{')
+        await editorReady(languageMode)
+        expect(editor.getText()).toBe('void main() {}')
+        editor.indentSelectedRows()
         expect(editor.getText()).toBe('  void main() {}')
+        await editorReady(languageMode)
         editor.insertNewline()
         expect(editor.getCursorBufferPosition()).toEqual([1, 4])
         expect(buffer.lineForRow(1)).toBe('    ')
@@ -1514,13 +1561,15 @@ describe('bracket matching', () => {
 
     describe('when in language specific scope', () => {
       describe('string interpolation', () => {
-        beforeEach(() => {
-          waitsForPromise(() => atom.packages.activatePackage('language-ruby'))
-
-          runs(() => buffer.setPath('foo.rb'))
+        beforeEach(async () => {
+          await atom.packages.activatePackage('language-ruby')
+          buffer.setPath('foo.rb')
+          let languageMode = buffer.getLanguageMode()
+          languageMode.useAsyncParsing = false
+          await languageMode.ready
         })
 
-        it('should insert curly braces inside doubly quoted string', () => {
+        it('should insert curly braces inside double-quoted string', () => {
           editor.insertText('foo = ')
           editor.insertText('"')
           editor.insertText('#')
@@ -1529,7 +1578,7 @@ describe('bracket matching', () => {
           expect(editor.getText()).toBe('foo = ""')
         })
 
-        it('should not insert curly braces inside singly quoted string', () => {
+        it('should not insert curly braces inside single-quoted string', () => {
           editor.insertText('foo = ')
           editor.insertText("'")
           editor.insertText('#')

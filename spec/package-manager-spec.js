@@ -1440,7 +1440,8 @@ describe('PackageManager', () => {
         await atom.packages.activatePackage('package-with-tree-sitter-grammar');
         const grammar = atom.grammars.selectGrammar('test.somelang');
         expect(grammar.name).toBe('Some Language');
-        expect(grammar.languageModule.isFakeTreeSitterParser).toBe(true);
+        await grammar.getQuery('highlightsQuery');
+        expect(grammar.highlightsQuery.includes('(empty)')).toBe(true);
       });
     });
 

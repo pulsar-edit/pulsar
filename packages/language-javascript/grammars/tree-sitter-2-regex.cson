@@ -1,5 +1,5 @@
 name: 'JavaScript RegExp'
-scopeName: 'source.regexp.js'
+scopeName: 'source.js.regexp'
 type: 'modern-tree-sitter'
 parser: 'tree-sitter-regex'
 

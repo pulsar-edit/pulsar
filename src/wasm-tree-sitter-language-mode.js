@@ -153,6 +153,8 @@ class WASMTreeSitterLanguageMode {
     this.grammarRegistry = grammars;
 
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
+    this.useAsyncParsing = FEATURE_ASYNC_PARSE;
+    this.useAsyncIndent = FEATURE_ASYNC_INDENT;
 
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
@@ -565,6 +567,9 @@ class WASMTreeSitterLanguageMode {
     let layers = this.languageLayersAtPoint(point);
     let results = [];
     for (let layer of layers) {
+      if (layer.grammar.scopeName === selector) {
+        return layer.getExtent();
+      }
       let items = layer.scopeMapAtPosition(point);
       for (let { capture, adjustedRange } of items) {
         let range = rangeForNode(adjustedRange);
@@ -929,8 +934,10 @@ class WASMTreeSitterLanguageMode {
   */
   getFoldableRangeContainingPoint(point) {
     point = this.buffer.clipPosition(point);
-    let fold = this.getFoldRangeForRow(point.row);
-    if (fold) { return fold; }
+    if (point.column >= this.buffer.lineLengthForRow(point.row)) {
+      let fold = this.getFoldRangeForRow(point.row);
+      if (fold) { return fold; }
+    }
 
     // Move backwards until we find a fold range containing this row.
     for (let row = point.row - 1; row >= 0; row--) {
@@ -945,12 +952,12 @@ class WASMTreeSitterLanguageMode {
     if (!this.tokenized) { return []; }
 
     let layers = this.getAllLanguageLayers();
-    let folds = [];
+    let allFolds = [];
     for (let layer of layers) {
       let folds = layer.foldResolver.getAllFoldRanges();
-      folds.push(...folds);
+      allFolds.push(...folds);
     }
-    return folds;
+    return allFolds;
   }
 
   // This method is improperly named, and is based on an assumption that every
@@ -1227,7 +1234,7 @@ class WASMTreeSitterLanguageMode {
     let indentTree = options.tree;
 
     if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncParsing || !this.useAsyncIndent) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
         // We can't answer this yet because we don't yet have a new syntax
@@ -1596,7 +1603,17 @@ class WASMTreeSitterLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForEditedBufferRow(row, tabLength, options = {}) {
-    if (row === 0) { return 0; }
+    const line = this.buffer.lineForRow(row);
+    const currentRowIndent = this.indentLevelForLine(line, tabLength);
+
+    // If the row is not indented at all, we have nothing to do, because we can
+    // only dedent a line at this phase.
+    if (currentRowIndent === 0) { return; }
+
+    // If we're on the first row, we have no preceding line to compare
+    // ourselves to. We should do nothing.
+    if (row === 0) { return; }
+
     // By the time this function runs, we probably know enough to be sure of
     // which layer controls the beginning of this row, even if we don't know
     // which one owns the position at the cursor.
@@ -1615,14 +1632,11 @@ class WASMTreeSitterLanguageMode {
     // resolvers.
     scopeResolver.reset();
 
-    const currentRowIndent = this.indentLevelForLine(
-      this.buffer.lineForRow(row), tabLength);
-
     // Ideally, we're running when the tree is clean, but if not, we must
     // re-parse the tree in order to make an accurate indents query.
     let indentTree = options.tree;
     if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !FEATURE_ASYNC_INDENT) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncIndent || !this.useAsyncParsing) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
         return this.atTransactionEnd().then(({ changeCount }) => {
@@ -3261,7 +3275,7 @@ class LanguageLayer {
   }
 
   async update(nodeRangeSet, params = {}) {
-    if (!FEATURE_ASYNC_PARSE) {
+    if (!this.languageMode.useAsyncParsing) {
       // Practically speaking, updates that affect _only this layer_ will happen
       // synchronously, because we've made sure not to call this method until the
       // root grammar's tree-sitter parser has been loaded. But we can't load any
@@ -3476,6 +3490,11 @@ class LanguageLayer {
   }
 
   async _performUpdate(nodeRangeSet, params = {}) {
+    // It's much more common in specs than in real life, but it's always
+    // possible for a layer to get destroyed during the async period between
+    // layer updates.
+    if (this.destroyed) return;
+
     let includedRanges = null;
     this.rangeList.clear();
 
@@ -3493,7 +3512,7 @@ class LanguageLayer {
     this.patchSinceCurrentParseStarted = new Patch();
     let language = this.grammar.getLanguageSync();
     let tree;
-    if (FEATURE_ASYNC_PARSE) {
+    if (this.languageMode.useAsyncParsing) {
       tree = this.languageMode.parseAsync(
         language,
         this.tree,
@@ -3852,6 +3871,12 @@ class LanguageLayer {
       range = range.union(new Range(earliest, latest));
     }
 
+    // Why do we have to do this explicitly? Because `descendantsOfType` will
+    // incorrectly return nodes if the range runs from (0, 0) to (0, 0). All
+    // other empty ranges seem not to have this problem. Upon cursory
+    // inspection, this bug doesn't seem to be limited to `web-tree-sitter`.
+    if (range.isEmpty()) { return; }
+
     // Now that we've enlarged the range, we might have more existing injection
     // markers to consider. But check for containment rather than intersection
     // so that we don't have to enlarge it again.
@@ -4018,20 +4043,38 @@ class LanguageLayer {
 class NodeRangeSet {
   constructor(previous, nodes, injectionPoint) {
     this.previous = previous;
-    this.nodes = nodes;
     this.newlinesBetween = injectionPoint.newlinesBetween;
     this.includeAdjacentWhitespace = injectionPoint.includeAdjacentWhitespace;
     this.includeChildren = injectionPoint.includeChildren;
+
+    // We shouldn't retain references to nodes here because the tree might get
+    // disposed of layer. Let's compile the information we need now while we're
+    // sure the tree is fresh.
+    this.nodeSpecs = [];
+    for (let node of nodes) {
+      this.nodeSpecs.push(this.getNodeSpec(node, true));
+    }
+  }
+
+  getNodeSpec (node, getChildren) {
+    let { startIndex, endIndex, startPosition, endPosition, id } = node;
+    let result = { startIndex, endIndex, startPosition, endPosition, id };
+    if (node.children && getChildren) {
+      result.children = [];
+      for (let child of node.children) {
+        result.children.push(this.getNodeSpec(child, false));
+      }
+    }
+    return result;
   }
 
   getRanges(buffer) {
     const previousRanges = this.previous && this.previous.getRanges(buffer);
     let result = [];
 
-    for (const node of this.nodes) {
+    for (const node of this.nodeSpecs) {
       let position = node.startPosition, index = node.startIndex;
-
-      if (!this.includeChildren) {
+      if (node.children && !this.includeChildren) {
         // If `includeChildren` is `false`, we're effectively collecting all
         // the disjoint text nodes that are direct descendants of this node.
         for (const child of node.children) {

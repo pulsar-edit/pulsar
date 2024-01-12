@@ -50,24 +50,8 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+                Fixed a bug in PPM that prevented package publishing.
               </li>
-              <li>
-                Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
-              </li>
-              <li>
-                Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
-              </li>
-              <li>
-                Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
-              </li>
-              <li>
-                Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
-              </li>
-              <li>
-                Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
-              </li>
-
             </ul>
 
             <section className="welcome-panel">

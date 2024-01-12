@@ -1,3 +1,4 @@
+const { CompositeDisposable } = require('event-kit');
 const { Point } = require('text-buffer');
 const ScopeDescriptor = require('./scope-descriptor');
 
@@ -16,7 +17,7 @@ function comparePoints(a, b) {
   }
 }
 
-function rangeSpecToString (range) {
+function rangeSpecToString(range) {
   let [sp, ep] = [range.startPosition, range.endPosition];
   return `(${sp.row}, ${sp.column}) - (${ep.row}, ${ep.column})`;
 }
@@ -63,6 +64,71 @@ function interpretPossibleKeyValuePair(rawValue, coerceValue = false) {
   return [key, value];
 }
 
+// `ScopeResolver`s can share a config cache if they have the same grammar.
+// There are many such `ScopeResolver`s (because there are many such
+// `LanguageLayer`s), and this consolidation cuts down on the number of
+// `onDidChange` handlers (which are costly when observing all config values).
+class ConfigCache {
+  constructor(config) {
+    this.subscriptions = new CompositeDisposable();
+    this.cachesByGrammar = new Map();
+    this.config = config;
+
+    this.subscriptions.add(
+      this.config.onDidChange(() => this.clearAll()),
+      atom.grammars.onDidAddGrammar(() => this.clearAll()),
+      atom.grammars.onDidUpdateGrammar(() => this.clearAll())
+    );
+  }
+
+  dispose() {
+    this.subscriptions.dispose();
+  }
+
+  clearAll() {
+    for (let cache of this.cachesByGrammar.values()) {
+      cache.clear();
+    }
+  }
+
+  getCacheForGrammar(grammar) {
+    let { scopeName } = grammar;
+    // We key on the scope name rather than the grammar instance. We need to be
+    // able to iterate over grammars, so we can't use a `WeakSet` here, and we
+    // have no lifecycle event to keep the map from getting stale.
+    //
+    // To prevent two different incarnations of the same grammar (after
+    // disabling and reenabling) from incorrectly sharing a cache, we clear all
+    // caches whenever grammars are added or updated.
+    let cache = this.cachesByGrammar.get(scopeName);
+    if (!cache) {
+      cache = new Map();
+      this.cachesByGrammar.set(scopeName, cache);
+    }
+    return cache;
+  }
+}
+
+// We can technically have more than one configuration object, though in
+// practice this will only point to `atom.config`. We do it this way for ease
+// of testing (e.g., if a test mocks a config object) and to avoid silly hacks.
+ConfigCache.CACHES_FOR_CONFIG_OBJECTS = new Map();
+
+ConfigCache.forConfig = (config) => {
+  let { CACHES_FOR_CONFIG_OBJECTS } = ConfigCache;
+  let configCache = CACHES_FOR_CONFIG_OBJECTS.get(config);
+  if (!configCache) {
+    configCache = new ConfigCache(config);
+    CACHES_FOR_CONFIG_OBJECTS.set(config, configCache);
+  }
+  return configCache;
+};
+
+ConfigCache.clear = () => {
+  ConfigCache.CACHES_FOR_CONFIG_OBJECTS.clear();
+};
+
+
 // A data structure for storing scope information while processing capture
 // data. The data is reset in between each task.
 //
@@ -86,10 +152,8 @@ class ScopeResolver {
     this.rangeData = new Map;
     this.pointKeyCache = new Map;
     this.patternCache = new Map;
-    this.configCache = new Map;
-    this.configSubscription = this.config.onDidChange(() => {
-      this.configCache.clear();
-    });
+    this.configCache = ConfigCache.forConfig(this.config)
+      .getCacheForGrammar(this.grammar);
   }
 
   getOrCompilePattern(pattern) {
@@ -477,8 +541,6 @@ class ScopeResolver {
     this.reset();
     this.patternCache.clear();
     this.pointKeyCache.clear();
-    this.configCache.clear();
-    this.configSubscription.dispose();
   }
 
   *[Symbol.iterator]() {
@@ -894,6 +956,10 @@ ScopeResolver.ADJUSTMENTS = {
 
     return position;
   }
+};
+
+ScopeResolver.clearConfigCache = () => {
+  ConfigCache.clear();
 };
 
 

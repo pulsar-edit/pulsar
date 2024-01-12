@@ -3,7 +3,7 @@ const dedent = require('dedent');
 describe('Tree-sitter Ruby grammar', () => {
   beforeEach(async () => {
     atom.config.set('core.useTreeSitterParsers', true);
-    atom.config.set('core.useExperimentalModernTreeSitter', false);
+    atom.config.set('core.useLegacyTreeSitter', true);
     await atom.packages.activatePackage('language-ruby');
   });
 

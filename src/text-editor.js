@@ -5757,6 +5757,7 @@ module.exports = class TextEditor {
 
     let languageMode = this.buffer.getLanguageMode();
     if (!languageMode.atTransactionEnd) return;
+    if (!languageMode.useAsyncParsing || !languageMode.useAsyncIndent) return;
 
     let promise = languageMode.atTransactionEnd().then(
       ({ range, autoIndentRequests }) => {

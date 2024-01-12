@@ -105,6 +105,11 @@
 ; An entire decorator without arguments, like `@foo`.
 (decorator "@" (identifier) .) @support.other.function.decorator.python
 
+; A namespaced decorator, like the `@foo` in `@foo.bar`, with or without a
+; function invocation.
+((decorator [(attribute) (call)]) @support.other.function.decorator.python
+  (#set! adjust.endAfterFirstMatchOf "\\."))
+
 ; The "@" and "foo" together in a decorator with arguments, like `@foo(True)`.
 ((decorator "@" (call function: (identifier))) @support.other.function.decorator.python
   (#set! adjust.endAt firstNamedChild.firstNamedChild.endPosition))
@@ -331,6 +336,10 @@
 (assignment
   left: (identifier) @variable.other.assignment.python)
 
+; The "a" and "b" in `a, b = 2, 3`.
+(assignment
+  left: (pattern_list
+    (identifier) @variable.other.assignment.python))
 
 ; OPERATORS
 ; =========
@@ -424,6 +433,8 @@
 (parameters
   "," @punctuation.separator.parameters.comma.python
   (#set! capture.final true))
+
+(pattern_list "," @punctuation.separator.destructuring.comma.python)
 
 (argument_list
   "(" @punctuation.definition.arguments.begin.bracket.round.python

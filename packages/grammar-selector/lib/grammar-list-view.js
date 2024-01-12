@@ -26,12 +26,6 @@ module.exports = class GrammarListView {
           let badgeColor = 'badge-success';
           let badgeText = 'Tree-sitter';
 
-          // if (isExperimentalTreeSitterMode()) {
-          //   badgeColor = isModernTreeSitter(grammar) ?
-          //     'badge-success' : 'badge-warning';
-            // badgeText = 'Tree-sitter'
-          // }
-          //
           parser.classList.add(
             'grammar-selector-parser',
             'badge',
@@ -118,6 +112,8 @@ module.exports = class GrammarListView {
         });
 
       if (atom.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
+        // Filter out all TextMate grammars for which there is a Tree-sitter
+        // grammar with the exact same name.
         const blacklist = new Set();
         grammars.forEach(grammar => {
           if (isTreeSitter(grammar)) {
@@ -148,13 +144,13 @@ module.exports = class GrammarListView {
 
 function getLanguageModeConfig() {
   let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
-  let isExperimental = atom.config.get('core.useExperimentalModernTreeSitter');
+  let isLegacy = atom.config.get('core.useLegacyTreeSitter');
   if (!isTreeSitterMode) return 'textmate';
-  return isExperimental ? 'wasm-tree-sitter' : 'node-tree-sitter';
+  return isLegacy ? 'node-tree-sitter' : 'wasm-tree-sitter';
 }
 
-function isExperimentalTreeSitterMode() {
-  return getLanguageModeConfig() === 'wasm-tree-sitter';
+function isLegacyTreeSitterMode() {
+  return getLanguageModeConfig() === 'node-tree-sitter';
 }
 
 function isTreeSitter(grammar) {
