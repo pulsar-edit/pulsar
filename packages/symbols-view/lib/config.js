@@ -19,6 +19,11 @@ const Config = {
     this.subscriptions?.dispose();
   },
 
+  getForEditor(editor, key) {
+    let grammar = editor.getGrammar();
+    return atom.config.get(`symbols-view.${key}`, { scope: [grammar?.scopeName] });
+  },
+
   get(key) {
     return atom.config.get(`symbols-view.${key}`);
   },
