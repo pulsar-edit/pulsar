@@ -724,7 +724,7 @@ module.exports = class GrammarRegistry {
 
     const tsGrammars = Object.values(this.treeSitterGrammarsById)
       .filter(g => g.scopeName);
-    result = result.concat(modernTsGrammars);
+    result = result.concat(tsGrammars);
 
     let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
       .filter(g => g.scopeName);
