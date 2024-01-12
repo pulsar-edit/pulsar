@@ -136,6 +136,13 @@
   (array_pattern
     (identifier) @variable.other.assignment.destructuring._LANG_))
 
+; A variable array destructuring with a default:
+; The "baz" in `let [foo, bar, baz = false] = something`
+(variable_declarator
+  (array_pattern
+    (assignment_pattern
+      (identifier) @variable.other.assignment.destructuring.js)))
+
 ; A variable declaration in a for…(in|of) loop:
 ; The "foo" in `for (let foo of bar) {`
 (for_in_statement
