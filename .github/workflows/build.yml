@@ -263,7 +263,7 @@ jobs:
         ./binaries/*AppImage --appimage-extract
         export BINARY_NAME='squashfs-root/pulsar'
         mkdir -p ./tests/videos
-        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+        xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
     - name: Add binaries to Rolling Release Repo - Linux
       if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
