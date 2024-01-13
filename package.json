@@ -295,7 +295,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
-    "@playwright/test": "1.38.0",
+    "@playwright/test": "1.38.1",
     "electron": "12.2.3",
     "electron-builder": "23.3.1",
     "electron-rebuild": "3.2.7",
@@ -303,8 +303,8 @@
     "eslint-plugin-jsdoc": "^39.7.4",
     "eslint-plugin-node": "^11.1.0",
     "jsdoc-to-markdown": "^8.0.0",
-    "playwright": "1.38.0",
-    "playwright-core": "1.38.0",
+    "playwright": "1.38.1",
+    "playwright-core": "1.38.1",
     "random-seed": "0.3.0",
     "webdriverio": "7.20.9"
   }
