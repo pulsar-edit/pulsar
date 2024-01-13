@@ -540,7 +540,17 @@
   "*"
   "/"
   "**"
+  "%"
 ] @keyword.operator.arithmetic.php
+
+[
+  "&"
+  "|"
+  "^"
+  "~"
+  "<<"
+  ">>"
+] @keyword.operator.bitwise.php
 
 [
   "+="

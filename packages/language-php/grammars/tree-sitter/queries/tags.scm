@@ -39,3 +39,5 @@
 
 (member_call_expression
   name: (name) @name) @reference.call
+
+(enum_declaration (name) @name) @definition.enum
