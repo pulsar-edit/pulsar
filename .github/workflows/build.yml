@@ -199,7 +199,7 @@ jobs:
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
-        tar xf ./binaries/*.tar.gz --verbose
+        tar xf ./binaries/*.tar.gz
         ls
         export BINARY_NAME=`ls ./pulsar-*/resources/pulsar.sh`
         mkdir -p ./tests/videos
