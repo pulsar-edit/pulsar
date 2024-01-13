@@ -245,21 +245,72 @@
 (class_declaration (base_clause (name) @entity.other.inherited-class.php))
 (class_declaration (class_interface_clause (name) @entity.other.implemented-interface.php))
 
-; Static method calls.
+; The "Foo" and "Bar" in `use Bar, Foo;`
+(use_declaration (name) @support.other.trait.php)
+
+; The "Foo" in `Baz::thud insteadof Foo;`
+(use_instead_of_clause (name) @support.other.trait.php .
+  (#set! capture.final true))
+
+; In `use` lists, the "bar" in `Foo::bar` is a method, not a constant.
+(use_list
+  (_
+    (class_constant_access_expression (name) @support.other.function.method.php .)
+  )
+  (#set! capture.final true))
+
+; The "Foo" and "bar" in `Foo::bar`.
+(class_constant_access_expression . (name) @support.class.php)
+(class_constant_access_expression (name) @support.other.property.php .)
+
+; The "Foo" and "bar" in "Foo::bar()".
 (scoped_call_expression
+  scope: (name) @support.class.php
   name: (name) @support.other.function.method.static.php)
 
+; The "Foo" and "$bar" in "Foo::$bar()".
+(scoped_call_expression
+  scope: (name) @support.class.php)
+(scoped_call_expression
+  name: (variable_name) @variable.other.method.static.php)
+
+; The "Foo" and "$bar" in `Foo::$bar`.
+(scoped_property_access_expression
+  scope: (name) @support.class.php)
+(scoped_property_access_expression
+  name: (variable_name) @variable.other.property.static.php
+  (#set! capture.final true))
+
+; The "bar" in `$foo->bar()`.
 (member_call_expression
   name: (name) @support.other.function.method.php)
 
-(scoped_call_expression
-  scope: (name) @support.class.php)
+; The "bar" in `$foo->bar`.
+(member_access_expression
+  name: (name) @support.other.property.php
+  (#set! capture.final true))
+
+; The "$bar" in `$foo->$bar()`.
+(member_call_expression
+  name: (variable_name) @variable.other.method.php
+  (#set! capture.final true))
+
+; The "$bar" in `$foo->$bar`.
+(member_access_expression
+  name: (variable_name) @variable.other.property.php
+  (#set! capture.final true))
 
 
 ; TRAITS
 ; ======
 
 (trait_declaration (name) @entity.name.type.trait.php)
+
+
+; INTERFACES
+; ==========
+
+(interface_declaration (name) @entity.name.type.interface.php)
 
 
 ; TYPES
@@ -272,10 +323,21 @@
 
 "global" @storage.modifier.global.php
 
-["trait" "class"] @storage.type._TYPE_.php
+["enum" "interface" "trait" "class"] @storage.type._TYPE_.php
+(enum_case "case" @storage.type.case.php)
 "function" @storage.type.function.php
 "fn" @storage.type.function.arrow.php
 
+
+; ENUMS
+; =====
+
+(enum_declaration
+  name: (name) @entity.name.type.enum.php)
+
+(enum_declaration_list
+  (enum_case
+    name: (name) @constant.other.enum.php))
 
 ; VARIABLES
 ; =========
@@ -299,11 +361,6 @@
     (variable_name
       "$" @punctuation.definition.variable.php
     ) @variable.parameter.php))
-
-; The "$bar" in `$foo->$bar`.
-(member_access_expression
-  name: (variable_name) @variable.other.property.php
-  (#set! capture.final true))
 
 ((variable_name
   ("$" @punctuation.definition.variable.php)
@@ -349,10 +406,8 @@
 
 
 [
-  "abstract"
   "as"
   "break"
-  "case"
   "catch"
   "const"
   "continue"
@@ -367,16 +422,12 @@
   "endif"
   "endswitch"
   "endwhile"
-  "extends"
   "finally"
   "foreach"
   "if"
-  "implements"
   "include_once"
   "include"
   "insteadof"
-  "interface"
-  "namespace"
   "new"
   "require_once"
   "require"
@@ -388,8 +439,14 @@
   "while"
 ] @keyword.control._TYPE_.php
 
+(case_statement "case" @keyword.control.case.php)
+
 [
+  "abstract"
+  "extends"
   "final"
+  "implements"
+  "namespace"
   "private"
   "protected"
   "public"
@@ -451,7 +508,11 @@
 (optional_type "?" @keyword.operator.nullable-type.php)
 (union_type "|" @keyword.operator.union-type.php)
 
-["&&" "||"] @keyword.operator.logical.php
+[
+  "&&"
+  "||"
+  "??"
+] @keyword.operator.logical.php
 
 ["="] @keyword.operator.assignment.php
 
@@ -484,7 +545,15 @@
   "-="
   "*="
   "/="
+  "%="
+  "**="
+  "&="
+  "|="
+  "^="
+  "<<="
+  ">>="
   ".="
+  "??="
 ] @keyword.operator.assignment.compound.php
 
 "->" @keyword.operator.class.php
