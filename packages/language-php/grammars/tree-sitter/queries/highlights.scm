@@ -530,6 +530,8 @@
   "<"
   "<="
   ">="
+  "<>"
+  "<=>"
 ] @keyword.operator.comparison.php
 
 [
