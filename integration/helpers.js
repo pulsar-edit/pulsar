@@ -8,6 +8,10 @@ async function openAtom(profilePath, videoName) {
   const env = process.env
   env.ATOM_HOME = path.join("tmp", profilePath)
 
+  if(process.env.CI){
+    env.NODE_ENV = 'development'
+  }
+
   const config = {
     args: ["--no-sandbox", "."],
     cwd: ".",
