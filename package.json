@@ -23,12 +23,12 @@
     "node": ">=14"
   },
   "license": "MIT",
-  "electronVersion": "27.1.0",
+  "electronVersion": "28.1.3",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
     "@electron/remote": "2.0.10",
-    "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#c6ddd2e0ace7b3cfe8082fcbe5985c49f76da5b8",
+    "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#670c97d95ac22e4ac54aa6ebda0f2e3d3716764a",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
     "async": "3.2.4",
@@ -291,9 +291,9 @@
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
-    "@electron/rebuild": "3.2.13",
+    "@electron/rebuild": "3.5.0",
     "@playwright/test": "1.22.2",
-    "electron": "27.1.0",
+    "electron": "28.1.3",
     "electron-builder": "23.3.1",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
@@ -307,6 +307,7 @@
   "resolutions": {
     "node-abi": "3.51.0",
     "keytar": "7.9.0",
+    "nan": "2.18.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
     "superstring": "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459",
     "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
