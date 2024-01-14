@@ -11,5 +11,17 @@
   "license": "MIT",
   "dependencies": {
     "tree-sitter-java": "0.19.1"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

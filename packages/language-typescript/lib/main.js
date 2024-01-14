@@ -65,31 +65,24 @@ exports.activate = function () {
       },
       languageScope: null
     });
-
-    atom.grammars.addInjectionPoint(scopeName, {
-      type: 'comment',
-      language: (node) => {
-        return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
-      },
-      content: (node) => node,
-      languageScope: null
-    });
-
-    for (let type of ['template_string', 'string_fragment', 'comment']) {
-      atom.grammars.addInjectionPoint(scopeName, {
-        type,
-        language: (node) => {
-          return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
-        },
-        content: (node) => node,
-        languageScope: null
-      });
-    }
   }
 };
 
-const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
-const HYPERLINK_PATTERN = /\bhttps?:/
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  for (const scopeName of ['source.ts', 'source.tsx', 'source.flow']) {
+    hyperlink.addInjectionPoint(scopeName, {
+      types: ['template_string', 'string_fragment', 'comment']
+    });
+  }
+};
+
+exports.consumeTodoInjection = (todo) => {
+  for (const scopeName of ['source.ts', 'source.tsx', 'source.flow']) {
+    todo.addInjectionPoint(scopeName, { types: ['comment'] });
+  }
+};
+
+
 const STYLED_REGEX = /\bstyled\b/i;
 
 function languageStringForTemplateTag(tag) {

@@ -14,5 +14,17 @@
   "license": "MIT",
   "dependencies": {
     "tree-sitter-typescript": "0.20.1"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

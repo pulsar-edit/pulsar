@@ -1,3 +1,8 @@
+function isPhpDoc(node) {
+  let { text } = node;
+  return text.startsWith('/**') && !text.startsWith('/***')
+}
+
 exports.activate = function () {
 
   // Here's how we handle the mixing of PHP and HTML:
@@ -76,36 +81,6 @@ exports.activate = function () {
   // TODOs and URLs
   // ==============
 
-  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
-  const HYPERLINK_PATTERN = /\bhttps?:/
-
-  function isPhpDoc(node) {
-    let { text } = node;
-    return text.startsWith('/**') && !text.startsWith('/***')
-  }
-
-  atom.grammars.addInjectionPoint('text.html.php', {
-    type: 'comment',
-    language: (node) => {
-      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
-
-  for (let type of ['comment', 'string_value']) {
-    atom.grammars.addInjectionPoint('text.html.php', {
-      type,
-      language(node) {
-        // PHPDoc can parse URLs better than we can.
-        if (isPhpDoc(node)) return undefined;
-        return HYPERLINK_PATTERN.test(node.text) ?
-          'hyperlink' : undefined;
-      },
-      content: (node) => node,
-      languageScope: null
-    });
-  }
 
   // HEREDOCS and NOWDOCS
   // ====================
@@ -141,7 +116,7 @@ exports.activate = function () {
 
   // PHPDoc
   // ======
-  
+
   atom.grammars.addInjectionPoint('text.html.php', {
     type: 'comment',
     language(node) {
@@ -152,4 +127,17 @@ exports.activate = function () {
     content(node) { return node; }
   });
 
+};
+
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  hyperlink.addInjectionPoint('text.html.php', {
+    types: ['comment', 'string_value'],
+    language(node) {
+      if (isPhpDoc(node)) return null;
+    }
+  });
+};
+
+exports.consumeTodoInjection = (todo) => {
+  todo.addInjectionPoint('text.html.php', { types: ['comment'] });
 };
