@@ -288,6 +288,11 @@
 
 ["class" "function"] @storage.type._TYPE_._LANG_
 
+(type_arguments "<" @punctuation.definition.parameters.begin.bracket.angle.js
+  (#set! capture.final))
+(type_arguments ">" @punctuation.definition.parameters.end.bracket.angle.js
+  (#set! capture.final))
+
 "=>" @storage.type.arrow._LANG_
 
 ; TODO: If I allow scopes like `storage.type.string._LANG_`, I will make a lot of
