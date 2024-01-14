@@ -1,22 +1,27 @@
 exports.activate = () => {
 
-  atom.grammars.addInjectionPoint('source.css', {
-    type: 'comment',
-    language: () => 'todo',
-    content: (node) => node
-  });
+  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+  const HYPERLINK_PATTERN = /\bhttps?:/
 
   atom.grammars.addInjectionPoint('source.css', {
     type: 'comment',
-    language: () => 'hyperlink',
-    content: (node) => node
+    language(node) {
+      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
   });
 
-  atom.grammars.addInjectionPoint('source.css', {
-    type: 'string_value',
-    language: () => 'hyperlink',
-    content: (node) => node
-  });
+  for (let type of ['comment', 'string_value']) {
+    atom.grammars.addInjectionPoint('source.css', {
+      type,
+      language(node) {
+        return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
+      },
+      content: (node) => node,
+      languageScope: null
+    });
+  }
 
   // Catch things like
   //
@@ -31,7 +36,8 @@ exports.activate = () => {
       if (!functionName === 'url') { return null; }
 
       return node.descendantsOfType('plain_value');
-    }
+    },
+    languageScope: null
   });
 
 };

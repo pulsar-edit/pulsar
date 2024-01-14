@@ -1214,7 +1214,25 @@ class WASMTreeSitterLanguageMode {
     // `indents.scm`, perhaps with an explanatory comment.)
     let controllingLayer = this.controllingLayerAtPoint(
       comparisonRowEnd,
-      (layer) => !!layer.indentsQuery
+      (layer) => {
+        if (!layer.indentsQuery) return false;
+        // We want to exclude layers with a content range that _begins at_ the
+        // cursor position. Why? Because the content that starts at the cursor
+        // is about to shift down to the next line. It'd be odd if that layer
+        // was in charge of the indentation hint if it didn't have any content
+        // on the preceding line.
+        //
+        // So first we test for containment exclusive of endpoints…
+        if (layer.containsPoint(comparisonRowEnd, true)) {
+          return true;
+        }
+
+        // …but we'll still accept layers that have a content range which
+        // _ends_ at the cursor position.
+        return layer.getCurrentRanges()?.some(r => {
+          return r.end.compare(comparisonRowEnd) === 0;
+        });
+      }
     );
 
     if (!controllingLayer) {
@@ -1382,6 +1400,42 @@ class WASMTreeSitterLanguageMode {
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
 
+      // The controlling layer on the previous line gets to decide what our
+      // starting indent is on the current line. But it might not extend to the
+      // current line, so we should determine which layer is in charge of the
+      // second phase.
+      let rowStart = new Point(row, 0);
+      let dedentControllingLayer = this.controllingLayerAtPoint(
+        rowStart,
+        (layer) => {
+          if (!layer.indentsQuery) return false;
+          // We're inverting the logic from above: now we want to allow layers
+          // that _begin_ at the cursor and exclude layers that _end_ at the
+          // cursor. Because we'll be analyzing content that comes _after_ the
+          // cursor to understand whether to dedent!
+          //
+          // So first we test for containment exclusive of endpoints…
+          if (layer.containsPoint(rowStart, true)) {
+            return true;
+          }
+
+          // …but we'll still accept layers that have a content range which
+          // _starts_ at the cursor position.
+          return layer.getCurrentRanges()?.some(r => {
+            return r.start.compare(rowStart) === 0;
+          });
+        }
+      );
+
+      if (dedentControllingLayer && dedentControllingLayer !== controllingLayer) {
+        // If this layer is different from the one we used above, then we
+        // should run this layer's indents query against its own tree. If _no_
+        // layers qualify at this position, we can still reluctantly use the
+        // original layer.
+        indentsQuery = dedentControllingLayer.indentsQuery;
+        indentTree = dedentControllingLayer.getOrParseTree();
+      }
+
       // The second phase covers any captures on the current line that can
       // cause the current line to be indented or dedented.
       let dedentCaptures = indentsQuery.captures(
@@ -1501,7 +1555,7 @@ class WASMTreeSitterLanguageMode {
       // because we start at the previous row to find the suggested indent for
       // the current row.
       let controllingLayer = this.controllingLayerAtPoint(
-        new Point(row - 1, Infinity),
+        this.buffer.clipPosition(new Point(row - 1, Infinity)),
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
 
@@ -3001,7 +3055,7 @@ class LanguageLayer {
 
     this.tree = null;
     this.lastSyntaxTree = null;
-    this.temporaryTrees = null;
+    this.temporaryTrees = [];
 
     while (trees.length > 0) {
       let tree = trees.pop();
@@ -3687,9 +3741,9 @@ class LanguageLayer {
     return markers.map(m => m.getRange());
   }
 
-  containsPoint(point) {
+  containsPoint(point, exclusive = false) {
     let ranges = this.getCurrentRanges() ?? [this.getExtent()];
-    return ranges.some(r => r.containsPoint(point));
+    return ranges.some(r => r.containsPoint(point, exclusive));
   }
 
   getOrParseTree({ force = true, anonymous = false } = {}) {
@@ -4069,7 +4123,7 @@ class NodeRangeSet {
   }
 
   getRanges(buffer) {
-    const previousRanges = this.previous && this.previous.getRanges(buffer);
+    const previousRanges = this.previous?.getRanges(buffer);
     let result = [];
 
     for (const node of this.nodeSpecs) {
@@ -4211,7 +4265,7 @@ class NodeRangeSet {
   // For injection points with `newlinesBetween` enabled, ensure that a
   // newline is included between each disjoint range.
   _ensureNewline(buffer, newRanges, startIndex, startPosition) {
-    const lastRange = newRanges[newRanges.length - 1];
+    const lastRange = last(newRanges);
     if (lastRange && lastRange.endPosition.row < startPosition.row) {
       newRanges.push({
         startPosition: new Point(
@@ -4308,7 +4362,7 @@ class RangeList {
   }
 
   insertOrdered(newRange) {
-    let index = this.ranges.findIndex((r, i) => {
+    let index = this.ranges.findIndex(r => {
       return r.start.compare(newRange.start) > 0;
     });
     this.ranges.splice(index, 0, newRange);

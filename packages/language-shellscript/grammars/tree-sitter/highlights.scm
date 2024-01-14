@@ -11,11 +11,14 @@
   (#eq? @keyword.control.return.shell "return")
   (#set! capture.final true))
 
-((command_name) @support.function.builtin.shell
-  (#match? @support.function.builtin.shell "^(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)$")
+((command_name) @support.function.builtin._TEXT_.shell
+  (#match? @support.function.builtin._TEXT_.shell "^(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)$")
   (#set! capture.final true))
 
-(command_name) @support.other.function.shell
+(unset_command "unset" @support.function.builtin.unset.shell)
+
+((command_name) @support.other.function.shell
+  (#is-not? test.descendantOfType "command_substitution"))
 
 
 [
@@ -44,7 +47,7 @@
   "$" @punctuation.definition.variable.shell (variable_name))
 (expansion
   "${" @punctuation.definition.variable.begin.shell
-  (variable_name)
+  ; (variable_name)
   "}" @punctuation.definition.variable.end.shell) @variable.other.bracket.shell
 
 
@@ -84,7 +87,10 @@
   (#set! adjust.startAndEndAroundFirstMatchOf ".$"))
 
 (string
-  (command_substitution) @meta.embedded.line.subshell.shell)
+  (command_substitution) @meta.embedded.line.subshell.shell
+  (#set! capture.final true))
+
+(command_substitution) @string.interpolation.backtick.shell
 
 (heredoc_start) @punctuation.definition.string.begin.heredoc.shell
 (heredoc_body) @string.unquoted.heredoc.shell
@@ -102,6 +108,10 @@
 
 (list ["&&" "||"] @keyword.operator.logical.shell)
 (binary_expression ["&&" "||"] @keyword.operator.logical.shell)
+
+(pipeline "|" @keyword.operator.pipe.shell)
+(expansion operator: "#" @keyword.operator.expansion.shell)
+
 
 ; "*" @keyword.operator.glob.shell
 
@@ -141,6 +151,8 @@
 (file_redirect
   destination: (word) @constant.numeric.file-descriptor.shell
     (#match? @constant.numeric.file-descriptor.shell "^[12]$"))
+
+(number) @constant.numeric.decimal.shell
 
 (test_command
   "[[" @punctuation.brace.double-square.begin.shell)

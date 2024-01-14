@@ -38,6 +38,11 @@
 (super) @variable.language.super._LANG_._LANG_x
 
 (required_parameter
+  pattern: (identifier) @variable.parameter.with-default._LANG_
+  value: (_)
+  (#set! capture.final true))
+
+(required_parameter
   pattern: (identifier) @variable.parameter._LANG_)
 
 (required_parameter
@@ -49,6 +54,12 @@
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
     (#set! capture.final true))
 
+(required_parameter
+  pattern: (object_pattern
+    (object_assignment_pattern
+      (shorthand_property_identifier_pattern) @variable.parameter.destructuring.with-default._LANG_))
+    (#set! capture.final true))
+
 (optional_parameter
   pattern: (identifier) @variable.parameter.optional._LANG_)
 
@@ -57,6 +68,11 @@
 (type_predicate
   name: (identifier) @variable.other.type._LANG_
   "is" @keyword.operator.type.is._LANG_)
+
+; Assertion functions: the `asserts` in
+; `function checkFoo(obj: unknown): asserts obj is foo`
+(asserts "asserts" @keyword.type.asserts._LANG_)
+(asserts (identifier) @variable.other.type._LANG_)
 
 ["var" "const" "let"] @storage.type._TYPE_._LANG_
 
@@ -120,6 +136,13 @@
   (array_pattern
     (identifier) @variable.other.assignment.destructuring._LANG_))
 
+; A variable array destructuring with a default:
+; The "baz" in `let [foo, bar, baz = false] = something`
+(variable_declarator
+  (array_pattern
+    (assignment_pattern
+      (identifier) @variable.other.assignment.destructuring.js)))
+
 ; A variable declaration in a for…(in|of) loop:
 ; The "foo" in `for (let foo of bar) {`
 (for_in_statement
@@ -154,6 +177,12 @@
 ; The "foo" in `(foo => …)`
 (arrow_function parameter: (identifier) @variable.parameter._LANG_)
 
+; `infer` keywords inside `extends` clauses function as a sort of type
+; parameter, so we'll try highlighting them that way.
+;
+; TODO: We may or may not want `capture.final` here.
+(infer_type (type_identifier) @variable.parameter.type._LANG_
+  (#set! capture.final true))
 
 ; COMMENTS
 ; ========
@@ -255,7 +284,7 @@
 ; =====
 
 ["var" "let" "const"] @storage.modifier._TYPE_._LANG_
-["extends" "static" "async"] @storage.modifier._TYPE_._LANG_
+["extends" "static" "async" "infer"] @storage.modifier._TYPE_._LANG_
 
 ["class" "function"] @storage.type._TYPE_._LANG_
 
@@ -317,6 +346,12 @@
 ; TODO: This is both a key and a value, so opinions may vary on how to treat it.
 (object
   (shorthand_property_identifier) @entity.other.attribute-name.shorthand._LANG_)
+
+; The "FOO" in `FOO.bar` should be scoped as a constant.
+(member_expression
+  object: (identifier) @constant.other.object._LANG_
+  (#match? @constant.other.object._LANG_ "^[_A-Z]+$")
+  (#set! capture.final true))
 
 ; The "foo" in `foo.bar`.
 (member_expression
@@ -405,6 +440,8 @@
 (generator_function "*" @storage.modifier.generator._LANG_)
 (generator_function_declaration "*" @storage.modifier.generator._LANG_)
 (method_definition "*" @storage.modifier.generator._LANG_)
+
+(asserts "asserts" @keyword.control.type.asserts._LANG_)
 
 ; SUPPORT
 ; =======
@@ -746,6 +783,9 @@
 
 
 (ternary_expression
+  ["?" ":"] @keyword.operator.ternary._LANG_)
+
+(conditional_type
   ["?" ":"] @keyword.operator.ternary._LANG_)
 
 ; PUNCTUATION

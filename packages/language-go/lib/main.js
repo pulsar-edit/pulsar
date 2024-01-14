@@ -2,17 +2,8 @@ exports.activate = () => {
   const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
   const HYPERLINK_PATTERN = /\bhttps?:/
 
-  atom.grammars.addInjectionPoint('source.java', {
-    type: 'comment',
-    language: (node) => {
-      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
-
-  for (let type of ['string_literal', 'comment']) {
-    atom.grammars.addInjectionPoint('source.java', {
+  for (let type of ['comment', 'interpreted_string_literal', 'raw_string_literal']) {
+    atom.grammars.addInjectionPoint('source.go', {
       type,
       language: (node) => {
         return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
@@ -21,4 +12,14 @@ exports.activate = () => {
       languageScope: null
     });
   }
+
+  atom.grammars.addInjectionPoint('source.go', {
+    type: 'comment',
+    language(node) {
+      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+    },
+    content: (node) => node,
+    languageScope: null
+  });
+
 };

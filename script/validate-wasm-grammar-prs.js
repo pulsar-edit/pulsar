@@ -64,6 +64,9 @@ if (wasmFilesChanged.length === 0) {
 for (const wasmFile of wasmFilesChanged) {
   const wasmPath = path.dirname(wasmFile);
 
+  // Don't check the base `tree-sitter.wasm` file.
+  if (wasmFile.includes('vendor/web-tree-sitter')) continue;
+
   const files = fs.readdirSync(path.join(wasmPath, ".."));
   console.log(`Detected changes to: ${wasmFile}`);
 
@@ -76,6 +79,9 @@ for (const wasmFile of wasmFilesChanged) {
   }
 
   for (const file of files) {
+    // Only check `cson` files.
+    if (!file.endsWith('.cson')) continue;
+
     const filePath = path.join(wasmPath, "..", file);
     console.log(`Checking: ${filePath}`);
 

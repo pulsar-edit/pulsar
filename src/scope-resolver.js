@@ -391,6 +391,11 @@ class ScopeResolver {
     return range;
   }
 
+  isFinal(existingData = {}) {
+    return ('capture.final' in existingData) ||
+      ('final' in existingData);
+  }
+
   // Given a syntax capture, test whether we should include its scope in the
   // document.
   test(capture, existingData) {
@@ -401,7 +406,7 @@ class ScopeResolver {
       refutedProperties: refuted = {}
     } = capture;
 
-    if (existingData?.final || existingData?.['capture.final']) {
+    if (this.isFinal(existingData)) {
       return false;
     }
 
@@ -574,16 +579,16 @@ ScopeResolver.interpolateName = (name, node) => {
 // Special `#set!` predicates that work on “claimed” and “unclaimed” ranges.
 ScopeResolver.CAPTURE_SETTINGS = {
   // Passes only if another capture has not already declared `final` for the
-  // exact same range. If a capture is the first one to define `final`, then
+  // exact same range. If a capture is the first one to define `exact`, then
   // all other captures for that same range are ignored, whether they try to
   // define `final` or not.
-  final(node, existingData) {
-    let final = existingData?.final || existingData?.['capture.final'];
-    return !(existingData && final);
+  final(_node, existingData) {
+    if (!existingData) return true;
+    return !('capture.final' in existingData) && !('final' in existingData);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.
-  shy(node, existingData) {
+  shy(_node, existingData) {
     return existingData === undefined;
   }
 };

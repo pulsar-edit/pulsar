@@ -100,6 +100,8 @@ describe('SymbolsView', () => {
     activationPromise.then(() => {
       mainModule = atom.packages.getActivePackage('symbols-view').mainModule;
     });
+    await activationPromise;
+    await atom.packages.activatePackage('language-javascript');
     jasmine.attachToDOM(getWorkspaceView());
   });
 
@@ -111,6 +113,9 @@ describe('SymbolsView', () => {
     beforeEach(async () => {
       atom.config.set('symbols-view.providerTimeout', 500);
       await atom.workspace.open(directory.resolve('sample.js'));
+      let editor = atom.workspace.getActiveTextEditor();
+      let languageMode  =  editor.getBuffer().getLanguageMode();
+      if (languageMode.ready) await languageMode.ready;
     });
 
     it('displays all symbols with line numbers', async () => {
@@ -303,7 +308,39 @@ describe('SymbolsView', () => {
         beforeEach(() => {
           // Last time we referred to this one by its package name; now we use
           // its human-friendly name. They should be interchangeable.
-          atom.config.set('symbols-view.preferCertainProviders', ['Competing Exclusive', 'symbol-provider-dummy']);
+          atom.config.set(
+            'symbols-view.preferCertainProviders',
+            ['Competing Exclusive', 'symbol-provider-dummy']
+          );
+        });
+
+        it('prefers the one with the highest score (providers listed earlier beating those listed later)', async () => {
+          registerProvider(DummyProvider, CompetingExclusiveProvider);
+          spyOn(CompetingExclusiveProvider, 'getSymbols').andCallThrough();
+          spyOn(DummyProvider, 'getSymbols').andCallThrough();
+          await activationPromise;
+          await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
+          symbolsView = getSymbolsView();
+          expect(choiceCount(symbolsView)).toBe(5);
+          expect(DummyProvider.getSymbols).not.toHaveBeenCalled();
+          expect(CompetingExclusiveProvider.getSymbols).toHaveBeenCalled();
+        });
+      });
+
+      describe('and one has a scope-specific `preferCertainProviders` setting', () => {
+        beforeEach(() => {
+          // Last time we referred to this one by its package name; now we use
+          // its human-friendly name. They should be interchangeable.
+          atom.config.set(
+            'symbols-view.preferCertainProviders',
+            ['Competing Exclusive', 'symbol-provider-dummy'],
+            { scopeSelector: '.source.js' }
+          );
+
+          atom.config.set(
+            'symbols-view.preferCertainProviders',
+            ['symbol-provider-dummy']
+          );
         });
 
         it('prefers the one with the highest score (providers listed earlier beating those listed later)', async () => {

@@ -129,6 +129,10 @@
   "." @keyword.operator.accessor.ruby
   ) @meta.function.method.with-arguments
 
+(singleton_method
+  name: (identifier) @entity.name.function.ruby
+  (#set! capture.final "true"))
+
 (call
   method: (identifier) @keyword.other.special-method
   (#match? @keyword.other.special-method "^(raise|loop)$"))
@@ -201,6 +205,8 @@
   (#set! adjust.startAt firstChild.startPosition)
   (#set! adjust.endAt firstChild.nextSibling.endPosition)
   (#set! capture.final true))
+
+(keyword_parameter name: (identifier) @variable.parameter.keyword.ruby)
 
 ; This scope should span both the key and the adjacent colon.
 ((pair key: (hash_key_symbol)) @constant.other.symbol.hashkey.ruby
@@ -486,6 +492,9 @@
 [
   "&"
 ] @keyword.operator.other.ruby
+
+".." @keyword.operator.range.inclusive.ruby
+"..." @keyword.operator.range.exclusive.ruby
 
 [
   "=="
