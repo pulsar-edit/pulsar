@@ -246,11 +246,11 @@ class Name {
   }
 
   toSymbol() {
-    let { name, shortName, position, context, tag } = this;
-    let symbol = { name, shortName, position };
+    let { name, shortName, position, context, tag, icon } = this;
+    let symbol = { name, shortName, position, icon };
     if (tag) {
       symbol.tag = tag;
-      symbol.icon = iconForTag(tag);
+      symbol.icon ??= iconForTag(tag);
     }
     if (context) symbol.context = context;
 

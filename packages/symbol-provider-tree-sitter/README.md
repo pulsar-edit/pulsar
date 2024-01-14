@@ -179,3 +179,5 @@ If this value is omitted, this provider will still attempt to match certain comm
 The `symbol.tag` predicate will set the value of a symbol’s `tag` property to a fixed string.
 
 The `tag` property is used to supply a word that represents the symbol in some way. For conventional symbols, this will often be something like `class` or `function`.
+
+This provider will attempt to match certain common tag values to icons. This can be overridden by specifying an explicit `symbol.icon` value.
