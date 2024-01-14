@@ -8,7 +8,6 @@ injectionRegex: '^(internal-php)$'
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-php#594b8bad093abe739c3d2a2cae5abae33c5fb23d'
+  # TODO: See if we can make an “empty” Tree-sitter parser. We don't need this
+  # layer to do any of its own parsing work.
   grammar: 'tree-sitter/tree-sitter-php.wasm'
-  # TODO: This shouldn't be necessary. Investigate why a `highlightsQuery` is
-  # still required.
-  highlightsQuery: 'tree-sitter/queries/empty.scm'

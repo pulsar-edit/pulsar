@@ -2949,22 +2949,14 @@ class LanguageLayer {
     // off this promise. We can `await this.languageLoaded` later on.
     this.languageLoaded = this.grammar.getLanguage().then(language => {
       this.language = language;
-      // TODO: Currently, we require a highlights query, but we might want to
-      // rethink this. There are use cases for treating the root layer merely
-      // as a way to delegate to injections, in which case syntax highlighting
-      // wouldn't be needed.
-      return this.grammar.getQuery('highlightsQuery').then(highlightsQuery => {
-        this.highlightsQuery = highlightsQuery;
-      }).catch(() => {
-        throw new GrammarLoadError(grammar, 'highlightsQuery');
-      });
-    }).then(() => {
-      // All other queries are optional. Regular expression language layers,
-      // for instance, don't really have a need for any of these.
-      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery', 'tagsQuery'];
+      // All queries are optional. Regular expression language layers, for
+      // instance, don't really have a need for any queries other than
+      // `highlightsQuery`, and some kinds of layers don't even need
+      // `highlightsQuery`.
+      let queries = ['highlightsQuery', 'foldsQuery', 'indentsQuery', 'localsQuery', 'tagsQuery'];
       let promises = [];
 
-      for (let queryType of otherQueries) {
+      for (let queryType of queries) {
         if (grammar[queryType]) {
           let promise = this.grammar.getQuery(queryType).then(query => {
             this[queryType] = query;
@@ -4110,7 +4102,7 @@ class NodeRangeSet {
     }
   }
 
-  getNodeSpec (node, getChildren) {
+  getNodeSpec(node, getChildren) {
     let { startIndex, endIndex, startPosition, endPosition, id } = node;
     let result = { startIndex, endIndex, startPosition, endPosition, id };
     if (node.children && getChildren) {

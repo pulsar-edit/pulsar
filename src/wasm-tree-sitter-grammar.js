@@ -146,10 +146,6 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   async loadQueryFiles(grammarPath, queryPaths) {
-    if (!('highlightsQuery' in queryPaths)) {
-      throw new Error(`Highlights query must be present`);
-    }
-
     if (this._loadQueryFilesPromise) {
       return this._loadQueryFilesPromise;
     }
