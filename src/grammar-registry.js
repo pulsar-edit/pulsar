@@ -288,6 +288,8 @@ module.exports = class GrammarRegistry {
       if (isNewTreeSitter) {
         if (parserConfig === 'wasm-tree-sitter') {
           score += 0.1;
+        } else if (parserConfig === 'textmate') {
+          score = -1;
         }
       } else if (isOldTreeSitter) {
         if (parserConfig === 'node-tree-sitter') {
@@ -298,6 +300,8 @@ module.exports = class GrammarRegistry {
           // score, but just a bit less than we'd bump it if this were a
           // modern Tree-sitter grammar.
           score += 0.09;
+        } else if (parserConfig === 'textmate') {
+          score = -1;
         }
       }
 
