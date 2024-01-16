@@ -11,15 +11,27 @@
 (jsx_opening_element
   name: (identifier) @entity.name.tag.ts.tsx)
 
+; The "Foo.Bar" in `<Foo.Bar>`.
+(jsx_opening_element
+  name: (nested_identifier) @entity.name.tag.ts.tsx)
+
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  "/" @punctuation.definition.tag.end.ts.tsx
-  (#set! capture.final true)
   name: (identifier) @entity.name.tag.ts.tsx)
+
+; The "Foo.Bar" in `</Foo.Bar>`.
+(jsx_closing_element
+  name: (nested_identifier) @entity.name.tag.ts.tsx)
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
   (property_identifier) @entity.other.attribute-name.ts.tsx)
+
+; The slashes in closing tags should not be interpreted as math operators.
+(jsx_self_closing_element "/" @punctuation.definition.tag.end.ts.tsx
+  (#set! capture.final true))
+(jsx_closing_element "/" @punctuation.definition.tag.end.ts.tsx
+  (#set! capture.final true))
 
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.ts.tsx

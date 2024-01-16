@@ -265,6 +265,16 @@
 (internal_module
   name: (identifier) @entity.name.type.namespace._LANG_)
 
+; The "Bar" of `namespace Foo.Bar` and `namespace Foo.Baz.Bar`.
+(internal_module
+  name: (nested_identifier
+    (identifier) @entity.name.type.namespace._LANG_ .)
+    (#set! isLastNamespaceSegment true))
+
+; The "Foo" and "Baz" of `namespace Foo.Bar` and `namespace Foo.Baz.Bar`.
+(nested_identifier (identifier) @support.type.namespace._LANG_
+  (#is? test.descendantOfType "internal_module")
+  (#is-not? test.rangeWithData isLastNamespaceSegment))
 
 ; DECLARATIONS
 ; ============
@@ -447,6 +457,12 @@
 (method_definition "*" @storage.modifier.generator._LANG_)
 
 (asserts "asserts" @keyword.control.type.asserts._LANG_)
+
+; An invocation of any function.
+(call_expression
+  function: (identifier) @support.other.function._LANG_
+  (#set! capture.shy true))
+
 
 ; SUPPORT
 ; =======
@@ -738,13 +754,8 @@
   "||="
 ] @keyword.operator.assignment.compound._LANG_
 
-[
-  "+"
-  "-"
-  "*"
-  "/"
-  "%"
-] @keyword.operator.arithmetic._LANG_
+(binary_expression
+  ["+" "-" "*" "/" "%"] @keyword.operator.arithmetic._LANG_)
 
 [
   "=="
