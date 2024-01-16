@@ -8,6 +8,7 @@
 
 ## 1.113.0
 
+- Enabled Modern Tree-sitter by default
 - Added a modern Tree-sitter grammar for PHP.
 - Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
 - Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.

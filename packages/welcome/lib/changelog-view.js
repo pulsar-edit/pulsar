@@ -50,6 +50,9 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
+                Enabled Modern Tree-sitter Grammars by default
+              </li>
+              <li>
                 Added a modern Tree-sitter grammar for PHP.
               </li>
               <li>
