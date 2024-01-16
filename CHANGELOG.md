@@ -6,6 +6,29 @@
 
 ## [Unreleased]
 
+## 1.113.0
+
+- Enabled Modern Tree-sitter Grammars by default
+- Added a modern Tree-sitter grammar for PHP.
+- Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+- Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
+- Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
+- Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
+- Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+
+### Pulsar
+- Fixed: Tree-sitter fixes for December (including a PHP grammar!) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/852)
+- Added: Make `useExperimentalModernTreeSitter` the default... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/855)
+- Fixed: Ensure editor is visible before measuring block decorations [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/854)
+- Added: Overhaul `symbols-view` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/829)
+- Added: Default to no emoji when rendering Markdown [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/850)
+
+### find-and-replace
+- Fixed: [find-and-replace] Fix `capitalize` utility [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/849)
+
+### symbols-view
+- Fixed: [symbols-view] Fix issue with returning from a declaration [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/864)
+
 ## 1.112.1
 
 - Fixed a bug in PPM that prevented package publishing.
