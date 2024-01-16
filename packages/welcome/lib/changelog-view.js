@@ -67,6 +67,9 @@ export default class ChangeLogView {
               <li>
                 Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
               </li>
+              <li>
+                Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+              </li>
             </ul>
 
             <section className="welcome-panel">
