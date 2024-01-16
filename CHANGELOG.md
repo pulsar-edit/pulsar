@@ -20,6 +20,8 @@
 - Fixed: Ensure editor is visible before measuring block decorations [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/854)
 - Added: Overhaul `symbols-view` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/829)
 - Added: Default to no emoji when rendering Markdown [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/850)
+
+### find-and-replace
 - Fixed: [find-and-replace] Fix `capitalize` utility [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/849)
 
 ## 1.112.1
