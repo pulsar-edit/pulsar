@@ -7,13 +7,34 @@
 ; SUPPORT
 ; =======
 
+; There are lots of constructs that look like ordinary function calls but are
+; actually special language statements.
 (array_creation_expression
-  "array" @support.function.builtin.array.php)
+  "array" @support.function.builtin.array.php
+  "(" @punctuation.definition.parameters.begin.bracket.round.php
+  ")" @punctuation.definition.parameters.end.bracket.round.php)
 
-(list_literal "list" @support.function.builtin.list.php)
+(list_literal "list" @support.function.builtin.list.php
+  "(" @punctuation.definition.parameters.begin.bracket.round.php
+  ")" @punctuation.definition.parameters.end.bracket.round.php)
+
+(unset_statement
+  "unset" @support.function.unset.php
+  "(" @punctuation.definition.parameters.begin.bracket.round.php
+  ")" @punctuation.definition.parameters.end.bracket.round.php)
+
+(print_intrinsic
+  ; Don't delimit the parentheses like parameter punctuation; they're optional
+  ; for `print`.
+  "print" @support.function.print.php)
 
 ; The list of standard library methods in `php.cson` is… a lot. This is my
 ; biased attempt to pare it down to the most important functions.
+
+(function_call_expression
+  function: (name) @support.function._TEXT_.php
+  (#match? @support.function._TEXT_.php "^(isset|eval|empty)$")
+  (#set! capture.final))
 
 (function_call_expression
   function: (name) @support.function.array.php
@@ -30,10 +51,6 @@
 (function_call_expression
   function: (name) @support.function.class-obj.php
   (#match? @support.function.class-obj.php "^(class_alias|all_user_method(_array)?|is_(a|subclass_of)|__autoload|(class|interface|method|property|trait)_exists|get_(class(_(vars|methods))?|(called|parent)_class|object_vars|declared_(classes|interfaces|traits)))$"))
-
-(function_call_expression
-  function: (name) @support.function.construct.php
-  (#match? @support.function.construct.php "^(isset|unset|eval|empty)$"))
 
 (function_call_expression
   function: (name) @support.function.construct.output.php
@@ -263,14 +280,15 @@
 (class_constant_access_expression . (name) @support.class.php)
 (class_constant_access_expression (name) @support.other.property.php .)
 
-; The "Foo" and "bar" in "Foo::bar()".
-(scoped_call_expression
-  scope: (name) @support.class.php
-  name: (name) @support.other.function.method.static.php)
-
-; The "Foo" and "$bar" in "Foo::$bar()".
+; The "Foo" in `Foo::bar()` and `Foo::$bar()`.
 (scoped_call_expression
   scope: (name) @support.class.php)
+
+; The "bar" in `Foo::bar()`.
+(scoped_call_expression
+  name: (name) @support.other.function.method.static.php)
+
+; The "$bar" in `Foo::$bar()`.
 (scoped_call_expression
   name: (variable_name) @variable.other.method.static.php)
 
@@ -299,6 +317,10 @@
 (member_access_expression
   name: (variable_name) @variable.other.property.php
   (#set! capture.final true))
+
+; The "Foo" in `new Foo();`.
+(object_creation_expression
+  (name) @support.class.php)
 
 
 ; TRAITS
@@ -588,8 +610,10 @@
 
 "{" @punctuation.definition.block.begin.bracket.curly.php
 "}" @punctuation.definition.block.end.bracket.curly.php
-"(" @punctuation.definition.begin.bracket.round.php
-")" @punctuation.definition.end.bracket.round.php
+("(" @punctuation.definition.begin.bracket.round.php
+  (#set! capture.shy true))
+(")" @punctuation.definition.end.bracket.round.php
+  (#set! capture.shy true))
 "[" @punctuation.definition.begin.bracket.square.php
 "]" @punctuation.definition.end.bracket.square.php
 
