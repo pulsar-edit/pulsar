@@ -40,6 +40,14 @@
 
 (jsx_expression) @meta.embedded.line.ts.tsx
 
+(jsx_opening_element
+  "<" @punctuation.definition.tag.begin.ts.tsx
+  ">" @punctuation.definition.tag.end.ts.tsx)
+
+(jsx_closing_element
+  "<" @punctuation.definition.tag.begin.ts.tsx
+  ">" @punctuation.definition.tag.end.ts.tsx)
+
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.ts.tsx
   (#set! capture.final true))
@@ -50,6 +58,7 @@
   (#set! adjust.startAt lastChild.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.endPosition)
   (#set! capture.final true))
+
 
 
 ; META

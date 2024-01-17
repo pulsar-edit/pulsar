@@ -757,16 +757,18 @@
 (binary_expression
   ["+" "-" "*" "/" "%"] @keyword.operator.arithmetic._LANG_)
 
-[
-  "=="
-  "==="
-  "!="
-  "!=="
-  ">="
-  "<="
-  ">"
-  "<"
-] @keyword.operator.comparison._LANG_
+(binary_expression
+  [
+    "=="
+    "==="
+    "!="
+    "!=="
+    ">="
+    "<="
+    ">"
+    "<"
+  ] @keyword.operator.comparison._LANG_
+)
 
 ["++" "--"] @keyword.operator.increment._LANG_
 
