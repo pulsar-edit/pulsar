@@ -47,6 +47,8 @@
 
 [
   "struct"
+  "interface"
+  "map"
 ] @storage.type._TYPE_.go
 
 (struct_type
@@ -62,6 +64,7 @@
 [
   "break"
   "case"
+  "chan"
   "continue"
   "default"
   "defer"
