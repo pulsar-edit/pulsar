@@ -101,9 +101,9 @@ module.exports = {
 
     return new Disposable(() => {
       if (Array.isArray(provider)) {
-        this.broker.remove(...provider);
+        this.broker?.remove(...provider);
       } else {
-        this.broker.remove(provider);
+        this.broker?.remove(provider);
       }
     });
   },
