@@ -15,6 +15,14 @@
   "dependencies": {
     "tree-sitter-typescript": "0.20.1"
   },
+  "configSchema": {
+    "alignCaseWithSwitch": {
+      "title": "Align “case” with ”switch”",
+      "type": "boolean",
+      "default": false,
+      "description": "When enabled, `case` and `default` statements in `switch` blocks will match the indent level of the enclosing `switch` instead of indenting themselves one level."
+    }
+  },
   "consumedServices": {
     "hyperlink.injection": {
       "versions": {

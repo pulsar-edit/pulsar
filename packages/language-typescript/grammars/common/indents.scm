@@ -16,12 +16,19 @@
     (#is? test.last true))
     (#set! indent.matchIndentOf parent.startPosition))
 
-; 'case' and 'default' need to be indented one level more than their containing
-; `switch`. TODO: Might need to make this configurable.
+; By default, `case` and `default` need to be indented one level more than their containing
+; `switch`.
 (["case" "default"] @match
   (#set! indent.matchIndentOf parent.parent.startPosition)
-  (#set! indent.offsetIndent 1))
+  (#set! indent.offsetIndent 1)
+  (#is-not? test.config "language-typescript.alignCaseWithSwitch"))
 
+; When this config setting is enabled, `case` and `default` need to be indented
+; to match their containing `switch`.
+(["case" "default"] @match
+  (#set! indent.matchIndentOf parent.parent.startPosition)
+  (#set! indent.offsetIndent 0)
+  (#is? test.config "language-typescript.alignCaseWithSwitch"))
 
 ; ONE-LINE CONDITIONALS
 ; =====================
@@ -95,11 +102,13 @@
 (["||" "&&" "?"] @indent
   (#is? test.lastTextOnRow true))
 
-; …and the line after that should be dedented.
+; …and the line after that should be dedented…
 (binary_expression
   ["||" "&&"]
     right: (_) @dedent.next
-    (#is-not? test.startsOnSameRowAs parent.startPosition))
+    (#is-not? test.startsOnSameRowAs parent.startPosition)
+    ; …unless the right side of the expression spans multiple lines.
+    (#is? test.endsOnSameRowAs startPosition))
 
 ; …unless it's a ternary, in which case the dedent should wait until the
 ; alternative clause.
@@ -110,7 +119,10 @@
 ;
 (ternary_expression
   alternative: (_) @dedent.next
-  (#is-not? test.startsOnSameRowAs parent.startPosition))
+  (#is-not? test.startsOnSameRowAs parent.startPosition)
+  ; Only dedent the next line if the alternative doesn't itself span multiple
+  ; lines.
+  (#is? test.endsOnSameRowAs startPosition))
 
 
 ; GENERAL
