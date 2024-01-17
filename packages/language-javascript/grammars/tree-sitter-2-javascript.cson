@@ -4,13 +4,15 @@ type: 'modern-tree-sitter'
 parser: 'tree-sitter-javascript'
 
 injectionRegex: '^(js|javascript|JS|JAVASCRIPT)$'
+
 treeSitter:
-  grammar: 'ts/grammar.wasm'
-  highlightsQuery: 'ts/highlights.scm'
-  localsQuery: 'ts/locals.scm'
-  foldsQuery: 'ts/folds.scm'
-  indentsQuery: 'ts/indents.scm'
-  tagsQuery: 'ts/tags.scm'
+  parserSource: 'github:tree-sitter/tree-sitter-javascript#f1e5a09b8d02f8209a68249c93f0ad647b228e6e'
+  grammar: 'tree-sitter/tree-sitter-javascript.wasm'
+  highlightsQuery: 'tree-sitter/highlights.scm'
+  localsQuery: 'tree-sitter/locals.scm'
+  foldsQuery: 'tree-sitter/folds.scm'
+  indentsQuery: 'tree-sitter/indents.scm'
+  tagsQuery: 'tree-sitter/tags.scm'
 
 firstLineRegex: [
   # shebang line

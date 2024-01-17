@@ -752,8 +752,6 @@
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  "/" @punctuation.definition.tag.end.js
-  (#set! capture.final true)
   name: (identifier) @entity.name.tag.js)
 
 ; The "bar" in `<Foo bar={true} />`.
@@ -772,20 +770,15 @@
   ">" @punctuation.definition.tag.end.js)
 
 (jsx_closing_element
-  "<" @punctuation.definition.tag.begin.js
+  "</" @punctuation.definition.tag.begin.js
   ">" @punctuation.definition.tag.end.js)
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.js
   (#set! capture.final true))
 
-((jsx_self_closing_element
-  ; The "/>" in `<Foo />`, extended to cover both anonymous nodes at once.
-  "/") @punctuation.definition.tag.end.js
-  (#set! adjust.startAt lastChild.previousSibling.startPosition)
-  (#set! adjust.endAt lastChild.endPosition)
-  (#set! capture.final true))
-
+(jsx_self_closing_element
+  "/>" @punctuation.definition.tag.end.js)
 
 ; OPERATORS
 ; ==========

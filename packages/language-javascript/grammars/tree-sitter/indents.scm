@@ -20,11 +20,19 @@
     (#is? test.last true))
     (#set! indent.matchIndentOf parent.startPosition))
 
-; 'case' and 'default' need to be indented one level more than their containing
-; `switch`. TODO: Might need to make this configurable.
+; By default, `case` and `default` need to be indented one level more than their containing
+; `switch`.
 (["case" "default"] @match
   (#set! indent.matchIndentOf parent.parent.startPosition)
-  (#set! indent.offsetIndent 1))
+  (#set! indent.offsetIndent 1)
+  (#is-not? test.config "language-javascript.alignCaseWithSwitch"))
+
+; When this config setting is enabled, `case` and `default` need to be indented
+; to match their containing `switch`.
+(["case" "default"] @match
+  (#set! indent.matchIndentOf parent.parent.startPosition)
+  (#set! indent.offsetIndent 0)
+  (#is? test.config "language-javascript.alignCaseWithSwitch"))
 
 
 ; ONE-LINE CONDITIONALS
@@ -104,7 +112,9 @@
 (binary_expression
   ["||" "&&"]
     right: (_) @dedent.next
-    (#is-not? test.startsOnSameRowAs parent.startPosition))
+    (#is-not? test.startsOnSameRowAs parent.startPosition)
+    ; …unless the right side of the expression spans multiple lines.
+    (#is? test.endsOnSameRowAs startPosition))
 
 ; …unless it's a ternary, in which case the dedent should wait until the
 ; alternative clause.
@@ -115,7 +125,10 @@
 ;
 (ternary_expression
   alternative: (_) @dedent.next
-  (#is-not? test.startsOnSameRowAs parent.startPosition))
+  (#is-not? test.startsOnSameRowAs parent.startPosition)
+  ; Only dedent the next line if the alternative doesn't itself span multiple
+  ; lines.
+  (#is? test.endsOnSameRowAs startPosition))
 
 
 ; DEDENT-NEXT IN LIMITED SCENARIOS
