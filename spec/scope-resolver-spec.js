@@ -28,7 +28,7 @@ const jsGrammarPath = resolve(
 let jsConfig = CSON.readFileSync(jsGrammarPath);
 
 const jsRegexGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-regex.cson'
+  'language-javascript/grammars/modern-tree-sitter-regex.cson'
 );
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);
 

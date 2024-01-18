@@ -26,11 +26,11 @@ const jsGrammarPath = resolve(
 );
 
 const jsRegexGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-regex.cson'
+  'language-javascript/grammars/modern-tree-sitter-regex.cson'
 );
 
 const jsdocGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-jsdoc.cson'
+  'language-javascript/grammars/modern-tree-sitter-jsdoc.cson'
 );
 const htmlGrammarPath = resolve(
   'language-html/grammars/modern-tree-sitter-html.cson'
