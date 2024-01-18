@@ -22,7 +22,7 @@ const pythonGrammarPath = resolve(
   'language-python/grammars/modern-tree-sitter-python.cson'
 );
 const jsGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-javascript.cson'
+  'language-javascript/grammars/modern-tree-sitter-javascript.cson'
 );
 
 const jsRegexGrammarPath = resolve(

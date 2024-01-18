@@ -23,7 +23,7 @@ function resolve(modulePath) {
 }
 
 const jsGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-javascript.cson'
+  'language-javascript/grammars/modern-tree-sitter-javascript.cson'
 );
 let jsConfig = CSON.readFileSync(jsGrammarPath);
 
