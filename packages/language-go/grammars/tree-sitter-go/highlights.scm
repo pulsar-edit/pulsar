@@ -47,6 +47,8 @@
 
 [
   "struct"
+  "interface"
+  "map"
 ] @storage.type._TYPE_.go
 
 (struct_type
@@ -55,13 +57,14 @@
       (field_identifier) @entity.other.attribute-name.go)))
 
 (keyed_element
-  (field_identifier) @entity.other.attribute-name.go
-  .
-  ":" @punctuation.separator.key-value.go)
+  . (literal_element) @entity.other.attribute-name.go)
+
+(keyed_element ":" @punctuation.separator.key-value.go)
 
 [
   "break"
   "case"
+  "chan"
   "continue"
   "default"
   "defer"
@@ -252,7 +255,8 @@
 
 ";" @punctuation.terminator.go
 "," @punctuation.separator.comma.go
-":" @punctuation.separator.colon.go
+(":" @punctuation.separator.colon.go
+  (#set! capture.shy))
 
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.go
