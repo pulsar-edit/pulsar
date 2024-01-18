@@ -587,9 +587,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           ]
         ]);
 
-        console.log('adding: ()');
         buffer.setTextInRange([[0, 3], [0, 3]], '()');
-        console.log('done: ()');
 
         expectTokensToEqual(editor, [
           [
@@ -598,9 +596,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           ]
         ]);
 
-        console.log('adding: new');
         buffer.setTextInRange([[0, 0], [0, 0]], 'new ');
-        console.log('done: new');
 
         expectTokensToEqual(editor, [
           [
@@ -613,7 +609,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         await nextHighlightingUpdate(languageMode);
         // await wait(0);
         // await languageMode.atTransactionEnd();
-        console.log('proceeding!');
 
         expectTokensToEqual(editor, [
           [
@@ -1799,7 +1794,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         (#set! fold.endAt lastChild.previousSibling.endPosition))
 
       ((jsx_self_closing_element) @fold
-        (#set! fold.endAt lastChild.previousSibling.startPosition))
+        (#set! fold.endAt lastChild.startPosition))
       `);
 
       buffer.setText(dedent`
