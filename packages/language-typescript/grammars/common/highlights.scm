@@ -74,6 +74,7 @@
 (asserts "asserts" @keyword.type.asserts._LANG_)
 (asserts (identifier) @variable.other.type._LANG_)
 
+
 ["var" "const" "let"] @storage.type._TYPE_._LANG_
 
 ; A simple variable declaration:
@@ -85,6 +86,11 @@
 ; The "foo" in `foo = true`
 (assignment_expression
   left: (identifier) @variable.other.assignment._LANG_)
+
+; The "bar" in `foo.bar = true`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property._LANG_))
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
@@ -368,14 +374,20 @@
   (#match? @constant.other.object._LANG_ "^[_A-Z]+$")
   (#set! capture.final true))
 
+
 ; The "foo" in `foo.bar`.
 (member_expression
   object: (identifier) @support.other.object._LANG_)
 
-; The "bar" in `foo.bar.baz`.
+; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
 (member_expression
-  object: (member_expression
-    property: (property_identifier) @support.other.object._LANG_))
+  property: (property_identifier) @support.other.property.js)
+
+; ; The "bar" in `foo.bar.baz`.
+; (member_expression
+;   object: (member_expression
+;     property: (property_identifier) @support.other.object._LANG_)
+;     (#set! capture.final))
 
 (method_signature
   (property_identifier) @entity.other.attribute-name.method._LANG_)
@@ -419,6 +431,11 @@
 ; the "foo" in `foo () {` (inside a class body)
 (method_definition
   name: (property_identifier) @entity.name.function.method.definition._LANG_)
+
+; Private field method definitions:
+; the "#foo" in `#foo () {` (inside a class body)
+(method_definition
+  name: (private_property_identifier) @entity.name.function.method.private.definition._LANG_)
 
 ; Function property assignment:
 ; The "foo" in `thing.foo = (arg) => {}`

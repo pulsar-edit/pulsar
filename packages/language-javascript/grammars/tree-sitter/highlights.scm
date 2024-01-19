@@ -250,6 +250,11 @@
 (method_definition
   name: (property_identifier) @entity.name.function.method.definition.js)
 
+; Private method definitions:
+; the "#foo" in `#foo () {` (inside a class body)
+(method_definition
+  name: (private_property_identifier) @entity.name.function.method.private.definition.js)
+
 ; Function property assignment:
 ; The "foo" in `thing.foo = (arg) => {}`
 (assignment_expression
