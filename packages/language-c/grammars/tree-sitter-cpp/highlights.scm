@@ -13,6 +13,10 @@
 "#define" @keyword.control.directive.define.cpp
 "#include" @keyword.control.directive.include.cpp
 
+(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.c
+  (#set! adjust.endAfterFirstMatchOf "^#"))
+
+
 ; This will match if the more specific rules above haven't matched. The
 ; anonymous nodes will match under ideal conditions, but might not be present
 ; if the parser is flummoxed.
@@ -207,36 +211,43 @@
 ; Declarations and assignments
 ; ----------------------------
 
-; The "x" in `int x`;
+; The "x" in `int x;`
 (declaration
   declarator: (identifier) @variable.declaration.cpp)
 
-; The "x" in `int x = y`;
+; The "x" in `int x = y;`
 (init_declarator
   declarator: (identifier) @variable.declaration.cpp)
 
+; The "x" in `SomeType *x;`
+(declaration
+  declarator: (pointer_declarator
+    declarator: (identifier) @variable.declaration.pointer.c))
+
 (field_declaration
-  (field_identifier) @variable.declaration.cpp)
+  (field_identifier) @variable.declaration.member.cpp)
 
 (field_declaration
   (pointer_declarator
-  	(field_identifier) @variable.declaration.cpp))
+  	(field_identifier) @variable.declaration.member.cpp))
 
 (field_declaration
   (array_declarator
-  	(field_identifier) @variable.declaration.cpp))
+  	(field_identifier) @variable.declaration.member.cpp))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @variable.declaration.cpp))
+    (identifier) @variable.declaration.member.cpp))
 
+; The "x" in `x = y;`
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
 
-; The "foo" in `bar.foo = "baz"`.
+; The "foo" in `something->foo = "bar";`
 (assignment_expression
   left: (field_expression
-    field: (field_identifier) @variable.other.member.assignment.cpp))
+    field: (field_identifier) @variable.other.member.assignment.cpp)
+    (#set! capture.final))
 
 ((reference_declarator
   (identifier) @variable.declaration.cpp)
@@ -420,8 +431,10 @@
 
 ";" @punctuation.terminator.statement.cpp
 
-"," @punctuation.separator.comma.cpp
-"->" @keyword.operator.accessor.cpp
+("," @punctuation.separator.comma.cpp
+  (#set! capture.shy))
+("->" @keyword.operator.accessor.pointer-access.cpp
+  (#set! capture.shy))
 
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.cpp
@@ -445,6 +458,22 @@
 ")" @punctuation.definition.end.bracket.round.cpp
 "[" @punctuation.definition.array.begin.bracket.square.cpp
 "]" @punctuation.definition.array.end.bracket.square.cpp
+
+; META
+; ====
+
+((compound_statement) @meta.block.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((enumerator_list) @meta.block.enum.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((field_declaration_list) @meta.block.field.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
 
 ; TODO:
 ;
