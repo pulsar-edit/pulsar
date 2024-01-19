@@ -81,7 +81,10 @@
 ] @keyword.control._TYPE_.go
 
 
+; Function names: the "foo" in `func foo() {`
 (function_declaration (identifier) @entity.name.function.go)
+; Method names: the "Foo" in `func (x Bar) Foo {`
+(method_declaration (field_identifier) @entity.name.function.method.go)
 
 (call_expression
   (identifier) @support.function.builtin.go
