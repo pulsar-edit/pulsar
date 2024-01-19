@@ -33,6 +33,7 @@
   "in"
   "do"
   "done"
+  "while"
 ] @keyword.control._TYPE_.shell
 
 (declaration_command
@@ -137,6 +138,7 @@
 
 (file_redirect
   [
+    "<"
     ">"
     ">&"
     "&>"
@@ -153,6 +155,15 @@
     (#match? @constant.numeric.file-descriptor.shell "^[12]$"))
 
 (number) @constant.numeric.decimal.shell
+
+; TODO: Double parentheses are used like `let` expressions, but ((i++)) is not
+; understood by `tree-sitter-bash` as a variable increment. It needs an equals
+; sign before it construes the contents as math.
+(test_command
+  "((" @punctuation.brace.double-round.begin.shell)
+(test_command
+  "))" @punctuation.brace.double-round.end.shell)
+
 
 (test_command
   "[[" @punctuation.brace.double-square.begin.shell)
