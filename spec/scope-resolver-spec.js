@@ -132,6 +132,38 @@ describe('ScopeResolver', () => {
     }
   });
 
+  it('provides the grammar with the text of leaf nodes only', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (expression_statement) @not_leaf_node
+      (call_expression) @also_not_leaf_node
+      (identifier) @leaf_node
+      (property_identifier) @also_leaf_node
+    `);
+
+    let tokens = [];
+    const original = grammar.idForScope.bind(grammar);
+    grammar.idForScope = function(scope, text) {
+      if (text) {
+        tokens.push(text);
+      }
+      return original(scope, text);
+    };
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText('aa.bb(cc.dd());');
+    await languageMode.ready;
+
+    // If non-leaf nodes are included, this list would included things like
+    // 'aa.bb()' and `cc.dd()`
+    expect(tokens).toEqual([
+        'aa',
+        'bb',
+        'cc',
+        'dd',
+    ]);
+  });
+
   it('interpolates magic tokens in scope names', async () => {
     await grammar.setQueryForTest('highlightsQuery', `
       (lexical_declaration kind: _ @declaration._TYPE_)
