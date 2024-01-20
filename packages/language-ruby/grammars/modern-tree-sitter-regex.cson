@@ -1,0 +1,9 @@
+scopeName: 'source.regexp'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-regex'
+
+injectionRegex: '^(rb-regex)$'
+
+treeSitter:
+  grammar: 'tree-sitter-regex/tree-sitter-regex.wasm'
+  highlightsQuery: 'tree-sitter-regex/highlights.scm'

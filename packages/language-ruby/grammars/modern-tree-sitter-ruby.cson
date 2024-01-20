@@ -7,12 +7,12 @@ injectionRegex: 'rb|ruby|RB|RUBY'
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-ruby#4d9ad3f010fdc47a8433adcf9ae30c8eb8475ae7'
-  grammar: 'ts/tree-sitter-ruby.wasm'
-  highlightsQuery: 'ts/highlights.scm'
-  localsQuery: 'ts/locals.scm'
-  foldsQuery: 'ts/folds.scm'
-  indentsQuery: 'ts/indents.scm'
-  tagsQuery: 'ts/tags.scm'
+  grammar: 'tree-sitter-ruby/tree-sitter-ruby.wasm'
+  highlightsQuery: 'tree-sitter-ruby/highlights.scm'
+  localsQuery: 'tree-sitter-ruby/locals.scm'
+  foldsQuery: 'tree-sitter-ruby/folds.scm'
+  indentsQuery: 'tree-sitter-ruby/indents.scm'
+  tagsQuery: 'tree-sitter-ruby/tags.scm'
 
 firstLineRegex: [
   # shebang line
