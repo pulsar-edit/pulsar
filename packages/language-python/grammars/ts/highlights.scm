@@ -222,7 +222,7 @@
   _ @punctuation.definition.string.end.python
   (#is? test.last true))
 
-(string prefix: _ @storage.type.string.python
+(string (string_start) @storage.type.string.python
   (#match? @storage.type.string.python "^[bBfFrRuU]+")
   (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuU]+"))
 
@@ -258,6 +258,7 @@
 ] @keyword.control.statement._TYPE_.python
 
 [
+  "break"
   "continue"
   "for"
   "while"
@@ -396,6 +397,9 @@
   "or"
 ] @keyword.operator.logical._TYPE_.python
 
+; The 'not' and 'in' are each scoped separately, each one being an anonymous
+; node incorrectly named "not in".
+"not in" @keyword.operator.logical.not-in.python
 "is not" @keyword.operator.logical.is-not.python
 
 (call
