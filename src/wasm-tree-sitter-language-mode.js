@@ -1163,6 +1163,8 @@ class WASMTreeSitterLanguageMode {
       ...rawOptions
     };
 
+    let originalControllingLayer = options.controllingLayer;
+
     let comparisonRow = options.comparisonRow;
     if (comparisonRow === undefined) {
       comparisonRow = row - 1;
@@ -1249,7 +1251,11 @@ class WASMTreeSitterLanguageMode {
     // resolvers.
     scopeResolver.reset();
 
-    let indentTree = options.tree;
+    let indentTree = null;
+    if (options.tree && originalControllingLayer === controllingLayer) {
+      // Make sure this tree belongs to the layer we expect it to.
+      indentTree = options.tree;
+    }
 
     if (!indentTree) {
       if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncParsing || !this.useAsyncIndent) {
@@ -1556,9 +1562,10 @@ class WASMTreeSitterLanguageMode {
       // the current row.
       let controllingLayer = this.controllingLayerAtPoint(
         this.buffer.clipPosition(new Point(row - 1, Infinity)),
+        // This query isn't as precise as the one we end up making later, but
+        // that's OK. This is just a first pass.
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
-
       if (isPastedText) {
         // In this mode, we're not trying to auto-indent every line; instead,
         // we're trying to auto-indent the _first_ line of a region of text
@@ -1581,7 +1588,11 @@ class WASMTreeSitterLanguageMode {
           let firstLineIdealIndent = this.suggestedIndentForBufferRow(
             row,
             tabLength,
-            { ...options, tree }
+            {
+              ...options,
+              controllingLayer,
+              tree
+            }
           );
 
           if (firstLineIdealIndent == null) {
