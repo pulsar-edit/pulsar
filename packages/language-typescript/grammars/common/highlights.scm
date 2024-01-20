@@ -9,6 +9,10 @@
 (import_specifier
   (identifier) @variable.other.assignment.import._LANG_)
 
+; The "*" in `import * as Foo from './bar'`
+(import_clause
+  (namespace_import "*" @variable.other.assignment.import.all._LANG_))
+
 ; The "foo" in `import * as foo from './bar'`
 (namespace_import
   (identifier) @variable.other.assignment.import.namespace._LANG_)
