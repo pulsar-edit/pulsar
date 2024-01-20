@@ -37,7 +37,7 @@
 ] @keyword.control._TYPE_.shell
 
 (declaration_command
-  ["local" "export"] @storage.modifier._TYPE_.shell)
+  ["local" "export" "declare" "readonly"] @storage.modifier._TYPE_.shell)
 
 (variable_assignment
   (variable_name) @variable.other.member.shell
@@ -91,7 +91,30 @@
   (command_substitution) @meta.embedded.line.subshell.shell
   (#set! capture.final true))
 
-(command_substitution) @string.interpolation.backtick.shell
+; Command substitution with backticks: var=`cmd`
+((command_substitution) @string.quoted.interpolated.backtick.shell
+  (#match? @string.quoted.interpolated.backtick.shell "^`"))
+
+((command_substitution) @punctuation.definition.string.begin.shell
+  (#match? @punctuation.definition.string.begin.shell "^`")
+  (#set! adjust.endAfterFirstMatchOf "^`"))
+
+((command_substitution) @punctuation.definition.string.end.shell
+  (#match? @punctuation.definition.string.end.shell "`$")
+  (#set! adjust.startBeforeFirstMatchOf "`$"))
+
+; Command substitution of the form: var=$(cmd)
+((command_substitution) @string.quoted.interpolated.dollar.shell
+  (#match? @string.quoted.interpolated.dollar.shell "^\\$\\("))
+
+((command_substitution) @punctuation.definition.string.begin.shell
+  (#match? @punctuation.definition.string.begin.shell "^\\$\\(")
+  (#set! adjust.endAfterFirstMatchOf "^\\$\\("))
+
+((command_substitution) @punctuation.definition.string.end.shell
+  (#match? @punctuation.definition.string.end.shell "\\)$")
+  (#set! adjust.startBeforeFirstMatchOf "\\)$"))
+
 
 (heredoc_start) @punctuation.definition.string.begin.heredoc.shell
 (heredoc_body) @string.unquoted.heredoc.shell
@@ -173,12 +196,12 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.brace.curly.begin.shell
-"}" @punctuation.brace.curly.end.shell
-"(" @punctuation.brace.round.begin.shell
-")" @punctuation.brace.round.end.shell
-"[" @punctuation.brace.square.begin.shell
-"]" @punctuation.brace.square.end.shell
+("{" @punctuation.brace.curly.begin.shell (#set! capture.shy))
+("}" @punctuation.brace.curly.end.shell (#set! capture.shy))
+("(" @punctuation.brace.round.begin.shell (#set! capture.shy))
+(")" @punctuation.brace.round.end.shell (#set! capture.shy))
+("[" @punctuation.brace.square.begin.shell (#set! capture.shy))
+("]" @punctuation.brace.square.end.shell (#set! capture.shy))
 
-";" @punctuation.terminator.statement.shell
-":" @punctuation.separator.colon.shell
+(";" @punctuation.terminator.statement.shell (#set! capture.shy))
+(":" @punctuation.separator.colon.shell (#set! capture.shy))
