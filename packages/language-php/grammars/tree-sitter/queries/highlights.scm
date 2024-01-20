@@ -118,7 +118,7 @@
 
 (function_call_expression
   function: (name) @support.function.math.php
-  (#match? @support.function.math.php "^((a)?(cos|sin|tan)(h)?|sqrt|srand|hypot|hexdec|ceil|is_(nan|(in)?finite)|octdec|dec(hex|oct|bin)|deg2rad|pi|pow|exp(m1)?|floor|fmod|lcg_value|log(1(p|0))?|atan2|abs|round|rand|rad2deg|getrandmax|mt_(srand|rand|getrandmax)|max|min|bindec|base_convert)$"))
+  (#match? @support.function.math.php "^((a)?(cos|sin|tan)(h)?|sqrt|srand|hypot|hexdec|ceil|is_(nan|(in)?finite)|octdec|dec(hex|oct|bin)|deg2rad|pi|pow|exp(m1)?|floor|f(mod|div)|lcg_value|log(1(p|0))?|atan2|abs|round|rand|rad2deg|getrandmax|mt_(srand|rand|getrandmax)|max|min|bindec|base_convert|intdiv)$"))
 
 (function_call_expression
   function: (name) @support.function.mbstring.php
@@ -505,10 +505,15 @@
   (#match? @punctuation.definition.comment.php "^#")
   (#set! adjust.startAndEndAroundFirstMatchOf "^#"))
 
-; Don't highlight PHPDoc comments because the injection will handle them.
+; Capture these because the PHPDoc injection won't process them…
+((comment) @comment.block.documentation.php
+  (#match? @comment.block.documentation.php "^/\\*\\*\\*"))
+
+; …but otherwise leave this style of comment to be handled by PHPDoc.
 ((comment) @_IGNORE_
   (#match? @_IGNORE_ "^/\\*\\*")
   (#set! capture.final true))
+
 
 ((comment) @comment.block.php
   (#match? @comment.block.php "^/\\*(?!\\*)"))
