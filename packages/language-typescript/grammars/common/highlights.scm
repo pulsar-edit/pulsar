@@ -357,130 +357,6 @@
   ; (#is? test.descendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
   (#set! capture.final true))
 
-; OBJECTS
-; =======
-
-; The "foo" in `{ foo: true }`.
-(pair
-  key: (property_identifier) @entity.other.attribute-name._LANG_)
-
-; TODO: This is both a key and a value, so opinions may vary on how to treat it.
-(object
-  (shorthand_property_identifier) @entity.other.attribute-name.shorthand._LANG_)
-
-; The "FOO" in `FOO.bar` should be scoped as a constant.
-(member_expression
-  object: (identifier) @constant.other.object._LANG_
-  (#match? @constant.other.object._LANG_ "^[_A-Z]+$")
-  (#set! capture.final true))
-
-
-; The "foo" in `foo.bar`.
-(member_expression
-  object: (identifier) @support.other.object._LANG_)
-
-; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
-(member_expression
-  property: (property_identifier) @support.other.property.js)
-
-; ; The "bar" in `foo.bar.baz`.
-; (member_expression
-;   object: (member_expression
-;     property: (property_identifier) @support.other.object._LANG_)
-;     (#set! capture.final))
-
-(method_signature
-  (property_identifier) @entity.other.attribute-name.method._LANG_)
-
-(property_signature
-  (property_identifier) @entity.other.attribute-name._LANG_)
-
-
-
-; FUNCTIONS
-; =========
-
-(method_definition
-  name: (property_identifier) @entity.name.function.method._LANG_)
-
-(call_expression
-  function: (member_expression
-    property: (property_identifier) @support.other.function.method._LANG_))
-
-; Named function expressions:
-; the "foo" in `let bar = function foo () {`
-(function
-  name: (identifier) @entity.name.function.definition._LANG_)
-
-; Function definitions:
-; the "foo" in `function foo () {`
-(function_declaration
-  name: (identifier) @entity.name.function.definition._LANG_)
-
-; Named generator function expressions:
-; the "foo" in `let bar = function* foo () {`
-(generator_function
-  name: (identifier) @entity.name.function.generator.definition._LANG_)
-
-; Generator function definitions:
-; the "foo" in `function* foo () {`
-(generator_function_declaration
-  name: (identifier) @entity.name.function.generator.definition._LANG_)
-
-; Method definitions:
-; the "foo" in `foo () {` (inside a class body)
-(method_definition
-  name: (property_identifier) @entity.name.function.method.definition._LANG_)
-
-; Private field method definitions:
-; the "#foo" in `#foo () {` (inside a class body)
-(method_definition
-  name: (private_property_identifier) @entity.name.function.method.private.definition._LANG_)
-
-; Function property assignment:
-; The "foo" in `thing.foo = (arg) => {}`
-(assignment_expression
-  left: (member_expression
-    property: (property_identifier) @entity.name.function.definition._LANG_
-    (#set! capture.final true))
-  right: [(arrow_function) (function)])
-
-; Function variable assignment:
-; The "foo" in `let foo = function () {`
-(variable_declarator
-  name: (identifier) @entity.name.function.definition._LANG_
-  value: [(function) (arrow_function)])
-
-; Function variable reassignment:
-; The "foo" in `foo = function () {`
-(assignment_expression
-  left: (identifier) @function
-  right: [(function) (arrow_function)])
-
-; Object key-value pair function:
-; The "foo" in `{ foo: function () {} }`
-(pair
-  key: (property_identifier) @entity.name.function.method.definition._LANG_
-  value: [(function) (arrow_function)])
-
-(function "function" @storage.type.function._LANG_)
-(function_declaration "function" @storage.type.function._LANG_)
-
-(generator_function "function" @storage.type.function._LANG_)
-(generator_function_declaration "function" @storage.type.function._LANG_)
-
-(generator_function "*" @storage.modifier.generator._LANG_)
-(generator_function_declaration "*" @storage.modifier.generator._LANG_)
-(method_definition "*" @storage.modifier.generator._LANG_)
-
-(asserts "asserts" @keyword.control.type.asserts._LANG_)
-
-; An invocation of any function.
-(call_expression
-  function: (identifier) @support.other.function._LANG_
-  (#set! capture.shy true))
-
-
 ; SUPPORT
 ; =======
 
@@ -656,6 +532,132 @@
 ((identifier) @constant.language.infinity._LANG_
   (#eq? @constant.language.infinity._LANG_ "Infinity")
   (#set! capture.final true))
+
+
+; OBJECTS
+; =======
+
+; The "foo" in `{ foo: true }`.
+(pair
+  key: (property_identifier) @entity.other.attribute-name._LANG_)
+
+; TODO: This is both a key and a value, so opinions may vary on how to treat it.
+(object
+  (shorthand_property_identifier) @entity.other.attribute-name.shorthand._LANG_)
+
+; The "FOO" in `FOO.bar` should be scoped as a constant.
+(member_expression
+  object: (identifier) @constant.other.object._LANG_
+  (#match? @constant.other.object._LANG_ "^[_A-Z]+$")
+  (#set! capture.final true))
+
+
+; The "foo" in `foo.bar`.
+(member_expression
+  object: (identifier) @support.other.object._LANG_)
+
+; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
+(member_expression
+  property: (property_identifier) @support.other.property.js)
+
+; ; The "bar" in `foo.bar.baz`.
+; (member_expression
+;   object: (member_expression
+;     property: (property_identifier) @support.other.object._LANG_)
+;     (#set! capture.final))
+
+(method_signature
+  (property_identifier) @entity.other.attribute-name.method._LANG_)
+
+(property_signature
+  (property_identifier) @entity.other.attribute-name._LANG_)
+
+
+
+; FUNCTIONS
+; =========
+
+(method_definition
+  name: (property_identifier) @entity.name.function.method._LANG_)
+
+(call_expression
+  function: (member_expression
+    property: (property_identifier) @support.other.function.method._LANG_))
+
+; Named function expressions:
+; the "foo" in `let bar = function foo () {`
+(function
+  name: (identifier) @entity.name.function.definition._LANG_)
+
+; Function definitions:
+; the "foo" in `function foo () {`
+(function_declaration
+  name: (identifier) @entity.name.function.definition._LANG_)
+
+; Named generator function expressions:
+; the "foo" in `let bar = function* foo () {`
+(generator_function
+  name: (identifier) @entity.name.function.generator.definition._LANG_)
+
+; Generator function definitions:
+; the "foo" in `function* foo () {`
+(generator_function_declaration
+  name: (identifier) @entity.name.function.generator.definition._LANG_)
+
+; Method definitions:
+; the "foo" in `foo () {` (inside a class body)
+(method_definition
+  name: (property_identifier) @entity.name.function.method.definition._LANG_)
+
+; Private field method definitions:
+; the "#foo" in `#foo () {` (inside a class body)
+(method_definition
+  name: (private_property_identifier) @entity.name.function.method.private.definition._LANG_)
+
+; Function property assignment:
+; The "foo" in `thing.foo = (arg) => {}`
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @entity.name.function.definition._LANG_
+    (#set! capture.final true))
+  right: [(arrow_function) (function)])
+
+; Function variable assignment:
+; The "foo" in `let foo = function () {`
+(variable_declarator
+  name: (identifier) @entity.name.function.definition._LANG_
+  value: [(function) (arrow_function)])
+
+; Function variable reassignment:
+; The "foo" in `foo = function () {`
+(assignment_expression
+  left: (identifier) @function
+  right: [(function) (arrow_function)])
+
+; Object key-value pair function:
+; The "foo" in `{ foo: function () {} }`
+(pair
+  key: (property_identifier) @entity.name.function.method.definition._LANG_
+  value: [(function) (arrow_function)])
+
+(function "function" @storage.type.function._LANG_)
+(function_declaration "function" @storage.type.function._LANG_)
+
+(generator_function "function" @storage.type.function._LANG_)
+(generator_function_declaration "function" @storage.type.function._LANG_)
+
+(generator_function "*" @storage.modifier.generator._LANG_)
+(generator_function_declaration "*" @storage.modifier.generator._LANG_)
+(method_definition "*" @storage.modifier.generator._LANG_)
+
+(asserts "asserts" @keyword.control.type.asserts._LANG_)
+
+; An invocation of any function.
+(call_expression
+  function: (identifier) @support.other.function._LANG_
+  (#set! capture.shy true))
+
+
 
 ; Things that `LOOK_LIKE_CONSTANTS`.
 ([(property_identifier) (identifier)] @constant.other._LANG_
