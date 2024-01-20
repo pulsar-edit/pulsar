@@ -6,7 +6,8 @@ parser: 'tree-sitter-ruby'
 injectionRegex: 'rb|ruby|RB|RUBY'
 
 treeSitter:
-  grammar: 'ts/grammar.wasm'
+  parserSource: 'github:tree-sitter/tree-sitter-ruby#4d9ad3f010fdc47a8433adcf9ae30c8eb8475ae7'
+  grammar: 'ts/tree-sitter-ruby.wasm'
   highlightsQuery: 'ts/highlights.scm'
   localsQuery: 'ts/locals.scm'
   foldsQuery: 'ts/folds.scm'
