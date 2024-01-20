@@ -6,6 +6,7 @@ parser: 'tree-sitter-html'
 injectionRegex: '(HTML|html|Html)$'
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-html#d742025fa2d8e6100f134a6ea990443aa1f074b3'
   grammar: 'tree-sitter-html/tree-sitter-html.wasm'
   highlightsQuery: 'tree-sitter-html/highlights.scm'
   foldsQuery: 'tree-sitter-html/folds.scm'
