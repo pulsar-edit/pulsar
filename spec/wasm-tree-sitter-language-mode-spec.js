@@ -1026,6 +1026,32 @@ describe('WASMTreeSitterLanguageMode', () => {
         ]);
       });
 
+      it('handles injections with no highlights query', async () => {
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(jsGrammar);
+        atom.grammars.addGrammar(htmlGrammar);
+        htmlGrammar.highlightsQuery = false;
+        // Pretend this grammar doesn't have a highlights query.
+        spyOn(htmlGrammar, 'getQuery').andReturn(Promise.resolve(null));
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: jsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        buffer.setText('text = html`<p></p>`');
+        await languageMode.atTransactionEnd();
+
+        // An injection should still be able to add its root scope even when
+        // its grammar has no `highlightsQuery`.
+        let descriptor = editor.scopeDescriptorForBufferPosition([0, 15]);
+
+        expect(descriptor.getScopesArray()).toContain('text.html.basic');
+      });
+
       it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async () => {
         jasmine.useRealClock();
         const ejsGrammar = new WASMTreeSitterGrammar(

@@ -3113,7 +3113,7 @@ class LanguageLayer {
   // through a `ScopeResolver`.
   getSyntaxBoundaries(from, to) {
     let { buffer } = this.languageMode;
-    if (!(this.language && this.tree && this.highlightsQuery)) {
+    if (!(this.language && this.tree)) {
       return [[], new OpenScopeMap()];
     }
 
@@ -3123,7 +3123,12 @@ class LanguageLayer {
     let boundaries = createTree(comparePoints);
     let extent = this.getExtent();
 
-    const captures = this.highlightsQuery.captures(this.tree.rootNode, from, to);
+    let captures;
+    if (this.highlightsQuery) {
+      captures = this.highlightsQuery.captures(this.tree.rootNode, from, to);
+    } else {
+      captures = [];
+    }
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -3145,7 +3150,7 @@ class LanguageLayer {
       // `allowEmpty` to force these to be considered, but for marking scopes,
       // there's no need for it; it'd just cause us to open and close a scope
       // in the same position.
-      if (node.text === '') { continue; }
+      if (node.childCount === 0 && node.text === '') { continue; }
 
       // Ask the `ScopeResolver` to process each capture in turn. Some captures
       // will be ignored if they fail certain tests, and some will have their
