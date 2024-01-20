@@ -58,7 +58,7 @@ exports.activate = function () {
     atom.grammars.addInjectionPoint(scopeName, {
       type: 'regex_pattern',
       language() {
-        return 'js-regex';
+        return 'ts-regex';
       },
       content(regex) {
         return regex;
