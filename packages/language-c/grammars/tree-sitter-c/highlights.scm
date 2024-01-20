@@ -175,6 +175,12 @@
   declarator: (pointer_declarator
     declarator: (identifier) @variable.parameter.c))
 
+; The "foo" in `SomeType **foo` within a parameter list.
+(parameter_declaration
+  declarator: (pointer_declarator
+    declarator: (pointer_declarator
+      declarator: (identifier) @variable.parameter.c)))
+
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
   declarator: (array_declarator

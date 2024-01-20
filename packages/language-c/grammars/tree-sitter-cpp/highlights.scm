@@ -259,17 +259,24 @@
 (preproc_params
   (identifier) @variable.parameter.preprocessor.cpp)
 
+; The "foo" in `const char foo` within a parameter list.
 (parameter_declaration
   declarator: (identifier) @variable.parameter.cpp)
 
+; The "foo" in `const char *foo` within a parameter list.
 (parameter_declaration
   declarator: (pointer_declarator
     declarator: (identifier) @variable.parameter.cpp))
 
+; The "foo" in `SomeType **foo` within a parameter list.
+(parameter_declaration
+  declarator: (pointer_declarator
+    declarator: (pointer_declarator
+      declarator: (identifier) @variable.parameter.c)))
+
 (parameter_declaration
   declarator: (reference_declarator
     (identifier) @variable.parameter.cpp))
-
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
