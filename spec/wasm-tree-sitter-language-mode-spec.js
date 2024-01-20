@@ -39,7 +39,7 @@ const ejsGrammarPath = resolve(
   'language-html/grammars/modern-tree-sitter-ejs.cson'
 );
 const rubyGrammarPath = resolve(
-  'language-ruby/grammars/tree-sitter-2-ruby.cson'
+  'language-ruby/grammars/modern-tree-sitter-ruby.cson'
 );
 const rustGrammarPath = resolve(
   'language-rust-bundled/grammars/modern-tree-sitter-rust.cson'
