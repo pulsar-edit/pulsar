@@ -137,6 +137,17 @@
 (field_declaration
   (field_identifier) @variable.declaration.member.c)
 
+; An attribute in a C99 struct designated initializer:
+; the "foo" in `MY_TYPE a = { .foo = true };
+(initializer_pair
+  (field_designator
+    (field_identifier) @variable.declaration.member.c))
+
+; (and the associated ".")
+(initializer_pair
+  (field_designator
+    "." @keyword.operator.accessor.c))
+
 (field_declaration
   (pointer_declarator
     (field_identifier) @variable.declaration.member.c))

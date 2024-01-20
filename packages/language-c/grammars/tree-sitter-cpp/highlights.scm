@@ -224,8 +224,20 @@
   declarator: (pointer_declarator
     declarator: (identifier) @variable.declaration.pointer.c))
 
+; A member of a struct.
 (field_declaration
   (field_identifier) @variable.declaration.member.cpp)
+
+; An attribute in a C99 struct designated initializer:
+; the "foo" in `MY_TYPE a = { .foo = true };
+(initializer_pair
+  (field_designator
+    (field_identifier) @variable.declaration.member.cpp))
+
+; (and the associated ".")
+(initializer_pair
+  (field_designator
+    "." @keyword.operator.accessor.cpp))
 
 (field_declaration
   (pointer_declarator
