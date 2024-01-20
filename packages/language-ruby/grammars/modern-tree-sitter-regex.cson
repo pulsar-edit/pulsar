@@ -1,4 +1,4 @@
-scopeName: 'source.regexp'
+scopeName: 'source.rb.regexp'
 type: 'modern-tree-sitter'
 parser: 'tree-sitter-regex'
 
