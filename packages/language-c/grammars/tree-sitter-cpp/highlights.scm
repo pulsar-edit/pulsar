@@ -73,28 +73,38 @@
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @support.type.builtin.cpp
-  (#match? @support.type.builtin.cpp "^(char|int|float|double|long)$"))
+((identifier) @support.storage.type.builtin.cpp
+  (#match? @support.storage.type.builtin.cpp "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @support.type.other.cpp
-  (#match? @support.type.other.cpp "_t$"))
+((identifier) @support.other.storage.type.cpp
+  (#match? @support.other.storage.type.cpp "_t$"))
 
 
+; These refer to language constructs and remain in the `storage` namespace.
 [
   "enum"
-  "long"
-  "short"
-  "signed"
   "struct"
   "typedef"
   "union"
-  "unsigned"
-
   "template"
 ] @storage.type.cpp
 
+; These refer to value types and go under `support`.
+[
+  "long"
+  "short"
+] @support.storage.type.builtin.cpp
+
+; These act as modifiers to value types and also go under `support`.
+[
+  "signed"
+  "unsigned"
+] @support.storage.modifier.builtin.cpp
+
+; These act as general language modifiers and remain in the `storage`
+; namespace.
 [
   "const"
   "extern"
@@ -114,14 +124,14 @@
   "override"
   "final"
   "noexcept"
-] @storage.modifier.cpp
+
+  "typename"
+] @storage.modifier._TYPE_.cpp
 
 (
-  (primitive_type) @support.type.stdint.cpp
-  (#match? @support.type.stdint.cpp "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$")
+  (primitive_type) @support.storage.type.stdint.cpp
+  (#match? @support.storage.type.stdint.cpp "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$")
 )
-
-"typename" @storage.modifier.typename.cpp
 
 
 ; FUNCTIONS

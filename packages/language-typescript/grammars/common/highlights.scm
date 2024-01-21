@@ -78,9 +78,6 @@
 (asserts "asserts" @keyword.type.asserts._LANG_)
 (asserts (identifier) @variable.other.type._LANG_)
 
-
-["var" "const" "let"] @storage.type._TYPE_._LANG_
-
 ; A simple variable declaration:
 ; The "foo" in `let foo = true`
 (variable_declarator
@@ -303,10 +300,10 @@
 ; TYPES
 ; =====
 
-["var" "let" "const"] @storage.modifier._TYPE_._LANG_
+; These go under `storage.type`/`storage.modifier` because they’re core
+; language constructs.
+["var" "let" "const" "class" "function"] @storage.type._TYPE_._LANG_
 ["extends" "static" "async" "infer"] @storage.modifier._TYPE_._LANG_
-
-["class" "function"] @storage.type._TYPE_._LANG_
 
 (type_arguments "<" @punctuation.definition.parameters.begin.bracket.angle.js
   (#set! capture.final))
@@ -318,48 +315,68 @@
 ; TODO: If I allow scopes like `storage.type.string._LANG_`, I will make a lot of
 ; text look like strings by accident. This really needs to be fixed in syntax
 ; themes.
-(predefined_type _ @storage.type._LANG_ @support.type._LANG_)
+;
+; NOTE: To settle the long debate (in my head) about whether value types are
+; `support.type` or `storage.type`, I’ve adopted the same compromised used
+; by legacy Tree-sitter: value types are filed under `support.storage.type`.
+
+; These appear to be the primitives like `number`, `string`, `boolean`, `void`,
+; et cetera. `null` and `undefined` get their own nodes.
+(predefined_type _ @support.storage.type.predefined._LANG_)
 
 (type_alias_declaration
   name: (type_identifier) @variable.declaration.type._LANG_)
 
-((literal_type [(null) (undefined)]) @storage.type._TEXT_._LANG_)
-((literal_type [(null) (undefined)]) @support.type._TEXT_._LANG_
-  (#set! capture.final true))
+((literal_type [(null) (undefined)]) @support.storage.type._TEXT_._LANG_
+  (#set! capture.final))
 
 ; TODO: Decide whether other literal types — strings, booleans, and whatnot —
 ; should be highlighted as they are in JS, or should be highlighted like other
 ; types in annotations.
 
+; These are `storage.type` because they are core language constructs rather
+; than value types.
 [
-  "implements"
   "namespace"
   "enum"
   "interface"
   "module"
   "declare"
+] @storage.type._TYPE_._LANG_
+"type" @storage.type._LANG_
+
+; These are `storage.modifier` becase they act as adjectives and verbs for
+; language constructs.
+[
+  "implements"
   "public"
   "private"
   "protected"
   "readonly"
   "satisfies"
-  "type"
 ] @storage.modifier._TYPE_._LANG_
 
 (index_signature
   name: (identifier) @entity.other.attribute-name.type._LANG_)
 
-((type_identifier) @storage.type._LANG_
-  ; (#is? test.descendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
-  )
+; The utility types documented at
+; https://www.typescriptlang.org/docs/handbook/utility-types.html.
+(generic_type
+  (type_identifier) @support.storage.type.builtin.utility._LANG_
+  (#match? @support.storage.type.builtin.utility._LANG_ "^(Awaited|Partial|Required|Readonly|Record|Pick|Omit|Exclude|Extract|NonNullable|(?:Constructor)?Parameters|(?:Return|Instance|(?:Omit)?ThisParameter|This)Type|(?:Upper|Lower)case|Capitalize|Uncapitalize)$")
+  (#set! capture.final))
 
-; A capture can satisfy more than one of these criteria, so we need to guard
-; against multiple matches. That's why we use `test.final` here, and why the
-; two capture names are applied in separate captures — otherwise `test.final`
-; would be applied after the first capture.
-((type_identifier) @support.type._LANG_
-  ; (#is? test.descendantOfType "type_annotation type_arguments satisfies_expression type_parameter")
-  (#set! capture.final true))
+; All core language builtin types.
+((type_identifier) @support.storage.type.builtin._LANG_
+(#match? @support.storage.type.builtin._LANG_ "^(AggregateError|Array|ArrayBuffer|BigInt|BigInt64Array|BigUint64Array|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Object|Promise|Proxy|RangeError|ReferenceError|RegExp|Set|Symbol|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
+  (#set! capture.final))
+
+; TODO: We could add a special scope name to the entire suite of DOM types, but
+; I don't have the strength for that right now.
+
+;
+((type_identifier) @support.storage.other.type._LANG_
+  )
 
 ; SUPPORT
 ; =======
@@ -577,12 +594,8 @@
   (property_identifier) @entity.other.attribute-name._LANG_)
 
 
-
 ; FUNCTIONS
 ; =========
-
-(method_definition
-  name: (property_identifier) @entity.name.function.method._LANG_)
 
 (call_expression
   function: (member_expression
@@ -644,12 +657,15 @@
   key: (property_identifier) @entity.name.function.method.definition._LANG_
   value: [(function) (arrow_function)])
 
+; Function is `storage.type` because it's a core language construct.
 (function "function" @storage.type.function._LANG_)
 (function_declaration "function" @storage.type.function._LANG_)
 
 (generator_function "function" @storage.type.function._LANG_)
 (generator_function_declaration "function" @storage.type.function._LANG_)
 
+; The `*` sigil acts as a modifier on a core language construct, hence
+; `storage.modifier`.
 (generator_function "*" @storage.modifier.generator._LANG_)
 (generator_function_declaration "*" @storage.modifier.generator._LANG_)
 (method_definition "*" @storage.modifier.generator._LANG_)
@@ -660,8 +676,6 @@
 (call_expression
   function: (identifier) @support.other.function._LANG_
   (#set! capture.shy true))
-
-
 
 ; Things that `LOOK_LIKE_CONSTANTS`.
 ([(property_identifier) (identifier)] @constant.other._LANG_
