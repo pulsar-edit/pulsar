@@ -338,13 +338,17 @@
 ; TYPES
 ; =====
 
-(primitive_type) @storage.type.builtin.php
-(cast_type) @storage.type.builtin.php
-(named_type (name) @storage.type.php)
-(named_type (qualified_name) @storage.type.php)
+; Primitive types are value types, hence are placed in `support.storage.type`.
+(primitive_type) @support.storage.type.builtin.php
+(cast_type) @support.storage.type.builtin.php
 
+(named_type (name) @support.storage.type.php)
+(named_type (qualified_name) @support.storage.type.php)
+
+; Acts as a modifier on all variables, regardless of value type, hence `storage.modifier`.
 "global" @storage.modifier.global.php
 
+; Core language constructs go in `storage.type`.
 ["enum" "interface" "trait" "class"] @storage.type._TYPE_.php
 (enum_case "case" @storage.type.case.php)
 "function" @storage.type.function.php
