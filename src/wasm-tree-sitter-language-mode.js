@@ -3238,7 +3238,7 @@ class LanguageLayer {
           // Do nothing; we don't need to set this boundary.
         } else {
           // The range must end somewhere within our range.
-          // 
+          //
           // Close the boundaries in the opposite order of how we opened them.
           for (let i = languageScopeIds.length - 1; i >= 0; i--) {
             this.scopeResolver.setBoundary(
@@ -3767,7 +3767,7 @@ class LanguageLayer {
   }
 
   getOrParseTree({ force = true, anonymous = false } = {}) {
-    if (!this.treeIsDirty || !force) { return this.tree; }
+    if (this.tree && (!this.treeIsDirty || !force)) { return this.tree; }
 
     // Eventually we'll take this out, but for now it serves as an indicator of
     // how often we have to manually re-parse in between transactions —
@@ -4146,8 +4146,15 @@ class NodeRangeSet {
     const previousRanges = this.previous?.getRanges(buffer);
     let result = [];
 
-    for (const node of this.nodeSpecs) {
+    for (let node of this.nodeSpecs) {
+      // An injection point isn't given the point at which the buffer ends, so
+      // it's free to return an `endIndex` of `Infinity` here and rely on us to
+      // clip it to the boundary of the buffer.
+      if (node.endIndex === Infinity) {
+        node = this._clipRange(node, buffer);
+      }
       let position = node.startPosition, index = node.startIndex;
+
       if (node.children && !this.includeChildren) {
         // If `includeChildren` is `false`, we're effectively collecting all
         // the disjoint text nodes that are direct descendants of this node.
@@ -4201,6 +4208,13 @@ class NodeRangeSet {
       });
     }
     return this._consolidateRanges(result);
+  }
+
+  _clipRange(range, buffer) {
+    // Convert this range spec to an actual `Range`, clip it, then convert it
+    // back to a range spec with accurate `startIndex` and `endIndex` values.
+    let clippedRange = buffer.clipRange(rangeForNode(range));
+    return rangeToTreeSitterRangeSpec(clippedRange, buffer);
   }
 
   // Combine adjacent ranges to minimize the number of boundaries.
