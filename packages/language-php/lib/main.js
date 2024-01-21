@@ -1,6 +1,81 @@
+const { Point, Range } = require('atom');
+
 function isPhpDoc(node) {
   let { text } = node;
   return text.startsWith('/**') && !text.startsWith('/***')
+}
+
+function comparePoints(a, b) {
+  const rows = a.row - b.row;
+  if (rows === 0) {
+    return a.column - b.column;
+  } else {
+    return rows;
+  }
+}
+
+// Given a series of opening and closing PHP tags, pairs and groups them as a
+// series of node specs suitable for defining the bounds of an injection.
+function interpret(nodes) {
+  let sorted = [...nodes].sort((a, b) => {
+    return comparePoints(a.startPosition, b.startPosition);
+  });
+
+  let ranges = [];
+  let currentStart = null;
+  let lastIndex = nodes.length - 1;
+
+  for (let [index, node] of sorted.entries()) {
+    let isStart = node.type === 'php_tag';
+    let isEnd = node.type === '?>';
+    let isLast = index === lastIndex;
+
+    if (isStart) {
+      if (currentStart) {
+        throw new Error('Unbalanced content!');
+      }
+      currentStart = node;
+
+      if (isLast) {
+        // There's no ending tag to match this starting tag. This is valid and
+        // simply signifies that the rest of the file is PHP. We can return a
+        // range from here to `Infinity` and let the language mode clip it to
+        // the edge of the buffer.
+        let spec = {
+          startIndex: currentStart.startIndex,
+          startPosition: currentStart.startPosition,
+          endIndex: Infinity,
+          endPosition: Point.INFINITY,
+          range: new Range(
+            currentStart.range.start,
+            Point.INFINITY
+          )
+        };
+        ranges.push(spec);
+        currentStart = null;
+        break;
+      }
+    }
+
+    if (isEnd) {
+      if (!currentStart) {
+        throw new Error('Unbalanced content!');
+      }
+      let spec = {
+        startIndex: currentStart.startIndex,
+        startPosition: currentStart.startPosition,
+        endIndex: node.endIndex,
+        endPosition: node.endPosition,
+        range: new Range(
+          currentStart.range.start,
+          node.range.end
+        )
+      };
+      ranges.push(spec);
+      currentStart = null;
+    }
+  }
+  return ranges;
 }
 
 exports.activate = function () {
@@ -50,36 +125,48 @@ exports.activate = function () {
       return 'internal-php';
     },
     content(node) {
-      let results = [];
-      // At the top level we should ignore `text` nodes, since they're just
-      // HTML. We should also ignore the middle children of
-      // `text_interpolation` nodes (also `text`), but we need to include their
-      // first and last children, which correspond to `?>` and `<?php`.
+      // The actual structure of the tree is utter chaos for us. The best way
+      // to make sense of it is to grab all the delimiters of the ranges we're
+      // interested in, sort them, pair them off, and turn them into fake
+      // ranges. As long as we return objects with the range properties that
+      // actual nodes have, _and_ we opt into `includeChildren` (so that it
+      // doesn't try to read the `children` property to subtract child nodes'
+      // ranges), this works just fine.
       //
-      // In practice, it seems that `text` is always a child of the root except
-      // inside of `text_interpolation`, and `text_interpolation` is always a
-      // child of the root. The only exceptions I've noticed are when the tree
-      // is in an error state, so they may not be worth worrying about.
-      for (let child of node.children) {
-        if (child.type === 'text') { continue; }
-        if (child.type === 'text_interpolation') {
-          for (let grandchild of child.children) {
-            if (grandchild.type === 'text') { continue; }
-            results.push(grandchild);
-          }
-          continue;
-        }
-        results.push(child);
-      }
-      return results;
+      // If you're ever skeptical about whether this is really the easiest way
+      // to do this, fire up `tree-sitter-tools` and take a look at the
+      // structure of a PHP file in `tree-sitter-php`. If you know of something
+      // simpler, I'm all ears.
+      //
+      // TODO: This method should be allowed to return actual ordinary `Range`
+      // instances, in which case we'd understand that no futher processing
+      // need take place by the language mode.
+      let boundaries = node.descendantsOfType(['php_tag', '?>']);
+      return interpret(boundaries);
     },
     includeChildren: true,
-    newlinesBetween: true,
-    includeAdjacentWhitespace: true
-  });
+    newlinesBetween: false,
+    // includeAdjacentWhitespace: true,
 
-  // TODOs and URLs
-  // ==============
+    // For parity with the TextMate PHP grammar, we need to be able to scope
+    // this region with not just `source.php` but also `meta.embedded.X.php`,
+    // where X is one of `line` or `block` depending on whether the range spans
+    // multiple lines.
+    //
+    // There is no way to do this via queries because there is no discrete node
+    // against which we could conditionally add `meta.embedded.block` or
+    // `meta.embedded.line`… because of the aforementioned lunacy of the tree
+    // structure.
+    //
+    // So we had to invent a feature for it. When `languageScope` is a function,
+    // it allows the injection to decide on a range-by-range basis what the
+    // scope name is… _and_ it can return more than one scope name.
+    languageScope(grammar, _buffer, range) {
+      let extraScope = range.start.row !== range.end.row ?
+        'meta.embedded.block.php' : 'meta.embedded.line.php';
+      return [grammar.scopeName, extraScope];
+    }
+  });
 
 
   // HEREDOCS and NOWDOCS
@@ -128,6 +215,9 @@ exports.activate = function () {
   });
 
 };
+
+// TODOs and URLs
+// ==============
 
 exports.consumeHyperlinkInjection = (hyperlink) => {
   hyperlink.addInjectionPoint('text.html.php', {

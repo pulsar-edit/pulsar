@@ -8,10 +8,6 @@ injectionRegex: 'php|PHP'
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-php#d5e7cacb6c27e0e131c7f76c0dbfee56dfcc61e3'
   grammar: 'tree-sitter/tree-sitter-php.wasm'
-  highlightsQuery: 'tree-sitter/queries/highlights.scm'
-  tagsQuery: 'tree-sitter/queries/tags.scm'
-  foldsQuery: 'tree-sitter/queries/folds.scm'
-  indentsQuery: 'tree-sitter/queries/indents.scm'
 
 fileTypes: [
   'aw'

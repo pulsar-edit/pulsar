@@ -2582,29 +2582,29 @@ class HighlightIterator {
 
   getCloseScopeIds() {
     let iterator = last(this.iterators);
-    if (this.currentScopeIsCovered) {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'would close',
-      //   iterator._inspectScopes(
-      //     iterator.getCloseScopeIds()
-      //   ),
-      //   'at',
-      //   iterator.getPosition().toString(),
-      //   'but scope is covered!'
-      // );
-    } else {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'CLOSING',
-      //   iterator.getPosition().toString(),
-      //   iterator._inspectScopes(
-      //     iterator.getCloseScopeIds()
-      //   )
-      // );
-    }
+    // if (this.currentScopeIsCovered) {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'would close',
+    //     iterator._inspectScopes(
+    //       iterator.getCloseScopeIds()
+    //     ),
+    //     'at',
+    //     iterator.getPosition().toString(),
+    //     'but scope is covered!'
+    //   );
+    // } else {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'CLOSING',
+    //     iterator.getPosition().toString(),
+    //     iterator._inspectScopes(
+    //       iterator.getCloseScopeIds()
+    //     )
+    //   );
+    // }
     if (iterator) {
       if (this.currentScopeIsCovered) {
         return iterator.getOpenScopeIds().filter(id => {
@@ -2620,29 +2620,29 @@ class HighlightIterator {
   getOpenScopeIds() {
     let iterator = last(this.iterators);
     // let ids = iterator.getOpenScopeIds();
-    if (this.currentScopeIsCovered) {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'would open',
-      //   iterator._inspectScopes(
-      //     iterator.getOpenScopeIds()
-      //   ),
-      //   'at',
-      //   iterator.getPosition().toString(),
-      //   'but scope is covered!'
-      // );
-    } else {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'OPENING',
-      //   iterator.getPosition().toString(),
-      //   iterator._inspectScopes(
-      //     iterator.getOpenScopeIds()
-      //   )
-      // );
-    }
+    // if (this.currentScopeIsCovered) {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'would open',
+    //     iterator._inspectScopes(
+    //       iterator.getOpenScopeIds()
+    //     ),
+    //     'at',
+    //     iterator.getPosition().toString(),
+    //     'but scope is covered!'
+    //   );
+    // } else {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'OPENING',
+    //     iterator.getPosition().toString(),
+    //     iterator._inspectScopes(
+    //       iterator.getOpenScopeIds()
+    //     )
+    //   );
+    // }
     if (iterator) {
       if (this.currentScopeIsCovered) {
         return iterator.getOpenScopeIds().filter(id => {
@@ -2683,6 +2683,8 @@ class HighlightIterator {
     iterator?.logPosition();
   }
 }
+
+const EMPTY_SCOPES = Object.freeze([]);
 
 // Iterates through everything that a `LanguageLayer` is responsible for,
 // marking boundaries for scope insertion.
@@ -2777,7 +2779,7 @@ class LayerHighlightIterator {
   }
 
   isAtInjectionBoundary() {
-    let position = Point.fromObject(this.iterator.key);
+    let position = Point.fromObject(this.iterator.key.position);
     return position.isEqual(this.start) || position.isEqual(this.end);
   }
 
@@ -2789,61 +2791,38 @@ class LayerHighlightIterator {
   }
 
   getOpenScopeIds() {
-    let openScopeIds = this.iterator.value.openScopeIds;
-    // if (openScopeIds.length > 0) {
-    //   console.log(
-    //     this.name,
-    //     this.depth,
-    //     'OPENING',
-    //     this.getPosition().toString(),
-    //     this._inspectScopes(
-    //       this.iterator.value.openScopeIds
-    //     )
-    //   );
-    // }
-    return [...openScopeIds];
+    let { key, value } = this.iterator;
+    return key.boundary === 'end' ? EMPTY_SCOPES : [...value.scopeIds];
   }
 
   getCloseScopeIds() {
-    let closeScopeIds = this.iterator.value.closeScopeIds;
-    // if (closeScopeIds.length > 0) {
-    //   console.log(
-    //     this.name,
-    //     'CLOSING',
-    //     this.getPosition().toString(),
-    //     this._inspectScopes(
-    //       this.iterator.value.closeScopeIds
-    //     )
-    //   );
-    // }
-    return [...closeScopeIds];
+    let { key, value } = this.iterator;
+    return key.boundary === 'start' ? EMPTY_SCOPES : [...value.scopeIds];
   }
 
   opensScopes() {
-    let scopes = this.getOpenScopeIds();
-    return scopes.length > 0;
+    return this.iterator?.key?.boundary === 'start';
   }
 
   closesScopes() {
-    let scopes = this.getCloseScopeIds();
-    return scopes.length > 0;
+    return this.iterator?.key?.boundary === 'end';
   }
 
   getPosition() {
-    return this.iterator.key || Point.INFINITY;
+    return this.iterator?.key?.position ?? Point.INFINITY;
   }
 
   logPosition() {
     let pos = this.getPosition();
+    let { key, value } = this.iterator;
 
     let { languageMode } = this.languageLayer;
+    let verb = key.boundary === 'end' ? 'close' : 'open';
 
     console.log(
       `[highlight] (${pos.row}, ${pos.column})`,
-      'close',
-      this.iterator.value.closeScopeIds.map(id => languageMode.scopeNameForScopeId(id)),
-      'open',
-      this.iterator.value.openScopeIds.map(id => languageMode.scopeNameForScopeId(id)),
+      verb,
+      value.scopeIds.map(id => languageMode.scopeNameForScopeId(id)),
       'next?',
       this.iterator.hasNext
     );
@@ -2851,35 +2830,33 @@ class LayerHighlightIterator {
 
   compare(other) {
     // First, favor the one whose current position is earlier.
-    const result = comparePoints(this.iterator.key, other.iterator.key);
+    const result = comparePoints(
+      this.iterator.key.position,
+      other.iterator.key.position
+    );
     if (result !== 0) { return result; }
 
     // Failing that, favor iterators that need to close scopes over those that
     // don't.
-    if (this.closesScopes() && !other.closesScopes()) {
+    let ourBoundary = this.iterator.key.boundary;
+    let theirBoundary = other.iterator.key.boundary;
+    let bothClosing = ourBoundary === 'end' && theirBoundary === 'end';
+
+    if (ourBoundary === 'end' && !bothClosing) {
       return -1;
-    } else if (other.closesScopes() && !this.closesScopes()) {
+    } else if (theirBoundary === 'end' && !bothClosing) {
       return 1;
     }
-
-    let bothOpening = this.opensScopes() && other.opensScopes();
-    let bothClosing = this.closesScopes() && other.closesScopes();
 
     if (bothClosing) {
       // When both iterators are closing scopes, the deeper layer should act
       // first.
       return other.languageLayer.depth - this.languageLayer.depth;
     } else {
-      // When both iterators are opening scopes — or if there's a mix of
-      // opening and closing — the shallower layer should act first.
+      // When both iterators are opening scopes, the shallower layer should act
+      // first.
       return this.languageLayer.depth - other.languageLayer.depth;
     }
-
-    // TODO: We need to move to a system where every point in the iterator
-    // _either_ closes scopes _or_ opens them, with the former visited before
-    // the latter. Otherwise there's no correct way to sort them when two
-    // different layers have the same position and both want to close _and_
-    // open scopes.
   }
 
   moveToSuccessor() {
@@ -2904,7 +2881,7 @@ class LayerHighlightIterator {
     if (!this.end) { return false; }
 
     let next = this.peekAtSuccessor();
-    return comparePoints(next, this.end) > 0;
+    return comparePoints(next.position, this.end) > 0;
   }
 }
 
@@ -2982,6 +2959,9 @@ class LanguageLayer {
       if (err.name === 'GrammarLoadError') {
         console.warn(err.message);
         if (err.queryType === 'highlightsQuery') {
+          // Recover by setting an empty `highlightsQuery` so that we don't
+          // propagate errors.
+          //
           // TODO: Warning?
           grammar.highlightsQuery = grammar.setQueryForTest(
             'highlightsQuery',
@@ -3015,10 +2995,8 @@ class LanguageLayer {
         // injected.
         languageScope = injectionPoint.languageScope;
 
-        // The `languageScope` parameter can be a function.
-        if (typeof languageScope === 'function') {
-          languageScope = languageScope(this.grammar);
-        }
+        // The `languageScope` parameter can be a function. That means we won't
+        // decide now; we'll decide later on a range-by-range basis.
 
         // Honor an explicit `null`, but fall back to the default scope name
         // otherwise.
@@ -3028,7 +3006,10 @@ class LanguageLayer {
       }
 
       this.languageScope = languageScope;
-      if (languageScope === null) {
+      if (languageScope === null || typeof languageScope === 'function') {
+        // If `languageScope` is a function, we'll still often end up with a
+        // `languageScopeId` (or several); we just won't be able to compute it
+        // ahead of time.
         this.languageScopeId = null;
       } else {
         this.languageScopeId = this.languageMode.idForScope(languageScope);
@@ -3120,15 +3101,10 @@ class LanguageLayer {
     from = buffer.clipPosition(Point.fromObject(from, true));
     to = buffer.clipPosition(Point.fromObject(to, true));
 
-    let boundaries = createTree(comparePoints);
+    let boundaries = createTree(compareBoundaries);
     let extent = this.getExtent();
 
-    let captures;
-    if (this.highlightsQuery) {
-      captures = this.highlightsQuery.captures(this.tree.rootNode, from, to);
-    } else {
-      captures = [];
-    }
+    let captures = this.highlightsQuery?.captures(this.tree.rootNode, from, to) ?? [];
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -3213,37 +3189,65 @@ class LanguageLayer {
     //
     let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
 
-    if (this.languageScopeId) {
+    let languageScopeIdForRange = () => this.languageScopeId;
+    if (typeof this.languageScope === 'function') {
+      languageScopeIdForRange = (range) => {
+        let scopeName = this.languageScope(this.grammar, this.languageMode.buffer, range);
+        if (Array.isArray(scopeName)) {
+          return scopeName.map(s => this.languageMode.idForScope(s));
+        } else {
+          return this.languageMode.idForScope(scopeName);
+        }
+      };
+    }
+
+    if (this.languageScopeId || typeof this.languageScope === 'function') {
       for (let range of includedRanges) {
         // Filter out ranges that have no intersection with ours.
         if (range.end.isLessThanOrEqual(from)) { continue; }
         if (range.start.isGreaterThanOrEqual(to)) { continue; }
 
+        let languageScopeIds = languageScopeIdForRange(range);
+        if (!languageScopeIds) continue;
+
+        if (!Array.isArray(languageScopeIds)) {
+          languageScopeIds = [languageScopeIds];
+        }
+
         if (range.start.isLessThan(from)) {
           // If we get this far, we know that the base language scope was open
           // when our range began.
-          alreadyOpenScopes.set(range.start, [this.languageScopeId]);
+          alreadyOpenScopes.set(
+            range.start,
+            languageScopeIds
+          );
         } else {
           // Range start must be between `from` and `to`, or else equal `from`
           // exactly.
-          this.scopeResolver.setBoundary(
-            range.start,
-            this.languageScopeId,
-            'open',
-            { root: true, length: Infinity }
-          );
+          for (let id of languageScopeIds) {
+            this.scopeResolver.setBoundary(
+              range.start,
+              id,
+              'open',
+              { root: true, length: Infinity }
+            );
+          }
         }
 
         if (range.end.isGreaterThan(to)) {
           // Do nothing; we don't need to set this boundary.
         } else {
           // The range must end somewhere within our range.
-          this.scopeResolver.setBoundary(
-            range.end,
-            this.languageScopeId,
-            'close',
-            { root: true, length: Infinity }
-          );
+          // 
+          // Close the boundaries in the opposite order of how we opened them.
+          for (let i = languageScopeIds.length - 1; i >= 0; i--) {
+            this.scopeResolver.setBoundary(
+              range.end,
+              languageScopeIds[i],
+              'close',
+              { root: true, length: Infinity }
+            );
+          }
         }
       }
     }
@@ -3263,12 +3267,20 @@ class LanguageLayer {
         continue;
       }
 
-      let bundle = {
-        closeScopeIds: [...data.close],
-        openScopeIds: [...data.open]
-      };
+      let OPEN_KEY = { position: point, boundary: 'start' };
+      let CLOSE_KEY = { position: point, boundary: 'end' };
 
-      boundaries = boundaries.insert(point, bundle);
+      if (data.close.length > 0) {
+        boundaries = boundaries.insert(CLOSE_KEY, {
+          scopeIds: Object.freeze(data.close)
+        });
+      }
+
+      if (data.open.length > 0) {
+        boundaries = boundaries.insert(OPEN_KEY, {
+          scopeIds: Object.freeze(data.open)
+        });
+      }
     }
 
     return [boundaries, alreadyOpenScopes];
@@ -3829,11 +3841,11 @@ class LanguageLayer {
 
     // If the cursor is resting before column X, we want all scopes that cover
     // the character in column X.
-    let captures = this.highlightsQuery.captures(
+    let captures = this.highlightsQuery?.captures(
       this.tree.rootNode,
       point,
       { row: point.row, column: point.column + 1 }
-    );
+    ) ?? [];
 
     let results = [];
     for (let capture of captures) {

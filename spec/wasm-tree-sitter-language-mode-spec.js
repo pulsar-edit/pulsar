@@ -1428,6 +1428,73 @@ describe('WASMTreeSitterLanguageMode', () => {
         ).toBe(true);
       });
 
+      it('allows multiple base scopes on the injected layer when `languageScope` is a function', async () => {
+
+        let customJsConfig = { ...jsConfig };
+        let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
+
+        await jsGrammar.setQueryForTest('highlightsQuery', `
+          (comment) @comment
+          (property_identifier) @property
+          (call_expression (identifier) @function)
+          (template_string) @string
+          (template_substitution
+            ["\${" "}"] @interpolation)
+        `);
+
+        let customHtmlConfig = { ...htmlConfig };
+        let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
+
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
+          (fragment) @html
+          (tag_name) @tag
+          (attribute_name) @attr
+        `);
+
+        customHtmlGrammar.addInjectionPoint({
+          ...SCRIPT_TAG_INJECTION_POINT,
+          languageScope: (grammar, _buffer, range) => {
+            return [grammar.scopeName, `meta.line${range.start.row}`];
+          }
+        });
+
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(customJsGrammar);
+        atom.grammars.addGrammar(customHtmlGrammar);
+        buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>\n<script>\ngoodbye();</script>');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: customHtmlGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        let descriptor = languageMode.scopeDescriptorForPosition([1, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line0`)
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line5`)
+        ).toBe(false);
+
+        descriptor = languageMode.scopeDescriptorForPosition([6, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line5`)
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line0`)
+        ).toBe(false);
+      });
+
       it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async () => {
         const promise = new Promise(resolve => {
           editor.onDidTokenize(event => {
