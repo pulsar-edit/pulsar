@@ -39,7 +39,7 @@
 
 (paragraph) @markup.paragraph.gfm
 
-(thematic_break) @punctuation.definition.horizontal-rule.gfm
+(thematic_break) @markup.horizontal-rule.gfm
 
 (block_quote) @markup.quote.blockquote.gfm
 ((block_quote) @punctuation.definition.blockquote.gfm
