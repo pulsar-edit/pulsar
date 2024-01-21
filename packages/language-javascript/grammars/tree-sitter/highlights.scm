@@ -71,10 +71,20 @@
 (assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
+; Mark all the properties whose right-hand sides are functions so that we can
+; exclude them from the next query.
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+  right: [(arrow_function) (function)] @_IGNORE_
+    (#set! isFunctionProperty true))
+
 ; The "bar" in `foo.bar = true`
 (assignment_expression
   left: (member_expression
-    property: (property_identifier) @variable.other.assignment.property.js))
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
 
 ; The "bar" in `foo.#bar = true`
 (assignment_expression
