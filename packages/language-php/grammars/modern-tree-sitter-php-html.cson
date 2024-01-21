@@ -6,7 +6,7 @@ parser: 'tree-sitter-php'
 injectionRegex: 'php|PHP'
 
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-php#d5e7cacb6c27e0e131c7f76c0dbfee56dfcc61e3'
+  parserSource: 'github:tree-sitter/tree-sitter-php#b569a5f2c0d592e67430520d1a0e1f765d83ceb0'
   grammar: 'tree-sitter/tree-sitter-php.wasm'
 
 fileTypes: [
