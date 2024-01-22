@@ -177,6 +177,7 @@ jobs:
         node ./rolling-release-binary-upload.js
 
     - name: Upload Video Artifacts
+      if: always()
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Videos
