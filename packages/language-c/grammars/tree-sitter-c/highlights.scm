@@ -140,9 +140,10 @@
   declarator: (identifier) @variable.declaration.c)
 
 ; The "x" in `SomeType *x;`
-(declaration
-  declarator: (pointer_declarator
-    declarator: (identifier) @variable.declaration.pointer.c))
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.c
+  (#is? test.descendantOfType "declaration field_declaration"))
 
 ; A member of a struct.
 (field_declaration
@@ -193,15 +194,10 @@
   declarator: (identifier) @variable.parameter.c)
 
 ; The "foo" in `const char *foo` within a parameter list.
-(parameter_declaration
-  declarator: (pointer_declarator
-    declarator: (identifier) @variable.parameter.c))
-
-; The "foo" in `SomeType **foo` within a parameter list.
-(parameter_declaration
-  declarator: (pointer_declarator
-    declarator: (pointer_declarator
-      declarator: (identifier) @variable.parameter.c)))
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.c
+  (#is? test.descendantOfType "parameter_declaration"))
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
