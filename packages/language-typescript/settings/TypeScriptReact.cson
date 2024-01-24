@@ -17,3 +17,12 @@
     'commentEnd': ' */}',
     'increaseIndentPattern': "{[^}\"']*$|\\[[^\\]\"']*$|\\([^)\"']*$|<[a-zA-Z][^/]*$|^\\s*>$",
     'decreaseIndentPattern': "^\\s*(\\s*/[*].*[*]/\\s*)*[}\\])]|^\\s*(</|/>)"
+
+'.meta.tag.tsx .meta.block.ts.tsx':
+  editor:
+    commentStart: '// '
+    comments:
+      line: '//'
+      block:
+        start: '/*'
+        end: '*/'
