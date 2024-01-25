@@ -76,7 +76,7 @@
 <!---------------------------{ Badges }--------------------------->
 
 [Badge OpenCollective]: https://opencollective.com/pulsar-edit/tiers/badge.svg
-[Badge Discussions]: https://img.shields.io/github/discussions/pulsar-edit/.github?style=for-the-badge&logo=GitHub&labelColor=78af9f&color=5a8377
+[Badge Discussions]: https://img.shields.io/github/discussions/pulsar-edit/.github?style=for-the-badge&logo=GitHub&labelColor=50555b&color=35393d
 [Badge Upstream]: https://img.shields.io/badge/Upstream_Status-Sunset-966227.svg?style=for-the-badge&labelColor=c38033
 [Badge Discord]: https://img.shields.io/badge/Discord-4b7494.svg?style=for-the-badge&labelColor=6399c4&logoColor=white&logo=Discord
 [Badge License]: https://img.shields.io/badge/License-MIT-ac7f31.svg?style=for-the-badge&labelColor=e5ab42
@@ -86,8 +86,8 @@
 <!-- [Badge Reddit]: https://img.shields.io/reddit/subreddit-subscribers/pulsaredit?style=for-the-badge&label=Reddit&logoColor=white&logo=Reddit&labelColor=e05d44&color=b14835 -->
 [Badge Reddit]: https://img.shields.io/badge/%2Fr%2Fpulsaredit-e05d44?style=for-the-badge&logo=Reddit&logoColor=white&labelColor=e05d44&color=b14835
 [Badge Status]: https://img.shields.io/cirrus/github/pulsar-edit/pulsar?style=for-the-badge&labelColor=c77b7f&label=Build%20Status&color=8d575a
-[Badge Mastodon]: https://img.shields.io/mastodon/follow/109416671848539153?domain=https%3A%2F%2Ffosstodon.org%2F&style=for-the-badge&logo=Mastodon&logoColor=white&label=Mastodon&labelColor=9292fc&color=6364FF
-[Badge Lemmy]: https://img.shields.io/lemmy/pulsaredit%40lemmy.ml?style=for-the-badge&logo=Lemmy&logoColor=white&label=Lemmy&labelColor=64ad82&color=00A846
+[Badge Mastodon]: https://img.shields.io/mastodon/follow/109416671848539153?domain=https%3A%2F%2Ffosstodon.org%2F&style=for-the-badge&logo=Mastodon&logoColor=white&label=Mastodon&labelColor=a0a0d8&color=7c7cc1
+[Badge Lemmy]: https://img.shields.io/lemmy/pulsaredit%40lemmy.ml?style=for-the-badge&logo=Lemmy&logoColor=white&label=Lemmy&labelColor=64ad82&color=1d9b52
 
 
 <!--------------------------{ Buttons }--------------------------->
