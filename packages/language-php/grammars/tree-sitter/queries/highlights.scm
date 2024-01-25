@@ -402,8 +402,10 @@
 ((dynamic_variable_name) @punctuation.definition.variable.begin.php
   (#set! adjust.startBeforeFirstMatchOf "^\\}$"))
 
-((name) @constant.other.php
-  (#match? @constant.other.php "^_?[A-Z][A-Z\\d_]+$"))
+; ((name) @constant.other.php
+;   (#match? @constant.other.php "^_?[A-Z][A-Z\\d_]+$"))
+
+(const_declaration (const_element) @variable.other.constant.php)
 
 ((name) @constant.language.php
  (#match? @constant.language.php "^__[A-Z][A-Z\d_]+__$"))
