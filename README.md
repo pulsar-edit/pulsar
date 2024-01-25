@@ -5,9 +5,9 @@
 
 [![Badge Discussions]][Discussions]  
 [![Badge Discord]][Discord]  
-[![Badge Reddit]][Reddit]
-[![Badge Mastodon]][Mastodon]
-[![Badge Lemmy]][Lemmy]
+[![Badge Reddit]][Reddit]  
+[![Badge Mastodon]][Mastodon]  
+[![Badge Lemmy]][Lemmy]  
 
 [![Badge Status]][Status]  
 [![Badge License]][License]
