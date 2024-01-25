@@ -1,36 +1,36 @@
 
-; WORKAROUND:
-;
-; When you're typing a new property name inside of a list, tree-sitter-css will
-; assume the thing you're typing is a descendant selector tag name until you
-; get to the colon. This prevents it from highlighting the incomplete line like
-; a selector tag name.
 
-(descendant_selector
-  (tag_name) @_IGNORE_
-  (#set! capture.final true))
+; NOTE: `tree-sitter-css` recovers poorly from invalidity inside a block when
+; you're adding a new property-value pair above others in a list. When the user
+; is typing and the file is temporarily invalid, it will make incorrect guesses
+; about tokens that occur between the cursor and the end of the block.
+;
+; The fix here is for `tree-sitter-css` to get better at recovering from its
+; parsing error, but parser authors don't currently have much control over
+; that. In the meantime, this query is a decent mitigation: it colors the
+; affected tokens like plain text instead of assuming (nearly always
+; incorrectly) them to be tag names.
+;
+; Ideally, this is temporary, and we can remove it soon. Until then, it makes
+; syntax highlighting less obnoxious.
+
+((tag_name) @_IGNORE_
+  (#is? test.descendantOfType "ERROR")
+  (#set! capture.final))
 
 (ERROR
   (attribute_name) @_IGNORE_
-  (#set! capture.final true))
+  (#set! capture.final))
 
 ((ERROR
   (attribute_name) @invalid.illegal)
-  (#set! capture.final true))
+  (#set! capture.final))
 
 ; WORKAROUND:
 ;
-; `:hover` and other pseudo-classes don't highlight correctly inside a media
-; query (https://github.com/tree-sitter/tree-sitter-css/issues/28)
-(
-  (ERROR) @entity.other.attribute-name.pseudo-class.css
-  (#match? @entity.other.attribute-name.pseudo-class.css "^:[\\w-]+$")
-)
-
-; WORKAROUND:
-;
-; In `::after`, the "after" has a node type of `tag_name`. We want to catch it
-; here so that it doesn't get scoped like an HTML tag name in a selector.
+; In `::after`, the "after" has a node type of `tag_name`. Unclear whether this
+; is a bug or intended behavior. We want to catch it here so that it doesn't
+; get scoped like an HTML tag name in a selector.
 
 ; Scope the entire `::after` range as one unit.
 ((pseudo_element_selector)
