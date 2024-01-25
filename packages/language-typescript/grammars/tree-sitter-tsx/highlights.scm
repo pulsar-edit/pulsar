@@ -9,23 +9,26 @@
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
-  name: (identifier) @entity.name.tag.ts.tsx)
+  name: (identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
 
 ; The "Foo.Bar" in `<Foo.Bar>`.
 (jsx_opening_element
-  name: (nested_identifier) @entity.name.tag.ts.tsx)
+  name: (nested_identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  name: (identifier) @entity.name.tag.ts.tsx)
+  name: (identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
 
 ; The "Foo.Bar" in `</Foo.Bar>`.
 (jsx_closing_element
-  name: (nested_identifier) @entity.name.tag.ts.tsx)
+  name: (nested_identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
   (property_identifier) @entity.other.attribute-name.ts.tsx)
+
+; The empty tag used as a shorthand for a fragment: `<>`.
+(jsx_fragment) @meta.tag.ts.tsx
 
 ; The slashes in closing tags should not be interpreted as math operators.
 (jsx_self_closing_element "/" @punctuation.definition.tag.end.ts.tsx
@@ -45,6 +48,10 @@
   ">" @punctuation.definition.tag.end.ts.tsx)
 
 (jsx_closing_element
+  "<" @punctuation.definition.tag.begin.ts.tsx
+  ">" @punctuation.definition.tag.end.ts.tsx)
+
+(jsx_fragment
   "<" @punctuation.definition.tag.begin.ts.tsx
   ">" @punctuation.definition.tag.end.ts.tsx)
 

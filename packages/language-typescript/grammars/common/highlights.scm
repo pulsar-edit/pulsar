@@ -294,7 +294,8 @@
 ; ==========
 
 (interface_declaration
-  name: (_) @entity.name.type.interface._LANG_)
+  name: (_) @entity.name.type.interface._LANG_
+  (#set! capture.final))
 
 
 ; TYPES
@@ -308,6 +309,11 @@
 (type_arguments "<" @punctuation.definition.parameters.begin.bracket.angle.js
   (#set! capture.final))
 (type_arguments ">" @punctuation.definition.parameters.end.bracket.angle.js
+  (#set! capture.final))
+
+(type_parameters "<" @punctuation.definition.parameters.begin.bracket.angle.js
+  (#set! capture.final))
+(type_parameters ">" @punctuation.definition.parameters.end.bracket.angle.js
   (#set! capture.final))
 
 "=>" @storage.type.arrow._LANG_
