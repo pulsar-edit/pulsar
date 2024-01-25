@@ -46,6 +46,9 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup Python
+      # actions/setup-python's copy of Python is compiled for too new glibc,
+      # which won't work in a Debian 10 Docker image.
+      # Get Python from apt repos instead on Linux.
       if: ${{ runner.os != 'Linux' }}
       uses: actions/setup-python@v4
       with:
@@ -213,6 +216,10 @@ jobs:
 
 
   test-and-upload-Linux:
+    # I couldn't figure out how to get these visual tests to actually run in the
+    # Debian Docker environment. If anyone can make it work, feel free to
+    # re-combine visual testing on Linux back into the main build job above!
+    # - DeeDeeG
     runs-on: ubuntu-latest
     needs: build
 
