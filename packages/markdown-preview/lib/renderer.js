@@ -30,23 +30,37 @@ exports.toDOMFragment = async function (text, filePath, grammar, callback) {
 
   } else {
     // We use the new parser!
-    const domFragment = atom.ui.markdown.render(text,
+    const domFragment = await atom.ui.markdown.render(
+      text,
       {
         renderMode: "fragment",
         filePath: filePath,
-        breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
-        useDefaultEmoji: true,
-        sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+        breaks: atom.config.get("markdown-preview.breakOnSingleNewline"),
+        emoji: true,
+        sanitize: true,
+        sanitizeAllowUnknownProtocols: atom.config.get("markdown-preview.allowUnsafeProtocols"),
+        highlight: scopeForFenceName,
+        defaultGrammar: grammar
       }
     );
-    const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
-    await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment,
-      {
-        renderMode: "fragment",
-        syntaxScopeNameFunc: scopeForFenceName,
-        grammar: grammar
-      }
-    );
+
+    // const domFragment = atom.ui.markdown.render(text,
+    //   {
+    //     renderMode: "fragment",
+    //     filePath: filePath,
+    //     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+    //     useDefaultEmoji: true,
+    //     sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+    //   }
+    // );
+    // const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
+    // await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment,
+    //   {
+    //     renderMode: "fragment",
+    //     syntaxScopeNameFunc: scopeForFenceName,
+    //     grammar: grammar
+    //   }
+    // );
 
     return domHTMLFragment;
   }
@@ -71,28 +85,41 @@ exports.toHTML = async function (text, filePath, grammar) {
     return result
   } else {
     // We use the new parser!
-    const domFragment = atom.ui.markdown.render(text,
+    const domFragment = await atom.ui.markdown.render(
+      text,
       {
         renderMode: "full",
         filePath: filePath,
-        breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
-        useDefaultEmoji: true,
-        sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+        breaks: atom.config.get("markdown-preview.breakOnSingleNewline"),
+        emoji: true,
+        sanitize: true,
+        sanitizeAllowUnknownProtocols: atom.config.get("markdown-preview.allowUnsafeProtocols"),
+        highlight: scopeForFenceName,
+        grammar: grammar
       }
     );
-    const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
+    // const domFragment = atom.ui.markdown.render(text,
+    //   {
+    //     renderMode: "full",
+    //     filePath: filePath,
+    //     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+    //     useDefaultEmoji: true,
+    //     sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+    //   }
+    // );
+    // const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
 
     const div = document.createElement("div");
     div.appendChild(domHTMLFragment);
     document.body.appendChild(div);
 
-    await atom.ui.markdown.applySyntaxHighlighting(div,
-      {
-        renderMode: "full",
-        syntaxScopeNameFunc: scopeForFenceName,
-        grammar: grammar
-      }
-    );
+    // await atom.ui.markdown.applySyntaxHighlighting(div,
+    //   {
+    //     renderMode: "full",
+    //     syntaxScopeNameFunc: scopeForFenceName,
+    //     grammar: grammar
+    //   }
+    // );
 
     const result = div.innerHTML;
     div.remove();
