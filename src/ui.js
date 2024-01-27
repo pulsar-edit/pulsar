@@ -275,15 +275,15 @@ function buildRenderer(givenOpts = {}) {
   const defaultOpts = {
     html: true, // Enable HTML tags in source
     breaks: true, // Convert `\n` in paragraphs into `<br>`
-    emoji: true, // enable or disable emojis
-    githubHeadings: true, // Use `markdown-it-github-headings`
-    taskCheckbox: true, // Use `markdown-it-task-checkbox`
+    emoji: false, // enable or disable emojis
+    githubHeadings: false, // Use `markdown-it-github-headings`
+    taskCheckbox: false, // Use `markdown-it-task-checkbox`
     taskCheckboxDisabled: true, // For `taskCheckbox`: Disable checkbox interactivity
-    taskCheckboxDivWrap: true, // For `taskCheckbox`: Wrap div arround checkbox
-    transformImageLinks: true, // Attempt to resolve image urls
+    taskCheckboxDivWrap: false, // For `taskCheckbox`: Wrap div arround checkbox
+    transformImageLinks: false, // Attempt to resolve image urls
     rootDomain: "", // the root URL that should be used for attempted translations
     filePath: "", // the local path to use during translations
-    transformNonFqdnLinks: true, // Attempt to resolve non-FQDN links
+    transformNonFqdnLinks: false, // Attempt to resolve non-FQDN links
     transformAtomLinks: true, // Attempt to rewrite links to Atom pages to the Pulsar equivolant
     disableMode: "none", // The level of disabling that should be set.
     // - none: Nothing is disabled, the default
