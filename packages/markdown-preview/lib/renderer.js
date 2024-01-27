@@ -42,27 +42,9 @@ exports.toDOMFragment = async function (text, filePath, grammar, callback) {
         highlight: scopeForFenceName,
         defaultGrammar: grammar
       }
-    );
+    )();
 
-    // const domFragment = atom.ui.markdown.render(text,
-    //   {
-    //     renderMode: "fragment",
-    //     filePath: filePath,
-    //     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
-    //     useDefaultEmoji: true,
-    //     sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
-    //   }
-    // );
-    // const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
-    // await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment,
-    //   {
-    //     renderMode: "fragment",
-    //     syntaxScopeNameFunc: scopeForFenceName,
-    //     grammar: grammar
-    //   }
-    // );
-
-    return domHTMLFragment;
+    return domFragment;
   }
 }
 
@@ -97,29 +79,11 @@ exports.toHTML = async function (text, filePath, grammar) {
         highlight: scopeForFenceName,
         grammar: grammar
       }
-    );
-    // const domFragment = atom.ui.markdown.render(text,
-    //   {
-    //     renderMode: "full",
-    //     filePath: filePath,
-    //     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
-    //     useDefaultEmoji: true,
-    //     sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
-    //   }
-    // );
-    // const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
+    )();
 
     const div = document.createElement("div");
-    div.appendChild(domHTMLFragment);
+    div.appendChild(domFragment);
     document.body.appendChild(div);
-
-    // await atom.ui.markdown.applySyntaxHighlighting(div,
-    //   {
-    //     renderMode: "full",
-    //     syntaxScopeNameFunc: scopeForFenceName,
-    //     grammar: grammar
-    //   }
-    // );
 
     const result = div.innerHTML;
     div.remove();
