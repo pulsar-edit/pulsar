@@ -759,7 +759,7 @@
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
   name: (identifier) @entity.name.tag.js
-  ) @meta.tag.js
+  ) @meta.tag.jsx.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
@@ -782,11 +782,11 @@
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
-  ">" @punctuation.definition.tag.end.js) @meta.tag.js
+  ">" @punctuation.definition.tag.end.js) @meta.tag.jsx.js
 
 (jsx_closing_element
   "</" @punctuation.definition.tag.begin.js
-  ">" @punctuation.definition.tag.end.js) @meta.tag.js
+  ">" @punctuation.definition.tag.end.js) @meta.tag.jsx.js
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.js
