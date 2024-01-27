@@ -100,6 +100,13 @@
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
 
+; Public field definition in a class body:
+; The "foo" in `foo = "bar";`
+(field_definition
+  property: (property_identifier) @variable.other.assignment.property.public.js)
+
+; Private field definition in a class body:
+; The "#foo" in `#foo = "bar";`
 (field_definition
   property: (private_property_identifier) @variable.other.assignment.property.private.js)
 
