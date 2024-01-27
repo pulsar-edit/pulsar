@@ -782,11 +782,11 @@
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
-  ">" @punctuation.definition.tag.end.js)
+  ">" @punctuation.definition.tag.end.js) @meta.tag.js
 
 (jsx_closing_element
   "</" @punctuation.definition.tag.begin.js
-  ">" @punctuation.definition.tag.end.js)
+  ">" @punctuation.definition.tag.end.js) @meta.tag.js
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.js
