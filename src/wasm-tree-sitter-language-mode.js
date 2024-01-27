@@ -1520,7 +1520,7 @@ class WASMTreeSitterLanguageMode {
     }
 
     scopeResolver.reset();
-    let finalIndent = comparisonRowIndent + indentDelta + dedentDelta;
+    let finalIndent = comparisonRowIndent + indentDelta + dedentDelta + existingIndent;
     // console.log('score:', comparisonRowIndent, '+', indentDelta, '-', ((dedentDelta < 0) ? -dedentDelta : dedentDelta), '=', finalIndent);
 
     return Math.max(finalIndent - existingIndent, 0);
