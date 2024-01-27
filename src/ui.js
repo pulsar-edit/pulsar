@@ -75,9 +75,9 @@ function render(content, givenOpts = {}, mdInstance) {
   // Some options have changed since the initial implmentation of the `atom.ui.markdown`
   // feature. We will pass along the values of no longer used config options, to
   // ensure backwards compatibility.
-  opts.frontMatter = givenOpts.handleFrontMatter ?? defaultOpts.frontMatter;
-  opts.highlight = givenOpts.syntaxScopeNameFunc ?? defaultOpts.highlight;
-  opts.defaultGrammar = givenOpts.grammar ?? defaultOpts.defaultGrammar;
+  opts.frontMatter = givenOpts.handleFrontMatter ?? givenOpts.frontMatter ?? defaultOpts.frontMatter;
+  opts.highlight = givenOpts.syntaxScopeNameFunc ?? givenOpts.highlight ?? defaultOpts.highlight;
+  opts.defaultGrammar = givenOpts.grammar ?? givenOpts.defaultGrammar ?? defaultOpts.defaultGrammar;
   // End of backwards compaitbility options
   // Maybe we should emit a warning or deprecation when one is used?
 
@@ -144,7 +144,7 @@ function render(content, givenOpts = {}, mdInstance) {
       ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose
     };
 
-    rendered = mdComponents.deps.domPurify.sanitize(rendered, opts);
+    rendered = mdComponents.deps.domPurify.sanitize(rendered, domPurifyOpts);
   }
 
   // We now could return this text as ready to go, but lets check if we can
@@ -185,7 +185,7 @@ function render(content, givenOpts = {}, mdInstance) {
     }
 
     if (fontFamily) {
-      for (const codeElement of content.querySelectorAll("code")) {
+      for (const codeElement of domHTMLFragment.querySelectorAll("code")) {
         codeElement.style.fontFamily = fontFamily;
       }
     }
@@ -229,14 +229,11 @@ function render(content, givenOpts = {}, mdInstance) {
       await Promise.all(promises);
       return domHTMLFragment;
     };
-    // await Promise.all(promises);
-    //
-    // return domHTMLFragment;
+  } else {
+    // We aren't preforming any syntax highlighting, so lets return our rendered
+    // text.
+    return rendered;
   }
-
-  // We aren't preforming any syntax highlighting, so lets return our rendered
-  // text.
-  return rendered;
 }
 
 /**
@@ -295,9 +292,9 @@ function buildRenderer(givenOpts = {}) {
   // Some options have changed since the initial implmentation of the `atom.ui.markdown`
   // feature. We will pass along the values of no longer used config options, to
   // ensure backwards compatibility.
-  opts.emoji = givenOpts.useDefaultEmoji ?? defaultOpts.emoji;
-  opts.githubHeadings = givenOpts.useGitHubHeadings ?? defaultOpts.githubHeadings;
-  opts.taskCheckbox = givenOpts.useTaskCheckbox ?? defaultOpts.taskCheckbox;
+  opts.emoji = givenOpts.useDefaultEmoji ?? givenOpts.emoji ?? defaultOpts.emoji;
+  opts.githubHeadings = givenOpts.useGitHubHeadings ?? givenOpts.githubHeadings ?? defaultOpts.githubHeadings;
+  opts.taskCheckbox = givenOpts.useTaskCheckbox ?? givenOpts.taskCheckbox ?? defaultOpts.taskCheckbox;
   // End of backwards compaitbility options
   // Maybe we should emit a warning or deprecation when one is used?
 
@@ -307,6 +304,18 @@ function buildRenderer(givenOpts = {}) {
   const cleanRootDomain = () => {
     // We will also remove any trailing `/` as link resolvers down the line add them in
     return opts.rootDomain.replace(".git", "").replace(/\/$/, "");
+  };
+  const convertPathToLocalProtocol = (link) => {
+    // Not sure how this wasn't caught before, but when we resolve a local link,
+    // such as `D:\pulsar-edit\pulsar\resources\readme.png` two things happen:
+    // If `sanitize: true` then DOMPurify removes all "\" then the resulting URL
+    // is invalid, but even worse if `sanitizeAllowUnknownProtocols: false`
+    // the URL will be removed entirely.
+    // So we need to convert from a valid local path like above, to a valid
+    // file protocol link, such as `file:///D:/pulsar-edit/pulsar/resources/readme.png`
+    link = link.replace(/\\/g, "/");
+    link = `file:///${link}`;
+    return link;
   };
 
   const markdownItOpts = {
@@ -347,7 +356,7 @@ function buildRenderer(givenOpts = {}) {
       // Lets say content contains './my-cool-image.png'
       // We need to turn it into something like this:
       // https://github.com/USER/REPO/raw/HEAD/my-cool-image.png
-      if (mdComponents.reg.localLinks.curentDir.test(token.attrGet("src"))) {
+      if (mdComponents.reg.localLinks.currentDir.test(token.attrGet("src"))) {
         let rawLink = token.attrGet("src");
         rawLink = rawLink.replace(mdComponents.reg.localLinks.currentDir, "");
         // Now that we have the raw link of a local link, we need to handle this
@@ -356,14 +365,14 @@ function buildRenderer(givenOpts = {}) {
         if (validLocalItem) {
           let originalSrc = path.resolve(rawLink);
           let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
-          if (fs.lstatSync(originalSrc).isFile()) {
+          if (fs.lstatSync(originalSrc, { throwIfNoEntry: false })?.isFile()) {
             // the normal link is already a valid local link to the filesystem
-            token.attrSet("src", originalSrc);
+            token.attrSet("src", convertPathToLocalProtocol(originalSrc));
             hasSet = true;
-          } else if (fs.lstatSync(newSrc).isFile()) {
+          } else if (fs.lstatSync(newSrc, { throwIfNoEntry: false })?.isFile()) {
             // This link does successfully point to the filesystem after being
             // merged with the provided filePath
-            token.attrSet("src", newSrc);
+            token.attrSet("src", convertPathToLocalProtocol(newSrc));
             hasSet = true;
           }
         }
@@ -382,9 +391,9 @@ function buildRenderer(givenOpts = {}) {
         let hasSet = false;
         if (validLocalItem) {
           const [rootDirectory] = atom.project.relativePath(opts.filePath);
-          if (fs.lstatSync(src).isFile() && rootDirectory) {
+          if (fs.lstatSync(src, { throwIfNoEntry: false })?.isFile() && rootDirectory) {
             let newSrc = path.join(rootDirectory, rawLink);
-            token.attrSet("src", newSrc);
+            token.attrSet("src", convertPathToLocalProtocol(newSrc));
             hasSet = true;
           }
         }
@@ -396,9 +405,28 @@ function buildRenderer(givenOpts = {}) {
       } else if (!token.attrGet("src").startsWith("http") && !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))) {
         // This looks like an implicit relative url
         let rawLink = token.attrGet("src");
-        // TODO Don't assume GitHub. At this point it's obvious where these checks
-        // originated from, and that they need to be expanded
-        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+
+        let hasSet = false;
+        if (validLocalItem) {
+          let originalSrc = path.resolve(rawLink);
+          let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
+
+          if (fs.lstatSync(originalSrc, { throwIfNoEntry: false })?.isFile()) {
+            // the normal link is already a valid local link to the filesystem
+            token.attrSet("src", convertPathToLocalProtocol(originalSrc));
+            hasSet = true;
+          } else if (fs.lstatSync(newSrc, { throwIfNoEntry: false})?.isFile()) {
+            // This link does successfully point to the filesystem after being
+            // merged with the provided filePath
+            token.attrSet("src", convertPathToLocalProtocol(newSrc));
+            hasSet = true;
+          }
+        }
+        if (validRootDomain && !hasSet) {
+          // TODO again we shouldn't assume this image is one GitHub
+          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+          hasSet = true;
+        }
       } else if ([ ".git", ".png", ".jpg", ".jpeg", ".webp"].find(ext => token.attrGet("src").endsWith(ext)) && token.attrGet("src").startsWith("https://github.com") && token.attrGet("src").includes("blob")) {
         // Should match images being distributed from GitHub that's using `blob` instead of `raw`
         // which will cause images to fail to load.
