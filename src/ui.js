@@ -274,7 +274,7 @@ function buildRenderer(givenOpts = {}) {
     breaks: true, // Convert `\n` in paragraphs into `<br>`
     emoji: false, // enable or disable emojis
     githubHeadings: false, // Use `markdown-it-github-headings`
-    taskCheckbox: false, // Use `markdown-it-task-checkbox`
+    taskCheckbox: true, // Use `markdown-it-task-checkbox`
     taskCheckboxDisabled: true, // For `taskCheckbox`: Disable checkbox interactivity
     taskCheckboxDivWrap: false, // For `taskCheckbox`: Wrap div arround checkbox
     transformImageLinks: false, // Attempt to resolve image urls
