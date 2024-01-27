@@ -2582,7 +2582,7 @@ class HighlightIterator {
 
   getCloseScopeIds() {
     let iterator = last(this.iterators);
-    // if (this.currentScopeIsCovered) {
+    // if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'close') {
     //   console.log(
     //     iterator.name,
     //     iterator.depth,
@@ -2606,8 +2606,12 @@ class HighlightIterator {
     //   );
     // }
     if (iterator) {
-      if (this.currentScopeIsCovered) {
-        return iterator.getOpenScopeIds().filter(id => {
+      // If this iterator is covered completely, or if it's covered in a
+      // position that prevents us from closing scopes…
+      if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'close') {
+        // …then the only closing scope we're allowed to apply is one that ends
+        // the base scope of an injection range.
+        return iterator.getCloseScopeIds().filter(id => {
           return iterator.languageLayer.languageScopeId === id;
         });
       } else {
@@ -2620,7 +2624,7 @@ class HighlightIterator {
   getOpenScopeIds() {
     let iterator = last(this.iterators);
     // let ids = iterator.getOpenScopeIds();
-    // if (this.currentScopeIsCovered) {
+    // if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'open') {
     //   console.log(
     //     iterator.name,
     //     iterator.depth,
@@ -2644,7 +2648,11 @@ class HighlightIterator {
     //   );
     // }
     if (iterator) {
-      if (this.currentScopeIsCovered) {
+      // If this iterator is covered completely, or if it's covered in a
+      // position that prevents us from opening scopes…
+      if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'open') {
+        // …then the only opening scope we're allowed to apply is one that ends
+        // the base scope of an injection range.
         return iterator.getOpenScopeIds().filter(id => {
           return iterator.languageLayer.languageScopeId === id;
         });
@@ -2662,20 +2670,22 @@ class HighlightIterator {
     if (layerCount > 1) {
       const rest = [...this.iterators];
       const leader = rest.pop();
-      let covered = rest.some(it => {
-        return it.coversIteratorAtPosition(
-          leader,
-          leader.getPosition()
-        );
-      });
+      let covers = false;
+      for (let it of rest) {
+        let iteratorCovers = it.coversIteratorAtPosition(leader, leader.getPosition());
+        if (iteratorCovers !== false) {
+          covers = iteratorCovers;
+          break;
+        }
+      }
 
-      if (covered) {
-        this.currentScopeIsCovered = true;
+      if (covers) {
+        this.currentIteratorIsCovered = covers;
         return;
       }
     }
 
-    this.currentScopeIsCovered = false;
+    this.currentIteratorIsCovered = false;
   }
 
   logPosition() {
@@ -2743,16 +2753,40 @@ class LayerHighlightIterator {
     // …and this iterator is deeper than the other…
     if (iterator.depth > this.depth) { return false; }
 
-    // …and this iterator's ranges actually include this position.
+    // …and one of this iterator's content ranges actually includes this
+    // position. (With caveats!)
     let ranges = this.languageLayer.getCurrentRanges();
     if (ranges) {
-      return ranges.some(range => range.containsPoint(position));
-    }
+      // A given layer's content ranges aren't allowed to overlap each other.
+      // So only a single range from this list can possibly match.
+      let overlappingRange = ranges.find(range => range.containsPoint(position))
+      if (!overlappingRange) return false;
 
-    // TODO: Despite all this, we may want to allow parent layers to apply
-    // scopes at the very edges of this layer's ranges/extent; or perhaps to
-    // apply ending scopes at starting positions and vice-versa; or at least to
-    // make it a configurable behavior.
+      // If the current position is right in the middle of an injection's
+      // range, then it should cover all attempts to apply scopes. But what if
+      // we're on one of its edges? Since closing scopes act before opening
+      // scopes,
+      //
+      // * if this iterator _starts_ a range at position X, it doesn't get to
+      //   prevent another iterator from _ending_ a scope at position X;
+      // * if this iterator _ends_ a range at position X, it doesn't get to
+      //   prevent another iterator from _starting_ a scope at position X.
+      //
+      // So at a given position, `currentIteratorIsCovered` can be `true` (all
+      // scopes suppressed), `false` (none suppressed), `"close"` (only closing
+      // scopes suppressed), or `"open"` (only opening scopes suppressed).
+      if (overlappingRange.end.compare(position) === 0) {
+        // We're at the right edge of the injection range. We want to prevent
+        // iterators from closing scopes, but not from opening them.
+        return 'close';
+      } else if (overlappingRange.start.compare(position) === 0) {
+        // We're at the left edge of the injection range. We want to prevent
+        // iterators from opening scopes, but not from closing them.
+        return 'open';
+      } else {
+        return true;
+      }
+    }
   }
 
   seek(start, endRow) {

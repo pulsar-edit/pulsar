@@ -32,8 +32,8 @@
 ; -----------
 
 ; Wrap the "foo" and "!" of `foo!()`.
-((macro_invocation (identifier) @support.other.function.rust))
-  ; (#set! adjust.endAt firstChild.nextSibling.endPosition))
+((macro_invocation (identifier)) @support.other.function.rust
+  (#set! adjust.endAt firstChild.nextSibling.endPosition))
 
 (call_expression
   function: (identifier) @support.other.function.rust)
