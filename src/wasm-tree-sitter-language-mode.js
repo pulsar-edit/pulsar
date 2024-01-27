@@ -1138,7 +1138,7 @@ class WASMTreeSitterLanguageMode {
         break;
       }
     }
-    return Math.floor(indentLength / tabLength);
+    return indentLength / tabLength
   }
 
   // Get the suggested indentation level for an existing line in the buffer.
