@@ -79,18 +79,17 @@
   right: [(arrow_function) (function)] @_IGNORE_
     (#set! isFunctionProperty true))
 
-; The "bar" in `foo.bar = true`
+; The "bar" in `foo.bar = true`.
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @variable.other.assignment.property.js)
     (#is-not? test.rangeWithData isFunctionProperty)
     (#set! capture.final))
 
-; The "bar" in `foo.#bar = true`
+; The "bar" in `foo.#bar = true`.
 (assignment_expression
   left: (member_expression
     property: (private_property_identifier) @variable.other.assignment.property.private.js))
-
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
@@ -156,18 +155,17 @@
   (rest_pattern
     (identifier) @variable.other.assignment.destructuring.rest.js))
 
-; A variable array destructuring:
-; The "foo" and "bar" in `let [foo, bar] = something`
-(variable_declarator
-  (array_pattern
+; An array-destructured assignment or reassignment, regardless of depth:
+; The "foo" in `[foo] = bar;` and `[[foo]] = bar;`.
+(array_pattern
+  (identifier) @variable.other.assignment.destructuring.js)
+
+; An array-destructured assignment or reassignment with a default, regardless of depth:
+; The "baz" in `let [foo, bar, baz = false] = something;` and `let [[baz = 5]] = something`;
+(array_pattern
+  (assignment_pattern
     (identifier) @variable.other.assignment.destructuring.js))
 
-; A variable array destructuring with a default:
-; The "baz" in `let [foo, bar, baz = false] = something`
-(variable_declarator
-  (array_pattern
-    (assignment_pattern
-      (identifier) @variable.other.assignment.destructuring.js)))
 
 ; A variable declaration in a for…(in|of) loop:
 ; The "foo" in `for (let foo of bar) {`
@@ -827,7 +825,13 @@
 
 (unary_expression ["+" "-"] @keyword.operator.unary.js)
 
-(ternary_expression ["?" ":"] @keyword.operator.ternary.js)
+(ternary_expression ["?" ":"] @keyword.operator.ternary.js
+  (#set! capture.final))
+
+; Try to highlight `?` like an operator while the user is typing without
+; waiting for its paired `:`.
+("?" @keyword.operator.ternary.js
+  (#is? test.descendantOfType "ERROR"))
 
 [
   "&&="

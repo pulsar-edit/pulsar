@@ -137,18 +137,16 @@
     value: (assignment_pattern
       left: (identifier) @variable.other.assignment.destructuring._LANG_)))
 
-; A variable array destructuring:
-; The "foo" and "bar" in `let [foo, bar] = something`
-(variable_declarator
-  (array_pattern
-    (identifier) @variable.other.assignment.destructuring._LANG_))
+; An array-destructured assignment or reassignment, regardless of depth:
+; The "foo" in `[foo] = bar;` and `[[foo]] = bar;`.
+(array_pattern
+  (identifier) @variable.other.assignment.destructuring._LANG_)
 
-; A variable array destructuring with a default:
-; The "baz" in `let [foo, bar, baz = false] = something`
-(variable_declarator
-  (array_pattern
-    (assignment_pattern
-      (identifier) @variable.other.assignment.destructuring.js)))
+; An array-destructured assignment or reassignment with a default, regardless of depth:
+; The "baz" in `let [foo, bar, baz = false] = something;` and `let [[baz = 5]] = something`;
+(array_pattern
+  (assignment_pattern
+    (identifier) @variable.other.assignment.destructuring._LANG_))
 
 ; A variable declaration in a for…(in|of) loop:
 ; The "foo" in `for (let foo of bar) {`
@@ -306,14 +304,14 @@
 ["var" "let" "const" "class" "function"] @storage.type._TYPE_._LANG_
 ["extends" "static" "async" "infer"] @storage.modifier._TYPE_._LANG_
 
-(type_arguments "<" @punctuation.definition.parameters.begin.bracket.angle.js
+(type_arguments "<" @punctuation.definition.parameters.begin.bracket.angle._LANG_
   (#set! capture.final))
-(type_arguments ">" @punctuation.definition.parameters.end.bracket.angle.js
+(type_arguments ">" @punctuation.definition.parameters.end.bracket.angle._LANG_
   (#set! capture.final))
 
-(type_parameters "<" @punctuation.definition.parameters.begin.bracket.angle.js
+(type_parameters "<" @punctuation.definition.parameters.begin.bracket.angle._LANG_
   (#set! capture.final))
-(type_parameters ">" @punctuation.definition.parameters.end.bracket.angle.js
+(type_parameters ">" @punctuation.definition.parameters.end.bracket.angle._LANG_
   (#set! capture.final))
 
 "=>" @storage.type.arrow._LANG_
@@ -389,148 +387,148 @@
 
 ; Array methods.
 (member_expression
-  object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "Array")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(from|isArray|of)$")
+  object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "Array")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(from|isArray|of)$")
     (#set! capture.final true))
 
 ; Date methods.
 (member_expression
-  object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "Date")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(now|parse|UTC)$")
+  object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "Date")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(now|parse|UTC)$")
     (#set! capture.final true))
 
 ; JSON methods.
 (member_expression
-  object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "JSON")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(parse|stringify)$")
+  object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "JSON")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(parse|stringify)$")
     (#set! capture.final true))
 
 ; Math methods.
 (member_expression
-  object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "Math")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(abs|acos|acosh|asin|asinh|atan|atanh|atan2|cbrt|ceil|clz32|cos|cosh|exp|expm1|floor|fround|hypot|imul|log|log1p|log10|log2|max|min|pow|random|round|sign|sin|sinh|sqrt|tan|tanh|trunc)$")
+  object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "Math")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(abs|acos|acosh|asin|asinh|atan|atanh|atan2|cbrt|ceil|clz32|cos|cosh|exp|expm1|floor|fround|hypot|imul|log|log1p|log10|log2|max|min|pow|random|round|sign|sin|sinh|sqrt|tan|tanh|trunc)$")
     (#set! capture.final true))
 
 ; Object methods.
 (member_expression
-  object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "Object")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(assign|create|defineProperty|defineProperties|entries|freeze|fromEntries|getOwnPropertyDescriptor|getOwnPropertyDescriptors|getOwnPropertyNames|getOwnPropertySymbols|getPrototypeOf|is|isExtensible|isFrozen|isSealed|keys|preventExtensions|seal|setPrototypeOf|values)$")
+  object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "Object")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(assign|create|defineProperty|defineProperties|entries|freeze|fromEntries|getOwnPropertyDescriptor|getOwnPropertyDescriptors|getOwnPropertyNames|getOwnPropertySymbols|getPrototypeOf|is|isExtensible|isFrozen|isSealed|keys|preventExtensions|seal|setPrototypeOf|values)$")
     (#set! capture.final true))
 
 ; Reflect methods.
 (member_expression
-  object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "Reflect")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(apply|construct|defineProperty|deleteProperty|get|getOwnPropertyDescriptor|getPrototypeOf|has|isExtensible|ownKeys|preventExtensions|set|setPrototypeOf)$")
+  object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "Reflect")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(apply|construct|defineProperty|deleteProperty|get|getOwnPropertyDescriptor|getPrototypeOf|has|isExtensible|ownKeys|preventExtensions|set|setPrototypeOf)$")
     (#set! capture.final true))
 
 ; Intl.X instantiations.
 (new_expression
   constructor: (member_expression
-    object: (identifier) @support.object.builtin.js
-      (#eq? @support.object.builtin.js "Intl")
-    property: (property_identifier) @support.class.builtin.js
-      (#match? @support.class.builtin.js "^(Collator|DateTimeFormat|DisplayNames|ListFormat|Locale|NumberFormat|PluralRules|Segmenter)$"))
+    object: (identifier) @support.object.builtin._LANG_
+      (#eq? @support.object.builtin._LANG_ "Intl")
+    property: (property_identifier) @support.class.builtin._LANG_
+      (#match? @support.class.builtin._LANG_ "^(Collator|DateTimeFormat|DisplayNames|ListFormat|Locale|NumberFormat|PluralRules|Segmenter)$"))
       (#set! capture.final true))
 
 ; Built-in class instantiations.
 (new_expression
-  constructor: (identifier) @support.class.builtin.instance.js
-    (#match? @support.class.builtin.instance.js "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
+  constructor: (identifier) @support.class.builtin.instance._LANG_
+    (#match? @support.class.builtin.instance._LANG_ "^(AggregateError|Array|ArrayBuffer|BigInt64Array|BigUint64Array|Boolean|DataView|Date|Error|EvalError|FinalizationRegistry|Float32Array|Float64Array|Function|ImageCapture|Int8Array|Int16Array|Int32Array|Map|Number|Object|Promise|RangeError|ReferenceError|RegExp|Set|String|SyntaxError|TypeError|Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|URIError|URL|WeakMap|WeakRef|WeakSet|XMLHttpRequest)$")
     (#set! capture.final true))
 
 ; Built-in constructors that can be invoked without `new`.
 (call_expression
-  (identifier) @support.function.builtin.js
-  (#match? @support.function.builtin.js "^(AggregateError|Array|ArrayBuffer|Boolean|BigInt|Error|EvalError|Function|Number|Object|Proxy|RangeError|String|Symbol|SyntaxError|URIError)$")
+  (identifier) @support.function.builtin._LANG_
+  (#match? @support.function.builtin._LANG_ "^(AggregateError|Array|ArrayBuffer|Boolean|BigInt|Error|EvalError|Function|Number|Object|Proxy|RangeError|String|Symbol|SyntaxError|URIError)$")
   (#set! capture.final true))
 
 ; Built-in functions.
 (call_expression
-  (identifier) @support.function.builtin.js
-  (#match? @support.function.builtin.js "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
+  (identifier) @support.function.builtin._LANG_
+  (#match? @support.function.builtin._LANG_ "^(decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt)$")
   (#set! capture.final true))
 
 ; Built-in `console` functions.
 
 (member_expression
-  object: (identifier) @support.class.builtin.console.js
-    (#eq? @support.class.builtin.console.js "console")
-  property: (property_identifier) @support.function.builtin.console.js
-    (#match? @support.function.builtin.console.js "^(assert|clear|count(Reset)?|debug|dir(xml)?|error|group(End)?info|log|profile(End)?|table|time(End|Log|Stamp)?|trace|warn)$")
+  object: (identifier) @support.class.builtin.console._LANG_
+    (#eq? @support.class.builtin.console._LANG_ "console")
+  property: (property_identifier) @support.function.builtin.console._LANG_
+    (#match? @support.function.builtin.console._LANG_ "^(assert|clear|count(Reset)?|debug|dir(xml)?|error|group(End)?info|log|profile(End)?|table|time(End|Log|Stamp)?|trace|warn)$")
     (#set! capture.final true))
 
 ; Static methods of `Promise`.
 (member_expression
-  object: (identifier) @support.class.builtin.js
-    (#eq? @support.class.builtin.js "Promise")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(all|allSettled|any|race|resolve|reject)$")
+  object: (identifier) @support.class.builtin._LANG_
+    (#eq? @support.class.builtin._LANG_ "Promise")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(all|allSettled|any|race|resolve|reject)$")
     (#set! capture.final true))
 
 ; All “well-known” symbols (as they are referred to in the spec).
 (member_expression
-  object: (identifier) @support.class.builtin.js
-  property: (property_identifier) @support.property.builtin.js
-  (#eq? @support.class.builtin.js "Symbol")
-  (#match? @support.property.builtin.js "^(asyncIterator|hasInstance|isConcatSpreadable|iterator|match|matchAll|replace|search|split|species|toPrimitive|toStringTag|unscopables)$")
+  object: (identifier) @support.class.builtin._LANG_
+  property: (property_identifier) @support.property.builtin._LANG_
+  (#eq? @support.class.builtin._LANG_ "Symbol")
+  (#match? @support.property.builtin._LANG_ "^(asyncIterator|hasInstance|isConcatSpreadable|iterator|match|matchAll|replace|search|split|species|toPrimitive|toStringTag|unscopables)$")
   (#set! capture.final true))
 
 ; Static methods of `Symbol`.
 (member_expression
-  object: (identifier) @support.class.builtin.js
-    (#eq? @support.class.builtin.js "Symbol")
-  property: (property_identifier) @support.function.builtin.js
-    (#match? @support.function.builtin.js "^(for|keyFor)$")
+  object: (identifier) @support.class.builtin._LANG_
+    (#eq? @support.class.builtin._LANG_ "Symbol")
+  property: (property_identifier) @support.function.builtin._LANG_
+    (#match? @support.function.builtin._LANG_ "^(for|keyFor)$")
     (#set! capture.final true))
 
 ; Other built-in objects.
-((identifier) @support.class.builtin.js
-  (#match? @support.class.builtin.js "^(Symbol)$")
+((identifier) @support.class.builtin._LANG_
+  (#match? @support.class.builtin._LANG_ "^(Symbol)$")
   (#set! capture.final true))
 
 ; Deprecated built-in functions.
 (call_expression
-  (identifier) @invalid.deprecated.function.js
-  (#match? @invalid.deprecated.function.js "^(escape|unescape)$")
+  (identifier) @invalid.deprecated.function._LANG_
+  (#match? @invalid.deprecated.function._LANG_ "^(escape|unescape)$")
   (#set! capture.final true))
 
 ; Built-in DOM classes.
-((identifier) @support.class.builtin.js
-  (#match? @support.class.builtin.js "^(Document|Element|HTMLElement|HTMLDocument|HTML(Select|BR|HR|LI|Div|Map|Mod|Pre|Area|Base|Body|Data|Font|Form|Head|Html|Link|Menu|Meta|Slot|Span|Time|Audio|DList|Embed|Image|Input|Label|Media|Meter|OList|Param|Quote|Style|Table|Title|Track|UList|Video|Anchor|Button|Canvas|Dialog|IFrame|Legend|Object|Option|Output|Script|Source|Content|Details|Heading|Marquee|Picture|Unknown|DataList|FieldSet|FrameSet|MenuItem|OptGroup|Progress|TableCol|TableRow|Template|TextArea|Paragraph|TableCell|Options|TableCaption|TableSection|FormControls))$")
+((identifier) @support.class.builtin._LANG_
+  (#match? @support.class.builtin._LANG_ "^(Document|Element|HTMLElement|HTMLDocument|HTML(Select|BR|HR|LI|Div|Map|Mod|Pre|Area|Base|Body|Data|Font|Form|Head|Html|Link|Menu|Meta|Slot|Span|Time|Audio|DList|Embed|Image|Input|Label|Media|Meter|OList|Param|Quote|Style|Table|Title|Track|UList|Video|Anchor|Button|Canvas|Dialog|IFrame|Legend|Object|Option|Output|Script|Source|Content|Details|Heading|Marquee|Picture|Unknown|DataList|FieldSet|FrameSet|MenuItem|OptGroup|Progress|TableCol|TableRow|Template|TextArea|Paragraph|TableCell|Options|TableCaption|TableSection|FormControls))$")
   (#set! capture.final true))
 
 ; Deprecated built-in DOM classes.
-((identifier) @invalid.deprecated.class.js
-  (#match? @invalid.deprecated.class.js "^(HTMLShadowElement)$")
+((identifier) @invalid.deprecated.class._LANG_
+  (#match? @invalid.deprecated.class._LANG_ "^(HTMLShadowElement)$")
   (#set! capture.final true))
 
 ; Built-in DOM methods on `document`.
 (call_expression
   function: (member_expression
-    object: (identifier) @support.object.builtin.js
-    (#eq? @support.object.builtin.js "document")
-    property: (property_identifier) @support.function.method.builtin.js
-    (#match? @support.function.method.builtin.js "^(adoptNode|append|caretPositionFromPoint|caretRangeFromPoint|createAttribute(?:NS)?|createCDATASection|createComment|createDocumentFragment|createElement(?:NS)?|createEvent|createNodeIterator|createProcessingInstruction|createRange|createTextNode|createTreeWalker|elementFromPoint|elementsFromPoint|exitFullscreen|exitPictureInPicture|exitPointerLock|getAnimations|getElementById|getElementsByClassName|getElementsByTagName(?:NS)?|getSelection|hasStorageAccess|importNode|prepend|querySelector|querySelectorAll|releaseCapture|replaceChildren|requestStorageAccess|createExpression|createNSResolver|evaluate|getElementsByName|hasFocus|write|writeln|open|close)$")
+    object: (identifier) @support.object.builtin._LANG_
+    (#eq? @support.object.builtin._LANG_ "document")
+    property: (property_identifier) @support.function.method.builtin._LANG_
+    (#match? @support.function.method.builtin._LANG_ "^(adoptNode|append|caretPositionFromPoint|caretRangeFromPoint|createAttribute(?:NS)?|createCDATASection|createComment|createDocumentFragment|createElement(?:NS)?|createEvent|createNodeIterator|createProcessingInstruction|createRange|createTextNode|createTreeWalker|elementFromPoint|elementsFromPoint|exitFullscreen|exitPictureInPicture|exitPointerLock|getAnimations|getElementById|getElementsByClassName|getElementsByTagName(?:NS)?|getSelection|hasStorageAccess|importNode|prepend|querySelector|querySelectorAll|releaseCapture|replaceChildren|requestStorageAccess|createExpression|createNSResolver|evaluate|getElementsByName|hasFocus|write|writeln|open|close)$")
     (#set! capture.final true)))
 
 ; Built-in DOM methods on nodes. These will show up as builtins on _any_ class, but
 ; they're distinctive enough that we're OK with that possibility.
 (call_expression
   function: (member_expression
-    property: (property_identifier) @support.function.method.builtin.js
-    (#match? @support.function.method.builtin.js "^(addEventListener|appendChild|cloneNode|compareDocumentPosition|contains|getElementsByClassName|getElementsByTagName(?:NS)?|getRootNode|hasChildNodes|insertBefore|isDefaultNamespace|isEqualNode|isSameNode|lookupPrefix|lookupNamespaceURI|normalize|querySelector|querySelectorAll|removeChild|replaceChild|removeEventListener)$")
+    property: (property_identifier) @support.function.method.builtin._LANG_
+    (#match? @support.function.method.builtin._LANG_ "^(addEventListener|appendChild|cloneNode|compareDocumentPosition|contains|getElementsByClassName|getElementsByTagName(?:NS)?|getRootNode|hasChildNodes|insertBefore|isDefaultNamespace|isEqualNode|isSameNode|lookupPrefix|lookupNamespaceURI|normalize|querySelector|querySelectorAll|removeChild|replaceChild|removeEventListener)$")
     (#set! capture.final true)))
 
 ; BUILTINS
@@ -585,7 +583,7 @@
 
 ; The "bar" in `foo.bar`, `foo.bar.baz`, and `foo.bar[baz]`.
 (member_expression
-  property: (property_identifier) @support.other.property.js)
+  property: (property_identifier) @support.other.property._LANG_)
 
 ; ; The "bar" in `foo.bar.baz`.
 ; (member_expression
@@ -844,10 +842,17 @@
 
 
 (ternary_expression
-  ["?" ":"] @keyword.operator.ternary._LANG_)
+  ["?" ":"] @keyword.operator.ternary._LANG_
+  (#set! capture.final))
 
 (conditional_type
-  ["?" ":"] @keyword.operator.ternary._LANG_)
+  ["?" ":"] @keyword.operator.ternary._LANG_
+  (#set! capture.final))
+
+; Try to highlight `?` like an operator while the user is typing without
+; waiting for its paired `:`.
+("?" @keyword.operator.ternary._LANG_
+  (#is? test.descendantOfType "ERROR"))
 
 ; PUNCTUATION
 ; ===========
