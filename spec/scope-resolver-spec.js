@@ -159,6 +159,67 @@ describe('ScopeResolver', () => {
     ]);
   });
 
+  it('does not apply any scopes when @_IGNORE_ is used', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (lexical_declaration kind: _ @_IGNORE_
+        (#match? @_IGNORE_ "const"))
+      (lexical_declaration kind: _ @let
+        (#match? @let "let"))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      let bar = 'troz'
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      if (name === '_IGNORE_') {
+        expect(!!result).toBe(false);
+      } else {
+        expect(!!result).toBe(true);
+      }
+    }
+  });
+
+  it('does not apply any scopes when multiple @_IGNORE_s are used', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (variable_declarator
+        (identifier) @_IGNORE_.identifier
+        (string) @_IGNORE_.string
+      )
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      let bar = false
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      if (name.startsWith('_IGNORE_')) {
+        expect(!!result).toBe(false);
+      } else {
+        expect(!!result).toBe(true);
+      }
+    }
+  });
+
+
   describe('adjustments', () => {
     it('adjusts ranges with (#set! adjust.startAt)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
