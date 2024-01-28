@@ -217,9 +217,13 @@
     (identifier) @variable.parameter.lambda.java))
 
 (variable_declarator
-  name: (identifier) @variable.other.assignment.java)
+  name: (identifier) @variable.other.declaration.java)
 
+(assignment_expression
+  left: (identifier) @variable.other.assignment.java)
 
+(update_expression
+  (identifier) @variable.other.assignment.java)
 
 ; PACKAGES
 ; ========
@@ -358,6 +362,8 @@
 
 (binary_expression
   ["&" "|" "^" "~" "<<" ">>" ">>>"] @keyword.operator.bitwise.java)
+
+["++" "--"] @keyword.operator.increment.java
 
 "." @keyword.operator.accessor.dot.java
 "::" @keyword.operator.accessor.method-reference.java
