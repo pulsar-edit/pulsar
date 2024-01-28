@@ -350,7 +350,7 @@ function buildRenderer(givenOpts = {}) {
     // reference to this
 
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
-      let token = tokens[idx];
+       let token = tokens[idx];
       let aIndex = token.attrIndex("src");
 
       // Lets say content contains './my-cool-image.png'
@@ -359,77 +359,39 @@ function buildRenderer(givenOpts = {}) {
       if (mdComponents.reg.localLinks.currentDir.test(token.attrGet("src"))) {
         let rawLink = token.attrGet("src");
         rawLink = rawLink.replace(mdComponents.reg.localLinks.currentDir, "");
-        // Now that we have the raw link of a local link, we need to handle this
-        // depending on if the link is local or not
-        let hasSet = false;
-        if (validLocalItem) {
-          let originalSrc = path.resolve(rawLink);
+        // Now we need to handle links for both the web and locally
+        // We can do this by first checking if the link resolves locally
+        if (couldBeLocalItem) {
           let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
-          if (fs.lstatSync(originalSrc, { throwIfNoEntry: false })?.isFile()) {
-            // the normal link is already a valid local link to the filesystem
-            token.attrSet("src", convertPathToLocalProtocol(originalSrc));
-            hasSet = true;
-          } else if (fs.lstatSync(newSrc, { throwIfNoEntry: false })?.isFile()) {
-            // This link does successfully point to the filesystem after being
-            // merged with the provided filePath
-            token.attrSet("src", convertPathToLocalProtocol(newSrc));
-            hasSet = true;
+          if (!fs.lstatSync(newSrc).isFile()) {
+            token.attrSet("src", newSrc);
+          } else {
+            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
           }
-        }
-        if (validRootDomain && !hasSet) {
-          // Attempt to resolve remotely only if this is a valid root domain provided
-          // and we didn't already set it when checking locally
-
-          // TODO this should not assume that the only image host is GitHub
+        } else {
           token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
         }
       } else if (mdComponents.reg.localLinks.rootDir.test(token.attrGet("src"))) {
-        // tests for any links pointing to the root dir `/`
         let rawLink = token.attrGet("src");
         rawLink = rawLink.replace(mdComponents.reg.localLinks.rootDir, "");
-        // Now to handle the possible we or local link resolving
-        let hasSet = false;
-        if (validLocalItem) {
+        // Now to handle the possible web or local link
+        if (couldBeLocalItem) {
           const [rootDirectory] = atom.project.relativePath(opts.filePath);
-          if (fs.lstatSync(src, { throwIfNoEntry: false })?.isFile() && rootDirectory) {
+          if (!fs.lstatSync(src).isFile() && rootDirectory) {
             let newSrc = path.join(rootDirectory, rawLink);
-            token.attrSet("src", convertPathToLocalProtocol(newSrc));
-            hasSet = true;
+            token.attrSet("src", newSrc);
+          } else {
+            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
           }
-        }
-        if (validRootDomain && !hasSet) {
-          // TODO again we shouldn't assume this image is on GitHub
+        } else {
           token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-          hasSet = true;
         }
       } else if (!token.attrGet("src").startsWith("http") && !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))) {
-        // This looks like an implicit relative url
+        // Check for implicit relative urls
         let rawLink = token.attrGet("src");
-
-        let hasSet = false;
-        if (validLocalItem) {
-          let originalSrc = path.resolve(rawLink);
-          let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
-
-          if (fs.lstatSync(originalSrc, { throwIfNoEntry: false })?.isFile()) {
-            // the normal link is already a valid local link to the filesystem
-            token.attrSet("src", convertPathToLocalProtocol(originalSrc));
-            hasSet = true;
-          } else if (fs.lstatSync(newSrc, { throwIfNoEntry: false})?.isFile()) {
-            // This link does successfully point to the filesystem after being
-            // merged with the provided filePath
-            token.attrSet("src", convertPathToLocalProtocol(newSrc));
-            hasSet = true;
-          }
-        }
-        if (validRootDomain && !hasSet) {
-          // TODO again we shouldn't assume this image is one GitHub
-          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-          hasSet = true;
-        }
-      } else if ([ ".git", ".png", ".jpg", ".jpeg", ".webp"].find(ext => token.attrGet("src").endsWith(ext)) && token.attrGet("src").startsWith("https://github.com") && token.attrGet("src").includes("blob")) {
-        // Should match images being distributed from GitHub that's using `blob` instead of `raw`
-        // which will cause images to fail to load.
+        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+      } else if ([".gif", ".png", ".jpg", ".jpeg", ".webp"].find(ext => token.attrGet("src").endsWith(ext)) && token.attrGet("src").startsWith("https://github.com") && token.attrGet("src").includes("blob")) {
+        // Should match any image being distributed from GitHub that's using `blob` instead of `raw` causing images to not load correctly
         let rawLink = token.attrGet("src");
         token.attrSet("src", rawLink.replace("blob", "raw"));
       }
