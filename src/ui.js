@@ -299,24 +299,14 @@ function buildRenderer(givenOpts = {}) {
   // Maybe we should emit a warning or deprecation when one is used?
 
   // Setup
-  const validRootDomain = (typeof opts.rootDomain === "string" && opts.rootDomain.length > 1);
-  const validLocalItem = (typeof opts.filePath === "string" && opts.filePath.length > 1);
+  const validateRootDomain = () => {
+    return typeof opts.rootDomain === "string" && opts.rootDomain.length > 1;
+  };
   const cleanRootDomain = () => {
     // We will also remove any trailing `/` as link resolvers down the line add them in
     return opts.rootDomain.replace(".git", "").replace(/\/$/, "");
   };
-  const convertPathToLocalProtocol = (link) => {
-    // Not sure how this wasn't caught before, but when we resolve a local link,
-    // such as `D:\pulsar-edit\pulsar\resources\readme.png` two things happen:
-    // If `sanitize: true` then DOMPurify removes all "\" then the resulting URL
-    // is invalid, but even worse if `sanitizeAllowUnknownProtocols: false`
-    // the URL will be removed entirely.
-    // So we need to convert from a valid local path like above, to a valid
-    // file protocol link, such as `file:///D:/pulsar-edit/pulsar/resources/readme.png`
-    link = link.replace(/\\/g, "/");
-    link = `file:///${link}`;
-    return link;
-  };
+
 
   const markdownItOpts = {
     html: opts.html,
@@ -343,14 +333,21 @@ function buildRenderer(givenOpts = {}) {
   }
 
   // Hook up custom rules
-  if (opts.transformImageLinks) {
+  if (opts.transformImageLinks && validateRootDomain()) {
     // Here we will take any links for images provided in the content, and do
     // our best to ensure they can accurately resolve.
-    const defaultImageRenderer = md.renderer.rules.image; // We want to keep a
-    // reference to this
+    const defaultImageRenderer = md.renderer.rules.image; // We want to keep access to this
+
+    // Determines when we handle links if the item could be a local file or not
+    let couldBeLocalItem;
+    if (typeof opts.filePath != "string" || opts.filePath.length < 1) {
+      couldBeLocalItem = false;
+    } else {
+      couldBeLocalItem = true;
+    }
 
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
-       let token = tokens[idx];
+      let token = tokens[idx];
       let aIndex = token.attrIndex("src");
 
       // Lets say content contains './my-cool-image.png'
@@ -401,7 +398,7 @@ function buildRenderer(givenOpts = {}) {
     };
   }
 
-  if (validRootDomain && opts.transformNonFqdnLinks) {
+  if (validateRootDomain() && opts.transformNonFqdnLinks) {
     md.core.ruler.after("inline", "fix-links", (state) => {
       state.tokens.forEach((blockToken) => {
         if (blockToken.type === "inline" && blockToken.children) {
