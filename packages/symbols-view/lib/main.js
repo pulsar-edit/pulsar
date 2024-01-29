@@ -86,7 +86,7 @@ module.exports = {
       'symbols-view.prefillSelectedText',
       { scope: [editor.getGrammar()?.scopeName] }
     );
-    return prefill ? selection.getText() : '';
+    return prefill ? editor.getSelectedText() : '';
   },
 
   deactivate() {
