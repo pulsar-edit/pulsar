@@ -79,7 +79,7 @@ function registerProvider(...args) {
 }
 
 describe('SymbolsView', () => {
-  let symbolsView, activationPromise, editor, directory, mainModule;
+  let symbolsView, activationPromise, editor, directory, mainModule, languageMode;
 
   beforeEach(async () => {
     jasmine.unspy(Date, 'now');
@@ -101,10 +101,9 @@ describe('SymbolsView', () => {
     atom.config.set('symbols-view.showIconsInSymbolsView', false);
 
     activationPromise = atom.packages.activatePackage('symbols-view');
-    activationPromise.then(() => {
+    await activationPromise.then(() => {
       mainModule = atom.packages.getActivePackage('symbols-view').mainModule;
     });
-    await activationPromise;
     await atom.packages.activatePackage('language-javascript');
     jasmine.attachToDOM(getWorkspaceView());
   });
@@ -117,8 +116,8 @@ describe('SymbolsView', () => {
     beforeEach(async () => {
       atom.config.set('symbols-view.providerTimeout', 500);
       await atom.workspace.open(directory.resolve('sample.js'));
-      let editor = atom.workspace.getActiveTextEditor();
-      let languageMode  =  editor.getBuffer().getLanguageMode();
+      editor = atom.workspace.getActiveTextEditor();
+      languageMode = editor.getBuffer().getLanguageMode();
       if (languageMode.ready) await languageMode.ready;
     });
 
@@ -142,6 +141,40 @@ describe('SymbolsView', () => {
       expect(symbolsView.element.querySelector('li:first-child .primary-line').classList.contains('icon')).toBe(false);
       expect(symbolsView.element.querySelector('li:first-child .primary-line').classList.contains('no-icon')).toBe(false);
 
+    });
+
+    it('prefills the query field if `prefillSelectedText` is `true`', async () => {
+      atom.config.set('symbols-view.prefillSelectedText', true);
+      registerProvider(DummyProvider);
+      await activationPromise;
+      spyOn(editor, 'getSelectedText').andReturn('Symbol on Row 13');
+      await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
+      symbolsView = getSymbolsView();
+
+      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(document.body.contains(symbolsView.element)).toBe(true);
+      expect(symbolsView.element.querySelectorAll('li').length).toBe(1);
+
+      expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 13');
+      expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText('Line 13');
+    });
+
+    it('does not prefill the query field if `prefillSelectedText` is `false`', async () => {
+      atom.config.set('symbols-view.prefillSelectedText', false);
+      registerProvider(DummyProvider);
+      await activationPromise;
+      spyOn(editor, 'getSelectedText').andReturn('Symbol on Row 13');
+      await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
+      symbolsView = getSymbolsView();
+
+      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(document.body.contains(symbolsView.element)).toBe(true);
+      expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
+
+      expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 1');
+      expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText('Line 1');
+      expect(symbolsView.element.querySelector('li:last-child .primary-line')).toHaveText('Symbol on Row 13');
+      expect(symbolsView.element.querySelector('li:last-child .secondary-line')).toHaveText('Line 13');
     });
 
     it('does not wait for providers that take too long', async () => {
@@ -614,11 +647,54 @@ describe('SymbolsView', () => {
   describe('when toggling project symbols', () => {
     beforeEach(async () => {
       await atom.workspace.open(directory.resolve('sample.js'));
+      editor = atom.workspace.getActiveTextEditor();
     });
 
     it('displays all symbols', async () => {
       registerProvider(DummyProvider);
       await activationPromise;
+      await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
+      symbolsView = atom.workspace.getModalPanels()[0].item;
+
+      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(document.body.contains(symbolsView.element)).toBe(true);
+      expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
+
+      let root = atom.project.getPaths()[1];
+      let resolved = directory.resolve('other-file.js');
+      let relative = `${path.basename(root)}${resolved.replace(root, '')}`;
+
+      expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 1');
+      expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText(`${relative}:1`);
+      expect(symbolsView.element.querySelector('li:last-child .primary-line')).toHaveText('Symbol on Row 13');
+      expect(symbolsView.element.querySelector('li:last-child .secondary-line')).toHaveText(`${relative}:13`);
+    });
+
+    it('prefills the query field if `prefillSelectedText` is `true`', async () => {
+      atom.config.set('symbols-view.prefillSelectedText', true);
+      registerProvider(DummyProvider);
+      await activationPromise;
+      spyOn(editor, 'getSelectedText').andReturn('Symbol on Row 13');
+      await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
+      symbolsView = getSymbolsView();
+
+      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(document.body.contains(symbolsView.element)).toBe(true);
+      expect(symbolsView.element.querySelectorAll('li').length).toBe(1);
+
+      let root = atom.project.getPaths()[1];
+      let resolved = directory.resolve('other-file.js');
+      let relative = `${path.basename(root)}${resolved.replace(root, '')}`;
+
+      expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 13');
+      expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText(`${relative}:13`);
+    });
+
+    it('does not prefill the query field if `prefillSelectedText` is `false`', async () => {
+      atom.config.set('symbols-view.prefillSelectedText', false);
+      registerProvider(DummyProvider);
+      await activationPromise;
+      spyOn(editor, 'getSelectedText').andReturn('Symbol on Row 13');
       await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
       symbolsView = atom.workspace.getModalPanels()[0].item;
 
@@ -756,6 +832,9 @@ describe('SymbolsView', () => {
     describe('when quickJumpToSymbol is true', () => {
       beforeEach(async () => {
         await atom.workspace.open(directory.resolve('sample.js'));
+        editor = atom.workspace.getActiveTextEditor();
+        languageMode = editor.getBuffer().getLanguageMode();
+        if (languageMode.ready) await languageMode.ready;
       });
 
       it('jumps to the selected function', async () => {
@@ -775,6 +854,7 @@ describe('SymbolsView', () => {
       // dev tools console? That seems to break it on a reliable basis. Not
       // sure why yet.
       it('restores previous editor state on cancel', async () => {
+        atom.config.set('symbols-view.prefillSelectedText', false);
         registerProvider(DummyProvider);
         await activationPromise;
         const bufferRanges = [{start: {row: 0, column: 0}, end: {row: 0, column: 3}}];
