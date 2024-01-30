@@ -8,28 +8,41 @@ describe("Renders Markdown", () => {
   });
 
   describe("transforms links correctly", () => {
+    const mdOpts = {
+      transformImageLinks: true,
+      transformNonFqdnLinks: true
+    };
+
     it("makes no changes to a fqdn link", () => {
-      expect(atom.ui.markdown.render("[Hello World](https://github.com)"))
+      expect(atom.ui.markdown.render("[Hello World](https://github.com)", mdOpts))
         .toBe('<p><a href="https://github.com">Hello World</a></p>\n');
     });
     it("resolves package links to pulsar", () => {
-      expect(atom.ui.markdown.render("[Hello](https://atom.io/packages/hey-pane)"))
+      expect(atom.ui.markdown.render("[Hello](https://atom.io/packages/hey-pane)", mdOpts))
         .toBe('<p><a href="https://web.pulsar-edit.dev/packages/hey-pane">Hello</a></p>\n');
     });
     it("resolves atom links to web archive", () => {
-      expect(atom.ui.markdown.render("[Hello](https://flight-manual.atom.io/some-docs)"))
+      expect(atom.ui.markdown.render("[Hello](https://flight-manual.atom.io/some-docs)", mdOpts))
         .toBe('<p><a href="https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/some-docs">Hello</a></p>\n');
     });
     it("resolves incomplete local links", () => {
       expect(atom.ui.markdown.render(
         "[Hello](./readme.md)",
-        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
+        {
+          rootDomain: "https://github.com/pulsar-edit/pulsar",
+          transformImageLinks: true,
+          transformNonFqdnLinks: true
+        }
       )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/readme.md">Hello</a></p>\n');
     });
     it("resolves incomplete root links", () => {
       expect(atom.ui.markdown.render(
         "[Hello](/readme.md)",
-        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
+        {
+          rootDomain: "https://github.com/pulsar-edit/pulsar",
+          transformImageLinks: true,
+          transformNonFqdnLinks: true
+        }
       )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/readme.md">Hello</a></p>\n');
     });
   });
