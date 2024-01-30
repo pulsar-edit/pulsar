@@ -62,6 +62,11 @@ if (wasmFilesChanged.length === 0) {
 // are also accompanied by a change in the `parserSource` key
 
 for (const wasmFile of wasmFilesChanged) {
+  // Ignore files that have been deleted or moved.
+  if (!fs.existsSync(wasmFile)) {
+    console.log(`Skipping file that no longer exists: ${wasmFile}`);
+    continue;
+  }
   const wasmPath = path.dirname(wasmFile);
 
   // Don't check the base `tree-sitter.wasm` file.

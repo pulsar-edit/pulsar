@@ -24,33 +24,14 @@ exports.activate = function () {
     // coverShallowerScopes: false
   });
 
-  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
-  const HYPERLINK_PATTERN = /\bhttps?:/
+};
 
-  atom.grammars.addInjectionPoint('source.ruby', {
-    type: 'comment',
-    language: (node) => {
-      return TODO_PATTERN.test(node.text) ? 'todo' : null;
-    },
-    content: (node) => node,
-    languageScope: null
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  hyperlink.addInjectionPoint('source.ruby', {
+    types: ['comment', 'string_content']
   });
+};
 
-  atom.grammars.addInjectionPoint('source.ruby', {
-    type: 'comment',
-    language: (node) => {
-      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : null;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
-
-  atom.grammars.addInjectionPoint('source.ruby', {
-    type: 'string_content',
-    language: (node) => {
-      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : null;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
+exports.consumeTodoInjection = (todo) => {
+  todo.addInjectionPoint('source.ruby', { types: ['comment'] });
 };

@@ -208,7 +208,8 @@ jobs:
         node ./rolling-release-binary-upload.js
 
     - name: Upload Video Artifacts
-      if: runner.os != 'Linux'
+      # Run whether this job passed or failed, unless explicitly cancelled.
+      if: ${{ !cancelled() && runner.os != 'Linux' }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Videos
@@ -267,7 +268,8 @@ jobs:
         node ./rolling-release-binary-upload.js
 
     - name: Upload Video Artifacts - Linux
-      if: runner.os == 'Linux'
+      # Run whether this job passed or failed, unless explicitly cancelled.
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Videos

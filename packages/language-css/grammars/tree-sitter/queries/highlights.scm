@@ -1,36 +1,36 @@
 
-; WORKAROUND:
-;
-; When you're typing a new property name inside of a list, tree-sitter-css will
-; assume the thing you're typing is a descendant selector tag name until you
-; get to the colon. This prevents it from highlighting the incomplete line like
-; a selector tag name.
 
-(descendant_selector
-  (tag_name) @_IGNORE_
-  (#set! capture.final true))
+; NOTE: `tree-sitter-css` recovers poorly from invalidity inside a block when
+; you're adding a new property-value pair above others in a list. When the user
+; is typing and the file is temporarily invalid, it will make incorrect guesses
+; about tokens that occur between the cursor and the end of the block.
+;
+; The fix here is for `tree-sitter-css` to get better at recovering from its
+; parsing error, but parser authors don't currently have much control over
+; that. In the meantime, this query is a decent mitigation: it colors the
+; affected tokens like plain text instead of assuming (nearly always
+; incorrectly) them to be tag names.
+;
+; Ideally, this is temporary, and we can remove it soon. Until then, it makes
+; syntax highlighting less obnoxious.
+
+((tag_name) @_IGNORE_
+  (#is? test.descendantOfType "ERROR")
+  (#set! capture.final))
 
 (ERROR
   (attribute_name) @_IGNORE_
-  (#set! capture.final true))
+  (#set! capture.final))
 
 ((ERROR
   (attribute_name) @invalid.illegal)
-  (#set! capture.final true))
+  (#set! capture.final))
 
 ; WORKAROUND:
 ;
-; `:hover` and other pseudo-classes don't highlight correctly inside a media
-; query (https://github.com/tree-sitter/tree-sitter-css/issues/28)
-(
-  (ERROR) @entity.other.attribute-name.pseudo-class.css
-  (#match? @entity.other.attribute-name.pseudo-class.css "^:[\\w-]+$")
-)
-
-; WORKAROUND:
-;
-; In `::after`, the "after" has a node type of `tag_name`. We want to catch it
-; here so that it doesn't get scoped like an HTML tag name in a selector.
+; In `::after`, the "after" has a node type of `tag_name`. Unclear whether this
+; is a bug or intended behavior. We want to catch it here so that it doesn't
+; get scoped like an HTML tag name in a selector.
 
 ; Scope the entire `::after` range as one unit.
 ((pseudo_element_selector)
@@ -61,9 +61,6 @@
 
 ; (selectors "," @punctuation.separator.list.comma.css)
 
-; The "div" in `div.foo {`.
-(tag_name) @entity.name.tag.css
-
 ; The "foo" in `div[attr=foo] {`.
 (attribute_selector (plain_value) @string.unquoted.css)
 
@@ -77,10 +74,30 @@
 (id_selector
   "#" @punctuation.definition.entity.id.css) @entity.other.attribute-name.id.css
 
-; KNOWN ISSUE: Namespace selectors like `svg|link` are not supported. See:
-; https://github.com/tree-sitter/tree-sitter-css/issues/33
+; Declaration of a namespace:
+; The "svg" in `@namespace svg url(http://www.w3.org/2000/svg);`
+(namespace_name) @entity.other.namespace-prefix.css
 
-;(namespace_name) @entity.other.namespace-prefix.css
+; A namespaced tag name:
+; The "svg" in `svg|a {}`.
+(namespace_selector
+  . (tag_name) @entity.other.namespace-prefix.css
+  "|" @punctuation.separator.namespace.css
+  (#set! capture.final))
+
+; Not sure if this is intended, but a namespaced attribute in an attribute
+; selector is construed as two tag-name children of the `attribute_name`.
+; The "xl" in `[xl|href] {}`.
+(attribute_name
+  . (tag_name) @entity.other.namespace-prefix.css
+  "|" @punctuation.separator.namespace.css
+  (tag_name) @entity.other.attribute_name.css
+  (#set! capture.final)) @_IGNORE_
+
+; The "div" in `div.foo {`.
+(tag_name) @entity.name.tag.css
+; The "*" in `*[foo="bar"]`.
+(universal_selector) @entity.name.tag.universal.css
 
 ; The '.' in `.foo`.
 (class_selector
@@ -101,28 +118,40 @@
   (#set! adjust.startAt lastChild.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.endPosition))
 
+; Punctuation around the arguments of a pseudo-class or a function.
 (arguments
   "(" @punctuation.definition.arguments.begin.bracket.round.css
   ")" @punctuation.definition.arguments.end.bracket.round.css)
 
+; Punctuation around an attribute selector.
 (attribute_selector
   "[" @punctuation.definition.entity.begin.bracket.square.css
   (attribute_name) @entity.other.attribute-name.css
   "]" @punctuation.definition.entity.end.bracket.square.css)
 
+; Operators inside attribute selectors.
 (attribute_selector
   ["=" "^=" "$=" "~=" "|="] @keyword.operator.pattern.css)
 
-; The `foo` in `@keyframes foo {`.
+; The "foo" in `@keyframes foo {`.
 (keyframes_name) @entity.name.keyframes.css
 
 ; VARIABLES
 ; =========
 
+; Variable declaration:
+; The "--link-visited" in `--link-visited: #039;`.
 (declaration
   (property_name) @variable.other.assignment.css
   (#match? @variable.other.assignment.css "^--" )
   (#set! capture.final true))
+
+; Variable usage:
+; The ""--link--visited" in `color: var(--link-visited);`.
+((function_name) @support.function.var.css
+  (arguments (plain_value) @variable.css)
+  (#eq? @support.function.var.css "var"))
+
 
 ; PROPERTIES
 ; ==========
@@ -147,9 +176,9 @@
   (#match? @string.quoted.single.css "^'")
   (#match? @string.quoted.single.css "'$"))
 
+; The punctuation around quoted strings.
 ((string_value) @punctuation.definition.string.begin.css
   (#set! adjust.startAndEndAroundFirstMatchOf "^[\"']"))
-
 ((string_value) @punctuation.definition.string.end.css
   (#set! adjust.startAndEndAroundFirstMatchOf "[\"']$"))
 
@@ -207,10 +236,6 @@
 ;   (function_name) @support.function.var.css
 ;   (#eq? @support.function.var.css "var")
 ; )
-
-((function_name) @support.function.var.css
-  (arguments (plain_value) @variable.css)
-  (#eq? @support.function.var.css "var"))
 
 ((function_name) @support.function._TEXT_.css
   ; Because we just handled it above.

@@ -80,4 +80,4 @@
 
 ((jsx_self_closing_element) @fold
   ; Exclude both the slash and angle bracket `/>` from the fold.
-  (#set! fold.endAt lastChild.previousSibling.startPosition))
+  (#set! fold.endAt lastChild.startPosition))

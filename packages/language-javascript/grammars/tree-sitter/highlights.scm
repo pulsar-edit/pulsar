@@ -71,16 +71,25 @@
 (assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
-; The "bar" in `foo.bar = true`
+; Mark all the properties whose right-hand sides are functions so that we can
+; exclude them from the next query.
 (assignment_expression
   left: (member_expression
-    property: (property_identifier) @variable.other.assignment.property.js))
+    property: (property_identifier) @variable.other.assignment.property.js)
+  right: [(arrow_function) (function)] @_IGNORE_
+    (#set! isFunctionProperty true))
 
-; The "bar" in `foo.#bar = true`
+; The "bar" in `foo.bar = true`.
+(assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
+; The "bar" in `foo.#bar = true`.
 (assignment_expression
   left: (member_expression
     property: (private_property_identifier) @variable.other.assignment.property.private.js))
-
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
@@ -90,6 +99,13 @@
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
 
+; Public field definition in a class body:
+; The "foo" in `foo = "bar";`
+(field_definition
+  property: (property_identifier) @variable.other.assignment.property.public.js)
+
+; Private field definition in a class body:
+; The "#foo" in `#foo = "bar";`
 (field_definition
   property: (private_property_identifier) @variable.other.assignment.property.private.js)
 
@@ -139,18 +155,17 @@
   (rest_pattern
     (identifier) @variable.other.assignment.destructuring.rest.js))
 
-; A variable array destructuring:
-; The "foo" and "bar" in `let [foo, bar] = something`
-(variable_declarator
-  (array_pattern
+; An array-destructured assignment or reassignment, regardless of depth:
+; The "foo" in `[foo] = bar;` and `[[foo]] = bar;`.
+(array_pattern
+  (identifier) @variable.other.assignment.destructuring.js)
+
+; An array-destructured assignment or reassignment with a default, regardless of depth:
+; The "baz" in `let [foo, bar, baz = false] = something;` and `let [[baz = 5]] = something`;
+(array_pattern
+  (assignment_pattern
     (identifier) @variable.other.assignment.destructuring.js))
 
-; A variable array destructuring with a default:
-; The "baz" in `let [foo, bar, baz = false] = something`
-(variable_declarator
-  (array_pattern
-    (assignment_pattern
-      (identifier) @variable.other.assignment.destructuring.js)))
 
 ; A variable declaration in a for…(in|of) loop:
 ; The "foo" in `for (let foo of bar) {`
@@ -249,6 +264,11 @@
 ; the "foo" in `foo () {` (inside a class body)
 (method_definition
   name: (property_identifier) @entity.name.function.method.definition.js)
+
+; Private method definitions:
+; the "#foo" in `#foo () {` (inside a class body)
+(method_definition
+  name: (private_property_identifier) @entity.name.function.method.private.definition.js)
 
 ; Function property assignment:
 ; The "foo" in `thing.foo = (arg) => {}`
@@ -744,7 +764,7 @@
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
   name: (identifier) @entity.name.tag.js
-  ) @meta.tag.js
+  ) @meta.tag.jsx.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
@@ -752,8 +772,6 @@
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  "/" @punctuation.definition.tag.end.js
-  (#set! capture.final true)
   name: (identifier) @entity.name.tag.js)
 
 ; The "bar" in `<Foo bar={true} />`.
@@ -769,23 +787,18 @@
 
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.js
-  ">" @punctuation.definition.tag.end.js)
+  ">" @punctuation.definition.tag.end.js) @meta.tag.jsx.js
 
 (jsx_closing_element
-  "<" @punctuation.definition.tag.begin.js
-  ">" @punctuation.definition.tag.end.js)
+  "</" @punctuation.definition.tag.begin.js
+  ">" @punctuation.definition.tag.end.js) @meta.tag.jsx.js
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.js
   (#set! capture.final true))
 
-((jsx_self_closing_element
-  ; The "/>" in `<Foo />`, extended to cover both anonymous nodes at once.
-  "/") @punctuation.definition.tag.end.js
-  (#set! adjust.startAt lastChild.previousSibling.startPosition)
-  (#set! adjust.endAt lastChild.endPosition)
-  (#set! capture.final true))
-
+(jsx_self_closing_element
+  "/>" @punctuation.definition.tag.end.js)
 
 ; OPERATORS
 ; ==========
@@ -812,7 +825,13 @@
 
 (unary_expression ["+" "-"] @keyword.operator.unary.js)
 
-(ternary_expression ["?" ":"] @keyword.operator.ternary.js)
+(ternary_expression ["?" ":"] @keyword.operator.ternary.js
+  (#set! capture.final))
+
+; Try to highlight `?` like an operator while the user is typing without
+; waiting for its paired `:`.
+("?" @keyword.operator.ternary.js
+  (#is? test.descendantOfType "ERROR"))
 
 [
   "&&="

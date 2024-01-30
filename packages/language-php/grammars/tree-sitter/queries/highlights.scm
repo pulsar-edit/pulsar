@@ -7,13 +7,34 @@
 ; SUPPORT
 ; =======
 
+; There are lots of constructs that look like ordinary function calls but are
+; actually special language statements.
 (array_creation_expression
-  "array" @support.function.builtin.array.php)
+  "array" @support.function.builtin.array.php
+  "(" @punctuation.definition.parameters.begin.bracket.round.php
+  ")" @punctuation.definition.parameters.end.bracket.round.php)
 
-(list_literal "list" @support.function.builtin.list.php)
+(list_literal "list" @support.function.builtin.list.php
+  "(" @punctuation.definition.parameters.begin.bracket.round.php
+  ")" @punctuation.definition.parameters.end.bracket.round.php)
+
+(unset_statement
+  "unset" @support.function.unset.php
+  "(" @punctuation.definition.parameters.begin.bracket.round.php
+  ")" @punctuation.definition.parameters.end.bracket.round.php)
+
+(print_intrinsic
+  ; Don't delimit the parentheses like parameter punctuation; they're optional
+  ; for `print`.
+  "print" @support.function.print.php)
 
 ; The list of standard library methods in `php.cson` is… a lot. This is my
 ; biased attempt to pare it down to the most important functions.
+
+(function_call_expression
+  function: (name) @support.function._TEXT_.php
+  (#match? @support.function._TEXT_.php "^(isset|eval|empty)$")
+  (#set! capture.final))
 
 (function_call_expression
   function: (name) @support.function.array.php
@@ -30,10 +51,6 @@
 (function_call_expression
   function: (name) @support.function.class-obj.php
   (#match? @support.function.class-obj.php "^(class_alias|all_user_method(_array)?|is_(a|subclass_of)|__autoload|(class|interface|method|property|trait)_exists|get_(class(_(vars|methods))?|(called|parent)_class|object_vars|declared_(classes|interfaces|traits)))$"))
-
-(function_call_expression
-  function: (name) @support.function.construct.php
-  (#match? @support.function.construct.php "^(isset|unset|eval|empty)$"))
 
 (function_call_expression
   function: (name) @support.function.construct.output.php
@@ -101,7 +118,7 @@
 
 (function_call_expression
   function: (name) @support.function.math.php
-  (#match? @support.function.math.php "^((a)?(cos|sin|tan)(h)?|sqrt|srand|hypot|hexdec|ceil|is_(nan|(in)?finite)|octdec|dec(hex|oct|bin)|deg2rad|pi|pow|exp(m1)?|floor|fmod|lcg_value|log(1(p|0))?|atan2|abs|round|rand|rad2deg|getrandmax|mt_(srand|rand|getrandmax)|max|min|bindec|base_convert)$"))
+  (#match? @support.function.math.php "^((a)?(cos|sin|tan)(h)?|sqrt|srand|hypot|hexdec|ceil|is_(nan|(in)?finite)|octdec|dec(hex|oct|bin)|deg2rad|pi|pow|exp(m1)?|floor|f(mod|div)|lcg_value|log(1(p|0))?|atan2|abs|round|rand|rad2deg|getrandmax|mt_(srand|rand|getrandmax)|max|min|bindec|base_convert|intdiv)$"))
 
 (function_call_expression
   function: (name) @support.function.mbstring.php
@@ -263,14 +280,15 @@
 (class_constant_access_expression . (name) @support.class.php)
 (class_constant_access_expression (name) @support.other.property.php .)
 
-; The "Foo" and "bar" in "Foo::bar()".
-(scoped_call_expression
-  scope: (name) @support.class.php
-  name: (name) @support.other.function.method.static.php)
-
-; The "Foo" and "$bar" in "Foo::$bar()".
+; The "Foo" in `Foo::bar()` and `Foo::$bar()`.
 (scoped_call_expression
   scope: (name) @support.class.php)
+
+; The "bar" in `Foo::bar()`.
+(scoped_call_expression
+  name: (name) @support.other.function.method.static.php)
+
+; The "$bar" in `Foo::$bar()`.
 (scoped_call_expression
   name: (variable_name) @variable.other.method.static.php)
 
@@ -300,6 +318,10 @@
   name: (variable_name) @variable.other.property.php
   (#set! capture.final true))
 
+; The "Foo" in `new Foo();`.
+(object_creation_expression
+  (name) @support.class.php)
+
 
 ; TRAITS
 ; ======
@@ -316,13 +338,17 @@
 ; TYPES
 ; =====
 
-(primitive_type) @storage.type.builtin.php
-(cast_type) @storage.type.builtin.php
-(named_type (name) @storage.type.php)
-(named_type (qualified_name) @storage.type.php)
+; Primitive types are value types, hence are placed in `support.storage.type`.
+(primitive_type) @support.storage.type.builtin.php
+(cast_type) @support.storage.type.builtin.php
 
+(named_type (name) @support.storage.type.php)
+(named_type (qualified_name) @support.storage.type.php)
+
+; Acts as a modifier on all variables, regardless of value type, hence `storage.modifier`.
 "global" @storage.modifier.global.php
 
+; Core language constructs go in `storage.type`.
 ["enum" "interface" "trait" "class"] @storage.type._TYPE_.php
 (enum_case "case" @storage.type.case.php)
 "function" @storage.type.function.php
@@ -376,8 +402,10 @@
 ((dynamic_variable_name) @punctuation.definition.variable.begin.php
   (#set! adjust.startBeforeFirstMatchOf "^\\}$"))
 
-((name) @constant.other.php
-  (#match? @constant.other.php "^_?[A-Z][A-Z\\d_]+$"))
+; ((name) @constant.other.php
+;   (#match? @constant.other.php "^_?[A-Z][A-Z\\d_]+$"))
+
+(const_declaration (const_element) @variable.other.constant.php)
 
 ((name) @constant.language.php
  (#match? @constant.language.php "^__[A-Z][A-Z\d_]+__$"))
@@ -483,10 +511,15 @@
   (#match? @punctuation.definition.comment.php "^#")
   (#set! adjust.startAndEndAroundFirstMatchOf "^#"))
 
-; Don't highlight PHPDoc comments because the injection will handle them.
+; Capture these because the PHPDoc injection won't process them…
+((comment) @comment.block.documentation.php
+  (#match? @comment.block.documentation.php "^/\\*\\*\\*"))
+
+; …but otherwise leave this style of comment to be handled by PHPDoc.
 ((comment) @_IGNORE_
   (#match? @_IGNORE_ "^/\\*\\*")
   (#set! capture.final true))
+
 
 ((comment) @comment.block.php
   (#match? @comment.block.php "^/\\*(?!\\*)"))
@@ -588,8 +621,10 @@
 
 "{" @punctuation.definition.block.begin.bracket.curly.php
 "}" @punctuation.definition.block.end.bracket.curly.php
-"(" @punctuation.definition.begin.bracket.round.php
-")" @punctuation.definition.end.bracket.round.php
+("(" @punctuation.definition.begin.bracket.round.php
+  (#set! capture.shy true))
+(")" @punctuation.definition.end.bracket.round.php
+  (#set! capture.shy true))
 "[" @punctuation.definition.begin.bracket.square.php
 "]" @punctuation.definition.end.bracket.square.php
 

@@ -10,5 +10,12 @@
   },
   "devDependencies": {
     "coffeescript": "^1.7.0"
-  }
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    }
+  }  
 }

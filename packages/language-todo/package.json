@@ -1,11 +1,19 @@
 {
   "name": "language-todo",
   "version": "0.29.4",
+  "main": "lib/main",
   "description": "TODO/FIXME highlighting support in Atom",
   "engines": {
     "atom": "*",
     "node": ">=14"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
-  "license": "MIT"
+  "license": "MIT",
+  "providedServices": {
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "provideTodoInjection"
+      }
+    }
+  }
 }

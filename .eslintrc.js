@@ -19,6 +19,12 @@ module.exports = {
       asyncArrow: "always",
       named: "never"
     }],
+    "node/no-missing-require": [
+      "error",
+      {
+        allowModules: ["atom"]
+      }
+    ],
     "node/no-unpublished-require": [
       "error",
       {

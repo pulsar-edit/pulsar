@@ -487,12 +487,15 @@ class ScopeResolver {
       this.setDataForRange(range, props);
     }
 
-    if (name === '_IGNORE_') {
+    if (name === '_IGNORE_' || name.startsWith('_IGNORE_.')) {
       // "@_IGNORE_" is a magical variable in an SCM file that will not be
       // applied in the grammar, but which allows us to prevent other kinds of
       // scopes from matching. We purposefully allowed this syntax node to set
       // data for a given range, but not to apply its scope ID to any
       // boundaries.
+      //
+      // A query can also use multiple different @_IGNORE_-style variables by
+      // adding segments after the @_IGNORE_, such as @_IGNORE_.foo.bar.
       return false;
     }
 

@@ -1,8 +1,3 @@
-; CAVEATS:
-;
-; * No support for lookbehind as of March 2023 (waiting on
-; https://github.com/tree-sitter/tree-sitter-regex/pull/15)
-
 (non_capturing_group) @meta.group.non-capturing.regexp
 
 [
@@ -17,6 +12,8 @@
 
 [
   (boundary_assertion)
+  (start_assertion)
+  (end_assertion)
 ] @keyword.control.anchor.regexp
 
 [
@@ -24,10 +21,10 @@
   (lazy)
 ] @keyword.operator.quantifier.regexp
 
-((lookahead_assertion) @keyword.operator.lookahead.regexp
+((lookaround_assertion) @keyword.operator.lookaround.regexp
   (#set! adjust.startAndEndAroundFirstMatchOf "\\?="))
 
-((lookahead_assertion) @keyword.operator.lookahead.negated.regexp
+((lookaround_assertion) @keyword.operator.lookaround.negated.regexp
   (#set! adjust.startAndEndAroundFirstMatchOf "\\?!"))
 
 ((non_capturing_group) @keyword.operator.group.non-capturing.regexp

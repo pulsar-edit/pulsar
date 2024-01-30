@@ -22,15 +22,15 @@ const pythonGrammarPath = resolve(
   'language-python/grammars/modern-tree-sitter-python.cson'
 );
 const jsGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-javascript.cson'
+  'language-javascript/grammars/modern-tree-sitter-javascript.cson'
 );
 
 const jsRegexGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-regex.cson'
+  'language-javascript/grammars/modern-tree-sitter-regex.cson'
 );
 
 const jsdocGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-jsdoc.cson'
+  'language-javascript/grammars/modern-tree-sitter-jsdoc.cson'
 );
 const htmlGrammarPath = resolve(
   'language-html/grammars/modern-tree-sitter-html.cson'
@@ -39,7 +39,7 @@ const ejsGrammarPath = resolve(
   'language-html/grammars/modern-tree-sitter-ejs.cson'
 );
 const rubyGrammarPath = resolve(
-  'language-ruby/grammars/tree-sitter-2-ruby.cson'
+  'language-ruby/grammars/modern-tree-sitter-ruby.cson'
 );
 const rustGrammarPath = resolve(
   'language-rust-bundled/grammars/modern-tree-sitter-rust.cson'
@@ -587,9 +587,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           ]
         ]);
 
-        console.log('adding: ()');
         buffer.setTextInRange([[0, 3], [0, 3]], '()');
-        console.log('done: ()');
 
         expectTokensToEqual(editor, [
           [
@@ -598,9 +596,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           ]
         ]);
 
-        console.log('adding: new');
         buffer.setTextInRange([[0, 0], [0, 0]], 'new ');
-        console.log('done: new');
 
         expectTokensToEqual(editor, [
           [
@@ -613,7 +609,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         await nextHighlightingUpdate(languageMode);
         // await wait(0);
         // await languageMode.atTransactionEnd();
-        console.log('proceeding!');
 
         expectTokensToEqual(editor, [
           [
@@ -1031,6 +1026,32 @@ describe('WASMTreeSitterLanguageMode', () => {
         ]);
       });
 
+      it('handles injections with no highlights query', async () => {
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(jsGrammar);
+        atom.grammars.addGrammar(htmlGrammar);
+        htmlGrammar.highlightsQuery = false;
+        // Pretend this grammar doesn't have a highlights query.
+        spyOn(htmlGrammar, 'getQuery').andReturn(Promise.resolve(null));
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: jsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        buffer.setText('text = html`<p></p>`');
+        await languageMode.atTransactionEnd();
+
+        // An injection should still be able to add its root scope even when
+        // its grammar has no `highlightsQuery`.
+        let descriptor = editor.scopeDescriptorForBufferPosition([0, 15]);
+
+        expect(descriptor.getScopesArray()).toContain('text.html.basic');
+      });
+
       it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async () => {
         jasmine.useRealClock();
         const ejsGrammar = new WASMTreeSitterGrammar(
@@ -1405,6 +1426,73 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           descriptor.getScopesArray().includes(`source.js.custom-${timestamp}`)
         ).toBe(true);
+      });
+
+      it('allows multiple base scopes on the injected layer when `languageScope` is a function', async () => {
+
+        let customJsConfig = { ...jsConfig };
+        let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
+
+        await jsGrammar.setQueryForTest('highlightsQuery', `
+          (comment) @comment
+          (property_identifier) @property
+          (call_expression (identifier) @function)
+          (template_string) @string
+          (template_substitution
+            ["\${" "}"] @interpolation)
+        `);
+
+        let customHtmlConfig = { ...htmlConfig };
+        let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
+
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
+          (fragment) @html
+          (tag_name) @tag
+          (attribute_name) @attr
+        `);
+
+        customHtmlGrammar.addInjectionPoint({
+          ...SCRIPT_TAG_INJECTION_POINT,
+          languageScope: (grammar, _buffer, range) => {
+            return [grammar.scopeName, `meta.line${range.start.row}`];
+          }
+        });
+
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(customJsGrammar);
+        atom.grammars.addGrammar(customHtmlGrammar);
+        buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>\n<script>\ngoodbye();</script>');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: customHtmlGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        let descriptor = languageMode.scopeDescriptorForPosition([1, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line0`)
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line5`)
+        ).toBe(false);
+
+        descriptor = languageMode.scopeDescriptorForPosition([6, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line5`)
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line0`)
+        ).toBe(false);
       });
 
       it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async () => {
@@ -1799,7 +1887,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         (#set! fold.endAt lastChild.previousSibling.endPosition))
 
       ((jsx_self_closing_element) @fold
-        (#set! fold.endAt lastChild.previousSibling.startPosition))
+        (#set! fold.endAt lastChild.startPosition))
       `);
 
       buffer.setText(dedent`

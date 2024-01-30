@@ -11,6 +11,7 @@ fileTypes: [
 injectionRegex: '^(ejs|EJS)$'
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-embedded-template#203f7bd3c1bbfbd98fc19add4b8fcb213c059205'
   grammar: 'tree-sitter-embedded-template/tree-sitter-embedded-template.wasm'
   highlightsQuery: 'tree-sitter-embedded-template/ejs/highlights.scm'
   foldsQuery: 'tree-sitter-embedded-template/ejs/folds.scm'

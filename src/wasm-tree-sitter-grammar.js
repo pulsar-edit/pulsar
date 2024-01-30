@@ -138,7 +138,12 @@ module.exports = class WASMTreeSitterGrammar {
   async getLanguage() {
     await parserInitPromise;
     if (!this._language) {
-      this._language = await Parser.Language.load(this.treeSitterGrammarPath);
+      try {
+        this._language = await Parser.Language.load(this.treeSitterGrammarPath);
+      } catch (err) {
+        console.error(`Error loading grammar for ${this.scopeName}; original error follows`);
+        throw err;
+      }
     }
 
     if (!this._queryFilesLoaded) {
@@ -148,10 +153,6 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   async loadQueryFiles(grammarPath, queryPaths) {
-    if (!('highlightsQuery' in queryPaths)) {
-      throw new Error(`Highlights query must be present`);
-    }
-
     if (this._loadQueryFilesPromise) {
       return this._loadQueryFilesPromise;
     }

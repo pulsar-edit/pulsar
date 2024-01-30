@@ -21,7 +21,7 @@
 
 ((inline_tag) @meta.inline-tag.jsdoc.js)
 
-(tag_name) @entity.name.tag.jsdoc.js
+(tag_name) @keyword.other.tag.jsdoc.js
 
 ((tag (type)) @storage.type.instance.jsdoc.js
   ; Join the type with its surrounding braces.

@@ -16,12 +16,19 @@
     (#is? test.last true))
     (#set! indent.matchIndentOf parent.startPosition))
 
-; 'case' and 'default' need to be indented one level more than their containing
-; `switch`. TODO: Might need to make this configurable.
+; By default, `case` and `default` need to be indented one level more than their containing
+; `switch`.
 (["case" "default"] @match
   (#set! indent.matchIndentOf parent.parent.startPosition)
-  (#set! indent.offsetIndent 1))
+  (#set! indent.offsetIndent 1)
+  (#is-not? test.config "language-typescript.indentation.alignCaseWithSwitch"))
 
+; When this config setting is enabled, `case` and `default` need to be indented
+; to match their containing `switch`.
+(["case" "default"] @match
+  (#set! indent.matchIndentOf parent.parent.startPosition)
+  (#set! indent.offsetIndent 0)
+  (#is? test.config "language-typescript.indentation.alignCaseWithSwitch"))
 
 ; ONE-LINE CONDITIONALS
 ; =====================
@@ -29,10 +36,12 @@
 ; An `if` statement without an opening brace should indent the next line…
 (if_statement
   condition: (parenthesized_expression ")" @indent
-  (#is? test.lastTextOnRow true)))
+  (#is? test.lastTextOnRow true)
+  (#is? test.config "language-typescript.indentation.indentAfterBracelessIf")))
 ; (as should a braceless `else`…)
 ("else" @indent
-  (#is? test.lastTextOnRow true))
+  (#is? test.lastTextOnRow true)
+  (#is? test.config "language-typescript.indentation.indentAfterBracelessIf"))
 
 ; …and keep that indent level if the user types a comment before the
 ; consequence…
@@ -40,7 +49,8 @@
   consequence: (empty_statement) @match
   (#is-not? test.startsOnSameRowAs parent.startPosition)
   (#set! indent.matchIndentOf parent.startPosition)
-  (#set! indent.offsetIndent 1))
+  (#set! indent.offsetIndent 1)
+  (#is? test.config "language-typescript.indentation.indentAfterBracelessIf"))
 
 ; …and keep that indent level after the user starts typing…
 (if_statement
@@ -57,7 +67,8 @@
   ; of an `expression_statement`, for some reason.
   (#not-match? @match "^\\s*{")
   (#set! indent.matchIndentOf parent.startPosition)
-  (#set! indent.offsetIndent 1))
+  (#set! indent.offsetIndent 1)
+  (#is? test.config "language-typescript.indentation.indentAfterBracelessIf"))
 
 ; …but dedent after exactly one statement.
 (if_statement
@@ -72,7 +83,8 @@
   ] @dedent.next
   ; When an opening curly brace is unpaired, it might get interpreted as part
   ; of an `expression_statement`, for some reason.
-  (#not-match? @dedent.next "^\\s*{"))
+  (#not-match? @dedent.next "^\\s*{")
+  (#is? test.config "language-typescript.indentation.indentAfterBracelessIf"))
 
 (else_clause
   [
@@ -83,7 +95,8 @@
     (throw_statement)
     (debugger_statement)
   ] @dedent.next
-  (#is-not? test.startsOnSameRowAs parent.startPosition))
+  (#is-not? test.startsOnSameRowAs parent.startPosition)
+  (#is? test.config "language-typescript.indentation.indentAfterBracelessIf"))
 
 ; HANGING INDENT ON SPLIT LINES
 ; =============================
@@ -92,14 +105,22 @@
 ; `config` scope test.
 
 ; Any of these at the end of a line indicate the next line should be indented…
-(["||" "&&" "?"] @indent
+(["||" "&&"] @indent
+  (#is? test.config "language-typescript.indentation.addHangingIndentAfterLogicalOperators")
   (#is? test.lastTextOnRow true))
 
-; …and the line after that should be dedented.
+("?" @indent
+  (#is? test.config "language-typescript.indentation.addHangingIndentAfterTernaryOperators")
+  (#is? test.lastTextOnRow true))
+
+; …and the line after that should be dedented…
 (binary_expression
   ["||" "&&"]
     right: (_) @dedent.next
-    (#is-not? test.startsOnSameRowAs parent.startPosition))
+    (#is? test.config "language-typescript.indentation.addHangingIndentAfterLogicalOperators")
+    (#is-not? test.startsOnSameRowAs parent.startPosition)
+    ; …unless the right side of the expression spans multiple lines.
+    (#is? test.endsOnSameRowAs startPosition))
 
 ; …unless it's a ternary, in which case the dedent should wait until the
 ; alternative clause.
@@ -110,7 +131,11 @@
 ;
 (ternary_expression
   alternative: (_) @dedent.next
-  (#is-not? test.startsOnSameRowAs parent.startPosition))
+  (#is? test.config "language-typescript.indentation.addHangingIndentAfterTernaryOperators")
+  (#is-not? test.startsOnSameRowAs parent.startPosition)
+  ; Only dedent the next line if the alternative doesn't itself span multiple
+  ; lines.
+  (#is? test.endsOnSameRowAs startPosition))
 
 
 ; GENERAL
@@ -120,17 +145,24 @@
 (template_substitution "}" @_IGNORE_ (#set! capture.final true))
 
 
-[
-  "{"
-  "("
-  "["
-] @indent
+; As strange as it may seem to make all of these basic indentation hints
+; configurable, some brace styles are incompatible with some of these choices;
+; see https://github.com/orgs/pulsar-edit/discussions/249.
+("{" @indent
+  (#is? test.config "language-typescript.indentation.indentBraces"))
+("}" @dedent
+  (#is? test.config "language-typescript.indentation.indentBraces"))
 
-[
-  "}"
-  ")"
-  "]"
-] @dedent
+("[" @indent
+  (#is? test.config "language-typescript.indentation.indentBrackets"))
+("]" @dedent
+  (#is? test.config "language-typescript.indentation.indentBrackets"))
+
+("(" @indent
+  (#is? test.config "language-typescript.indentation.indentParentheses"))
+(")" @dedent
+  (#is? test.config "language-typescript.indentation.indentParentheses"))
+
 
 (type_parameters "<" @indent)
 (type_parameters ">" @dedent)
