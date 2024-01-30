@@ -1695,7 +1695,12 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('.suggestedIndentForBufferRows', () => {
+    beforeEach(async () => {
+      await atom.packages.activatePackage('language-javascript');
+    })
+
     it('works correctly when straddling an injection boundary', async () => {
+
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
