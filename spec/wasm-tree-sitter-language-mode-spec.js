@@ -1695,11 +1695,12 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('.suggestedIndentForBufferRows', () => {
+    beforeEach(async () => {
+      await atom.packages.activatePackage('language-javascript');
+    })
+
     it('works correctly when straddling an injection boundary', async () => {
 
-      atom.config.set('language-javascript.indentation.indentBraces', true);
-      atom.config.set('language-javascript.indentation.indentBrackets', true);
-      atom.config.set('language-javascript.indentation.indentParentheses', true);
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
