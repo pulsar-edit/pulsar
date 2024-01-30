@@ -55,7 +55,9 @@ module.exports = class WASMTreeSitterGrammar {
     }
   }
 
-  idForScope(scopeName) {
+  // Though _text is unused here, some packages (eg semanticolor) use it to
+  // customize scopes on the fly.
+  idForScope(scopeName, _text) {
     if (!scopeName) { return undefined; }
     let id = this.idsByScope[scopeName];
     if (!id) {

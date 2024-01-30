@@ -292,8 +292,8 @@ function renderMarkdown(content, givenOpts = {}) {
         if (match) {
           // We define breakline as a custom Token Type
           let token = state.push("html_inline", "breakline", 0);
-          token.content = "<br/>";
-          state.pos += "<br/>".length;
+          token.content = "<br>";
+          state.pos += match[0].length;
           return true;
         }
       }

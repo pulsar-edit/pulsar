@@ -492,8 +492,8 @@ class WASMTreeSitterLanguageMode {
     return this.grammar.scopeNameForScopeId(scopeId);
   }
 
-  idForScope(name) {
-    return this.grammar.idForScope(name);
+  idForScope(name, text) {
+    return this.grammar.idForScope(name, text);
   }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
@@ -3016,7 +3016,7 @@ class LanguageLayer {
       this.tree = null;
       this.scopeResolver = new ScopeResolver(
         this,
-        (name) => this.languageMode.idForScope(name)
+        (name, text) => this.languageMode.idForScope(name, text)
       );
       this.foldResolver = new FoldResolver(this.buffer, this);
 

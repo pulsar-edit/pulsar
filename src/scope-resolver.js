@@ -499,7 +499,10 @@ class ScopeResolver {
       return false;
     }
 
-    let id = this.idForScope(name);
+    let id = this.idForScope(
+        name,
+        node.childCount === 0 ? node.text : undefined,
+    );
 
     let {
       startPosition: start,
