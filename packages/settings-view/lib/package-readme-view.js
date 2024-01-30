@@ -25,8 +25,10 @@ export default class PackageReadmeView {
 
     const markdownOpts = {
       breaks: false,
-      taskCheckboxDisabled: true,
-      useGitHubHeadings: true
+      taskCheckbox: true,
+      githubHeadings: true,
+      transformImageLinks: true,
+      transformNonFqdnLinks: true
     };
 
     if (readmeIsLocal) {

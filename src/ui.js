@@ -30,108 +30,309 @@ const mdComponents = {
 };
 
 /**
- * @function renderMarkdown
+ * @function render
  * @memberof markdown
- * @alias render
- * @desc Takes a Markdown document and renders it as HTML.
- * @param {string} content - The Markdown source material.
- * @param {object} givenOpts - The optional arguments:
- * @param {string} givenOpts.renderMode - Determines how the page is rendered.
- * Valid values "full" or "fragment".
- * @param {boolean} givenOpts.html - Whether HTML tags should be allowed.
- * @param {boolean} givenOpts.sanitize - If the page content should be saniized via DOMPurify.
- * @param {boolean} givenOpts.sanitizeAllowUnknownProtocols - Controls DOMPurify's
- * own option of 'ALLOW_UNKNOWN_PROTOCOLS'.
- * @param {boolean} givenOpts.sanitizeAllowSelfClose - Controls DOMPurify's
- * own option of 'ALLOW_SELF_CLOSE'
- * @param {boolean} givenOpts.breaks - If newlines should always be converted
- * into breaklines.
- * @param {boolean} givenOpts.handleFrontMatter - Whether frontmatter data should
+ * @desc Processes the actual rendering of markdown content.
+ * @param {string} content - The string of Markdown.
+ * @param {object} givenOpts - The optional arguments
+ * @param {boolean} givenOpts.frontMatter - Whether frontmatter data should be
  * processed and displayed.
- * @param {boolean} givenOpts.useDefaultEmoji - Whether `markdown-it-emoji` should be enabled.
- * @param {boolean} givenOpts.useGitHubHeadings - Whether `markdown-it-github-headings`
- * should be enabled. False by default.
- * @param {boolean} givenOpts.useTaskCheckbox - Whether `markdown-it-task-checkbox`
- * should be enabled. True by default.
- * @param {boolean} givenOpts.taskCheckboxDisabled - Controls `markdown-it-task-checkbox`
- * `disabled` option. True by default.
- * @param {boolean} givenOpts.taskCheckboxDivWrap - Controls `markdown-it-task-checkboc`
- * `divWrap` option. False by default.
- * @param {boolean} givenOpts.transformImageLinks - Attempt to resolve image URLs.
- * True by default.
- * @param {boolean} givenOpts.transformAtomLinks - Attempt to resolve links
- * pointing to Atom. True by Default.
- * @param {boolean} givenOpts.transformNonFqdnLinks - Attempt to resolve links
- * that are not fully qualified domain names. True by Default.
- * @param {string} givenOpts.rootDomain - The root URL of the online resource.
- * Useful when attempting to resolve any links on the page. Only works for online
- * resources.
- * @param {string} givenOpts.filePath - The local alternative to `rootDomain`.
- * Used to resolve incomplete paths, but locally on the file system.
- * @param {string} givenOpts.disabledMode - The level of disabling of markdown features.
- * `none` by default. But supports: "none", "strict"
- * @returns {string} Parsed HTML content.
+ * @param {boolean} givenOpts.sanitize - Whether sanitization should be applied.
+ * @param {boolean} givenOpts.sanitizeAllowUnknownProtocols - Whether DOMPurify's
+ * `ALLOW_UNKNOWN_PROTOCOLS` should be enabled.
+ * @param {boolean} givenOpts.sanitizeAllowSelfClose - Whether DOMPurify's
+ * `ALLOW_SELF_CLOSE_IN_ATTR` should be enabled.
+ * @param {string} givenOpts.renderMode - Determines how the page is returned.
+ * `full` or `fragment` applies only when Syntax Highlighting.
+ * @param {string|object} givenOpts.defaultGrammar - An instance of a Pulsar Grammar
+ * or string, which will be used as the default grammar to apply to code blocks.
+ * @param {boolean|function} givenOpts.highlight - Determines if Syntax Highlighting
+ * is applied. Can be a boolean, with true applying syntax highlighting. Or it can
+ * be a function, which will be used to resolve fenced code block scope names to
+ * a Pulsar language grammar.
+ * @param {object} mdInstance - An optional instance of MarkdownIT. Retreived from
+ * `atom.ui.markdown.buildRenderer()`.
  */
-function renderMarkdown(content, givenOpts = {}) {
-  // First we will setup our markdown renderer instance according to the opts provided
+function render(content, givenOpts = {}, mdInstance) {
+  // Define our default opts to create a full options object
   const defaultOpts = {
-    renderMode: "full", // Determines if we are rendering a fragment or full page.
-    // Valid values: 'full', 'fragment'
-    html: true, // Enable HTML tags in source
-    sanitize: true, // Enable or disable sanitization
-    sanitizeAllowUnknownProtocols: true,
-    sanitizeAllowSelfClose: true,
-    breaks: false, // Convert `\n` in paragraphs into `<br>`
-    handleFrontMatter: true, // Determines if Front Matter content should be parsed
-    useDefaultEmoji: false, // Use `markdown-it-emoji`
-    useGitHubHeadings: false, // Use `markdown-it-github-headings`
-    useTaskCheckbox: true, // Use `markdown-it-task-checkbox`
-    taskCheckboxDisabled: true, // `markdown-it-task-checkbox`: Disable checkbox interactivity
-    taskCheckboxDivWrap: false, // `markdown-it-task-checkbox`: Wrap div arround checkboc
-    transformImageLinks: true, // Attempt to resolve image urls
-    transformAtomLinks: true, // Attempt to rewrite links to Atom pages, changing them to Pulsar
-    transformNonFqdnLinks: true, // Attempt to resolve non-FQDN links
-    rootDomain: "", // The root URL that should be used for the above 'transform' options
-    filePath: "", // The path to the file where this markdown is generated from,
-    disableMode: "none", // The level of disabling that should be done on the output.
-    // Provides helpful defaults to control how much or how little is disabled:
-    // - none: Nothing is disabled
-    // - strict: Everything possible is disabled, except what is otherwise needed
+    frontMatter: true, // Determines if Front Matter content should be parsed
+    sanitize: true, // Enable or disable sanitization of Markdown output
+    sanitizeAllowUnknownProtocols: true, // pass the value of `ALLOW_UNKNOWN_PROTOCOLS` to DomPurify
+    sanitizeAllowSelfClose: true, // pass the value of `ALLOW_SELF_CLOSE_IN_ATTR` to DomPurify
+    highlight: false, // This enables syntax highlighting. Can be true or a function
+    // to resolve scope names
+    defaultGrammar: null, // Allows passing a Pulsar Grammar to default to that
+    // language if applicable, or otherwise allows passing a new default language,
+    // if excluded, default becomes 'text'. This is an unresolved scope fence
+    renderMode: "full", // Determines what type of content is returned during
+    // syntax highlighting, can be `full` or `fragment`. `fragment` is recommended
+    // for most applications.
   };
 
   let opts = { ...defaultOpts, ...givenOpts };
 
+  // Some options have changed since the initial implmentation of the `atom.ui.markdown`
+  // feature. We will pass along the values of no longer used config options, to
+  // ensure backwards compatibility.
+  opts.frontMatter = givenOpts.handleFrontMatter ?? givenOpts.frontMatter ?? defaultOpts.frontMatter;
+  opts.highlight = givenOpts.syntaxScopeNameFunc ?? givenOpts.highlight ?? defaultOpts.highlight;
+  opts.defaultGrammar = givenOpts.grammar ?? givenOpts.defaultGrammar ?? defaultOpts.defaultGrammar;
+  // End of backwards compaitbility options
+  // Maybe we should emit a warning or deprecation when one is used?
+
+  let md;
+
+  if (mdInstance) {
+    // We have been provided a markdown instance from `buildRenderer()` so we
+    // can use that
+    md = mdInstance;
+  } else {
+    // No instance was provided, lets make our own
+    // We will pass all values that we were given onto the `buildRenderer` func
+    md = buildRenderer(givenOpts);
+  }
+
+  let textContent;
+
+  if (opts.frontMatter) {
+    mdComponents.deps.yamlFrontMatter ??= require("yaml-front-matter");
+    const { __content, vars } = mdComponents.deps.yamlFrontMatter.loadFront(content);
+
+    const renderYamlTable = (variables) => {
+      if (typeof variables === "undefined") {
+        return "";
+      }
+
+      const entries = Object.entries(variables);
+
+      if (!entries.length) {
+        return "";
+      }
+
+      const markdownRows = [
+        entries.map(entry => entry[0]),
+        entries.map(entry => '--'),
+        entries.map((entry) => {
+          if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
+            // Remove all newlines, or they ruin formatting of parent table
+            return md.render(renderYamlTable(entry[1])).replace(/\n/g, "");
+          } else {
+            return entry[1];
+          }
+        })
+      ];
+
+      return (
+        markdownRows.map(row => "| " + row.join(" | ") + " |").join("\n") + "\n"
+      );
+    };
+
+    textContent = renderYamlTable(vars) + __content;
+  } else {
+    textContent = content;
+  }
+
+  // Now time to render the content
+  let rendered = md.render(textContent);
+
+  if (opts.sanitize) {
+    mdComponents.deps.domPurify ??= require("dompurify");
+
+    let domPurifyOpts = {
+      ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols,
+      ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose
+    };
+
+    rendered = mdComponents.deps.domPurify.sanitize(rendered, domPurifyOpts);
+  }
+
+  // We now could return this text as ready to go, but lets check if we can
+  // apply any syntax highlighting
+  if (opts.highlight) {
+    // Checking above for truthy should match for if it's a function or true boolean
+    const convertToDOM = (data) => {
+      const template = document.createElement("template");
+      template.innerHTML = data;
+      const fragment = template.content.cloneNode(true);
+      return fragment;
+    };
+
+    const domHTMLFragment = convertToDOM(rendered);
+
+    // Now it's time to apply the actual syntax highlighting to our html fragment
+    const scopeForFenceName = (fence) => {
+      if (typeof opts.highlight === "function") {
+        return opts.highlight(fence);
+      } else {
+        // TODO mimick the system we built into `markdown-preview` for this
+        // We could build one in, or just return default
+        return "text.plain";
+      }
+    };
+
+    let defaultLanguage;
+    const fontFamily = atom.config.get("editor.fontFamily");
+
+    if (opts.defaultGrammar?.scopeName === "source.litcoffee") {
+      // This is so that we can support defaulting to coffeescript if writing in
+      // 'source.litcoffee' and rendering our markdown
+      defaultLanguage = "coffee";
+    } else if (typeof opts.defaultGrammar === "string") {
+      defaultLanguage = opts.defaultGrammar;
+    } else {
+      defaultLanguage = "text";
+    }
+
+    if (fontFamily) {
+      for (const codeElement of domHTMLFragment.querySelectorAll("code")) {
+        codeElement.style.fontFamily = fontFamily;
+      }
+    }
+
+    let editorCallback;
+
+    if (opts.renderMode === "fragment") {
+      editorCallback = makeAtomEditorNonInteractive;
+    } else {
+      editorCallback = convertAtomEditorToStandardElement;
+    }
+
+    const promises = [];
+    for (const preElement of domHTMLFragment.querySelectorAll("pre")) {
+      const codeBlock = preElement.firstElementChild ?? preElement;
+      const className = codeBlock.getAttribute("class");
+      const fenceName =
+        className != null ? className.replace(/^language-/, "") : defaultLanguage;
+
+      const editor = new TextEditor({
+        readonly: true,
+        keyboardInputEnabled: false
+      });
+      const editorElement = editor.getElement();
+
+      preElement.classList.add("editor-colors", `lang-${fenceName}`);
+      editorElement.setUpdatedSynchronously(true);
+      preElement.innerHTML = "";
+      preElement.parentNode.insertBefore(editorElement, preElement);
+      editor.setText(codeBlock.textContent.replace(/\r?\n$/, ""));
+      atom.grammars.assignLanguageMode(editor, scopeForFenceName(fenceName));
+      editor.setVisible(true);
+
+      promises.push(editorCallback(editorElement, preElement));
+    }
+
+    // Since we don't want to force this function to always be async, as it's only
+    // needed to be async for this syntax highlighting call, we will instead return
+    // an async function that can awaited on
+    return async () => {
+      await Promise.all(promises);
+      return domHTMLFragment;
+    };
+  } else {
+    // We aren't preforming any syntax highlighting, so lets return our rendered
+    // text.
+    return rendered;
+  }
+}
+
+/**
+ * @function buildRenderer
+ * @memberof markdown
+ * @desc Returns a Markdown Renderer instance with the provided options.
+ * Helpful to avoid having to build a new one over and over.
+ * @param {object} givenOpts - The optional arguments
+ * @param {boolean} givenOpts.html - Whether HTML tags should be allowed.
+ * @param {boolean} givenOpts.breaks - If newlines should always be converted
+ * into breaklines.
+ * @param {boolean} givenOpts.emoji - If emojis should be included.
+ * @param {boolean} givenOpts.githubHeadings - Whether `markdown-it-github-headings`
+ * should be enabled.
+ * @param {boolean} givenOpts.taskCheckbox - Whether `markdown-it-task-checkbox`
+ * should be enabled.
+ * @param {boolean} givenOpts.taskCheckboxDisabled - Controls `markdown-it-task-checkbox`
+ * `disabled` option.
+ * @param {boolean} givenOpts.taskCheckboxDivWrap - Controls `markdown-it-task-checkbox`
+ * `divWrap` option.
+ * @param {boolean} givenOpts.transformImageLinks - If links to images should
+ * attempted to be resolved.
+ * @param {boolean} givenOpts.transformNonFqdnLinks - If non-FQDN links should be
+ * resolved.
+ * @param {boolean} givenOpts.transformAtomLinks - If links to Atom pages should
+ * resolved to the Pulsar equivolant.
+ * @param {string} givenOpts.rootDomain - The root URL of the online resource.
+ * Used when resolving links.
+ * @param {string} givenOpts.filePath - The path to the local resource.
+ * Used when resolving links.
+ * @param {string} givenOpts.disableMode - The level of disabling to apply.
+ * @return {object} An instance of a MarkdownIT.
+ */
+function buildRenderer(givenOpts = {}) {
+  // Define our default opts to create a full options object
+  const defaultOpts = {
+    html: true, // Enable HTML tags in source
+    breaks: true, // Convert `\n` in paragraphs into `<br>`
+    emoji: false, // enable or disable emojis
+    githubHeadings: false, // Use `markdown-it-github-headings`
+    taskCheckbox: true, // Use `markdown-it-task-checkbox`
+    taskCheckboxDisabled: true, // For `taskCheckbox`: Disable checkbox interactivity
+    taskCheckboxDivWrap: false, // For `taskCheckbox`: Wrap div arround checkbox
+    transformImageLinks: false, // Attempt to resolve image urls
+    rootDomain: "", // the root URL that should be used for attempted translations
+    filePath: "", // the local path to use during translations
+    transformNonFqdnLinks: false, // Attempt to resolve non-FQDN links
+    transformAtomLinks: true, // Attempt to rewrite links to Atom pages to the Pulsar equivolant
+    disableMode: "none", // The level of disabling that should be set.
+    // - none: Nothing is disabled, the default
+    // - strict: Most everything is disabled.
+  };
+
+  let opts = { ...defaultOpts, ...givenOpts };
+
+  // Some options have changed since the initial implmentation of the `atom.ui.markdown`
+  // feature. We will pass along the values of no longer used config options, to
+  // ensure backwards compatibility.
+  opts.emoji = givenOpts.useDefaultEmoji ?? givenOpts.emoji ?? defaultOpts.emoji;
+  opts.githubHeadings = givenOpts.useGitHubHeadings ?? givenOpts.githubHeadings ?? defaultOpts.githubHeadings;
+  opts.taskCheckbox = givenOpts.useTaskCheckbox ?? givenOpts.taskCheckbox ?? defaultOpts.taskCheckbox;
+  // End of backwards compaitbility options
+  // Maybe we should emit a warning or deprecation when one is used?
+
+  // Setup
   const validateRootDomain = () => {
     return typeof opts.rootDomain === "string" && opts.rootDomain.length > 1;
   };
-
   const cleanRootDomain = () => {
     // We will also remove any trailing `/` as link resolvers down the line add them in
     return opts.rootDomain.replace(".git", "").replace(/\/$/, "");
   };
+
 
   const markdownItOpts = {
     html: opts.html,
     breaks: opts.breaks
   };
 
-  let md = new MarkdownIt(markdownItOpts);
+  const md = new MarkdownIt(markdownItOpts);
 
-  if (opts.useDefaultEmoji) {
+  // Hook up emojis
+  if (opts.emoji) {
     mdComponents.deps.markdownItEmoji ??= require("markdown-it-emoji");
     md.use(mdComponents.deps.markdownItEmoji, {});
   }
-  if (opts.useGitHubHeadings) {
+  if (opts.githubHeadings) {
     mdComponents.deps.markdownItGitHubHeadings ??= require("markdown-it-github-headings");
     md.use(mdComponents.deps.markdownItGitHubHeadings, {});
   }
-  if (opts.useTaskCheckbox) {
+  if (opts.taskCheckbox) {
     mdComponents.deps.markdownItTaskCheckbox ??= require("markdown-it-task-checkbox");
     md.use(mdComponents.deps.markdownItTaskCheckbox, {
       disabled: opts.taskCheckboxDisabled,
       divWrap: opts.taskCheckboxDivWrap
     });
   }
+
+  // Hook up custom rules
   if (opts.transformImageLinks && validateRootDomain()) {
     // Here we will take any links for images provided in the content, and do
     // our best to ensure they can accurately resolve.
@@ -196,6 +397,7 @@ function renderMarkdown(content, givenOpts = {}) {
       return defaultImageRenderer(tokens, idx, options, env, self);
     };
   }
+
   if (validateRootDomain() && opts.transformNonFqdnLinks) {
     md.core.ruler.after("inline", "fix-links", (state) => {
       state.tokens.forEach((blockToken) => {
@@ -220,8 +422,9 @@ function renderMarkdown(content, givenOpts = {}) {
         }
       });
     });
-  } else if (opts.transformAtomLinks) {
-    // This is a separate if since transforming Atom links does not need a valid root domain provided
+  }
+
+  if (opts.transformAtomLinks) {
     md.core.ruler.after("inline", "fix-atom-links", (state) => {
       state.tokens.forEach((blockToken) => {
         if (blockToken.type === "inline" && blockToken.children) {
@@ -247,8 +450,8 @@ function renderMarkdown(content, givenOpts = {}) {
     });
   }
 
-  // Here we can add some simple additions that make code highlighting possible later on,
-  // but doesn't actually preform any code highlighting.
+  // Here we add a simple addition that makes code highlighting possible later on
+  // but itself doesn't do much to highlight
   md.options.highlight = function(str, lang) {
     return `<pre><code class="language-${lang}">${str}</code></pre>`;
   };
@@ -256,7 +459,6 @@ function renderMarkdown(content, givenOpts = {}) {
   // Process disables
   if (opts.disableMode === "strict") {
 
-    // Easy Disable
     md.disable("lheading");
 
     // Disable Code Blocks
@@ -286,7 +488,7 @@ function renderMarkdown(content, givenOpts = {}) {
       // Determine how to best handle this to only allow line breaks. Research needed
       if (state.src.charAt(state.pos) === "<") {
         // We only want to act once on the beginning of the inline element
-        // Then confirm if it's the item we expect
+        // then confirm if it's the item we expect
         const textAfterPending = state.src.replace(state.pending, "");
         const match = textAfterPending.match(/^<br\s*\/?>/);
         if (match) {
@@ -342,7 +544,7 @@ function renderMarkdown(content, givenOpts = {}) {
         tokens[idx].type = "text";
         tokens[idx].content = "";
 
-        if (tokens[idx].type == endType) {
+        if (tokens[idx].type === endType) {
           break;
         }
 
@@ -364,7 +566,7 @@ function renderMarkdown(content, givenOpts = {}) {
     };
 
     // Disable Ordered lists
-    md.renderer.rules.ordered_list_open = (tokens, idx, _options, _env, _self) => {
+    md.renderer.rules.ordered_list_open = (tokens, idx, _options, _env, _self) =>  {
       stripAllTokensTill(tokens, idx, "ordered_list_close");
       return "";
     };
@@ -373,13 +575,11 @@ function renderMarkdown(content, givenOpts = {}) {
     md.renderer.rules.html_inline = (tokens, idx, _options, _env, _self) => {
       if (tokens[idx].type === "html_inline") {
         // Here we can build an allow list of inline HTML elements to keep.
-        if (
-          tokens[idx].tag !== "breakline"
-          ) {
-            return "";
-          } else {
-            return tokens[idx].content;
-          }
+        if (tokens[idx].tag !== "breakline") {
+          return "";
+        } else {
+          return tokens[idx].content;
+        }
       }
     };
 
@@ -392,163 +592,10 @@ function renderMarkdown(content, givenOpts = {}) {
 
   }
 
-  let textContent;
+  // Done processing restrictions
 
-  if (opts.handleFrontMatter) {
-    mdComponents.deps.yamlFrontMatter ??= require("yaml-front-matter");
-    const { __content, vars } = mdComponents.deps.yamlFrontMatter.loadFront(content);
-
-    const renderYamlTable = (variables) => {
-      if (typeof variables === "undefined") {
-        return "";
-      }
-
-      const entries = Object.entries(variables);
-
-      if (!entries.length) {
-        return "";
-      }
-
-      const markdownRows = [
-        entries.map(entry => entry[0]),
-        entries.map(entry => '--'),
-        entries.map((entry) => {
-          if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
-            // Remove all newlines, or they ruin formatting of parent table
-            return md.render(renderYamlTable(entry[1])).replace(/\n/g, "");
-          } else {
-            return entry[1];
-          }
-        })
-      ];
-
-      return (
-        markdownRows.map(row => "| " + row.join(" | ") + " |").join("\n") + "\n"
-      );
-    };
-
-    textContent = renderYamlTable(vars) + __content;
-  } else {
-    textContent = content;
-  }
-
-  let rendered = md.render(textContent);
-
-  if (opts.sanitize) {
-    mdComponents.deps.domPurify ??= require("dompurify");
-
-    let domPurifyOpts = {
-      ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols,
-      ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose
-    };
-
-    rendered = mdComponents.deps.domPurify.sanitize(rendered, opts);
-  }
-
-  return rendered;
-}
-
-/**
- * @function applySyntaxHighlighting
- * @memberof markdown
- * @async
- * @desc Uses Pulsar's built-in Syntax Highlighting system to apply the same syntax
- * highlighting to code blocks within markdown. Modifies the existing object passed.
- * @param {HTMLFragment} content - The HTML Node/Fragment to apply syntax highlighting on.
- * Will modifyn the original object.
- * @param {object} givenOpts - Optional Arguments:
- * @param {function} givenOpts.syntaxScopeNameFunc - A function that can be called with
- * any given language ID from a code block scope, and returns the grammar source id
- * that should be used to preform syntax highlighting.
- * @param {string} givenOpts.renderMode - Whether we are rdnering a document fragment
- * or a full document. Valid values: "full", "fragment".
- * @param {object} givenOpts.grammar - The grammar of the source file. Carryover from
- * original `markdown-preview` functionality.
- */
-function applySyntaxHighlighting(content, givenOpts = {}) {
-  const defaultOpts = {
-    syntaxScopeNameFunc: null, // Function used to resolve codeblock fences language id
-    // to a Pulsar Grammar source. Should be a function that takes the declared scope and returns a source,
-    grammar: null,
-    renderMode: "full", // Just like in `renderMarkdown` this can be full or fragment
-  };
-
-  const opts = { ...defaultOpts, ...givenOpts };
-
-  const scopeForFenceName = (fence) => {
-    if (typeof opts.syntaxScopeNameFunc == "function") {
-      return opts.syntaxScopeNameFunc(fence);
-    } else {
-      // We could build one in, or just return default
-      return "text.plain";
-    }
-  };
-
-  let defaultLanguage;
-  const fontFamily = atom.config.get("editor.fontFamily");
-
-  if ((opts.grammar != null ? opts.grammar.scopeName : undefined) === "source.litcoffee") {
-    // This behavior is carried over from `markdown-preview` but it's purpose and need
-    // is not fully understood.
-    defaultLanguage = "coffee";
-  } else {
-    defaultLanguage = "text";
-  }
-
-  if (fontFamily) {
-    for (const codeElement of content.querySelectorAll("code")) {
-      codeElement.style.fontFamily = fontFamily;
-    }
-  }
-
-  let editorCallback;
-
-  if (opts.renderMode === "fragment") {
-    editorCallback = makeAtomEditorNonInteractive;
-  } else {
-    // Captures full and defaults
-    editorCallback = convertAtomEditorToStandardElement;
-  }
-
-  const promises = [];
-  for (const preElement of content.querySelectorAll("pre")) {
-    const codeBlock = preElement.firstElementChild ?? preElement;
-    const className = codeBlock.getAttribute("class");
-    const fenceName =
-      className != null ? className.replace(/^language-/, "") : defaultLanguage;
-
-    const editor = new TextEditor({
-      readonly: true,
-      keyboardInputEnabled: false
-    });
-    const editorElement = editor.getElement();
-
-    preElement.classList.add("editor-colors", `lang-${fenceName}`);
-    editorElement.setUpdatedSynchronously(true);
-    preElement.innerHTML = "";
-    preElement.parentNode.insertBefore(editorElement, preElement);
-    editor.setText(codeBlock.textContent.replace(/\r?\n$/, ""));
-    atom.grammars.assignLanguageMode(editor, scopeForFenceName(fenceName));
-    editor.setVisible(true);
-
-    promises.push(editorCallback(editorElement, preElement));
-  }
-  return Promise.all(promises);
-}
-
-/**
- * @function convertToDOM
- * @memberof markdown
- * @desc Takes a raw HTML string of data and returns a proper HTMLFragment.
- * This should be done if you need access to APIs available on the DOM itself.
- * @param {string} content - The HTML String.
- * @returns {HTMLFragment}
- */
-function convertToDOM(content) {
-  const template = document.createElement("template");
-  template.innerHTML = content;
-  const fragment = template.content.cloneNode(true);
-  return fragment;
+  // Return the fully complete markdown instance
+  return md;
 }
 
 /*
@@ -722,12 +769,11 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
  * @member markdown
  * @memberof ui
  * @desc The Markdown object exported from the UI API.
- * Provides access to: ".render", ".applySyntaxHighlighting", ".convertToDOM"
+ * Provides access to: ".render", ".buildRenderer"
  */
 const markdown = {
-  render: renderMarkdown,
-  applySyntaxHighlighting: applySyntaxHighlighting,
-  convertToDOM: convertToDOM
+  render: render,
+  buildRenderer: buildRenderer
 };
 
 module.exports = {

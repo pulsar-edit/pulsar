@@ -9,7 +9,7 @@ module.exports = {
     return atom.ui.markdown.render(
       description,
       {
-        useTaskCheckbox: false,
+        taskCheckbox: false,
         disableMode: "strict",
       }
     ).replace(/<p>(.*)<\/p>/, "$1").trim();

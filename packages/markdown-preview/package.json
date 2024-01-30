@@ -91,7 +91,7 @@
       "default": ""
     },
     "useOriginalParser": {
-      "description": "Wether to use the original Markdown Parser, or the new Pulsar one.",
+      "description": "Whether to use the original Markdown Parser, or the new Pulsar internal one.",
       "type": "boolean",
       "default": "true"
     }
