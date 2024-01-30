@@ -24,7 +24,3 @@ fileTypes: [
   'phtml'
   'profile'
 ]
-
-firstLineRegex: "^\\#!.*(?:\\s|\\/)php\\d?(?:$|\\s)|^\\s*<\\?(php|=|\\s|$)"
-
-contentRegex: "<\\?(php|=|\\s|$)"
