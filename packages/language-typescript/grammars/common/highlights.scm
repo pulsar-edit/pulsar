@@ -726,6 +726,13 @@
   "}" @punctuation.definition.template-expression.end._LANG_
 ) @meta.embedded.line.interpolation._LANG_
 
+(string
+  (escape_sequence) @constant.character.escape.js)
+
+(template_string
+  (escape_sequence) @constant.character.escape.js)
+
+
 ; CONSTANTS
 ; =========
 
