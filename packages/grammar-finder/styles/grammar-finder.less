@@ -1,0 +1,53 @@
+@import "ui-variables";
+
+@package-card-background-color: lighten(@tool-panel-background-color, 8%);
+
+.list-group .package-card.selected::before {
+  height: fit-content;
+}
+
+.package-card.selected {
+  background-color: @background-color-selected;
+}
+
+.package-card {
+  padding: (@component-padding * 1.5);
+  margin-bottom: @component-padding;
+  overflow: hidden;
+  font-size: 1.2em;
+  background-color: @package-card-background-color;
+
+  .package-name {
+    margin-right: .5em;
+    font-weight: bolder;
+    color: @text-color-highlight;
+  }
+
+  .package-version {
+    font-size: .8em;
+    margin-right: @component-padding;
+  }
+
+  .description {
+    color: @text-color;
+    overflow: hidden;
+    min-height: 38px;
+    max-height: 38px;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .card-name {
+    font-weight: 300;
+    margin: 0 0 .2em 0;
+    font-size: 1.2em;
+    line-height: 1.4;
+  }
+
+  .package-description {
+    white-space: normal;
+    line-height: 1.4;
+  }
+}

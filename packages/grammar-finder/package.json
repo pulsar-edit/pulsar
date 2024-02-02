@@ -1,0 +1,29 @@
+{
+  "name": "grammar-finder",
+  "verison": "1.0.0",
+  "main": "./lib/main.js",
+  "description": "Discover Community Package Grammars for your files.",
+  "license": "MIT",
+  "repository": "https://github.com/pulsar-edit/pulsar",
+  "engines": {
+    "atom": ">=1.114"
+  },
+  "dependencies": {
+    "superagent": "^8.0.9",
+    "atom-select-list": "pulsar-edit/atom-select-list"
+  },
+  "configSchema": {
+    "autoFind": {
+      "type": "boolean",
+      "default": true,
+      "description": "Look for available grammars when Pulsar is unable to find one locally."
+    },
+    "ignoreExtList": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
