@@ -23,7 +23,7 @@ This is a great way to find alternative packages, or if you don't like the notif
 
 ### `autoFind`
 
-This can be enabled or disabled at will, effecting the 'AutoFind' feature availability.
+When enabled, `autoFind` will show a notification inviting you to install a suitable grammar for an unrecognized file type.
 
 ### `ignoreExtList`
 
