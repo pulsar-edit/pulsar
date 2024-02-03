@@ -1,6 +1,6 @@
 # Grammar-Finder
 
-Discover Community Package Grammars for your files.
+Discover language grammars for unrecognized files.
 
 ## AutoFind
 
