@@ -17,7 +17,7 @@ When an 'AutoFind' notification appears you can quickly select:
 
 `grammar-finder` adds `grammar-finder:find-grammars-for-file` to the Command Palette, so that at any time you can check if any community packages provide syntax highlighting for the file you are currently working in.
 
-This is a great way to find alternative packages, or if you don't like the notifications of 'AutoFind', this can be used to locate packages on your terms.
+This makes it possible to find grammars for _recognized_ file types — or for unrecognized file types if you’ve disabled `autoFind`.
 
 ## Configuration
 
