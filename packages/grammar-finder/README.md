@@ -15,7 +15,7 @@ When an 'AutoFind' notification appears you can quickly select:
 
 ## Command Palette
 
-Grammar-Finder adds `grammar-finder:find-grammars-for-file` to the Command Palette, so that at any time you can check if any Community Packages provide Syntax Highlighting for the file you are currently working in.
+`grammar-finder` adds `grammar-finder:find-grammars-for-file` to the Command Palette, so that at any time you can check if any community packages provide syntax highlighting for the file you are currently working in.
 
 This is a great way to find alternative packages, or if you don't like the notifications of 'AutoFind', this can be used to locate packages on your terms.
 
