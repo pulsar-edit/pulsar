@@ -27,4 +27,4 @@ When enabled, `autoFind` will show a notification inviting you to install a suit
 
 ### `ignoreExtList`
 
-Any file extension can be added to this list to disable all checks for Community Packages. Ensure the extension is added without any preceding `.` for lookups to occur correctly.
+Any file extensions can be added to this list to disable all automatic checks for community packages for those file types. Choosing the “Disable `grammar-finder` for X” option on an `autoFind` notification will automatically add a given file extension to this list. This field should contain a comma-separated list of file extensions without any leading `.`s.
