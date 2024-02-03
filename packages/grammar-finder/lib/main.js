@@ -5,6 +5,10 @@ const PackageListView = require("./package-list-view.js");
 class GrammarFinder {
   activate() {
 
+    // This local variable is intended to act as 'session' storage, or editing
+    // session storage. Where the next time the editor is opened it's info is gone
+    this.promptedForExt = [];
+
     atom.grammars.emitter.on("did-auto-assign-grammar", async (data) => {
       if (!atom.config.get("grammar-finder.autoFind")) {
         // autofind is turned off
@@ -26,6 +30,11 @@ class GrammarFinder {
         return;
       }
 
+      if (this.promptedForExt.includes(ext)) {
+        // If we have already prompted for this extension in this editing session
+        return;
+      }
+
       const packages = await this.checkForGrammars(ext);
 
       if (packages.length === 0) {
@@ -33,8 +42,10 @@ class GrammarFinder {
         return;
       }
 
+      this.promptedForExt.push(ext);
+
       // Lets notify the user about the found packages
-      this.notify(packages, extOrFalse, "Pulsar couldn't identify an installed grammar for this file.");
+      this.notify(packages, ext, "Pulsar couldn't identify an installed grammar for this file.");
     });
 
     this.disposables = new CompositeDisposable();
