@@ -158,7 +158,7 @@ class GrammarFinder {
             }
           },
           {
-            text: `Disable Grammar-Finder for '${ext}'`,
+            text: `Don't suggest packages for '${ext}' files`,
             onDidClick: () => {
               let ignoreExtList = atom.config.get("grammar-finder.ignoreExtList");
               ignoreExtList.push(ext);
@@ -166,7 +166,7 @@ class GrammarFinder {
             }
           },
           {
-            text: "Disable AutoFind",
+            text: "Never suggest packages for unrecognized files",
             onDidClick: () => {
               atom.config.set("grammar-finder.autoFind", false);
             }
