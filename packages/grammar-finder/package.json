@@ -2,7 +2,7 @@
   "name": "grammar-finder",
   "verison": "1.0.0",
   "main": "./lib/main.js",
-  "description": "Discover Community Package Grammars for your files.",
+  "description": "Discover language packages for unrecognized files",
   "license": "MIT",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "engines": {
