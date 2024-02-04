@@ -50,4 +50,41 @@
     white-space: normal;
     line-height: 1.4;
   }
+
+  .downloads {
+    color: @text-color-highlight;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+
+  .stats {
+
+    .stats-item {
+      margin-left: (@component-padding*1.5);
+      height: 26px;
+      display: inline-block;
+      line-height: 24px;
+      vertical-align: top;
+
+      .icon {
+        color: @text-color-subtle;
+      }
+    }
+
+    .star-box {
+      display: inline-block;
+      vertical-align: top;
+
+      .star-button {
+        padding: 0 6px;
+
+        .octicon {
+          margin-right: 0px;
+        }
+      }
+    }
+  }
 }
