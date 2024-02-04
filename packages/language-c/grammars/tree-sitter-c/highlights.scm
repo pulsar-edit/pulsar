@@ -305,7 +305,7 @@
 ; macro preprocessors. The convention is decently strong in C/C++ that all-caps
 ; identifiers will refer to `#define`d things.
 ((identifier) @constant.other.c
-  (#match? @constant.other.c "[_A-Z][_A-Z0-9]*$")
+  (#match? @constant.other.c "^[_A-Z][_A-Z0-9]*$")
   (#set! capture.shy))
 
 
