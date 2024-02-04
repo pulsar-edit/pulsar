@@ -9,7 +9,6 @@
     "atom": ">=1.114"
   },
   "dependencies": {
-    "superagent": "^8.0.9",
     "atom-select-list": "pulsar-edit/atom-select-list"
   },
   "configSchema": {

@@ -140,10 +140,14 @@ class GrammarFinder {
   async checkForGrammars(ext) {
     this.superagent ??= require("superagent");
 
-    const res = await this.superagent
-      .get("https://api.pulsar-edit.dev/api/packages")
-      .set("User-Agent", "Pulsar.Grammar-Finder")
-      .query({ fileExtension: ext });
+    const res = await fetch(
+      `https://api.pulsar-edit.dev/api/packages?fileExtension=${ext}`,
+      {
+        headers: {
+          "User-Agent": "Pulsar.Grammar-Finder"
+        }
+      }
+    );
 
     if (res.status !== 200) {
       // Return empty array
@@ -151,7 +155,7 @@ class GrammarFinder {
       return [];
     }
 
-    return res.body;
+    return res.json();
   }
 
   notify(packages, ext, title) {
