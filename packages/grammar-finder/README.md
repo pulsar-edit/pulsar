@@ -4,7 +4,7 @@ Discover language grammars for unrecognized files.
 
 ## AutoFind
 
-With 'AutoFind' enabled, when Pulsar fails to locate a grammar for the file you've just opened, defaulting to 'Plain Text', `grammar-finer` will automatically contact the Pulsar Package Registry in search of a community package that provides syntax highlighting for the file currently opened.
+With 'AutoFind' enabled, when Pulsar fails to locate a grammar for the file you've just opened, defaulting to 'Plain Text', `grammar-finder` will automatically contact the Pulsar Package Registry in search of a community package that provides syntax highlighting for the file currently opened.
 
 If any packages are found you can easily view the whole list and install the one that looks best.
 
