@@ -31,6 +31,8 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
+    outputs:
+      timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
     - name: Install build dependencies - Linux
@@ -76,6 +78,13 @@ jobs:
         git config --global --add safe.directory /__w/pulsar/pulsar
         git submodule init
         git submodule update
+
+    - name: Set Timestamp for Binary Version - Linux
+      id: linux-binary-version
+      if: ${{ runner.os == 'Linux' }}
+      # This output is currently only set for the sake of the Rolling binary upload script.
+      # See the "test-and-upload-Linux" job below.
+      run: echo "timestamp=`date -u +%Y%m%d%H`" >> "$GITHUB_OUTPUT"
 
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
@@ -257,6 +266,12 @@ jobs:
         export BINARY_NAME='squashfs-root/pulsar'
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+
+    - name: Check Pulsar Version
+      if: ${{ runner.os != 'Windows' }}
+      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}/g" package.json
+      env:
+        TIMESTAMP: ${{needs.build.outputs.timestamp}}
 
     - name: Add binaries to Rolling Release Repo - Linux
       if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
