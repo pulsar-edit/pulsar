@@ -136,7 +136,7 @@ export default class CommandPaletteView {
     const matches = atom.ui.fuzzyMatcher.match(text, query, {recordMatchIndexes: true})
     let matchedChars = []
     let lastIndex = 0;
-    let matchIndexes = matches ? (matches.matchIndexes ?? []) : []
+    const matchIndexes = matches ? (matches.matchIndexes ?? []) : []
     matchIndexes.forEach(matchIndex => {
       const unmatched = text.substring(lastIndex, matchIndex)
       if (unmatched) {
