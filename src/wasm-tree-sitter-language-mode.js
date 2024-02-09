@@ -2149,6 +2149,9 @@ class FoldResolver {
     let boundaries = createTree(compareBoundaries);
     let captures = this.layer.foldsQuery.captures(rootNode, start, end);
 
+    // TODO: When a node is captured more than once, we handle all captures. We
+    // should instead use `ScopeResolver` so that a single folds query can use
+    // `capture.final` and `capture.shy` to rule out other possible matches.
     for (let capture of captures) {
       if (capture.node.startPosition.row < start.row) { continue; }
       if (capture.name === 'fold') {
@@ -2156,7 +2159,7 @@ class FoldResolver {
           position: capture.node.startPosition,
           boundary: 'start'
         }, capture);
-      } else {
+      } else if (capture.name.startsWith('fold.')) {
         let key = this.keyForDividedFold(capture);
         boundaries = boundaries.insert(key, capture);
       }
