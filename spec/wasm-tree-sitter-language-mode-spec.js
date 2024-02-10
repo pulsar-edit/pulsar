@@ -1931,18 +1931,10 @@ describe('WASMTreeSitterLanguageMode', () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
 
       await grammar.setQueryForTest('foldsQuery', scm`
-        ((element
-          (start_tag
-            (tag_name) @_IGNORE_) @fold)
-          (#match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
-          (#set! fold.invalidateOnChange true)
-        )
-
         (element
           (start_tag
             (tag_name) @_IGNORE_
              ">" @fold)
-          (#not-match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
           (#set! fold.endAt parent.parent.lastNamedChild.startPosition)
           (#set! fold.adjustToEndOfPreviousRow true)
         )
@@ -1950,12 +1942,14 @@ describe('WASMTreeSitterLanguageMode', () => {
         (element
           (start_tag
             (tag_name) @_IGNORE_) @fold
-          (#not-match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
           (#set! fold.invalidateOnChange true)
           (#set! fold.endAt lastChild.startPosition)
           (#set! fold.adjustToEndOfPreviousRow true))
       `);
 
+      // This is almost the exact scenario that created the need for this
+      // predicate. Since we use `adjustToEndOfPreviousRow`, this fold won't be
+      // valid in the below scenario because it'd start and end on row 0.
       buffer.setText(dedent`
         <div
           foo="bar">
@@ -1978,6 +1972,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.insertText('\n');
       await languageMode.atTransactionEnd();
 
+      // It's only after we make this edit — and `start_tag` ends on row 2
+      // instead of row 1 — that the fold becomes valid, since now the fold
+      // range will start at row 0 and end at row 1. But without
+      // `fold.invalidateOnChange`, we wouldn't know that the change on line 1
+      // could have any effect on whether row 0 was foldable.
       expect(editor.getText()).toBe(dedent`
         <div
           foo="bar"
@@ -1987,8 +1986,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         </div>
       `)
 
-      // Making that buffer change on line 1 should invalidate the fold cache
-      // on line 0.
       expect(editor.isFoldableAtBufferRow(0)).toBe(true);
       expect(editor.isFoldableAtBufferRow(1)).toBe(false);
       expect(editor.isFoldableAtBufferRow(2)).toBe(true);
