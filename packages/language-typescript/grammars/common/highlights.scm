@@ -295,6 +295,21 @@
   name: (_) @entity.name.type.interface._LANG_
   (#set! capture.final))
 
+; ENUMS
+; =====
+
+; The "Foo" in `enum Foo {`
+(enum_declaration
+  name: (_) @entity.name.type.enum._LANG_
+  (#set! capture.final))
+
+; The "foo" and "bar" in `enum Baz { foo, bar }`
+(enum_body
+  name: (property_identifier) @variable.declaration.enum._LANG_)
+
+; The "foo" in `enum Bar { foo = 1 }`
+(enum_assignment
+  name: (property_identifier) @variable.declaration.enum._LANG_)
 
 ; TYPES
 ; =====
