@@ -196,6 +196,11 @@ class ScopeResolver {
       ('highlight.invalidateOnChange' in capture.setProperties);
   }
 
+  shouldInvalidateFoldOnChange(capture) {
+    return capture.setProperties &&
+      ('fold.invalidateOnChange' in capture.setProperties);
+  }
+
   // We want to index scope data on buffer position, but each `Point` (or
   // ad-hoc point object) is a different object. We could normalize them to a
   // string and use the string as the map key, but we'd have to convert them
