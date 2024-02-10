@@ -33,13 +33,13 @@ module.exports = class SQLStateStore {
   }
 
   save(key, value) {
-    return this.dbPromise.then(db =>
-      getOne(db,
+    return this.dbPromise.then(db => {
+      return getOne(db,
         `REPLACE INTO ${this.tableName} VALUES (?, ?)`,
         key,
         JSON.stringify({ value: value, storedAt: new Date().toString() })
       )
-    )
+    })
   }
 
   load(key) {
@@ -47,7 +47,7 @@ module.exports = class SQLStateStore {
       getOne(db, `SELECT value FROM ${this.tableName} WHERE key = ?`, key )
     ).then(result => {
       if(result) {
-        const parsed = JSON.parse(result.value);
+        const parsed = JSON.parse(result.value, reviver);
         return parsed?.value
       }
       return null;
@@ -94,4 +94,12 @@ function awaitForAtomGlobal() {
       }
     }, 50)
   })
+}
+
+function reviver(_, value) {
+  if(value?.type === 'Buffer') {
+    return Buffer.from(value.data);
+  } else {
+    return value;
+  }
 }
