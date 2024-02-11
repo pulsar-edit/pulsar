@@ -11,11 +11,14 @@
   (#eq? @keyword.control.return.shell "return")
   (#set! capture.final true))
 
-((command_name) @support.function.builtin.shell
-  (#match? @support.function.builtin.shell "^(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)$")
+((command_name) @support.function.builtin._TEXT_.shell
+  (#match? @support.function.builtin._TEXT_.shell "^(?:alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|dirs|disown|echo|enable|eval|exec|exit|false|fc|fg|getopts|hash|help|history|jobs|kill|let|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|times|trap|true|type|ulimit|umask|unalias|unset|wait)$")
   (#set! capture.final true))
 
-(command_name) @support.other.function.shell
+(unset_command "unset" @support.function.builtin.unset.shell)
+
+((command_name) @support.other.function.shell
+  (#is-not? test.descendantOfType "command_substitution"))
 
 
 [
@@ -30,10 +33,11 @@
   "in"
   "do"
   "done"
+  "while"
 ] @keyword.control._TYPE_.shell
 
 (declaration_command
-  ["local" "export"] @storage.modifier._TYPE_.shell)
+  ["local" "export" "declare" "readonly"] @storage.modifier._TYPE_.shell)
 
 (variable_assignment
   (variable_name) @variable.other.member.shell
@@ -44,7 +48,7 @@
   "$" @punctuation.definition.variable.shell (variable_name))
 (expansion
   "${" @punctuation.definition.variable.begin.shell
-  (variable_name)
+  ; (variable_name)
   "}" @punctuation.definition.variable.end.shell) @variable.other.bracket.shell
 
 
@@ -84,7 +88,33 @@
   (#set! adjust.startAndEndAroundFirstMatchOf ".$"))
 
 (string
-  (command_substitution) @meta.embedded.line.subshell.shell)
+  (command_substitution) @meta.embedded.line.subshell.shell
+  (#set! capture.final true))
+
+; Command substitution with backticks: var=`cmd`
+((command_substitution) @string.quoted.interpolated.backtick.shell
+  (#match? @string.quoted.interpolated.backtick.shell "^`"))
+
+((command_substitution) @punctuation.definition.string.begin.shell
+  (#match? @punctuation.definition.string.begin.shell "^`")
+  (#set! adjust.endAfterFirstMatchOf "^`"))
+
+((command_substitution) @punctuation.definition.string.end.shell
+  (#match? @punctuation.definition.string.end.shell "`$")
+  (#set! adjust.startBeforeFirstMatchOf "`$"))
+
+; Command substitution of the form: var=$(cmd)
+((command_substitution) @string.quoted.interpolated.dollar.shell
+  (#match? @string.quoted.interpolated.dollar.shell "^\\$\\("))
+
+((command_substitution) @punctuation.definition.string.begin.shell
+  (#match? @punctuation.definition.string.begin.shell "^\\$\\(")
+  (#set! adjust.endAfterFirstMatchOf "^\\$\\("))
+
+((command_substitution) @punctuation.definition.string.end.shell
+  (#match? @punctuation.definition.string.end.shell "\\)$")
+  (#set! adjust.startBeforeFirstMatchOf "\\)$"))
+
 
 (heredoc_start) @punctuation.definition.string.begin.heredoc.shell
 (heredoc_body) @string.unquoted.heredoc.shell
@@ -102,6 +132,10 @@
 
 (list ["&&" "||"] @keyword.operator.logical.shell)
 (binary_expression ["&&" "||"] @keyword.operator.logical.shell)
+
+(pipeline "|" @keyword.operator.pipe.shell)
+(expansion operator: "#" @keyword.operator.expansion.shell)
+
 
 ; "*" @keyword.operator.glob.shell
 
@@ -127,6 +161,7 @@
 
 (file_redirect
   [
+    "<"
     ">"
     ">&"
     "&>"
@@ -142,6 +177,17 @@
   destination: (word) @constant.numeric.file-descriptor.shell
     (#match? @constant.numeric.file-descriptor.shell "^[12]$"))
 
+(number) @constant.numeric.decimal.shell
+
+; TODO: Double parentheses are used like `let` expressions, but ((i++)) is not
+; understood by `tree-sitter-bash` as a variable increment. It needs an equals
+; sign before it construes the contents as math.
+(test_command
+  "((" @punctuation.brace.double-round.begin.shell)
+(test_command
+  "))" @punctuation.brace.double-round.end.shell)
+
+
 (test_command
   "[[" @punctuation.brace.double-square.begin.shell)
 (test_command
@@ -150,12 +196,12 @@
 ; PUNCTUATION
 ; ===========
 
-"{" @punctuation.brace.curly.begin.shell
-"}" @punctuation.brace.curly.end.shell
-"(" @punctuation.brace.round.begin.shell
-")" @punctuation.brace.round.end.shell
-"[" @punctuation.brace.square.begin.shell
-"]" @punctuation.brace.square.end.shell
+("{" @punctuation.brace.curly.begin.shell (#set! capture.shy))
+("}" @punctuation.brace.curly.end.shell (#set! capture.shy))
+("(" @punctuation.brace.round.begin.shell (#set! capture.shy))
+(")" @punctuation.brace.round.end.shell (#set! capture.shy))
+("[" @punctuation.brace.square.begin.shell (#set! capture.shy))
+("]" @punctuation.brace.square.end.shell (#set! capture.shy))
 
-";" @punctuation.terminator.statement.shell
-":" @punctuation.separator.colon.shell
+(";" @punctuation.terminator.statement.shell (#set! capture.shy))
+(":" @punctuation.separator.colon.shell (#set! capture.shy))

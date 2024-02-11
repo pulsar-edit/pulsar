@@ -23,7 +23,7 @@ const languages = [
   // {language: "mustache", code: '10', checks: {numeric: '10'}},
   {language: "Objective C", code: '10', checks: {numeric: '10'}},
   {language: "Perl", code: '10', checks: {numeric: '10'}},
-  {language: "PHP", code: '<? 10 %>', checks: {numeric: '10'}},
+  {language: "PHP", code: '<? $foo ?>', checks: {variable: '$foo'}},
   // {language: "property-list", code: '10', checks: {numeric: '10'}},
   {language: "Python", code: '10', checks: {numeric: '10'}},
   {language: "Ruby on Rails", code: '10', checks: {numeric: '10'}},

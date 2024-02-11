@@ -23,12 +23,12 @@ function resolve(modulePath) {
 }
 
 const jsGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-javascript.cson'
+  'language-javascript/grammars/modern-tree-sitter-javascript.cson'
 );
 let jsConfig = CSON.readFileSync(jsGrammarPath);
 
 const jsRegexGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-regex.cson'
+  'language-javascript/grammars/modern-tree-sitter-regex.cson'
 );
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);
 
@@ -132,6 +132,38 @@ describe('ScopeResolver', () => {
     }
   });
 
+  it('provides the grammar with the text of leaf nodes only', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (expression_statement) @not_leaf_node
+      (call_expression) @also_not_leaf_node
+      (identifier) @leaf_node
+      (property_identifier) @also_leaf_node
+    `);
+
+    let tokens = [];
+    const original = grammar.idForScope.bind(grammar);
+    grammar.idForScope = function(scope, text) {
+      if (text) {
+        tokens.push(text);
+      }
+      return original(scope, text);
+    };
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText('aa.bb(cc.dd());');
+    await languageMode.ready;
+
+    // If non-leaf nodes are included, this list would included things like
+    // 'aa.bb()' and `cc.dd()`
+    expect(tokens).toEqual([
+        'aa',
+        'bb',
+        'cc',
+        'dd',
+    ]);
+  });
+
   it('interpolates magic tokens in scope names', async () => {
     await grammar.setQueryForTest('highlightsQuery', `
       (lexical_declaration kind: _ @declaration._TYPE_)
@@ -158,6 +190,67 @@ describe('ScopeResolver', () => {
       'declaration.let'
     ]);
   });
+
+  it('does not apply any scopes when @_IGNORE_ is used', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (lexical_declaration kind: _ @_IGNORE_
+        (#match? @_IGNORE_ "const"))
+      (lexical_declaration kind: _ @let
+        (#match? @let "let"))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      let bar = 'troz'
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      if (name === '_IGNORE_') {
+        expect(!!result).toBe(false);
+      } else {
+        expect(!!result).toBe(true);
+      }
+    }
+  });
+
+  it('does not apply any scopes when multiple @_IGNORE_s are used', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (variable_declarator
+        (identifier) @_IGNORE_.identifier
+        (string) @_IGNORE_.string
+      )
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      let bar = false
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    for (let capture of captures) {
+      let { node, name } = capture;
+      let result = scopeResolver.store(capture);
+      if (name.startsWith('_IGNORE_')) {
+        expect(!!result).toBe(false);
+      } else {
+        expect(!!result).toBe(true);
+      }
+    }
+  });
+
 
   describe('adjustments', () => {
     it('adjusts ranges with (#set! adjust.startAt)', async () => {
@@ -301,12 +394,12 @@ describe('ScopeResolver', () => {
 
   describe('tests', () => {
 
-    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final true)', async () => {
+    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
         ((string) @string1
-          (#set! capture.final true))
+          (#set! capture.final))
 
         (string) @string2
         "=" @operator
@@ -323,7 +416,7 @@ describe('ScopeResolver', () => {
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
       for (let capture of captures) {
-        let { node, name } = capture;
+        let { name } = capture;
         let result = scopeResolver.store(capture);
         if (name === 'string0') {
           expect(!!result).toBe(true);
@@ -373,12 +466,12 @@ describe('ScopeResolver', () => {
       }
     });
 
-    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final true)', async () => {
+    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final)', async () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
         ((string) @string1
-        (#set! capture.final true))
+        (#set! capture.final))
 
         (string) @string2
         "=" @operator

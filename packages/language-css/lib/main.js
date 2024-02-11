@@ -1,21 +1,7 @@
-exports.activate = () => {
 
-  atom.grammars.addInjectionPoint('source.css', {
-    type: 'comment',
-    language: () => 'todo',
-    content: (node) => node
-  });
-
-  atom.grammars.addInjectionPoint('source.css', {
-    type: 'comment',
-    language: () => 'hyperlink',
-    content: (node) => node
-  });
-
-  atom.grammars.addInjectionPoint('source.css', {
-    type: 'string_value',
-    language: () => 'hyperlink',
-    content: (node) => node
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  hyperlink.addInjectionPoint('source.css', {
+    types: ['comment', 'string_value']
   });
 
   // Catch things like
@@ -23,15 +9,18 @@ exports.activate = () => {
   // @import url(https://www.example.com/style.css);
   //
   // where the URL is unquoted.
-  atom.grammars.addInjectionPoint('source.css', {
-    type: 'call_expression',
+  hyperlink.addInjectionPoint('source.css', {
+    types: ['call_expression'],
     language: () => 'hyperlink',
-    content: (node) => {
+    content(node) {
       let functionName = node.descendantsOfType('function_value')[0]?.text;
       if (!functionName === 'url') { return null; }
 
       return node.descendantsOfType('plain_value');
     }
   });
+};
 
+exports.consumeTodoInjection = (todo) => {
+  todo.addInjectionPoint('source.css', { types: ['comment'] });
 };

@@ -492,8 +492,8 @@ class WASMTreeSitterLanguageMode {
     return this.grammar.scopeNameForScopeId(scopeId);
   }
 
-  idForScope(name) {
-    return this.grammar.idForScope(name);
+  idForScope(name, text) {
+    return this.grammar.idForScope(name, text);
   }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
@@ -1138,7 +1138,7 @@ class WASMTreeSitterLanguageMode {
         break;
       }
     }
-    return Math.floor(indentLength / tabLength);
+    return indentLength / tabLength
   }
 
   // Get the suggested indentation level for an existing line in the buffer.
@@ -1162,6 +1162,8 @@ class WASMTreeSitterLanguageMode {
       forceTreeParse: false,
       ...rawOptions
     };
+
+    let originalControllingLayer = options.controllingLayer;
 
     let comparisonRow = options.comparisonRow;
     if (comparisonRow === undefined) {
@@ -1214,7 +1216,25 @@ class WASMTreeSitterLanguageMode {
     // `indents.scm`, perhaps with an explanatory comment.)
     let controllingLayer = this.controllingLayerAtPoint(
       comparisonRowEnd,
-      (layer) => !!layer.indentsQuery
+      (layer) => {
+        if (!layer.indentsQuery) return false;
+        // We want to exclude layers with a content range that _begins at_ the
+        // cursor position. Why? Because the content that starts at the cursor
+        // is about to shift down to the next line. It'd be odd if that layer
+        // was in charge of the indentation hint if it didn't have any content
+        // on the preceding line.
+        //
+        // So first we test for containment exclusive of endpoints…
+        if (layer.containsPoint(comparisonRowEnd, true)) {
+          return true;
+        }
+
+        // …but we'll still accept layers that have a content range which
+        // _ends_ at the cursor position.
+        return layer.getCurrentRanges()?.some(r => {
+          return r.end.compare(comparisonRowEnd) === 0;
+        });
+      }
     );
 
     if (!controllingLayer) {
@@ -1231,7 +1251,11 @@ class WASMTreeSitterLanguageMode {
     // resolvers.
     scopeResolver.reset();
 
-    let indentTree = options.tree;
+    let indentTree = null;
+    if (options.tree && originalControllingLayer === controllingLayer) {
+      // Make sure this tree belongs to the layer we expect it to.
+      indentTree = options.tree;
+    }
 
     if (!indentTree) {
       if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncParsing || !this.useAsyncIndent) {
@@ -1382,6 +1406,42 @@ class WASMTreeSitterLanguageMode {
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
 
+      // The controlling layer on the previous line gets to decide what our
+      // starting indent is on the current line. But it might not extend to the
+      // current line, so we should determine which layer is in charge of the
+      // second phase.
+      let rowStart = new Point(row, 0);
+      let dedentControllingLayer = this.controllingLayerAtPoint(
+        rowStart,
+        (layer) => {
+          if (!layer.indentsQuery) return false;
+          // We're inverting the logic from above: now we want to allow layers
+          // that _begin_ at the cursor and exclude layers that _end_ at the
+          // cursor. Because we'll be analyzing content that comes _after_ the
+          // cursor to understand whether to dedent!
+          //
+          // So first we test for containment exclusive of endpoints…
+          if (layer.containsPoint(rowStart, true)) {
+            return true;
+          }
+
+          // …but we'll still accept layers that have a content range which
+          // _starts_ at the cursor position.
+          return layer.getCurrentRanges()?.some(r => {
+            return r.start.compare(rowStart) === 0;
+          });
+        }
+      );
+
+      if (dedentControllingLayer && dedentControllingLayer !== controllingLayer) {
+        // If this layer is different from the one we used above, then we
+        // should run this layer's indents query against its own tree. If _no_
+        // layers qualify at this position, we can still reluctantly use the
+        // original layer.
+        indentsQuery = dedentControllingLayer.indentsQuery;
+        indentTree = dedentControllingLayer.getOrParseTree();
+      }
+
       // The second phase covers any captures on the current line that can
       // cause the current line to be indented or dedented.
       let dedentCaptures = indentsQuery.captures(
@@ -1460,7 +1520,7 @@ class WASMTreeSitterLanguageMode {
     }
 
     scopeResolver.reset();
-    let finalIndent = comparisonRowIndent + indentDelta + dedentDelta;
+    let finalIndent = comparisonRowIndent + indentDelta + dedentDelta + existingIndent;
     // console.log('score:', comparisonRowIndent, '+', indentDelta, '-', ((dedentDelta < 0) ? -dedentDelta : dedentDelta), '=', finalIndent);
 
     return Math.max(finalIndent - existingIndent, 0);
@@ -1501,10 +1561,11 @@ class WASMTreeSitterLanguageMode {
       // because we start at the previous row to find the suggested indent for
       // the current row.
       let controllingLayer = this.controllingLayerAtPoint(
-        new Point(row - 1, Infinity),
+        this.buffer.clipPosition(new Point(row - 1, Infinity)),
+        // This query isn't as precise as the one we end up making later, but
+        // that's OK. This is just a first pass.
         (layer) => !!layer.indentsQuery && !!layer.tree
       );
-
       if (isPastedText) {
         // In this mode, we're not trying to auto-indent every line; instead,
         // we're trying to auto-indent the _first_ line of a region of text
@@ -1527,7 +1588,11 @@ class WASMTreeSitterLanguageMode {
           let firstLineIdealIndent = this.suggestedIndentForBufferRow(
             row,
             tabLength,
-            { ...options, tree }
+            {
+              ...options,
+              controllingLayer,
+              tree
+            }
           );
 
           if (firstLineIdealIndent == null) {
@@ -2517,32 +2582,36 @@ class HighlightIterator {
 
   getCloseScopeIds() {
     let iterator = last(this.iterators);
-    if (this.currentScopeIsCovered) {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'would close',
-      //   iterator._inspectScopes(
-      //     iterator.getCloseScopeIds()
-      //   ),
-      //   'at',
-      //   iterator.getPosition().toString(),
-      //   'but scope is covered!'
-      // );
-    } else {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'CLOSING',
-      //   iterator.getPosition().toString(),
-      //   iterator._inspectScopes(
-      //     iterator.getCloseScopeIds()
-      //   )
-      // );
-    }
+    // if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'close') {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'would close',
+    //     iterator._inspectScopes(
+    //       iterator.getCloseScopeIds()
+    //     ),
+    //     'at',
+    //     iterator.getPosition().toString(),
+    //     'but scope is covered!'
+    //   );
+    // } else {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'CLOSING',
+    //     iterator.getPosition().toString(),
+    //     iterator._inspectScopes(
+    //       iterator.getCloseScopeIds()
+    //     )
+    //   );
+    // }
     if (iterator) {
-      if (this.currentScopeIsCovered) {
-        return iterator.getOpenScopeIds().filter(id => {
+      // If this iterator is covered completely, or if it's covered in a
+      // position that prevents us from closing scopes…
+      if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'close') {
+        // …then the only closing scope we're allowed to apply is one that ends
+        // the base scope of an injection range.
+        return iterator.getCloseScopeIds().filter(id => {
           return iterator.languageLayer.languageScopeId === id;
         });
       } else {
@@ -2555,31 +2624,35 @@ class HighlightIterator {
   getOpenScopeIds() {
     let iterator = last(this.iterators);
     // let ids = iterator.getOpenScopeIds();
-    if (this.currentScopeIsCovered) {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'would open',
-      //   iterator._inspectScopes(
-      //     iterator.getOpenScopeIds()
-      //   ),
-      //   'at',
-      //   iterator.getPosition().toString(),
-      //   'but scope is covered!'
-      // );
-    } else {
-      // console.log(
-      //   iterator.name,
-      //   iterator.depth,
-      //   'OPENING',
-      //   iterator.getPosition().toString(),
-      //   iterator._inspectScopes(
-      //     iterator.getOpenScopeIds()
-      //   )
-      // );
-    }
+    // if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'open') {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'would open',
+    //     iterator._inspectScopes(
+    //       iterator.getOpenScopeIds()
+    //     ),
+    //     'at',
+    //     iterator.getPosition().toString(),
+    //     'but scope is covered!'
+    //   );
+    // } else {
+    //   console.log(
+    //     iterator.name,
+    //     iterator.depth,
+    //     'OPENING',
+    //     iterator.getPosition().toString(),
+    //     iterator._inspectScopes(
+    //       iterator.getOpenScopeIds()
+    //     )
+    //   );
+    // }
     if (iterator) {
-      if (this.currentScopeIsCovered) {
+      // If this iterator is covered completely, or if it's covered in a
+      // position that prevents us from opening scopes…
+      if (this.currentIteratorIsCovered === true || this.currentIteratorIsCovered === 'open') {
+        // …then the only opening scope we're allowed to apply is one that ends
+        // the base scope of an injection range.
         return iterator.getOpenScopeIds().filter(id => {
           return iterator.languageLayer.languageScopeId === id;
         });
@@ -2597,20 +2670,22 @@ class HighlightIterator {
     if (layerCount > 1) {
       const rest = [...this.iterators];
       const leader = rest.pop();
-      let covered = rest.some(it => {
-        return it.coversIteratorAtPosition(
-          leader,
-          leader.getPosition()
-        );
-      });
+      let covers = false;
+      for (let it of rest) {
+        let iteratorCovers = it.coversIteratorAtPosition(leader, leader.getPosition());
+        if (iteratorCovers !== false) {
+          covers = iteratorCovers;
+          break;
+        }
+      }
 
-      if (covered) {
-        this.currentScopeIsCovered = true;
+      if (covers) {
+        this.currentIteratorIsCovered = covers;
         return;
       }
     }
 
-    this.currentScopeIsCovered = false;
+    this.currentIteratorIsCovered = false;
   }
 
   logPosition() {
@@ -2618,6 +2693,8 @@ class HighlightIterator {
     iterator?.logPosition();
   }
 }
+
+const EMPTY_SCOPES = Object.freeze([]);
 
 // Iterates through everything that a `LanguageLayer` is responsible for,
 // marking boundaries for scope insertion.
@@ -2676,16 +2753,40 @@ class LayerHighlightIterator {
     // …and this iterator is deeper than the other…
     if (iterator.depth > this.depth) { return false; }
 
-    // …and this iterator's ranges actually include this position.
+    // …and one of this iterator's content ranges actually includes this
+    // position. (With caveats!)
     let ranges = this.languageLayer.getCurrentRanges();
     if (ranges) {
-      return ranges.some(range => range.containsPoint(position));
-    }
+      // A given layer's content ranges aren't allowed to overlap each other.
+      // So only a single range from this list can possibly match.
+      let overlappingRange = ranges.find(range => range.containsPoint(position))
+      if (!overlappingRange) return false;
 
-    // TODO: Despite all this, we may want to allow parent layers to apply
-    // scopes at the very edges of this layer's ranges/extent; or perhaps to
-    // apply ending scopes at starting positions and vice-versa; or at least to
-    // make it a configurable behavior.
+      // If the current position is right in the middle of an injection's
+      // range, then it should cover all attempts to apply scopes. But what if
+      // we're on one of its edges? Since closing scopes act before opening
+      // scopes,
+      //
+      // * if this iterator _starts_ a range at position X, it doesn't get to
+      //   prevent another iterator from _ending_ a scope at position X;
+      // * if this iterator _ends_ a range at position X, it doesn't get to
+      //   prevent another iterator from _starting_ a scope at position X.
+      //
+      // So at a given position, `currentIteratorIsCovered` can be `true` (all
+      // scopes suppressed), `false` (none suppressed), `"close"` (only closing
+      // scopes suppressed), or `"open"` (only opening scopes suppressed).
+      if (overlappingRange.end.compare(position) === 0) {
+        // We're at the right edge of the injection range. We want to prevent
+        // iterators from closing scopes, but not from opening them.
+        return 'close';
+      } else if (overlappingRange.start.compare(position) === 0) {
+        // We're at the left edge of the injection range. We want to prevent
+        // iterators from opening scopes, but not from closing them.
+        return 'open';
+      } else {
+        return true;
+      }
+    }
   }
 
   seek(start, endRow) {
@@ -2712,7 +2813,7 @@ class LayerHighlightIterator {
   }
 
   isAtInjectionBoundary() {
-    let position = Point.fromObject(this.iterator.key);
+    let position = Point.fromObject(this.iterator.key.position);
     return position.isEqual(this.start) || position.isEqual(this.end);
   }
 
@@ -2724,61 +2825,38 @@ class LayerHighlightIterator {
   }
 
   getOpenScopeIds() {
-    let openScopeIds = this.iterator.value.openScopeIds;
-    // if (openScopeIds.length > 0) {
-    //   console.log(
-    //     this.name,
-    //     this.depth,
-    //     'OPENING',
-    //     this.getPosition().toString(),
-    //     this._inspectScopes(
-    //       this.iterator.value.openScopeIds
-    //     )
-    //   );
-    // }
-    return [...openScopeIds];
+    let { key, value } = this.iterator;
+    return key.boundary === 'end' ? EMPTY_SCOPES : [...value.scopeIds];
   }
 
   getCloseScopeIds() {
-    let closeScopeIds = this.iterator.value.closeScopeIds;
-    // if (closeScopeIds.length > 0) {
-    //   console.log(
-    //     this.name,
-    //     'CLOSING',
-    //     this.getPosition().toString(),
-    //     this._inspectScopes(
-    //       this.iterator.value.closeScopeIds
-    //     )
-    //   );
-    // }
-    return [...closeScopeIds];
+    let { key, value } = this.iterator;
+    return key.boundary === 'start' ? EMPTY_SCOPES : [...value.scopeIds];
   }
 
   opensScopes() {
-    let scopes = this.getOpenScopeIds();
-    return scopes.length > 0;
+    return this.iterator?.key?.boundary === 'start';
   }
 
   closesScopes() {
-    let scopes = this.getCloseScopeIds();
-    return scopes.length > 0;
+    return this.iterator?.key?.boundary === 'end';
   }
 
   getPosition() {
-    return this.iterator.key || Point.INFINITY;
+    return this.iterator?.key?.position ?? Point.INFINITY;
   }
 
   logPosition() {
     let pos = this.getPosition();
+    let { key, value } = this.iterator;
 
     let { languageMode } = this.languageLayer;
+    let verb = key.boundary === 'end' ? 'close' : 'open';
 
     console.log(
       `[highlight] (${pos.row}, ${pos.column})`,
-      'close',
-      this.iterator.value.closeScopeIds.map(id => languageMode.scopeNameForScopeId(id)),
-      'open',
-      this.iterator.value.openScopeIds.map(id => languageMode.scopeNameForScopeId(id)),
+      verb,
+      value.scopeIds.map(id => languageMode.scopeNameForScopeId(id)),
       'next?',
       this.iterator.hasNext
     );
@@ -2786,35 +2864,33 @@ class LayerHighlightIterator {
 
   compare(other) {
     // First, favor the one whose current position is earlier.
-    const result = comparePoints(this.iterator.key, other.iterator.key);
+    const result = comparePoints(
+      this.iterator.key.position,
+      other.iterator.key.position
+    );
     if (result !== 0) { return result; }
 
     // Failing that, favor iterators that need to close scopes over those that
     // don't.
-    if (this.closesScopes() && !other.closesScopes()) {
+    let ourBoundary = this.iterator.key.boundary;
+    let theirBoundary = other.iterator.key.boundary;
+    let bothClosing = ourBoundary === 'end' && theirBoundary === 'end';
+
+    if (ourBoundary === 'end' && !bothClosing) {
       return -1;
-    } else if (other.closesScopes() && !this.closesScopes()) {
+    } else if (theirBoundary === 'end' && !bothClosing) {
       return 1;
     }
-
-    let bothOpening = this.opensScopes() && other.opensScopes();
-    let bothClosing = this.closesScopes() && other.closesScopes();
 
     if (bothClosing) {
       // When both iterators are closing scopes, the deeper layer should act
       // first.
       return other.languageLayer.depth - this.languageLayer.depth;
     } else {
-      // When both iterators are opening scopes — or if there's a mix of
-      // opening and closing — the shallower layer should act first.
+      // When both iterators are opening scopes, the shallower layer should act
+      // first.
       return this.languageLayer.depth - other.languageLayer.depth;
     }
-
-    // TODO: We need to move to a system where every point in the iterator
-    // _either_ closes scopes _or_ opens them, with the former visited before
-    // the latter. Otherwise there's no correct way to sort them when two
-    // different layers have the same position and both want to close _and_
-    // open scopes.
   }
 
   moveToSuccessor() {
@@ -2839,7 +2915,7 @@ class LayerHighlightIterator {
     if (!this.end) { return false; }
 
     let next = this.peekAtSuccessor();
-    return comparePoints(next, this.end) > 0;
+    return comparePoints(next.position, this.end) > 0;
   }
 }
 
@@ -2895,22 +2971,14 @@ class LanguageLayer {
     // off this promise. We can `await this.languageLoaded` later on.
     this.languageLoaded = this.grammar.getLanguage().then(language => {
       this.language = language;
-      // TODO: Currently, we require a highlights query, but we might want to
-      // rethink this. There are use cases for treating the root layer merely
-      // as a way to delegate to injections, in which case syntax highlighting
-      // wouldn't be needed.
-      return this.grammar.getQuery('highlightsQuery').then(highlightsQuery => {
-        this.highlightsQuery = highlightsQuery;
-      }).catch(() => {
-        throw new GrammarLoadError(grammar, 'highlightsQuery');
-      });
-    }).then(() => {
-      // All other queries are optional. Regular expression language layers,
-      // for instance, don't really have a need for any of these.
-      let otherQueries = ['foldsQuery', 'indentsQuery', 'localsQuery', 'tagsQuery'];
+      // All queries are optional. Regular expression language layers, for
+      // instance, don't really have a need for any queries other than
+      // `highlightsQuery`, and some kinds of layers don't even need
+      // `highlightsQuery`.
+      let queries = ['highlightsQuery', 'foldsQuery', 'indentsQuery', 'localsQuery', 'tagsQuery'];
       let promises = [];
 
-      for (let queryType of otherQueries) {
+      for (let queryType of queries) {
         if (grammar[queryType]) {
           let promise = this.grammar.getQuery(queryType).then(query => {
             this[queryType] = query;
@@ -2925,6 +2993,9 @@ class LanguageLayer {
       if (err.name === 'GrammarLoadError') {
         console.warn(err.message);
         if (err.queryType === 'highlightsQuery') {
+          // Recover by setting an empty `highlightsQuery` so that we don't
+          // propagate errors.
+          //
           // TODO: Warning?
           grammar.highlightsQuery = grammar.setQueryForTest(
             'highlightsQuery',
@@ -2945,7 +3016,7 @@ class LanguageLayer {
       this.tree = null;
       this.scopeResolver = new ScopeResolver(
         this,
-        (name) => this.languageMode.idForScope(name)
+        (name, text) => this.languageMode.idForScope(name, text)
       );
       this.foldResolver = new FoldResolver(this.buffer, this);
 
@@ -2958,10 +3029,8 @@ class LanguageLayer {
         // injected.
         languageScope = injectionPoint.languageScope;
 
-        // The `languageScope` parameter can be a function.
-        if (typeof languageScope === 'function') {
-          languageScope = languageScope(this.grammar);
-        }
+        // The `languageScope` parameter can be a function. That means we won't
+        // decide now; we'll decide later on a range-by-range basis.
 
         // Honor an explicit `null`, but fall back to the default scope name
         // otherwise.
@@ -2971,7 +3040,10 @@ class LanguageLayer {
       }
 
       this.languageScope = languageScope;
-      if (languageScope === null) {
+      if (languageScope === null || typeof languageScope === 'function') {
+        // If `languageScope` is a function, we'll still often end up with a
+        // `languageScopeId` (or several); we just won't be able to compute it
+        // ahead of time.
         this.languageScopeId = null;
       } else {
         this.languageScopeId = this.languageMode.idForScope(languageScope);
@@ -3001,7 +3073,7 @@ class LanguageLayer {
 
     this.tree = null;
     this.lastSyntaxTree = null;
-    this.temporaryTrees = null;
+    this.temporaryTrees = [];
 
     while (trees.length > 0) {
       let tree = trees.pop();
@@ -3056,17 +3128,17 @@ class LanguageLayer {
   // through a `ScopeResolver`.
   getSyntaxBoundaries(from, to) {
     let { buffer } = this.languageMode;
-    if (!(this.language && this.tree && this.highlightsQuery)) {
+    if (!(this.language && this.tree)) {
       return [[], new OpenScopeMap()];
     }
 
     from = buffer.clipPosition(Point.fromObject(from, true));
     to = buffer.clipPosition(Point.fromObject(to, true));
 
-    let boundaries = createTree(comparePoints);
+    let boundaries = createTree(compareBoundaries);
     let extent = this.getExtent();
 
-    const captures = this.highlightsQuery.captures(this.tree.rootNode, from, to);
+    let captures = this.highlightsQuery?.captures(this.tree.rootNode, from, to) ?? [];
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -3088,7 +3160,7 @@ class LanguageLayer {
       // `allowEmpty` to force these to be considered, but for marking scopes,
       // there's no need for it; it'd just cause us to open and close a scope
       // in the same position.
-      if (node.text === '') { continue; }
+      if (node.childCount === 0 && node.text === '') { continue; }
 
       // Ask the `ScopeResolver` to process each capture in turn. Some captures
       // will be ignored if they fail certain tests, and some will have their
@@ -3151,37 +3223,65 @@ class LanguageLayer {
     //
     let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
 
-    if (this.languageScopeId) {
+    let languageScopeIdForRange = () => this.languageScopeId;
+    if (typeof this.languageScope === 'function') {
+      languageScopeIdForRange = (range) => {
+        let scopeName = this.languageScope(this.grammar, this.languageMode.buffer, range);
+        if (Array.isArray(scopeName)) {
+          return scopeName.map(s => this.languageMode.idForScope(s));
+        } else {
+          return this.languageMode.idForScope(scopeName);
+        }
+      };
+    }
+
+    if (this.languageScopeId || typeof this.languageScope === 'function') {
       for (let range of includedRanges) {
         // Filter out ranges that have no intersection with ours.
         if (range.end.isLessThanOrEqual(from)) { continue; }
         if (range.start.isGreaterThanOrEqual(to)) { continue; }
 
+        let languageScopeIds = languageScopeIdForRange(range);
+        if (!languageScopeIds) continue;
+
+        if (!Array.isArray(languageScopeIds)) {
+          languageScopeIds = [languageScopeIds];
+        }
+
         if (range.start.isLessThan(from)) {
           // If we get this far, we know that the base language scope was open
           // when our range began.
-          alreadyOpenScopes.set(range.start, [this.languageScopeId]);
+          alreadyOpenScopes.set(
+            range.start,
+            languageScopeIds
+          );
         } else {
           // Range start must be between `from` and `to`, or else equal `from`
           // exactly.
-          this.scopeResolver.setBoundary(
-            range.start,
-            this.languageScopeId,
-            'open',
-            { root: true, length: Infinity }
-          );
+          for (let id of languageScopeIds) {
+            this.scopeResolver.setBoundary(
+              range.start,
+              id,
+              'open',
+              { root: true, length: Infinity }
+            );
+          }
         }
 
         if (range.end.isGreaterThan(to)) {
           // Do nothing; we don't need to set this boundary.
         } else {
           // The range must end somewhere within our range.
-          this.scopeResolver.setBoundary(
-            range.end,
-            this.languageScopeId,
-            'close',
-            { root: true, length: Infinity }
-          );
+          //
+          // Close the boundaries in the opposite order of how we opened them.
+          for (let i = languageScopeIds.length - 1; i >= 0; i--) {
+            this.scopeResolver.setBoundary(
+              range.end,
+              languageScopeIds[i],
+              'close',
+              { root: true, length: Infinity }
+            );
+          }
         }
       }
     }
@@ -3201,12 +3301,20 @@ class LanguageLayer {
         continue;
       }
 
-      let bundle = {
-        closeScopeIds: [...data.close],
-        openScopeIds: [...data.open]
-      };
+      let OPEN_KEY = { position: point, boundary: 'start' };
+      let CLOSE_KEY = { position: point, boundary: 'end' };
 
-      boundaries = boundaries.insert(point, bundle);
+      if (data.close.length > 0) {
+        boundaries = boundaries.insert(CLOSE_KEY, {
+          scopeIds: Object.freeze(data.close)
+        });
+      }
+
+      if (data.open.length > 0) {
+        boundaries = boundaries.insert(OPEN_KEY, {
+          scopeIds: Object.freeze(data.open)
+        });
+      }
     }
 
     return [boundaries, alreadyOpenScopes];
@@ -3687,13 +3795,13 @@ class LanguageLayer {
     return markers.map(m => m.getRange());
   }
 
-  containsPoint(point) {
+  containsPoint(point, exclusive = false) {
     let ranges = this.getCurrentRanges() ?? [this.getExtent()];
-    return ranges.some(r => r.containsPoint(point));
+    return ranges.some(r => r.containsPoint(point, exclusive));
   }
 
   getOrParseTree({ force = true, anonymous = false } = {}) {
-    if (!this.treeIsDirty || !force) { return this.tree; }
+    if (this.tree && (!this.treeIsDirty || !force)) { return this.tree; }
 
     // Eventually we'll take this out, but for now it serves as an indicator of
     // how often we have to manually re-parse in between transactions —
@@ -3767,11 +3875,11 @@ class LanguageLayer {
 
     // If the cursor is resting before column X, we want all scopes that cover
     // the character in column X.
-    let captures = this.highlightsQuery.captures(
+    let captures = this.highlightsQuery?.captures(
       this.tree.rootNode,
       point,
       { row: point.row, column: point.column + 1 }
-    );
+    ) ?? [];
 
     let results = [];
     for (let capture of captures) {
@@ -4056,7 +4164,7 @@ class NodeRangeSet {
     }
   }
 
-  getNodeSpec (node, getChildren) {
+  getNodeSpec(node, getChildren) {
     let { startIndex, endIndex, startPosition, endPosition, id } = node;
     let result = { startIndex, endIndex, startPosition, endPosition, id };
     if (node.children && getChildren) {
@@ -4069,11 +4177,18 @@ class NodeRangeSet {
   }
 
   getRanges(buffer) {
-    const previousRanges = this.previous && this.previous.getRanges(buffer);
+    const previousRanges = this.previous?.getRanges(buffer);
     let result = [];
 
-    for (const node of this.nodeSpecs) {
+    for (let node of this.nodeSpecs) {
+      // An injection point isn't given the point at which the buffer ends, so
+      // it's free to return an `endIndex` of `Infinity` here and rely on us to
+      // clip it to the boundary of the buffer.
+      if (node.endIndex === Infinity) {
+        node = this._clipRange(node, buffer);
+      }
       let position = node.startPosition, index = node.startIndex;
+
       if (node.children && !this.includeChildren) {
         // If `includeChildren` is `false`, we're effectively collecting all
         // the disjoint text nodes that are direct descendants of this node.
@@ -4127,6 +4242,13 @@ class NodeRangeSet {
       });
     }
     return this._consolidateRanges(result);
+  }
+
+  _clipRange(range, buffer) {
+    // Convert this range spec to an actual `Range`, clip it, then convert it
+    // back to a range spec with accurate `startIndex` and `endIndex` values.
+    let clippedRange = buffer.clipRange(rangeForNode(range));
+    return rangeToTreeSitterRangeSpec(clippedRange, buffer);
   }
 
   // Combine adjacent ranges to minimize the number of boundaries.
@@ -4211,7 +4333,7 @@ class NodeRangeSet {
   // For injection points with `newlinesBetween` enabled, ensure that a
   // newline is included between each disjoint range.
   _ensureNewline(buffer, newRanges, startIndex, startPosition) {
-    const lastRange = newRanges[newRanges.length - 1];
+    const lastRange = last(newRanges);
     if (lastRange && lastRange.endPosition.row < startPosition.row) {
       newRanges.push({
         startPosition: new Point(
@@ -4308,7 +4430,7 @@ class RangeList {
   }
 
   insertOrdered(newRange) {
-    let index = this.ranges.findIndex((r, i) => {
+    let index = this.ranges.findIndex(r => {
       return r.start.compare(newRange.start) > 0;
     });
     this.ranges.splice(index, 0, newRange);

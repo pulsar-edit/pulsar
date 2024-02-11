@@ -14,5 +14,17 @@
   "license": "MIT",
   "dependencies": {
     "atom-grammar-test": "^0.6.4"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

@@ -82,6 +82,13 @@
   }
 }
 
+// Style `property` (anywhere in a scope name) like `variable` to keep
+// continuity of appearance after some scope name changes in
+// JavaScript/TypeScript.
+.syntax--property {
+  color: @hue-5;
+}
+
 .syntax--variable {
   color: @hue-5;
 
@@ -312,5 +319,11 @@
 
   &.syntax--raw {
     color: @hue-4;
+  }
+
+  // Horizontal rules in GFM used to be scoped as `comment.hr`. For continuity,
+  // we assign the color of a comment to this new scope.
+  &.syntax--horizontal-rule {
+    color: @mono-3;
   }
 }

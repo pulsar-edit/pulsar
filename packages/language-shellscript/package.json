@@ -11,5 +11,17 @@
     "node": ">=12"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
-  "license": "MIT"
+  "license": "MIT",
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
+  }
 }

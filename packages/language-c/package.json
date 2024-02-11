@@ -10,6 +10,18 @@
   "license": "MIT",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

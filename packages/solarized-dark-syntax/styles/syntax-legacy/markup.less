@@ -37,4 +37,10 @@
     color: @syntax-comment-color;
     font-style: italic;
   }
+
+  // Horizontal rules in GFM used to be scoped as `comment.hr`. For continuity,
+  // we assign the color of a comment to this new scope.
+  &.syntax--horizontal-rule {
+    color: @syntax-comment-color;
+  }
 }

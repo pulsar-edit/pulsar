@@ -4,6 +4,7 @@
   (object)
   (template_string)
   (named_imports)
+  (object_type)
 ] @fold
 
 ; When we've got

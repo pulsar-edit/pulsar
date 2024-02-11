@@ -13,6 +13,10 @@
 "#define" @keyword.control.directive.define.cpp
 "#include" @keyword.control.directive.include.cpp
 
+(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.c
+  (#set! adjust.endAfterFirstMatchOf "^#"))
+
+
 ; This will match if the more specific rules above haven't matched. The
 ; anonymous nodes will match under ideal conditions, but might not be present
 ; if the parser is flummoxed.
@@ -69,28 +73,38 @@
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @support.type.builtin.cpp
-  (#match? @support.type.builtin.cpp "^(char|int|float|double|long)$"))
+((identifier) @support.storage.type.builtin.cpp
+  (#match? @support.storage.type.builtin.cpp "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @support.type.other.cpp
-  (#match? @support.type.other.cpp "_t$"))
+((identifier) @support.other.storage.type.cpp
+  (#match? @support.other.storage.type.cpp "_t$"))
 
 
+; These refer to language constructs and remain in the `storage` namespace.
 [
   "enum"
-  "long"
-  "short"
-  "signed"
   "struct"
   "typedef"
   "union"
-  "unsigned"
-
   "template"
 ] @storage.type.cpp
 
+; These refer to value types and go under `support`.
+[
+  "long"
+  "short"
+] @support.storage.type.builtin.cpp
+
+; These act as modifiers to value types and also go under `support`.
+[
+  "signed"
+  "unsigned"
+] @support.storage.modifier.builtin.cpp
+
+; These act as general language modifiers and remain in the `storage`
+; namespace.
 [
   "const"
   "extern"
@@ -110,14 +124,14 @@
   "override"
   "final"
   "noexcept"
-] @storage.modifier.cpp
+
+  "typename"
+] @storage.modifier._TYPE_.cpp
 
 (
-  (primitive_type) @support.type.stdint.cpp
-  (#match? @support.type.stdint.cpp "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$")
+  (primitive_type) @support.storage.type.stdint.cpp
+  (#match? @support.storage.type.stdint.cpp "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$")
 )
-
-"typename" @storage.modifier.typename.cpp
 
 
 ; FUNCTIONS
@@ -137,6 +151,9 @@
 
 (function_declarator
   (field_identifier) @entity.name.function.method.cpp)
+
+(field_initializer
+  (field_identifier) @entity.name.function.cpp)
 
 (call_expression
   (identifier) @support.function.c99.cpp
@@ -204,36 +221,56 @@
 ; Declarations and assignments
 ; ----------------------------
 
-; The "x" in `int x`;
+; The "x" in `int x;`
 (declaration
   declarator: (identifier) @variable.declaration.cpp)
 
-; The "x" in `int x = y`;
+; The "x" in `int x = y;`
 (init_declarator
   declarator: (identifier) @variable.declaration.cpp)
 
+; The "x" in `SomeType *x;`
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.c
+  (#is? test.descendantOfType "declaration field_declaration"))
+
+; A member of a struct.
 (field_declaration
-  (field_identifier) @variable.declaration.cpp)
+  (field_identifier) @variable.declaration.member.cpp)
+
+; An attribute in a C99 struct designated initializer:
+; the "foo" in `MY_TYPE a = { .foo = true };
+(initializer_pair
+  (field_designator
+    (field_identifier) @variable.declaration.member.cpp))
+
+; (and the associated ".")
+(initializer_pair
+  (field_designator
+    "." @keyword.operator.accessor.cpp))
 
 (field_declaration
   (pointer_declarator
-  	(field_identifier) @variable.declaration.cpp))
+  	(field_identifier) @variable.declaration.member.cpp))
 
 (field_declaration
   (array_declarator
-  	(field_identifier) @variable.declaration.cpp))
+  	(field_identifier) @variable.declaration.member.cpp))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @variable.declaration.cpp))
+    (identifier) @variable.declaration.member.cpp))
 
+; The "x" in `x = y;`
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
 
-; The "foo" in `bar.foo = "baz"`.
+; The "foo" in `something->foo = "bar";`
 (assignment_expression
   left: (field_expression
-    field: (field_identifier) @variable.other.member.assignment.cpp))
+    field: (field_identifier) @variable.other.member.assignment.cpp)
+    (#set! capture.final))
 
 ((reference_declarator
   (identifier) @variable.declaration.cpp)
@@ -245,17 +282,19 @@
 (preproc_params
   (identifier) @variable.parameter.preprocessor.cpp)
 
+; The "foo" in `const char foo` within a parameter list.
 (parameter_declaration
   declarator: (identifier) @variable.parameter.cpp)
 
-(parameter_declaration
-  declarator: (pointer_declarator
-    declarator: (identifier) @variable.parameter.cpp))
+; The "foo" in `const char *foo` within a parameter list.
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.c
+  (#is? test.descendantOfType "parameter_declaration"))
 
 (parameter_declaration
   declarator: (reference_declarator
     (identifier) @variable.parameter.cpp))
-
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
@@ -417,8 +456,10 @@
 
 ";" @punctuation.terminator.statement.cpp
 
-"," @punctuation.separator.comma.cpp
-"->" @keyword.operator.accessor.cpp
+("," @punctuation.separator.comma.cpp
+  (#set! capture.shy))
+("->" @keyword.operator.accessor.pointer-access.cpp
+  (#set! capture.shy))
 
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.cpp
@@ -442,6 +483,22 @@
 ")" @punctuation.definition.end.bracket.round.cpp
 "[" @punctuation.definition.array.begin.bracket.square.cpp
 "]" @punctuation.definition.array.end.bracket.square.cpp
+
+; META
+; ====
+
+((compound_statement) @meta.block.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((enumerator_list) @meta.block.enum.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((field_declaration_list) @meta.block.field.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
 
 ; TODO:
 ;

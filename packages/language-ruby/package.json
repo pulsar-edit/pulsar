@@ -14,5 +14,17 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "devDependencies": {
     "dedent": "^0.7.0"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

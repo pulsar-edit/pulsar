@@ -1098,8 +1098,23 @@ class Config {
           !sources || sources.includes(this.projectFile)
         )
       ) {
-        const projectValue = getValueAtKeyPath(this.projectSettings, keyPath);
-        value = projectValue === undefined ? value : projectValue;
+        let projectValue = getValueAtKeyPath(this.projectSettings, keyPath);
+        if (projectValue === undefined) {
+          // There is no project-specific override for this key path. `value`
+          // stays as `value` and we pretend this never happened.
+        } else if (isPlainObject(value) && isPlainObject(projectValue)) {
+          // This key path returned an object, so we need to merge the contents
+          // of the two objects into a third composite object. First we clone
+          // the project object so as not to modify it…
+          projectValue = this.deepClone(projectValue);
+          // …then we copy over the regular value's properties, preferring the
+          // project-specific value wherever there is overlap.
+          this.deepDefaults(projectValue, value);
+          value = projectValue;
+        } else {
+          // This is a single value, so we prefer the project version.
+          value = projectValue;
+        }
       }
     }
 

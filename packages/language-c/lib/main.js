@@ -1,10 +1,10 @@
-exports.activate = function() {
+exports.activate = function () {
   // Highlight macro bodies as C/C++
   for (const language of ['c', 'cpp']) {
     for (const nodeType of ['preproc_def', 'preproc_function_def']) {
       atom.grammars.addInjectionPoint(`source.${language}`, {
         type: nodeType,
-        language(node) {
+        language() {
           return language;
         },
         content(node) {
@@ -12,5 +12,19 @@ exports.activate = function() {
         }
       });
     }
+  }
+};
+
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  for (const language of ['c', 'cpp']) {
+    hyperlink.addInjectionPoint(`source.${language}`, {
+      types: ['comment', 'string_literal']
+    });
+  }
+};
+
+exports.consumeTodoInjection = (todo) => {
+  for (const language of ['c', 'cpp']) {
+    todo.addInjectionPoint(`source.${language}`, { types: ['comment'] });
   }
 };

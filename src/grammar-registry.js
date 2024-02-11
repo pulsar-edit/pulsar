@@ -279,6 +279,8 @@ module.exports = class GrammarRegistry {
       if (isTreeSitter) {
         if (parserConfig === 'wasm-tree-sitter') {
           score += 0.1;
+        } else if (parserConfig === 'textmate') {
+          score = -1;
         }
       }
 

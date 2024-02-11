@@ -50,7 +50,25 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed a bug in PPM that prevented package publishing.
+                Enabled Modern Tree-sitter Grammars by default
+              </li>
+              <li>
+                Added a modern Tree-sitter grammar for PHP.
+              </li>
+              <li>
+                Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+              </li>
+              <li>
+                Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
+              </li>
+              <li>
+                Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
+              </li>
+              <li>
+                Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
+              </li>
+              <li>
+                Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
               </li>
             </ul>
 

@@ -1,0 +1,11 @@
+
+scopeName: 'comment.block.documentation.phpdoc.php'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-phpdoc'
+
+injectionRegex: '^(phpdoc|PHPDoc)$'
+
+treeSitter:
+  parserSource: 'github:claytonrcarter/tree-sitter-phpdoc#915a527d5aafa81b31acf67fab31b0ac6b6319c0'
+  grammar: 'tree-sitter/tree-sitter-phpdoc.wasm'
+  highlightsQuery: 'tree-sitter/queries/phpdoc/highlights.scm'

@@ -88,3 +88,40 @@ exports.activate = () => {
     includeChildren: true
   });
 };
+
+
+// Since this parser isn't guaranteed to detect all URLs in paragraphs (see
+// https://github.com/pulsar-edit/pulsar/issues/885), we'll inject the
+// `hyperlink` parser into `text` nodes in paragraphs when there appear to be
+// URLs in them.
+exports.consumeHyperlinkInjection = (hyperlink) => {
+
+  function textChildren(node) {
+    let results = [];
+    for (let i = 0; i < node.namedChildCount; i++) {
+      let child = node.child(i);
+      if (child.type === 'text') {
+        results.push(child);
+      }
+    }
+    return results;
+  }
+
+  hyperlink.addInjectionPoint('source.gfm.embedded', {
+    types: ['paragraph'],
+    // Override the language callback so that it doesn't test URLs that are
+    // already handled in `uri_autolink` nodes.
+    language(node) {
+      for (let child of textChildren(node)) {
+        if (hyperlink.test(child)) {
+          return 'hyperlink';
+        }
+      }
+      return null;
+    },
+    content(node) {
+      return textChildren(node);
+    }
+  });
+
+};

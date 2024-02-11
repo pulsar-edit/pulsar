@@ -11,5 +11,74 @@
   "license": "MIT",
   "keywords": [
     "tree-sitter"
-  ]
+  ],
+  "configSchema": {
+    "indentation": {
+      "title": "Indentation",
+      "type": "object",
+      "properties": {
+        "indentBraces": {
+          "title": "Indent Curly Braces",
+          "type": "boolean",
+          "default": true,
+          "order": 1,
+          "description": "Indent after `{`."
+        },
+        "indentBrackets": {
+          "title": "Indent Brackets",
+          "type": "boolean",
+          "default": true,
+          "order": 2,
+          "description": "Indent after `[`."
+        },
+        "indentParentheses": {
+          "title": "Indent Parentheses",
+          "type": "boolean",
+          "default": true,
+          "order": 3,
+          "description": "Indent after `(`."
+        },
+        "alignCaseWithSwitch": {
+          "title": "Align “case” With ”switch”",
+          "type": "boolean",
+          "default": false,
+          "order": 4,
+          "description": "When enabled, `case` and `default` statements in `switch` blocks will match the indent level of the enclosing `switch` instead of indenting themselves one level."
+        },
+        "indentAfterBracelessIf": {
+          "title": "Indent After Braceless “if” And “else”",
+          "type": "boolean",
+          "default": true,
+          "order": 5,
+          "description": "When enabled, `if` and `else` statements without a brace on the initial line will trigger an indent, then a dedent after a single statement. Disable if your brace style is incompatible with this pattern."
+        },
+        "addHangingIndentAfterLogicalOperators": {
+          "title": "Add Hanging Indent After Logical Operators",
+          "type": "boolean",
+          "default": true,
+          "order": 6,
+          "description": "When enabled, will add a hanging indent when a line ends with `&&` or `||`, continuing the indent until the end of the statement."
+        },
+        "addHangingIndentAfterTernaryOperators": {
+          "title": "Add Hanging Indent After Ternary Operators",
+          "type": "boolean",
+          "default": true,
+          "order": 7,
+          "description": "When enabled, will add a hanging indent when a line ends with `?`, continuing the indent through the ensuing `:` until the end of the statement."
+        }
+      }
+    }
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
+  }
 }

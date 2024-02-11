@@ -13,6 +13,10 @@
 "#define" @keyword.control.directive.define.c
 "#include" @keyword.control.directive.include.c
 
+(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.c
+  (#set! adjust.endAfterFirstMatchOf "^#"))
+
+
 ; This will match if the more specific rules above haven't matched. The
 ; anonymous nodes will match under ideal conditions, but might not be present
 ; if the parser is flummoxed.
@@ -43,30 +47,41 @@
   (type_identifier) @_IGNORE_
   (#set! capture.final true))
 
-(primitive_type) @support.type.builtin.c
-(type_identifier) @support.type.other.c
+(primitive_type) @support.storage.type.builtin.c
+(type_identifier) @support.other.storage.type.c
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @support.type.builtin.c
-  (#match? @support.type.builtin.c "^(char|int|float|double|long)$"))
+((identifier) @support.storage.type.builtin.c
+  (#match? @support.storage.type.builtin.c "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @support.type.other.c
-  (#match? @support.type.other.c "_t$"))
+((identifier) @support.other.storage.type.c
+  (#match? @support.other.storage.type.c "_t$"))
 
+; These refer to language constructs and remain in the `storage` namespace.
 [
   "enum"
-  "long"
-  "short"
-  "signed"
   "struct"
   "typedef"
   "union"
-  "unsigned"
 ] @storage.type.c
 
+; These refer to value types and go under `support`.
+[
+  "long"
+  "short"
+] @support.storage.type.builtin.c
+
+; These act as modifiers to value types and also go under `support`.
+[
+  "signed"
+  "unsigned"
+] @support.storage.modifier.builtin.c
+
+; These act as general language modifiers and remain in the `storage`
+; namespace.
 [
   "const"
   "extern"
@@ -75,10 +90,10 @@
   "restrict"
   "static"
   "volatile"
-] @storage.modifier.c
+] @storage.modifier._TYPE_.c
 
-((primitive_type) @support.type.stdint.c
-  (#match? @support.type.stdint.c "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$"))
+((primitive_type) @support.storage.type.stdint.c
+  (#match? @support.storage.type.stdint.c "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$"))
 
 (enum_specifier
   name: (type_identifier) @variable.other.declaration.type.c)
@@ -116,31 +131,56 @@
 ; Declarations and assignments
 ; ----------------------------
 
-; The "x" in `int x`;
+; The "x" in `int x;`
 (declaration
   declarator: (identifier) @variable.declaration.c)
 
-; The "x" in `int x = y`;
+; The "x" in `int x = y;`
 (init_declarator
   declarator: (identifier) @variable.declaration.c)
 
+; The "x" in `SomeType *x;`
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.c
+  (#is? test.descendantOfType "declaration field_declaration"))
+
+; A member of a struct.
 (field_declaration
-  (field_identifier) @entity.other.attribute-name.c)
+  (field_identifier) @variable.declaration.member.c)
+
+; An attribute in a C99 struct designated initializer:
+; the "foo" in `MY_TYPE a = { .foo = true };
+(initializer_pair
+  (field_designator
+    (field_identifier) @variable.declaration.member.c))
+
+; (and the associated ".")
+(initializer_pair
+  (field_designator
+    "." @keyword.operator.accessor.c))
 
 (field_declaration
   (pointer_declarator
-    (field_identifier) @entity.other.attribute-name.c))
+    (field_identifier) @variable.declaration.member.c))
 
 (field_declaration
   (array_declarator
-    (field_identifier) @entity.other.attribute-name.c))
+    (field_identifier) @variable.declaration.member.c))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @entity.other.attribute-name.c))
+    (identifier) @variable.declaration.member.c))
 
+; The "x" in `x = y;`
 (assignment_expression
   left: (identifier) @variable.other.assignment.c)
+
+; The "foo" in `something->foo = "bar";`
+(assignment_expression
+  left: (field_expression
+    field: (field_identifier) @variable.other.member.assignment.c)
+    (#set! capture.final))
 
 
 ; Function parameters
@@ -154,9 +194,10 @@
   declarator: (identifier) @variable.parameter.c)
 
 ; The "foo" in `const char *foo` within a parameter list.
-(parameter_declaration
-  declarator: (pointer_declarator
-    declarator: (identifier) @variable.parameter.c))
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.c
+  (#is? test.descendantOfType "parameter_declaration"))
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
@@ -172,7 +213,7 @@
 ; The "size" in `finfo->size`.
 (field_expression
   "->"
-  field: (field_identifier) @support.other.property.c)
+  field: (field_identifier) @variable.other.member.c)
 
 
 ; FUNCTIONS
@@ -309,8 +350,10 @@
 
 ";" @punctuation.terminator.statement.c
 
-"," @punctuation.separator.comma.c
-"->" @punctuation.separator.pointer-access.c
+("," @punctuation.separator.comma.c
+  (#set! capture.shy))
+("->" @keyword.operator.accessor.pointer-access.c
+  (#set! capture.shy))
 
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.c
@@ -334,6 +377,22 @@
 ")" @punctuation.definition.end.bracket.round.c
 "[" @punctuation.definition.array.begin.bracket.square.c
 "]" @punctuation.definition.array.end.bracket.square.c
+
+
+; META
+; ====
+
+((compound_statement) @meta.block.c
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((enumerator_list) @meta.block.enum.c
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((field_declaration_list) @meta.block.field.c
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
 
 ; TODO:
 ;

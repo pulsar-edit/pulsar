@@ -52,6 +52,14 @@ describe('CTagsProvider', () => {
     );
   });
 
+  it('identifies its project root correctly', () => {
+    let root = provider.getPackageRoot();
+    expect(root).toContain("symbol-provider-ctags");
+    expect(
+      fs.existsSync(path.join(root, "vendor", "ctags-darwin"))
+    ).toBe(true);
+  });
+
   describe('when tags can be generated for a file', () => {
     beforeEach(async () => {
       await atom.workspace.open(directory.resolve('sample.js'));

@@ -1,11 +1,24 @@
 {
   "name": "language-yaml",
   "version": "0.32.0",
+  "main": "lib/main",
   "description": "YAML language support in Atom",
   "engines": {
     "atom": "*",
     "node": ">=12"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
-  "license": "MIT"
+  "license": "MIT",
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
+  }
 }

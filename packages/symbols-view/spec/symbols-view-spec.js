@@ -35,6 +35,10 @@ function getWorkspaceView() {
   return atom.views.getView(atom.workspace);
 }
 
+function getEditor() {
+  return atom.workspace.getActiveTextEditor();
+}
+
 function getEditorView() {
   return atom.views.getView(atom.workspace.getActiveTextEditor());
 }
@@ -100,6 +104,8 @@ describe('SymbolsView', () => {
     activationPromise.then(() => {
       mainModule = atom.packages.getActivePackage('symbols-view').mainModule;
     });
+    await activationPromise;
+    await atom.packages.activatePackage('language-javascript');
     jasmine.attachToDOM(getWorkspaceView());
   });
 
@@ -111,6 +117,9 @@ describe('SymbolsView', () => {
     beforeEach(async () => {
       atom.config.set('symbols-view.providerTimeout', 500);
       await atom.workspace.open(directory.resolve('sample.js'));
+      let editor = atom.workspace.getActiveTextEditor();
+      let languageMode  =  editor.getBuffer().getLanguageMode();
+      if (languageMode.ready) await languageMode.ready;
     });
 
     it('displays all symbols with line numbers', async () => {
@@ -303,7 +312,39 @@ describe('SymbolsView', () => {
         beforeEach(() => {
           // Last time we referred to this one by its package name; now we use
           // its human-friendly name. They should be interchangeable.
-          atom.config.set('symbols-view.preferCertainProviders', ['Competing Exclusive', 'symbol-provider-dummy']);
+          atom.config.set(
+            'symbols-view.preferCertainProviders',
+            ['Competing Exclusive', 'symbol-provider-dummy']
+          );
+        });
+
+        it('prefers the one with the highest score (providers listed earlier beating those listed later)', async () => {
+          registerProvider(DummyProvider, CompetingExclusiveProvider);
+          spyOn(CompetingExclusiveProvider, 'getSymbols').andCallThrough();
+          spyOn(DummyProvider, 'getSymbols').andCallThrough();
+          await activationPromise;
+          await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
+          symbolsView = getSymbolsView();
+          expect(choiceCount(symbolsView)).toBe(5);
+          expect(DummyProvider.getSymbols).not.toHaveBeenCalled();
+          expect(CompetingExclusiveProvider.getSymbols).toHaveBeenCalled();
+        });
+      });
+
+      describe('and one has a scope-specific `preferCertainProviders` setting', () => {
+        beforeEach(() => {
+          // Last time we referred to this one by its package name; now we use
+          // its human-friendly name. They should be interchangeable.
+          atom.config.set(
+            'symbols-view.preferCertainProviders',
+            ['Competing Exclusive', 'symbol-provider-dummy'],
+            { scopeSelector: '.source.js' }
+          );
+
+          atom.config.set(
+            'symbols-view.preferCertainProviders',
+            ['symbol-provider-dummy']
+          );
         });
 
         it('prefers the one with the highest score (providers listed earlier beating those listed later)', async () => {
@@ -469,35 +510,104 @@ describe('SymbolsView', () => {
     });
   });
 
-  describe('return from declaration', () => {
-    beforeEach(async () => {
-      registerProvider(TaggedProvider);
-      await atom.workspace.open(directory.resolve('tagged.js'));
-      await activationPromise;
-      editor = atom.workspace.getActiveTextEditor();
-    });
-
-    it("doesn't do anything when no go-tos have been triggered", async () => {
-      editor.setCursorBufferPosition([6, 0]);
-      atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
-
-      expect(editor.getCursorBufferPosition()).toEqual([6, 0]);
-    });
-
-    it('returns to the previous row and column', async () => {
-      editor.setCursorBufferPosition([6, 24]);
-      editor = atom.workspace.getActiveTextEditor();
-      spyOn(SymbolsView.prototype, 'moveToPosition').andCallThrough();
-      atom.commands.dispatch(getEditorView(), 'symbols-view:go-to-declaration');
-
-      await conditionPromise(() => {
-        return SymbolsView.prototype.moveToPosition.callCount === 1;
+  describe('when returning from declaration', () => {
+    describe('in the same file', () => {
+      beforeEach(async () => {
+        registerProvider(TaggedProvider);
+        await atom.workspace.open(directory.resolve('tagged.js'));
+        await activationPromise;
+        editor = atom.workspace.getActiveTextEditor();
       });
-      expect(editor.getCursorBufferPosition()).toEqual([2, 0]);
-      atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
 
-      await conditionPromise(() => SymbolsView.prototype.moveToPosition.callCount === 2);
-      expect(editor.getCursorBufferPosition()).toEqual([6, 24]);
+      it("doesn't do anything when no go-tos have been triggered", async () => {
+        editor.setCursorBufferPosition([6, 0]);
+        atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
+
+        expect(editor.getCursorBufferPosition()).toEqual([6, 0]);
+      });
+
+      it('returns to the previous row and column', async () => {
+        editor.setCursorBufferPosition([6, 24]);
+        editor = atom.workspace.getActiveTextEditor();
+        spyOn(SymbolsView.prototype, 'moveToPosition').andCallThrough();
+        atom.commands.dispatch(getEditorView(), 'symbols-view:go-to-declaration');
+
+        await conditionPromise(() => {
+          return SymbolsView.prototype.moveToPosition.callCount === 1;
+        });
+
+        expect(getEditor()).toBe(editor);
+
+        expect(getEditor().getCursorBufferPosition()).toEqual([2, 0]);
+        atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
+
+        await conditionPromise(() => SymbolsView.prototype.moveToPosition.callCount === 2);
+        expect(getEditor().getCursorBufferPosition()).toEqual([6, 24]);
+      });
+    });
+
+    describe('in a different file', () => {
+      beforeEach(async () => {
+        registerProvider(TaggedProvider);
+        await atom.workspace.open(directory.resolve('sample.js'));
+        await activationPromise;
+        editor = atom.workspace.getActiveTextEditor();
+      });
+
+      it("doesn't do anything when no go-tos have been triggered", async () => {
+        editor.setCursorBufferPosition([6, 0]);
+        atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
+
+        expect(editor.getCursorBufferPosition()).toEqual([6, 0]);
+      });
+
+      it('returns to the previous row and column', async () => {
+        editor.setCursorBufferPosition([6, 24]);
+        editor = atom.workspace.getActiveTextEditor();
+        spyOn(SymbolsView.prototype, 'moveToPosition').andCallThrough();
+        atom.commands.dispatch(getEditorView(), 'symbols-view:go-to-declaration');
+
+        await conditionPromise(() => {
+          return SymbolsView.prototype.moveToPosition.callCount === 1;
+        });
+
+        expect(getEditor()).not.toBe(editor);
+
+        expect(getEditor().getCursorBufferPosition()).toEqual([2, 0]);
+        atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
+
+        await conditionPromise(() => SymbolsView.prototype.moveToPosition.callCount === 2);
+
+        expect(getEditor()).toBe(editor);
+        expect(getEditor().getCursorBufferPosition()).toEqual([6, 24]);
+      });
+
+      it('returns to a different file when the file was already open', async () => {
+        editor.setCursorBufferPosition([6, 24]);
+        editor = atom.workspace.getActiveTextEditor();
+        spyOn(SymbolsView.prototype, 'moveToPosition').andCallThrough();
+        atom.commands.dispatch(getEditorView(), 'symbols-view:go-to-declaration');
+
+        await conditionPromise(() => {
+          return SymbolsView.prototype.moveToPosition.callCount === 1;
+        });
+
+        expect(getEditor()).not.toBe(editor);
+        let editorPath = editor.getPath();
+        let editorId = editor.id;
+        atom.workspace.getActivePane().destroyItem(editor);
+
+        expect(getEditor().getCursorBufferPosition()).toEqual([2, 0]);
+        atom.commands.dispatch(getEditorView(), 'symbols-view:return-from-declaration');
+
+        await conditionPromise(() => SymbolsView.prototype.moveToPosition.callCount === 2);
+
+        // Make sure this is a different instance of TextEditor for the same
+        // path.
+        expect(getEditor().getPath()).toBe(editorPath);
+        expect(getEditor().id).not.toBe(editorId);
+        expect(getEditor().getCursorBufferPosition()).toEqual([6, 24]);
+      });
     });
   });
 

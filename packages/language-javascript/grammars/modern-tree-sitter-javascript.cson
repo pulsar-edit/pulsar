@@ -1,0 +1,33 @@
+name: 'JavaScript'
+scopeName: 'source.js'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-javascript'
+
+injectionRegex: '^(js|javascript|JS|JAVASCRIPT)$'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-javascript#f1e5a09b8d02f8209a68249c93f0ad647b228e6e'
+  grammar: 'tree-sitter/tree-sitter-javascript.wasm'
+  highlightsQuery: 'tree-sitter/highlights.scm'
+  localsQuery: 'tree-sitter/locals.scm'
+  foldsQuery: 'tree-sitter/folds.scm'
+  indentsQuery: 'tree-sitter/indents.scm'
+  tagsQuery: 'tree-sitter/tags.scm'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(node)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=(js|javascript)'
+]
+
+fileTypes: [
+  'js',
+  'cjs',
+  'mjs',
+  'jsx'
+]
+
+comments:
+  start: '// '

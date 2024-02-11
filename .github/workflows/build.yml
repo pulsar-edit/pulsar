@@ -24,11 +24,21 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-20.04, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        include:
+          - os: ubuntu-latest
+            image: "debian:10"
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.image }}
+    outputs:
+      timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
+    - name: Install build dependencies - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd
+
     - name: Checkout the latest code
       uses: actions/checkout@v3
 
@@ -38,6 +48,10 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Setup Python
+      # actions/setup-python's copy of Python is compiled for too new glibc,
+      # which won't work in a Debian 10 Docker image.
+      # Get Python from apt repos instead on Linux.
+      if: ${{ runner.os != 'Linux' }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
@@ -48,10 +62,29 @@ jobs:
       # out of the box. 'setuptools' package provides 'distutils'.
       run: python3 -m pip install setuptools
 
+    - name: Install Yarn - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: npm install -g yarn
+
     - name: Setup Git Submodule
+      if: ${{ runner.os != 'Linux' }}
       run: |
         git submodule init
         git submodule update
+
+    - name: Setup Git Submodule - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        git config --global --add safe.directory /__w/pulsar/pulsar
+        git submodule init
+        git submodule update
+
+    - name: Set Timestamp for Binary Version - Linux
+      id: linux-binary-version
+      if: ${{ runner.os == 'Linux' }}
+      # This output is currently only set for the sake of the Rolling binary upload script.
+      # See the "test-and-upload-Linux" job below.
+      run: echo "timestamp=`date -u +%Y%m%d%H`" >> "$GITHUB_OUTPUT"
 
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
@@ -85,6 +118,15 @@ jobs:
         command: |
           yarn build
           yarn run build:apm
+
+    - name: Cache Pulsar dependencies - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS) (Signed)
@@ -135,20 +177,18 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: node ./script/rename.js "Windows"
 
+    - name: Cache Pulsar Binaries - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache/save@v3
+      with:
+        path: ./binaries
+        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Binaries
         path: ./binaries/*
-
-    - name: Test Binary - Linux
-      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
-      run: |
-        rm -R node_modules/electron; yarn install --check-files
-        ./binaries/*AppImage --appimage-extract
-        export BINARY_NAME='squashfs-root/pulsar'
-        mkdir -p ./tests/videos
-        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
     - name: Test Binary - Windows
       if: runner.os == 'Windows' && env.RUN_WINDOWS_VT == true
@@ -168,7 +208,7 @@ jobs:
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
     - name: Add binaries to Rolling Release Repo
-      if: ${{ github.event_name == 'push' }}
+      if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
       # We only want to upload rolling binaries if they are a commit to master
       # Otherwise we want to not upload if it's a PR or manually triggered build
       run: |
@@ -177,6 +217,74 @@ jobs:
         node ./rolling-release-binary-upload.js
 
     - name: Upload Video Artifacts
+      # Run whether this job passed or failed, unless explicitly cancelled.
+      if: ${{ !cancelled() && runner.os != 'Linux' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }} Videos
+        path: ./tests/videos/**
+
+
+  test-and-upload-Linux:
+    # I couldn't figure out how to get these visual tests to actually run in the
+    # Debian Docker environment. If anyone can make it work, feel free to
+    # re-combine visual testing on Linux back into the main build job above!
+    # - DeeDeeG
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v3
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Restore Cached Pulsar Binaries - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache/restore@v3
+      with:
+        path: ./binaries
+        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+
+    - name: Restore Cached Pulsar dependencies - Linux
+      if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache/restore@v3
+      with:
+        path: |
+          node_modules
+          packages
+        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
+
+    - name: Test Binary - Linux
+      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      run: |
+        rm -R node_modules/electron; yarn install --check-files
+        ./binaries/*AppImage --appimage-extract
+        export BINARY_NAME='squashfs-root/pulsar'
+        mkdir -p ./tests/videos
+        Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
+
+    - name: Check Pulsar Version
+      if: ${{ runner.os != 'Windows' }}
+      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}/g" package.json
+      env:
+        TIMESTAMP: ${{needs.build.outputs.timestamp}}
+
+    - name: Add binaries to Rolling Release Repo - Linux
+      if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
+      # We only want to upload rolling binaries if they are a commit to master
+      # Otherwise we want to not upload if it's a PR or manually triggered build
+      run: |
+        cd ./script/rolling-release-scripts
+        npm install
+        node ./rolling-release-binary-upload.js
+
+    - name: Upload Video Artifacts - Linux
+      # Run whether this job passed or failed, unless explicitly cancelled.
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }} Videos

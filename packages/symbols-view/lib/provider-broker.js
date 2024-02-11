@@ -180,7 +180,7 @@ module.exports = class ProviderBroker {
     let exclusivesByScore = [];
     let results = [];
 
-    let preferredProviders = atom.config.get('symbols-view.preferCertainProviders');
+    let preferredProviders = Config.getForEditor(meta.editor, 'preferCertainProviders');
 
     if (shouldLog) {
       console.debug(`Provider broker choosing among ${this.providers.length} candidates:`, this.providers);
