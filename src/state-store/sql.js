@@ -10,7 +10,17 @@ module.exports = class SQLStateStore {
     this.dbPromise = (async () => {
       await awaitForAtomGlobal();
       const dbPath = path.join(atom.getConfigDirPath(), 'session-store.db');
-      const db = new sqlite3.Database(dbPath);
+      let db;
+      try {
+        db = new sqlite3.Database(dbPath);
+      } catch(error) {
+        atom.notifications.addFatalError('Error loading database', {
+          stack: new Error('Error loading SQLite database for state storage').stack,
+          dismissable: true
+        });
+        console.error('Error loading SQLite database', error);
+        return null
+      }
       await getOne(db,
         `CREATE TABLE IF NOT EXISTS ${this.tableName} (key VARCHAR, value JSON)`
       );
@@ -19,9 +29,8 @@ module.exports = class SQLStateStore {
       );
       return db;
     })();
-    // this.
     this.connected = false;
-    this.dbPromise.then(_ => this.connected = true);
+    this.dbPromise.then(db => this.connected = !!db);
   }
 
   isConnected() {
@@ -34,6 +43,7 @@ module.exports = class SQLStateStore {
 
   save(key, value) {
     return this.dbPromise.then(db => {
+      if(!db) return null;
       return getOne(db,
         `REPLACE INTO ${this.tableName} VALUES (?, ?)`,
         key,
@@ -43,9 +53,10 @@ module.exports = class SQLStateStore {
   }
 
   load(key) {
-    return this.dbPromise.then(db =>
-      getOne(db, `SELECT value FROM ${this.tableName} WHERE key = ?`, key )
-    ).then(result => {
+    return this.dbPromise.then(db => {
+      if(!db) return null;
+      return getOne(db, `SELECT value FROM ${this.tableName} WHERE key = ?`, key )
+    }).then(result => {
       if(result) {
         const parsed = JSON.parse(result.value, reviver);
         return parsed?.value
@@ -67,9 +78,10 @@ module.exports = class SQLStateStore {
   }
 
   count() {
-    return this.dbPromise.then(db =>
-      getOne(db, `SELECT COUNT(key) c FROM ${this.tableName}`).then(r => r.c)
-    );
+    return this.dbPromise.then(db => {
+      if(!db) return null;
+      return getOne(db, `SELECT COUNT(key) c FROM ${this.tableName}`).then(r => r.c)
+    });
   }
 };
 
