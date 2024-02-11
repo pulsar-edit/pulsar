@@ -23,11 +23,11 @@
     "node": ">=14"
   },
   "license": "MIT",
-  "electronVersion": "28.1.3",
+  "electronVersion": "28.2.2",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
-    "@electron/remote": "2.0.10",
+    "@electron/remote": "2.1.2",
     "@pulsar-edit/fuzzy-native": "https://github.com/pulsar-edit/fuzzy-native.git#670c97d95ac22e4ac54aa6ebda0f2e3d3716764a",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
@@ -291,9 +291,9 @@
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
-    "@electron/rebuild": "3.5.0",
+    "@electron/rebuild": "3.6.0",
     "@playwright/test": "1.22.2",
-    "electron": "28.1.3",
+    "electron": "28.2.2",
     "electron-builder": "23.3.1",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
