@@ -73,7 +73,7 @@ module.exports = class SQLStateStore {
 
   clear() {
     return this.dbPromise.then(db =>
-      getOne(db, `DROP TABLE ${this.tableName}`)
+      getOne(db, `DELETE FROM ${this.tableName}`)
     );
   }
 
