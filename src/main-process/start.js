@@ -8,6 +8,7 @@ const fs = require('fs');
 const CSON = require('season');
 const Config = require('../config');
 const StartupTime = require('../startup-time');
+const CONSTANTS = require("../pulsar-constants.js");
 
 StartupTime.setStartTime();
 
@@ -70,7 +71,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   }
 
   const releaseChannel = getReleaseChannel(app.getVersion());
-  let appUserModelId = 'dev.pulsar-edit.pulsar.' + process.arch;
+  let appUserModelId = `${CONSTANTS.APP_IDENTIFIER}.${process.arch}`;
 
   // If the release channel is not stable, we append it to the app user model id.
   // This allows having the different release channels as separate items in the taskbar.

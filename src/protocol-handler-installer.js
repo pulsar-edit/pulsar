@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+const CONSTANTS = require("./pulsar-constants.js");
 
 const SETTING = 'core.uriHandlerRegistration';
 const PROMPT = 'prompt';
@@ -12,7 +13,7 @@ module.exports = class ProtocolHandlerInstaller {
 
   async isDefaultProtocolClient() {
     return ipcRenderer.invoke('isDefaultProtocolClient', {
-      protocol: 'atom',
+      protocol: CONSTANTS.PROTOCOL_NAME,
       path: process.execPath,
       args: ['--uri-handler', '--']
     });
@@ -24,7 +25,7 @@ module.exports = class ProtocolHandlerInstaller {
     return (
       this.isSupported() &&
       ipcRenderer.invoke('setAsDefaultProtocolClient', {
-        protocol: 'atom',
+        protocol: CONSTANTS.PROTOCOL_NAME,
         path: process.execPath,
         args: ['--uri-handler', '--']
       })
@@ -82,13 +83,13 @@ module.exports = class ProtocolHandlerInstaller {
     };
 
     notification = notifications.addInfo(
-      'Register as default atom:// URI handler?',
+      `Register as default ${CONSTANTS.PROTOCOL_PATH} URI handler?`,
       {
         dismissable: true,
         icon: 'link',
         description:
-          'Pulsar is not currently set as the default handler for atom:// URIs. Would you like Pulsar to handle ' +
-          'atom:// URIs?',
+          `Pulsar is not currently set as the default handler for ${CONSTANTS.PROTOCOL_PATH} URIs. Would you like Pulsar to handle ` +
+          `${CONSTANTS.PROTOCOL_PATH} URIs?`,
         buttons: [
           {
             text: 'Yes',

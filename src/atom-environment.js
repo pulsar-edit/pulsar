@@ -48,6 +48,7 @@ const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
 const packagejson = require("../package.json");
+const CONSTANTS = require("./pulsar-constants.js");
 
 const stat = util.promisify(fs.stat);
 
@@ -393,15 +394,15 @@ class AtomEnvironment {
   registerDefaultOpeners() {
     this.workspace.addOpener(uri => {
       switch (uri) {
-        case 'atom://.pulsar/stylesheet':
+        case CONSTANTS.STYLESHEET_PROTOCOL:
           return this.workspace.openTextFile(
             this.styles.getUserStyleSheetPath()
           );
-        case 'atom://.pulsar/keymap':
+        case CONSTANTS.KEYMAP_PROTOCOL:
           return this.workspace.openTextFile(this.keymaps.getUserKeymapPath());
-        case 'atom://.pulsar/config':
+        case CONSTANTS.CONFIG_PROTOCOL:
           return this.workspace.openTextFile(this.config.getUserConfigPath());
-        case 'atom://.pulsar/init-script':
+        case CONSTANTS.INIT_SCRIPT_PROTOCOL:
           return this.workspace.openTextFile(this.getUserInitScriptPath());
       }
     });

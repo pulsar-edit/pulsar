@@ -1,5 +1,6 @@
 const fs = require('fs-plus');
 const path = require('path');
+const CONSTANTS = require("./pulsar-constants.js");
 
 const hasWriteAccess = dir => {
   const testFilePath = path.join(dir, 'write.test');
@@ -28,7 +29,7 @@ const getAppDirectory = () => {
 module.exports = {
   setAtomHome: homePath => {
     // When a read-writeable .pulsar folder exists above app use that
-    const portableHomePath = path.join(getAppDirectory(), '..', '.pulsar');
+    const portableHomePath = path.join(getAppDirectory(), '..', CONSTANTS.DOT_FOLDER);
     if (fs.existsSync(portableHomePath)) {
       if (hasWriteAccess(portableHomePath)) {
         process.env.ATOM_HOME = portableHomePath;
@@ -46,7 +47,7 @@ module.exports = {
     }
 
     // Fall back to default .atom folder in users home folder
-    process.env.ATOM_HOME = path.join(homePath, '.pulsar');
+    process.env.ATOM_HOME = path.join(homePath, CONSTANTS.DOT_FOLDER);
   },
 
   setUserData: app => {

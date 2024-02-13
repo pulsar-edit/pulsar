@@ -31,6 +31,7 @@ const _ = require('underscore-plus');
 let FindParentDir = null;
 let Resolve = null;
 const ConfigSchema = require('../config-schema');
+const CONSTANTS = require("../pulsar-constants.js");
 
 const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
 
@@ -657,21 +658,21 @@ module.exports = class AtomApplication extends EventEmitter {
       });
     }
 
-    this.openPathOnEvent('application:about', 'atom://about');
-    this.openPathOnEvent('application:show-settings', 'atom://config');
-    this.openPathOnEvent('application:open-your-config', 'atom://.pulsar/config');
+    this.openPathOnEvent('application:about', CONSTANTS.ABOUT_UI_PROTOCOL);
+    this.openPathOnEvent('application:show-settings', CONSTANTS.CONFIG_UI_PROTOCOL);
+    this.openPathOnEvent('application:open-your-config', CONSTANTS.CONFIG_PROTOCOL);
     this.openPathOnEvent(
       'application:open-your-init-script',
-      'atom://.pulsar/init-script'
+      CONSTANTS.INIT_SCRIPT_PROTOCOL
     );
-    this.openPathOnEvent('application:open-your-keymap', 'atom://.pulsar/keymap');
+    this.openPathOnEvent('application:open-your-keymap', CONSTANTS.KEYMAP_PROTOCOL);
     this.openPathOnEvent(
       'application:open-your-snippets',
-      'atom://.pulsar/snippets'
+      CONSTANTS.SNIPPETS_PROTOCOL
     );
     this.openPathOnEvent(
       'application:open-your-stylesheet',
-      'atom://.pulsar/stylesheet'
+      CONSTANTS.STYLESHEET_PROTOCOL
     );
     this.openPathOnEvent(
       'application:open-license',
@@ -1527,7 +1528,7 @@ module.exports = class AtomApplication extends EventEmitter {
   //   :safeMode - Boolean to control the opened window's safe mode.
   openUrl({ urlToOpen, devMode, safeMode, env }) {
     const parsedUrl = url.parse(urlToOpen, true);
-    if (parsedUrl.protocol !== 'atom:') return;
+    if (parsedUrl.protocol !== CONSTANTS.PROTOCOL) return;
 
     const pack = this.findPackageWithName(parsedUrl.host, devMode);
     if (pack && pack.urlMain) {

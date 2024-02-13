@@ -3,6 +3,7 @@
 const dedent = require('dedent');
 const yargs = require('yargs');
 const { app } = require('electron');
+const CONSTANTS = require("../pulsar-constants.js");
 
 module.exports = function parseCommandLine(processArgs) {
   // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Pulsar launches.
@@ -28,7 +29,7 @@ module.exports = function parseCommandLine(processArgs) {
     A file may be opened at the desired line (and optionally column) by
     appending the numbers right after the file name, e.g. \`pulsar file:5:8\`.
 
-    Paths that start with \`atom://\` will be interpreted as URLs.
+    Paths that start with \`${CONSTANTS.PROTOCOL_PATH}\` will be interpreted as URLs.
 
     Environment Variables:
 
@@ -36,7 +37,7 @@ module.exports = function parseCommandLine(processArgs) {
                               Defaults to \`~/github/atom\`.
 
       ATOM_HOME               The root path for all configuration files and folders.
-                              Defaults to \`~/.pulsar\`.`
+                              Defaults to \`~/${CONSTANTS.DOT_FOLDER}\`.`
   );
   options
     .alias('d', 'dev')
@@ -76,7 +77,7 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('safe')
     .describe(
       'safe',
-      'Do not load packages from ~/.pulsar/packages or ~/.pulsar/dev/packages.'
+      `Do not load packages from ~/${CONSTANTS.DOT_FOLDER}/packages or ~/${CONSTANTS.DOT_FOLDER}/dev/packages.`
     );
   options
     .boolean('benchmark')
@@ -171,7 +172,7 @@ module.exports = function parseCommandLine(processArgs) {
     args = {
       uriHandler: true,
       'uri-handler': true,
-      _: args._.filter(str => str.startsWith('atom://')).slice(0, 1)
+      _: args._.filter(str => str.startsWith(CONSTANTS.PROTOCOL_PATH)).slice(0, 1)
     };
   }
 
@@ -219,7 +220,7 @@ module.exports = function parseCommandLine(processArgs) {
       // In the next block, .startsWith() only works on strings. So, skip non-string arguments.
       continue;
     }
-    if (path.startsWith('atom://')) {
+    if (path.startsWith(CONSTANTS.PROTOCOL_PATH)) {
       urlsToOpen.push(path);
     } else {
       pathsToOpen.push(path);

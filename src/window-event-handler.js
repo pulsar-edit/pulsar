@@ -1,6 +1,7 @@
 const { Disposable, CompositeDisposable } = require('event-kit');
 const listen = require('./delegated-listener');
 const { debounce } = require('underscore-plus');
+const CONSTANTS = require("./pulsar-constants.js");
 
 // Handles low-level events related to the `window`.
 module.exports = class WindowEventHandler {
@@ -306,7 +307,7 @@ module.exports = class WindowEventHandler {
     if (uri && uri[0] !== '#') {
       if (/^https?:\/\//.test(uri)) {
         this.applicationDelegate.openExternal(uri);
-      } else if (uri.startsWith('atom://')) {
+      } else if (uri.startsWith(CONSTANTS.PROTOCOL_PATH)) {
         this.atomEnvironment.uriHandlerRegistry.handleURI(uri);
       }
     }

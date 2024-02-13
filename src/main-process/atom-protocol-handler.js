@@ -1,6 +1,7 @@
 const { protocol } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const CONSTANTS = require("../pulsar-constants.js");
 
 // Handles requests with 'atom' protocol.
 //
@@ -30,7 +31,7 @@ module.exports = class AtomProtocolHandler {
 
   // Creates the 'atom' custom protocol handler.
   registerAtomProtocol() {
-    protocol.registerFileProtocol('atom', (request, callback) => {
+    protocol.registerFileProtocol(CONSTANTS.PROTOCOL_NAME, (request, callback) => {
       const relativePath = path.normalize(request.url.substr(7));
 
       let filePath;
