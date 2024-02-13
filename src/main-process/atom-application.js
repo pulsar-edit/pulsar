@@ -658,21 +658,21 @@ module.exports = class AtomApplication extends EventEmitter {
       });
     }
 
-    this.openPathOnEvent('application:about', CONSTANTS.ABOUT_UI_PROTOCOL);
-    this.openPathOnEvent('application:show-settings', CONSTANTS.CONFIG_UI_PROTOCOL);
-    this.openPathOnEvent('application:open-your-config', CONSTANTS.CONFIG_PROTOCOL);
+    this.openPathOnEvent('application:about', CONSTANTS.ABOUT_UI_URI);
+    this.openPathOnEvent('application:show-settings', CONSTANTS.CONFIG_UI_URI);
+    this.openPathOnEvent('application:open-your-config', CONSTANTS.CONFIG_URI);
     this.openPathOnEvent(
       'application:open-your-init-script',
-      CONSTANTS.INIT_SCRIPT_PROTOCOL
+      CONSTANTS.INIT_SCRIPT_URI
     );
-    this.openPathOnEvent('application:open-your-keymap', CONSTANTS.KEYMAP_PROTOCOL);
+    this.openPathOnEvent('application:open-your-keymap', CONSTANTS.KEYMAP_URI);
     this.openPathOnEvent(
       'application:open-your-snippets',
-      CONSTANTS.SNIPPETS_PROTOCOL
+      CONSTANTS.SNIPPETS_URI
     );
     this.openPathOnEvent(
       'application:open-your-stylesheet',
-      CONSTANTS.STYLESHEET_PROTOCOL
+      CONSTANTS.STYLESHEET_URI
     );
     this.openPathOnEvent(
       'application:open-license',

@@ -9,17 +9,17 @@ module.exports = {
   DOT_FOLDER: ".pulsar", // The folder where all user data and configuration data is stored
   APP_IDENTIFIER: "dev.pulsar-edit.pulsar",
   // atom://.pulsar/stylesheet
-  STYLESHEET_PROTOCOL: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/stylesheet`,
+  STYLESHEET_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/stylesheet`,
   // atom://.pulsar/keymap
-  KEYMAP_PROTOCOL: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/keymap`,
+  KEYMAP_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/keymap`,
   // atom://.pulsar/config
-  CONFIG_PROTOCOL: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/config`,
+  CONFIG_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/config`,
   // atom://.pulsar/init-script
-  INIT_SCRIPT_PROTOCOL: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/init-script`,
+  INIT_SCRIPT_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/init-script`,
   // atom://.pulsar/snippets
-  SNIPPETS_PROTOCOL: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/snippets`,
+  SNIPPETS_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/snippets`,
   // atom://config
-  CONFIG_UI_PROTOCOL: `${this.PROTOCOL_PATH}config`,
+  CONFIG_UI_URI: `${this.PROTOCOL_PATH}config`,
   // atom://about
-  ABOUT_UI_PROTOCOL: `${this.PROTOCOL_PATH}about`
+  ABOUT_UI_URI: `${this.PROTOCOL_PATH}about`
 };

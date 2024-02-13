@@ -394,15 +394,15 @@ class AtomEnvironment {
   registerDefaultOpeners() {
     this.workspace.addOpener(uri => {
       switch (uri) {
-        case CONSTANTS.STYLESHEET_PROTOCOL:
+        case CONSTANTS.STYLESHEET_URI:
           return this.workspace.openTextFile(
             this.styles.getUserStyleSheetPath()
           );
-        case CONSTANTS.KEYMAP_PROTOCOL:
+        case CONSTANTS.KEYMAP_URI:
           return this.workspace.openTextFile(this.keymaps.getUserKeymapPath());
-        case CONSTANTS.CONFIG_PROTOCOL:
+        case CONSTANTS.CONFIG_URI:
           return this.workspace.openTextFile(this.config.getUserConfigPath());
-        case CONSTANTS.INIT_SCRIPT_PROTOCOL:
+        case CONSTANTS.INIT_SCRIPT_URI:
           return this.workspace.openTextFile(this.getUserInitScriptPath());
       }
     });
