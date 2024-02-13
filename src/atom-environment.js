@@ -600,7 +600,7 @@ class AtomEnvironment {
   // Public: Gets the release channel of the Pulsar application.
   //
   // Returns the release channel as a {String}. Will return a specific release channel
-  // name like 'beta' or 'nightly' if one is found in the Pulsar version or 'stable'
+  // name like 'dev' if one is found in the Pulsar version or 'stable'
   // otherwise.
   getReleaseChannel() {
     return getReleaseChannel(this.getVersion());
@@ -608,7 +608,7 @@ class AtomEnvironment {
 
   // Public: Returns a {Boolean} that is `true` if the current version is an official release.
   isReleasedVersion() {
-    return this.getReleaseChannel().match(/stable|beta|nightly/) != null;
+    return this.getReleaseChannel().match(/stable|dev/) != null;
   }
 
   // Public: Get the time taken to completely load the current window.
