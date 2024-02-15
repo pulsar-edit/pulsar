@@ -13,33 +13,55 @@
 "#define" @keyword.control.directive.define.cpp
 "#include" @keyword.control.directive.include.cpp
 
-(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.c
+(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.cpp
   (#set! adjust.endAfterFirstMatchOf "^#"))
 
-
-; This will match if the more specific rules above haven't matched. The
-; anonymous nodes will match under ideal conditions, but might not be present
-; if the parser is flummoxed.
-((preproc_directive) @keyword.control.directive.c
+; `preproc_directive` will be used when the parser doesn't recognize the
+; directive as one of the above. It's permissive; `#afdfafsdfdfad` would be
+; parsed as a `preproc_directive`.
+;
+; Hence this rule will match if the more specific rules above haven't matched.
+; The anonymous nodes will match under ideal conditions, but might not be
+; present even when they ought to be _if_ the parser is flummoxed; so this'll
+; sometimes catch `#ifdef` and others.
+((preproc_directive) @keyword.control.directive.cpp
   (#set! capture.shy true))
 
-((preproc_ifdef
-  (identifier) @entity.name.function.preprocessor.c
-  (#match? @entity.name.function.preprocessor.c "[a-zA-Z_$][\\w$]*")))
+((preproc_directive) @punctuation.definition.directive.cpp
+  (#set! capture.shy true)
+  (#set! adjust.endAfterFirstMatchOf "^#"))
 
-(preproc_function_def
-  (identifier) @entity.name.function.preprocessor.c
-  (#set! capture.final true))
-
+; Macro functions are definitely entities.
 (preproc_function_def
   (identifier) @entity.name.function.preprocessor.cpp
-  (#set! capture.final true)
-)
+  (#set! capture.final true))
 
-(system_lib_string) @string.quoted.other.lt-gt.include.c
-((system_lib_string) @punctuation.definition.string.begin.c
+; Identifiers in macro definitions are definitely constants.
+((preproc_def
+  name: (identifier) @constant.preprocessor.cpp))
+
+; We can also safely treat identifiers as constants in `#ifdef`…
+((preproc_ifdef
+  (identifier) @constant.preprocessor.cpp))
+
+; …and `#if` and `#elif`…
+(preproc_if
+  (binary_expression
+    (identifier) @constant.preprocessor.cpp))
+(preproc_elif
+  (binary_expression
+    (identifier) @constant.preprocessor.cpp))
+
+; …and `#undef`.
+((preproc_call
+  directive: (preproc_directive) @_IGNORE_
+  argument: (preproc_arg) @constant.preprocessor.cpp)
+  (#eq? @_IGNORE_ "#undef"))
+
+(system_lib_string) @string.quoted.other.lt-gt.include.cpp
+((system_lib_string) @punctuation.definition.string.begin.cpp
   (#set! adjust.endAfterFirstMatchOf "^<"))
-((system_lib_string) @punctuation.definition.string.end.c
+((system_lib_string) @punctuation.definition.string.end.cpp
   (#set! adjust.startBeforeFirstMatchOf ">$"))
 
 
@@ -52,6 +74,13 @@
   (type_identifier) @_IGNORE_
   (#set! capture.final true))
 
+; When the user has typed `#define FOO`, the macro injection thinks that `FOO`
+; is a type declaration (for some reason). This node structure seems to exist
+; only in that unusual and incorrect scenario, so we'll stop it from happening
+; so that it doesn't override the underlying `constant.other.c` scope.
+(translation_unit
+  (type_identifier) @_IGNORE_
+  (#set! capture.final))
 
 (primitive_type) @support.type.builtin.cpp
 
@@ -232,7 +261,7 @@
 ; The "x" in `SomeType *x;`
 ; (Should work no matter how many pointers deep we are.)
 (pointer_declarator
-  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.c
+  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.cpp
   (#is? test.descendantOfType "declaration field_declaration"))
 
 ; A member of a struct.
@@ -289,7 +318,7 @@
 ; The "foo" in `const char *foo` within a parameter list.
 ; (Should work no matter how many pointers deep we are.)
 (pointer_declarator
-  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.c
+  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.cpp
   (#is? test.descendantOfType "parameter_declaration"))
 
 (parameter_declaration
@@ -332,8 +361,19 @@
   (false)
 ] @constant.language._TYPE_.cpp
 
-((identifier) @constant.cpp
-  (#match? @constant.cpp "[_A-Z][_A-Z0-9]*$"))
+; Don't try to scope (e.g.) `int FOO = 1` as a constant when the user types `=`
+; but has not typed the value yet.
+(ERROR
+  (identifier) @_IGNORE_
+  (#set! capture.final))
+
+; In most languages we wouldn't be making the assumption that an all-caps
+; identifier should be treated as a constant. But those languages don't have
+; macro preprocessors. The convention is decently strong in C/C++ that all-caps
+; identifiers will refer to `#define`d things.
+((identifier) @constant.other.cpp
+  (#match? @constant.other.cpp "[_A-Z][_A-Z0-9]*$")
+  (#set! capture.shy))
 
 
 ; COMMENTS

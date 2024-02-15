@@ -13,3 +13,7 @@
 
 (inline_tag "{" @punctation.definition.tag.begin.brace.curly.phpdoc.php)
 (inline_tag "}" @punctation.definition.tag.end.brace.curly.phpdoc.php)
+
+(array_type "<" @punctuation.definition.generic.begin.bracket.angle.phpdoc.php)
+(array_type ">" @punctuation.definition.generic.end.bracket.angle.phpdoc.php)
+(array_type "," @punctuation.separator.generic.comma.phpdoc.php)

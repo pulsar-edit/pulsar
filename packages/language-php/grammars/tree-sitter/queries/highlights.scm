@@ -511,15 +511,21 @@
   (#match? @punctuation.definition.comment.php "^#")
   (#set! adjust.startAndEndAroundFirstMatchOf "^#"))
 
+; All block comments get re-highlighted whenever a change takes place inside
+; them.
+((comment) @_IGNORE_
+  (#match? @_IGNORE_ "^/\\*")
+  (#set! highlight.invalidateOnChange true))
+
 ; Capture these because the PHPDoc injection won't process them…
 ((comment) @comment.block.documentation.php
-  (#match? @comment.block.documentation.php "^/\\*\\*\\*"))
+  (#match? @comment.block.documentation.php "^/\\*\\*\\*")
+  (#set! highlight.invalidateOnChange true))
 
 ; …but otherwise leave this style of comment to be handled by PHPDoc.
 ((comment) @_IGNORE_
   (#match? @_IGNORE_ "^/\\*\\*")
   (#set! capture.final true))
-
 
 ((comment) @comment.block.php
   (#match? @comment.block.php "^/\\*(?!\\*)"))

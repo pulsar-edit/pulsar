@@ -343,13 +343,22 @@ class WASMTreeSitterLanguageMode {
     });
   }
 
-  emitRangeUpdate(range) {
+  // Invalidate fold caches for the rows touched by the given range.
+  //
+  // Invalidating syntax highlighting also invalidates fold caches for the same
+  // range, but this method allows us to invalidate parts of the fold cache
+  // without affecting syntax highlighting.
+  emitFoldUpdate(range) {
     const startRow = range.start.row;
     const endRow = range.end.row;
     for (let row = startRow; row < endRow; row++) {
       this.isFoldableCache[row] = undefined;
     }
     this.prefillFoldCache(range);
+  }
+
+  emitRangeUpdate(range) {
+    this.emitFoldUpdate(range);
     this.emitter.emit('did-change-highlighting', range);
   }
 
@@ -2137,11 +2146,9 @@ class FoldResolver {
       return result;
     }
 
-    // The red-black tree we use here is a bit more complex up front than the
-    // one we use for syntax boundaries, because I didn't want the added
-    // complexity later on of having to aggregate boundaries when they share a
-    // position in the buffer.
-    //
+    let scopeResolver = this.layer.scopeResolver;
+    scopeResolver.reset();
+
     // Instead of keying off of a plain buffer position, this tree also
     // considers whether the boundary is a fold start or a fold end. If one
     // boundary ends at the same point that another one starts, the ending
@@ -2150,17 +2157,43 @@ class FoldResolver {
     let captures = this.layer.foldsQuery.captures(rootNode, start, end);
 
     for (let capture of captures) {
-      if (capture.node.startPosition.row < start.row) { continue; }
+      // NOTE: Currently, the first fold to match for a given starting position
+      // is the only one considered. That's because we use a version of a
+      // red-black tree in which we silently ignore any attempts to add a key
+      // that is equivalent in value to that of a previously added key.
+      //
+      // Attempts to use `capture.final` and `capture.shy` won't harm anything,
+      // but they'll be redundant. Other types of custom predicates, however,
+      // should work just fine.
+      let result = scopeResolver.store(capture);
+      if (!result) { continue; }
+
+      // Some folds are unusual enough that they can flip from valid to
+      // invalid, or vice versa, based on edits to rows other than their
+      // starting row. We need to keep track of these nodes so that we can
+      // invalidate the fold cache properly when edits happen inside of them.
+      if (scopeResolver.shouldInvalidateFoldOnChange(capture)) {
+        this.layer.foldNodesToInvalidateOnChange.add(capture.node.id);
+      }
+
+      if (capture.node.startPosition.row < start.row) {
+        // This fold starts before the range we're interested in. We needed to
+        // run these nodes through the scope resolver for various reasons, but
+        // they're not relevant to our iterator.
+        continue;
+      }
       if (capture.name === 'fold') {
         boundaries = boundaries.insert({
           position: capture.node.startPosition,
           boundary: 'start'
         }, capture);
-      } else {
+      } else if (capture.name.startsWith('fold.')) {
         let key = this.keyForDividedFold(capture);
         boundaries = boundaries.insert(key, capture);
       }
     }
+
+    scopeResolver.reset();
 
     this.boundaries = boundaries;
     this.boundariesRange = new Range(start, end);
@@ -2956,6 +2989,7 @@ class LanguageLayer {
     this.rangeList = new RangeList();
 
     this.nodesToInvalidateOnChange = new Set();
+    this.foldNodesToInvalidateOnChange = new Set();
 
     this.tree = null;
     this.lastSyntaxTree = null;
@@ -3110,6 +3144,7 @@ class LanguageLayer {
           let range = this.getExtent();
           this.languageMode.emitRangeUpdate(range);
           this.nodesToInvalidateOnChange.clear();
+          this.foldNodesToInvalidateOnChange.clear();
           this._pendingQueryFileChange = false;
         } catch (error) {
           console.error(`Error parsing query file: ${queryType}`);
@@ -3597,6 +3632,32 @@ class LanguageLayer {
     return { scopes, definitions, references };
   }
 
+  // Given a range and a `Set` of node IDs, test if any of those nodes' ranges
+  // overlap with the given range.
+  //
+  // We use this to test if a given edit should trigger the behavior indicated
+  // by `(fold|highlight).invalidateOnChange`.
+  searchForNodesInRange(range, nodeIdSet) {
+    let node = this.getSyntaxNodeContainingRange(
+      range,
+      n => nodeIdSet.has(n.id)
+    );
+
+    if (node) {
+      // One of this node's ancestors might also be in our list, so we'll
+      // traverse upwards and find out.
+      let ancestor = node.parent;
+      while (ancestor) {
+        if (nodeIdSet.has(ancestor.id)) {
+          node = ancestor;
+        }
+        ancestor = ancestor.parent;
+      }
+      return node;
+    }
+    return null;
+  }
+
   async _performUpdate(nodeRangeSet, params = {}) {
     // It's much more common in specs than in real life, but it's always
     // possible for a layer to get destroyed during the async period between
@@ -3664,31 +3725,37 @@ class LanguageLayer {
     this.lastTransactionEditedRange = this.editedRange;
     this.editedRange = null;
 
+    let foldRangeList = new RangeList();
+
     // Look for a node that was marked with `invalidateOnChange`. If we find
     // one, we should invalidate that node's entire buffer region.
     if (affectedRange) {
-      let node = this.getSyntaxNodeContainingRange(
+
+      // First look for nodes that were previously marked with
+      // `highlight.invalidateOnChange`; those will specify ranges for which
+      // we'll need to force a re-highlight.
+      let node = this.searchForNodesInRange(
         affectedRange,
-        n => this.nodesToInvalidateOnChange.has(n.id)
+        this.nodesToInvalidateOnChange
       );
-
       if (node) {
-        // One of this node's ancestors might also be in our invalidation list,
-        // so we'll traverse upwards to see if we should invalidate a larger
-        // node instead.
-        let ancestor = node.parent;
-        while (ancestor) {
-          if (this.nodesToInvalidateOnChange.has(ancestor.id)) {
-            node = ancestor;
-          }
-          ancestor = ancestor.parent;
-        }
-
         this.rangeList.add(node.range);
+      }
+
+      // Now look for nodes that were previously marked with
+      // `fold.invalidateOnChange`; those will specify ranges that need their
+      // fold cache updated even when highlighting is unaffected.
+      let foldNode = this.searchForNodesInRange(
+        affectedRange,
+        this.foldNodesToInvalidateOnChange
+      );
+      if (foldNode) {
+        foldRangeList.add(foldNode.range);
       }
     }
 
     this.nodesToInvalidateOnChange.clear();
+    this.foldNodesToInvalidateOnChange.clear();
 
     if (this.lastSyntaxTree) {
       const rangesWithSyntaxChanges = this.lastSyntaxTree.getChangedRanges(tree);
@@ -3762,6 +3829,13 @@ class LanguageLayer {
       this.languageMode.emitRangeUpdate(range);
     }
 
+    for (let range of foldRangeList) {
+      // The fold cache is automatically cleared for any range that needs
+      // re-highlighting. But sometimes we need to go further and invalidate
+      // rows that don't even need highlighting changes.
+      this.languageMode.emitFoldUpdate(range);
+    }
+
     if (affectedRange) {
       let injectionPromise = this._populateInjections(affectedRange, nodeRangeSet);
       if (injectionPromise) {
@@ -3795,6 +3869,9 @@ class LanguageLayer {
     return markers.map(m => m.getRange());
   }
 
+  // Checks whether a given {Point} lies within one of this layer's content
+  // ranges — not just its extent. The optional `exclusive` flag will return
+  // `false` if the point lies on a boundary of a content range.
   containsPoint(point, exclusive = false) {
     let ranges = this.getCurrentRanges() ?? [this.getExtent()];
     return ranges.some(r => r.containsPoint(point, exclusive));
