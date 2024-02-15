@@ -256,8 +256,8 @@ function render(content, givenOpts = {}, mdInstance) {
  * `divWrap` option.
  * @param {boolean} givenOpts.transformImageLinks - If links to images should
  * attempted to be resolved.
- * @param {boolean} givenOpts.transformNonFqdnLinks - If non-FQDN links should be
- * resolved.
+ * @param {boolean} givenOpts.transformNonFqdnLinks - If non fully qualified
+ * domain name links should be resolved.
  * @param {boolean} givenOpts.transformAtomLinks - If links to Atom pages should
  * resolved to the Pulsar equivolant.
  * @param {string} givenOpts.rootDomain - The root URL of the online resource.
