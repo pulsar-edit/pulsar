@@ -254,8 +254,8 @@ function render(content, givenOpts = {}, mdInstance) {
  * `disabled` option.
  * @param {boolean} givenOpts.taskCheckboxDivWrap - Controls `markdown-it-task-checkbox`
  * `divWrap` option.
- * @param {boolean} givenOpts.transformImageLinks - If links to images should
- * attempted to be resolved.
+ * @param {boolean} givenOpts.transformImageLinks - If it should attempt to 
+ * resolve links to images.
  * @param {boolean} givenOpts.transformNonFqdnLinks - If non fully qualified
  * domain name links should be resolved.
  * @param {boolean} givenOpts.transformAtomLinks - If links to Atom pages should
