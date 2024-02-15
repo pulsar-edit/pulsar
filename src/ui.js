@@ -259,7 +259,7 @@ function render(content, givenOpts = {}, mdInstance) {
  * @param {boolean} givenOpts.transformNonFqdnLinks - If non fully qualified
  * domain name links should be resolved.
  * @param {boolean} givenOpts.transformAtomLinks - If links to Atom pages should
- * resolved to the Pulsar equivolant.
+ * resolved to the Pulsar equivalent.
  * @param {string} givenOpts.rootDomain - The root URL of the online resource.
  * Used when resolving links.
  * @param {string} givenOpts.filePath - The path to the local resource.
