@@ -1,6 +1,6 @@
 
 (namespace_definition
-  name: (namespace_name) @name) @module
+  name: (namespace_name) @name) @definition.namespace
 
 (interface_declaration
   name: (name) @name) @definition.interface
@@ -11,7 +11,7 @@
 (class_declaration
   name: (name) @name) @definition.class
 
-(class_interface_clause [(name) (qualified_name)] @name) @impl
+(class_interface_clause [(name) (qualified_name)] @name) @reference.interface
 
 (property_declaration
   (property_element (variable_name (name) @name))) @definition.field
@@ -40,4 +40,4 @@
 (member_call_expression
   name: (name) @name) @reference.call
 
-(enum_declaration (name) @name) @definition.enum
+((enum_declaration (name) @name) @definition.enum)

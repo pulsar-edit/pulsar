@@ -7,7 +7,7 @@ const el = require('./element-builder');
 const { badge, isIterable, timeout } = require('./util');
 
 class FileView extends SymbolsView {
-  constructor (stack, broker) {
+  constructor(stack, broker) {
     super(stack, broker);
     this.cachedResults = new Map();
     // Cached results can be partially invalidated. If a provider wants to
@@ -87,12 +87,12 @@ class FileView extends SymbolsView {
     });
   }
 
-  destroy () {
+  destroy() {
     this.editorsSubscription.dispose();
     return super.destroy();
   }
 
-  elementForItem ({ position, name, tag, icon, context, providerName }) {
+  elementForItem({ position, name, tag, icon, context, providerName }) {
     // Style matched characters in search results.
     const matches = match(name, this.selectListView.getFilterQuery());
 
@@ -137,12 +137,12 @@ class FileView extends SymbolsView {
     return el('li.two-lines', primary, secondary);
   }
 
-  didChangeSelection (item) {
+  didChangeSelection(item) {
     let quickJump = Config.get('quickJumpToFileSymbol');
     if (quickJump && item) this.openTag(item);
   }
 
-  async didCancelSelection () {
+  async didCancelSelection() {
     this.abortController?.abort();
     await this.cancel();
     let editor = this.getEditor();
@@ -152,12 +152,12 @@ class FileView extends SymbolsView {
     this.initialState = null;
   }
 
-  didConfirmEmptySelection () {
+  didConfirmEmptySelection() {
     this.abortController?.abort();
     super.didConfirmEmptySelection();
   }
 
-  async toggle () {
+  async toggle(filterTerm = '') {
     if (this.panel.isVisible()) await this.cancel();
     let editor = this.getEditor();
     // Remember exactly where the editor is so that we can restore that state
@@ -170,9 +170,10 @@ class FileView extends SymbolsView {
     let populated = this.populate(editor);
     if (!populated) return;
     this.attach();
+    this.selectListView.update({ query: filterTerm });
   }
 
-  serializeEditorState (editor) {
+  serializeEditorState(editor) {
     let editorElement = atom.views.getView(editor);
     let scrollTop = editorElement.getScrollTop();
 
@@ -182,32 +183,32 @@ class FileView extends SymbolsView {
     };
   }
 
-  deserializeEditorState (editor, { bufferRanges, scrollTop }) {
+  deserializeEditorState(editor, { bufferRanges, scrollTop }) {
     let editorElement = atom.views.getView(editor);
 
     editor.setSelectedBufferRanges(bufferRanges);
     editorElement.setScrollTop(scrollTop);
   }
 
-  getEditor () {
+  getEditor() {
     return atom.workspace.getActiveTextEditor();
   }
 
-  getPath () {
+  getPath() {
     return this.getEditor()?.getPath();
   }
 
-  getScopeName () {
+  getScopeName() {
     return this.getEditor()?.getGrammar()?.scopeName;
   }
 
-  isValidSymbol (symbol) {
+  isValidSymbol(symbol) {
     if (!symbol.position || !(symbol.position instanceof Point)) return false;
     if (typeof symbol.name !== 'string') return false;
     return true;
   }
 
-  async populate (editor) {
+  async populate(editor) {
     let result = this.cachedResults.get(editor);
     let providersToQuery = this.providersWithInvalidatedCaches.get(editor);
     if (result && !providersToQuery?.size) {
@@ -238,7 +239,7 @@ class FileView extends SymbolsView {
     }
   }
 
-  async generateSymbols (editor, existingSymbols = null, onlyProviders = null) {
+  async generateSymbols(editor, existingSymbols = null, onlyProviders = null) {
     this.abortController?.abort();
     this.abortController = new AbortController();
 

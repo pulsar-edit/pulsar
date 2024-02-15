@@ -1,4 +1,4 @@
-const { Disposable } = require('atom');
+const { Disposable, TextEditor } = require('atom');
 const Config = require('./config');
 const ProviderBroker = require('./provider-broker');
 const Path = require('path');
@@ -32,9 +32,13 @@ module.exports = {
     this.workspaceSubscription = atom.commands.add(
       'atom-workspace',
       {
-        'symbols-view:toggle-project-symbols': () => {
-          if (!this.ensureProvidersExist()) return;
-          this.createProjectView().toggle();
+        'symbols-view:toggle-project-symbols': (event) => {
+          if (!this.ensureProvidersExist()) {
+            event.abortKeyBinding();
+            return;
+          }
+          let text = this.getSelectedTextIfEnabled(event);
+          this.createProjectView().toggle(text);
         },
         'symbols-view:show-active-providers': () => {
           this.showActiveProviders();
@@ -45,12 +49,13 @@ module.exports = {
     this.editorSubscription = atom.commands.add(
       'atom-text-editor:not([mini])',
       {
-        'symbols-view:toggle-file-symbols': (e) => {
+        'symbols-view:toggle-file-symbols': (event) => {
           if (!this.ensureProvidersExist()) {
-            e.abortKeyBinding();
+            event.abortKeyBinding();
             return;
           }
-          this.createFileView().toggle();
+          let text = this.getSelectedTextIfEnabled(event);
+          this.createFileView().toggle(text);
         },
         'symbols-view:go-to-declaration': () => {
           if (!this.ensureProvidersExist()) return;
@@ -64,6 +69,24 @@ module.exports = {
     );
 
     migrateOldConfigIfNeeded();
+  },
+
+  getSelectedTextIfEnabled(event) {
+    let editorView = event.target.closest('atom-text-editor');
+    if (!editorView) return '';
+    let editor = editorView.getModel();
+    let selection = editor.getLastSelection();
+
+    // Don't use the selection if it spans more than one buffer line.
+    let range = selection.getBufferRange();
+    if (range.start.row !== range.end.row) return '';
+
+    // Don't use the selection unless the associated config option is enabled.
+    let prefill = atom.config.get(
+      'symbols-view.prefillSelectedText',
+      { scope: [editor.getGrammar()?.scopeName] }
+    );
+    return prefill ? editor.getSelectedText() : '';
   },
 
   deactivate() {
@@ -101,9 +124,9 @@ module.exports = {
 
     return new Disposable(() => {
       if (Array.isArray(provider)) {
-        this.broker.remove(...provider);
+        this.broker?.remove(...provider);
       } else {
-        this.broker.remove(provider);
+        this.broker?.remove(provider);
       }
     });
   },
