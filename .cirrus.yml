@@ -1,6 +1,6 @@
 env:
   PYTHON_VERSION: 3.12
-  GITHUB_TOKEN: ENCRYPTED[!af8c6a449b6ff0a381ac6dd267d664a9e5d3551cbc9922aa98f806a0c881e10f47565f915dc277dd3f5c7cdf47f09d1b!]
+  GITHUB_TOKEN: ENCRYPTED[!c394f11378a8bc92ff1b05662ee3e574fc662692e45f0a048aa8cab42fb072b039d83f68fd6953f470af51846063ce46!]
   # The above token, is a GitHub API Token, that allows us to download RipGrep without concern of API limits
 
 # linux_task:
