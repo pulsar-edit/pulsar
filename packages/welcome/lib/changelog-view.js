@@ -50,25 +50,25 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Enabled Modern Tree-sitter Grammars by default
+                Prevented an exception raised in the command palette in certain unusual filtering scenarios.
               </li>
               <li>
-                Added a modern Tree-sitter grammar for PHP.
+                Fix the tag Linux binaries are uploaded to at the Rolling releases repo.
               </li>
               <li>
-                Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+                Tweak Rolling release binary upload script to reject `-dev` version strings, as it should.
               </li>
               <li>
-                Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
+                Refrain from rendering anchor icons when showing a package's README file in `settings-view`.
               </li>
               <li>
-                Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
+                Build Linux binaries on Debian 10, for older glibc and compatibility with older Linux distros.
               </li>
               <li>
-                Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
+                Fixed a rendering error in `atom.ui.markdown.render` when `disableMode` was set to `"strict"` and the input contained HTML line breaks.
               </li>
               <li>
-                Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+                Added support for the semanticolor package in modern tree-sitter grammars.
               </li>
             </ul>
 
