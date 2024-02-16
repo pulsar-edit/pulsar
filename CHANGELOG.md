@@ -13,6 +13,9 @@
 - Build Linux binaries on Debian 10, for older glibc and compatibility with older Linux distros.
 - Fixed a rendering error in `atom.ui.markdown.render` when `disableMode` was set to `"strict"` and the input contained HTML line breaks.
 - Added support for the semanticolor package in modern tree-sitter grammars.
+- Added new `--force` flag to `ppm link` command that will uninstall any conflicting package already installed.
+- Added language entity colors to `syntax-variables.less`.
+- Numerous Tree-Sitter Grammar syntax highlighting fixes.
 
 ### Pulsar
 - Fixed: fix(tree-sitter): pass node text to grammar [@claytoncarter](https://github.com/pulsar-edit/pulsar/pull/860)

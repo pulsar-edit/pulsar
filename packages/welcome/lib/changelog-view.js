@@ -64,6 +64,15 @@ export default class ChangeLogView {
               <li>
                 Added support for the semanticolor package in modern tree-sitter grammars.
               </li>
+              <li>
+                Added new `--force` flag to `ppm link` command that will uninstall any conflicting package already installed.
+              </li>
+              <li>
+                Added language entity colors to `syntax-variables.less`.
+              </li>
+              <li>
+                Numerous Tree-Sitter Grammar syntax highlighting fixes.
+              </li>
             </ul>
 
             <section className="welcome-panel">
