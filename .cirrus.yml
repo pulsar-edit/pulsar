@@ -85,6 +85,7 @@ arm_linux_task:
                 libasound2-dev
                 libnss3
                 xvfb
+    - gem install dotenv -v 2.8.1
     - gem install fpm
     - git submodule init
     - git submodule update
