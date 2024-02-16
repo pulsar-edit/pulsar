@@ -33,11 +33,16 @@
 - Fixed: `symbols-view` rolling fixes [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/861)
 - Fixed: Tree-sitter rolling fixes (February) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/906)
 - Updated: [meta] Update Cirrus `GITHUB_TOKEN` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/924)
+- Updated: deps: Update github to v0.36.20-pretranspiled to bump dugite [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/925)
+- Fixed: [symbols-view] Remap go-to-declaration commands on Windows/Linux [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/926)
 
 ### PPM
 - Fixed: Fix test failure due to missing atom command [@toddy15](https://github.com/pulsar-edit/ppm/pull/124)
 - Updated: Update syntax-variables.less to include language entity colors [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/123)
 - Added: feat(link): add --force flag [@claytoncarter](https://github.com/pulsar-edit/ppm/pull/122)
+
+### github
+- Updated: Bump dugite to 2.5.2 [@DeeDeeG](https://github.com/pulsar-edit/github/pull/39)
 
 ## 1.113.0
 
