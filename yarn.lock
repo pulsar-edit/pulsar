@@ -3818,10 +3818,10 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dugite@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.1.0.tgz#6f50c2244e57aaac2f36440aa7289815c73a688c"
-  integrity sha512-4l4jJz5zC6Q+/8doQNQZ9Ss3rmnO/JCHfOmQO+zGv+TIOUXimzfS02RvUOuFpEhZuaFTeFBSuK6ll/02TX3SxA==
+dugite@2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.5.2.tgz#9a10f4ed7d3cd701e7b09c65faf78c231c7f4e23"
+  integrity sha512-qrS3RXFzWW3cyXVaqct665+JxuP1LFhE0DPV1DqmbabO/eLNLDMICRROaGDh/Hw9ssbyVERxNDF6HW7oCLXrCg==
   dependencies:
     progress "^2.0.3"
     tar "^6.1.11"
@@ -4888,9 +4888,9 @@ github-slugger@^1.1.1:
   resolved "https://registry.yarnpkg.com/github-slugger/-/github-slugger-1.5.0.tgz#17891bbc73232051474d68bd867a34625c955f7d"
   integrity sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==
 
-"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.19-pretranspiled.tar.gz":
-  version "0.36.19"
-  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.19-pretranspiled.tar.gz#e2ec13277cc6a8db484192cb7ee3a1ff7fcc8048"
+"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz":
+  version "0.36.20"
+  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz#1f3edb9383940c72037b35cfa6081d59a160f6b8"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -4906,7 +4906,7 @@ github-slugger@^1.1.1:
     classnames "2.2.6"
     compare-sets "1.0.1"
     dompurify "2.0.17"
-    dugite "2.1.0"
+    dugite "2.5.2"
     event-kit "2.5.3"
     fs-extra "4.0.3"
     graphql "14.5.8"
@@ -4928,7 +4928,7 @@ github-slugger@^1.1.1:
     underscore-plus "1.7.0"
     what-the-diff "0.6.0"
     what-the-status "1.0.3"
-    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz"
+    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz"
     yubikiri "2.0.0"
 
 glob-parent@^6.0.2:
@@ -9871,11 +9871,11 @@ what-the-status@1.0.3:
   dependencies:
     split "^1.0.0"
 
-"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz":
+"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz":
   version "0.2.0"
-  resolved "https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz#2e90f101d1179a36685fd1b948af361342e3c797"
+  resolved "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz#1a504ee809e9ff86d1109de27c2e94fdf23f37d1"
   dependencies:
-    dugite "2.1.0"
+    dugite "2.5.2"
     superstring "^2.4.4"
     what-the-diff "^0.6.0"
 
