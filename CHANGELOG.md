@@ -9,8 +9,6 @@
 ## 1.114.0
 
 - Prevented an exception raised in the command palette in certain unusual filtering scenarios.
-- Fix the tag Linux binaries are uploaded to at the Rolling releases repo.
-- Tweak Rolling release binary upload script to reject `-dev` version strings, as it should.
 - Refrain from rendering anchor icons when showing a package's README file in `settings-view`.
 - Build Linux binaries on Debian 10, for older glibc and compatibility with older Linux distros.
 - Fixed a rendering error in `atom.ui.markdown.render` when `disableMode` was set to `"strict"` and the input contained HTML line breaks.

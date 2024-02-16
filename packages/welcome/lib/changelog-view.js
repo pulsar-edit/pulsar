@@ -53,12 +53,6 @@ export default class ChangeLogView {
                 Prevented an exception raised in the command palette in certain unusual filtering scenarios.
               </li>
               <li>
-                Fix the tag Linux binaries are uploaded to at the Rolling releases repo.
-              </li>
-              <li>
-                Tweak Rolling release binary upload script to reject `-dev` version strings, as it should.
-              </li>
-              <li>
                 Refrain from rendering anchor icons when showing a package's README file in `settings-view`.
               </li>
               <li>
