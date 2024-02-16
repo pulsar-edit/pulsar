@@ -16,6 +16,7 @@
 - Added new `--force` flag to `ppm link` command that will uninstall any conflicting package already installed.
 - Added language entity colors to `syntax-variables.less`.
 - Numerous Tree-Sitter Grammar syntax highlighting fixes.
+- Bumped dugite to make the github package compatible with ARM Linux.
 
 ### Pulsar
 - Fixed: fix(tree-sitter): pass node text to grammar [@claytoncarter](https://github.com/pulsar-edit/pulsar/pull/860)

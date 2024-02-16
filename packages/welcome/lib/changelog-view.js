@@ -73,6 +73,9 @@ export default class ChangeLogView {
               <li>
                 Numerous Tree-Sitter Grammar syntax highlighting fixes.
               </li>
+              <li>
+                Bumped dugite to make the github package compatible with ARM Linux.
+              </li>
             </ul>
 
             <section className="welcome-panel">
