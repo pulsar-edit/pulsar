@@ -4120,42 +4120,92 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('indentsQuery', `
         ["{"] @indent
         ["}"] @dedent
-        `);
+      `);
 
-        let emptyClassText = dedent`
-        class Example {
+      let emptyClassText = dedent`
+      class Example {
 
-        }
-        `;
+      }
+      `;
 
-        buffer.setText(emptyClassText);
+      buffer.setText(emptyClassText);
 
-        const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-        buffer.setLanguageMode(languageMode);
-        await languageMode.ready;
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
 
-        editor.setCursorBufferPosition([1, 0]);
-        editor.indent();
-        await languageMode.atTransactionEnd();
-        editor.insertText('// this is a comment', { autoIndent: true });
-        await languageMode.atTransactionEnd();
-        expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
+      editor.setCursorBufferPosition([1, 0]);
+      editor.indent();
+      await languageMode.atTransactionEnd();
+      editor.insertText('// this is a comment', { autoIndent: true });
+      await languageMode.atTransactionEnd();
+      expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(2)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(2)).toEqual('  ');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(3)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(3)).toEqual('  ');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(4)).toEqual('  ');
     });
+
+    it(`can indent properly in a multi-cursor environment without auto-indenting large ranges of the buffer`, async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      expect(editor.getUndoGroupingInterval()).toBe(300);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      // No spaces after the `{`s in these examples so that we can more easily
+      // compare expected output to actual output.
+      buffer.setText(dedent`
+        function test () {return }
+
+        function test () {return }
+
+        function test () {return }
+      `);
+
+      editor.setCursorBufferPosition([0, 18])
+      editor.addCursorAtBufferPosition([2, 18])
+      editor.addCursorAtBufferPosition([4, 18])
+
+      editor.insertNewline({
+        autoIndent: true,
+        autoIndentNewline: true,
+        autoDecreaseIndent: true
+      })
+
+      await wait(0);
+
+      expect(buffer.getText()).toBe(dedent`
+        function test () {
+          return }
+
+        function test () {
+          return }
+
+        function test () {
+          return }
+      `)
+
+    })
 
   });
 });

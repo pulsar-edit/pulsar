@@ -1270,6 +1270,7 @@ class WASMTreeSitterLanguageMode {
       if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncParsing || !this.useAsyncIndent) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
+        let lineForRow = this.buffer.lineForRow(row)
         // We can't answer this yet because we don't yet have a new syntax
         // tree. Return a promise that will fulfill once we can determine the
         // right indent level.
@@ -1278,23 +1279,31 @@ class WASMTreeSitterLanguageMode {
         // preliminary indent level and then follow up later with a more
         // accurate one. It's a bit disorienting that the editor falls back to
         // an indent level of `0` when a newline is inserted.
-        return this.atTransactionEnd().then(({ changeCount }) => {
-          if (changeCount > 1) {
-            // There were multiple changes in this transaction, so it's not
-            // safe to assume that the original row still needs its indentation
-            // adjusted. The row could've been shifted up or down by other
-            // edits, or it could've been deleted entirely.
+        return this.atTransactionEnd().then(() => {
+          if (lineForRow !== this.buffer.lineForRow(row)) {
+            // We're now revisiting this indentation question at the end of the
+            // transaction. Other changes may have taken place since we were
+            // first asked what the indent level should be for this line. So
+            // how do we know if the question is still relevant? After all, the
+            // text that was on this row earlier might be on some other row
+            // now.
             //
-            // Instead, we return `undefined` here, and the `TextEditor` will
-            // understand that its only recourse is to auto-indent the whole
-            // extent of the transaction instead.
+            // So we compare the text that was on the row when we were first
+            // called… to the text that is on the row now that the transaction
+            // is over. If they're the same, that's a _strong_ indicator that
+            // the result we return will still be relevant.
+            //
+            // If not, as is the case in this code path, we return `undefined`,
+            // signalling to the `TextEditor` that its only recourse is to
+            // auto-indent the whole extent of the transaction instead.
             return undefined;
           }
-          // Otherwise, it's safe to auto-indent this line alone, because it
-          // was the only change in this transaction. But we've retained the
-          // original values for `comparisonRow` and `comparisonRowIndent`
-          // because that's the proper basis from which to determine the given
-          // row's indent level.
+          // If we get this far, it's safe to auto-indent this line. Either it
+          // was the only change in its transaction or the other changes
+          // happened on different lines. But we've retained the original
+          // values for `comparisonRow` and `comparisonRowIndent` because
+          // that's the proper basis from which to determine the given row's
+          // indent level.
           let result = this.suggestedIndentForBufferRow(row, tabLength, {
             ...rawOptions,
             comparisonRow: comparisonRow,
@@ -1379,6 +1388,18 @@ class WASMTreeSitterLanguageMode {
           continue;
         }
         indentDelta--;
+        if (indentDelta < 0) {
+          // In the _indent_ phase, the delta won't ever go lower than `0`.
+          // This is because we assume that the previous line is correctly
+          // indented! The only function that `dedent` has for us is canceling
+          // out any `indent` and preventing false positives.
+          //
+          // So no matter how many `dedent` tokens we see on a particular line…
+          // if the _last_ token we see is an `indent` token, then it hints
+          // that the next line should be indented by one level.
+          indentDelta = 0;
+        }
+
       }
     }
 
