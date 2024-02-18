@@ -7,17 +7,17 @@ parser: 'tree-sitter-clojure'
 'fileTypes': [
   'boot'
   'clj'
+  'clje'
+  'cljr'
   'clj.hl'
   'cljc'
   'cljs'
   'cljs.hl'
   'cljx'
   'clojure'
-  'org'
-  'bb'
+  'edn'
   'joke'
   'joker'
-  'edn'
 ]
 'firstLineMatch': '''(?x)
   # Hashbang
