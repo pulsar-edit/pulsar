@@ -49,7 +49,7 @@
 [Electron]: https://github.com/electron/electron
 [Atom]: https://github.blog/2022-06-08-sunsetting-atom/
 [Discord]: https://discord.gg/7aEbB9dGRT 'Join the Pulsar Discord today!'
-[Crowdin]: https://crowdin.pulsar-edit.dev
+[Crowdin]: https://crowdin.com/project/pulsar-edit
 [Status]: https://cirrus-ci.com/github/pulsar-edit/pulsar/master
 [Codacy]: https://app.codacy.com/gh/pulsar-edit/pulsar
 [Reddit]: https://www.reddit.com/r/pulsaredit/
