@@ -1,4 +1,4 @@
-/**
+/*
  This file aims to run some short simple tests against `update.js`. Focusing
  mainly on the Regex used within `sanitizeDescription()`
 */
