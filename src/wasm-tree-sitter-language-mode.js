@@ -16,6 +16,11 @@ const FEATURE_ASYNC_PARSE = true;
 
 const LINE_LENGTH_LIMIT_FOR_HIGHLIGHTING = 10000;
 
+// How many milliseconds we can spend on synchronous re-parses (for indentation
+// purposes) in a given transaction before we fall back to asynchronous
+// indentation instead. Only comes into play when async indentation is enabled.
+const REPARSE_BUDGET_PER_TRANSACTION_MILLIS = 10
+
 const PARSE_JOB_LIMIT_MICROS = 3000;
 const PARSERS_IN_USE = new Set();
 
@@ -155,6 +160,8 @@ class WASMTreeSitterLanguageMode {
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
     this.useAsyncParsing = FEATURE_ASYNC_PARSE;
     this.useAsyncIndent = FEATURE_ASYNC_INDENT;
+    this.transactionReparseBudgetMs = REPARSE_BUDGET_PER_TRANSACTION_MILLIS;
+    this.currentTransactionReparseBudgetMs = this.transactionReparseBudgetMs;
 
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
@@ -339,6 +346,9 @@ class WASMTreeSitterLanguageMode {
         this.resolveNextTransactionPromise();
         this.transactionChangeCount = 0;
         this.autoIndentRequests = 0;
+        // Since a new transaction is starting, we can reset our reparse
+        // budget.
+        this.currentTransactionReparseBudgetMs = this.transactionReparseBudgetMs;
       }
     });
   }
@@ -1150,20 +1160,88 @@ class WASMTreeSitterLanguageMode {
     return indentLength / tabLength
   }
 
+  // In an ideal world, we would use synchronous indentation all the time. It's
+  // feature-equivalent to TextMate-style indentation.
+  //
+  // But it requires us to be able to tell the editor, at an arbitrary point in
+  // time, what the suggested indentation for a buffer row is. We might get
+  // asked this question only once in a transaction — or 100 times. We don't
+  // know ahead of time. And if we want to be able to answer the question
+  // synchronously, we must reparse the buffer synchronously _each time_.
+  //
+  // That's fine in the only-one-edit case, but unacceptable in the
+  // 100-edits-in-one-transaction case. The problem isn't the extra work; it's
+  // the extra _lag_. We don't want the editor to freeze because we're doing
+  // 100 buffer parses in a row.
+  //
+  // In order to do synchronous indentation most of the time while still
+  // guarding against this edge case, we'll
+  //
+  // * start out each transaction preferring synchronous indentation, but
+  // * switch to async indentation if our time budget is exceeded in any one
+  //   transaction.
+  //
+  shouldUseAsyncIndent() {
+    let result = true;
+    if (!this.useAsyncParsing || !this.useAsyncIndent) result = false;
+    if (this.currentTransactionReparseBudgetMs > 0) {
+      result = false;
+    }
+    return result;
+  }
+
   // Get the suggested indentation level for an existing line in the buffer.
   //
-  // * bufferRow - A {Number} indicating the buffer row
-  // * tabLength - A {Number} signifying the length of a tab, in spaces,
+  // * `bufferRow` - A {Number} indicating the buffer row.
+  // * `tabLength` - A {Number} signifying the length of a tab, in spaces,
   //   according to the current settings of the buffer.
+  // * `options` (optional) - An {Object} will the following properties,all of
+  //   which are optional:
+  // * `options.skipBlankLines`: {Boolean} indicating whether to ignore blank
+  //   lines when determining which row to use as a reference row. Default is
+  //   `true`. Irrelevant if `options.comparisonRow` is specified.
+  // * `options.skipDedentCheck`: {Boolean} indicationg whether to skip the
+  //   second phase of the check and determine only if the current row should
+  //   _start out_ indented from the reference row.
+  // * `options.preserveLeadingWhitespace`: {Boolean} indicating whether to
+  //   adjust the returned number to account for the indentation level of any
+  //   whitespace that may already be on the row. Defaults to `false`.
+  // * `options.forceTreeParse`: {Boolean} indicating whether to force this
+  //   method to synchronously parse the buffer into a tree, even if it
+  //   otherwise would not. Defaults to `false`.
+  // * `options.comparisonRow`: A {Number} specifying the row to use as a
+  //   reference row. Must be a valid row that occurs earlier in the buffer
+  //   than `row`. If omitted, this method will determine the reference row on
+  //   its own.
   //
-  // Returns a {Number}, or {null} if this method cannot make a suggestion.
+  // Will return either an immediate result or a {Promise}, depending on
+  // whether it can make a synchronous decision.
+  //
+  // When acting synchronously, this method returns a {Number}, or {null} if
+  // this method cannot make a suggestion. It will return a synchronous result
+  // if (a) the tree is clean, (b) the language mode decides it can afford to
+  // do a synchronous re-parse of the buffer, or (c) `options.forceTreeParse`
+  // is `true`. Otherwise, this method will wait until the end of the current
+  // buffer transaction.
+  //
+  // When acting asynchronously, this method may or may not be able to give an
+  // answer. If it can, it will return a {Promise} that resolves with a
+  // {Number} signifying the suggested indentation level. If it can't — because
+  // it thinks the content has been altered too much for it to make a
+  // suggestion — it will return a {Promise} that resolves with {undefined},
+  // signalling that a fallback style of indentation adjustment should take
+  // place.
+  //
   suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
+    // NOTE: This method is hundreds of lines long, but so much of that total
+    // consists of comments like this one — because this is a hard thing to
+    // intuit. This code needs lots of explanation, but that doesn't mean
+    // that the logic is impossibly complex.
     let root = this.rootLanguageLayer;
     if (row === 0) { return 0; }
     if (!root || !root.tree || !root.ready) { return null; }
 
     let options = {
-      allowMatchCapture: true,
       skipBlankLines: true,
       skipDedentCheck: false,
       preserveLeadingWhitespace: false,
@@ -1207,9 +1285,9 @@ class WASMTreeSitterLanguageMode {
         this.buffer.lineForRow(comparisonRow), tabLength);
     }
 
-    // TODO: What's the right place to measure from? Often we're here because
-    // the user just hit Enter, which means we'd run before injection layers
-    // have been re-parsed. Hence the injection's language layer might not know
+    // What's the right place to measure from? Often we're here because the
+    // user just hit Enter, which means we'd run before injection layers have
+    // been re-parsed. Hence the injection's language layer might not know
     // whether it controls the point at the cursor. So instead we look for the
     // layer that controls the point at the end of the comparison row. This may
     // not always be correct, but we'll find out.
@@ -1267,20 +1345,45 @@ class WASMTreeSitterLanguageMode {
     }
 
     if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncParsing || !this.useAsyncIndent) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.shouldUseAsyncIndent()) {
+        // If we're in this code path, it either means the tree is clean (the
+        // `get` path) or that we're willing to spend the time to do a
+        // synchronous reparse (the `parse` path). Either way, we'll be able to
+        // deliver a synchronous answer to the question.
         indentTree = controllingLayer.getOrParseTree();
       } else {
-        let lineForRow = this.buffer.lineForRow(row)
         // We can't answer this yet because we don't yet have a new syntax
-        // tree. Return a promise that will fulfill once we can determine the
-        // right indent level.
+        // tree, and are unwilling to spend time doing a synchronous re-parse.
+        // Return a promise that will fulfill once the transaction is over.
         //
         // TODO: For async, we might need an approach where we suggest a
         // preliminary indent level and then follow up later with a more
         // accurate one. It's a bit disorienting that the editor falls back to
         // an indent level of `0` when a newline is inserted.
-        return this.atTransactionEnd().then(() => {
-          if (lineForRow !== this.buffer.lineForRow(row)) {
+        let comparisonRowText = this.buffer.lineForRow(comparisonRow)
+        let rowText = this.buffer.lineForRow(row)
+        return this.atTransactionEnd().then(({ changeCount }) => {
+          let shouldFallback = false;
+          // If this was the only change in the transaction, then we can
+          // definitely adjust the indentation level after the fact. If not,
+          // then we might still be able to make indentation decisions in cases
+          // where they do not affect one another.
+          //
+          // Hence if neither the comparison row nor the current row has had
+          // its contents change in any way since we were first called, we will
+          // assume it's safe to adjust the indentation level after the fact.
+          // Otherwise we'll fall back to a single transaction-wide indentation
+          // adjustment — fewer tree parses, but more likely to produce unusual
+          // results.
+          if (changeCount > 1) {
+            if (comparisonRowText !== this.buffer.lineForRow(comparisonRow)) {
+              shouldFallback = true;
+            }
+            if (rowText !== this.buffer.lineForRow(row)) {
+              shouldFallback = true;
+            }
+          }
+          if (shouldFallback) {
             // We're now revisiting this indentation question at the end of the
             // transaction. Other changes may have taken place since we were
             // first asked what the indent level should be for this line. So
@@ -1298,6 +1401,7 @@ class WASMTreeSitterLanguageMode {
             // auto-indent the whole extent of the transaction instead.
             return undefined;
           }
+
           // If we get this far, it's safe to auto-indent this line. Either it
           // was the only change in its transaction or the other changes
           // happened on different lines. But we've retained the original
@@ -1308,7 +1412,8 @@ class WASMTreeSitterLanguageMode {
             ...rawOptions,
             comparisonRow: comparisonRow,
             comparisonRowIndent: comparisonRowIndent,
-            tree: controllingLayer.tree
+            tree: controllingLayer.tree,
+            controllingLayer
           });
           return result;
         });
@@ -1391,8 +1496,9 @@ class WASMTreeSitterLanguageMode {
         if (indentDelta < 0) {
           // In the _indent_ phase, the delta won't ever go lower than `0`.
           // This is because we assume that the previous line is correctly
-          // indented! The only function that `dedent` has for us is canceling
-          // out any `indent` and preventing false positives.
+          // indented! The only function that `dedent` serves for us in this
+          // phase is canceling out an earlier `indent` and preventing false
+          // positives.
           //
           // So no matter how many `dedent` tokens we see on a particular line…
           // if the _last_ token we see is an `indent` token, then it hints
@@ -1465,9 +1571,9 @@ class WASMTreeSitterLanguageMode {
 
       if (dedentControllingLayer && dedentControllingLayer !== controllingLayer) {
         // If this layer is different from the one we used above, then we
-        // should run this layer's indents query against its own tree. If _no_
-        // layers qualify at this position, we can still reluctantly use the
-        // original layer.
+        // should run this layer's indents query against its own tree. (If _no_
+        // layers qualify at this position, we won't hit this code path, so
+        // we'll reluctantly still use the original layer and tree.)
         indentsQuery = dedentControllingLayer.indentsQuery;
         indentTree = dedentControllingLayer.getOrParseTree();
       }
@@ -1531,7 +1637,8 @@ class WASMTreeSitterLanguageMode {
         }
 
         // Only `@dedent` or `@match` captures can change this line's
-        // indentation.
+        // indentation. We handled `@match` above, so we'll filter out all non-
+        // `@dedent`s now.
         if (name !== 'dedent') { continue; }
 
         // Only consider a given range once, even if it's marked with multiple
@@ -1541,7 +1648,6 @@ class WASMTreeSitterLanguageMode {
         positionSet.add(key);
         dedentDelta--;
       }
-
 
       // `@indent`/`@dedent` captures, no matter how many there are, can
       // dedent the current line by one level at most. To indent more than
@@ -3898,6 +4004,23 @@ class LanguageLayer {
     return ranges.some(r => r.containsPoint(point, exclusive));
   }
 
+  // Returns a syntax tree for the current buffer.
+  //
+  // By default, this method will either return the current tree (if it's up to
+  // date) or synchronously parse the buffer into a new tree (if it isn't).
+  //
+  // If you don't want to force a re-parse and don't mind that the current tree
+  // might be stale, pass `force: false` as an option.
+  //
+  // In certain circumstances, the new tree might be promoted to the canonical
+  // tree for this layer. To prevent this, pass `anonymous: false` as an option.
+  //
+  // All trees returned by this method are managed by this language layer and
+  // will be deleted when the next transaction is complete. Retaining a
+  // reference to the returned tree will not prevent this from happening. To
+  // opt into managing the life cycle of the returned tree, copy it immediately
+  // when you receive it.
+  //
   getOrParseTree({ force = true, anonymous = false } = {}) {
     if (this.tree && (!this.treeIsDirty || !force)) { return this.tree; }
 
@@ -3937,12 +4060,27 @@ class LanguageLayer {
     // probably isn't a way to “fix” this for injection layers except through
     // cutting down on off-schedule parses.
     //
+    let then = performance.now()
     let tree = this.languageMode.parse(
       this.language,
       this.tree,
       ranges,
       // { tag: `Re-parsing ${this.inspect()}` }
     );
+    let now = performance.now()
+
+    let parseTime = now - then;
+
+    // Since we can't look into the future, we don't know how many times during
+    // this transaction we'll be asked to make indentation sugestions. If we
+    // knew ahead of time, we'd be able to decide at the beginning of a
+    // transaction whether we could afford to do synchronous indentation.
+    //
+    // Instead, we do the next best thing: we start out doing synchronous
+    // indentation, then fall back to asynchronous indentation once we've
+    // exceeded our time budget. So we keep track of how long each reparse
+    // takes and subtract it from our budget.
+    this.languageMode.currentTransactionReparseBudgetMs -= parseTime;
 
     if (this.depth === 0 && !anonymous) {
       this.tree = tree;

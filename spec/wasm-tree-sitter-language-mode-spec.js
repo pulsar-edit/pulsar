@@ -3880,7 +3880,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.getText()).toEqual(emptyClassText);
     });
 
-    // This test is known to fail (and expected to fail) without async-indent enabled.
     it('auto-indents correctly if any change in a transaction wants auto-indentation', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -3904,19 +3903,45 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setText(emptyClassText);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      // Force this test to use async indent in all cases.
+      languageMode.transactionReparseBudgetMs = 0;
+      languageMode.currentTransactionReparseBudgetMs = 0;
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
 
-      editor.setCursorBufferPosition([1, 0]);
+      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+
+      editor.setCursorBufferPosition([0, 15]);
       editor.transact(() => {
-        editor.insertText('// this is a comment', { autoIndent: true });
+        // This is a transaction in which each indentation decision is
+        // contingent on the previous indentation decisions that have been
+        // made. But in async indent mode, we cannot make any indentation
+        // suggestions until the end of the transaction.
+        //
+        // Still, in some scenarios, this will be OK. We can make each of these
+        // indentation decisions in order once the transaction is done. In this
+        // case, since each edit
+        //
+        // This is an imperfect heuristic and won't produce good results in
+        // many cases, which is why we flip to async indent reluctantly and
+        // only in certain scenarios. But it's better than committing to
+        // N re-parses (where N equals the number of indentation suggestions
+        // we're asked to make during a given transaction) no matter how high
+        // N may be. And it's also better than performing no indentation at all
+        // in these cases.
         editor.insertNewline();
-        editor.insertText('// and this is another', { autoIndent: true });
+        editor.insertText('// this is a comment', { autoIndent: true, autoDecreaseIndent: true });
+        editor.insertNewline();
+        editor.insertText('// and this is another', { autoIndent: true, autoDecreaseIndent: true });
         editor.insertNewline();
       });
 
       await wait(0);
+
+      expect(
+        languageMode.suggestedIndentForBufferRows
+      ).toHaveBeenCalled();
 
       expect(editor.lineTextForBufferRow(1)).toEqual(
         `  // this is a comment`
@@ -4075,7 +4100,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         ["}"] @dedent
       `);
 
-      // let textToPaste = `// this is a comment\n  // and this is another`;
       let textToPaste = `a comment`;
       buffer.setText(textToPaste);
 
@@ -4169,6 +4193,10 @@ describe('WASMTreeSitterLanguageMode', () => {
       `);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      // Force this test to use async indent in all cases.
+      languageMode.transactionReparseBudgetMs = 0;
+      languageMode.currentTransactionReparseBudgetMs = 0;
+      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
@@ -4181,6 +4209,10 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         function test () {return }
       `);
+
+      expect(
+        languageMode.suggestedIndentForBufferRows
+      ).not.toHaveBeenCalled();
 
       editor.setCursorBufferPosition([0, 18])
       editor.addCursorAtBufferPosition([2, 18])
