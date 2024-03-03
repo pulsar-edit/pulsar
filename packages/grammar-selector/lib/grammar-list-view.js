@@ -4,6 +4,13 @@ module.exports = class GrammarListView {
   constructor() {
     this.autoDetect = { name: 'Auto Detect' };
 
+    this.configSubscription = atom.config.observe(
+      'grammar-selector.hideDuplicateTextMateGrammars',
+      (value) => {
+        this.hideDuplicateGrammars = value
+      }
+    );
+
     this.selectListView = new SelectListView({
       itemsClassList: ['mark-active'],
       items: [],
@@ -20,18 +27,23 @@ module.exports = class GrammarListView {
         const div = document.createElement('div');
         div.classList.add('pull-right');
 
-        if (isTreeSitter(grammar)) {
+        if (isTreeSitter(grammar) && !this.hideDuplicateGrammars) {
+          // When we show all grammars, even duplicates, we should add a badge
+          // to each Tree-sitter grammar to distinguish them in the list.
           const parser = document.createElement('span');
 
-          let badgeColor = 'badge-success';
-          let badgeText = 'Tree-sitter';
+          let badgeColor;
+          let badgeText = isModernTreeSitter(grammar) ? 'Modern Tree-sitter' : 'Legacy Tree-sitter';
+          let languageModeConfig = getLanguageModeConfig();
 
-          if (isLegacyTreeSitterMode()) {
+          if (languageModeConfig === 'node-tree-sitter') {
             // Color the legacy badge green to represent the user's preference.
             badgeColor = isLegacyTreeSitter(grammar) ?
               'badge-success' : 'badge-warning';
-            badgeText = isLegacyTreeSitter(grammar) ?
-              'Legacy Tree-sitter' : 'Modern Tree-sitter';
+          } else {
+            // Color the modern badge green to represent the user's preference.
+            badgeColor = isModernTreeSitter(grammar) ?
+              'badge-success' : 'badge-warning';
           }
 
           parser.classList.add(
@@ -40,10 +52,12 @@ module.exports = class GrammarListView {
             badgeColor
           );
           parser.textContent = badgeText;
-          parser.setAttribute(
-            'title',
-            '(Recommended) A faster parser with improved syntax highlighting & code navigation support.'
-          );
+          if (isModernTreeSitter(grammar)) {
+            parser.setAttribute(
+              'title',
+              '(Recommended) A faster parser with improved syntax highlighting & code navigation support.'
+            );
+          }
           div.appendChild(parser);
         }
 
@@ -99,6 +113,66 @@ module.exports = class GrammarListView {
     this.selectListView.reset();
   }
 
+  getParserPreferenceForScopeName(scopeName) {
+    let useTreeSitterParsers = atom.config.get(
+      'core.useTreeSitterParsers',
+      { scope: [scopeName] }
+    );
+    let useLegacyTreeSitter = atom.config.get(
+      'core.useLegacyTreeSitter',
+      { scope: [scopeName] }
+    );
+
+    if (!useTreeSitterParsers) {
+      return 'textmate';
+    } else if (useLegacyTreeSitter) {
+      return 'node-tree-sitter';
+    } else {
+      return 'web-tree-sitter';
+    }
+  }
+
+  getParserTypeForGrammar(grammar) {
+    switch (grammar.constructor.name) {
+      case 'WASMTreeSitterGrammar':
+        return 'web-tree-sitter';
+      case 'TreeSitterGrammar':
+        return 'node-tree-sitter';
+      default:
+        return 'textmate';
+    }
+  }
+
+  grammarShouldBeDisplayed(grammar, parserPreference) {
+    if (!this.hideDuplicateGrammars) return true;
+    return this.getParserTypeForGrammar(grammar) === parserPreference;
+  }
+
+  getAllDisplayableGrammars() {
+    let allGrammars = atom.grammars
+      .getGrammars({ includeTreeSitter: true })
+      .filter(grammar => {
+        return grammar !== atom.grammars.nullGrammar && grammar.name;
+      });
+
+    let parserPreferenceById = new Map();
+
+    let results = [];
+    for (let grammar of allGrammars) {
+      let id = grammar.scopeName;
+      let preference = parserPreferenceById.get(id);
+      if (!preference) {
+        preference = this.getParserPreferenceForScopeName(id);
+        parserPreferenceById.set(id, preference);
+      }
+      if (this.grammarShouldBeDisplayed(grammar, preference)) {
+        results.push(grammar);
+      }
+    }
+
+    return results;
+  }
+
   async toggle() {
     if (this.panel != null) {
       this.cancel();
@@ -113,31 +187,7 @@ module.exports = class GrammarListView {
         this.currentGrammar = this.autoDetect;
       }
 
-      let grammars = atom.grammars
-        .getGrammars({ includeTreeSitter: true })
-        .filter(grammar => {
-          return grammar !== atom.grammars.nullGrammar && grammar.name;
-        });
-
-      // Don't show legacy Tree-sitter grammars in the selector unless the user
-      // has opted into it.
-      if (!isLegacyTreeSitterMode()) {
-        grammars = grammars.filter(grammar => !isLegacyTreeSitter(grammar));
-      }
-
-      if (atom.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
-        // Filter out all TextMate grammars for which there is a Tree-sitter
-        // grammar with the exact same name.
-        const blacklist = new Set();
-        grammars.forEach(grammar => {
-          if (isTreeSitter(grammar)) {
-            blacklist.add(grammar.name);
-          }
-        });
-        grammars = grammars.filter(
-          grammar => isTreeSitter(grammar) || !blacklist.has(grammar.name)
-        );
-      }
+      let grammars = this.getAllDisplayableGrammars();
 
       grammars.sort((a, b) => {
         if (a.scopeName === 'text.plain') {
