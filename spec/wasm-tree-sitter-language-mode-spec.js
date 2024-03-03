@@ -3919,16 +3919,17 @@ describe('WASMTreeSitterLanguageMode', () => {
         // made. But in async indent mode, we cannot make any indentation
         // suggestions until the end of the transaction.
         //
-        // Still, in some scenarios, this will be OK. We can make each of these
-        // indentation decisions in order once the transaction is done. In this
-        // case, since each edit
+        // Still, in some scenarios, this will be OK. Either we can make each
+        // of these indentation decisions in order once the transaction is
+        // done, or we can give up and auto-indent the whole range covered by
+        // the transaction when we're done.
         //
         // This is an imperfect heuristic and won't produce good results in
         // many cases, which is why we flip to async indent reluctantly and
-        // only in certain scenarios. But it's better than committing to
-        // N re-parses (where N equals the number of indentation suggestions
-        // we're asked to make during a given transaction) no matter how high
-        // N may be. And it's also better than performing no indentation at all
+        // only in certain scenarios. But it's better than committing to N
+        // re-parses (where N equals the number of indentation suggestions
+        // we're asked to make during a given transaction) no matter how high N
+        // may be. And it's also better than performing no indentation at all
         // in these cases.
         editor.insertNewline();
         editor.insertText('// this is a comment', { autoIndent: true, autoDecreaseIndent: true });

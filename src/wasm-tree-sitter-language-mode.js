@@ -161,7 +161,7 @@ class WASMTreeSitterLanguageMode {
     this.useAsyncParsing = FEATURE_ASYNC_PARSE;
     this.useAsyncIndent = FEATURE_ASYNC_INDENT;
     this.transactionReparseBudgetMs = REPARSE_BUDGET_PER_TRANSACTION_MILLIS;
-    this.currentTransactionReparseBudgetMs = this.transactionReparseBudgetMs;
+    this.currentTransactionReparseBudgetMs = undefined;
 
     this.injectionsMarkerLayer = buffer.addMarkerLayer();
 
