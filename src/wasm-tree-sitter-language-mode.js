@@ -2388,13 +2388,21 @@ class FoldResolver {
     }
   }
 
+  // Returns `true` if there is no non-whitespace content on this position's
+  // row before this position's column.
+  positionIsNotPrecededByTextOnLine(position) {
+    let textForRow = this.buffer.lineForRow(position.row)
+    let precedingText = textForRow.substring(0, position.column)
+    return !(/\S/.test(precedingText))
+  }
+
   resolvePositionForDividedFold(capture) {
     let { name, node } = capture;
     if (name === 'fold.start') {
       return new Point(node.startPosition.row, Infinity);
     } else if (name === 'fold.end') {
       let end = node.startPosition;
-      if (end.column === 0) {
+      if (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end)) {
         // If the fold ends at the start of the line, adjust it so that it
         // actually ends at the end of the previous line. This behavior is
         // implied in the existing specs.
