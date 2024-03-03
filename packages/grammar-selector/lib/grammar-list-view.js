@@ -113,41 +113,6 @@ module.exports = class GrammarListView {
     this.selectListView.reset();
   }
 
-  getParserPreferenceForScopeName(scopeName) {
-    let useTreeSitterParsers = atom.config.get(
-      'core.useTreeSitterParsers',
-      { scope: [scopeName] }
-    );
-    let useLegacyTreeSitter = atom.config.get(
-      'core.useLegacyTreeSitter',
-      { scope: [scopeName] }
-    );
-
-    if (!useTreeSitterParsers) {
-      return 'textmate';
-    } else if (useLegacyTreeSitter) {
-      return 'node-tree-sitter';
-    } else {
-      return 'web-tree-sitter';
-    }
-  }
-
-  getParserTypeForGrammar(grammar) {
-    switch (grammar.constructor.name) {
-      case 'WASMTreeSitterGrammar':
-        return 'web-tree-sitter';
-      case 'TreeSitterGrammar':
-        return 'node-tree-sitter';
-      default:
-        return 'textmate';
-    }
-  }
-
-  grammarShouldBeDisplayed(grammar, parserPreference) {
-    if (!this.hideDuplicateGrammars) return true;
-    return this.getParserTypeForGrammar(grammar) === parserPreference;
-  }
-
   getAllDisplayableGrammars() {
     let allGrammars = atom.grammars
       .getGrammars({ includeTreeSitter: true })
@@ -155,22 +120,7 @@ module.exports = class GrammarListView {
         return grammar !== atom.grammars.nullGrammar && grammar.name;
       });
 
-    let parserPreferenceById = new Map();
-
-    let results = [];
-    for (let grammar of allGrammars) {
-      let id = grammar.scopeName;
-      let preference = parserPreferenceById.get(id);
-      if (!preference) {
-        preference = this.getParserPreferenceForScopeName(id);
-        parserPreferenceById.set(id, preference);
-      }
-      if (this.grammarShouldBeDisplayed(grammar, preference)) {
-        results.push(grammar);
-      }
-    }
-
-    return results;
+    return allGrammars;
   }
 
   async toggle() {
@@ -199,6 +149,20 @@ module.exports = class GrammarListView {
         }
         return a.name.localeCompare(b.name);
       });
+
+      if (this.hideDuplicateGrammars) {
+        let displayedGrammars = [];
+        let seenIds = new Set();
+
+        for (let grammar of grammars) {
+          if (seenIds.has(grammar.scopeName)) continue;
+          seenIds.add(grammar.scopeName);
+          displayedGrammars.push(grammar);
+        }
+
+        grammars = displayedGrammars;
+      }
+
       grammars.unshift(this.autoDetect);
       await this.selectListView.update({ items: grammars });
       this.attach();
@@ -206,15 +170,14 @@ module.exports = class GrammarListView {
   }
 };
 
+// We look up global settings here, but it's just to determine the badge
+// colors. Otherwise we should be looking up these values in a scope-specific
+// manner.
 function getLanguageModeConfig() {
   let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
   let isLegacy = atom.config.get('core.useLegacyTreeSitter');
   if (!isTreeSitterMode) return 'textmate';
-  return isLegacy ? 'node-tree-sitter' : 'wasm-tree-sitter';
-}
-
-function isLegacyTreeSitterMode() {
-  return getLanguageModeConfig() === 'node-tree-sitter';
+  return isLegacy ? 'node-tree-sitter' : 'web-tree-sitter';
 }
 
 function isTreeSitter(grammar) {
@@ -233,8 +196,29 @@ function compareGrammarType(a, b) {
   return getGrammarScore(a) - getGrammarScore(b);
 }
 
+// Given a scope name, determines the user's preferred parser type for that
+// language.
+function getParserPreferenceForScopeName(scopeName) {
+  let useTreeSitterParsers = atom.config.get(
+    'core.useTreeSitterParsers',
+    { scope: [scopeName] }
+  );
+  let useLegacyTreeSitter = atom.config.get(
+    'core.useLegacyTreeSitter',
+    { scope: [scopeName] }
+  );
+
+  if (!useTreeSitterParsers) {
+    return 'textmate';
+  } else if (useLegacyTreeSitter) {
+    return 'node-tree-sitter';
+  } else {
+    return 'web-tree-sitter';
+  }
+}
+
 function getGrammarScore(grammar) {
-  let languageParser = getLanguageModeConfig();
+  let languageParser = getParserPreferenceForScopeName(grammar.scopeName);
   if (isModernTreeSitter(grammar)) {
     return languageParser === 'node-tree-sitter' ? -1 : -2;
   }
