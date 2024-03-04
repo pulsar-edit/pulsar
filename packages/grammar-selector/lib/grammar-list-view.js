@@ -21,30 +21,20 @@ module.exports = class GrammarListView {
         if (grammar === this.currentGrammar) {
           element.classList.add('active');
         }
+        element.classList.add('grammar-item');
         element.textContent = grammarName;
         element.dataset.grammar = grammarName;
 
         const div = document.createElement('div');
         div.classList.add('pull-right');
 
-        if (isTreeSitter(grammar) && !this.hideDuplicateGrammars) {
-          // When we show all grammars, even duplicates, we should add a badge
-          // to each Tree-sitter grammar to distinguish them in the list.
+        if (!this.hideDuplicateGrammars) {
+          // When we show all grammars, we should add a badge to each grammar
+          // to distinguish them from one another in the list.
           const parser = document.createElement('span');
 
-          let badgeColor;
-          let badgeText = isModernTreeSitter(grammar) ? 'Modern Tree-sitter' : 'Legacy Tree-sitter';
-          let languageModeConfig = getLanguageModeConfig();
-
-          if (languageModeConfig === 'node-tree-sitter') {
-            // Color the legacy badge green to represent the user's preference.
-            badgeColor = isLegacyTreeSitter(grammar) ?
-              'badge-success' : 'badge-warning';
-          } else {
-            // Color the modern badge green to represent the user's preference.
-            badgeColor = isModernTreeSitter(grammar) ?
-              'badge-success' : 'badge-warning';
-          }
+          let badgeText = getBadgeTextForGrammar(grammar);
+          let badgeColor = getBadgeColorForGrammar(grammar);
 
           parser.classList.add(
             'grammar-selector-parser',
@@ -180,10 +170,6 @@ function getLanguageModeConfig() {
   return isLegacy ? 'node-tree-sitter' : 'web-tree-sitter';
 }
 
-function isTreeSitter(grammar) {
-  return isLegacyTreeSitter(grammar) || isModernTreeSitter(grammar);
-}
-
 function isModernTreeSitter(grammar) {
   return grammar.constructor.name === 'WASMTreeSitterGrammar';
 }
@@ -215,6 +201,41 @@ function getParserPreferenceForScopeName(scopeName) {
   } else {
     return 'web-tree-sitter';
   }
+}
+
+function getBadgeTextForGrammar(grammar) {
+  switch (grammar.constructor.name) {
+    case 'Grammar':
+      return 'TextMate';
+    case 'WASMTreeSitterGrammar':
+      return 'Modern Tree-sitter';
+    case 'TreeSitterGrammar':
+      return 'Legacy Tree-sitter';
+  }
+}
+
+const BADGE_COLORS_BY_LANGUAGE_MODE_CONFIG = {
+  'textmate': {
+    'Grammar': 'badge-success',
+    'TreeSitterGrammar': 'badge-info',
+    'WASMTreeSitterGrammar': 'badge-info'
+  },
+  'web-tree-sitter': {
+    'WASMTreeSitterGrammar': 'badge-success',
+    'TreeSitterGrammar': 'badge-warning',
+    'Grammar': 'badge-info'
+  },
+  'node-tree-sitter': {
+    'TreeSitterGrammar': 'badge-success',
+    'WASMTreeSitterGrammar': 'badge-warning',
+    'Grammar': 'badge-info'
+  }
+};
+
+function getBadgeColorForGrammar(grammar) {
+  let languageModeConfig = getLanguageModeConfig();
+  let classNameMap = BADGE_COLORS_BY_LANGUAGE_MODE_CONFIG[languageModeConfig];
+  return classNameMap[grammar.constructor.name];
 }
 
 function getGrammarScore(grammar) {
