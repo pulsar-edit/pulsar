@@ -166,10 +166,14 @@ module.exports = class FuzzyFinderView {
       this.moveToCaretPosition(caretPosition)
     } else if (!uri) {
       this.cancel()
-    } else if (fs.lstatSync(uri).isDirectory()) {
-      this.selectListView.update({errorMessage: 'Selected path is a directory'})
-      setTimeout(() => { this.selectListView.update({errorMessage: null}) }, 2000)
     } else {
+      try {
+        if (fs.lstatSync(uri).isDirectory()) {
+          this.selectListView.update({errorMessage: 'Selected path is a directory'})
+          setTimeout(() => { this.selectListView.update({errorMessage: null}) }, 2000)
+          return
+        }
+      } catch (e) {}
       const caretPosition = this.getCaretPosition()
       this.cancel()
       this.openURI(uri, caretPosition, openOptions)
