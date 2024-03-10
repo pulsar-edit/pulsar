@@ -103,9 +103,6 @@
 ; HANGING INDENT ON SPLIT LINES
 ; =============================
 
-; TODO: We might want to make this configurable behavior with the
-; `config` scope test.
-
 ; Any of these at the end of a line indicate the next line should be indented…
 (["||" "&&"] @indent
   (#is? test.config "language-javascript.indentation.addHangingIndentAfterLogicalOperators")

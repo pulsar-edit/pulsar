@@ -862,7 +862,7 @@
 ; use "?." to target it.
 (optional_chain) @keyword.operator.accessor.optional-chaining.js
 
-; Optional chaining is illegal…:
+; Optional chaining is illegal…
 
 ; …on the left-hand side of an assignment.
 (assignment_expression
