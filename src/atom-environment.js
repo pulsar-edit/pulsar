@@ -1769,7 +1769,36 @@ or use Pane::saveItemAs for programmatic saving.`);
           '` do not exist.';
       }
 
-      this.notifications.addWarning(message, { description });
+      let notification;
+
+      let removeMissingPaths = async () => {
+        this.applicationDelegate.setProjectRoots(this.project.getPaths());
+
+        for (const missingFolder of missingFolders) {
+          const { pathToOpen } = missingFolder;
+
+          this.notifications.addWarning(`Removed ${pathToOpen}`);
+        }
+
+        if (notification) {
+          notification.dismiss();
+        }
+      };
+
+      let skipRemove = () => {
+        if (notification) {
+          notification.dismiss();
+        }
+      }
+
+      notification = this.notifications.addWarning(message, {
+        description,
+        dismissable: true,
+        buttons: [
+          { text: 'Remove all', onDidClick: removeMissingPaths },
+          { text: 'Skip for now', onDidClick: skipRemove }
+        ]
+      });
     }
 
     ipcRenderer.send('window-command', 'window:locations-opened');

@@ -764,11 +764,28 @@ describe('AtomEnvironment', () => {
           expect(atom.workspace.getTextEditors()).toEqual([]);
           expect(atom.project.getPaths()).toEqual([existingDir]);
 
-          expect(atom.notifications.addWarning).toHaveBeenCalledWith(
-            'Unable to open project folders',
-            {
-              description: `The directories \`${nonExistent}\` and \`${existingFile}\` do not exist.`
-            }
+          expect(atom.notifications.addWarning).toHaveBeenCalled();
+          expect(
+            atom.notifications.addWarning.calls.mostRecent().args[0],
+          ).toEqual("Unable to open project folders");
+
+          expect(
+            atom.notifications.addWarning.calls.mostRecent().args[1],
+          ).toEqual(
+            jasmine.objectContaining({
+              description: `The directories \`${nonExistent}\` and \`${existingFile}\` do not exist.`,
+              dismissable: true,
+              buttons: jasmine.arrayContaining([
+                jasmine.objectContaining({
+                  text: "Remove all",
+                  onDidClick: jasmine.any(Function),
+                }),
+                jasmine.objectContaining({
+                  text: "Skip for now",
+                  onDidClick: jasmine.any(Function),
+                }),
+              ]),
+            }),
           );
         });
       });
