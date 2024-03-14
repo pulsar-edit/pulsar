@@ -5831,13 +5831,6 @@ jasmine-json@~0.0:
     underscore ">= 1.3.1"
     walkdir ">= 0.0.1"
 
-jasmine-reporters@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/jasmine-reporters/-/jasmine-reporters-1.1.0.tgz#f3350885890c9edaad12a087c62f2cc19dcf66c0"
-  integrity sha512-y0sNPC0/emtTk9eDCXp57JqOAEfBkOCSF/p+d1Zd4dv2tLdfmvAm2PtEUpI/j1Y5qYsxnoWO1M3VZ4YoZIPoTg==
-  dependencies:
-    mkdirp "~0.3.5"
-
 jasmine-reporters@>=0.2.0:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/jasmine-reporters/-/jasmine-reporters-2.5.2.tgz#b5dfa1d9c40b8020c5225e0e1e2b9953d66a4d69"
@@ -8661,7 +8654,8 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
-    pegjs "^0.10.0"
+    loophole "^1"
+    pegjs "~0.8.0"
     scoped-property-store "^0.17.0"
     season "^6.0.2"
     temp "~0.8.0"

@@ -86,7 +86,6 @@
     "image-view": "file:packages/image-view",
     "incompatible-packages": "file:packages/incompatible-packages",
     "jasmine-json": "~0.0",
-    "jasmine-reporters": "1.1.0",
     "jasmine-tagged": "^1.1.4",
     "key-path-helpers": "^0.4.0",
     "keybinding-resolver": "file:./packages/keybinding-resolver",
