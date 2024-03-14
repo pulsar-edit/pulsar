@@ -293,7 +293,9 @@
     "start": "electron --no-sandbox --enable-logging . -f",
     "dist": "node script/electron-builder.js",
     "js-docs": "jsdoc2md --files src --configure docs/.jsdoc.json > ./docs/Pulsar-API-Documentation.md",
-    "private-js-docs": "jsdoc2md --private --files src --configure docs/.jsdoc.json > ./docs/Source-Code-Documentation.md"
+    "private-js-docs": "jsdoc2md --private --files src --configure docs/.jsdoc.json > ./docs/Source-Code-Documentation.md",
+    "test:editor": "yarn test:only spec",
+    "test:only": "yarn start --test"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
