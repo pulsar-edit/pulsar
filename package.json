@@ -23,7 +23,7 @@
     "node": ">=14"
   },
   "license": "MIT",
-  "electronVersion": "28.2.2",
+  "electronVersion": "29.1.4",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
@@ -293,7 +293,7 @@
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "3.6.0",
     "@playwright/test": "1.22.2",
-    "electron": "28.2.2",
+    "electron": "29.1.4",
     "electron-builder": "23.3.1",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
@@ -305,9 +305,9 @@
     "webdriverio": "7.20.9"
   },
   "resolutions": {
-    "node-abi": "3.51.0",
+    "node-abi": "3.56.0",
     "keytar": "7.9.0",
-    "nan": "2.18.0",
+    "nan": "2.19.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
     "superstring": "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459",
     "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
